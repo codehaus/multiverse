@@ -1,0 +1,508 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head><title>Multiverse - Java based Software Transactional Memory implementation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="style.css" type="text/css"/>
+
+    <!-- start of google analytics stuff -->
+    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+        _uacct = "UA-2882464-1";
+        urchinTracker();
+    </script>
+    <!-- end of google analytics stuff -->
+</head>
+<body>
+
+<div id="main-header">
+    <div>
+        <h1 class="main-header-left">Java based Software Transactional Memory implementation</h1>
+        <hr class="hide"/>
+    </div>
+</div>
+
+<div id="header">
+    <div id="header-title">
+        <h1>Multiverse</h1>
+
+        <p>Created by <a href="mailto:alarmnummer@gmail.com">Peter Veentjer</a></p>
+    </div>
+    <!-- div id="header-logo" -->
+    <!-- a id="header-logo" href="http://www.codehaus.org">codehaus.org</a -->
+    <!-- /div -->
+    <hr class="hide"/>
+</div>
+
+<div id="content">
+    <div id="side">
+        
+        <div class="nav-title">
+            <div><h3>Menu</h3></div>
+        </div>
+        <ul class="nav">
+            
+            <li><a class="unselected" href="overview.html">Overview</a></li>
+            
+            
+            <li><a class="unselected" href="documentationoverview.html">Documentation</a></li>
+            
+            
+            <li><a class="unselected" href="faq.html">FAQ</a></li>
+            
+            
+            <li><a class="unselected" href="contact.html">Contact</a></li>
+            
+            
+            <li><a class="unselected" href="missionstatement.html">Mission Statement</a></li>
+            
+            
+            <li><a class="unselected" href="download.html">Download</a></li>
+            
+            
+            <li><a class="unselected" href="https://jira.codehaus.org/browse/MULTIVERSE">Jira</a></li>
+            
+            
+            <li><a class="unselected" href="http://docs.codehaus.org/display/MULTIVERSE/Home">Wiki</a></li>
+            
+            
+            <li><a class="unselected" href="http://pveentjer.wordpress.com">Blog</a></li>
+            
+            
+            <li><a class="unselected" href="license.html">License</a></li>
+            
+            
+        </ul>
+        <div class="nav-footer">
+            <div></div>
+        </div>
+        <hr class="hide"/>
+        
+        <div class="nav-title">
+            <div><h3>Releases</h3></div>
+        </div>
+        <ul class="nav">
+            
+            <li><a class="unselected" href="0.3.release.html">Multiverse 0.3</a></li>
+            
+            
+            <li><a class="unselected" href="0.4.release.html">Multiverse 0.4</a></li>
+            
+            
+        </ul>
+        <div class="nav-footer">
+            <div></div>
+        </div>
+        <hr class="hide"/>
+        
+    </div>
+
+    <div id="mainContent">
+        <h1>Blocking Transactions Manual</h1>
+
+<ol>
+    <li><a href="#traditional.approach">Traditional approach</a></li>
+    <li><a href="#blocking.operations.in.multiverse">Blocking transactions in Multiverse</a></li>
+    <li><a href="#the.retry.primitive">The retry primitive</a></li>
+    <li><a href="#multiple.blocking.resources">Multiple blocking resources</a></li>
+    <li><a href="#noretrypossibleexception">NoRetryPossibleException</a></li>
+    <li><a href="#the.orelse.primitive">The orelse primitive</a></li>
+    <li><a href="#blocking.readonly.transaction">Blocking readonly transactions</a></li>
+    <li><a href="#interruptible.transactions">Interruptible transactions</a></li>
+    <li><a href="#transactional.collection.framework">Transactional collections framework</a></li>
+</ol>
+
+This manual contains information about how to use blocking transactions in Multiverse.        
+
+<h2 id="traditional.approach">The traditional approach</h2>
+In traditional lock based concurrency control, blocking operations can be created by using low level
+        blocking primitives like the java.util.concurrent.locks.Condition or the waitset (every Java Object
+        has a waitset that is integrated with the intrinsic lock). But also higher blocking abstraction
+        like the Semaphore or CountDownLatches are available. This chapter contains some information to refresh your
+        memory, but you can also directly skip to the
+    <a href="#blocking.operations.in.multiverse">Blocking transactions in Multiverse</a>        
+<p/>
+If you want to create a blocking Stack using the waitset in combination with the intrinsic lock, you would get something
+        like this:
+<pre>
+    public class Stack{
+
+        private volatile Node head;
+
+        public Stack(){
+            head = null;
+        }
+
+        public boolean isEmpty(){
+            return head == null;
+        }
+
+        public E pop()throws InterruptedException{
+            synchronized(this){
+                while(head == null){
+                    await();
+                }
+
+                Node oldHead = head;
+                head = oldHead.next;
+                return oldHead.value;
+            }
+        }
+
+        public void push(Object item){
+            if(item == null){
+                throw new NullPointerException();
+            }
+
+            synchronized(this){
+                head = new Node(item,head);
+                notify();
+            }
+        }
+
+        final static class Node{
+            private final Object value;
+            private final Node next;
+
+            public Node(Object value, Node next){
+                this.value = value;
+                this.next = next;
+            }
+        }
+    }
+</pre>
+
+And using the java.util.concurrent.locks.Lock & Condition, it would look like this:
+
+<pre>
+
+import java.util.concurrent.locks.*;
+
+public class Stack{
+
+        private Lock lock = new ReentrantLock();
+        private Condition itemAvailableCondition = lock.newCondition();
+        private volatile Node head;
+
+        public Stack(){
+            head = null;
+        }
+
+        public boolean isEmpty(){
+            return head == null;
+        }
+
+        public E pop()throws InterruptedException{
+            lock.lock();
+            try{
+                while(head == null){
+                    itemAvalableCondition.await();
+                }
+                Node oldHead = head;
+                head = oldHead.next;
+                return oldHead.value;
+            }finally{
+                lock.release();
+            }
+        }
+
+        public void push(Object item){
+            if(item == null){
+                throw new NullPointerException();
+            }
+
+            lock.lock();
+            try{
+                head = new Node(item,head);
+                itemAvailableCondition.signal();
+            }finally{
+                lock.release();
+            }
+        }
+
+        final static class Node{
+            private final Object value;
+            private final Node next;
+
+            public Node(Object value, Node next){
+                this.value = value;
+                this.next = next;
+            }
+        }
+    }
+</pre>
+
+<h2 id="blocking.operations.in.multiverse">Blocking transactions in Multiverse</h2>
+With Multiverse blocking transactions are less complicated (no need to deal with locks or spurious wakeups) because
+        <b>automatically</b> all instance methods of transactional objects are able to participate in blocking
+        operations (unless the instance method is made readonly).  
+
+<h2 id="the.retry.primitive">The retry primitive</h2>
+The retry primitive is
+
+Underneath you can see a TransactionalStack POJO with TransactionalObject annotation. Each instance
+method automatically is executed an update transaction and can be used in blocking operations
+(it does automatic read tracking).
+<pre>
+
+    import org.multiverse.api.annotations.*;
+    import static org.multiverse.api.StmUtils.retry;
+
+    @TransactionalObject
+    public class TransactionalStack{
+
+        private Node head;
+
+        public Stack(){
+            head = null;
+        }
+
+        public boolean isEmpty(){
+            return head == null;
+        }
+
+        public E pop(){
+            if(head == null){
+                retry();
+            }
+
+            Node oldHead = head;
+            head = oldHead.next;
+            return oldHead.value;
+        }
+
+        public void push(Object item){
+            if(item == null){
+                throw new NullPointerException();
+            }
+            head = new Node(item,head);
+        }
+
+        final static class Node{
+            private final Object value;
+            private final Node next;
+
+            public Node(Object value, Node next){
+                this.value = value;
+                this.next = next;
+            }
+        }
+    }
+</pre>
+If you take a closer look at the pop method, you'll see that retry() is called when
+there is no item on the stack. When this method is called, the STM knows that the transaction can't make
+progress and blocks it until a write on the head is done by a different transaction.
+When this happens, the blocked transaction is notified by the STM and continues execution.
+<p/>
+
+<h2 id="multiple.blocking.resources">Multiple blocking resources</h2>
+With traditional blocking concurrency control, it is hard to wait on multiple blocking resources. For example
+if you want to pop an item from one of 2 stacks, you have a serious problem because each stack will have
+its own waitset/Condition and it is not possible to sleep on both.
+<p/>
+With STM this behavior is very easy to realize. We have already seen that a popping
+transaction that was blocked after calling the retry() method, automatically is notified when a write on the head is done.
+But by default in an update transaction, listening is done automatically on all transactional object that have reveived
+reads or writes inside that transaction.
+<p/>
+
+Take a look at the following approach for this problem:
+<pre>
+    import org.multiverse.api.annotations.*;
+
+    import static org.multiverse.api.StmUtils.retry;
+
+    @TransactionalObject
+    public class TransactionalFunkyStack{
+
+        private final TransactionalStack stack1 = new TransactionalStack();
+        private final TransactionalStack stack2 = new TransactionalStack();
+
+        public void push1(Object item){
+            stack1.push(item);
+        }
+
+        public void push2(Object item){
+            stack2.push();
+        }
+
+        public void pop(){
+            if(!stack1.isEmpty()){
+                return stack1.pop();
+            }
+
+            if(!stack2.isEmpty()){
+                return stack2.pop();
+            }
+
+            retry();
+        }
+    }
+</pre>
+Because the pop method calls the isEmpty() method of stack1 and stack2 when neither of them contain an item, both stacks
+are read and automatically tracked by the transaction of the pop() method of the TransactionalFunkyStack. When
+the retry() is executed on the end, it blocks the thread and the STM notifies the thread when an updates has
+executed on stack1 or stack2.
+<p/>
+On a lower level a RetryError is thrown by the retry() method and ends the current execution of the transaction.
+The transaction management logic (added by the instrumentation) of the pop method catches this RetryError
+and creates a Latch (a blocking structure that can be used to let threads wait until some condition occurs)
+and registers this latch to all read transactional objects that have been tracked by the transaction (this also
+includes transactional objects that are modified).
+
+<h2 id="noretrypossibleexception">NoRetryPossibleException</h2>
+If a retry() is done without any transactional objects being used inside the transaction, there is no way
+for the transaction to be notified because it isn't listening to any change. Essentially it means that the
+transaction is going to deadlock because it can't wakup.
+<p/>
+Luckily Multiverse is able to detect this problem and throws a NoRetryPossibleException when there are no tracked
+reads. In some cases some of the reads are tracked, but not all (for example a non read tracking update
+transaction). If a retry is executed with these transactions, it also leads to a NoRetryPossibleException. This
+is done to prevent listening to an arbitrary set of transactional objects and therefor create more predictable
+behavior.
+
+<h2 id="the.orelse.primitive">The orelse primitive</h2>
+With an STM it is easy to listen to multiple resources using the retry primitive. But if you look at the pop() method in
+<a href="#multiple.blocking.resources">Multiple blocking
+    resources</a>, you can see that first all structures are checked,
+and then a retry is done. But what if a retry is done in code you can't change, but you want to check out
+other branches? That is where the 'orelse' primitive is for. It makes it possible to compose blocking
+operations. The pop() method of the FunkyTransactionalStack could also have been written using the
+orelse primitive:
+
+<pre>
+        import org.multiverse.templates.OrElseTemplate;
+
+        @TransactionalObject
+        public class TransactionalFunkyStack{
+
+            ...
+
+            public Object pop(){
+                return new OrElseTemplate(){
+                    public void run(){
+                        return stack1.pop();
+                    }
+                    public void runorelse(){
+                        return stack2.pop();
+                    }
+                }.execute();
+            }
+        }
+</pre>
+By using the OrElseTemplate it is possible compose the pop transaction on stack1 and the pop transaction of
+stack2. Onfurtunately Java doesn't support Closures till Java 7, so we are stuck with this verbose
+syntax.
+<p/>
+It also is possible to nest orelse blocks, e.g.:
+<pre>
+        import org.multiverse.templates.OrElseTemplate;
+
+        @TransactionalObject
+        public class TransactionalFunkyStack{
+
+            ...
+
+            public Object pop(){
+                return new OrElseTemplate(){
+                    public void run(){
+                        return new OrElseTemplate(){
+                            public void run(){
+                                return stack1.pop();
+                            }
+                            public void runorelse(){
+                                return stack2.pop();
+                            }
+                        }.execute();
+                    }
+                    public void runorelse(){
+                        return new OrElseTemplate(){
+                            public void run(){
+                                return stack3.pop();
+                            }
+                            public void runorelse(){
+                                return stack4.pop();
+                            }
+                        }.execute();
+                    }
+                }.execute();
+            }
+        }
+</pre>
+
+<h2 id="blocking.readonly.transaction">Blocking readonly transactions</h2>
+By default, readonly transactions in Multiverse, are not able to be blocking because tracking reads, costs memory
+and cpu cycles. In most cases, when you block, you also are going to do updates, so that is why automatic read
+tracking is enabled by default on update transactions and is disabled by default on readonly transactions.
+<p/>
+But it is possible to create a blocking readonly transaction using the
+automaticReadTracking property. The following fragment shows a new method on the TransactionalStack
+where a wait can be done until the stack becomes empty.
+<pre>
+        @TransactionalMethod(readonly = true, automaticReadTracking = true)
+        public void awaitEmpty(){
+            if(head == null){
+                retry();
+            }
+        }
+</pre>
+
+<h2 id="interruptible.transactions">Interruptible transactions</h2>
+With the intrinsic lock in Java it wasn't possible to interrupt a thread once it has entered the lock.
+With the java.util.concurrent.locks.Lock this was finally solved when the JSR-166 library was added in
+Java 5. The advantage of a thread being interruptible, is that it can be interrupted by another thread (in most cases
+these are some form of management threads) and abort their operation.
+<p/>
+In Multiverse this behavior can be configured using the interruptible property in the TransactionalMethod annotation.
+Default all transactions are non interruptible, but this behavior can be customized by setting the
+interruptible property on the TransactionalMethod annotation, e.g.:
+
+<pre>
+    @TransactionalMethod(interruptible = true)
+    public E popInterruptible()implements InterruptedException{
+        if(head == null){
+            retry();
+        }
+
+        Node oldHead = head;
+        head = oldHead.next;
+        return oldHead.value;
+    }
+</pre>
+The popInterruptible will be interruptible when it blocks (so when the Stack is empty). So unlike traditional lock
+based approaches, interruptibility is not configured on the blocking resources but on the transaction.
+<p/>
+It is important that the popInterruptible method does define an Exception or InterruptedException. If this is missing,
+the Multiverse Javaagent will complain. It also is important to realize that it isn't sufficient to add
+the InterruptedException without setting the interruptible property of the TransactionalMethod annotation.
+
+<h2 id="transactional.collection.framework">Transactional collections framework</h2>
+Multiverse already provides a few blocking implementations of the Java Collections Framework. Currently the following
+collections are provided:
+<ol>
+    <li><b>TransactionalLinkedList</b> that acts as Collection, List, Queue, Deque, BlockingQueue and BlockingDeque</li>
+</ol>
+These can be used as drop in replacements. We are working on more implementations
+(the TransactionalTreeMap/TransactionalTreeSet, TransactionalHashMap/TransactionalSet and TransactionalArrayList)
+are planned.
+
+
+
+
+
+
+    </div>
+
+    <!-- end of main content -->
+
+    <div id="footer">
+        <hr class="hide"/>
+        <div id="footer-contents">Last updated: 19 December 2009
+            <br/>
+            Copyright © 2009
+        </div>
+    </div>
+</div>
+<!-- content -->
+</body>
+</html>

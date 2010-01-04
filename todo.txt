@@ -1,0 +1,388 @@
+---------------------------------------------------------------
+todo engine
+---------------------------------------------------------------
+
+- tests that use different transaction size to cause all transaction implementations to be used
+
+- test for the writeskew problem; activation enabled
+
+- test for the writeskew problem; activation disabled
+
+- better message when there are too many failures.. atm it is unclear (write conflict? lock conflict?)
+
+    - add to donor logic
+
+    - add to transaction template
+
+- check that a update transaction with writeskew enabled but without readtracking is not possible.
+
+- writeskew detection tests
+
+    - tinyupdatealphatransaction
+
+- profiler should be added to the abstract transaction config
+
+- profiler statements of the abstract transaction should be added.
+
+- locking
+
+    - transaction with only fresh objects doesnt need to increase the version, or
+    lock/unlock.
+
+- rethink about the or-else. There is no need to create a snapshot, but it can be used for nested transactions.
+
+    - FixedTrackingUpdateAlphaTransaction and support for 'orelse'
+
+     - TinyTrackingUpdateTransaction and support for orelse
+
+     - TinyTrackingReadonlyTransaction and support for orelse
+
+     - GrowingTrackingReadonlyTransaction and support for orelse
+
+- new constructed atomic object the tranlocal is not created and readonly transactions are going
+to complain about that.
+
+- BUG: constructors that don't do anything cause problems because the tranlocal isn't created
+    Perhaps always do a load when the constructor exits (since it is hard to add logic in the constructor begin)
+
+    - GrowingReadTrackingReadonlyAlphaTransaction_loadForReadTest && fresh
+
+    - GrowingNonTrackingUpdateAlphaTransaction_loadForReadTest && fresh
+
+    - GrowingTrackingUpdateAlphaTransaction_loadForReadTest && fresh
+
+    - FixedTrackingUpdateAlphaTransaction_loadForReadTest  && fresh
+
+    - TinyTrackingUpdateAlphaTransaction_loadForReadTest && fresh
+
+    - TinyNonTrackingUpdateAlphaTransaction_loadForReadTest && fresh
+
+- make sure (using bug shaker) that the registration of the listener contains no
+concurrency problem. I think it is possible that there are pending
+
+- class hierarchy of recoverableexceptions is strange (retry and transactiontoosmall are recoverable but don't
+implement this interface)
+
+- it can happen that a retry latch.wait happens even though no retry should be executed anymore
+
+- upgrade to clover
+
+- growing/schrinking of the TransactionalThreadPool is not perfect
+
+- TransactionalThreadPoolExecutor_awaitTerminationTest
+
+- TransactionalThreadPoolExecutor_constructorTest
+
+- TransactionalThreadPoolExecutor_miscTest
+
+- TransactionalThreadPoolExecutor_setCorePoolSizeTest
+
+- TransactionalThreadPoolExecutor_setMaxPoolSizeTest
+
+- TransactionalThreadPoolExecutor_stressLongTest
+
+- timeout op de transaction through annotations
+
+- debug information for the atomic object is lost somehow:
+org.multiverse.api.exceptions.ReadonlyException
+	at org.multiverse.stms.alpha.transactions.readonly.NonTrackingReadonlyAlphaTransaction.doAbortAndRegisterRetryLatch(NonTrackingReadonlyAlphaTransaction.java:166)
+	at org.multiverse.stms.AbstractTransaction.abortAndRegisterRetryLatch(AbstractTransaction.java:214)
+	at org.multiverse.transactional.primitives.TransactionalInteger.await(IntegerRef.java)
+	at org.multiverse.integrationtests.notification.PingPongLongTest$PingPongThread.doRun(PingPongLongTest.java:75)
+	at org.multiverse.TestThread.run(TestThread.java:44)
+Thread PingPongThread-1 has thrown an exception
+
+- retry policy should be configurable through annotation
+
+- logging
+
+    - logging should be re-enabled but not with a subclass
+
+    - logging configurable through annotations?
+
+- support subclassing in instrumentation
+
+    - tranlocal snapshot needs to be fixed for subclassing.
+
+- logging on transactions should be configurable
+
+- snapshot for retry doesn't reset everything; like the tasks
+
+    + implement feature
+
+    - make tests
+
+- optimizations
+
+    - use the 'delegate' method directory if one if available instead of going through the coordinator
+
+    - use the Transaction passed on the first argument instead of getting it from the threadlocal
+
+    - the tranlocal 'this' add to method, reduces the need for unwanted tranlocal retrieval
+
+- Test 'testContentOfFastAtomicObjectIsCopied' incomplete in file 'AtomicObject_clashingFieldTest.java' at line 62
+
+- Test 'equals' incomplete in file 'TransactionalLinkedList.java' at line 1117
+
+- Test 'hash' incomplete in file 'TransactionalLinkedList.java' at line 1122
+
+- Test 'assertAllMethodsAreCopied' incomplete in file 'AtomicMethod_FastAtomicObjectMixinTest.java' at line 60
+
+- Test 'test' incomplete in file 'CigaretteSmokersProblemSimplifiedTest.java' at line 51
+
+- CigaretteSmokersProblemSimplifiedTest
+
+instrumentation
+
+    - testCreateAtomicObjectInConstructor
+
+- primitive refs should also have their waiting methods checked.
+
+---------------------------------------------------------------
+todo features
+---------------------------------------------------------------
+
+- support that a field can be moved from the atomic object but to a non conflicting
+location. (Using a ref).
+
+- Exclude anotation should also work on method
+
+- inlining of transactions
+
+- when instrumentation fails, instead of continuing with the process, reinstrument the classes so that
+ they always throw an error. Remove all fields/methods?
+
+- GlobalStmInstance test
+
+- performance test with readonly and update transaction that only do reads.
+
+- todo:
+   measure avarage locking tim with and without this (late wakening).
+
+- bug shaker inbouwen
+
+- work with a debug flag the enables exception reuse generally?
+
+- ref annotation to mark a field as managed so that the instrumentation can wrap an Ref  
+
+- a transaction that only does no updates but insert instead: does this transactionneed to increase
+the clock?
+
+- history for stale objects
+
+- dynamic history length for history; start with a zero history and once there is a loadtoooldversion,
+start maintaining history. Increase the history as long as you get loadtoooldversions.
+
+- customizable contention managers
+
+- pessimistic online locking
+
+- nested transactions
+
+- SkipList
+
+- Tree
+
+- Growing Array List
+
+- via een system property aangeven welke mixin gebruikt moet worden
+
+- het inlezen van de mixin hoeft niet iedere keer te gebeuren, maar
+  kan eenmalig gedaan worden.
+
+    - problem: the classnode of the mixin is modified atm, so can't be reused. This modification
+    should be removed, or it is not possible to reuse the classnode and it needs to be read again and again
+
+- more complex cycle test with collections that have references to each other.
+
+- a selector for transactions to make non blocking transaction processing possible, using more transactions
+than threads. Just like non blocking io.
+
+- on instance level control on the length of history; if load fails because no history can be found, \
+increase the length of the history to main and retry the transaction.
+
+- for the update transaction, you don't need to do the 'isCommitted' check. Inside
+an update transaction, all tranlocals will always be updatable. Readonly transactions,
+you always need to check if an update is done. So if this could be determined what type
+ of transaction it is, the checks could be removed.
+
+- propagation support
+
+- a better way to run the tests of the stm dependant packages in the core package. Atm
+they are moved to the alpha package, so they have an stm to be tested against.
+
+- when a field access is done without a transaction, throw an error that contains the class/field
+
+- exceptions thrown in the fastmixin doen't show transaction
+
+- let the JavaAgent print the revision of subversion & the release version; this helps to locate problems.
+
+- stress test for strictlinkedblockingdeque
+
+---------------------------------------------------------------
+idea:
+---------------------------------------------------------------
+
+- tx reuse? So if an aborted or committed transaction is found and a new tx needs to start,
+could this old tx be reused? 
+
+- a tranlocal that can't be used for listening to; causes less space, but also reduces
+stress on the memory bus because of no reads need to be done on the listeners (no
+reads and no writes)/
+
+- profile: number of retries needed for a transaction to complete.
+
+- when a test fails, the report should be stored somewhere so that it won't be lost when
+clean is done.
+
+- instead of having a locked bit, the tranlocal could have access to the transaction. Once committed,
+this reference can be set to null. Can also be used for detecting if a tranlocal can in from a different
+transaction.
+
+- provide as much as possible to point to failures in the byteocode (missing
+parts for example) which class/method it was.. for debugging purposes of course
+
+- a performance test comparing the 'managed ref' approach vs the full blown multiverse approach.
+
+- a performance comparison between 'uninstrumented' code and instrumented code.
+
+- a performance comparison between profiled and unprofiled code.
+
+- statistics about number of loads that could get information from the transaction instead
+of loading from main memory. This is also needed for optimizing bytecode.
+
+- could the abort and retry mechanism be implemented more efficiently? Atm the whole transaction
+is aborted and the complete transaction needs to be re-done. A more efficient implemention could block
+and wait until a write has happened on some field and continue with the operation, just like a classic
+wait/notify.
+
+- more efficient wait/notify: for example the balancedtree and sleeping for a specific key. Atm
+all objects loaded by a transaction are a reason to wake up (cause a change happens on them). But
+what if you are only interested in a specific field... this could reduce the stress on the mechanism
+
+- door onderscheid te maken tussen attachednew en loaded, zou je eventueel nog optimalisaties kunnen doen:
+     - op nieuw objecten hoef je geen lock aan te vragen
+     - op nieuw objecten hoef je niet te valideren
+     - op nieuw objecten hoef je geen lock te releasen
+     - op nieuw objecten hoef je je niet druk te maken over retrylisteners
+
+- online pessimistic locking
+
+- bloomfilter
+
+- abort silently
+
+- ipv de cheap latch zou je ook de monitor lock van de transactie kunnen gebruiken.
+Dit scheelt nog een object creatie.
+
+- timeout tijd.. spaarrekening waar je iedere keer vanaf kunt boeken.
+
+- de timeout tijds op de locks zetten
+
+- managed ref annotation: by setting a ref, you don't force an object to an atomic object
+but a normal object using a managed ref.
+
+- shake out concurrency bugs
+
+    - insert random delays in the fastatomicobject
+
+    - insert random delays in alphaupdatetransaction
+
+    - insert random delays in alphareadonlytransaction
+
+    - rerun tests with the bug shakers on
+
+- should the locks be released when the write is done, or should the locks be released
+  when the all the writes have been done. Normally this would not be an issue, but there are
+  problems when atomic objects refer to other atomic objects that have not been written. In
+  these cases you could run into a loadexception
+
+---------------------------------------------------------------
+done
+---------------------------------------------------------------
+
+- regression test that transactional template is able to deal with blocking transactions
+
+- regrestion test that the transactional template is able to deal with growing transactions
+
+- cleanup of the TransactionalTemplate; less constructors and better behavior with ignoring threadlocal.
+
+- constructors and the transctional method annotation;perhaps create a transactional constructor
+annotation
+
+- added readonly to TransactionalConstructor.
+
+- the transactionaltemplate needs to get the same logic as the transactionlogicdonor
+
+- improved the Javadoc of the TransactionalTemplate
+
+- more cleanup of the TransactionalConstructor
+
+- improved the too many retries exception in the TransactionalConstructor
+
+- dirty checks moeten ingesteld worden
+
+- cleanup in the tranlocal/ ___writeVersion is accessed less directly and this makes the introduction
+of caching the dirty check much cheaper.
+
+- dirty stuff is in place again
+
+- alpha ref should have familyname + smart tx selectors set
+
+- regression test that the transaction template is able to deal with write conflicts
+
+- regression test that the transaction template is able to deal with read conflicts
+
+- instead of failing the fixed update transacton, let is grow
+
+- instead of failing the fixed update transaction, let it grow
+
+- dirty check testen
+
+    - growing update aplha transaction
+
+    - fixed update alpha transaction
+
+    - tiny update alpha transaction
+
+- better mechanism for increasing the size of fixedlengthtransactions
+
+- GrowingTrackingUpdateAlphaTransaction_commitTest
+
+- think about multiple stm's in the same jvm
+
+-if (readonlyTranlocal == null) {
+            throw new LoadUncommittedException(getLoadUncommittedMessage(txObject));
+        }
+    - the update transactions should throw loaducnommitted when a read is done on an uncommitted object.
+
+- transaction templates instead of transctional template.
+
+- fresh objects
+
+- register retry on update transaction should fail if it doesn't has explicit tracked reads.
+
+    -when it does no automatic read tracking
+
+- TransactionalThreadPoolExecutor_shutdownTest
+
+- TransactionalThreadPoolExecutor_executeTest
+
+- read tracking  tests in the loadForRead and loadForWrite
+
+    - growingupdatealphatransaction
+
+    - fixedupdatealphatransaction
+
+    - tinyupdatealphatransaction
+
+- add tests for the new 'template' methods of the abstract readonly and subclasses
+
+- tests for the improved schedule functionality
+
+- lifecycle
+
+    - lifecycle method of the atomictemplate need to be tested
+
+- TransactionalThreadPoolExecutor_startTest
+

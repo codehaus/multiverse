@@ -1,0 +1,59 @@
+<html>
+<body>
+
+Commute
+
+Operations can be executed in a different order, while still being valid.
+For example an unconditional increase of the salary or an increase in the size.
+
+Another example is a change in the size of a collection. If somehow an operation
+could commute, so in case of a conflict reexecuted,
+
+CommuteTask... or perhaps using annotation.
+
+<pre>
+    public void add(E item){
+        head = new Node(head, item);
+        incSize();
+    }
+
+    @Commute
+    void incSize(){
+        size++;
+    }
+</pre>
+
+<h2>Needed</h2>
+<ol>
+    <li>Maintain a history with all commute operations</li>
+    <li></li>
+</ol>
+
+When a transaction fails, it should check if the fields in that conflict are fields
+changed in a commute operation; this is part of the transaction history.
+
+The prepare using commute works like this:
+<ol>
+    <li>
+        It automatically should revert the fields that can be 'repared'. The other fields
+        should not be changed. The problem is that somehow needs to be analyzed wich fields
+        should be copied; could the orelse functionality save us somehow? So can this
+        functionality somehow in it.
+    </li>
+    >
+    <li>
+        The commute operations should all re-execute.
+    </li>
+</ol>
+
+
+There also needs to be a change/addition to the current conflict detection. Atm
+is is failfast because there is no possibility to repair, but if the repair is added
+we need to find all fields from all atomic objects that have conflicted. Based on
+this conflicting fields one can detect which commute methods need to be notified.
+
+Commute matchers;
+Can automatically all commuters be invoked?
+
+</body>
+</html>

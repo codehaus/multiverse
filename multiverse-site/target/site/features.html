@@ -1,0 +1,224 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head><title>Multiverse - Java based Software Transactional Memory implementation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="style.css" type="text/css"/>
+
+    <!-- start of google analytics stuff -->
+    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+        _uacct = "UA-2882464-1";
+        urchinTracker();
+    </script>
+    <!-- end of google analytics stuff -->
+</head>
+<body>
+
+<div id="main-header">
+    <div>
+        <h1 class="main-header-left">Java based Software Transactional Memory implementation</h1>
+        <hr class="hide"/>
+    </div>
+</div>
+
+<div id="header">
+    <div id="header-title">
+        <h1>Multiverse</h1>
+
+        <p>Founded by Peter Veentjer</p>
+    </div>
+    <!-- div id="header-logo" -->
+    <!-- a id="header-logo" href="http://www.codehaus.org">codehaus.org</a -->
+    <!-- /div -->
+    <hr class="hide"/>
+</div>
+
+<div id="content">
+    <div id="side">
+        
+        <div class="nav-title">
+            <div><h3>Menu</h3></div>
+        </div>
+        <ul class="nav">
+            
+            <li><a class="unselected" href="overview.html">Overview</a></li>
+            
+            
+            <li><a class="unselected" href="download.html">Download</a></li>
+            
+            
+            <li><a class="selected" href="features.html">Features</a></li>
+            
+            
+            <li><a class="unselected" href="missionstatement.html">Mission Statement</a></li>
+            
+            
+            <li><a class="unselected" href="nosql.html">NoSQL</a></li>
+            
+            
+            <li><a class="unselected" href="team.html">Team</a></li>
+            
+            
+            <li><a class="unselected" href="http://pveentjer.wordpress.com">Blog</a></li>
+            
+            
+            <li><a class="unselected" href="development.html">Development</a></li>
+            
+            
+            <li><a class="unselected" href="http://pveentjer.wordpress.com">Blog</a></li>
+            
+            
+            <li><a class="unselected" href="license.html">License</a></li>
+            
+            
+        </ul>
+        <div class="nav-footer">
+            <div></div>
+        </div>
+        <hr class="hide"/>
+        
+        <div class="nav-title">
+            <div><h3>Documentation</h3></div>
+        </div>
+        <ul class="nav">
+            
+            <li><a class="unselected" href="documentationoverview.html">Overview</a></li>
+            
+            
+            <li><a class="unselected" href="manual.html">Reference Manual</a></li>
+            
+            
+            <li><a class="unselected" href="https://linktojavadoc">Javadoc</a></li>
+            
+            
+        </ul>
+        <div class="nav-footer">
+            <div></div>
+        </div>
+        <hr class="hide"/>
+        
+    </div>
+
+    <div id="mainContent">
+        <h1>Features</h1>
+
+<ol>
+    <li><b>Seamless integration in Java:</b> using annotations in combination with instrumentation (so you are
+        not forced to extend classes or implement interfaces). Most transaction features can be configured through
+        the annotations. 
+    </li>
+    <li><b>Independent of Java language:</b> so it can be used in other languages running on the JVM like
+        Scala or Groovy.
+    </li>
+    <li>
+        <b>Object and field level granularity:</b> the main STM implementation, called the AlphaStm is able to
+        deal with object and field level granularity. 
+    </li>
+    <li>
+        <b>Only transactional access possible:</b> prevents having to deal with accessing transactional
+        objects without a transaction.  
+    </li>
+    <li><b>Different transaction modes:</b>
+        <ul>
+            <li><b>read tracking update transaction:</b> the work horse that is able to do writes and
+                participate in blocking transactions.
+            </li>
+            <li><b>non read tracking update transaction:</b> consumes less resources than the read tracking version,
+                but can't participate in blocking transactions or prevent write skew problems.
+            </li>
+            <li><b>read tracking readonly transaction:</b> the standard transaction implementation for readonly
+                transaction. It is perfect serialized but can't participate in blocking transactions.
+            </li>
+            <li><b>non read tracking readonly transaction:</b> consumes more resources than the non read tracking
+                version, but is able to participate in blocking transactions.
+            </li>
+        </ul>
+    </li>
+    <li>
+        <b>Transaction lifecycle listener:</b> so that compensating or deferred actions can be executed when a
+        transaction aborts or commits.
+    </li>
+    <li>
+        <b>Optional write skew prevention:</b> makes is possible to create truly serialized transactions.
+    </li>
+    <li>
+        <b>Blocking transactions:</b>
+        <ul>
+            <li><b>retry primitive:</b></li>
+            <li><b>orelse primitive:</b></li>
+            <li><b>interruptible transactions:</b></li>
+            <li><b>non blocking transactions:</b></li>
+        </ul>
+    </li>
+    <li>
+        <b>Transactional collections:</b>
+        <ul>
+            <li><b>TransactionalLinkedList:</b> general purpose linked list that can be used as BlockingQueue and
+            BlockingDeque implementation.</li>
+            <li><b>TransactionalHashMap:</b> hash based transactional ConcurrentMap implementation.</li>
+            <li><b>TransactionalHashSet:</b> hash based transactional Set implementation.</li>
+            <li><b>TransactionalTreeMap:</b> tree based transactional ConcurrentMap implementation.</li>
+            <li><b>TransactionTreeSet:</b> tree based transactional Set implementation.</li>
+        </ul>
+    </li>
+    <li>
+        <b>Transactional references and primitives</b>
+        <ul>
+            <li><b>TransactionalReference:</b> makes it possible to work with managed references. This
+            looks a lot like the approach other STM implementations take like Clojure.</li>
+            <li><b>Transactional primitive:</b> like the TransactionalInteger and TransactionalBoolean that
+                behave like transactional references but without creating a lot of small wrapper objects.
+            </li>
+        </ul>
+    </li>
+    <li>
+        <b>Templates:</b>
+        <ul>
+            <li><b>TransactionTemplate:</b> a template that can be used as an alternative to using
+            instrumentation.</li>
+            <li><b>OrElseTemplate:</b> a template that can be used to make use of the orelse primitive.
+            </li>
+        </ul>
+    </li>
+    <li>
+        <b>TransactionalThreadPoolExecutor:</b> a Transaction implementation of the
+        ThreadPoolExecutor from Java that is able to participate in transactions.
+    </li>
+    <li>
+        <b>2 Phase commit:</b> to make it possible to combine transactions executing on different
+        transactional resources, or even for combining the commit/abort atomic on different transactions
+        on the same stm.
+    </li>
+    <li>
+        <b>Learning Stm:</b> that learns by runtime transaction analysis and chooses better performing
+        or behaving transactions. 
+    </li>
+
+</ol>
+
+<h2>Planned features</h2>
+Of course there are also a lot of features in the pipeline. The most important ones are:
+<ol>
+    <li><b>Persistence:</b> for making committed transactions durable.</li>
+    <li><b>Distributed STM:</b> for making committed transactions durable.</li>
+    <li><b>Profiler:</b> to pinpoint performance or contention problems.</li>
+    <li><b>Contention management:</b> to have more control on liveness issues like livelocking and starvation.</li>
+    <li><b>More collections:</b> like ArrayLists, SkipList, Tries etc</li>
+    <li><b>Better scalability:</b> </li>
+</ol>
+    </div>
+
+    <!-- end of main content -->
+
+    <div id="footer">
+        <hr class="hide"/>
+        <div id="footer-contents">Last updated: 3 Januari 2010
+            <br/>
+            Copyright © 2010
+        </div>
+    </div>
+</div>
+<!-- content -->
+</body>
+</html>

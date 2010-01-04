@@ -1,0 +1,244 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head><title>Multiverse - Java based Software Transactional Memory implementation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="style.css" type="text/css"/>
+
+    <!-- start of google analytics stuff -->
+    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+        _uacct = "UA-2882464-1";
+        urchinTracker();
+    </script>
+    <!-- end of google analytics stuff -->
+</head>
+<body>
+
+<div id="main-header">
+    <div>
+        <h1 class="main-header-left">Java based Software Transactional Memory implementation</h1>
+        <hr class="hide"/>
+    </div>
+</div>
+
+<div id="header">
+    <div id="header-title">
+        <h1>Multiverse</h1>
+
+        <p>Founded by Peter Veentjer</p>
+    </div>
+    <!-- div id="header-logo" -->
+    <!-- a id="header-logo" href="http://www.codehaus.org">codehaus.org</a -->
+    <!-- /div -->
+    <hr class="hide"/>
+</div>
+
+<div id="content">
+    <div id="side">
+        
+        <div class="nav-title">
+            <div><h3>Menu</h3></div>
+        </div>
+        <ul class="nav">
+            
+            <li><a class="unselected" href="overview.html">Overview</a></li>
+            
+            
+            <li><a class="unselected" href="download.html">Download</a></li>
+            
+            
+            <li><a class="unselected" href="features.html">Features</a></li>
+            
+            
+            <li><a class="unselected" href="missionstatement.html">Mission Statement</a></li>
+            
+            
+            <li><a class="unselected" href="nosql.html">NoSQL</a></li>
+            
+            
+            <li><a class="unselected" href="team.html">Team</a></li>
+            
+            
+            <li><a class="unselected" href="http://pveentjer.wordpress.com">Blog</a></li>
+            
+            
+            <li><a class="unselected" href="development.html">Development</a></li>
+            
+            
+            <li><a class="unselected" href="http://pveentjer.wordpress.com">Blog</a></li>
+            
+            
+            <li><a class="unselected" href="license.html">License</a></li>
+            
+            
+        </ul>
+        <div class="nav-footer">
+            <div></div>
+        </div>
+        <hr class="hide"/>
+        
+        <div class="nav-title">
+            <div><h3>Documentation</h3></div>
+        </div>
+        <ul class="nav">
+            
+            <li><a class="unselected" href="documentationoverview.html">Overview</a></li>
+            
+            
+            <li><a class="unselected" href="manual.html">Reference Manual</a></li>
+            
+            
+            <li><a class="unselected" href="https://linktojavadoc">Javadoc</a></li>
+            
+            
+        </ul>
+        <div class="nav-footer">
+            <div></div>
+        </div>
+        <hr class="hide"/>
+        
+    </div>
+
+    <div id="mainContent">
+        <h2>Multiverse 0.4</h2>
+
+Multiverse 0.4 is not released yet and is planned for 1 Februari 2010 and will contain the following
+feature set:
+<ol>
+    <li>
+        <b>Read-tracking readonly transaction:</b> unlike a non tracking readonly transaction,
+        a tracking readonly transaction is able to participate in blocking operations because it knows
+        which transactional objects have been read and therefor which objects to listen to. A tracking
+        readonly transaction also is less subject to read-conflicts. This disadvantage of this transaction
+        is that it requires more resources than a non tracking readonly transaction. One of the ways
+        this functionality is exposed, is through the automaticReadTracking property of the TransactionalMethod
+        annotation.
+    </li>
+    <!-- link to TransactionalMethod annotation -->
+    <li>
+        <b>Non read-tracking update transaction:</b> unlike a tracking update transaction, a non tracking
+        update transaction doesn't consume more resources for reads. The disadvantage is that it can't
+        participate in blocking operations because it isn't known which reads have been executed. One of the ways
+        this functionality is exposed, is through the automaticReadTracking property of the TransactionalMethod
+        annotation.
+    </li>
+    <!-- link to TransactionalMethod annotation -->
+    <li>
+        <b>Optional interruptible transactional methods:</b> makes it possible to wakeup a Transaction when it
+        does a blocking operation like waiting an a blocking queue for an item to appear. One of the ways to
+        activate this behavior is through the interruptible property of the @TransactionalMethod annotation.
+    </li>
+    <!-- link to TransactionalMethod annotation -->
+    <li>
+        <b>Transaction level logging:</b> using java.util.Logging. This makes it possible to see
+        what is going on inside a single transaction. One of the ways to activate this behaviour is through
+        the @TransactionalMethod annotation.
+    </li>
+    <!-- link to TransactionalMethod annotation -->
+    <li>
+        <b>Optional writeskew detection:</b> in readtracking update transactions. If writeskew detection is enabled,
+        concurrent executing transaction will appear to be executing serially. If writeskew detection is not
+        enabled, the system could be subject to certain isolation problems. For more information see the
+        following <a href="http://en.wikipedia.org/wiki/Snapshot_isolation">link</a>.
+    </li>
+    <li>
+        <b>TransactionalThreadPoolExecutor:</b> a Transactional clone of the java.util.concurrent.ThreadPoolExecutor
+        where the execute methods can participate in transactions. This makes it possible that tasks are executed
+        atomically (so all of them are executed or none of them).
+    </li>
+    <!-- li>
+        <b>TransactionalNonBlockingThreadPoolExecutor:</b> an executor that can be used for non blocking transactions.
+        It can be used for example to handle thousands of transactions concurrently using only a few transactions.
+        With traditional concurrency control it is hard to move away from a thread per operation if blocking
+        operations are executed, but with transactional memory this is possible.        
+    </li -->
+    <li>
+        <b>TransactionalTreeMap and TransactionalTreeSet: </b> that provide transactional versions of a
+        tree and tree based set. They support the following interfaces:
+        <ol>
+            <li>java.util.Map</li>
+            <li>java.util.concurrent.ConcurrentMap</li>
+            <li>java.util.Set</li>
+            <li>java.util.Collection</li>
+        </ol>
+    </li>
+    <li>
+        <b>Transactional primitives</b> like the TransactionalInteger and TransactionalBoolean. Useful for having
+        transactional primitive fields that reduce creation of short lived wrappers (like the Integer or Long)
+        that cause gc stress. The following primitives have been added:
+        <ol>
+            <li>TransactionalBoolean</li>
+            <li>TransactionalByte</li>
+            <li>TransactionalCharacter</li>
+            <li>TransactionalDouble</li>
+            <li>TransactionalFloat</li>
+            <li>TransactionalInteger</li>
+            <li>TransactionalLong</li>
+            <li>TransactionalShort</li>
+        </ol>
+    <li>
+    <li>
+        <b>Self learning transactional implementation selector:</b> based on runtime observation the system is
+        able to select the transaction implementation that is optimal for a certain number of reads and or writes.
+        The system begins with an implementation transaction (all transactions belonging to a transaction
+        family to be precise) that is small and once these implementation complain that they are not big enough
+        a 'bigger' implementation is selected. The following transaction 'tastes' are created.
+        <ol>
+            <li><b>Tiny:</b> optimized for a single tracked read or update</li>
+            <li><b>Fixed: </b> optimized for transactions with a very small number of tracked reads or
+                updates.
+            </li>
+            <li><b>Growing:</b> optimized for a larger number of tracked reads or updates</li>
+        </ol>
+        This optimization is activated by default.
+        <p/>
+        Todo: a performance comparison.
+    </li>
+    <!-- li>
+        <b>2 phase commit:</b> this makes it possible to let Multiverse transactions participate in
+        distributed transactions/multiple transactional resources.
+        <p/>
+        Link to source
+    </li -->
+    <!-- li>
+        <b>Instrumentation support for TransactionalObject subclassing</b>. With the 0.3 release it is not
+        allowed for an TransactionalObject (with managed fields) to subclass from another
+        TransactionalObject (with managed fields). This limitation will be removed in the 0.4 release.
+    </li -->
+    <li>
+        <b>Easier to embed: </b> that want to embed Multiverse without relying
+        on the instrumentation.
+    </li>
+    <li>
+        <b>And a lot of performance improvements!</b> An overview of some benchmarks will be added in the near future.
+        But
+        a single threaded performance test using a tiny transaction (with only one transactional object) is able to do
+        roughly 5M update transactions/second on a single core of 2.3 Ghz Dual Core Intel Laptop. In the following
+        releases more performance improvements can be expected, but also scalability improvements (for example using
+        some form of commuting operations).
+    </li>
+</ol>
+
+<h3>Maven information for the 0.4 release</h3>
+If you want to use the 0.4 .. do the following to your pom..
+
+
+
+
+
+    </div>
+
+    <!-- end of main content -->
+
+    <div id="footer">
+        <hr class="hide"/>
+        <div id="footer-contents">Last updated: 3 Januari 2010
+            <br/>
+            Copyright © 2010
+        </div>
+    </div>
+</div>
+<!-- content -->
+</body>
+</html>

@@ -1,0 +1,98 @@
+<h1>3 Transaction Lifecycle events</h1>
+
+<ul>
+    <li><a href="#introduction">3.1 Introduction</a></li>
+    <li><a href="#compensating.tasks">3.2 Compensating tasks</a></li>
+    <li><a href="#executing.tasks.in.parallel.or.asynchronously">3.3 Transaction lifecycle listeners</a></li>
+</ul>
+
+<h2 id="introduction">3.1 Introduction</h2>
+It is possible in Multiverse to execute additional logic if a transaction aborts or commits. The following lifecycle
+events are available:
+<ol>
+    <li><b>pre commit:</b> just before committing.
+    </li>
+    <li><b>post commit:</b> just after committing.
+    </li>
+    <li><b>pre abort:</b> just before aborting, so while the transaction still is active.
+    </li>
+    <li><b>post abort:</b> just after aborting.
+    </li>
+</ol>
+At the moment there is no support for the pre en post start events because transactions always begin started. It could
+        be the started state is added if it is needed.
+<p/>
+Using a org.multiverse.api.TransactionLifecycleListener one can listen to event, an example:
+
+<pre>
+    import org.multiverse.api.*;
+
+    public class PostCommitEventListener implements TransactionLifecycleListener{
+        public  void notify(Transaction tx, TransactionLifecycleEvent event){
+            if(event == TransactionLifecycleEvent.postCommit){
+                System.out.println("Transaction was committed");
+            }
+        }
+    }
+</pre>
+
+And can be registered like this:
+
+<pre>
+    import org.multiverse.api.*;
+    import org.multiverse.transactional.annotations.*;
+    import static org.multiverse.api.ThreadLocalTransaction.*;
+
+    @TransactionalObject
+    public class Account{
+
+        private int balance;
+
+        public Account(){
+            balance = 0;
+        }
+
+        public void transfer(int amount){
+            balance+=amount;
+
+            Transaction tx = getThreadLocalTransaction();
+            tx.register(new PostCommitEventListener());
+        }
+    }
+</pre>
+
+Using the
+
+If long tasks need to be executed after committing or aborting, and these tasks should be executed in parallel, this can
+        be realized by using an executor, e.g.:
+
+There are all kinds of reasons why a transaction can fail. It could be that there is a write conflict while committing,
+        read conflict while using the transaction, or when blocking transactions are used and a transaction does a
+        retry. It could also be that for optimization purposes the STM experiments with different transaction settings
+        to achieve a better performing or behaving result.
+
+There is no functionality for a transaction to repair itself one it starts to abort.. once the aborting process
+        is initiated, there is no way of stopping it.
+
+<h2 id="compensating.tasks">3.2 Compensating tasks</h2>
+
+<h2 id="executing.tasks.in.parallel.or.asynchronously">3.3 Executing tasks in parallel or asynchronously</h2>
+
+If there are long running tasks that need to be executed in parallel,
+
+<pre>
+    import org.multiverse.api.*;
+
+    ...
+
+    private Executor executor = ...
+
+    class LongTaskEventListener extends TransactionLifecycleListener{
+        public  void notify(Transaction tx, TransactionLifecycleEvent event){
+            if(event == TransactionLifecycleEvent.postCommit){
+                LongTask longTask = new SomeLongTask();
+                executor.execute(longTask);
+            }
+        }
+    }
+</pre>

@@ -1,0 +1,192 @@
+package org.multiverse.stms.alpha.transactions.update;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.LoadLockedException;
+import org.multiverse.api.exceptions.LoadTooOldVersionException;
+import org.multiverse.stms.alpha.AlphaStm;
+import org.multiverse.stms.alpha.AlphaStmConfig;
+import org.multiverse.stms.alpha.AlphaTranlocal;
+import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
+import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
+import org.multiverse.stms.alpha.transactions.AlphaTransaction;
+import org.multiverse.stms.alpha.transactions.OptimalSize;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.multiverse.TestUtils.*;
+
+public class TinyUpdateAlphaTransaction_openForReadTest {
+
+    private AlphaStm stm;
+    private AlphaStmConfig stmConfig;
+    private OptimalSize optimalSize;
+
+    @Before
+    public void setUp() {
+        stmConfig = AlphaStmConfig.createDebugConfig();
+        stm = new AlphaStm(stmConfig);
+        optimalSize = new OptimalSize(1);
+    }
+
+    public TinyUpdateAlphaTransaction startSutTransaction() {
+        TinyUpdateAlphaTransaction.Config config = new TinyUpdateAlphaTransaction.Config(
+                stmConfig.clock,
+                stmConfig.restartBackoffPolicy,
+                null,
+                stmConfig.profiler,
+                stmConfig.maxRetryCount,
+                stmConfig.commitLockPolicy, true, optimalSize, true, true, true, true);
+        return new TinyUpdateAlphaTransaction(config);
+    }
+
+    public TinyUpdateAlphaTransaction startSutTransactionWithoutAutomaticReadTracking() {
+        TinyUpdateAlphaTransaction.Config config = new TinyUpdateAlphaTransaction.Config(
+                stmConfig.clock,
+                stmConfig.restartBackoffPolicy,
+                null,
+                stmConfig.profiler,
+                stmConfig.maxRetryCount,
+                stmConfig.commitLockPolicy, true, optimalSize, true, true, true, false);
+        return new TinyUpdateAlphaTransaction(config);
+    }
+
+    @Test
+    public void whenAutomaticReadTrackingDisabled_openForReadIsNotTracked() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction tx = startSutTransactionWithoutAutomaticReadTracking();
+        tx.openForRead(ref);
+
+        assertNull(getField(tx,"attached"));
+    }
+
+    @Test
+    public void whenTxObjectNull_thenNullReturned() {
+        AlphaTransaction tx = startSutTransaction();
+
+        AlphaTranlocal tranlocal = tx.openForRead(null);
+
+        assertNull(tranlocal);
+        assertIsActive(tx);
+    }
+
+    @Test
+    public void whenNotCommittedBefore_thenFreshTranlocalReturned() {
+        ManualRef ref = ManualRef.createUncommitted();
+
+        AlphaTransaction tx = startSutTransaction();
+        AlphaTranlocal found = tx.openForRead(ref);
+
+        assertNotNull(found);
+        assertSame(ref, found.getTransactionalObject());
+        assertTrue(found.isUncommitted());
+    }
+
+    @Test
+    public void whenLocked_thenLoadLockedException() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction lockOwner = mock(AlphaTransaction.class);
+        ref.___tryLock(lockOwner);
+
+        long version = stm.getVersion();
+        AlphaTransaction tx = startSutTransaction();
+        try {
+            tx.openForRead(ref);
+            fail();
+        } catch (LoadLockedException expected) {
+        }
+
+        assertIsActive(tx);
+        assertEquals(version, stm.getVersion());
+    }
+
+    @Test
+    public void whenOlderVersionExists_thenOlderVersionReturned() {
+        ManualRef ref = new ManualRef(stm);
+        AlphaTranlocal committed = ref.___load();
+        stmConfig.clock.tick();
+        AlphaTransaction tx = startSutTransaction();
+
+        ManualRefTranlocal found = (ManualRefTranlocal) tx.openForRead(ref);
+        assertSame(committed, found);
+        assertSame(committed, getField(tx, "attached"));
+    }
+
+    @Test
+    public void whenVersionMatch() {
+        ManualRef ref = new ManualRef(stm);
+        ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
+        long version = stm.getVersion();
+        AlphaTransaction tx = startSutTransaction();
+
+        ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForRead(ref);
+
+        assertSame(committed, tranlocal);
+        assertSame(committed, getField(tx, "attached"));
+        assertIsActive(tx);
+        assertEquals(version, stm.getVersion());
+    }
+
+    @Test
+    public void whenVersionTooNew_thenLoadTooOldVersionException() {
+        ManualRef ref = new ManualRef(stm);
+        AlphaTransaction tx = startSutTransaction();
+        //the 'conflicting' update
+        ref.inc(stm);
+
+        try {
+            tx.openForWrite(ref);
+            fail();
+        } catch (LoadTooOldVersionException expected) {
+        }
+
+        assertIsActive(tx);
+        assertNull(getField(tx, "attached"));
+    }
+
+    @Test
+    public void whenOpenForReadWhenAlreadyOpenedForWrite_thenSameTranlocalReturned() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction tx = startSutTransaction();
+        AlphaTranlocal tranlocal = tx.openForWrite(ref);
+        AlphaTranlocal found = tx.openForRead(ref);
+
+        assertSame(tranlocal, found);
+    }
+
+    @Test
+    public void whenCommitted_thenCallFails() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction tx = startSutTransaction();
+        tx.commit();
+
+        try {
+            tx.openForRead(ref);
+            fail();
+        } catch (DeadTransactionException ex) {
+        }
+
+        assertIsCommitted(tx);
+    }
+
+    @Test
+    public void whenAborted_thenCallFails() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction tx = startSutTransaction();
+        tx.abort();
+
+        try {
+            tx.openForRead(ref);
+            fail();
+        } catch (DeadTransactionException ex) {
+        }
+
+        assertIsAborted(tx);
+    }
+}

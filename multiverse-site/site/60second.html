@@ -1,0 +1,82 @@
+<h1>60 Second guide to Multiverse</h1>
+
+Multiverse is a Software Transansactional Memory implementation and meant as an alternative to traditional lock
+based concurrency. If you have worked with databases before, Transactional Memory should feel familiar because
+both share 1 very important concept; transactions.
+<p/>
+In Multiverse a normal Pojo can be made transactional by adding the TransactionalObject annotation, e.g.:
+<pre>
+
+    import org.multiverse.transactional.annotations.TransactionalObject;
+
+    @TransactionalObject
+    public class Account{
+
+        private Date lastUpdate;
+        private int balance;
+
+        public Account(int balance){
+            setBalance(balance);
+        }
+
+        public int getBalance(){
+            return balance;
+        }
+
+        public void setBalance(int newBalance){
+            lastUpdate = new Date();
+    
+            if(newBalance &lt; 0){
+                throw new IllegalStateException("negative balance not allowed");
+            }
+            balance = newBalance;
+        }
+
+        public int getLastUpdate(){
+            return lastUpdate;
+        }
+    }
+</pre>
+All <b>instance</b> methods of this Account class will now be transactional and give you the following features:
+<ol>
+    <li><b>failure atomicity:</b> all writes will commit or none will commit. For an example check the
+        setBalance method where the lastUpdate is set even though the call could fail.
+    </li>
+    <li><b>isolation: </b> all reads and writes are thread-safe and are isolated from
+        other transactions. A transaction automatically gets a near-serializable isolation level.
+    </li>
+    <li><b>no deadlocks:</b> between transactions because deadlocks are prevented by the STM.
+</ol>
+Another big advantage is that the methods have become composable, so you can combine methods while keeping the
+transactional properties. This is very hard to realize with a traditional lock based approach. Composing can be
+done by creating a new instance method on a transactional object that calls the composing operations, or
+by adding a TransactionalMethod annotation around a normal method or around a static method of a transactional
+object, e.g.:
+
+<pre>
+    import org.multiverse.transactional.annotations.TransactionalMethod;
+    import org.multiverse.transactional.annotations.TransactionalObject;
+
+    @TransactionalObject
+    public class Account{
+
+        ...
+
+        @TransactionalMethod
+        public static void transfer(Account from, Account to, int amount){
+            from.setBalance(from.getBalance()-amount);
+            to.setBalance(to.getBalance()+amount);
+        }
+    }
+</pre>
+Money can safely be transfered from one acount to another using the transfer method; so no race problems, partial
+writes or deadlocks are possible.
+<p/>
+These examples only scratchs the surface of Multiverse, but just having transactional methods can be
+a very big step forward in a lot of cases. For more advanced features and indepth documention, the
+<a href="manual.html">manual</a> or te <a href="documentationoverview.html">Documentation overview</a> 
+        are the best places to get started.
+                                          
+<h3>Footnote</h3>
+To make this transactional behavior possible, you need to set up the Multiverse Java agent. For more information check
+the <a href="setup-javaagent.html">Javaagent setup page</a>.

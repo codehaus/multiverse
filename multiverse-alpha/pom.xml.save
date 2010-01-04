@@ -1,0 +1,169 @@
+comp<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>multiverse-alpha</artifactId>
+    <name>Alpha Multiverse STM engine</name>
+    <description>
+        Contains the main Multiverse STM Implementation: the Alpha Engine. The Alpha engine supports
+        readonly and update transactions. It also supports the retry/or else mechanism.
+    </description>
+    <packaging>jar</packaging>
+
+    <parent>
+        <artifactId>multiverse</artifactId>
+        <groupId>org.multiverse</groupId>
+        <version>0.4-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <build>
+        <plugins>
+            <!-- A plugin that creates alphaagent.jar so that the unit tests can be executed using the agent.
+              This is done by creating a alphaagent.jar using the JAR plugin during the generate-test-resources phase. -->
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-javaagent</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>${multiverse.agentname}</finalName>
+                            <archive>
+                                <manifestEntries>
+                                    <Premain-Class>${multiverse.agentclass}</Premain-Class>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>clean</goal>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-javaagent:${project.build.directory}/${multiverse.agentname}.jar</argLine>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>failsafe-maven-plugin</artifactId>
+                <configuration>
+                    <argLine>-javaagent:${project.build.directory}/${multiverse.agentname}.jar</argLine>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2-beta-2</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <archive>
+                                <manifestEntries>
+                                    <Premain-Class>${multiverse.agentclass}</Premain-Class>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" />
+                                <jarjar destfile="${build.directory}/${build.finalName}-jar-with-dependencies.jar" update="true">
+                                    <!-- Replace "org.objectweb.asm.x.y.." with "org.multiverse.repackaged.org.objectweb.asm.x.y..".
+                                      See http://code.google.com/p/jarjar/wiki/CommandLineDocs for more informtion on jarjar rules. -->
+                                    <rule pattern="org.objectweb.asm.**" result="${groupId}.repackaged.@0"/>
+                                </jarjar>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.tonicsystems.jarjar</groupId>
+                        <artifactId>jarjar</artifactId>
+                        <version>1.0-rc8</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+
+    <properties>
+      <multiverse.agentname>alphaagent</multiverse.agentname>
+      <multiverse.agentclass>org.multiverse.stms.alpha.instrumentation.MultiverseJavaAgent</multiverse.agentclass>
+    </properties>
+
+    <dependencies>
+        <!-- Multiverse dependencies -->
+        <dependency>
+            <groupId>org.multiverse</groupId>
+            <artifactId>multiverse-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- we also want access to the jar containing the test code from the multiverse-core project -->
+        <dependency>
+            <groupId>org.multiverse</groupId>
+            <artifactId>multiverse-core</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- ASM dependencies -->
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-tree</artifactId>
+            <version>3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-commons</artifactId>
+            <version>3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-util</artifactId>
+            <version>3.2</version>
+        </dependency>
+    </dependencies>
+
+</project>

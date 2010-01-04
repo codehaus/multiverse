@@ -1,0 +1,52 @@
+<h1>4. Transactional references and primitives</h1>
+
+<ul>
+    <li><a href="#introduction">4.1 Transactional references</a></li>
+    <li><a href="#blocking.transactions">4.2 Composing operations</a></li>
+    <li><a href="#blocking.transactions">4.3 Blocking transactions</a></li>
+    <li><a href="#transactional.primitives">4.4 Transactional primitives</a></li>
+    <li><a href="#transactionalreference.and.jmm">4.5 Transactional references and the Java Memory Model</a></li>
+</ul>
+
+<h2 id="introduction">4.1 Introduction</h2>
+A transactional reference is a reference to an object that is transansactional, so is:
+<ol>
+    <li><b>atomic:</b> changes on a transactional reference will all be written or none will be written.</li>
+    <li><b>isolated:</b> it will not see changes made by other transactions concurrently executing</li>
+    <li><b>deadlock free:</b> no worries about deadlocks.</li>
+</ol>
+If no other transactional resources are used in a transaction, the java.util.concurrent.atomic.AtomicReference
+        probably be a better solution.
+
+In org.multiverse.transactional.references package, multiple transactional
+
+<pre>
+    import org.multiverse.transactional.references.*;
+
+    public class Person{
+        private final TransactionalReference&lt;String&gt; name = new TransactionalReference&lt;String&gt;();
+
+        public String getName(){
+            return name.get();
+        }
+
+        public void setName(String newName){
+            name.set(newName);
+        }
+    }
+</pre>
+
+In this example I don't make use of the @TransactionalObject annotation; because it would have been a cleaner
+        alternative than the verbose TransactionalReference approach. This is done for explanation purposes.
+
+<h2 id="composing.operations">4.2 Composing operations</h2>
+        Although
+
+<h2 id="blocking.transactions">4.3 Blocking transactions</h2>
+
+<h2 id="transactionalreference.and.jmm">4.4 Transactional references and the JMM</h2>
+Transactional references safely can be used by multiple threads because they always ensure a 'happens before' relation
+        between a transaction.commit and a transaction.start. For more information see chapter 5:
+<a href="manual-jmm.html">Multiverse and the Java Memory Model</a>.
+
+<h2 id="transactional.primitives">4.5 Transactional primitives</h2>

@@ -1,0 +1,14 @@
+<projectDescription>
+  <name>multiverse-benchy</name>
+  <comment>Benchy the Benchmark framework is an application that can be used to execute benchmarks. It doesn&apos;t
+        contain any Benchmarks itself (it isn&apos;t related to multiverse in principle).</comment>
+  <projects/>
+  <buildSpec>
+    <buildCommand>
+      <name>org.eclipse.jdt.core.javabuilder</name>
+    </buildCommand>
+  </buildSpec>
+  <natures>
+    <nature>org.eclipse.jdt.core.javanature</nature>
+  </natures>
+</projectDescription>

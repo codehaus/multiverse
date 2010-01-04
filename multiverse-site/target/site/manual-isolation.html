@@ -1,0 +1,214 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head><title>Multiverse - Java based Software Transactional Memory implementation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="style.css" type="text/css"/>
+
+    <!-- start of google analytics stuff -->
+    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+        _uacct = "UA-2882464-1";
+        urchinTracker();
+    </script>
+    <!-- end of google analytics stuff -->
+</head>
+<body>
+
+<div id="main-header">
+    <div>
+        <h1 class="main-header-left">Java based Software Transactional Memory implementation</h1>
+        <hr class="hide"/>
+    </div>
+</div>
+
+<div id="header">
+    <div id="header-title">
+        <h1>Multiverse</h1>
+
+        <p>Founded by Peter Veentjer</p>
+    </div>
+    <!-- div id="header-logo" -->
+    <!-- a id="header-logo" href="http://www.codehaus.org">codehaus.org</a -->
+    <!-- /div -->
+    <hr class="hide"/>
+</div>
+
+<div id="content">
+    <div id="side">
+        
+        <div class="nav-title">
+            <div><h3>Menu</h3></div>
+        </div>
+        <ul class="nav">
+            
+            <li><a class="unselected" href="overview.html">Overview</a></li>
+            
+            
+            <li><a class="unselected" href="download.html">Download</a></li>
+            
+            
+            <li><a class="unselected" href="features.html">Features</a></li>
+            
+            
+            <li><a class="unselected" href="missionstatement.html">Mission Statement</a></li>
+            
+            
+            <li><a class="unselected" href="nosql.html">NoSQL</a></li>
+            
+            
+            <li><a class="unselected" href="team.html">Team</a></li>
+            
+            
+            <li><a class="unselected" href="http://pveentjer.wordpress.com">Blog</a></li>
+            
+            
+            <li><a class="unselected" href="development.html">Development</a></li>
+            
+            
+            <li><a class="unselected" href="http://pveentjer.wordpress.com">Blog</a></li>
+            
+            
+            <li><a class="unselected" href="license.html">License</a></li>
+            
+            
+        </ul>
+        <div class="nav-footer">
+            <div></div>
+        </div>
+        <hr class="hide"/>
+        
+        <div class="nav-title">
+            <div><h3>Documentation</h3></div>
+        </div>
+        <ul class="nav">
+            
+            <li><a class="unselected" href="documentationoverview.html">Overview</a></li>
+            
+            
+            <li><a class="unselected" href="manual.html">Reference Manual</a></li>
+            
+            
+            <li><a class="unselected" href="https://linktojavadoc">Javadoc</a></li>
+            
+            
+        </ul>
+        <div class="nav-footer">
+            <div></div>
+        </div>
+        <hr class="hide"/>
+        
+    </div>
+
+    <div id="mainContent">
+        <h1>8 Transaction isolation</h1>
+
+<ul>
+    <li><a href="#introduction">8.1 Introduction</a></li>
+    <li><a href="#databases.and.isolation.levels">8.2 Databases and isolation levels</a></li>
+    <li><a href="#read.conflicts">8.3 Introduction</a></li>
+    <li><a href="#read.conflicts">8.4 Introduction</a></li>
+    <li><a href="#readonly.transactions">8.5 Readonly transactions</a></li>
+    <li><a href="#preventing.writeskew">8.6 Preventing write skew</a></li>
+</ul>
+
+<h2 id="introduction">8.1 Introduction</h2>
+Multiverse provides out of the box a near serialized isolation level, meaning that the transactions executing in
+the stm appears to be behaving as executing serialized. If transactions doesn't share state, nothing needs to be
+said about the ordering (the ordering is partial).
+<p/>
+
+<h2 id="databases.and.isolation.levels">8.2 Databases and isolation levels</h2>
+In traditional databases, isolation normally is defined by setting the correct isolation level on
+the transaction. The isolation describes which problems are and which allowed. It is up to the database
+to make sure that doesn't allow more problems than specified (ofcourse it is allowed to cause less
+problems than specified).
+
+The following isolation levels are the standard for databases:
+<ol>
+    <li><b>serialized:</b> you are not allowed to observe any isolation problems.</li>
+    <li><b>repeatable-read:</b> you are allowed see a chance caused by the insert or removal of databases records,
+        for example the count of set of persons could change during execution of a transaction, because a person
+        was inserted or removed by a different transaction.
+    </li>
+    <li><b>read-committed:</b> you are allowed to see problems allowed under the repeatable read state, but you
+        are not allowed to see uncommitted state.
+    </li>
+    <li><b>dirty-read:</b> you are allowed to see the see problems allowed under the read-committed isolation level
+        and you are able to see uncommitted state. In most cases dirty-reads are not a good thing and MVCC databases
+        don't even support it.
+    </li>
+
+</ol>
+Multiverse provides automatically the same isolation level Multi Version Concurrency Control databases like
+Oracle, Postgresql and MySQL with Innodb. Lower isolation levels read-dirty, read-committed and repeatable-read
+are not supported by the main STM implementation in Multiverse (called the AlphaStm).
+<p/>
+MVCC also provide the isolation level 'readonly', that provides the same guarantees as serialized (real serialized even)
+without being able to do writes. This is exactly the same behavior you get when you set the readonly property of the
+TransactionalObject to true.
+<p/>
+Having such an high isolation out of the box is great if you don't want to deal with race problems, but it
+could reduce performance (and this means that transactions need to be retried more often). In the future
+we are going to provide mechanisms for overcoming these problems. Mechanisms like transactional boosting to
+reduce the number of write conficts if operations can commute (for operations that can commute). Or some form
+of stripe of slots that can provide hints about a slot being free or filled without causing a write-conflict
+if some form of invisible read is done. Each STM instance could provide a factory for creating stripes so that
+every STM implementation can implement its own.
+
+<h2 id="read.conflicts">8.3 Readconflicts </h2>
+
+
+<h2 id="write.conflicts">8.4 Writeconflicts </h2>
+
+In Oracle this problem is known under ORA-08177 (link to blog).
+
+<h2 id="readonly.transactions">8.5 Readonly transactions</h2>
+
+<h2 id="preventing.writeskew">8.6 Preventing write skew</h2>
+With Multiverse protection against writeskew...
+it is not detection.. because that would be to weak..
+
+In MVCC databases like Oracle it isn't possible to get prevention against writeskewing as direct feature. So this
+means that there are certain cenario's that an MVCC database allow for concurrent executions that violates
+with any serialized execution of transactions.
+
+<h2 id="Partial ordering and the clock">Version and ordering</h2>
+Multiverse is based on the TL2 design made by David Dice (....) and can be found here. TL2 implementations
+centrally have a single shared components; clock (could be based on an AtomicLock). Based on this clock the
+transaction is able to figure out of it does anything illegal while doing read or writes.
+<p/>
+The ordering of transactions is partial, only when there is shared state anything can be said about the order
+or transactions committing. So this means that nothing needs to be set about transactions executing concurrently
+        if they don't share state. On a lower level it could mean that a transaction is interleaves after
+        it increased the clock but before it actually commits. If that transaction has the chance to
+        finishes sooner, it received a higher version of the clock it increased but does the actual
+        writes before the first transaction begins doing the writes.
+<p/>        
+This can can be hard stuff to swallow, but from a practical point of view it means that a version assigned to
+        tranlocals <b>can't</b>> be used as absolute indicate of the order the commits were done.
+        So be careful what that.
+
+<h3>Clock as scalability bottleneck</h3>>
+The clock needed for TL2 implementation causes contention on the memory bus, even between transactions (especially
+between update transactions) that don't share any state, so eventually it will become a bottleneck. Removing the
+clock will get a high attention in the future when are going to scale up to more and more cores. But on my dual
+        cpu xeon systems (8 real processors in total, or 16 virtual ones with hyperthreading enabled) I'm able to
+        do 15M updates on the clock a second. So in theory that would mean the same amount of update transactions and
+        even a higher amount of readonly transactions a second. 
+
+    </div>
+
+    <!-- end of main content -->
+
+    <div id="footer">
+        <hr class="hide"/>
+        <div id="footer-contents">Last updated: 3 Januari 2010
+            <br/>
+            Copyright © 2010
+        </div>
+    </div>
+</div>
+<!-- content -->
+</body>
+</html>

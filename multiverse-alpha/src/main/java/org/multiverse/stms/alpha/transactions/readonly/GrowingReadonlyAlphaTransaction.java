@@ -1,0 +1,98 @@
+package org.multiverse.stms.alpha.transactions.readonly;
+
+import org.multiverse.api.Latch;
+import org.multiverse.api.TransactionFactory;
+import org.multiverse.stms.AbstractTransactionConfig;
+import org.multiverse.stms.alpha.AlphaTranlocal;
+import org.multiverse.stms.alpha.AlphaTransactionalObject;
+import org.multiverse.stms.alpha.transactions.AlphaTransaction;
+import org.multiverse.utils.clock.Clock;
+import org.multiverse.utils.profiling.ProfileRepository;
+import org.multiverse.utils.restartbackoff.RestartBackoffPolicy;
+
+import java.util.IdentityHashMap;
+import java.util.Map;
+
+import static java.lang.String.format;
+
+/**
+ * A readonly {@link org.multiverse.stms.alpha.transactions.AlphaTransaction} that does do read tracking. The advantage
+ * is that once an transactionalobject has been opened, you wont get load errors. Another advantage is that is
+ * can participate in retries. A disadvantage is that it it costs extra memory (because of the reads that need to
+ * be tracked).
+ *
+ * @author Peter Veentjer
+ */
+public class GrowingReadonlyAlphaTransaction
+        extends AbstractReadonlyAlphaTransaction<GrowingReadonlyAlphaTransaction.Config> {
+
+    public static class Config extends AbstractTransactionConfig {
+
+        public final ProfileRepository profiler;
+
+        public Config(Clock clock, RestartBackoffPolicy restartBackoffPolicy,
+                      String familyName, ProfileRepository profiler, int maxRetryCount, boolean interruptible) {
+            super(clock, restartBackoffPolicy, familyName, true, maxRetryCount, interruptible, true,true);
+            this.profiler = profiler;
+        }
+    }
+
+    public static class Factory implements TransactionFactory<AlphaTransaction> {
+
+        public final Config config;
+
+        public Factory(Config config) {
+            this.config = config;
+        }
+
+        @Override
+        public AlphaTransaction start() {
+            return new GrowingReadonlyAlphaTransaction(config);
+        }
+    }
+
+    private final Map<AlphaTransactionalObject, AlphaTranlocal>
+            attachedMap = new IdentityHashMap<AlphaTransactionalObject, AlphaTranlocal>();
+
+    public GrowingReadonlyAlphaTransaction(Config config) {
+        super(config);
+
+        init();
+    }
+
+    @Override
+    protected void doClear() {
+        attachedMap.clear();
+    }
+
+    @Override
+    protected AlphaTranlocal findAttached(AlphaTransactionalObject txObject) {
+        return attachedMap.get(txObject);
+    }
+
+    @Override
+    protected void attach(AlphaTranlocal tranlocal) {
+        attachedMap.put(tranlocal.getTransactionalObject(), tranlocal);
+    }
+
+    @Override
+    protected boolean doRegisterRetryLatch(Latch latch, long wakeupVersion) {
+        boolean trackedReads = false;
+
+        for (AlphaTransactionalObject txObject : attachedMap.keySet()) {
+            switch (txObject.___registerRetryListener(latch,wakeupVersion)){
+                case opened:
+                    return true;
+                case registered:
+                    trackedReads = true;
+                    break;
+                case noregistration:
+                    break;
+                default:
+                    throw new IllegalStateException();
+            }
+        }
+
+        return trackedReads;
+    }
+}

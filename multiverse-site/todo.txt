@@ -1,0 +1,11 @@
+todo
+
+- the news in the main page doesn't look good
+
+- the refmanual for 0.4 needs to be written
+
+- reference to the javadoc need to be placed
+
+- recommended literature
+
+done

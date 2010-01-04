@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head><title>Multiverse - Java based Software Transactional Memory implementation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="style.css" type="text/css"/>
+
+    <!-- start of google analytics stuff -->
+    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+        _uacct = "UA-2882464-1";
+        urchinTracker();
+    </script>
+    <!-- end of google analytics stuff -->
+</head>
+<body>
+
+<div id="main-header">
+    <div>
+        <h1 class="main-header-left">Java based Software Transactional Memory implementation</h1>
+        <hr class="hide"/>
+    </div>
+</div>
+
+<div id="header">
+    <div id="header-title">
+        <h1>Multiverse</h1>
+
+        <p>Founded by Peter Veentjer</p>
+    </div>
+    <!-- div id="header-logo" -->
+    <!-- a id="header-logo" href="http://www.codehaus.org">codehaus.org</a -->
+    <!-- /div -->
+    <hr class="hide"/>
+</div>
+
+<div id="content">
+    <div id="side">
+        
+        <div class="nav-title">
+            <div><h3>Menu</h3></div>
+        </div>
+        <ul class="nav">
+            
+            <li><a class="unselected" href="overview.html">Overview</a></li>
+            
+            
+            <li><a class="unselected" href="download.html">Download</a></li>
+            
+            
+            <li><a class="unselected" href="features.html">Features</a></li>
+            
+            
+            <li><a class="unselected" href="missionstatement.html">Mission Statement</a></li>
+            
+            
+            <li><a class="unselected" href="nosql.html">NoSQL</a></li>
+            
+            
+            <li><a class="unselected" href="team.html">Team</a></li>
+            
+            
+            <li><a class="unselected" href="http://pveentjer.wordpress.com">Blog</a></li>
+            
+            
+            <li><a class="unselected" href="development.html">Development</a></li>
+            
+            
+            <li><a class="unselected" href="http://pveentjer.wordpress.com">Blog</a></li>
+            
+            
+            <li><a class="unselected" href="license.html">License</a></li>
+            
+            
+        </ul>
+        <div class="nav-footer">
+            <div></div>
+        </div>
+        <hr class="hide"/>
+        
+        <div class="nav-title">
+            <div><h3>Documentation</h3></div>
+        </div>
+        <ul class="nav">
+            
+            <li><a class="unselected" href="documentationoverview.html">Overview</a></li>
+            
+            
+            <li><a class="unselected" href="manual.html">Reference Manual</a></li>
+            
+            
+            <li><a class="unselected" href="https://linktojavadoc">Javadoc</a></li>
+            
+            
+        </ul>
+        <div class="nav-footer">
+            <div></div>
+        </div>
+        <hr class="hide"/>
+        
+    </div>
+
+    <div id="mainContent">
+        <h1>4. Transactional references and primitives</h1>
+
+<ul>
+    <li><a href="#introduction">4.1 Transactional references</a></li>
+    <li><a href="#blocking.transactions">4.2 Composing operations</a></li>
+    <li><a href="#blocking.transactions">4.3 Blocking transactions</a></li>
+    <li><a href="#transactional.primitives">4.4 Transactional primitives</a></li>
+    <li><a href="#transactionalreference.and.jmm">4.5 Transactional references and the Java Memory Model</a></li>
+</ul>
+
+<h2 id="introduction">4.1 Introduction</h2>
+A transactional reference is a reference to an object that is transansactional, so is:
+<ol>
+    <li><b>atomic:</b> changes on a transactional reference will all be written or none will be written.</li>
+    <li><b>isolated:</b> it will not see changes made by other transactions concurrently executing</li>
+    <li><b>deadlock free:</b> no worries about deadlocks.</li>
+</ol>
+If no other transactional resources are used in a transaction, the java.util.concurrent.atomic.AtomicReference
+        probably be a better solution.
+
+In org.multiverse.transactional.references package, multiple transactional
+
+<pre>
+    import org.multiverse.transactional.references.*;
+
+    public class Person{
+        private final TransactionalReference&lt;String&gt; name = new TransactionalReference&lt;String&gt;();
+
+        public String getName(){
+            return name.get();
+        }
+
+        public void setName(String newName){
+            name.set(newName);
+        }
+    }
+</pre>
+
+In this example I don't make use of the @TransactionalObject annotation; because it would have been a cleaner
+        alternative than the verbose TransactionalReference approach. This is done for explanation purposes.
+
+<h2 id="composing.operations">4.2 Composing operations</h2>
+        Although
+
+<h2 id="blocking.transactions">4.3 Blocking transactions</h2>
+
+<h2 id="transactionalreference.and.jmm">4.4 Transactional references and the JMM</h2>
+Transactional references safely can be used by multiple threads because they always ensure a 'happens before' relation
+        between a transaction.commit and a transaction.start. For more information see chapter 5:
+<a href="manual-jmm.html">Multiverse and the Java Memory Model</a>.
+
+<h2 id="transactional.primitives">4.5 Transactional primitives</h2>
+    </div>
+
+    <!-- end of main content -->
+
+    <div id="footer">
+        <hr class="hide"/>
+        <div id="footer-contents">Last updated: 3 Januari 2010
+            <br/>
+            Copyright © 2010
+        </div>
+    </div>
+</div>
+<!-- content -->
+</body>
+</html>
