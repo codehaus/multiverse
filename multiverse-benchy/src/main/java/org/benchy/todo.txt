@@ -1,0 +1,82 @@
+
+TODO
+
+- system should be able to do something with multiple attempts.
+
+- system should be able to place error information in the output
+
+- System.out/System.err should be stored
+
+- what should be done on the managedfieldremappingmethodadapter to
+
+- if one testcase fails, the other testcases won't execute.
+
+- if one benchmark fails, the other benchmarks won't execute
+
+- system should be able to deal with different types than just integers
+
+- diagrammain needs a date parameter on occassion: atm it always uses the current date.
+
+- improved error handling diagram main for arguments
+
+- the benchy framework should be placed in a seperate src directory and create a seperate jar.
+
+NICE TO HAVES
+
+- it should be easy to create short, medium and long tests.
+
+- central repository where all information from different machines can be collected
+
+- at the moment each driver need to extract the testcase parameters, this can
+be automated using reflection.
+
+- during execution you want to see where you are.. current testcase index/total testcases.
+
+- the attempt dir should not be a number, but something like attempt-1.
+
+- it would be nice if the testcaseresult was written as soon as it is completed,
+not after the completion of the complete benchmark.
+
+DONE
+
+- improved logging 
+
+- improved error handling for the benchmark main for arguments
+
+- the order in which the result in the output file are placed are arbitrary
+
+- whole benchmark framework should be placed under org/benchy
+
+- benchmark main should be moved to different package
+
+- diagram main should be moved to the benchmarkframework package
+
+- user should be able to start different jvm's for executing the tests so that different parameters
+can be used. For example g1 garbage collector or pointer compression.
+
+- de inhoud van de testcase json wordt nog niet de testcase gezet
+
+- it would be nice if a single benchmark can be run, instead of all the benchmarks.
+
+- user should be able to create diagrams from the benchmark
+
+- user should be able to set the title from the command line
+
+- user should be able to set the name of the output png from the commandline
+
+
+- system should be able to easily combine multiple graphs
+
+- system is only able to deal with 1 line on the graph
+
+- 2 lines should be drawn in the diagram
+
+- the content of the test
+
+- the directory needs to be created consistent
+
+
+- atm it is not possible to see which testresults belong to each other and which not.
+    - you can't see if attempts belong to each other
+    - you can't see of testresults for differenttestcases but the same benchmark
+    belong to each other.

@@ -1,0 +1,11 @@
+todo
+
+- locks need  to be released as soon as they can't be acquired
+
+- real tests for the FailFastAtomicObjectLockPolicy
+
+- real tests for the RetryingFailFastAtomicObjectLockPolicy
+
+- real tests for the RetryingSpinningAtomicObjectLockPolicy
+
+- real tests for the SpinningAtomicObjectLockPolicy 

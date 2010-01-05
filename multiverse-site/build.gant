@@ -1,0 +1,437 @@
+//================ variables ==============================================
+
+version_main                    = "0.1rc2"
+name_main                       = "prometheus"
+name_testsupport                = "prometheus-testsupport"
+name_sandbox                    = "prometheus-sandbox"
+
+dir_src                         = "src"
+dir_src_main                    = "$dir_src/main"
+
+dir_src_test                    = "$dir_src/test"
+dir_src_testsupport             = "$dir_src/testsupport"
+dir_src_stresstest              = "$dir_src/stresstest"
+
+dir_sandbox                     = "src-sandbox"
+dir_src_sandbox                 = "$dir_sandbox/sandbox"
+dir_src_sandbox_test            = "$dir_sandbox/sandboxtest"
+
+dir_target                      = "target"
+dir_classes                     = "$dir_target/classes"
+dir_classes_main                = "$dir_classes/main"
+dir_classes_sandbox             = "$dir_classes/sandbox"
+dir_classes_sandbox_test        = "$dir_classes/sandbox_test"
+dir_classes_test                = "$dir_classes/test"
+dir_classes_stresstest          = "$dir_classes/stresstest"
+dir_classes_testsupport         = "$dir_classes/testsupport"
+
+dir_lib                         = "lib"
+dir_lib_provided                = "$dir_lib/provided"
+dir_lib_support                 = "$dir_lib/support"
+
+dir_javadoc                     = "$dir_target/javadoc"
+dir_javadoc_main                = "$dir_javadoc/main"
+dir_javadoc_testsupport         = "$dir_javadoc/testsupport"
+
+dir_unitreports                 = "$dir_target/junit-reports"
+dir_clover                      = "$dir_target/clover"
+dir_release                     = "$dir_target/$name_main-$version_main"
+dir_site                        = "$dir_target/site"
+
+
+dir_dav_prometheus              = "/mnt/dav-prometheus"
+dir_dav_prometheus_dist         = "/mnt/dav-prometheus-dist"
+
+clover_home                     = System.getenv ( ).'CLOVER_HOME'
+
+//================ paths ==================================================
+
+Ant.path( id : 'classpath_provided' ) {
+    fileset( dir : dir_lib_provided, includes : '*.jar' )
+}
+
+Ant.path( id : 'classpath_support' ) {
+    fileset( dir : dir_lib_support, includes : '**/*.jar' )
+}
+
+Ant.path( id: 'classpath_clover'){
+    fileset( dir : clover_home, includes : '**/*.jar')
+}
+
+//================ tasksdefs ==============================================
+
+Ant.taskdef (
+    resource : 'cloverlib.xml', classpathref : 'classpath_clover'
+)
+
+//================ tasks ==================================================
+
+target ( 'default' : 'The default target.' ) {
+    println ( 'Default' )
+    depends ( compile_main )
+    Ant.echo ( message : 'A default message from Ant.' )
+}
+
+target ( 'clean' : 'Removes all generated files'){
+    Ant.delete(dir : dir_target)
+    println( dir_clover )
+}
+
+//================ compile ==================================================
+
+target ( compile_main : 'Compiles the main package' ) {
+    println('executing compile_main')
+    Ant.mkdir(dir : dir_classes_main)
+    Ant.javac ( srcdir : dir_src_main , destDir : dir_classes_main , source : '1.5' , target : '1.5' , debug : 'on' ) {
+        classpath {
+            path ( refid : 'classpath_provided' )            
+        }
+    }
+}
+
+target ( compile_testsupport : 'Compiles the testsupport package' ) {
+    depends( compile_main )
+    println('executing compile_testsupport')
+    Ant.mkdir(dir : dir_classes_testsupport)
+    Ant.javac ( srcdir : dir_src_testsupport , destDir : dir_classes_testsupport , source : '1.5' , target : '1.5' , debug : 'on' ) {
+        classpath {
+            path ( refid : 'classpath_provided' )
+            path ( refid : 'classpath_support' )
+            pathelement ( location : dir_classes_main )
+        }
+    }
+}
+
+target ( compile_test : 'Compiles the main tests' ) {
+    depends( compile_testsupport )
+    println('executing compile_test')
+    Ant.mkdir(dir : dir_classes_test)
+    Ant.javac ( srcdir : dir_src_test , destDir : dir_classes_test , source : '1.5' , target : '1.5' , debug : 'on' ) {
+        classpath {
+            path ( refid : 'classpath_provided' )
+            path ( refid : 'classpath_support' )
+            pathelement ( location : dir_classes_main )
+            pathelement ( location : dir_classes_testsupport )
+        }
+    }
+}
+
+target ( compile_stresstest : 'Compiles the stress tests' ) {
+    depends( compile_test )
+    println('executing compile_stresstest')
+    Ant.mkdir(dir : dir_classes_stresstest)
+    Ant.javac ( srcdir : dir_src_stresstest , destDir : dir_classes_stresstest , source : '1.5' , target : '1.5' , debug : 'on' ) {
+        classpath {
+            path ( refid : 'classpath_provided' )
+            path ( refid : 'classpath_support' )
+            pathelement ( location : dir_classes_main )
+            pathelement ( location : dir_classes_test )
+            pathelement ( location : dir_classes_testsupport )
+        }
+    }
+}
+
+target ( compile_sandbox : 'Compiles the sandbox package' ) {
+    depends( compile_main )
+
+    println('executing compile_sandbox')      
+    Ant.mkdir(dir : dir_classes_sandbox)
+    Ant.javac ( srcdir : dir_src_sandbox , destDir : dir_classes_sandbox , source : '1.5' , target : '1.5' , debug : 'on' ) {
+        classpath {
+            path ( refid : 'classpath_provided' )
+            pathelement ( location : dir_classes_main )
+        }
+    }
+}
+
+target ( compile_sandbox_test : 'Compiles the sandbox test package' ) {
+    depends( compile_sandbox )
+    depends( compile_testsupport )
+
+    println('executing compile_sandbox_test')
+    Ant.mkdir(dir : dir_classes_sandbox_test)
+    Ant.javac ( srcdir : dir_src_sandbox_test , destDir : dir_classes_sandbox_test , source : '1.5' , target : '1.5' , debug : 'on' ) {
+        classpath {
+            path ( refid : 'classpath_provided' )
+            path ( refid : 'classpath_support' )
+            pathelement ( location : dir_classes_main )
+            pathelement ( location : dir_classes_sandbox )
+            pathelement ( location : dir_classes_testsupport )
+        }
+    }
+}
+
+target (compile_all : 'Compiles all sources '){
+    println('executing compile_all')
+    depends( compile_main )
+    depends( compile_testsupport )
+    depends( compile_test )
+    depends( compile_stresstest )
+    depends( compile_sandbox )
+    depends( compile_sandbox_test )
+}
+
+//================ test ==================================================
+
+target(test_main : 'Tests the main package'){
+    depends( compile_test )
+    println('executing the main tests')
+    Ant.mkdir ( dir : dir_unitreports )
+    Ant.junit ( printsummary : 'yes', haltonfailure : 'true') {
+        formatter ( type : 'plain' )
+        batchtest ( fork : 'yes' , todir : dir_unitreports ) {
+            fileset (
+                dir : dir_classes_test , includes : '**/*Test.class', excludes : '**/*AbstractTest.class'
+            )
+        }
+        classpath {
+            path ( refid : 'classpath_provided' )
+            path ( refid : 'classpath_support' )
+            path ( refid : 'classpath_clover' )
+            pathelement ( location : dir_classes_main )
+            pathelement ( location : dir_classes_testsupport )
+            pathelement ( location : dir_classes_test )
+        }
+    }
+}
+
+target(test_stress : 'Runs the stress tests'){
+    depends( compile_stresstest )
+    println('executing the stress tests')
+    Ant.mkdir ( dir : dir_unitreports )
+    Ant.junit ( printsummary : 'yes' ) {
+        formatter ( type : 'plain' )
+        batchtest ( fork : 'yes' , todir : dir_unitreports ) {
+            fileset (
+                dir : dir_classes_stresstest , includes : '**/*Test.class', excludes : '**/*AbstractTest.class'
+            )
+        }
+        classpath {
+            path ( refid : 'classpath_provided' )
+            path ( refid : 'classpath_support' )
+            pathelement ( location : dir_classes_main )
+            pathelement ( location : dir_classes_testsupport )
+            pathelement ( location : dir_classes_stresstest )
+            pathelement ( location : dir_classes_test )
+        }
+    }
+}
+
+target(test_sandbox : 'Runs the sandbox tests'){
+    depends( compile_sandbox_test )
+    println('executing the sandbox tests')
+    Ant.mkdir ( dir : dir_unitreports )
+    Ant.junit ( printsummary : 'yes' , haltonfailure : 'false') {
+        formatter ( type : 'plain' )
+        batchtest ( fork : 'yes' , todir : dir_unitreports ) {
+            fileset (
+                dir : dir_classes_sandbox_test , includes : '**/*Test.class', excludes : '**/*AbstractTest.class'
+            )
+        }
+        classpath {
+            path ( refid : 'classpath_provided' )
+            path ( refid : 'classpath_support' )
+            pathelement ( location : dir_classes_main )
+            pathelement ( location : dir_classes_testsupport )
+            pathelement ( location : dir_classes_sandbox )
+            pathelement ( location : dir_classes_sandbox_test )
+        }
+    }
+}
+
+target( test_all : 'Runs all tests' ){
+    println('Running all tests')
+    depends( test_main )
+    depends( test_stress )
+    depends( test_sandbox )
+}
+
+//================ jar ==================================================
+
+target( jar_main : 'Creates the jar for the main module' ){
+    depends( compile_main )
+    println( 'Creates the jar for the main module' )
+    Ant.mkdir(dir : dir_target)
+    Ant.jar( jarfile : "$dir_target/$name_main-${version_main}.jar",
+             basedir : dir_classes_main)
+}
+
+target( jar_testsupport : 'Creates the jar for the testsupport module'){
+    depends( compile_testsupport )
+    println( 'Creates the jar for testsupport module' )
+    Ant.mkdir( dir: dir_target)
+    Ant.jar( jarfile : "$dir_target/$name_testsupport-${version_main}.jar",
+             basedir : dir_classes_main)
+}
+
+target( jar_sandbox : 'Creates the jar for the sandbox module'){
+    depends( compile_sandbox )
+    println( 'Creates the jar for the sandbox module' )
+    Ant.mkdir( dir: dir_target)
+    Ant.jar( jarfile : "$dir_target/${name_sandbox}-${version_main}.jar",
+             basedir : dir_classes_sandbox)
+}
+
+target( jar_all : 'Creates all jars' ){
+    println( 'Creating all jars' )
+    depends( jar_main )
+    depends( jar_testsupport )
+    depends( jar_sandbox )
+}
+
+//====================== javadoc ==========================
+
+target( javadoc_main : 'Generates Javadoc for the main module'){
+    println( 'Generate Javadoc for the main module')
+    depends( compile_main )
+
+    Ant.delete( dir : dir_javadoc_main )
+    Ant.mkdir( dir : dir_javadoc_main )
+    Ant.javadoc( sourcepath : dir_src_main, destdir : dir_javadoc_main, packagenames : 'org.codehaus.prometheus.*',
+                 author : 'true', use : 'true', version : 'true', windowtitle : 'Prometheus', 'private' : 'false')
+}
+
+target( javadoc_testsupport : 'Generates Javadoc for the testsupport module'){
+    println( 'Generate Javadoc for the testsupport module')
+    depends( compile_testsupport )
+
+    Ant.delete( dir : dir_javadoc_testsupport )
+    Ant.mkdir( dir : dir_javadoc_testsupport )
+    Ant.javadoc( sourcepath : dir_src_testsupport, destdir : dir_javadoc_testsupport, packagenames : 'org.codehaus.prometheus.*',
+                 author : 'true', use : 'true', version : 'true', windowtitle : 'Prometheus TestSupport', 'private' : 'false')
+}
+
+target( javadoc_all : 'Generates Javadoc for all modules'){
+    println( 'Generate Javadoc for all modules' )
+    depends( javadoc_main )
+    depends( javadoc_testsupport )
+}
+
+//====================== clover ==========================
+
+target( clover_activate : 'Activates Clover test coverage'){
+    Ant.mkdir( dir : "$dir_clover/db/" )
+    Ant.'clover-setup'(initString : "$dir_clover/db/prometheus-coverage.db"){
+        files{
+            exclude( name : "**/test/**/*.java")
+            exclude( name : "**/test/**/*Test.java")
+        }
+    }
+}
+
+target( clover_html : 'Generates a Clover HTML test coverage report'){
+    depends( clover_activate )
+
+    Ant.delete( dir: "$dir_clover/htmlreport/" )
+    Ant.mkdir( dir: "$dir_clover/htmlreport/" )
+    Ant.'clover-html-report'( outdir:"$dir_clover/htmlreport", title:'Prometheus', projectName:'Prometheus')
+}
+
+target ( clover_report : 'Generates a clover report (also builds and tests)'){
+    Ant.delete(dir: dir_classes)
+    depends( clover_activate )
+    depends( test_main )
+    depends( clover_html )
+}
+
+target(site_generate_main :'Generates the main Prometheus site (without reports, javadoc etc)'){
+    Ant.mkdir( dir: dir_site )
+    Ant.copy( file: 'site/style.css', todir: dir_site)
+    Ant.copy( file: 'site/index.html', todir: dir_site)
+
+    def engine = new GroovyScriptEngine('.')
+    def value = engine.run('menu.groovy', new Binding())
+
+}
+
+target (site_generate : 'Generates the complete Prometheus site including javadoc, reports etc'){
+    depends(site_generate )
+    depends( clover_report )
+    Ant.copy(todir: "$dir_site/clover"){
+        fileset(dir: "$dir_clover/htmlreport")
+    }
+
+    depends( javadoc_main )
+    Ant.copy(todir: "$dir_site/javadoc/main"){
+        fileset(dir: dir_javadoc_main)
+    }
+
+    depends( javadoc_testsupport )
+    Ant.copy(todir: "$dir_site/javadoc/testsupport"){
+        fileset(dir: dir_javadoc_testsupport)
+    }
+}
+
+target (site_update : 'Updates the prometheus website on the internet'){
+    depends( site_generate )
+    Ant.copy(todir: "$dir_dav_prometheus"){
+        fileset(dir: dir_site)
+    }
+}
+
+//todo: test code moet niet getest worden (alhoewel het wel handig is om dead code terug te vinden)
+
+target( build_dist : 'Builds the complete distribution' ){
+    println( 'Builds the complete distribution' )
+    //todo: failonerror should be true
+    depends( clean )
+    depends( compile_main )
+    depends( test_main )
+    depends( compile_testsupport )
+    //depends( test_stress )
+    depends( javadoc_all )
+    depends( jar_all )
+    depends( jar_testsupport )
+}
+
+target (build_release :'Build the complete release'){
+    println( 'Builds the complete release' )
+    depends( build_dist )
+    Ant.delete(dir: dir_release )
+    Ant.mkdir(dir: dir_release )
+
+    Ant.copy(todir: "$dir_release/javadoc"){
+        fileset(dir: "$dir_javadoc")
+    }
+
+    Ant.copy(todir: "$dir_release/src/main"){
+        fileset(dir: "$dir_src/main")
+    }
+
+    Ant.copy(todir: "$dir_release/src/test"){
+        fileset(dir: "$dir_src/test")
+    }
+
+    Ant.copy(todir: "$dir_release/src/stresstest"){
+        fileset(dir: "$dir_src/stresstest")
+    }
+
+    Ant.copy(todir: "$dir_release/src/testsupport"){
+        fileset(dir: "$dir_src/testsupport")
+    }
+
+    Ant.copy(todir: "$dir_release/bin"){
+        fileset(file: "$dir_target/*.jar")
+    }
+
+    Ant.copy(todir: "$dir_release"){
+        fileset(file: "license.*")
+    }
+
+    Ant.copy(todir: "$dir_release/lib"){
+        fileset(dir: "$dir_lib_provided")
+    }
+
+    Ant.zip(file :"$dir_target/${name_main}-${version_main}.zip"){
+        zipfileset(dir: "$dir_release")
+    }
+}
+
+target (make_release:'Makes a release (also does uploading)'){
+    println('Makes the release, updates the site')
+    depends(build_release)
+
+    Ant.copy(todir: "$dir_dav_prometheus_dist"){
+        fileset(file: "${dir_target}/${name_main}-${version_main}.zip")
+    }
+}
