@@ -1,13 +1,16 @@
 class Menu {
+
   String name
   MenuItem[] items
 }
 
 class MenuItem {
+
   String url, title, pageid
 }
 
 class Page {
+
   String pageid, file
 }
 
@@ -17,23 +20,22 @@ def templatecontent = new File('site/pagetemplate.html').text
 
 def menus = [
         new Menu(name: 'Menu', items: [
-                new MenuItem(title: 'Overview', pageid: 'overview'),
-                new MenuItem(title: 'Download', pageid: 'download'),
-                new MenuItem(title: 'Features', pageid: 'features'),
-                new MenuItem(title: 'Mission Statement', pageid: 'missionstatement'),
-                new MenuItem(title: 'NoSQL', pageid: 'nosql'),
-                new MenuItem(title: 'Team', pageid: 'team'),
-                new MenuItem(title: 'Blog', url: 'http://pveentjer.wordpress.com'),
-                new MenuItem(title: 'Development', pageid :'development'),
-                new MenuItem(title: 'Blog', url: 'http://pveentjer.wordpress.com'),
-                new MenuItem(title: 'License', pageid: 'license')
-        ]),
+                 new MenuItem(title: 'Overview', pageid: 'overview'),
+                 new MenuItem(title: 'Download', pageid: 'download'),
+                 new MenuItem(title: 'Features', pageid: 'features'),
+                 new MenuItem(title: 'Mission Statement', pageid: 'missionstatement'),
+                 new MenuItem(title: 'NoSQL', pageid: 'nosql'),
+                 new MenuItem(title: 'Team', pageid: 'team'),
+                 new MenuItem(title: 'Development', pageid: 'development'),
+                 new MenuItem(title: 'Blog', url: 'http://pveentjer.wordpress.com'),
+                 new MenuItem(title: 'License', pageid: 'license')
+                 ]),
 
         new Menu(name: 'Documentation', items: [
-              new MenuItem(title: 'Overview', pageid: 'documentationoverview'),
-              new MenuItem(title: 'Reference Manual', pageid: 'manual'),              
-              new MenuItem(title: 'Javadoc', url: 'https://linktojavadoc')                                
-        ]) 
+                 new MenuItem(title: 'Overview', pageid: 'documentationoverview'),
+                 new MenuItem(title: 'Reference Manual', pageid: 'manual'),
+                 new MenuItem(title: 'Javadoc', url: 'https://linktojavadoc')
+                 ])
 ]
 
 //this is redundant information, all pages can be derived from the menu.
@@ -63,6 +65,7 @@ def pages = [
         new Page(pageid: 'faq'),
         new Page(pageid: 'team'),
         new Page(pageid: 'development'),
+        new Page(pageid: 'tutorial'),
         new Page(pageid: 'setup-javaagent'),
         new Page(pageid: 'mavenconfiguration'),
         new Page(pageid: 'documentationoverview')
