@@ -25,7 +25,6 @@ def menus = [
                 new MenuItem(title: 'Team', pageid: 'team'),
                 new MenuItem(title: 'Blog', url: 'http://pveentjer.wordpress.com'),
                 new MenuItem(title: 'Development', pageid :'development'),
-                new MenuItem(title: 'Blog', url: 'http://pveentjer.wordpress.com'),
                 new MenuItem(title: 'License', pageid: 'license')
         ]),
 
