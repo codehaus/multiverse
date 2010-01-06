@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?><archetype>
+  <id>multiverse-project-archetype</id>
+  <sources>
+    <source>src\main\java\CubbyHole.java</source>
+  </sources>
+  <testSources>
+    <source>src\test\java\CubbyHoleTest.java</source>
+  </testSources>
+</archetype>

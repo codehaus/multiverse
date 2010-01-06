@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <title>Multiverse: Performance Guidelines</title>
+</head>
+
+<body>
+<h1>Performance guidelines</h1>
+This document contains some performance guidelines that should be understood while developing
+for the Multiverse project.
+<ol>
+    <li><b>Don't pay for what you don't use:</b>
+        in some cases extra code is added to deal with certain functionality like
+        profiling or logging. This added functionality should not reduce the performance
+        of the STM when it is deactivated. Making effective use of dead code removal
+        executed by the JIT is one of the ways to make this possible. Another example
+        is creating different update-transaction implementations for specific transaction
+        lengths. This could replace an expensive map structure, by a much cheaper
+        array. For certain length the fixed-length array will outperform the map.
+    </li>
+    <li><b>Watch out for object creation in frequent executed loops:</b> although the
+        new garbage collectors have improved over the years quite a lot, object creation
+        still can slow down the performance of some operation if millions of objects are
+        created per second.
+    </li>
+    <li>
+        <b>volatile reads are cheap compared to volatile writes:</b>
+    </li>
+    <li>
+        <b>arrays are you friend:</b> although they are seen as old school, they still
+        are very valuable. There are a few advantages like easy to process elements of
+        the array in parallel, there are also other advantages like a decreased size
+        of memory compared to a linkedlist and it also reduced object creation overhead.
+        To store 10 items in a linkedlist, you need to create at least 10 listnode objects, and
+        with an array you only need a single object.
+    </li>
+</ol>
+</body>
+</html>
+
+
+
+

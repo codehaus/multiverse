@@ -1,0 +1,7 @@
+target
+multiverse-project-archetype.iml
+multiverse-project-archetype.ipr
+multiverse-project-archetype.iws
+.settings
+.classpath
+.project

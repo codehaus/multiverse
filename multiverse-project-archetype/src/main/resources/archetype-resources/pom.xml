@@ -1,0 +1,102 @@
+#set( $symbol_dollar = '$' )
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>${groupId}</groupId>
+    <artifactId>${artifactId}</artifactId>
+    <version>${version}</version>
+    <name>${artifactId} project</name>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>       
+            <plugin>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-java-and-agent</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>1.6.0</version>
+                                </requireJavaVersion>
+                                
+                                <!-- can't run tests without the Multiverse agent -->
+                                <requireFilesExist>
+                                    <files>
+                                        <file>${symbol_dollar}{multiverse.agentjar}</file>
+                                    </files>
+                                </requireFilesExist>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-javaagent:${symbol_dollar}{multiverse.agentjar}</argLine>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.multiverse</groupId>
+                        <artifactId>multiverse-alpha</artifactId>
+                        <version>${symbol_dollar}{multiverse.version}</version>
+                        <classifier>jar-with-dependencies</classifier>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+
+    <properties>
+      <multiverse.version>0.3-SNAPSHOT</multiverse.version>
+      <multiverse.agentjar>${symbol_dollar}{settings.localRepository}/org/multiverse/multiverse-alpha/${symbol_dollar}{multiverse.version}/multiverse-alpha-${symbol_dollar}{multiverse.version}-jar-with-dependencies.jar</multiverse.agentjar>
+    </properties>
+
+    <dependencies>
+        <!-- Multiverse dependencies -->
+        <dependency>
+            <groupId>org.multiverse</groupId>
+            <artifactId>multiverse-alpha</artifactId>
+            <version>${symbol_dollar}{multiverse.version}</version>
+            <classifier>jar-with-dependencies</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+                <exclusion>                
+                    <groupId>asm</groupId>
+                    <artifactId>asm-tree</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm-commons</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm-util</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.7</version>
+            <scope>test</scope>
+        </dependency>        
+    </dependencies>
+</project>

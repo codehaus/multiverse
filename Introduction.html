@@ -1,0 +1,91 @@
+<html>
+<body>
+<h1>Introduction to Multiverse</h1>
+This is an introduction of <a href="http://multiverse.googlecode.com">Multiverse</a>; a Java Software
+Transactional Memory implementation.
+</body>
+
+<h2>AtomicObject</h2>
+An AtomicObject is an object (a POJO) that can be used inside an STM. Changes on atomic object are atomic and isolated
+from others; so the STM is going to take care concurrency issues. An AtomicObject can be created by adding the
+@AtomicObject annotation to the object, for example:
+<pre>
+    @AtomicObject
+    public class Account{
+        private int amount;
+
+        public int getAmount(){
+            return amount;
+        }
+
+        public void setAmount(int newAmount){
+            if(newAmount &lt;0){
+                throw new IllegalArgumentException();
+            }
+            amount = newAmount;
+        }
+    }
+</pre>
+
+Instrumentation is used on the Account class so that it can participate inside STM transactions, see 'getting up and
+running' for more information.
+
+All changes done on atomic objects, should be done through atomic methods. An atomic method is executed in a transaction
+(and automatically retried on certain failures). Luckily all instance methods of an atomicobject, become an AtomicMethod
+automatically. For other methods (for example methods on non atomic objects or static methods) this needs to be done
+explicit by adding the @AtomicMethod annotation, for example:
+
+<pre>
+    class Bank{
+
+        @AtomicMethod
+        public void transfer(Account from, Account to, int amount){
+            if(amount<0){
+                throw new IllegalArgumentException();
+            }
+
+            to.setAmount(to.getAmount()+amount);
+            from.setAmount(from.getAmount()-amount);
+        }
+    }
+</pre>
+The transfer method is now an atomic method and makes sure that the transfer operation is executed once, or
+not at all. When an atomic method throws an exception it can't handle, the transaction is aborted else it
+automatically retries the call. This behavior
+
+When a field of an AtomicObject is final, it doesn't need to be managed by the STM, so make final what you can make
+final because
+it not only improves performance, it also is a very good programming practice. If all fields are final, the object
+essentially is ignored by the stm because it doesn't need to be managed at all. This also reduces unnecessary overhead
+on the stm.
+
+When an atomic method is called by another atomic method, it automatically participates in the transaction of the
+outer method.
+
+<h2></h2>
+With the Bank.transfer example
+
+<h2>Getting up and running</h2>
+An
+
+<h2>Not supported</h2>
+Atm there are certain Java features that are not supported by Multiverse. These limitations will be resolved
+in comming releases, but for the 0.3 release you are out of luck. If it is very import, please send a mail
+to the mailinglist and we'll see if we can give the issue a higher priority. All of the Multiverse committers
+have a full time job next to this project.
+
+The issues are:
+<ol>
+    <li>Subclassing of AtomicObjects: you can extend non atomicobject classes and implement as many interfaces
+        as you want. But extending an AtomicObject (with managed fields) is not alllowed. This is a limitation in
+        the instrumentation.
+    </li>
+    <li>No arrays: arrays are not instrumented, so they are not managed by the STM. So they can be passed
+        as is.
+    </li>
+    <li>
+
+    </li>
+</ol>
+
+</html>
