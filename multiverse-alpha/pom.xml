@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -41,18 +42,6 @@
                 </executions>
             </plugin>
 
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>clean</goal>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
@@ -100,7 +89,7 @@
                         <configuration>
                             <tasks>
                                 <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"/>
-                                <jarjar destfile="${build.directory}/${artifactId}-${version}-javaagent.jar"
+                                <jarjar destfile="${build.directory}/${artifactId}-${version}-jar-with-dependencies.jar"
                                         update="true">
                                     <!-- Replace "org.objectweb.asm.x.y.." with "org.multiverse.repackaged.org.objectweb.asm.x.y..".
                                       See http://code.google.com/p/jarjar/wiki/CommandLineDocs for more informtion on jarjar rules. -->
@@ -122,7 +111,7 @@
     </build>
 
     <properties>
-        <multiverse.agentname>alphaagent</multiverse.agentname>
+        <multiverse.agentname>${build.finalName}-javaagent</multiverse.agentname>
         <multiverse.agentclass>org.multiverse.stms.alpha.instrumentation.MultiverseJavaAgent</multiverse.agentclass>
         <asm.version>3.2</asm.version>
     </properties>

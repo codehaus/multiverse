@@ -1,7 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache. isorg/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
 
     <name>Multiverse Software Transactional Memory</name>
@@ -27,7 +27,7 @@
 
     <organization>
         <name>Multiverse</name>
-        <url>http://multiverse.googlecode.com</url>
+        <url>http://multiverse.codehaus.org</url>
     </organization>
 
     <developers>
@@ -160,6 +160,7 @@
                 <artifactId>failsafe-maven-plugin</artifactId>
                 <version>2.4.3-alpha-1</version>
                 <configuration>
+                    <encoding>${sourceEncoding}</encoding>
                     <includes>
                         <include>**/*LongTest.java</include>
                     </includes>
@@ -192,35 +193,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <configuration>
-                    <instrumentation>
-                        <excludes>
-                            <exclude>**/*Exception.class</exclude>
-                            <exclude>**/*Error.class</exclude>
-                        </excludes>
-                    </instrumentation>
-                    <check>
-                        <branchRate>0</branchRate>
-                        <lineRate>0</lineRate>
-                        <haltOnFailure>false</haltOnFailure>
-                        <totalBranchRate>0</totalBranchRate>
-                        <totalLineRate>0</totalLineRate>
-                        <packageLineRate>0</packageLineRate>
-                        <packageBranchRate>0</packageBranchRate>
-                    </check>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>clean</goal>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin -->
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-clover2-plugin</artifactId>
@@ -274,17 +246,33 @@
     </dependencies>
 
     <scm>
-        <connection>scm:svn:https://multiverse.googlecode.com/svn/trunk</connection>
-        <developerConnection>scm:svn:https://multiverse.googlecode.com/svn/trunk</developerConnection>
-        <url>http://code.google.com/p/multiverse/source/browse/trunk</url>
+        <connection>scm:git:git://git.codehaus.org/multiverse.git</connection>
+        <developerConnection>scm:git:ssh://git@git.codehaus.org/multiverse.git</developerConnection>
+        <url>http://git.codehaus.org/gitweb.cgi?p=multiverse.git</url>
     </scm>
     <issueManagement>
-        <system>Google Code</system>
-        <url>http://code.google.com/p/multiverse/issues/list</url>
+        <system>Jira</system>
+        <url>http://jira.codehaus.org/browse/MULTIVERSE</url>
     </issueManagement>
 
     <reporting>
         <plugins>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.6.1</version>
+                <configuration>
+                    <encoding>${sourceEncoding}</encoding>
+                    <quiet>true</quiet>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <id>default</id>
+                        <reports>
+                            <report>aggregate</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>        
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jxr-maven-plugin</artifactId>
@@ -350,10 +338,6 @@
                     <targetJdk>${targetJdk}</targetJdk>
                 </configuration>
             </plugin>
-            <!-- plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-            </plugin -->
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-clover2-plugin</artifactId>
@@ -367,19 +351,19 @@
     <distributionManagement>
         <repository>
             <id>multiverse-releases</id>
-            <url>dav:https://multiverse.googlecode.com/svn/maven-repository/releases</url>
+            <url>dav:https://dav.codehaus.org/repository/multiverse</url>
         </repository>
         <snapshotRepository>
             <id>multiverse-snapshots</id>
-            <url>dav:https://multiverse.googlecode.com/svn/maven-repository/snapshots</url>
+            <url>dav:https://dav.codehaus.org/snapshots.repository/multiverse</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
         <site>
             <id>multiverse-site</id>
             <name>Multiverse Maven site</name>
-            <url>ftp://multiversestm.org</url>
+            <url>dav:https://dav.codehaus.org/multiverse/maven-site</url>
         </site>
-        <downloadUrl>http://code.google.com/p/multiverse/downloads</downloadUrl>
+        <downloadUrl>http://dist.codehaus.org/multiverse</downloadUrl>
     </distributionManagement>
 
     <profiles>
