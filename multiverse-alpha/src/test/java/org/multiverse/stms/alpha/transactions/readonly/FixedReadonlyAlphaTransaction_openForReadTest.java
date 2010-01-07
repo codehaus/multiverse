@@ -2,9 +2,9 @@ package org.multiverse.stms.alpha.transactions.readonly;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.TransactionTooSmallException;
 import org.multiverse.api.exceptions.LoadLockedException;
 import org.multiverse.api.exceptions.LoadTooOldVersionException;
+import org.multiverse.api.exceptions.TransactionTooSmallException;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -39,7 +39,7 @@ public class FixedReadonlyAlphaTransaction_openForReadTest {
                 stmConfig.restartBackoffPolicy,
                 null,
                 stmConfig.profiler,
-                stmConfig.maxRetryCount, true, optimalSize,size);
+                stmConfig.maxRetryCount, true, optimalSize, size);
 
         return new FixedReadonlyAlphaTransaction(config, size);
     }
@@ -139,10 +139,10 @@ public class FixedReadonlyAlphaTransaction_openForReadTest {
         tx.openForRead(ref2);
         tx.openForRead(ref3);
 
-        try{
+        try {
             tx.openForRead(ref4);
             fail();
-        }catch(TransactionTooSmallException expected){
+        } catch (TransactionTooSmallException expected) {
         }
         assertEquals(5, optimalSize.get());
     }

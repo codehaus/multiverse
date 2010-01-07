@@ -2,14 +2,12 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.multiverse.transactional.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
+import org.multiverse.transactional.annotations.TransactionalObject;
 
 import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.testIncomplete;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 
 /**
@@ -183,14 +181,4 @@ public class TransactionalObject_WithFinalsTest {
             return next.next.next;
         }
     }
-
-    //todo: test with multiple primitives.
-
-    @Test
-    @Ignore
-    public void testMissing() {
-        testIncomplete();
-    }
-    //a.b.c.d of the same type and finals.
-    //a.b.c of different types and final
 }

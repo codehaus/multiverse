@@ -5,7 +5,7 @@ import org.multiverse.api.*;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.NoRetryPossibleException;
 import org.multiverse.api.exceptions.PanicError;
-import org.multiverse.utils.TodoException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
 
 import static java.text.MessageFormat.format;
 
@@ -73,7 +73,6 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
     }
 
     protected void doClear() {
-
     }
 
     @Override
@@ -87,13 +86,17 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
                 listener.next = listeners;
                 listeners = listener;
                 break;
+            case prepared:
+                String preparedMsg = format("Can't register listener on prepared transaction '%s'",
+                                            config.getFamilyName());
+                throw new PreparedTransactionException(preparedMsg);
             case committed:
                 String committedMsg = format("Can't register listener on already committed transaction '%s'",
-                        config.getFamilyName());
+                                             config.getFamilyName());
                 throw new DeadTransactionException(committedMsg);
             case aborted:
                 String abortMsg = format("Can't register listener on already aborted transaction '%s'",
-                        config.getFamilyName());
+                                         config.getFamilyName());
                 throw new DeadTransactionException(abortMsg);
             default:
                 throw new RuntimeException();
@@ -102,29 +105,38 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
 
 
     @Override
-    public void join(TwoPhaseCommitGroup group) {
+    public final void prepare() {
         switch (status) {
             case active:
-                throw new TodoException();
+                try {
+                    notifyAll(TransactionLifecycleEvent.preCommit);
+
+                    //todo: the pre-commit tasks need to be executed
+                    doPrepare();
+                    status = TransactionStatus.prepared;
+                } finally {
+                    if (status != TransactionStatus.prepared) {
+                        abort();
+                    }
+                }
+                break;
+            case prepared:
+                break;
             case committed:
-                String committedMsg = format("Can't start 2phase commit on already committed transaction '%s'",
-                        config.getFamilyName());
+                String committedMsg = format("Can't prepare already committed transaction '%s'",
+                                             config.getFamilyName());
                 throw new DeadTransactionException(committedMsg);
             case aborted:
-                String abortedMsg = format("Can't start 2phase on already on already aborted transaction '%s'",
-                        config.getFamilyName());
+                String abortedMsg = format("Can't prepare already aborted transaction '%s'",
+                                           config.getFamilyName());
                 throw new DeadTransactionException(abortedMsg);
             default:
                 throw new RuntimeException();
         }
     }
 
-    protected TwoPhaseCommitGroup doStartTwoPhaseCommit() {
-        String committedMsg = format("Can't start 2phase commit transaction '%s' because it isn't supported",
-                config.getFamilyName());
-        throw new UnsupportedOperationException(committedMsg);
+    protected void doPrepare() {
     }
-
 
     @Override
     public final void restart() {
@@ -162,10 +174,16 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
     public final void abort() {
         switch (status) {
             case active:
+                //fall through
+            case prepared:
                 try {
                     notifyAll(TransactionLifecycleEvent.preAbort);
                     status = TransactionStatus.aborted;
-                    doAbort();
+                    if (status == TransactionStatus.active) {
+                        doAbortActive();
+                    } else {
+                        doAbortPrepared();
+                    }
                     notifyAll(TransactionLifecycleEvent.postAbort);
                 } finally {
                     //we have to make sure that whatever happens, the transaction is aborted.
@@ -175,7 +193,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
                 break;
             case committed:
                 String committedMsg = format("Can't abort already committed transaction '%s'",
-                        config.getFamilyName());
+                                             config.getFamilyName());
                 throw new DeadTransactionException(committedMsg);
             case aborted:
                 //ignore
@@ -185,10 +203,14 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
         }
     }
 
+    protected void doAbortPrepared() {
+
+    }
+
     /**
      * Method is designed to be overridden to add custom behavior on the abort of the transaction.
      */
-    protected void doAbort() {
+    protected void doAbortActive() {
     }
 
     @Override
@@ -196,18 +218,27 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
         switch (status) {
             case active:
                 try {
-                    try {
-                        notifyAll(TransactionLifecycleEvent.preCommit);                        
-                        doCommit();
-                        status = TransactionStatus.committed;
-                        notifyAll(TransactionLifecycleEvent.postCommit);
-                    } finally {
-                        if (status != TransactionStatus.committed) {
-                            abort();
-                        }
-                    }
+                    notifyAll(TransactionLifecycleEvent.preCommit);
+                    doCommitActive();
+                    status = TransactionStatus.committed;
+                    notifyAll(TransactionLifecycleEvent.postCommit);
                 } finally {
+                    if (status != TransactionStatus.committed) {
+                        abort();
+                    }
                 }
+                break;
+            case prepared:
+                try {
+                    doCommitPrepared();
+                    status = TransactionStatus.committed;
+                    notifyAll(TransactionLifecycleEvent.postCommit);
+                } finally {
+                    if (status != TransactionStatus.committed) {
+                        abort();
+                    }
+                }
+                break;
             case committed:
                 //ignore the call
                 return;
@@ -224,7 +255,10 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
      * <p/>
      * The default behavior is that the readversion is returned (so usefull for readonly transactions).
      */
-    protected void doCommit() {
+    protected void doCommitActive() {
+    }
+
+    protected void doCommitPrepared() {
     }
 
     @Override
@@ -238,17 +272,17 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
                 boolean trackedReads = doRegisterRetryLatch(latch, version + 1);
                 if (!trackedReads) {
                     String msg = format("No retry is possible on transaction '%s' because it has no tracked reads",
-                            config.getFamilyName());
+                                        config.getFamilyName());
                     throw new NoRetryPossibleException(msg);
                 }
                 break;
             case committed:
                 String commitMsg = format("No retry is possible on already committed transaction '%s'",
-                        config.getFamilyName());
+                                          config.getFamilyName());
                 throw new DeadTransactionException(commitMsg);
             case aborted: {
                 String abortedMsg = format("No retry is possible on already aborted transaction '%s'",
-                        config.getFamilyName());
+                                           config.getFamilyName());
                 throw new DeadTransactionException(abortedMsg);
             }
             default:
@@ -263,14 +297,13 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
      *
      * @param latch         the latch to register. Value will never be null.
      * @param wakeupVersion the minimal version of the transactional object to wakeup for.
-     * @return true if there were tracked reads (so the latch was opened or registered at at least 1
-     *         transactional object)
+     * @return true if there were tracked reads (so the latch was opened or registered at at least 1 transactional
+     *         object)
      */
     protected boolean doRegisterRetryLatch(Latch latch, long wakeupVersion) {
         return false;
     }
 
-    @Override
     public final void startOr() {
         switch (status) {
             case active:
@@ -281,18 +314,17 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
                 break;
             case committed:
                 String commitMsg = format("Can't call startOr on already committed transaction '%s'",
-                        config.getFamilyName());
+                                          config.getFamilyName());
                 throw new DeadTransactionException(commitMsg);
             case aborted:
                 String abortMsg = format("Can't call startOr on already aborted transaction '%s'",
-                        config.getFamilyName());
+                                         config.getFamilyName());
                 throw new DeadTransactionException(abortMsg);
             default:
                 throw new RuntimeException();
         }
     }
 
-    @Override
     public final void endOr() {
         switch (status) {
             case active:
@@ -305,18 +337,17 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
                 break;
             case committed:
                 String committedMsg = format("Can't call endOr on already committed transaction '%s'",
-                        config.getFamilyName());
+                                             config.getFamilyName());
                 throw new DeadTransactionException(committedMsg);
             case aborted:
                 String abortedMsg = format("Can't call endOr on already aborted transaction '%s'",
-                        config.getFamilyName());
+                                           config.getFamilyName());
                 throw new DeadTransactionException(abortedMsg);
             default:
                 throw new RuntimeException();
         }
     }
 
-    @Override
     public final void endOrAndStartElse() {
         switch (status) {
             case active:
@@ -331,11 +362,11 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
                 break;
             case committed:
                 String commitMsg = format("Can't call endOrAndStartElse on already committed transaction '%s'",
-                        config.getFamilyName());
+                                          config.getFamilyName());
                 throw new DeadTransactionException(commitMsg);
             case aborted:
                 String abortMsg = format("Can't call endOrAndStartElse on already aborted transaction '%s'",
-                        config.getFamilyName());
+                                         config.getFamilyName());
                 throw new DeadTransactionException(abortMsg);
             default:
                 throw new RuntimeException();

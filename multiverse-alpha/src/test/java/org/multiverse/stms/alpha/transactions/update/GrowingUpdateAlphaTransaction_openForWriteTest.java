@@ -6,6 +6,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.LoadLockedException;
 import org.multiverse.api.exceptions.LoadTooOldVersionException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
@@ -39,13 +40,13 @@ public class GrowingUpdateAlphaTransaction_openForWriteTest {
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
-                false, true,true,true,true);
+                false, true, true, true, true);
         return new GrowingUpdateAlphaTransaction(config);
     }
 
     @Test
     public void whenVersionMatches() {
-        ManualRef ref = new ManualRef(stm,0);
+        ManualRef ref = new ManualRef(stm, 0);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
 
         AlphaTransaction tx = startSutTransaction();
@@ -63,10 +64,10 @@ public class GrowingUpdateAlphaTransaction_openForWriteTest {
     public void whenNullTxObject_thenNullPointerException() {
         AlphaTransaction tx = startSutTransaction();
 
-        try{
+        try {
             tx.openForWrite(null);
             fail();
-        }catch(NullPointerException expected){
+        } catch (NullPointerException expected) {
         }
 
         assertIsActive(tx);
@@ -91,7 +92,7 @@ public class GrowingUpdateAlphaTransaction_openForWriteTest {
      */
     @Test
     public void whenLockedAndEqualVersion_thenLoadLockedException() {
-        ManualRef ref = new ManualRef(stm,0);
+        ManualRef ref = new ManualRef(stm, 0);
         Transaction owner = mock(Transaction.class);
         ref.___tryLock(owner);
 
@@ -108,7 +109,7 @@ public class GrowingUpdateAlphaTransaction_openForWriteTest {
 
     @Test
     public void whenVersionTooNew_thenLoadTooOldVersion() {
-        ManualRef ref = new ManualRef(stm,0);
+        ManualRef ref = new ManualRef(stm, 0);
 
         AlphaTransaction tx1 = startSutTransaction();
 
@@ -126,7 +127,7 @@ public class GrowingUpdateAlphaTransaction_openForWriteTest {
 
     @Test
     public void whenLocked_thenLoadLockedException() {
-        ManualRef ref = new ManualRef(stm,0);
+        ManualRef ref = new ManualRef(stm, 0);
 
         stmConfig.clock.tick();
 
@@ -145,7 +146,7 @@ public class GrowingUpdateAlphaTransaction_openForWriteTest {
 
     @Test
     public void whenAlreadyOpenedForWrite_thenSameTranlocalReturned() {
-        ManualRef ref = new ManualRef(stm,0);
+        ManualRef ref = new ManualRef(stm, 0);
 
         AlphaTransaction tx = startSutTransaction();
         ManualRefTranlocal exected = (ManualRefTranlocal) tx.openForWrite(ref);
@@ -156,7 +157,7 @@ public class GrowingUpdateAlphaTransaction_openForWriteTest {
 
     @Test
     public void whenAlreadyOpenedForRead_thenItIsUpgradedToOpenForWrite() {
-        ManualRef ref = new ManualRef(stm,20);
+        ManualRef ref = new ManualRef(stm, 20);
 
         AlphaTransaction tx = startSutTransaction();
         ManualRefTranlocal read1 = (ManualRefTranlocal) tx.openForRead(ref);
@@ -171,7 +172,7 @@ public class GrowingUpdateAlphaTransaction_openForWriteTest {
 
     @Test
     public void whenOpenedForWriteOnDifferentTransactions_thenDifferentTranlocalsAreReturned() {
-        ManualRef ref = new ManualRef(stm,1);
+        ManualRef ref = new ManualRef(stm, 1);
 
         AlphaTransaction tx1 = startTrackingUpdateTransaction(stm);
         ManualRefTranlocal found1 = (ManualRefTranlocal) tx1.openForWrite(ref);
@@ -199,7 +200,7 @@ public class GrowingUpdateAlphaTransaction_openForWriteTest {
 
     @Test
     public void whenCommitted_thenDeadTransactionException() {
-        ManualRef ref = new ManualRef(stm,0);
+        ManualRef ref = new ManualRef(stm, 0);
 
         AlphaTransaction tx = startSutTransaction();
         tx.commit();
@@ -217,7 +218,7 @@ public class GrowingUpdateAlphaTransaction_openForWriteTest {
 
     @Test
     public void whenAborted_thenDeadTransactionException() {
-        ManualRef ref = new ManualRef(stm,0);
+        ManualRef ref = new ManualRef(stm, 0);
 
         AlphaTransaction tx = startSutTransaction();
         tx.abort();
@@ -231,5 +232,21 @@ public class GrowingUpdateAlphaTransaction_openForWriteTest {
 
         assertIsAborted(tx);
         assertEquals(expectedVersion, stm.getVersion());
+    }
+
+    @Test
+    public void whenPrepared_thenPreparedTransactionException() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction tx = startSutTransaction();
+        tx.prepare();
+
+        try {
+            tx.openForRead(ref);
+            fail();
+        } catch (PreparedTransactionException expected) {
+        }
+
+        assertIsPrepared(tx);
     }
 }

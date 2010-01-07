@@ -56,4 +56,6 @@ public abstract class AbstractReadonlyAlphaTransaction<C extends AbstractTransac
                 AlphaStmUtils.toTxObjectString(txObject), config.getFamilyName());
         throw new ReadonlyException(msg);
     }
+
+
 }

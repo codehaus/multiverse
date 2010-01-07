@@ -2,6 +2,9 @@
 todo engine
 ---------------------------------------------------------------
 
+- when the abort fails for a prepared transaction, there could be issues without the doAbortPrepared not releasing
+resources
+
 - tests that use different transaction size to cause all transaction implementations to be used
 
 - test for the writeskew problem; activation enabled

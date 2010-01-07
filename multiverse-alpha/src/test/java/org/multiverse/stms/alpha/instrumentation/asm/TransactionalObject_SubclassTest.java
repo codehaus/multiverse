@@ -1,10 +1,11 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.multiverse.transactional.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
+import org.multiverse.transactional.annotations.TransactionalObject;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -23,6 +24,7 @@ public class TransactionalObject_SubclassTest {
     }
 
     @Test
+    @Ignore
     public void subclassingWithExplicitTxObjectAnnotation() {
         //A a = new A();
         //assertTrue(a instanceof AlphaTransactionalObject);

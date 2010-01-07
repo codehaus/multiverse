@@ -2,7 +2,9 @@ package org.multiverse.stms.alpha.transactions.readonly;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.LoadLockedException;
 import org.multiverse.api.exceptions.LoadTooOldVersionException;
 import org.multiverse.api.exceptions.LoadUncommittedException;
 import org.multiverse.stms.alpha.AlphaStm;
@@ -13,6 +15,7 @@ import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.alpha.AlphaTestUtils.startTrackingUpdateTransaction;
 
@@ -103,7 +106,20 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
 
     @Test
     public void whenLocked() {
-        testIncomplete();
+        ManualRef ref = new ManualRef(stm);
+
+        Transaction owner = mock(Transaction.class);
+        ref.___tryLock(owner);
+
+        AlphaTransaction tx = startTransactionUnderTest();
+
+        try {
+            tx.openForRead(ref);
+            fail();
+        } catch (LoadLockedException expected) {
+        }
+
+        assertIsActive(tx);
     }
 
     @Test

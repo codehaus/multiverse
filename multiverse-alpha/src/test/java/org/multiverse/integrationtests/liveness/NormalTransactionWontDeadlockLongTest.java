@@ -4,17 +4,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
-import static org.multiverse.TestUtils.*;
 import org.multiverse.transactional.annotations.TransactionalMethod;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 /**
- * A Tests that makes sure that normaly Transactions are not the subject to deadlocks.
- * Normally resources are locked and this could lead to a deadlock. With TL2Stm resources
- * are locked only for a small amount of time, if the lock can't be acquired, all locks
- * are released.
+ * A Tests that makes sure that normaly Transactions are not the subject to deadlocks. Normally resources are locked and
+ * this could lead to a deadlock. With TL2Stm resources are locked only for a small amount of time, if the lock can't be
+ * acquired, all locks are released.
  *
  * @author Peter Veentjer.
  */
@@ -41,7 +40,7 @@ public class NormalTransactionWontDeadlockLongTest {
     }
 
     @Test
-    public void test() {
+    public void noReadTracking() {
         ModifyThread[] threads = createThreads();
         startAll(threads);
         joinAll(threads);

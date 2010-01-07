@@ -8,12 +8,13 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AbstractAlphaTransaction;
 import org.multiverse.utils.Listeners;
+import org.multiverse.utils.TodoException;
 
 import static java.lang.String.format;
 
 /**
- * An abstract {@link org.multiverse.stms.alpha.transactions.AlphaTransaction} that provides all
- * the pluming logic for update transactions.
+ * An abstract {@link org.multiverse.stms.alpha.transactions.AlphaTransaction} that provides all the pluming logic for
+ * update transactions.
  *
  * @author Peter Veentjer.
  */
@@ -26,11 +27,11 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
 
     @Override
     protected final boolean doRegisterRetryLatch(Latch latch, long wakeupVersion) {
-        if(!config.automaticReadTracking){
+        if (!config.automaticReadTracking) {
             return false;
         }
 
-        return dodoRegisterRetryLatch(latch,wakeupVersion);
+        return dodoRegisterRetryLatch(latch, wakeupVersion);
     }
 
     protected abstract boolean dodoRegisterRetryLatch(Latch latch, long wakeupVersion);
@@ -54,9 +55,9 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
     }
 
     /**
-     * Attaches the tranlocal to this Transaction. The tranlocal will never be null and this call
-     * is only made when no read for the transactional object of the readonly has been made.
-     * It is important that an implementation doesn't ignore this call.
+     * Attaches the tranlocal to this Transaction. The tranlocal will never be null and this call is only made when no
+     * read for the transactional object of the readonly has been made. It is important that an implementation doesn't
+     * ignore this call.
      *
      * @param opened the opened AlphaTranlocal to attach.
      */
@@ -66,16 +67,15 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
      * Finds the tranlocal for the given transactional object in the set of attached tranlocals.
      *
      * @param txObject the transactional object to find the tranlocal for.
-     * @return the found tranlocal. If no tranlocal was found in the set of attached tranlocals,
-     *         null is returned.
+     * @return the found tranlocal. If no tranlocal was found in the set of attached tranlocals, null is returned.
      */
     protected abstract AlphaTranlocal find(AlphaTransactionalObject txObject);
 
     /**
-     * Returns the state of the attached tranlocals. This information is needed for the transaction
-     * to decide what to do (write changes etc). It is important that the implementation should not
-     * stop after it finds one element that is dirty, it should check all attached objects. This is
-     * because the isDirty flag on each tranlocal needs to be cached for later use.
+     * Returns the state of the attached tranlocals. This information is needed for the transaction to decide what to do
+     * (write changes etc). It is important that the implementation should not stop after it finds one element that is
+     * dirty, it should check all attached objects. This is because the isDirty flag on each tranlocal needs to be
+     * cached for later use.
      *
      * @return the AttachedState.
      */
@@ -99,9 +99,9 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
 
 
     /**
-     * Checks if attached updated-items have a conflict. Call is made after the locks on the updates have been
-     * acquired. A conflict means that a new version of the tranlocal (that itself is a update) already is
-     * stored in in the transactional object.
+     * Checks if attached updated-items have a conflict. Call is made after the locks on the updates have been acquired.
+     * A conflict means that a new version of the tranlocal (that itself is a update) already is stored in in the
+     * transactional object.
      *
      * @return true if at least 1 attached tranlocal has a conflict.
      */
@@ -112,11 +112,7 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
             return false;
         }
 
-        if (tranlocal.isCommitted()) {
-            return false;
-        }
-
-        return tranlocal.hasConflict();
+        return tranlocal.hasWriteConflict();
     }
 
     /**
@@ -125,36 +121,31 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
      *
      * @return true if there are conflict, false otherwise.
      */
-    protected abstract boolean hasReadConflicts();
+    protected abstract boolean hasReadConflict();
 
-    protected final boolean hasReadConflict(AlphaTranlocal attached){
-        if(attached == null){
+    protected final boolean hasReadConflict(AlphaTranlocal attached) {
+        if (attached == null) {
             return false;
         }
 
-        if(attached.isUncommitted()){
-            return false;
-        }
-
-        return attached.hasConflict();
+        return attached.hasReadConflict(this);
     }
 
     /**
      * Locks the writeset. If the locks could not be obtained, false is returned.
      * <p/>
-     * todo: in the future the dirty check could be added. If something is an update, but not dirty
-     * there is no need to lock it under certain conditions (it causes the aba problem).
+     * todo: in the future the dirty check could be added. If something is an update, but not dirty there is no need to
+     * lock it under certain conditions (it causes the aba problem).
      *
      * @return true if the writeset was locked successfully, false otherwise.
      */
     protected abstract boolean tryWriteLocks();
 
     /**
-     * Releases all the locks on the transactional objects of the attached tranlocals that have been acquired.
-     * This call is made when the commit was not a success (so the writeversion still isn't set).
+     * Releases all the locks on the transactional objects of the attached tranlocals that have been acquired. This call
+     * is made when the commit was not a success (so the writeversion still isn't set).
      * <p/>
-     * It is important that this call doesn't fail, because else it could leave transactional objects locked
-     * forever.
+     * It is important that this call doesn't fail, because else it could leave transactional objects locked forever.
      */
     protected abstract void doReleaseWriteLocksForFailure();
 
@@ -176,11 +167,10 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
     }
 
     /**
-     * Releases the locks on the tranlocal objects of the attached tranlocals with the given writeVersion.
-     * This call is made when the commit was a success.
+     * Releases the locks on the tranlocal objects of the attached tranlocals with the given writeVersion. This call is
+     * made when the commit was a success.
      * <p/>
-     * It is important that this call doesn't fail, because else it could leave transactional objects locked
-     * forever.
+     * It is important that this call doesn't fail, because else it could leave transactional objects locked forever.
      *
      * @param writeVersion the writeVersion of the tranlocals to release.
      */
@@ -229,7 +219,35 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
         }
     }
 
-    protected final void doCommit() {
+    @Override
+    protected void doPrepare() {
+        if (!hasWrites()) {
+            return;
+        }
+
+        if (!tryWriteLocks()) {
+            throw createFailedToObtainCommitLocksException();
+        }
+
+        throw new TodoException();
+    }
+
+    @Override
+    protected void doAbortPrepared() {
+        doReleaseWriteLocksForFailure();
+    }
+
+    @Override
+    protected void doCommitPrepared() {
+        long writeVersion = 0;
+        Listeners[] listeners = store(writeVersion);
+        doReleaseWriteLocksForSuccess(writeVersion);
+        openAll(listeners);
+
+        throw new TodoException();
+    }
+
+    protected final void doCommitActive() {
         if (!hasWrites()) {
             return;
         }
@@ -242,11 +260,24 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
         Listeners[] listeners = null;
         long writeVersion = Long.MIN_VALUE;
         try {
-            if (hasConflicts()) {
-                throw createWriteConflictException();
+            boolean hasConflict;
+            if (config.optimizedConflictDetection && getReadVersion() == config.clock.getVersion()) {
+                writeVersion = config.clock.tick();
+                //it could be that a different transaction also reached this part, so we need to make sure
+                hasConflict = writeVersion != getReadVersion() + 1;
+            } else if (config.detectWriteSkew) {
+                writeVersion = config.clock.tick();
+                hasConflict = hasReadConflict();
+            } else {
+                hasConflict = hasWriteConflict();
+                if (!hasConflict) {
+                    writeVersion = config.clock.tick();
+                }
             }
 
-            writeVersion = config.clock.tick();
+            if (hasConflict) {
+                throw createWriteConflictException();
+            }
 
             listeners = store(writeVersion);
             success = true;
@@ -262,18 +293,6 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
             doReleaseWriteLocksForSuccess(writeVersion);
         } else {
             doReleaseWriteLocksForFailure();
-        }
-    }
-
-    private boolean hasConflicts() {
-        if (config.optimizedConflictDetection && getReadVersion() == config.clock.getVersion()) {
-            return false;
-        }
-
-        if(config.detectWriteSkew){
-            return hasReadConflicts() || hasWriteConflict();
-        }else{
-            return hasWriteConflict();
         }
     }
 
@@ -300,8 +319,7 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
     }
 
     /**
-     * Opens all listeners. Stops as soon as it finds a null, and can safely be called with a null
-     * listenersArray.
+     * Opens all listeners. Stops as soon as it finds a null, and can safely be called with a null listenersArray.
      *
      * @param arrayOfListeners the array of Listeners.
      */

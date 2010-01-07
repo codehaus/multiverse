@@ -2,10 +2,7 @@ package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.TransactionTooSmallException;
-import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.LoadLockedException;
-import org.multiverse.api.exceptions.LoadTooOldVersionException;
+import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -43,11 +40,10 @@ public class FixedUpdateAlphaTransaction_openForWriteTest {
                 stmConfig.maxRetryCount,
                 true,
                 optimalSize,
-                true,true,true,true,size
+                true, true, true, true, size
         );
         return new FixedUpdateAlphaTransaction(config, size);
     }
-
 
     @Test
     public void whenFirstTime() {
@@ -262,5 +258,21 @@ public class FixedUpdateAlphaTransaction_openForWriteTest {
         }
 
         assertIsCommitted(tx);
+    }
+
+    @Test
+    public void whenPrepared_thenPreparedTransactionException() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction tx = startSutTransaction(1);
+        tx.prepare();
+
+        try {
+            tx.openForWrite(ref);
+            fail();
+        } catch (PreparedTransactionException expected) {
+        }
+
+        assertIsPrepared(tx);
     }
 }

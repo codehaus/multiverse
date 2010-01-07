@@ -4,10 +4,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.TransactionStatus;
-import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.transactional.annotations.TransactionalMethod;
 import org.multiverse.transactional.primitives.TransactionalInteger;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
@@ -15,21 +15,24 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 /**
- * A Test that checks when writeSkew detection has been disabled and can happen, and with
- * writeskewdetection enabled that it can't happen.
+ * A Test that checks when writeSkew detection has been disabled and can happen, and with writeskewdetection enabled
+ * that it can't happen.
  *
  * @author Peter Veentjer.
  */
 public class WriteSkewLongTest {
+
+    private AtomicBoolean writeSkewOccurred = new AtomicBoolean();
     private int bankCustomerCount = 10;
     private int threadCount = 20;
-    private int txCountPerThread = 20 * 1000;
+    private int txCountPerThread = 1000;
 
     private TransactionalInteger[] accounts;
     private TransferThread[] threads;
 
     @Before
     public void setUp() {
+        writeSkewOccurred.set(false);
         clearThreadLocalTransaction();
 
         accounts = new TransactionalInteger[bankCustomerCount * 2];
@@ -58,7 +61,7 @@ public class WriteSkewLongTest {
         joinAll(threads);
 
         //this condition should fail
-        assertWriteSkewOccurred();
+        assertTrue(writeSkewOccurred.get());
 
         printAccounts();
 
@@ -80,30 +83,8 @@ public class WriteSkewLongTest {
         return sum;
     }
 
-    public void assertNoNegativeBalance() {
-        for (int k = 0; k < bankCustomerCount; k++) {
-            int balance1 = accounts[k * 2].get();
-            int balance2 = accounts[k * 2 + 1].get();
-
-            assertTrue(balance1 + balance2 >= 0);
-        }
-    }
-
-    public void assertWriteSkewOccurred() {
-        int count = 0;
-        for (int k = 0; k < bankCustomerCount; k++) {
-            int balance1 = accounts[k * 2].get();
-            int balance2 = accounts[k * 2 + 1].get();
-
-            if(balance1+balance2<0){
-                count++;
-            }
-        }
-
-        assertTrue(count>0);
-    }
-
     public class TransferThread extends TestThread {
+
         public TransferThread(int id) {
             super("TransferThread-" + id);
         }
@@ -131,7 +112,13 @@ public class WriteSkewLongTest {
             TransactionalInteger fromAccount2 = accounts[fromUser * 2 + 1];
 
             //here do the open for read/write take place.
-            if (fromAccount1.get() + fromAccount2.get() >= amount) {
+            int sum = fromAccount1.get() + fromAccount2.get();
+            if (sum < 0) {
+                System.out.println("WriteSkew occurred");
+                writeSkewOccurred.set(true);
+            }
+
+            if (sum >= amount) {
                 if (randomBoolean()) {
                     fromAccount1.dec(amount);
                 } else {
@@ -181,6 +168,7 @@ public class WriteSkewLongTest {
     }
 
     private class NonDetectingThread extends TestThread {
+
         final TransactionalInteger from1;
         final TransactionalInteger from2;
         final TransactionalInteger to;
@@ -205,7 +193,7 @@ public class WriteSkewLongTest {
     @Test
     public void simpleTestWithWriteSkewDetectionEnabledRepeated() {
         for (int k = 0; k < 100; k++) {
-            System.out.println("iteration: "+k);
+            System.out.println("iteration: " + k);
             simpleTestWithWriteSkewDetectionEnabled();
         }
     }
@@ -225,7 +213,7 @@ public class WriteSkewLongTest {
         t2.start();
         t1.start();
 
-        joinAll(t2);       
+        joinAll(t2);
         joinAll(t1);
 
         System.out.printf("from1=%s from2=%s  total=%s\n", from1.get(), from2.get(), from1.get() + from2.get());
@@ -237,6 +225,7 @@ public class WriteSkewLongTest {
     }
 
     private class DetectingThread extends TestThread {
+
         final TransactionalInteger from1;
         final TransactionalInteger from2;
         final TransactionalInteger to;
@@ -254,7 +243,7 @@ public class WriteSkewLongTest {
                 from1.dec(100);
                 to.inc(100);
                 //System.out.println("enough cash");
-            }else{
+            } else {
                 //System.out.println("not enough cash");
             }
 

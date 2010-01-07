@@ -86,7 +86,6 @@ public class ManualRef extends DefaultTxObjectMixin {
         tranlocal.value += value;
     }
 
-
     public void set(AlphaStm stm, int value) {
         TransactionFactory factory = stm.getTransactionFactoryBuilder().setReadonly(false).build();
         set(factory, value);

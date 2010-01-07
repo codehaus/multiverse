@@ -10,8 +10,6 @@ import org.multiverse.utils.clock.StrictClock;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 
@@ -37,11 +35,11 @@ public class AbstractTransaction_abortTest {
     }
 
     @Test
-    public void whenDoAbortThrowsError() {        
+    public void whenDoAbortThrowsError() {
         AbstractTransaction tx = spy(new AbstractTransactionImpl());
 
         RuntimeException expected = new RuntimeException();
-        doThrow(expected).when(tx).doAbort();
+        doThrow(expected).when(tx).doAbortActive();
 
         try {
             tx.abort();
@@ -50,6 +48,15 @@ public class AbstractTransaction_abortTest {
             assertSame(expected, found);
             assertIsAborted(tx);
         }
+    }
+
+    @Test
+    public void whenPrepared_thenAbort() {
+        AbstractTransaction tx = spy(new AbstractTransactionImpl());
+        tx.prepare();
+
+        tx.abort();
+        verify(tx, times(1)).doAbortPrepared();
     }
 
     @Test
@@ -120,7 +127,7 @@ public class AbstractTransaction_abortTest {
     }
 
     @Test
-    public void whenPostAbortTaskFails_exceptionThrown(){
+    public void whenPostAbortTaskFails_exceptionThrown() {
         Transaction tx = new AbstractTransactionImpl();
 
         RuntimeException exception = new RuntimeException();

@@ -1,7 +1,7 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.multiverse.api.Latch;
-import org.multiverse.api.TransactionTooSmallException;
+import org.multiverse.api.exceptions.TransactionTooSmallException;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.UncommittedFilter;
@@ -25,9 +25,10 @@ public class TinyUpdateAlphaTransaction
         public Config(
                 Clock clock, RestartBackoffPolicy restartBackoffPolicy, String familyName, ProfileRepository profiler,
                 int maxRetryCount, CommitLockPolicy commitLockPolicy, boolean interruptible, OptimalSize optimalSize,
-                boolean detectWriteSkew, boolean optimizeConflictDetection, boolean dirtyCheck, boolean automaticReadTracking) {
+                boolean detectWriteSkew, boolean optimizeConflictDetection, boolean dirtyCheck,
+                boolean automaticReadTracking) {
             super(clock, restartBackoffPolicy, familyName, false, maxRetryCount, interruptible, commitLockPolicy,
-                    profiler, detectWriteSkew, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
+                  profiler, detectWriteSkew, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
 
             this.optimalSize = optimalSize;
         }
@@ -50,7 +51,7 @@ public class TinyUpdateAlphaTransaction
         CommitLockPolicy lockPolicy = config.commitLockPolicy;
         return lockPolicy.tryAcquire(
                 attached,
-                config.dirtyCheck?UncommittedFilter.DIRTY_CHECK:UncommittedFilter.NO_DIRTY_CHECK,
+                config.dirtyCheck ? UncommittedFilter.DIRTY_CHECK : UncommittedFilter.NO_DIRTY_CHECK,
                 this);
     }
 
@@ -75,14 +76,14 @@ public class TinyUpdateAlphaTransaction
     }
 
     @Override
-    protected boolean hasReadConflicts() {
+    protected boolean hasReadConflict() {
         return hasWriteConflict(attached);
     }
 
     @Override
     protected Listeners[] store(long writeVersion) {
-        Listeners listeners = store(attached,writeVersion);
-        return listeners == null?null:new Listeners[]{listeners};
+        Listeners listeners = store(attached, writeVersion);
+        return listeners == null ? null : new Listeners[]{listeners};
     }
 
     @Override

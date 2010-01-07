@@ -71,7 +71,7 @@ public class IntRefTest {
         setThreadLocalTransaction(t1);
 
         IntRefTranlocal tranlocal = (IntRefTranlocal) t1.openForWrite(value);
-        assertTrue(tranlocal.hasConflict());
+        assertTrue(tranlocal.hasReadConflict(t1));
     }
 
     // ========================= atomic behavior ====================================

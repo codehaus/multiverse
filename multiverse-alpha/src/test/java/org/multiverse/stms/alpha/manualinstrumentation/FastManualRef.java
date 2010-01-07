@@ -3,9 +3,9 @@ package org.multiverse.stms.alpha.manualinstrumentation;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.TransactionStatus;
-import org.multiverse.api.TransactionTooSmallException;
 import org.multiverse.api.exceptions.RecoverableThrowable;
 import org.multiverse.api.exceptions.TooManyRetriesException;
+import org.multiverse.api.exceptions.TransactionTooSmallException;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.mixins.FastTxObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
@@ -34,7 +34,8 @@ public class FastManualRef extends FastTxObjectMixin {
         new TransactionTemplate(stm) {
             @Override
             public Object execute(Transaction t) {
-                FastManualRefTranlocal tranlocal = (FastManualRefTranlocal) ((AlphaTransaction) t).openForWrite(FastManualRef.this);
+                FastManualRefTranlocal tranlocal = (FastManualRefTranlocal) ((AlphaTransaction) t).openForWrite(
+                        FastManualRef.this);
                 tranlocal.value = value;
                 return null;
             }
@@ -122,7 +123,7 @@ public class FastManualRef extends FastTxObjectMixin {
             } while (attempt - 1 < tx.getConfig().getMaxRetryCount());
 
             String msg = format("Could not complete transaction '%s' within %s retries",
-                    tx.getConfig().getFamilyName(), tx.getConfig().getMaxRetryCount());
+                                tx.getConfig().getFamilyName(), tx.getConfig().getMaxRetryCount());
             throw new TooManyRetriesException(msg);
         } finally {
             clearThreadLocalTransaction();
@@ -141,7 +142,7 @@ public class FastManualRef extends FastTxObjectMixin {
 
                 tx.commit();
                 return;
-            }catch(TransactionTooSmallException ex){
+            } catch (TransactionTooSmallException ex) {
                 tx = (AlphaTransaction) txFactory.start();
             } catch (Throwable throwable) {
                 if (throwable instanceof RecoverableThrowable) {
@@ -163,7 +164,7 @@ public class FastManualRef extends FastTxObjectMixin {
         } while (attempt - 1 < tx.getConfig().getMaxRetryCount());
 
         String msg = format("Could not complete transaction '%s' within %s retries",
-                tx.getConfig().getFamilyName(), tx.getConfig().getMaxRetryCount());
+                            tx.getConfig().getFamilyName(), tx.getConfig().getMaxRetryCount());
         throw new TooManyRetriesException(msg);
     }
 

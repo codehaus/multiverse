@@ -1,13 +1,13 @@
 package org.multiverse.stms;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-import static org.multiverse.TestUtils.*;
-import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.utils.clock.StrictClock;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.multiverse.TestUtils.*;
 
 /**
  * @author Peter Veentjer
@@ -28,7 +28,7 @@ public class AbstractTransaction_startOrTest {
 
     @Test
     public void whenCommitted_thenDeadTransactionException() {
-        Transaction tx = new AbstractTransactionImpl(clock);
+        AbstractTransaction tx = new AbstractTransactionImpl(clock);
         tx.commit();
 
         long version = clock.getVersion();
@@ -43,7 +43,7 @@ public class AbstractTransaction_startOrTest {
 
     @Test
     public void whenAborted_thenDeadTransactionException() {
-        Transaction t = new AbstractTransactionImpl(clock);
+        AbstractTransaction t = new AbstractTransactionImpl(clock);
         t.abort();
 
         long version = clock.getVersion();

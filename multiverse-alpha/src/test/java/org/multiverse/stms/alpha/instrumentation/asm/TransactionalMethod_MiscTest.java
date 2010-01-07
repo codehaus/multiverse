@@ -2,17 +2,17 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.templates.TransactionTemplate;
+import org.multiverse.transactional.annotations.TransactionalMethod;
+import org.multiverse.transactional.annotations.TransactionalObject;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.assertIsActive;
-import static org.multiverse.TestUtils.testIncomplete;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
@@ -35,8 +35,9 @@ public class TransactionalMethod_MiscTest {
     }
 
     @Test
+    @Ignore
     public void abstractMethodIsIgnored() {
-        testIncomplete();
+
     }
 
     public static abstract class AbstractMethod {

@@ -3,11 +3,11 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.annotations.TransactionalObject;
 import org.multiverse.api.exceptions.LoadTooOldVersionException;
 import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.stms.alpha.AlphaStm;
+import org.multiverse.transactional.annotations.TransactionalMethod;
+import org.multiverse.transactional.annotations.TransactionalObject;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -16,8 +16,8 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 /**
- * A Test that checks if the configuration of the Transaction is correct if the TransactionalMethod
- * and TransactionalObject annotations are used.
+ * A Test that checks if the configuration of the Transaction is correct if the TransactionalMethod and
+ * TransactionalObject annotations are used.
  *
  * @author Peter Veentjer.
  */
@@ -68,13 +68,14 @@ public class TransactionalMethod_settingTest {
         ObjectWithDetectWriteSkew object = new ObjectWithDetectWriteSkew();
 
         assertFalse(object.updateNoDetectingMethod());
-        assertTrue(object.updateDefaultMethod());
+        assertFalse(object.updateDefaultMethod());
         assertTrue(object.updateDetectingMethod());
     }
 
 
     @TransactionalObject
     public static class ObjectWithDetectWriteSkew {
+
         private int x;
 
         public ObjectWithDetectWriteSkew() {
@@ -118,6 +119,7 @@ public class TransactionalMethod_settingTest {
 
     @TransactionalObject
     public static class ObjectWithReadonly {
+
         private int x;
 
         public ObjectWithReadonly() {
@@ -152,6 +154,7 @@ public class TransactionalMethod_settingTest {
 
     @TransactionalObject
     public static class ObjectWithInterruptible {
+
         private int value;
 
         public ObjectWithInterruptible() {
@@ -190,6 +193,7 @@ public class TransactionalMethod_settingTest {
 
     @TransactionalObject
     public static class AutomaticReadTracking {
+
         private int value;
 
         public void defaultMethod() {

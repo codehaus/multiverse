@@ -1,4 +1,4 @@
-package org.multiverse.api;
+package org.multiverse.api.exceptions;
 
 public class TransactionTooSmallException extends RuntimeException {
 

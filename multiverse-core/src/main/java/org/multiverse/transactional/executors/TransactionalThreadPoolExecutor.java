@@ -18,21 +18,12 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
 /**
  * A transactional {@link java.util.concurrent.Executor}.
  * <p/>
- * Known concurrent limitations
- * <ol>
- * <li>no concurrent takes and puts</li>
- * <li>no concurrent takes (not really a big issue since the takes only have a very short transactions)</li>
- * <li>no concurrent puts</li>
- * </ol>
- * This will eventually be solved when a better queue implementation is found.
+ * Known concurrent limitations <ol> <li>no concurrent takes and puts</li> <li>no concurrent takes (not really a big
+ * issue since the takes only have a very short transactions)</li> <li>no concurrent puts</li> </ol> This will
+ * eventually be solved when a better queue implementation is found.
  * <p/>
- * todo:
- * <ol>
- * <li> Shutdown not implemented</li>
- * <li> Shutdown now not implemented</li>
- * <li>awaitTerminated not implemented</li>
- * <li>exception handling</li>
- * </ol>
+ * todo: <ol> <li> Shutdown not implemented</li> <li> Shutdown now not implemented</li> <li>awaitTerminated not
+ * implemented</li> <li>exception handling</li> </ol>
  * <p/>
  * A task executes by a TransactionalThreadPoolExecutor will not automatically receives its own transaction.
  *
@@ -158,8 +149,8 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
 
     /**
      * Sets the corePoolSize of this TransactionalThreadPoolExecutor. If the TransactionalThreadPoolExecutor is
-     * unstarted, it isn't started. If the newCorePoolSize is larger than the maximumPoolSize, it automatically
-     * sets the maxPoolSize to newCorePoolSize.
+     * unstarted, it isn't started. If the newCorePoolSize is larger than the maximumPoolSize, it automatically sets the
+     * maxPoolSize to newCorePoolSize.
      *
      * @param newCorePoolSize the new core poolsize.
      * @throws IllegalArgumentException if newCorePoolSize is smaller than 0.
@@ -237,6 +228,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
      * Returns the thread factory used to create new threads.
      *
      * @return the current thread factory
+     *
      * @see #setThreadFactory
      */
     @TransactionalMethod(readonly = true)
@@ -272,7 +264,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
                 state = State.terminated;
                 return Collections.EMPTY_LIST;
             case started:
-                if(threads.isEmpty()){
+                if (threads.isEmpty()) {
                     state = State.terminated;
                 }
                 throw new TodoException();
@@ -285,7 +277,6 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
                 throw new IllegalStateException();
         }
     }
-
 
 
     @Override
@@ -330,8 +321,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
     }
 
     /**
-     * Awaits for this TransactionalThreadPoolExecutor to complete without the possibility of being
-     * interrupted.
+     * Awaits for this TransactionalThreadPoolExecutor to complete without the possibility of being interrupted.
      */
     @TransactionalMethod(readonly = true, automaticReadTracking = true)
     public void awaitTerminationUninterruptibly() {
@@ -412,6 +402,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
     }
 
     enum State {
+
         unstarted, started, shutdown, terminated
     }
 
@@ -492,13 +483,13 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
         }
     }
 
-    private class InterruptAllListener extends TransactionLifecycleListener{
+    private class InterruptAllListener extends TransactionLifecycleListener {
 
         @Override
         @TransactionalMethod
         public void notify(Transaction tx, TransactionLifecycleEvent event) {
-            if(event == TransactionLifecycleEvent.postCommit){
-                for(Thread thread: threads){
+            if (event == TransactionLifecycleEvent.postCommit) {
+                for (Thread thread : threads) {
                     thread.interrupt();
                 }
             }

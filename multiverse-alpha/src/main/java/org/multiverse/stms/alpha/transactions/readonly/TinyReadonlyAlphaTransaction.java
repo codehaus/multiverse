@@ -2,7 +2,7 @@ package org.multiverse.stms.alpha.transactions.readonly;
 
 import org.multiverse.api.Latch;
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.TransactionTooSmallException;
+import org.multiverse.api.exceptions.TransactionTooSmallException;
 import org.multiverse.stms.AbstractTransactionConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;

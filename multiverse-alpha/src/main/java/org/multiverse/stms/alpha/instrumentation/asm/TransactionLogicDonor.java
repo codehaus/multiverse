@@ -1,9 +1,13 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
-import org.multiverse.api.*;
+import org.multiverse.api.Latch;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionFactory;
+import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.RecoverableThrowable;
 import org.multiverse.api.exceptions.RetryError;
 import org.multiverse.api.exceptions.TooManyRetriesException;
+import org.multiverse.api.exceptions.TransactionTooSmallException;
 import org.multiverse.utils.latches.CheapLatch;
 import org.multiverse.utils.restartbackoff.RestartBackoffPolicy;
 
@@ -14,8 +18,8 @@ import static org.multiverse.api.ThreadLocalTransaction.*;
  * The donor class that can be used while instrumenting atomic methods and adding the transaction management
  * donorMethod.
  * <p/>
- * It is important that if there are static methods used in this donor that they are public, so that they
- * still can be used if the donor methods are transplanted.
+ * It is important that if there are static methods used in this donor that they are public, so that they still can be
+ * used if the donor methods are transplanted.
  *
  * @author Peter Veentjer.
  */
@@ -100,7 +104,7 @@ public class TransactionLogicDonor {
             } while (attempt - 1 < tx.getConfig().getMaxRetryCount());
 
             String msg = format("Could not complete transaction '%s' within %s retries",
-                    tx.getConfig().getFamilyName(), tx.getConfig().getMaxRetryCount());
+                                tx.getConfig().getFamilyName(), tx.getConfig().getMaxRetryCount());
             throw new TooManyRetriesException(msg);
         } finally {
             clearThreadLocalTransaction();

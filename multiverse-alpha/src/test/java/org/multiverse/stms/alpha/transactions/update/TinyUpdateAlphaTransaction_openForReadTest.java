@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.LoadLockedException;
 import org.multiverse.api.exceptions.LoadTooOldVersionException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -59,7 +60,7 @@ public class TinyUpdateAlphaTransaction_openForReadTest {
         AlphaTransaction tx = startSutTransactionWithoutAutomaticReadTracking();
         tx.openForRead(ref);
 
-        assertNull(getField(tx,"attached"));
+        assertNull(getField(tx, "attached"));
     }
 
     @Test
@@ -188,5 +189,21 @@ public class TinyUpdateAlphaTransaction_openForReadTest {
         }
 
         assertIsAborted(tx);
+    }
+
+    @Test
+    public void whenPrepared_thenPreparedTransactionException() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction tx = startSutTransaction();
+        tx.prepare();
+
+        try {
+            tx.openForRead(ref);
+            fail();
+        } catch (PreparedTransactionException expected) {
+        }
+
+        assertIsPrepared(tx);
     }
 }

@@ -4,9 +4,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.multiverse.transactional.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
+import org.multiverse.transactional.annotations.TransactionalObject;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -32,20 +32,21 @@ public class TransactionalObject_ConstructorTest {
     }
 
     @Test
-    public void testConstructorWithReadFirst(){
+    public void testConstructorWithReadFirst() {
         ConstructorWithReadFirst object = new ConstructorWithReadFirst();
         assertEquals(0, object.getField());
     }
 
     @TransactionalObject
-    public class ConstructorWithReadFirst{
+    public class ConstructorWithReadFirst {
+
         private int field;
 
-        public ConstructorWithReadFirst(){
-            this.field = field*2;
+        public ConstructorWithReadFirst() {
+            this.field = field * 2;
         }
 
-        public int getField(){
+        public int getField() {
             return field;
         }
     }
@@ -404,26 +405,33 @@ public class TransactionalObject_ConstructorTest {
     }
 
     @Test
-    @Ignore
     public void constructorWithSuperCallingConstructor() {
-        //todo
+        ConstructorThatCallsSuper object = new ConstructorThatCallsSuper(10);
+        assertEquals(10, object.value);
+    }
+
+    static class Super {
+
+        int value;
+
+        Super(int value) {
+            this.value = value;
+        }
+    }
+
+    @TransactionalObject
+    static class ConstructorThatCallsSuper extends Super {
+
+        public ConstructorThatCallsSuper(int value) {
+            super(value);
+        }
     }
 
 
     @Test
-    @Ignore
-    public void atomicObjectWithNoArgThisCallingConstructor() {
-        //todo
-    }
-
-    @Test
-    @Ignore
     public void constructorThatCallsThis() {
-        long version = stm.getVersion();
-        //ThisCallingConstructor c = new ThisCallingConstructor();
-        //assertEquals(25, c.getValue());
-        //assertEquals(version + 1, stm.getClockVersion());
-        //todo
+        ThisCallingConstructor c = new ThisCallingConstructor();
+        assertEquals(25, c.getValue());
     }
 
     @TransactionalObject
@@ -433,13 +441,10 @@ public class TransactionalObject_ConstructorTest {
 
         public ThisCallingConstructor() {
             this(25);
-            //    System.out.println("value = "+value);
         }
 
         public ThisCallingConstructor(int value) {
-            //    System.out.println("constructor called with value: "+value);
             this.value = value;
-            //    System.out.println("value set: "+this.value);
         }
 
         public int getValue() {
@@ -518,9 +523,11 @@ public class TransactionalObject_ConstructorTest {
     }
 
     @Test
-    @Ignore
     public void testStaticInitializer() {
-        //todo
+        ObjectWithStaticInitializer o = new ObjectWithStaticInitializer(10);
+
+        assertEquals(100, ObjectWithStaticInitializer.staticValue);
+        assertEquals(10, o.getValue());
     }
 
     @Test

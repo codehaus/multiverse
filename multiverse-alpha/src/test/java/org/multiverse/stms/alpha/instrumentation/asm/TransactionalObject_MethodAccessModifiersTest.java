@@ -4,15 +4,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Stm;
-import org.multiverse.transactional.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
+import org.multiverse.transactional.annotations.TransactionalObject;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.multiverse.TestUtils.testIncomplete;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
@@ -324,11 +323,6 @@ public class TransactionalObject_MethodAccessModifiersTest {
         public int getValue() {
             return value;
         }
-    }
-
-    @Test
-    public void testConstructor() {
-        testIncomplete();
     }
 
     @Test

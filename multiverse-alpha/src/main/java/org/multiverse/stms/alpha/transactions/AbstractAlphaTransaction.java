@@ -1,6 +1,7 @@
 package org.multiverse.stms.alpha.transactions;
 
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.stms.AbstractTransaction;
 import org.multiverse.stms.AbstractTransactionConfig;
 import org.multiverse.stms.AbstractTransactionSnapshot;
@@ -34,6 +35,12 @@ public abstract class AbstractAlphaTransaction<C extends AbstractTransactionConf
                 }
 
                 return doOpenForRead(txObject);
+            case prepared:
+                String preparedMsg = format(
+                        "Can't open for read transactional object '%s' " +
+                                "because transaction '%s' already is committed.",
+                        toTxObjectString(txObject), config.getFamilyName());
+                throw new PreparedTransactionException(preparedMsg);
             case committed:
                 String committedMsg = format(
                         "Can't open for read transactional object '%s' " +
@@ -71,14 +78,22 @@ public abstract class AbstractAlphaTransaction<C extends AbstractTransactionConf
                 }
 
                 return doOpenForWrite(txObject);
+            case prepared:
+                String preparedMsg = format(
+                        "Can't open for write transactional object '%s' "
+                                + "because transaction '%s' already is prepared for committing.",
+                        toTxObjectString(txObject), config.getFamilyName());
+                throw new PreparedTransactionException(preparedMsg);
             case committed:
                 String committedMsg = format(
-                        "Can't open for write transactional object '%s' because transaction '%s' already is committed.",
+                        "Can't open for write transactional object '%s' "
+                                + "because transaction '%s' already is committed.",
                         toTxObjectString(txObject), config.getFamilyName());
                 throw new DeadTransactionException(committedMsg);
             case aborted:
                 String abortedMsg = format(
-                        "Can't open for writ transactional object '%s' because transaction '%s' already is aborted.",
+                        "Can't open for writ transactional object '%s' "
+                                + "because transaction '%s' already is aborted.",
                         toTxObjectString(txObject), config.getFamilyName());
                 throw new DeadTransactionException(abortedMsg);
             default:

@@ -1,14 +1,13 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
+import org.multiverse.stms.alpha.AlphaStm;
+import org.multiverse.templates.OrElseTemplate;
 import org.multiverse.templates.TransactionTemplate;
 import org.multiverse.transactional.annotations.Exclude;
 import org.multiverse.transactional.annotations.TransactionalObject;
-import org.multiverse.stms.alpha.AlphaStm;
-import org.multiverse.templates.OrElseTemplate;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -483,12 +482,6 @@ public class TranlocalSnapshotTest {
     }
 
     @Test
-    @Ignore
-    public void RuntimeKnownTxObjectField() {
-        //todo
-    }
-
-    @Test
     public void testMultipleFieldsObjectTest() {
         final MultipleFieldsObject m = new MultipleFieldsObject(1, 2, 3);
 
@@ -822,6 +815,7 @@ public class TranlocalSnapshotTest {
 
     @TransactionalObject
     static class TestMultipleFields {
+
         int field1, field2, field3;
     }
 }

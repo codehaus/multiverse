@@ -1,8 +1,8 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.multiverse.api.Latch;
-import org.multiverse.api.TransactionTooSmallException;
 import org.multiverse.api.exceptions.PanicError;
+import org.multiverse.api.exceptions.TransactionTooSmallException;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.UncommittedFilter;
@@ -16,8 +16,8 @@ import org.multiverse.utils.restartbackoff.RestartBackoffPolicy;
 import static java.lang.System.arraycopy;
 
 /**
- * A {@link AbstractUpdateAlphaTransaction} where the tranlocals are stored in an array. An
- * array is faster for very small collection than a map.
+ * A {@link AbstractUpdateAlphaTransaction} where the tranlocals are stored in an array. An array is faster for very
+ * small collection than a map.
  *
  * @author Peter Veentjer
  */
@@ -32,10 +32,11 @@ public class FixedUpdateAlphaTransaction
         public Config(
                 Clock clock, RestartBackoffPolicy restartBackoffPolicy, String familyName,
                 ProfileRepository profiler, CommitLockPolicy commitLockPolicy, int maxRetryCount,
-                boolean detectWriteSkew, OptimalSize optimalSize, boolean interruptible, boolean optimizeConflictDetection,
+                boolean detectWriteSkew, OptimalSize optimalSize, boolean interruptible,
+                boolean optimizeConflictDetection,
                 boolean dirtyCheck, boolean automaticReadTracking, int maximumSize) {
             super(clock, restartBackoffPolicy, familyName, false, maxRetryCount, interruptible, commitLockPolicy,
-                    profiler, detectWriteSkew, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
+                  profiler, detectWriteSkew, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
 
             this.optimalSize = optimalSize;
             this.maximumSize = maximumSize;
@@ -113,7 +114,7 @@ public class FixedUpdateAlphaTransaction
         }
 
         if (firstFreeIndex == attachedArray.length) {
-            int newOptimalSize = attachedArray.length+2;
+            int newOptimalSize = attachedArray.length + 2;
             config.optimalSize.compareAndSet(attachedArray.length, newOptimalSize);
             if (attachedArray.length >= config.maximumSize) {
                 throw TransactionTooSmallException.INSTANCE;
@@ -163,10 +164,10 @@ public class FixedUpdateAlphaTransaction
     }
 
     @Override
-    protected boolean hasReadConflicts() {
+    protected boolean hasReadConflict() {
         for (int k = 0; k < firstFreeIndex; k++) {
             AlphaTranlocal attached = attachedArray[k];
-            if(hasReadConflict(attached)){
+            if (hasReadConflict(attached)) {
                 return true;
             }
         }

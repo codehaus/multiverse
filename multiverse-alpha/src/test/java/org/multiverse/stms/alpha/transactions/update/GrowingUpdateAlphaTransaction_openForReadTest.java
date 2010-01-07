@@ -6,6 +6,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.LoadLockedException;
 import org.multiverse.api.exceptions.LoadTooOldVersionException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -67,7 +68,7 @@ public class GrowingUpdateAlphaTransaction_openForReadTest {
         AlphaTransaction tx = startSutTransactionWithoutAutomaticReadTracking();
         tx.openForRead(ref);
 
-        Map attachedMap = (Map) getField(tx,"attachedMap");
+        Map attachedMap = (Map) getField(tx, "attachedMap");
         assertTrue(attachedMap.isEmpty());
     }
 
@@ -136,10 +137,10 @@ public class GrowingUpdateAlphaTransaction_openForReadTest {
     }
 
     /**
-     * In the previous version multiverse, it was allowed to do a load of an txobject that was locked even the
-     * version of the current content matches the version of the transaction. If the atomicobject didn't have any
-     * primitives to other objects, this should be alright. But if an object does have dependencies, these dependencies
-     * could escape before they are committed. For now this has been disallowed.
+     * In the previous version multiverse, it was allowed to do a load of an txobject that was locked even the version
+     * of the current content matches the version of the transaction. If the atomicobject didn't have any primitives to
+     * other objects, this should be alright. But if an object does have dependencies, these dependencies could escape
+     * before they are committed. For now this has been disallowed.
      */
     @Test
     public void whenLockedAndVersionMatch_thenLoadLockedException() {
@@ -280,6 +281,22 @@ public class GrowingUpdateAlphaTransaction_openForReadTest {
         assertIsAborted(tx);
         assertSame(committed, ref.___load());
         assertEquals(expectedVersion, stm.getVersion());
+    }
+
+    @Test
+    public void whenPrepared_thenPreparedTransactionException() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction tx = startSutTransaction();
+        tx.prepare();
+
+        try {
+            tx.openForWrite(ref);
+            fail();
+        } catch (PreparedTransactionException expected) {
+        }
+
+        assertIsPrepared(tx);
     }
 
     public Map getReadWriteMap(AlphaTransaction tx) {

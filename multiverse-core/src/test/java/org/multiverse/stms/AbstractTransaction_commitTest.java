@@ -30,7 +30,7 @@ public class AbstractTransaction_commitTest {
         AbstractTransaction tx = spy(new AbstractTransactionImpl());
 
         RuntimeException expected = new RuntimeException();
-        doThrow(expected).when(tx).doCommit();
+        doThrow(expected).when(tx).doCommitActive();
 
         try {
             tx.commit();
@@ -82,7 +82,7 @@ public class AbstractTransaction_commitTest {
     }
 
     @Test
-    public void whenPostCommitTaskFails_exceptionThrown(){
+    public void whenPostCommitTaskFails_exceptionThrown() {
         Transaction tx = new AbstractTransactionImpl();
 
         RuntimeException exception = new RuntimeException();
@@ -104,6 +104,11 @@ public class AbstractTransaction_commitTest {
         verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.postCommit);
         verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.preAbort);
         verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.postAbort);
+    }
+
+    @Test
+    public void whenPrepared() {
+
     }
 
     @Test

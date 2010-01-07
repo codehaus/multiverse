@@ -159,7 +159,7 @@ public final class MetadataExtractor implements Opcodes {
             TransactionalMethodParams params = new TransactionalMethodParams();
             params.readOnly = false;
             params.automaticReadTracking = true;
-            params.detectWriteSkew = true;
+            params.detectWriteSkew = false;
             params.retryCount = 0;
             params.familyName = createDefaultFamilyName(method);
             params.interruptible = false;
@@ -186,9 +186,9 @@ public final class MetadataExtractor implements Opcodes {
             params.familyName = (String) getValue(txMethodAnnotation, "familyName", createDefaultFamilyName(method));
             params.automaticReadTracking = (Boolean) getValue(txMethodAnnotation, "automaticReadTracking", true);
             params.interruptible = (Boolean) getValue(txMethodAnnotation, "interruptible", false);
-            params.detectWriteSkew = (Boolean) getValue(txMethodAnnotation, "detectWriteSkew", true);
+            params.detectWriteSkew = (Boolean) getValue(txMethodAnnotation, "detectWriteSkew", false);
             params.smartTxLengthSelector = false;
-            params.readOnly = (Boolean) getValue(txMethodAnnotation, "readonly", false); 
+            params.readOnly = (Boolean) getValue(txMethodAnnotation, "readonly", false);
             return params;
         } else {
             AnnotationNode txMethodAnnotation = AsmUtils.getVisibleAnnotation(method, TransactionalMethod.class);
@@ -197,9 +197,11 @@ public final class MetadataExtractor implements Opcodes {
             params.familyName = (String) getValue(txMethodAnnotation, "familyName", createDefaultFamilyName(method));
             params.retryCount = (Integer) getValue(txMethodAnnotation, "retryCount", 1000);
             boolean trackReadsDefault = !params.readOnly;
-            params.automaticReadTracking = (Boolean) getValue(txMethodAnnotation, "automaticReadTracking", trackReadsDefault);
+            params.automaticReadTracking = (Boolean) getValue(txMethodAnnotation,
+                                                              "automaticReadTracking",
+                                                              trackReadsDefault);
             params.interruptible = (Boolean) getValue(txMethodAnnotation, "interruptible", false);
-            boolean detectWriteSkewDefault = !params.readOnly;
+            boolean detectWriteSkewDefault = false;
             params.detectWriteSkew = (Boolean) getValue(txMethodAnnotation, "detectWriteSkew", detectWriteSkewDefault);
             params.smartTxLengthSelector = true;
             return params;

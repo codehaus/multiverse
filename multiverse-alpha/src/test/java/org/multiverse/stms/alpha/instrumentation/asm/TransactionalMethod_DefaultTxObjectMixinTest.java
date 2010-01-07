@@ -2,23 +2,21 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.transactional.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
+import org.multiverse.transactional.annotations.TransactionalObject;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.multiverse.TestUtils.testIncomplete;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.stms.alpha.instrumentation.AlphaReflectionUtils.existsField;
 
 /**
- * A unit tests that checks if all fields/methods/interfaces of the FastAtomicObject are copied
- * when the code is instrumented (each atomicobject will receive the complete content of the
- * fastatomicobject).
+ * A unit tests that checks if all fields/methods/interfaces of the FastAtomicObject are copied when the code is
+ * instrumented (each atomicobject will receive the complete content of the fastatomicobject).
  * <p/>
- * This tests depends on the fact that the DefaultTxObjectMixin is used as donor. So when this
- * is changed, this test needs to be changed.
+ * This tests depends on the fact that the DefaultTxObjectMixin is used as donor. So when this is changed, this test
+ * needs to be changed.
  *
  * @author Peter Veentjer.
  */
@@ -37,7 +35,6 @@ public class TransactionalMethod_DefaultTxObjectMixinTest {
         assertEquals(Object.class, clazz.getSuperclass());
         assertAllInstanceFieldsAreCopied(clazz);
         assertAllStaticFieldsAreCopied(clazz);
-        assertAllMethodsAreCopied(clazz);
         assertAlphaAtomicObjectInterfaceIsCopied(clazz);
     }
 
@@ -61,10 +58,6 @@ public class TransactionalMethod_DefaultTxObjectMixinTest {
         return false;
     }
 
-    private void assertAllMethodsAreCopied(Class clazz) {
-        testIncomplete();
-    }
-
     private void assertAllInstanceFieldsAreCopied(Class clazz) {
         assertTrue(existsField(clazz, "___lockOwner"));
         assertTrue(existsField(clazz, "___tranlocal"));
@@ -73,6 +66,7 @@ public class TransactionalMethod_DefaultTxObjectMixinTest {
 
     @TransactionalObject
     public static class SomeTxObject {
+
         int x;
 
         SomeTxObject(int x) {

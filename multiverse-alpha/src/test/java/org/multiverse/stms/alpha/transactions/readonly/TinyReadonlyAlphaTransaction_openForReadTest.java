@@ -2,10 +2,10 @@ package org.multiverse.stms.alpha.transactions.readonly;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.TransactionTooSmallException;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.LoadLockedException;
 import org.multiverse.api.exceptions.LoadTooOldVersionException;
+import org.multiverse.api.exceptions.TransactionTooSmallException;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;

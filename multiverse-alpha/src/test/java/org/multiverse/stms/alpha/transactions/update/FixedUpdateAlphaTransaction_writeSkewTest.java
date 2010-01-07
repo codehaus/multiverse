@@ -45,7 +45,7 @@ public class FixedUpdateAlphaTransaction_writeSkewTest {
                 stmConfig.maxRetryCount,
                 detectWriteSkew,
                 optimalSize,
-                true, false, true, true,size
+                true, false, true, true, size
         );
         return new FixedUpdateAlphaTransaction(config, size);
     }
@@ -88,7 +88,7 @@ public class FixedUpdateAlphaTransaction_writeSkewTest {
         }
 
         assertIsAborted(tx2);
-        assertEquals(version, stm.getVersion());
+        assertEquals(version + 1, stm.getVersion());
         assertSame(committedRef1, ref1.___load());
         assertSame(tranlocalRef2, ref2.___load());
     }
@@ -245,7 +245,8 @@ public class FixedUpdateAlphaTransaction_writeSkewTest {
         final ManualRef accountTo2;
         final boolean enabled;
 
-        public TransferThread(int id, ManualRef accountFrom1, ManualRef accountFrom2, ManualRef accountTo1, ManualRef accountTo2, boolean enabled) {
+        public TransferThread(int id, ManualRef accountFrom1, ManualRef accountFrom2, ManualRef accountTo1,
+                              ManualRef accountTo2, boolean enabled) {
             super("TransferThread-" + id);
 
             this.accountFrom1 = accountFrom1;

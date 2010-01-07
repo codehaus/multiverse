@@ -183,11 +183,16 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
         public AlphaTransactionFactoryBuilder() {
             this(false, true, null, 1000, false, AlphaStm.this.commitLockPolicy,
-                    AlphaStm.this.restartBackoffPolicy, null, true, AlphaStm.this.smartTxLengthSelector, AlphaStm.this.dirtyCheck);
+                 AlphaStm.this.restartBackoffPolicy,
+                 null,
+                 false,
+                 AlphaStm.this.smartTxLengthSelector,
+                 AlphaStm.this.dirtyCheck);
         }
 
         public AlphaTransactionFactoryBuilder(
-                boolean readonly, boolean automaticReadTracking, String familyName, int maxRetryCount, boolean detectWriteSkew,
+                boolean readonly, boolean automaticReadTracking, String familyName, int maxRetryCount,
+                boolean detectWriteSkew,
                 CommitLockPolicy commitLockPolicy, RestartBackoffPolicy restartBackoffPolicy, OptimalSize optimalSize,
                 boolean interruptible, boolean smartTxLengthSelector, boolean dirtyCheck) {
             this.readonly = readonly;
@@ -365,7 +370,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                             new FixedUpdateAlphaTransaction.Config(
                                     clock, restartBackoffPolicy, familyName, profiler, commitLockPolicy,
                                     maxRetryCount, detectWriteSkew, optimalSize, interruptible,
-                                    optimizeConflictDetection, true,automaticReadTracking, maxFixedUpdateSize);
+                                    optimizeConflictDetection, true, automaticReadTracking, maxFixedUpdateSize);
 
                     TinyUpdateAlphaTransaction.Config tinyConfig =
                             new TinyUpdateAlphaTransaction.Config(

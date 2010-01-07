@@ -9,8 +9,9 @@ import org.multiverse.utils.commitlock.CommitLock;
 import static java.lang.String.format;
 
 /**
- * The Tranlocal is the Transaction local content of a TransactionalObject, since the state from the TransactionalObject is removed.
- * So for every TransactionalObject there are 1 or more Tranlocals (or zero when the TransactionalObject is being constructed).
+ * The Tranlocal is the Transaction local content of a TransactionalObject, since the state from the TransactionalObject
+ * is removed. So for every TransactionalObject there are 1 or more Tranlocals (or zero when the TransactionalObject is
+ * being constructed).
  * <p/>
  * Semantics of version: after the Tranlocal is committed, the version contains the write version. Before the commit it
  * contains the current read version.
@@ -85,37 +86,37 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
 
     /**
      * Checks if the tranlocal is dirty
-     *
+     * <p/>
      * If the tranlocal is committed, false is returned and nothing is changed.
-     *
+     * <p/>
      * If not is dirty (but also not committed) the ___writeVersion is set to 0 and false is returned.
-     *
+     * <p/>
      * If dirty (but also not committed) the ___writeVersion is set to -1.
      *
      * @return
      */
-    public boolean isDirtySweep(){
-        if(isCommitted()){
+    public boolean isDirtySweep() {
+        if (isCommitted()) {
             return false;
         }
 
-        if(isDirty()){
+        if (isDirty()) {
             ___writeVersion = -1;
             return true;
-        }else{
+        } else {
             ___writeVersion = 0;
             return false;
         }
     }
 
     /**
-     * Checks if the tranlocal is dirty by making use of a ___writeVersion that is changed by the
-     * isDirtySweep method. If the tranlocal is committed, false will be returned.
+     * Checks if the tranlocal is dirty by making use of a ___writeVersion that is changed by the isDirtySweep method.
+     * If the tranlocal is committed, false will be returned.
      *
      * @return true if dirty, false otherwise.
      */
-    public boolean getPrecalculatedIsDirty(){
-        if(isCommitted()){
+    public boolean getPrecalculatedIsDirty() {
+        if (isCommitted()) {
             return false;
         }
 
@@ -126,40 +127,39 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
         return ___writeVersion > 0;
     }
 
-    public final boolean isUncommitted(){
+    public final boolean isUncommitted() {
         return !isCommitted();
     }
 
-    public long getWriteVersion(){
+    public long getWriteVersion() {
         return ___writeVersion;
     }
 
-    /**
-     * Checks if the tranlocal conflicts with the most recently committed tranlocal.
-     * <p/>
-     * Value could be stale as soon as it is returned. So if you want to make sure that no conflicts are introduced by
-     * other transactions, you need to have the commitlock of the AlphaTransactionalObject.
-     * <p/>
-     *
-     * @return true if there was a conflict, false otherwise.
-     * @throws org.multiverse.api.exceptions.LoadException
-     *          if failed to load the data needed to perform the check on dirtiness state. Depends on the implementation
-     *          if this is thrown.
-     */
-    public final boolean hasConflict() {
+    public final boolean hasWriteConflict() {
         if (isCommitted()) {
-            if(getTransactionalObject().___getLockOwner()!=null){
-                return true;
-            }
-
-            //a readonly one will conflict if there already different alphatranlocal active.
-            return getTransactionalObject().___load() != this;
+            return false;
         }
 
-        AlphaTranlocal origin = getOrigin();
-        //an object that is updated conflict when the active version is not the same as
-        //the origin of the tranlocal.
-        return origin != getTransactionalObject().___load();
+        AlphaTransactionalObject txObject = getTransactionalObject();
+
+        AlphaTranlocal current = txObject.___load();
+        return current != getOrigin();
+    }
+
+    public final boolean hasReadConflict(Transaction allowedLockOwner) {
+        AlphaTransactionalObject txObject = getTransactionalObject();
+
+        Transaction lockOwner = txObject.___getLockOwner();
+        if (lockOwner != null && lockOwner != allowedLockOwner) {
+            return true;
+        }
+
+        AlphaTranlocal current = txObject.___load();
+        if (isCommitted()) {
+            return current != this;
+        }
+
+        return current != getOrigin();
     }
 
     @Override
@@ -203,20 +203,20 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
         getTransactionalObject().___releaseLock(expectedLockOwner);
     }
 
-/**
+    /**
      * Debug representation of a TransactionalObject.
      *
      * @return the string representation of the atomicobject.
      */
     public String toDebugString() {
-        if(isCommitted()){
+        if (isCommitted()) {
             return format("readonly-tranlocal(class=%s@%s, version=%s)",
-                    getTransactionalObject().getClass().getSimpleName(),
-                    System.identityHashCode(getTransactionalObject()),
-                    ___writeVersion);
-        }else{
+                          getTransactionalObject().getClass().getSimpleName(),
+                          System.identityHashCode(getTransactionalObject()),
+                          ___writeVersion);
+        } else {
             return format("update-tranlocal(origin=%s)",
-                    getOrigin()==null?null:getOrigin().toDebugString());
+                          getOrigin() == null ? null : getOrigin().toDebugString());
         }
     }
 

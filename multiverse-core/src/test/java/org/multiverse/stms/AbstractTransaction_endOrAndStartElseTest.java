@@ -2,7 +2,6 @@ package org.multiverse.stms;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.utils.clock.StrictClock;
 
@@ -29,7 +28,7 @@ public class AbstractTransaction_endOrAndStartElseTest {
 
     @Test
     public void whenCommitted_thenDeadTransactionException() {
-        Transaction tx = new AbstractTransactionImpl(clock);
+        AbstractTransaction tx = new AbstractTransactionImpl(clock);
         tx.commit();
 
         long version = clock.getVersion();
@@ -44,7 +43,7 @@ public class AbstractTransaction_endOrAndStartElseTest {
 
     @Test
     public void whenAborted_thenDeadTransactionException() {
-        Transaction tx = new AbstractTransactionImpl(clock);
+        AbstractTransaction tx = new AbstractTransactionImpl(clock);
         tx.abort();
 
         long version = clock.getVersion();

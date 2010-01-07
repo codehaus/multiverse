@@ -17,8 +17,7 @@ public class TransactionalConstructor_settingsTest {
 
     public class ReadonlyExplicitlyEnabled {
 
-        @TransactionalConstructor(readonly = true)
-        ReadonlyExplicitlyEnabled() {
+        @TransactionalConstructor(readonly = true) ReadonlyExplicitlyEnabled() {
             Transaction tx = getThreadLocalTransaction();
             assertTrue(tx.getConfig().isReadonly());
         }
@@ -26,8 +25,7 @@ public class TransactionalConstructor_settingsTest {
 
     public class ReadonlyExplicitlyDisabled {
 
-        @TransactionalConstructor(readonly = false)
-        ReadonlyExplicitlyDisabled() {
+        @TransactionalConstructor(readonly = false) ReadonlyExplicitlyDisabled() {
             Transaction tx = getThreadLocalTransaction();
             assertFalse(tx.getConfig().isReadonly());
         }
@@ -48,7 +46,7 @@ public class TransactionalConstructor_settingsTest {
             assertFalse(tx.getConfig().isReadonly());
             assertEquals(0, tx.getConfig().getMaxRetryCount());
             assertTrue(tx.getConfig().automaticReadTracking());
-            assertTrue(tx.getConfig().detectWriteSkew());
+            assertFalse(tx.getConfig().detectWriteSkew());
         }
     }
 
@@ -70,6 +68,7 @@ public class TransactionalConstructor_settingsTest {
     }
 
     public class EnabledReadTracking {
+
         @TransactionalConstructor(automaticReadTracking = true)
         public EnabledReadTracking() {
             Transaction tx = getThreadLocalTransaction();
@@ -95,7 +94,8 @@ public class TransactionalConstructor_settingsTest {
     }
 
     public class DetectWriteSkewEnabled {
-        @TransactionalConstructor(automaticReadTracking = true)
+
+        @TransactionalConstructor(detectWriteSkew = true)
         public DetectWriteSkewEnabled() {
             Transaction tx = getThreadLocalTransaction();
             assertTrue(tx.getConfig().detectWriteSkew());

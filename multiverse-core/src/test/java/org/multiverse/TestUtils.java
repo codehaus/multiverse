@@ -68,7 +68,7 @@ public class TestUtils {
 
         System.out.println("============================================================================");
         System.out.printf("Test '%s' incomplete in file '%s' at line %s\n",
-                caller.getMethodName(), caller.getFileName(), caller.getLineNumber());
+                          caller.getMethodName(), caller.getFileName(), caller.getLineNumber());
         System.out.println("============================================================================");
     }
 
@@ -78,7 +78,7 @@ public class TestUtils {
 
         System.out.println("============================================================================");
         System.out.printf("Test '%s' incomplete in file '%s' at line %s\n",
-                caller.getMethodName(), caller.getFileName(), caller.getLineNumber());
+                          caller.getMethodName(), caller.getFileName(), caller.getLineNumber());
         System.out.printf("Reason: %s\n", reason);
         System.out.println("============================================================================");
     }
@@ -90,6 +90,11 @@ public class TestUtils {
     public static void assertIsActive(Transaction t) {
         assertNotNull("No transaction found", t);
         assertEquals(TransactionStatus.active, t.getStatus());
+    }
+
+    public static void assertIsPrepared(Transaction t) {
+        assertNotNull("No transaction found", t);
+        assertEquals(TransactionStatus.prepared, t.getStatus());
     }
 
     public static void assertIsCommitted(Transaction t) {

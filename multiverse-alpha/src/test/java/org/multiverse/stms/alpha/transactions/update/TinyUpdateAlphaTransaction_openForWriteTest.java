@@ -2,16 +2,13 @@ package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.LoadLockedException;
-import org.multiverse.api.exceptions.LoadTooOldVersionException;
+import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.api.TransactionTooSmallException;
 import org.multiverse.stms.alpha.transactions.OptimalSize;
 
 import static org.junit.Assert.*;
@@ -40,7 +37,7 @@ public class TinyUpdateAlphaTransaction_openForWriteTest {
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount,
-                stmConfig.commitLockPolicy, true, optimalSize,true,true,true,true);
+                stmConfig.commitLockPolicy, true, optimalSize, true, true, true, true);
         return new TinyUpdateAlphaTransaction(config);
     }
 
@@ -48,12 +45,12 @@ public class TinyUpdateAlphaTransaction_openForWriteTest {
     public void whenNullTxObject_thenNullPointerException() {
         AlphaTransaction tx = startSutTransaction();
 
-        try{
+        try {
             tx.openForWrite(null);
             fail();
-        }catch(NullPointerException expected){
+        } catch (NullPointerException expected) {
         }
-        
+
         assertIsActive(tx);
     }
 
@@ -212,4 +209,21 @@ public class TinyUpdateAlphaTransaction_openForWriteTest {
         assertEquals(version, stm.getVersion());
         assertSame(committed, ref.___load());
     }
+
+    @Test
+    public void whenPrepared_thenPreparedTransactionException() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction tx = startSutTransaction();
+        tx.prepare();
+
+        try {
+            tx.openForWrite(ref);
+            fail();
+        } catch (PreparedTransactionException expected) {
+        }
+
+        assertIsPrepared(tx);
+    }
 }
+

@@ -1,7 +1,6 @@
 package org.multiverse.stms.alpha;
 
 import org.multiverse.api.Latch;
-import org.multiverse.stms.alpha.RegisterRetryListenerResult;
 import org.multiverse.utils.Listeners;
 import org.multiverse.utils.commitlock.CommitLock;
 
@@ -23,17 +22,11 @@ public interface AlphaTransactionalObject extends CommitLock {
      *
      * @param readVersion the version of the Tranlocal to read.
      * @return the loaded Tranlocal. If nothing is committed, null is returned.
+     *
      * @throws org.multiverse.api.exceptions.LoadException
      *          if the system wasn't able to load the Tranlocal.
      */
     AlphaTranlocal ___load(long readVersion);
-
-    /**
-     * Checks if there is a conflict. 
-     *
-     * @return true is there is a conflict, false if not.
-     */
-    boolean ___hasConflict(long version);
 
     /**
      * Loads the most recently committed AlphaTranlocal. Call never fails. Value could be stale as soon as it is

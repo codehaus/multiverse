@@ -19,7 +19,8 @@ import static java.lang.String.format;
 /**
  * Doesn't support blocking operations.
  * <p/>
- * Base AlphaTransactionalObject implementation that also can be used to transplant methods from during instrumentation.
+ * Base AlphaTransactionalObject implementation that also can be used to transplant methods from during
+ * instrumentation.
  * <p/>
  * It is important that the constructor doesn't contain any donorMethod because the constructor code is not copied when
  * this class is 'mixed' in. In the future perhaps this is fixed when there needs to be a constructor. So you are
@@ -41,16 +42,6 @@ public abstract class FastTxObjectMixin implements AlphaTransactionalObject, Mul
     @Override
     public AlphaTranlocal ___load() {
         return ___TRANLOCAL_UPDATER.get(this);
-    }
-
-    @Override
-    public boolean ___hasConflict(long maximumVersion) {
-        if (___getLockOwner() == null) {
-            return true;
-        }
-
-        AlphaTranlocal tranlocal = ___TRANLOCAL_UPDATER.get(this);
-        return tranlocal.getWriteVersion() > maximumVersion;
     }
 
     public Listeners ___getListeners() {
@@ -92,8 +83,11 @@ public abstract class FastTxObjectMixin implements AlphaTransactionalObject, Mul
             if (LoadTooOldVersionException.reuse) {
                 throw LoadTooOldVersionException.INSTANCE;
             } else {
-                String msg = format("Can't load version '%s' for transactionalobject '%s', the oldest version found is '%s'",
-                        readVersion, AlphaStmUtils.toTxObjectString(this), tranlocalTime1.getWriteVersion());
+                String msg = format(
+                        "Can't load version '%s' for transactionalobject '%s', the oldest version found is '%s'",
+                        readVersion,
+                        AlphaStmUtils.toTxObjectString(this),
+                        tranlocalTime1.getWriteVersion());
                 throw new LoadTooOldVersionException(msg);
             }
         } else {
@@ -106,7 +100,8 @@ public abstract class FastTxObjectMixin implements AlphaTransactionalObject, Mul
                 if (LoadLockedException.reuse) {
                     throw LoadLockedException.INSTANCE;
                 } else {
-                    String msg = format("Failed to load already locked transactionalobject '%s'", AlphaStmUtils.toTxObjectString(this));
+                    String msg = format("Failed to load already locked transactionalobject '%s'",
+                                        AlphaStmUtils.toTxObjectString(this));
                     throw new LoadLockedException(msg);
                 }
             }
@@ -126,8 +121,11 @@ public abstract class FastTxObjectMixin implements AlphaTransactionalObject, Mul
                 if (LoadTooOldVersionException.reuse) {
                     throw LoadTooOldVersionException.INSTANCE;
                 } else {
-                    String msg = format("Can't load version '%s' transactionalobject '%s', the oldest version found is '%s'",
-                            readVersion, AlphaStmUtils.toTxObjectString(this), tranlocalTime2.getWriteVersion());
+                    String msg = format(
+                            "Can't load version '%s' transactionalobject '%s', the oldest version found is '%s'",
+                            readVersion,
+                            AlphaStmUtils.toTxObjectString(this),
+                            tranlocalTime2.getWriteVersion());
                     throw new LoadTooOldVersionException(msg);
                 }
             } else {
@@ -140,7 +138,7 @@ public abstract class FastTxObjectMixin implements AlphaTransactionalObject, Mul
 
     @Override
     public Transaction ___getLockOwner() {
-        return ___lockOwner;
+        return ___LOCKOWNER_UPDATER.get(this);
     }
 
     @Override
@@ -163,14 +161,16 @@ public abstract class FastTxObjectMixin implements AlphaTransactionalObject, Mul
         if (___SANITY_CHECKS_ENABLED) {
             if (___lockOwner == null) {
                 String msg = format("Lock on transactionalObject '%s' is not hold while doing the store",
-                        AlphaStmUtils.toTxObjectString(this));
+                                    AlphaStmUtils.toTxObjectString(this));
                 throw new PanicError(msg);
             }
 
             if (tranlocal.getWriteVersion() >= writeVersion) {
                 String msg = format("The tranlocal of transactionalObject '%s' has version '%s'  " +
                         "and and is too large for writeVersion '%s'",
-                        AlphaStmUtils.toTxObjectString(this), tranlocal.getTransactionalObject(), writeVersion);
+                                    AlphaStmUtils.toTxObjectString(this),
+                                    tranlocal.getTransactionalObject(),
+                                    writeVersion);
                 throw new PanicError(msg);
             }
 

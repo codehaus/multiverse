@@ -1,12 +1,12 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.multiverse.transactional.annotations.TransactionalMethod;
 import org.multiverse.stms.alpha.AlphaStm;
+import org.multiverse.transactional.annotations.TransactionalMethod;
 
 import static org.multiverse.TestUtils.assertIsActive;
-import static org.multiverse.TestUtils.testIncomplete;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
@@ -14,6 +14,7 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
  * Checks if AtomicMethods with different access modifiers are transformed correctly
  */
 public class TransactionalMethod_AccessModifierTest {
+
     private AlphaStm stm;
 
     @Before
@@ -80,15 +81,15 @@ public class TransactionalMethod_AccessModifierTest {
 
     public static class PackageFriendlyMethod {
 
-        @TransactionalMethod
-        void doIt() {
+        @TransactionalMethod void doIt() {
             assertTransactionWorking();
         }
     }
 
     @Test
+    @Ignore
     public void abstractMethodFails() {
-        testIncomplete();
+
     }
 
     @Test

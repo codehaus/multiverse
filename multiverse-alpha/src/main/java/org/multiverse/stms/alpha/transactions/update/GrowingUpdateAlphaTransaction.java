@@ -18,12 +18,12 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 /**
- * A {@link AbstractUpdateAlphaTransaction} implementation where the AlphaTranlocals are stored in
- * an IdentityHashMap (to prevent unwanted equals/hashcode calls on AlphaTransactionalObjects.
+ * A {@link AbstractUpdateAlphaTransaction} implementation where the AlphaTranlocals are stored in an IdentityHashMap
+ * (to prevent unwanted equals/hashcode calls on AlphaTransactionalObjects.
  * <p/>
- * This implementation is good for larger transaction sizes and is able to grow. In the future certain
- * parts of this implementation (like writing, conflict detection etc) could be executed in parallel (e.g.
- * by using the fork join framework).
+ * This implementation is good for larger transaction sizes and is able to grow. In the future certain parts of this
+ * implementation (like writing, conflict detection etc) could be executed in parallel (e.g. by using the fork join
+ * framework).
  *
  * @author Peter Veentjer.
  */
@@ -39,7 +39,7 @@ public class GrowingUpdateAlphaTransaction
                 boolean automaticReadTracking) {
 
             super(clock, restartBackoffPolicy, familyName, false, maxRetryCount, interruptible, commitLockPolicy,
-                    profiler, detectWriteSkew, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
+                  profiler, detectWriteSkew, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
         }
     }
 
@@ -127,7 +127,7 @@ public class GrowingUpdateAlphaTransaction
     }
 
     @Override
-    protected boolean hasReadConflicts() {
+    protected boolean hasReadConflict() {
         for (AlphaTranlocal attached : attachedMap.values()) {
             if (hasReadConflict(attached)) {
                 return true;
