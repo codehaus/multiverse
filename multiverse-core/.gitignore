@@ -1,7 +1,7 @@
-
-/target
+/.settings
 /.classpath
 /.project
+/target
 /multiverse-core.iml
 /multiverse-core.ipr
 /multiverse-core.iws
