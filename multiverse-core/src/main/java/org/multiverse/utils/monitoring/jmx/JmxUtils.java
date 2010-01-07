@@ -1,23 +1,22 @@
 package org.multiverse.utils.monitoring.jmx;
 
-import java.lang.management.ManagementFactory;
-
 import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import java.lang.management.ManagementFactory;
 
 /**
  * Registers MBeans.
  */
 public abstract class JmxUtils {
-    private static final MBeanServer PLATFORM_SERVER = 
-        ManagementFactory.getPlatformMBeanServer();
-    
+
+    private static final MBeanServer PLATFORM_SERVER =
+            ManagementFactory.getPlatformMBeanServer();
+
     /**
-     * Registers an MBean. The object name is generated according to
-     * {@code <mean.package>:type=<mbean.type>}, e.g.
+     * Registers an MBean. The object name is generated according to {@code <mean.package>:type=<mbean.type>}, e.g.
      * {@code org.multiverse.utils.monitoring.jmx:type=JmxUtils}.
-     * 
+     *
      * @param mbean the MBean to register
      * @return the name under which the MBean was registered
      */
@@ -28,15 +27,15 @@ public abstract class JmxUtils {
             return name;
         } catch (JMException exception) {
             throw new IllegalArgumentException(String.format(
-                    "Unable to register MBean '%s' under name '%s' due to: %s", 
+                    "Unable to register MBean '%s' under name '%s' due to: %s",
                     mbean, name, exception.getMessage()));
         }
     }
-    
+
     private static String getDefaultMBeanName(Class<?> mbeanClass) {
         String classNameWithoutPackage = mbeanClass.getSimpleName();
-        return String.format("%s:type=%s", 
-                mbeanClass.getName().replace("." + classNameWithoutPackage, ""), 
-                classNameWithoutPackage);
+        return String.format("%s:type=%s",
+                             mbeanClass.getName().replace("." + classNameWithoutPackage, ""),
+                             classNameWithoutPackage);
     }
 }

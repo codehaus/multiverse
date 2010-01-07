@@ -1,7 +1,7 @@
 package org.multiverse.integration.scala
 
 import org.multiverse.api.{StmUtils => JavaStmUtils, Transaction}
-import org.multiverse.templates.{AtomicTemplate, OrElseTemplate}
+import org.multiverse.templates.{TransactionTemplate, OrElseTemplate}
 
 /**
  * Contains a set of utility functions and syntax convenience to integrate 
@@ -58,7 +58,7 @@ object StmUtils {
      * @return the value returned by {@link AtomicTemplate#execute()}
      */    
     def atomic[E](block: => E) = 
-        new AtomicTemplate[E] {
+        new TransactionTemplate[E] {
             def execute(t: Transaction) = block
         }.execute()
 

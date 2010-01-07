@@ -1,7 +1,7 @@
 package org.multiverse.integration.scala.examples
 
 import org.multiverse.integration.scala.StmUtils._;
-import org.multiverse.transactional.primitives.manual.Ref;
+import org.multiverse.transactional.primitives.TransactionalInteger;
 
 /**
  * A &quot;port&quot; of the Java {@link org.multiverse.integrationtests.classicproblems.DiningPhilosophersLongTest DiningPhilosophers} 
@@ -13,7 +13,7 @@ class DiningPhilosophers {
     val philosopherCount = 10
     val eatCount = 1000
 
-    lazy val forks: List[Ref[PhilosopherThread]] = createForks
+    lazy val forks: List[TransactionalInteger] = createForks
     lazy val philosopherThreads: List[PhilosopherThread] = createPhilosopherThreads
 
     private[examples] def run() {
@@ -21,13 +21,13 @@ class DiningPhilosophers {
         philosopherThreads.foreach(_.join())
     
         forks.foreach(f =>
-            if (!f.isNull) throw new AssertionError(
-                String.format("Fork %s is being held by Philosopher %s", f, f.get))
+            if (f.get != 0) throw new AssertionError(
+                String.format("Fork %s is being held by Philosopher %s", f, f.get.toString))
         )
     }
 
     private def createForks = 
-        for (k <- List.range(0, philosopherCount)) yield new Ref[PhilosopherThread] 
+        for (k <- List.range(0, philosopherCount)) yield new TransactionalInteger(0) 
     
     private def createPhilosopherThreads =
         for {
@@ -51,7 +51,7 @@ class DiningPhilosophers {
         def doRun()
     }
     
-    class PhilosopherThread(id: Int, leftFork: Ref[PhilosopherThread], rightFork: Ref[PhilosopherThread]) 
+    class PhilosopherThread(id: Int, leftFork: TransactionalInteger, rightFork: TransactionalInteger) 
         extends ExampleThread("PhilosopherThread-" + id) {
 
         def doRun() {
@@ -69,11 +69,11 @@ class DiningPhilosophers {
 
         private def takeForks() {
             atomic {
-                if (!leftFork.isNull) retry()
-                else leftFork.set(this)
+                if (leftFork.get == 1) retry()
+                else leftFork.inc()
                 
-                if (!rightFork.isNull) retry()
-                else rightFork.set(this)
+                if (rightFork.get == 1) retry()
+                else rightFork.inc()
             }
         }
 
@@ -85,8 +85,8 @@ class DiningPhilosophers {
 
         private def releaseForks() {
             atomic {
-                leftFork.clear()
-                rightFork.clear()
+                leftFork.dec()
+                rightFork.dec()
             }
         }
     }

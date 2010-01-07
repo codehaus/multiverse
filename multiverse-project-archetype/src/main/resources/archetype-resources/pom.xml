@@ -1,6 +1,7 @@
 #set( $symbol_dollar = '$' )
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+        <?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>${groupId}</groupId>
@@ -17,7 +18,7 @@
                     <source>1.6</source>
                     <target>1.6</target>
                 </configuration>
-            </plugin>       
+            </plugin>
             <plugin>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <executions>
@@ -31,7 +32,7 @@
                                 <requireJavaVersion>
                                     <version>1.6.0</version>
                                 </requireJavaVersion>
-                                
+
                                 <!-- can't run tests without the Multiverse agent -->
                                 <requireFilesExist>
                                     <files>
@@ -61,8 +62,10 @@
     </build>
 
     <properties>
-      <multiverse.version>0.3-SNAPSHOT</multiverse.version>
-      <multiverse.agentjar>${symbol_dollar}{settings.localRepository}/org/multiverse/multiverse-alpha/${symbol_dollar}{multiverse.version}/multiverse-alpha-${symbol_dollar}{multiverse.version}-jar-with-dependencies.jar</multiverse.agentjar>
+        <multiverse.version>0.3-SNAPSHOT</multiverse.version>
+        <multiverse.agentjar>
+            ${symbol_dollar}{settings.localRepository}/org/multiverse/multiverse-alpha/${symbol_dollar}{multiverse.version}/multiverse-alpha-${symbol_dollar}{multiverse.version}-jar-with-dependencies.jar
+        </multiverse.agentjar>
     </properties>
 
     <dependencies>
@@ -77,7 +80,7 @@
                     <groupId>asm</groupId>
                     <artifactId>asm</artifactId>
                 </exclusion>
-                <exclusion>                
+                <exclusion>
                     <groupId>asm</groupId>
                     <artifactId>asm-tree</artifactId>
                 </exclusion>
@@ -91,12 +94,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.7</version>
             <scope>test</scope>
-        </dependency>        
+        </dependency>
     </dependencies>
 </project>
