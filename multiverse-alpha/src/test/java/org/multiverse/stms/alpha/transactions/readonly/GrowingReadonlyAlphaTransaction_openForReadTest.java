@@ -6,6 +6,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.LoadLockedException;
 import org.multiverse.api.exceptions.LoadTooOldVersionException;
+import org.multiverse.api.exceptions.LoadUncommittedException;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -34,7 +35,7 @@ public class GrowingReadonlyAlphaTransaction_openForReadTest {
     public GrowingReadonlyAlphaTransaction startTransactionUnderTest() {
         GrowingReadonlyAlphaTransaction.Config config = new GrowingReadonlyAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount,
@@ -52,6 +53,21 @@ public class GrowingReadonlyAlphaTransaction_openForReadTest {
 
         assertFalse(ref.isTryLockCalled());
     }
+
+    @Test
+    public void whenNotCommittedBefore_thenLoadUncommittedException() {
+        ManualRef ref = ManualRef.createUncommitted();
+
+        AlphaTransaction tx = startTransactionUnderTest();
+        try {
+            tx.openForRead(ref);
+            fail();
+        } catch (LoadUncommittedException expected) {
+        }
+
+        assertIsActive(tx);
+    }
+
 
     @Test
     public void whenFirstTimeOpenedForRead_thenReturnReadonlyValue() {
@@ -73,7 +89,7 @@ public class GrowingReadonlyAlphaTransaction_openForReadTest {
 
         AlphaTranlocal found = tx.openForRead(ref);
 
-        assertSame(expected,found);
+        assertSame(expected, found);
         assertIsActive(tx);
     }
 

@@ -1,12 +1,11 @@
 package org.multiverse.integrationtests.notification;
 
 import org.junit.Test;
-import org.multiverse.transactional.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.TestUtils.assertAlive;
-import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.sleepMs;
 
 /**
@@ -36,7 +35,7 @@ public class RetryInterruptibleTest {
     class AwaitThread extends Thread {
         private boolean wasInterrupted;
 
-        public void run(){
+        public void run() {
             try {
                 await();
             } catch (InterruptedException e) {
@@ -45,7 +44,7 @@ public class RetryInterruptibleTest {
         }
 
         @TransactionalMethod(automaticReadTracking = true, interruptible = true)
-        public void await()throws InterruptedException{
+        public void await() throws InterruptedException {
             ref.await(1);
         }
     }

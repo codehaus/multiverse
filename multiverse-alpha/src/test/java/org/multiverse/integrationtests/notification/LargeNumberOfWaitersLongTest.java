@@ -1,19 +1,19 @@
 package org.multiverse.integrationtests.notification;
 
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.transactional.primitives.TransactionalInteger;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.api.StmUtils.retry;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.primitives.TransactionalInteger;
-
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -126,7 +126,7 @@ public class LargeNumberOfWaitersLongTest {
 
         @Override
         public void doRun() {
-            while (wakeupCountDown.getAndDecrement() > 0){
+            while (wakeupCountDown.getAndDecrement() > 0) {
                 doWait();
             }
 

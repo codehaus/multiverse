@@ -1,8 +1,9 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import org.multiverse.transactional.annotations.TransactionalObject;
+import org.multiverse.annotations.TransactionalObject;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Veentjer
@@ -20,7 +21,7 @@ public class TransactionalObject_InstanceFieldGetSetTest {
     public static class PutOnField {
         int value;
 
-        public PutOnField(){
+        public PutOnField() {
             value = 0;
         }
 

@@ -32,7 +32,7 @@ public class GrowingUpdateAlphaTransaction_commitTest {
     public GrowingUpdateAlphaTransaction startSutTransaction() {
         GrowingUpdateAlphaTransaction.Config config = new GrowingUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
@@ -41,15 +41,15 @@ public class GrowingUpdateAlphaTransaction_commitTest {
         return new GrowingUpdateAlphaTransaction(config);
     }
 
-    public GrowingUpdateAlphaTransaction startSutTransactionWithWriteSkewDetection(boolean detectWriteSkew) {
+    public GrowingUpdateAlphaTransaction startSutTransactionWithWriteSkewDetection(boolean preventWriteSkew) {
         GrowingUpdateAlphaTransaction.Config config = new GrowingUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
-                detectWriteSkew, true, true, true, true);
+                preventWriteSkew, true, true, true, true);
         return new GrowingUpdateAlphaTransaction(config);
     }
 
@@ -214,7 +214,7 @@ public class GrowingUpdateAlphaTransaction_commitTest {
             tx.commit();
             fail();
         } catch (WriteConflictException expected) {
-       }
+        }
 
         assertIsAborted(tx);
         assertSame(committed, ref.___load());

@@ -35,7 +35,7 @@ public class GrowingUpdateAlphaTransaction_openForWriteTest {
     public GrowingUpdateAlphaTransaction startSutTransaction() {
         GrowingUpdateAlphaTransaction.Config config = new GrowingUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,

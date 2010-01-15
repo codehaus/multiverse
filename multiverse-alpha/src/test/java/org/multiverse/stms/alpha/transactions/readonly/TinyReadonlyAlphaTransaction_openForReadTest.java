@@ -2,10 +2,7 @@ package org.multiverse.stms.alpha.transactions.readonly;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.LoadLockedException;
-import org.multiverse.api.exceptions.LoadTooOldVersionException;
-import org.multiverse.api.exceptions.TransactionTooSmallException;
+import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -35,7 +32,7 @@ public class TinyReadonlyAlphaTransaction_openForReadTest {
     public TinyReadonlyAlphaTransaction startSutTransaction() {
         TinyReadonlyAlphaTransaction.Config config = new TinyReadonlyAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount, true, optimalSize);
@@ -52,6 +49,20 @@ public class TinyReadonlyAlphaTransaction_openForReadTest {
 
         assertSame(committed, found);
         assertSame(committed, getField(tx, "attached"));
+    }
+
+    @Test
+    public void whenNotCommittedBefore_thenLoadUncommittedException() {
+        ManualRef ref = ManualRef.createUncommitted();
+
+        AlphaTransaction tx = startSutTransaction();
+        try {
+            tx.openForRead(ref);
+            fail();
+        } catch (LoadUncommittedException expected) {
+        }
+
+        assertIsActive(tx);
     }
 
     @Test

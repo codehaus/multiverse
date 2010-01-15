@@ -1,22 +1,22 @@
 package org.multiverse.integrationtests.classicproblems;
 
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
-import static org.multiverse.TestUtils.*;
-import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.transactional.DefaultTransactionalReference;
-import org.multiverse.transactional.annotations.TransactionalMethod;
 import org.multiverse.transactional.collections.TransactionalLinkedList;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * The Sleeping Barber problem, due to legendary Dutch computer scientist <a href="http://en.wikipedia.org/wiki/Edsger_Dijkstra">E.W.
@@ -170,6 +170,7 @@ public class SleepingBarberLongTest {
          * asleep yet!).
          * We would end up with a sleeping barber and a waiting customer: deadlock. 
          */
+
         @TransactionalMethod
         private void fallAsleepIfShopEmpty() {
             if (chairs.isEmpty() && !isClosingTime()) {
@@ -263,6 +264,7 @@ public class SleepingBarberLongTest {
         * and setting his state to "waiting". Otherwise, s/he may be beckoned forward
         * by the barber before s/he is waiting.
         */
+
         @TransactionalMethod
         private boolean tryToSitDown() {
             if (!chairs.offer(this)) {
@@ -285,6 +287,7 @@ public class SleepingBarberLongTest {
          * to a superfluous notification sent to the consumer), but it's slightly more
          * interesting to try to prevent it.
          */
+
         @TransactionalMethod
         private void wakeBarberIfAsleep() {
             if (barber.isAsleep()) {
@@ -301,8 +304,8 @@ public class SleepingBarberLongTest {
             // walk over to the barber
             int wasCalled = state.set(2);
             assert (wasCalled == 1) : String.format("Customer %s stood up but wasn't called (state: %d)?!?",
-                                                    getName(),
-                                                    wasCalled);
+                    getName(),
+                    wasCalled);
         }
 
         public void askForward() {

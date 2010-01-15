@@ -1,12 +1,13 @@
 package org.multiverse.integrationtests.financial;
 
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalObject;
+
+import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.annotations.TransactionalObject;
 
 /**
  * The MoneyTransferLongTest is a test where money is transferred from one account to another. At random transfers are

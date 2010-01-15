@@ -26,7 +26,7 @@ public class IntStackPerformanceLongTest {
                 .setSmartTxLengthSelector(true)
                 .setFamilyName("IntStackPerformanceLongTest")
                 .setReadonly(false)
-                .setDetectWriteSkew(false)
+                .setPreventWriteSkew(false)
                 .setAutomaticReadTracking(true).build();
     }
 
@@ -47,8 +47,8 @@ public class IntStackPerformanceLongTest {
             stack.push(10);
             stack.pop();
 
-            if(k % (500*1000) == 0){
-                System.out.printf("at %s\n",k);
+            if (k % (500 * 1000) == 0) {
+                System.out.printf("at %s\n", k);
             }
         }
 
@@ -78,8 +78,8 @@ public class IntStackPerformanceLongTest {
             popTx.commit();
 
 
-            if(k % 500000 == 0){
-                System.out.printf("at %s\n",k);
+            if (k % 500000 == 0) {
+                System.out.printf("at %s\n", k);
             }
         }
 

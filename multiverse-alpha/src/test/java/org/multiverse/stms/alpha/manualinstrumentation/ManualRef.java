@@ -22,7 +22,7 @@ public class ManualRef extends DefaultTxObjectMixin {
     }
 
     public ManualRef(AlphaStm stm, final int value) {
-        new TransactionTemplate(stm) {
+        new TransactionTemplate(stm.getTransactionFactoryBuilder().build(), false, false) {
             @Override
             public Object execute(Transaction t) {
                 ManualRefTranlocal tranlocal = (ManualRefTranlocal) ((AlphaTransaction) t).openForWrite(ManualRef.this);
@@ -32,8 +32,8 @@ public class ManualRef extends DefaultTxObjectMixin {
         }.execute();
     }
 
-    public ManualRef(AlphaTransaction t, final int value) {
-        ManualRefTranlocal tranlocal = (ManualRefTranlocal) ((AlphaTransaction) t).openForWrite(ManualRef.this);
+    public ManualRef(AlphaTransaction tx, final int value) {
+        ManualRefTranlocal tranlocal = (ManualRefTranlocal) ((AlphaTransaction) tx).openForWrite(ManualRef.this);
         tranlocal.value = value;
     }
 
@@ -48,7 +48,7 @@ public class ManualRef extends DefaultTxObjectMixin {
     }
 
     public int get(TransactionFactory txFactory) {
-        return new TransactionTemplate<Integer>(txFactory) {
+        return new TransactionTemplate<Integer>(txFactory, false, false) {
             @Override
             public Integer execute(Transaction t) throws Exception {
                 return get((AlphaTransaction) t);
@@ -67,7 +67,7 @@ public class ManualRef extends DefaultTxObjectMixin {
     }
 
     public void inc(TransactionFactory txFactory) {
-        new TransactionTemplate(txFactory) {
+        new TransactionTemplate(txFactory, false, false) {
             @Override
             public Object execute(Transaction t) {
                 inc((AlphaTransaction) t);
@@ -91,8 +91,8 @@ public class ManualRef extends DefaultTxObjectMixin {
         set(factory, value);
     }
 
-    public void set(TransactionFactory factory, final int value) {
-        new TransactionTemplate(factory) {
+    public void set(TransactionFactory txFactory, final int value) {
+        new TransactionTemplate(txFactory, false, false) {
             @Override
             public Object execute(Transaction t) throws Exception {
                 set((AlphaTransaction) t, value);

@@ -11,14 +11,16 @@ import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.isAbstract;
 import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.isNative;
 
 /**
- * Transforms TransactionalObjects so that access
+ * Transforms TransactionalObjects so that access to fields in non transactional method is transformed
  */
-public class TransactionalObjectFieldAccessTransformer implements Opcodes {
+public class NonTransactionalMethodFieldAccessTransformer implements Opcodes {
 
     private final ClassNode originalClass;
+    private final MetadataRepository metadataRepository;
 
-    public TransactionalObjectFieldAccessTransformer(ClassNode originalClass) {
+    public NonTransactionalMethodFieldAccessTransformer(ClassNode originalClass) {
         this.originalClass = originalClass;
+        this.metadataRepository = MetadataRepository.INSTANCE;
     }
 
     public ClassNode transform() {
@@ -38,7 +40,9 @@ public class TransactionalObjectFieldAccessTransformer implements Opcodes {
     }
 
     private MethodNode fixMethod(MethodNode originalMethod) {
-        if (isAbstract(originalMethod) || isNative(originalMethod)) {
+        if (isAbstract(originalMethod) ||
+                isNative(originalMethod) ||
+                metadataRepository.isTransactionalMethod(originalClass, originalMethod)) {
             return originalMethod;
         }
 
@@ -50,7 +54,7 @@ public class TransactionalObjectFieldAccessTransformer implements Opcodes {
         fixedMethod.exceptions = originalMethod.exceptions;
         fixedMethod.tryCatchBlocks = new LinkedList();//originalMethod.tryCatchBlocks;
 
-        originalMethod.accept(new TransactionalObjectRemappingMethodAdapter(fixedMethod, originalClass, originalMethod));
+        originalMethod.accept(new NonTransactionalMethodFieldAccessMethodAdapter(fixedMethod, originalClass, originalMethod));
 
         return fixedMethod;
     }

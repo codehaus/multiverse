@@ -5,7 +5,9 @@ import org.multiverse.api.Transaction;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.objectweb.asm.*;
+import org.objectweb.asm.MethodAdapter;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
@@ -22,19 +24,21 @@ import static org.objectweb.asm.Type.getInternalName;
  * <p/>
  * Where the persontranlocal is retrieved from the current transaction.
  */
-public class TransactionalObjectRemappingMethodAdapter extends MethodAdapter implements Opcodes {
+public class NonTransactionalMethodFieldAccessMethodAdapter extends MethodAdapter implements Opcodes {
 
     private final MetadataRepository metadataRepository;
     private final MethodNode originalMethod;
     private final ClassNode owner;
     private final boolean isTransactionalMethod;
+    private final boolean isRealTransactionalObject;
 
-    public TransactionalObjectRemappingMethodAdapter(MethodVisitor mv, ClassNode owner, MethodNode originalMethod) {
+    public NonTransactionalMethodFieldAccessMethodAdapter(MethodVisitor mv, ClassNode owner, MethodNode originalMethod) {
         super(mv);
         this.metadataRepository = MetadataRepository.INSTANCE;
         this.owner = owner;
         this.originalMethod = originalMethod;
         this.isTransactionalMethod = metadataRepository.isTransactionalMethod(owner, originalMethod);
+        this.isRealTransactionalObject = metadataRepository.isRealTransactionalObject(owner.name);
     }
 
     @Override
@@ -63,33 +67,6 @@ public class TransactionalObjectRemappingMethodAdapter extends MethodAdapter imp
                     }
 
                     txObjectOnTopToTranlocal(owner, true);
-
-                    //Label continueWithPut = new Label();
-                    //mv.visitInsn(DUP);
-                    //mv.visitFieldInsn(GETFIELD, tranlocalName, "___writeVersion", "J");
-                    //mv.visitLdcInsn(new Long(0));
-                    //mv.visitInsn(LCMP);
-                    //if version equals 0 then continueWithPut
-
-                    //mv.visitJumpInsn(IFEQ, continueWithPut);
-
-                   // mv.visitTypeInsn(NEW, Type.getInternalName(ReadonlyException.class));
-                   // mv.visitInsn(DUP);
-                   // String msg = format(
-                   //         "Can't write on committed field %s.%s. The cause of this error is probably an update " +
-                   //                 "in a readonly transaction", owner, name);
-                    //
-                   // mv.visitLdcInsn(msg);
-                   // mv.visitMethodInsn(
-                   //         INVOKESPECIAL,
-                   //         Type.getInternalName(ReadonlyException.class),
-                   //         "<init>",
-                   //         "(Ljava/lang/String;)V");
-                   // mv.visitInsn(ATHROW);
-                   //
-                   // mv.visitLabel(continueWithPut);
-
-                    //[value(txobject), owner(tranlocal),..
 
                     if (isCategory2(valueDesc)) {
                         //[owner(tranlocal), value(category2),..
@@ -123,35 +100,25 @@ public class TransactionalObjectRemappingMethodAdapter extends MethodAdapter imp
         //System.out.println("end "+owner+"."+name+" opcode="+opcode);
     }
 
-    private void txObjectOnTopToTranlocal(String txObjectName, boolean update) {
+    private void txObjectOnTopToTranlocal(String txObjectName, boolean write) {
         if (txObjectName.contains("__")) {
             throw new RuntimeException("No generated classes are allowed: " + txObjectName);
         }
 
-        //if (isTransactionalMethod) {
-        //    if (isStatic(originalMethod)) {
-        //        super.visitVarInsn(ALOAD, 0);
-        //    } else {
-        //        super.visitVarInsn(ALOAD, 1);
-        //    }
-        //} else {
         super.visitMethodInsn(
                 INVOKESTATIC,
                 getInternalName(ThreadLocalTransaction.class),
                 "getRequiredThreadLocalTransaction",
                 format("()%s", getDescriptor(Transaction.class)));
-        //}
-
         super.visitInsn(SWAP);
-
         super.visitTypeInsn(CHECKCAST, txObjectName);
 
-        String method = update ? "openForWrite" : "openForRead";
+        String openMethod = write ? "openForWrite" : "openForRead";
 
         super.visitMethodInsn(
                 INVOKEINTERFACE,
                 getInternalName(AlphaTransaction.class),
-                method,
+                openMethod,
                 format("(%s)%s", getDescriptor(AlphaTransactionalObject.class), getDescriptor(AlphaTranlocal.class)));
 
         String tranlocalName = metadataRepository.getTranlocalName(txObjectName);

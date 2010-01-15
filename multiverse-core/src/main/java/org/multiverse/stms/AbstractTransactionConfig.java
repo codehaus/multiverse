@@ -1,10 +1,10 @@
 package org.multiverse.stms;
 
 import org.multiverse.api.TransactionConfig;
+import org.multiverse.utils.backoff.BackoffPolicy;
+import org.multiverse.utils.backoff.ExponentialBackoffPolicy;
 import org.multiverse.utils.clock.Clock;
 import org.multiverse.utils.clock.StrictClock;
-import org.multiverse.utils.restartbackoff.ExponentialRestartBackoffPolicy;
-import org.multiverse.utils.restartbackoff.RestartBackoffPolicy;
 
 /**
  * Contains the configuration for the AbstractTransaction.
@@ -14,40 +14,40 @@ import org.multiverse.utils.restartbackoff.RestartBackoffPolicy;
  *
  * @author Peter Veentjer.
  */
-public class AbstractTransactionConfig implements TransactionConfig{
+public class AbstractTransactionConfig implements TransactionConfig {
 
     public final Clock clock;
-    public final RestartBackoffPolicy restartBackoffPolicy;
+    public final BackoffPolicy backoffPolicy;
     public final String familyName;
     public final boolean readOnly;
     public final int maxRetryCount;
     public final boolean interruptible;
-    public final boolean detectWriteSkew;
+    public final boolean preventWriteSkew;
     public final boolean automaticReadTracking;
 
     /**
      * This method should be removed, only used for testing purposes.
      */
     public AbstractTransactionConfig() {
-        this(new StrictClock(), ExponentialRestartBackoffPolicy.INSTANCE_10_MS_MAX, null, true, 1000, true, true,true);
+        this(new StrictClock(), ExponentialBackoffPolicy.INSTANCE_10_MS_MAX, null, true, 1000, true, true, true);
     }
 
     public AbstractTransactionConfig(
-            Clock clock, RestartBackoffPolicy restartBackoffPolicy, String familyName, boolean readOnly,
-            int maxRetryCount, boolean interruptible, boolean detectWriteSkew, boolean automaticReadTracking) {
+            Clock clock, BackoffPolicy backoffPolicy, String familyName, boolean readOnly,
+            int maxRetryCount, boolean interruptible, boolean preventWriteSkew, boolean automaticReadTracking) {
         assert clock != null;
-        assert restartBackoffPolicy != null;
-        
+        assert backoffPolicy != null;
+
         this.clock = clock;
         this.familyName = familyName;
         this.readOnly = readOnly;
-        this.restartBackoffPolicy = restartBackoffPolicy;
+        this.backoffPolicy = backoffPolicy;
         this.maxRetryCount = maxRetryCount;
         this.interruptible = interruptible;
         this.automaticReadTracking = automaticReadTracking;
-        this.detectWriteSkew = detectWriteSkew;
+        this.preventWriteSkew = preventWriteSkew;
 
-        if(readOnly && !automaticReadTracking && detectWriteSkew){
+        if (readOnly && !automaticReadTracking && preventWriteSkew) {
             throw new RuntimeException();
         }
     }
@@ -73,8 +73,8 @@ public class AbstractTransactionConfig implements TransactionConfig{
     }
 
     @Override
-    public boolean detectWriteSkew() {
-        return detectWriteSkew;
+    public boolean preventWriteSkew() {
+        return preventWriteSkew;
     }
 
     @Override
@@ -83,7 +83,7 @@ public class AbstractTransactionConfig implements TransactionConfig{
     }
 
     @Override
-    public RestartBackoffPolicy getRestartBackoffPolicy() {
-        return restartBackoffPolicy;
+    public BackoffPolicy getRetryBackoffPolicy() {
+        return backoffPolicy;
     }
 }

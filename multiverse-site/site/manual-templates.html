@@ -9,6 +9,8 @@
             <li><a href="#transactiontemplate.and.transaction.lifecycle.events">
                 7.2.2 TransactionTemplate and transaction lifecycle events</a>
             </li>
+            <li><a href="#transactiontemplate.and.threadlocal">7.2.4TransactionTemplate and ignore
+                ThreadLocalTransaction</a></li>
         </ul>
     </li>
     <li><a href="#orelsetemplate">7.3 OrElseTemplate</a></li>
@@ -27,7 +29,7 @@ introduction of closures). Multiverse provides 2 important templates:
 With the TransactionTemplate you can add transactional logic where it is needed without relying
 on instrumentation. It automatically manages the transaction(s) and deals with retries. In most cases the
 TransactionTemplate it prefered above writing the logic manually could lead to all kinds of problems (the
-        internals of the transaction management still are subject to chance since Multiverse still is evolving).
+internals of the transaction management still are subject to chance since Multiverse still is evolving).
 The Stm sees no difference between transactions managed by TransactionTemplates or those managed by instrumented
 code. So they share all the same facilities.
 <p/>
@@ -86,13 +88,25 @@ If you want to give Multiverse the chance to learn about your transactions and d
 like selecting better suiting transaction implementations, it is important that you set the familyName
 on the TransactionFactoryBuilder. The familyName is the way for Multiverse to recognize different
 transactions and do the optimizations. If you use instrumentation, the familyName is infered by the instrumentation
-        process, so no worries about that.
+process, so no worries about that.
 
 <h3 id="transactiontemplate.and.transaction.lifecycle.events">7.2.3 TransactionTemplate and transaction lifecycle
     events</h3>
 In some cases you need execute actions (for example starting threads or cleaning up resources) after or before
-        an abort or commit executes. Tasks can be executed using the 
+an abort or commit executes. Tasks can be executed using the
 <a href="manual-lifecycleevents.html">chapter 3: Transaction lifecycle events</a>
+<p/>
+Listening to transaction lifecycle events is not completely free because additional objects need to be created
+and registered. If you want to squeeze out the most performance, you can create a TransactionTemplate
+with disabled lifecycle listeners. Check the Javadoc for the complete overview of the constructors of the
+TransactionTemplate.
+
+<h3 id="transactiontemplate.and.threadlocal">7.2.4 TransactionTemplate and ignore ThreadLocalTransaction</h3>
+By default the TransactionTemplate looks at the ThreadLocalTransaction to see if there is a running transaction,
+and if it creates a new Transaction, it publishes the created transaction on the ThreadLocalTransaction. If you
+don't need the ThreadLocalTransaction, you can disable reading/writing to the TransactionThreadLocal. Reducing
+access to the threadlocal could improve performance if it is done very very often. See the complete
+overview of constructors of the TransactionTemplate for more detailed information.
 
 <h2 id="orelsetemplate">7.3 OrElseTemplate</h2>
 For more information about blocking, see

@@ -50,7 +50,7 @@ public class NonBlockingTransactionExecutorTest {
         }
     }
 
-    public class DecTask implements NonBlockingTask {
+    public class DecTask implements TransactionalTask {
 
         private final TransactionFactory transactionFactory;
         private int refIndex;
@@ -70,8 +70,8 @@ public class NonBlockingTransactionExecutorTest {
         public boolean execute(Transaction t) {
             TransactionalInteger ref = refs[refIndex];
             ref.await(1);
-            count++;                        
-            System.out.println("End wait ref: "+refIndex+ " count: "+count);
+            count++;
+            System.out.println("End wait ref: " + refIndex + " count: " + count);
             ref.dec();
             return count != 10;
         }

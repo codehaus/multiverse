@@ -31,7 +31,7 @@ public class FixedReadonlyAlphaTransaction_openForWriteTest {
 
         FixedReadonlyAlphaTransaction.Config config = new FixedReadonlyAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount, true, optimalSize, size);

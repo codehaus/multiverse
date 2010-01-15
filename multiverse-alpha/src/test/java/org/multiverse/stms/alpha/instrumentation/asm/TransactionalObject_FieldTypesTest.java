@@ -3,15 +3,14 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Stm;
-import org.multiverse.transactional.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 
 import java.lang.reflect.Field;
 
 import static java.lang.reflect.Modifier.isTransient;
-import static java.lang.reflect.Modifier.isVolatile;
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
@@ -39,11 +38,9 @@ public class TransactionalObject_FieldTypesTest {
     @Test
     public void testVolatile() {
         VolatileField o = new VolatileField();
-        assertTrue(o instanceof AlphaTransactionalObject);
+        assertFalse(o instanceof AlphaTransactionalObject);
 
-        Field volatileField = getTranlocalField(VolatileField.class, "field");
-        assertTrue(isVolatile(volatileField.getModifiers()));
-        assertFalse(existsField(VolatileField.class, "field"));
+        assertTrue(existsField(VolatileField.class, "field"));
     }
 
     @TransactionalObject

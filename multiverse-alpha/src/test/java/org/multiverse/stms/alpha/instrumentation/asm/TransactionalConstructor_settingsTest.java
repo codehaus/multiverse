@@ -1,8 +1,8 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.junit.Test;
+import org.multiverse.annotations.TransactionalConstructor;
 import org.multiverse.api.Transaction;
-import org.multiverse.transactional.annotations.TransactionalConstructor;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
@@ -17,7 +17,8 @@ public class TransactionalConstructor_settingsTest {
 
     public class ReadonlyExplicitlyEnabled {
 
-        @TransactionalConstructor(readonly = true) ReadonlyExplicitlyEnabled() {
+        @TransactionalConstructor(readonly = true)
+        ReadonlyExplicitlyEnabled() {
             Transaction tx = getThreadLocalTransaction();
             assertTrue(tx.getConfig().isReadonly());
         }
@@ -25,7 +26,8 @@ public class TransactionalConstructor_settingsTest {
 
     public class ReadonlyExplicitlyDisabled {
 
-        @TransactionalConstructor(readonly = false) ReadonlyExplicitlyDisabled() {
+        @TransactionalConstructor(readonly = false)
+        ReadonlyExplicitlyDisabled() {
             Transaction tx = getThreadLocalTransaction();
             assertFalse(tx.getConfig().isReadonly());
         }
@@ -46,7 +48,7 @@ public class TransactionalConstructor_settingsTest {
             assertFalse(tx.getConfig().isReadonly());
             assertEquals(0, tx.getConfig().getMaxRetryCount());
             assertTrue(tx.getConfig().automaticReadTracking());
-            assertFalse(tx.getConfig().detectWriteSkew());
+            assertFalse(tx.getConfig().preventWriteSkew());
         }
     }
 
@@ -79,26 +81,26 @@ public class TransactionalConstructor_settingsTest {
     // ============================
 
     @Test
-    public void detectWriteSkew() {
-        new DetectWriteSkewDisabled();
-        new DetectWriteSkewEnabled();
+    public void preventWriteSkew() {
+        new preventWriteSkewDisabled();
+        new preventWriteSkewEnabled();
     }
 
-    public class DetectWriteSkewDisabled {
+    public class preventWriteSkewDisabled {
 
-        @TransactionalConstructor(detectWriteSkew = false)
-        public DetectWriteSkewDisabled() {
+        @TransactionalConstructor(preventWriteSkew = false)
+        public preventWriteSkewDisabled() {
             Transaction tx = getThreadLocalTransaction();
-            assertFalse(tx.getConfig().detectWriteSkew());
+            assertFalse(tx.getConfig().preventWriteSkew());
         }
     }
 
-    public class DetectWriteSkewEnabled {
+    public class preventWriteSkewEnabled {
 
-        @TransactionalConstructor(detectWriteSkew = true)
-        public DetectWriteSkewEnabled() {
+        @TransactionalConstructor(preventWriteSkew = true)
+        public preventWriteSkewEnabled() {
             Transaction tx = getThreadLocalTransaction();
-            assertTrue(tx.getConfig().detectWriteSkew());
+            assertTrue(tx.getConfig().preventWriteSkew());
         }
     }
 

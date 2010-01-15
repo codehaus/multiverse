@@ -38,7 +38,7 @@ public class GrowingUpdateAlphaTransaction_openForReadTest {
     public GrowingUpdateAlphaTransaction startSutTransaction() {
         GrowingUpdateAlphaTransaction.Config config = new GrowingUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
@@ -51,7 +51,7 @@ public class GrowingUpdateAlphaTransaction_openForReadTest {
     public GrowingUpdateAlphaTransaction startSutTransactionWithoutAutomaticReadTracking() {
         GrowingUpdateAlphaTransaction.Config config = new GrowingUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,

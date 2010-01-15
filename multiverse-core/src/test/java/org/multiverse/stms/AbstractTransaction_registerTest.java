@@ -5,6 +5,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionLifecycleEvent;
 import org.multiverse.api.TransactionLifecycleListener;
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
@@ -14,6 +15,22 @@ import static org.multiverse.TestUtils.assertIsActive;
  * @author Peter Veentjer
  */
 public class AbstractTransaction_registerTest {
+
+    @Test
+    public void whenPrepared_thenPreparedTransactionException() {
+        AbstractTransaction tx = spy(new AbstractTransactionImpl());
+        tx.prepare();
+
+        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+
+        try {
+            tx.register(listener);
+            fail();
+        } catch (PreparedTransactionException expected) {
+        }
+
+        verify(listener, never()).notify((Transaction) anyObject(), (TransactionLifecycleEvent) anyObject());
+    }
 
     @Test
     public void whenAlreadyCommitted_thenDeadTransactionException() {
@@ -75,5 +92,4 @@ public class AbstractTransaction_registerTest {
         verify(listener, never()).notify(tx, TransactionLifecycleEvent.preAbort);
         verify(listener, never()).notify(tx, TransactionLifecycleEvent.postAbort);
     }
-
 }

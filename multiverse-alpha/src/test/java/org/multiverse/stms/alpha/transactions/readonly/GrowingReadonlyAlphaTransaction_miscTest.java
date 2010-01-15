@@ -5,10 +5,8 @@ import org.junit.Test;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.readonly.GrowingReadonlyAlphaTransaction;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.TestUtils.assertIsActive;
 
@@ -26,7 +24,7 @@ public class GrowingReadonlyAlphaTransaction_miscTest {
     public GrowingReadonlyAlphaTransaction startTransactionUnderTest() {
         GrowingReadonlyAlphaTransaction.Config config = new GrowingReadonlyAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount, true);

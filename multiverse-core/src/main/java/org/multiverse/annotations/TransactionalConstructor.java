@@ -1,4 +1,4 @@
-package org.multiverse.transactional.annotations;
+package org.multiverse.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -46,7 +46,7 @@ public @interface TransactionalConstructor {
      *
      * @return true if the writeskew problem should be prevented.
      */
-    boolean detectWriteSkew() default true;
+    boolean preventWriteSkew() default false;
 
     boolean loggingEnabled() default false;
 }

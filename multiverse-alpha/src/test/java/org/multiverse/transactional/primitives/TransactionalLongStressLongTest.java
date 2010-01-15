@@ -3,7 +3,7 @@ package org.multiverse.transactional.primitives;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
-import org.multiverse.transactional.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalMethod;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

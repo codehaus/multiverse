@@ -11,6 +11,7 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.OptimalSize;
 import org.multiverse.utils.latches.CheapLatch;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.stms.alpha.transactions.AlphaTransactionTestUtils.assertHasListeners;
@@ -32,7 +33,7 @@ public class FixedUpdateAlphaTransaction_abortTest {
         optimalSize.set(size);
         FixedUpdateAlphaTransaction.Config config = new FixedUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
@@ -109,4 +110,18 @@ public class FixedUpdateAlphaTransaction_abortTest {
 
         assertHasListeners(ref, latch);
     }
+
+    @Test
+    public void whenPreparedWithLockedResources_thenResourcesFreed() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction tx = startSutTransaction(10);
+        ref.inc(tx);
+        tx.prepare();
+
+        tx.abort();
+        assertIsAborted(tx);
+        assertNull(ref.___getLockOwner());
+    }
+
 }

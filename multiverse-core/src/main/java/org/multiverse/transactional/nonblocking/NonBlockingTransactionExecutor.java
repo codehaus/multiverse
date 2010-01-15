@@ -47,7 +47,7 @@ public class NonBlockingTransactionExecutor {
         }
     }
 
-    public void execute(NonBlockingTask task) {
+    public void execute(TransactionalTask task) {
         if (task == null) {
             throw new NullPointerException();
         }
@@ -76,7 +76,7 @@ public class NonBlockingTransactionExecutor {
         private void run(NonBlockingTaskWrapper task) {
             Transaction t;
             if (task.previous == null) {
-                t = task.nonBlockingTask.getTransactionFactory().start();
+                t = task.transactionalTask.getTransactionFactory().start();
             } else {
                 t = task.previous;
                 t.restart();
@@ -84,14 +84,14 @@ public class NonBlockingTransactionExecutor {
 
             setThreadLocalTransaction(t);
             try {
-                boolean again = task.nonBlockingTask.execute(t);
+                boolean again = task.transactionalTask.execute(t);
                 t.commit();
                 if (again) {
                     //todo: return value ignored here.. s
-                    tasks.offer(new NonBlockingTaskWrapper(task.nonBlockingTask));
+                    tasks.offer(new NonBlockingTaskWrapper(task.transactionalTask));
                 }
             } catch (RetryError ex) {
-                Latch latch = new NonBlockingLatch(t, task.nonBlockingTask);
+                Latch latch = new NonBlockingLatch(t, task.transactionalTask);
                 t.registerRetryLatch(latch);
                 ///System.out.println("RetryError encountered");
             }
@@ -100,16 +100,16 @@ public class NonBlockingTransactionExecutor {
 
     public class NonBlockingTaskWrapper {
 
-        final NonBlockingTask nonBlockingTask;
+        final TransactionalTask transactionalTask;
         final Transaction previous;
 
-        public NonBlockingTaskWrapper(NonBlockingTask nonBlockingTask, Transaction previous) {
-            this.nonBlockingTask = nonBlockingTask;
+        public NonBlockingTaskWrapper(TransactionalTask transactionalTask, Transaction previous) {
+            this.transactionalTask = transactionalTask;
             this.previous = previous;
         }
 
-        public NonBlockingTaskWrapper(NonBlockingTask nonBlockingTask) {
-            this.nonBlockingTask = nonBlockingTask;
+        public NonBlockingTaskWrapper(TransactionalTask transactionalTask) {
+            this.transactionalTask = transactionalTask;
             this.previous = null;
         }
     }
@@ -118,18 +118,18 @@ public class NonBlockingTransactionExecutor {
 
         private final AtomicBoolean open = new AtomicBoolean();
         private final Transaction previousTransaction;
-        private final NonBlockingTask nonBlockingTask;
+        private final TransactionalTask transactionalTask;
 
-        public NonBlockingLatch(Transaction previousTransaction, NonBlockingTask nonBlockingTask) {
+        public NonBlockingLatch(Transaction previousTransaction, TransactionalTask transactionalTask) {
             this.previousTransaction = previousTransaction;
-            this.nonBlockingTask = nonBlockingTask;
+            this.transactionalTask = transactionalTask;
         }
 
         @Override
         public void open() {
             if (open.compareAndSet(false, true)) {
                 NonBlockingTaskWrapper nonBlockingTaskWrapper = new NonBlockingTaskWrapper(
-                        nonBlockingTask, previousTransaction);
+                        transactionalTask, previousTransaction);
 
                 try {
                     tasks.put(nonBlockingTaskWrapper);

@@ -31,11 +31,11 @@ public class TinyUpdateAlphaTransaction_abortTest {
     public TinyUpdateAlphaTransaction startSutTransaction() {
         TinyUpdateAlphaTransaction.Config config = new TinyUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount,
-                stmConfig.commitLockPolicy, true, optimalSize, true, true,true,true);
+                stmConfig.commitLockPolicy, true, optimalSize, true, true, true, true);
         return new TinyUpdateAlphaTransaction(config);
     }
 
@@ -130,4 +130,18 @@ public class TinyUpdateAlphaTransaction_abortTest {
         assertFalse(latch.isOpen());
         assertHasListeners(ref, latch);
     }
+
+    @Test
+    public void whenPreparedWithLockedResources_thenResourcesFreed() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction tx = startSutTransaction();
+        ref.inc(tx);
+        tx.prepare();
+
+        tx.abort();
+        assertIsAborted(tx);
+        assertNull(ref.___getLockOwner());
+    }
+
 }

@@ -3,6 +3,7 @@ package org.multiverse.stms.alpha;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionFactory;
 import org.multiverse.stms.alpha.transactions.update.AbstractUpdateAlphaTransaction;
 import org.multiverse.stms.alpha.transactions.update.GrowingUpdateAlphaTransaction;
 
@@ -40,7 +41,7 @@ public class AlphaStmTest {
 
         assertFalse(t.getConfig().isReadonly());
         assertTrue(t.getConfig().automaticReadTracking());
-        assertFalse(t.getConfig().detectWriteSkew());
+        assertFalse(t.getConfig().preventWriteSkew());
         assertEquals(1000, t.getConfig().getMaxRetryCount());
         assertFalse(t.getConfig().isInterruptible());
     }
@@ -54,7 +55,7 @@ public class AlphaStmTest {
 
         assertFalse(t.getConfig().isReadonly());
         assertTrue(t.getConfig().automaticReadTracking());
-        assertFalse(t.getConfig().detectWriteSkew());
+        assertFalse(t.getConfig().preventWriteSkew());
         assertEquals(1000, t.getConfig().getMaxRetryCount());
         assertFalse(t.getConfig().isInterruptible());
     }
@@ -64,5 +65,21 @@ public class AlphaStmTest {
         Transaction t = stm.getTransactionFactoryBuilder().setReadonly(false).setAutomaticReadTracking(true).build()
                 .start();
         assertTrue(t instanceof GrowingUpdateAlphaTransaction);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void whenUpdateTransactionWithWriteSkewDetectionAndNoAutomaticReadTracking_thenIllegalStateException() {
+        stm.getTransactionFactoryBuilder()
+                .setReadonly(false)
+                .setAutomaticReadTracking(false)
+                .setPreventWriteSkew(true).build();
+    }
+
+    @Test
+    public void whenReadonlyTransactionWithWriteSkewDetectionAndNoAutomaticReadTracking_thenIgnore() {
+        TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+                .setReadonly(true)
+                .setAutomaticReadTracking(false)
+                .setPreventWriteSkew(true).build();
     }
 }

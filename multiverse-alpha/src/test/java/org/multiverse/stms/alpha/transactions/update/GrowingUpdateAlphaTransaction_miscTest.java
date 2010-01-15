@@ -23,12 +23,12 @@ public class GrowingUpdateAlphaTransaction_miscTest {
     public GrowingUpdateAlphaTransaction startSutTransaction() {
         GrowingUpdateAlphaTransaction.Config config = new GrowingUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
-                false, true, true, true,true);
+                false, true, true, true, true);
         return new GrowingUpdateAlphaTransaction(config);
     }
 

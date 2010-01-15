@@ -1,11 +1,12 @@
 package org.multiverse.transactional.collections;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import org.multiverse.api.Stm;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class TransactionalLinkedList_constructorTest {
@@ -23,6 +24,7 @@ public class TransactionalLinkedList_constructorTest {
         long version = stm.getVersion();
         TransactionalLinkedList<String> list = new TransactionalLinkedList<String>();
 
+        assertEquals(0, list.size());
         assertEquals(version + 1, stm.getVersion());
         assertEquals(Integer.MAX_VALUE, list.getMaxCapacity());
         assertEquals("[]", list.toString());

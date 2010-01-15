@@ -8,9 +8,9 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.clock.Clock;
 import org.multiverse.utils.profiling.ProfileRepository;
-import org.multiverse.utils.restartbackoff.RestartBackoffPolicy;
 
 /**
  * A tracking readonly transaction that is optimized for reading/tracking a single transactional object.
@@ -25,10 +25,10 @@ public class TinyReadonlyAlphaTransaction
         public final ProfileRepository profiler;
         public final OptimalSize optimalSize;
 
-        public Config(Clock clock, RestartBackoffPolicy restartBackoffPolicy,
+        public Config(Clock clock, BackoffPolicy backoffPolicy,
                       String familyName, ProfileRepository profiler, int maxRetryCount,
                       boolean interruptible, OptimalSize optimalSize) {
-            super(clock, restartBackoffPolicy, familyName, true, maxRetryCount, interruptible, false, true);
+            super(clock, backoffPolicy, familyName, true, maxRetryCount, interruptible, false, true);
             this.profiler = profiler;
             this.optimalSize = optimalSize;
         }

@@ -27,7 +27,7 @@ public class TinyReadonlyAlphaTransaction_performanceLongTest {
     public TinyReadonlyAlphaTransaction startSutTransaction() {
         TinyReadonlyAlphaTransaction.Config config = new TinyReadonlyAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount, true, optimalSize);
@@ -35,18 +35,18 @@ public class TinyReadonlyAlphaTransaction_performanceLongTest {
     }
 
     @Test
-    public void testNoTxManagement(){
+    public void testNoTxManagement() {
         ManualRef ref = new ManualRef(stm, 10);
 
         long startNs = System.nanoTime();
 
-        for(int k=0;k<transactionCount;k++){
+        for (int k = 0; k < transactionCount; k++) {
             AlphaTransaction tx = startSutTransaction();
             tx.openForRead(ref);
             tx.commit();
 
-            if(k % (10*1000*1000)==0){
-                System.out.printf("at %s\n",k);
+            if (k % (10 * 1000 * 1000) == 0) {
+                System.out.printf("at %s\n", k);
             }
         }
 
@@ -58,20 +58,20 @@ public class TinyReadonlyAlphaTransaction_performanceLongTest {
     }
 
     @Test
-    public void testNoTxManagementAndTxReuse(){
+    public void testNoTxManagementAndTxReuse() {
         ManualRef ref = new ManualRef(stm, 10);
 
         long startNs = System.nanoTime();
 
         AlphaTransaction tx = startSutTransaction();
 
-        for(int k=0;k<transactionCount;k++){
+        for (int k = 0; k < transactionCount; k++) {
             tx.restart();
             tx.openForRead(ref);
             tx.commit();
 
-            if(k % (10*1000*1000)==0){
-                System.out.printf("at %s\n",k);
+            if (k % (10 * 1000 * 1000) == 0) {
+                System.out.printf("at %s\n", k);
             }
         }
 

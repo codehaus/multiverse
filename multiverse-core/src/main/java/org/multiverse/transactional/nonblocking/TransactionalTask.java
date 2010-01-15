@@ -8,7 +8,7 @@ import org.multiverse.api.TransactionFactory;
  *
  * @author Peter Veentjer.
  */
-public interface NonBlockingTask {
+public interface TransactionalTask {
 
     /**
      * The TransactionFactory used to create transactions for executing this task.
@@ -18,10 +18,10 @@ public interface NonBlockingTask {
     TransactionFactory getTransactionFactory();
 
     /**
-     *
      * @param t the Transaction used to execute the task.
      * @return true if the task should be executed again, false otherwise.
      * @throws org.multiverse.api.exceptions.RetryError
+     *
      */
     boolean execute(Transaction t);
 }

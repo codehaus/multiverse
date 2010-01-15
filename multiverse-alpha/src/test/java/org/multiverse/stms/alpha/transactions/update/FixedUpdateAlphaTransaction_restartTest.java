@@ -9,10 +9,8 @@ import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.OptimalSize;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.multiverse.TestUtils.assertIsActive;
-import static org.multiverse.TestUtils.getField;
+import static org.junit.Assert.*;
+import static org.multiverse.TestUtils.*;
 
 public class FixedUpdateAlphaTransaction_restartTest {
 
@@ -31,14 +29,14 @@ public class FixedUpdateAlphaTransaction_restartTest {
         optimalSize.set(size);
         FixedUpdateAlphaTransaction.Config config = new FixedUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
                 true,
                 optimalSize,
-                true,true,true,true,size
+                true, true, true, true, size
         );
         return new FixedUpdateAlphaTransaction(config, size);
     }
@@ -65,8 +63,22 @@ public class FixedUpdateAlphaTransaction_restartTest {
 
         tx.restart();
         assertIsActive(tx);
-        assertEquals(0, getField(tx,"firstFreeIndex"));
+        assertEquals(0, getField(tx, "firstFreeIndex"));
         assertSame(committed1, ref1.___load());
         assertSame(committed2, ref2.___load());
     }
+
+    @Test
+    public void whenPreparedWithLockedResources_thenResourcesFreed() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction tx = startSutTransaction(10);
+        ref.inc(tx);
+        tx.prepare();
+
+        tx.abort();
+        assertIsAborted(tx);
+        assertNull(ref.___getLockOwner());
+    }
+
 }

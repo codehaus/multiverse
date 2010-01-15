@@ -2,11 +2,11 @@ package org.multiverse.stms.alpha;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Transaction;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.transactions.readonly.AbstractReadonlyAlphaTransaction;
-import org.multiverse.stms.alpha.transactions.update.*;
+import org.multiverse.stms.alpha.transactions.update.AbstractUpdateAlphaTransaction;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

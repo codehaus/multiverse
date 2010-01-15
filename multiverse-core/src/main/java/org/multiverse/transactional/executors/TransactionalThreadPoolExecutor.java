@@ -1,10 +1,10 @@
 package org.multiverse.transactional.executors;
 
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionLifecycleEvent;
 import org.multiverse.api.TransactionLifecycleListener;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.annotations.TransactionalObject;
 import org.multiverse.transactional.collections.TransactionalLinkedList;
 import org.multiverse.utils.TodoException;
 
@@ -228,7 +228,6 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
      * Returns the thread factory used to create new threads.
      *
      * @return the current thread factory
-     *
      * @see #setThreadFactory
      */
     @TransactionalMethod(readonly = true)
@@ -465,7 +464,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
         }
     }
 
-    private static class StartAllListener extends TransactionLifecycleListener {
+    private static class StartAllListener implements TransactionLifecycleListener {
 
         private final Thread[] threads;
 
@@ -483,7 +482,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
         }
     }
 
-    private class InterruptAllListener extends TransactionLifecycleListener {
+    private class InterruptAllListener implements TransactionLifecycleListener {
 
         @Override
         @TransactionalMethod

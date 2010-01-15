@@ -1,7 +1,7 @@
 package org.multiverse.transactional.collections;
 
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.annotations.TransactionalObject;
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.utils.TodoException;
 
 import java.util.*;
@@ -34,24 +34,21 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
     //clojure provides to prevent unwanted writeconflicts.
     private int size;
 
-    //in the future the head and tail need to be moved to a 'ref' so that they won't cause
-    //write conflicts. This is solution for stm's with object granularity that cause
-    //false writeconflicts.
+    //@FieldGranularity
     private Node<E> head;
+
+    //@FieldGranularity
     private Node<E> tail;
 
     public TransactionalLinkedList() {
         this(Integer.MAX_VALUE);
-        size = 0;//needed to force a write, will be removed in the future
     }
 
     public TransactionalLinkedList(int maxCapacity) {
         if (maxCapacity < 0) {
             throw new IllegalArgumentException("maxCapacity can't be smaller than 0");
         }
-
         this.maxCapacity = maxCapacity;
-        this.size = 0;//needed to force a write, will be removed in the future
     }
 
     @Override

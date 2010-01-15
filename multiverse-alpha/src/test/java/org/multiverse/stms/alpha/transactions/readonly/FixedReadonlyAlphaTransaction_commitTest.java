@@ -29,7 +29,7 @@ public class FixedReadonlyAlphaTransaction_commitTest {
 
         FixedReadonlyAlphaTransaction.Config config = new FixedReadonlyAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount, true, optimalSize, size);
@@ -48,9 +48,9 @@ public class FixedReadonlyAlphaTransaction_commitTest {
         assertIsCommitted(tx);
         assertEquals(version, stm.getVersion());
     }
-    
+
     @Test
-    public void whenNoConflictingReads_thenCommitSuccess(){
+    public void whenNoConflictingReads_thenCommitSuccess() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = startTransactionUnderTest(10);
@@ -64,7 +64,7 @@ public class FixedReadonlyAlphaTransaction_commitTest {
     }
 
     @Test
-    public void whenConflictingWritesAreFoundAfterOpenForRead_thenCommitSuccess(){
+    public void whenConflictingWritesAreFoundAfterOpenForRead_thenCommitSuccess() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = startTransactionUnderTest(10);

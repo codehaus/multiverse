@@ -3,8 +3,8 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestUtils;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.annotations.TransactionalObject;
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.utils.instrumentation.InstrumentationProblemMonitor;
 

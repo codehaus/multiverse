@@ -1,26 +1,23 @@
 package org.multiverse.integrationtests.stability;
 
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 import org.junit.Before;
 import org.junit.Test;
-import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-
-import org.multiverse.api.Transaction;
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Stm;
-
-import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-
+import org.multiverse.api.Transaction;
 import org.multiverse.api.Transactions;
-import org.multiverse.transactional.DefaultTransactionalReference;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.annotations.TransactionalObject;
 import org.multiverse.templates.TransactionTemplate;
+import org.multiverse.transactional.DefaultTransactionalReference;
 
 import java.util.LinkedList;
 import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 /**
  * A Test to see how well the MultiversionedStm deals with cycles. In the 0.2 release it was very important because

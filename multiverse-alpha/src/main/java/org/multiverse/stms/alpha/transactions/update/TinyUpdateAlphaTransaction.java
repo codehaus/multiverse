@@ -7,10 +7,10 @@ import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.UncommittedFilter;
 import org.multiverse.stms.alpha.transactions.OptimalSize;
 import org.multiverse.utils.Listeners;
+import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.clock.Clock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
 import org.multiverse.utils.profiling.ProfileRepository;
-import org.multiverse.utils.restartbackoff.RestartBackoffPolicy;
 
 /**
  * @author Peter Veentjer
@@ -23,12 +23,12 @@ public class TinyUpdateAlphaTransaction
         public final OptimalSize optimalSize;
 
         public Config(
-                Clock clock, RestartBackoffPolicy restartBackoffPolicy, String familyName, ProfileRepository profiler,
+                Clock clock, BackoffPolicy backoffPolicy, String familyName, ProfileRepository profiler,
                 int maxRetryCount, CommitLockPolicy commitLockPolicy, boolean interruptible, OptimalSize optimalSize,
-                boolean detectWriteSkew, boolean optimizeConflictDetection, boolean dirtyCheck,
+                boolean preventWriteSkew, boolean optimizeConflictDetection, boolean dirtyCheck,
                 boolean automaticReadTracking) {
-            super(clock, restartBackoffPolicy, familyName, false, maxRetryCount, interruptible, commitLockPolicy,
-                  profiler, detectWriteSkew, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
+            super(clock, backoffPolicy, familyName, false, maxRetryCount, interruptible, commitLockPolicy,
+                    profiler, preventWriteSkew, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
 
             this.optimalSize = optimalSize;
         }

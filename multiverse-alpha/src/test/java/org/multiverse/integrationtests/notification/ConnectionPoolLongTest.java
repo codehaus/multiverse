@@ -3,8 +3,8 @@ package org.multiverse.integrationtests.notification;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.annotations.TransactionalObject;
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.transactional.collections.TransactionalLinkedList;
 
 import java.util.concurrent.BlockingDeque;
@@ -55,7 +55,7 @@ public class ConnectionPoolLongTest {
             }
         }
 
-        @TransactionalMethod(retryCount = 10000)
+        @TransactionalMethod(maxRetryCount = 10000)
         Connection takeConnection() throws InterruptedException {
             return deque.takeFirst();
         }

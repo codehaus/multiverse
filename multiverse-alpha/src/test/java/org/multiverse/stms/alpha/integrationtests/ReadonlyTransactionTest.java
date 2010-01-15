@@ -2,13 +2,13 @@ package org.multiverse.stms.alpha.integrationtests;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.transactional.DefaultTransactionalReference;
-import org.multiverse.transactional.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
+import org.multiverse.transactional.DefaultTransactionalReference;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;

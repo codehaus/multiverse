@@ -34,7 +34,7 @@ public class TinyUpdateAlphaTransaction_openForReadTest {
     public TinyUpdateAlphaTransaction startSutTransaction() {
         TinyUpdateAlphaTransaction.Config config = new TinyUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount,
@@ -45,12 +45,21 @@ public class TinyUpdateAlphaTransaction_openForReadTest {
     public TinyUpdateAlphaTransaction startSutTransactionWithoutAutomaticReadTracking() {
         TinyUpdateAlphaTransaction.Config config = new TinyUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount,
                 stmConfig.commitLockPolicy, true, optimalSize, true, true, true, false);
         return new TinyUpdateAlphaTransaction(config);
+    }
+
+    @Test
+    public void testAutomaticReadTrackingProperty() {
+        AlphaTransaction tx = startSutTransactionWithoutAutomaticReadTracking();
+        assertFalse(tx.getConfig().automaticReadTracking());
+
+        tx = startSutTransaction();
+        assertTrue(tx.getConfig().automaticReadTracking());
     }
 
     @Test
@@ -60,7 +69,8 @@ public class TinyUpdateAlphaTransaction_openForReadTest {
         AlphaTransaction tx = startSutTransactionWithoutAutomaticReadTracking();
         tx.openForRead(ref);
 
-        assertNull(getField(tx, "attached"));
+        AlphaTranlocal tranlocal = (AlphaTranlocal) getField(tx, "attached");
+        assertNull("attached field was not null", getField(tx, "attached"));
     }
 
     @Test

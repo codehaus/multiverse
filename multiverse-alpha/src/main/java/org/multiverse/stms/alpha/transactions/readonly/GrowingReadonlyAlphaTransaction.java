@@ -6,14 +6,12 @@ import org.multiverse.stms.AbstractTransactionConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
+import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.clock.Clock;
 import org.multiverse.utils.profiling.ProfileRepository;
-import org.multiverse.utils.restartbackoff.RestartBackoffPolicy;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
-
-import static java.lang.String.format;
 
 /**
  * A readonly {@link org.multiverse.stms.alpha.transactions.AlphaTransaction} that does do read tracking. The advantage
@@ -30,9 +28,9 @@ public class GrowingReadonlyAlphaTransaction
 
         public final ProfileRepository profiler;
 
-        public Config(Clock clock, RestartBackoffPolicy restartBackoffPolicy,
+        public Config(Clock clock, BackoffPolicy backoffPolicy,
                       String familyName, ProfileRepository profiler, int maxRetryCount, boolean interruptible) {
-            super(clock, restartBackoffPolicy, familyName, true, maxRetryCount, interruptible, true,true);
+            super(clock, backoffPolicy, familyName, true, maxRetryCount, interruptible, true, true);
             this.profiler = profiler;
         }
     }
@@ -80,7 +78,7 @@ public class GrowingReadonlyAlphaTransaction
         boolean trackedReads = false;
 
         for (AlphaTransactionalObject txObject : attachedMap.keySet()) {
-            switch (txObject.___registerRetryListener(latch,wakeupVersion)){
+            switch (txObject.___registerRetryListener(latch, wakeupVersion)) {
                 case opened:
                     return true;
                 case registered:

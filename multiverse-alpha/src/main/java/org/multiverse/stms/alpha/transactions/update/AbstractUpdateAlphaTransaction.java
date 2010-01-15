@@ -8,7 +8,6 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AbstractAlphaTransaction;
 import org.multiverse.utils.Listeners;
-import org.multiverse.utils.TodoException;
 
 import static java.lang.String.format;
 
@@ -20,6 +19,8 @@ import static java.lang.String.format;
  */
 public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlphaTransactionConfig>
         extends AbstractAlphaTransaction<C, AbstractTransactionSnapshot> {
+
+    private long writeVersion;
 
     public AbstractUpdateAlphaTransaction(C config) {
         super(config);
@@ -177,11 +178,13 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
     protected abstract void doReleaseWriteLocksForSuccess(long writeVersion);
 
     protected final void doReleaseWriteLockForSuccess(AlphaTranlocal tranlocal, long writeVersion) {
+        if (tranlocal == null) {
+            return;
+        }
+
         boolean release = true;
 
-        if (tranlocal == null) {
-            release = false;
-        } else if (tranlocal.isCommitted()) {
+        if (tranlocal.isCommitted()) {
             if (tranlocal.___writeVersion != writeVersion) {
                 release = false;
             }
@@ -202,6 +205,10 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
     protected abstract Listeners[] store(long writeVersion);
 
     protected final Listeners store(AlphaTranlocal tranlocal, long writeVersion) {
+        if (tranlocal == null) {
+            return null;
+        }
+
         AlphaTransactionalObject txObject = tranlocal.getTransactionalObject();
 
         if (tranlocal.isCommitted()) {
@@ -220,7 +227,7 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
     }
 
     @Override
-    protected void doPrepare() {
+    protected final void doPrepare() {
         if (!hasWrites()) {
             return;
         }
@@ -229,7 +236,25 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
             throw createFailedToObtainCommitLocksException();
         }
 
-        throw new TodoException();
+        boolean hasConflict;
+        if (config.optimizedConflictDetection && getReadVersion() == config.clock.getVersion()) {
+            writeVersion = config.clock.tick();
+            //it could be that a different transaction also reached this part, so we need to make sure
+            hasConflict = writeVersion != getReadVersion() + 1;
+        } else if (config.preventWriteSkew) {
+            writeVersion = config.clock.tick();
+            hasConflict = hasReadConflict();
+        } else {
+            hasConflict = hasWriteConflict();
+            if (!hasConflict) {
+                writeVersion = config.clock.tick();
+            }
+        }
+
+        if (hasConflict) {
+            doReleaseWriteLocksForFailure();
+            throw createWriteConflictException();
+        }
     }
 
     @Override
@@ -239,61 +264,9 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
 
     @Override
     protected void doCommitPrepared() {
-        long writeVersion = 0;
         Listeners[] listeners = store(writeVersion);
         doReleaseWriteLocksForSuccess(writeVersion);
         openAll(listeners);
-
-        throw new TodoException();
-    }
-
-    protected final void doCommitActive() {
-        if (!hasWrites()) {
-            return;
-        }
-
-        if (!tryWriteLocks()) {
-            throw createFailedToObtainCommitLocksException();
-        }
-
-        boolean success = false;
-        Listeners[] listeners = null;
-        long writeVersion = Long.MIN_VALUE;
-        try {
-            boolean hasConflict;
-            if (config.optimizedConflictDetection && getReadVersion() == config.clock.getVersion()) {
-                writeVersion = config.clock.tick();
-                //it could be that a different transaction also reached this part, so we need to make sure
-                hasConflict = writeVersion != getReadVersion() + 1;
-            } else if (config.detectWriteSkew) {
-                writeVersion = config.clock.tick();
-                hasConflict = hasReadConflict();
-            } else {
-                hasConflict = hasWriteConflict();
-                if (!hasConflict) {
-                    writeVersion = config.clock.tick();
-                }
-            }
-
-            if (hasConflict) {
-                throw createWriteConflictException();
-            }
-
-            listeners = store(writeVersion);
-            success = true;
-        } finally {
-            releaseWriteLocks(success, writeVersion);
-        }
-
-        openAll(listeners);
-    }
-
-    private void releaseWriteLocks(boolean success, long writeVersion) {
-        if (success) {
-            doReleaseWriteLocksForSuccess(writeVersion);
-        } else {
-            doReleaseWriteLocksForFailure();
-        }
     }
 
     private WriteConflictException createWriteConflictException() {

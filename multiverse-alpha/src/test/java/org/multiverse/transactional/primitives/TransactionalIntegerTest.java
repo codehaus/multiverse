@@ -1,15 +1,22 @@
 package org.multiverse.transactional.primitives;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
-import org.multiverse.transactional.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.exceptions.DeadTransactionException;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.sleepMs;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 public class TransactionalIntegerTest {
+
+    @Before
+    public void setUp() {
+        clearThreadLocalTransaction();
+    }
 
     @Test
     public void constructorWithNoArg() {
@@ -108,7 +115,7 @@ public class TransactionalIntegerTest {
     }
 
     @Test
-    public void await(){
+    public void await() {
         TransactionalInteger txInt = new TransactionalInteger();
 
         SetThread t = new SetThread(txInt, 3);
@@ -132,5 +139,5 @@ public class TransactionalIntegerTest {
             sleepMs(300);
             txInt.set(value);
         }
-    }       
+    }
 }

@@ -33,7 +33,7 @@ public class FixedUpdateAlphaTransaction_openForWriteTest {
         optimalSize.set(size);
         FixedUpdateAlphaTransaction.Config config = new FixedUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,

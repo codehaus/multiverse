@@ -36,6 +36,7 @@ public class TransactionTemplateTest {
 
     /**
      * Starts an update transaction and places it in the
+     *
      * @return
      */
     public Transaction startThreadLocalUpdateTransaction() {
@@ -46,7 +47,7 @@ public class TransactionTemplateTest {
         setThreadLocalTransaction(t);
         return t;
     }
-    
+
     @Test
     public void testEmptyTemplate() {
         long version = stm.getVersion();
@@ -117,7 +118,7 @@ public class TransactionTemplateTest {
         final Transaction outerTx = txFactory.start();
         setThreadLocalTransaction(outerTx);
 
-        new TransactionTemplate(txFactory, false) {
+        new TransactionTemplate(txFactory, false, true) {
             @Override
             public Object execute(Transaction innerTx) throws Exception {
                 assertNotSame(innerTx, outerTx);
@@ -265,7 +266,7 @@ public class TransactionTemplateTest {
             new TransactionTemplate(txFactory) {
                 @Override
                 public Object execute(Transaction t) throws Exception {
-                    executeCounter.value++;                   
+                    executeCounter.value++;
                     ref.inc();
                     throw new LoadTooOldVersionException();
                 }

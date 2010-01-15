@@ -31,7 +31,7 @@ public class TinyReadonlyAlphaTransaction_openForWriteTest {
     public TinyReadonlyAlphaTransaction startSutTransaction() {
         TinyReadonlyAlphaTransaction.Config config = new TinyReadonlyAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount, true, optimalSize);

@@ -1,13 +1,14 @@
 package org.multiverse.transactional.collections;
 
-import static org.multiverse.api.StmUtils.retry;
-import org.multiverse.transactional.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.utils.TodoException;
 
 import java.util.AbstractQueue;
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+
+import static org.multiverse.api.StmUtils.retry;
 
 public abstract class AbstractBlockingQueue<E> extends AbstractQueue<E> implements BlockingQueue<E> {
 

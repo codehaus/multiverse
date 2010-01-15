@@ -33,7 +33,7 @@ public class TinyReadonlyAlphaTransaction_registerRetryLatchTest {
     public TinyReadonlyAlphaTransaction startSutTransaction() {
         TinyReadonlyAlphaTransaction.Config config = new TinyReadonlyAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount, true, optimalSize);
@@ -84,7 +84,7 @@ public class TinyReadonlyAlphaTransaction_registerRetryLatchTest {
         assertHasListeners(ref, latch);
     }
 
-    
+
     @Test
     public void whenListenersAlreadyPresent_newListenerAppended() {
         ManualRef ref = new ManualRef(stm);

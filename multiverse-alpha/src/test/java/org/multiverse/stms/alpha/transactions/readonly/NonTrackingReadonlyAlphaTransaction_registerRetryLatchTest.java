@@ -8,13 +8,10 @@ import org.multiverse.api.exceptions.NoRetryPossibleException;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
-import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.utils.latches.CheapLatch;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsActive;
 
 /**
@@ -31,10 +28,10 @@ public class NonTrackingReadonlyAlphaTransaction_registerRetryLatchTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public NonTrackingReadonlyAlphaTransaction startTransactionUnderTest() {
+    public NonTrackingReadonlyAlphaTransaction startSutTransaction() {
         NonTrackingReadonlyAlphaTransaction.Config config = new NonTrackingReadonlyAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount);
@@ -43,7 +40,7 @@ public class NonTrackingReadonlyAlphaTransaction_registerRetryLatchTest {
 
     @Test
     public void whenUnused_thenNoRetryPossibleException() {
-        Transaction tx = startTransactionUnderTest();
+        Transaction tx = startSutTransaction();
         Latch latch = new CheapLatch();
 
         try {
@@ -60,7 +57,7 @@ public class NonTrackingReadonlyAlphaTransaction_registerRetryLatchTest {
     public void whenUsed_thenNoRetryPossibleException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = startSutTransaction();
         tx.openForRead(ref);
 
         Latch latch = new CheapLatch();

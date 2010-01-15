@@ -1,12 +1,15 @@
 package org.multiverse.transactional.collections;
 
-import static org.multiverse.api.StmUtils.retry;
-import org.multiverse.transactional.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.utils.TodoException;
 
-import java.util.*;
+import java.util.AbstractCollection;
+import java.util.Collection;
+import java.util.NoSuchElementException;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.TimeUnit;
+
+import static org.multiverse.api.StmUtils.retry;
 
 public abstract class AbstractBlockingDeque<E> extends AbstractCollection<E> implements BlockingDeque<E> {
 
@@ -234,6 +237,15 @@ public abstract class AbstractBlockingDeque<E> extends AbstractCollection<E> imp
     @TransactionalMethod(interruptible = true)
     public E take() throws InterruptedException {
         return takeFirst();
+    }
+
+    @TransactionalMethod
+    public E takeUninterruptible() {
+        if (isEmpty()) {
+            retry();
+        }
+
+        return doRemoveFirst();
     }
 
     @Override

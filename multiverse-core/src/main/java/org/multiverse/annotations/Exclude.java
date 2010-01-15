@@ -1,4 +1,4 @@
-package org.multiverse.transactional.annotations;
+package org.multiverse.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

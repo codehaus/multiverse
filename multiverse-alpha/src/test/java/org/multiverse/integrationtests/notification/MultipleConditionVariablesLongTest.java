@@ -5,14 +5,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.TestUtils;
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.api.Stm;
+import org.multiverse.transactional.primitives.TransactionalInteger;
+
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-import org.multiverse.api.Stm;
 import static org.multiverse.api.StmUtils.retry;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.primitives.TransactionalInteger;
-
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**

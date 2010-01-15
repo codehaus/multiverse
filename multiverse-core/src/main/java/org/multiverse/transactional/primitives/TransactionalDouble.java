@@ -1,11 +1,11 @@
 package org.multiverse.transactional.primitives;
 
-import static org.multiverse.api.StmUtils.retry;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.annotations.TransactionalObject;
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalObject;
 
 import static java.lang.Double.doubleToLongBits;
 import static java.lang.String.format;
+import static org.multiverse.api.StmUtils.retry;
 
 /**
  * A reference for a primitive double.
@@ -37,7 +37,7 @@ public class TransactionalDouble {
         }
     }
 
-     /**
+    /**
      * Sets the new value and returns the old value.
      *
      * @param newValue the new value.

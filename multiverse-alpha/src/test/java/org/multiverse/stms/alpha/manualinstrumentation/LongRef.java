@@ -1,15 +1,17 @@
 package org.multiverse.stms.alpha.manualinstrumentation;
 
-import static org.multiverse.api.StmUtils.retry;
-import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Transaction;
-import org.multiverse.transactional.annotations.TransactionalMethod;
 import org.multiverse.api.exceptions.ReadonlyException;
-import org.multiverse.stms.alpha.*;
+import org.multiverse.stms.alpha.AlphaTranlocal;
+import org.multiverse.stms.alpha.AlphaTranlocalSnapshot;
+import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
+
+import static org.multiverse.api.StmUtils.retry;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer

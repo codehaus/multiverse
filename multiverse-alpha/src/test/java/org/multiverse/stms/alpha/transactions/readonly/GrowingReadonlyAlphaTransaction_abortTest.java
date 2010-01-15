@@ -29,7 +29,7 @@ public class GrowingReadonlyAlphaTransaction_abortTest {
     public GrowingReadonlyAlphaTransaction startTransactionUnderTest() {
         GrowingReadonlyAlphaTransaction.Config config = new GrowingReadonlyAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount, true);

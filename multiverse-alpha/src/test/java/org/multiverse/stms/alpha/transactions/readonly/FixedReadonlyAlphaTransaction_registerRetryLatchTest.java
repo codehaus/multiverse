@@ -11,9 +11,7 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.OptimalSize;
 import org.multiverse.utils.latches.CheapLatch;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.multiverse.stms.alpha.transactions.AlphaTransactionTestUtils.assertHasListeners;
 import static org.multiverse.stms.alpha.transactions.AlphaTransactionTestUtils.assertHasNoListeners;
 
@@ -34,7 +32,7 @@ public class FixedReadonlyAlphaTransaction_registerRetryLatchTest {
 
         FixedReadonlyAlphaTransaction.Config config = new FixedReadonlyAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount, true, optimalSize, size);
@@ -111,8 +109,8 @@ public class FixedReadonlyAlphaTransaction_registerRetryLatchTest {
     }
 
     @Test
-    public void whenPreexistingListener_thenListenerAppended(){
-         ManualRef ref = new ManualRef(stm);
+    public void whenPreexistingListener_thenListenerAppended() {
+        ManualRef ref = new ManualRef(stm);
         Latch latch1 = new CheapLatch();
         Latch latch2 = new CheapLatch();
 

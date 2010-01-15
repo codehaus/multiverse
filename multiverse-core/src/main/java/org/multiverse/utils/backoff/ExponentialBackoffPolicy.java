@@ -1,12 +1,13 @@
-package org.multiverse.utils.restartbackoff;
+package org.multiverse.utils.backoff;
 
 import org.multiverse.api.Transaction;
 
 import java.util.concurrent.TimeUnit;
+
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
- * A {@link RestartBackoffPolicy} that does an exponential backoff. So each next attempt, the delay is doubled until a
+ * A {@link BackoffPolicy} that does an exponential backoff. So each next attempt, the delay is doubled until a
  * configurable maximum delay has been reached.
  * <p/>
  * The exponential growth of delay can be truncated by providing a maxDelay. If no max delay is provided, the maximum
@@ -14,23 +15,23 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  *
  * @author Peter Veentjer.
  */
-public class ExponentialRestartBackoffPolicy implements RestartBackoffPolicy {
+public class ExponentialBackoffPolicy implements BackoffPolicy {
 
-    public final static ExponentialRestartBackoffPolicy INSTANCE_10_MS_MAX = new ExponentialRestartBackoffPolicy();
+    public final static ExponentialBackoffPolicy INSTANCE_10_MS_MAX = new ExponentialBackoffPolicy();
 
     private final long maxDelayNs;
     private final long minDelayNs;
 
     /**
-     * Creates an ExponentialRestartBackoffPolicy with 100 nanoseconds as minimal delay and 10 milliseconds as maximum
+     * Creates an ExponentialBackoffPolicy with 100 nanoseconds as minimal delay and 10 milliseconds as maximum
      * delay.
      */
-    public ExponentialRestartBackoffPolicy() {
+    public ExponentialBackoffPolicy() {
         this(1000, MILLISECONDS.toNanos(10), TimeUnit.NANOSECONDS);
     }
 
     /**
-     * Creates an ExponentialRestartBackoffPolicy with given maximum delay.
+     * Creates an ExponentialBackoffPolicy with given maximum delay.
      *
      * @param minDelayNs the minimum delay in nanoseconds to wait. If a negative or zero value provided, it will be
      *                   interpreted that no external minimal value is needed.
@@ -38,7 +39,7 @@ public class ExponentialRestartBackoffPolicy implements RestartBackoffPolicy {
      * @param unit       the unit of maxDelay.
      * @throws NullPointerException if unit is null.
      */
-    public ExponentialRestartBackoffPolicy(long minDelayNs, long maxDelay, TimeUnit unit) {
+    public ExponentialBackoffPolicy(long minDelayNs, long maxDelay, TimeUnit unit) {
         this.maxDelayNs = unit.toNanos(maxDelay);
         this.minDelayNs = minDelayNs;
         if (minDelayNs > maxDelayNs) {
@@ -71,7 +72,7 @@ public class ExponentialRestartBackoffPolicy implements RestartBackoffPolicy {
     }
 
     @Override
-    public void backoffUninterruptible(Transaction t, int attempt) {
+    public void delayedUninterruptible(Transaction t, int attempt) {
         long delayNs = calcDelayNs(attempt);
 
         try {

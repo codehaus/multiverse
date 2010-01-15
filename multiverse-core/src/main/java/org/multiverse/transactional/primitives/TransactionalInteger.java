@@ -1,13 +1,14 @@
 package org.multiverse.transactional.primitives;
 
-import static org.multiverse.api.StmUtils.retry;
-
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.annotations.TransactionalObject;
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalObject;
 
 import static java.lang.String.format;
+import static org.multiverse.api.StmUtils.retry;
 
 /**
+ * A transactional primitive for an int.
+ *
  * @author Peter Veentjer
  */
 @TransactionalObject
@@ -15,39 +16,91 @@ public class TransactionalInteger {
 
     private int value;
 
+    /**
+     * Creates a new TransactionalInteger with the 0 as value.
+     */
     public TransactionalInteger() {
         this(0);
     }
 
+    /**
+     * Creates a new TransactionalInteger with the given value.
+     *
+     * @param value the initial value of this TransactionalInteger.
+     */
     public TransactionalInteger(int value) {
         this.value = value;
     }
 
-    public int inc() {
-        value++;
-        return value;
-    }
-
-    public int inc(int amount) {
-        value += amount;
-        return value;
-    }
-
-    public int dec() {
-        value--;
-        return value;
-    }
-
-    public int dec(int amount) {
-        value -= amount;
-        return value;
-    }
-
+    /**
+     * Gets the current value.
+     *
+     * @return gets the current value.
+     */
     @TransactionalMethod(readonly = true)
     public int get() {
         return value;
     }
 
+    /**
+     * Sets the new value and returns the old value.
+     *
+     * @param newValue the new value.
+     * @return the previous value.
+     */
+    public int set(int newValue) {
+        int oldValue = this.value;
+        this.value = newValue;
+        return oldValue;
+    }
+
+    /**
+     * Decreases the value in this TransactionalInteger by one.
+     *
+     * @return the decreased value.
+     */
+    public int dec() {
+        value--;
+        return value;
+    }
+
+    /**
+     * Increases the value in this TransactionalInteger by one.
+     *
+     * @return the increased value.
+     */
+    public int inc() {
+        value++;
+        return value;
+    }
+
+    /**
+     * Increase the value of this TransactionalInteger by the given amount.
+     *
+     * @param amount the amount the value needs to be increased with. Value is allowed to be 0 or negative.
+     * @return the increased value.
+     */
+    public int inc(int amount) {
+        value += amount;
+        return value;
+    }
+
+    /**
+     * Decreases the value of this TransactionalInteger by the given amount.
+     *
+     * @param amount the amount the value needs to be decreased with. Value is allowed to be 0 or negative.
+     * @return the decreased value.
+     */
+    public int dec(int amount) {
+        value -= amount;
+        return value;
+    }
+
+    /**
+     * Waits till the value is equal to the desired value.
+     *
+     * @param desired the value to wait for.
+     */
     @TransactionalMethod(readonly = true, automaticReadTracking = true)
     public void await(int desired) {
         if (desired != value) {
@@ -55,6 +108,12 @@ public class TransactionalInteger {
         }
     }
 
+    /**
+     * Waits till this value is larger than.
+     *
+     * @param than the value to wait for.
+     * @return
+     */
     @TransactionalMethod(readonly = true, automaticReadTracking = true)
     public int awaitLargerThan(int than) {
         if (!(value > than)) {
@@ -98,18 +157,6 @@ public class TransactionalInteger {
         }
 
         return value;
-    }
-
-    /**
-     * Sets the new value and returns the old value.
-     *
-     * @param newValue the new value.
-     * @return the previous value.
-     */
-    public int set(int newValue) {
-        int oldValue = this.value;
-        this.value = newValue;
-        return oldValue;
     }
 
     @TransactionalMethod(readonly = true)

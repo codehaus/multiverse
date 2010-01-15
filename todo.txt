@@ -2,71 +2,20 @@
 todo engine
 ---------------------------------------------------------------
 
-- when the abort fails for a prepared transaction, there could be issues without the doAbortPrepared not releasing
-resources
+- optimizations
 
-- tests that use different transaction size to cause all transaction implementations to be used
+    - test: the transaction call from another transaction call lifting method optimization
 
-- test for the writeskew problem; activation enabled
+    - test: different situations for the transactionalmethod->transactionalmethod call. 
 
-- test for the writeskew problem; activation disabled
+    - GET_FIELD for tranlocal should use the tranlocal field
 
-- better message when there are too many failures.. atm it is unclear (write conflict? lock conflict?)
+    - PUT_FIELD for the tranlocal should use the tranlocal field
 
-    - add to donor logic
+    - when a loadForWrite is done, a check needs to be done if the current tranlocal is committed. If it is, it
+    should be replaced by the updatable version.
 
-    - add to transaction template
-
-- check that a update transaction with writeskew enabled but without readtracking is not possible.
-
-- writeskew detection tests
-
-    - tinyupdatealphatransaction
-
-- profiler should be added to the abstract transaction config
-
-- profiler statements of the abstract transaction should be added.
-
-- locking
-
-    - transaction with only fresh objects doesnt need to increase the version, or
-    lock/unlock.
-
-- rethink about the or-else. There is no need to create a snapshot, but it can be used for nested transactions.
-
-    - FixedTrackingUpdateAlphaTransaction and support for 'orelse'
-
-     - TinyTrackingUpdateTransaction and support for orelse
-
-     - TinyTrackingReadonlyTransaction and support for orelse
-
-     - GrowingTrackingReadonlyTransaction and support for orelse
-
-- new constructed atomic object the tranlocal is not created and readonly transactions are going
-to complain about that.
-
-- BUG: constructors that don't do anything cause problems because the tranlocal isn't created
-    Perhaps always do a load when the constructor exits (since it is hard to add logic in the constructor begin)
-
-    - GrowingReadTrackingReadonlyAlphaTransaction_loadForReadTest && fresh
-
-    - GrowingNonTrackingUpdateAlphaTransaction_loadForReadTest && fresh
-
-    - GrowingTrackingUpdateAlphaTransaction_loadForReadTest && fresh
-
-    - FixedTrackingUpdateAlphaTransaction_loadForReadTest  && fresh
-
-    - TinyTrackingUpdateAlphaTransaction_loadForReadTest && fresh
-
-    - TinyNonTrackingUpdateAlphaTransaction_loadForReadTest && fresh
-
-- make sure (using bug shaker) that the registration of the listener contains no
-concurrency problem. I think it is possible that there are pending
-
-- class hierarchy of recoverableexceptions is strange (retry and transactiontoosmall are recoverable but don't
-implement this interface)
-
-- it can happen that a retry latch.wait happens even though no retry should be executed anymore
+- relaxed clock in combination with writeskew
 
 - upgrade to clover
 
@@ -85,6 +34,52 @@ implement this interface)
 - TransactionalThreadPoolExecutor_stressLongTest
 
 - timeout op de transaction through annotations
+
+- test for the writeskew problem; activation disabled
+
+- better message when there are too many failures.. atm it is unclear (write conflict? lock conflict?)
+
+    - add to donor logic
+
+    - add to transaction template
+
+- writeskew detection tests
+
+    - tinyupdatealphatransaction
+
+- profiler
+
+    - profiler should be added to the abstract transaction config
+
+    - profiler statements of the abstract transaction should be added.
+
+- locking
+
+    - transaction with only fresh objects doesnt need to increase the version, or
+    lock/unlock.
+
+---------------------------------------------------------------
+todo unclear
+---------------------------------------------------------------
+
+- tests that use different transaction size to cause all transaction implementations to be used
+
+- rethink about the or-else. There is no need to create a snapshot, but it can be used for nested transactions.
+
+    - FixedTrackingUpdateAlphaTransaction and support for 'orelse'
+
+     - TinyTrackingUpdateTransaction and support for orelse
+
+     - TinyTrackingReadonlyTransaction and support for orelse
+
+     - GrowingTrackingReadonlyTransaction and support for orelse
+
+
+- make sure (using bug shaker) that the registration of the listener contains no
+concurrency problem. I think it is possible that there are pending
+
+- class hierarchy of recoverableexceptions is strange (retry and transactiontoosmall are recoverable but don't
+implement this interface)
 
 - debug information for the atomic object is lost somehow:
 org.multiverse.api.exceptions.ReadonlyException
@@ -109,20 +104,6 @@ Thread PingPongThread-1 has thrown an exception
 
 - logging on transactions should be configurable
 
-- snapshot for retry doesn't reset everything; like the tasks
-
-    + implement feature
-
-    - make tests
-
-- optimizations
-
-    - use the 'delegate' method directory if one if available instead of going through the coordinator
-
-    - use the Transaction passed on the first argument instead of getting it from the threadlocal
-
-    - the tranlocal 'this' add to method, reduces the need for unwanted tranlocal retrieval
-
 - Test 'testContentOfFastAtomicObjectIsCopied' incomplete in file 'AtomicObject_clashingFieldTest.java' at line 62
 
 - Test 'equals' incomplete in file 'TransactionalLinkedList.java' at line 1117
@@ -135,15 +116,13 @@ Thread PingPongThread-1 has thrown an exception
 
 - CigaretteSmokersProblemSimplifiedTest
 
-instrumentation
-
-    - testCreateAtomicObjectInConstructor
-
 - primitive refs should also have their waiting methods checked.
 
 ---------------------------------------------------------------
 todo features
 ---------------------------------------------------------------
+
+- blocking executor.
 
 - support that a field can be moved from the atomic object but to a non conflicting
 location. (Using a ref).
@@ -388,4 +367,61 @@ of caching the dirty check much cheaper.
     - lifecycle method of the atomictemplate need to be tested
 
 - TransactionalThreadPoolExecutor_startTest
+
+- test for the writeskew problem; activation enabled
+
+- instead of calling it writeSkewDetection, call writeSkewPrevents
+
+- when the abort fails for a prepared transaction, there could be issues without the doAbortPrepared not releasing
+resources
+
+- check that a update transaction with writeskew enabled but without readtracking is not possible.
+
+- snapshot for retry doesn't reset everything; like the tasks  : FUNCTIONALITY NOT USED
+
+    + implement feature
+
+    - make tests
+
+instrumentation
+
+    - testCreateAtomicObjectInConstructor
+
+- prepare in the commit should be implemented
+
+- once an tranlocal needs to be loaded, access the transaction from the transaction var instead of the tranlocal.
+
+- BUG: constructors that don't do anything cause problems because the tranlocal isn't created
+    Perhaps always do a load when the constructor exits (since it is hard to add logic in the constructor begin)
+
+    - GrowingReadTrackingReadonlyAlphaTransaction_loadForReadTest && fresh
+
+    - GrowingNonTrackingUpdateAlphaTransaction_loadForReadTest && fresh
+
+    - GrowingTrackingUpdateAlphaTransaction_loadForReadTest && fresh
+
+    - FixedTrackingUpdateAlphaTransaction_loadForReadTest  && fresh
+
+    - TinyTrackingUpdateAlphaTransaction_loadForReadTest && fresh
+
+    - TinyNonTrackingUpdateAlphaTransaction_loadForReadTest && fresh
+
+    + Problem is now solved, tests need to be added.
+
+- new constructed atomic object the tranlocal is not created and readonly transactions are going
+to complain about that.
+
+ - the tranlocal 'this' add to method, reduces the need for unwanted tranlocal retrieval
+
+- if a transactional method is started, in the coordinating method, the tranlocal should be loaded
+  and passed as argument. Also prevent the lazy creation of tranlocal.
+
+    - if it is known that a call is done on transactional method of a transactional object, instead of jumping
+    to the coordinating method, jump to the lifting method.
+
+- get idea up and running with tests.
+
+- get tests up and running
+
+- it can happen that a retry latch.wait happens even though no retry should be executed anymore
 

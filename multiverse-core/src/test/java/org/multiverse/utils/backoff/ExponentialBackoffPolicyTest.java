@@ -1,28 +1,29 @@
-package org.multiverse.utils.restartbackoff;
+package org.multiverse.utils.backoff;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-public class ExponentialRestartBackoffPolicyTest {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class ExponentialBackoffPolicyTest {
 
     @Test
     public void construction_INSTANCE() {
-        ExponentialRestartBackoffPolicy policy = ExponentialRestartBackoffPolicy.INSTANCE_10_MS_MAX;
+        ExponentialBackoffPolicy policy = ExponentialBackoffPolicy.INSTANCE_10_MS_MAX;
         assertEquals(1000, policy.getMinDelayNs());
         assertEquals(TimeUnit.MILLISECONDS.toNanos(10), policy.getMaxDelayNs());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void minimumDelayCantBeLargerThanMaximumDelay() {
-        new ExponentialRestartBackoffPolicy(10, 9, TimeUnit.NANOSECONDS);
+        new ExponentialBackoffPolicy(10, 9, TimeUnit.NANOSECONDS);
     }
 
     @Test
     public void noDelayForZeroIteration() {
-        ExponentialRestartBackoffPolicy policy = new ExponentialRestartBackoffPolicy();
+        ExponentialBackoffPolicy policy = new ExponentialBackoffPolicy();
         long delayNs = policy.calcDelayNs(0);
         assertEquals(policy.getMinDelayNs(), delayNs);
     }
@@ -30,7 +31,7 @@ public class ExponentialRestartBackoffPolicyTest {
     @Test
     public void minimumDelay() {
         long minDelay = 10000;
-        ExponentialRestartBackoffPolicy policy = new ExponentialRestartBackoffPolicy(minDelay, 1, TimeUnit.SECONDS);
+        ExponentialBackoffPolicy policy = new ExponentialBackoffPolicy(minDelay, 1, TimeUnit.SECONDS);
 
         long delayNs = policy.calcDelayNs(1);
 
@@ -40,7 +41,7 @@ public class ExponentialRestartBackoffPolicyTest {
     @Test
     public void tooLargeValueTruncated() {
         long maxDelayNs = 10 * 1000;
-        ExponentialRestartBackoffPolicy policy = new ExponentialRestartBackoffPolicy(
+        ExponentialBackoffPolicy policy = new ExponentialBackoffPolicy(
                 100,
                 maxDelayNs,
                 TimeUnit.NANOSECONDS);
@@ -53,7 +54,7 @@ public class ExponentialRestartBackoffPolicyTest {
     @Test
     public void happyFlow() {
         long maxDelayNs = 1000 * 1000;
-        ExponentialRestartBackoffPolicy policy = new ExponentialRestartBackoffPolicy(
+        ExponentialBackoffPolicy policy = new ExponentialBackoffPolicy(
                 100,
                 maxDelayNs,
                 TimeUnit.NANOSECONDS);
@@ -66,7 +67,7 @@ public class ExponentialRestartBackoffPolicyTest {
     public void sleep() throws InterruptedException {
         long sleepNs = TimeUnit.MILLISECONDS.toNanos(100);
         long startNs = System.nanoTime();
-        ExponentialRestartBackoffPolicy.sleep(sleepNs);
+        ExponentialBackoffPolicy.sleep(sleepNs);
         long elapsedNs = System.nanoTime() - startNs;
 
         //we need to build in some room for systems non perfect delays and time measurements. 

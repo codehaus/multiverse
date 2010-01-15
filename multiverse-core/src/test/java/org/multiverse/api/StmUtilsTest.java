@@ -8,7 +8,7 @@ import org.multiverse.api.exceptions.RetryError;
 
 import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.testIncomplete;
-import static org.multiverse.api.StmUtils.*;
+import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
@@ -38,30 +38,6 @@ public class StmUtilsTest {
     @Test(expected = NoTransactionFoundException.class)
     public void retryWithoutTransactionFails() {
         retry();
-    }
-
-    @Test
-    public void deferredExecuteIsForwardedToTransactionThreadLocal() {
-        Runnable task = mock(Runnable.class);
-
-        Transaction t = mock(Transaction.class);
-        setThreadLocalTransaction(t);
-        deferredExecute(task);
-
-        testIncomplete();/*verify(t).schedule(task, TransactionLifecycleEvent.postCommit);
-        */
-    }
-
-    @Test(expected = NoTransactionFoundException.class)
-    public void deferredExecuteWithoutTransactionFails() {
-        Runnable task = mock(Runnable.class);
-        deferredExecute(task);
-    }
-
-    @Test(expected = NoTransactionFoundException.class)
-    public void compensatingExecuteWithoutTransactionFails() {
-        Runnable task = mock(Runnable.class);
-        compensatingExecute(task);
     }
 
     @Test

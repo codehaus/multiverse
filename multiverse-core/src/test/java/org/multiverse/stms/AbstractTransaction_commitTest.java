@@ -26,11 +26,11 @@ public class AbstractTransaction_commitTest {
     }
 
     @Test
-    public void whenOnCommitThrowsException_thenAbort() {
+    public void whenPrepareThrowsException_thenAbort() {
         AbstractTransaction tx = spy(new AbstractTransactionImpl());
 
         RuntimeException expected = new RuntimeException();
-        doThrow(expected).when(tx).doCommitActive();
+        doThrow(expected).when(tx).doPrepare();
 
         try {
             tx.commit();
@@ -108,7 +108,30 @@ public class AbstractTransaction_commitTest {
 
     @Test
     public void whenPrepared() {
+        AbstractTransaction tx = spy(new AbstractTransactionImpl());
+        tx.prepare();
 
+        tx.commit();
+        verify(tx, times(1)).doCommitPrepared();
+    }
+
+    @Test
+    public void whenDoCommitPreparedFails_thenAbort() {
+        AbstractTransaction tx = spy(new AbstractTransactionImpl());
+        tx.prepare();
+
+        RuntimeException expected = new RuntimeException();
+        doThrow(expected).when(tx).doCommitPrepared();
+
+        try {
+            tx.commit();
+            fail();
+        } catch (Exception found) {
+            assertSame(expected, found);
+        }
+
+        verify(tx, times(1)).doAbortPrepared();
+        assertIsAborted(tx);
     }
 
     @Test

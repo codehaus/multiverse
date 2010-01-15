@@ -1,17 +1,17 @@
 package org.multiverse.stms.alpha.manualinstrumentation;
 
-import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-import static org.multiverse.api.StmUtils.retry;
-
 import org.multiverse.api.GlobalStmInstance;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.stms.alpha.AlphaTranlocal;
+import org.multiverse.stms.alpha.manualinstrumentation.IntStackTranlocal.IntNode;
 import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.manualinstrumentation.IntStackTranlocal.IntNode;
 import org.multiverse.templates.TransactionTemplate;
+
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.StmUtils.retry;
 
 public final class IntStack extends DefaultTxObjectMixin {
 
@@ -63,7 +63,7 @@ public final class IntStack extends DefaultTxObjectMixin {
     public final static TransactionFactory popTxFactory = GlobalStmInstance.getGlobalStmInstance().getTransactionFactoryBuilder().
             setReadonly(false).
             setSmartTxLengthSelector(true).
-            setDetectWriteSkew(false).
+            setPreventWriteSkew(false).
             setFamilyName("IntStack.pop()").
             setAutomaticReadTracking(true).build();
 
@@ -92,7 +92,7 @@ public final class IntStack extends DefaultTxObjectMixin {
     public final static TransactionFactory pushTxFactory = GlobalStmInstance.getGlobalStmInstance().getTransactionFactoryBuilder().
             setReadonly(false).
             setSmartTxLengthSelector(true).
-            setDetectWriteSkew(false).
+            setPreventWriteSkew(false).
             setFamilyName("IntStack.push()").
             setAutomaticReadTracking(false).build();
 

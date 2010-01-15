@@ -1,11 +1,12 @@
 package org.multiverse.transactional.collections;
 
-import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import org.multiverse.api.Stm;
+
+import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 public class TransactionalLinkedList_setTest {
@@ -46,7 +47,6 @@ public class TransactionalLinkedList_setTest {
         list.add("1");
         list.add("2");
         list.add("3");
-
 
         String result = list.set(0, "a");
         assertEquals(result, "1");

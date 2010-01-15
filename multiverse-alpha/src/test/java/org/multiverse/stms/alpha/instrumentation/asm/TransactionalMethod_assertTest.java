@@ -2,7 +2,7 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.transactional.annotations.TransactionalObject;
+import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -17,7 +17,7 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
  * at java.lang.ClassLoader.defineClass(ClassLoader.java:621)
  * at java.security.SecureClassLoader.defineClass(SecureClassLoader.java:124)
  * </pre>
- *
+ * <p/>
  * This is a regression test to make sure that the issue isn't introduced again.
  *
  * @author Peter Veentjer.

@@ -1,7 +1,7 @@
 package org.multiverse.stms.alpha.instrumentation.integrationtest;
 
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.annotations.TransactionalObject;
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.manualinstrumentation.Stack;
 
 /**
@@ -25,6 +25,7 @@ public class Queue<E> {
     }
 
     //this calling constructor is not allowed yet.
+
     public Queue() {
         pushedStack = new Stack<E>();
         readyToPopStack = new Stack<E>();

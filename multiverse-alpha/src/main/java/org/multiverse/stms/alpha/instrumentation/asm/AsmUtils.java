@@ -1,9 +1,5 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
-import org.multiverse.transactional.annotations.Exclude;
-import org.multiverse.transactional.annotations.TransactionalConstructor;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.annotations.TransactionalObject;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -24,6 +20,44 @@ import static org.objectweb.asm.Type.getDescriptor;
 import static org.objectweb.asm.Type.getInternalName;
 
 public final class AsmUtils implements Opcodes {
+
+    public static int firstIndexAfterSuper(String methodName, InsnList instructions, String superClass) {
+        if (!methodName.equals("<init>")) {
+            throw new RuntimeException();
+        }
+
+        if (instructions == null) {
+            return -1;
+        }
+
+        int depth = 0;
+        for (int k = 0; k < instructions.size(); k++) {
+            AbstractInsnNode insn = (AbstractInsnNode) instructions.get(k);
+            //System.out.println(insn+" opcode: "+insn.getOpcode());
+            if (insn.getOpcode() == INVOKESPECIAL) {
+                MethodInsnNode methodInsn = (MethodInsnNode) insn;
+                //System.out.printf("method %s.%s\n",methodInsn.owner,methodInsn.name);
+                if (methodInsn.name.equals("<init>") && methodInsn.owner.endsWith(superClass)) {
+                    if (depth == 0) {
+                        return k + 1;
+                    } else {
+                        depth--;
+                    }
+                }
+            } else if (insn.getOpcode() == NEW) {
+                TypeInsnNode typeInsn = (TypeInsnNode) insn;
+                if (typeInsn.desc.equals(superClass)) {
+                    depth++;
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    public static int firstIndexAfterSuper(MethodNode methodNode, String superClass) {
+        return firstIndexAfterSuper(methodNode.name, methodNode.instructions, superClass);
+    }
 
     public static String toString(AbstractInsnNode insnNode) {
         TraceMethodVisitor asmifier = new TraceMethodVisitor();
@@ -61,14 +95,19 @@ public final class AsmUtils implements Opcodes {
     }
 
     public static int sizeOfFormalParameters(MethodNode methodNode) {
-        int size = isStatic(methodNode) ? 0 : 1;
+        return sizeOfFormalParameters(methodNode.desc);
+    }
 
-        for (Type argType : Type.getArgumentTypes(methodNode.desc)) {
+    public static int sizeOfFormalParameters(String desc) {
+        int size = 0;
+
+        for (Type argType : Type.getArgumentTypes(desc)) {
             size += argType.getSize();
         }
 
         return size;
     }
+
 
     public static int sizeOfLocalVariables(List<LocalVariableNode> localVariables) {
         int size = 0;
@@ -99,6 +138,23 @@ public final class AsmUtils implements Opcodes {
     }
 
 
+    public static int upgradeToProtected(int access) {
+        if (isProtected(access)) {
+            return access;
+        }
+
+        if (isPublic(access)) {
+            return access;
+        }
+
+        if (isPrivate(access)) {
+            access = access - ACC_PRIVATE;
+        }
+
+        return access + ACC_PROTECTED;
+    }
+
+
     /**
      * A new constructor descriptor is created by adding the extraArgType as the first argument (so the other arguments
      * all shift one pos to the right).
@@ -118,22 +174,6 @@ public final class AsmUtils implements Opcodes {
         return Type.getMethodDescriptor(returnType, newArgTypes);
     }
 
-
-    public static boolean isExcluded(FieldNode field) {
-        return hasVisibleAnnotation(field, Exclude.class);
-    }
-
-    public static boolean hasTransactionalMethodAnnotation(MethodNode methodNode) {
-        return hasVisibleAnnotation(methodNode, TransactionalMethod.class);
-    }
-
-    public static boolean hasTransactionalConstructorAnnotation(MethodNode methodNode){
-        return hasVisibleAnnotation(methodNode, TransactionalConstructor.class);
-    }
-
-    public static boolean hasTransactionalObjectAnnotation(ClassNode classNode) {
-        return hasVisibleAnnotation(classNode, TransactionalObject.class);
-    }
 
     public static MethodNode remap(MethodNode originalMethod, Remapper remapper) {
         String[] exceptions = getExceptions(originalMethod);
@@ -188,7 +228,8 @@ public final class AsmUtils implements Opcodes {
     public static void printVariableTable(List<LocalVariableNode> variables) {
         System.out.println("LocalVariables size = " + variables.size());
         for (LocalVariableNode localVariableNode : variables) {
-            System.out.println("\t" + localVariableNode.name + " " + localVariableNode.desc + " " + localVariableNode.index);
+            System.out.println(
+                    "\t" + localVariableNode.name + " " + localVariableNode.desc + " " + localVariableNode.index);
         }
     }
 
@@ -404,6 +445,11 @@ public final class AsmUtils implements Opcodes {
     public static boolean isNative(MethodNode methodNode) {
         return isNative(methodNode.access);
     }
+
+    public static boolean isFinal(FieldNode fieldNode) {
+        return isFinal(fieldNode.access);
+    }
+
 
     public static boolean isStatic(FieldNode fieldNode) {
         return isStatic(fieldNode.access);

@@ -38,7 +38,7 @@ public class GrowingUpdateAlphaTransaction_registerRetryLatchTest {
     public GrowingUpdateAlphaTransaction startSutTransaction() {
         GrowingUpdateAlphaTransaction.Config config = new GrowingUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
@@ -50,7 +50,7 @@ public class GrowingUpdateAlphaTransaction_registerRetryLatchTest {
     public GrowingUpdateAlphaTransaction startSutTransactionWithoutReadTracking() {
         GrowingUpdateAlphaTransaction.Config config = new GrowingUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,

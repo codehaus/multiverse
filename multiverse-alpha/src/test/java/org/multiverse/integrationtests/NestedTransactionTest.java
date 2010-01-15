@@ -2,10 +2,10 @@ package org.multiverse.integrationtests;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.transactional.annotations.TransactionalMethod;
 import org.multiverse.templates.TransactionTemplate;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 

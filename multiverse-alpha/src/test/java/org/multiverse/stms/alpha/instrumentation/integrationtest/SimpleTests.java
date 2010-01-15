@@ -1,7 +1,7 @@
 package org.multiverse.stms.alpha.instrumentation.integrationtest;
 
 import org.junit.Test;
-import org.multiverse.transactional.annotations.TransactionalObject;
+import org.multiverse.annotations.TransactionalObject;
 
 /**
  * Created by IntelliJ IDEA. User: alarmnummer Date: Nov 12, 2009 Time: 2:23:54 PM To change this template use File |
@@ -10,14 +10,14 @@ import org.multiverse.transactional.annotations.TransactionalObject;
 public class SimpleTests {
 
     @Test
-    public void ref(){
-        Ref1 ref1  = new Ref1();
+    public void ref() {
+        Ref1 ref1 = new Ref1();
         //ref1.set(10);
         //assertEquals(10, ref1.get());
     }
 
     @TransactionalObject
-    static class Ref1{
+    static class Ref1 {
         int value;
 
         //public int get() {
@@ -28,6 +28,7 @@ public class SimpleTests {
         //    this.value = value;
         //}
 
-        public void nothing(){}
+        public void nothing() {
+        }
     }
 }

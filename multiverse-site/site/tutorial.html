@@ -70,7 +70,7 @@ bypass instrumentation but makes integration with the Java language more intrusi
 transaction, the TransactionalObject annotation needs to be added:
 
 <pre>
-    import org.multiverse.transactional.annotations.TransactionalObject;
+    import org.multiverse.annotations.TransactionalObject;
 
     @TransactionalObject
     public class Account{
@@ -151,7 +151,7 @@ if you look careful you can see that a loop is used in the await method. This is
 The same behavior can also be realized with Multiverse:
 
 <pre>
-    import org.multiverse.transactional.annotations.TransactionalObject;
+    import org.multiverse.annotations.TransactionalObject;
     import static org.multiverse.api.StmUtils.retry;
 
     @TransactionalObject

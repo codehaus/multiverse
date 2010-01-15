@@ -33,14 +33,14 @@ public class FixedUpdateAlphaTransaction_registerRetryLatchTest {
         optimalSize.set(size);
         FixedUpdateAlphaTransaction.Config config = new FixedUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
                 true,
                 optimalSize,
-                true,true,true,true,size
+                true, true, true, true, size
         );
         return new FixedUpdateAlphaTransaction(config, size);
     }
@@ -49,18 +49,18 @@ public class FixedUpdateAlphaTransaction_registerRetryLatchTest {
         optimalSize.set(size);
         FixedUpdateAlphaTransaction.Config config = new FixedUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
                 true,
                 optimalSize,
-                true,true,true,false,size
+                true, true, true, false, size
         );
         return new FixedUpdateAlphaTransaction(config, size);
     }
-    
+
     @Test
     public void whenNoAutomaticReadtracking_thenNoRetryPossibleException() {
         ManualRef ref = new ManualRef(stm);

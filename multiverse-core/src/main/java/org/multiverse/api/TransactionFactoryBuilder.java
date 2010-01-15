@@ -101,21 +101,22 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     /**
      * If writeskew detection should be enabled.
      *
-     * @param detectWriteSkew
+     * @param preventWriteSkew
      * @return the new TransactionFactoryBuilder
      */
-    B setDetectWriteSkew(boolean detectWriteSkew);
+    B setPreventWriteSkew(boolean preventWriteSkew);
 
     /**
      * Builds a {@link TransactionFactory} with the provided configuration.
      *
      * @return the started Transaction.
+     * @throws IllegalStateException if the configuration for creating a transaction factory is not valid.
      */
     TransactionFactory<T> build();
 
     // B setLoggingEnabled(boolean loggingEnabled);
 
-      //B setCommitLockPolicy(CommitLockPolicy commitLockPolicy);
+    //B setCommitLockPolicy(CommitLockPolicy commitLockPolicy);
 
 
 }

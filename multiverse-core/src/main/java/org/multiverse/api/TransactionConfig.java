@@ -1,11 +1,28 @@
 package org.multiverse.api;
 
-import org.multiverse.utils.restartbackoff.RestartBackoffPolicy;
+import org.multiverse.utils.backoff.BackoffPolicy;
 
+/**
+ * Contains the transaction configuration used by a {@link Transaction}. In the beginning this was all placed in the
+ * Transaction, adding a lot of 'informational' methods to the transaction and therefor complicating its usage. So
+ * all the configurational stuff was moved to a specialized object: the TransactionConfig.
+ *
+ * @author Peter Veentjer.
+ */
 public interface TransactionConfig {
 
-    RestartBackoffPolicy getRestartBackoffPolicy();
+    /**
+     * Returns the BackoffPolicy used.
+     *
+     * @return the BackoffPolicy used.
+     */
+    BackoffPolicy getRetryBackoffPolicy();
 
+    /**
+     * Checks if this transaction does automaticReadTracking.
+     *
+     * @return true if the transaction does automatic read tracking, false otherwise.
+     */
     boolean automaticReadTracking();
 
     /**
@@ -40,14 +57,14 @@ public interface TransactionConfig {
     boolean isReadonly();
 
     /**
-     * Checks if this Transaction should detect writeskew.
+     * Checks if this Transaction should prent writeskew.
      * <p/>
      * todo: explanation about writeskew
      * <p/>
-     * If the transaction is readonly, the value is not specified.
-     * If the transaction
+     * If the transaction is readonly, the value is true since it won't suffer from
+     * write skew problems.
      *
-     * @return true if a writeskews is detected, false otherwise.
+     * @return true if a writeskews are prevented, false otherwise.
      */
-    boolean detectWriteSkew();
+    boolean preventWriteSkew();
 }

@@ -1,6 +1,6 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
-import org.multiverse.transactional.annotations.TransactionalObject;
+import org.multiverse.annotations.TransactionalObject;
 
 @TransactionalObject
 public class TransactionalObject_StaticInitializerTest_SUT {

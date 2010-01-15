@@ -1,10 +1,10 @@
 package org.multiverse.transactional.primitives;
 
-import static org.multiverse.api.StmUtils.retry;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.annotations.TransactionalObject;
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalObject;
 
 import static java.lang.String.format;
+import static org.multiverse.api.StmUtils.retry;
 
 /**
  * A reference for a long.

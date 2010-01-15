@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.LoadLockedException;
 import org.multiverse.api.exceptions.LoadTooOldVersionException;
+import org.multiverse.api.exceptions.LoadUncommittedException;
 import org.multiverse.api.exceptions.TransactionTooSmallException;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
@@ -36,7 +37,7 @@ public class FixedReadonlyAlphaTransaction_openForReadTest {
 
         FixedReadonlyAlphaTransaction.Config config = new FixedReadonlyAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount, true, optimalSize, size);
@@ -49,6 +50,20 @@ public class FixedReadonlyAlphaTransaction_openForReadTest {
         AlphaTransaction tx = startTransactionUnderTest(10);
         AlphaTranlocal tranlocal = tx.openForRead(null);
         assertNull(tranlocal);
+    }
+
+    @Test
+    public void whenNotCommittedBefore_thenLoadUncommittedException() {
+        ManualRef ref = ManualRef.createUncommitted();
+
+        AlphaTransaction tx = startTransactionUnderTest(10);
+        try {
+            tx.openForRead(ref);
+            fail();
+        } catch (LoadUncommittedException expected) {
+        }
+
+        assertIsActive(tx);
     }
 
     @Test

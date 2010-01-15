@@ -1,14 +1,14 @@
 package org.multiverse.integrationtests.isolation;
 
-import static org.junit.Assert.assertEquals;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
-import static org.multiverse.TestUtils.*;
-
-import org.multiverse.transactional.DefaultTransactionalReference;
-import org.multiverse.transactional.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.ThreadLocalTransaction;
+import org.multiverse.transactional.DefaultTransactionalReference;
+
+import static org.junit.Assert.assertEquals;
+import static org.multiverse.TestUtils.*;
 
 /**
  * A phantom read is a read that returns inconsistent values based on the number of atomicobjects. In

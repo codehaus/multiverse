@@ -1,12 +1,10 @@
 package org.multiverse.transactional;
 
-import org.multiverse.api.Transaction;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.annotations.TransactionalObject;
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalObject;
 
 import static java.lang.String.format;
 import static org.multiverse.api.StmUtils.retry;
-import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 /**
  * Default {@link TransactionalReference}. Changes on primitives are atomic and consistent,
@@ -28,7 +26,6 @@ public final class DefaultTransactionalReference<E> implements TransactionalRefe
     public DefaultTransactionalReference() {
         this(null);
     }
-
 
 
     /**

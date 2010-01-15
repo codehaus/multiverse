@@ -3,7 +3,7 @@ package org.multiverse.integrationtests.isolation;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
-import org.multiverse.transactional.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -13,7 +13,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.TestUtils.*;
 
-public class AnotherWriteSkewTest {
+public class AnotherWriteSkewLongTest {
 
     private int transactionCountPerThread = 10 * 1000 * 1000;
     private User user1;
@@ -87,7 +87,7 @@ public class AnotherWriteSkewTest {
             doIt();
         }
 
-        @TransactionalMethod(automaticReadTracking = true, detectWriteSkew = true)
+        @TransactionalMethod(automaticReadTracking = true, preventWriteSkew = true)
         private void runWithPreventWriteSkew() {
             doIt();
         }

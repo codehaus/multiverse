@@ -38,7 +38,7 @@ public abstract class AbstractAlphaTransaction<C extends AbstractTransactionConf
             case prepared:
                 String preparedMsg = format(
                         "Can't open for read transactional object '%s' " +
-                                "because transaction '%s' already is committed.",
+                                "because transaction '%s' is prepared to commit.",
                         toTxObjectString(txObject), config.getFamilyName());
                 throw new PreparedTransactionException(preparedMsg);
             case committed:
@@ -81,7 +81,7 @@ public abstract class AbstractAlphaTransaction<C extends AbstractTransactionConf
             case prepared:
                 String preparedMsg = format(
                         "Can't open for write transactional object '%s' "
-                                + "because transaction '%s' already is prepared for committing.",
+                                + "because transaction '%s' already is prepared to commit.",
                         toTxObjectString(txObject), config.getFamilyName());
                 throw new PreparedTransactionException(preparedMsg);
             case committed:

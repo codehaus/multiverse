@@ -1,15 +1,16 @@
 package org.multiverse.stms;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionLifecycleEvent;
+import org.multiverse.api.TransactionLifecycleListener;
 import org.multiverse.utils.clock.StrictClock;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.assertIsActive;
-import static org.multiverse.TestUtils.testIncomplete;
 
 /**
  * @author Peter Veentjer
@@ -24,7 +25,7 @@ public class AbstractTransaction_restartTest {
     }
 
     @Test
-    public void callOnActiveTransaction() {
+    public void whenActive_thenTransactionRestarted() {
         Transaction tx = new AbstractTransactionImpl(clock);
         long version = clock.getVersion();
 
@@ -34,37 +35,31 @@ public class AbstractTransaction_restartTest {
         assertEquals(version, clock.getVersion());
     }
 
-    public void when_TasksAreReset(){
-        
-    }
-
     @Test
-    public void whenActiveScheduledTasksExecuted() {
+    public void whenActive_thenListenersAreNotified() {
         Transaction tx = new AbstractTransactionImpl(clock);
 
-        testIncomplete();
+        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+        tx.register(listener);
 
-        /*
-        Runnable preAbortTask = mock(Runnable.class);
-        Runnable postAbortTask = mock(Runnable.class);
-        Runnable preCommitTask = mock(Runnable.class);
-        Runnable postCommitTask = mock(Runnable.class);
+        reset(listener);
 
-        t.schedule(preAbortTask, TransactionLifecycleEvent.preAbort);
-        t.schedule(postAbortTask, TransactionLifecycleEvent.postAbort);
-        t.schedule(preCommitTask, TransactionLifecycleEvent.preCommit);
-        t.schedule(postCommitTask, TransactionLifecycleEvent.postCommit);
+        tx.restart();
 
-        t.abortAndReturnRestarted();
-
-        verify(preAbortTask).run();
-        verify(postAbortTask).run();
-        verify(preCommitTask, never()).run();
-        verify(postCommitTask, never()).run();   */
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.preAbort);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.postAbort);
+        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.preCommit);
+        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.postCommit);
     }
 
     @Test
-    public void whenCommittedTransactionIsRestarted() {
+    @Ignore
+    public void whenPrepared_then() {
+
+    }
+
+    @Test
+    public void whenCommitted_thenTransactionIsRestarted() {
         Transaction tx = new AbstractTransactionImpl(clock);
         tx.commit();
 
@@ -77,36 +72,17 @@ public class AbstractTransaction_restartTest {
     }
 
     @Test
-    public void whenCommittedNoScheduledTasksAreExecuted() {
+    public void whenCommitted_thenNoScheduledTasksAreExecuted() {
         Transaction tx = new AbstractTransactionImpl(clock);
 
-        Runnable preAbortTask = mock(Runnable.class);
-        Runnable postAbortTask = mock(Runnable.class);
-        Runnable preCommitTask = mock(Runnable.class);
-        Runnable postCommitTask = mock(Runnable.class);
+        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+        tx.register(listener);
+        tx.commit();
 
-        /*
+        reset(listener);
 
-        t.schedule(preAbortTask, TransactionLifecycleEvent.preAbort);
-        t.schedule(postAbortTask, TransactionLifecycleEvent.postAbort);
-        t.schedule(preCommitTask, TransactionLifecycleEvent.preCommit);
-        t.schedule(postCommitTask, TransactionLifecycleEvent.postCommit);
-
-        //lets do the abort and reset the mocks to clean unwanted mocking
-        t.commit();
-        reset(preCommitTask, postCommitTask);
-
-        //now do the abortAndRestart
-        t.abortAndReturnRestarted();
-
-        //make sure that there have not been any calls on the tasks
-        verify(preAbortTask, never()).run();
-        verify(postAbortTask, never()).run();
-        verify(preCommitTask, never()).run();
-        verify(postCommitTask, never()).run();
-
-        */
-        testIncomplete();
+        tx.restart();
+        verify(listener, never()).notify((Transaction) any(), (TransactionLifecycleEvent) any());
     }
 
     @Test
@@ -123,34 +99,16 @@ public class AbstractTransaction_restartTest {
     }
 
     @Test
-    public void whenAbortedNoTasksAreExecuted() {
+    public void whenAborted_thenNoListenersExecuted() {
         Transaction tx = new AbstractTransactionImpl(clock);
 
-        Runnable preAbortTask = mock(Runnable.class);
-        Runnable postAbortTask = mock(Runnable.class);
-        Runnable preCommitTask = mock(Runnable.class);
-        Runnable postCommitTask = mock(Runnable.class);
-        /*
+        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+        tx.register(listener);
+        tx.abort();
 
-        t.schedule(preAbortTask, TransactionLifecycleEvent.preAbort);
-        t.schedule(postAbortTask, TransactionLifecycleEvent.postAbort);
-        t.schedule(preCommitTask, TransactionLifecycleEvent.preCommit);
-        t.schedule(postCommitTask, TransactionLifecycleEvent.postCommit);
+        reset(listener);
 
-        //lets do the abort and reset the mocks to clean unwanted mocking
-        t.abort();
-        reset(preAbortTask, postAbortTask);
-
-        //now do the abortAndRestart
-        t.abortAndReturnRestarted();
-
-        //make sure that there have not been any calls on the tasks
-        verify(preAbortTask, never()).run();
-        verify(postAbortTask, never()).run();
-        verify(preCommitTask, never()).run();
-        verify(postCommitTask, never()).run();
-        */
-
-        testIncomplete();
+        tx.restart();
+        verify(listener, never()).notify((Transaction) any(), (TransactionLifecycleEvent) any());
     }
 }

@@ -29,7 +29,7 @@ public class TinyReadonlyAlphaTransaction_commitTest {
     public TinyReadonlyAlphaTransaction startSutTransaction() {
         TinyReadonlyAlphaTransaction.Config config = new TinyReadonlyAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount, true, optimalSize);
@@ -37,7 +37,7 @@ public class TinyReadonlyAlphaTransaction_commitTest {
     }
 
     @Test
-    public void whenUnused(){
+    public void whenUnused() {
         AlphaTransaction tx = startSutTransaction();
 
         long version = stm.getVersion();
@@ -48,7 +48,7 @@ public class TinyReadonlyAlphaTransaction_commitTest {
     }
 
     @Test
-    public void whenUsed(){
+    public void whenUsed() {
         ManualRef ref = new ManualRef(stm);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
 
@@ -63,7 +63,7 @@ public class TinyReadonlyAlphaTransaction_commitTest {
     }
 
     @Test
-    public void whenConflict_thenCommitSucceeds(){
+    public void whenConflict_thenCommitSucceeds() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = startSutTransaction();

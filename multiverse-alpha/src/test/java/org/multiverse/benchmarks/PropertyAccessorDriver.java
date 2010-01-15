@@ -3,8 +3,8 @@ package org.multiverse.benchmarks;
 import org.benchy.TestCaseResult;
 import org.benchy.executor.AbstractBenchmarkDriver;
 import org.benchy.executor.TestCase;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.annotations.TransactionalObject;
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
 
 import static java.lang.String.format;

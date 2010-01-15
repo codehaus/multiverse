@@ -8,10 +8,10 @@ import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.UncommittedFilter;
 import org.multiverse.stms.alpha.transactions.OptimalSize;
 import org.multiverse.utils.Listeners;
+import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.clock.Clock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
 import org.multiverse.utils.profiling.ProfileRepository;
-import org.multiverse.utils.restartbackoff.RestartBackoffPolicy;
 
 import static java.lang.System.arraycopy;
 
@@ -30,13 +30,13 @@ public class FixedUpdateAlphaTransaction
         public final int maximumSize;
 
         public Config(
-                Clock clock, RestartBackoffPolicy restartBackoffPolicy, String familyName,
+                Clock clock, BackoffPolicy backoffPolicy, String familyName,
                 ProfileRepository profiler, CommitLockPolicy commitLockPolicy, int maxRetryCount,
-                boolean detectWriteSkew, OptimalSize optimalSize, boolean interruptible,
+                boolean preventWriteSkew, OptimalSize optimalSize, boolean interruptible,
                 boolean optimizeConflictDetection,
                 boolean dirtyCheck, boolean automaticReadTracking, int maximumSize) {
-            super(clock, restartBackoffPolicy, familyName, false, maxRetryCount, interruptible, commitLockPolicy,
-                  profiler, detectWriteSkew, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
+            super(clock, backoffPolicy, familyName, false, maxRetryCount, interruptible, commitLockPolicy,
+                    profiler, preventWriteSkew, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
 
             this.optimalSize = optimalSize;
             this.maximumSize = maximumSize;

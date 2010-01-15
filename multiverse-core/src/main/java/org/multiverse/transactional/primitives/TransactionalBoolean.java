@@ -1,8 +1,9 @@
 package org.multiverse.transactional.primitives;
 
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalObject;
+
 import static org.multiverse.api.StmUtils.retry;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.annotations.TransactionalObject;
 
 /**
  * @author Peter Veentjer
@@ -12,6 +13,9 @@ public class TransactionalBoolean {
 
     private boolean value;
 
+    /**
+     * Creates a new TransactionalBoolean with false as va
+     */
     public TransactionalBoolean() {
         this(false);
     }
@@ -32,7 +36,7 @@ public class TransactionalBoolean {
         }
     }
 
-     /**
+    /**
      * Sets the new value and returns the old value.
      *
      * @param newValue the new value.
@@ -46,9 +50,9 @@ public class TransactionalBoolean {
 
     @TransactionalMethod(readonly = true)
     public String toString() {
-        if(value){
+        if (value) {
             return "TransactionalBoolean(value=true)";
-        }else{
+        } else {
             return "TransactionalBoolean(value=false)";
         }
     }

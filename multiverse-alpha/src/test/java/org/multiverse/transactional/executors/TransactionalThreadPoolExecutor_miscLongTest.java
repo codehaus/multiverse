@@ -16,7 +16,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 import static org.multiverse.transactional.executors.TransactionalThreadPoolExecutorTestUtils.assertIsUnstarted;
 
-public class TransactionalThreadPoolExecutor_miscTest {
+public class TransactionalThreadPoolExecutor_miscLongTest {
 
     private Stm stm;
 
@@ -36,12 +36,12 @@ public class TransactionalThreadPoolExecutor_miscTest {
         executor.setMaxPoolSize(2);
         executor.setCorePoolSize(2);
 
-        Runnable task = new Runnable(){
+        Runnable task = new Runnable() {
             @Override
             public void run() {
-                System.out.println("Start "+System.identityHashCode(Thread.currentThread()));
+                System.out.println("Start " + System.identityHashCode(Thread.currentThread()));
                 sleepMs(5000);
-                System.out.println("Finished "+System.identityHashCode(Thread.currentThread()));
+                System.out.println("Finished " + System.identityHashCode(Thread.currentThread()));
             }
         };
 

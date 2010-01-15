@@ -8,7 +8,6 @@ import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.OptimalSize;
 
-import static org.junit.Assert.assertNull;
 import static org.multiverse.TestUtils.assertIsAborted;
 
 public class TinyReadonlyAlphaTransaction_abortTest {
@@ -27,7 +26,7 @@ public class TinyReadonlyAlphaTransaction_abortTest {
     public TinyReadonlyAlphaTransaction startSutTransaction() {
         TinyReadonlyAlphaTransaction.Config config = new TinyReadonlyAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount, true, optimalSize);
@@ -43,7 +42,7 @@ public class TinyReadonlyAlphaTransaction_abortTest {
     }
 
     @Test
-    public void whenUsed_thenTxAborted(){
+    public void whenUsed_thenTxAborted() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = startSutTransaction();

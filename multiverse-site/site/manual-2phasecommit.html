@@ -1,0 +1,128 @@
+<h1>9 Two Phase Commit</h1>
+
+<ul>
+    <li><a href="#introduction">9.1 Introduction</a></li>
+    <li><a href="#conceptually.flawed">9.2 Conceptually flawed</a></li>
+    <li><a href="#transaction.prepare">9.3 The Transaction prepare() method</a>
+        <ul>
+            <li><a href="#important.of.commit.or.abort">9.3.1 Importance of commit or abort</a></li>
+            <li><a href="#xa.protocol">9.3.1 XA Protocol</a></li>
+        </ul>
+    </li>
+    <li><a href="#commitgroup">9.4 CommitGroup</a></li>
+</ul>
+
+<h2 id="introduction">9.1 Introduction</h2>
+With the 2 phase commit it is possible execute multiple transactions atomically and isolated. The 2 phase commit
+has 2 stages:
+<ol>
+    <li>let all the participants (cohorts) prepare</li>
+    <li>let all the participants commit</li>
+</ol>
+If all cohorts agree, all transactions can be committed. If one of the cohorts doesn't agree, all transactions are
+aborted.
+
+<h2 id="conceptually.flawed">9.2 Conceptually flawed</h2>
+It is important to realize that the 2 phase commit conceptually is flawed. It is possible that the system gets
+in an inconsistent state after all transactions succesfully prepared to commit and before all transactions
+committed the changes. If one of the transactions crach, not all changes have been made final. For in memory
+transactions in Multiverse this won't be an issue because the only way for a transaction to crash is when
+it runs into a system error (like running out of memory), or a programming error or when the jvm is killed
+(for example when the server crashes).
+
+<h2 id="transaction.prepare">9.3 The Transaction prepare() method</h2>
+The Transaction interfaces exposes a prepare method that makes it possible to let Multiverse participate in
+2 phase commits. It can be used to combine Multiverse with another transactional resource (for example
+changes made on a database using a sql transaction). But it also can be used to execute multiple
+transactions in Multiverse.
+<p/>
+The prepare method guarantees that if the successfully completed, that the needed resources are locked. And if the
+prepare method throws an exception, it guarantees that all resources have been released and the transaction
+automatically is put in the aborted state.
+<p/>
+After the prepare is called, it isn't possible to do access methods apart from the commit/abort that do changes.
+So opening transactional objects for reading/writing is not allowed. If this happens, a
+PreparedTransactionException is thrown.
+<p/>
+The prepare method is idempotent, so it doesn't matter if it is called more than once. If the prepare method is called
+while the the transaction is aborted or committed, a DeadTransactionException is thrown.
+
+<h3 id="important.of.commit.or.abort">9.3.1 Importance of commit or abort</h3>
+When a transaction has changes on transactional objects that need to be written, these transactional
+objects are locked so that other transactions can't make conflicting writes after the prepare successfully
+is called. This means that while these transactional objects are locked, other transactions can't make
+use of these transactional objects. So while the transaction as long as the transaction is not aborted
+or committed, these objects are going to cause a lot of read/write conflicts.
+
+<h3 id="xa.protocol">9.3.2 XA protocol</h3>
+At the moment no other 2 phase commit functionality is provided, but this is expected for the future. One of the
+things that probably is going to be added is some form of XA-support.
+
+<h2 id="commitgroup">9.3 CommitGroup</h2>
+The org.multiverse.api.CommitGroup is a synchronization structure that can be compared to a countdownlatch
+and coordinates prepare and commit/abort, so this doesn't need to be accessed directly.
+<p/>
+The CommitGroup.awaitCommit method is responsible for preparing the transaction to commit and suspending the
+calling thread as long as CommitGroup is not committed/aborted. If the transaction already is aborted or
+committed, this method will throw an exception. If the transaction already is prepared, they transaction
+is put to sleep. And if the transaction is active, it is prepared. If preparing succeeds, the thread
+is put to sleep and can wait for the commit/abort. If the prepare fails, the transaction is aborted, but
+the CommitGroup isn't aborted. This is because reexecuting the transaction could lead to a successfull
+execution the next time.
+<p/>
+The CommitGroup can be committed/aborted in 2 ways:
+<ol>
+    <li>with a transaction; by calling the CommitGroup.commit(Transaction) method.</li>
+    <li>without a transaction; by calling CommitGroup.commit() or CommitGroup.abort().</li>
+</ol>
+
+<p/>
+This is an example where a CommitGroup is used to coordinate the commit of 2 threads.
+<pre>
+    import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
+    import org.multiverse.annotations.TransactionalMethod;
+    import org.multiverse.transactional.primitives.TransactionalInteger;
+    import org.multiverse.util.CommitGroup;
+
+    public class Foo{
+
+        private final TransactionalInteger ref1 = new TransactionalInteger();
+        private final TransactionalInteger ref2 = new TransactionalInteger();
+        private final CommitGroup commitGroup = new CommitGroup();
+
+        public void foo(){
+            IncThread t1 = new IncThread(ref1);
+            IncThread t2 = new IncThread(ref2);
+
+            t1.start();
+            t2.start();
+
+            commitGroup.commit();
+        }
+
+        class IncThread extends Thread{
+
+            private final TransactionalInteger ref;
+
+            public IncThread(TransactionalInteger ref){
+                this.ref = ref;
+            }
+
+            @TransactionalMethod
+            public void run(){
+                ref.inc();
+                commitGroup.awaitCommit(getThreadLocalTransaction());
+            }
+        }
+    }
+
+</pre>
+It is important that the commitGroup.awaitCommit method call in the IncThread.run method, is the last call of the
+method that used the transaction. If it isn't the last call, the already committed or aborted transaction
+could be used by transactional objects when they discover that the transaction is dead, a DeadTransaction
+is thrown.
+
+<p/>
+It is important the the CommitGroup is aborted/committed in the end. If it is open for too long, the transactional
+objects locked by the prepared transactions, are not usable and all thread wanting to access these transactional
+objects could run into problems.

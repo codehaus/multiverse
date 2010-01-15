@@ -2,8 +2,8 @@ package org.multiverse.templates;
 
 import org.multiverse.api.*;
 import org.multiverse.api.exceptions.*;
+import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.latches.CheapLatch;
-import org.multiverse.utils.restartbackoff.RestartBackoffPolicy;
 
 import java.util.logging.Logger;
 
@@ -48,6 +48,8 @@ public abstract class TransactionTemplate<E> {
 
     private final boolean threadLocalAware;
 
+    private final boolean lifecycleListenersEnabled;
+
     private final TransactionFactory txFactory;
 
     /**
@@ -88,23 +90,55 @@ public abstract class TransactionTemplate<E> {
      * @throws NullPointerException if txFactory is null.
      */
     public TransactionTemplate(TransactionFactory txFactory) {
-        this(txFactory, true);
+        this(txFactory, true, true);
     }
 
     /**
      * Creates a new TransactionTemplate with the provided TransactionFactory.
      *
-     * @param txFactory        the TransactionFactory used to create Transactions.
-     * @param threadLocalAware true if this TransactionTemplate should look at the ThreadLocalTransaction and publish
-     *                         the running transaction there.
+     * @param txFactory                 the TransactionFactory used to create Transactions.
+     * @param threadLocalAware          true if this TransactionTemplate should look at the ThreadLocalTransaction and publish
+     *                                  the running transaction there.
+     * @param lifecycleListenersEnabled true if the lifecycle callback methods should be enabled. Enabling them causes
+     *                                  extra object creation, so if you want to squeeze out more performance, set this to false at the price of
+     *                                  not having the lifecycle methods working.
      */
-    public TransactionTemplate(TransactionFactory txFactory, boolean threadLocalAware) {
+    public TransactionTemplate(TransactionFactory txFactory, boolean threadLocalAware, boolean lifecycleListenersEnabled) {
         if (txFactory == null) {
             throw new NullPointerException();
         }
 
+        this.lifecycleListenersEnabled = lifecycleListenersEnabled;
         this.txFactory = txFactory;
         this.threadLocalAware = threadLocalAware;
+    }
+
+    /**
+     * Checks if the TransactionTemplate should work together with the ThreadLocalTransaction.
+     *
+     * @return true if the TransactionTemplate should work together with the ThreadLocalTransaction.
+     */
+    public final boolean isThreadLocalAware() {
+        return threadLocalAware;
+    }
+
+    /**
+     * Checks if the lifecycle listeners on this TransactionTemplate have been enabled. Disabling it reduces
+     * object creation.
+     *
+     * @return true if the lifecycle listener has been enabled, false otherwise.
+     */
+    public final boolean isLifecycleListenersEnabled() {
+        return lifecycleListenersEnabled;
+    }
+
+    /**
+     * Returns the TransactionFactory this TransactionTemplate uses to create Transactions.
+     *
+     * @return the TransactionFactory this TransactionTemplate uses to create Transactions.
+     */
+    public final TransactionFactory getTransactionFactory() {
+        return txFactory;
     }
 
     /**
@@ -112,7 +146,6 @@ public abstract class TransactionTemplate<E> {
      *
      * @param tx the transaction used for this execution.
      * @return the result of the execution.
-     *
      * @throws Exception the Exception thrown
      */
     public abstract E execute(Transaction tx) throws Exception;
@@ -200,7 +233,6 @@ public abstract class TransactionTemplate<E> {
      * Executes the template. This is the method you want to call if you are using the template.
      *
      * @return the result of the {@link #execute(org.multiverse.api.Transaction)} method.
-     *
      * @throws InvisibleCheckedException if a checked exception was thrown while executing the {@link
      *                                   #execute(org.multiverse.api.Transaction)} method.
      * @throws org.multiverse.api.exceptions.DeadTransactionException
@@ -225,7 +257,6 @@ public abstract class TransactionTemplate<E> {
      * Executes the Template and rethrows the checked exception instead of wrapping it in a InvisibleCheckedException.
      *
      * @return the result
-     *
      * @throws Exception               the Exception thrown inside the {@link #execute(org.multiverse.api.Transaction)}
      *                                 method.
      * @throws org.multiverse.api.exceptions.DeadTransactionException
@@ -244,7 +275,7 @@ public abstract class TransactionTemplate<E> {
     }
 
     private E executeWithTransaction() throws Exception {
-        CallbackListener listener = new CallbackListener();
+        CallbackListener listener = lifecycleListenersEnabled ? new CallbackListener() : null;
 
         Transaction tx = txFactory.start();
         if (threadLocalAware) {
@@ -260,13 +291,17 @@ public abstract class TransactionTemplate<E> {
             do {
                 attempt++;
                 try {
-                    tx.register(listener);
+                    if (listener != null) {
+                        tx.register(listener);
+                    }
                     onStart(tx);
                     E result = execute(tx);
                     tx.commit();
                     return result;
                 } catch (RetryError er) {
-                    awaitChangeAndRestart(tx);
+                    if (attempt - 1 < tx.getConfig().getMaxRetryCount()) {
+                        awaitChangeAndRestart(tx);
+                    }
                 } catch (TransactionTooSmallException tooSmallException) {
                     tx = txFactory.start();
                     if (threadLocalAware) {
@@ -275,9 +310,8 @@ public abstract class TransactionTemplate<E> {
                 } catch (Throwable throwable) {
                     lastFailureCause = throwable;
                     if (throwable instanceof RecoverableThrowable) {
-//                        throwable.printStackTrace();
-                        RestartBackoffPolicy backoffPolicy = tx.getConfig().getRestartBackoffPolicy();
-                        backoffPolicy.backoffUninterruptible(tx, attempt);
+                        BackoffPolicy backoffPolicy = tx.getConfig().getRetryBackoffPolicy();
+                        backoffPolicy.delayedUninterruptible(tx, attempt);
                         tx.restart();
                     } else {
                         rethrow(throwable);
@@ -286,8 +320,8 @@ public abstract class TransactionTemplate<E> {
             } while (attempt - 1 < tx.getConfig().getMaxRetryCount());
 
             String msg = format("Too many retries on transaction '%s', maxRetryCount = %s",
-                                tx.getConfig().getFamilyName(),
-                                tx.getConfig().getMaxRetryCount());
+                    tx.getConfig().getFamilyName(),
+                    tx.getConfig().getMaxRetryCount());
             throw new TooManyRetriesException(msg, lastFailureCause);
         } finally {
             if (tx != null && tx.getStatus() != TransactionStatus.committed) {
@@ -340,7 +374,7 @@ public abstract class TransactionTemplate<E> {
         }
     }
 
-    private class CallbackListener extends TransactionLifecycleListener {
+    private class CallbackListener implements TransactionLifecycleListener {
 
         @Override
         public void notify(Transaction tx, TransactionLifecycleEvent event) {

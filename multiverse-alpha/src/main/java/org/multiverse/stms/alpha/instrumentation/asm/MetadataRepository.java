@@ -30,6 +30,9 @@ public final class MetadataRepository {
 
     public volatile static ClassLoader classLoader;
 
+    private MetadataRepository() {
+    }
+
     /**
      * todo: code needs to be cleaned up
      *
@@ -76,11 +79,14 @@ public final class MetadataRepository {
     }
 
     public TransactionalMethodParams getTransactionalMethodParams(ClassNode transactionalClass, MethodNode method) {
+        ensureMetadataExtracted(transactionalClass.name);
         String key = "TransactionalMethodParams#" + transactionalClass.name + '#' + method.name + '#' + method.desc;
         return (TransactionalMethodParams) infoMap.get(key);
     }
 
-    public void setTransactionalMethodParams(ClassNode transactionalClass, MethodNode method, TransactionalMethodParams params) {
+    public void setTransactionalMethodParams(ClassNode transactionalClass, MethodNode method,
+                                             TransactionalMethodParams params) {
+
         String key = "TransactionalMethodParams#" + transactionalClass.name + '#' + method.name + '#' + method.desc;
         infoMap.put(key, params);
     }
@@ -143,6 +149,29 @@ public final class MetadataRepository {
         putBoolean(managedField, key);
     }
 
+    public void setIsManagedInstanceFieldWithFieldGranularity(ClassNode txObject, FieldNode field,
+                                                              boolean managedField) {
+        String key = "IsManagedInstanceFieldWithFieldGranularity#" + txObject.name + '.' + field.name;
+        putBoolean(managedField, key);
+    }
+
+    public boolean isManagedInstanceFieldWithFieldGranularity(String txObjectName, String fieldName) {
+        ensureMetadataExtracted(txObjectName);
+        String key = "IsManagedInstanceFieldWithFieldGranularity#" + txObjectName + '.' + fieldName;
+
+        //System.out.println("---------------------------------");
+        for (String k : infoMap.keySet()) {
+            //if (k.startsWith("IsManagedInstanceFieldWithFieldGranularity#")) {
+            //    System.out.println("showing:   " + k);
+            //    System.out.println("searching: " + key);
+            //}//
+        }
+        //System.out.println("---------------------------------");
+
+        return getPrepareInfoAsBoolean(key);
+    }
+
+
     public boolean hasManagedInstanceFields(ClassNode txObject) {
         return isRealTransactionalObject(txObject.name);
     }
@@ -182,6 +211,17 @@ public final class MetadataRepository {
         List<FieldNode> fields = new LinkedList<FieldNode>();
         for (FieldNode fieldNode : (List<FieldNode>) classNode.fields) {
             if (isManagedInstanceField(classNode.name, fieldNode.name)) {
+                fields.add(fieldNode);
+            }
+        }
+        return fields;
+    }
+
+    public List<FieldNode> getManagedInstanceFieldsWithFieldGranularity(ClassNode classNode) {
+        List<FieldNode> fields = new LinkedList<FieldNode>();
+        for (FieldNode fieldNode : (List<FieldNode>) classNode.fields) {
+            //System.out.println("looking at: " + classNode.name + "." + fieldNode.name);
+            if (isManagedInstanceFieldWithFieldGranularity(classNode.name, fieldNode.name)) {
                 fields.add(fieldNode);
             }
         }
@@ -230,5 +270,17 @@ public final class MetadataRepository {
     public boolean isLoaded(String className) {
         String key = "Prepared#" + className;
         return getPrepareInfoAsBoolean(key);
+    }
+
+    public void setLiftingMethod(String owner, String methodName, String origDesc, String newDesc) {
+        ensureMetadataExtracted(owner);
+        String key = "LiftingMethod#" + owner + "." + methodName + "." + origDesc;
+        infoMap.put(key, newDesc);
+    }
+
+    public String getLiftingMethod(String owner, String methodName, String origDesc) {
+        ensureMetadataExtracted(owner);
+        String key = "LiftingMethod#" + owner + "." + methodName + "." + origDesc;
+        return (String) infoMap.get(key);
     }
 }

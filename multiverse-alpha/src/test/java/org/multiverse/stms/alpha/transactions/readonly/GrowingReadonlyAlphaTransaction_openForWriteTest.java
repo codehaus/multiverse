@@ -30,7 +30,7 @@ public class GrowingReadonlyAlphaTransaction_openForWriteTest {
     public GrowingReadonlyAlphaTransaction startTransactionUnderTest() {
         GrowingReadonlyAlphaTransaction.Config config = new GrowingReadonlyAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount,
@@ -55,7 +55,7 @@ public class GrowingReadonlyAlphaTransaction_openForWriteTest {
 
     @Test
     public void whenActive_thenReadonlyException() {
-        ManualRef ref = new ManualRef(stm,0);
+        ManualRef ref = new ManualRef(stm, 0);
         long expectedVersion = stm.getVersion();
 
         AlphaTransaction tx = startTransactionUnderTest();

@@ -2,7 +2,7 @@ package org.multiverse.stms.alpha.integrationtests;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.transactional.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.api.exceptions.WriteConflictException;
 import org.multiverse.stms.alpha.AlphaStm;
@@ -36,7 +36,7 @@ public class RetryCountTest {
     static class NoRetriesMethod {
         int count;
 
-        @TransactionalMethod(retryCount = 0)
+        @TransactionalMethod(maxRetryCount = 0)
         public void execute() {
             count++;
             throw new WriteConflictException();
@@ -59,7 +59,7 @@ public class RetryCountTest {
     static class OneRetriesMethod {
         int count;
 
-        @TransactionalMethod(retryCount = 1)
+        @TransactionalMethod(maxRetryCount = 1)
         public void execute() {
             count++;
             throw new WriteConflictException();
@@ -82,7 +82,7 @@ public class RetryCountTest {
     static class TenRetriesMethod {
         int count;
 
-        @TransactionalMethod(retryCount = 10)
+        @TransactionalMethod(maxRetryCount = 10)
         public void execute() {
             count++;
             throw new WriteConflictException();

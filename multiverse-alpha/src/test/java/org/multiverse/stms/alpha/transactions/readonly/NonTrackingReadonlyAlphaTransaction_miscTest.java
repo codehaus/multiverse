@@ -20,10 +20,10 @@ public class NonTrackingReadonlyAlphaTransaction_miscTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public NonTrackingReadonlyAlphaTransaction startTransactionUnderTest() {
+    public NonTrackingReadonlyAlphaTransaction startSutTransaction() {
         NonTrackingReadonlyAlphaTransaction.Config config = new NonTrackingReadonlyAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount);
@@ -33,7 +33,7 @@ public class NonTrackingReadonlyAlphaTransaction_miscTest {
     @Test
     public void start() {
         long version = stm.getVersion();
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = startSutTransaction();
         assertIsActive(tx);
         assertEquals(version, stm.getVersion());
     }

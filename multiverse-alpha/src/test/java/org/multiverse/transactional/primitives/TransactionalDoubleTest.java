@@ -1,7 +1,7 @@
 package org.multiverse.transactional.primitives;
 
 import org.junit.Test;
-import org.multiverse.transactional.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.exceptions.DeadTransactionException;
 
 import static java.lang.Double.doubleToLongBits;

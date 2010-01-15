@@ -3,9 +3,9 @@ package org.multiverse.benchmarks;
 import org.benchy.executor.AbstractBenchmarkDriver;
 import org.benchy.executor.TestCase;
 import org.multiverse.TestThread;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.stms.alpha.AlphaStm;
+import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
@@ -13,7 +13,7 @@ import static org.multiverse.api.GlobalStmInstance.setGlobalStmInstance;
 
 /**
  * A Benchmark that tests read performance of the STM.
- *
+ * <p/>
  * Atm only a single atomic object is concurrently read by transactions.
  *
  * @author Peter Veentjer

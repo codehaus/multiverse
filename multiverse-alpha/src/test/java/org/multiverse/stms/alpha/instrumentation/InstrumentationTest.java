@@ -2,7 +2,7 @@ package org.multiverse.stms.alpha.instrumentation;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.transactional.annotations.TransactionalObject;
+import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 

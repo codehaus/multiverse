@@ -2,8 +2,9 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.multiverse.transactional.annotations.TransactionalConstructor;
+import org.multiverse.annotations.TransactionalConstructor;
 import org.multiverse.stms.alpha.AlphaStm;
 
 import static org.junit.Assert.assertEquals;
@@ -140,6 +141,7 @@ public class TransactionalConstructor_accessModifierTest {
     }
 
     @Test
+    @Ignore
     public void testFinalField() {
         long version = stm.getVersion();
 
@@ -201,7 +203,8 @@ public class TransactionalConstructor_accessModifierTest {
     }
 
     @Test
-    public void testPrivateFriendlyConstructor() {
+    @Ignore
+    public void testPrivateConstructor() {
         long version = stm.getVersion();
 
         PrivateConstructor o = new PrivateConstructor();
@@ -220,5 +223,5 @@ public class TransactionalConstructor_accessModifierTest {
         }
     }
 
-    
+
 }

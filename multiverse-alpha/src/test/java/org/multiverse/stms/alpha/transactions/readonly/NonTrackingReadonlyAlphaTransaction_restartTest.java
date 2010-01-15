@@ -8,7 +8,6 @@ import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.TestUtils.testIncomplete;
 
@@ -26,10 +25,10 @@ public class NonTrackingReadonlyAlphaTransaction_restartTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public NonTrackingReadonlyAlphaTransaction startTransactionUnderTest() {
+    public NonTrackingReadonlyAlphaTransaction startSutTransaction() {
         NonTrackingReadonlyAlphaTransaction.Config config = new NonTrackingReadonlyAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount);
@@ -38,7 +37,7 @@ public class NonTrackingReadonlyAlphaTransaction_restartTest {
 
     @Test
     public void whenUnusedAndNoOtherUpdates() {
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = startSutTransaction();
 
         long expectedReadVersion = stm.getVersion();
         tx.restart();
@@ -49,7 +48,7 @@ public class NonTrackingReadonlyAlphaTransaction_restartTest {
 
     @Test
     public void whenUnusedAndOtherUpdates() {
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = startSutTransaction();
 
         stmConfig.clock.tick();
 
@@ -65,7 +64,7 @@ public class NonTrackingReadonlyAlphaTransaction_restartTest {
     public void whenUsedAndNoOtherUpdates() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = startSutTransaction();
         tx.openForRead(ref);
 
         testIncomplete();
@@ -73,7 +72,7 @@ public class NonTrackingReadonlyAlphaTransaction_restartTest {
 
     @Test
     public void whenAborted() {
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = startSutTransaction();
         tx.abort();
 
         long version = stm.getVersion();
@@ -86,7 +85,7 @@ public class NonTrackingReadonlyAlphaTransaction_restartTest {
 
     @Test
     public void whenCommitted() {
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = startSutTransaction();
         tx.commit();
 
         long version = stm.getVersion();

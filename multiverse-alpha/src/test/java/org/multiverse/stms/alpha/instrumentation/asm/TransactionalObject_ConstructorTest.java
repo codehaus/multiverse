@@ -4,9 +4,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
-import org.multiverse.transactional.annotations.TransactionalObject;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -98,7 +98,7 @@ public class TransactionalObject_ConstructorTest {
 
         testEmptyConstructor o = new testEmptyConstructor();
 
-        assertEquals(version, stm.getVersion());
+        assertEquals(version + 1, stm.getVersion());
     }
 
     @TransactionalObject
@@ -116,7 +116,7 @@ public class TransactionalObject_ConstructorTest {
 
         NoConstructor noConstructor = new NoConstructor();
 
-        assertEquals(version, stm.getVersion());
+        assertEquals(version + 1, stm.getVersion());
     }
 
     @TransactionalObject
@@ -391,7 +391,7 @@ public class TransactionalObject_ConstructorTest {
 
         TxObjectWithNoArgSuperCallingConstructor o = new TxObjectWithNoArgSuperCallingConstructor();
 
-        assertEquals(version, stm.getVersion());
+        assertEquals(version + 1, stm.getVersion());
     }
 
     @TransactionalObject

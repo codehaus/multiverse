@@ -6,9 +6,9 @@ import org.multiverse.stms.AbstractTransactionConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.clock.Clock;
 import org.multiverse.utils.profiling.ProfileRepository;
-import org.multiverse.utils.restartbackoff.RestartBackoffPolicy;
 
 import static java.lang.System.arraycopy;
 
@@ -21,10 +21,10 @@ public class FixedReadonlyAlphaTransaction
         public final OptimalSize optimalSize;
         private int maximumSize;
 
-        public Config(Clock clock, RestartBackoffPolicy restartBackoffPolicy,
+        public Config(Clock clock, BackoffPolicy backoffPolicy,
                       String familyName, ProfileRepository profiler, int maxRetryCount, boolean interruptible,
                       OptimalSize optimalSize, int maximumSize) {
-            super(clock, restartBackoffPolicy, familyName, true, maxRetryCount, interruptible, false, true);
+            super(clock, backoffPolicy, familyName, true, maxRetryCount, interruptible, false, true);
             this.profiler = profiler;
             this.optimalSize = optimalSize;
             this.maximumSize = maximumSize;

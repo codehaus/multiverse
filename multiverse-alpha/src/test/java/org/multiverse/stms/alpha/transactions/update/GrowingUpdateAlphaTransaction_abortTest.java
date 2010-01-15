@@ -29,12 +29,12 @@ public class GrowingUpdateAlphaTransaction_abortTest {
     public GrowingUpdateAlphaTransaction startSutTransaction() {
         GrowingUpdateAlphaTransaction.Config config = new GrowingUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
-                false, true, true, true,true);
+                false, true, true, true, true);
         return new GrowingUpdateAlphaTransaction(config);
     }
 
@@ -66,7 +66,7 @@ public class GrowingUpdateAlphaTransaction_abortTest {
     @Test
     public void abortDoesNotLockFreshObject() {
         AlphaTransaction tx = startSutTransaction();
-        ManualRef ref = new ManualRef(tx,0);
+        ManualRef ref = new ManualRef(tx, 0);
         tx.openForWrite(ref);
         ref.resetLockInfo();
         tx.abort();
@@ -140,6 +140,46 @@ public class GrowingUpdateAlphaTransaction_abortTest {
         assertIsAborted(tx);
         assertEquals(startVersion, stm.getVersion());
         assertNull(ref.___load());
+    }
+
+    // ============================================================
+
+    @Test
+    public void whenPreparedAndUnused_thenNothingHappens() {
+        AlphaTransaction tx = startSutTransaction();
+        tx.prepare();
+
+        long version = stm.getVersion();
+
+        tx.abort();
+        assertIsAborted(tx);
+        assertEquals(version, stm.getVersion());
+    }
+
+    //public void whenPrepared
+
+    @Test
+    public void whenPreparedAndDirty_thenResourcesReleased() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction tx = startSutTransaction();
+        ref.inc(tx);
+        tx.prepare();
+        tx.abort();
+
+        assertNull(ref.___getLockOwner());
+    }
+
+    @Test
+    public void whenPreparedAndDirty_thenChangesAreNotWritten() {
+        ManualRef ref = new ManualRef(stm);
+        ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
+
+        AlphaTransaction tx = startSutTransaction();
+        ref.inc(tx);
+        tx.prepare();
+
+        assertSame(committed, ref.___load());
     }
 
     // ================== complex scenario ========================

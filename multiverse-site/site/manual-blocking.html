@@ -10,7 +10,8 @@
     <li><a href="#the.orelse.primitive">2.7 The orelse primitive</a></li>
     <li><a href="#blocking.readonly.transaction">2.8 Blocking readonly transactions</a></li>
     <li><a href="#interruptible.transactions">2.9 Interruptible transactions</a></li>
-    <li><a href="#blocking.transactional.references.and.primitives">2.10 Blocking transactional references and primitives</a>
+    <li><a href="#blocking.transactional.references.and.primitives">2.10 Blocking transactional references and
+        primitives</a>
     </li>
     <li><a href="#timeouts">2.11 Timeouts</a></li>
     <li><a href="#fairness">2.12 Fairness</a></li>
@@ -21,10 +22,10 @@
 
 <h2 id="introduction">2.1 Introduction</h2>
 This chapter desctibes how blocking transactions can be created. Blocking transactions are very useful to wait
-        on a state change to happen if the current state doesnt suite your needs, for example a waiting on
-        a item on a BlockingQueue to appear. If you need a short refresh
-        of your memory, check the <a href="#lockbased.approach">Lock based approach</a> or else jump to the
-        <a href="#blocking.transactions">Blocking transactions</a>.
+on a state change to happen if the current state doesnt suite your needs, for example a waiting on
+a item on a BlockingQueue to appear. If you need a short refresh
+of your memory, check the <a href="#lockbased.approach">Lock based approach</a> or else jump to the
+<a href="#blocking.transactions">Blocking transactions</a>.
 
 <h2 id="lockbased.approach">2.2 Lock based approach</h2>
 Using traditional lock based concurrency control, blocking operations can be created by using low level
@@ -84,8 +85,8 @@ would get something like this:
 </pre>
 
 Check that you need to deal with the loop for checking the head == null condition in the pop() method. This is required
-        because in Java it is allowed to receive spurious wakeups using waitsets. Check that you also need to make
-        head volatile for the isEmpty() check, this is needed because without the volatile (or without acquiring and
+because in Java it is allowed to receive spurious wakeups using waitsets. Check that you also need to make
+head volatile for the isEmpty() check, this is needed because without the volatile (or without acquiring and
 releasing intrinsic lock of 'this'), there could be a Java Memory Model violation.
 <p/>
 
@@ -152,7 +153,8 @@ In most cases a lot of blocking components luckily can be picked of the shelf, b
 Fortunately Java already has an excelent concurrency library that was introduced in Java 5 with JSR-166.
 
 <h2 id="blocking.transactions">2.3 Blocking transactions</h2>
-With Multiverse blocking transactions are less complicated than with the <a href="#lockbased.approach">lock based approach</a>
+With Multiverse blocking transactions are less complicated than with the <a href="#lockbased.approach">lock based
+    approach</a>
 because there is no need to deal with locks or spurious wakeups explicitly. because
 <b>automatically</b> all instance methods of transactional objects are able to participate in blocking
 operations (unless the instance method is made readonly).
@@ -165,8 +167,8 @@ method automatically is executed an update transaction and can be used in blocki
 (it does automatic read tracking).
 <pre>
 
-    import org.multiverse.transactional.annotations.TransactionalMethod;
-    import org.multiverse.transactional.annotations.TransactionalObject;
+    import org.multiverse.annotations.TransactionalMethod;
+    import org.multiverse.annotations.TransactionalObject;
     import static org.multiverse.api.StmUtils.retry;
 
     @TransactionalObject
@@ -229,7 +231,7 @@ reads or writes inside that transaction.
 
 Take a look at the following approach for this problem:
 <pre>
-    import org.multiverse.transactional.annotations.*;
+    import org.multiverse.annotations.*;
 
     import static org.multiverse.api.StmUtils.retry;
 
@@ -265,8 +267,8 @@ Because the pop method calls the isEmpty() method of stack1 and stack2 when neit
 are read and automatically tracked by the transaction of the pop() method of the TransactionalFunkyStack. When
 the retry() is executed on the end, it blocks the thread and the STM notifies the thread when an updates has
 executed on stack1 or stack2. Unfortunately the retry is not a recognized language element like the throws clause,
-        so to make sure that the compiler doesn't complain about not returning anything, null is returned at the end.
-        But this code will never be executed.
+so to make sure that the compiler doesn't complain about not returning anything, null is returned at the end.
+But this code will never be executed.
 <p/>
 On a lower level a RetryError is thrown by the retry() method and ends the current execution of the transaction.
 The transaction management logic (added by the instrumentation) of the pop method catches this RetryError
@@ -321,7 +323,7 @@ syntax.
 It also is possible to nest orelse blocks, e.g.:
 <pre>
         import org.multiverse.templates.OrElseTemplate;
-        import org.multiverse.transactional.annotations.*;
+        import org.multiverse.annotations.*;
 
         @TransactionalObject
         public class TransactionalFunkyStack{
@@ -364,7 +366,7 @@ But it is possible to create a blocking readonly transaction using the
 automaticReadTracking property. The following fragment shows a new method on the TransactionalStack
 where a wait can be done until the stack becomes empty.
 <pre>
-        import org.multiverse.transactional.annotations.TransactionalMethod;
+        import org.multiverse.annotations.TransactionalMethod;
 
         ...
 
@@ -439,8 +441,8 @@ can also be used on the transactional references and transactional primitives.
 
 <h2 id="timeouts">2.11 Timeouts</h2>
 At the moment it isn't possible to work with timeouts if a transaction blocks, this functionality
-        will be implemented in the near future. This topic contains information about the expected
-        look and feel of the implementation.
+will be implemented in the near future. This topic contains information about the expected
+look and feel of the implementation.
 <p/>
 Timeouts are very useful
 to prevent waiting indeterminetly and will be added in the near future. From a technical point of view it
@@ -466,7 +468,7 @@ Eventually the following approaches are going to be added:
 The syntax is still subject to change.
 
 <h2 id="fairness">2.12 Fairness</h2>
-        Atm the moment it isn't possible to provide any fairness guarantees on 
+Atm the moment it isn't possible to provide any fairness guarantees on
 
 
 <h2 id="blocking.inefficiencies">2.13 Blocking inefficiencies</h2>

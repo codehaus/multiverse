@@ -38,6 +38,7 @@ public class MultiverseJavaAgent {
         //changed, unless you really know what you are doing.
         inst.addTransformer(new InitClassFileTransformer());
         inst.addTransformer(new JSRInlineClassFileTransformer());
+        inst.addTransformer(new FieldGranularityClassFileTransformer());
         inst.addTransformer(new TranlocalClassFileTransformer());
         inst.addTransformer(new TranlocalSnapshotClassFileTransformer());
         inst.addTransformer(new TransactionalObjectFieldAccessClassFileTransformer());
@@ -88,6 +89,11 @@ public class MultiverseJavaAgent {
                                   ProtectionDomain protectionDomain, byte[] bytecode)
                 throws IllegalClassFormatException {
             MetadataRepository.classLoader = loader;
+
+            if (DUMP_BYTECODE) {
+                writeToFileInTmpDirectory(className + "__Original.class", bytecode);
+            }
+
             return null;
         }
     }
@@ -113,7 +119,7 @@ public class MultiverseJavaAgent {
     public static class TransactionalObjectFieldAccessClassFileTransformer extends AbstractClassFileTransformer {
 
         public TransactionalObjectFieldAccessClassFileTransformer() {
-            super("TransactionalObjectFieldAccessTransformer");
+            super("NonTransactionalMethodFieldAccessTransformer");
         }
 
         @Override
@@ -122,7 +128,8 @@ public class MultiverseJavaAgent {
                 throws IllegalClassFormatException {
 
             ClassNode original = loadAsClassNode(bytecode);
-            TransactionalObjectFieldAccessTransformer transformer = new TransactionalObjectFieldAccessTransformer(original);
+            NonTransactionalMethodFieldAccessTransformer transformer = new NonTransactionalMethodFieldAccessTransformer(
+                    original);
             ClassNode transformed = transformer.transform();
             byte[] transformedBytecode = toBytecode(transformed);
             if (DUMP_BYTECODE) {
@@ -157,6 +164,32 @@ public class MultiverseJavaAgent {
 
             return null;
         }
+    }
+
+    public static class FieldGranularityClassFileTransformer extends AbstractClassFileTransformer {
+
+        public FieldGranularityClassFileTransformer() {
+            super("FieldGranularityClassFileTransformer");
+        }
+
+        @Override
+        public byte[] doTransform(ClassLoader loader, String className, Class<?> classBeingRedefined,
+                                  ProtectionDomain protectionDomain, byte[] bytecode)
+                throws IllegalClassFormatException {
+
+            ClassNode original = loadAsClassNode(bytecode);
+
+            FieldGranularityTransformer transformer = new FieldGranularityTransformer(original);
+
+            ClassNode transformed = transformer.transform();
+
+            byte[] resultCode = toBytecode(transformed);
+            if (DUMP_BYTECODE) {
+                writeToFileInTmpDirectory(transformed.name + "__FieldGranularity.class", resultCode);
+            }
+            return resultCode;
+        }
+
     }
 
     public static class TranlocalSnapshotClassFileTransformer extends AbstractClassFileTransformer {

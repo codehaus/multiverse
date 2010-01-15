@@ -1,13 +1,14 @@
 package org.multiverse.integrationtests.isolation;
 
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.transactional.primitives.TransactionalInteger;
+
+import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.primitives.TransactionalInteger;
 
 /**
  * A test that checks if reads are repeatable.

@@ -2,12 +2,12 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.LoadTooOldVersionException;
 import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.stms.alpha.AlphaStm;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.annotations.TransactionalObject;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -53,7 +53,7 @@ public class TransactionalMethod_settingTest {
             x = 0;
         }
 
-        @TransactionalMethod(retryCount = 51)
+        @TransactionalMethod(maxRetryCount = 51)
         public void doSomething(AtomicInteger tryCounter) {
             //force the loadForRead so that the retry doesn't find an empty transaction
             int b = x;
@@ -64,8 +64,8 @@ public class TransactionalMethod_settingTest {
     }
 
     @Test
-    public void testDetectWriteSkew() {
-        ObjectWithDetectWriteSkew object = new ObjectWithDetectWriteSkew();
+    public void testpreventWriteSkew() {
+        ObjectWithpreventWriteSkew object = new ObjectWithpreventWriteSkew();
 
         assertFalse(object.updateNoDetectingMethod());
         assertFalse(object.updateDefaultMethod());
@@ -74,28 +74,28 @@ public class TransactionalMethod_settingTest {
 
 
     @TransactionalObject
-    public static class ObjectWithDetectWriteSkew {
+    public static class ObjectWithpreventWriteSkew {
 
         private int x;
 
-        public ObjectWithDetectWriteSkew() {
+        public ObjectWithpreventWriteSkew() {
             x = 0;
         }
 
-        @TransactionalMethod(detectWriteSkew = true)
+        @TransactionalMethod(preventWriteSkew = true)
         public boolean updateDetectingMethod() {
             //force the loadForRead so that the retry doesn't find an empty transaction
             int b = x;
 
-            return getThreadLocalTransaction().getConfig().detectWriteSkew();
+            return getThreadLocalTransaction().getConfig().preventWriteSkew();
         }
 
-        @TransactionalMethod(detectWriteSkew = false)
+        @TransactionalMethod(preventWriteSkew = false)
         public boolean updateNoDetectingMethod() {
             //force the loadForRead so that the retry doesn't find an empty transaction
             int b = x;
 
-            return getThreadLocalTransaction().getConfig().detectWriteSkew();
+            return getThreadLocalTransaction().getConfig().preventWriteSkew();
         }
 
         @TransactionalMethod
@@ -105,7 +105,7 @@ public class TransactionalMethod_settingTest {
 
             Transaction tx = getThreadLocalTransaction();
 
-            return getThreadLocalTransaction().getConfig().detectWriteSkew();
+            return getThreadLocalTransaction().getConfig().preventWriteSkew();
         }
     }
 

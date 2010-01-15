@@ -1,7 +1,6 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
-import org.multiverse.transactional.annotations.TransactionalConstructor;
-import org.multiverse.transactional.annotations.TransactionalMethod;
+import org.multiverse.annotations.*;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;
@@ -36,8 +35,6 @@ public final class MetadataExtractor implements Opcodes {
     }
 
     public void extract() {
-        //System.out.println("MetadataExtractor "+classNode.name);
-
         metadataRepo.signalLoaded(classNode);
 
         if (isTxObject()) {
@@ -59,6 +56,8 @@ public final class MetadataExtractor implements Opcodes {
             metadataRepo.setTranlocalName(classNode, classNode.name + "__Tranlocal");
             metadataRepo.setTranlocalSnapshotName(classNode, classNode.name + "__TranlocalSnapshot");
         }
+
+        // System.out.println("Extracting metadata: " + classNode.name + " isRealTxObject: " + isRealTxObject);
     }
 
     private boolean isTxObject() {
@@ -85,22 +84,77 @@ public final class MetadataExtractor implements Opcodes {
 
     private void extractFieldMetadata(FieldNode field) {
         boolean isManagedField = false;
+        boolean isManagedFieldWithFieldGranularity = false;
 
         if (isManagedField(field)) {
             isRealTxObject = true;
             isManagedField = true;
+        } else if (isManagedFieldWithFieldGranularity(field)) {
+            isManagedFieldWithFieldGranularity = true;
         }
 
         metadataRepo.setIsManagedInstanceField(classNode, field, isManagedField);
+        metadataRepo.setIsManagedInstanceFieldWithFieldGranularity(classNode, field, isManagedFieldWithFieldGranularity);
     }
+
+    private boolean isManagedFieldWithFieldGranularity(FieldNode field) {
+        if (!isTxObject) {
+            return false;
+        }
+
+        if (!hasFieldGranularity(field)) {
+            return false;
+        }
+
+        if (isInvisible(field)) {
+            return false;
+        }
+
+        return true;
+    }
+
 
     /**
      * Checks if the field is a managed field of a transactional object.
      */
     private boolean isManagedField(FieldNode field) {
-        return isTxObject &&
-                hasDesiredFieldAccess(field.access) &&
-                !isExcluded(field);
+        if (!isTxObject) {
+            return false;
+        }
+
+        if (hasFieldGranularity(field)) {
+            return false;
+        }
+
+        if (isInvisible(field)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isInvisible(FieldNode fieldNode) {
+        if (isFinal(fieldNode)) {
+            return true;
+        }
+
+        if (isExcluded(fieldNode)) {
+            return true;
+        }
+
+        if (isStatic(fieldNode)) {
+            return true;
+        }
+
+        if (isSynthetic(fieldNode)) {
+            return true;
+        }
+
+        if (isVolatile(fieldNode)) {
+            return true;
+        }
+
+        return false;
     }
 
 
@@ -159,8 +213,8 @@ public final class MetadataExtractor implements Opcodes {
             TransactionalMethodParams params = new TransactionalMethodParams();
             params.readOnly = false;
             params.automaticReadTracking = true;
-            params.detectWriteSkew = false;
-            params.retryCount = 0;
+            params.preventWriteSkew = false;
+            params.maxRetryCount = 0;
             params.familyName = createDefaultFamilyName(method);
             params.interruptible = false;
             params.smartTxLengthSelector = false;
@@ -169,8 +223,8 @@ public final class MetadataExtractor implements Opcodes {
             TransactionalMethodParams params = new TransactionalMethodParams();
             params.readOnly = false;
             params.automaticReadTracking = true;
-            params.detectWriteSkew = true;
-            params.retryCount = 1000;
+            params.preventWriteSkew = true;
+            params.maxRetryCount = 1000;
             params.familyName = createDefaultFamilyName(method);
             params.interruptible = false;
             params.smartTxLengthSelector = true;
@@ -186,7 +240,7 @@ public final class MetadataExtractor implements Opcodes {
             params.familyName = (String) getValue(txMethodAnnotation, "familyName", createDefaultFamilyName(method));
             params.automaticReadTracking = (Boolean) getValue(txMethodAnnotation, "automaticReadTracking", true);
             params.interruptible = (Boolean) getValue(txMethodAnnotation, "interruptible", false);
-            params.detectWriteSkew = (Boolean) getValue(txMethodAnnotation, "detectWriteSkew", false);
+            params.preventWriteSkew = (Boolean) getValue(txMethodAnnotation, "preventWriteSkew", false);
             params.smartTxLengthSelector = false;
             params.readOnly = (Boolean) getValue(txMethodAnnotation, "readonly", false);
             return params;
@@ -195,14 +249,16 @@ public final class MetadataExtractor implements Opcodes {
             TransactionalMethodParams params = new TransactionalMethodParams();
             params.readOnly = (Boolean) getValue(txMethodAnnotation, "readonly", false);
             params.familyName = (String) getValue(txMethodAnnotation, "familyName", createDefaultFamilyName(method));
-            params.retryCount = (Integer) getValue(txMethodAnnotation, "retryCount", 1000);
+            params.maxRetryCount = (Integer) getValue(txMethodAnnotation, "maxRetryCount", 1000);
             boolean trackReadsDefault = !params.readOnly;
             params.automaticReadTracking = (Boolean) getValue(txMethodAnnotation,
-                                                              "automaticReadTracking",
-                                                              trackReadsDefault);
+                    "automaticReadTracking",
+                    trackReadsDefault);
             params.interruptible = (Boolean) getValue(txMethodAnnotation, "interruptible", false);
-            boolean detectWriteSkewDefault = false;
-            params.detectWriteSkew = (Boolean) getValue(txMethodAnnotation, "detectWriteSkew", detectWriteSkewDefault);
+            boolean preventWriteSkewDefault = false;
+            params.preventWriteSkew = (Boolean) getValue(txMethodAnnotation,
+                    "preventWriteSkew",
+                    preventWriteSkewDefault);
             params.smartTxLengthSelector = true;
             return params;
         }
@@ -243,22 +299,34 @@ public final class MetadataExtractor implements Opcodes {
     }
 
     private static boolean hasCorrectMethodAccessForTransactionalMethod(int access) {
-        return !(isSynthetic(access) || isAbstract(access) || isNative(access));
+        return !(AsmUtils.isSynthetic(access) || isAbstract(access) || isNative(access));
     }
 
-    private static boolean hasDesiredFieldAccess(int access) {
-        if (isFinal(access)) {
-            return false;
-        }
+    public static boolean isExcluded(FieldNode field) {
+        return hasVisibleAnnotation(field, Exclude.class);
+    }
 
-        if (isStatic(access)) {
-            return false;
-        }
+    public static boolean hasFieldGranularity(FieldNode field) {
+        return hasVisibleAnnotation(field, FieldGranularity.class);
+    }
 
-        if (isStatic(access)) {
-            return false;
-        }
+    public static boolean hasTransactionalMethodAnnotation(MethodNode methodNode) {
+        return hasVisibleAnnotation(methodNode, TransactionalMethod.class);
+    }
 
-        return true;
+    public static boolean hasTransactionalConstructorAnnotation(MethodNode methodNode) {
+        return hasVisibleAnnotation(methodNode, TransactionalConstructor.class);
+    }
+
+    public static boolean hasTransactionalObjectAnnotation(ClassNode classNode) {
+        return hasVisibleAnnotation(classNode, TransactionalObject.class);
+    }
+
+    public static boolean isSynthetic(FieldNode fieldNode) {
+        return (fieldNode.access & Opcodes.ACC_SYNTHETIC) != 0;
+    }
+
+    public static boolean isVolatile(FieldNode fieldNode) {
+        return (fieldNode.access & Opcodes.ACC_VOLATILE) != 0;
     }
 }

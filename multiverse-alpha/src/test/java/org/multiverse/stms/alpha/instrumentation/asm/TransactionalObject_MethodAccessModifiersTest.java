@@ -3,9 +3,9 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Stm;
 import org.multiverse.stms.alpha.AlphaStm;
-import org.multiverse.transactional.annotations.TransactionalObject;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

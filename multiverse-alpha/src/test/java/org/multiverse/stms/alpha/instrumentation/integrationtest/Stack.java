@@ -1,8 +1,9 @@
 package org.multiverse.stms.alpha.instrumentation.integrationtest;
 
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalObject;
+
 import static org.multiverse.api.StmUtils.retry;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.annotations.TransactionalObject;
 
 /**
  * @author Peter Veentjer

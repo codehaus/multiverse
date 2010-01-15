@@ -15,7 +15,7 @@ import java.util.List;
 
 import static java.lang.String.format;
 import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.internalToDesc;
-import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.upgradeToPublic;
+import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.upgradeToProtected;
 import static org.objectweb.asm.Type.*;
 
 /**
@@ -32,12 +32,14 @@ public final class TranlocalFactory implements Opcodes {
     private final String tranlocalName;
     private final MetadataRepository metadataRepo;
     private final boolean isFirstGeneration;
+    private final String tranlocalSuperName;
 
     public TranlocalFactory(ClassNode txObject) {
         this.txObject = txObject;
         this.metadataRepo = MetadataRepository.INSTANCE;
         this.tranlocalName = metadataRepo.getTranlocalName(txObject);
         this.tranlocalSnapshotName = metadataRepo.getTranlocalSnapshotName(txObject);
+        this.tranlocalSuperName = metadataRepo.getTranlocalName(txObject.superName);
         this.isFirstGeneration = !metadataRepo.isRealTransactionalObject(txObject.superName);
     }
 
@@ -60,7 +62,7 @@ public final class TranlocalFactory implements Opcodes {
             result.superName = metadataRepo.getTranlocalName(txObject.superName);
         }
 
-        result.methods.add(createUpdateConstructor());
+        result.methods.add(createOpenForWriteConstructor());
         result.methods.add(createPrepareForCommitMethod());
         result.methods.add(createIsDirtyMethod());
         result.methods.add(createGetTransactionalObjectMethod());
@@ -98,7 +100,7 @@ public final class TranlocalFactory implements Opcodes {
         for (FieldNode originalField : metadataRepo.getManagedInstanceFields(txObject)) {
 
             FieldNode remappedField = new FieldNode(
-                    upgradeToPublic(originalField.access),
+                    upgradeToProtected(originalField.access),
                     originalField.name,
                     originalField.desc,
                     originalField.signature,
@@ -147,11 +149,9 @@ public final class TranlocalFactory implements Opcodes {
             m.visitVarInsn(ALOAD, 0);
             m.visitVarInsn(ALOAD, 1);
 
-            String superTranlocal = metadataRepo.getTranlocalName(txObject.superName);
-
             String superDesc = format("(%s)V", internalToDesc(txObject.superName));
             m.visitMethodInsn(
-                    INVOKESPECIAL, superTranlocal, "<init>", superDesc);
+                    INVOKESPECIAL, tranlocalSuperName, "<init>", superDesc);
         }
 
 
@@ -162,7 +162,10 @@ public final class TranlocalFactory implements Opcodes {
         return m;
     }
 
-    private MethodNode createUpdateConstructor() {
+    /**
+     * Just override the existing one if one exists.
+     */
+    private MethodNode createOpenForWriteConstructor() {
         MethodNode m = new MethodNode(
                 ACC_PUBLIC + ACC_SYNTHETIC,
                 "<init>",
@@ -189,7 +192,11 @@ public final class TranlocalFactory implements Opcodes {
             m.visitFieldInsn(
                     PUTFIELD, tranlocalName, "___origin", internalToDesc(tranlocalName));
         } else {
-            //we need to call the super.
+            m.visitVarInsn(ALOAD, 0);
+            m.visitVarInsn(ALOAD, 1);
+
+            m.visitMethodInsn(
+                    INVOKESPECIAL, tranlocalSuperName, "<init>", format("(%s)V", internalToDesc(tranlocalSuperName)));
         }
 
         //placement of the managed fields.
@@ -312,9 +319,8 @@ public final class TranlocalFactory implements Opcodes {
             } else {
                 m.visitVarInsn(ALOAD, 0);
                 //todo: the rootAtomicobject should be used, not the super
-                String superTranlocal = metadataRepo.getTranlocalName(txObject.superName);
                 m.visitFieldInsn(
-                        GETFIELD, superTranlocal, "___origin", internalToDesc(superTranlocal));
+                        GETFIELD, tranlocalSuperName, "___origin", internalToDesc(tranlocalSuperName));
                 m.visitTypeInsn(CHECKCAST, tranlocalName);
             }
 

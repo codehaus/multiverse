@@ -3,8 +3,8 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
-import org.multiverse.transactional.annotations.TransactionalObject;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;

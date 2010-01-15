@@ -24,7 +24,8 @@
     <li><a href="#bad.scalability">8 Bad scalability</a></li>
     <li><a href="#low.availability">9 Low Availability</a></li>
     <li><a href="#easy.deployment">10 Easy deployment</a></li>
-    <li><a href="#not.limited">11 Not limited to the internal structures</a></li>
+    <li><a href="#not.limited">11 Not limited to vendor specific data-structures</a></li>
+    <li><a href="#also.works.as.messagequeue">12 Also works as message queue</a></li>
 </ul>
 
 <h2 id="introduction">1 Introduction</h2>
@@ -36,9 +37,17 @@ to share state and synchronize state changes between transactions. I have seen e
         relational databases is the cause although a good or-mapper can ease the pain. Another cause
         is that developers need to work around database limitations (e.g. the lack of thread notification).
     </li>
-    <li><b>performance problems</b> caused by too much synchronization, or just overflowing it with too many
+    <li><b>performance problems:</b> caused by too much contention, or just overflowing it with too many
         small queries instead of using a caching solution. I often see databases being misused for managing very
         volatile information like tracking the progress of some task.
+    </li>
+    <li>
+        <b>scalability problems:</b> distributed databases are not mainstream. There are all kinds of workarounds
+        to let traditional databases scale further (e.g. replication of readonly data or partitioning), but it
+        becomes quite expensive very quickly. Luckily the last few years a lot of good data grid solutions have
+        appeared,
+        like Gigaspaces (we are relying heavily on it at my employer) and Oracle Coherence, that reduce the stress
+        on the database.
     </li>
     <li>
         <b>race problems:</b> although databases provide a declarative form of concurrency control using isolation
@@ -56,9 +65,13 @@ to share state and synchronize state changes between transactions. I have seen e
         than on very expensive database solutions (for example Oracle Real Application Cluster).
     </li>
 </ol>
+Picking the best 'database' solution depends on a lot of factors and using a standard relational database for every
+situation, is just making software development more expensive than it needs to be. By relaxing some parts (e.g.
+transactional behavior) and improving on others (e.g. scalability), NoSQL databases can be a fit.
+<p/>
 I think Multiverse and transactional memory systems in general, could play a role in the NoSQL movement by providing
-a solution with unique properties like excelent performance and making it possible to build advanced concurrent
-datastructures without the complexity of a lock based approach.
+a solution with unique properties like excelent performance, perfect isolation and support for notification,
+and making it possible to build advanced concurrent datastructures without the complexity of a lock based approach.
 
 <h2 id="excellent.performance">2 Excellent performance</h2>
 I think it is going to be very hard to outperform a STM on a single JVM if you compare it to any commercial or opensource
@@ -89,13 +102,15 @@ databases like Oracle/Postgresql/MySQL + Innodb.
 <h3 id="not.only.isolation.also.notification">3.1 Not only isolation also notification</h3>
 One of the things that always annoys me with databases, it that it is hard to listen to changes. In most cases some
 kind of polling mechanism is added (often Quartz or ScheduledExecutor based) that checks the database for
-changes. But a more fine grained mechanism isn't available.
+changes. But a more fine grained mechanism isn't available. With software transactional memory it is possible to
+create very advanced blocking datastructures (ConcurrentMaps, Executors, BlockingDeques) with a lot less hassly
+than using a lock based approach. Transactional memory also provides the possibility to block on multiple
+transactional objects, instead of a single one. This is caused by the
+limitation that a thread can only wait in a single waitset. And composing blocking operations also is extremely
+simple that is very hard to realize with a lock based approach.
 <p/>
 With Multiverse you are able to listen to changes and combined with non blocking transactions, you could create
-millions of transactions that all are blocking on different sets of data, while only needing a few
-threads.
-
-BlockingQueues, ConcurrentMap etc
+millions of transactions that all are blocking on different sets of data, while only using a few threads.
 
 <h2 id="consistency.through.java.objects">4 Consistency through Java objects</h2>
 Consistency is the property that guarantees that all transaction start with a consistent view of the system
@@ -179,14 +194,20 @@ that always annoys me when dealing with databases.
 <p/>
 With Multiverse the 'database' is running in the same JVM as the application and automatically is started and
 stopped when the JVM starts and stops. And combine this with that Multiverse doesn't need a schema, and the
-deployment feels like non existent.
+deployment is practical non existent.
 
-<h2 id="not.limited">11 Not limited to the internal structures</h2>
-You are not limited to b-trees and other ... but you can create your own and use these in transactions.
-hashmap, trees, skiplists etc etc.
+<h2 id="not.limited">11 Not limited to vendor specific data-structures</h2>
+Although databases use very sophisticated datastructures internally, as a developer you don't have much influence
+on these structures. You can place an index and in most cases that is it (unless you are going to use
+database specific extensions). If you need to rely on a different form of data, like spatial data,
+you have to 'force' your model in relational model or use a non standard database. The cool thing about
+Multiverse (or Transactional Memory in general) is that you can create any structures you need. So you can
+create trees, hashtables, skiplists etc etc. In most cases your imagination will be the limiting factor and
+not the technology used.
 
-<h2>Embedded in the JVM</h2>
-So not working with yet another language (SQL) that isn't to perfect match for object oriented languages.
-Everything can be done in Java code (or a Java based language like Scala or Groovy for example).
-
-<h3>Timeseries</h3>
+<h2 id="also.works.as.messagequeue">12 Also works as message queue</h2>
+Since transactional memory is very flexibile, it can not only coordinate state changes but also coordinate
+notification, it would not be that hard to create a message queue implementation, for example a JMS implementation.
+And instead of relying on an expense 2 phase commit between de database and the message queue, or accepting that
+the message queue or database could get in an inconsistent state because one of them fails while doing a commit,
+you can using a single software transactional memory transaction.

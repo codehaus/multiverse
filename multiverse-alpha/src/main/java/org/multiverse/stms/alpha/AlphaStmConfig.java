@@ -1,13 +1,13 @@
 package org.multiverse.stms.alpha;
 
+import org.multiverse.utils.backoff.BackoffPolicy;
+import org.multiverse.utils.backoff.ExponentialBackoffPolicy;
 import org.multiverse.utils.clock.Clock;
 import org.multiverse.utils.clock.StrictClock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
 import org.multiverse.utils.commitlock.GenericCommitLockPolicy;
 import org.multiverse.utils.profiling.ProfileRepository;
 import org.multiverse.utils.profiling.SimpleProfileRepository;
-import org.multiverse.utils.restartbackoff.ExponentialRestartBackoffPolicy;
-import org.multiverse.utils.restartbackoff.RestartBackoffPolicy;
 
 /**
  * An Object responsible for storing the configuration for an {@link AlphaStm}. So instead of having to deal with ever
@@ -54,8 +54,8 @@ public final class AlphaStmConfig {
     public CommitLockPolicy commitLockPolicy =
             GenericCommitLockPolicy.FAIL_FAST_BUT_RETRY;
 
-    public RestartBackoffPolicy restartBackoffPolicy =
-            ExponentialRestartBackoffPolicy.INSTANCE_10_MS_MAX;
+    public BackoffPolicy backoffPolicy =
+            ExponentialBackoffPolicy.INSTANCE_10_MS_MAX;
 
     public boolean smartTxImplementationChoice = false;
 
@@ -85,8 +85,8 @@ public final class AlphaStmConfig {
             throw new IllegalStateException("Invalid configuration, 'clock' can't be null");
         }
 
-        if (restartBackoffPolicy == null) {
-            throw new IllegalStateException("Invalid configuration, 'restartBackoffPolicy' can't be null");
+        if (backoffPolicy == null) {
+            throw new IllegalStateException("Invalid configuration, 'backoffPolicy' can't be null");
         }
 
         if (maxFixedUpdateSize < 0) {

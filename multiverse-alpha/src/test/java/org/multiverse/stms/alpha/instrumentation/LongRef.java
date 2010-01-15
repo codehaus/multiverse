@@ -1,6 +1,6 @@
 package org.multiverse.stms.alpha.instrumentation;
 
-import org.multiverse.transactional.annotations.TransactionalObject;
+import org.multiverse.annotations.TransactionalObject;
 
 @TransactionalObject
 public class LongRef {

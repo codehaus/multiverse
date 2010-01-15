@@ -5,9 +5,9 @@ import org.multiverse.stms.AbstractTransactionConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
+import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.clock.Clock;
 import org.multiverse.utils.profiling.ProfileRepository;
-import org.multiverse.utils.restartbackoff.RestartBackoffPolicy;
 
 /**
  * A readonly {@link org.multiverse.stms.alpha.transactions.AlphaTransaction} implementation that doesn't track reads.
@@ -42,11 +42,11 @@ public class NonTrackingReadonlyAlphaTransaction
         public final ProfileRepository profiler;
 
         public Config(
-                Clock clock, RestartBackoffPolicy restartBackoffPolicy,
+                Clock clock, BackoffPolicy backoffPolicy,
                 String familyName,
                 ProfileRepository profiler,
                 int maxRetryCount) {
-            super(clock, restartBackoffPolicy, familyName, true, maxRetryCount, false, false, false);
+            super(clock, backoffPolicy, familyName, true, maxRetryCount, false, false, false);
             this.profiler = profiler;
         }
     }

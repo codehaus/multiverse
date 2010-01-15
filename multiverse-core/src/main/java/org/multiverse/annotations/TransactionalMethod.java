@@ -1,4 +1,4 @@
-package org.multiverse.transactional.annotations;
+package org.multiverse.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
  * Multiverse may try to this inference this.
  * <p/>
  * When the readonly property is set to true, the transaction is not be able to do any updates and will throw
- * a {@link org.multiverse.api.exceptions.ReadonlyException}. 
+ * a {@link org.multiverse.api.exceptions.ReadonlyException}.
  * <p/>
  * With the familyName groups of transactions can be identified that share similar paths of execution. Based on the
  * familyName the stm could do all kinds of optimizations. Luckily using instrumentation this family name can be set
@@ -41,7 +41,7 @@ public @interface TransactionalMethod {
 
     boolean automaticReadTracking() default false;
 
-    boolean detectWriteSkew() default true;
+    boolean preventWriteSkew() default false;
 
     String familyName() default "";
 
@@ -51,14 +51,14 @@ public @interface TransactionalMethod {
 
     boolean readonly() default false;
 
-    int retryCount() default 1000;
+    int maxRetryCount() default 1000;
 
     //PropagationLevel propagationLevel() default PropagationLevel.requires;
 
     //retry policy
 
     //CommitLockPolicy commitLockPolicy() default GenericCommitLockPolicy.FAIL_FAST;
-        
+
     //long timeout() default -1;
 
     //TimeUnit timeoutUnit() default TimeUnit.MILLISECONDS;

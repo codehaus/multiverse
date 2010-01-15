@@ -2,12 +2,26 @@ package org.multiverse.stms.alpha.instrumentation;
 
 import java.lang.reflect.Field;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 /**
  * @author Peter Veentjer
  */
 public class AlphaReflectionUtils {
 
     private AlphaReflectionUtils() {
+    }
+
+    public static void assertHasField(Class ownerClazz, String fieldName, Class expectedFieldType) {
+        for (Field field : ownerClazz.getDeclaredFields()) {
+            if (field.getName().equals(fieldName)) {
+                assertEquals(expectedFieldType, field.getType());
+                return;
+            }
+        }
+
+        fail();
     }
 
     public static boolean existsField(Class txObjectClass, String fieldName) {
@@ -37,7 +51,7 @@ public class AlphaReflectionUtils {
 
     public static boolean existsTranlocalSnapshotField(Class txObjectClass, String fieldName) {
         Class snapshotClass = getTranlocalSnapshotClass(txObjectClass);
-        return existsField( snapshotClass, fieldName);
+        return existsField(snapshotClass, fieldName);
     }
 
     public static Field getTranlocalField(Class txObjectClass, String fieldName) {

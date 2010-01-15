@@ -32,7 +32,7 @@ public class FixedReadonlyAlphaTransaction_resetTest {
 
         FixedReadonlyAlphaTransaction.Config config = new FixedReadonlyAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount, true, optimalSize, size);
@@ -41,16 +41,16 @@ public class FixedReadonlyAlphaTransaction_resetTest {
     }
 
     @Test
-    public void whenUnused(){
+    public void whenUnused() {
         AlphaTransaction tx = startTransactionUnderTest(10);
         tx.restart();
 
-        assertEquals(0, getField(tx,"firstFreeIndex"));
+        assertEquals(0, getField(tx, "firstFreeIndex"));
         assertIsActive(tx);
     }
 
     @Test
-    public void whenOtherTxCommitted_thenReadVersionUpdated(){
+    public void whenOtherTxCommitted_thenReadVersionUpdated() {
         AlphaTransaction tx = startTransactionUnderTest(10);
 
         stmConfig.clock.tick();
@@ -58,9 +58,9 @@ public class FixedReadonlyAlphaTransaction_resetTest {
         tx.restart();
         assertEquals(stm.getVersion(), tx.getReadVersion());
     }
-    
+
     @Test
-    public void whenUsed(){
+    public void whenUsed() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
         ManualRef ref3 = new ManualRef(stm);
@@ -72,8 +72,8 @@ public class FixedReadonlyAlphaTransaction_resetTest {
         tx.restart();
 
         assertEquals(0, getField(tx, "firstFreeIndex"));
-        AlphaTranlocal[] attached = (AlphaTranlocal[]) getField(tx,"attachedArray");
-        for(int k=0;k<attached.length;k++){
+        AlphaTranlocal[] attached = (AlphaTranlocal[]) getField(tx, "attachedArray");
+        for (int k = 0; k < attached.length; k++) {
             assertNull(attached[k]);
         }
     }

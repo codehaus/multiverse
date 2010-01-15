@@ -4,16 +4,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.TestUtils;
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Transaction;
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.primitives.TransactionalInteger;
 import org.multiverse.templates.OrElseTemplate;
+import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.api.StmUtils.retry;
 
-public class OrElseTest {
+public class OrElseLongTest {
 
     private int waitCountPerWaiter = 10000;
     private int waitingThreadCount = 20;
@@ -88,7 +88,7 @@ public class OrElseTest {
         @Override
         public void doRun() throws Exception {
             for (int k = 0; k < waitCountPerWaiter; k++) {
-                if (k % 1000== 0) {
+                if (k % 1000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
                 decreaseRefContainingOne(0);
@@ -111,7 +111,7 @@ public class OrElseTest {
                 @Override
                 public Object orelserun(Transaction t) {
                     if (refIndex == refs.length - 1) {
-                          retry();
+                        retry();
                     } else {
                         decreaseRefContainingOne(refIndex + 1);
                     }

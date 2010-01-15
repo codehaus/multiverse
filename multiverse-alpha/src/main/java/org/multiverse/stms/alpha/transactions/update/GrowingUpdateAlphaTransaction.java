@@ -7,11 +7,11 @@ import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.UncommittedFilter;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.utils.Listeners;
+import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.clock.Clock;
 import org.multiverse.utils.commitlock.CommitLock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
 import org.multiverse.utils.profiling.ProfileRepository;
-import org.multiverse.utils.restartbackoff.RestartBackoffPolicy;
 
 import java.util.Collection;
 import java.util.IdentityHashMap;
@@ -33,13 +33,13 @@ public class GrowingUpdateAlphaTransaction
     public static class Config extends AbstractUpdateAlphaTransactionConfig {
 
         public Config(
-                Clock clock, RestartBackoffPolicy restartBackoffPolicy, String familyName,
+                Clock clock, BackoffPolicy backoffPolicy, String familyName,
                 ProfileRepository profiler, CommitLockPolicy commitLockPolicy, int maxRetryCount,
-                boolean detectWriteSkew, boolean interruptible, boolean optimizeConflictDetection, boolean dirtyCheck,
+                boolean preventWriteSkew, boolean interruptible, boolean optimizeConflictDetection, boolean dirtyCheck,
                 boolean automaticReadTracking) {
 
-            super(clock, restartBackoffPolicy, familyName, false, maxRetryCount, interruptible, commitLockPolicy,
-                  profiler, detectWriteSkew, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
+            super(clock, backoffPolicy, familyName, false, maxRetryCount, interruptible, commitLockPolicy,
+                    profiler, preventWriteSkew, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
         }
     }
 

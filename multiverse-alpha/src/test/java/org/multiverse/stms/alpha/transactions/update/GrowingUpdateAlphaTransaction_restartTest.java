@@ -10,12 +10,9 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.TestUtils.getField;
-import static org.multiverse.TestUtils.testIncomplete;
 
 /**
  * @author Peter Veentjer
@@ -34,12 +31,12 @@ public class GrowingUpdateAlphaTransaction_restartTest {
     public GrowingUpdateAlphaTransaction startSutTransaction() {
         GrowingUpdateAlphaTransaction.Config config = new GrowingUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
-                false, true,true,true, true);
+                false, true, true, true, true);
         return new GrowingUpdateAlphaTransaction(config);
     }
 
@@ -76,6 +73,19 @@ public class GrowingUpdateAlphaTransaction_restartTest {
     }
 
     @Test
+    public void whenPreparedWithLockedResources_thenResourcesFreed() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction tx = startSutTransaction();
+        ref.inc(tx);
+        tx.prepare();
+
+        tx.restart();
+        assertIsActive(tx);
+        assertNull(ref.___getLockOwner());
+    }
+
+    @Test
     public void whenCommitted() {
         AlphaTransaction tx = startSutTransaction();
         tx.commit();
@@ -86,7 +96,7 @@ public class GrowingUpdateAlphaTransaction_restartTest {
     }
 
     @Test
-    public void whenVersionUpdatedByOtherTx_thenTxUpdatesReadVersion(){
+    public void whenVersionUpdatedByOtherTx_thenTxUpdatesReadVersion() {
         AlphaTransaction tx = startSutTransaction();
 
         stmConfig.clock.tick();
@@ -98,7 +108,7 @@ public class GrowingUpdateAlphaTransaction_restartTest {
     }
 
     @Test
-    public void whenReadWriteMapNonEmpty_thenItIsCleared(){
+    public void whenReadWriteMapNonEmpty_thenItIsCleared() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 

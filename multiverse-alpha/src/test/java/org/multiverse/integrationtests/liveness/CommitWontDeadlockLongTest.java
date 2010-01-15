@@ -3,7 +3,7 @@ package org.multiverse.integrationtests.liveness;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
-import org.multiverse.transactional.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.multiverse.TestUtils.*;

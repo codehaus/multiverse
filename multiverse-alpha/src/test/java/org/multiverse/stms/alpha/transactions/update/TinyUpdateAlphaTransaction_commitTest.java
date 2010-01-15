@@ -34,7 +34,7 @@ public class TinyUpdateAlphaTransaction_commitTest {
     public TinyUpdateAlphaTransaction startSutTransaction() {
         TinyUpdateAlphaTransaction.Config config = new TinyUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount,

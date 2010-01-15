@@ -2,7 +2,7 @@ package org.multiverse.integrationtests.financial;
 
 import org.junit.Test;
 import org.multiverse.TestThread;
-import org.multiverse.transactional.annotations.TransactionalObject;
+import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.transactional.collections.TransactionalLinkedList;
 import org.multiverse.utils.TodoException;
 

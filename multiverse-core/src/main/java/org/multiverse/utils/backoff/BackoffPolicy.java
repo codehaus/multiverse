@@ -1,12 +1,14 @@
-package org.multiverse.utils.restartbackoff;
+package org.multiverse.utils.backoff;
 
 import org.multiverse.api.Transaction;
 
 /**
- * A policy that can be used to backoff when a transaction needs to be restarted. A transaction restart normally is an
- * indication that there is contention, and by delaying the restart, other transactions are able to complete.
+ * A policy that can be used to backoff when it can't make progress because other transactions are interfering.
+ * A lot of interference means that there is a lot of contention and with a backoff policy it means that you can
+ * reduce contention by delaying certain transactions, so that the chance increases for some of them to make progress
+ * and eventually make the way free for the others.
  * <p/>
- * The {@link #backoffUninterruptible(org.multiverse.api.Transaction , int)} needs the transaction, so that different
+ * The {@link #delayedUninterruptible(org.multiverse.api.Transaction , int)} needs the transaction, so that different
  * dalays can be done based on the transaction. For example a transaction that has a higher priority could get a smaller
  * delay than a transaction with a lower priority.
  * <p/>
@@ -14,12 +16,12 @@ import org.multiverse.api.Transaction;
  *
  * @author Peter Veentjer.
  */
-public interface RestartBackoffPolicy {
+public interface BackoffPolicy {
 
     /**
      * Executes the delay. This call is interruptible.
      *
-     * @param t       the transaction that is going to be restarted. The transaction should never be null, but it
+     * @param tx      the transaction that is going to be restarted. The transaction should never be null, but it
      *                depends on the implementation if this is checked.
      * @param attempt indicates the number of times the transaction is tried. Attempt should always be equal or larger
      *                than 1. It depends on the implementation if this is checked.
@@ -27,17 +29,17 @@ public interface RestartBackoffPolicy {
      * @throws IllegalArgumentException if attempt smaller than 1. It depends on the implementation if this is checked.
      * @throws InterruptedException     if the delay is interrupted.
      */
-    void delay(Transaction t, int attempt) throws InterruptedException;
+    void delay(Transaction tx, int attempt) throws InterruptedException;
 
     /**
      * Executes the delay without the possibility of being interrupted.
      *
-     * @param t       the transaction that is going to be restarted. The transaction should never be null, but it
+     * @param tx      the transaction that is going to be restarted. The transaction should never be null, but it
      *                depends on the implementation if this is checked.
      * @param attempt indicates the number of times the transaction is tried. Attempt should always be equal or larger
      *                than 1. It depends on the implementation if this is checked.
      * @throws NullPointerException     if t is null. It depends on the implementation if this is checked.
      * @throws IllegalArgumentException if attempt smaller than 1. It depends on the implementation if this is checked.
      */
-    void backoffUninterruptible(Transaction t, int attempt);
+    void delayedUninterruptible(Transaction tx, int attempt);
 }

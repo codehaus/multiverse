@@ -24,10 +24,10 @@ public class NonTrackingReadonlyAlphaTransaction_abortTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public NonTrackingReadonlyAlphaTransaction startTransactionUnderTest() {
+    public NonTrackingReadonlyAlphaTransaction startSutTransaction() {
         NonTrackingReadonlyAlphaTransaction.Config config = new NonTrackingReadonlyAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount);
@@ -37,7 +37,7 @@ public class NonTrackingReadonlyAlphaTransaction_abortTest {
     @Test
     public void whenUnused() {
         long startVersion = stm.getVersion();
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = startSutTransaction();
         tx.abort();
 
         assertEquals(startVersion, stm.getVersion());
@@ -49,7 +49,7 @@ public class NonTrackingReadonlyAlphaTransaction_abortTest {
         ManualRef ref = new ManualRef(stm);
         long startVersion = stm.getVersion();
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = startSutTransaction();
         tx.openForRead(ref);
         tx.abort();
 

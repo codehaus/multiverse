@@ -34,30 +34,30 @@ public class FixedUpdateAlphaTransaction_commitTest {
         optimalSize.set(size);
         FixedUpdateAlphaTransaction.Config config = new FixedUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
                 true,
                 optimalSize,
-                true, true, true, true,size
+                true, true, true, true, size
         );
         return new FixedUpdateAlphaTransaction(config, size);
     }
 
-    public AlphaTransaction startSutTransactionWithDetectWriteSkew(int size, boolean detectWriteSkew) {
+    public AlphaTransaction startSutTransactionWithPreventWriteSkew(int size, boolean preventWriteSkew) {
         optimalSize.set(size);
         FixedUpdateAlphaTransaction.Config config = new FixedUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
-                detectWriteSkew,
+                preventWriteSkew,
                 optimalSize,
-                true, true, true, true,size
+                true, true, true, true, size
         );
         return new FixedUpdateAlphaTransaction(config, size);
     }
@@ -169,11 +169,11 @@ public class FixedUpdateAlphaTransaction_commitTest {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx1 = startSutTransactionWithDetectWriteSkew(10, false);
+        AlphaTransaction tx1 = startSutTransactionWithPreventWriteSkew(10, false);
         tx1.openForRead(ref1);
         ref2.inc(tx1);
 
-        AlphaTransaction tx2 = startSutTransactionWithDetectWriteSkew(10, false);
+        AlphaTransaction tx2 = startSutTransactionWithPreventWriteSkew(10, false);
         tx2.openForRead(ref2);
         ref1.inc(tx2);
 
@@ -189,11 +189,11 @@ public class FixedUpdateAlphaTransaction_commitTest {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx1 = startSutTransactionWithDetectWriteSkew(10, true);
+        AlphaTransaction tx1 = startSutTransactionWithPreventWriteSkew(10, true);
         tx1.openForRead(ref1);
         ref2.inc(tx1);
 
-        AlphaTransaction tx2 = startSutTransactionWithDetectWriteSkew(10, true);
+        AlphaTransaction tx2 = startSutTransactionWithPreventWriteSkew(10, true);
         tx2.openForRead(ref2);
         ref1.inc(tx2);
 

@@ -105,7 +105,7 @@ public class FastManualRef extends FastTxObjectMixin {
                     tx = (AlphaTransaction) txFactory.start();
                 } catch (Throwable throwable) {
                     if (throwable instanceof RecoverableThrowable) {
-                        tx.getConfig().getRestartBackoffPolicy().backoffUninterruptible(tx, attempt);
+                        tx.getConfig().getRetryBackoffPolicy().delayedUninterruptible(tx, attempt);
                     } else if (throwable instanceof RuntimeException) {
                         throw (RuntimeException) throwable;
                     } else {
@@ -123,7 +123,7 @@ public class FastManualRef extends FastTxObjectMixin {
             } while (attempt - 1 < tx.getConfig().getMaxRetryCount());
 
             String msg = format("Could not complete transaction '%s' within %s retries",
-                                tx.getConfig().getFamilyName(), tx.getConfig().getMaxRetryCount());
+                    tx.getConfig().getFamilyName(), tx.getConfig().getMaxRetryCount());
             throw new TooManyRetriesException(msg);
         } finally {
             clearThreadLocalTransaction();
@@ -146,7 +146,7 @@ public class FastManualRef extends FastTxObjectMixin {
                 tx = (AlphaTransaction) txFactory.start();
             } catch (Throwable throwable) {
                 if (throwable instanceof RecoverableThrowable) {
-                    tx.getConfig().getRestartBackoffPolicy().backoffUninterruptible(tx, attempt);
+                    tx.getConfig().getRetryBackoffPolicy().delayedUninterruptible(tx, attempt);
                 } else if (throwable instanceof RuntimeException) {
                     throw (RuntimeException) throwable;
                 } else {
@@ -164,7 +164,7 @@ public class FastManualRef extends FastTxObjectMixin {
         } while (attempt - 1 < tx.getConfig().getMaxRetryCount());
 
         String msg = format("Could not complete transaction '%s' within %s retries",
-                            tx.getConfig().getFamilyName(), tx.getConfig().getMaxRetryCount());
+                tx.getConfig().getFamilyName(), tx.getConfig().getMaxRetryCount());
         throw new TooManyRetriesException(msg);
     }
 

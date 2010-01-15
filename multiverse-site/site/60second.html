@@ -7,7 +7,7 @@ both share 1 very important concept; transactions.
 In Multiverse a normal Pojo can be made transactional by adding the TransactionalObject annotation, e.g.:
 <pre>
 
-    import org.multiverse.transactional.annotations.TransactionalObject;
+    import org.multiverse.annotations.TransactionalObject;
 
     @TransactionalObject
     public class Account{
@@ -54,8 +54,8 @@ by adding a TransactionalMethod annotation around a normal method or around a st
 object, e.g.:
 
 <pre>
-    import org.multiverse.transactional.annotations.TransactionalMethod;
-    import org.multiverse.transactional.annotations.TransactionalObject;
+    import org.multiverse.annotations.TransactionalMethod;
+    import org.multiverse.annotations.TransactionalObject;
 
     @TransactionalObject
     public class Account{
@@ -74,9 +74,9 @@ writes or deadlocks are possible.
 <p/>
 These examples only scratchs the surface of Multiverse, but just having transactional methods can be
 a very big step forward in a lot of cases. For more advanced features and indepth documention, the
-<a href="manual.html">manual</a> or te <a href="documentationoverview.html">Documentation overview</a> 
-        are the best places to get started.
-                                          
+<a href="manual.html">manual</a> or the <a href="documentationoverview.html">Documentation overview</a>
+are the best places to get started.
+
 <h3>Footnote</h3>
 To make this transactional behavior possible, you need to set up the Multiverse Java agent. For more information check
 the <a href="setup-javaagent.html">Javaagent setup page</a>.

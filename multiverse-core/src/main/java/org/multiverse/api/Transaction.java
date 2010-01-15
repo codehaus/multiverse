@@ -55,10 +55,14 @@ public interface Transaction {
     TransactionStatus getStatus();
 
     /**
-     * Commits this Transaction. If the Transaction already is committed, the call is ignored.
+     * Commits this Transaction. If the Transaction is: <ol> <li>active: it is prepared for commit and then
+     * committed<li> <li>prepared: it is committed (so changes persisted)</li> <li>aborted: a DeadTransactionException
+     * is thrown</li> <li>committed: a DeadTransactionException is thrown</li> </ol> So it is safe to call while active
+     * or prepared.
      * <p/>
      * Transaction will be aborted if the commit does not succeed.
      * <p/>
+     * Commit will not throw any validation exceptions after the transaction is prepared.
      *
      * @throws org.multiverse.api.exceptions.CommitFailureException
      *          if the commit failed. Check the class hierarchy of the CommitFailureException for more information.
@@ -69,17 +73,16 @@ public interface Transaction {
 
     /**
      * Prepares this transaction to be committed. It can lock resources to make sure that no conflicting changes are
-     * made after the transaction has been prepared.
+     * made after the transaction has been prepared. If the transaction already is prepared, the call is ignored.  If
+     * the prepare fails, the transaction automatically is aborted.
      * <p/>
-     * It the prepare doesn't succeed, it must release all sources acquired because no guarantee is made that the abort
-     * is called.
-     * <p/>
-     * todo: nothing is said over the exception when the prepare didn't succeed.
+     * It is very important that the transaction eventually commits or aborts, if it doesn't no other transaction
+     * reading/writing the committed resources, can commit.
      *
+     * @throws org.multiverse.api.exceptions.CommitFailureException
+     *          if the transaction can't be prepared.
      * @throws org.multiverse.api.exceptions.DeadTransactionException
      *          if the transaction already is committed or aborted.
-     * @throws org.multiverse.api.exceptions.PreparedTransactionException
-     *          if the transaction already is prepared
      */
     void prepare();
 
@@ -106,8 +109,7 @@ public interface Transaction {
     /**
      * Registers the retry Latch. This functionality is required for the retry mechanism (so blocking!) and is something
      * different than 'just' restarting. The Latch contains all the 'waiting' logic, so you can do timed and non
-     * interruptible timeouts. It can be compared to a {@link java.util.concurrent.Future}.
-     * <p/>
+     * interruptible timeouts on that structure. It can be compared to a {@link java.util.concurrent.Future}.
      *
      * @param latch the Latch to register.
      * @throws NullPointerException          if latch is null.
@@ -127,9 +129,9 @@ public interface Transaction {
      * If the execution of one of the listeners fails, the others won't be executed. If it listeners fails before the
      * precommit, the transaction is aborted (no matter what).
      * <p/>
-     * There is no guaranteed order of execution of the listeners
+     * The listeners are executed in the order they are registered.
      * <p/>
-     * If the same listener is added multiple times, it could be notified multiple times (no guarantee).
+     * If the same listener is added multiple times, it will be notified multiple times.
      * <p/>
      * The listener will be executed on the current thread that causes the commit/abort.
      * <p/>

@@ -1,15 +1,15 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.multiverse.api.Latch;
-import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.RecoverableThrowable;
 import org.multiverse.api.exceptions.RetryError;
 import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.api.exceptions.TransactionTooSmallException;
+import org.multiverse.stms.alpha.transactions.AlphaTransaction;
+import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.latches.CheapLatch;
-import org.multiverse.utils.restartbackoff.RestartBackoffPolicy;
 
 import static java.lang.String.format;
 import static org.multiverse.api.ThreadLocalTransaction.*;
@@ -33,14 +33,14 @@ public class TransactionLogicDonor {
     public static TransactionFactory transactionFactory;
 
     public static void donorConstructor() throws Exception {
-        Transaction tx = getThreadLocalTransaction();
+        AlphaTransaction tx = (AlphaTransaction) getThreadLocalTransaction();
 
         if (isActiveTransaction(tx)) {
             execute();
             return;
         }
 
-        tx = transactionFactory.start();
+        tx = (AlphaTransaction) transactionFactory.start();
         setThreadLocalTransaction(tx);
         try {
             execute();
@@ -60,15 +60,16 @@ public class TransactionLogicDonor {
         }
     }
 
+
     public static void donorMethod() throws Exception {
-        Transaction tx = getThreadLocalTransaction();
+        AlphaTransaction tx = (AlphaTransaction) getThreadLocalTransaction();
 
         if (isActiveTransaction(tx)) {
             execute();
             return;
         }
 
-        tx = transactionFactory.start();
+        tx = (AlphaTransaction) transactionFactory.start();
         setThreadLocalTransaction(tx);
         try {
             int attempt = 0;
@@ -79,39 +80,47 @@ public class TransactionLogicDonor {
                     tx.commit();
                     return;
                 } catch (RetryError er) {
-                    waitForChange(tx);
+                    if (attempt - 1 < tx.getConfig().getMaxRetryCount()) {
+                        waitForChange(tx);
+                    }
                 } catch (TransactionTooSmallException tooSmallException) {
-                    tx = transactionFactory.start();
+                    tx = (AlphaTransaction) transactionFactory.start();
                     setThreadLocalTransaction(tx);
                 } catch (Throwable throwable) {
                     if (throwable instanceof RecoverableThrowable) {
-                        RestartBackoffPolicy backoffPolicy = tx.getConfig().getRestartBackoffPolicy();
-                        backoffPolicy.backoffUninterruptible(tx, attempt);
-                    } else if (throwable instanceof Exception) {
-                        throw (Exception) throwable;
+                        BackoffPolicy backoffPolicy = tx.getConfig().getRetryBackoffPolicy();
+                        backoffPolicy.delayedUninterruptible(tx, attempt);
                     } else {
-                        throw (Error) throwable;
+                        rethrow(throwable);
                     }
                 } finally {
-                    if (tx.getStatus() != TransactionStatus.committed) {
-                        if (attempt - 1 < tx.getConfig().getMaxRetryCount()) {
-                            tx.restart();
-                        } else {
-                            tx.abort();
-                        }
+                    if (tx.getStatus() != TransactionStatus.committed && attempt - 1 < tx.getConfig().getMaxRetryCount()) {
+                        tx.restart();
                     }
                 }
             } while (attempt - 1 < tx.getConfig().getMaxRetryCount());
 
             String msg = format("Could not complete transaction '%s' within %s retries",
-                                tx.getConfig().getFamilyName(), tx.getConfig().getMaxRetryCount());
+                    tx.getConfig().getFamilyName(), tx.getConfig().getMaxRetryCount());
             throw new TooManyRetriesException(msg);
         } finally {
             clearThreadLocalTransaction();
+
+            if (tx.getStatus() != TransactionStatus.committed) {
+                tx.abort();
+            }
         }
     }
 
-    public static void waitForChange(Transaction tx) throws InterruptedException {
+    public static void rethrow(Throwable throwable) throws Exception {
+        if (throwable instanceof Exception) {
+            throw (Exception) throwable;
+        } else {
+            throw (Error) throwable;
+        }
+    }
+
+    public static void waitForChange(AlphaTransaction tx) throws InterruptedException {
         Latch latch = new CheapLatch();
         tx.registerRetryLatch(latch);
         if (tx.getConfig().isInterruptible()) {
@@ -121,13 +130,7 @@ public class TransactionLogicDonor {
         }
     }
 
-    public static void abortIfActive(Transaction t) {
-        if (t.getStatus() == TransactionStatus.active) {
-            t.abort();
-        }
-    }
-
-    public static boolean isActiveTransaction(Transaction t) {
+    public static boolean isActiveTransaction(AlphaTransaction t) {
         return t != null && t.getStatus() == TransactionStatus.active;
     }
 }

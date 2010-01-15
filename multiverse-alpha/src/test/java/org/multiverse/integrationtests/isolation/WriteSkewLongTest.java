@@ -1,10 +1,11 @@
 package org.multiverse.integrationtests.isolation;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Transaction;
-import org.multiverse.transactional.annotations.TransactionalMethod;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -105,7 +106,7 @@ public class WriteSkewLongTest {
             }
         }
 
-        @TransactionalMethod(automaticReadTracking = true, detectWriteSkew = false)
+        @TransactionalMethod(automaticReadTracking = true, preventWriteSkew = false)
         public void transfer(int fromUser, int toUser, int amount) {
 
             TransactionalInteger fromAccount1 = accounts[fromUser * 2];
@@ -139,6 +140,7 @@ public class WriteSkewLongTest {
     }
 
     @Test
+    @Ignore
     public void simpleTestWithWriteSkewDetectionDisabledRepeated() {
         for (int k = 0; k < 100; k++) {
             simpleTestWithWriteSkewDisabled();
@@ -180,7 +182,7 @@ public class WriteSkewLongTest {
         }
 
         @Override
-        @TransactionalMethod(detectWriteSkew = false)
+        @TransactionalMethod(preventWriteSkew = false)
         public void doRun() throws Exception {
             if (from1.get() + from2.get() >= 100) {
                 from1.dec(100);
@@ -193,7 +195,6 @@ public class WriteSkewLongTest {
     @Test
     public void simpleTestWithWriteSkewDetectionEnabledRepeated() {
         for (int k = 0; k < 100; k++) {
-            System.out.println("iteration: " + k);
             simpleTestWithWriteSkewDetectionEnabled();
         }
     }
@@ -208,20 +209,13 @@ public class WriteSkewLongTest {
         DetectingThread t1 = new DetectingThread(from1, from2, to1);
         DetectingThread t2 = new DetectingThread(from2, from1, to2);
 
-        //System.out.println("--------------------------begin------------------------------");
-
         t2.start();
         t1.start();
 
         joinAll(t2);
         joinAll(t1);
 
-        System.out.printf("from1=%s from2=%s  total=%s\n", from1.get(), from2.get(), from1.get() + from2.get());
-        System.out.printf("to1=%s to1=%s  total=%s\n", to1.get(), to2.get(), to1.get() + to2.get());
-
         assertTrue(from1.get() + from2.get() >= 0);
-
-        //System.out.println("---------------------------end-------------------------------");
     }
 
     private class DetectingThread extends TestThread {
@@ -237,7 +231,7 @@ public class WriteSkewLongTest {
         }
 
         @Override
-        @TransactionalMethod(detectWriteSkew = true)
+        @TransactionalMethod(preventWriteSkew = true)
         public void doRun() throws Exception {
             if (from1.get() + from2.get() >= 100) {
                 from1.dec(100);
@@ -250,7 +244,7 @@ public class WriteSkewLongTest {
             Transaction tx = getThreadLocalTransaction();
             assertFalse(tx.getConfig().isReadonly());
             assertTrue(tx.getConfig().automaticReadTracking());
-            assertTrue(tx.getConfig().detectWriteSkew());
+            assertTrue(tx.getConfig().preventWriteSkew());
 
             sleepMs(200);
         }

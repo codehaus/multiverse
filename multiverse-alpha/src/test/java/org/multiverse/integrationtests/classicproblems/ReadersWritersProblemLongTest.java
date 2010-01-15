@@ -1,19 +1,17 @@
 package org.multiverse.integrationtests.classicproblems;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
-
-import static org.multiverse.TestUtils.*;
-import static org.multiverse.api.StmUtils.retry;
-
-import org.multiverse.transactional.annotations.TransactionalMethod;
-import org.multiverse.transactional.annotations.TransactionalObject;
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalObject;
 
 import java.util.concurrent.atomic.AtomicLong;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.StmUtils.retry;
 
 /**
  */
@@ -148,7 +146,7 @@ public class ReadersWritersProblemLongTest {
         }
 
         @Override
-        @TransactionalMethod(retryCount = 10000)
+        @TransactionalMethod(maxRetryCount = 10000)
         public void acquireReadLock() {
             if (readerCount == -1) {
                 retry();
@@ -158,7 +156,7 @@ public class ReadersWritersProblemLongTest {
         }
 
         @Override
-        @TransactionalMethod(retryCount = 10000)
+        @TransactionalMethod(maxRetryCount = 10000)
         public void acquireWriteLock() {
             if (readerCount != 0) {
                 retry();

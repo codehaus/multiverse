@@ -23,10 +23,10 @@ public class NonTrackingReadonlyAlphaTransaction_openForWriteTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public NonTrackingReadonlyAlphaTransaction startTransactionUnderTest() {
+    public NonTrackingReadonlyAlphaTransaction startSutTransaction() {
         NonTrackingReadonlyAlphaTransaction.Config config = new NonTrackingReadonlyAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount);
@@ -35,7 +35,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForWriteTest {
 
     @Test
     public void whenActiveAndNullTxObject_thenNullPointerException() {
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = startSutTransaction();
 
         try {
             tx.openForWrite(null);
@@ -50,7 +50,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForWriteTest {
     public void withActive_thenReadonlyException() {
         ManualRef ref = new ManualRef(stm, 0);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = startSutTransaction();
 
         try {
             tx.openForWrite(ref);
@@ -63,9 +63,9 @@ public class NonTrackingReadonlyAlphaTransaction_openForWriteTest {
 
     @Test
     public void whenCommitted_thenDeadTransactionException() {
-        ManualRef value = new ManualRef(stm,10);
+        ManualRef value = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = startSutTransaction();
         tx.commit();
 
         try {
@@ -82,7 +82,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForWriteTest {
     public void whenAborted_thenDeadTransactionException() {
         ManualRef value = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = startSutTransaction();
         tx.abort();
 
         try {

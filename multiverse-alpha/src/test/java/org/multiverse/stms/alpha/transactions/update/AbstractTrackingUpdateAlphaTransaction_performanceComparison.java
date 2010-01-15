@@ -35,18 +35,18 @@ public class AbstractTrackingUpdateAlphaTransaction_performanceComparison {
 
         fixedConfig = new FixedUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
                 true,
-                optimalSize, true, true,true,true,10
+                optimalSize, true, true, true, true, 10
         );
 
         growingConfig = new GrowingUpdateAlphaTransaction.Config(
                 stmConfig.clock,
-                stmConfig.restartBackoffPolicy,
+                stmConfig.backoffPolicy,
                 null,
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,

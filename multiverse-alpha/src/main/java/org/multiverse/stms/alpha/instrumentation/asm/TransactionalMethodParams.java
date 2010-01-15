@@ -11,7 +11,7 @@ public class TransactionalMethodParams {
 
     public String familyName;
 
-    public int retryCount;
+    public int maxRetryCount;
 
     public boolean automaticReadTracking;
 
@@ -19,5 +19,5 @@ public class TransactionalMethodParams {
 
     public boolean smartTxLengthSelector;
 
-    public boolean detectWriteSkew;
+    public boolean preventWriteSkew;
 }

@@ -1,14 +1,14 @@
 package org.multiverse.integrationtests.stability;
 
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
-import static org.multiverse.TestUtils.*;
-import org.multiverse.transactional.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
+import static org.junit.Assert.assertEquals;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 public class ConflictingWritesDontBreakSystemLongTest {
