@@ -32,10 +32,10 @@ def menus = [
         ]),
 
         new Menu(name: 'Documentation', items: [
-                new MenuItem(title: 'Overview', pageid: 'documentationoverview'),
-                new MenuItem(title: 'Reference Manual', pageid: 'manual'),
-                new MenuItem(title: 'Javadoc', url: 'https://linktojavadoc')
-        ])
+                 new MenuItem(title: 'Overview', pageid: 'documentationoverview'),
+                 new MenuItem(title: 'Reference Manual', pageid: 'manual'),
+                 new MenuItem(title: 'Javadoc', url: 'http://multiverse.codehaus.org/maven-site/apidocs/')
+                 ])
 ]
 
 //this is redundant information, all pages can be derived from the menu.

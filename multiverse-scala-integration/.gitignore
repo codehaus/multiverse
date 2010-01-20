@@ -1,8 +1,8 @@
 /.manager
 /.settings
-/target
 /.classpath
 /.project
+/target
 /multiverse-scala-integration.iml
 /multiverse-scala-integration.ipr
 /multiverse-scala-integration.iws
