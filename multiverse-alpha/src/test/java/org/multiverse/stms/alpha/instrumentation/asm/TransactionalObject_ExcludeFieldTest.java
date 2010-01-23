@@ -15,7 +15,7 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
 /**
  * @author Peter Veentjer
  */
-public class TransactionalObject_ExcludeTest {
+public class TransactionalObject_ExcludeFieldTest {
 
     private AlphaStm stm;
 
