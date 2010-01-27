@@ -1,41 +1,54 @@
 package org.multiverse.transactional.executors;
 
+import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.multiverse.TestUtils.testIncomplete;
+import static org.multiverse.TestUtils.getField;
+import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-import static org.multiverse.transactional.executors.TransactionalThreadPoolExecutorTestUtils.assertIsTerminated;
-import static org.multiverse.transactional.executors.TransactionalThreadPoolExecutorTestUtils.assertIsUnstarted;
+import static org.multiverse.transactional.executors.TransactionalThreadPoolExecutorTestUtils.*;
 
 public class TransactionalThreadPoolExecutor_setCorePoolSizeTest {
     private Stm stm;
 
     @Before
-    public void setUp(){
-         stm = getGlobalStmInstance();
+    public void setUp() {
+        stm = getGlobalStmInstance();
+    }
+
+    private TransactionalThreadPoolExecutor executor;
+
+    @After
+    public void tearDown() {
+        if (executor != null) {
+            executor.shutdown();
+            executor.awaitTerminationUninterruptibly();
+        }
     }
 
     @Test
     public void whenUnstarted() {
-        TransactionalThreadPoolExecutor executor = new TransactionalThreadPoolExecutor();
+        executor = new TransactionalThreadPoolExecutor();
         long version = stm.getVersion();
 
         executor.setCorePoolSize(10);
 
-        assertEquals(version+1, stm.getVersion());
+        assertEquals(version + 1, stm.getVersion());
         assertIsUnstarted(executor);
         assertEquals(10, executor.getCorePoolSize());
-        assertEquals(10, executor.getMaxPoolSize());
         assertEquals(0, executor.getCurrentPoolSize());
     }
 
     @Test
-    public void whenUnstartedAndSmallerThanZero_thenIllegalArgumentException() {
-        TransactionalThreadPoolExecutor executor = new TransactionalThreadPoolExecutor();
+    public void whenValueSmallerThanZero_thenIllegalArgumentException() {
+        executor = new TransactionalThreadPoolExecutor();
 
         long version = stm.getVersion();
         try {
@@ -47,23 +60,101 @@ public class TransactionalThreadPoolExecutor_setCorePoolSizeTest {
         assertEquals(version, stm.getVersion());
         assertIsUnstarted(executor);
         assertEquals(1, executor.getCorePoolSize());
-        assertEquals(1, executor.getMaxPoolSize());
         assertEquals(0, executor.getCurrentPoolSize());
     }
 
     @Test
-    public void whenStarted() {
-        testIncomplete();
+    public void whenNoChange() {
+        executor = new TransactionalThreadPoolExecutor();
+        executor.start();
+
+        executor.setCorePoolSize(1);
+        assertIsStarted(executor);
+        assertEquals(1, executor.getCorePoolSize());
+    }
+
+    @Test
+    public void whenPoolSizeIncreased() {
+        executor = new TransactionalThreadPoolExecutor();
+        executor.start();
+
+        Runnable command = new Runnable() {
+            @Override
+            public void run() {
+                sleepMs(5000);
+            }
+        };
+
+        executor.execute(command);
+        executor.execute(command);
+
+        sleepMs(500);
+        assertEquals(1, executor.getWorkQueue().size());
+        executor.setCorePoolSize(2);
+
+        sleepMs(500);
+        assertEquals(0, executor.getWorkQueue().size());
+    }
+
+    @Test
+    public void whenPoolSizeDecreasedAndWorkersDoingNothing() {
+        executor = new TransactionalThreadPoolExecutor();
+        executor.setCorePoolSize(5);
+        executor.start();
+
+        executor.setCorePoolSize(2);
+        assertEquals(2, executor.getCorePoolSize());
+    }
+
+    @Test
+    @Ignore
+    public void whenPoolSizeDecreasedAndWorkersWorking() {
+        Runnable command = new Runnable() {
+            @Override
+            public void run() {
+                sleepMs(500);
+            }
+        };
+
+        executor = new TransactionalThreadPoolExecutor();
+        executor.setCorePoolSize(3);
+
+        for (int k = 0; k < 3; k++) {
+            executor.execute(command);
+        }
+
+        executor.setCorePoolSize(1);
+        sleepMs(1000);
+
+        List<Thread> threads = (List<Thread>) getField(executor, "threads");
+        assertEquals(1, threads.size());
     }
 
     @Test
     public void whenShutdown_thenIllegalStateException() {
-        testIncomplete();
+        executor = new TransactionalThreadPoolExecutor();
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                sleepMs(1000);
+            }
+        });
+        sleepMs(500);
+        executor.shutdown();
+
+        try {
+            executor.setCorePoolSize(10);
+            fail();
+        } catch (IllegalStateException expected) {
+        }
+
+        assertIsShutdown(executor);
+        assertEquals(1, executor.getCorePoolSize());
     }
 
     @Test
     public void whenTerminated_thenIllegalStateException() {
-        TransactionalThreadPoolExecutor executor = new TransactionalThreadPoolExecutor();
+        executor = new TransactionalThreadPoolExecutor();
         executor.shutdown();
 
         try {

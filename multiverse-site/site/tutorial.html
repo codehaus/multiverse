@@ -1,12 +1,12 @@
 <h1>Multiverse Tutorial</h1>
 
 <ul>
-    <li><a href="introduction">Introduction</a></li>
-    <li><a href="traditional">Traditional</a>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#traditional">Traditional</a>
         <ul>
             <li><a href="race.problems">Race problems</a></li>
-            <li><a href="race.problems">Atomicity</a></li>
-            <li><a href="race.problems">Deadlocks</a></li>
+            <li><a href="atomicity">Atomicity</a></li>
+            <li><a href="deadlocks">Deadlocks</a></li>
             <li><a href="race.problems">Composability</a></li>
             <li><a href="race.problems">Reordering and visibility problems</a></li>
         </ul>
@@ -20,11 +20,11 @@
     </li>
 </ul>
 
-<h2>Introduction</h2>
-Traditional concurrency control is considered to be one of the most complex subjects for developers. They need to deal
-with all kinds of issues like race problems or deadlocks.  I'll show the issues using the following
-Account example:
-
+<h2 id="introduction">Introduction</h2>
+Traditional concurrency control is considered to be one of the most complex subjects for developers. This is because
+it is very hard to realize about improper synchronized programs because you need to deal with an extra dimension
+of problems. So it isn't uncommon that concurrent code contains race problems or deadlocks. Take a look
+at the following example:
 <pre>
     public class Account{
         private int balance;
@@ -37,14 +37,51 @@ Account example:
             return balance;
         }
 
-        public void setBalance(int newBalance){
-            if(newBalance == null){
-                throw new IllegalArgumentException()
+        public void inc(int amount){
+            if(balance + amount < 0)
+                throw new NotEnooughMoneyException();
             }
-            this.balance = newBalance;
+
+            this.balance +=amount;
         }
     }
 </pre>
+If this Account object is concurrently accessed, strange problems could start to happen:
+<ol>
+    <li>It could be that money is lost or created; when 2 threads concurrently call the
+    <li>
+        It could be that the Account gets a negative balance;
+    </li>
+</ol>
+Both are violations of the constraints of the system and could lead to serious problems. In databases these problems
+normally would be solved by configuring the correct isolation level, or adding some pessimistic or optimistic
+locking.
+<p/>
+The traditional approach to solving these problems is to springle the code with synchronized keywords and hope
+that the problem is fixed, e.g.:
+
+<pre>
+    public class Account{
+        private int balance;
+
+        public Account(int balance){
+            this.balance = balance;
+        }
+
+        public synchronized int getBalance(){
+            return balance;
+        }
+
+        public synchronized void inc(int amount){
+            if(balance + amount < 0)
+                throw new NotEnooughMoneyException();
+            }
+
+            this.balance +=amount;
+        }
+    }
+</pre>
+
 
 <h2 id="multiverse">Multiverse</h2>
 
@@ -99,7 +136,13 @@ This is all that is needed to make the Account object transactional. All
 With the traditional lock based approach it is hard to compose a new operation by executing multiple other operations,
 e.g:
 
-public static void transfer(Account account, Account
+<pre>
+@TransactionalMethod
+public static void transfer(Account from Account to, int amount){
+    from.setBalance(from.getBalance()-amount);
+    to.setBalance(to.getBalance()+amount);
+}
+</pre>
 
 
 <h2 id="transaction.mapping">Transaction Mapping</h2>
@@ -109,8 +152,8 @@ Apart from making objects transactional, there is a lot more than just correct i
 For example when a thread needs to wait on a BlockingQueue for an item to come available. With a lock
 based approach you can make use lower primitives like:
 <ol>
-    <li><b>waitset:</b></li>
-    <li><b>condition:</b></li>
+    <li><b>waitset:</b> that is part of every Object</li>
+    <li><b>java.util.concurrent.locks.Condition:</b>< that was introduced in Java 5/li>
 </ol>
 Or make use of higher blocking structures like the CountDownLatch. If I want to add a new function to the
 SynchronizedAccount where a thread can block on the account to reach a balance, it would look something like this:

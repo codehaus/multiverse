@@ -102,4 +102,8 @@ for (page in pages) {
   output.write(result)
 }
 
+def output = new File("$outputdirectory/style.css")
+output.createNewFile()
+output.write(new File("site/style.css").text)
+
 println('finished')

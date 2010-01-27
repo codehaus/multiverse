@@ -1,13 +1,6 @@
 package org.benchy.executor;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
 import org.benchy.BenchmarkResultRepository;
 import org.benchy.FileBasedBenchmarkResultRepository;
 
@@ -85,7 +78,7 @@ public class BenchmarkMain {
 
     static class TestCaseDeserializer implements JsonDeserializer {
         @Override
-        public Object deserialize(JsonElement json, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+        public Object deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
             JsonObject obj = (JsonObject) json;
 
             TestCase testCase = new TestCase();

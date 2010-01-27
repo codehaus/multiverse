@@ -1,5 +1,7 @@
 package org.multiverse.transactional.executors;
 
+import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 
@@ -8,10 +10,20 @@ import static org.multiverse.transactional.executors.TransactionalThreadPoolExec
 
 public class TransactionalThreadPoolExecutor_awaitTerminationUninterruptiblyTest {
 
+    private TransactionalThreadPoolExecutor executor;
+
+    @After
+    public void tearDown() {
+        if (executor != null) {
+            executor.shutdown();
+            executor.awaitTerminationUninterruptibly();
+        }
+    }
+
     @Test
     public void whenUnstarted() {
-        TransactionalThreadPoolExecutor executor = new TransactionalThreadPoolExecutor();
-        AwaitThread awaitThread = new AwaitThread(executor);
+        executor = new TransactionalThreadPoolExecutor();
+        AwaitThread awaitThread = new AwaitThread();
         awaitThread.start();
 
         sleepSome();
@@ -23,18 +35,18 @@ public class TransactionalThreadPoolExecutor_awaitTerminationUninterruptiblyTest
     }
 
     @Test
+    @Ignore
     public void whenStarted() {
-        testIncomplete();
     }
 
     @Test
+    @Ignore
     public void whenShutdown() {
-        testIncomplete();
     }
 
     @Test
     public void whenTerminated() throws InterruptedException {
-        TransactionalThreadPoolExecutor executor = new TransactionalThreadPoolExecutor();
+        executor = new TransactionalThreadPoolExecutor();
         executor.shutdown();
 
         executor.awaitTerminationUninterruptibly();
@@ -42,11 +54,8 @@ public class TransactionalThreadPoolExecutor_awaitTerminationUninterruptiblyTest
     }
 
     private class AwaitThread extends TestThread {
-        private final TransactionalThreadPoolExecutor executor;
-
-        private AwaitThread(TransactionalThreadPoolExecutor executor) {
+        private AwaitThread() {
             super("AwaitThread");
-            this.executor = executor;
         }
 
         @Override

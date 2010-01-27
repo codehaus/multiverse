@@ -12,8 +12,8 @@ import java.util.*;
  * <li>{@link java.util.Queue}</li> <li>{@link java.util.concurrent.BlockingQueue}</li> <li>{@link java.util.Deque}</li>
  * <li>{@link java.util.concurrent.BlockingDeque}</li> </ol>
  * <p/>
- * Each operation on this TransactionalLinkedList is transactional by default, and of course can participate in already running
- * transactions.
+ * Each operation on this TransactionalLinkedList is transactional by default, and of course can participate in already
+ * running transactions.
  * <p/>
  * There is a scalability issue with this structure and it has to do with unwanted writeconflicts. Although a take and
  * put can be executed concurrently because there is a seperate tail and head to place items on, one of the transactions

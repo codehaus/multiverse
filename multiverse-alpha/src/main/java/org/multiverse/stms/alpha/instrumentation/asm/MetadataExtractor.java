@@ -23,55 +23,57 @@ import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.*;
  */
 public final class MetadataExtractor implements Opcodes {
 
-    private boolean isRealTxObject = false;
-    private boolean isTxObject = false;
-    private boolean hasTxMethods = false;
-    private ClassNode classNode;
-    private MetadataRepository metadataRepo;
+    private final ClassNode classNode;
+    private final MetadataRepository metadataRepository;
+
+    private boolean isRealTransactionalObject = false;
+    private boolean isTransactionalObject = false;
+    private boolean hasTransactionalMethods = false;
 
     public MetadataExtractor(ClassNode classNode) {
         this.classNode = classNode;
-        this.metadataRepo = MetadataRepository.INSTANCE;
+        this.metadataRepository = MetadataRepository.INSTANCE;
     }
 
     public void extract() {
-        metadataRepo.signalLoaded(classNode);
+        metadataRepository.markAsLoaded(classNode);
 
-        if (isTxObject()) {
-            isTxObject = true;
+        if (isTransactionalObject()) {
+            isTransactionalObject = true;
 
-            if (metadataRepo.isRealTransactionalObject(classNode.superName)) {
-                isRealTxObject = true;
+            if (metadataRepository.isRealTransactionalObject(classNode.superName)) {
+                isRealTransactionalObject = true;
             }
         }
 
         extractFieldMetadata();
         extractMethodMetadata();
 
-        metadataRepo.setIsTransactionalObject(classNode, isTxObject);
-        metadataRepo.setIsRealTransactionalObject(classNode, isRealTxObject);
-        metadataRepo.setHasTransactionalMethods(classNode, hasTxMethods);
+        metadataRepository.setIsTransactionalObject(classNode, isTransactionalObject);
+        metadataRepository.setIsRealTransactionalObject(classNode, isRealTransactionalObject);
+        metadataRepository.setHasTransactionalMethods(classNode, hasTransactionalMethods);
 
-        if (isRealTxObject) {
-            metadataRepo.setTranlocalName(classNode, classNode.name + "__Tranlocal");
-            metadataRepo.setTranlocalSnapshotName(classNode, classNode.name + "__TranlocalSnapshot");
+        if (isRealTransactionalObject) {
+            metadataRepository.setTranlocalName(classNode, classNode.name + "__Tranlocal");
+            metadataRepository.setTranlocalSnapshotName(classNode, classNode.name + "__TranlocalSnapshot");
         }
-
-        // System.out.println("Extracting metadata: " + classNode.name + " isRealTxObject: " + isRealTxObject);
     }
 
-    private boolean isTxObject() {
-        if (isInterface(classNode)) {
-            return false;
-        }
-
-        if (metadataRepo.isTransactionalObject(classNode.superName)) {
-            return true;
-        }
-
+    private boolean isTransactionalObject() {
         if (hasTransactionalObjectAnnotation(classNode)) {
             return true;
         }
+
+        if (metadataRepository.isTransactionalObject(classNode.superName)) {
+            return true;
+        }
+
+        for (String interfaceName : (List<String>) classNode.interfaces) {
+            if (metadataRepository.isTransactionalObject(interfaceName)) {
+                return true;
+            }
+        }
+
 
         return false;
     }
@@ -87,18 +89,18 @@ public final class MetadataExtractor implements Opcodes {
         boolean isManagedFieldWithFieldGranularity = false;
 
         if (isManagedField(field)) {
-            isRealTxObject = true;
+            isRealTransactionalObject = true;
             isManagedField = true;
         } else if (isManagedFieldWithFieldGranularity(field)) {
             isManagedFieldWithFieldGranularity = true;
         }
 
-        metadataRepo.setIsManagedInstanceField(classNode, field, isManagedField);
-        metadataRepo.setIsManagedInstanceFieldWithFieldGranularity(classNode, field, isManagedFieldWithFieldGranularity);
+        metadataRepository.setIsManagedInstanceField(classNode, field, isManagedField);
+        metadataRepository.setIsManagedInstanceFieldWithFieldGranularity(classNode, field, isManagedFieldWithFieldGranularity);
     }
 
     private boolean isManagedFieldWithFieldGranularity(FieldNode field) {
-        if (!isTxObject) {
+        if (!isTransactionalObject) {
             return false;
         }
 
@@ -106,7 +108,7 @@ public final class MetadataExtractor implements Opcodes {
             return false;
         }
 
-        if (isInvisible(field)) {
+        if (isInvisibleField(field)) {
             return false;
         }
 
@@ -118,7 +120,7 @@ public final class MetadataExtractor implements Opcodes {
      * Checks if the field is a managed field of a transactional object.
      */
     private boolean isManagedField(FieldNode field) {
-        if (!isTxObject) {
+        if (!isTransactionalObject) {
             return false;
         }
 
@@ -126,14 +128,14 @@ public final class MetadataExtractor implements Opcodes {
             return false;
         }
 
-        if (isInvisible(field)) {
+        if (isInvisibleField(field)) {
             return false;
         }
 
         return true;
     }
 
-    private boolean isInvisible(FieldNode fieldNode) {
+    private boolean isInvisibleField(FieldNode fieldNode) {
         if (isFinal(fieldNode)) {
             return true;
         }
@@ -146,7 +148,7 @@ public final class MetadataExtractor implements Opcodes {
             return true;
         }
 
-        if (isSynthetic(fieldNode)) {
+        if (isSynthetic(fieldNode.access)) {
             return true;
         }
 
@@ -164,36 +166,47 @@ public final class MetadataExtractor implements Opcodes {
         }
     }
 
+    private boolean isInvisibleMethod(MethodNode methodNode) {
+        if (isExcluded(methodNode)) {
+            return true;
+        }
+
+        if (isSynthetic(methodNode.access)) {
+            return true;
+        }
+
+        return false;
+    }
+
     private void extractMethodMetadata(MethodNode method) {
-        boolean isTxMethod = false;
+        boolean isTransactionalMethod = false;
         TransactionalMethodParams params = null;
 
-        ensureNoTxMethodAccessModifierViolation(method);
-
-        if (isTxObject) {
-            if (hasTransactionalMethodAnnotation(method) || hasTransactionalConstructorAnnotation(method)) {
-                isTxMethod = true;
+        if (!isInvisibleMethod(method)) {
+            if (isTransactionalObject) {
+                if (hasTransactionalMethodAnnotation(method) || hasTransactionalConstructorAnnotation(method)) {
+                    isTransactionalMethod = true;
+                    params = createTransactionalMethodParams(method);
+                } else if (!isStatic(method)) {
+                    isTransactionalMethod = true;
+                    params = createDefaultTransactionalMethodParams(method);
+                }
+            } else if (hasTransactionalMethodAnnotation(method)) {
+                isTransactionalMethod = true;
                 params = createTransactionalMethodParams(method);
-            } else if (hasCorrectMethodAccessForTransactionalMethod(method.access) && !isStatic(method)) {
-                isTxMethod = true;
-                params = createDefaultTransactionalMethodParams(method);
+            } else if (hasTransactionalConstructorAnnotation(method)) {
+                isTransactionalMethod = true;
+                params = createTransactionalMethodParams(method);
             }
-        } else if (hasTransactionalMethodAnnotation(method)) {
-            isTxMethod = true;
-            params = createTransactionalMethodParams(method);
-        } else if (hasTransactionalConstructorAnnotation(method)) {
-            isTxMethod = true;
-            params = createTransactionalMethodParams(method);
         }
 
-        if (isTxMethod) {
-            hasTxMethods = true;
+        if (isTransactionalMethod) {
+            hasTransactionalMethods = true;
         }
 
-        metadataRepo.setIsTransactionalMethod(classNode, method, isTxMethod);
-
-        if (isTxMethod) {
-            metadataRepo.setTransactionalMethodParams(classNode, method, params);
+        metadataRepository.setIsTransactionalMethod(classNode, method, isTransactionalMethod);
+        if (isTransactionalMethod) {
+            metadataRepository.setTransactionalMethodParams(classNode, method, params);
         }
     }
 
@@ -299,11 +312,15 @@ public final class MetadataExtractor implements Opcodes {
     }
 
     private static boolean hasCorrectMethodAccessForTransactionalMethod(int access) {
-        return !(AsmUtils.isSynthetic(access) || isAbstract(access) || isNative(access));
+        return !(AsmUtils.isSynthetic(access) || isNative(access));
     }
 
     public static boolean isExcluded(FieldNode field) {
         return hasVisibleAnnotation(field, Exclude.class);
+    }
+
+    public static boolean isExcluded(MethodNode methodNode) {
+        return hasVisibleAnnotation(methodNode, Exclude.class);
     }
 
     public static boolean hasFieldGranularity(FieldNode field) {
@@ -322,8 +339,8 @@ public final class MetadataExtractor implements Opcodes {
         return hasVisibleAnnotation(classNode, TransactionalObject.class);
     }
 
-    public static boolean isSynthetic(FieldNode fieldNode) {
-        return (fieldNode.access & Opcodes.ACC_SYNTHETIC) != 0;
+    public static boolean isSynthetic(int access) {
+        return (access & Opcodes.ACC_SYNTHETIC) != 0;
     }
 
     public static boolean isVolatile(FieldNode fieldNode) {

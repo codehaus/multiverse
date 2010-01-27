@@ -1,7 +1,8 @@
 package org.multiverse.utils.clock;
 
-import static java.lang.String.format;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static java.lang.String.format;
 
 /**
  * The RelaxedClock is less strict about increasing the clock. It finds it ok if someone has increased the clock instead
@@ -41,6 +42,11 @@ public final class RelaxedClock implements Clock {
 
         //todo: could it be that time on the clock hasn't increased yet?
         return oldTime + 1;
+    }
+
+    @Override
+    public long strictTick() {
+        return clock.incrementAndGet();
     }
 
     @Override

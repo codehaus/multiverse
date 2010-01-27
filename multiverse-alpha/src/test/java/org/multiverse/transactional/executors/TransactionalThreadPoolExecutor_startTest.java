@@ -1,19 +1,30 @@
 package org.multiverse.transactional.executors;
 
+import org.junit.After;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.transactional.executors.TransactionalThreadPoolExecutorTestUtils.assertIsStarted;
 import static org.multiverse.transactional.executors.TransactionalThreadPoolExecutorTestUtils.assertIsTerminated;
 
 public class TransactionalThreadPoolExecutor_startTest {
 
+
+    private TransactionalThreadPoolExecutor executor;
+
+    @After
+    public void tearDown() {
+        if (executor != null) {
+            executor.shutdown();
+            executor.awaitTerminationUninterruptibly();
+        }
+    }
+
+
     @Test
     public void whenUnstarted_thenInitialization() {
-        TransactionalThreadPoolExecutor executor = new TransactionalThreadPoolExecutor();
+        executor = new TransactionalThreadPoolExecutor();
         executor.start();
 
         assertIsStarted(executor);
@@ -22,7 +33,7 @@ public class TransactionalThreadPoolExecutor_startTest {
 
     @Test
     public void whenStarted_callIgnored() {
-        TransactionalThreadPoolExecutor executor = new TransactionalThreadPoolExecutor();
+        executor = new TransactionalThreadPoolExecutor();
         executor.start();
 
         executor.start();
@@ -31,7 +42,7 @@ public class TransactionalThreadPoolExecutor_startTest {
 
     @Test
     public void whenShutdown_thenIllegalStateException() {
-        TransactionalThreadPoolExecutor executor = new TransactionalThreadPoolExecutor();
+        executor = new TransactionalThreadPoolExecutor();
         executor.start();
 
         executor.execute(new Runnable() {
@@ -56,7 +67,7 @@ public class TransactionalThreadPoolExecutor_startTest {
 
     @Test
     public void whenTerminated_thenIllegalStateException() {
-        TransactionalThreadPoolExecutor executor = new TransactionalThreadPoolExecutor();
+        executor = new TransactionalThreadPoolExecutor();
 
         executor.shutdown();
 

@@ -1,5 +1,6 @@
 package org.multiverse.transactional.executors;
 
+import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -8,14 +9,25 @@ import java.util.List;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.TestUtils.sleepMs;
-import static org.multiverse.TestUtils.testIncomplete;
 import static org.multiverse.transactional.executors.TransactionalThreadPoolExecutorTestUtils.assertIsTerminated;
 
 public class TransactionalThreadPoolExecutor_shutdownNowTest {
 
+
+    private TransactionalThreadPoolExecutor executor;
+
+    @After
+    public void tearDown() {
+        if (executor != null) {
+            executor.shutdown();
+            executor.awaitTerminationUninterruptibly();
+        }
+    }
+
+
     @Test
     public void whenUnstarted() {
-        TransactionalThreadPoolExecutor executor = new TransactionalThreadPoolExecutor();
+        executor = new TransactionalThreadPoolExecutor();
 
         List<Runnable> tasks = executor.shutdownNow();
 
@@ -25,18 +37,18 @@ public class TransactionalThreadPoolExecutor_shutdownNowTest {
     }
 
     @Test
+    @Ignore
     public void whenStarted() {
-        testIncomplete();
     }
 
     @Test
     @Ignore
     public void whenShutdown_thenRunningTaskInterrupted() {
-        TransactionalThreadPoolExecutor executor = new TransactionalThreadPoolExecutor();
+        executor = new TransactionalThreadPoolExecutor();
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                sleepMs(1000000000);
+                sleepMs(1000);
             }
         });
 
@@ -52,7 +64,7 @@ public class TransactionalThreadPoolExecutor_shutdownNowTest {
 
     @Test
     public void whenTerminated() {
-        TransactionalThreadPoolExecutor executor = new TransactionalThreadPoolExecutor();
+        executor = new TransactionalThreadPoolExecutor();
         executor.shutdown();
 
         List<Runnable> tasks = executor.shutdownNow();

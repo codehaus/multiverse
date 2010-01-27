@@ -167,6 +167,8 @@ public abstract class TransactionTemplate<E> {
      * If this TransactionTemplate doesn't starts its own transaction, this method won't be called.
      * <p/>
      * If an exception is thrown while executing this method, the execute and transaction will abort.
+     *
+     * @param tx the Transaction that is started.
      */
     protected void onStart(Transaction tx) {
     }

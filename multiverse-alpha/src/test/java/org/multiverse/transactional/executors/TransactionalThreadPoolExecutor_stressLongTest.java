@@ -12,19 +12,18 @@ public class TransactionalThreadPoolExecutor_stressLongTest {
 
     private TransactionalThreadPoolExecutor executor;
 
-    private static final int scheduleCount = 2*1000*1000;
+    private static final int scheduleCount = 2 * 1000 * 1000;
 
     private AtomicInteger runningCount;
 
     @Before
     public void setUp() {
         executor = new TransactionalThreadPoolExecutor();
-        //executor.setCorePoolSize(2);
         runningCount = new AtomicInteger(executor.getCorePoolSize());
     }
 
     @Test
-    public void testi() {
+    public void test() {
         long startNs = nanoTime();
 
         for (int k = 0; k < executor.getCorePoolSize(); k++) {
@@ -44,16 +43,16 @@ public class TransactionalThreadPoolExecutor_stressLongTest {
         private int count;
         private final int id;
 
-        public Command(int id){
-            this.id=id;
+        public Command(int id) {
+            this.id = id;
         }
 
         @Override
         public void run() {
             count++;
 
-            if(count % 100000 == 0){
-                System.out.printf("Command %s is at %s\n",id, count);
+            if (count % 100000 == 0) {
+                System.out.printf("Command %s is at %s\n", id, count);
             }
 
             if (count < scheduleCount) {

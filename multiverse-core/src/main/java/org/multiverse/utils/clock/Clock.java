@@ -34,6 +34,8 @@ public interface Clock {
      */
     long tick();
 
+    long strictTick();
+
     /**
      * Returns the current version. The returned value could be stale as soon as it is received.
      *

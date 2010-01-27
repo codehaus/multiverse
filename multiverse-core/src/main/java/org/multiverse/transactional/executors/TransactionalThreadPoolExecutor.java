@@ -11,19 +11,35 @@ import org.multiverse.utils.TodoException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 /**
- * A transactional {@link java.util.concurrent.Executor}.
+ * A transactional {@link java.util.concurrent.Executor} implementation that looks a lot like the
+ * {@link java.util.concurrent.ThreadPoolExecutor}.
  * <p/>
- * Known concurrent limitations <ol> <li>no concurrent takes and puts</li> <li>no concurrent takes (not really a big
- * issue since the takes only have a very short transactions)</li> <li>no concurrent puts</li> </ol> This will
- * eventually be solved when a better queue implementation is found.
+ * Known concurrent limitations
+ * <ol>
+ * <li>no concurrent takes and puts</li>
+ * <li>no concurrent takes (not really a big
+ * issue since the takes only have a very short transactions)</li>
+ * <li>no concurrent puts</li>
+ * </ol>
+ * This will eventually be solved when a better queue implementation is found.
  * <p/>
- * todo: <ol> <li> Shutdown not implemented</li> <li> Shutdown now not implemented</li> <li>awaitTerminated not
- * implemented</li> <li>exception handling</li> </ol>
+ * todo:
+ * <ol>
+ * <li> Shutdown now not implemented</li>
+ * </ol>
+ * <p/>
+ * <dt>Exception handling</dt>
+ * If an Exception is thrown when a command is executed, it will not be logged and discarded instead. In the
+ * ThreadPoolExecutor it is possible to override the
+ * {@link java.util.concurrent.ThreadPoolExecutor#afterExecute(Runnable, Throwable)} but this functionality isn't
+ * provided yet. So the best thing that you can do is wrap the command in a logging Runnable that catches and
+ * logs the exception.
  * <p/>
  * A task executes by a TransactionalThreadPoolExecutor will not automatically receives its own transaction.
  *
@@ -36,7 +52,6 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
     private final TransactionalLinkedList<Thread> threads = new TransactionalLinkedList<Thread>();
 
     private State state;
-    private int maxPoolSize;
     private int corePoolSize;
     private ThreadFactory threadFactory;
 
@@ -48,7 +63,17 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
      * memory instead of rejecting tasks.
      */
     public TransactionalThreadPoolExecutor() {
-        this(new TransactionalLinkedList<Runnable>(), 1, 1);
+        this(new TransactionalLinkedList<Runnable>(), 1);
+    }
+
+    /**
+     * Creates a new TransactionalThreadPool with an unbound workqueue and the provided poolSize.
+     *
+     * @param poolSize the maximum and core poolsize.
+     * @throws IllegalArgumentException if poolSize smaller than 0.
+     */
+    public TransactionalThreadPoolExecutor(int poolSize) {
+        this(new TransactionalLinkedList<Runnable>(), poolSize);
     }
 
     /**
@@ -58,38 +83,35 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
      * @throws NullPointerException if workQueue is null.
      */
     public TransactionalThreadPoolExecutor(BlockingQueue<Runnable> workQueue) {
-        this(workQueue, 1, 1);
+        this(workQueue, 1);
     }
 
     /**
      * Creates a new TransactionalThreadPoolExecutor.
      *
-     * @param workQueue    the BlockingQueue to store unprecces work.
-     * @param corePoolSize
-     * @param maxPoolSize
+     * @param workQueue    the BlockingQueue to store unprocessed work.
+     * @param corePoolSize the minimum number of threads in this TransactionalThreadPoolExecutor.
      * @throws NullPointerException     if workQueue is null.
      * @throws IllegalArgumentException if corePoolSize is smaller than zero or if maxPoolSize smaller than
      *                                  corePoolSize.
      */
-    public TransactionalThreadPoolExecutor(BlockingQueue<Runnable> workQueue, int corePoolSize, int maxPoolSize) {
+    public TransactionalThreadPoolExecutor(BlockingQueue<Runnable> workQueue, int corePoolSize) {
         if (workQueue == null) {
             throw new NullPointerException();
         }
         if (corePoolSize < 0) {
             throw new IllegalArgumentException();
         }
-        if (maxPoolSize < corePoolSize) {
-            throw new IllegalArgumentException();
-        }
 
-        this.maxPoolSize = maxPoolSize;
         this.corePoolSize = corePoolSize;
         this.workQueue = workQueue;
         this.state = State.unstarted;
         this.threadFactory = new ThreadFactory() {
+            final AtomicLong idGenerator = new AtomicLong();
+
             @Override
             public Thread newThread(Runnable r) {
-                return new Thread(r, "worker");
+                return new Thread(r, "worker-" + idGenerator.incrementAndGet());
             }
         };
     }
@@ -106,48 +128,6 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
     }
 
     /**
-     * Returns the maximum number of threads in this TransactionalThreadPoolExecutor. The returned value will always be
-     * equal or larger than {@link #getCorePoolSize()}. If the pool of threads doesn't grow, the returned value will be
-     * equal to {@link #getCorePoolSize()}.
-     *
-     * @return the maximum number of thread in this TransactionalThreadPoolExecutor .
-     */
-    @TransactionalMethod(readonly = true)
-    public int getMaxPoolSize() {
-        return maxPoolSize;
-    }
-
-    /**
-     * Sets the maximum poolsize.
-     *
-     * @param newMaxPoolSize the new maximum poolsize
-     * @throws IllegalArgumentException if newMaxPoolSize is smaller than 0
-     * @throws IllegalStateException    if this TransactionalThreadPoolExecutor is shutdown or terminated.
-     */
-    @TransactionalMethod(automaticReadTracking = false)
-    public void setMaxPoolSize(int newMaxPoolSize) {
-        switch (state) {
-            case unstarted:
-                //fall through
-            case started:
-                if (newMaxPoolSize < 0) {
-                    throw new IllegalArgumentException();
-                }
-
-                if (corePoolSize > newMaxPoolSize) {
-                    corePoolSize = newMaxPoolSize;
-                }
-
-                maxPoolSize = newMaxPoolSize;
-                break;
-            case shutdown:
-                throw new IllegalStateException();
-            case terminated:
-                throw new IllegalStateException();
-        }
-    }
-
-    /**
      * Sets the corePoolSize of this TransactionalThreadPoolExecutor. If the TransactionalThreadPoolExecutor is
      * unstarted, it isn't started. If the newCorePoolSize is larger than the maximumPoolSize, it automatically sets the
      * maxPoolSize to newCorePoolSize.
@@ -158,16 +138,18 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
      */
     @TransactionalMethod(automaticReadTracking = false)
     public void setCorePoolSize(int newCorePoolSize) {
+        if (newCorePoolSize < 0) {
+            throw new IllegalArgumentException();
+        }
+
         switch (state) {
             case unstarted:
-                //fall through
+                corePoolSize = newCorePoolSize;
+                break;
             case started:
-                if (newCorePoolSize < 0) {
-                    throw new IllegalArgumentException();
-                }
-
-                if (maxPoolSize < newCorePoolSize) {
-                    maxPoolSize = newCorePoolSize;
+                int extra = newCorePoolSize - corePoolSize;
+                if (extra > 0) {
+                    createAndRegisterWorkers(extra);
                 }
 
                 corePoolSize = newCorePoolSize;
@@ -290,16 +272,22 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
         return state == State.terminated;
     }
 
+    @TransactionalMethod(readonly = true)
+    public boolean isStarted() {
+        return state == State.started;
+    }
+
+
     @Override
     @TransactionalMethod(readonly = true, automaticReadTracking = true)
     public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
         switch (state) {
             case unstarted:
-                throw new TodoException();
+                throw new UnsupportedOperationException();
             case started:
-                throw new TodoException();
+                throw new UnsupportedOperationException();
             case shutdown:
-                throw new TodoException();
+                throw new UnsupportedOperationException();
             case terminated:
                 return true;
             default:
@@ -344,11 +332,6 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
                 if (!workOffered) {
                     throw new RejectedExecutionException();
                 }
-
-                if (threads.size() < maxPoolSize) {
-                    Thread thread = createAndRegisterWorker();
-                    getThreadLocalTransaction().register(new StartAllListener(thread));
-                }
                 break;
             case shutdown:
                 throw new RejectedExecutionException();
@@ -369,12 +352,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
         switch (state) {
             case unstarted:
                 state = State.started;
-                Thread[] newThreads = new Thread[corePoolSize];
-                for (int k = 0; k < corePoolSize; k++) {
-                    Thread thread = createAndRegisterWorker();
-                    newThreads[k] = thread;
-                }
-                getThreadLocalTransaction().register(new StartAllListener(newThreads));
+                createAndRegisterWorkers(corePoolSize);
                 break;
             case started:
                 //ignore call
@@ -388,12 +366,18 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
         }
     }
 
-    private Thread createAndRegisterWorker() {
-        Worker worker = new Worker();
-        Thread thread = threadFactory.newThread(worker);
-        worker.thread = thread;
-        threads.add(thread);
-        return thread;
+    private void createAndRegisterWorkers(int size) {
+        Thread[] newThreads = new Thread[size];
+        for (int k = 0; k < corePoolSize; k++) {
+            Worker worker = new Worker();
+            Thread thread = threadFactory.newThread(worker);
+            worker.thread = thread;
+
+            threads.add(thread);
+            newThreads[k] = thread;
+        }
+
+        getThreadLocalTransaction().register(new StartAllListener(newThreads));
     }
 
     private void signalTerminated() {
@@ -401,7 +385,6 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
     }
 
     enum State {
-
         unstarted, started, shutdown, terminated
     }
 
@@ -411,12 +394,14 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
 
         @Override
         public void run() {
-            //it is important that the task is not processed under the same transaction as the item is removed
-            //from the queue because it will limit concurrency and could also lead to the same task being
-            //picked up by multiple threads (and all but one of them will fail when they do a commit).
+            work();
+            drainWorkQueue();
+            die();
+        }
+
+        private void work() {
             boolean again = true;
             do {
-
                 try {
                     Runnable command = takeWork();
                     if (command == null) {
@@ -425,11 +410,26 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
                         execute(command);
                     }
                 } catch (InterruptedException ex) {
-                    //ignore, continue the loop.
+                    //ignore, continue the loop.. will terminate if executor was shutdown.
                 }
             } while (again);
+        }
 
-            again = true;
+        @TransactionalMethod
+        private Runnable takeWork() throws InterruptedException {
+            if (corePoolSize > threads.size() || isShutdown()) {
+                if (!isShutdown()) {
+                    System.out.println("overbodige werker gevonden");
+                }
+                threads.remove(thread);
+                return null;
+            } else {
+                return workQueue.take();
+            }
+        }
+
+        private void drainWorkQueue() {
+            boolean again = true;
             do {
                 Runnable command = workQueue.poll();
                 if (command == null) {
@@ -438,28 +438,20 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
                     execute(command);
                 }
             } while (again);
-
-            threads.remove(thread);
-            if (threads.isEmpty()) {
-                signalTerminated();
-            }
         }
 
         @TransactionalMethod
-        private Runnable takeWork() throws InterruptedException {
-            if (getState() == State.started) {
-                return workQueue.take();
-            } else {
-                return null;
+        private void die() {
+            if (isShutdown()) {
+                //it could be that this method is called more than once, but that doesn't cause problems
+                signalTerminated();
             }
         }
 
         private void execute(Runnable command) {
             try {
                 command.run();
-            } catch (RuntimeException ex) {
-                ex.printStackTrace();
-                //todo
+            } catch (RuntimeException ignore) {
             }
         }
     }

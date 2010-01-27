@@ -7,7 +7,7 @@ import static java.lang.String.format;
 import static org.multiverse.api.StmUtils.retry;
 
 /**
- * A transactional primitive for an int.
+ * A transactional primitive for a int.
  *
  * @author Peter Veentjer
  */
@@ -112,7 +112,7 @@ public class TransactionalInteger {
      * Waits till this value is larger than.
      *
      * @param than the value to wait for.
-     * @return
+     * @return the value that currently is active.
      */
     @TransactionalMethod(readonly = true, automaticReadTracking = true)
     public int awaitLargerThan(int than) {
@@ -123,6 +123,12 @@ public class TransactionalInteger {
         return value;
     }
 
+    /**
+     * Waits till the value is equal or larger than.
+     *
+     * @param than
+     * @return
+     */
     @TransactionalMethod(readonly = true, automaticReadTracking = true)
     public int awaitLargerOrEqualThan(int than) {
         if (!(value >= than)) {

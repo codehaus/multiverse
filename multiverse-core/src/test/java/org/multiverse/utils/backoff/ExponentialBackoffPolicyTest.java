@@ -3,6 +3,7 @@ package org.multiverse.utils.backoff;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -67,7 +68,7 @@ public class ExponentialBackoffPolicyTest {
     public void sleep() throws InterruptedException {
         long sleepNs = TimeUnit.MILLISECONDS.toNanos(100);
         long startNs = System.nanoTime();
-        ExponentialBackoffPolicy.sleep(sleepNs);
+        LockSupport.parkNanos(sleepNs);
         long elapsedNs = System.nanoTime() - startNs;
 
         //we need to build in some room for systems non perfect delays and time measurements. 

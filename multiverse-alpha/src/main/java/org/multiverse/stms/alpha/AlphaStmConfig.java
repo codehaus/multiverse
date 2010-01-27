@@ -3,6 +3,7 @@ package org.multiverse.stms.alpha;
 import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.backoff.ExponentialBackoffPolicy;
 import org.multiverse.utils.clock.Clock;
+import org.multiverse.utils.clock.RelaxedClock;
 import org.multiverse.utils.clock.StrictClock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
 import org.multiverse.utils.commitlock.GenericCommitLockPolicy;
@@ -41,7 +42,7 @@ public final class AlphaStmConfig {
         config.loggingPossible = false;
         config.optimizedConflictDetection = true;
         config.smartTxImplementationChoice = true;
-        config.clock = new StrictClock();//new RelaxedClock();
+        config.clock = new RelaxedClock();
         return config;
     }
 

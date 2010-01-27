@@ -176,9 +176,9 @@ public final class MetadataRepository {
         return isRealTransactionalObject(txObject.name);
     }
 
-    public boolean isTransactionalObject(String className) {
-        ensureMetadataExtracted(className);
-        String key = "IsTxObject#" + className;
+    public boolean isTransactionalObject(String classInternalName) {
+        ensureMetadataExtracted(classInternalName);
+        String key = "IsTxObject#" + classInternalName;
         return getPrepareInfoAsBoolean(key);
     }
 
@@ -187,9 +187,9 @@ public final class MetadataRepository {
         putBoolean(txObject, key);
     }
 
-    public boolean isRealTransactionalObject(String className) {
-        ensureMetadataExtracted(className);
-        String key = "IsRealTxObject#" + className;
+    public boolean isRealTransactionalObject(String classInternalName) {
+        ensureMetadataExtracted(classInternalName);
+        String key = "IsRealTxObject#" + classInternalName;
         return getPrepareInfoAsBoolean(key);
     }
 
@@ -258,7 +258,7 @@ public final class MetadataRepository {
         return getPrepareInfoAsBoolean(key);
     }
 
-    public void signalLoaded(ClassNode classNode) {
+    public void markAsLoaded(ClassNode classNode) {
         String key = "Prepared#" + classNode.name;
         putBoolean(true, key);
     }

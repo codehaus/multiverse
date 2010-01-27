@@ -1,8 +1,10 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.TestUtils;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.stms.alpha.AlphaStm;
 
@@ -19,13 +21,14 @@ public class TransactionalMethod_AccessModifierTest {
 
     @Before
     public void setUp() {
+        TestUtils.resetInstrumentationProblemMonitor();
         stm = (AlphaStm) getGlobalStmInstance();
     }
 
-    //@After
-    //public void tearDown(){
-    //    assertNoInstrumentationProblems();
-    //}
+    @After
+    public void tearDown() {
+        TestUtils.resetInstrumentationProblemMonitor();
+    }
 
     public static void assertTransactionWorking() {
         assertIsActive(getThreadLocalTransaction());

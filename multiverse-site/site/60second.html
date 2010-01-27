@@ -4,7 +4,7 @@ Multiverse is a Software Transansactional Memory implementation and meant as an 
 based concurrency. If you have worked with databases before, Transactional Memory should feel familiar because
 both share 1 very important concept; transactions.
 <p/>
-In Multiverse a normal Pojo can be made transactional by adding the TransactionalObject annotation, e.g.:
+In Multiverse a normal POJO can be made transactional by adding the TransactionalObject annotation, e.g.:
 <pre>
 
     import org.multiverse.annotations.TransactionalObject;
@@ -43,15 +43,17 @@ All <b>instance</b> methods of this Account class will now be transactional and 
         setBalance method where the lastUpdate is set even though the call could fail.
     </li>
     <li><b>isolation: </b> all reads and writes are thread-safe and are isolated from
-        other transactions. A transaction automatically gets a near-serializable isolation level.
+        other transactions. A transaction automatically gets a Oracle version of the SERIALIZABLE isolation level.
+        You don't need to deal with lower isolation levels like the READ_UNCOMMITTED, READ_COMMITTED. and
+        REPEATABLE_READ.
     </li>
-    <li><b>no deadlocks:</b> between transactions because deadlocks are prevented by the STM.
+    <li><b>no deadlocks:</b> between transactions because deadlocks are prevented by Multiverse.
 </ol>
 Another big advantage is that the methods have become composable, so you can combine methods while keeping the
 transactional properties. This is very hard to realize with a traditional lock based approach. Composing can be
 done by creating a new instance method on a transactional object that calls the composing operations, or
-by adding a TransactionalMethod annotation around a normal method or around a static method of a transactional
-object, e.g.:
+by adding a TransactionalMethod annotation around a normal method of a non transactional object, or around a
+static method of a transactional object, e.g.:
 
 <pre>
     import org.multiverse.annotations.TransactionalMethod;

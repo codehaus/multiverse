@@ -1,5 +1,6 @@
 package org.multiverse.transactional.executors;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Stm;
@@ -7,19 +8,28 @@ import org.multiverse.api.Stm;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.TestUtils.sleepMs;
-import static org.multiverse.TestUtils.testIncomplete;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.transactional.executors.TransactionalThreadPoolExecutorTestUtils.assertIsTerminated;
 
 public class TransactionalThreadPoolExecutor_shutdownTest {
 
-    private TransactionalThreadPoolExecutor executor;
     private Stm stm;
 
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
         executor = new TransactionalThreadPoolExecutor();
+    }
+
+
+    private TransactionalThreadPoolExecutor executor;
+
+    @After
+    public void tearDown() {
+        if (executor != null) {
+            executor.shutdown();
+            executor.awaitTerminationUninterruptibly();
+        }
     }
 
     @Test
@@ -38,9 +48,9 @@ public class TransactionalThreadPoolExecutor_shutdownTest {
     }
 
     @Test
-    public void whenStartedAndTaskRunning_thenShutdown(){
+    public void whenStartedAndTaskRunning_thenShutdown() {
         executor.start();
-        executor.execute(new Runnable(){
+        executor.execute(new Runnable() {
             @Override
             public void run() {
                 sleepMs(1000);

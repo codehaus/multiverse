@@ -1,5 +1,6 @@
 package org.multiverse.transactional.executors;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Stm;
@@ -22,9 +23,21 @@ public class TransactionalThreadPoolExecutor_executeTest {
         stm = getGlobalStmInstance();
     }
 
+
+    private TransactionalThreadPoolExecutor executor;
+
+    @After
+    public void tearDown() {
+        if (executor != null) {
+            executor.shutdown();
+            executor.awaitTerminationUninterruptibly();
+        }
+    }
+
+
     @Test
     public void whenTaskIsNull_thenNullPointerException() {
-        TransactionalThreadPoolExecutor executor = new TransactionalThreadPoolExecutor();
+        executor = new TransactionalThreadPoolExecutor();
         executor.start();
 
         try {
@@ -38,16 +51,17 @@ public class TransactionalThreadPoolExecutor_executeTest {
 
     @Test
     public void whenUnstarted_thenStartedAndTaskAccepted() {
-        TransactionalThreadPoolExecutor executor = new TransactionalThreadPoolExecutor();
+        executor = new TransactionalThreadPoolExecutor();
         Runnable command = mock(Runnable.class);
         executor.execute(command);
 
         assertIsStarted(executor);
     }
 
+
     @Test
     public void whenStarted() {
-        TransactionalThreadPoolExecutor executor = new TransactionalThreadPoolExecutor();
+        executor = new TransactionalThreadPoolExecutor();
         executor.start();
 
         Runnable task = mock(Runnable.class);
@@ -61,7 +75,7 @@ public class TransactionalThreadPoolExecutor_executeTest {
 
     @Test
     public void whenShutdown_thenRejectedExecutionException() {
-        TransactionalThreadPoolExecutor executor = new TransactionalThreadPoolExecutor();
+        executor = new TransactionalThreadPoolExecutor();
 
         executor.execute(new Runnable() {
             @Override
@@ -85,7 +99,7 @@ public class TransactionalThreadPoolExecutor_executeTest {
 
     @Test
     public void whenTerminated_thenRejectedExecutionException() {
-        TransactionalThreadPoolExecutor executor = new TransactionalThreadPoolExecutor();
+        executor = new TransactionalThreadPoolExecutor();
         executor.shutdown();
 
         Runnable command = mock(Runnable.class);

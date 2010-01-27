@@ -72,18 +72,6 @@ public final class AsmUtils implements Opcodes {
     }
 
 
-    public static void print(InsnList insnList, String msg) {
-        System.out.printf("=====================%s====================\n", msg);
-        System.out.println(toString(insnList));
-        System.out.printf("=====================%s====================\n", msg);
-    }
-
-    public static void print(MethodNode methodNode, String msg) {
-        System.out.printf("=====================%s====================\n", msg);
-        System.out.println(toString(methodNode));
-        System.out.printf("=====================%s====================\n", msg);
-    }
-
     public static int firstFreeIndex(MethodNode methodNode) {
         int firstFreeIndex = 0;
 
@@ -232,115 +220,6 @@ public final class AsmUtils implements Opcodes {
                     "\t" + localVariableNode.name + " " + localVariableNode.desc + " " + localVariableNode.index);
         }
     }
-
-    public static String toString(MethodNode method) {
-        TraceMethodVisitor mv = new TraceMethodVisitor();
-
-        StringBuffer sb = new StringBuffer();
-        sb.append("name: " + method.name + "\n");
-        sb.append("desc: " + method.desc + "\n");
-        sb.append("sig: " + method.signature + "\n");
-        sb.append("LocalVariables\n");
-        for (int k = 0; k < method.localVariables.size(); k++) {
-            LocalVariableNode var = (LocalVariableNode) method.localVariables.get(k);
-            var.accept(mv);
-            sb.append(format("\t%s", mv.getText().get(0)));
-            mv.getText().clear();
-        }
-
-        //method.accept(mv);
-
-
-        sb.append("Instructions\n");
-        for (int j = 0; j < method.instructions.size(); ++j) {
-            method.instructions.get(j).accept(mv);
-
-            //Frame f = m
-            //if (f == null) {
-            //    s.append('?');
-            //} else {
-            //    for (int k = 0; k < f.getLocals(); ++k) {
-            //        s.append(getShortName(f.getLocal(k).toString()))
-            //                .append(' ');
-            //    }
-            //    s.append(" : ");
-            //    for (int k = 0; k < f.getStackSize(); ++k) {
-            //        s.append(getShortName(f.getStack(k).toString()))
-            //                .append(' ');
-            //    }
-            //}
-
-            sb.append("\t" + Integer.toString(j + 100000).substring(1));
-            sb.append("  : " + mv.text.get(j)); // mv.text.get(j));
-        }
-
-        sb.append("TryCatchBlocks\n");
-        for (int j = 0; j < method.tryCatchBlocks.size(); ++j) {
-            mv.getText().clear();
-            ((TryCatchBlockNode) method.tryCatchBlocks.get(j)).accept(mv);
-            sb.append("\t" + mv.text);
-        }
-        sb.append("\n");
-
-        return sb.toString();
-
-
-        /*
-       StringBuffer sb = new StringBuffer();
-       sb.append(method.name + method.desc + "\n");
-       sb.append("localvariables\n");
-       for(int k=0;k<method.localVariables.size();k++){
-           LocalVariableNode var = (LocalVariableNode)method.localVariables.get(k);
-           sb.append(format("\t%s:%s:%s  %s-%s\n", var.index,var.name,var.desc));
-       }
-
-       sb.append(toString(method.instructions)+"\n");
-
-
-       return sb.toString();*/
-    }
-
-    public static String toString(InsnList instructions) {
-        StringBuffer sb = new StringBuffer();
-
-
-        TraceMethodVisitor mv = new TraceMethodVisitor();
-
-        for (int j = 0; j < instructions.size(); ++j) {
-            instructions.get(j).accept(mv);
-
-            StringBuffer s = new StringBuffer();
-            //Frame f = m
-            //if (f == null) {
-            //    s.append('?');
-            //} else {
-            //    for (int k = 0; k < f.getLocals(); ++k) {
-            //        s.append(getShortName(f.getLocal(k).toString()))
-            //                .append(' ');
-            //    }
-            //    s.append(" : ");
-            //    for (int k = 0; k < f.getStackSize(); ++k) {
-            //        s.append(getShortName(f.getStack(k).toString()))
-            //                .append(' ');
-            //    }
-            //}
-
-            sb.append(Integer.toString(j + 100000).substring(1));
-            sb.append(" " + s + " : " + mv.text.get(j)); // mv.text.get(j));
-        }
-
-        return sb.toString();
-    }
-
-    private static String getShortName(final String name) {
-        int n = name.lastIndexOf('/');
-        int k = name.length();
-        if (name.charAt(k - 1) == ';') {
-            k--;
-        }
-        return n == -1 ? name : name.substring(n + 1, k);
-    }
-
 
     /**
      * Loads a Class as ClassNode. The ClassLoader of the Class is used to retrieve a resource stream.

@@ -33,7 +33,6 @@ public class TransactionalThreadPoolExecutor_miscLongTest {
     @Test
     public void longRunningTasksCanRunParallel() throws ExecutionException, InterruptedException {
         TransactionalThreadPoolExecutor executor = new TransactionalThreadPoolExecutor();
-        executor.setMaxPoolSize(2);
         executor.setCorePoolSize(2);
 
         Runnable task = new Runnable() {
@@ -66,19 +65,5 @@ public class TransactionalThreadPoolExecutor_miscLongTest {
 
         assertIsUnstarted(executor);
         testIncomplete();
-    }
-
-    @Test
-    public void test() {
-        TransactionalThreadPoolExecutor executor = new TransactionalThreadPoolExecutor();
-        Runnable command = new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("hello");
-            }
-        };
-        executor.execute(command);
-        executor.execute(command);
-        executor.execute(command);
     }
 }

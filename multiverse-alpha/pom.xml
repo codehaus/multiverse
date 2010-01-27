@@ -44,17 +44,19 @@
 
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
                 <configuration>
                     <argLine>-javaagent:${project.build.directory}/${multiverse.agentname}.jar</argLine>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
+
+            <!-- plugin>
                 <artifactId>failsafe-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
                 <configuration>
                     <argLine>-javaagent:${project.build.directory}/${multiverse.agentname}.jar</argLine>
                 </configuration>
-            </plugin>
+            </plugin -->
 
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -78,6 +80,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
@@ -166,4 +169,25 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>stress</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <argLine>-javaagent:${project.build.directory}/${multiverse.agentname}.jar</argLine>
+                            <includes>
+                                <include>**/*LongTest.java</include>
+                            </includes>
+                            <argLine>-Xmx256m</argLine>
+                            <forkMode>once</forkMode>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

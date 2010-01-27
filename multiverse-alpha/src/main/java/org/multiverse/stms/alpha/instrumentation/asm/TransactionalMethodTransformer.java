@@ -93,28 +93,28 @@ public class TransactionalMethodTransformer implements Opcodes {
             }
 
             MethodNode donor = getDonor(originalMethod);
+            if (!isAbstract(originalMethod)) {
+                originalClass.methods.remove(originalMethod);
 
-            originalClass.methods.remove(originalMethod);
+                TransactionalMethodParams params = metadataRepository.getTransactionalMethodParams(originalClass,
+                        originalMethod);
 
-            TransactionalMethodParams params = metadataRepository.getTransactionalMethodParams(originalClass,
-                    originalMethod);
+                //txFactoryField is used to create the transaction fot this originalMethod
+                FieldNode txFactoryField = createTxFactoryField(originalMethod);
+                originalClass.fields.add(txFactoryField);
 
-            //txFactoryField is used to create the transaction fot this originalMethod
-            FieldNode txFactoryField = createTxFactoryField(originalMethod);
-            originalClass.fields.add(txFactoryField);
+                //add the txFactory initialization code to the front of the static initializer.
+                InsnList insnList = codeForTxFactoryInitialization(params, txFactoryField);
+                staticInitializer.instructions.insert(insnList);
 
-            //add the txFactory initialization code to the front of the static initializer.
-            InsnList insnList = codeForTxFactoryInitialization(params, txFactoryField);
-            staticInitializer.instructions.insert(insnList);
+                //create the coordinating method (the method that does the tx management)
+                MethodNode coordinatingMethod = createCoordinatorMethod(originalMethod, donor, txFactoryField, params);
+                originalClass.methods.add(coordinatingMethod);
 
-            //create the coordinating method (the method that does the tx management)
-            MethodNode coordinatingMethod = createCoordinatorMethod(originalMethod, donor, txFactoryField, params);
-            originalClass.methods.add(coordinatingMethod);
-
-            //creat the lift method (method that contains the 'original' logic).
-            MethodNode liftMethod = createLiftMethod(originalMethod);
-            originalClass.methods.add(liftMethod);
-
+                //creat the lift method (method that contains the 'original' logic).
+                MethodNode liftMethod = createLiftMethod(originalMethod);
+                originalClass.methods.add(liftMethod);
+            }
         }
 
         return originalClass;
@@ -250,10 +250,6 @@ public class TransactionalMethodTransformer implements Opcodes {
      * @return the transformed MethodNode.
      */
     public MethodNode createLiftMethod(MethodNode originalMethod) {
-        CloneMap cloneMap = new CloneMap();
-
-        DebugInfo debugInfo = findDebugInfo(originalMethod);
-
         MethodNode result = new MethodNode();
         result.name = originalMethod.name;
         result.access = originalMethod.access;
@@ -265,17 +261,20 @@ public class TransactionalMethodTransformer implements Opcodes {
         result.signature = originalMethod.signature;
         result.exceptions = originalMethod.exceptions;
 
+        CloneMap cloneMap = new CloneMap();
+
+        DebugInfo debugInfo = findDebugInfo(originalMethod);
+
         LabelNode startLabelNode = new LabelNode();
         LabelNode endLabelNode = new LabelNode();
 
-        result.localVariables = createListMethodLocalVariableTable(
+        result.localVariables = createLiftMethodLocalVariableTable(
                 originalMethod, cloneMap, startLabelNode, endLabelNode);
 
         result.tryCatchBlocks = createLiftMethodTryCatchBlocks(originalMethod, cloneMap);
 
         result.instructions = createLiftMethodInstructions(
                 originalMethod, cloneMap, debugInfo, startLabelNode, endLabelNode);
-
         return result;
     }
 
@@ -530,7 +529,7 @@ public class TransactionalMethodTransformer implements Opcodes {
         return tryCatchBlocks;
     }
 
-    private List createListMethodLocalVariableTable(MethodNode originalMethod, CloneMap cloneMap,
+    private List createLiftMethodLocalVariableTable(MethodNode originalMethod, CloneMap cloneMap,
                                                     LabelNode startLabelNode,
                                                     LabelNode endLabelNode) {
         List<LocalVariableNode> result = new LinkedList<LocalVariableNode>();
@@ -646,6 +645,10 @@ public class TransactionalMethodTransformer implements Opcodes {
         result.invisibleParameterAnnotations = originalMethod.invisibleParameterAnnotations;
         //todo: clone
         result.annotationDefault = originalMethod.annotationDefault;
+
+        if (isAbstract(originalMethod)) {
+            return result;
+        }
 
         CloneMap cloneMap = new CloneMap();
 

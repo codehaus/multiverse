@@ -15,7 +15,7 @@ public class TestCase {
 
     private final Properties properties = new Properties();
 
-    public TestCase(){
+    public TestCase() {
         setProperty("runCount", 1);
         setProperty("warmupRunCount", 1);
     }
@@ -43,8 +43,6 @@ public class TestCase {
     public void setProperty(String name, Object value) {
         properties.put(name, value.toString());
     }
-
-    
 
     public String getProperty(String name) {
         return (String) properties.get(name);

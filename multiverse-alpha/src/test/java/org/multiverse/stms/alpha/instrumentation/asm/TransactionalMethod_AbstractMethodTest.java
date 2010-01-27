@@ -1,11 +1,12 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alarmnummer
- * Date: Jan 23, 2010
- * Time: 12:16:51 AM
- * To change this template use File | Settings | File Templates.
- */
+import org.junit.Ignore;
+import org.junit.Test;
+
+@Ignore
 public class TransactionalMethod_AbstractMethodTest {
+
+    @Test
+    public void test() {
+    }
 }

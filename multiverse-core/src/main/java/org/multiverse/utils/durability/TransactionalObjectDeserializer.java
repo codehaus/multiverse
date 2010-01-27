@@ -22,5 +22,5 @@ public interface TransactionalObjectDeserializer {
 
     void persist(String field, short value);
 
-    void persist(Object value);
+    void persist(String field, Object value);
 }

@@ -5,6 +5,7 @@ import org.multiverse.api.Transaction;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.locks.LockSupport.parkNanos;
 
 /**
  * A {@link BackoffPolicy} that does an exponential backoff. So each next attempt, the delay is doubled until a
@@ -67,26 +68,13 @@ public class ExponentialBackoffPolicy implements BackoffPolicy {
 
     @Override
     public void delay(Transaction t, int attempt) throws InterruptedException {
-        long delayNs = calcDelayNs(attempt);
-        sleep(delayNs);
+        delayedUninterruptible(t, attempt);
     }
 
     @Override
     public void delayedUninterruptible(Transaction t, int attempt) {
         long delayNs = calcDelayNs(attempt);
-
-        try {
-            sleep(delayNs);
-        } catch (InterruptedException e) {
-            //restore the interrupt
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    protected static void sleep(long delayNs) throws InterruptedException {
-        long millis = TimeUnit.NANOSECONDS.toMillis(delayNs);
-        int nanos = (int) (delayNs % (1000 * 1000));
-        Thread.sleep(millis, nanos);
+        parkNanos(delayNs);
     }
 
     protected long calcDelayNs(int attempt) {

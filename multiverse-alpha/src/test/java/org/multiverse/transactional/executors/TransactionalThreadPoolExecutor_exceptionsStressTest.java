@@ -1,11 +1,58 @@
 package org.multiverse.transactional.executors;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alarmnummer
- * Date: Jan 22, 2010
- * Time: 10:58:25 PM
- * To change this template use File | Settings | File Templates.
- */
+import org.junit.Before;
+import org.junit.Test;
+import org.multiverse.TestUtils;
+import org.multiverse.api.Stm;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+
 public class TransactionalThreadPoolExecutor_exceptionsStressTest {
+
+    private Stm stm;
+    private TransactionalThreadPoolExecutor executor;
+    private AtomicInteger todoCount;
+
+    @Before
+    public void setUp() {
+        stm = getGlobalStmInstance();
+
+        executor = new TransactionalThreadPoolExecutor();
+        executor.setCorePoolSize(5);
+
+        todoCount = new AtomicInteger(100000);
+    }
+
+    @Test
+    public void test() throws InterruptedException {
+        for (int k = 0; k < executor.getCorePoolSize(); k++) {
+            executor.execute(new Task());
+        }
+
+
+        executor.awaitTermination();
+    }
+
+    public class Task implements Runnable {
+
+        @Override
+        public void run() {
+            int count = todoCount.decrementAndGet();
+            if (count <= 0) {
+                if (count == 0) {
+                    executor.shutdown();
+                }
+
+                return;
+            }
+
+            executor.execute(new Task());
+
+            if (TestUtils.randomOneOf(10)) {
+                throw new RuntimeException();
+            }
+        }
+    }
 }

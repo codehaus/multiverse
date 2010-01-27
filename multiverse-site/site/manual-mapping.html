@@ -34,7 +34,12 @@
             <li><a href="#transactionalconstructor.and.blocking">1.4.1 @TransactionalConstructor and blocking</a></li>
         </ul>
     </li>
-    <li><a href="#exclude">1.5 @Exclude</a></li>
+    <li><a href="#exclude">1.5 @Exclude</a>
+        <ul>
+            <li><a href="#exclude">1.5.1 @Exclude field</a></li>
+            <li><a href="#exclude">1.5.2 @Exclude method</a></li>
+        </ul>
+    </li>
     <li><a href="#fieldgranularity">1.6 @FieldGranularity</a></li>
 </ul>
 
@@ -278,7 +283,7 @@ check <a href="">Chapter XXX: Transaction Nesting</a>.
 
 <h3 id="transactionalmethod.and.interfaces">@TransactionalMethod and interfaces</h3>
 It is important to realize that @TransactionalMethod don't inherit, so the following example
-is not going to give the result you want it to have.
+is not going to give the result you want to have.
 
 <pre>
     import org.multiverse.annotations.TransactionalMethod;
@@ -299,8 +304,8 @@ is not going to give the result you want it to have.
 </pre>
 Although the methods on the transactional object Account are transactional, the transfer method itself isn't.
 So this transfer is subject to race problems; imagine what happens when a different transaction modifies
-the balance of the from account just after the from.get() has been called and just before from.set is called.
-And it also is subject to lack of atomicity.
+the balance of the from account just after the from.get() has been called and just before the setBalance method
+on from is called. And it also is subject to lack of atomicity.
 <p/>
 The lack of inheritance of method annotation in Java is something that has annoyed me from day one, but we have
 to live with it.
@@ -389,6 +394,13 @@ because the 'create' function can be executed more than once (because of the awa
 multiple IntValue's are created.
 
 <h2 id="exclude">1.5 @Exclude</h2>
+The @Exclude annotation can be used for 2 reaons:
+<ol>
+    <li><a href="#exclude.field">excluding a field</a></li>
+    <li><a href="#exclude.method">excluding a method</a></li>
+</ol>
+
+<h3 id="exclude.field">1.5.1 @Exclude field</h3>
 When a TransactionalObject annotation is placed on an object, all non final instance fields of that object will
 automatically be managed by the STM. But in some you want to exclude certain fields. This can be done with the
 @Exclude annotation:
@@ -414,6 +426,37 @@ transactions are trying to prevent. So it should be used wisely.
 <p/>
 If a @Exclude annotation is placed on a field of a non transactional object, or if the field automatically is excluded
 (final, static, volatile) it has no effect and is completely ignored.
+
+<h3 id="exclude.method">1.5.1 @Exclude method</h3>
+When a TransactionalObject annotation is placed on an object, all instance methods of that object automatically
+become transactional update methods. But in some cases you want to exclude that method. This can be done
+with adding an Exclude annotation on a method.
+
+<pre>
+    import org.multiverse.annotations.Exclude;
+    import org.multiverse.annotations.TransactionalObject;
+
+    @TransactionalObject
+    public class Foo{
+        private int a;
+
+        @Exclude
+        public void sayHello(){
+            System.out.println("hello");
+        }
+    }
+</pre>
+The Exclude has a very high priority, so it can be used to override @TransactionalMethod or @TransactionalObject
+configuration.
+<p/>
+If an excluded method access managed fields, you need to watch out. If there is no transaction active in the
+ThreadLocalTransaction, you will get an NoTransactionFoundException. If there is a transaction active,
+this transaction will be used to access the field.
+<p/>
+If an excluded method calls multiple other transactional methods, it could be that multiple transactions are used.
+So you won't get your isolation or atomicity guarantees.
+<p/>
+If an exclude annotation is placed on a non transactional method, it is ignored.
 
 <h2 id="fieldgranularity">1.6 @FieldGranularity</h2>
 If a transactional object has more than 1 fields, it could be that you get a writeconflict on 2 transactions

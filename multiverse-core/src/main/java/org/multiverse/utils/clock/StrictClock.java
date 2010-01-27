@@ -1,7 +1,8 @@
 package org.multiverse.utils.clock;
 
-import static java.lang.String.format;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static java.lang.String.format;
 
 /**
  * The intuitive implementation of a {@link Clock}. It wraps an AtomicLong and increases the value every time a tick is
@@ -29,6 +30,10 @@ public final class StrictClock implements Clock {
         clock.set(time);
     }
 
+    @Override
+    public long strictTick() {
+        return tick();
+    }
 
     @Override
     public long tick() {
