@@ -11,6 +11,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.transactional.executors.TransactionalThreadPoolExecutorTestUtils.assertIsStarted;
 import static org.multiverse.transactional.executors.TransactionalThreadPoolExecutorTestUtils.assertIsTerminated;
 
@@ -22,12 +23,13 @@ public class TransactionalThreadPoolExecutor_executeTest {
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
+        clearThreadLocalTransaction();
     }
 
     @After
     public void tearDown() {
         if (executor != null) {
-            executor.shutdownNow();
+            executor.shutdown();//should be shutdownNow but causes NPE, needs to be fixed
             executor.awaitTerminationUninterruptibly();
         }
     }
