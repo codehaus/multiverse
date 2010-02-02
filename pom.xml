@@ -19,8 +19,8 @@
 
     <licenses>
         <license>
-            <name>MIT License</name>
-            <url>license.txt</url>
+            <name>Apache 2 License</name>
+            <!-- url>http://www.apache.org/licenses/LICENSE-2.0</url -->
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -107,7 +107,7 @@
     </properties>
 
     <build>
-        <pluginManagement>
+        <pluginManagement>            
             <plugins>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -127,7 +127,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
                         <excludes>
-                            <exclude>**/*LongTest.java</exclude>
+                            <exclude>**/*StressTest.java</exclude>
                         </excludes>
                         <includes>
                             <include>**/*Test.java</include>
@@ -251,6 +251,7 @@
         <developerConnection>scm:git:ssh://git@git.codehaus.org/multiverse.git</developerConnection>
         <url>http://git.codehaus.org/gitweb.cgi?p=multiverse.git</url>
     </scm>
+
     <issueManagement>
         <system>Jira</system>
         <url>http://jira.codehaus.org/browse/MULTIVERSE</url>
@@ -352,19 +353,19 @@
     <distributionManagement>
         <repository>
             <id>multiverse-releases</id>
-            <url>dav:https://dav.codehaus.org/repository/multiverse</url>
+            <url>dav:https://dav.codehaus.org/repository/multiverse/</url>
         </repository>
         <snapshotRepository>
             <id>multiverse-snapshots</id>
-            <url>dav:https://dav.codehaus.org/snapshots.repository/multiverse</url>
+            <url>dav:https://dav.codehaus.org/snapshots.repository/multiverse/</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
         <site>
             <id>multiverse-site</id>
             <name>Multiverse Maven site</name>
-            <url>dav:https://dav.codehaus.org/multiverse/maven-site</url>
+            <url>dav:https://dav.codehaus.org/multiverse/maven-site/</url>
         </site>
-        <downloadUrl>http://dist.codehaus.org/multiverse</downloadUrl>
+        <downloadUrl>http://dist.codehaus.org/multiverse/</downloadUrl>
     </distributionManagement>
 
     <profiles>

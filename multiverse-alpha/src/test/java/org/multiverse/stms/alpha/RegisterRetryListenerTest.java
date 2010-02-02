@@ -1,20 +1,19 @@
 package org.multiverse.stms.alpha;
 
-import static junit.framework.Assert.fail;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.multiverse.TestUtils.assertIsActive;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-import static org.multiverse.stms.alpha.AlphaTestUtils.startTrackingUpdateTransaction;
-
 import org.multiverse.api.Latch;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.NoRetryPossibleException;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 import org.multiverse.utils.latches.CheapLatch;
+
+import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.multiverse.TestUtils.assertIsActive;
+import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
+import static org.multiverse.stms.alpha.AlphaTestUtils.startTrackingUpdateTransaction;
 
 public class RegisterRetryListenerTest {
 

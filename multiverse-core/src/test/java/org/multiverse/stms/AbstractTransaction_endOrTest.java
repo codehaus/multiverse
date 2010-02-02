@@ -3,7 +3,7 @@ package org.multiverse.stms;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.utils.clock.StrictClock;
+import org.multiverse.utils.clock.StrictPrimitiveClock;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -14,11 +14,11 @@ import static org.multiverse.TestUtils.*;
  */
 public class AbstractTransaction_endOrTest {
 
-    private StrictClock clock;
+    private StrictPrimitiveClock clock;
 
     @Before
     public void setUp() {
-        clock = new StrictClock(1);
+        clock = new StrictPrimitiveClock(1);
     }
 
     @Test

@@ -17,7 +17,7 @@ public abstract class JmxUtils {
      * Registers an MBean. The object name is generated according to {@code <mean.package>:type=<mbean.type>}, e.g.
      * {@code org.multiverse.utils.monitoring.jmx:type=JmxUtils}.
      *
-     * @param mbean the MBean to register
+     * @param mbean the MBean to registerLifecycleListener
      * @return the name under which the MBean was registered
      */
     public static String registerMBean(Object mbean) {

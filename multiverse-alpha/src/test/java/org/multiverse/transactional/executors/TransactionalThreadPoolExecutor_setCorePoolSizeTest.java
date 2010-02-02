@@ -15,6 +15,7 @@ import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.transactional.executors.TransactionalThreadPoolExecutorTestUtils.*;
 
+@Ignore
 public class TransactionalThreadPoolExecutor_setCorePoolSizeTest {
     private Stm stm;
 
@@ -28,7 +29,7 @@ public class TransactionalThreadPoolExecutor_setCorePoolSizeTest {
     @After
     public void tearDown() {
         if (executor != null) {
-            executor.shutdown();
+            executor.shutdownNow();
             executor.awaitTerminationUninterruptibly();
         }
     }

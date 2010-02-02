@@ -101,7 +101,7 @@ public abstract class FastTxObjectMixin implements AlphaTransactionalObject, Mul
                     throw LoadLockedException.INSTANCE;
                 } else {
                     String msg = format("Failed to load already locked transactionalobject '%s'",
-                                        AlphaStmUtils.toTxObjectString(this));
+                            AlphaStmUtils.toTxObjectString(this));
                     throw new LoadLockedException(msg);
                 }
             }
@@ -161,16 +161,16 @@ public abstract class FastTxObjectMixin implements AlphaTransactionalObject, Mul
         if (___SANITY_CHECKS_ENABLED) {
             if (___lockOwner == null) {
                 String msg = format("Lock on transactionalObject '%s' is not hold while doing the store",
-                                    AlphaStmUtils.toTxObjectString(this));
+                        AlphaStmUtils.toTxObjectString(this));
                 throw new PanicError(msg);
             }
 
             if (tranlocal.getWriteVersion() >= writeVersion) {
                 String msg = format("The tranlocal of transactionalObject '%s' has version '%s'  " +
                         "and and is too large for writeVersion '%s'",
-                                    AlphaStmUtils.toTxObjectString(this),
-                                    tranlocal.getTransactionalObject(),
-                                    writeVersion);
+                        AlphaStmUtils.toTxObjectString(this),
+                        tranlocal.getTransactionalObject(),
+                        writeVersion);
                 throw new PanicError(msg);
             }
 

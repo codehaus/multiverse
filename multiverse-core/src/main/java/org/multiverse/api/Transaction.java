@@ -1,34 +1,53 @@
 package org.multiverse.api;
 
 /**
- * All changes on transaction objects must be done through a Transaction. The transaction make sure that the changes
- * are: <ol> <li>Atomic: all or nothing gets committed (Failure atomicity)</li> <li>Consistent : </li> <li>Isolated: a
+ * All changes on transaction objects must be done through a Transaction. The transaction make sure that changes
+ * on java objects are:
+ * <ul>
+ * <li>Atomic: all or nothing gets committed (Failure atomicity)</li>
+ * <li>Consistent : </li>
+ * <li>Isolated: a
  * transaction is executed isolated from other transactions. Meaning that a transaction won't see changed made by
- * transactions executed concurrently, but it will see changes made by transaction completed before.</li> </ol>
+ * transactions executed concurrently, but it will see changes made by transaction completed before.</li>
+ * </ul>
  * <p/>
- * <h3>Thread-safety</h3> A Transaction is not thread-safe to use (just like a Hibernate Session is not thread-safe to
- * use). It can be handed over from thread to thread, but one needs to be really careful with threadlocals. Although the
+ * <dl>
+ * <p/>
+ * <dt>Thread-safety</dt>
+ * <dd>
+ * A Transaction is not thread-safe to use (just like a Hibernate Session is not thread-safe to use). It can be
+ * handed over from thread to thread, but one needs to be really careful with threadlocals. Although the
  * Stm/Transaction implementation don't care about threadlocals, the stuff in front (templates, instrumented code etc)
  * could depend on threadlocals.
+ * </dd>
  * <p/>
- * <h3>Listen to lifecycles</h3> It is possible to listen to a Transaction when it aborts, or commits. This can be done
- * with the {@link #register(TransactionLifecycleListener)}
+ * <dt>Listen to lifecycles</dt>
+ * <dd>
+ * It is possible to listen to a Transaction when it aborts, or commits. This can be done with the
+ * {@link #registerLifecycleListener(TransactionLifecycleListener)}.
  * <p/>
  * When the Transaction is reset, the lifecycle tasks are dropped. So the lifecycle task need to be registered again.
- * <h3>Blocking</h3> It is possible to let a transaction block until some state changes has happened; comparable with
+ * </dd>
+ * <p/>
+ * <dt>Blocking</dt>
+ * <dd>
+ * It is possible to let a transaction block until some state changes has happened; comparable with
  * the waitset/{@link java.util.concurrent.locks.Condition} functionality already provided. For more information see the
  * {@link #registerRetryLatch(Latch)}.
  * <p/>
  * Because a custom {@link Latch} implementation can be provided, you have a lot of control on the blocking behavior.
  * But atm it is not possible to get fairness on when the Latch is opened. Policies to customize starvation,
  * lifelocking, deadlocking will be added in the future.
+ * </dd>
+ * <p/>
+ * </dl>
  *
  * @author Peter Veentjer.
  */
 public interface Transaction {
 
     /**
-     * Gets the TransactionConfig that is used by this Transaction.
+     * Gets the {@link TransactionConfig} that is used by this Transaction.
      *
      * @return the used TransactionConfig.
      */
@@ -41,7 +60,7 @@ public interface Transaction {
      * <p/>
      * The value is unspecified once the Transaction is aborted or committed.
      * <p/>
-     * TODO: Method depends on long as time, not a good thing
+     * Method depends on long as time, and is going to be removed or replaced in the future.
      *
      * @return the version of the stm when this Transaction started.
      */
@@ -55,9 +74,13 @@ public interface Transaction {
     TransactionStatus getStatus();
 
     /**
-     * Commits this Transaction. If the Transaction is: <ol> <li>active: it is prepared for commit and then
-     * committed<li> <li>prepared: it is committed (so changes persisted)</li> <li>aborted: a DeadTransactionException
-     * is thrown</li> <li>committed: a DeadTransactionException is thrown</li> </ol> So it is safe to call while active
+     * Commits this Transaction. If the Transaction is:
+     * <ol>
+     * <li>active: it is prepared for commit and then committed</li>
+     * <li>prepared: it is committed (so changes persisted)</li>
+     * <li>aborted: a DeadTransactionException is thrown</li>
+     * <li>committed: a DeadTransactionException is thrown</li>
+     * </ol> So it is safe to call while active
      * or prepared.
      * <p/>
      * Transaction will be aborted if the commit does not succeed.
@@ -89,11 +112,11 @@ public interface Transaction {
     /**
      * Aborts this Transaction. This means that the changes made in this transaction are not committed. It depends on
      * the implementation if this operation is simple (ditching objects for example), or if changes need to be rolled
-     * back.
+     * back. If an exception is thrown while executing the abort, the transaction is still aborted. And example of
+     * such a situation is a pre-abort task that fails. So the transaction always is aborted (unless it is committed).
      * <p/>
      * If the Transaction already is aborted, the call is ignored.
      * <p/>
-     * It is important that the abort never fails.
      *
      * @throws org.multiverse.api.exceptions.DeadTransactionException
      *          if this transaction already is committed
@@ -103,13 +126,19 @@ public interface Transaction {
     /**
      * Restarts this Transaction. It doesn't matter what the transaction state of the transaction is. This is the
      * preferred way to restart a transaction once a recoverable exception or retry occurred.
+     * <p/>
+     * If the Transaction is prepared or committed, it will be aborted before it is restarted. If there are
+     * TransactionLifecycleListeners that cause problems while executing the pre/post abort notification, the
+     * transaction will be aborted and the exception will be propagated.
      */
     void restart();
 
     /**
-     * Registers the retry Latch. This functionality is required for the retry mechanism (so blocking!) and is something
-     * different than 'just' restarting. The Latch contains all the 'waiting' logic, so you can do timed and non
-     * interruptible timeouts on that structure. It can be compared to a {@link java.util.concurrent.Future}.
+     * Registers the retry Latch on this Transaction. This functionality is required for the retry mechanism
+     * (so blocking!) and is something different than 'just' restarting. The Latch contains all the 'waiting' logic,
+     * so you can do timed and non interruptible timeouts on that structure. A latch can be compared to a
+     * {@link java.util.concurrent.Future} because it also pops open once some event occurs (an interesting write
+     * in the case of a Latch).
      *
      * @param latch the Latch to register.
      * @throws NullPointerException          if latch is null.
@@ -124,32 +153,32 @@ public interface Transaction {
     void registerRetryLatch(Latch latch);
 
     /**
-     * Registers a TransactionLifecycleListener to this Transaction.
+     * Registers a TransactionLifecycleListener on this Transaction. It can be used to receive a callback from the
+     * transaction if the {@link TransactionStatus} of that transaction. Without this functionality it would not
+     * be possible to execute compensating or deferred action once a transaction aborts or commits.
      * <p/>
-     * If the execution of one of the listeners fails, the others won't be executed. If it listeners fails before the
-     * precommit, the transaction is aborted (no matter what).
+     * If the execution of one of the listeners fails, the others won't be executed. If one of the listeners fails
+     * before the commit/abort, the transaction is aborted (no matter what).
      * <p/>
      * The listeners are executed in the order they are registered.
      * <p/>
      * If the same listener is added multiple times, it will be notified multiple times.
      * <p/>
-     * The listener will be executed on the current thread that causes the commit/abort.
+     * The listener will be executed on the thread that starts the commit/abort.
      * <p/>
-     * If the listener accesses the STM, it could see changes made after the commit/abort of the current transaction.
-     * This is because it is not running in the same transaction because the current transaction already is committed or
-     * aborted.
+     * If the listener accesses the stm after the transaction has been committed or aborted, it could see changes
+     * made after that transaction. So all assumptions about state are possibly wrong so one needs to take care of
+     * re-validating state if needed.
      * <p/>
      * A good use case of this feature is starting up threads. If you need to start threads, you don't want to start
-     * them immediately because eventually the transaction could be aborted. And another problem is that new transaction
-     * started by spawned threads are not able to see the changes already made in the current transaction, because the
-     * current transaction hasn't completed yet.
+     * them immediately because eventually the transaction could be aborted. 
      *
-     * @param listener the TransactionLifecycleListener to register
+     * @param listener the TransactionLifecycleListener to registerLifecycleListener
      * @throws NullPointerException if listener is null.
      * @throws org.multiverse.api.exceptions.DeadTransactionException
      *                              if transaction already is aborted or committed.
      * @throws org.multiverse.api.exceptions.PreparedTransactionException
      *                              if the transaction is prepared.
      */
-    void register(TransactionLifecycleListener listener);
+    void registerLifecycleListener(TransactionLifecycleListener listener);
 }

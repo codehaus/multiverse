@@ -8,7 +8,7 @@ import org.multiverse.api.ThreadLocalTransaction._
 import org.multiverse.integration.scala.StmUtils._
 import org.multiverse.stms.alpha.{AlphaStm, AlphaRef}
 import org.multiverse.stms._
-import org.multiverse.utils.clock.StrictClock
+import org.multiverse.utils.clock.StrictPrimitiveClock
 import org.scalatest.Spec
 import org.scalatest.junit.JUnitRunner
 

@@ -2,9 +2,9 @@ package org.multiverse.stms.alpha;
 
 import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.backoff.ExponentialBackoffPolicy;
-import org.multiverse.utils.clock.Clock;
-import org.multiverse.utils.clock.RelaxedClock;
-import org.multiverse.utils.clock.StrictClock;
+import org.multiverse.utils.clock.PrimitiveClock;
+import org.multiverse.utils.clock.RelaxedPrimitiveClock;
+import org.multiverse.utils.clock.StrictPrimitiveClock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
 import org.multiverse.utils.commitlock.GenericCommitLockPolicy;
 import org.multiverse.utils.profiling.ProfileRepository;
@@ -29,28 +29,25 @@ public final class AlphaStmConfig {
 
     public static AlphaStmConfig createDebugConfig() {
         AlphaStmConfig config = new AlphaStmConfig();
-        config.loggingPossible = true;
         config.smartTxImplementationChoice = false;
         config.optimizedConflictDetection = false;
-        config.clock = new StrictClock();
+        config.clock = new StrictPrimitiveClock();
         return config;
     }
 
     public static AlphaStmConfig createFastConfig() {
         AlphaStmConfig config = new AlphaStmConfig();
         config.profiler = null;
-        config.loggingPossible = false;
         config.optimizedConflictDetection = true;
         config.smartTxImplementationChoice = true;
-        config.clock = new RelaxedClock();
+        config.clock = new RelaxedPrimitiveClock();
         return config;
     }
 
-    public Clock clock = new StrictClock();
+    public PrimitiveClock clock = new StrictPrimitiveClock();
 
+    //nothing is done with the profiler;
     public ProfileRepository profiler = new SimpleProfileRepository();
-
-    public boolean loggingPossible = true;
 
     public CommitLockPolicy commitLockPolicy =
             GenericCommitLockPolicy.FAIL_FAST_BUT_RETRY;

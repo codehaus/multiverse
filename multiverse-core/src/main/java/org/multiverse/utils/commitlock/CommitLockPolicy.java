@@ -3,7 +3,6 @@ package org.multiverse.utils.commitlock;
 import org.multiverse.api.Transaction;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * A policy responsible for acquiring the lock of a set of {@link CommitLock}s.
@@ -27,6 +26,7 @@ public interface CommitLockPolicy {
      * Tries to acquire the lock.
      *
      * @param lock      the CommitLock to acquire.
+     * @param filter    the filter that selects to objects to lock.
      * @param lockOwner the Transaction that wants to own the lock.
      * @return true if the lock is acquired, false otherwise.
      */
@@ -34,7 +34,7 @@ public interface CommitLockPolicy {
 
     /**
      * Tries to acquire all the locks that should be locked (so are allowed by the lock filter).
-     *
+     * <p/>
      * The filter is useful for dealing with a read/write set where only the writes need to be locked.
      *
      * @param locks     the CommitLocks where some need to be acquired.

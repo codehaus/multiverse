@@ -14,7 +14,7 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 
 public class NonBlockingTransactionExecutorTest {
 
-    private NonBlockingTransactionExecutor nonBlockingTransactionExecutor;
+    private NonBlockingTaskThreadPoolExecutor nonBlockingTransactionThreadPoolExecutor;
     private TransactionalInteger[] refs;
     private Stm stm;
     private TransactionFactory transactionFactory;
@@ -22,8 +22,8 @@ public class NonBlockingTransactionExecutorTest {
 
     @Before
     public void setUp() {
-        nonBlockingTransactionExecutor = new NonBlockingTransactionExecutor(3);
-        nonBlockingTransactionExecutor.start();
+        nonBlockingTransactionThreadPoolExecutor = new NonBlockingTaskThreadPoolExecutor(3);
+        nonBlockingTransactionThreadPoolExecutor.start();
 
         stm = getGlobalStmInstance();
         refs = new TransactionalInteger[refCount];
@@ -40,7 +40,7 @@ public class NonBlockingTransactionExecutorTest {
     @Ignore
     public void test() {
         for (int k = 0; k < refCount; k++) {
-            nonBlockingTransactionExecutor.execute(new DecTask(transactionFactory, k));
+            nonBlockingTransactionThreadPoolExecutor.execute(new DecTask(transactionFactory, k));
         }
 
         for (int k = 0; k < 1000; k++) {
@@ -50,7 +50,7 @@ public class NonBlockingTransactionExecutorTest {
         }
     }
 
-    public class DecTask implements TransactionalTask {
+    public class DecTask implements NonBlockingTask {
 
         private final TransactionFactory transactionFactory;
         private int refIndex;

@@ -1,6 +1,5 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
-import static org.junit.Assert.assertFalse;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -8,6 +7,8 @@ import org.multiverse.utils.instrumentation.InstrumentationProblemMonitor;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
+
+import static org.junit.Assert.assertFalse;
 
 /**
  * This is a regression test that makes sure that the Multiverse Javaagent is able to deal with MBeanServer being used

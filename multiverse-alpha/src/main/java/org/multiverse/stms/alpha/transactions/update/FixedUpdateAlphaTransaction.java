@@ -9,7 +9,7 @@ import org.multiverse.stms.alpha.UncommittedFilter;
 import org.multiverse.stms.alpha.transactions.OptimalSize;
 import org.multiverse.utils.Listeners;
 import org.multiverse.utils.backoff.BackoffPolicy;
-import org.multiverse.utils.clock.Clock;
+import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
 import org.multiverse.utils.profiling.ProfileRepository;
 
@@ -30,7 +30,7 @@ public class FixedUpdateAlphaTransaction
         public final int maximumSize;
 
         public Config(
-                Clock clock, BackoffPolicy backoffPolicy, String familyName,
+                PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName,
                 ProfileRepository profiler, CommitLockPolicy commitLockPolicy, int maxRetryCount,
                 boolean preventWriteSkew, OptimalSize optimalSize, boolean interruptible,
                 boolean optimizeConflictDetection,

@@ -7,7 +7,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionLifecycleEvent;
 import org.multiverse.api.TransactionLifecycleListener;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.utils.clock.StrictClock;
+import org.multiverse.utils.clock.StrictPrimitiveClock;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -19,11 +19,11 @@ import static org.multiverse.TestUtils.assertIsCommitted;
  */
 public class AbstractTransaction_abortTest {
 
-    private StrictClock clock;
+    private StrictPrimitiveClock clock;
 
     @Before
     public void setUp() {
-        clock = new StrictClock(1);
+        clock = new StrictPrimitiveClock(1);
     }
 
     @Test
@@ -65,7 +65,7 @@ public class AbstractTransaction_abortTest {
     public void whenPreparedAndPreAbortTaskFails_thenDoAbortPreparedNotSkipped() {
         AbstractTransaction tx = spy(new AbstractTransactionImpl());
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        tx.register(listener);
+        tx.registerLifecycleListener(listener);
         tx.prepare();
 
         RuntimeException expected = new RuntimeException();
@@ -114,7 +114,7 @@ public class AbstractTransaction_abortTest {
         Transaction tx = new AbstractTransactionImpl();
 
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        tx.register(listener);
+        tx.registerLifecycleListener(listener);
 
         tx.abort();
 
@@ -133,7 +133,7 @@ public class AbstractTransaction_abortTest {
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         doThrow(exception).when(listener).notify(tx, TransactionLifecycleEvent.preAbort);
 
-        tx.register(listener);
+        tx.registerLifecycleListener(listener);
 
         try {
             tx.abort();
@@ -158,7 +158,7 @@ public class AbstractTransaction_abortTest {
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         doThrow(exception).when(listener).notify(tx, TransactionLifecycleEvent.postAbort);
 
-        tx.register(listener);
+        tx.registerLifecycleListener(listener);
 
         try {
             tx.abort();

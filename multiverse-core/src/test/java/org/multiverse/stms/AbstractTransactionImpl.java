@@ -1,8 +1,8 @@
 package org.multiverse.stms;
 
 import org.multiverse.utils.backoff.ExponentialBackoffPolicy;
-import org.multiverse.utils.clock.Clock;
-import org.multiverse.utils.clock.StrictClock;
+import org.multiverse.utils.clock.PrimitiveClock;
+import org.multiverse.utils.clock.StrictPrimitiveClock;
 
 /**
  * @author Peter Veentjer
@@ -11,7 +11,7 @@ public class AbstractTransactionImpl extends AbstractTransaction {
 
     public AbstractTransactionImpl() {
         super(new AbstractTransactionConfig(
-                new StrictClock(1),
+                new StrictPrimitiveClock(1),
                 ExponentialBackoffPolicy.INSTANCE_10_MS_MAX,
                 null,
                 true,
@@ -20,7 +20,7 @@ public class AbstractTransactionImpl extends AbstractTransaction {
         init();
     }
 
-    public AbstractTransactionImpl(Clock clock) {
+    public AbstractTransactionImpl(PrimitiveClock clock) {
         super(new AbstractTransactionConfig(
                 clock,
                 ExponentialBackoffPolicy.INSTANCE_10_MS_MAX,
@@ -31,7 +31,7 @@ public class AbstractTransactionImpl extends AbstractTransaction {
         init();
     }
 
-    public AbstractTransactionImpl(String familyName, Clock clock) {
+    public AbstractTransactionImpl(String familyName, PrimitiveClock clock) {
         super(new AbstractTransactionConfig(
                 clock,
                 ExponentialBackoffPolicy.INSTANCE_10_MS_MAX,

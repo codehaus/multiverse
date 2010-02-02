@@ -3,7 +3,7 @@ package org.multiverse.utils;
 /**
  * Can be thrown in code when something has not been implemented yet.
  * <p/>
- * Code in a release should be clear of TodoExceptions.
+ * Code in a release should be whenTransactionAvailable_thenItIsCleared of TodoExceptions.
  *
  * @author Peter Veentjer.
  */

@@ -27,7 +27,7 @@ public class TransactionalThreadPoolExecutor_shutdownTest {
     @After
     public void tearDown() {
         if (executor != null) {
-            executor.shutdown();
+            executor.shutdownNow();
             executor.awaitTerminationUninterruptibly();
         }
     }

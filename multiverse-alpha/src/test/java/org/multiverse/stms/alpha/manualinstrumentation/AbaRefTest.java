@@ -3,7 +3,6 @@ package org.multiverse.stms.alpha.manualinstrumentation;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.Transactions;
 import org.multiverse.stms.alpha.AlphaStm;
 
 import static org.junit.Assert.assertEquals;
@@ -24,7 +23,7 @@ public class AbaRefTest {
     }
 
     public Transaction startTransaction() {
-        Transaction t = Transactions.startUpdateTransaction(stm);
+        Transaction t = stm.getTransactionFactoryBuilder().build().start();
         setThreadLocalTransaction(t);
         return t;
     }

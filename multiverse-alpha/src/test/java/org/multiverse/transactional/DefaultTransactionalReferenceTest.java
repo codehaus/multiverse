@@ -1,17 +1,15 @@
 package org.multiverse.transactional;
 
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import org.multiverse.api.Stm;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-import static org.multiverse.api.Transactions.startUpdateTransaction;
-
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.RetryError;
-import org.multiverse.transactional.DefaultTransactionalReference;
+
+import static org.junit.Assert.*;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
@@ -188,7 +186,7 @@ public class DefaultTransactionalReferenceTest {
         DefaultTransactionalReference<String> ref = new DefaultTransactionalReference<String>(oldRef);
 
         long version = stm.getVersion();
-        Transaction tx = startUpdateTransaction(stm);
+        Transaction tx = stm.getTransactionFactoryBuilder().build().start();
         setThreadLocalTransaction(tx);
         String newRef = "bar";
         ref.set(newRef);
@@ -221,7 +219,7 @@ public class DefaultTransactionalReferenceTest {
 
         //we start a transaction because we don't want to lift on the retry mechanism
         //of the transaction that else would be started on the getOrAwait method.
-        Transaction t = startUpdateTransaction(stm);
+        Transaction t = stm.getTransactionFactoryBuilder().build().start();
         setThreadLocalTransaction(t);
         try {
             ref.getOrAwait();

@@ -1,0 +1,10 @@
+<html>
+<body>
+This package contains support for logical clocks (needed to prevent isolation problems). At the moment the main
+clock is the {@link PrimitiveClock}, but in the future more advanced clocks like the vector clock will be provided.
+The former is very very fast, but it isn't going to scale because unrelated transactions need to share the same
+clock. That is where vector clocks come in. Although they are a lot slower, the shared clock isn't needed anymore.
+The addition of the vector clock will also be the first step to creating a distributed stm (a PrimitiveClock is not
+going to scale since the performance of a cluster is limited to the increase rate of the clock).
+</body>
+</html>

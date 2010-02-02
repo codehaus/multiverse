@@ -14,14 +14,13 @@ import org.multiverse.stms.alpha.transactions.update.GrowingUpdateAlphaTransacti
 import org.multiverse.stms.alpha.transactions.update.TinyUpdateAlphaTransaction;
 import org.multiverse.utils.TodoException;
 import org.multiverse.utils.backoff.BackoffPolicy;
-import org.multiverse.utils.clock.Clock;
+import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
 import org.multiverse.utils.profiling.ProfileRepository;
 import org.multiverse.utils.profiling.ProfilerAware;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
 import static java.lang.String.format;
@@ -54,13 +53,9 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
     private final static Logger logger = Logger.getLogger(AlphaStm.class.getName());
 
-    private final Clock clock;
+    private final PrimitiveClock clock;
 
     private final ProfileRepository profiler;
-
-    private final boolean loggingPossible;
-
-    private final AtomicLong logIdGenerator;
 
     private final CommitLockPolicy commitLockPolicy;
 
@@ -120,8 +115,6 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             clock.tick();
         }
         this.maxFixedUpdateSize = config.maxFixedUpdateSize;
-        this.loggingPossible = config.loggingPossible;
-        this.logIdGenerator = loggingPossible ? new AtomicLong() : null;
         this.commitLockPolicy = config.commitLockPolicy;
         this.backoffPolicy = config.backoffPolicy;
         this.optimizeConflictDetection = config.optimizedConflictDetection;

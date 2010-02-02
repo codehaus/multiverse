@@ -8,7 +8,7 @@ import org.multiverse.stms.alpha.UncommittedFilter;
 import org.multiverse.stms.alpha.transactions.OptimalSize;
 import org.multiverse.utils.Listeners;
 import org.multiverse.utils.backoff.BackoffPolicy;
-import org.multiverse.utils.clock.Clock;
+import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
 import org.multiverse.utils.profiling.ProfileRepository;
 
@@ -23,7 +23,7 @@ public class TinyUpdateAlphaTransaction
         public final OptimalSize optimalSize;
 
         public Config(
-                Clock clock, BackoffPolicy backoffPolicy, String familyName, ProfileRepository profiler,
+                PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName, ProfileRepository profiler,
                 int maxRetryCount, CommitLockPolicy commitLockPolicy, boolean interruptible, OptimalSize optimalSize,
                 boolean preventWriteSkew, boolean optimizeConflictDetection, boolean dirtyCheck,
                 boolean automaticReadTracking) {

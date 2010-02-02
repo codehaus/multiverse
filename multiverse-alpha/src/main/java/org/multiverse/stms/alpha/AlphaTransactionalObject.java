@@ -22,7 +22,6 @@ public interface AlphaTransactionalObject extends CommitLock {
      *
      * @param readVersion the version of the Tranlocal to read.
      * @return the loaded Tranlocal. If nothing is committed, null is returned.
-     *
      * @throws org.multiverse.api.exceptions.LoadException
      *          if the system wasn't able to load the Tranlocal.
      */
@@ -60,7 +59,7 @@ public interface AlphaTransactionalObject extends CommitLock {
      * structure that can be used to let a thread (transaction) wait for a specific event. In this case we use it to
      * notify the Transaction that the desired update has taken place.
      *
-     * @param listener      the Latch to register.
+     * @param listener      the Latch to registerLifecycleListener.
      * @param wakeupVersion the minimum version to wake up for.
      * @return true if the listener was registered on a committed object, false otherwise.
      */

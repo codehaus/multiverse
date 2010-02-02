@@ -7,7 +7,7 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.utils.backoff.BackoffPolicy;
-import org.multiverse.utils.clock.Clock;
+import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.profiling.ProfileRepository;
 
 import java.util.IdentityHashMap;
@@ -28,7 +28,7 @@ public class GrowingReadonlyAlphaTransaction
 
         public final ProfileRepository profiler;
 
-        public Config(Clock clock, BackoffPolicy backoffPolicy,
+        public Config(PrimitiveClock clock, BackoffPolicy backoffPolicy,
                       String familyName, ProfileRepository profiler, int maxRetryCount, boolean interruptible) {
             super(clock, backoffPolicy, familyName, true, maxRetryCount, interruptible, true, true);
             this.profiler = profiler;

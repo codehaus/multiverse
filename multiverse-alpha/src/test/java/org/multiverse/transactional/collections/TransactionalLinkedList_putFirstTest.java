@@ -1,25 +1,28 @@
 package org.multiverse.transactional.collections;
 
-import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import org.multiverse.api.Stm;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-import static org.multiverse.api.Transactions.startUpdateTransaction;
-
 import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.RetryError;
+
+import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 public class TransactionalLinkedList_putFirstTest {
 
     private Stm stm;
+    private TransactionFactory updateTxFactory;
 
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
-        setThreadLocalTransaction(null);
+        updateTxFactory = stm.getTransactionFactoryBuilder().build();
+        clearThreadLocalTransaction();
     }
 
     @Test
@@ -68,7 +71,7 @@ public class TransactionalLinkedList_putFirstTest {
 
         long version = stm.getVersion();
 
-        Transaction t = startUpdateTransaction(stm);
+        Transaction t = updateTxFactory.start();
         setThreadLocalTransaction(t);
 
         try {

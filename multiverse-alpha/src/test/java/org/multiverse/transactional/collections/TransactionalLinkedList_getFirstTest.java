@@ -1,14 +1,15 @@
 package org.multiverse.transactional.collections;
 
-import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import org.multiverse.api.Stm;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 import java.util.NoSuchElementException;
+
+import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 public class TransactionalLinkedList_getFirstTest {
 

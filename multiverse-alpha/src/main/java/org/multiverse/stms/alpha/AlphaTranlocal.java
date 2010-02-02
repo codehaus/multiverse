@@ -211,12 +211,12 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
     public String toDebugString() {
         if (isCommitted()) {
             return format("readonly-tranlocal(class=%s@%s, version=%s)",
-                          getTransactionalObject().getClass().getSimpleName(),
-                          System.identityHashCode(getTransactionalObject()),
-                          ___writeVersion);
+                    getTransactionalObject().getClass().getSimpleName(),
+                    System.identityHashCode(getTransactionalObject()),
+                    ___writeVersion);
         } else {
             return format("update-tranlocal(origin=%s)",
-                          getOrigin() == null ? null : getOrigin().toDebugString());
+                    getOrigin() == null ? null : getOrigin().toDebugString());
         }
     }
 

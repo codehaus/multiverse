@@ -2,9 +2,7 @@ package org.multiverse.stms.alpha.manualinstrumentation;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.Transactions;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
@@ -14,7 +12,7 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 public class StackTest {
-    private Stm stm;
+    private AlphaStm stm;
 
     @Before
     public void setUp() {
@@ -23,7 +21,7 @@ public class StackTest {
     }
 
     public Transaction startUpdateTransaction() {
-        Transaction t = Transactions.startUpdateTransaction(stm);
+        Transaction t = stm.getTransactionFactoryBuilder().build().start();
         setThreadLocalTransaction(t);
         return t;
     }

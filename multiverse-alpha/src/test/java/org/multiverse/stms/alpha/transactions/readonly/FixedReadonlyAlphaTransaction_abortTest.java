@@ -7,5 +7,6 @@ public class FixedReadonlyAlphaTransaction_abortTest {
 
     @Test
     @Ignore
-    public void test(){}
+    public void test() {
+    }
 }

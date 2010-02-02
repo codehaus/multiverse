@@ -16,6 +16,7 @@ import static org.multiverse.transactional.executors.TransactionalThreadPoolExec
 
 public class TransactionalThreadPoolExecutor_executeTest {
 
+    private TransactionalThreadPoolExecutor executor;
     private Stm stm;
 
     @Before
@@ -23,17 +24,13 @@ public class TransactionalThreadPoolExecutor_executeTest {
         stm = getGlobalStmInstance();
     }
 
-
-    private TransactionalThreadPoolExecutor executor;
-
     @After
     public void tearDown() {
         if (executor != null) {
-            executor.shutdown();
+            executor.shutdownNow();
             executor.awaitTerminationUninterruptibly();
         }
     }
-
 
     @Test
     public void whenTaskIsNull_thenNullPointerException() {

@@ -14,7 +14,7 @@ public class CheapLatchTest {
 
     @After
     public void tearDown(){
-        Thread.interrupted();//clear the interrupt status
+        Thread.interrupted();//whenTransactionAvailable_thenItIsCleared the interrupt status
     }
 
     @Test

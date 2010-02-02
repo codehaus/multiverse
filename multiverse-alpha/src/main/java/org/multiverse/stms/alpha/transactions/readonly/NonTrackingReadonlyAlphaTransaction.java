@@ -6,7 +6,7 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.utils.backoff.BackoffPolicy;
-import org.multiverse.utils.clock.Clock;
+import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.profiling.ProfileRepository;
 
 /**
@@ -42,7 +42,7 @@ public class NonTrackingReadonlyAlphaTransaction
         public final ProfileRepository profiler;
 
         public Config(
-                Clock clock, BackoffPolicy backoffPolicy,
+                PrimitiveClock clock, BackoffPolicy backoffPolicy,
                 String familyName,
                 ProfileRepository profiler,
                 int maxRetryCount) {

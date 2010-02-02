@@ -2,7 +2,6 @@ package org.multiverse.stms.alpha.integrationtests;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.Transactions;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.manualinstrumentation.IntRef;
 import org.multiverse.stms.alpha.manualinstrumentation.IntRefTranlocal;
@@ -47,7 +46,7 @@ public class AbaProblemIsNotDetectedTest {
     }
 
     public AlphaTransaction startUpdateTransaction() {
-        AlphaTransaction t = (AlphaTransaction) Transactions.startUpdateTransaction(stm);
+        AlphaTransaction t = stm.getTransactionFactoryBuilder().build().start();
         setThreadLocalTransaction(t);
         return t;
     }

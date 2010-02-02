@@ -4,13 +4,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionFactory;
 import org.multiverse.stms.alpha.AlphaStm;
+import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-import static org.multiverse.api.Transactions.startUpdateTransaction;
 
 /**
  * @author Peter Veentjer
@@ -18,11 +20,13 @@ import static org.multiverse.api.Transactions.startUpdateTransaction;
 public class NonBlockingAccessTest {
 
     private AlphaStm stm;
+    private TransactionFactory<AlphaTransaction> updateTxFactory;
 
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
-        setThreadLocalTransaction(null);
+        updateTxFactory = stm.getTransactionFactoryBuilder().build();
+        clearThreadLocalTransaction();
     }
 
     @After
@@ -35,12 +39,12 @@ public class NonBlockingAccessTest {
         TransactionalInteger ref = new TransactionalInteger(0);
 
         //begin the first transaction
-        Transaction t1 = startUpdateTransaction(stm);
+        Transaction t1 = updateTxFactory.start();
         setThreadLocalTransaction(t1);
         ref.inc();
 
         //begin the second transaction
-        Transaction t2 = startUpdateTransaction(stm);
+        Transaction t2 = updateTxFactory.start();
         setThreadLocalTransaction(t2);
         int value = ref.get();
         //commit the second transaction. This should succeed
@@ -54,12 +58,12 @@ public class NonBlockingAccessTest {
         TransactionalInteger ref = new TransactionalInteger(0);
 
         //begin the first transaction
-        Transaction t1 = startUpdateTransaction(stm);
+        Transaction t1 = updateTxFactory.start();
         setThreadLocalTransaction(t1);
         ref.inc();
 
         //begin the second transaction
-        Transaction t2 = startUpdateTransaction(stm);
+        Transaction t2 = updateTxFactory.start();
         setThreadLocalTransaction(t2);
         ref.inc();
         //commit the second transaction. This should succeed
@@ -73,12 +77,12 @@ public class NonBlockingAccessTest {
         TransactionalInteger ref = new TransactionalInteger(0);
 
         //do the read in the first transaction but don't commit.
-        Transaction t1 = startUpdateTransaction(stm);
+        Transaction t1 = updateTxFactory.start();
         setThreadLocalTransaction(t1);
         ref.get();
 
         //do the write in the second transaction
-        Transaction t2 = startUpdateTransaction(stm);
+        Transaction t2 = updateTxFactory.start();
         setThreadLocalTransaction(t2);
         ref.inc();
         t2.commit();

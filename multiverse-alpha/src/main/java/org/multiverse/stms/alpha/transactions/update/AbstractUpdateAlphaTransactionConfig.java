@@ -2,7 +2,7 @@ package org.multiverse.stms.alpha.transactions.update;
 
 import org.multiverse.stms.AbstractTransactionConfig;
 import org.multiverse.utils.backoff.BackoffPolicy;
-import org.multiverse.utils.clock.Clock;
+import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
 import org.multiverse.utils.profiling.ProfileRepository;
 
@@ -19,7 +19,7 @@ public class AbstractUpdateAlphaTransactionConfig extends AbstractTransactionCon
     public final boolean dirtyCheck;
 
     public AbstractUpdateAlphaTransactionConfig(
-            Clock clock, BackoffPolicy backoffPolicy, String familyName, boolean readOnly,
+            PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName, boolean readOnly,
             int maxRetryCount, boolean interruptible, CommitLockPolicy commitLockPolicy, ProfileRepository profiler,
             boolean preventWriteSkew, boolean automaticReadTracking, boolean optimizedConflictDetection, boolean dirtyCheck) {
 

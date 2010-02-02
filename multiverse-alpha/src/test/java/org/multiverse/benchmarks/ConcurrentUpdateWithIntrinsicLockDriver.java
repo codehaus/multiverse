@@ -73,6 +73,7 @@ public class ConcurrentUpdateWithIntrinsicLockDriver extends AbstractBenchmarkDr
     }
 
     //traditional object, not an atomic object
+
     class intRef {
         private int value;
 

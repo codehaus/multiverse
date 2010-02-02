@@ -1,6 +1,5 @@
 package org.multiverse.api;
 
-import org.multiverse.api.exceptions.NoTransactionFoundException;
 import org.multiverse.api.exceptions.RetryError;
 
 import static org.multiverse.api.ThreadLocalTransaction.getRequiredThreadLocalTransaction;
@@ -20,7 +19,8 @@ public final class StmUtils {
      * Under the hood the retry throws an RetryError that will be caught up the chain
      * (by the TransactionTemplate for example).
      *
-     * @throws NoTransactionFoundException if no transaction is found in the ThreadLocalTransaction.
+     * @throws org.multiverse.api.exceptions.NoTransactionFoundException
+     *          if no transaction is found in the ThreadLocalTransaction.
      */
     public static void retry() {
         getRequiredThreadLocalTransaction();

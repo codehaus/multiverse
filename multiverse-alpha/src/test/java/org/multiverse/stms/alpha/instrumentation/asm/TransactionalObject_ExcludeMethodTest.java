@@ -4,22 +4,24 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.Exclude;
-import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.exceptions.NoTransactionFoundException;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.utils.instrumentation.InstrumentationProblemMonitor;
+import org.objectweb.asm.Type;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.multiverse.TestUtils.resetInstrumentationProblemMonitor;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class TransactionalObject_ExcludeMethodTest {
     private AlphaStm stm;
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         stm = (AlphaStm) getGlobalStmInstance();
         resetInstrumentationProblemMonitor();
     }
@@ -28,24 +30,32 @@ public class TransactionalObject_ExcludeMethodTest {
     public void tearDown() {
         assertFalse(InstrumentationProblemMonitor.INSTANCE.isProblemFound());
         resetInstrumentationProblemMonitor();
+        clearThreadLocalTransaction();
     }
 
     @Test
     public void whenExcludeMethodIsCombinedWithExplicitTransactionalMethod_thenTransactionalMethodIgnored() {
         ExcludePriorityObject o = new ExcludePriorityObject();
 
+        boolean isTransactional = MetadataRepository.INSTANCE.isTransactionalMethod(
+                Type.getType(ExcludePriorityObject.class).getInternalName(), "excludedIncTwice", "()V");
+
+        assertFalse(isTransactional);
+
         long version = stm.getVersion();
+        clearThreadLocalTransaction();
         o.excludedIncTwice();
-        assertEquals(version + 2, stm.getVersion());
         assertEquals(2, o.get());
+        assertEquals(version + 2, stm.getVersion());
     }
 
     @TransactionalObject
-    public class ExcludePriorityObject {
+    public static class ExcludePriorityObject {
 
         private int value;
 
         public void inc() {
+
             value++;
         }
 
@@ -54,7 +64,7 @@ public class TransactionalObject_ExcludeMethodTest {
         }
 
         @Exclude
-        @TransactionalMethod
+        //@TransactionalMethod
         public void excludedIncTwice() {
             inc();
             inc();
@@ -79,7 +89,7 @@ public class TransactionalObject_ExcludeMethodTest {
 
 
     @TransactionalObject
-    public class ObjectForFieldAccess {
+    public static class ObjectForFieldAccess {
 
         private int value;
 
@@ -118,7 +128,7 @@ public class TransactionalObject_ExcludeMethodTest {
         assertEquals(version, stm.getVersion());
     }
 
-    public class NonTransactionalObject {
+    public static class NonTransactionalObject {
         private int value;
 
         @Exclude
@@ -139,7 +149,7 @@ public class TransactionalObject_ExcludeMethodTest {
     }
 
     @TransactionalObject
-    public class SomeObject {
+    public static class SomeObject {
 
         private int value;
 

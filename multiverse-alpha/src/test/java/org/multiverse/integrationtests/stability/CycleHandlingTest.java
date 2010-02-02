@@ -7,7 +7,6 @@ import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.Transactions;
 import org.multiverse.templates.TransactionTemplate;
 import org.multiverse.transactional.DefaultTransactionalReference;
 
@@ -37,7 +36,7 @@ public class CycleHandlingTest {
     }
 
     public Transaction startUpdateTransaction() {
-        Transaction t = Transactions.startUpdateTransaction(stm);
+        Transaction t = stm.getTransactionFactoryBuilder().build().start();
         setThreadLocalTransaction(t);
         return t;
     }

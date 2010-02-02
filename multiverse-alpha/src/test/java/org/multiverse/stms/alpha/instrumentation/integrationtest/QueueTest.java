@@ -5,12 +5,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.ThreadLocalTransaction;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionFactory;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-import static org.multiverse.api.Transactions.startUpdateTransaction;
 import static org.multiverse.stms.alpha.instrumentation.AlphaReflectionUtils.*;
 
 /**
@@ -19,10 +19,12 @@ import static org.multiverse.stms.alpha.instrumentation.AlphaReflectionUtils.*;
 public class QueueTest {
 
     private AlphaStm stm;
+    private TransactionFactory updateTxFactory;
 
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
+        updateTxFactory = stm.getTransactionFactoryBuilder().build();
     }
 
     @After
@@ -76,7 +78,7 @@ public class QueueTest {
 
         long version = stm.getVersion();
 
-        Transaction t = startUpdateTransaction(stm);
+        Transaction t = updateTxFactory.start();
         ThreadLocalTransaction.setThreadLocalTransaction(t);
 
         queue.push("foo");

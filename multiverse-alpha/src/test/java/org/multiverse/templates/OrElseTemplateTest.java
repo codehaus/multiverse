@@ -46,7 +46,7 @@ public class OrElseTemplateTest {
         final TransactionalInteger leftRef = new TransactionalInteger();
 
         Transaction tx = startUpdateTransaction();
-        new OrElseTemplate(tx){
+        new OrElseTemplate(tx) {
             @Override
             public Object run(Transaction tx) {
                 leftRef.set(1);

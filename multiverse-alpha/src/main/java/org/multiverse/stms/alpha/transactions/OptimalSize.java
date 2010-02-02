@@ -12,7 +12,7 @@ public final class OptimalSize {
         this.size.set(initialSize);
     }
 
-    public void set(int newValue){
+    public void set(int newValue) {
         size.set(newValue);
     }
 
@@ -20,11 +20,11 @@ public final class OptimalSize {
         return size.get();
     }
 
-    public void compareAndSet(int expected, int newSize){
+    public void compareAndSet(int expected, int newSize) {
         size.compareAndSet(expected, newSize);
     }
 
-    public String toString(){
-        return format("OptimalSize(size=%s)",size.get());
+    public String toString() {
+        return format("OptimalSize(size=%s)", size.get());
     }
 }

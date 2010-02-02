@@ -8,8 +8,8 @@ import org.multiverse.stms.alpha.AlphaStm;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-import static org.multiverse.api.Transactions.startUpdateTransaction;
 
 /**
  * @author Peter Veentjer
@@ -21,16 +21,16 @@ public class RefTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
     }
 
     @After
     public void after() {
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
     }
 
     public Transaction startTransaction() {
-        Transaction t = startUpdateTransaction(stm);
+        Transaction t = stm.getTransactionFactoryBuilder().build().start();
         setThreadLocalTransaction(t);
         return t;
     }

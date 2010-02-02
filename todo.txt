@@ -2,11 +2,9 @@
 todo engine
 ---------------------------------------------------------------
 
-- clover should be disabled while executing the integration tests.
+- the integration tests should be executed from maven using the stress 
 
 - Test 'testContentOfFastAtomicObjectIsCopied' incomplete in file 'AtomicObject_clashingFieldTest.java' at line 62
-
-- Test 'equals' incomplete in file 'TransactionalLinkedList.java' at line 1117
 
 - Test 'hash' incomplete in file 'TransactionalLinkedList.java' at line 1122
 
@@ -82,7 +80,6 @@ Thread PingPongThread-1 has thrown an exception
     - tranlocal snapshot needs to be fixed for subclassing.
 
 - logging on transactions should be configurable
-
 
 - Test 'assertAllMethodsAreCopied' incomplete in file 'AtomicMethod_FastAtomicObjectMixinTest.java' at line 60
 
@@ -282,4 +279,9 @@ Thread.sleep.
 - TransactionalThreadPoolExecutor is not doing anything with the maximum pool size
   (it also needs to rely on some kind of timeout so that unused threads are dropped).
 
-- the long running tests are not part of the normal maven install anymore.. 
+- the long running tests are not part of the normal maven install anymore..
+
+ - clover should be disabled while executing the integration tests.
+
+- Test 'equals' incomplete in file 'TransactionalLinkedList.java' at line 1117
+

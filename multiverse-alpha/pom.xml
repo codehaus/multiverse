@@ -17,6 +17,12 @@
         <version>0.4-SNAPSHOT</version>
     </parent>
 
+    <properties>
+        <multiverse.agentname>${build.finalName}-javaagent</multiverse.agentname>
+        <multiverse.agentclass>org.multiverse.stms.alpha.instrumentation.MultiverseJavaAgent</multiverse.agentclass>
+        <asm.version>3.2</asm.version>
+    </properties>
+
     <build>
         <plugins>
             <!-- A plugin that creates alphaagent.jar so that the unit tests can be executed using the agent.
@@ -112,12 +118,6 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <multiverse.agentname>${build.finalName}-javaagent</multiverse.agentname>
-        <multiverse.agentclass>org.multiverse.stms.alpha.instrumentation.MultiverseJavaAgent</multiverse.agentclass>
-        <asm.version>3.2</asm.version>
-    </properties>
 
     <dependencies>
         <!-- Multiverse dependencies -->

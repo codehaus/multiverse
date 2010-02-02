@@ -6,9 +6,9 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionLifecycleEvent;
 import org.multiverse.api.TransactionLifecycleListener;
 import org.multiverse.transactional.collections.TransactionalLinkedList;
-import org.multiverse.utils.TodoException;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -245,12 +245,19 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
                 state = State.terminated;
                 return Collections.EMPTY_LIST;
             case started:
+                //fall through                
+            case shutdown:
+                LinkedList<Runnable> sink = new LinkedList<Runnable>();
+                workQueue.drainTo(sink);
+
                 if (threads.isEmpty()) {
                     state = State.terminated;
+                }else{
+                    state = State.shutdown;
+                    getThreadLocalTransaction().registerLifecycleListener(new InterruptWorkersListener());
                 }
-                throw new TodoException();
-            case shutdown:
-                throw new TodoException();
+
+                return sink;
             case terminated:
                 //ignore it.
                 return Collections.EMPTY_LIST;
@@ -276,7 +283,6 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
     public boolean isStarted() {
         return state == State.started;
     }
-
 
     @Override
     @TransactionalMethod(readonly = true, automaticReadTracking = true)
@@ -377,7 +383,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
             newThreads[k] = thread;
         }
 
-        getThreadLocalTransaction().register(new StartAllListener(newThreads));
+        getThreadLocalTransaction().registerLifecycleListener(new StartWorkersListener(newThreads));
     }
 
     private void signalTerminated() {
@@ -456,11 +462,11 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
         }
     }
 
-    private static class StartAllListener implements TransactionLifecycleListener {
+    private static class StartWorkersListener implements TransactionLifecycleListener {
 
         private final Thread[] threads;
 
-        private StartAllListener(Thread... threads) {
+        private StartWorkersListener(Thread... threads) {
             this.threads = threads;
         }
 
@@ -474,7 +480,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
         }
     }
 
-    private class InterruptAllListener implements TransactionLifecycleListener {
+    private class InterruptWorkersListener implements TransactionLifecycleListener {
 
         @Override
         @TransactionalMethod

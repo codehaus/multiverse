@@ -40,7 +40,7 @@ public class IntRef extends DefaultTxObjectMixin {
         IntRefTranlocal tranlocal = (IntRefTranlocal) ((AlphaTransaction) t).openForWrite(IntRef.this);
         tranlocal.value = value;
     }
-    
+
     public IntRef(final int value) {
         new TransactionTemplate() {
             @Override

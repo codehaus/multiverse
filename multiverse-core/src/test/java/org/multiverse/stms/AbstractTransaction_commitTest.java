@@ -6,7 +6,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionLifecycleEvent;
 import org.multiverse.api.TransactionLifecycleListener;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.utils.clock.StrictClock;
+import org.multiverse.utils.clock.StrictPrimitiveClock;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -18,11 +18,11 @@ import static org.multiverse.TestUtils.assertIsCommitted;
  */
 public class AbstractTransaction_commitTest {
 
-    private StrictClock clock;
+    private StrictPrimitiveClock clock;
 
     @Before
     public void setUp() {
-        clock = new StrictClock(1);
+        clock = new StrictPrimitiveClock(1);
     }
 
     @Test
@@ -46,7 +46,7 @@ public class AbstractTransaction_commitTest {
         Transaction tx = new AbstractTransactionImpl(clock);
 
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        tx.register(listener);
+        tx.registerLifecycleListener(listener);
         tx.commit();
 
         assertIsCommitted(tx);
@@ -65,7 +65,7 @@ public class AbstractTransaction_commitTest {
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         doThrow(exception).when(listener).notify(tx, TransactionLifecycleEvent.preCommit);
 
-        tx.register(listener);
+        tx.registerLifecycleListener(listener);
 
         try {
             tx.commit();
@@ -90,7 +90,7 @@ public class AbstractTransaction_commitTest {
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         doThrow(exception).when(listener).notify(tx, TransactionLifecycleEvent.postCommit);
 
-        tx.register(listener);
+        tx.registerLifecycleListener(listener);
 
         try {
             tx.commit();

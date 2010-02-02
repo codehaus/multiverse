@@ -8,7 +8,7 @@ import org.multiverse.stms.alpha.UncommittedFilter;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.utils.Listeners;
 import org.multiverse.utils.backoff.BackoffPolicy;
-import org.multiverse.utils.clock.Clock;
+import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.commitlock.CommitLock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
 import org.multiverse.utils.profiling.ProfileRepository;
@@ -33,7 +33,7 @@ public class GrowingUpdateAlphaTransaction
     public static class Config extends AbstractUpdateAlphaTransactionConfig {
 
         public Config(
-                Clock clock, BackoffPolicy backoffPolicy, String familyName,
+                PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName,
                 ProfileRepository profiler, CommitLockPolicy commitLockPolicy, int maxRetryCount,
                 boolean preventWriteSkew, boolean interruptible, boolean optimizeConflictDetection, boolean dirtyCheck,
                 boolean automaticReadTracking) {

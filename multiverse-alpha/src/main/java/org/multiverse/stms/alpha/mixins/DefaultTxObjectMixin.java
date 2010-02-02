@@ -103,7 +103,7 @@ public abstract class DefaultTxObjectMixin implements AlphaTransactionalObject, 
                     throw LoadLockedException.INSTANCE;
                 } else {
                     String msg = format("Failed to load already locked transactionalobject '%s'",
-                                        AlphaStmUtils.toTxObjectString(this));
+                            AlphaStmUtils.toTxObjectString(this));
                     throw new LoadLockedException(msg);
                 }
             }
@@ -163,16 +163,16 @@ public abstract class DefaultTxObjectMixin implements AlphaTransactionalObject, 
         if (___SANITY_CHECKS_ENABLED) {
             if (___lockOwner == null) {
                 String msg = format("Lock on transactionalObject '%s' is not hold while doing the store",
-                                    AlphaStmUtils.toTxObjectString(this));
+                        AlphaStmUtils.toTxObjectString(this));
                 throw new PanicError(msg);
             }
 
             if (tranlocal.getWriteVersion() >= writeVersion) {
                 String msg = format("The tranlocal of transactionalObject '%s' has version '%s'  " +
                         "and and is too large for writeVersion '%s'",
-                                    AlphaStmUtils.toTxObjectString(this),
-                                    tranlocal.getTransactionalObject(),
-                                    writeVersion);
+                        AlphaStmUtils.toTxObjectString(this),
+                        tranlocal.getTransactionalObject(),
+                        writeVersion);
                 throw new PanicError(msg);
             }
 
@@ -212,9 +212,9 @@ public abstract class DefaultTxObjectMixin implements AlphaTransactionalObject, 
         AlphaTranlocal tranlocalT1 = ___TRANLOCAL_UPDATER.get(this);
 
         //could it be that a locked value is read? (YES, can happen) A value that will be updated,
-        //but isn't updated yet.. consequence: the listener tries to register a listener.
+        //but isn't updated yet.. consequence: the listener tries to registerLifecycleListener a listener.
         if (tranlocalT1 == null) {
-            //no tranlocal has been committed yet. We don't need to register the listener,
+            //no tranlocal has been committed yet. We don't need to registerLifecycleListener the listener,
             //because this call can only be made a transaction that has newattached items
             //and does an abort.
 
@@ -229,7 +229,7 @@ public abstract class DefaultTxObjectMixin implements AlphaTransactionalObject, 
             return RegisterRetryListenerResult.opened;
         } else {
             //ok, the version we are looking for has not been committed yet, so we need to
-            //register a the listener so that it will be opened
+            //registerLifecycleListener a the listener so that it will be opened
 
             boolean placedListener;
             Listeners newListeners;
@@ -239,7 +239,7 @@ public abstract class DefaultTxObjectMixin implements AlphaTransactionalObject, 
                 newListeners = new Listeners(listener, oldListeners);
                 placedListener = ___LISTENERS_UPDATER.compareAndSet(this, oldListeners, newListeners);
                 if (!placedListener) {
-                    //it could be that another transaction did a register, but it also could mean
+                    //it could be that another transaction did a registerLifecycleListener, but it also could mean
                     //that a write occurred.
                     AlphaTranlocal tranlocalT2 = ___TRANLOCAL_UPDATER.get(this);
                     if (tranlocalT1 != tranlocalT2) {

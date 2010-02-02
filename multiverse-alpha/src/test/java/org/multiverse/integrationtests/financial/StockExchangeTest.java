@@ -144,7 +144,7 @@ public class StockExchangeTest {
          * <p/>
          * No check is done on duplicates
          *
-         * @param stock the stock to register.
+         * @param stock the stock to registerLifecycleListener.
          */
         public void register(Stock stock) {
             listing.add(stock);
@@ -261,7 +261,7 @@ public class StockExchangeTest {
     }
 
     /**
-     * A Company; a Business Entity that is allowed to go the to Stock market to register {@link Stock}.
+     * A Company; a Business Entity that is allowed to go the to Stock market to registerLifecycleListener {@link Stock}.
      */
     @TransactionalObject
     private class Company {

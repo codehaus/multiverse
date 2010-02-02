@@ -1,14 +1,15 @@
 package org.multiverse.transactional.collections;
 
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import org.multiverse.api.Stm;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
+import static org.junit.Assert.*;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 public class TransactionalLinkedList_iteratorTest {
 
@@ -21,7 +22,7 @@ public class TransactionalLinkedList_iteratorTest {
     }
 
     @Test(expected = NoSuchElementException.class)
-    public void emptyDeqeue() {
+    public void whenListEmpty() {
         TransactionalLinkedList<String> list = new TransactionalLinkedList<String>();
         Iterator<String> it = list.iterator();
         assertFalse(it.hasNext());
@@ -29,10 +30,12 @@ public class TransactionalLinkedList_iteratorTest {
     }
 
     @Test
-    public void emptyNonEmpty() {
+    public void whenMultipleItemsAvailable() {
         TransactionalLinkedList<String> list = new TransactionalLinkedList<String>();
         list.add("1");
         list.add("2");
+        list.add("3");
+        list.add("4");
 
         Iterator<String> it = list.iterator();
         assertTrue(it.hasNext());
@@ -41,11 +44,17 @@ public class TransactionalLinkedList_iteratorTest {
         assertTrue(it.hasNext());
         assertEquals("2", it.next());
 
+        assertTrue(it.hasNext());
+        assertEquals("3", it.next());
+
+        assertTrue(it.hasNext());
+        assertEquals("4", it.next());
+
         assertFalse(it.hasNext());
     }
 
     @Test
-    public void removeFromIterator() {
+    public void whenItemRemovedFromIterator() {
         TransactionalLinkedList<String> list = new TransactionalLinkedList<String>();
         list.add("1");
         list.add("2");

@@ -92,7 +92,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Transacti
     public static <E> AlphaRef<E> createCommittedRef(Stm stm, E value) {
         Transaction tx = stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
-                .setFamilyName(AlphaRef.class.getName()+".createCommitted(Stm,E)")
+                .setFamilyName(AlphaRef.class.getName() + ".createCommitted(Stm,E)")
                 .setSmartTxLengthSelector(true)
                 .build().start();
         AlphaRef<E> ref = new AlphaRef<E>(tx, value);
@@ -101,7 +101,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Transacti
     }
 
     private final static TransactionFactory initTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
-            .setFamilyName(AlphaRef.class.getName()+".init()")
+            .setFamilyName(AlphaRef.class.getName() + ".init()")
             .setSmartTxLengthSelector(true)
             .setReadonly(false)
             .setAutomaticReadTracking(false)
@@ -157,7 +157,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Transacti
     }
 
     private final static TransactionFactory getTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
-            .setFamilyName(AlphaRef.class.getName()+".get()")
+            .setFamilyName(AlphaRef.class.getName() + ".get()")
             .setSmartTxLengthSelector(true)
             .setReadonly(true)
             .setAutomaticReadTracking(false).build();
@@ -183,7 +183,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Transacti
 
     private final static TransactionFactory getOrAwaitTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
             .setReadonly(true)
-            .setFamilyName(AlphaRef.class.getName()+".getOrAwait()")
+            .setFamilyName(AlphaRef.class.getName() + ".getOrAwait()")
             .setSmartTxLengthSelector(true)
             .setAutomaticReadTracking(true).build();
 
@@ -217,7 +217,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Transacti
 
     private final static TransactionFactory setTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
             .setReadonly(false)
-            .setFamilyName(AlphaRef.class.getName()+".set()")
+            .setFamilyName(AlphaRef.class.getName() + ".set()")
             .setSmartTxLengthSelector(true)
             .setAutomaticReadTracking(false).build();
 
@@ -243,7 +243,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Transacti
     }
 
     private final static TransactionFactory isNullTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
-            .setFamilyName(AlphaRef.class.getName()+".isNull()")
+            .setFamilyName(AlphaRef.class.getName() + ".isNull()")
             .setSmartTxLengthSelector(true)
             .setReadonly(true)
             .setAutomaticReadTracking(false).build();
@@ -269,7 +269,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Transacti
     }
 
     private final static TransactionFactory clearTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
-            .setFamilyName(AlphaRef.class.getName()+".clear()")
+            .setFamilyName(AlphaRef.class.getName() + ".clear()")
             .setSmartTxLengthSelector(true)
             .setReadonly(false)
             .setAutomaticReadTracking(false).build();
@@ -297,7 +297,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Transacti
     }
 
     private final static TransactionFactory toStringTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
-            .setFamilyName(AlphaRef.class.getName()+".toString()")
+            .setFamilyName(AlphaRef.class.getName() + ".toString()")
             .setSmartTxLengthSelector(true)
             .setReadonly(true)
             .setAutomaticReadTracking(false).build();

@@ -7,5 +7,6 @@ public class FixedUpdateAlphaTransaction_miscTest {
 
     @Test
     @Ignore
-    public void testConstructor(){}
+    public void testConstructor() {
+    }
 }

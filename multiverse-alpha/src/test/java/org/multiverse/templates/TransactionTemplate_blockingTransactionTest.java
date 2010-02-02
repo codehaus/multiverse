@@ -28,7 +28,7 @@ public class TransactionTemplate_blockingTransactionTest {
         startAll(thread1, thread2, thread3);
         joinAll(thread1);
 
-        assertAlive(thread2,thread3);
+        assertAlive(thread2, thread3);
         ref.set(1);
 
         joinAll(thread2);

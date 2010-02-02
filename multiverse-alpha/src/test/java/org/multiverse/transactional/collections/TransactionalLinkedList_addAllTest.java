@@ -1,16 +1,17 @@
 package org.multiverse.transactional.collections;
 
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import static org.multiverse.TestUtils.testIncomplete;
-import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import org.multiverse.api.Stm;
-import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-import static java.util.Arrays.asList;
 import java.util.LinkedList;
 import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.junit.Assert.*;
+import static org.multiverse.TestUtils.testIncomplete;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class TransactionalLinkedList_addAllTest {
 

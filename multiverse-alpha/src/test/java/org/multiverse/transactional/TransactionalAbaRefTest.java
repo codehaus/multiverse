@@ -1,18 +1,16 @@
 package org.multiverse.transactional;
 
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-
-import org.multiverse.api.Transaction;
 import org.multiverse.api.Stm;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-import static org.multiverse.api.Transactions.startUpdateTransaction;
-
+import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.RetryError;
-import org.multiverse.transactional.TransactionalAbaReference;
+
+import static org.junit.Assert.*;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
@@ -20,10 +18,12 @@ import org.multiverse.transactional.TransactionalAbaReference;
 public class TransactionalAbaRefTest {
 
     private Stm stm;
+    private TransactionFactory updateTxFactory;
 
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
+        updateTxFactory = stm.getTransactionFactoryBuilder().build();
         setThreadLocalTransaction(null);
     }
 
@@ -47,7 +47,7 @@ public class TransactionalAbaRefTest {
 
         long version = stm.getVersion();
 
-        Transaction tx =startUpdateTransaction(stm);
+        Transaction tx = stm.getTransactionFactoryBuilder().build().start();
         setThreadLocalTransaction(tx);
         ref.set(newValue);
         tx.abort();
@@ -189,7 +189,7 @@ public class TransactionalAbaRefTest {
         TransactionalAbaReference<String> ref = new TransactionalAbaReference<String>(oldRef);
 
         long version = stm.getVersion();
-        Transaction tx = startUpdateTransaction(stm);
+        Transaction tx = updateTxFactory.start();
         setThreadLocalTransaction(tx);
         String newRef = "bar";
         ref.set(newRef);
@@ -222,7 +222,7 @@ public class TransactionalAbaRefTest {
 
         //we start a transaction because we don't want to lift on the retry mechanism
         //of the transaction that else would be started on the getOrAwait method.
-        Transaction tx = startUpdateTransaction(stm);
+        Transaction tx = stm.getTransactionFactoryBuilder().build().start();
         setThreadLocalTransaction(tx);
         try {
             ref.getOrAwait();

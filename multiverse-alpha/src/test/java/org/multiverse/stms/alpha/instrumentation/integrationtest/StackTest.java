@@ -14,7 +14,6 @@ import org.multiverse.templates.TransactionTemplate;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-import static org.multiverse.api.Transactions.startUpdateTransaction;
 import static org.multiverse.stms.alpha.instrumentation.AlphaReflectionUtils.*;
 
 /**
@@ -23,10 +22,12 @@ import static org.multiverse.stms.alpha.instrumentation.AlphaReflectionUtils.*;
 public class StackTest {
 
     private AlphaStm stm;
+    private TransactionFactory updateTxFactory;
 
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
+        updateTxFactory = stm.getTransactionFactoryBuilder().build();
     }
 
     @After
@@ -166,7 +167,7 @@ public class StackTest {
 
         long version = stm.getVersion();
 
-        Transaction t = startUpdateTransaction(stm);
+        Transaction t = updateTxFactory.start();
         ThreadLocalTransaction.setThreadLocalTransaction(t);
 
         stack.push("foo");

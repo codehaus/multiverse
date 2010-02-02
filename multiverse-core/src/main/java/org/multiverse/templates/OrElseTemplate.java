@@ -79,18 +79,10 @@ public abstract class OrElseTemplate<E> {
     public abstract E orelserun(Transaction tx);
 
     public final E execute() {
-        //tx.startOr();
-        boolean endOr = true;
         try {
             return run(tx);
         } catch (RetryError e) {
-            endOr = false;            
-            //tx.endOrAndStartElse();
             return orelserun(tx);
-        } finally {
-            if (endOr) {
-                //tx.endOr();
-            }
         }
     }
 }

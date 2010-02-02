@@ -5,8 +5,6 @@ import org.multiverse.api.exceptions.*;
 import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.latches.CheapLatch;
 
-import java.util.logging.Logger;
-
 import static java.lang.String.format;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
@@ -43,8 +41,6 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
  * @author Peter Veentjer
  */
 public abstract class TransactionTemplate<E> {
-
-    private final static Logger logger = Logger.getLogger(TransactionTemplate.class.getName());
 
     private final boolean threadLocalAware;
 
@@ -294,7 +290,7 @@ public abstract class TransactionTemplate<E> {
                 attempt++;
                 try {
                     if (listener != null) {
-                        tx.register(listener);
+                        tx.registerLifecycleListener(listener);
                     }
                     onStart(tx);
                     E result = execute(tx);

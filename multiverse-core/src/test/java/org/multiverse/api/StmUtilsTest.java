@@ -2,6 +2,7 @@ package org.multiverse.api;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.NoTransactionFoundException;
 import org.multiverse.api.exceptions.RetryError;
@@ -41,9 +42,10 @@ public class StmUtilsTest {
     }
 
     @Test
+    @Ignore
     public void compensatingExecuteIsForwardedToTransactionThreadLocal() {
-        testIncomplete();/*
 
+       /*
         Runnable task = mock(Runnable.class);
 
 

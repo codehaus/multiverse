@@ -17,7 +17,7 @@ public class AbstractTransaction_prepareTest {
     public void whenLifecycleListenerRegistered_thenPreCommitIsCalled() {
         AbstractTransaction tx = new AbstractTransactionImpl();
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        tx.register(listener);
+        tx.registerLifecycleListener(listener);
 
         tx.prepare();
 
@@ -33,7 +33,7 @@ public class AbstractTransaction_prepareTest {
         AbstractTransaction tx = spy(new AbstractTransactionImpl());
         RuntimeException expected = new RuntimeException();
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        tx.register(listener);
+        tx.registerLifecycleListener(listener);
 
         doThrow(expected).when(listener).notify(tx, TransactionLifecycleEvent.preCommit);
 
@@ -82,7 +82,7 @@ public class AbstractTransaction_prepareTest {
     public void whenAlreadyPrepared_noLifecycleListenersCalled() {
         AbstractTransaction tx = spy(new AbstractTransactionImpl());
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        tx.register(listener);
+        tx.registerLifecycleListener(listener);
         tx.prepare();
 
         reset(listener);

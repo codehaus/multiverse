@@ -10,17 +10,15 @@ import static org.multiverse.transactional.executors.TransactionalThreadPoolExec
 
 public class TransactionalThreadPoolExecutor_startTest {
 
-
     private TransactionalThreadPoolExecutor executor;
 
     @After
     public void tearDown() {
         if (executor != null) {
-            executor.shutdown();
+            executor.shutdownNow();
             executor.awaitTerminationUninterruptibly();
         }
     }
-
 
     @Test
     public void whenUnstarted_thenInitialization() {

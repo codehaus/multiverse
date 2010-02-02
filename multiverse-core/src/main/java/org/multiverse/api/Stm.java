@@ -1,24 +1,22 @@
 package org.multiverse.api;
 
 /**
- * The main interface for software transactional memory. Updates/reads in the stm should only be done through the {@link
- * Transaction} interface. So see that for more details.
- * <p/>
- * This interface is made for a shared clock based stm's. When in the future the shared clock is dropped, this interface
- * needs to be refactored or a new framework needs to be created.
- * <p/>
+ * The main interface for software transactional memory. Updates/reads in the stm should only be done through the
+ * {@link Transaction}. So see that for more details.
+  * <p/>
  * It is important that an TransactionalObject only is used within a single stm. If it is 'shared' between different
- * stm's, isolation problems could start to appear.
+ * stm's, isolation problems could start to appear. This can be caused by the fact that different stm's probably use
+ * different clocks. And the clock is needed to prevent isolation problems.
  *
  * @author Peter Veentjer.
  */
 public interface Stm<B extends TransactionFactoryBuilder> {
 
     /**
-     * Gets the {@link TransactionFactoryBuilder} that needs to be used to execute transactions on this Stm. See the {@link
-     * TransactionFactoryBuilder} for more info.
+     * Gets the {@link TransactionFactoryBuilder} that needs to be used to execute transactions on this Stm. See the
+     * {@link TransactionFactoryBuilder} for more info.
      *
-     * @return the TransactionFactoryBuilder that belongs to this Stm.
+     * @return the TransactionFactoryBuilder that needs to be used to execute transactions on this Stm.
      */
     B getTransactionFactoryBuilder();
 

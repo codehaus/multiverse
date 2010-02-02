@@ -1,11 +1,11 @@
 package org.multiverse.stms.alpha.manualinstrumentation;
 
-import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-import static org.multiverse.api.StmUtils.retry;
-
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.templates.TransactionTemplate;
+
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.StmUtils.retry;
 
 public final class IntQueue {
 
@@ -37,7 +37,7 @@ public final class IntQueue {
                 if (size() >= maxCapacity) {
                     retry();
                 }
-                
+
                 pushedStack.push(item);
                 return null;
             }
@@ -53,10 +53,10 @@ public final class IntQueue {
                         readyToPopStack.push(pushedStack.pop());
                     }
                 }
-                
+
                 return readyToPopStack.pop();
             }
-        }.execute();        
+        }.execute();
     }
 
     private final static TransactionFactory sizeTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
@@ -70,7 +70,7 @@ public final class IntQueue {
             public Integer execute(Transaction t) {
                 return pushedStack.size() + readyToPopStack.size();
             }
-        }.execute();        
+        }.execute();
     }
 
     private final static TransactionFactory isEmptyTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
@@ -83,6 +83,6 @@ public final class IntQueue {
             public Boolean execute(Transaction t) {
                 return pushedStack.isEmpty() && readyToPopStack.isEmpty();
             }
-        }.execute();          
+        }.execute();
     }
 }

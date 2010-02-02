@@ -6,6 +6,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.LoadUncommittedException;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.api.exceptions.RetryError;
@@ -14,16 +15,18 @@ import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-import static org.multiverse.api.Transactions.startReadonlyTransaction;
-import static org.multiverse.api.Transactions.startUpdateTransaction;
 
 public class AlphaRefTest {
 
     private Stm stm;
+    private TransactionFactory updateTxFactory;
+    private TransactionFactory readonlyTxFactory;
 
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
+        updateTxFactory = stm.getTransactionFactoryBuilder().build();
+        readonlyTxFactory = stm.getTransactionFactoryBuilder().setReadonly(true).build();
         setThreadLocalTransaction(null);
     }
 
@@ -47,7 +50,7 @@ public class AlphaRefTest {
 
         long version = stm.getVersion();
 
-        Transaction tx = startUpdateTransaction(stm);
+        Transaction tx = updateTxFactory.start();
         setThreadLocalTransaction(tx);
         ref.set(newValue);
         tx.abort();
@@ -60,7 +63,7 @@ public class AlphaRefTest {
 
     @Test
     public void createCommitted() {
-        Transaction tx = startUpdateTransaction(stm);
+        Transaction tx = updateTxFactory.start();
         long version = stm.getVersion();
         AlphaRef<String> ref = AlphaRef.createCommittedRef(stm, "foo");
         tx.abort();
@@ -72,7 +75,7 @@ public class AlphaRefTest {
     @Ignore
     @Test
     public void createCommittedButWithBrokenValue() {
-        Transaction tx = startUpdateTransaction(stm);
+        Transaction tx = updateTxFactory.start();
         setThreadLocalTransaction(tx);
         AlphaRef<String> r1 = new AlphaRef<String>(tx);
         AlphaRef<AlphaRef<String>> r2 = AlphaRef.createCommittedRef(stm, r1);
@@ -90,7 +93,7 @@ public class AlphaRefTest {
     public void createCommittedDoesntCareAboutAlreadyAvailableTransaction() {
         long version = stm.getVersion();
 
-        Transaction tx = startUpdateTransaction(stm);
+        Transaction tx = updateTxFactory.start();
         setThreadLocalTransaction(tx);
         AlphaRef<String> ref = AlphaRef.createCommittedRef(stm, null);
         tx.abort();
@@ -143,7 +146,7 @@ public class AlphaRefTest {
         AlphaRef<String> ref = new AlphaRef<String>(value);
         long version = stm.getVersion();
 
-        Transaction tx = startReadonlyTransaction(stm);
+        Transaction tx = readonlyTxFactory.start();
         setThreadLocalTransaction(tx);
 
         try {
@@ -163,7 +166,7 @@ public class AlphaRefTest {
         AlphaRef<String> ref = new AlphaRef<String>(value);
         long version = stm.getVersion();
 
-        Transaction tx = startReadonlyTransaction(stm);
+        Transaction tx = readonlyTxFactory.start();
         setThreadLocalTransaction(tx);
 
         try {
@@ -278,7 +281,7 @@ public class AlphaRefTest {
         AlphaRef<String> ref = new AlphaRef<String>(oldRef);
 
         long version = stm.getVersion();
-        Transaction tx = startUpdateTransaction(stm);
+        Transaction tx = updateTxFactory.start();
         setThreadLocalTransaction(tx);
         String newRef = "bar";
         ref.set(newRef);
@@ -311,7 +314,7 @@ public class AlphaRefTest {
 
         //we start a transaction because we don't want to lift on the retry mechanism
         //of the transaction that else would be started on the getOrAwait method.
-        Transaction tx = startUpdateTransaction(stm);
+        Transaction tx = updateTxFactory.start();
         setThreadLocalTransaction(tx);
         try {
             ref.getOrAwait();

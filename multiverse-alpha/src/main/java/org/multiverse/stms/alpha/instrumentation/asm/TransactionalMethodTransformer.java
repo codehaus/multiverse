@@ -100,7 +100,7 @@ public class TransactionalMethodTransformer implements Opcodes {
                         originalMethod);
 
                 //txFactoryField is used to create the transaction fot this originalMethod
-                FieldNode txFactoryField = createTxFactoryField(originalMethod);
+                FieldNode txFactoryField = createTxFactoryField();
                 originalClass.fields.add(txFactoryField);
 
                 //add the txFactory initialization code to the front of the static initializer.
@@ -133,10 +133,9 @@ public class TransactionalMethodTransformer implements Opcodes {
     /**
      * Creates the static field that contains the txFactory for a transactional method.
      *
-     * @param originalMethod the MethodNode
      * @return the created FieldNode.
      */
-    private FieldNode createTxFactoryField(MethodNode originalMethod) {
+    private FieldNode createTxFactoryField() {
         int access = ACC_FINAL + ACC_PUBLIC + ACC_STATIC + ACC_SYNTHETIC;
         String name = "___transactionFactory_" + System.nanoTime(); //todo: improve
         String desc = Type.getDescriptor(TransactionFactory.class);

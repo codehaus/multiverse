@@ -72,7 +72,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
     }
 
     @Override
-    public final void register(TransactionLifecycleListener listener) {
+    public final void registerLifecycleListener(TransactionLifecycleListener listener) {
         switch (status) {
             case active:
                 if (listener == null) {
@@ -85,15 +85,16 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
                 listeners.add(listener);
                 break;
             case prepared:
-                String preparedMsg = format("Can't register listener on prepared transaction '%s'",
+                String preparedMsg = format("Can't register TransactionLifecycleListener on prepared transaction '%s'",
                         config.getFamilyName());
                 throw new PreparedTransactionException(preparedMsg);
             case committed:
-                String committedMsg = format("Can't register listener on already committed transaction '%s'",
+                String committedMsg = format("Can't register TransactionLifecycleListener on already committed " +
+                        "transaction '%s'",
                         config.getFamilyName());
                 throw new DeadTransactionException(committedMsg);
             case aborted:
-                String abortMsg = format("Can't register listener on already aborted transaction '%s'",
+                String abortMsg = format("Can't register TransactionLifecycleListener on already aborted transaction '%s'",
                         config.getFamilyName());
                 throw new DeadTransactionException(abortMsg);
             default:
@@ -289,7 +290,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
      * <p/>
      * This method is designed to be overridden.
      *
-     * @param latch         the latch to register. Value will never be null.
+     * @param latch         the latch to registerLifecycleListener. Value will never be null.
      * @param wakeupVersion the minimal version of the transactional object to wakeup for.
      * @return true if there were tracked reads (so the latch was opened or registered at at least 1 transactional
      *         object)

@@ -1,8 +1,8 @@
 package org.multiverse.stms.alpha.manualinstrumentation;
 
-import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTranlocalSnapshot;
+import org.multiverse.stms.alpha.AlphaTransactionalObject;
 
 /**
  * access modifiers for fields are public because this object is used for testing purposes. For the instrumentation the
@@ -52,11 +52,11 @@ public class IntRefTranlocal extends AlphaTranlocal {
             return false;
         }
 
-        if(___origin == null){
+        if (___origin == null) {
             return true;
         }
 
-        if(___origin.value!=value){
+        if (___origin.value != value) {
             return true;
         }
 

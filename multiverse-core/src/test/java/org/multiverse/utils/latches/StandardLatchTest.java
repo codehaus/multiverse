@@ -18,7 +18,7 @@ public class StandardLatchTest {
 
     @After
     public void tearDown() {
-        //clear the interrupted status
+        //whenTransactionAvailable_thenItIsCleared the interrupted status
         Thread.interrupted();
     }
 

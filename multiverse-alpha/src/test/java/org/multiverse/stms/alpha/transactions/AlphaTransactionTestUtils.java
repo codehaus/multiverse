@@ -13,14 +13,14 @@ import static org.junit.Assert.*;
 
 public class AlphaTransactionTestUtils {
 
-    public static void assertHasNoListeners(ManualRef ref){
+    public static void assertHasNoListeners(ManualRef ref) {
         assertNull(ref.___getListeners());
     }
 
-    public static void assertHasListeners(ManualRef ref, Latch... expectedLatches){
+    public static void assertHasListeners(ManualRef ref, Latch... expectedLatches) {
         List<Latch> found = new LinkedList<Latch>();
         Listeners listener = ref.___getListeners();
-        while(listener!=null){
+        while (listener != null) {
             found.add(listener.getListener());
             listener = listener.getNext();
         }

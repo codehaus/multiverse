@@ -1,9 +1,8 @@
 package org.multiverse.utils.monitoring;
 
-import org.multiverse.utils.profiling.ProfileCollator;
-
 /**
- * Exposes some of the information made available via the {@link ProfileCollator} via JMX.
+ * Exposes some of the information made available via the {@link org.multiverse.utils.profiling.ProfileCollator}
+ * via JMX.
  *
  * @author Andrew Phillips
  */

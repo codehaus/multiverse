@@ -269,6 +269,10 @@ public abstract class AbstractBlockingDeque<E> extends AbstractCollection<E> imp
     @Override
     @TransactionalMethod
     public int drainTo(Collection<? super E> c) {
+        if(isEmpty()){
+            return 0;
+        }
+
         for (E item : this) {
             c.add(item);
         }

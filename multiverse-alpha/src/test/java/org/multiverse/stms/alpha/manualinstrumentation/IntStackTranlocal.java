@@ -1,8 +1,8 @@
 package org.multiverse.stms.alpha.manualinstrumentation;
 
-import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTranlocalSnapshot;
+import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.manualinstrumentation.IntStackTranlocal.IntNode;
 
 public final class IntStackTranlocal extends AlphaTranlocal {
@@ -66,11 +66,11 @@ public final class IntStackTranlocal extends AlphaTranlocal {
             return false;
         }
 
-        if(___origin == null){
+        if (___origin == null) {
             return true;
         }
 
-        if(___origin.head!=head){
+        if (___origin.head != head) {
             return true;
         }
 

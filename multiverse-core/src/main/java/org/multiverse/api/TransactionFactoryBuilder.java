@@ -3,7 +3,7 @@ package org.multiverse.api;
 /**
  * An implementation of the builder design pattern to create a {@link TransactionFactory}. This is the place to be
  * for transaction configuration. This approach also gives the freedom to access implementation specific
- * setters.
+ * setters by implementing and extending the {@link TransactionFactoryBuilder} interface.
  * <p/>
  * <h2>Usage</h2>
  * In most cases the TransactionFactoryBuilder will be dropped once the TransactionFactory
@@ -64,7 +64,7 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     B setReadonly(boolean readonly);
 
     /**
-     * Sets the the maximum number of retries a transaction can be retried. The default is 1000.
+     * Sets the the maximum count a transaction can be retried. The default is 1000.
      *
      * @param retryCount the maximum number of times a transaction can be tried.
      * @return the new TransactionFactoryBuilder
@@ -93,15 +93,16 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      * for the correct transaction length. Constructors are not able to deal with
      * retrying tx.
      *
-     * @param smartTxlengthSelector
+     * @param smartTxlengthSelector indicates if smartTxlength selection should be used.
+     *
      * @return the new TransactionFactoryBuilder
      */
     B setSmartTxLengthSelector(boolean smartTxlengthSelector);
 
     /**
-     * If writeskew detection should be enabled.
+     * If writeskew prevention should be enabled.
      *
-     * @param preventWriteSkew
+     * @param preventWriteSkew  indicates if writeSkews should be prevented.
      * @return the new TransactionFactoryBuilder
      */
     B setPreventWriteSkew(boolean preventWriteSkew);

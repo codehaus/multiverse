@@ -5,7 +5,8 @@ import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.multiverse.stms.alpha.instrumentation.AlphaReflectionUtils.*;
+import static org.multiverse.stms.alpha.instrumentation.AlphaReflectionUtils.existsField;
+import static org.multiverse.stms.alpha.instrumentation.AlphaReflectionUtils.existsTranlocalField;
 
 /**
  * @author Peter Veentjer

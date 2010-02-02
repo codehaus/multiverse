@@ -344,24 +344,30 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
         return hashCode;
     }
 
-    public boolean equals(Object o) {
-        if (o == this) {
+    public boolean equals(Object thatObj) {
+        if (thatObj == this) {
             return true;
         }
-        if (!(o instanceof List)) {
+
+        if (!(thatObj instanceof List)) {
             return false;
         }
 
-        ListIterator<E> e1 = listIterator();
-        ListIterator e2 = ((List) o).listIterator();
-        while (e1.hasNext() && e2.hasNext()) {
-            E o1 = e1.next();
-            Object o2 = e2.next();
-            if (!(o1 == null ? o2 == null : o1.equals(o2))) {
+        List that = (List) thatObj;
+        if (that.size() != this.size()) {
+            return false;
+        }
+
+        ListIterator<E> thisIt = listIterator();
+        ListIterator thatIt = that.listIterator();
+        while (thisIt.hasNext() && thatIt.hasNext()) {
+            E thisItem = thisIt.next();
+            Object thatItem = thatIt.next();
+            if (!(thisItem == null ? thatItem == null : thisItem.equals(thatItem))) {
                 return false;
             }
         }
-        return !(e1.hasNext() || e2.hasNext());
+        return !(thisIt.hasNext() || thatIt.hasNext());
     }
 
     @TransactionalObject
@@ -377,7 +383,7 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
 
         @Override
         public boolean hasNext() {
-            return node.next != null;
+            return node != null;
         }
 
         @Override

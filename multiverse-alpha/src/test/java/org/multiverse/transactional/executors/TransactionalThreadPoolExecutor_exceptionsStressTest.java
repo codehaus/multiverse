@@ -1,5 +1,6 @@
 package org.multiverse.transactional.executors;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestUtils;
@@ -23,6 +24,14 @@ public class TransactionalThreadPoolExecutor_exceptionsStressTest {
         executor.setCorePoolSize(5);
 
         todoCount = new AtomicInteger(100000);
+    }
+
+    @After
+    public void tearDown() {
+        if (executor != null) {
+            executor.shutdownNow();
+            executor.awaitTerminationUninterruptibly();
+        }
     }
 
     @Test
