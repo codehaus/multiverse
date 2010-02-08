@@ -1,8 +1,8 @@
 package org.multiverse.benchmarks;
 
+import org.benchy.AbstractBenchmarkDriver;
 import org.benchy.TestCaseResult;
-import org.benchy.executor.AbstractBenchmarkDriver;
-import org.benchy.executor.TestCase;
+import org.benchy.TestCase;
 import org.multiverse.TestThread;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.transactional.primitives.TransactionalInteger;
@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
-import static org.multiverse.api.GlobalStmInstance.setGlobalStmInstance;
 
 /**
  * @author Peter Veentjer
@@ -22,14 +21,10 @@ public class ConcurrentUpdateDriver extends AbstractBenchmarkDriver {
     private int incCountPerThread;
     private int threadCount;
     private IncThread[] threads;
-    private AlphaStm stm;
     private TransactionalInteger ref;
 
     @Override
     public void preRun(TestCase testCase) {
-        stm = AlphaStm.createFast();
-        setGlobalStmInstance(stm);
-
         incCountPerThread = testCase.getIntProperty("incCountPerThread");
         threadCount = testCase.getIntProperty("threadCount");
 

@@ -13,6 +13,7 @@ import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.getField;
 import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.transactional.executors.TransactionalThreadPoolExecutorTestUtils.*;
 
 @Ignore
@@ -22,6 +23,7 @@ public class TransactionalThreadPoolExecutor_setCorePoolSizeTest {
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
+        clearThreadLocalTransaction();
     }
 
     private TransactionalThreadPoolExecutor executor;

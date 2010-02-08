@@ -107,7 +107,7 @@
     </properties>
 
     <build>
-        <pluginManagement>            
+        <pluginManagement>
             <plugins>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -350,20 +350,38 @@
         </plugins>
     </reporting>
 
-    <distributionManagement>
+    <!-- distributionManagement>
         <repository>
             <id>multiverse-releases</id>
-            <url>dav:https://dav.codehaus.org/repository/multiverse/</url>
+            <url>http://dav.codehaus.org/repository/multiverse/</url>
         </repository>
         <snapshotRepository>
             <id>multiverse-snapshots</id>
-            <url>dav:https://dav.codehaus.org/snapshots.repository/multiverse/</url>
+            <url>https://dav.codehaus.org/snapshots.repository/multiverse/</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
         <site>
             <id>multiverse-site</id>
             <name>Multiverse Maven site</name>
-            <url>dav:https://dav.codehaus.org/multiverse/maven-site/</url>
+            <url>http://dav.codehaus.org/multiverse/maven-site/</url>
+        </site>
+        
+    </distributionManagement -->
+
+    <distributionManagement>
+        <repository>
+            <id>multiverse-releases</id>
+            <name>Multiverse Central Repository</name>
+            <url>dav:https://dav.codehaus.org/repository/multiverse/</url>
+        </repository>
+        <snapshotRepository>
+            <id>multiverse-snapshots</id>
+            <name>Multiverse Central Development Repository</name>
+            <url>dav:https://dav.codehaus.org/snapshots.repository/multiverse/</url>
+        </snapshotRepository>
+        <site>
+            <id>multiverse-site</id>
+            <url>dav:https://dav.codehaus.org/multiverse/</url>
         </site>
         <downloadUrl>http://dist.codehaus.org/multiverse/</downloadUrl>
     </distributionManagement>
@@ -391,6 +409,7 @@
                             <quiet>true</quiet>
                         </configuration>
                     </plugin>
+
                     <plugin>
                         <artifactId>maven-assembly-plugin</artifactId>
                         <version>2.2-beta-2</version>
@@ -413,6 +432,7 @@
                 </plugins>
             </build>
         </profile>
+
         <profile>
             <id>stress</id>
             <build>
@@ -431,23 +451,5 @@
                 </plugins>
             </build>
         </profile>
-        <!-- profile>
-            <id>hudson</id>
-            <distributionManagement>
-                <repository>
-                    <id>hudson.scala-tools.org</id>
-                    <url>file:///home/scala-tools.org/www/repo-snapshots</url>
-                </repository>
-                <snapshotRepository>
-                    <id>hudson.scala-tools.org</id>
-                    <url>file:///home/scala-tools.org/www/repo-snapshots</url>
-                    <uniqueVersion>false</uniqueVersion>
-                </snapshotRepository>
-                <site>
-                    <id>hudson.scala-tools.org</id>
-                    <url>file:///home/scala-tools.org/www/mvnsites-snapshots/akka</url>
-                </site>
-            </distributionManagement>
-        </profile -->
     </profiles>
 </project>

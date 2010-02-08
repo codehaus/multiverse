@@ -1,12 +1,19 @@
 package org.multiverse.transactional.executors;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.transactional.collections.TransactionalLinkedList;
 
 import static org.junit.Assert.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.transactional.executors.TransactionalThreadPoolExecutorTestUtils.assertIsUnstarted;
 
 public class TransactionalThreadPoolExecutor_constructorTest {
+
+    @Before
+    public void setUp(){
+           clearThreadLocalTransaction();
+    }
 
     @Test
     public void withEmptyConstructor() {

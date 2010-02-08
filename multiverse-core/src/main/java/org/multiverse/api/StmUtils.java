@@ -27,7 +27,87 @@ public final class StmUtils {
         throw RetryError.create();
     }
 
-    //we don't want instances.
+    /**
+     * Prepares the Transaction in the ThreadLocalTransaction transaction.
+     * <p/>
+     * For more information see {@link Transaction#prepare()}.
+     */
+    public static void prepare() {
+        Transaction tx = getRequiredThreadLocalTransaction();
+        tx.prepare();
+    }
+
+    /**
+     * Aborts the Transaction in the ThreadLocalTransaction transaction.
+     * <p/>
+     * For more information see {@link Transaction#abort()} ()}.
+     */
+    public static void abort() {
+        Transaction tx = getRequiredThreadLocalTransaction();
+        tx.abort();
+    }
+
+    /**
+     * Commits the Transaction in the ThreadLocalTransaction transaction.
+     * <p/>
+     * For more information see {@link Transaction#abort()} ()}.
+     */
+    public static void commit() {
+        Transaction tx = getRequiredThreadLocalTransaction();
+        tx.commit();
+    }
+
+    /**
+     * Scheduled an deferred task on the Transaction in the ThreadLocalTransaction. This task is executed after
+     * the transaction commits and one of the use cases is starting transactions.
+     * <p/>
+     * For more information see {@link Transaction#registerLifecycleListener(TransactionLifecycleListener)}.
+     *
+     * @param task the deferred task to execute.
+     * @throws NullPointerException if task is null.
+     */
+    public static void scheduleDeferredTask(final Runnable task) {
+        if (task == null) {
+            throw new NullPointerException();
+        }
+
+        Transaction tx = getRequiredThreadLocalTransaction();
+        tx.registerLifecycleListener(new TransactionLifecycleListener() {
+            @Override
+            public void notify(Transaction tx, TransactionLifecycleEvent event) {
+                if (event == TransactionLifecycleEvent.postCommit) {
+                    task.run();
+                }
+            }
+        });
+    }
+
+    /**
+     * Scheduled an compensating task on the Transaction in the ThreadLocalTransaction. This task is executed after
+     * the transaction aborts and one of the use cases is cleaning up non transaction resources like the file system.
+     * <p/>
+     * For more information see {@link Transaction#registerLifecycleListener(TransactionLifecycleListener)}.
+     *
+     * @param task the deferred task to execute.
+     * @throws NullPointerException if task is null.
+     */
+    public static void scheduleCompensatingTask(final Runnable task) {
+        if (task == null) {
+            throw new NullPointerException();
+        }
+
+        Transaction tx = getRequiredThreadLocalTransaction();
+        tx.registerLifecycleListener(new TransactionLifecycleListener() {
+            @Override
+            public void notify(Transaction tx, TransactionLifecycleEvent event) {
+                if (event == TransactionLifecycleEvent.postAbort) {
+                    task.run();
+                }
+            }
+        });
+    }
+
+    //we don't want instances
 
     private StmUtils() {
     }

@@ -1,15 +1,13 @@
 package org.multiverse.benchmarks;
 
+import org.benchy.AbstractBenchmarkDriver;
+import org.benchy.TestCase;
 import org.benchy.TestCaseResult;
-import org.benchy.executor.AbstractBenchmarkDriver;
-import org.benchy.executor.TestCase;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
-import org.multiverse.stms.alpha.AlphaStm;
 
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.api.GlobalStmInstance.setGlobalStmInstance;
 
 /**
  * A Driver that tests the overhead of field access in transactions. Within a loop
@@ -27,13 +25,9 @@ import static org.multiverse.api.GlobalStmInstance.setGlobalStmInstance;
 public class PropertyAccessorDriver extends AbstractBenchmarkDriver {
     private long loopSize;
     private LongRef ref;
-    private AlphaStm stm;
     private String writeType;
 
     public void preRun(TestCase testCase) {
-        stm = AlphaStm.createFast();
-        setGlobalStmInstance(stm);
-
         loopSize = testCase.getLongProperty("loopSize");
         ref = new LongRef();
         writeType = testCase.getProperty("writeType");

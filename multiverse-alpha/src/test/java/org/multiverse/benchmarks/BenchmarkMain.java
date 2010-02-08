@@ -1,9 +1,11 @@
 package org.multiverse.benchmarks;
 
-import org.benchy.FileBasedBenchmarkResultRepository;
-import org.benchy.executor.Benchmark;
+import org.benchy.Benchmark;
+import org.benchy.TestCase;
 import org.benchy.executor.BenchmarkExecutor;
-import org.benchy.executor.TestCase;
+import org.benchy.executor.DefaultBenchmarkExecutor;
+import org.benchy.graph.GraphMain;
+import org.benchy.repository.FileBasedBenchmarkResultRepository;
 
 /**
  * @author Peter Veentjer
@@ -12,14 +14,16 @@ public class BenchmarkMain {
 
     public static void main(String[] args) {
         FileBasedBenchmarkResultRepository repository = new FileBasedBenchmarkResultRepository();
-        BenchmarkExecutor executor = new BenchmarkExecutor(repository);
+        BenchmarkExecutor executor = new DefaultBenchmarkExecutor(repository);
 
 
-        //executors.execute(createReadPerformanceBenchmark());
+        executor.execute(createReadPerformanceBenchmark());
         //executors.execute(createNonConcurrentUpdateBenchmark());
         // executors.execute(createConcurrentUpdateClassicLockBenchmark());
         // executors.execute(createConcurrentUpdateBenchmark());
-        executor.execute(createSetterInLoopDriver());
+        //executor.execute(createSetterInLoopDriver());
+
+        GraphMain.main(new String[]{"/tmp",});
     }
 
     private static Benchmark createSetterInLoopDriver() {
@@ -36,11 +40,11 @@ public class BenchmarkMain {
         localTestCase.setProperty("writeType", "local");
 
         Benchmark benchmark = new Benchmark();
-        benchmark.driverClass = PropertyAccessorDriver.class.getName();
-        benchmark.benchmarkName = "SetterInLoopDriver";
-        benchmark.testCases.add(setterTestCase);
-        benchmark.testCases.add(fieldTestCase);
-        benchmark.testCases.add(localTestCase);
+        benchmark.setDriverClass(PropertyAccessorDriver.class.getName());
+        benchmark.setBenchmarkName("SetterInLoopDriver");
+        benchmark.getTestCases().add(setterTestCase);
+        benchmark.getTestCases().add(fieldTestCase);
+        benchmark.getTestCases().add(localTestCase);
         return benchmark;
     }
 
@@ -50,9 +54,9 @@ public class BenchmarkMain {
         testCase.setProperty("threadCount", 1);
 
         Benchmark benchmark = new Benchmark();
-        benchmark.driverClass = ConcurrentUpdateDriver.class.getName();
-        benchmark.benchmarkName = "ConcurrentUpdate";
-        benchmark.testCases.add(testCase);
+        benchmark.setDriverClass(ConcurrentUpdateDriver.class.getName());
+        benchmark.setBenchmarkName("ConcurrentUpdate");
+        benchmark.getTestCases().add(testCase);
         return benchmark;
     }
 
@@ -63,9 +67,9 @@ public class BenchmarkMain {
         testCase.setProperty("threadCount", 8);
 
         Benchmark benchmark = new Benchmark();
-        benchmark.driverClass = ConcurrentUpdateWithIntrinsicLockDriver.class.getName();
-        benchmark.benchmarkName = "ConcurrentUpdateClassicLock";
-        benchmark.testCases.add(testCase);
+        benchmark.setDriverClass(ConcurrentUpdateWithIntrinsicLockDriver.class.getName());
+        benchmark.setBenchmarkName("ConcurrentUpdateClassicLock");
+        benchmark.getTestCases().add(testCase);
         return benchmark;
     }
 
@@ -76,28 +80,28 @@ public class BenchmarkMain {
         testCase.setProperty("threadCount", 8);
 
         Benchmark benchmark = new Benchmark();
-        benchmark.driverClass = NonConcurrentUpdateDriver.class.getName();
-        benchmark.benchmarkName = "NonConcurrentUpdate";
-        benchmark.testCases.add(testCase);
+        benchmark.setDriverClass(NonConcurrentUpdateDriver.class.getName());
+        benchmark.setBenchmarkName("NonConcurrentUpdate");
+        benchmark.getTestCases().add(testCase);
         return benchmark;
     }
 
     private static Benchmark createReadPerformanceBenchmark() {
         TestCase readonlyTestCase = new TestCase();
-        readonlyTestCase.setProperty("readCountPerThread", 10 * 1000 * 1000);
-        readonlyTestCase.setProperty("threadCount", 10);
+        readonlyTestCase.setProperty("readCountPerThread", 3 * 1000 * 1000);
+        readonlyTestCase.setProperty("threadCount", 1);
         readonlyTestCase.setProperty("readonly", true);
 
         TestCase updateTestCase = new TestCase();
-        updateTestCase.setProperty("readCountPerThread", 10 * 1000 * 1000);
-        updateTestCase.setProperty("threadCount", 10);
+        updateTestCase.setProperty("readCountPerThread", 3 * 1000 * 1000);
+        updateTestCase.setProperty("threadCount", 1);
         updateTestCase.setProperty("readonly", false);
 
         Benchmark benchmark = new Benchmark();
-        benchmark.driverClass = ReadPerformanceDriver.class.getName();
-        benchmark.benchmarkName = "ReadPerformance";
-        benchmark.testCases.add(readonlyTestCase);
-        benchmark.testCases.add(updateTestCase);
+        benchmark.setDriverClass(ReadPerformanceDriver.class.getName());
+        benchmark.setBenchmarkName("ReadPerformance");
+        benchmark.getTestCases().add(readonlyTestCase);
+        benchmark.getTestCases().add(updateTestCase);
         return benchmark;
     }
 }

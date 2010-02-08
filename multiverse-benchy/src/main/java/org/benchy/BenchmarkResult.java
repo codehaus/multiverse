@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Contains the results of a Benchmark.
+ *
  * @author Peter Veentjer
  */
 public class BenchmarkResult {
@@ -17,6 +19,10 @@ public class BenchmarkResult {
     }
 
     public BenchmarkResult(String benchmarkName, List<TestCaseResult> testCaseResultList) {
+        if (benchmarkName == null) {
+            throw new NullPointerException();
+        }
+
         if (testCaseResultList == null) {
             throw new NullPointerException();
         }
@@ -25,10 +31,21 @@ public class BenchmarkResult {
         this.benchmarkName = benchmarkName;
     }
 
+    /**
+     * Returns the name of the Benchmark.
+     *
+     * @return the result of the benchmark.
+     */
     public String getBenchmarkName() {
         return benchmarkName;
     }
 
+    /**
+     * Adds a TestCaseResult to this BenchmarkResult.
+     *
+     * @param result the TestCaseResult to add.
+     * @throws NullPointerException if result is null.
+     */
     public void add(TestCaseResult result) {
         if (result == null) {
             throw new NullPointerException();
@@ -36,7 +53,7 @@ public class BenchmarkResult {
         testCaseResultList.add(result);
     }
 
-    public List<TestCaseResult> getTestCaseResultList() {
+    public List<TestCaseResult> getTestCaseResults() {
         return Collections.unmodifiableList(testCaseResultList);
     }
 }

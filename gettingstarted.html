@@ -7,7 +7,7 @@
     <style type="text/css">
         .code {
             margin: 5px 0px;
-            padding: 4px; 
+            padding: 4px;
             background-color: #99FFFF;
         }
     </style>
@@ -20,13 +20,18 @@ This document contains some hints on how to quickly get started with a Multivers
     <li><b>Use the Maven archtype:</b>
         From the command line, run
         <div class="code">
-        <tt>mvn -DarchetypeGroupId=org.multiverse        -DarchetypeArtifactId=multiverse-project-archetype -DarchetypeVersion=<em>multiverse-version</em> archetype:generate</tt></div> 
+            <tt>mvn -DarchetypeGroupId=org.multiverse -DarchetypeArtifactId=multiverse-project-archetype
+                -DarchetypeVersion=<em>multiverse-version</em> archetype:generate</tt></div>
         to create a Maven project setup for Multiverse development. Just import into your favourite
         IDE and have a look at the included sample code!</br>
-        If you are offline and thus aren't able to access the repositories hosting the archetype, you can install the provided JAR locally by executing
+        If you are offline and thus aren't able to access the repositories hosting the archetype, you can install the
+        provided JAR locally by executing
         <div class="code">
-        <tt>mvn install:install-file -DgroupId=org.multiverse -DartifactId=multiverse-project-archetype -Dversion=<em>multiverse-version</em> -Dpackaging=jar -Dfile=archetypes/multiverse-project-archetype-<em>multiverse-version</em>.jar</tt></div>
-        before continuing as above. You can also add the <tt>multiverse-alpha-<em>multiverse-version</em>-jar-with-dependencies.jar</tt> JAR required by the project to your repository in this way, if you are offline.
+            <tt>mvn install:install-file -DgroupId=org.multiverse -DartifactId=multiverse-project-archetype
+                -Dversion=<em>multiverse-version</em> -Dpackaging=jar
+                -Dfile=archetypes/multiverse-project-archetype-<em>multiverse-version</em>.jar</tt></div>
+        before continuing as above. You can also add the <tt>multiverse-alpha-<em>multiverse-version</em>-jar-with-dependencies.jar</tt>
+        JAR required by the project to your repository in this way, if you are offline.
     </li>
     <li><b>Remember that tests require the Multiverse agent:</b>
         The archetype's Surefire plugin configuration already takes care of starting the Multiverse
@@ -35,10 +40,11 @@ This document contains some hints on how to quickly get started with a Multivers
         the agent.<br/>
         In Eclipse, this means opening the <tt>Run Configuration</tt> for the test you're trying to
         run, and adding <tt>
-        <div class="code">
-        <tt><em>M2_REPO</em>/org/multiverse/multiverse-alpha/<em>multiverse-version</em>/multiverse-alpha-<em>multiverse-version</em>-jar-with-dependencies.jar</tt></div> 
-        to the VM arguments tab.
-    </li>    
+            <div class="code">
+                <tt><em>M2_REPO</em>/org/multiverse/multiverse-alpha/<em>multiverse-version</em>/multiverse-alpha-<em>multiverse-version</em>-jar-with-dependencies.jar</tt>
+            </div>
+            to the VM arguments tab.
+    </li>
 </ol>
 </body>
 </html>

@@ -1,5 +1,6 @@
-package org.multiverse.utils;
+package org.multiverse.commitbarriers;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -15,9 +16,10 @@ import org.multiverse.transactional.primitives.TransactionalInteger;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public class CommitGroup_awaitCommitTest {
+public class VetoCommitBarrier_awaitCommitTest {
     private Stm stm;
     private TransactionFactory txFactory;
 
@@ -25,33 +27,41 @@ public class CommitGroup_awaitCommitTest {
     public void setUp() {
         stm = getGlobalStmInstance();
         txFactory = stm.getTransactionFactoryBuilder().build();
+        clearThreadLocalTransaction();
+        clearCurrentThreadInterruptedStatus();
     }
+
+    @After
+    public void tearDown() {
+        clearCurrentThreadInterruptedStatus();
+    }
+
 
     @Test
     public void whenTransactionNull_thenNullPointerException() throws InterruptedException {
-        CommitGroup group = new CommitGroup();
+        VetoCommitBarrier barrier = new VetoCommitBarrier();
 
         try {
-            group.awaitCommit(null);
+            barrier.awaitCommit(null);
             fail();
         } catch (NullPointerException expected) {
         }
 
-        assertTrue(group.isOpen());
-        assertEquals(0, group.getPreparedCount());
+        assertTrue(barrier.isOpen());
+        assertEquals(0, barrier.getNumberWaiting());
     }
 
     @Test
     public void whenTransactionPreparable_thenAdded() {
-        CommitGroup group = new CommitGroup();
+        VetoCommitBarrier barrier = new VetoCommitBarrier();
         TransactionalInteger ref = new TransactionalInteger();
-        IncThread thread = new IncThread(ref, group);
+        IncThread thread = new IncThread(ref, barrier);
         thread.start();
 
         sleepMs(500);
         assertAlive(thread);
-        assertTrue(group.isOpen());
-        assertEquals(1, group.getPreparedCount());
+        assertTrue(barrier.isOpen());
+        assertEquals(1, barrier.getNumberWaiting());
     }
 
     @Test
@@ -62,7 +72,7 @@ public class CommitGroup_awaitCommitTest {
 
     @Test
     public void whenPrepareFails() throws InterruptedException {
-        final CommitGroup group = new CommitGroup();
+        final VetoCommitBarrier group = new VetoCommitBarrier();
         final TransactionalInteger ref = new TransactionalInteger();
 
         FailToPrepareThread thread = new FailToPrepareThread(group, ref);
@@ -73,14 +83,14 @@ public class CommitGroup_awaitCommitTest {
 
         thread.join();
         thread.assertFailedWithException(TooManyRetriesException.class);
-        assertEquals(0, group.getPreparedCount());
+        assertEquals(0, group.getNumberWaiting());
     }
 
     class FailToPrepareThread extends TestThread {
-        final CommitGroup group;
+        final VetoCommitBarrier group;
         final TransactionalInteger ref;
 
-        FailToPrepareThread(CommitGroup group, TransactionalInteger ref) {
+        FailToPrepareThread(VetoCommitBarrier group, TransactionalInteger ref) {
             this.group = group;
             this.ref = ref;
             setPrintStackTrace(false);
@@ -100,7 +110,7 @@ public class CommitGroup_awaitCommitTest {
         Transaction tx = txFactory.start();
         tx.abort();
 
-        CommitGroup group = new CommitGroup();
+        VetoCommitBarrier group = new VetoCommitBarrier();
         try {
             group.awaitCommit(tx);
             fail();
@@ -109,7 +119,7 @@ public class CommitGroup_awaitCommitTest {
 
         assertTrue(group.isOpen());
         assertIsAborted(tx);
-        assertEquals(0, group.getPreparedCount());
+        assertEquals(0, group.getNumberWaiting());
     }
 
     @Test
@@ -117,7 +127,7 @@ public class CommitGroup_awaitCommitTest {
         Transaction tx = txFactory.start();
         tx.commit();
 
-        CommitGroup group = new CommitGroup();
+        VetoCommitBarrier group = new VetoCommitBarrier();
         try {
             group.awaitCommit(tx);
             fail();
@@ -126,51 +136,51 @@ public class CommitGroup_awaitCommitTest {
 
         assertTrue(group.isOpen());
         assertIsCommitted(tx);
-        assertEquals(0, group.getPreparedCount());
+        assertEquals(0, group.getNumberWaiting());
     }
 
     @Test
-    public void whenCommitGroupAborted_thenIllegalStateException() throws InterruptedException {
-        CommitGroup group = new CommitGroup();
-        group.abort();
+    public void whenBarrierAborted_thenIllegalStateException() throws InterruptedException {
+        VetoCommitBarrier barrier = new VetoCommitBarrier();
+        barrier.abort();
 
         Transaction tx = txFactory.start();
         try {
-            group.awaitCommit(tx);
+            barrier.awaitCommit(tx);
             fail();
         } catch (IllegalStateException expected) {
         }
 
         assertIsActive(tx);
-        assertTrue(group.isAborted());
-        assertEquals(0, group.getPreparedCount());
+        assertTrue(barrier.isAborted());
+        assertEquals(0, barrier.getNumberWaiting());
     }
 
     @Test
-    public void whenCommitGroupCommitted_thenIllegalStateException() throws InterruptedException {
-        CommitGroup group = new CommitGroup();
-        group.commit();
+    public void whenCommitted_thenIllegalStateException() throws InterruptedException {
+        VetoCommitBarrier barrier = new VetoCommitBarrier();
+        barrier.commit();
 
         Transaction tx = txFactory.start();
         try {
-            group.awaitCommit(tx);
+            barrier.awaitCommit(tx);
             fail();
         } catch (IllegalStateException expected) {
         }
 
         assertIsActive(tx);
-        assertTrue(group.isCommitted());
-        assertEquals(0, group.getPreparedCount());
+        assertTrue(barrier.isCommitted());
+        assertEquals(0, barrier.getNumberWaiting());
     }
 
     public class IncThread extends TestThread {
         private final TransactionalInteger ref;
-        private final CommitGroup group;
+        private final VetoCommitBarrier barrier;
         private Transaction tx;
 
-        public IncThread(TransactionalInteger ref, CommitGroup group) {
+        public IncThread(TransactionalInteger ref, VetoCommitBarrier barrier) {
             super("IncThread");
-            this.group = group;
+            this.barrier = barrier;
             this.ref = ref;
         }
 
@@ -179,7 +189,7 @@ public class CommitGroup_awaitCommitTest {
         public void doRun() throws Exception {
             tx = getThreadLocalTransaction();
             ref.inc();
-            group.awaitCommit(tx);
+            barrier.awaitCommit(tx);
         }
     }
 }

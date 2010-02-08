@@ -1,8 +1,10 @@
 package org.benchy.executor;
 
 import com.google.gson.*;
-import org.benchy.BenchmarkResultRepository;
-import org.benchy.FileBasedBenchmarkResultRepository;
+import org.benchy.Benchmark;
+import org.benchy.TestCase;
+import org.benchy.repository.BenchmarkResultRepository;
+import org.benchy.repository.FileBasedBenchmarkResultRepository;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,7 +25,7 @@ public class BenchmarkMain {
 
         Benchmark benchmark = loadBenchmark(readbenchmarkJson());
 
-        BenchmarkExecutor executor = new BenchmarkExecutor(repository);
+        BenchmarkExecutor executor = new DefaultBenchmarkExecutor(repository);
         executor.execute(benchmark);
 
         System.out.println("Finished");
@@ -62,14 +64,14 @@ public class BenchmarkMain {
             Benchmark benchmark = new Benchmark();
 
             JsonObject obj = (JsonObject) json;
-            benchmark.benchmarkName = obj.get("benchmarkName").getAsString();
-            benchmark.driverClass = obj.get("driverClass").getAsString();
+            benchmark.setBenchmarkName(obj.get("benchmarkName").getAsString());
+            benchmark.setDriverClass(obj.get("driverClass").getAsString());
 
             JsonArray testCaseJsonArray = obj.get("testcases").getAsJsonArray();
             for (JsonElement element : testCaseJsonArray) {
                 JsonObject o = (JsonObject) element;
                 TestCase testCase = context.deserialize(o, TestCase.class);
-                benchmark.testCases.add(testCase);
+                benchmark.getTestCases().add(testCase);
             }
 
             return benchmark;

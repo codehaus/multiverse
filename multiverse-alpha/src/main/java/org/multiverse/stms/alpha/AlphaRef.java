@@ -41,6 +41,7 @@ import static org.multiverse.api.StmUtils.retry;
  * @author Peter Veentjer
  */
 public final class AlphaRef<E> extends DefaultTxObjectMixin implements TransactionalReference<E> {
+    private static final String CREATE_COMMITTED_FAMILY_NAME = AlphaRef.class.getName() + ".createCommitted(Stm,E)";
 
     /**
      * Creates a committed ref with a null value using the Stm in the {@link org.multiverse.api.GlobalStmInstance}.
@@ -92,7 +93,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Transacti
     public static <E> AlphaRef<E> createCommittedRef(Stm stm, E value) {
         Transaction tx = stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
-                .setFamilyName(AlphaRef.class.getName() + ".createCommitted(Stm,E)")
+                .setFamilyName(CREATE_COMMITTED_FAMILY_NAME)
                 .setSmartTxLengthSelector(true)
                 .build().start();
         AlphaRef<E> ref = new AlphaRef<E>(tx, value);

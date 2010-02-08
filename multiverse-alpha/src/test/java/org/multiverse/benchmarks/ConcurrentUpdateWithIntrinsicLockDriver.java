@@ -1,8 +1,8 @@
 package org.multiverse.benchmarks;
 
+import org.benchy.AbstractBenchmarkDriver;
+import org.benchy.TestCase;
 import org.benchy.TestCaseResult;
-import org.benchy.executor.AbstractBenchmarkDriver;
-import org.benchy.executor.TestCase;
 import org.multiverse.TestThread;
 
 import java.util.concurrent.TimeUnit;

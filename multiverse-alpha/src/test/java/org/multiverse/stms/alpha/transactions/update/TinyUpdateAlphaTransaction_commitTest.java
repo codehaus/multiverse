@@ -1,7 +1,6 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Latch;
 import org.multiverse.api.exceptions.WriteConflictException;
@@ -71,7 +70,6 @@ public class TinyUpdateAlphaTransaction_commitTest {
     }
 
     @Test
-    @Ignore
     public void whenUpdate_updatedTranlocalIsWritten() {
         ManualRef ref = new ManualRef(stm);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();

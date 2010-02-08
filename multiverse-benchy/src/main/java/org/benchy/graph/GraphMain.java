@@ -1,9 +1,9 @@
 package org.benchy.graph;
 
 import org.benchy.BenchmarkResult;
-import org.benchy.BenchmarkResultRepository;
-import org.benchy.FileBasedBenchmarkResultRepository;
 import org.benchy.TestCaseResult;
+import org.benchy.repository.BenchmarkResultRepository;
+import org.benchy.repository.FileBasedBenchmarkResultRepository;
 
 import java.io.File;
 import java.util.Date;
@@ -11,10 +11,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+/**
+ * Main responsible for reading the {@link org.benchy.repository.BenchmarkResultRepository} and writing output
+ * with the GnuPlotGraphWriter.
+ *
+ * @author Peter Veentjer.
+ */
 public class GraphMain {
 
-    private BenchmarkResultRepository resultRepository;
-    private org.benchy.graph.GraphModel model = new org.benchy.graph.GraphModel();
+    private final BenchmarkResultRepository resultRepository;
+    private final GraphModel model = new GraphModel();
 
     public GraphMain(File benchmarkDir) {
         resultRepository = new FileBasedBenchmarkResultRepository(benchmarkDir);
@@ -27,19 +33,23 @@ public class GraphMain {
             addToModel(now, name);
         }
 
-        org.benchy.graph.GraphWriter writer = new org.benchy.graph.GnuPlotGraphWriter(outputFile, x, y);
+        GraphWriter writer = new GnuPlotGraphWriter(outputFile, x, y);
         writer.write(model);
     }
 
     public void addToModel(Date date, String benchmarkName) {
         BenchmarkResult benchmarkResult = resultRepository.load(date, benchmarkName);
 
-        for (TestCaseResult caseResult : benchmarkResult.getTestCaseResultList()) {
+        for (TestCaseResult caseResult : benchmarkResult.getTestCaseResults()) {
             model.add(benchmarkName, caseResult);
         }
     }
 
     public static void main(String[] args) {
+        if (args.length != 5) {
+            throw new RuntimeException();
+        }
+
         System.out.println("Diagram creator");
 
         File storageDirectory = new File(args[0]);

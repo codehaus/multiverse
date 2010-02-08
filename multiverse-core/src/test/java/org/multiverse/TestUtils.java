@@ -14,14 +14,18 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.*;
 
 public class TestUtils {
 
-    public static Object getField(Object o, String fieldname) {
+    public static void clearCurrentThreadInterruptedStatus() {
+        Thread.interrupted();
+    }
 
+    public static Object getField(Object o, String fieldname) {
         try {
             Field field = o.getClass().getDeclaredField(fieldname);
             field.setAccessible(true);
@@ -68,7 +72,7 @@ public class TestUtils {
 
         System.out.println("============================================================================");
         System.out.printf("Test '%s' incomplete in file '%s' at line %s\n",
-                          caller.getMethodName(), caller.getFileName(), caller.getLineNumber());
+                caller.getMethodName(), caller.getFileName(), caller.getLineNumber());
         System.out.println("============================================================================");
     }
 
@@ -78,7 +82,7 @@ public class TestUtils {
 
         System.out.println("============================================================================");
         System.out.printf("Test '%s' incomplete in file '%s' at line %s\n",
-                          caller.getMethodName(), caller.getFileName(), caller.getLineNumber());
+                caller.getMethodName(), caller.getFileName(), caller.getLineNumber());
         System.out.printf("Reason: %s\n", reason);
         System.out.println("============================================================================");
     }
@@ -87,24 +91,32 @@ public class TestUtils {
         assertFalse(InstrumentationProblemMonitor.INSTANCE.isProblemFound());
     }
 
-    public static void assertIsActive(Transaction t) {
-        assertNotNull("No transaction found", t);
-        assertEquals(TransactionStatus.active, t.getStatus());
+    public static void assertIsActive(Transaction... transactions) {
+        assertNotNull("No transaction found", transactions);
+        for (Transaction tx : transactions) {
+            assertEquals(TransactionStatus.active, tx.getStatus());
+        }
     }
 
-    public static void assertIsPrepared(Transaction t) {
-        assertNotNull("No transaction found", t);
-        assertEquals(TransactionStatus.prepared, t.getStatus());
+    public static void assertIsPrepared(Transaction... transactions) {
+        assertNotNull("No transaction found", transactions);
+        for (Transaction tx : transactions) {
+            assertEquals(TransactionStatus.prepared, tx.getStatus());
+        }
     }
 
-    public static void assertIsCommitted(Transaction t) {
-        assertNotNull("No transaction found", t);
-        assertEquals(TransactionStatus.committed, t.getStatus());
+    public static void assertIsCommitted(Transaction... transactions) {
+        assertNotNull("No transaction found", transactions);
+        for (Transaction tx : transactions) {
+            assertEquals(TransactionStatus.committed, tx.getStatus());
+        }
     }
 
-    public static void assertIsAborted(Transaction t) {
-        assertNotNull("No transaction found", t);
-        assertEquals(TransactionStatus.aborted, t.getStatus());
+    public static void assertIsAborted(Transaction... transactions) {
+        assertNotNull("No transaction found", transactions);
+        for (Transaction tx : transactions) {
+            assertEquals(TransactionStatus.aborted, tx.getStatus());
+        }
     }
 
     public static boolean equals(Object o1, Object o2) {
@@ -164,17 +176,9 @@ public class TestUtils {
             return;
         }
 
-        long totalNanos = TimeUnit.MICROSECONDS.toNanos(us);
-        long ms = totalNanos / TimeUnit.MICROSECONDS.toNanos(1);
-        int ns = (int) (totalNanos % TimeUnit.MICROSECONDS.toNanos(1));
-        try {
-            Thread.sleep(ms, ns);
-        } catch (InterruptedException ex) {
-            Thread.interrupted();
-            throw new RuntimeException(ex);
-        }
+        long nanos = TimeUnit.MICROSECONDS.toNanos(us);
+        LockSupport.parkNanos(nanos);
     }
-
 
     public static void startAll(TestThread... threads) {
         for (Thread thread : threads) {

@@ -1,5 +1,6 @@
 package org.multiverse.transactional.executors;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.ExecutorService;
@@ -7,12 +8,19 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+
 /**
  * Quality of this task is flaky, needs to be refactored to a benchmark driver.
  */
 public class ExecutorPerformanceStressTest {
 
     private int taskCount = 1000 * 1000;
+
+    @Before
+    public void setUp() {
+        clearThreadLocalTransaction();
+    }
 
     @Test
     public void testThreadPoolExecutor() throws InterruptedException {

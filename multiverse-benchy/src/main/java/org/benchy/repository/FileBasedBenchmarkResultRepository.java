@@ -1,12 +1,16 @@
-package org.benchy;
+package org.benchy.repository;
+
+import org.benchy.BenchmarkResult;
+import org.benchy.TestCaseResult;
 
 import java.io.*;
-import static java.lang.String.format;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static java.lang.String.format;
+
 /**
- * A {@link org.benchy.BenchmarkResultRepository} that persist on file system.
+ * A {@link org.benchy.repository.BenchmarkResultRepository} that persist on file system.
  * <p/>
  * Implementation is not threadsafe.
  *
@@ -19,15 +23,18 @@ public class FileBasedBenchmarkResultRepository implements BenchmarkResultReposi
             throw new NullPointerException();
         }
 
-        if (!dir.isDirectory()) {
+        if (!dir.exists()) {
             if (!dir.mkdirs()) {
                 String msg = format("Unable to create directory %s", dir);
-                throw new RuntimeException(msg);
+                throw new IllegalArgumentException(msg);
             }
+        } else if (!dir.isDirectory()) {
+            String msg = format("file %s is not a directory", dir);
+            throw new IllegalArgumentException(msg);
         }
     }
 
-    private File rootDir;
+    private final File rootDir;
 
     /**
      * Creates a FileBasedBenchmarkResultRepository that stores all benchmark results in the temp directory.
@@ -42,7 +49,6 @@ public class FileBasedBenchmarkResultRepository implements BenchmarkResultReposi
 
     public FileBasedBenchmarkResultRepository(File rootDir) {
         ensureExistingDirectory(rootDir);
-
         this.rootDir = rootDir;
     }
 
@@ -97,7 +103,7 @@ public class FileBasedBenchmarkResultRepository implements BenchmarkResultReposi
         File targetDir = createTargetDir(benchmarkResult.getBenchmarkName());
 
         int k = 1;
-        for (TestCaseResult result : benchmarkResult.getTestCaseResultList()) {
+        for (TestCaseResult result : benchmarkResult.getTestCaseResults()) {
             File outputFile = new File(targetDir, k + ".txt");
             writeOutputToFile(result, outputFile);
             k++;

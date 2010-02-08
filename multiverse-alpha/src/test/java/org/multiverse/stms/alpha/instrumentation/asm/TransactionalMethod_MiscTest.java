@@ -2,7 +2,6 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
@@ -32,31 +31,6 @@ public class TransactionalMethod_MiscTest {
 
     public static void assertTransactionWorking() {
         assertIsActive(getThreadLocalTransaction());
-    }
-
-    @Test
-    @Ignore
-    public void abstractMethodIsIgnored() {
-
-    }
-
-    public static abstract class AbstractMethod {
-
-        @TransactionalMethod
-        abstract void doIt();
-    }
-
-    //@Test
-    //public void nativeMethodIsIgnored() {
-    //    testIncomplete();
-    //
-    //    //NativeMethod nativeMethod = new NativeMethod();
-    //    //nativeMethod.doIt();
-    //}
-
-    public static class NativeMethod {
-
-        native void doIt();
     }
 
     /**

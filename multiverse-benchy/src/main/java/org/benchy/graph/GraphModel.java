@@ -2,15 +2,12 @@ package org.benchy.graph;
 
 import org.benchy.TestCaseResult;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GraphModel {
 
     private Map<String, List<TestCaseResult>> map = new HashMap<String, List<TestCaseResult>>();
+
     private List<String> lineIdList = new LinkedList<String>();
 
     public void add(String lineId, TestCaseResult testCaseResult) {

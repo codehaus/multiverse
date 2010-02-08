@@ -16,7 +16,10 @@ class Page {
 
 //=======================================================
 
-def templatecontent = new File('site/pagetemplate.html').text
+def basedir = project.properties['basedir']
+
+def templatecontent = new File(basedir+'site/pagetemplate.html').text
+//def templatecontent = new File('site/pagetemplate.html').text
 
 def menus = [
         new Menu(name: 'Menu', items: [
@@ -27,6 +30,7 @@ def menus = [
                 new MenuItem(title: 'NoSQL', pageid: 'nosql'),
                 new MenuItem(title: 'Team', pageid: 'team'),
                 new MenuItem(title: 'Development', pageid: 'development'),
+                new MenuItem(title: 'Support', pageid: 'support'),
                 new MenuItem(title: 'Blog', url: 'http://pveentjer.wordpress.com'),
                 new MenuItem(title: 'License', pageid: 'license')
         ]),
@@ -67,14 +71,16 @@ def pages = [
         new Page(pageid: 'team'),
         new Page(pageid: 'development'),
         new Page(pageid: 'tutorial'),
+        new Page(pageid: 'index'),
         new Page(pageid: 'setup-javaagent'),
+        new Page(pageid: 'support'),
         new Page(pageid: 'mavenconfiguration'),
         new Page(pageid: 'documentationoverview')
 ]
 
-def outputdirectory = 'target/site'
+def outputdirectory = "$basedir/target/site"
 
-def lastupdate = '3 Januari 2010'
+def lastupdate = String.format("%tm %<tB %<tY",new GregorianCalendar())
 
 //=============== template engine ==================
 
@@ -90,7 +96,7 @@ for (page in pages) {
   def filename = "${page.pageid}.html"
   def engine = new groovy.text.GStringTemplateEngine()
   def template = engine.createTemplate(templatecontent)
-  def pagecontent = new File("site/$filename").text
+  def pagecontent = new File("$basedir/site/$filename").text
   def binding = [menus: menus,
           pagecontent: pagecontent,
           page: page,
@@ -104,6 +110,11 @@ for (page in pages) {
 
 def output = new File("$outputdirectory/style.css")
 output.createNewFile()
-output.write(new File("site/style.css").text)
+output.write(new File("${basedir}/site/style.css").text)
+
+def settingsxml = new File("$outputdirectory/settings.xml")
+settingsxml.createNewFile()
+settingsxml.write(new File("${basedir}/site/settings.xml").text)
+
 
 println('finished')

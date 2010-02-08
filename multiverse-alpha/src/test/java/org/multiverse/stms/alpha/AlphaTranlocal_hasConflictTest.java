@@ -1,13 +1,14 @@
 package org.multiverse.stms.alpha;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.api.Transaction;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 
 public class AlphaTranlocal_hasConflictTest {
@@ -20,23 +21,28 @@ public class AlphaTranlocal_hasConflictTest {
     }
 
     @Test
-    @Ignore
     public void whenFreshAndNoConflictingTransaction_thenNoConflict() {
         ManualRef ref = ManualRef.createUncommitted();
 
         ManualRefTranlocal tranlocal = new ManualRefTranlocal(ref);
-        //assertFalse(tranlocal.hasReadConflict());
+
+        Transaction tx = mock(Transaction.class);
+        boolean hasConflict = tranlocal.hasReadConflict(tx);
+        assertFalse(hasConflict);
     }
 
     @Test
-    @Ignore
     public void whenFreshAndConflictingTransaction_thenConflict() {
         ManualRef ref = ManualRef.createUncommitted();
-        ManualRefTranlocal first = new ManualRefTranlocal(ref);
-        ref.___store(first, stm.getVersion() + 1);
 
-        ManualRefTranlocal tranlocal = new ManualRefTranlocal(ref);
-        //assertTrue(tranlocal.hasReadConflict());
+        ManualRefTranlocal tranlocal = ref.___openUnconstructed();
+
+        //conflicting update
+        ref.inc(stm);
+
+        Transaction tx = mock(Transaction.class);
+        boolean hasConflict = tranlocal.hasReadConflict(tx);
+        assertTrue(hasConflict);
     }
 
     @Test
@@ -61,16 +67,16 @@ public class AlphaTranlocal_hasConflictTest {
     }
 
     @Test
-    @Ignore
     public void whenReadonlyAndNoConflictTransaction_thenNoConflict() {
         ManualRef ref = new ManualRef(stm);
         ManualRefTranlocal readonly = (ManualRefTranlocal) ref.___load();
 
-        //assertFalse(readonly.hasReadConflict());
+        Transaction tx = mock(Transaction.class);
+        boolean hasConflict = readonly.hasReadConflict(tx);
+        assertFalse(hasConflict);
     }
 
     @Test
-    @Ignore
     public void whenReadonlyAndConflictingTransaction_thenConflict() {
         ManualRef ref = new ManualRef(stm);
         ManualRefTranlocal readonly = (ManualRefTranlocal) ref.___load();
@@ -78,7 +84,8 @@ public class AlphaTranlocal_hasConflictTest {
         //conflicting transaction
         ref.inc(stm);
 
-        //assertTrue(readonly.hasReadConflict());
-
+        Transaction tx = mock(Transaction.class);
+        boolean hasConflict = readonly.hasReadConflict(tx);
+        assertTrue(hasConflict);
     }
 }

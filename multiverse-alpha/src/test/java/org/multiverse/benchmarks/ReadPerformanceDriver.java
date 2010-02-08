@@ -1,15 +1,14 @@
 package org.multiverse.benchmarks;
 
-import org.benchy.executor.AbstractBenchmarkDriver;
-import org.benchy.executor.TestCase;
+import org.benchy.AbstractBenchmarkDriver;
+import org.benchy.TestCase;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
-import static org.multiverse.api.GlobalStmInstance.setGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * A Benchmark that tests read performance of the STM.
@@ -25,13 +24,11 @@ public class ReadPerformanceDriver extends AbstractBenchmarkDriver {
     private boolean readonly;
 
     private ReadThread[] threads;
-    private AlphaStm stm;
     private TransactionalInteger ref;
 
     @Override
     public void preRun(TestCase testCase) {
-        stm = AlphaStm.createFast();
-        setGlobalStmInstance(stm);
+        clearThreadLocalTransaction();
 
         incCountPerThread = testCase.getIntProperty("readCountPerThread");
         threadCount = testCase.getIntProperty("threadCount");
@@ -60,6 +57,10 @@ public class ReadPerformanceDriver extends AbstractBenchmarkDriver {
         @Override
         public void doRun() throws Exception {
             for (int k = 0; k < incCountPerThread; k++) {
+                if ((k % 1000000) == 0) {
+                    System.out.printf("%s is at %s\n", getName(), k);
+                }
+
                 if (readonly) {
                     readInReadonlyMode();
                 } else {

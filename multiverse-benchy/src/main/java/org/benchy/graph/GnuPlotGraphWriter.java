@@ -10,6 +10,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
+/**
+ * The {@link GraphWriter} that exports in gnu-plot format.
+ *
+ * @author Peter Veentjer.
+ */
 public class GnuPlotGraphWriter implements GraphWriter {
 
     private File outputFile;

@@ -1,18 +1,25 @@
 package org.multiverse.transactional.executors;
 
 import org.junit.After;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertTrue;
+import static org.multiverse.TestUtils.assertAlive;
+import static org.multiverse.TestUtils.sleepMs;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.transactional.executors.TransactionalThreadPoolExecutorTestUtils.assertIsTerminated;
 
 public class TransactionalThreadPoolExecutor_awaitTerminationTest {
     private TransactionalThreadPoolExecutor executor;
+
+    @Before
+    public void setUp() {
+        clearThreadLocalTransaction();
+    }
 
     @After
     public void tearDown() {
@@ -23,20 +30,75 @@ public class TransactionalThreadPoolExecutor_awaitTerminationTest {
     }
 
     @Test
-    @Ignore
-    public void whenUnstarted() {
+    public void whenUnstarted() throws InterruptedException {
+        executor = new TransactionalThreadPoolExecutor();
 
+        TestThread thread = new TestThread() {
+            @Override
+            public void doRun() throws Exception {
+                executor.awaitTermination();
+            }
+        };
+        thread.start();
+        sleepMs(500);
+
+        executor.shutdownNow();
+        thread.join();
+        thread.assertNothingThrown();
+
+        assertTrue(executor.isTerminated());
     }
 
     @Test
-    @Ignore
-    public void whenStarted_thenUnsupportedOperationException() {
+    public void whenStarted() throws InterruptedException {
+        executor = new TransactionalThreadPoolExecutor();
+        executor.start();
 
+        TestThread thread = new TestThread() {
+            @Override
+            public void doRun() throws Exception {
+                executor.awaitTermination();
+            }
+        };
+        thread.start();
+        sleepMs(500);
+
+        executor.shutdownNow();
+        thread.join();
+        thread.assertNothingThrown();
+
+        assertTrue(executor.isShutdown() || executor.isTerminated());
     }
 
     @Test
-    @Ignore
-    public void whenShutdown() {
+    public void whenShutdown() throws InterruptedException {
+        executor = new TransactionalThreadPoolExecutor();
+
+        Runnable task = new Runnable() {
+            @Override
+            public void run() {
+                sleepMs(10000);
+            }
+        };
+
+        executor.execute(task);
+        sleepMs(500);
+        executor.shutdown();
+
+        TestThread thread = new TestThread() {
+            @Override
+            public void doRun() throws Exception {
+                executor.awaitTermination();
+            }
+        };
+        thread.start();
+        sleepMs(500);
+
+        assertAlive(thread);
+
+        executor.shutdownNow();
+        thread.join();
+        thread.assertNothingThrown();
     }
 
     @Test
@@ -48,19 +110,4 @@ public class TransactionalThreadPoolExecutor_awaitTerminationTest {
         assertTrue(result);
         assertIsTerminated(executor);
     }
-
-    public class AwaitThread extends TestThread {
-        private final ThreadPoolExecutor threadPoolExecutor;
-
-        public AwaitThread(ThreadPoolExecutor threadPoolExecutor) {
-            super("AwaitThread");
-            this.threadPoolExecutor = threadPoolExecutor;
-        }
-
-        @Override
-        public void doRun() throws Exception {
-            //threadPoolExecutor.aw            
-        }
-    }
-
 }

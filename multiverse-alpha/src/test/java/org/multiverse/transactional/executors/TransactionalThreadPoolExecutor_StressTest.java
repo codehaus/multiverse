@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.System.nanoTime;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class TransactionalThreadPoolExecutor_StressTest {
 
@@ -18,6 +19,7 @@ public class TransactionalThreadPoolExecutor_StressTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         executor = new TransactionalThreadPoolExecutor();
         runningCount = new AtomicInteger(executor.getCorePoolSize());
     }

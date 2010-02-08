@@ -23,6 +23,7 @@ public class TransactionalThreadPoolExecutor_miscStressTest {
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
+        clearThreadLocalTransaction();
     }
 
     @Test

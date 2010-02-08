@@ -1,5 +1,7 @@
-package org.multiverse.utils;
+package org.multiverse.commitbarriers;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
@@ -8,34 +10,46 @@ import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public class CommitGroup_commitTest {
+public class VetoCommitBarrier_commitTest {
+
+    @Before
+    public void setUp() {
+        clearThreadLocalTransaction();
+        clearCurrentThreadInterruptedStatus();
+    }
+
+    @After
+    public void tearDown() {
+        clearCurrentThreadInterruptedStatus();
+    }
 
     @Test
     public void whenNoPendingTransactions() {
-        CommitGroup group = new CommitGroup();
-        group.commit();
+        VetoCommitBarrier barrier = new VetoCommitBarrier();
+        barrier.commit();
 
-        assertTrue(group.isCommitted());
+        assertTrue(barrier.isCommitted());
     }
 
     @Test
     public void whenPendingTransactions() {
-        CommitGroup group = new CommitGroup();
+        VetoCommitBarrier barrier = new VetoCommitBarrier();
 
         TransactionalInteger ref1 = new TransactionalInteger();
         TransactionalInteger ref2 = new TransactionalInteger();
         TransactionalInteger ref3 = new TransactionalInteger();
 
-        IncThread thread1 = new IncThread(ref1, group);
-        IncThread thread2 = new IncThread(ref2, group);
-        IncThread thread3 = new IncThread(ref3, group);
+        IncThread thread1 = new IncThread(ref1, barrier);
+        IncThread thread2 = new IncThread(ref2, barrier);
+        IncThread thread3 = new IncThread(ref3, barrier);
 
         startAll(thread1, thread2, thread3);
 
         sleepMs(500);
-        group.commit();
+        barrier.commit();
         joinAll(thread1, thread2, thread3);
 
         assertIsCommitted(thread1.tx);
@@ -48,35 +62,35 @@ public class CommitGroup_commitTest {
     }
 
     @Test
-    public void whenGroupCommitted_thenIgnored() {
-        CommitGroup group = new CommitGroup();
-        group.commit();
+    public void whenBarrierCommitted_thenIgnored() {
+        VetoCommitBarrier barrier = new VetoCommitBarrier();
+        barrier.commit();
 
-        group.commit();
-        assertTrue(group.isCommitted());
+        barrier.commit();
+        assertTrue(barrier.isCommitted());
     }
 
     @Test
-    public void whenGroupAborted_thenIllegalStateException() {
-        CommitGroup group = new CommitGroup();
-        group.abort();
+    public void whenBarrierAborted_thenIllegalStateException() {
+        VetoCommitBarrier barrier = new VetoCommitBarrier();
+        barrier.abort();
 
         try {
-            group.commit();
+            barrier.commit();
             fail();
         } catch (IllegalStateException expected) {
         }
-        assertTrue(group.isAborted());
+        assertTrue(barrier.isAborted());
     }
 
     public class IncThread extends TestThread {
         private final TransactionalInteger ref;
-        private final CommitGroup group;
+        private final VetoCommitBarrier barrier;
         private Transaction tx;
 
-        public IncThread(TransactionalInteger ref, CommitGroup group) {
+        public IncThread(TransactionalInteger ref, VetoCommitBarrier barrier) {
             super("IncThread");
-            this.group = group;
+            this.barrier = barrier;
             this.ref = ref;
         }
 
@@ -85,7 +99,7 @@ public class CommitGroup_commitTest {
         public void doRun() throws Exception {
             tx = getThreadLocalTransaction();
             ref.inc();
-            group.awaitCommit(tx);
+            barrier.awaitCommit(tx);
         }
     }
 }

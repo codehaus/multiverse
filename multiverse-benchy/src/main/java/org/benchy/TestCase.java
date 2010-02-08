@@ -1,4 +1,4 @@
-package org.benchy.executor;
+package org.benchy;
 
 import java.util.HashMap;
 import java.util.Map;

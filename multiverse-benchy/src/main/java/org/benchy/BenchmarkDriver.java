@@ -1,6 +1,4 @@
-package org.benchy.executor;
-
-import org.benchy.TestCaseResult;
+package org.benchy;
 
 /**
  * Contains the unparametrized algorithm you want to benchmark. All the variable parameters
@@ -14,9 +12,19 @@ import org.benchy.TestCaseResult;
  */
 public interface BenchmarkDriver {
 
+    /**
+     * Is executed before the run.
+     *
+     * @param testCase
+     */
     void preRun(TestCase testCase);
 
     void run();
 
+    /**
+     * Is executed after the run.
+     *
+     * @param caseResult
+     */
     void postRun(TestCaseResult caseResult);
 }

@@ -11,6 +11,49 @@
         <artifactId>multiverse</artifactId>
         <version>0.4-SNAPSHOT</version>
     </parent>
-    
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.groovy.maven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <properties>
+                                <basedir>${pom.basedir}/</basedir>
+                            </properties>
+                            <source>${pom.basedir}/menu.groovy</source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!-- reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>2.0-beta-7</version>
+                <configuration>
+                    <outputDirectory>${basedir}/target/newsite</outputDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting -->
 </project>
 

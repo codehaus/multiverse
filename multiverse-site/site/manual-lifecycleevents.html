@@ -93,6 +93,25 @@ after a Transaction commits. A deferred task can be created using the Transactio
 </pre>
 It is important to realize that when the notify method accesses transactional objects, this is done in a new
 transaction.
+<p>
+    Luckily there also is a shortcut for creating and scheduling a deferred task:
+<pre>
+    import org.multiverse.annotations.TransactionalMethod;
+    import static org.multiverse.api.StmUtils.scheduleDeferredTask;
+
+    @TransactionalMethod
+    public void foo(){
+        scheduleDeferredTask(new Runnable(){
+            public void run(){
+                System.out.println("Executing deferred task");
+            }
+        });
+    }
+</pre>
+Under water the runnable automatically is wrapped in a TransactionLifecycleListener and registered on the Transaction
+in the TransactionThreadLocal. If no transaction is found, a NoTransactionFoundException is thrown. It consumes
+a little more space since an additional object needs to be created (next to the TransactionLifecycleListener).
+
 
 <h2 id="compensating.tasks">3.4 Compensating tasks</h2>
 A compensating tasks is a tasks that is executed after a transaction aborts. They are very useful to implement
@@ -113,6 +132,26 @@ the TransactionLifecycleListener:
 </pre>
 It is important to realize that when the notify method accesses transactional objects, it is done in a new
 transaction.
+
+<p>
+    Luckily there also is a shortcut for creating and scheduling a compensating task:
+<pre>
+    import org.multiverse.annotations.TransactionalMethod;
+    import static org.multiverse.api.StmUtils.scheduleCompensatingTask;
+
+    @TransactionalMethod
+    public void foo(){
+        scheduleCompensatingTask(new Runnable(){
+            public void run(){
+                System.out.println("Executing compensating task");
+            }
+        });
+    }
+</pre>
+Under water the runnable automatically is wrapped in a TransactionLifecycleListener and registered on the Transaction
+in the TransactionThreadLocal. If no transaction is found, a NoTransactionFoundException is thrown. It consumes
+a little more space since an additional object needs to be created (next to the TransactionLifecycleListener).
+
 
 <h2 id="transactionlifecyclelistener.and.transactions">3.5 TransactionLifecycleListener and exceptions</h2>
 If an exception is thrown while

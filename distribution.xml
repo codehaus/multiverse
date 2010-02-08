@@ -7,8 +7,7 @@
     <fileSets>
         <fileSet>
             <includes>
-                <include>license.css</include>
-                <include>license.html</include>
+                <include>LICENSE</include>
             </includes>
         </fileSet>
         <fileSet>

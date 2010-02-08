@@ -1,9 +1,11 @@
-package org.benchy;
+package org.benchy.repository;
+
+import org.benchy.BenchmarkResult;
 
 import java.util.Date;
 
 /**
- * The TestResultRepository is responsible for storing and retrieving {@link TestCaseResult}.
+ * The TestResultRepository is responsible for storing and retrieving {@link org.benchy.BenchmarkResult}.
  *
  * @author Peter Veentjer
  */
@@ -25,10 +27,10 @@ public interface BenchmarkResultRepository {
     BenchmarkResult loadLast(String benchmark);
 
     /**
-     * Stores the TestResult in the repository.
+     * Stores the BenchmarkResult in the repository.
      *
-     * @param benchmarkResult the TestResult to store.
-     * @throws NullPointerException if testResult is null.
+     * @param result the TestResult to store.
+     * @throws NullPointerException if result is null.
      */
-    void store(BenchmarkResult benchmarkResult);
+    void store(BenchmarkResult result);
 }

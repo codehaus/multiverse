@@ -72,23 +72,6 @@ public class AlphaRefTest {
         assertEquals("foo", ref.get());
     }
 
-    @Ignore
-    @Test
-    public void createCommittedButWithBrokenValue() {
-        Transaction tx = updateTxFactory.start();
-        setThreadLocalTransaction(tx);
-        AlphaRef<String> r1 = new AlphaRef<String>(tx);
-        AlphaRef<AlphaRef<String>> r2 = AlphaRef.createCommittedRef(stm, r1);
-        tx.abort();
-
-        AlphaRef<String> ref = r2.get();
-        try {
-            ref.get();
-            fail();
-        } catch (LoadUncommittedException e) {
-        }
-    }
-
     @Test
     public void createCommittedDoesntCareAboutAlreadyAvailableTransaction() {
         long version = stm.getVersion();

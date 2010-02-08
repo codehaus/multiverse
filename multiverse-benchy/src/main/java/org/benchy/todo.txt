@@ -1,6 +1,8 @@
 
 TODO
 
+- make sure that the jar created the alpha.. contains the agent xml config.
+
 - system should be able to do something with multiple attempts.
 
 - system should be able to place error information in the output
@@ -18,8 +20,6 @@ TODO
 - diagrammain needs a date parameter on occassion: atm it always uses the current date.
 
 - improved error handling diagram main for arguments
-
-- the benchy framework should be placed in a seperate src directory and create a seperate jar.
 
 NICE TO HAVES
 
@@ -75,8 +75,10 @@ can be used. For example g1 garbage collector or pointer compression.
 
 - the directory needs to be created consistent
 
-
 - atm it is not possible to see which testresults belong to each other and which not.
     - you can't see if attempts belong to each other
     - you can't see of testresults for differenttestcases but the same benchmark
     belong to each other.
+
+- the benchy framework should be placed in a seperate src directory and create a seperate jar.
+

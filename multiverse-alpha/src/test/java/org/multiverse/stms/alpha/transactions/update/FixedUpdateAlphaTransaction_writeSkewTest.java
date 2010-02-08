@@ -307,7 +307,6 @@ public class FixedUpdateAlphaTransaction_writeSkewTest {
 
             AlphaTranlocal write2 = find(attached, firstFreeIndex, to);
             assertFalse(write2.isCommitted());
-
         }
 
         public AlphaTranlocal find(AlphaTranlocal[] attached, int firstFreeIndex, ManualRef ref) {

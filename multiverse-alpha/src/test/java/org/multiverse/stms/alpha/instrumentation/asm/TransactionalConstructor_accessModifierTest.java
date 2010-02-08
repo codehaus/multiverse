@@ -141,7 +141,6 @@ public class TransactionalConstructor_accessModifierTest {
     }
 
     @Test
-    @Ignore
     public void testFinalField() {
         long version = stm.getVersion();
 
@@ -203,7 +202,6 @@ public class TransactionalConstructor_accessModifierTest {
     }
 
     @Test
-    @Ignore
     public void testPrivateConstructor() {
         long version = stm.getVersion();
 

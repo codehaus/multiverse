@@ -29,7 +29,7 @@ public class TransactionalThreadPoolExecutor_executeTest {
     @After
     public void tearDown() {
         if (executor != null) {
-            executor.shutdown();//should be shutdownNow but causes NPE, needs to be fixed
+            executor.shutdown();//TODO: should be shutdownNow but causes NPE, needs to be fixed
             executor.awaitTerminationUninterruptibly();
         }
     }

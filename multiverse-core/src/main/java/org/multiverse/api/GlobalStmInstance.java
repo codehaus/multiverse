@@ -33,7 +33,7 @@ public final class GlobalStmInstance {
 
     private static final Logger logger = Logger.getLogger(GlobalStmInstance.class.getName());
 
-    private static volatile Stm instance;
+    private static final Stm instance;
 
     static {
         try {
@@ -143,33 +143,6 @@ public final class GlobalStmInstance {
      */
     public static Stm getGlobalStmInstance() {
         return instance;
-    }
-
-    /**
-     * Sets the global Stm instance.
-     *
-     * @param newInstance the instance to set.
-     * @throws NullPointerException if newInstance is null. No need to allow for an illegal reference.
-     */
-    public static void setGlobalStmInstance(Stm newInstance) {
-        if (newInstance == null) {
-            throw new NullPointerException();
-        }
-
-        doSomeLogging();
-        instance = newInstance;
-    }
-
-    private static void doSomeLogging() {
-        Stm oldInstance = instance;
-        if (oldInstance != null && oldInstance.getVersion() > 0) {
-            logger.warning("Replacing a used global STM instance. The old STM instance already has commits " +
-                    "and this could lead to strange concurrency bugs. Normally this situation should be prevented. " +
-                    "The safest thing to do is to drop all transactional objects that have been created while " +
-                    "using that STM.");
-        } else {
-            logger.info("Replacing unused GlobalStmInstance");
-        }
     }
 
     //we don't want instances.

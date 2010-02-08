@@ -1,5 +1,7 @@
-package org.benchy.executor;
+package org.benchy;
 
+import org.benchy.BenchmarkDriver;
+import org.benchy.TestCase;
 import org.benchy.TestCaseResult;
 
 /**

@@ -1,16 +1,13 @@
 package org.benchy;
 
-import org.benchy.executor.Benchmark;
-import org.benchy.executor.TestCase;
-
 import java.util.Properties;
 
 /**
- * The result of executing a {@link org.benchy.executor.TestCase}.
+ * The result of executing a {@link TestCase}.
  * <p/>
  * todo:
  * Properties should be replaced by a map. Properties is a leaky abstraction from the
- * {@link org.benchy.FileBasedBenchmarkResultRepository}.
+ * {@link org.benchy.repository.FileBasedBenchmarkResultRepository}.
  *
  * @author Peter Veentjer.
  */
@@ -61,8 +58,8 @@ public class TestCaseResult {
     }
 
     private void copyPropertiesFromBenchmark(Benchmark benchmark) {
-        put("benchmarkName", benchmark.benchmarkName);
-        put("driverClass", benchmark.driverClass);
+        put("benchmarkName", benchmark.getBenchmarkName());
+        put("driverClass", benchmark.getDriverClass());
     }
 
     public String get(String key) {
@@ -89,7 +86,6 @@ public class TestCaseResult {
 
     public long getLongProperty(String name) {
         String value = getExistingProperty(name);
-
         return Long.parseLong(value);
     }
 

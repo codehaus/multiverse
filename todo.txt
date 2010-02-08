@@ -2,6 +2,9 @@
 todo engine
 ---------------------------------------------------------------
 
+- the barriers should have the uninterruptible version excplicitly be named uniterruptble to indicate to the
+programmer that something special is going on.
+
 - the integration tests should be executed from maven using the stress 
 
 - Test 'testContentOfFastAtomicObjectIsCopied' incomplete in file 'AtomicObject_clashingFieldTest.java' at line 62

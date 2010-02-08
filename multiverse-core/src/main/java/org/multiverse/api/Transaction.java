@@ -100,7 +100,7 @@ public interface Transaction {
      * the prepare fails, the transaction automatically is aborted.
      * <p/>
      * It is very important that the transaction eventually commits or aborts, if it doesn't no other transaction
-     * reading/writing the committed resources, can commit.
+     * reading/writing the committed resources, can't commit.
      *
      * @throws org.multiverse.api.exceptions.CommitFailureException
      *          if the transaction can't be prepared.
@@ -171,7 +171,7 @@ public interface Transaction {
      * re-validating state if needed.
      * <p/>
      * A good use case of this feature is starting up threads. If you need to start threads, you don't want to start
-     * them immediately because eventually the transaction could be aborted. 
+     * them immediately because eventually the transaction could be aborted.
      *
      * @param listener the TransactionLifecycleListener to registerLifecycleListener
      * @throws NullPointerException if listener is null.

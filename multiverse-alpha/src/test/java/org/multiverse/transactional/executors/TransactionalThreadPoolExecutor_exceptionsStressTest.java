@@ -9,6 +9,7 @@ import org.multiverse.api.Stm;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class TransactionalThreadPoolExecutor_exceptionsStressTest {
 
@@ -18,6 +19,7 @@ public class TransactionalThreadPoolExecutor_exceptionsStressTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         stm = getGlobalStmInstance();
 
         executor = new TransactionalThreadPoolExecutor();

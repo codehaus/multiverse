@@ -1,14 +1,15 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.utils.instrumentation.InstrumentationProblemMonitor;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 
 import static org.junit.Assert.assertFalse;
+import static org.multiverse.TestUtils.resetInstrumentationProblemMonitor;
 
 /**
  * This is a regression test that makes sure that the Multiverse Javaagent is able to deal with MBeanServer being used
@@ -21,21 +22,21 @@ public class JmxMBeanServerRegressionTest {
 
     @Before
     public void setUp() {
-        org.multiverse.TestUtils.resetInstrumentationProblemMonitor();
+        resetInstrumentationProblemMonitor();
     }
 
     @Test
-    @Ignore
     public void test() {
-        Bean bean = new Bean();
+        ProblemCausingObject object = new ProblemCausingObject();
         assertFalse(InstrumentationProblemMonitor.INSTANCE.isProblemFound());
     }
 
-    public static class Bean {
+    @TransactionalObject
+    public static class ProblemCausingObject {
 
         MBeanServer x = MBeanServerFactory.createMBeanServer();
 
-        public Bean() {
+        public ProblemCausingObject() {
             MBeanServer server = MBeanServerFactory.createMBeanServer();
         }
 

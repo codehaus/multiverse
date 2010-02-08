@@ -9,6 +9,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.transactional.executors.TransactionalThreadPoolExecutorTestUtils.assertIsTerminated;
 
 public class TransactionalThreadPoolExecutor_shutdownTest {
@@ -19,6 +20,7 @@ public class TransactionalThreadPoolExecutor_shutdownTest {
     public void setUp() {
         stm = getGlobalStmInstance();
         executor = new TransactionalThreadPoolExecutor();
+        clearThreadLocalTransaction();
     }
 
 

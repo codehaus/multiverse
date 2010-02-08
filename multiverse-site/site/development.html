@@ -1,9 +1,21 @@
 <h1>Development</h1>
+On this page you can find all information related to developing Multiverse. For more information about how to set up
+your project that depends on Multiverse, check the <a href="mavenconfiguration.html">following</a> page.
 
+<h2>Links</h2>
+Underneath you can find the most important links:
 <ul>
-    <li><a href="http://git.codehaus.org/gitweb.cgi?p=multiverse.git">Browse</a> sources.</li>
-    <li><a href="http://jira.codehaus.org/browse/MULTIVERSE">Jira</a></li>
-    <li><a href="http://docs.codehaus.org/display/MULTIVERSE">Confluence</a></li>
+    <li><a href="http://git.codehaus.org/gitweb.cgi?p=multiverse.git">Web-based GIT viewer</a>.</li>
+    <li><a href="http://jira.codehaus.org/browse/MULTIVERSE">Jira</a> to track the issue. The issues
+        still need to be migrated from the old website to JIRA.
+    </li>
+    <li><a href="http://docs.codehaus.org/display/MULTIVERSE">Confluence:</a> the (still empty) wiki</li>
+    <li><a href="http://bamboo.ci.codehaus.org/browse/MULTIVERSE-DEF">Bamboo:</a> our continuous
+        integration server.
+    </li>
+    <li><a href="http://multiverse.codehaus.org/maven-site/index.html">Maven Site:</a> the default (and) ugly
+        generated maven site containing all the reports.
+    </li>
 </ul>
 
 <h2>Downloading the sources</h2>
@@ -11,17 +23,51 @@ If you are not a committer you can execute the following command:
 <pre>
 git clone git://git.codehaus.org/multiverse.git multiverse
 </pre>
-This command can be executed in the directory you want to Multiverse project to be checked out. The Multiverse directory
-        automatically is created for you.
-<p/>
-If you are a committer you can execute the following command:
+This command can be executed in the directory you want the Multiverse project to be checked out. The multiverse directory
+automatically is created for you.
+<p>
+    If you are a committer you can execute the following command:
 <pre>
 git clone ssh://git@git.codehaus.org/multiverse.git
 </pre>
-If you execute this command, and you haven't registered a 'Authorized Keys' at Codehaus, you will be asked for a password.
-I don't know what the password is and it is best to create an key and upload it to codehaus. For more information
-about creating a key, check the following <a href="http://docs.codehaus.org/display/HAUS/SSH+Guide">SSH Guide on
-    Codehaus</a> and the public part of the key can be copy/paste to your
+If you execute this command, and you haven't registered a 'Authorized Keys' at Codehaus, you will be asked for a
+password. I don't know what the password is and it is best to create an key and upload it to codehaus.
+For more information about creating a key, check the following
+<a href="http://docs.codehaus.org/display/HAUS/SSH+Guide">SSH Guide on Codehaus</a> and the public part of the key
+can be copy/paste to your
 <a href="http://xircles.codehaus.org/my/details">Codehaus details page</a>
 A better manual will be provided in the future because this 'getting up and running' stuff always irritates me and
-wastes my precious time. 
+wastes my precious time.
+
+<h2>Building the project</h2>
+If you have installed Maven 2, the only thing you need to do is the execute 'mvn clean install' in the root
+Multiverse directory.
+
+<h2>Running the stress tests</h2>
+There are a bunch of stress tests (they are named *StressTest) that run for quite some time (15/20 minutes
+on my laptop). They are not executed under a standard phase cause of Clover (the additional instrumentation caused
+by clover takes a lot of extra time). At the moment the stress tests are completely disabled, so you need to run
+them from your ide.
+
+<h2>Setting up your ide</h2>
+If you are working on Multiverse, you need to make sure that the javaagent is running. This can be done by adding
+the following parameters when  you run a unit test:
+<pre>
+    -javaagent:/java/projects/multiverse/0.4/multiverse-alpha/target/multiverse-alpha-0.4-SNAPSHOT-javaagent.jar
+</pre>
+Make sure that you set the path correctly. Another thing you need to do, if you are working on Multiverse itself,
+is to make sure that the compile task of the multiverse-alpha project is called. This will trigger the
+java-agent jar to be build before unit tests are executed.
+<p>
+    Under IntelliJ you can all place this under a default config. After that is done, you never need to worry
+    about this again.
+
+<h2>Setting up Clover</h2>
+Multiverse uses Clover as test coverage tool and out of the box a evaluation license is provided. This license
+eventually will expire, so you will need a real license. Luckily Atlassian was kind enough to provide a free
+license for the Multiverse project. Please send me (alarmnummer at gmail dot com) and email if you are a committer,
+and I'll send you the key.
+<p/>
+Once you reived the key, you need to change your maven settings. Check the following <a
+        href="settings.xml">settings.xml</a>
+for more detailed information. Linux users can find this file in the '~/.m2' directory.

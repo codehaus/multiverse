@@ -2,7 +2,6 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
@@ -48,27 +47,6 @@ public class TransactionalObject_ConstructorTest {
 
         public int getField() {
             return field;
-        }
-    }
-
-    @Test
-    @Ignore
-    public void testConflictingConstructor() {
-        ConflictingConstructor conflictingConstructor = new ConflictingConstructor();
-        //todo
-    }
-
-    @TransactionalObject
-    public static class ConflictingConstructor {
-
-        private int field;
-
-        public ConflictingConstructor() {
-
-        }
-
-        public ConflictingConstructor(ConflictingConstructor conflictingConstructor) {
-
         }
     }
 
