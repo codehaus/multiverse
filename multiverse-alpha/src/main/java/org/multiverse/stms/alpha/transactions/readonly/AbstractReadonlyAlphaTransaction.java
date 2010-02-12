@@ -4,12 +4,12 @@ import org.multiverse.api.exceptions.LoadUncommittedException;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.stms.AbstractTransactionConfig;
 import org.multiverse.stms.AbstractTransactionSnapshot;
-import org.multiverse.stms.alpha.AlphaStmUtils;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AbstractAlphaTransaction;
 
 import static java.lang.String.format;
+import static org.multiverse.stms.alpha.AlphaStmUtils.toTxObjectString;
 
 public abstract class AbstractReadonlyAlphaTransaction<C extends AbstractTransactionConfig>
         extends AbstractAlphaTransaction<C, AbstractTransactionSnapshot> {
@@ -45,7 +45,7 @@ public abstract class AbstractReadonlyAlphaTransaction<C extends AbstractTransac
                         "readonly transactional object has not been committed before. The cause of this " +
                         "problem is very likely that a reference to this transactional object escaped " +
                         "the creating transaction before that transaction was committed.'",
-                AlphaStmUtils.toTxObjectString(txObject), config.getFamilyName());
+                toTxObjectString(txObject), config.getFamilyName());
         return new LoadUncommittedException(msg);
     }
 
@@ -53,9 +53,15 @@ public abstract class AbstractReadonlyAlphaTransaction<C extends AbstractTransac
     protected final AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {
         String msg = format(
                 "Can't open for write transactional object '%s' because transaction '%s' is readonly'",
-                AlphaStmUtils.toTxObjectString(txObject), config.getFamilyName());
+                toTxObjectString(txObject), config.getFamilyName());
         throw new ReadonlyException(msg);
     }
 
-
+    @Override
+    protected final AlphaTranlocal doOpenForCommutingOperation(AlphaTransactionalObject txObject) {
+        String msg = format(
+                "Can't open for commuting operation transactional object '%s' because transaction '%s' is readonly'",
+                toTxObjectString(txObject), config.getFamilyName());
+        throw new ReadonlyException(msg);
+    }
 }

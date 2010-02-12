@@ -2,19 +2,23 @@ package org.multiverse.commitbarriers;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.TestThread;
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
+import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.commitbarriers.VetoCommitBarrier;
+import org.multiverse.api.exceptions.WriteConflictException;
+import org.multiverse.transactional.primitives.TransactionalInteger;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 public class VetoCommitBarrier_commitWithTransactionTest {
     private Stm stm;
@@ -59,21 +63,48 @@ public class VetoCommitBarrier_commitWithTransactionTest {
     }
 
     @Test
-    @Ignore
-    public void whenTransactionIsFirst() {
+    public void whenPendingTransaction() throws InterruptedException {
+        final VetoCommitBarrier barrier = new VetoCommitBarrier();
 
+        final TransactionalInteger ref = new TransactionalInteger();
+
+        TestThread t = new TestThread() {
+            @Override
+            @TransactionalMethod
+            public void doRun() throws Exception {
+                ref.inc();
+                Transaction tx = getThreadLocalTransaction();
+                barrier.awaitCommit(tx);
+            }
+        };
+        t.start();
+
+        sleepMs(500);
+        assertAlive(t);
+        assertTrue(barrier.isOpen());
+
+        barrier.commit();
+        t.join();
+        t.assertNothingThrown();
+        assertTrue(barrier.isCommitted());
+        assertEquals(1, ref.get());
+        assertEquals(0, barrier.getNumberWaiting());
     }
 
     @Test
-    @Ignore
-    public void whenTransactionFailedToPrepare() {
+    public void whenTransactionFailedToPrepare_thenBarrierNotAbortedOrCommitted() {
+        Transaction tx = mock(Transaction.class);
+        doReturn(TransactionStatus.active).when(tx).getStatus();
+        doThrow(new WriteConflictException()).when(tx).prepare();
 
-    }
+        VetoCommitBarrier barrier = new VetoCommitBarrier();
+        try {
+            barrier.commit(tx);
+            fail();
+        } catch (WriteConflictException expected) {
+        }
 
-    @Test
-    @Ignore
-    public void whenPendingTransactions_thenTheyAreNotified() {
-
+        assertTrue(barrier.isOpen());
     }
 
     @Test

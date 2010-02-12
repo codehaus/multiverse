@@ -1,10 +1,12 @@
 package org.multiverse.transactional.primitives;
 
 import org.junit.Test;
+import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.exceptions.DeadTransactionException;
 
 import static org.junit.Assert.*;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 public class TransactionalByteTest {
@@ -111,4 +113,28 @@ public class TransactionalByteTest {
         getThreadLocalTransaction().abort();
     }
 
+    @Test
+    public void awaitTest() {
+        final TransactionalByte ref = new TransactionalByte();
+
+        TestThread t = new TestThread() {
+            @Override
+            public void doRun() throws Exception {
+                ref.await((byte) 2);
+            }
+        };
+
+        t.start();
+        sleepMs(500);
+
+        assertAlive(t);
+
+        ref.set((byte) 1);
+        sleepMs(500);
+
+        assertAlive(t);
+
+        ref.set((byte) 2);
+        joinAll(t);
+    }
 }

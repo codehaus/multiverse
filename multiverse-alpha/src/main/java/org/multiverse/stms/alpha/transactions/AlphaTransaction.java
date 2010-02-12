@@ -49,4 +49,6 @@ public interface AlphaTransaction extends Transaction {
      *                              if this transaction isn't active.
      */
     AlphaTranlocal openForWrite(AlphaTransactionalObject txObject);
+
+    AlphaTranlocal openForCommutingOperation(AlphaTransactionalObject txObject);
 }

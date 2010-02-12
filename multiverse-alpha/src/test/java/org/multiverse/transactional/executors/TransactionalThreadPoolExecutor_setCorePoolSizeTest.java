@@ -2,7 +2,6 @@ package org.multiverse.transactional.executors;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 
@@ -16,7 +15,6 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.transactional.executors.TransactionalThreadPoolExecutorTestUtils.*;
 
-@Ignore
 public class TransactionalThreadPoolExecutor_setCorePoolSizeTest {
     private Stm stm;
 
@@ -110,12 +108,11 @@ public class TransactionalThreadPoolExecutor_setCorePoolSizeTest {
     }
 
     @Test
-    @Ignore
     public void whenPoolSizeDecreasedAndWorkersWorking() {
         Runnable command = new Runnable() {
             @Override
             public void run() {
-                sleepMs(500);
+                sleepMs(1000);
             }
         };
 
@@ -126,8 +123,9 @@ public class TransactionalThreadPoolExecutor_setCorePoolSizeTest {
             executor.execute(command);
         }
 
+        sleepMs(500);
         executor.setCorePoolSize(1);
-        sleepMs(1000);
+        sleepMs(2000);
 
         List<Thread> threads = (List<Thread>) getField(executor, "threads");
         assertEquals(1, threads.size());

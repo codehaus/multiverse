@@ -4,6 +4,7 @@ import org.multiverse.MultiverseConstants;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.PanicError;
+import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.utils.commitlock.CommitLock;
 
 import static java.lang.String.format;
@@ -85,7 +86,7 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
     public abstract boolean isDirty();
 
     /**
-     * Checks if the tranlocal is dirty
+     * Checks if the tranlocal is dirty and caches the value
      * <p/>
      * If the tranlocal is committed, false is returned and nothing is changed.
      * <p/>
@@ -95,7 +96,7 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
      *
      * @return
      */
-    public boolean isDirtySweep() {
+    public boolean isDirtyAndCacheValue() {
         if (isCommitted()) {
             return false;
         }
@@ -110,7 +111,7 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
     }
 
     /**
-     * Checks if the tranlocal is dirty by making use of a ___writeVersion that is changed by the isDirtySweep method.
+     * Checks if the tranlocal is dirty by making use of a ___writeVersion that is changed by the isDirtyAndCacheValue method.
      * If the tranlocal is committed, false will be returned.
      *
      * @return true if dirty, false otherwise.
@@ -129,6 +130,13 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
 
     public final boolean isUncommitted() {
         return !isCommitted();
+    }
+
+    public final boolean isUnfixated() {
+        return ___writeVersion == -1;
+    }
+
+    public void fixate(AlphaTransaction tx) {
     }
 
     public long getWriteVersion() {

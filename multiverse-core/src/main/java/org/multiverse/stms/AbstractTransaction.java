@@ -229,7 +229,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
                 //fall through
             case prepared:
                 try {
-                    doCommitPrepared();
+                    doStore();
                     status = TransactionStatus.committed;
                     notifyAll(TransactionLifecycleEvent.postCommit);
                 } finally {
@@ -249,7 +249,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
         }
     }
 
-    protected void doCommitPrepared() {
+    protected void doStore() {
     }
 
     @Override

@@ -7,7 +7,7 @@ import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.exceptions.DeadTransactionException;
 
 import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.sleepMs;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
@@ -139,5 +139,30 @@ public class TransactionalIntegerTest {
             sleepMs(300);
             txInt.set(value);
         }
+    }
+
+    @Test
+    public void awaitTest() {
+        final TransactionalInteger ref = new TransactionalInteger();
+
+        TestThread t = new TestThread() {
+            @Override
+            public void doRun() throws Exception {
+                ref.await(2);
+            }
+        };
+
+        t.start();
+        sleepMs(500);
+
+        assertAlive(t);
+
+        ref.set(1);
+        sleepMs(500);
+
+        assertAlive(t);
+
+        ref.set(2);
+        joinAll(t);
     }
 }

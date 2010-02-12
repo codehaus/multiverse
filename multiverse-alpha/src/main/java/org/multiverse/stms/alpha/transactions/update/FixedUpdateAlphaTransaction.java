@@ -100,6 +100,8 @@ public class FixedUpdateAlphaTransaction
                 //from now on.
                 attached = attached.openForWrite();
                 attachedArray[indexOf] = attached;
+            } else if (attached.isUnfixated()) {
+                attached.fixate(this);
             }
             return attached;
         }

@@ -252,7 +252,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
 
                 if (threads.isEmpty()) {
                     state = State.terminated;
-                }else{
+                } else {
                     state = State.shutdown;
                     getThreadLocalTransaction().registerLifecycleListener(new InterruptWorkersListener());
                 }
@@ -423,10 +423,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
 
         @TransactionalMethod
         private Runnable takeWork() throws InterruptedException {
-            if (corePoolSize > threads.size() || isShutdown()) {
-                if (!isShutdown()) {
-                    System.out.println("overbodige werker gevonden");
-                }
+            if (threads.size() > corePoolSize || isShutdown()) {
                 threads.remove(thread);
                 return null;
             } else {

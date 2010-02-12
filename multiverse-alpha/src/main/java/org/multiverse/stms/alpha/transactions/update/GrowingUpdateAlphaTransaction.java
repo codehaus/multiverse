@@ -179,6 +179,8 @@ public class GrowingUpdateAlphaTransaction
             //from now on.
             attached = attached.openForWrite();
             attachedMap.put(txObject, attached);
+        } else if (attached.isUnfixated()) {
+            attached.fixate(this);
         }
 
         return attached;

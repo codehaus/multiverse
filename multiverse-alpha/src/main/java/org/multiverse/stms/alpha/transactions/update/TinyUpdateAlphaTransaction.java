@@ -111,6 +111,8 @@ public class TinyUpdateAlphaTransaction
 
             if (attached.isCommitted()) {
                 attached = attached.openForWrite();
+            } else if (attached.isUnfixated()) {
+                attached.fixate(this);
             }
         } else {
             AlphaTranlocal committed = txObject.___load(getReadVersion());

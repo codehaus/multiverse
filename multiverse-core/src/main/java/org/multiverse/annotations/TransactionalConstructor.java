@@ -6,13 +6,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation that can be placed on constructor. There is a lot of overlap with the
- * {@link TransactionalMethod} annotation, but the big difference is that transactions
- * on constructors can't be retried. So everything related to retrying has been removed.
+ * Annotation that can be placed on constructor. There is a lot of overlap with the {@link TransactionalMethod}
+ * annotation, but the big difference is that transactions on constructors can't be retried. So everything related
+ * to retrying has been removed.
  * <p/>
- * The reason why this annotation exists is that it is very hard to add the instrumentation
- * in a constructor so that it can be retried. It has to do with a bytecode verification that
- * treats an uninitialized objects as a different type than an initialized one.
+ * The reason why this annotation exists is that it is very hard to add the instrumentation in a constructor so that
+ * it can be retried. It has to do with a bytecode verification that treats an uninitialized objects as a different
+ * type than an initialized one.
  *
  * @author Peter Veentjer.
  */
@@ -36,17 +36,15 @@ public @interface TransactionalConstructor {
      * If the transaction automatically should track reads. This behavior is not only useful to reduce
      * read conflicts, it also is needed for blocking transactions and prevention of the write skew problem.
      *
-     * @return true if it should do automatic readtracking, false otherwise.
+     * @return true if it should do automatic read tracking, false otherwise.
      */
     boolean automaticReadTracking() default true;
 
     /**
-     * If the writeskew problem should be prevented. If set to true, the automaticReadTracking also has to
+     * If the write skew problem should be prevented. If set to true, the automaticReadTracking also has to
      * be set to true.
      *
-     * @return true if the writeskew problem should be prevented.
+     * @return true if the writes kew problem should be prevented.
      */
     boolean preventWriteSkew() default false;
-
-    boolean loggingEnabled() default false;
 }

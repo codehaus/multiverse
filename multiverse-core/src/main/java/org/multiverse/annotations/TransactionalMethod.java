@@ -47,19 +47,7 @@ public @interface TransactionalMethod {
 
     boolean interruptible() default false;
 
-    boolean loggingEnabled() default false;
-
     boolean readonly() default false;
 
     int maxRetryCount() default 1000;
-
-    //PropagationLevel propagationLevel() default PropagationLevel.requires;
-
-    //retry policy
-
-    //CommitLockPolicy commitLockPolicy() default GenericCommitLockPolicy.FAIL_FAST;
-
-    //long timeout() default -1;
-
-    //TimeUnit timeoutUnit() default TimeUnit.MILLISECONDS;
 }

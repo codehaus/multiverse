@@ -8,6 +8,7 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AbstractAlphaTransaction;
 import org.multiverse.utils.Listeners;
+import org.multiverse.utils.TodoException;
 
 import static java.lang.String.format;
 
@@ -41,6 +42,10 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
     protected final AlphaTranlocal doOpenForRead(AlphaTransactionalObject txObject) {
         AlphaTranlocal attached = find(txObject);
         if (attached != null) {
+            if (!attached.isUnfixated()) {
+                attached.fixate(this);
+            }
+
             return attached;
         }
 
@@ -53,6 +58,20 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
         }
 
         return attached;
+    }
+
+    @Override
+    protected AlphaTranlocal doOpenForCommutingOperation(AlphaTransactionalObject txObject) {
+        AlphaTranlocal attached = find(txObject);
+        if (attached != null) {
+            if (attached.isUnfixated()) {
+
+            } else if (attached.isCommitted()) {
+                attached = attached.openForWrite();
+            }
+        }
+
+        throw new TodoException();
     }
 
     /**
@@ -92,7 +111,7 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
         }
 
         if (config.dirtyCheck) {
-            return attached.isDirtySweep();
+            return attached.isDirtyAndCacheValue();
         } else {
             return true;
         }
@@ -263,7 +282,7 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
     }
 
     @Override
-    protected void doCommitPrepared() {
+    protected void doStore() {
         Listeners[] listeners = store(writeVersion);
         doReleaseWriteLocksForSuccess(writeVersion);
         openAll(listeners);
