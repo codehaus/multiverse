@@ -37,7 +37,7 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyTest {
         } catch (NullPointerException expected) {
         }
 
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
         assertEquals(0, barrier.getNumberWaiting());
     }
 
@@ -89,7 +89,7 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyTest {
         sleepMs(500);
 
         assertAlive(t1, t2);
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
 
         Transaction tx = new AbstractTransactionImpl();
         barrier.awaitCommitUninterruptibly(tx);
@@ -110,7 +110,7 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyTest {
         } catch (IllegalStateException ex) {
         }
 
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
         assertEquals(0, barrier.getNumberWaiting());
     }
 
@@ -126,12 +126,12 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyTest {
         } catch (IllegalStateException ex) {
         }
 
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
         assertEquals(0, barrier.getNumberWaiting());
     }
 
     @Test
-    public void whenAborted_thenThrowsIllegalStateException() {
+    public void whenAborted_thenClosedCommitBarrierException() {
         barrier = new CountdownCommitBarrier(1);
         barrier.abort();
 
@@ -140,14 +140,14 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyTest {
         try {
             barrier.awaitCommitUninterruptibly(tx);
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (ClosedCommitBarrierException expected) {
         }
 
         assertTrue(barrier.isAborted());
     }
 
     @Test
-    public void whenCommitted_thenThrowsIllegalStateException() {
+    public void whenCommitted_thenClosedCommitBarrierException() {
         barrier = new CountdownCommitBarrier(1);
         barrier.awaitCommitUninterruptibly(new AbstractTransactionImpl());
 
@@ -155,10 +155,10 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyTest {
         try {
             barrier.awaitCommitUninterruptibly(tx);
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (ClosedCommitBarrierException expected) {
         }
 
-        assertIsActive(tx);
+        assertIsAborted(tx);
     }
 
     class AwaitThread extends TestThread {

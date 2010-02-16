@@ -112,7 +112,7 @@ public class WriteSkewStressTest {
             TransactionalInteger fromAccount1 = accounts[fromUser * 2];
             TransactionalInteger fromAccount2 = accounts[fromUser * 2 + 1];
 
-            //here do the open for read/write take place.
+            //here do the closed for read/write take place.
             int sum = fromAccount1.get() + fromAccount2.get();
             if (sum < 0) {
                 System.out.println("WriteSkew occurred");

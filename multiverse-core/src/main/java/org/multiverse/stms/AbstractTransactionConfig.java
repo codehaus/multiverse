@@ -35,8 +35,13 @@ public class AbstractTransactionConfig implements TransactionConfig {
     public AbstractTransactionConfig(
             PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName, boolean readOnly,
             int maxRetryCount, boolean interruptible, boolean preventWriteSkew, boolean automaticReadTracking) {
-        assert clock != null;
-        assert backoffPolicy != null;
+        if (clock == null) {
+            throw new NullPointerException();
+        }
+
+        if (backoffPolicy == null) {
+            throw new NullPointerException();
+        }
 
         this.clock = clock;
         this.familyName = familyName;
@@ -47,8 +52,9 @@ public class AbstractTransactionConfig implements TransactionConfig {
         this.automaticReadTracking = automaticReadTracking;
         this.preventWriteSkew = preventWriteSkew;
 
-        if (readOnly && !automaticReadTracking && preventWriteSkew) {
-            throw new RuntimeException();
+        if (!readOnly && !automaticReadTracking && preventWriteSkew) {
+            throw new IllegalArgumentException("It isn't allowed to have a update transaction with preventWriteSkew " +
+                    "enabled and automaticReadTracking disabled. The last is needed to do the first.");
         }
     }
 

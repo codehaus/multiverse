@@ -2,6 +2,7 @@ package org.multiverse.transactional.executors;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
@@ -105,6 +106,7 @@ public class TransactionalThreadPoolExecutor_shutdownNowTest {
     }
 
     @Test
+    @Ignore
     public void whenShutdownAndPendingWork_thenPendingReturned() {
         executor = new TransactionalThreadPoolExecutor();
         executor.execute(new Runnable() {

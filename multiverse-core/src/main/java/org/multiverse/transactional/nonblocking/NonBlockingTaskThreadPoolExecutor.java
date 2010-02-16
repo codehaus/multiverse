@@ -2,7 +2,7 @@ package org.multiverse.transactional.nonblocking;
 
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Transaction;
-import org.multiverse.transactional.executors.TransactionalExecutor;
+import org.multiverse.transactional.executors.TransactionalThreadPoolExecutor;
 
 /**
  * Waarom zou je meer transacties willen? Ivm blocking van transaction. Atm heeft iedere transactie zijn eigen thread
@@ -22,11 +22,11 @@ public class NonBlockingTaskThreadPoolExecutor implements NonBlockingTransaction
     private Thread[] workerThreads;
     private int threadCount;
     private TransactionSelector selector;
-    private TransactionalExecutor executor;
+    private TransactionalThreadPoolExecutor executor;
     private State state;
 
     public NonBlockingTaskThreadPoolExecutor(int threadCount) {
-        this(new DefaultTransactionSelector<NonBlockingTaskImpl>(), threadCount);
+        this(new DefaultTransactionSelector<SelectionKey>(), threadCount);
     }
 
     public NonBlockingTaskThreadPoolExecutor(TransactionSelector selector, int threadCount) {
@@ -36,21 +36,22 @@ public class NonBlockingTaskThreadPoolExecutor implements NonBlockingTransaction
         this.threadCount = threadCount;
         this.selector = selector;
         this.state = State.unstarted;
+        this.executor = new TransactionalThreadPoolExecutor(threadCount);
     }
 
-    public boolean isShutdown(){
-        return false;
+    public boolean isShutdown() {
+        return executor.isShutdown();
     }
 
-    public boolean isTerminated(){
-        return false;    
+    public boolean isTerminated() {
+        return executor.isTerminated();
     }
 
     public void start() {
-
+        executor.start();
     }
 
-    public void stop(){
+    public void shutdown() {
 
     }
 
@@ -60,14 +61,7 @@ public class NonBlockingTaskThreadPoolExecutor implements NonBlockingTransaction
             throw new NullPointerException();
         }
 
-        Runnable registerCommand = new Runnable(){
-            @Override
-            public void run() {
-                selector.register(new Key(task));
-            }
-        };
-
-        executor.execute(registerCommand);
+        selector.register(new Key(task));
     }
 
     class Key implements TransactionSelectionKey {
@@ -84,21 +78,22 @@ public class NonBlockingTaskThreadPoolExecutor implements NonBlockingTransaction
         }
     }
 
-    /*
     public class Worker implements Runnable {
 
         @Override
         public void run() {
+            /*
             try {
-                while (!shutdown) {
-                    NonBlockingTaskWrapper task = tasks.take();
-                    run(task);
+                while (!isShutdown()) {
+                    SelectionKey key = selector.select();
+                    run(key.task);
                 }
             } catch (InterruptedException ex) {
-            }
+            } */
         }
 
         private void run(NonBlockingTask task) {
+            /*
             Transaction t;
             if (task.previous == null) {
                 t = task.transactionalTask.getTransactionFactory().start();
@@ -120,15 +115,15 @@ public class NonBlockingTaskThreadPoolExecutor implements NonBlockingTransaction
                 t.registerRetryLatch(latch);
                 ///System.out.println("RetryError encountered");
 
-            }
+            } */
         }
-    } */
+    }
 
-    static class NonBlockingTaskImpl implements TransactionSelectionKey {
+    static class SelectionKey implements TransactionSelectionKey {
 
         private final NonBlockingTask task;
 
-        NonBlockingTaskImpl(NonBlockingTask task) {
+        SelectionKey(NonBlockingTask task) {
             this.task = task;
         }
 

@@ -10,7 +10,7 @@ import org.multiverse.stms.AbstractTransactionImpl;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.multiverse.TestUtils.assertIsActive;
+import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.clearCurrentThreadInterruptedStatus;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
@@ -37,7 +37,7 @@ public class CountdownCommitBarrier_tryAwaitCommitTest {
         } catch (NullPointerException expected) {
         }
 
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
         assertEquals(0, barrier.getNumberWaiting());
     }
 
@@ -54,7 +54,8 @@ public class CountdownCommitBarrier_tryAwaitCommitTest {
     }
 
     @Test
-    public void whenAborted_thenIllegalStateException() {
+    @Ignore
+    public void whenAborted_thenClosedCommitBarrierException() {
         CountdownCommitBarrier barrier = new CountdownCommitBarrier(1);
         barrier.abort();
 
@@ -62,27 +63,28 @@ public class CountdownCommitBarrier_tryAwaitCommitTest {
         try {
             barrier.tryAwaitCommit(tx);
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (ClosedCommitBarrierException expected) {
         }
 
         assertTrue(barrier.isAborted());
         assertEquals(0, barrier.getNumberWaiting());
-        assertIsActive(tx);
+        assertIsAborted(tx);
     }
 
     @Test
-    public void whenCommitted_thenIllegalStateException() {
+    @Ignore
+    public void whenCommitted_thenClosedCommitBarrierException() {
         CountdownCommitBarrier barrier = new CountdownCommitBarrier(0);
 
         Transaction tx = new AbstractTransactionImpl();
         try {
             barrier.tryAwaitCommit(tx);
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (ClosedCommitBarrierException expected) {
         }
 
         assertTrue(barrier.isCommitted());
         assertEquals(0, barrier.getNumberWaiting());
-        assertIsActive(tx);
+        assertIsAborted(tx);
     }
 }

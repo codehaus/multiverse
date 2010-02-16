@@ -13,7 +13,7 @@ public class TransactionalThreadPoolExecutor_StressTest {
 
     private TransactionalThreadPoolExecutor executor;
 
-    private static final int scheduleCount = 2 * 1000 * 1000;
+    private static final int scheduleCount = 5 * 1000 * 1000;
 
     private AtomicInteger runningCount;
 

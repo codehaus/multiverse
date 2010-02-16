@@ -40,7 +40,7 @@ public class CountdownCommitBarrier_awaitCommitWithTransactionTest {
         } catch (NullPointerException expected) {
         }
 
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
         assertEquals(0, barrier.getNumberWaiting());
     }
 
@@ -71,7 +71,7 @@ public class CountdownCommitBarrier_awaitCommitWithTransactionTest {
 
         sleepMs(500);
         assertAlive(t);
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
         barrier.abort();
 
         t.join();
@@ -129,7 +129,7 @@ public class CountdownCommitBarrier_awaitCommitWithTransactionTest {
         }
 
         assertIsCommitted(tx);
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
     }
 
     @Test
@@ -146,11 +146,11 @@ public class CountdownCommitBarrier_awaitCommitWithTransactionTest {
         }
 
         assertIsAborted(tx);
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
     }
 
     @Test
-    public void whenAborted_thenIllegalStateException() throws InterruptedException {
+    public void whenAborted_thenClosedCommitBarrierException() throws InterruptedException {
         barrier = new CountdownCommitBarrier(1);
         barrier.abort();
 
@@ -159,7 +159,7 @@ public class CountdownCommitBarrier_awaitCommitWithTransactionTest {
         try {
             barrier.awaitCommit(tx);
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (ClosedCommitBarrierException expected) {
         }
 
         assertTrue(barrier.isAborted());
@@ -167,7 +167,7 @@ public class CountdownCommitBarrier_awaitCommitWithTransactionTest {
     }
 
     @Test
-    public void whenCommitted_thenIllegalStateException() throws InterruptedException {
+    public void whenCommitted_thenClosedCommitBarrierException() throws InterruptedException {
         barrier = new CountdownCommitBarrier(0);
 
         Transaction tx = new AbstractTransactionImpl();
@@ -175,20 +175,11 @@ public class CountdownCommitBarrier_awaitCommitWithTransactionTest {
         try {
             barrier.awaitCommit(tx);
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (ClosedCommitBarrierException expected) {
         }
 
         assertTrue(barrier.isCommitted());
         assertEquals(0, barrier.getNumberWaiting());
     }
 
-    public class AwaitCommitThread extends TestThread {
-        private Transaction tx;
-
-        @Override
-        public void doRun() throws Exception {
-            tx = getThreadLocalTransaction();
-            barrier.awaitCommit(tx);
-        }
-    }
 }

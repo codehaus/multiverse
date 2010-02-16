@@ -66,7 +66,7 @@ public abstract class TestThread extends Thread {
 
     public void assertFailedWithException(Class expected) {
         assertNotNull(throwable);
-        assertTrue(throwable.getClass().isAssignableFrom(expected));
+        assertTrue("Found exception: " + throwable.getClass().getName(), throwable.getClass().isAssignableFrom(expected));
     }
 
     public void assertNothingThrown() {

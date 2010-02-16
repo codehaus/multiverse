@@ -38,7 +38,7 @@ public class CountdownCommitBarrier_constructorTest {
     @Test
     public void whenPositiveParties() {
         CountdownCommitBarrier barrier = new CountdownCommitBarrier(10);
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
         assertEquals(10, barrier.getParties());
         assertEquals(0, barrier.getNumberWaiting());
     }

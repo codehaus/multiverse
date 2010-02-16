@@ -13,9 +13,7 @@ import org.multiverse.transactional.primitives.TransactionalInteger;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.assertIsActive;
-import static org.multiverse.TestUtils.clearCurrentThreadInterruptedStatus;
-import static org.multiverse.TestUtils.sleepMs;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
@@ -43,7 +41,7 @@ public class CountdownCommitBarrier_tryAwaitCommitTransactionWithTimeoutTest {
         } catch (NullPointerException expected) {
         }
 
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
         assertEquals(0, barrier.getNumberWaiting());
     }
 
@@ -59,13 +57,13 @@ public class CountdownCommitBarrier_tryAwaitCommitTransactionWithTimeoutTest {
         }
 
         assertIsActive(tx);
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
         assertEquals(0, barrier.getNumberWaiting());
     }
 
     @Test
     @Ignore
-    public void whenNotLastOne(){
+    public void whenNotLastOne() {
 
     }
 
@@ -94,7 +92,7 @@ public class CountdownCommitBarrier_tryAwaitCommitTransactionWithTimeoutTest {
 
         final TransactionalInteger ref = new TransactionalInteger();
 
-        TestThread t = new TestThread(){
+        TestThread t = new TestThread() {
             @TransactionalMethod
             @Override
             public void doRun() throws Exception {
@@ -112,12 +110,12 @@ public class CountdownCommitBarrier_tryAwaitCommitTransactionWithTimeoutTest {
 
         t.join();
         t.assertNothingThrown();
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
         assertEquals(1, ref.get());
     }
 
     @Test
-    public void whenAborted() {
+    public void whenAborted_thenClosedBarrierException() {
         barrier = new CountdownCommitBarrier(1);
         barrier.abort();
 
@@ -126,7 +124,7 @@ public class CountdownCommitBarrier_tryAwaitCommitTransactionWithTimeoutTest {
         try {
             barrier.tryAwaitCommit(tx, 1, TimeUnit.DAYS);
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (ClosedCommitBarrierException expected) {
         }
 
         assertIsActive(tx);
@@ -135,7 +133,7 @@ public class CountdownCommitBarrier_tryAwaitCommitTransactionWithTimeoutTest {
     }
 
     @Test
-    public void whenCommitted() {
+    public void whenCommitted_thenClosedBarrierException() {
         barrier = new CountdownCommitBarrier(0);
 
         Transaction tx = new AbstractTransactionImpl();
@@ -143,7 +141,7 @@ public class CountdownCommitBarrier_tryAwaitCommitTransactionWithTimeoutTest {
         try {
             barrier.tryAwaitCommit(tx, 1, TimeUnit.DAYS);
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (ClosedCommitBarrierException expected) {
         }
 
         assertIsActive(tx);

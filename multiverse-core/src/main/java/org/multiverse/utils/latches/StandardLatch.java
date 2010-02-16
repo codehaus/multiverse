@@ -28,7 +28,7 @@ public final class StandardLatch implements Latch {
     /**
      * Creates a new StandardLatch.
      *
-     * @param isOpen true if the latch already is open, false otherwise.
+     * @param isOpen true if the latch already is closed, false otherwise.
      */
     public StandardLatch(boolean isOpen) {
         this.isOpen = isOpen;
@@ -74,7 +74,7 @@ public final class StandardLatch implements Latch {
             throw new NullPointerException();
         }
 
-        if(isOpen){
+        if (isOpen) {
             return true;
         }
 
@@ -111,7 +111,7 @@ public final class StandardLatch implements Latch {
             throw new NullPointerException();
         }
 
-        if(isOpen){
+        if (isOpen) {
             return true;
         }
 
@@ -122,10 +122,10 @@ public final class StandardLatch implements Latch {
             do {
                 long startNs = System.nanoTime();
                 try {
-                    return tryAwait(timeoutNs)>0;
+                    return tryAwait(timeoutNs) > 0;
                 } catch (InterruptedException ex) {
                     restoreInterrupt = true;
-                    timeoutNs -=System.nanoTime()-startNs;
+                    timeoutNs -= System.nanoTime() - startNs;
                 }
             } while (true);
         } finally {

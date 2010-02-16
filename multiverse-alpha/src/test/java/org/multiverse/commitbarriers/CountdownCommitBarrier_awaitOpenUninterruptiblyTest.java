@@ -5,12 +5,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class VetoCommitBarrier_awaitCloseTest {
-    private VetoCommitBarrier barrier;
+public class CountdownCommitBarrier_awaitOpenUninterruptiblyTest {
+
+    private CountdownCommitBarrier barrier;
 
     @Before
     public void setUp() {
@@ -24,33 +26,34 @@ public class VetoCommitBarrier_awaitCloseTest {
     }
 
     @Test
-    public void whenStartInterrupted_thenInterruptedException() {
-        barrier = new VetoCommitBarrier();
-
-        Thread.currentThread().interrupt();
-
-        try {
-            barrier.awaitClose();
-            fail();
-        } catch (InterruptedException expected) {
-        }
-
-        assertTrue(barrier.isOpen());
-        assertEquals(0, barrier.getNumberWaiting());
-    }
-
-    @Test
-    public void whenInterruptedWhileWaiting_thenInterruptedException() {
-        barrier = new VetoCommitBarrier();
+    public void whenStartInterrupted() {
+        barrier = new CountdownCommitBarrier(1);
 
         TestThread t = new TestThread() {
             @Override
             public void doRun() throws Exception {
-                try {
-                    barrier.awaitClose();
-                    fail();
-                } catch (InterruptedException expected) {
-                }
+                Thread.currentThread().interrupt();
+                barrier.awaitOpenUninterruptibly();
+            }
+        };
+        t.start();
+
+        sleepMs(500);
+        assertAlive(t);
+
+        barrier.abort();
+
+        joinAll(t);
+    }
+
+    @Test
+    public void whenInterruptedWhileWaiting() {
+        barrier = new CountdownCommitBarrier(1);
+
+        TestThread t = new TestThread() {
+            @Override
+            public void doRun() throws Exception {
+                barrier.awaitOpenUninterruptibly();
             }
         };
         t.start();
@@ -58,17 +61,22 @@ public class VetoCommitBarrier_awaitCloseTest {
         sleepMs(500);
         t.interrupt();
 
+        sleepMs(500);
+        assertAlive(t);
+
+        barrier.abort();
+
         joinAll(t);
     }
 
     @Test
     public void whenAbortedWhileWaiting() {
-        barrier = new VetoCommitBarrier();
+        barrier = new CountdownCommitBarrier(1);
 
         TestThread t = new TestThread() {
             @Override
             public void doRun() throws Exception {
-                barrier.awaitClose();
+                barrier.awaitOpenUninterruptibly();
             }
         };
         t.start();
@@ -80,39 +88,39 @@ public class VetoCommitBarrier_awaitCloseTest {
     }
 
     @Test
-    public void whenCommittedWhileWaiting() {
-        barrier = new VetoCommitBarrier();
+    public void whenCommittedWhileWaiting() throws InterruptedException {
+        barrier = new CountdownCommitBarrier(1);
 
         TestThread t = new TestThread() {
             @Override
             public void doRun() throws Exception {
-                barrier.awaitClose();
+                barrier.awaitOpenUninterruptibly();
             }
         };
         t.start();
 
         sleepMs(500);
-        barrier.commit();
+        barrier.awaitCommit();
 
         joinAll(t);
+        assertTrue(barrier.isCommitted());
     }
 
     @Test
     public void whenCommitted() throws InterruptedException {
-        VetoCommitBarrier barrier = new VetoCommitBarrier();
-        barrier.commit();
+        barrier = new CountdownCommitBarrier(0);
 
-        barrier.awaitClose();
+        barrier.awaitOpenUninterruptibly();
         assertTrue(barrier.isCommitted());
         assertEquals(0, barrier.getNumberWaiting());
     }
 
     @Test
     public void whenAborted() throws InterruptedException {
-        VetoCommitBarrier barrier = new VetoCommitBarrier();
+        barrier = new CountdownCommitBarrier(1);
         barrier.abort();
 
-        barrier.awaitClose();
+        barrier.awaitOpenUninterruptibly();
         assertTrue(barrier.isAborted());
         assertEquals(0, barrier.getNumberWaiting());
     }

@@ -38,7 +38,7 @@ public class VetoCommitBarrier_tryAwaitCommitTest {
         } catch (NullPointerException expected) {
         }
 
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
     }
 
     @Test
@@ -61,7 +61,7 @@ public class VetoCommitBarrier_tryAwaitCommitTest {
 
     @Test
     @Ignore
-    public void whenAborted_thenIllegalStateException() {
+    public void whenAborted_thenClosedCommitBarrierException() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
         barrier.abort();
 
@@ -70,7 +70,7 @@ public class VetoCommitBarrier_tryAwaitCommitTest {
         try {
             // barrier.tryAwaitCommit(tx);
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (ClosedCommitBarrierException expected) {
         }
 
         assertTrue(barrier.isAborted());
@@ -79,7 +79,7 @@ public class VetoCommitBarrier_tryAwaitCommitTest {
 
     @Test
     @Ignore
-    public void whenCommitted_thenIllegalStateException() {
+    public void whenCommitted_thenClosedCommitBarrierException() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
         barrier.commit();
 
@@ -88,7 +88,7 @@ public class VetoCommitBarrier_tryAwaitCommitTest {
         try {
             //barrier.tryAwaitCommit(tx);
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (ClosedCommitBarrierException expected) {
         }
 
         assertTrue(barrier.isCommitted());

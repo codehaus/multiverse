@@ -30,7 +30,7 @@ public final class CheapLatch implements Latch {
     /**
      * Creates a new CheapLatch.
      *
-     * @param isOpen true if the latch already is open, false if the latch is closed.
+     * @param isOpen true if the latch already is closed, false if the latch is closed.
      */
     public CheapLatch(boolean isOpen) {
         this.isOpen = isOpen;

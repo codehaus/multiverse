@@ -48,7 +48,7 @@ public class VetoCommitBarrier_commitWithTransactionTest {
         } catch (NullPointerException expected) {
         }
 
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
     }
 
     @Test
@@ -81,7 +81,7 @@ public class VetoCommitBarrier_commitWithTransactionTest {
 
         sleepMs(500);
         assertAlive(t);
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
 
         barrier.commit();
         t.join();
@@ -104,7 +104,7 @@ public class VetoCommitBarrier_commitWithTransactionTest {
         } catch (WriteConflictException expected) {
         }
 
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
     }
 
     @Test
@@ -121,7 +121,7 @@ public class VetoCommitBarrier_commitWithTransactionTest {
         }
 
         assertIsAborted(tx);
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
     }
 
     @Test
@@ -138,11 +138,11 @@ public class VetoCommitBarrier_commitWithTransactionTest {
         }
 
         assertIsCommitted(tx);
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
     }
 
     @Test
-    public void whenBarrierCommitted_thenIllegalStateException() {
+    public void whenBarrierCommitted_thenClosedCommitBarrierException() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
         barrier.commit();
 
@@ -150,7 +150,7 @@ public class VetoCommitBarrier_commitWithTransactionTest {
         try {
             barrier.commit(tx);
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (ClosedCommitBarrierException expected) {
         }
 
         assertTrue(barrier.isCommitted());
@@ -158,7 +158,7 @@ public class VetoCommitBarrier_commitWithTransactionTest {
     }
 
     @Test
-    public void whenBarrierAborted_thenIllegalStateException() {
+    public void whenBarrierAborted_thenClosedCommitBarrierException() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
         barrier.abort();
 
@@ -166,7 +166,7 @@ public class VetoCommitBarrier_commitWithTransactionTest {
         try {
             barrier.commit(tx);
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (ClosedCommitBarrierException expected) {
         }
 
         assertTrue(barrier.isAborted());

@@ -137,7 +137,7 @@ public interface Transaction {
      * Registers the retry Latch on this Transaction. This functionality is required for the retry mechanism
      * (so blocking!) and is something different than 'just' restarting. The Latch contains all the 'waiting' logic,
      * so you can do timed and non interruptible timeouts on that structure. A latch can be compared to a
-     * {@link java.util.concurrent.Future} because it also pops open once some event occurs (an interesting write
+     * {@link java.util.concurrent.Future} because it also pops closed once some event occurs (an interesting write
      * in the case of a Latch).
      *
      * @param latch the Latch to register.

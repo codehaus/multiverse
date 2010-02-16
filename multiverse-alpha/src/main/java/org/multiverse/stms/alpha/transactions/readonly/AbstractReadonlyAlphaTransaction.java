@@ -56,12 +56,4 @@ public abstract class AbstractReadonlyAlphaTransaction<C extends AbstractTransac
                 toTxObjectString(txObject), config.getFamilyName());
         throw new ReadonlyException(msg);
     }
-
-    @Override
-    protected final AlphaTranlocal doOpenForCommutingOperation(AlphaTransactionalObject txObject) {
-        String msg = format(
-                "Can't open for commuting operation transactional object '%s' because transaction '%s' is readonly'",
-                toTxObjectString(txObject), config.getFamilyName());
-        throw new ReadonlyException(msg);
-    }
 }

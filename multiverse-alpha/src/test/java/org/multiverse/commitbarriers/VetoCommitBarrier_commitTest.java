@@ -71,14 +71,14 @@ public class VetoCommitBarrier_commitTest {
     }
 
     @Test
-    public void whenBarrierAborted_thenIllegalStateException() {
+    public void whenBarrierAborted_thenClosedCommitBarrierException() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
         barrier.abort();
 
         try {
             barrier.commit();
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (ClosedCommitBarrierException expected) {
         }
         assertTrue(barrier.isAborted());
     }

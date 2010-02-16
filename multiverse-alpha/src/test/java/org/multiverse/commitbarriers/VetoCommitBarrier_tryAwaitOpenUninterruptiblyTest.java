@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class VetoCommitBarrier_tryAwaitCloseUninterruptiblyTest {
+public class VetoCommitBarrier_tryAwaitOpenUninterruptiblyTest {
 
     private VetoCommitBarrier barrier;
 
@@ -31,13 +31,13 @@ public class VetoCommitBarrier_tryAwaitCloseUninterruptiblyTest {
         barrier = new VetoCommitBarrier();
 
         try {
-            barrier.tryAwaitCloseUninterruptibly(1, null);
+            barrier.tryAwaitOpenUninterruptibly(1, null);
             fail();
         } catch (NullPointerException expected) {
 
         }
 
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
     }
 
     @Test
@@ -47,7 +47,7 @@ public class VetoCommitBarrier_tryAwaitCloseUninterruptiblyTest {
         TestThread t = new TestThread() {
             @Override
             public void doRun() {
-                boolean result = barrier.tryAwaitCloseUninterruptibly(1500, TimeUnit.MILLISECONDS);
+                boolean result = barrier.tryAwaitOpenUninterruptibly(1500, TimeUnit.MILLISECONDS);
                 assertFalse(result);
             }
         };
@@ -61,7 +61,7 @@ public class VetoCommitBarrier_tryAwaitCloseUninterruptiblyTest {
         t.join();
         t.assertNothingThrown();
         assertTrue(t.hasEndedWithInterruptStatus());
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
     }
 
     @Test
@@ -71,7 +71,7 @@ public class VetoCommitBarrier_tryAwaitCloseUninterruptiblyTest {
         TestThread t = new TestThread() {
             @Override
             public void doRun() throws Exception {
-                boolean result = barrier.tryAwaitCloseUninterruptibly(1, TimeUnit.DAYS);
+                boolean result = barrier.tryAwaitOpenUninterruptibly(1, TimeUnit.DAYS);
                 assertTrue(result);
             }
         };
@@ -94,7 +94,7 @@ public class VetoCommitBarrier_tryAwaitCloseUninterruptiblyTest {
         TestThread t = new TestThread() {
             @Override
             public void doRun() throws Exception {
-                boolean result = barrier.tryAwaitCloseUninterruptibly(1, TimeUnit.DAYS);
+                boolean result = barrier.tryAwaitOpenUninterruptibly(1, TimeUnit.DAYS);
                 assertTrue(result);
             }
         };
@@ -117,7 +117,7 @@ public class VetoCommitBarrier_tryAwaitCloseUninterruptiblyTest {
         TestThread t = new TestThread() {
             @Override
             public void doRun() throws Exception {
-                boolean result = barrier.tryAwaitCloseUninterruptibly(1, TimeUnit.SECONDS);
+                boolean result = barrier.tryAwaitOpenUninterruptibly(1, TimeUnit.SECONDS);
                 assertFalse(result);
             }
         };
@@ -132,7 +132,7 @@ public class VetoCommitBarrier_tryAwaitCloseUninterruptiblyTest {
         barrier = new VetoCommitBarrier();
         barrier.commit();
 
-        boolean result = barrier.tryAwaitCloseUninterruptibly(1, TimeUnit.DAYS);
+        boolean result = barrier.tryAwaitOpenUninterruptibly(1, TimeUnit.DAYS);
 
         assertTrue(result);
         assertTrue(barrier.isCommitted());
@@ -143,7 +143,7 @@ public class VetoCommitBarrier_tryAwaitCloseUninterruptiblyTest {
         barrier = new VetoCommitBarrier();
         barrier.abort();
 
-        boolean result = barrier.tryAwaitCloseUninterruptibly(1, TimeUnit.DAYS);
+        boolean result = barrier.tryAwaitOpenUninterruptibly(1, TimeUnit.DAYS);
 
         assertTrue(result);
         assertTrue(barrier.isAborted());

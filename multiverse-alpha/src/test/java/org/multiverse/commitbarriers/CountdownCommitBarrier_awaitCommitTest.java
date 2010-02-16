@@ -58,7 +58,7 @@ public class CountdownCommitBarrier_awaitCommitTest {
         thread.start();
         sleepMs(500);
 
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
         assertAlive(thread);
     }
 
@@ -87,6 +87,7 @@ public class CountdownCommitBarrier_awaitCommitTest {
         thread.join();
         thread.assertFailedWithException(IllegalStateException.class);
         assertTrue(barrier.isAborted());
+
         assertEquals(0, barrier.getNumberWaiting());
         assertEquals(0, ref.get());
     }
@@ -139,7 +140,7 @@ public class CountdownCommitBarrier_awaitCommitTest {
         thread.start();
         sleepMs(500);
 
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
 
         thread.interrupt();
         thread.join();
@@ -150,27 +151,27 @@ public class CountdownCommitBarrier_awaitCommitTest {
     }
 
     @Test
-    public void whenAborted_thenIllegalStateException() throws InterruptedException {
+    public void whenAborted_thenClosedCommitBarrierException() throws InterruptedException {
         barrier = new CountdownCommitBarrier(1);
         barrier.abort();
 
         try {
             barrier.awaitCommit();
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (ClosedCommitBarrierException expected) {
         }
 
         assertTrue(barrier.isAborted());
     }
 
     @Test
-    public void whenCommitted_thenIllegalStateException() throws InterruptedException {
+    public void whenCommitted_thenClosedCommitBarrierException() throws InterruptedException {
         barrier = new CountdownCommitBarrier(0);
 
         try {
             barrier.awaitCommit();
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (ClosedCommitBarrierException expected) {
         }
 
         assertTrue(barrier.isCommitted());

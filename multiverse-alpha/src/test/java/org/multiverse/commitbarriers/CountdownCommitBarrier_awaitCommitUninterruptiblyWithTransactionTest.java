@@ -12,8 +12,6 @@ import org.multiverse.stms.AbstractTransactionImpl;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
@@ -42,7 +40,7 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyWithTransactionTes
         } catch (NullPointerException expected) {
         }
 
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
         assertEquals(0, barrier.getNumberWaiting());
     }
 
@@ -67,7 +65,7 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyWithTransactionTes
         }
 
         assertIsAborted(tx);
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
         assertEquals(0, barrier.getNumberWaiting());
     }
 
@@ -84,7 +82,7 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyWithTransactionTes
         }
 
         assertIsCommitted(tx);
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
         assertEquals(0, barrier.getNumberWaiting());
     }
 
@@ -118,7 +116,7 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyWithTransactionTes
         sleepMs(500);
 
         assertAlive(t);
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
 
         //todo
         //assertTrue(t.isInterrupted());
@@ -185,7 +183,7 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyWithTransactionTes
     }
 
     @Test
-    public void whenAborted_thenIllegalStateException() {
+    public void whenAborted_thenClosedCommitBarrierException() {
         barrier = new CountdownCommitBarrier(1);
         barrier.abort();
 
@@ -193,27 +191,27 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyWithTransactionTes
         try {
             barrier.awaitCommitUninterruptibly(tx);
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (ClosedCommitBarrierException expected) {
         }
 
         assertTrue(barrier.isAborted());
         assertEquals(0, barrier.getNumberWaiting());
-        assertIsActive(tx);
+        assertIsAborted(tx);
     }
 
     @Test
-    public void whenCommitted_thenIllegalStateException() {
+    public void whenCommitted_thenClosedCommitBarrierException() {
         barrier = new CountdownCommitBarrier(0);
 
         Transaction tx = new AbstractTransactionImpl();
         try {
             barrier.awaitCommitUninterruptibly(tx);
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (ClosedCommitBarrierException expected) {
         }
 
         assertTrue(barrier.isCommitted());
         assertEquals(0, barrier.getNumberWaiting());
-        assertIsActive(tx);
+        assertIsAborted(tx);
     }
 }

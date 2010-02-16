@@ -13,7 +13,7 @@ public interface TransactionSelector<K extends TransactionSelectionKey> {
 
     /**
      * Registers a NonBlockingTaskContext to this TransactionSelector so that it
-     *
+     * <p/>
      * No guarantees are made of the same NonBlockingTaskContext is registered while it already is registered
      * (and not been returned with a select).
      *
@@ -33,7 +33,15 @@ public interface TransactionSelector<K extends TransactionSelectionKey> {
      */
     K select() throws InterruptedException;
 
+    /**
+     * Selects a key to use or null if none available.
+     *
+     * @return the selected key, or null if none available.
+     */
     K selectNow();
 
+    /**
+     *
+     */
     void close();
 }

@@ -10,15 +10,11 @@ import static java.lang.System.getProperty;
  * some classloader, share the same configuration. So one STM implementation with sanity checks enabled and the other
  * not, is not possible.
  * <p/>
- * It is an interface so that is can be implemented for easier access.
+ * It is an interface so that is can be 'implemented' for easier access.
  *
  * @author Peter Veentjer
  */
 public interface MultiverseConstants {
-
-
-    boolean ___BUGSHAKER_ENABLED =
-            parseBoolean(getProperty(MultiverseConstants.class.getName() + ".bugshaker", "true"));
 
 
     /**

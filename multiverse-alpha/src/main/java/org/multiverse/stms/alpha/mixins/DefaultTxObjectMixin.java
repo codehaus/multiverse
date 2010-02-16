@@ -267,7 +267,7 @@ public abstract class DefaultTxObjectMixin implements AlphaTransactionalObject, 
                                 throw new PanicError(msg);
                             }
                         }
-                        //a write happened so we can open this latch
+                        //a write happened so we can closed this latch
                         listener.open();
                         return RegisterRetryListenerResult.opened;
                     }

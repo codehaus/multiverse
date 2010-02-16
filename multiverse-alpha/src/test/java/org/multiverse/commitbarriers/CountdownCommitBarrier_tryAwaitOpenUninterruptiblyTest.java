@@ -13,7 +13,7 @@ import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class CountdownCommitBarrier_tryAwaitCloseUninterruptiblyTest {
+public class CountdownCommitBarrier_tryAwaitOpenUninterruptiblyTest {
     private CountdownCommitBarrier barrier;
 
     @Before
@@ -32,13 +32,13 @@ public class CountdownCommitBarrier_tryAwaitCloseUninterruptiblyTest {
         barrier = new CountdownCommitBarrier(1);
 
         try {
-            barrier.tryAwaitCloseUninterruptibly(1, null);
+            barrier.tryAwaitOpenUninterruptibly(1, null);
             fail();
         } catch (NullPointerException expected) {
 
         }
 
-        assertTrue(barrier.isOpen());
+        assertTrue(barrier.isClosed());
     }
 
     @Test
@@ -54,7 +54,7 @@ public class CountdownCommitBarrier_tryAwaitCloseUninterruptiblyTest {
         TestThread t = new TestThread() {
             @Override
             public void doRun() throws Exception {
-                boolean result = barrier.tryAwaitCloseUninterruptibly(1, TimeUnit.DAYS);
+                boolean result = barrier.tryAwaitOpenUninterruptibly(1, TimeUnit.DAYS);
                 assertTrue(result);
             }
         };
@@ -85,7 +85,7 @@ public class CountdownCommitBarrier_tryAwaitCloseUninterruptiblyTest {
     public void whenCommitted() {
         barrier = new CountdownCommitBarrier(0);
 
-        boolean result = barrier.tryAwaitCloseUninterruptibly(1, TimeUnit.DAYS);
+        boolean result = barrier.tryAwaitOpenUninterruptibly(1, TimeUnit.DAYS);
 
         assertTrue(result);
         assertTrue(barrier.isCommitted());
@@ -96,7 +96,7 @@ public class CountdownCommitBarrier_tryAwaitCloseUninterruptiblyTest {
         barrier = new CountdownCommitBarrier(1);
         barrier.abort();
 
-        boolean result = barrier.tryAwaitCloseUninterruptibly(1, TimeUnit.DAYS);
+        boolean result = barrier.tryAwaitOpenUninterruptibly(1, TimeUnit.DAYS);
 
         assertTrue(result);
         assertTrue(barrier.isAborted());

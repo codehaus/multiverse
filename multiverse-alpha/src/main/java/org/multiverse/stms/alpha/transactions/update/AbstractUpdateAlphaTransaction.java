@@ -8,7 +8,6 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AbstractAlphaTransaction;
 import org.multiverse.utils.Listeners;
-import org.multiverse.utils.TodoException;
 
 import static java.lang.String.format;
 
@@ -58,20 +57,6 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
         }
 
         return attached;
-    }
-
-    @Override
-    protected AlphaTranlocal doOpenForCommutingOperation(AlphaTransactionalObject txObject) {
-        AlphaTranlocal attached = find(txObject);
-        if (attached != null) {
-            if (attached.isUnfixated()) {
-
-            } else if (attached.isCommitted()) {
-                attached = attached.openForWrite();
-            }
-        }
-
-        throw new TodoException();
     }
 
     /**

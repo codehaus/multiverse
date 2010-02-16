@@ -3,6 +3,7 @@ package org.multiverse.commitbarriers;
 import org.multiverse.api.Transaction;
 import org.multiverse.utils.TodoException;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
@@ -28,8 +29,8 @@ public final class CountdownCommitBarrier extends AbstractCommitBarrier {
      * Create a new CountdownCommitBarrier that uses an unfair lock.
      *
      * @param parties the number of parties waiting. If the number of parties is 0, the VetoCommitBarrier is created
-     *                committed, else it will be open.
-     * @throws IllegalArgumentException if parties smaller than 0.
+     *                committed, else it will be closed.
+     * @throws IllegalArgumentException if parties is smaller than 0.
      */
     public CountdownCommitBarrier(int parties) {
         this(parties, false);
@@ -39,19 +40,18 @@ public final class CountdownCommitBarrier extends AbstractCommitBarrier {
      * Creates a new CountdownCommitBarrier.
      *
      * @param parties the number of parties waiting. If the number of parties is 0, the VetoCommitBarrier is created
-     *                committed, else it will be open.
+     *                committed, else it will be closed.
      * @param fair    if the lock bu this CountdownCommitBarrier is fair.
      * @throws IllegalArgumentException if parties smaller than 0.
      */
     public CountdownCommitBarrier(int parties, boolean fair) {
-        super(fair);
+        super(parties == 0 ? Status.committed : Status.closed, fair);
 
         if (parties < 0) {
             throw new IllegalArgumentException();
         }
 
         this.parties = parties;
-        this.status = parties == 0 ? Status.committed : Status.open;
     }
 
     /**
@@ -61,6 +61,10 @@ public final class CountdownCommitBarrier extends AbstractCommitBarrier {
      */
     public int getParties() {
         return parties;
+    }
+
+    private boolean isLastParty() {
+        return getNumberWaiting() == parties - 1;
     }
 
     /**
@@ -73,46 +77,49 @@ public final class CountdownCommitBarrier extends AbstractCommitBarrier {
      * <li>Some other thread times out while waiting for barrier
      * </ul>
      * <p/>
-     * A transaction can be added that already is prepared.
+     * A transaction can be added that already is prepared. If the barrier already is committed or aborted, the
+     * transaction is aborted.
      * <p/>
      * This call is not responsive to interrupts.
      *
      * @param tx the transaction
-     * @throws NullPointerException  if tx is null.
+     * @throws NullPointerException         if tx is null.
      * @throws org.multiverse.api.exceptions.DeadTransactionException
-     *                               if tx already is committed or aborted.
-     * @throws IllegalStateException if commitGroup already aborted or committed.
+     *                                      if tx already is committed or aborted.
+     * @throws ClosedCommitBarrierException if commitGroup already aborted or committed.
      */
     public void awaitCommitUninterruptibly(Transaction tx) {
-        if (tx == null) {
-            throw new NullPointerException();
-        }
+        ensureNotDead(tx);
 
+        List<Runnable> postCommitTasks = null;
         lock.lock();
         try {
-            switch (status) {
-                case open:
+            switch (getStatus()) {
+                case closed:
                     tx.prepare();
 
-                    if (numberWaiting == parties - 1) {
-                        status = Status.committed;
-                        statusCondition.signalAll();
+                    if (isLastParty()) {
+                        postCommitTasks = signalCommit();
                     } else {
-                        numberWaiting++;
-                        while (status == Status.open) {
+                        addWaiter(tx);
+
+                        while (getStatus() == Status.closed) {
                             statusCondition.awaitUninterruptibly();
                         }
-                        numberWaiting--;
                     }
                     break;
                 case aborted:
+                    tx.abort();
+
                     String abortedMsg = format("Can't call awaitCommitUninterruptible on already aborted " +
                             "CountdownCommitBarrier with transaction %s ", tx.getConfig().getFamilyName());
-                    throw new IllegalStateException(abortedMsg);
+                    throw new ClosedCommitBarrierException(abortedMsg);
                 case committed:
+                    tx.abort();
+
                     String commitMsg = format("Can't call awaitCommitUninterruptible on already committed " +
                             "CountdownCommitBarrier with transaction %s ", tx.getConfig().getFamilyName());
-                    throw new IllegalStateException(commitMsg);
+                    throw new ClosedCommitBarrierException(commitMsg);
                 default:
                     throw new IllegalStateException();
             }
@@ -120,166 +127,151 @@ public final class CountdownCommitBarrier extends AbstractCommitBarrier {
             lock.unlock();
         }
 
-        after(tx);
-    }
-
-    private void after(Transaction tx) {
-        if (isCommitted()) {
-            tx.commit();
-        } else {
-            tx.abort();
-            throw new IllegalStateException();
-        }
+        finish(tx);
+        executeTasks(postCommitTasks);
     }
 
     /**
      * Returns one party and awaits commit.
      *
-     * @throws InterruptedException  if the waiting thread is interrupted. The CountdownCommitBarrier also is aborted.
-     * @throws IllegalStateException if this CountdownCommitBarrier already is committed or aborted.
+     * @throws InterruptedException         if the waiting thread is interrupted. The CountdownCommitBarrier also is aborted.
+     * @throws ClosedCommitBarrierException if this CountdownCommitBarrier already is committed or aborted.
      */
     public void awaitCommit() throws InterruptedException {
         try {
             lock.lockInterruptibly();
+
+            List<Runnable> postCommitTasks = null;
+            try {
+                switch (getStatus()) {
+                    case closed:
+                        if (isLastParty()) {
+                            postCommitTasks = signalCommit();
+                        } else {
+                            addWaiter(null);
+                            while (getStatus() == Status.closed) {
+                                statusCondition.await();
+                            }
+                        }
+                        break;
+                    case aborted:
+                        String abortedMsg = format("Can't call awaitCommit on already aborted CountdownCommitBarrier");
+                        throw new ClosedCommitBarrierException(abortedMsg);
+                    case committed:
+                        String commitMsg = format("Can't call awaitCommit on already committed CountdownCommitBarrier");
+                        throw new ClosedCommitBarrierException(commitMsg);
+                    default:
+                        throw new IllegalStateException();
+                }
+            } finally {
+                lock.unlock();
+            }
+
+            if (!isCommitted()) {
+                throw new IllegalStateException();
+            }
+
+            executeTasks(postCommitTasks);
         } catch (InterruptedException ex) {
             abort();
             throw ex;
-        }
-
-        try {
-            switch (status) {
-                case open:
-                    if (numberWaiting == parties - 1) {
-                        status = Status.committed;
-                        statusCondition.signalAll();
-                    } else {
-                        numberWaiting++;
-                        try {
-                            while (status == Status.open) {
-                                try {
-                                    statusCondition.await();
-                                } catch (InterruptedException ex) {
-                                    abort();
-                                    throw ex;
-                                }
-                            }
-                        } finally {
-                            numberWaiting--;
-                        }
-                    }
-                    break;
-                case aborted:
-                    String abortedMsg = format("Can't call awaitCommit on already aborted CountdownCommitBarrier");
-                    throw new IllegalStateException(abortedMsg);
-                case committed:
-                    String commitMsg = format("Can't call awaitCommit on already committed CountdownCommitBarrier");
-                    throw new IllegalStateException(commitMsg);
-                default:
-                    throw new IllegalStateException();
-            }
-        } finally {
-            lock.unlock();
-        }
-
-        if (!isCommitted()) {
-            throw new IllegalStateException();
         }
     }
 
     /**
      * Returns one party and awaits commit. This method only blocks for a very short amount of time.
+     * <p/>
+     * If the CountdownCommitBarrier already is aborted or committed, the transaction is aborted.
      *
      * @param tx the Transaction that wants to join the other parties to commit with.
      * @return true if CountdownCommitBarrier was committed, false if aborted.
-     * @throws IllegalStateException if tx or this CountdownCommitBarrier is aborted or committed.
-     * @throws NullPointerException  if tx is null.
+     * @throws ClosedCommitBarrierException if tx or this CountdownCommitBarrier is aborted or committed.
+     * @throws NullPointerException         if tx is null.
      */
     public boolean tryAwaitCommit(Transaction tx) {
-        if (tx == null) {
-            throw new NullPointerException();
-        }
-
-        if (!lock.tryLock()) {
-            return false;
-        }
+        ensureNotDead(tx);
 
         try {
-            switch (status) {
-                case open:
-                    switch (tx.getStatus()) {
-                        case active:
-                            tx.prepare();
-                            break;
-                        case prepared:
-                            break;
-                        default:
-                            throw new IllegalStateException();//better exception.
-                    }
-
-                    if (numberWaiting == parties) {
-                        status = Status.committed;
-                        statusCondition.signalAll();
-                        tx.commit();
-                        return true;
-                    } else {
-                        status = Status.aborted;
-                        statusCondition.signalAll();
-                        tx.abort();
-                        return false;
-                    }
-                case aborted:
-                    String abortedMsg = format("Can't call tryAwaitCommit on already aborted " +
-                            "CountdownCommitBarrier with transaction %s ", tx.getConfig().getFamilyName());
-                    throw new IllegalStateException(abortedMsg);
-                case committed:
-                    String commitMsg = format("Can't call tryAwaitCommit on already committed " +
-                            "CountdownCommitBarrier with transaction %s ", tx.getConfig().getFamilyName());
-                    throw new IllegalStateException(commitMsg);
-                default:
-                    throw new IllegalStateException();
+            if (!lock.tryLock()) {
+                abort();
+                return false;
             }
+
+            List<Runnable> postCommitTasks = null;
+            try {
+                switch (getStatus()) {
+                    case closed:
+                        tx.prepare();
+
+                        if (isLastParty()) {
+                            postCommitTasks = signalCommit();
+                        } else {
+                            postCommitTasks = signalAborted();
+                        }
+                        break;
+                    case aborted:
+                        String abortedMsg = format("Can't call tryAwaitCommit on already aborted " +
+                                "CountdownCommitBarrier with transaction %s ", tx.getConfig().getFamilyName());
+                        throw new ClosedCommitBarrierException(abortedMsg);
+                    case committed:
+                        String commitMsg = format("Can't call tryAwaitCommit on already committed " +
+                                "CountdownCommitBarrier with transaction %s ", tx.getConfig().getFamilyName());
+                        throw new ClosedCommitBarrierException(commitMsg);
+                    default:
+                        throw new IllegalStateException();
+                }
+            } finally {
+                lock.unlock();
+            }
+
+            executeTasks(postCommitTasks);
+            return isCommitted();
         } finally {
-            lock.unlock();
+            finish(tx);
         }
     }
 
+
     /**
      * If a timeout occurs, the CountdownCommitBarrier is aborted.
+     * <p/>
+     * If the CountdownCommitBarrier already is aborted or committed, the transaction is aborted.
      *
      * @param tx      the transaction used by the party.
      * @param timeout time maximum amount of time to wait till this CountdownCommitBarrier is committed.
      * @param unit    the TimeUnit for the timeout argument
      * @return true if this CountdownCommitBarrier was committed, false otherwise.
-     * @throws NullPointerException  if tx or unit is null.
-     * @throws IllegalStateException if this CountdownCommitBarrier already is aborted or committed.
+     * @throws NullPointerException         if tx or unit is null.
+     * @throws ClosedCommitBarrierException if this CountdownCommitBarrier already is aborted or committed.
      */
     public boolean tryAwaitCommit(Transaction tx, long timeout, TimeUnit unit) {
-        if (tx == null || unit == null) {
+        ensureNotDead(tx);
+
+        if (unit == null) {
             throw new NullPointerException();
         }
 
         lock.lock();
         try {
-            switch (status) {
-                case open:
+            switch (getStatus()) {
+                case closed:
                     tx.prepare();
-                    if (numberWaiting == parties - 1) {
+                    if (isLastParty()) {
 
                     } else {
 
                     }
                     long timeoutNs = unit.toNanos(timeout);
 
-
                     throw new TodoException();
                 case aborted:
                     String abortedMsg = format("Can't call tryAwaitCommit on already aborted " +
                             "CountdownCommitBarrier with transaction %s ", tx.getConfig().getFamilyName());
-                    throw new IllegalStateException(abortedMsg);
+                    throw new ClosedCommitBarrierException(abortedMsg);
                 case committed:
                     String commitMsg = format("Can't call tryAwaitCommit on already committed " +
                             "CountdownCommitBarrier with transaction %s ", tx.getConfig().getFamilyName());
-                    throw new IllegalStateException(commitMsg);
+                    throw new ClosedCommitBarrierException(commitMsg);
                 default:
                     throw new IllegalStateException();
             }
@@ -290,18 +282,18 @@ public final class CountdownCommitBarrier extends AbstractCommitBarrier {
 
     /**
      * Returns one party and awaits commit.
+     * <p/>
+     * If the CountdownCommitBarrier already is aborted or committed, the transaction is aborted.
      *
      * @param tx the transaction that belongs to the party.
-     * @throws InterruptedException  if the thread is interrupted while waiting.
-     * @throws IllegalStateException if this CountdownCommitBarrier already is aborted or committed.
+     * @throws InterruptedException         if the thread is interrupted while waiting.
+     * @throws ClosedCommitBarrierException if this CountdownCommitBarrier already is aborted or committed.
      * @throws org.multiverse.api.exceptions.DeadTransactionException
-     *                               if tx already is aborted or committed.
-     * @throws NullPointerException  if tx is null.
+     *                                      if tx already is aborted or committed.
+     * @throws NullPointerException         if tx is null.
      */
     public void awaitCommit(Transaction tx) throws InterruptedException {
-        if (tx == null) {
-            throw new NullPointerException();
-        }
+        ensureNotDead(tx);
 
         try {
             lock.lockInterruptibly();
@@ -311,16 +303,16 @@ public final class CountdownCommitBarrier extends AbstractCommitBarrier {
             throw ex;
         }
 
+        List<Runnable> postCommitTasks = null;
         try {
-            switch (status) {
-                case open:
+            switch (getStatus()) {
+                case closed:
                     tx.prepare();
-                    if (numberWaiting == parties - 1) {
-                        status = Status.committed;
-                        statusCondition.signalAll();
+                    if (isLastParty()) {
+                        postCommitTasks = signalCommit();
                     } else {
-                        numberWaiting++;
-                        while (status == Status.open) {
+                        addWaiter(tx);
+                        while (getStatus() == Status.closed) {
                             try {
                                 statusCondition.await();
                             } catch (InterruptedException ex) {
@@ -329,17 +321,16 @@ public final class CountdownCommitBarrier extends AbstractCommitBarrier {
                                 throw ex;
                             }
                         }
-                        numberWaiting--;
                     }
                     break;
                 case aborted:
                     String abortedMsg = format("Can't call awaitCommit on already aborted " +
                             "CountdownCommitBarrier with transaction %s ", tx.getConfig().getFamilyName());
-                    throw new IllegalStateException(abortedMsg);
+                    throw new ClosedCommitBarrierException(abortedMsg);
                 case committed:
                     String commitMsg = format("Can't call awaitCommit on already committed " +
                             "CountdownCommitBarrier with transaction %s ", tx.getConfig().getFamilyName());
-                    throw new IllegalStateException(commitMsg);
+                    throw new ClosedCommitBarrierException(commitMsg);
                 default:
                     throw new IllegalStateException();
             }
@@ -347,6 +338,8 @@ public final class CountdownCommitBarrier extends AbstractCommitBarrier {
             lock.unlock();
         }
 
-        after(tx);
+        finish(tx);
+
+        executeTasks(postCommitTasks);
     }
 }

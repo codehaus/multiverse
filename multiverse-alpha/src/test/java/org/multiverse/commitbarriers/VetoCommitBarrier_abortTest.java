@@ -2,6 +2,7 @@ package org.multiverse.commitbarriers;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
@@ -37,6 +38,7 @@ public class VetoCommitBarrier_abortTest {
     }
 
     @Test
+    @Ignore
     public void whenPendingTransactions_theyAreAborted() throws InterruptedException {
         barrier = new VetoCommitBarrier();
         TransactionalInteger ref = new TransactionalInteger();
@@ -67,14 +69,14 @@ public class VetoCommitBarrier_abortTest {
     }
 
     @Test
-    public void whenBarrierCommitted_thenIllegalStateException() {
+    public void whenBarrierCommitted_thenClosedCommitBarrierException() {
         barrier = new VetoCommitBarrier();
         barrier.commit();
 
         try {
             barrier.abort();
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (ClosedCommitBarrierException expected) {
         }
 
         assertTrue(barrier.isCommitted());

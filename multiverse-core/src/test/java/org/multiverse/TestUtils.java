@@ -39,8 +39,7 @@ public class TestUtils {
 
     public static void resetInstrumentationProblemMonitor() {
         try {
-            Field field = InstrumentationProblemMonitor.class.getDeclaredField(
-                    "problemFound");
+            Field field = InstrumentationProblemMonitor.class.getDeclaredField("problemFound");
             field.setAccessible(true);
             field.set(InstrumentationProblemMonitor.INSTANCE, false);
         } catch (NoSuchFieldException e) {
@@ -136,22 +135,20 @@ public class TestUtils {
     }
 
     /**
-     * Returns random int exclusive max.
+     * Returns random int exclusive max. 0 is allowed as max and returns 0 (so this is unlike the Random.nextInt).
      *
      * @param max
      * @return
      */
     public static int randomInt(int max) {
+        if (max == 0) {
+            return 0;
+        }
         return ThreadLocalRandom.current().nextInt(max);
     }
 
     public static void sleepRandomMs(int maxMs) {
-        if (maxMs <= 0) {
-            return;
-        }
-
         sleepMs((long) randomInt(maxMs));
-        //Thread.yield();
     }
 
     public static void sleepSome() {
@@ -159,16 +156,8 @@ public class TestUtils {
     }
 
     public static void sleepMs(long ms) {
-        if (ms <= 0) {
-            return;
-        }
-
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException ex) {
-            Thread.interrupted();
-            throw new RuntimeException(ex);
-        }
+        long us = TimeUnit.MILLISECONDS.toMicros(ms);
+        sleepUs(us);
     }
 
     public static void sleepUs(long us) {
@@ -185,7 +174,6 @@ public class TestUtils {
             thread.start();
         }
     }
-
 
     /**
      * Joins all threads. If this can't be done within 5 minutes, an assertion failure is thrown.

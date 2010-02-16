@@ -79,23 +79,16 @@ public class CountdownCommitBarrier_abortTest {
     }
 
     @Test
-    public void whenCommitted_thenIllegalStateException() {
+    public void whenCommitted_thenClosedCommitBarrierException() {
         barrier = new CountdownCommitBarrier(0);
 
         try {
             barrier.abort();
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (ClosedCommitBarrierException expected) {
 
         }
 
         assertTrue(barrier.isCommitted());
-    }
-
-    @TransactionalMethod
-    public Transaction committingMethod(CountdownCommitBarrier barrier) {
-        Transaction tx = getThreadLocalTransaction();
-        barrier.awaitCommitUninterruptibly(tx);
-        return tx;
     }
 }
