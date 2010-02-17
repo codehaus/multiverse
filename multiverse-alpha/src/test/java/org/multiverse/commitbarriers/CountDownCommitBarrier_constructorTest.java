@@ -9,7 +9,7 @@ import static org.junit.Assert.assertTrue;
 import static org.multiverse.TestUtils.clearCurrentThreadInterruptedStatus;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class CountdownCommitBarrier_constructorTest {
+public class CountDownCommitBarrier_constructorTest {
 
     @Before
     public void setUp() {
@@ -24,12 +24,12 @@ public class CountdownCommitBarrier_constructorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void whenNegativeParties_thenIllegalArgumentException() {
-        new CountdownCommitBarrier(-1);
+        new CountDownCommitBarrier(-1);
     }
 
     @Test
     public void whenZeroParties_thenBarrierCommitted() {
-        CountdownCommitBarrier barrier = new CountdownCommitBarrier(0);
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(0);
         assertTrue(barrier.isCommitted());
         assertEquals(0, barrier.getParties());
         assertEquals(0, barrier.getNumberWaiting());
@@ -37,7 +37,7 @@ public class CountdownCommitBarrier_constructorTest {
 
     @Test
     public void whenPositiveParties() {
-        CountdownCommitBarrier barrier = new CountdownCommitBarrier(10);
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(10);
         assertTrue(barrier.isClosed());
         assertEquals(10, barrier.getParties());
         assertEquals(0, barrier.getNumberWaiting());

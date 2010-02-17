@@ -14,7 +14,7 @@ import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.clearCurrentThreadInterruptedStatus;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class CountdownCommitBarrier_tryAwaitCommitTest {
+public class CountDownCommitBarrier_tryJoinCommitTest {
 
     @Before
     public void setUp() {
@@ -29,10 +29,10 @@ public class CountdownCommitBarrier_tryAwaitCommitTest {
 
     @Test
     public void whenOpenAndNullTransaction_thenNullPointerException() {
-        CountdownCommitBarrier barrier = new CountdownCommitBarrier(1);
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
 
         try {
-            barrier.tryAwaitCommit(null);
+            barrier.tryJoinCommit(null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -54,16 +54,15 @@ public class CountdownCommitBarrier_tryAwaitCommitTest {
     }
 
     @Test
-    @Ignore
     public void whenAborted_thenClosedCommitBarrierException() {
-        CountdownCommitBarrier barrier = new CountdownCommitBarrier(1);
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
         barrier.abort();
 
         Transaction tx = new AbstractTransactionImpl();
         try {
-            barrier.tryAwaitCommit(tx);
+            barrier.tryJoinCommit(tx);
             fail();
-        } catch (ClosedCommitBarrierException expected) {
+        } catch (CommitBarrierOpenException expected) {
         }
 
         assertTrue(barrier.isAborted());
@@ -72,15 +71,14 @@ public class CountdownCommitBarrier_tryAwaitCommitTest {
     }
 
     @Test
-    @Ignore
-    public void whenCommitted_thenClosedCommitBarrierException() {
-        CountdownCommitBarrier barrier = new CountdownCommitBarrier(0);
+    public void whenCommitted_thenCommitBarrierOpenException() {
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(0);
 
         Transaction tx = new AbstractTransactionImpl();
         try {
-            barrier.tryAwaitCommit(tx);
+            barrier.tryJoinCommit(tx);
             fail();
-        } catch (ClosedCommitBarrierException expected) {
+        } catch (CommitBarrierOpenException expected) {
         }
 
         assertTrue(barrier.isCommitted());

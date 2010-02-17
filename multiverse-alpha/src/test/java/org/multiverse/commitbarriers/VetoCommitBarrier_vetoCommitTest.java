@@ -13,7 +13,7 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public class VetoCommitBarrier_commitTest {
+public class VetoCommitBarrier_vetoCommitTest {
 
     @Before
     public void setUp() {
@@ -29,7 +29,7 @@ public class VetoCommitBarrier_commitTest {
     @Test
     public void whenNoPendingTransactions() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
-        barrier.commit();
+        barrier.vetoCommit();
 
         assertTrue(barrier.isCommitted());
     }
@@ -49,7 +49,7 @@ public class VetoCommitBarrier_commitTest {
         startAll(thread1, thread2, thread3);
 
         sleepMs(500);
-        barrier.commit();
+        barrier.vetoCommit();
         joinAll(thread1, thread2, thread3);
 
         assertIsCommitted(thread1.tx);
@@ -64,9 +64,9 @@ public class VetoCommitBarrier_commitTest {
     @Test
     public void whenBarrierCommitted_thenIgnored() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
-        barrier.commit();
+        barrier.vetoCommit();
 
-        barrier.commit();
+        barrier.vetoCommit();
         assertTrue(barrier.isCommitted());
     }
 
@@ -76,9 +76,9 @@ public class VetoCommitBarrier_commitTest {
         barrier.abort();
 
         try {
-            barrier.commit();
+            barrier.vetoCommit();
             fail();
-        } catch (ClosedCommitBarrierException expected) {
+        } catch (CommitBarrierOpenException expected) {
         }
         assertTrue(barrier.isAborted());
     }
@@ -99,7 +99,7 @@ public class VetoCommitBarrier_commitTest {
         public void doRun() throws Exception {
             tx = getThreadLocalTransaction();
             ref.inc();
-            barrier.awaitCommit(tx);
+            barrier.joinCommit(tx);
         }
     }
 }

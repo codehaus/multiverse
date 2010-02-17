@@ -6,11 +6,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
-public class CountdownCommitBarrier_registerOnAbortTaskTest {
+public class CountDownCommitBarrier_registerOnAbortTaskTest {
 
     @Test
     public void whenNullTask_thenNullPointerException() {
-        CountdownCommitBarrier barrier = new CountdownCommitBarrier(1);
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
 
         try {
             barrier.registerOnAbortTask(null);
@@ -23,7 +23,7 @@ public class CountdownCommitBarrier_registerOnAbortTaskTest {
 
     @Test
     public void whenAborted_thenTaskExecuted() {
-        CountdownCommitBarrier barrier = new CountdownCommitBarrier(1);
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
         Runnable task = mock(Runnable.class);
 
         barrier.registerOnAbortTask(task);
@@ -34,18 +34,18 @@ public class CountdownCommitBarrier_registerOnAbortTaskTest {
 
     @Test
     public void whenCommitted_thenTaskNotExecuted() throws InterruptedException {
-        CountdownCommitBarrier barrier = new CountdownCommitBarrier(1);
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
         Runnable task = mock(Runnable.class);
 
         barrier.registerOnAbortTask(task);
-        barrier.awaitCommit();
+        barrier.countDown();
 
         verify(task, never()).run();
     }
 
     @Test
     public void whenTaskThrowsRuntimeException_thenOtherTasksNotExecuted() {
-        CountdownCommitBarrier barrier = new CountdownCommitBarrier(1);
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
         Runnable task1 = mock(Runnable.class);
         doThrow(new FakeException()).when(task1).run();
         Runnable task2 = mock(Runnable.class);
@@ -67,13 +67,13 @@ public class CountdownCommitBarrier_registerOnAbortTaskTest {
 
     @Test
     public void whenCommitted_thenClosedCommitBarrierException() {
-        CountdownCommitBarrier barrier = new CountdownCommitBarrier(0);
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(0);
 
         Runnable task = mock(Runnable.class);
         try {
             barrier.registerOnAbortTask(task);
             fail();
-        } catch (ClosedCommitBarrierException expected) {
+        } catch (CommitBarrierOpenException expected) {
         }
 
         assertTrue(barrier.isCommitted());
@@ -82,14 +82,14 @@ public class CountdownCommitBarrier_registerOnAbortTaskTest {
 
     @Test
     public void whenAborted_thenClosedCommitBarrierException() {
-        CountdownCommitBarrier barrier = new CountdownCommitBarrier(1);
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
         barrier.abort();
 
         Runnable task = mock(Runnable.class);
         try {
             barrier.registerOnAbortTask(task);
             fail();
-        } catch (ClosedCommitBarrierException expected) {
+        } catch (CommitBarrierOpenException expected) {
         }
 
         assertTrue(barrier.isAborted());

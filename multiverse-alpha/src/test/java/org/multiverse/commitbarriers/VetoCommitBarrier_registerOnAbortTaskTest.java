@@ -38,7 +38,7 @@ public class VetoCommitBarrier_registerOnAbortTaskTest {
         Runnable task = mock(Runnable.class);
 
         barrier.registerOnAbortTask(task);
-        barrier.commit();
+        barrier.vetoCommit();
 
         verify(task, never()).run();
     }
@@ -69,13 +69,13 @@ public class VetoCommitBarrier_registerOnAbortTaskTest {
     @Test
     public void whenCommitted_thenClosedCommitBarrierException() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
-        barrier.commit();
+        barrier.vetoCommit();
 
         Runnable task = mock(Runnable.class);
         try {
             barrier.registerOnAbortTask(task);
             fail();
-        } catch (ClosedCommitBarrierException expected) {
+        } catch (CommitBarrierOpenException expected) {
         }
 
         assertTrue(barrier.isCommitted());
@@ -91,7 +91,7 @@ public class VetoCommitBarrier_registerOnAbortTaskTest {
         try {
             barrier.registerOnAbortTask(task);
             fail();
-        } catch (ClosedCommitBarrierException expected) {
+        } catch (CommitBarrierOpenException expected) {
         }
 
         assertTrue(barrier.isAborted());

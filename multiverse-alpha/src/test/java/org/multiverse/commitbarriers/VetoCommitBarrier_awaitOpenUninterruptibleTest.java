@@ -40,7 +40,7 @@ public class VetoCommitBarrier_awaitOpenUninterruptibleTest {
         sleepMs(500);
         assertAlive(t);
 
-        barrier.commit();
+        barrier.vetoCommit();
 
         joinAll(t);
     }
@@ -63,7 +63,7 @@ public class VetoCommitBarrier_awaitOpenUninterruptibleTest {
         sleepMs(500);
         assertAlive(t);
 
-        barrier.commit();
+        barrier.vetoCommit();
 
         joinAll(t);
     }
@@ -99,7 +99,7 @@ public class VetoCommitBarrier_awaitOpenUninterruptibleTest {
         t.start();
 
         sleepMs(500);
-        barrier.commit();
+        barrier.vetoCommit();
 
         joinAll(t);
     }
@@ -107,7 +107,7 @@ public class VetoCommitBarrier_awaitOpenUninterruptibleTest {
     @Test
     public void whenCommitted() throws InterruptedException {
         barrier = new VetoCommitBarrier();
-        barrier.commit();
+        barrier.vetoCommit();
 
         barrier.awaitOpenUninterruptibly();
         assertTrue(barrier.isCommitted());

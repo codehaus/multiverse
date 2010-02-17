@@ -16,8 +16,8 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public class CountdownCommitBarrier_awaitCommitUninterruptiblyWithTransactionTest {
-    private CountdownCommitBarrier barrier;
+public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest {
+    private CountDownCommitBarrier barrier;
 
     @Before
     public void setUp() {
@@ -32,10 +32,10 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyWithTransactionTes
 
     @Test
     public void whenTransactionNull() {
-        barrier = new CountdownCommitBarrier(1);
+        barrier = new CountDownCommitBarrier(1);
 
         try {
-            barrier.awaitCommitUninterruptibly(null);
+            barrier.joinCommitUninterruptibly(null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -47,19 +47,19 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyWithTransactionTes
     @Test
     @Ignore
     public void whenTransactionFailsToPrepare() {
-        barrier = new CountdownCommitBarrier(1);
+        barrier = new CountDownCommitBarrier(1);
 
 
     }
 
     @Test
     public void whenTransactionAborted_thenDeadTransactionException() {
-        barrier = new CountdownCommitBarrier(1);
+        barrier = new CountDownCommitBarrier(1);
 
         Transaction tx = new AbstractTransactionImpl();
         tx.abort();
         try {
-            barrier.awaitCommitUninterruptibly(tx);
+            barrier.joinCommitUninterruptibly(tx);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -71,12 +71,12 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyWithTransactionTes
 
     @Test
     public void whenTransactionCommitted_thenDeadTransactionException() {
-        barrier = new CountdownCommitBarrier(1);
+        barrier = new CountDownCommitBarrier(1);
 
         Transaction tx = new AbstractTransactionImpl();
         tx.commit();
         try {
-            barrier.awaitCommitUninterruptibly(tx);
+            barrier.joinCommitUninterruptibly(tx);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -94,7 +94,7 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyWithTransactionTes
 
     @Test
     public void whenInterruptedWhileWaiting_thenNoInterruption() throws InterruptedException {
-        barrier = new CountdownCommitBarrier(2);
+        barrier = new CountDownCommitBarrier(2);
 
         final TransactionalInteger ref = new TransactionalInteger();
 
@@ -104,7 +104,7 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyWithTransactionTes
             public void doRun() throws Exception {
                 ref.inc();
                 Transaction tx = getThreadLocalTransaction();
-                barrier.awaitCommitUninterruptibly(tx);
+                barrier.joinCommitUninterruptibly(tx);
             }
         };
 
@@ -124,7 +124,7 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyWithTransactionTes
 
     @Test
     public void whenCommittedWhileWaiting() throws InterruptedException {
-        barrier = new CountdownCommitBarrier(2);
+        barrier = new CountDownCommitBarrier(2);
 
         final TransactionalInteger ref = new TransactionalInteger();
 
@@ -134,7 +134,7 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyWithTransactionTes
             public void doRun() throws Exception {
                 ref.inc();
                 Transaction tx = getThreadLocalTransaction();
-                barrier.awaitCommitUninterruptibly(tx);
+                barrier.joinCommitUninterruptibly(tx);
             }
         };
 
@@ -142,7 +142,7 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyWithTransactionTes
         t.start();
         sleepMs(500);
 
-        barrier.awaitCommit();
+        barrier.countDown();
         sleepMs(500);
 
         t.join();
@@ -154,7 +154,7 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyWithTransactionTes
 
     @Test
     public void whenAbortedWhileWaiting_() throws InterruptedException {
-        barrier = new CountdownCommitBarrier(2);
+        barrier = new CountDownCommitBarrier(2);
 
         final TransactionalInteger ref = new TransactionalInteger();
 
@@ -164,7 +164,7 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyWithTransactionTes
             public void doRun() throws Exception {
                 ref.inc();
                 Transaction tx = getThreadLocalTransaction();
-                barrier.awaitCommitUninterruptibly(tx);
+                barrier.joinCommitUninterruptibly(tx);
             }
         };
 
@@ -184,14 +184,14 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyWithTransactionTes
 
     @Test
     public void whenAborted_thenClosedCommitBarrierException() {
-        barrier = new CountdownCommitBarrier(1);
+        barrier = new CountDownCommitBarrier(1);
         barrier.abort();
 
         Transaction tx = new AbstractTransactionImpl();
         try {
-            barrier.awaitCommitUninterruptibly(tx);
+            barrier.joinCommitUninterruptibly(tx);
             fail();
-        } catch (ClosedCommitBarrierException expected) {
+        } catch (CommitBarrierOpenException expected) {
         }
 
         assertTrue(barrier.isAborted());
@@ -201,13 +201,13 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyWithTransactionTes
 
     @Test
     public void whenCommitted_thenClosedCommitBarrierException() {
-        barrier = new CountdownCommitBarrier(0);
+        barrier = new CountDownCommitBarrier(0);
 
         Transaction tx = new AbstractTransactionImpl();
         try {
-            barrier.awaitCommitUninterruptibly(tx);
+            barrier.joinCommitUninterruptibly(tx);
             fail();
-        } catch (ClosedCommitBarrierException expected) {
+        } catch (CommitBarrierOpenException expected) {
         }
 
         assertTrue(barrier.isCommitted());

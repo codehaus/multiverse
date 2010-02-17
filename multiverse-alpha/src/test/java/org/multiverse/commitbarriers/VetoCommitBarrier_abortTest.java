@@ -2,12 +2,10 @@ package org.multiverse.commitbarriers;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.junit.Assert.*;
@@ -38,7 +36,6 @@ public class VetoCommitBarrier_abortTest {
     }
 
     @Test
-    @Ignore
     public void whenPendingTransactions_theyAreAborted() throws InterruptedException {
         barrier = new VetoCommitBarrier();
         TransactionalInteger ref = new TransactionalInteger();
@@ -55,8 +52,8 @@ public class VetoCommitBarrier_abortTest {
         assertEquals(0, ref.get());
         assertIsAborted(thread1.tx);
         assertIsAborted(thread2.tx);
-        thread1.assertFailedWithException(DeadTransactionException.class);
-        thread2.assertFailedWithException(DeadTransactionException.class);
+        thread1.assertFailedWithException(CommitBarrierOpenException.class);
+        thread2.assertFailedWithException(CommitBarrierOpenException.class);
     }
 
     @Test
@@ -71,12 +68,12 @@ public class VetoCommitBarrier_abortTest {
     @Test
     public void whenBarrierCommitted_thenClosedCommitBarrierException() {
         barrier = new VetoCommitBarrier();
-        barrier.commit();
+        barrier.vetoCommit();
 
         try {
             barrier.abort();
             fail();
-        } catch (ClosedCommitBarrierException expected) {
+        } catch (CommitBarrierOpenException expected) {
         }
 
         assertTrue(barrier.isCommitted());
@@ -97,7 +94,7 @@ public class VetoCommitBarrier_abortTest {
         public void doRun() throws Exception {
             tx = getThreadLocalTransaction();
             ref.inc();
-            barrier.awaitCommit(tx);
+            barrier.joinCommit(tx);
         }
     }
 }

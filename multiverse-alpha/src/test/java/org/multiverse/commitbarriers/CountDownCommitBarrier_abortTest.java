@@ -13,8 +13,8 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public class CountdownCommitBarrier_abortTest {
-    private CountdownCommitBarrier barrier;
+public class CountDownCommitBarrier_abortTest {
+    private CountDownCommitBarrier barrier;
 
     @Before
     public void setUp() {
@@ -29,7 +29,7 @@ public class CountdownCommitBarrier_abortTest {
 
     @Test
     public void whenNoPartiesWaiting() {
-        barrier = new CountdownCommitBarrier(1);
+        barrier = new CountDownCommitBarrier(1);
         barrier.abort();
 
         assertTrue(barrier.isAborted());
@@ -37,7 +37,7 @@ public class CountdownCommitBarrier_abortTest {
 
     @Test
     public void whenPartiesWaiting_theyAreAborted() {
-        barrier = new CountdownCommitBarrier(3);
+        barrier = new CountDownCommitBarrier(3);
 
         CommitThread thread1 = new CommitThread(barrier);
         CommitThread thread2 = new CommitThread(barrier);
@@ -53,10 +53,10 @@ public class CountdownCommitBarrier_abortTest {
     }
 
     class CommitThread extends TestThread {
-        final CountdownCommitBarrier barrier;
+        final CountDownCommitBarrier barrier;
         Transaction tx;
 
-        CommitThread(CountdownCommitBarrier barrier) {
+        CommitThread(CountDownCommitBarrier barrier) {
             setPrintStackTrace(false);
             this.barrier = barrier;
         }
@@ -65,13 +65,13 @@ public class CountdownCommitBarrier_abortTest {
         @TransactionalMethod
         public void doRun() throws Exception {
             tx = getThreadLocalTransaction();
-            barrier.awaitCommitUninterruptibly(tx);
+            barrier.joinCommitUninterruptibly(tx);
         }
     }
 
     @Test
     public void whenAborted_thenIgnored() {
-        barrier = new CountdownCommitBarrier(1);
+        barrier = new CountDownCommitBarrier(1);
         barrier.abort();
 
         barrier.abort();
@@ -80,12 +80,12 @@ public class CountdownCommitBarrier_abortTest {
 
     @Test
     public void whenCommitted_thenClosedCommitBarrierException() {
-        barrier = new CountdownCommitBarrier(0);
+        barrier = new CountDownCommitBarrier(0);
 
         try {
             barrier.abort();
             fail();
-        } catch (ClosedCommitBarrierException expected) {
+        } catch (CommitBarrierOpenException expected) {
 
         }
 

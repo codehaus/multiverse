@@ -14,7 +14,7 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public class CountdownCommitBarrier_IntegrationTest {
+public class CountDownCommitBarrier_IntegrationTest {
 
     @Before
     public void setUp() {
@@ -29,7 +29,7 @@ public class CountdownCommitBarrier_IntegrationTest {
 
     @Test
     public void testMultipleWaiters() {
-        CountdownCommitBarrier barrier = new CountdownCommitBarrier(2);
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(2);
         AwaitThread t1 = new AwaitThread(barrier);
         t1.start();
 
@@ -48,7 +48,7 @@ public class CountdownCommitBarrier_IntegrationTest {
 
     @Test
     public void testSingleWaiter() {
-        CountdownCommitBarrier barrier = new CountdownCommitBarrier(1);
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
         AwaitThread t1 = new AwaitThread(barrier);
         t1.start();
 
@@ -60,10 +60,10 @@ public class CountdownCommitBarrier_IntegrationTest {
 
     public class AwaitThread extends TestThread {
         private Transaction tx;
-        private final CountdownCommitBarrier barrier;
+        private final CountDownCommitBarrier barrier;
 
 
-        public AwaitThread(CountdownCommitBarrier barrier) {
+        public AwaitThread(CountDownCommitBarrier barrier) {
             super("AwaitThread");
             this.barrier = barrier;
         }
@@ -75,7 +75,7 @@ public class CountdownCommitBarrier_IntegrationTest {
             TransactionalInteger dummy = new TransactionalInteger();
 
             tx = getThreadLocalTransaction();
-            barrier.awaitCommitUninterruptibly(tx);
+            barrier.joinCommitUninterruptibly(tx);
         }
     }
 }

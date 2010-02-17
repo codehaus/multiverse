@@ -19,7 +19,7 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public class VetoCommitBarrier_awaitCommitTest {
+public class VetoCommitBarrier_joinCommitTest {
     private Stm stm;
     private TransactionFactory txFactory;
 
@@ -42,7 +42,7 @@ public class VetoCommitBarrier_awaitCommitTest {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
 
         try {
-            barrier.awaitCommit(null);
+            barrier.joinCommit(null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -101,7 +101,7 @@ public class VetoCommitBarrier_awaitCommitTest {
         public void doRun() throws Exception {
             sleepMs(1000);
             ref.inc();
-            group.awaitCommit(getThreadLocalTransaction());
+            group.joinCommit(getThreadLocalTransaction());
         }
     }
 
@@ -112,7 +112,7 @@ public class VetoCommitBarrier_awaitCommitTest {
 
         VetoCommitBarrier group = new VetoCommitBarrier();
         try {
-            group.awaitCommit(tx);
+            group.joinCommit(tx);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -129,7 +129,7 @@ public class VetoCommitBarrier_awaitCommitTest {
 
         VetoCommitBarrier group = new VetoCommitBarrier();
         try {
-            group.awaitCommit(tx);
+            group.joinCommit(tx);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -146,9 +146,9 @@ public class VetoCommitBarrier_awaitCommitTest {
 
         Transaction tx = txFactory.start();
         try {
-            barrier.awaitCommit(tx);
+            barrier.joinCommit(tx);
             fail();
-        } catch (ClosedCommitBarrierException expected) {
+        } catch (CommitBarrierOpenException expected) {
         }
 
         assertIsActive(tx);
@@ -159,13 +159,13 @@ public class VetoCommitBarrier_awaitCommitTest {
     @Test
     public void whenCommitted_thenClosedCommitBarrierException() throws InterruptedException {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
-        barrier.commit();
+        barrier.vetoCommit();
 
         Transaction tx = txFactory.start();
         try {
-            barrier.awaitCommit(tx);
+            barrier.joinCommit(tx);
             fail();
-        } catch (ClosedCommitBarrierException expected) {
+        } catch (CommitBarrierOpenException expected) {
         }
 
         assertIsActive(tx);
@@ -189,7 +189,7 @@ public class VetoCommitBarrier_awaitCommitTest {
         public void doRun() throws Exception {
             tx = getThreadLocalTransaction();
             ref.inc();
-            barrier.awaitCommit(tx);
+            barrier.joinCommit(tx);
         }
     }
 }

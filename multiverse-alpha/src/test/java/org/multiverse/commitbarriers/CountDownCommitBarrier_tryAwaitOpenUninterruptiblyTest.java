@@ -13,8 +13,8 @@ import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class CountdownCommitBarrier_tryAwaitOpenUninterruptiblyTest {
-    private CountdownCommitBarrier barrier;
+public class CountDownCommitBarrier_tryAwaitOpenUninterruptiblyTest {
+    private CountDownCommitBarrier barrier;
 
     @Before
     public void setUp() {
@@ -29,7 +29,7 @@ public class CountdownCommitBarrier_tryAwaitOpenUninterruptiblyTest {
 
     @Test
     public void whenNullTimeout_thenNullPointerException() {
-        barrier = new CountdownCommitBarrier(1);
+        barrier = new CountDownCommitBarrier(1);
 
         try {
             barrier.tryAwaitOpenUninterruptibly(1, null);
@@ -49,7 +49,7 @@ public class CountdownCommitBarrier_tryAwaitOpenUninterruptiblyTest {
 
     @Test
     public void whenCommittedWhileWaiting() throws InterruptedException {
-        barrier = new CountdownCommitBarrier(1);
+        barrier = new CountDownCommitBarrier(1);
 
         TestThread t = new TestThread() {
             @Override
@@ -63,7 +63,7 @@ public class CountdownCommitBarrier_tryAwaitOpenUninterruptiblyTest {
         sleepMs(500);
         assertAlive(t);
 
-        barrier.awaitCommit();
+        barrier.countDown();
         t.join();
         t.assertNothingThrown();
         assertTrue(barrier.isCommitted());
@@ -83,7 +83,7 @@ public class CountdownCommitBarrier_tryAwaitOpenUninterruptiblyTest {
 
     @Test
     public void whenCommitted() {
-        barrier = new CountdownCommitBarrier(0);
+        barrier = new CountDownCommitBarrier(0);
 
         boolean result = barrier.tryAwaitOpenUninterruptibly(1, TimeUnit.DAYS);
 
@@ -93,7 +93,7 @@ public class CountdownCommitBarrier_tryAwaitOpenUninterruptiblyTest {
 
     @Test
     public void whenAborted() {
-        barrier = new CountdownCommitBarrier(1);
+        barrier = new CountDownCommitBarrier(1);
         barrier.abort();
 
         boolean result = barrier.tryAwaitOpenUninterruptibly(1, TimeUnit.DAYS);

@@ -13,8 +13,8 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public class CountdownCommitBarrier_awaitCommitUninterruptiblyTest {
-    private CountdownCommitBarrier barrier;
+public class CountDownCommitBarrier_joinCommitUninterruptiblyTest {
+    private CountDownCommitBarrier barrier;
 
     @Before
     public void setUp() {
@@ -29,10 +29,10 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyTest {
 
     @Test
     public void whenOpenAndNullTransaction_thenNullPointerException() {
-        barrier = new CountdownCommitBarrier(1);
+        barrier = new CountDownCommitBarrier(1);
 
         try {
-            barrier.awaitCommitUninterruptibly(null);
+            barrier.joinCommitUninterruptibly(null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -43,12 +43,12 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyTest {
 
     @Test
     public void whenOpenAndThreadAlreadyInterrupted_thenNotInterruptedButInterruptStatusIsSet() {
-        barrier = new CountdownCommitBarrier(1);
+        barrier = new CountDownCommitBarrier(1);
 
         Thread.currentThread().interrupt();
         Transaction tx = new AbstractTransactionImpl();
 
-        barrier.awaitCommitUninterruptibly(tx);
+        barrier.joinCommitUninterruptibly(tx);
 
         assertTrue(barrier.isCommitted());
         assertEquals(0, barrier.getNumberWaiting());
@@ -60,8 +60,8 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyTest {
         Transaction tx = new AbstractTransactionImpl();
         tx.prepare();
 
-        barrier = new CountdownCommitBarrier(1);
-        barrier.awaitCommitUninterruptibly(tx);
+        barrier = new CountDownCommitBarrier(1);
+        barrier.joinCommitUninterruptibly(tx);
 
         assertIsCommitted(tx);
         assertTrue(barrier.isCommitted());
@@ -72,8 +72,8 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyTest {
         Transaction tx = new AbstractTransactionImpl();
         tx.prepare();
 
-        barrier = new CountdownCommitBarrier(1);
-        barrier.awaitCommitUninterruptibly(tx);
+        barrier = new CountDownCommitBarrier(1);
+        barrier.joinCommitUninterruptibly(tx);
 
         assertIsCommitted(tx);
         assertTrue(barrier.isCommitted());
@@ -81,7 +81,7 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyTest {
 
     @Test
     public void whenOpenAndLastTransaction_thenAllTransactionsCommitted() {
-        barrier = new CountdownCommitBarrier(3);
+        barrier = new CountDownCommitBarrier(3);
         AwaitThread t1 = new AwaitThread();
         AwaitThread t2 = new AwaitThread();
 
@@ -92,7 +92,7 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyTest {
         assertTrue(barrier.isClosed());
 
         Transaction tx = new AbstractTransactionImpl();
-        barrier.awaitCommitUninterruptibly(tx);
+        barrier.joinCommitUninterruptibly(tx);
         joinAll(t1, t2);
 
         assertIsCommitted(tx, t1.tx, t2.tx);
@@ -103,9 +103,9 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyTest {
         Transaction tx = new AbstractTransactionImpl();
         tx.abort();
 
-        barrier = new CountdownCommitBarrier(1);
+        barrier = new CountDownCommitBarrier(1);
         try {
-            barrier.awaitCommitUninterruptibly(tx);
+            barrier.joinCommitUninterruptibly(tx);
             fail();
         } catch (IllegalStateException ex) {
         }
@@ -119,9 +119,9 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyTest {
         Transaction tx = new AbstractTransactionImpl();
         tx.commit();
 
-        barrier = new CountdownCommitBarrier(1);
+        barrier = new CountDownCommitBarrier(1);
         try {
-            barrier.awaitCommitUninterruptibly(tx);
+            barrier.joinCommitUninterruptibly(tx);
             fail();
         } catch (IllegalStateException ex) {
         }
@@ -132,15 +132,15 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyTest {
 
     @Test
     public void whenAborted_thenClosedCommitBarrierException() {
-        barrier = new CountdownCommitBarrier(1);
+        barrier = new CountDownCommitBarrier(1);
         barrier.abort();
 
         Transaction tx = new AbstractTransactionImpl();
 
         try {
-            barrier.awaitCommitUninterruptibly(tx);
+            barrier.joinCommitUninterruptibly(tx);
             fail();
-        } catch (ClosedCommitBarrierException expected) {
+        } catch (CommitBarrierOpenException expected) {
         }
 
         assertTrue(barrier.isAborted());
@@ -148,14 +148,14 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyTest {
 
     @Test
     public void whenCommitted_thenClosedCommitBarrierException() {
-        barrier = new CountdownCommitBarrier(1);
-        barrier.awaitCommitUninterruptibly(new AbstractTransactionImpl());
+        barrier = new CountDownCommitBarrier(1);
+        barrier.joinCommitUninterruptibly(new AbstractTransactionImpl());
 
         Transaction tx = new AbstractTransactionImpl();
         try {
-            barrier.awaitCommitUninterruptibly(tx);
+            barrier.joinCommitUninterruptibly(tx);
             fail();
-        } catch (ClosedCommitBarrierException expected) {
+        } catch (CommitBarrierOpenException expected) {
         }
 
         assertIsAborted(tx);
@@ -168,7 +168,7 @@ public class CountdownCommitBarrier_awaitCommitUninterruptiblyTest {
         @TransactionalMethod
         public void doRun() throws Exception {
             tx = getThreadLocalTransaction();
-            barrier.awaitCommitUninterruptibly(tx);
+            barrier.joinCommitUninterruptibly(tx);
         }
     }
 }

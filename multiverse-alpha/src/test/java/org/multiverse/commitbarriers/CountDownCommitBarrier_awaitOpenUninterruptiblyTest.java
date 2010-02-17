@@ -10,9 +10,9 @@ import static org.junit.Assert.assertTrue;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class CountdownCommitBarrier_awaitOpenUninterruptiblyTest {
+public class CountDownCommitBarrier_awaitOpenUninterruptiblyTest {
 
-    private CountdownCommitBarrier barrier;
+    private CountDownCommitBarrier barrier;
 
     @Before
     public void setUp() {
@@ -27,7 +27,7 @@ public class CountdownCommitBarrier_awaitOpenUninterruptiblyTest {
 
     @Test
     public void whenStartInterrupted() {
-        barrier = new CountdownCommitBarrier(1);
+        barrier = new CountDownCommitBarrier(1);
 
         TestThread t = new TestThread() {
             @Override
@@ -48,7 +48,7 @@ public class CountdownCommitBarrier_awaitOpenUninterruptiblyTest {
 
     @Test
     public void whenInterruptedWhileWaiting() {
-        barrier = new CountdownCommitBarrier(1);
+        barrier = new CountDownCommitBarrier(1);
 
         TestThread t = new TestThread() {
             @Override
@@ -71,7 +71,7 @@ public class CountdownCommitBarrier_awaitOpenUninterruptiblyTest {
 
     @Test
     public void whenAbortedWhileWaiting() {
-        barrier = new CountdownCommitBarrier(1);
+        barrier = new CountDownCommitBarrier(1);
 
         TestThread t = new TestThread() {
             @Override
@@ -89,7 +89,7 @@ public class CountdownCommitBarrier_awaitOpenUninterruptiblyTest {
 
     @Test
     public void whenCommittedWhileWaiting() throws InterruptedException {
-        barrier = new CountdownCommitBarrier(1);
+        barrier = new CountDownCommitBarrier(1);
 
         TestThread t = new TestThread() {
             @Override
@@ -100,7 +100,7 @@ public class CountdownCommitBarrier_awaitOpenUninterruptiblyTest {
         t.start();
 
         sleepMs(500);
-        barrier.awaitCommit();
+        barrier.countDown();
 
         joinAll(t);
         assertTrue(barrier.isCommitted());
@@ -108,7 +108,7 @@ public class CountdownCommitBarrier_awaitOpenUninterruptiblyTest {
 
     @Test
     public void whenCommitted() throws InterruptedException {
-        barrier = new CountdownCommitBarrier(0);
+        barrier = new CountDownCommitBarrier(0);
 
         barrier.awaitOpenUninterruptibly();
         assertTrue(barrier.isCommitted());
@@ -117,7 +117,7 @@ public class CountdownCommitBarrier_awaitOpenUninterruptiblyTest {
 
     @Test
     public void whenAborted() throws InterruptedException {
-        barrier = new CountdownCommitBarrier(1);
+        barrier = new CountDownCommitBarrier(1);
         barrier.abort();
 
         barrier.awaitOpenUninterruptibly();

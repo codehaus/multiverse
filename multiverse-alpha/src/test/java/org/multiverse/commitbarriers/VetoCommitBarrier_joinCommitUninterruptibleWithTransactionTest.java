@@ -7,7 +7,7 @@ import org.junit.Test;
 import static org.multiverse.TestUtils.clearCurrentThreadInterruptedStatus;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class VetoCommitBarrier_awaitCommitUninterruptibleWithTransactionTest {
+public class VetoCommitBarrier_joinCommitUninterruptibleWithTransactionTest {
 
     @Before
     public void setUp() {

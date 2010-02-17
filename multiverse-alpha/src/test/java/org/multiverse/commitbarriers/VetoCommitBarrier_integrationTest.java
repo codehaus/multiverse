@@ -40,7 +40,7 @@ public class VetoCommitBarrier_integrationTest {
         startAll(t1, t2);
         sleepMs(500);
 
-        barrier.commit();
+        barrier.vetoCommit();
 
         joinAll(t1, t2);
 
@@ -84,7 +84,7 @@ public class VetoCommitBarrier_integrationTest {
         @TransactionalMethod
         public void doRun() throws Exception {
             ref.inc();
-            barrier.awaitCommit(getThreadLocalTransaction());
+            barrier.joinCommit(getThreadLocalTransaction());
         }
     }
 }

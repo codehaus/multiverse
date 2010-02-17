@@ -19,7 +19,7 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public class CountdownCommitBarrier_StressTest {
+public class CountDownCommitBarrier_StressTest {
 
     private AtomicLong totalInc;
     private AtomicLong commitInc;
@@ -98,28 +98,28 @@ public class CountdownCommitBarrier_StressTest {
         public void runOnce() {
             int partyCount = randomInt(maxPartiesCount) + 1;
             totalInc.addAndGet(partyCount);
-            CountdownCommitBarrier countdownCommitBarrier = new CountdownCommitBarrier(partyCount);
+            CountDownCommitBarrier countDownCommitBarrier = new CountDownCommitBarrier(partyCount);
 
             Vector<Transaction> transactions = new Vector<Transaction>();
             for (int k = 0; k < partyCount; k++) {
-                executor.execute(new WorkerTask(k == 0, countdownCommitBarrier, transactions));
+                executor.execute(new WorkerTask(k == 0, countDownCommitBarrier, transactions));
             }
 
-            countdownCommitBarrier.awaitOpenUninterruptibly();
+            countDownCommitBarrier.awaitOpenUninterruptibly();
 
-            if (countdownCommitBarrier.isCommitted()) {
+            if (countDownCommitBarrier.isCommitted()) {
                 commitInc.getAndAdd(partyCount);
             }
         }
     }
 
     class WorkerTask implements Runnable {
-        final CountdownCommitBarrier countdownCommitBarrier;
+        final CountDownCommitBarrier countDownCommitBarrier;
         final boolean first;
         private Vector<Transaction> transactions;
 
-        WorkerTask(boolean first, CountdownCommitBarrier countdownCommitBarrier, Vector<Transaction> transactions) {
-            this.countdownCommitBarrier = countdownCommitBarrier;
+        WorkerTask(boolean first, CountDownCommitBarrier countDownCommitBarrier, Vector<Transaction> transactions) {
+            this.countDownCommitBarrier = countDownCommitBarrier;
             this.transactions = transactions;
             this.first = first;
         }
@@ -143,10 +143,10 @@ public class CountdownCommitBarrier_StressTest {
             transactions.add(tx);
 
             if (first && randomOneOf(oneOfFails)) {
-                countdownCommitBarrier.abort();
+                countDownCommitBarrier.abort();
             }
 
-            countdownCommitBarrier.awaitCommitUninterruptibly(tx);
+            countDownCommitBarrier.joinCommitUninterruptibly(tx);
         }
     }
 }

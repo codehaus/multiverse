@@ -8,11 +8,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.sleepMs;
 
-public class CountdownCommitBarrier_setTimeoutTest {
+public class CountDownCommitBarrier_setTimeoutTest {
 
     @Test
     public void whenNullTimeUnit_thenNullPointerException() {
-        CountdownCommitBarrier barrier = new CountdownCommitBarrier(1);
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
 
         try {
             barrier.setTimeout(10, null);
@@ -25,7 +25,7 @@ public class CountdownCommitBarrier_setTimeoutTest {
 
     @Test
     public void whenTimedOut() {
-        CountdownCommitBarrier barrier = new CountdownCommitBarrier(1);
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
 
         barrier.setTimeout(500, TimeUnit.MILLISECONDS);
         sleepMs(1000);
@@ -35,10 +35,10 @@ public class CountdownCommitBarrier_setTimeoutTest {
 
     @Test
     public void whenCommittedBeforeTimeout() throws InterruptedException {
-        CountdownCommitBarrier barrier = new CountdownCommitBarrier(1);
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
 
         barrier.setTimeout(500, TimeUnit.MILLISECONDS);
-        barrier.awaitCommit();
+        barrier.countDown();
 
         sleepMs(1000);
         assertTrue(barrier.isCommitted());
@@ -46,7 +46,7 @@ public class CountdownCommitBarrier_setTimeoutTest {
 
     @Test
     public void whenAbortedBeforeTimeout() {
-        CountdownCommitBarrier barrier = new CountdownCommitBarrier(1);
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
 
         barrier.setTimeout(500, TimeUnit.MILLISECONDS);
         barrier.abort();
@@ -57,12 +57,12 @@ public class CountdownCommitBarrier_setTimeoutTest {
 
     @Test
     public void whenCommitted_thenClosedCommitBarrierException() {
-        CountdownCommitBarrier barrier = new CountdownCommitBarrier(0);
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(0);
 
         try {
             barrier.setTimeout(10, TimeUnit.SECONDS);
             fail();
-        } catch (ClosedCommitBarrierException expected) {
+        } catch (CommitBarrierOpenException expected) {
         }
 
         assertTrue(barrier.isCommitted());
@@ -70,13 +70,13 @@ public class CountdownCommitBarrier_setTimeoutTest {
 
     @Test
     public void whenAborted_thenClosedCommitBarrierException() {
-        CountdownCommitBarrier barrier = new CountdownCommitBarrier(1);
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
         barrier.abort();
 
         try {
             barrier.setTimeout(10, TimeUnit.SECONDS);
             fail();
-        } catch (ClosedCommitBarrierException expected) {
+        } catch (CommitBarrierOpenException expected) {
         }
 
         assertTrue(barrier.isAborted());
