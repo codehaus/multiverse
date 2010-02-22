@@ -1,5 +1,7 @@
 package org.multiverse.api;
 
+import org.multiverse.utils.backoff.BackoffPolicy;
+
 /**
  * An implementation of the builder design pattern to create a {@link TransactionFactory}. This is the place to be
  * for transaction configuration. This approach also gives the freedom to access implementation specific
@@ -25,7 +27,8 @@ package org.multiverse.api;
  * <h2>Default configuration</h2>
  * Default a TransactionFactoryBuilder will be configured with:
  * <ol>
- * <li><b>readonly</b> true</li>
+ * <li><b>readonly</b>false</li>
+ * <li><b>automatic read tracking</b>true</li>
  * <li><b>familyName</b> null</li>
  * <li><b>maxRetryCount</b> 1000</li>
  * </ol>
@@ -64,14 +67,6 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     B setReadonly(boolean readonly);
 
     /**
-     * Sets the the maximum count a transaction can be retried. The default is 1000.
-     *
-     * @param retryCount the maximum number of times a transaction can be tried.
-     * @return the new TransactionFactoryBuilder
-     */
-    B setMaxRetryCount(int retryCount);
-
-    /**
      * If the transaction should automatically track all reads that have been done. This is needed for blocking
      * operations, but also for other features like writeskew detection.
      *
@@ -94,7 +89,6 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      * retrying tx.
      *
      * @param smartTxlengthSelector indicates if smartTxlength selection should be used.
-     *
      * @return the new TransactionFactoryBuilder
      */
     B setSmartTxLengthSelector(boolean smartTxlengthSelector);
@@ -102,22 +96,37 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     /**
      * If writeskew prevention should be enabled.
      *
-     * @param preventWriteSkew  indicates if writeSkews should be prevented.
+     * @param preventWriteSkew indicates if writeSkews should be prevented.
      * @return the new TransactionFactoryBuilder
      */
     B setPreventWriteSkew(boolean preventWriteSkew);
 
     /**
+     * Sets the new backoff policy. Policy is used to backoff when a transaction conflicts with another transaction.
+     * See the {@link BackoffPolicy} for more information.
+     *
+     * @param backoffPolicy the backoff policy to use.
+     * @return the new TransactionFactoryBuilder
+     * @throws NullPointerException if backoffPolicy is null.
+     */
+    B setBackoffPolicy(BackoffPolicy backoffPolicy);
+
+    /**
+     * Sets the the maximum count a transaction can be retried. The default is 1000.
+     *
+     * @param retryCount the maximum number of times a transaction can be tried.
+     * @return the new TransactionFactoryBuilder
+     */
+    B setMaxRetryCount(int retryCount);
+
+    /**
      * Builds a {@link TransactionFactory} with the provided configuration.
      *
      * @return the started Transaction.
-     * @throws IllegalStateException if the configuration for creating a transaction factory is not valid.
+     * @throws IllegalStateException if this TransactionFactoryBuilder is not configured correctly and therefor the
+     *                               TransactionFactory can't be created.
      */
     TransactionFactory<T> build();
 
     // B setLoggingEnabled(boolean loggingEnabled);
-
-    //B setCommitLockPolicy(CommitLockPolicy commitLockPolicy);
-
-
 }

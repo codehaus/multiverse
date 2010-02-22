@@ -89,7 +89,7 @@ public class AbstractTransactionConfig implements TransactionConfig {
     }
 
     @Override
-    public BackoffPolicy getRetryBackoffPolicy() {
+    public BackoffPolicy getBackoffPolicy() {
         return backoffPolicy;
     }
 }

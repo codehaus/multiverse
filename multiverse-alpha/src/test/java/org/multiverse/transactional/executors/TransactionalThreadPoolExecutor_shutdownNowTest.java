@@ -66,6 +66,7 @@ public class TransactionalThreadPoolExecutor_shutdownNowTest {
     }
 
     @Test
+    @Ignore
     public void whenStartedAndPendingWork_thenPendingWorkReturned() {
         executor = new TransactionalThreadPoolExecutor();
         executor.execute(new Runnable() {

@@ -2,24 +2,27 @@
 <ol>
     <li>
         Reduce complexity of concurrency control where applicable by replacing lock based technology
-        with transaction based.
+        with transaction based. The goal is not to replace traditional concurrency control completely,
+        but to provide an alternative programming model. I see Multiverse as filling the gap between
+        traditional databases and traditional concurrency control.
     </li>
     <li>
-        Make seamless integrates in the Java Language possible using annotations where fitting.
+        Seamless integration in the Java Language. In most cases this can be done through annotations
+        in combination with instrumentation. So you don't need to extend any classes, implement interfaces
+        impose limitations on the type of fields, or otherwise damage your oo design.
     </li>
     <li>
         Provide a STM implementation that doesn't rely on the Java Language, but can be integrated in
-        other Java based languages like Scala or Groovy as well.
+        other Java based languages like Scala or Groovy as well. The STM implementation itself
+        doesn't care about the language used, it only cares about classes implementing certain
+        interfaces.
     </li>
     <li>
-        Provide a good performing and scalable implementation to be useful in very demanding production environments.
+        Provide a good performing and scalable implementation to be useful in very demanding
+        production environments.
     </li>
     <li>
-        Provide sufficient features and configuration options so that it is easy to optimize
-        for speed or correctness.
-    </li>
-    <li>
-        Create a framework for experimenting with different STM implementations. It should be easy to
-        swap implementation but preventing the need to do a lot of code alterations.
+        Provide a framework for experimenting with different STM implementations. It should be easy to
+        swap implementations.
     </li>
 </ol>

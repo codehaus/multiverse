@@ -88,7 +88,7 @@ public class TransactionLogicDonor {
                     setThreadLocalTransaction(tx);
                 } catch (Throwable throwable) {
                     if (throwable instanceof RecoverableThrowable) {
-                        BackoffPolicy backoffPolicy = tx.getConfig().getRetryBackoffPolicy();
+                        BackoffPolicy backoffPolicy = tx.getConfig().getBackoffPolicy();
                         backoffPolicy.delayedUninterruptible(tx, attempt);
                     } else {
                         rethrow(throwable);

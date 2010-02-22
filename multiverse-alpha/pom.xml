@@ -18,7 +18,7 @@
     </parent>
 
     <properties>
-        <multiverse.agentname>${build.finalName}-javaagent</multiverse.agentname>
+        <multiverse.agentname>test-javaagent</multiverse.agentname>
         <multiverse.agentclass>org.multiverse.stms.alpha.instrumentation.MultiverseJavaAgent</multiverse.agentclass>
         <asm.version>3.2</asm.version>
     </properties>
@@ -64,29 +64,34 @@
                 </configuration>
             </plugin -->
 
+            <!-- plugin that packs the dependent libraries and adds the agent configuration to the manifest file-->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2-beta-2</version>
+                <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                        <manifestEntries>
+                            <Premain-Class>${multiverse.agentclass}</Premain-Class>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
                 <executions>
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <goal>single</goal>
+                            <goal>assembly</goal>
                         </goals>
-                        <configuration>
-                            <descriptorRefs>
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                            <archive>
-                                <manifestEntries>
-                                    <Premain-Class>${multiverse.agentclass}</Premain-Class>
-                                </manifestEntries>
-                            </archive>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
 
+            <!-- plugin that integrates the asm library in the alpha library-->
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
@@ -98,7 +103,7 @@
                         <configuration>
                             <tasks>
                                 <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"/>
-                                <jarjar destfile="${build.directory}/${artifactId}-${version}-jar-with-dependencies.jar"
+                                <jarjar destfile="${build.directory}/${artifactId}-${version}.jar"
                                         update="true">
                                     <!-- Replace "org.objectweb.asm.x.y.." with "org.multiverse.repackaged.org.objectweb.asm.x.y..".
                                       See http://code.google.com/p/jarjar/wiki/CommandLineDocs for more informtion on jarjar rules. -->

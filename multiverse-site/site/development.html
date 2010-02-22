@@ -1,6 +1,6 @@
 <h1>Development</h1>
 On this page you can find all information related to developing Multiverse. For more information about how to set up
-your project that depends on Multiverse, check the <a href="mavenconfiguration.html">following</a> page.
+your project that depends on Multiverse, check the <a href="developconfiguration.html">following</a> page.
 
 <h2>Links</h2>
 Underneath you can find the most important links:
@@ -41,26 +41,13 @@ wastes my precious time.
 
 <h2>Building the project</h2>
 If you have installed Maven 2, the only thing you need to do is the execute 'mvn clean install' in the root
-Multiverse directory.
+Multiverse directory. Make sure that you have Java 1.6 or higher installed.
 
 <h2>Running the stress tests</h2>
 There are a bunch of stress tests (they are named *StressTest) that run for quite some time (15/20 minutes
 on my laptop). They are not executed under a standard phase cause of Clover (the additional instrumentation caused
 by clover takes a lot of extra time). At the moment the stress tests are completely disabled, so you need to run
 them from your ide.
-
-<h2>Setting up your ide</h2>
-If you are working on Multiverse, you need to make sure that the javaagent is running. This can be done by adding
-the following parameters when  you run a unit test:
-<pre>
-    -javaagent:/java/projects/multiverse/0.4/multiverse-alpha/target/multiverse-alpha-0.4-SNAPSHOT-javaagent.jar
-</pre>
-Make sure that you set the path correctly. Another thing you need to do, if you are working on Multiverse itself,
-is to make sure that the compile task of the multiverse-alpha project is called. This will trigger the
-java-agent jar to be build before unit tests are executed.
-<p>
-    Under IntelliJ you can all place this under a default config. After that is done, you never need to worry
-    about this again.
 
 <h2>Setting up Clover</h2>
 Multiverse uses Clover as test coverage tool and out of the box a evaluation license is provided. This license

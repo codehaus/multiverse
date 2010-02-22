@@ -308,7 +308,7 @@ public abstract class TransactionTemplate<E> {
                 } catch (Throwable throwable) {
                     lastFailureCause = throwable;
                     if (throwable instanceof RecoverableThrowable) {
-                        BackoffPolicy backoffPolicy = tx.getConfig().getRetryBackoffPolicy();
+                        BackoffPolicy backoffPolicy = tx.getConfig().getBackoffPolicy();
                         backoffPolicy.delayedUninterruptible(tx, attempt);
                         tx.restart();
                     } else {

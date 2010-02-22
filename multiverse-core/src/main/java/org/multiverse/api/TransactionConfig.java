@@ -12,14 +12,16 @@ import org.multiverse.utils.backoff.BackoffPolicy;
 public interface TransactionConfig {
 
     /**
-     * Returns the BackoffPolicy used.
+     * Returns the BackoffPolicy used by the Stm when a transaction conflicts with another transaction.
      *
      * @return the BackoffPolicy used.
      */
-    BackoffPolicy getRetryBackoffPolicy();
+    BackoffPolicy getBackoffPolicy();
 
     /**
-     * Checks if this transaction does automaticReadTracking.
+     * Checks if this transaction does automaticReadTracking. Read tracking is needed for blocking transactions,
+     * but also for writeskew detection. Disadvantage of read tracking is that it is more expensive because
+     * the reads not to be registered on some datastructure so that they are tracked.
      *
      * @return true if the transaction does automatic read tracking, false otherwise.
      */
@@ -36,16 +38,17 @@ public interface TransactionConfig {
 
     /**
      * Returns the maximum number of times this Transaction be retried before failing. The returned value will
-     * always be equal or larger than 0.
+     * always be equal or larger than 0. If the value is set high and you are encountering a lot of
+     * TooManyRetryExceptions it could be that the objects are just not concurrent enough.
      *
      * @return the maxRetryCount.
      */
     int getMaxRetryCount();
 
     /**
-     * Checks if the Transaction can be interrupted if it is waiting.
+     * Checks if the Transaction can be interrupted if it is blocking.
      *
-     * @return true if the Transaction can be interrupted if it is waiting, false otherwise.
+     * @return true if the Transaction can be interrupted if it is blocking, false otherwise.
      */
     boolean isInterruptible();
 
@@ -57,14 +60,15 @@ public interface TransactionConfig {
     boolean isReadonly();
 
     /**
-     * Checks if this Transaction should prent writeskew.
+     * Checks if this Transaction should prent writeskew. This is an isolation anomaly and could lead to an execution
+     * of transactions that doesn't match any sequential execution. Writeskew detection can be expensive because
+     * more checks needs to be done. It also leads to lower concurrency because certain executions of transactions
+     * are not allowed and are aborted and retried.
      * <p/>
-     * todo: explanation about writeskew
-     * <p/>
-     * If the transaction is readonly, the value is true since it won't suffer from
-     * write skew problems.
+     * If the transaction is readonly, the value is undefined since a readonly transaction can't suffer from the
+     * writeskew problem.
      *
-     * @return true if a writeskews are prevented, false otherwise.
+     * @return true if the writeskew problem is prevented, false otherwise.
      */
     boolean preventWriteSkew();
 }

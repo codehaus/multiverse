@@ -2,6 +2,7 @@ package org.multiverse.transactional.executors;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 
@@ -71,6 +72,7 @@ public class TransactionalThreadPoolExecutor_awaitTerminationTest {
     }
 
     @Test
+    @Ignore
     public void whenShutdown() throws InterruptedException {
         executor = new TransactionalThreadPoolExecutor();
 

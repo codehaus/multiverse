@@ -145,6 +145,7 @@ public abstract class CommitBarrier {
      */
     public final void abort() {
         List<Runnable> postAbortTasks = null;
+
         lock.lock();
         try {
             switch (status) {
@@ -182,7 +183,8 @@ public abstract class CommitBarrier {
     }
 
     /**
-     * Awaits for this barrier to open (commit or abort).
+     * Awaits for this barrier to open (commit or abort). This call doesn't influence the state of this
+     * CommitBarrier.
      *
      * @throws InterruptedException if the calling thread is interrupted while waiting.
      */
@@ -203,7 +205,8 @@ public abstract class CommitBarrier {
     }
 
     /**
-     * Awaits for this barrier to open (commit or abort).
+     * Awaits for this barrier to open (commit or abort). This call doesn't influence the state of this
+     * CommitBarrier.
      * <p/>
      * This call is not responsive to interrupts.
      */
@@ -221,7 +224,8 @@ public abstract class CommitBarrier {
     }
 
     /**
-     * Waits for this barrier to open (abort or commit).
+     * Waits for this barrier to open (abort or commit). This call doesn't influence the state of this
+     * CommitBarrier.
      *
      * @param timeout the maximum amount of time to wait for the barrier to close.
      * @param unit    the TimeUnit for the timeout argument.
@@ -254,7 +258,8 @@ public abstract class CommitBarrier {
     }
 
     /**
-     * Tries to await the close of the barrier.
+     * Tries to await the close of the barrier. This call doesn't influence the state of this
+     * CommitBarrier.
      * <p/>
      * This call is not responsive to interrupts.
      *
@@ -507,11 +512,13 @@ public abstract class CommitBarrier {
     }
 
     /**
-     * Awaits for the tx to commit. It will commit when all transactions on the group are going to commit.
+     * Joins this CommitBarrier with the provided transaction. If the CommitBarrier can't commit yet, the method
+     * will block.
      * <p/>
-     * If the VetoCommitBarrier already is aborted or committed, the transaction is aborted.
+     * If the CommitBarrier already is aborted or committed, the transaction is aborted.
      * <p/>
-     * This call is responsive to interrupts.
+     * This method is responsive to interrupts. If the waiting thread is interrupted, it will abort itself and
+     * this CommitGroup.
      *
      * @param tx the Transaction to commit.
      * @throws InterruptedException       if the thread is interrupted while waiting.
@@ -566,27 +573,16 @@ public abstract class CommitBarrier {
     }
 
     /**
-     * Waits until all {@linkplain #getParties parties} have invoked <tt>await</tt> on this barrier.
+     * Joins this CommitBarrier with the provided transaction. If the CommitBarrier can't commit yet, this
+     * method will block without being interruptible.
      * <p/>
-     * If the current thread is not the last to arrive then it is disabled for thread scheduling purposes and
-     * lies dormant until one of the following things happens:
-     * <ul>
-     * <li>The last thread arrives; or
-     * <li>Some other thread times out while waiting for barrier
-     * </ul>
-     * <p/>
-     * A transaction can be added that already is prepared. If the barrier already is committed or aborted, the
-     * transaction is aborted.
-     * <p/>
-     * This call is not responsive to interrupts.
+     * If the CommitBarrier already is aborted or committed, the transaction is aborted.
      *
-     * @param tx the transaction
+     * @param tx the Transaction to commit.
      * @throws NullPointerException       if tx is null.
-     * @throws org.multiverse.api.exceptions.DeadTransactionException
-     *                                    if tx already is committed or aborted.
-     * @throws CommitBarrierOpenException if commitGroup already aborted or committed.
+     * @throws DeadTransactionException   if tx is committed/aborted.
+     * @throws CommitBarrierOpenException if this VetoCommitBarrier is committed or aborted.
      */
-
     public void joinCommitUninterruptibly(Transaction tx) {
         ensureNotDead(tx);
 
@@ -630,9 +626,10 @@ public abstract class CommitBarrier {
     }
 
     /**
-     * Returns one party and awaits commit. This method only blocks for a very short amount of time.
+     * Tries to joins this CommitBarrier with the provided transaction. If the CommitBarrier can't commit yet, the
+     * transaction and CommitBarrier will be aborted. So this method will not block (for a long period).
      * <p/>
-     * If the CountDownCommitBarrier already is aborted or committed, the transaction is aborted.
+     * If the CommitBarrier already is aborted or committed, the transaction is aborted.
      *
      * @param tx the Transaction that wants to join the other parties to commit with.
      * @return true if CountDownCommitBarrier was committed, false if aborted.
@@ -685,10 +682,29 @@ public abstract class CommitBarrier {
         return isCommitted();
     }
 
-
+    /**
+     * Tries to joins this CommitBarrier with the provided transaction. If the CommitBarrier can't commit yet, this call
+     * will block until one of the following things happens:
+     * <ol>
+     * <li>the CommitBarrier is committed</li>
+     * <li>the CommitBarrier is aborted</li>
+     * <li>the thread is interrupted</li>
+     * </ol>
+     * <p/>
+     * If the CommitBarrier already is aborted or committed, the transaction is aborted.
+     * <p/>
+     * This method is responsive to interrupts. If the waiting thread is interrupted, it will abort itself and
+     * this CommitGroup.
+     *
+     * @param tx      the Transaction that wants to join the other parties to commit with.
+     * @param timeout the maximum time to wait.
+     * @param unit    the TimeUnit for the timeout argument.
+     * @return true if CountDownCommitBarrier was committed, false if aborted.
+     * @throws CommitBarrierOpenException if tx or this CountDownCommitBarrier is aborted or committed.
+     * @throws NullPointerException       if tx or unit is null is null.
+     * @throws InterruptedException       if the calling thread is interrupted while waiting.
+     */
     public boolean tryJoinCommit(Transaction tx, long timeout, TimeUnit unit) throws InterruptedException {
-        ensureNotDead(tx);
-
         ensureNotDead(tx);
 
         long timeoutNs = unit.toNanos(timeout);
@@ -732,6 +748,25 @@ public abstract class CommitBarrier {
         return true;
     }
 
+    /**
+     * Tries to joins this CommitBarrier with the provided transaction. If the CommitBarrier can't commit yet, this call
+     * will block until one of the following things happens:
+     * <ol>
+     * <li>the CommitBarrier is committed</li>
+     * <li>the CommitBarrier is aborted</li>
+     * </ol>
+     * <p/>
+     * If the CommitBarrier already is aborted or committed, the transaction is aborted.
+     * <p/>
+     * This method is not responsive to interrupts.
+     *
+     * @param tx      the Transaction that wants to join the other parties to commit with.
+     * @param timeout the maximum time to wait.
+     * @param unit    the TimeUnit for the timeout argument.
+     * @return true if CountDownCommitBarrier was committed, false if aborted.
+     * @throws CommitBarrierOpenException if tx or this CountDownCommitBarrier is aborted or committed.
+     * @throws NullPointerException       if tx or unit is null is null.
+     */
     public boolean tryJoinCommitUninterruptibly(Transaction tx, long timeout, TimeUnit unit) {
         ensureNotDead(tx);
 

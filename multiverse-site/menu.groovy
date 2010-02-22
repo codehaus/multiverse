@@ -16,10 +16,11 @@ class Page {
 
 //=======================================================
 
+def lastupdate = String.format("%te %<tB %<tY",new GregorianCalendar())
+
 def basedir = project.properties['basedir']
 
 def templatecontent = new File(basedir+'site/pagetemplate.html').text
-//def templatecontent = new File('site/pagetemplate.html').text
 
 def menus = [
         new Menu(name: 'Menu', items: [
@@ -74,13 +75,13 @@ def pages = [
         new Page(pageid: 'index'),
         new Page(pageid: 'setup-javaagent'),
         new Page(pageid: 'support'),
-        new Page(pageid: 'mavenconfiguration'),
+        new Page(pageid: 'developconfiguration'),
+        new Page(pageid: 'otherjvmlanguages'),        
         new Page(pageid: 'documentationoverview')
 ]
 
 def outputdirectory = "$basedir/target/site"
 
-def lastupdate = String.format("%tm %<tB %<tY",new GregorianCalendar())
 
 //=============== template engine ==================
 
@@ -115,6 +116,10 @@ output.write(new File("${basedir}/site/style.css").text)
 def settingsxml = new File("$outputdirectory/settings.xml")
 settingsxml.createNewFile()
 settingsxml.write(new File("${basedir}/site/settings.xml").text)
+
+def pomxml = new File("$outputdirectory/pom.xml")
+pomxml.createNewFile()
+pomxml.write(new File("${basedir}/site/pom.xml").text)
 
 
 println('finished')

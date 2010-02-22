@@ -7,8 +7,8 @@
     <name>Multiverse Software Transactional Memory</name>
     <description>
         Multiverse is a Software Transactional Memory implementation that can be used in Java
-        but also in other languages like Scala. Essentially it is a framework that allows different
-        STM implementation (with different featuresets or performance characteristics) to be used
+        but also in other languages running on the JVM like Scala or Groovy. Essentially it is a framework that allows
+        different STM implementation (with different featuresets or performance characteristics) to be used
         under the hood. The main STM implementation is multiverse-alpha.
     </description>
     <groupId>org.multiverse</groupId>
@@ -17,11 +17,15 @@
     <inceptionYear>2008</inceptionYear>
     <packaging>pom</packaging>
 
+    <properties>
+        <sourceEncoding>UTF-8</sourceEncoding>
+        <targetJdk>1.6</targetJdk>
+    </properties>
+
     <licenses>
         <license>
-            <name>Apache 2 License</name>
-            <!-- url>http://www.apache.org/licenses/LICENSE-2.0</url -->
-            <distribution>repo</distribution>
+            <name>The Apache License, ASL Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
         </license>
     </licenses>
 
@@ -100,11 +104,6 @@
         <module>multiverse-site</module>
         <!-- module>multiverse-project-archetype</module -->
     </modules>
-
-    <properties>
-        <sourceEncoding>UTF-8</sourceEncoding>
-        <targetJdk>1.6</targetJdk>
-    </properties>
 
     <build>
         <pluginManagement>
@@ -257,6 +256,31 @@
         <url>http://jira.codehaus.org/browse/MULTIVERSE</url>
     </issueManagement>
 
+    <mailingLists>
+        <mailingList>
+            <name>Development List</name>
+            <subscribe>dev-subscribe@multiverse.codehaus.org</subscribe>
+            <unsubscribe>dev-unsubscribe@multiverse.codehaus.org</unsubscribe>
+            <post>dev@multiverse.codehaus.org</post>
+            <archive>http://archive.multiverse.codehaus.org/dev</archive>
+        </mailingList>
+
+        <mailingList>
+            <name>User List</name>
+            <subscribe>user-subscribe@multiverse.codehaus.org</subscribe>
+            <unsubscribe>user-unsubscribe@multiverse.codehaus.org</unsubscribe>
+            <post>user@multiverse.codehaus.org</post>
+            <archive>http://archive.multiverse.codehaus.org/user</archive>
+        </mailingList>
+
+        <mailingList>
+            <name>Commits List</name>
+            <subscribe>scm-subscribe@multiverse.codehaus.org</subscribe>
+            <unsubscribe>scm-unsubscribe@multiverse.codehaus.org</unsubscribe>
+            <archive>http://archive.multiverse.codehaus.org/scm</archive>
+        </mailingList>
+    </mailingLists>
+
     <reporting>
         <plugins>
             <plugin>
@@ -350,24 +374,6 @@
         </plugins>
     </reporting>
 
-    <!-- distributionManagement>
-        <repository>
-            <id>multiverse-releases</id>
-            <url>http://dav.codehaus.org/repository/multiverse/</url>
-        </repository>
-        <snapshotRepository>
-            <id>multiverse-snapshots</id>
-            <url>https://dav.codehaus.org/snapshots.repository/multiverse/</url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-        <site>
-            <id>multiverse-site</id>
-            <name>Multiverse Maven site</name>
-            <url>http://dav.codehaus.org/multiverse/maven-site/</url>
-        </site>
-        
-    </distributionManagement -->
-
     <distributionManagement>
         <repository>
             <id>multiverse-releases</id>
@@ -381,7 +387,8 @@
         </snapshotRepository>
         <site>
             <id>multiverse-site</id>
-            <url>dav:https://dav.codehaus.org/multiverse/</url>
+            <name>Multiverse Maven site</name>
+            <url>dav:https://dav.codehaus.org/multiverse/maven-site</url>
         </site>
         <downloadUrl>http://dist.codehaus.org/multiverse/</downloadUrl>
     </distributionManagement>

@@ -1,9 +1,5 @@
 package org.multiverse.api;
 
-import org.multiverse.utils.monitoring.ProfilePublisher;
-import org.multiverse.utils.profiling.ProfileRepository;
-import org.multiverse.utils.profiling.ProfilerAware;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
@@ -64,15 +60,15 @@ public final class GlobalStmInstance {
             }
 
             // XXX: think about a better place for this
-            if (instance instanceof ProfilerAware) {
-                ProfileRepository profiler = ((ProfilerAware) instance).getProfiler();
-                if (profiler != null) {
-                    ProfilePublisher publisher = new ProfilePublisher(profiler.getCollator());
-                    String mBeanName = "uncomment following for class circularity error"; //JmxUtils.registerMBean(publisher);
-                    logger.info(format("Successfully registered '%s' as an MBean under name '%s'",
-                            publisher, mBeanName));
-                }
-            }
+            //if (instance instanceof ProfilerAware) {
+            //    ProfileRepository profiler = ((ProfilerAware) instance).getProfiler();
+            //    if (profiler != null) {
+            //        ProfilePublisher publisher = new ProfilePublisher(profiler.getCollator());
+            //        String mBeanName = "uncomment following for class circularity error"; //JmxUtils.registerMBean(publisher);
+            //        logger.info(format("Successfully registered '%s' as an MBean under name '%s'",
+            //                publisher, mBeanName));
+            //    }
+            //}
         } catch (RuntimeException e) {
             e.printStackTrace();
             throw e;

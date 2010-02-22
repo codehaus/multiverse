@@ -71,6 +71,7 @@ public class VetoCommitBarrier_joinCommitTest {
     }
 
     @Test
+    @Ignore
     public void whenPrepareFails() throws InterruptedException {
         final VetoCommitBarrier group = new VetoCommitBarrier();
         final TransactionalInteger ref = new TransactionalInteger();

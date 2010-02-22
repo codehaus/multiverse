@@ -92,7 +92,9 @@ after a Transaction commits. A deferred task can be created using the Transactio
     }
 </pre>
 It is important to realize that when the notify method accesses transactional objects, this is done in a new
-transaction.
+transaction.If the pre-commit task throws a Throwable (Error or RuntimeException), the transaction is aborted,
+but the other pre and post commit tasks are not executed, but the pre-abort and post abort tasks
+are executed.
 <p>
     Luckily there also is a shortcut for creating and scheduling a deferred task:
 <pre>
@@ -109,9 +111,8 @@ transaction.
     }
 </pre>
 Under water the runnable automatically is wrapped in a TransactionLifecycleListener and registered on the Transaction
-in the TransactionThreadLocal. If no transaction is found, a NoTransactionFoundException is thrown. It consumes
+in the ThreadLocalTransaction. If no transaction is found, a NoTransactionFoundException is thrown. It consumes
 a little more space since an additional object needs to be created (next to the TransactionLifecycleListener).
-
 
 <h2 id="compensating.tasks">3.4 Compensating tasks</h2>
 A compensating tasks is a tasks that is executed after a transaction aborts. They are very useful to implement
@@ -132,6 +133,9 @@ the TransactionLifecycleListener:
 </pre>
 It is important to realize that when the notify method accesses transactional objects, it is done in a new
 transaction.
+<p>
+    If the pre-abort task throws a Throwable (Error or RuntimeException), the transaction is aborted,
+    but the other pre-abort and post-abort tasks are not executed.
 
 <p>
     Luckily there also is a shortcut for creating and scheduling a compensating task:
@@ -149,11 +153,11 @@ transaction.
     }
 </pre>
 Under water the runnable automatically is wrapped in a TransactionLifecycleListener and registered on the Transaction
-in the TransactionThreadLocal. If no transaction is found, a NoTransactionFoundException is thrown. It consumes
+in the ThreadLocalTransaction. If no transaction is found, a NoTransactionFoundException is thrown. It consumes
 a little more space since an additional object needs to be created (next to the TransactionLifecycleListener).
 
 
-<h2 id="transactionlifecyclelistener.and.transactions">3.5 TransactionLifecycleListener and exceptions</h2>
+<h2 id="transactionlifecyclelisteners.and.exceptions">3.5 TransactionLifecycleListener and exceptions</h2>
 If an exception is thrown while
 the TransactionLifecycleListener.notify method is called, other follwing TransactionLifecycleListeners
 for the same TransactionLifecycleEvent are not executed. This is a schema that shows what happens when

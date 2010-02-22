@@ -3,12 +3,26 @@ package org.multiverse.commitbarriers;
 import java.util.List;
 
 /**
- * A CountDownCommitBarrier is a blocking structure (a latch) that commits or aborts bases on the number of
- * waiting transactions. Once all the members of the barrier have returned, all the transactions are committed.
+ * A synchronization aid that allows a set of threads and transaction to all wait for each other to reach a common
+ * barrier point; once this barrier is opened, all transaction atomically commit. A CountDownCommitBarrier is useful
+ * in programs involving a fixed sized party of threads/transactions that must occasionally wait for each other.
+ * <p/>
+ * The CountDownCommitBarrier looks a lot like the {@link java.util.concurrent.CountDownLatch}. So if you have
+ * experience with that functionality, this one should feel familiar.
+ * <p/>
+ * A {@code CountDownCommitBarrier} is initialized with a given <em>count</em>.
+ * The {@link #await await} methods block until the current count reaches
+ * zero due to invocations of the {@link #countDown} method, after which
+ * all waiting threads are released and any subsequent invocations of
+ * {@link #await await} return immediately.  This is a one-shot phenomenon
+ * -- the count cannot be reset.  If you need a version that resets the
+ * count, consider using a {@link java.util.concurrent.CyclicBarrier}.
+ * <p/>
+ * <p/>
  * <p/>
  * This functionality is useful for two phase commit related functionality.
  * <p/>
- * The CountDownCommitBarrier can't be reused.
+ * The CountDownCommitBarrier can't be reused, so unlike the
  * <p/>
  * A CountDownCommitBarrier is thread-safe to use.
  *

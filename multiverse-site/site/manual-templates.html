@@ -6,11 +6,11 @@
         <ul>
             <li><a href="#transactiontemplate.and.nesting">7.2.1 TransactionTemplate and nesting</a></li>
             <li><a href="#transactiontemplate">7.2.1 TransactionTemplate and the TransactionFactory</a></li>
-            <li><a href="#transactiontemplate.and.transaction.lifecycle.events">
-                7.2.2 TransactionTemplate and transaction lifecycle events</a>
+            <li><a href="#transactiontemplate.and.transaction.lifecycle.events">7.2.2 TransactionTemplate and
+                transaction lifecycle events</a></li>
+            <li><a href="#transactiontemplate.and.threadlocal">7.2.4 TransactionTemplate and ThreadLocalTransaction</a>
             </li>
-            <li><a href="#transactiontemplate.and.threadlocal">7.2.4TransactionTemplate and ignore
-                ThreadLocalTransaction</a></li>
+            <li><a href="#transactiontemplate.and.exceptions">7.2.5 TransactionTemplate and exceptions</a></li>
         </ul>
     </li>
     <li><a href="#orelsetemplate">7.3 OrElseTemplate</a></li>
@@ -101,12 +101,18 @@ and registered. If you want to squeeze out the most performance, you can create 
 with disabled lifecycle listeners. Check the Javadoc for the complete overview of the constructors of the
 TransactionTemplate.
 
-<h3 id="transactiontemplate.and.threadlocal">7.2.4 TransactionTemplate and ignore ThreadLocalTransaction</h3>
-By default the TransactionTemplate looks at the ThreadLocalTransaction to see if there is a running transaction,
-and if it creates a new Transaction, it publishes the created transaction on the ThreadLocalTransaction. If you
-don't need the ThreadLocalTransaction, you can disable reading/writing to the TransactionThreadLocal. Reducing
-access to the threadlocal could improve performance if it is done very very often. See the complete
-overview of constructors of the TransactionTemplate for more detailed information.
+<h3 id="transactiontemplate.and.threadlocal">7.2.4 TransactionTemplate and ThreadLocalTransaction</h3>
+By default the TransactionTemplate looks at the ThreadLocalTransaction to see if there is a running
+transaction, and if needed it creates a new Transaction and it publishes the created transaction on
+the ThreadLocalTransaction. If you don't need the ThreadLocalTransaction, you can disable reading/writing
+to the TransactionThreadLocal. Reducing access to the threadlocal could improve performance if it is done
+very very often. See the complete overview of constructors of the TransactionTemplate for more detailed
+information.
+
+<h3 id="transactiontemplate.and.exceptions">7.2.5 TransactionTemplate and exceptions</h3>
+If the TransactionTemplate.execute(Transaction) method throws a Throwable, the transaction is
+aborted. In future releases there will be more control on this behavior; e.g. by configuring for
+which type of exceptions the TransactionTemplate is allowed to commit.
 
 <h2 id="orelsetemplate">7.3 OrElseTemplate</h2>
 For more information about blocking, see

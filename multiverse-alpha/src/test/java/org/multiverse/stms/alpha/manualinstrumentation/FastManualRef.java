@@ -105,7 +105,7 @@ public class FastManualRef extends FastTxObjectMixin {
                     tx = (AlphaTransaction) txFactory.start();
                 } catch (Throwable throwable) {
                     if (throwable instanceof RecoverableThrowable) {
-                        tx.getConfig().getRetryBackoffPolicy().delayedUninterruptible(tx, attempt);
+                        tx.getConfig().getBackoffPolicy().delayedUninterruptible(tx, attempt);
                     } else if (throwable instanceof RuntimeException) {
                         throw (RuntimeException) throwable;
                     } else {
@@ -146,7 +146,7 @@ public class FastManualRef extends FastTxObjectMixin {
                 tx = (AlphaTransaction) txFactory.start();
             } catch (Throwable throwable) {
                 if (throwable instanceof RecoverableThrowable) {
-                    tx.getConfig().getRetryBackoffPolicy().delayedUninterruptible(tx, attempt);
+                    tx.getConfig().getBackoffPolicy().delayedUninterruptible(tx, attempt);
                 } else if (throwable instanceof RuntimeException) {
                     throw (RuntimeException) throwable;
                 } else {

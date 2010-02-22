@@ -2,27 +2,15 @@
 todo engine
 ---------------------------------------------------------------
 
-- the barriers should have the uninterruptible version excplicitly be named uniterruptble to indicate to the
-programmer that something special is going on.
+- big zip of the project for easy download
+
+- big zip of the project should be added to the downloads of the site
 
 - the integration tests should be executed from maven using the stress 
 
 - Test 'testContentOfFastAtomicObjectIsCopied' incomplete in file 'AtomicObject_clashingFieldTest.java' at line 62
 
 - Test 'hash' incomplete in file 'TransactionalLinkedList.java' at line 1122
-
-- optimizations
-
-    - test: the transaction call from another transaction call lifting method optimization
-
-    - test: different situations for the transactionalmethod->transactionalmethod call. 
-
-    - GET_FIELD for tranlocal should use the tranlocal field
-
-    - PUT_FIELD for the tranlocal should use the tranlocal field
-
-    - when a loadForWrite is done, a check needs to be done if the current tranlocal is committed. If it is, it
-    should be replaced by the updatable version.
 
 - TransactionalThreadPoolExecutor_miscTest
 
@@ -95,6 +83,20 @@ Thread PingPongThread-1 has thrown an exception
 ---------------------------------------------------------------
 todo features
 ---------------------------------------------------------------
+
+- optimizations
+
+    - test: the transaction call from another transaction call lifting method optimization
+
+    - test: different situations for the transactionalmethod->transactionalmethod call.
+
+    - GET_FIELD for tranlocal should use the tranlocal field
+
+    - PUT_FIELD for the tranlocal should use the tranlocal field
+
+    - when a loadForWrite is done, a check needs to be done if the current tranlocal is committed. If it is, it
+    should be replaced by the updatable version.
+
 
 - timeout op de transaction through annotations
 
@@ -288,3 +290,9 @@ Thread.sleep.
 
 - Test 'equals' incomplete in file 'TransactionalLinkedList.java' at line 1117
 
+- the barriers should have the uninterruptible version excplicitly be named uniterruptble to indicate to the
+programmer that something special is going on.
+
+- project jars for the alpha module are now fine to look at (so no ugly names anymore)
+
+- date on the website is set automatically.

@@ -12,7 +12,6 @@ import org.multiverse.stms.alpha.transactions.readonly.TinyReadonlyAlphaTransact
 import org.multiverse.stms.alpha.transactions.update.FixedUpdateAlphaTransaction;
 import org.multiverse.stms.alpha.transactions.update.GrowingUpdateAlphaTransaction;
 import org.multiverse.stms.alpha.transactions.update.TinyUpdateAlphaTransaction;
-import org.multiverse.utils.TodoException;
 import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
@@ -26,26 +25,9 @@ import java.util.logging.Logger;
 import static java.lang.String.format;
 
 /**
- * Default {@link Stm} implementation that provides the most complete set of features. Like retry/orelse, profiling,
- * etc. It can be configured through the {@link AlphaStmConfig}.
+ * Default {@link Stm} implementation that provides the most complete set of features. Like retry/orelse.
  * <p/>
- * <h3>Statistics</h3> This implementation can use {@link org.multiverse.utils.profiling.ProfileRepository}. This choice
- * needs to be made when the STM is constructed, so that the JIT can remove calls to the Profiler completely if a null
- * value is passed. The JIT is able to completely remove the following:
- * <pre>
- * if(profiler!=null){
- *      profiler.incSomeCounter();
- * }
- * </pre>
- * So if you are not using the profiler, you don't need to pay for it.
- * <p/>
- * The instrumentation is added directly to the code. Although it is less pretty, adding some form of external mechanism
- * to add this functionality is going to complicate matters (not at least deployment issues).
- * <p/>
- * <h3>Logging</h3> Logging to java.logging can be enabled through the constructor.
- * <p/>
- * The logging can be completely removed by the JIT if the loggingPossible flag is set to false. No additional checks
- * are done.. so you don't need to pay the price for it if you don't use it.
+ * It can be configured through the {@link AlphaStmConfig}.
  *
  * @author Peter Veentjer.
  */
@@ -80,16 +62,10 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
     }
 
     /**
-     * Creates a new AlphaStm with the AlphaStmConfig.createDebugConfig as configuration.
+     * Creates a new AlphaStm with the AlphaStmConfig.createFast as configuration.
      */
     public AlphaStm() {
-        this(AlphaStmConfig.createDebugConfig());
-    }
-
-
-    @Override
-    public AlphaTransactionFactoryBuilder getTransactionFactoryBuilder() {
-        return transactionBuilder;
+        this(AlphaStmConfig.createFastConfig());
     }
 
     /**
@@ -109,11 +85,6 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         this.smartTxLengthSelector = config.smartTxImplementationChoice;
         this.profiler = config.profiler;
         this.clock = config.clock;
-        //the abstracttransaction requires the clock to be at least 1, requirement from the
-        //abstracttransaction.
-        if (clock.getVersion() == 0) {
-            clock.tick();
-        }
         this.maxFixedUpdateSize = config.maxFixedUpdateSize;
         this.commitLockPolicy = config.commitLockPolicy;
         this.backoffPolicy = config.backoffPolicy;
@@ -122,6 +93,11 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         this.dirtyCheck = config.dirtyCheck;
 
         logger.info("Created a new AlphaStm instance");
+    }
+
+    @Override
+    public AlphaTransactionFactoryBuilder getTransactionFactoryBuilder() {
+        return transactionBuilder;
     }
 
     /**
@@ -139,7 +115,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
      *
      * @return
      */
-    public BackoffPolicy getRestartBackoffPolicy() {
+    public BackoffPolicy getBackoffPolicy() {
         return backoffPolicy;
     }
 
@@ -253,13 +229,6 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     backoffPolicy, optimalSize, interruptible, smartTxLengthSelector, dirtyCheck);
         }
 
-        public AlphaTransactionFactoryBuilder setRestartBackoffPolicy(BackoffPolicy backoffPolicy) {
-            return new AlphaTransactionFactoryBuilder(
-                    readonly, automaticReadTracking, familyName, maxRetryCount, preventWriteSkew, commitLockPolicy,
-                    backoffPolicy, optimalSize, interruptible, smartTxLengthSelector, dirtyCheck);
-        }
-
-
         public AlphaTransactionFactoryBuilder setCommitLockPolicy(CommitLockPolicy commitLockPolicy) {
             if (commitLockPolicy == null) {
                 throw new NullPointerException();
@@ -278,12 +247,19 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     backoffPolicy, optimalSize, interruptible, smartTxLengthSelector, dirtyCheck);
         }
 
-        public AlphaTransactionFactoryBuilder setLogging(boolean logging) {
-            throw new TodoException();
+        @Override
+        public AlphaTransactionFactoryBuilder setPreventWriteSkew(boolean preventWriteSkew) {
+            return new AlphaTransactionFactoryBuilder(
+                    readonly, automaticReadTracking, familyName, maxRetryCount, preventWriteSkew, commitLockPolicy,
+                    backoffPolicy, optimalSize, interruptible, smartTxLengthSelector, dirtyCheck);
         }
 
         @Override
-        public AlphaTransactionFactoryBuilder setPreventWriteSkew(boolean preventWriteSkew) {
+        public AlphaTransactionFactoryBuilder setBackoffPolicy(BackoffPolicy backoffPolicy) {
+            if (backoffPolicy == null) {
+                throw new NullPointerException();
+            }
+
             return new AlphaTransactionFactoryBuilder(
                     readonly, automaticReadTracking, familyName, maxRetryCount, preventWriteSkew, commitLockPolicy,
                     backoffPolicy, optimalSize, interruptible, smartTxLengthSelector, dirtyCheck);
