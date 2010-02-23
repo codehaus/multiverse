@@ -16,7 +16,6 @@ import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
 import org.multiverse.utils.profiling.ProfileRepository;
-import org.multiverse.utils.profiling.ProfilerAware;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -31,9 +30,11 @@ import static java.lang.String.format;
  *
  * @author Peter Veentjer.
  */
-public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuilder>, ProfilerAware {
+public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuilder> {
 
     private final static Logger logger = Logger.getLogger(AlphaStm.class.getName());
+
+    private final ConcurrentMap<String, OptimalSize> sizeMap = new ConcurrentHashMap<String, OptimalSize>();
 
     private final PrimitiveClock clock;
 
@@ -119,21 +120,10 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         return backoffPolicy;
     }
 
-    /**
-     * Returns the DefaultStmStatistics or null if the Stm is running without statistics.
-     *
-     * @return return the TL2StmStatistics.
-     */
-    public ProfileRepository getProfiler() {
-        return profiler;
-    }
-
     @Override
     public long getVersion() {
         return clock.getVersion();
     }
-
-    private final ConcurrentMap<String, OptimalSize> sizeMap = new ConcurrentHashMap<String, OptimalSize>();
 
     public class AlphaTransactionFactoryBuilder
             implements TransactionFactoryBuilder<AlphaTransaction, AlphaTransactionFactoryBuilder> {
@@ -238,7 +228,6 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     readonly, automaticReadTracking, familyName, maxRetryCount, preventWriteSkew, commitLockPolicy,
                     backoffPolicy, optimalSize, interruptible, smartTxLengthSelector, dirtyCheck);
         }
-
 
         @Override
         public AlphaTransactionFactoryBuilder setSmartTxLengthSelector(boolean smartTxLengthSelector) {

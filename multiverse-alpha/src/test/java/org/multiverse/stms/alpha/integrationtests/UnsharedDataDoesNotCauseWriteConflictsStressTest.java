@@ -1,6 +1,5 @@
 package org.multiverse.stms.alpha.integrationtests;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
@@ -29,13 +28,6 @@ public class UnsharedDataDoesNotCauseWriteConflictsStressTest {
         setThreadLocalTransaction(null);
         clearThreadLocalTransaction();
         //new PrintMultiversionedStmStatisticsThread(multiversionedstm).start();
-    }
-
-    @After
-    public void tearDown() {
-        if (stm.getProfiler() != null) {
-            //stm.getProfiler().print();
-        }
     }
 
     @Test

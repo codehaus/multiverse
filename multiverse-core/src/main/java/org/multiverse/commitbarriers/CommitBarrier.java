@@ -16,7 +16,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static java.lang.String.format;
-import static java.util.Collections.unmodifiableList;
 
 /**
  * @author Peter Veentjer.
@@ -29,8 +28,6 @@ public abstract class CommitBarrier {
     private volatile ScheduledExecutorService executorService = EXECUTOR;
     protected final Lock lock;
     protected final Condition statusCondition;
-
-    private final List<Transaction> waitingTransactions = new LinkedList<Transaction>();
 
     private volatile Status status;
     private volatile int numberWaiting = 0;
@@ -87,22 +84,6 @@ public abstract class CommitBarrier {
      */
     public final boolean isAborted() {
         return status == Status.aborted;
-    }
-
-    /**
-     * Returns an immutable list of all transactions that currently are waiting for this barrier to commit.
-     * <p/>
-     * This method can be called no matter the state of the CommitBarrier.
-     *
-     * @return list of all transactions currently waiting.
-     */
-    public final List<Transaction> getWaitingTransactions() {
-        lock.lock();
-        try {
-            return unmodifiableList(new LinkedList<Transaction>(waitingTransactions));
-        } finally {
-            lock.unlock();
-        }
     }
 
     /**
@@ -449,21 +430,15 @@ public abstract class CommitBarrier {
     }
 
     /**
-     * Adds a Transaction to the set of waiters.
+     * Adds a waiters.
      * <p/>
      * Should only be called when the main lock is acquired.
      *
-     * @param tx the transaction to add as waiter.
-     * @throws NullPointerException  if tx is null.
      * @throws IllegalStateException if the transaction isn't closed.
      */
-    protected final void addWaiter(Transaction tx) {
+    protected final void addJoiner() {
         if (status != Status.closed) {
             throw new IllegalStateException();
-        }
-
-        if (tx != null) {
-            waitingTransactions.add(tx);
         }
 
         numberWaiting++;
@@ -474,8 +449,7 @@ public abstract class CommitBarrier {
      * <p/>
      * Can be called without the mainlock is acquired.
      *
-     * @param tx the transaction too finish
-     * @throws NullPointerException if tx is null.
+     * @param tx the transaction to finish
      */
     protected final void finish(Transaction tx) {
         if (tx == null) {
@@ -536,7 +510,7 @@ public abstract class CommitBarrier {
             switch (getStatus()) {
                 case closed:
                     tx.prepare();
-                    addWaiter(tx);
+                    addJoiner();
                     if (isLastParty()) {
                         tasks = signalCommit();
                     } else {
@@ -592,7 +566,7 @@ public abstract class CommitBarrier {
             switch (getStatus()) {
                 case closed:
                     tx.prepare();
-                    addWaiter(tx);
+                    addJoiner();
 
                     if (isLastParty()) {
                         postCommitTasks = signalCommit();
@@ -647,7 +621,7 @@ public abstract class CommitBarrier {
                 switch (getStatus()) {
                     case closed:
                         tx.prepare();
-                        addWaiter(tx);
+                        addJoiner();
 
                         if (isLastParty()) {
                             postCommitTasks = signalCommit();
@@ -714,7 +688,7 @@ public abstract class CommitBarrier {
             switch (getStatus()) {
                 case closed:
                     tx.prepare();
-                    addWaiter(tx);
+                    addJoiner();
                     while (getStatus() == Status.closed) {
                         try {
                             timeoutNs = statusCondition.awaitNanos(timeoutNs);
@@ -777,7 +751,7 @@ public abstract class CommitBarrier {
             switch (getStatus()) {
                 case closed:
                     tx.prepare();
-                    addWaiter(tx);
+                    addJoiner();
                     while (getStatus() == Status.closed) {
                         try {
                             timeoutNs = statusCondition.awaitNanos(timeoutNs);

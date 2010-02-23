@@ -166,6 +166,9 @@ public interface Transaction {
      * <p/>
      * The listener will be executed on the thread that starts the commit/abort.
      * <p/>
+     * If the listener is added after the Transaction is prepared, the preCommit event will not be called on the
+     * listener.
+     * <p/>
      * If the listener accesses the stm after the transaction has been committed or aborted, it could see changes
      * made after that transaction. So all assumptions about state are possibly wrong so one needs to take care of
      * re-validating state if needed.
@@ -177,8 +180,6 @@ public interface Transaction {
      * @throws NullPointerException if listener is null.
      * @throws org.multiverse.api.exceptions.DeadTransactionException
      *                              if transaction already is aborted or committed.
-     * @throws org.multiverse.api.exceptions.PreparedTransactionException
-     *                              if the transaction is prepared.
      */
     void registerLifecycleListener(TransactionLifecycleListener listener);
 }

@@ -4,7 +4,6 @@ import org.multiverse.MultiverseConstants;
 import org.multiverse.api.*;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.NoRetryPossibleException;
-import org.multiverse.api.exceptions.PreparedTransactionException;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -75,6 +74,8 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
     public final void registerLifecycleListener(TransactionLifecycleListener listener) {
         switch (status) {
             case active:
+                //fall through
+            case prepared:
                 if (listener == null) {
                     throw new NullPointerException();
                 }
@@ -84,10 +85,6 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
                 }
                 listeners.add(listener);
                 break;
-            case prepared:
-                String preparedMsg = format("Can't register TransactionLifecycleListener on prepared transaction '%s'",
-                        config.getFamilyName());
-                throw new PreparedTransactionException(preparedMsg);
             case committed:
                 String committedMsg = format("Can't register TransactionLifecycleListener on already committed " +
                         "transaction '%s'",
