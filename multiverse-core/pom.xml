@@ -6,6 +6,7 @@
     <artifactId>multiverse-core</artifactId>
     <name>The Multiverse core package</name>
     <description>Contains the core interfaces/classes of the Multiverse project. So no STM implementations</description>
+    <version>0.4-SNAPSHOT</version>
 
     <parent>
         <groupId>org.multiverse</groupId>

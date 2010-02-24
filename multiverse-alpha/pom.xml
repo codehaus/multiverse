@@ -9,6 +9,8 @@
         Contains the main Multiverse STM Implementation: the Alpha Engine. The Alpha engine supports
         readonly and update transactions. It also supports the retry/or else mechanism.
     </description>
+    <version>0.4-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
     <parent>
         <groupId>org.multiverse</groupId>
@@ -21,6 +23,13 @@
         <multiverse.agentclass>org.multiverse.stms.alpha.instrumentation.MultiverseJavaAgent</multiverse.agentclass>
         <asm.version>3.2</asm.version>
     </properties>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>anydoby.com</id>
+            <url>http://anydoby.com/maven</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <build>
         <plugins>
@@ -56,25 +65,9 @@
             </plugin>
 
             <!-- plugin>
-                <artifactId>failsafe-maven-plugin</artifactId>
-                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
-                    <argLine>-javaagent:${project.build.directory}/${multiverse.agentname}.jar</argLine>
-                </configuration>
-            </plugin -->
-
-            <!-- plugin that packs the dependent libraries and adds the agent configuration to the manifest file-->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <appendAssemblyId>false</appendAssemblyId>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
                     <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                        </manifest>
                         <manifestEntries>
                             <Premain-Class>${multiverse.agentclass}</Premain-Class>
                         </manifestEntries>
@@ -82,14 +75,36 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <id>jar</id>
                         <goals>
-                            <goal>assembly</goal>
+                            <goal>jar</goal>
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin -->
 
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifestEntries>
+                            <Premain-Class>${multiverse.agentclass}</Premain-Class>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
             <!-- plugin that integrates the asm library in the alpha library-->
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -103,8 +118,6 @@
                             <tasks>
                                 <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"/>
                                 <jarjar destfile="${build.directory}/${artifactId}-${version}.jar" update="true">
-                                    <!-- Replace "org.objectweb.asm.x.y.." with "org.multiverse.repackaged.org.objectweb.asm.x.y..".
-                                      See http://code.google.com/p/jarjar/wiki/CommandLineDocs for more informtion on jarjar rules. -->
                                     <rule pattern="org.objectweb.asm.**" result="${groupId}.repackaged.@0"/>
                                 </jarjar>
                             </tasks>
