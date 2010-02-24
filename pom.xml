@@ -12,7 +12,7 @@
     </description>
     <groupId>org.multiverse</groupId>
     <artifactId>multiverse</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.4</version>
     <inceptionYear>2008</inceptionYear>
     <packaging>pom</packaging>
 
