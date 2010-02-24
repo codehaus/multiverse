@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>multiverse-alpha</artifactId>
@@ -8,13 +9,13 @@
         Contains the main Multiverse STM Implementation: the Alpha Engine. The Alpha engine supports
         readonly and update transactions. It also supports the retry/or else mechanism.
     </description>
-    <version>0.5-SNAPSHOT</version>
+    <version>0.4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>org.multiverse</groupId>
         <artifactId>multiverse</artifactId>
-        <version>0.5-SNAPSHOT</version>
+        <version>0.4-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -22,13 +23,6 @@
         <multiverse.agentclass>org.multiverse.stms.alpha.instrumentation.MultiverseJavaAgent</multiverse.agentclass>
         <asm.version>3.2</asm.version>
     </properties>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>anydoby.com</id>
-            <url>http://anydoby.com/maven</url>
-        </pluginRepository>
-    </pluginRepositories>
 
     <build>
         <plugins>
@@ -115,9 +109,9 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" />
+                                <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"/>
                                 <jarjar destfile="${build.directory}/${artifactId}-${version}.jar" update="true">
-                                    <rule pattern="org.objectweb.asm.**" result="${groupId}.repackaged.@0" />
+                                    <rule pattern="org.objectweb.asm.**" result="${groupId}.repackaged.@0"/>
                                 </jarjar>
                             </tasks>
                         </configuration>
