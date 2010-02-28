@@ -3,18 +3,18 @@
 <ol>
     <li><b>Seamless integration in Java:</b> using annotations in combination with instrumentation (so you are
         not forced to extend classes or implement interfaces). Most transaction features can be configured through
-        the annotations. 
+        the annotations.
     </li>
     <li><b>Independent of Java language:</b> so it can be used in other languages running on the JVM like
         Scala or Groovy.
     </li>
     <li>
         <b>Object and field level granularity:</b> the main STM implementation, called the AlphaStm is able to
-        deal with object and field level granularity. 
+        deal with object and field level granularity.
     </li>
     <li>
         <b>Only transactional access possible:</b> prevents having to deal with accessing transactional
-        objects without a transaction.  
+        objects without a transaction.
     </li>
     <li><b>Different transaction modes:</b>
         <ul>
@@ -52,7 +52,8 @@
         <b>Transactional collections:</b>
         <ul>
             <li><b>TransactionalLinkedList:</b> general purpose linked list that can be used as BlockingQueue and
-            BlockingDeque implementation.</li>
+                BlockingDeque implementation.
+            </li>
             <li><b>TransactionalHashMap:</b> hash based transactional ConcurrentMap implementation.</li>
             <li><b>TransactionalHashSet:</b> hash based transactional Set implementation.</li>
             <li><b>TransactionalTreeMap:</b> tree based transactional ConcurrentMap implementation.</li>
@@ -63,7 +64,8 @@
         <b>Transactional references and primitives</b>
         <ul>
             <li><b>TransactionalReference:</b> makes it possible to work with managed references. This
-            looks a lot like the approach other STM implementations take like Clojure.</li>
+                looks a lot like the approach other STM implementations take like Clojure.
+            </li>
             <li><b>Transactional primitive:</b> like the TransactionalInteger and TransactionalBoolean that
                 behave like transactional references but without creating a lot of small wrapper objects.
             </li>
@@ -73,7 +75,8 @@
         <b>Templates:</b>
         <ul>
             <li><b>TransactionTemplate:</b> a template that can be used as an alternative to using
-            instrumentation.</li>
+                instrumentation.
+            </li>
             <li><b>OrElseTemplate:</b> a template that can be used to make use of the orelse primitive.
             </li>
         </ul>
@@ -89,18 +92,20 @@
     </li>
     <li>
         <b>Learning Stm:</b> that learns by runtime transaction analysis and chooses better performing
-        or behaving transactions. 
+        or behaving transactions.
     </li>
-
 </ol>
 
 <h2>Planned features</h2>
 Of course there are also a lot of features in the pipeline. The most important ones are:
 <ol>
     <li><b>Persistence:</b> for making committed transactions durable.</li>
-    <li><b>Distributed STM:</b> for making committed transactions durable.</li>
+    <li><b>Distributed STM:</b> so load can be spread out over a cluster of machines and it also is useful for
+        realizing failover.
+    </li>
     <li><b>Profiler:</b> to pinpoint performance or contention problems.</li>
     <li><b>Contention management:</b> to have more control on liveness issues like livelocking and starvation.</li>
-    <li><b>More collections:</b> like ArrayLists, SkipList, Tries etc</li>
-    <li><b>Better scalability:</b> </li>
+    <li><b>More collections:</b> like ArrayLists, HashMap, TreeMap, SkipList, Tries etc</li>
+    <li><b>Improved performance:</b> there is a lot of room for performance improvements by optimizing the bytecode.
+    </li>
 </ol>

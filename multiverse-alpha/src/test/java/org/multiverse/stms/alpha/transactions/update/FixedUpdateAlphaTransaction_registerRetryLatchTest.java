@@ -54,7 +54,7 @@ public class FixedUpdateAlphaTransaction_registerRetryLatchTest {
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
-                false,
+                true,
                 optimalSize,
                 true, true, true, false, size
         );

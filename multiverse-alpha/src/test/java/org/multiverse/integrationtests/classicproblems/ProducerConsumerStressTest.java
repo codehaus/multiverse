@@ -226,7 +226,7 @@ public class ProducerConsumerStressTest {
         public void doRun() {
             int k = 0;
             while (remainingCounter.getAndDecrement() > 0) {
-                if (k % 500 == 0) {
+                if (k % 1000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
 

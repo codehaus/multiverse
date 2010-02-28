@@ -35,7 +35,7 @@ public class FixedUpdateAlphaTransaction_writeSkewTest {
         optimalSize = new OptimalSize(1);
     }
 
-    public AlphaTransaction startSutTransaction(int size, boolean preventWriteSkew) {
+    public AlphaTransaction startSutTransaction(int size, boolean allowWriteSkewProblem) {
         optimalSize.set(size);
         FixedUpdateAlphaTransaction.Config config = new FixedUpdateAlphaTransaction.Config(
                 stmConfig.clock,
@@ -44,7 +44,7 @@ public class FixedUpdateAlphaTransaction_writeSkewTest {
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
-                preventWriteSkew,
+                allowWriteSkewProblem,
                 optimalSize,
                 true, false, true, true, size
         );
@@ -54,27 +54,27 @@ public class FixedUpdateAlphaTransaction_writeSkewTest {
     @Test
     public void testSettings() {
         AlphaTransaction tx1 = startSutTransaction(10, true);
-        assertTrue(tx1.getConfig().preventWriteSkew());
+        assertTrue(tx1.getConfig().allowWriteSkewProblem());
         assertTrue(tx1.getConfig().automaticReadTracking());
 
         AlphaTransaction tx2 = startSutTransaction(10, false);
-        assertFalse(tx2.getConfig().preventWriteSkew());
+        assertFalse(tx2.getConfig().allowWriteSkewProblem());
         assertTrue(tx2.getConfig().automaticReadTracking());
     }
 
     @Test
-    public void testWithWriteSkewDetectionEnabled() {
+    public void whenDisallowedWriteSkewProblem_thenWriteConflictException() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRefTranlocal committedRef1 = (ManualRefTranlocal) ref1.___load();
         ManualRef ref2 = new ManualRef(stm);
         ManualRefTranlocal committedRef2 = (ManualRefTranlocal) ref2.___load();
 
-        AlphaTransaction tx1 = startSutTransaction(10, true);
+        AlphaTransaction tx1 = startSutTransaction(10, false);
         tx1.openForRead(ref1);
         ManualRefTranlocal tranlocalRef2 = (ManualRefTranlocal) tx1.openForWrite(ref2);
         tranlocalRef2.value++;
 
-        AlphaTransaction tx2 = startSutTransaction(10, true);
+        AlphaTransaction tx2 = startSutTransaction(10, false);
         tx2.openForRead(ref2);
         ManualRefTranlocal tranlocalRef1 = (ManualRefTranlocal) tx2.openForWrite(ref1);
         tranlocalRef1.value++;
@@ -95,16 +95,16 @@ public class FixedUpdateAlphaTransaction_writeSkewTest {
     }
 
     @Test
-    public void testWithWriteSkewDetectionDisabled() {
+    public void whenEnabledWriteSkewProblem_writeSkewProblemHappens() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx1 = startSutTransaction(10, false);
+        AlphaTransaction tx1 = startSutTransaction(10, true);
         tx1.openForRead(ref1);
         ManualRefTranlocal tranlocalRef2 = (ManualRefTranlocal) tx1.openForWrite(ref2);
         tranlocalRef2.value++;
 
-        AlphaTransaction tx2 = startSutTransaction(10, false);
+        AlphaTransaction tx2 = startSutTransaction(10, true);
         tx2.openForRead(ref2);
         ManualRefTranlocal tranlocalRef1 = (ManualRefTranlocal) tx2.openForWrite(ref1);
         tranlocalRef1.value++;
@@ -121,35 +121,7 @@ public class FixedUpdateAlphaTransaction_writeSkewTest {
     }
 
     @Test
-    public void withFourAccounts() {
-        ManualRef accountA1 = new ManualRef(stm);
-        ManualRef accountA2 = new ManualRef(stm);
-
-        ManualRef accountB1 = new ManualRef(stm);
-        ManualRef accountB2 = new ManualRef(stm);
-
-        accountA1.set(stm, 50);
-        accountB1.set(stm, 50);
-
-        AlphaTransaction tx1 = startSutTransaction(10, false);
-        if (accountA1.get(tx1) + accountA2.get(tx1) > 25) {
-            accountA1.inc(tx1, -25);
-            accountB1.inc(tx1, 25);
-        }
-
-        AlphaTransaction tx2 = startSutTransaction(10, false);
-        if (accountB1.get(tx2) + accountB2.get(tx2) > 25) {
-            accountB2.inc(tx2, -25);
-            accountA2.inc(tx2, 25);
-        }
-
-        tx1.commit();
-        tx2.commit();
-    }
-
-
-    @Test
-    public void withFourAccountsAndConflictDetection() {
+    public void withFourAccountsAndAllowWriteSkewProblem() {
         ManualRef accountA1 = new ManualRef(stm);
         ManualRef accountA2 = new ManualRef(stm);
 
@@ -166,6 +138,34 @@ public class FixedUpdateAlphaTransaction_writeSkewTest {
         }
 
         AlphaTransaction tx2 = startSutTransaction(10, true);
+        if (accountB1.get(tx2) + accountB2.get(tx2) > 25) {
+            accountB2.inc(tx2, -25);
+            accountA2.inc(tx2, 25);
+        }
+
+        tx1.commit();
+        tx2.commit();
+    }
+
+
+    @Test
+    public void withFourAccountsAndDisallowedWriteSkewProblem_thenWriteConflictException() {
+        ManualRef accountA1 = new ManualRef(stm);
+        ManualRef accountA2 = new ManualRef(stm);
+
+        ManualRef accountB1 = new ManualRef(stm);
+        ManualRef accountB2 = new ManualRef(stm);
+
+        accountA1.set(stm, 50);
+        accountB1.set(stm, 50);
+
+        AlphaTransaction tx1 = startSutTransaction(10, false);
+        if (accountA1.get(tx1) + accountA2.get(tx1) > 25) {
+            accountA1.inc(tx1, -25);
+            accountB1.inc(tx1, 25);
+        }
+
+        AlphaTransaction tx2 = startSutTransaction(10, false);
         if (accountB1.get(tx2) + accountB2.get(tx2) > 25) {
             accountB2.inc(tx2, -25);
             accountA2.inc(tx2, 25);

@@ -32,11 +32,11 @@ public class FixedUpdateAlphaTransaction
         public Config(
                 PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName,
                 ProfileRepository profiler, CommitLockPolicy commitLockPolicy, int maxRetryCount,
-                boolean preventWriteSkew, OptimalSize optimalSize, boolean interruptible,
+                boolean allowWriteSkewProblem, OptimalSize optimalSize, boolean interruptible,
                 boolean optimizeConflictDetection,
                 boolean dirtyCheck, boolean automaticReadTracking, int maximumSize) {
             super(clock, backoffPolicy, familyName, false, maxRetryCount, interruptible, commitLockPolicy,
-                    profiler, preventWriteSkew, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
+                    profiler, allowWriteSkewProblem, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
 
             this.optimalSize = optimalSize;
             this.maximumSize = maximumSize;

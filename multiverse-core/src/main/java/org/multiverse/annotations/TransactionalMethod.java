@@ -24,11 +24,6 @@ import java.lang.annotation.Target;
  * When the readonly property is set to true, the transaction is not be able to do any updates and will throw
  * a {@link org.multiverse.api.exceptions.ReadonlyException}.
  * <p/>
- * With the familyName groups of transactions can be identified that share similar paths of execution. Based on the
- * familyName the stm could do all kinds of optimizations. Luckily using instrumentation this family name can be set
- * (and it should be) based on the class/method-name/method-signature. So no need for users to initialize it explicitly
- * unless they want to.
- * <p/>
  * With the retryCount the number of retries of the transaction can be controlled. For all kinds of reasons a
  * transaction can fail, and these transactions can be retried because the next time they could succeed. An example of
  * such a cause is optimistic locking the stm might use. The default number of retries is 1000.
@@ -41,9 +36,7 @@ public @interface TransactionalMethod {
 
     boolean automaticReadTracking() default false;
 
-    boolean preventWriteSkew() default false;
-
-    String familyName() default "";
+    boolean allowWriteSkewProblem() default true;
 
     boolean interruptible() default false;
 

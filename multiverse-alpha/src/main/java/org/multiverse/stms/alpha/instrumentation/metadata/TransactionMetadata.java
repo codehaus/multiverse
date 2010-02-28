@@ -1,11 +1,11 @@
-package org.multiverse.stms.alpha.instrumentation.asm;
+package org.multiverse.stms.alpha.instrumentation.metadata;
 
 /**
  * A container for all parameters passed to an transactional method.
  *
  * @author Peter Veentjer.
  */
-public class TransactionalMethodParams {
+public class TransactionMetadata {
 
     public boolean readOnly;
 
@@ -19,5 +19,5 @@ public class TransactionalMethodParams {
 
     public boolean smartTxLengthSelector;
 
-    public boolean preventWriteSkew;
+    public boolean allowWriteSkewProblem;
 }

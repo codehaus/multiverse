@@ -79,7 +79,6 @@ public class LargeNonParallelWriteonlyTransactionsStressTest {
                 .setSmartTxLengthSelector(true)
                 .setAutomaticReadTracking(false).build();
 
-
         new TransactionTemplate(txFactory) {
             @Override
             public Object execute(Transaction tx) {

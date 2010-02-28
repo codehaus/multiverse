@@ -94,12 +94,13 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     B setSmartTxLengthSelector(boolean smartTxlengthSelector);
 
     /**
-     * If writeskew prevention should be enabled.
+     * If writeskew problem is allowed to happen. Defaults to true and can have a big impact on performance (the
+     * complete read set needs to be validated and not just the writes). So disable it wisely.
      *
-     * @param preventWriteSkew indicates if writeSkews should be prevented.
+     * @param allowWriteSkew indicates if writeSkew problem is allowed.
      * @return the new TransactionFactoryBuilder
      */
-    B setPreventWriteSkew(boolean preventWriteSkew);
+    B setAllowWriteSkewProblem(boolean allowWriteSkew);
 
     /**
      * Sets the new backoff policy. Policy is used to backoff when a transaction conflicts with another transaction.

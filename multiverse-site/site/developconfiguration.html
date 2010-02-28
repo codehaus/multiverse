@@ -12,10 +12,10 @@
 If you want to execute your application (using Multiverse) from the command-line, you need to add the
 javaagent for Multiverse, e.g.:
 <pre>
-    java -javaagent:multiverse-alpha-0.4-SNAPSHOT.jar ...
+    java -javaagent:multiverse-alpha-0.4.jar ...
 </pre>
 This Javaagent (for the AlphaStm) contains all libraries needed for Multiverse. So no worries about other dependencies.
-You don't need to the add 'multiverse-alpha-0.4-SNAPSHOT.jar' classpath since it already will be made available
+You don't need to the add 'multiverse-alpha-0.4.jar' classpath since it already will be made available
 on the classpath through the javaagent mechanism.
 
 <h2 id="ant">ANT</h2>
@@ -32,16 +32,16 @@ This will popup a dialog and press the 'edit defaults' button at the bottom left
 'Default Settings' dialog. Select 'Junit' and edit the 'VM Parameters' textfield. If you are using Maven 2
 for your project, you can enter the following string:
 <pre>
-    -javaagent:/home/alarmnummer/.m2/repository/
-    org/multiverse/multiverse-alpha/0.4-SNAPSHOT/multiverse-alpha-0.4-SNAPSHOT.jar
+    -javaagent:/home/alarmnummer/.m2/repository/org/multiverse/multiverse-alpha/0.4/multiverse-alpha-0.4.jar
 </pre>
-Make sure that that you replace '/home/alarmnummer' by the location where your repository can be found and make
-sure that the linebreak is removed. If you are not using Maven 2, you need to <a href="download.html">download</a>
-Mutiverse and extract is somewhere and use the following text for the 'VM Parameters' textfield.
+Make sure that that you replace '/home/alarmnummer' by the location where your repository can be found and make sure
+that the multiverse-alpha jar has been downloaded in your repository. If you are not
+using Maven 2, you need to <a href="download.html">download</a> Mutiverse and extract is somewhere and use the following
+text for the 'VM Parameters' textfield.
 <pre>
-    -javaagent:SOMEDIR/multiverse-alpha-0.4-SNAPSHOT.jar
+    -javaagent:SOMEDIR/multiverse-alpha-0.4.jar
 </pre>
-Make sure that you replace 'SOMEDIR' by the directory that contains the multiverse-alpha-0.4-SNAPSHOT.jar.
+Make sure that you replace 'SOMEDIR' by the absolute path to the directory that contains the multiverse-alpha-0.4.jar.
 
 <h2 id="eclipse">Eclipse</h2>
 Not available since we are not using Eclipse. Check the documentation for the other environments to see what needs

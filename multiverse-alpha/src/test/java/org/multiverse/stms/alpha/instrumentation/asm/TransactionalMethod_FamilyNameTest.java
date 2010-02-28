@@ -21,23 +21,6 @@ public class TransactionalMethod_FamilyNameTest {
     }
 
     @Test
-    public void providedFamilyName() {
-        ProvidedFamilyName method = new ProvidedFamilyName();
-        method.execute();
-
-        assertEquals("provided", method.found);
-    }
-
-    private class ProvidedFamilyName {
-        private String found;
-
-        @TransactionalMethod(familyName = "provided")
-        public void execute() {
-            found = getThreadLocalTransaction().getConfig().getFamilyName();
-        }
-    }
-
-    @Test
     public void defaultFamilyNameWithoutArguments() {
         DefaultFamilyName method = new DefaultFamilyName();
         method.execute();

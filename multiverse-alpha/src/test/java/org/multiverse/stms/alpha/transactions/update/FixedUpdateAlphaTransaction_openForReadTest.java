@@ -53,7 +53,7 @@ public class FixedUpdateAlphaTransaction_openForReadTest {
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
-                false,
+                true,
                 optimalSize,
                 true, true, true, false, size
         );

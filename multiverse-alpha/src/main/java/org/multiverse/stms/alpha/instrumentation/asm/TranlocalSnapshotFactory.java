@@ -2,6 +2,9 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTranlocalSnapshot;
+import org.multiverse.stms.alpha.instrumentation.metadata.ClassMetadata;
+import org.multiverse.stms.alpha.instrumentation.metadata.FieldMetadata;
+import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
@@ -24,30 +27,32 @@ import static org.objectweb.asm.Type.getInternalName;
  */
 public class TranlocalSnapshotFactory implements Opcodes {
 
-    private ClassNode original;
-    private String tranlocalName;
-    private String tranlocalSnapshotName;
-    private MetadataRepository metadataService;
+    private final ClassNode classNode;
+    private final String tranlocalName;
+    private final String tranlocalSnapshotName;
+    private final MetadataRepository metadataService;
+    private final ClassMetadata classMetadata;
 
-    public TranlocalSnapshotFactory(ClassNode original) {
-        this.original = original;
+    public TranlocalSnapshotFactory(ClassNode classNode) {
         this.metadataService = MetadataRepository.INSTANCE;
-        this.tranlocalName = metadataService.getTranlocalName(original);
-        this.tranlocalSnapshotName = metadataService.getTranlocalSnapshotName(original);
+        this.classNode = classNode;
+        this.classMetadata = metadataService.getClassMetadata(classNode.name);
+        this.tranlocalName = classMetadata.getTranlocalName();
+        this.tranlocalSnapshotName = classMetadata.getTranlocalSnapshotName();
     }
 
     public ClassNode create() {
-        if (!metadataService.hasManagedInstanceFields(original)) {
+        if (!classMetadata.hasManagedFields()) {
             return null;
         }
 
         ClassNode result = new ClassNode();
-        result.version = original.version;
+        result.version = classNode.version;
         result.name = tranlocalSnapshotName;
         result.superName = getInternalName(AlphaTranlocalSnapshot.class);
         result.access = ACC_PUBLIC + ACC_FINAL + ACC_SYNTHETIC;
-        result.sourceFile = original.sourceFile;
-        result.sourceDebug = original.sourceDebug;
+        result.sourceFile = classNode.sourceFile;
+        result.sourceDebug = classNode.sourceDebug;
         result.methods.add(createConstructor());
         result.methods.add(createRestoreMethod());
         result.methods.add(createGetTranlocalMethod());
@@ -66,14 +71,18 @@ public class TranlocalSnapshotFactory implements Opcodes {
                 null);
         fields.add(tranlocalField);
 
-        for (FieldNode originalField : metadataService.getManagedInstanceFields(original)) {
-            FieldNode newField = new FieldNode(
-                    ACC_PRIVATE + ACC_FINAL + ACC_SYNTHETIC,
-                    originalField.name,
-                    originalField.desc,
-                    originalField.signature,
-                    null);
-            fields.add(newField);
+        for (FieldNode fieldNode : (List<FieldNode>) classNode.fields) {
+            FieldMetadata fieldMetadata = classMetadata.getFieldMetadata(fieldNode.name);
+
+            if (fieldMetadata.isManagedField()) {
+                FieldNode newFieldNode = new FieldNode(
+                        ACC_PRIVATE + ACC_FINAL + ACC_SYNTHETIC,
+                        fieldNode.name,
+                        fieldNode.desc,
+                        fieldNode.signature,
+                        null);
+                fields.add(newFieldNode);
+            }
         }
 
         return fields;
@@ -94,11 +103,15 @@ public class TranlocalSnapshotFactory implements Opcodes {
         m.visitVarInsn(ALOAD, 1);
         m.visitFieldInsn(PUTFIELD, tranlocalSnapshotName, "___tranlocal", internalToDesc(tranlocalName));
 
-        for (FieldNode managedField : metadataService.getManagedInstanceFields(original)) {
-            m.visitVarInsn(ALOAD, 0);
-            m.visitVarInsn(ALOAD, 1);
-            m.visitFieldInsn(GETFIELD, tranlocalName, managedField.name, managedField.desc);
-            m.visitFieldInsn(PUTFIELD, tranlocalSnapshotName, managedField.name, managedField.desc);
+        for (FieldNode fieldNode : (List<FieldNode>) classNode.fields) {
+            FieldMetadata fieldMetadata = classMetadata.getFieldMetadata(fieldNode.name);
+
+            if (fieldMetadata.isManagedField()) {
+                m.visitVarInsn(ALOAD, 0);
+                m.visitVarInsn(ALOAD, 1);
+                m.visitFieldInsn(GETFIELD, tranlocalName, fieldNode.name, fieldNode.desc);
+                m.visitFieldInsn(PUTFIELD, tranlocalSnapshotName, fieldNode.name, fieldNode.desc);
+            }
         }
 
         m.visitInsn(RETURN);
@@ -131,19 +144,23 @@ public class TranlocalSnapshotFactory implements Opcodes {
                 null,
                 new String[]{});
 
-        for (FieldNode managedField : metadataService.getManagedInstanceFields(original)) {
-            //[..
-            m.visitVarInsn(ALOAD, 0);
-            //[this, ..
-            m.visitFieldInsn(GETFIELD, tranlocalSnapshotName, "___tranlocal", internalToDesc(tranlocalName));
+        for (FieldNode fieldNode : (List<FieldNode>) classNode.fields) {
+            FieldMetadata fieldMetadata = classMetadata.getFieldMetadata(fieldNode.name);
 
-            //[tranlocal
-            m.visitVarInsn(ALOAD, 0);
-            //[this, tranlocal, ...
-            m.visitFieldInsn(GETFIELD, tranlocalSnapshotName, managedField.name, managedField.desc);
-            //[value, tranlocal, ..
-            m.visitFieldInsn(PUTFIELD, tranlocalName, managedField.name, managedField.desc);
-            //[..
+            if (fieldMetadata.isManagedField()) {
+                //[..
+                m.visitVarInsn(ALOAD, 0);
+                //[this, ..
+                m.visitFieldInsn(GETFIELD, tranlocalSnapshotName, "___tranlocal", internalToDesc(tranlocalName));
+
+                //[tranlocal
+                m.visitVarInsn(ALOAD, 0);
+                //[this, tranlocal, ...
+                m.visitFieldInsn(GETFIELD, tranlocalSnapshotName, fieldNode.name, fieldNode.desc);
+                //[value, tranlocal, ..
+                m.visitFieldInsn(PUTFIELD, tranlocalName, fieldNode.name, fieldNode.desc);
+                //[..
+            }
         }
 
         m.visitInsn(RETURN);

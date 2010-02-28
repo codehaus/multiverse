@@ -17,7 +17,7 @@ import static org.multiverse.api.StmUtils.retry;
  * A manual instrumented {@link org.multiverse.transactional.TransactionalReference} implementation. If this class
  * is used,you don't need to worry about instrumentation/javaagents and stuff like this.
  * <p/>
- * It is added to get the Akka project up and running, but probably will removed when the instrumentation is 100% up
+ * It is added to getClassMetadata the Akka project up and running, but probably will removed when the instrumentation is 100% up
  * and running and this can be done compiletime instead of messing with javaagents.
  * <p/>
  * <h3>Lifting on a transaction</h3>
@@ -83,7 +83,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Transacti
      * time being this is the 'expect_new' implementation of this propagation level.
      * <p/>
      * If the value is an transactionalobject or has a reference to it (perhaps indirectly), and the transaction this
-     * transactionalobject is created in is aborted (or hasn't committed) yet, you will get the dreaded {@link
+     * transactionalobject is created in is aborted (or hasn't committed) yet, you will getClassMetadata the dreaded {@link
      * org.multiverse.api.exceptions.LoadUncommittedException}.
      *
      * @param stm   the {@link org.multiverse.api.Stm} used for committing the ref.

@@ -3,6 +3,9 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTranlocalSnapshot;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
+import org.multiverse.stms.alpha.instrumentation.metadata.ClassMetadata;
+import org.multiverse.stms.alpha.instrumentation.metadata.FieldMetadata;
+import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -19,7 +22,8 @@ import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.upgradeToPr
 import static org.objectweb.asm.Type.*;
 
 /**
- * A factory responsible for creating the {@link AlphaTranlocal} class based on an {@link org.multiverse.stms.alpha.AlphaTransactionalObject}.
+ * A factory responsible for creating the {@link AlphaTranlocal} class based on an
+ * {@link org.multiverse.stms.alpha.AlphaTransactionalObject}.
  * <p/>
  * TranlocalClassNodeFactory should not be reused.
  *
@@ -27,40 +31,38 @@ import static org.objectweb.asm.Type.*;
  */
 public final class TranlocalFactory implements Opcodes {
 
-    private final ClassNode txObject;
-    private final String tranlocalSnapshotName;
+    private final ClassNode clazz;
+    private final ClassMetadata clazzMetadata;
     private final String tranlocalName;
-    private final MetadataRepository metadataRepo;
-    private final boolean isFirstGeneration;
-    private final String tranlocalSuperName;
+    private final String tranlocalSnapshotName;
+    private final MetadataRepository metadataRepository;
 
-    public TranlocalFactory(ClassNode txObject) {
-        this.txObject = txObject;
-        this.metadataRepo = MetadataRepository.INSTANCE;
-        this.tranlocalName = metadataRepo.getTranlocalName(txObject);
-        this.tranlocalSnapshotName = metadataRepo.getTranlocalSnapshotName(txObject);
-        this.tranlocalSuperName = metadataRepo.getTranlocalName(txObject.superName);
-        this.isFirstGeneration = !metadataRepo.isRealTransactionalObject(txObject.superName);
+    public TranlocalFactory(ClassNode clazz) {
+        this.metadataRepository = MetadataRepository.INSTANCE;
+        this.clazz = clazz;
+        this.clazzMetadata = metadataRepository.getClassMetadata(clazz.name);
+        this.tranlocalName = clazzMetadata.getTranlocalName();
+        this.tranlocalSnapshotName = clazzMetadata.getTranlocalSnapshotName();
     }
 
     public ClassNode create() {
         ClassNode result = new ClassNode();
-        result.version = txObject.version;
-        result.name = tranlocalName;
+        result.version = clazz.version;
+        result.name = clazzMetadata.getTranlocalName();
         result.access = ACC_PUBLIC + ACC_SYNTHETIC;
-        result.sourceFile = txObject.sourceFile;
-        result.sourceDebug = txObject.sourceDebug;
+        result.sourceFile = clazz.sourceFile;
+        result.sourceDebug = clazz.sourceDebug;
 
         result.fields.addAll(remapInstanceFields());
 
-        if (isFirstGeneration) {
-            result.superName = getInternalName(AlphaTranlocal.class);
-            result.fields.add(createOriginField());
-            result.fields.add(createTxObjectField());
-            result.methods.add(createGetOriginMethod());
-        } else {
-            result.superName = metadataRepo.getTranlocalName(txObject.superName);
-        }
+        //if (isFirstGeneration) {
+        result.superName = getInternalName(AlphaTranlocal.class);
+        result.fields.add(createOriginField());
+        result.fields.add(createTxObjectField());
+        result.methods.add(createGetOriginMethod());
+        //} else {
+        //    result.superName = metadataRepo.getTranlocalName(transactionalClass.superName);
+        //}
 
         result.methods.add(createOpenForWriteConstructor());
         result.methods.add(createPrepareForCommitMethod());
@@ -86,73 +88,65 @@ public final class TranlocalFactory implements Opcodes {
         m.visitTypeInsn(NEW, tranlocalName);
         m.visitInsn(DUP);
         m.visitVarInsn(ALOAD, 0);
-        m.visitMethodInsn(
-                INVOKESPECIAL,
-                tranlocalName,
-                "<init>",
-                format("(%s)V", internalToDesc(tranlocalName)));
+        m.visitMethodInsn(INVOKESPECIAL, tranlocalName, "<init>", format("(%s)V", internalToDesc(tranlocalName)));
         m.visitInsn(ARETURN);
         return m;
     }
 
     private List<FieldNode> remapInstanceFields() {
         List<FieldNode> result = new LinkedList<FieldNode>();
-        for (FieldNode originalField : metadataRepo.getManagedInstanceFields(txObject)) {
 
-            FieldNode remappedField = new FieldNode(
-                    upgradeToProtected(originalField.access),
-                    originalField.name,
-                    originalField.desc,
-                    originalField.signature,
-                    originalField.value);
-            result.add(remappedField);
+        for (FieldNode fieldNode : (List<FieldNode>) clazz.fields) {
+            FieldMetadata fieldMetadata = clazzMetadata.getFieldMetadata(fieldNode.name);
+
+            if (fieldMetadata.isManagedField()) {
+                FieldNode fixedFieldNode = new FieldNode(
+                        upgradeToProtected(fieldNode.access),
+                        fieldNode.name,
+                        fieldNode.desc,
+                        fieldNode.signature,
+                        fieldNode.value);
+                result.add(fixedFieldNode);
+            }
         }
 
         return result;
     }
 
     private FieldNode createOriginField() {
-        return new FieldNode(
-                ACC_PUBLIC + ACC_SYNTHETIC,
-                "___origin",
-                internalToDesc(tranlocalName), null, null);
+        return new FieldNode(ACC_PUBLIC + ACC_SYNTHETIC, "___origin", internalToDesc(tranlocalName), null, null);
     }
 
     private FieldNode createTxObjectField() {
-        return new FieldNode(
-                ACC_PUBLIC + ACC_SYNTHETIC + ACC_FINAL,
-                "___txObject",
-                internalToDesc(txObject.name), null, null);
+        return new FieldNode(ACC_PUBLIC + ACC_SYNTHETIC + ACC_FINAL, "___txObject", internalToDesc(clazz.name), null, null);
     }
 
     private MethodNode createFreshConstructor() {
         MethodNode m = new MethodNode(
                 ACC_PUBLIC + ACC_SYNTHETIC,
                 "<init>",
-                format("(%s)V", internalToDesc(txObject.name)),
+                format("(%s)V", internalToDesc(clazz.name)),
                 null,
                 new String[]{});
 
-        if (isFirstGeneration) {
-            //we need to call the no arg constructor of the AlphaTranlocal
-            m.visitVarInsn(ALOAD, 0);
-            m.visitMethodInsn(
-                    INVOKESPECIAL, getInternalName(AlphaTranlocal.class), "<init>", "()V");
+        //if (isFirstGeneration) {
+        //we need to call the no arg constructor of the AlphaTranlocal
+        m.visitVarInsn(ALOAD, 0);
+        m.visitMethodInsn(INVOKESPECIAL, getInternalName(AlphaTranlocal.class), "<init>", "()V");
 
-            //put the atomicobject
-            m.visitVarInsn(ALOAD, 0);
-            m.visitVarInsn(ALOAD, 1);
-            m.visitFieldInsn(
-                    PUTFIELD, tranlocalName, "___txObject", internalToDesc(txObject.name));
-        } else {
-            //we need to call the constructor of the superTranlocal with the TransactionalObject
-            m.visitVarInsn(ALOAD, 0);
-            m.visitVarInsn(ALOAD, 1);
-
-            String superDesc = format("(%s)V", internalToDesc(txObject.superName));
-            m.visitMethodInsn(
-                    INVOKESPECIAL, tranlocalSuperName, "<init>", superDesc);
-        }
+        //put the atomicobject
+        m.visitVarInsn(ALOAD, 0);
+        m.visitVarInsn(ALOAD, 1);
+        m.visitFieldInsn(PUTFIELD, tranlocalName, "___txObject", internalToDesc(clazz.name));
+        //} else {
+        //    //we need to call the constructor of the superTranlocal with the TransactionalObject
+        //    m.visitVarInsn(ALOAD, 0);
+        //    m.visitVarInsn(ALOAD, 1);
+        //
+        //    String superDesc = format("(%s)V", internalToDesc(transactionalClass.superName));
+        //    m.visitMethodInsn(
+        //            INVOKESPECIAL, tranlocalSuperName, "<init>", superDesc);
+        //}
 
 
         m.visitInsn(RETURN);
@@ -173,40 +167,38 @@ public final class TranlocalFactory implements Opcodes {
                 null,
                 new String[]{});
 
-        if (isFirstGeneration) {
-            m.visitVarInsn(ALOAD, 0);
-            m.visitMethodInsn(
-                    INVOKESPECIAL, getInternalName(AlphaTranlocal.class), "<init>", "()V");
+        //if (isFirstGeneration) {
+        m.visitVarInsn(ALOAD, 0);
+        m.visitMethodInsn(INVOKESPECIAL, getInternalName(AlphaTranlocal.class), "<init>", "()V");
 
-            //placement of the atomicObject
-            m.visitVarInsn(ALOAD, 0);
-            m.visitVarInsn(ALOAD, 1);
-            m.visitFieldInsn(
-                    GETFIELD, tranlocalName, "___txObject", internalToDesc(txObject.name));
-            m.visitFieldInsn(
-                    PUTFIELD, tranlocalName, "___txObject", internalToDesc(txObject.name));
+        //placement of the atomicObject
+        m.visitVarInsn(ALOAD, 0);
+        m.visitVarInsn(ALOAD, 1);
+        m.visitFieldInsn(GETFIELD, tranlocalName, "___txObject", internalToDesc(clazz.name));
+        m.visitFieldInsn(PUTFIELD, tranlocalName, "___txObject", internalToDesc(clazz.name));
 
-            //placement of the original
-            m.visitVarInsn(ALOAD, 0);
-            m.visitVarInsn(ALOAD, 1);
-            m.visitFieldInsn(
-                    PUTFIELD, tranlocalName, "___origin", internalToDesc(tranlocalName));
-        } else {
-            m.visitVarInsn(ALOAD, 0);
-            m.visitVarInsn(ALOAD, 1);
+        //placement of the original
+        m.visitVarInsn(ALOAD, 0);
+        m.visitVarInsn(ALOAD, 1);
+        m.visitFieldInsn(PUTFIELD, tranlocalName, "___origin", internalToDesc(tranlocalName));
 
-            m.visitMethodInsn(
-                    INVOKESPECIAL, tranlocalSuperName, "<init>", format("(%s)V", internalToDesc(tranlocalSuperName)));
-        }
+        //} else {
+        //    m.visitVarInsn(ALOAD, 0);
+        //    m.visitVarInsn(ALOAD, 1);
+        //
+        //    m.visitMethodInsn(
+        //            INVOKESPECIAL, tranlocalSuperName, "<init>", format("(%s)V", internalToDesc(tranlocalSuperName)));
+        //}
 
         //placement of the managed fields.
-        for (FieldNode managedField : metadataRepo.getManagedInstanceFields(txObject)) {
-            m.visitVarInsn(ALOAD, 0);
-            m.visitVarInsn(ALOAD, 1);
-            m.visitFieldInsn(
-                    GETFIELD, tranlocalName, managedField.name, managedField.desc);
-            m.visitFieldInsn(
-                    PUTFIELD, tranlocalName, managedField.name, managedField.desc);
+        for (FieldNode field : (List<FieldNode>) clazz.fields) {
+            FieldMetadata fieldMetadata = clazzMetadata.getFieldMetadata(field.name);
+            if (fieldMetadata.isManagedField()) {
+                m.visitVarInsn(ALOAD, 0);
+                m.visitVarInsn(ALOAD, 1);
+                m.visitFieldInsn(GETFIELD, tranlocalName, field.name, field.desc);
+                m.visitFieldInsn(PUTFIELD, tranlocalName, field.name, field.desc);
+            }
         }
 
         m.visitInsn(RETURN);
@@ -252,7 +244,7 @@ public final class TranlocalFactory implements Opcodes {
 
         //check on committed
         m.visitVarInsn(ALOAD, 0);
-        m.visitFieldInsn(GETFIELD, tranlocalName, "___txObject", internalToDesc(txObject.name));
+        m.visitFieldInsn(GETFIELD, tranlocalName, "___txObject", internalToDesc(clazz.name));
         m.visitInsn(ARETURN);
         m.visitMaxs(0, 0);//value's don't matter, will be reculculated, but call is needed
         m.visitEnd();
@@ -271,103 +263,102 @@ public final class TranlocalFactory implements Opcodes {
                 new String[]{});
 
         Label next = new Label();
-        if (isFirstGeneration) {
-            //check if it is readonly
-            m.visitVarInsn(ALOAD, 0);
-            m.visitFieldInsn(GETFIELD, tranlocalName, "___writeVersion", "J");
-            m.visitLdcInsn(new Long(0));
-            m.visitInsn(LCMP);
-            m.visitJumpInsn(IFEQ, next);
-            m.visitInsn(ICONST_0);
-            m.visitInsn(IRETURN);
+        //if (isFirstGeneration) {
+        //check if it is readonly
+        m.visitVarInsn(ALOAD, 0);
+        m.visitFieldInsn(GETFIELD, tranlocalName, "___writeVersion", "J");
+        m.visitLdcInsn(new Long(0));
+        m.visitInsn(LCMP);
+        m.visitJumpInsn(IFEQ, next);
+        m.visitInsn(ICONST_0);
+        m.visitInsn(IRETURN);
 
-            //check if it is fresh (so has no origin)
-            m.visitLabel(next);
-            m.visitVarInsn(ALOAD, 0);
-            m.visitFieldInsn(
-                    GETFIELD, tranlocalName, "___origin", internalToDesc(tranlocalName));
-            next = new Label();
-            m.visitJumpInsn(IFNONNULL, next);
-            m.visitInsn(ICONST_1);
-            m.visitInsn(IRETURN);
-        } else {
-            //call the super.getDirtynessStatus
-            m.visitVarInsn(ALOAD, 0);
-            m.visitMethodInsn(
-                    INVOKEVIRTUAL,
-                    metadataRepo.getTranlocalName(txObject.superName),
-                    "isDirty",
-                    "()Z");
-            //duplicate the returned value for later use
-            //do a comparison, and jump to next if the parent call returned a non clean
-            m.visitJumpInsn(IF_ACMPNE, next);
-            //so the parent returned a value different than clean,
-
-            m.visitInsn(ICONST_1);
-            m.visitInsn(IRETURN);
-        }
+        //check if it is fresh (so has no origin)
+        m.visitLabel(next);
+        m.visitVarInsn(ALOAD, 0);
+        m.visitFieldInsn(GETFIELD, tranlocalName, "___origin", internalToDesc(tranlocalName));
+        next = new Label();
+        m.visitJumpInsn(IFNONNULL, next);
+        m.visitInsn(ICONST_1);
+        m.visitInsn(IRETURN);
+        //} else {
+        //    //call the super.getDirtynessStatus
+        //    m.visitVarInsn(ALOAD, 0);
+        //    m.visitMethodInsn(
+        //            INVOKEVIRTUAL,
+        //            metadataRepo.getTranlocalName(transactionalClass.superName),
+        //            "isDirty",
+        //            "()Z");
+        //    //duplicate the returned value for later use
+        //    //do a comparison, and jump to next if the parent call returned a non clean
+        //    m.visitJumpInsn(IF_ACMPNE, next);
+        //    //so the parent returned a value different than clean,
+        //
+        //    m.visitInsn(ICONST_1);
+        //    m.visitInsn(IRETURN);
+        //}
 
         m.visitLabel(next);
 
-        List<FieldNode> managedFields = metadataRepo.getManagedInstanceFields(txObject);
-        if (!managedFields.isEmpty()) {
-            if (isFirstGeneration) {
-                m.visitVarInsn(ALOAD, 0);
+        if (clazzMetadata.hasManagedFields()) {
+            //if (isFirstGeneration) {
+            m.visitVarInsn(ALOAD, 0);
 
-                m.visitFieldInsn(
-                        GETFIELD, tranlocalName, "___origin", internalToDesc(tranlocalName));
-            } else {
-                m.visitVarInsn(ALOAD, 0);
-                //todo: the rootAtomicobject should be used, not the super
-                m.visitFieldInsn(
-                        GETFIELD, tranlocalSuperName, "___origin", internalToDesc(tranlocalSuperName));
-                m.visitTypeInsn(CHECKCAST, tranlocalName);
-            }
+            m.visitFieldInsn(GETFIELD, tranlocalName, "___origin", internalToDesc(tranlocalName));
+            //} else {
+            //    m.visitVarInsn(ALOAD, 0);
+            //    //todo: the rootAtomicobject should be used, not the super
+            //    m.visitFieldInsn(
+            //            GETFIELD, tranlocalSuperName, "___origin", internalToDesc(tranlocalSuperName));
+            //    m.visitTypeInsn(CHECKCAST, tranlocalName);
+            //}
 
             //check on managed fields.
 
-            for (FieldNode managedField : managedFields) {
-                m.visitInsn(DUP);
+            for (FieldNode fieldNode : (List<FieldNode>) clazz.fields) {
+                FieldMetadata fieldMetadata = clazzMetadata.getFieldMetadata(fieldNode.name);
 
-                m.visitFieldInsn(
-                        GETFIELD, tranlocalName, managedField.name, managedField.desc);
-                m.visitVarInsn(ALOAD, 0);
-                m.visitFieldInsn(
-                        GETFIELD, tranlocalName, managedField.name, managedField.desc);
+                if (fieldMetadata.isManagedField()) {
+                    m.visitInsn(DUP);
 
-                next = new Label();
-                switch (getType(managedField.desc).getSort()) {
-                    case Type.BOOLEAN:
-                    case Type.BYTE:
-                    case Type.CHAR:
-                    case Type.SHORT:
-                    case Type.INT:
-                        m.visitJumpInsn(IF_ICMPEQ, next);
-                        break;
-                    case Type.FLOAT:
-                        m.visitInsn(FCMPL);
-                        m.visitJumpInsn(IFEQ, next);
-                        break;
-                    case Type.LONG:
-                        m.visitInsn(LCMP);
-                        m.visitJumpInsn(IFEQ, next);
-                        break;
-                    case Type.DOUBLE:
-                        m.visitInsn(DCMPL);
-                        m.visitJumpInsn(IFEQ, next);
-                        break;
-                    case Type.OBJECT:
-                        //fall through
-                    case Type.ARRAY:
-                        m.visitJumpInsn(IF_ACMPEQ, next);
-                        break;
-                    default:
-                        throw new RuntimeException("Unhandled type: " + managedField.desc);
+                    m.visitFieldInsn(GETFIELD, tranlocalName, fieldNode.name, fieldNode.desc);
+                    m.visitVarInsn(ALOAD, 0);
+                    m.visitFieldInsn(GETFIELD, tranlocalName, fieldNode.name, fieldNode.desc);
+
+                    next = new Label();
+                    switch (getType(fieldNode.desc).getSort()) {
+                        case Type.BOOLEAN:
+                        case Type.BYTE:
+                        case Type.CHAR:
+                        case Type.SHORT:
+                        case Type.INT:
+                            m.visitJumpInsn(IF_ICMPEQ, next);
+                            break;
+                        case Type.FLOAT:
+                            m.visitInsn(FCMPL);
+                            m.visitJumpInsn(IFEQ, next);
+                            break;
+                        case Type.LONG:
+                            m.visitInsn(LCMP);
+                            m.visitJumpInsn(IFEQ, next);
+                            break;
+                        case Type.DOUBLE:
+                            m.visitInsn(DCMPL);
+                            m.visitJumpInsn(IFEQ, next);
+                            break;
+                        case Type.OBJECT:
+                            //fall through
+                        case Type.ARRAY:
+                            m.visitJumpInsn(IF_ACMPEQ, next);
+                            break;
+                        default:
+                            throw new RuntimeException("Unhandled type: " + fieldNode.desc);
+                    }
+
+                    m.visitInsn(ICONST_1);
+                    m.visitInsn(IRETURN);
+                    m.visitLabel(next);
                 }
-
-                m.visitInsn(ICONST_1);
-                m.visitInsn(IRETURN);
-                m.visitLabel(next);
             }
             m.visitLabel(next);
         }
@@ -414,8 +405,7 @@ public final class TranlocalFactory implements Opcodes {
                 new String[]{});
 
         m.visitVarInsn(ALOAD, 0);
-        m.visitFieldInsn(
-                GETFIELD, tranlocalName, "___origin", internalToDesc(tranlocalName));
+        m.visitFieldInsn(GETFIELD, tranlocalName, "___origin", internalToDesc(tranlocalName));
         m.visitInsn(ARETURN);
         m.visitMaxs(0, 0);//value's don't matter, will be reculculated, but call is needed
         m.visitEnd();

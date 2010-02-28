@@ -7,6 +7,8 @@ import org.multiverse.annotations.Exclude;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.exceptions.NoTransactionFoundException;
 import org.multiverse.stms.alpha.AlphaStm;
+import org.multiverse.stms.alpha.instrumentation.metadata.ClassMetadata;
+import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
 import org.multiverse.utils.instrumentation.InstrumentationProblemMonitor;
 import org.objectweb.asm.Type;
 
@@ -37,8 +39,9 @@ public class TransactionalObject_ExcludeMethodTest {
     public void whenExcludeMethodIsCombinedWithExplicitTransactionalMethod_thenTransactionalMethodIgnored() {
         ExcludePriorityObject o = new ExcludePriorityObject();
 
-        boolean isTransactional = MetadataRepository.INSTANCE.isTransactionalMethod(
-                Type.getType(ExcludePriorityObject.class).getInternalName(), "excludedIncTwice", "()V");
+        ClassMetadata classMetadata = MetadataRepository.INSTANCE.getClassMetadata(
+                Type.getType(ExcludePriorityObject.class).getInternalName());
+        boolean isTransactional = classMetadata.getMethodMetadata("excludedIncTwice", "()V").isTransactional();
 
         assertFalse(isTransactional);
 

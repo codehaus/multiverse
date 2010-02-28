@@ -1,6 +1,9 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.multiverse.stms.alpha.AlphaTranlocal;
+import org.multiverse.stms.alpha.instrumentation.metadata.ClassMetadata;
+import org.multiverse.stms.alpha.instrumentation.metadata.FieldMetadata;
+import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.Remapper;
@@ -36,23 +39,18 @@ import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.*;
  */
 public class TransactionalObjectTransformer implements Opcodes {
 
-    private final ClassNode txObject;
-    private final ClassNode mixin;
-    private final MetadataRepository metadataRepository;
-    private final String tranlocalName;
-    private final boolean isFirstGeneration;
+    private final ClassNode classNode;
+    private final ClassNode mixinClassNode;
+    private ClassMetadata classMetadata;
 
-    public TransactionalObjectTransformer(ClassNode txObject, ClassNode mixin) {
-        this.txObject = txObject;
-        this.mixin = mixin;
-        this.metadataRepository = MetadataRepository.INSTANCE;
-
-        this.tranlocalName = metadataRepository.getTranlocalName(txObject);
-        this.isFirstGeneration = !metadataRepository.isRealTransactionalObject(txObject.superName);
+    public TransactionalObjectTransformer(ClassNode originalClass, ClassNode mixinClassNode) {
+        this.classNode = originalClass;
+        this.classMetadata = MetadataRepository.INSTANCE.getClassMetadata(originalClass.name);
+        this.mixinClassNode = mixinClassNode;
     }
 
     public ClassNode transform() {
-        if (!metadataRepository.hasManagedInstanceFields(txObject)) {
+        if (classMetadata.isIgnoredClass() || !classMetadata.isRealTransactionalObject()) {
             return null;
         }
 
@@ -62,13 +60,13 @@ public class TransactionalObjectTransformer implements Opcodes {
 
         fixUnmanagedFields();
 
-        if (isFirstGeneration) {
-            mergeMixin();
-        }
+        //if (classMetadata.isFirstGeneration()) {
+        mergeMixin();
+        // }
 
-        txObject.methods.add(createOpenUnconstructedMethod());
+        classNode.methods.add(createOpenUnconstructedMethod());
 
-        return txObject;
+        return classNode;
     }
 
     private void ensureNoProblems() {
@@ -81,20 +79,20 @@ public class TransactionalObjectTransformer implements Opcodes {
         //}
 
         //check for conflicting fields 
-        for (FieldNode fieldNode : (List<FieldNode>) txObject.fields) {
+        for (FieldNode fieldNode : (List<FieldNode>) classNode.fields) {
             if (fieldNode.name.startsWith("___")) {
                 String msg = format("Field '%s.%s' begin with illegal pattern '___'",
-                        txObject.name,
+                        classNode.name,
                         fieldNode.name);
                 throw new IllegalStateException(msg);
             }
         }
 
         //check for conflicting method names
-        for (MethodNode methodNode : (List<MethodNode>) txObject.methods) {
+        for (MethodNode methodNode : (List<MethodNode>) classNode.methods) {
             if (methodNode.name.startsWith("___")) {
                 String msg = format("Method '%s.%s%s' begins with illegal patterns '___'",
-                        txObject.name,
+                        classNode.name,
                         methodNode.name,
                         methodNode.desc);
                 throw new IllegalStateException(msg);
@@ -108,19 +106,30 @@ public class TransactionalObjectTransformer implements Opcodes {
      * the tranlocal.
      */
     private void fixUnmanagedFields() {
-        for (FieldNode field : (List<FieldNode>) txObject.fields) {
-            if (!metadataRepository.isManagedInstanceField(txObject.name, field.name)) {
-                field.access = upgradeToPublic(field.access);
-                if (isFinal(field.access)) {
-                    field.access -= ACC_FINAL;
+        for (FieldNode fieldNode : (List<FieldNode>) classNode.fields) {
+            FieldMetadata fieldMetadata = classMetadata.getFieldMetadata(fieldNode.name);
+
+            if (!fieldMetadata.isManagedField()) {
+                fieldNode.access = upgradeToPublic(fieldNode.access);
+                if (isFinal(fieldNode.access)) {
+                    fieldNode.access -= ACC_FINAL;
                 }
             }
         }
     }
 
     private void removeManagedFields() {
-        List<FieldNode> managedFields = metadataRepository.getManagedInstanceFields(txObject);
-        txObject.fields.removeAll(managedFields);
+        List<FieldNode> fixedFields = new LinkedList<FieldNode>();
+
+        for (FieldNode fieldNode : (List<FieldNode>) classNode.fields) {
+            FieldMetadata fieldMetadata = classMetadata.getFieldMetadata(fieldNode.name);
+
+            if (!fieldMetadata.isManagedField()) {
+                fixedFields.add(fieldNode);
+            }
+        }
+
+        classNode.fields = fixedFields;
     }
 
     private void mergeMixin() {
@@ -131,16 +140,16 @@ public class TransactionalObjectTransformer implements Opcodes {
     }
 
     private void mergeStaticInitializers() {
-        Remapper remapper = new SimpleRemapper(mixin.name, txObject.name);
+        Remapper remapper = new SimpleRemapper(mixinClassNode.name, classNode.name);
 
-        MethodNode mixinStaticInit = findStaticInitializer(mixin);
+        MethodNode mixinStaticInit = findStaticInitializer(mixinClassNode);
 
         if (mixinStaticInit != null) {
-            MethodNode txObjectStaticInit = findStaticInitializer(txObject);
+            MethodNode txObjectStaticInit = findStaticInitializer(classNode);
 
             if (txObjectStaticInit == null) {
                 MethodNode remappedInit = remap(mixinStaticInit, remapper);
-                txObject.methods.add(remappedInit);
+                classNode.methods.add(remappedInit);
             } else {
                 MethodNode originalStaticInit = remap(mixinStaticInit, remapper);
                 originalStaticInit.name = "___clinit_mixin";
@@ -153,12 +162,12 @@ public class TransactionalObjectTransformer implements Opcodes {
                 replacementStaticInit.tryCatchBlocks = new LinkedList();
                 replacementStaticInit.exceptions = new LinkedList();
                 replacementStaticInit.localVariables = new LinkedList();
-                replacementStaticInit.visitMethodInsn(INVOKESTATIC, txObject.name, originalStaticInit.name, "()V");
-                replacementStaticInit.visitMethodInsn(INVOKESTATIC, txObject.name, txObjectStaticInit.name, "()V");
+                replacementStaticInit.visitMethodInsn(INVOKESTATIC, classNode.name, originalStaticInit.name, "()V");
+                replacementStaticInit.visitMethodInsn(INVOKESTATIC, classNode.name, txObjectStaticInit.name, "()V");
                 replacementStaticInit.visitInsn(RETURN);
 
-                txObject.methods.add(replacementStaticInit);
-                txObject.methods.add(originalStaticInit);
+                classNode.methods.add(replacementStaticInit);
+                classNode.methods.add(originalStaticInit);
             }
         }
     }
@@ -166,26 +175,26 @@ public class TransactionalObjectTransformer implements Opcodes {
     private void mergeMixinInterfaces() {
         Set<String> interfaces = new HashSet<String>();
 
-        interfaces.addAll(txObject.interfaces);
-        interfaces.addAll(mixin.interfaces);
+        interfaces.addAll(classNode.interfaces);
+        interfaces.addAll(mixinClassNode.interfaces);
 
-        txObject.interfaces = new LinkedList<String>(interfaces);
+        classNode.interfaces = new LinkedList<String>(interfaces);
     }
 
     private void mergeMixinFields() {
-        for (FieldNode mixinField : (List<FieldNode>) mixin.fields) {
-            txObject.fields.add(mixinField);
+        for (FieldNode mixinField : (List<FieldNode>) mixinClassNode.fields) {
+            classNode.fields.add(mixinField);
         }
     }
 
     private void mergeMixinMethods() {
-        Remapper remapper = new SimpleRemapper(mixin.name, txObject.name);
+        Remapper remapper = new SimpleRemapper(mixinClassNode.name, classNode.name);
 
-        for (MethodNode mixinMethod : (List<MethodNode>) mixin.methods) {
-            //all constructors and static constructors of the mixin are dropped
-            if (!mixinMethod.name.equals("<init>") && !mixinMethod.name.equals("<clinit>")) {
-                MethodNode remappedMethod = remap(mixinMethod, remapper);
-                txObject.methods.add(remappedMethod);
+        for (MethodNode mixinMethodNode : (List<MethodNode>) mixinClassNode.methods) {
+            //all constructors and static constructors of the mixinClassNode are dropped
+            if (!mixinMethodNode.name.equals("<init>") && !mixinMethodNode.name.equals("<clinit>")) {
+                MethodNode remappedMethod = remap(mixinMethodNode, remapper);
+                classNode.methods.add(remappedMethod);
             }
         }
     }
@@ -207,23 +216,13 @@ public class TransactionalObjectTransformer implements Opcodes {
     private MethodNode createOpenUnconstructedMethod() {
         String desc = "()" + Type.getDescriptor(AlphaTranlocal.class);
 
-        MethodNode m = new MethodNode(
-                ACC_PUBLIC + ACC_SYNTHETIC,
-                "___openUnconstructed",
-                desc,
-                null,
-                new String[]{});
-
-        m.visitTypeInsn(NEW, tranlocalName);
+        MethodNode m = new MethodNode(ACC_PUBLIC + ACC_SYNTHETIC, "___openUnconstructed", desc, null, new String[]{});
+        m.visitTypeInsn(NEW, classMetadata.getTranlocalName());
         m.visitInsn(DUP);
         m.visitVarInsn(ALOAD, 0);
-        m.visitMethodInsn(
-                INVOKESPECIAL,
-                tranlocalName,
-                "<init>",
-                format("(%s)V", internalToDesc(txObject.name)));
+        String constructorDesc = format("(%s)V", internalToDesc(classNode.name));
+        m.visitMethodInsn(INVOKESPECIAL, classMetadata.getTranlocalName(), "<init>", constructorDesc);
         m.visitInsn(ARETURN);
-
         return m;
     }
 }

@@ -1,5 +1,6 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
+import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
 import org.multiverse.utils.instrumentation.InstrumentationProblemMonitor;
 
 import java.lang.instrument.ClassFileTransformer;

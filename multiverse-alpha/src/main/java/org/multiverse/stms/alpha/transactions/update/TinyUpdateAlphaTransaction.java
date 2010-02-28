@@ -25,10 +25,10 @@ public class TinyUpdateAlphaTransaction
         public Config(
                 PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName, ProfileRepository profiler,
                 int maxRetryCount, CommitLockPolicy commitLockPolicy, boolean interruptible, OptimalSize optimalSize,
-                boolean preventWriteSkew, boolean optimizeConflictDetection, boolean dirtyCheck,
+                boolean allowWriteSkewProblem, boolean optimizeConflictDetection, boolean dirtyCheck,
                 boolean automaticReadTracking) {
             super(clock, backoffPolicy, familyName, false, maxRetryCount, interruptible, commitLockPolicy,
-                    profiler, preventWriteSkew, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
+                    profiler, allowWriteSkewProblem, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
 
             this.optimalSize = optimalSize;
         }

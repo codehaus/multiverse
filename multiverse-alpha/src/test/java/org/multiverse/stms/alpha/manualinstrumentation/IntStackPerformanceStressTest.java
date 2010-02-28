@@ -25,9 +25,7 @@ public class IntStackPerformanceStressTest {
         txFactory = stm.getTransactionFactoryBuilder()
                 .setSmartTxLengthSelector(true)
                 .setFamilyName("IntStackPerformanceStressTest")
-                .setReadonly(false)
-                .setPreventWriteSkew(false)
-                .setAutomaticReadTracking(true).build();
+                .setAutomaticReadTracking(false).build();
     }
 
 

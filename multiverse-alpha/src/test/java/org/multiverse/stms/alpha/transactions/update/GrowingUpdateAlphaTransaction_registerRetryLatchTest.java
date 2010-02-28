@@ -55,7 +55,7 @@ public class GrowingUpdateAlphaTransaction_registerRetryLatchTest {
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
-                false, true, true, true, false);
+                true, true, true, true, false);
         return new GrowingUpdateAlphaTransaction(config);
     }
 

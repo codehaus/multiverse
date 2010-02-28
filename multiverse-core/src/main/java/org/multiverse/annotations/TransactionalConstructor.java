@@ -23,16 +23,6 @@ public @interface TransactionalConstructor {
     boolean readonly() default false;
 
     /**
-     * The familyname of the transaction. If not set, a familyname will be inferred based on the classname en
-     * method signature and in most cases this is the best solution (not providing a value). The family name
-     * is not only useful for logging purposes, but als for optimizations like selecting the optimal transaction
-     * implementation for that specific set of transactions.
-     *
-     * @return the familyname of the transaction
-     */
-    String familyName() default "";
-
-    /**
      * If the transaction automatically should track reads. This behavior is not only useful to reduce
      * read conflicts, it also is needed for blocking transactions and prevention of the write skew problem.
      *
@@ -41,10 +31,10 @@ public @interface TransactionalConstructor {
     boolean automaticReadTracking() default true;
 
     /**
-     * If the write skew problem should be prevented. If set to true, the automaticReadTracking also has to
-     * be set to true.
+     * If the write skew problem is allowed to happen. If set to false, the automaticReadTracking also has to
+     * be set to true otherwise you will get an Exception.
      *
-     * @return true if the writes kew problem should be prevented.
+     * @return true if the writeSkew problem is allowed.
      */
-    boolean preventWriteSkew() default false;
+    boolean allowWriteSkewProblem() default true;
 }

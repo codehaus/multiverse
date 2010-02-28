@@ -28,6 +28,7 @@ public class AlphaStmTest {
     @Test
     public void testDefaultTransaction() {
         Transaction t = stm.getTransactionFactoryBuilder().build().start();
+
         assertTrue(t instanceof AbstractUpdateAlphaTransaction);
 
         //parameters should be checked
@@ -41,7 +42,7 @@ public class AlphaStmTest {
 
         assertFalse(t.getConfig().isReadonly());
         assertTrue(t.getConfig().automaticReadTracking());
-        assertFalse(t.getConfig().preventWriteSkew());
+        assertTrue(t.getConfig().allowWriteSkewProblem());
         assertEquals(1000, t.getConfig().getMaxRetryCount());
         assertFalse(t.getConfig().isInterruptible());
     }
@@ -55,7 +56,7 @@ public class AlphaStmTest {
 
         assertFalse(t.getConfig().isReadonly());
         assertTrue(t.getConfig().automaticReadTracking());
-        assertFalse(t.getConfig().preventWriteSkew());
+        assertTrue(t.getConfig().allowWriteSkewProblem());
         assertEquals(1000, t.getConfig().getMaxRetryCount());
         assertFalse(t.getConfig().isInterruptible());
     }
@@ -72,7 +73,7 @@ public class AlphaStmTest {
         stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
                 .setAutomaticReadTracking(false)
-                .setPreventWriteSkew(true).build();
+                .setAllowWriteSkewProblem(false).build();
     }
 
     @Test
@@ -80,6 +81,6 @@ public class AlphaStmTest {
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
                 .setReadonly(true)
                 .setAutomaticReadTracking(false)
-                .setPreventWriteSkew(true).build();
+                .setAllowWriteSkewProblem(true).build();
     }
 }

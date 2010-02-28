@@ -16,14 +16,25 @@ public class BenchmarkMain {
         FileBasedBenchmarkResultRepository repository = new FileBasedBenchmarkResultRepository();
         BenchmarkExecutor executor = new DefaultBenchmarkExecutor(repository);
 
-
-        executor.execute(createReadPerformanceBenchmark());
+        executor.execute(createThisReadPerformanceBenchmark());
+        //executor.execute(createReadPerformanceBenchmark());
         //executors.execute(createNonConcurrentUpdateBenchmark());
         // executors.execute(createConcurrentUpdateClassicLockBenchmark());
         // executors.execute(createConcurrentUpdateBenchmark());
         //executor.execute(createSetterInLoopDriver());
 
         GraphMain.main(new String[]{"/tmp",});
+    }
+
+    private static Benchmark createThisReadPerformanceBenchmark() {
+        TestCase testCase = new TestCase();
+        testCase.setProperty("readCount", 1L * 1000 * 1000 * 1000);
+
+        Benchmark benchmark = new Benchmark();
+        benchmark.setDriverClass(ThisReadPerformanceDriver.class);
+        benchmark.setBenchmarkName("ThisReadPerformanceDriver");
+        benchmark.getTestCases().add(testCase);
+        return benchmark;
     }
 
     private static Benchmark createSetterInLoopDriver() {

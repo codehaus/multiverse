@@ -64,38 +64,38 @@ public class TransactionalMethod_settingTest {
     }
 
     @Test
-    public void testpreventWriteSkew() {
-        ObjectWithpreventWriteSkew object = new ObjectWithpreventWriteSkew();
+    public void testAllowWriteSkewProblem() {
+        ObjectWithPreventWriteSkew object = new ObjectWithPreventWriteSkew();
 
-        assertFalse(object.updateNoDetectingMethod());
-        assertFalse(object.updateDefaultMethod());
-        assertTrue(object.updateDetectingMethod());
+        assertFalse(object.updateWithDisallowedWriteSkewProblem());
+        assertTrue(object.updateDefaultMethod());
+        assertTrue(object.updateWithAllowedWriteSkewProblem());
     }
 
 
     @TransactionalObject
-    public static class ObjectWithpreventWriteSkew {
+    public static class ObjectWithPreventWriteSkew {
 
         private int x;
 
-        public ObjectWithpreventWriteSkew() {
+        public ObjectWithPreventWriteSkew() {
             x = 0;
         }
 
-        @TransactionalMethod(preventWriteSkew = true)
-        public boolean updateDetectingMethod() {
+        @TransactionalMethod(allowWriteSkewProblem = true)
+        public boolean updateWithAllowedWriteSkewProblem() {
             //force the loadForRead so that the retry doesn't find an empty transaction
             int b = x;
 
-            return getThreadLocalTransaction().getConfig().preventWriteSkew();
+            return getThreadLocalTransaction().getConfig().allowWriteSkewProblem();
         }
 
-        @TransactionalMethod(preventWriteSkew = false)
-        public boolean updateNoDetectingMethod() {
+        @TransactionalMethod(allowWriteSkewProblem = false)
+        public boolean updateWithDisallowedWriteSkewProblem() {
             //force the loadForRead so that the retry doesn't find an empty transaction
             int b = x;
 
-            return getThreadLocalTransaction().getConfig().preventWriteSkew();
+            return getThreadLocalTransaction().getConfig().allowWriteSkewProblem();
         }
 
         @TransactionalMethod
@@ -105,7 +105,7 @@ public class TransactionalMethod_settingTest {
 
             Transaction tx = getThreadLocalTransaction();
 
-            return getThreadLocalTransaction().getConfig().preventWriteSkew();
+            return getThreadLocalTransaction().getConfig().allowWriteSkewProblem();
         }
     }
 

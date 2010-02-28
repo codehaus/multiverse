@@ -49,7 +49,7 @@ public class TinyUpdateAlphaTransaction_openForReadTest {
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount,
-                stmConfig.commitLockPolicy, true, optimalSize, false, true, true, false);
+                stmConfig.commitLockPolicy, true, optimalSize, true, true, true, false);
         return new TinyUpdateAlphaTransaction(config);
     }
 

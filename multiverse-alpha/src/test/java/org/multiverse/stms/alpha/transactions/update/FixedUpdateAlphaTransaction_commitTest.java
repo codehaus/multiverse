@@ -165,15 +165,15 @@ public class FixedUpdateAlphaTransaction_commitTest {
     }
 
     @Test
-    public void whenWriteSkewAndWriteDetectionDisabled_thenCommit() {
+    public void whenAllowWriteSkewProblem_thenCommit() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx1 = startSutTransactionWithPreventWriteSkew(10, false);
+        AlphaTransaction tx1 = startSutTransactionWithPreventWriteSkew(10, true);
         tx1.openForRead(ref1);
         ref2.inc(tx1);
 
-        AlphaTransaction tx2 = startSutTransactionWithPreventWriteSkew(10, false);
+        AlphaTransaction tx2 = startSutTransactionWithPreventWriteSkew(10, true);
         tx2.openForRead(ref2);
         ref1.inc(tx2);
 
@@ -185,15 +185,15 @@ public class FixedUpdateAlphaTransaction_commitTest {
     }
 
     @Test
-    public void whenWriteSkewAndDetectionEnabled_theWriteConflict() {
+    public void whenDisallowWriteSkewProblem_theWriteConflict() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx1 = startSutTransactionWithPreventWriteSkew(10, true);
+        AlphaTransaction tx1 = startSutTransactionWithPreventWriteSkew(10, false);
         tx1.openForRead(ref1);
         ref2.inc(tx1);
 
-        AlphaTransaction tx2 = startSutTransactionWithPreventWriteSkew(10, true);
+        AlphaTransaction tx2 = startSutTransactionWithPreventWriteSkew(10, false);
         tx2.openForRead(ref2);
         ref1.inc(tx2);
 

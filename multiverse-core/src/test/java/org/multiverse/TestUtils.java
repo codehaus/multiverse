@@ -141,7 +141,7 @@ public class TestUtils {
      * @return
      */
     public static int randomInt(int max) {
-        if (max == 0) {
+        if (max <= 0) {
             return 0;
         }
         return ThreadLocalRandom.current().nextInt(max);

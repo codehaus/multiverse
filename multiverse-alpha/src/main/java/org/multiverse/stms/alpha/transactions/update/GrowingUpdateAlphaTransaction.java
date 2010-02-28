@@ -35,11 +35,11 @@ public class GrowingUpdateAlphaTransaction
         public Config(
                 PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName,
                 ProfileRepository profiler, CommitLockPolicy commitLockPolicy, int maxRetryCount,
-                boolean preventWriteSkew, boolean interruptible, boolean optimizeConflictDetection, boolean dirtyCheck,
+                boolean allowWriteSkewProblem, boolean interruptible, boolean optimizeConflictDetection, boolean dirtyCheck,
                 boolean automaticReadTracking) {
 
             super(clock, backoffPolicy, familyName, false, maxRetryCount, interruptible, commitLockPolicy,
-                    profiler, preventWriteSkew, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
+                    profiler, allowWriteSkewProblem, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
         }
     }
 

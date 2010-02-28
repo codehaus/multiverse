@@ -37,11 +37,11 @@ public class GrowingUpdateAlphaTransaction_commitTest {
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
-                false, true, true, true, true);
+                true, true, true, true, true);
         return new GrowingUpdateAlphaTransaction(config);
     }
 
-    public GrowingUpdateAlphaTransaction startSutTransactionWithWriteSkewDetection(boolean preventWriteSkew) {
+    public GrowingUpdateAlphaTransaction startSutTransactionWithAllowingWriteSkewProblem(boolean allowWriteSkewProblem) {
         GrowingUpdateAlphaTransaction.Config config = new GrowingUpdateAlphaTransaction.Config(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
@@ -49,7 +49,7 @@ public class GrowingUpdateAlphaTransaction_commitTest {
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
-                preventWriteSkew, true, true, true, true);
+                allowWriteSkewProblem, true, true, true, true);
         return new GrowingUpdateAlphaTransaction(config);
     }
 
@@ -347,15 +347,15 @@ public class GrowingUpdateAlphaTransaction_commitTest {
     }
 
     @Test
-    public void whenWriteSkewAndWriteDetectionDisabled_thenCommit() {
+    public void whenAllowedWriteSkewProblem_thenCommit() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx1 = startSutTransactionWithWriteSkewDetection(false);
+        AlphaTransaction tx1 = startSutTransactionWithAllowingWriteSkewProblem(true);
         tx1.openForRead(ref1);
         ref2.inc(tx1);
 
-        AlphaTransaction tx2 = startSutTransactionWithWriteSkewDetection(false);
+        AlphaTransaction tx2 = startSutTransactionWithAllowingWriteSkewProblem(true);
         tx2.openForRead(ref2);
         ref1.inc(tx2);
 
@@ -367,15 +367,15 @@ public class GrowingUpdateAlphaTransaction_commitTest {
     }
 
     @Test
-    public void whenWriteSkewAndDetectionEnabled_theWriteConflict() {
+    public void whenDisallowedWriteSkewProblem_theWriteConflict() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx1 = startSutTransactionWithWriteSkewDetection(true);
+        AlphaTransaction tx1 = startSutTransactionWithAllowingWriteSkewProblem(false);
         tx1.openForRead(ref1);
         ref2.inc(tx1);
 
-        AlphaTransaction tx2 = startSutTransactionWithWriteSkewDetection(true);
+        AlphaTransaction tx2 = startSutTransactionWithAllowingWriteSkewProblem(false);
         tx2.openForRead(ref2);
         ref1.inc(tx2);
 

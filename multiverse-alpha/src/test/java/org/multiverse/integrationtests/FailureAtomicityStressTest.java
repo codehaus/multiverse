@@ -18,7 +18,7 @@ import static org.multiverse.TestUtils.startAll;
  * state is based on transactions that are eventually rolled back.
  * <p/>
  * There is a shared TransactionalInteger that is concurrently increased. Half of the transactions is going to be aborted
- * so with a writecount of x and a modifyThreadCount of y, the TransactionalInteger.get() will be x*y/2.
+ * so with a writecount of x and a modifyThreadCount of y, the TransactionalInteger.getClassMetadata() will be x*y/2.
  *
  * @author Peter Veentjer.
  */

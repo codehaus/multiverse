@@ -1,5 +1,9 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
+import org.multiverse.stms.alpha.instrumentation.metadata.ClassMetadata;
+import org.multiverse.stms.alpha.instrumentation.metadata.FieldMetadata;
+import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
+import org.multiverse.stms.alpha.instrumentation.metadata.MethodMetadata;
 import org.multiverse.transactional.DefaultTransactionalReference;
 import org.multiverse.transactional.primitives.*;
 import org.objectweb.asm.Opcodes;
@@ -14,42 +18,47 @@ import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.firstIndexA
 import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.isCategory2;
 import static org.objectweb.asm.Type.*;
 
-/**
- *
- */
 public class FieldGranularityTransformer implements Opcodes {
 
-    private final ClassNode originalClass;
-    private final MetadataRepository metadataRepository;
-    private final List<FieldNode> fieldsWithFieldGranularity;
+    private final ClassNode classNode;
+    private final ClassMetadata classMetadata;
+    private MetadataRepository metadataRepository;
 
-    public FieldGranularityTransformer(ClassNode originalClass) {
-        if (originalClass == null) {
+    public FieldGranularityTransformer(ClassNode classNode) {
+        if (classNode == null) {
             throw new RuntimeException();
         }
-        this.originalClass = originalClass;
-        this.metadataRepository = MetadataRepository.INSTANCE;
-        fieldsWithFieldGranularity = metadataRepository.getManagedInstanceFieldsWithFieldGranularity(originalClass);
 
+        this.classNode = classNode;
+        this.classMetadata = MetadataRepository.INSTANCE.getClassMetadata(classNode.name);
+        this.metadataRepository = MetadataRepository.INSTANCE;
     }
 
     public ClassNode transform() {
-        if (fieldsWithFieldGranularity.isEmpty()) {
-            return originalClass;
+        if (classMetadata == null || classMetadata.isIgnoredClass() || !classMetadata.hasFieldsWithFieldGranularity()) {
+            return classNode;
         }
 
         fixFields();
         fixFieldAccessInMethods();
         addInitializationLogicToConstructors();
-        return originalClass;
+        return classNode;
     }
 
     private void fixFieldAccessInMethods() {
-        for (MethodNode originalMethod : metadataRepository.getTransactionalMethods(originalClass)) {
-            MethodNode fixedMethod = fixMethod(originalMethod);
-            originalClass.methods.remove(originalMethod);
-            originalClass.methods.add(fixedMethod);
+        List<MethodNode> methods = new LinkedList<MethodNode>();
+
+        for (MethodNode methodNode : (List<MethodNode>) classNode.methods) {
+            MethodMetadata methodMetadata = classMetadata.getMethodMetadata(methodNode.name, methodNode.desc);
+
+            if (methodMetadata.isTransactional()) {
+                methodNode = fixMethod(methodNode);
+            }
+
+            methods.add(methodNode);
         }
+
+        classNode.methods = methods;
     }
 
     private MethodNode fixMethod(MethodNode originalMethod) {
@@ -76,14 +85,15 @@ public class FieldGranularityTransformer implements Opcodes {
         }
 
         List<LocalVariableNode> localVariableTable = new LinkedList<LocalVariableNode>();
-        for (LocalVariableNode original : (List<LocalVariableNode>) originalMethod.localVariables) {
+        for (LocalVariableNode localVariableNode : (List<LocalVariableNode>) originalMethod.localVariables) {
+
             LocalVariableNode cloned = new LocalVariableNode(
-                    original.name,
-                    original.desc,
-                    original.signature,
-                    cloneMap.get(original.start),
-                    cloneMap.get(original.end),
-                    original.index
+                    localVariableNode.name,
+                    localVariableNode.desc,
+                    localVariableNode.signature,
+                    cloneMap.get(localVariableNode.start),
+                    cloneMap.get(localVariableNode.end),
+                    localVariableNode.index
             );
             localVariableTable.add(cloned);
         }
@@ -96,12 +106,13 @@ public class FieldGranularityTransformer implements Opcodes {
         }
 
         List<TryCatchBlockNode> tryCatchBlocks = new LinkedList<TryCatchBlockNode>();
-        for (TryCatchBlockNode original : (List<TryCatchBlockNode>) originalMethod.tryCatchBlocks) {
+        for (TryCatchBlockNode tryCatchBlockNode : (List<TryCatchBlockNode>) originalMethod.tryCatchBlocks) {
+
             TryCatchBlockNode cloned = new TryCatchBlockNode(
-                    cloneMap.get(original.start),
-                    cloneMap.get(original.end),
-                    cloneMap.get(original.handler),
-                    original.type
+                    cloneMap.get(tryCatchBlockNode.start),
+                    cloneMap.get(tryCatchBlockNode.end),
+                    cloneMap.get(tryCatchBlockNode.handler),
+                    tryCatchBlockNode.type
             );
 
             tryCatchBlocks.add(cloned);
@@ -117,7 +128,10 @@ public class FieldGranularityTransformer implements Opcodes {
             switch (originalInsn.getOpcode()) {
                 case PUTFIELD: {
                     FieldInsnNode fieldInsn = (FieldInsnNode) originalInsn;
-                    if (metadataRepository.isManagedInstanceFieldWithFieldGranularity(fieldInsn.owner, fieldInsn.name)) {
+                    ClassMetadata ownerMetadata = metadataRepository.getClassMetadata(fieldInsn.owner);
+                    FieldMetadata fieldMetadata = ownerMetadata.getFieldMetadata(fieldInsn.name);
+
+                    if (fieldMetadata.hasFieldGranularity()) {
                         Type originalFieldType = getType(fieldInsn.desc);
                         boolean fieldIsCategory2 = isCategory2(fieldInsn.desc);
                         if (fieldIsCategory2) {
@@ -188,7 +202,8 @@ public class FieldGranularityTransformer implements Opcodes {
                 break;
                 case GETFIELD: {
                     FieldInsnNode fieldInsn = (FieldInsnNode) originalInsn;
-                    if (metadataRepository.isManagedInstanceFieldWithFieldGranularity(fieldInsn.owner, fieldInsn.name)) {
+                    FieldMetadata fieldMetadata = metadataRepository.getClassMetadata(fieldInsn.owner).getFieldMetadata(fieldInsn.name);
+                    if (fieldMetadata.hasFieldGranularity()) {
                         Class refClass = findReferenceClass(fieldInsn.desc);
 
                         instructions.add(new FieldInsnNode(
@@ -233,54 +248,70 @@ public class FieldGranularityTransformer implements Opcodes {
     }
 
     private void addInitializationLogicToConstructors() {
-        if (fieldsWithFieldGranularity.isEmpty()) {
+        if (!classMetadata.hasFieldsWithFieldGranularity()) {
             return;
         }
 
-        for (MethodNode methodNode : metadataRepository.getTransactionalMethods(originalClass)) {
-            if (methodNode.name.equals("<init>")) {
-                int firstAfterSuper = firstIndexAfterSuper(methodNode, originalClass.superName);
+        for (MethodNode methodNode : (List<MethodNode>) classNode.methods) {
+            MethodMetadata methodMetadata = classMetadata.getMethodMetadata(methodNode.name, methodNode.desc);
+
+            if (methodMetadata.isTransactional() && methodMetadata.isConstructor()) {
+                int firstAfterSuper = firstIndexAfterSuper(methodNode, classNode.superName);
 
                 if (firstAfterSuper >= 0) {
                     InsnList extraInstructions = new InsnList();
-                    for (FieldNode originalField : fieldsWithFieldGranularity) {
-                        extraInstructions.add(new VarInsnNode(ALOAD, 0));
+                    for (FieldNode fieldNode : (List<FieldNode>) classNode.fields) {
+                        FieldMetadata fieldMetadata = classMetadata.getFieldMetadata(fieldNode.name);
 
-                        Class referenceClass = findReferenceClass(originalField.desc);
-                        extraInstructions.add(new TypeInsnNode(NEW, getInternalName(referenceClass)));
-                        extraInstructions.add(new InsnNode(DUP));
+                        if (fieldMetadata.hasFieldGranularity()) {
+                            extraInstructions.add(new VarInsnNode(ALOAD, 0));
 
-                        String owner = getInternalName(referenceClass);
-                        extraInstructions.add(new MethodInsnNode(INVOKESPECIAL, owner, "<init>", "()V"));
+                            Class referenceClass = findReferenceClass(fieldMetadata.getDesc());
+                            extraInstructions.add(new TypeInsnNode(NEW, getInternalName(referenceClass)));
+                            extraInstructions.add(new InsnNode(DUP));
 
-                        extraInstructions.add(new FieldInsnNode(
-                                PUTFIELD,
-                                originalClass.name,
-                                originalField.name,
-                                Type.getDescriptor(referenceClass)));
+                            String owner = getInternalName(referenceClass);
+                            extraInstructions.add(new MethodInsnNode(INVOKESPECIAL, owner, "<init>", "()V"));
+
+
+                            String d = Type.getDescriptor(referenceClass);
+                            extraInstructions.add(new FieldInsnNode(
+                                    PUTFIELD,
+                                    classNode.name,
+                                    fieldNode.name,
+                                    Type.getDescriptor(referenceClass)));
+                        }
+
+                        AbstractInsnNode first = methodNode.instructions.get(firstAfterSuper);
+                        methodNode.instructions.insert(first, extraInstructions);
                     }
-
-                    AbstractInsnNode first = methodNode.instructions.get(firstAfterSuper);
-                    methodNode.instructions.insert(first, extraInstructions);
                 }
             }
         }
     }
 
     private void fixFields() {
-        for (FieldNode originalField : fieldsWithFieldGranularity) {
-            Class referenceClass = findReferenceClass(originalField.desc);
+        List<FieldNode> fields = new LinkedList<FieldNode>();
+        //todo: concurrent modification error here.
+        for (FieldNode fieldNode : (List<FieldNode>) classNode.fields) {
+            FieldMetadata fieldMetadata = classMetadata.getFieldMetadata(fieldNode.name);
+            if (fieldMetadata.hasFieldGranularity()) {
+                Class referenceClass = findReferenceClass(fieldNode.desc);
 
-            //todo: should not select public automatically
-            FieldNode fixedField = new FieldNode(
-                    ACC_SYNTHETIC + ACC_FINAL + ACC_PUBLIC,
-                    originalField.name,
-                    getDescriptor(referenceClass), null, null
-            );
+                //todo: should not select public automatically
+                FieldNode fixedFieldNode = new FieldNode(
+                        ACC_SYNTHETIC + ACC_FINAL + ACC_PUBLIC,
+                        fieldNode.name,
+                        getDescriptor(referenceClass), null, null
+                );
 
-            originalClass.fields.remove(originalField);
-            originalClass.fields.add(fixedField);
+                fields.add(fixedFieldNode);
+            } else {
+                fields.add(fieldNode);
+            }
         }
+
+        classNode.fields = fields;
     }
 
     /**

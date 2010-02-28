@@ -43,7 +43,7 @@ public class GrowingUpdateAlphaTransaction_openForReadTest {
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
-                false,
+                true,
                 true, true, true, true);
         return new GrowingUpdateAlphaTransaction(config);
     }
@@ -56,7 +56,7 @@ public class GrowingUpdateAlphaTransaction_openForReadTest {
                 stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
-                false,
+                true,
                 true, true, true, false);
         return new GrowingUpdateAlphaTransaction(config);
     }

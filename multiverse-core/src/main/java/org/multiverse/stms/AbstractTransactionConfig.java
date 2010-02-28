@@ -22,7 +22,7 @@ public class AbstractTransactionConfig implements TransactionConfig {
     public final boolean readOnly;
     public final int maxRetryCount;
     public final boolean interruptible;
-    public final boolean preventWriteSkew;
+    public final boolean allowWriteSkewProblem;
     public final boolean automaticReadTracking;
 
     /**
@@ -34,7 +34,7 @@ public class AbstractTransactionConfig implements TransactionConfig {
 
     public AbstractTransactionConfig(
             PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName, boolean readOnly,
-            int maxRetryCount, boolean interruptible, boolean preventWriteSkew, boolean automaticReadTracking) {
+            int maxRetryCount, boolean interruptible, boolean allowWriteSkewProblem, boolean automaticReadTracking) {
         if (clock == null) {
             throw new NullPointerException();
         }
@@ -50,11 +50,11 @@ public class AbstractTransactionConfig implements TransactionConfig {
         this.maxRetryCount = maxRetryCount;
         this.interruptible = interruptible;
         this.automaticReadTracking = automaticReadTracking;
-        this.preventWriteSkew = preventWriteSkew;
+        this.allowWriteSkewProblem = allowWriteSkewProblem;
 
-        if (!readOnly && !automaticReadTracking && preventWriteSkew) {
-            throw new IllegalArgumentException("It isn't allowed to have a update transaction with preventWriteSkew " +
-                    "enabled and automaticReadTracking disabled. The last is needed to do the first.");
+        if (!readOnly && !automaticReadTracking && !allowWriteSkewProblem) {
+            throw new IllegalArgumentException("It isn't allowed to have a update transaction with allowWriteSkewProblem " +
+                    "disabled and automaticReadTracking disabled. The last is needed to do the first.");
         }
     }
 
@@ -79,8 +79,8 @@ public class AbstractTransactionConfig implements TransactionConfig {
     }
 
     @Override
-    public boolean preventWriteSkew() {
-        return preventWriteSkew;
+    public boolean allowWriteSkewProblem() {
+        return allowWriteSkewProblem;
     }
 
     @Override

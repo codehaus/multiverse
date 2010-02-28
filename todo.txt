@@ -2,6 +2,8 @@
 todo engine
 ---------------------------------------------------------------
 
+- make sure that all the transformers stop modifying the original class node but return new ones instead
+
 - big zip of the project for easy download
 
 - big zip of the project should be added to the downloads of the site

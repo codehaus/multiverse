@@ -37,7 +37,7 @@ public class TinyUpdateAlphaTransaction_commitTest {
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount,
-                stmConfig.commitLockPolicy, true, optimalSize, false, true, true, true);
+                stmConfig.commitLockPolicy, true, optimalSize, true, true, true, true);
         return new TinyUpdateAlphaTransaction(config);
     }
 

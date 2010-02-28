@@ -31,8 +31,6 @@ public class TransactionalObject_SubclassTest {
 
         B.class.toString();
 
-        MetadataRepository repo = MetadataRepository.INSTANCE;
-
         B b = new B();
 
         assertTrue(b instanceof AlphaTransactionalObject);

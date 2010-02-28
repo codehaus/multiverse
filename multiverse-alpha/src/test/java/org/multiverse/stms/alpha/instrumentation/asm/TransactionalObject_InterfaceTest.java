@@ -5,6 +5,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
+import org.multiverse.stms.alpha.instrumentation.metadata.ClassMetadata;
+import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
 import org.multiverse.utils.instrumentation.InstrumentationProblemMonitor;
 import org.objectweb.asm.Type;
 
@@ -32,9 +34,9 @@ public class TransactionalObject_InterfaceTest {
         Class clazz = TransactionalInterface.class;
 
         String internalName = Type.getInternalName(clazz);
-
-        assertTrue(repository.isTransactionalObject(internalName));
-        assertFalse(repository.isRealTransactionalObject(internalName));
+        ClassMetadata classMetadata = repository.getClassMetadata(internalName);
+        assertTrue(classMetadata.isTransactionalObject());
+        assertFalse(classMetadata.isRealTransactionalObject());
 
         clazz.getMethod("someMethod");
     }
@@ -49,9 +51,10 @@ public class TransactionalObject_InterfaceTest {
         Class clazz = ExtendingInterface.class;
 
         String internalName = Type.getInternalName(clazz);
+        ClassMetadata classMetadata = repository.getClassMetadata(internalName);
 
-        assertTrue(repository.isTransactionalObject(internalName));
-        assertFalse(repository.isRealTransactionalObject(internalName));
+        assertTrue(classMetadata.isTransactionalObject());
+        assertFalse(classMetadata.isRealTransactionalObject());
     }
 
     interface ExtendingInterface extends TransactionalInterface {

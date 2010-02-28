@@ -26,7 +26,6 @@ import org.multiverse.utils.profiling.SimpleProfileRepository;
  * @author Peter Veentjer.
  */
 public final class AlphaStmConfig {
-
     public static AlphaStmConfig createDebugConfig() {
         AlphaStmConfig config = new AlphaStmConfig();
         config.smartTxImplementationChoice = false;
@@ -65,6 +64,9 @@ public final class AlphaStmConfig {
 
     public boolean dirtyCheck = true;
 
+    public boolean interruptible = false;
+
+
     /**
      * Check if the AlphaStmConfig has been configured correctly.
      *
@@ -89,6 +91,10 @@ public final class AlphaStmConfig {
 
         if (maxFixedUpdateSize < 0) {
             throw new IllegalStateException("Invalid configuration, fixedLengthMaximumSize can't be smaller than 0");
+        }
+
+        if (maxRetryCount < 0) {
+            throw new IllegalStateException("Invalid configuration, defaultMaxRetryCount can't be smaller than 0");
         }
     }
 }

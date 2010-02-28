@@ -32,8 +32,6 @@ public class ManualRefPerformanceStressTest {
         stm = (AlphaStm) getGlobalStmInstance();
         txFactory = stm.getTransactionFactoryBuilder()
                 .setFamilyName("sometransaction")
-                .setReadonly(false)
-                .setAutomaticReadTracking(true)
                 .build();
     }
 

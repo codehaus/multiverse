@@ -19,7 +19,7 @@ public class TransactionalLinkedList_getTest {
         setThreadLocalTransaction(null);
     }
 
-    // ============ get(int) ================================
+    // ============ getClassMetadata(int) ================================
 
     @Test
     public void getTooSmallIndex() {

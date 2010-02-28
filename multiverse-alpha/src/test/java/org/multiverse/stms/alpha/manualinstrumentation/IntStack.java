@@ -63,7 +63,7 @@ public final class IntStack extends DefaultTxObjectMixin {
     public final static TransactionFactory popTxFactory = GlobalStmInstance.getGlobalStmInstance().getTransactionFactoryBuilder().
             setReadonly(false).
             setSmartTxLengthSelector(true).
-            setPreventWriteSkew(false).
+            setAllowWriteSkewProblem(true).
             setFamilyName("IntStack.pop()").
             setAutomaticReadTracking(true).build();
 
@@ -92,7 +92,7 @@ public final class IntStack extends DefaultTxObjectMixin {
     public final static TransactionFactory pushTxFactory = GlobalStmInstance.getGlobalStmInstance().getTransactionFactoryBuilder().
             setReadonly(false).
             setSmartTxLengthSelector(true).
-            setPreventWriteSkew(false).
+            setAllowWriteSkewProblem(true).
             setFamilyName("IntStack.push()").
             setAutomaticReadTracking(false).build();
 

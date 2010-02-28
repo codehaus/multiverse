@@ -245,7 +245,7 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
             writeVersion = config.clock.tick();
             //it could be that a different transaction also reached this part, so we need to make sure
             hasConflict = writeVersion != getReadVersion() + 1;
-        } else if (config.preventWriteSkew) {
+        } else if (!config.allowWriteSkewProblem) {
             writeVersion = config.clock.strictTick();
             hasConflict = hasReadConflict();
         } else {

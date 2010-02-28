@@ -6,6 +6,7 @@ import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.TransactionFactoryBuilder;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
+import org.multiverse.stms.alpha.instrumentation.metadata.*;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -36,22 +37,72 @@ import static org.objectweb.asm.Type.*;
  */
 public class TransactionalMethodTransformer implements Opcodes {
 
-    private final ClassNode originalClass;
+    private final ClassNode classNode;
     private final MetadataRepository metadataRepository;
     private final ClassNode donorClass;
     private final MethodNode donorMethod;
     private final MethodNode donorConstructor;
-    private final boolean isRealTransactionalObject;
     private final String tranlocalName;
+    private final ClassMetadata classMetadata;
 
-    public TransactionalMethodTransformer(ClassNode classNode, ClassNode donorClass) {
-        this.originalClass = classNode;
+    public TransactionalMethodTransformer(ClassNode classNode, ClassNode donorClassNode) {
         this.metadataRepository = MetadataRepository.INSTANCE;
-        this.donorClass = donorClass;
-        this.tranlocalName = metadataRepository.getTranlocalName(classNode);
+        this.classNode = classNode;
+        this.classMetadata = metadataRepository.getClassMetadata(classNode.name);
+        this.donorClass = donorClassNode;
+        this.tranlocalName = classMetadata.getTranlocalName();
         this.donorMethod = getDonorMethod("donorMethod");
         this.donorConstructor = getDonorMethod("donorConstructor");
-        this.isRealTransactionalObject = metadataRepository.isRealTransactionalObject(classNode.name);
+    }
+
+    public ClassNode transform() {
+        if (classMetadata.isIgnoredClass() || !classMetadata.hasTransactionalMethods() || classMetadata.isInterface()) {
+            return null;
+        }
+
+        MethodNode staticInitializer = findStaticInitializer();
+        if (staticInitializer == null) {
+            staticInitializer = new MethodNode(ACC_STATIC, "<clinit>", "()V", null, new String[]{});
+            staticInitializer.instructions.add(new InsnNode(RETURN));
+            classNode.methods.add(staticInitializer);
+        }
+
+        List<MethodNode> methods = new LinkedList<MethodNode>();
+        for (MethodNode methodNode : (List<MethodNode>) classNode.methods) {
+            MethodMetadata methodMetadata = classMetadata.getMethodMetadata(methodNode.name, methodNode.desc);
+            if (methodMetadata == null || !methodMetadata.isTransactional()) {
+                methods.add(methodNode);
+            } else {
+                if (methodNode.name.equals("<clinit>")) {
+                    //todo: improve exception
+                    throw new RuntimeException();
+                }
+
+                MethodNode donor = getDonor(methodNode);
+                if (!isAbstract(methodNode)) {
+                    TransactionMetadata params = methodMetadata.getTransactionalMetadata();
+
+                    //txFactoryField is used to create the transaction fot this methodNode
+                    FieldNode txFactoryField = createTxFactoryField();
+                    classNode.fields.add(txFactoryField);
+
+                    //add the txFactory initialization code to the front of the static initializer.
+                    InsnList insnList = codeForTxFactoryInitialization(params, txFactoryField);
+                    staticInitializer.instructions.insert(insnList);
+
+                    //create the coordinating method (the method that does the tx management)
+                    MethodNode coordinatingMethod = createCoordinatorMethod(methodNode, donor, txFactoryField, params);
+                    methods.add(coordinatingMethod);
+
+                    //creat the lift method (method that contains the 'original' logic).
+                    MethodNode liftMethod = createLiftMethod(methodNode);
+                    methods.add(liftMethod);
+                }
+            }
+        }
+
+        classNode.methods = methods;
+        return classNode;
     }
 
     private MethodNode getDonorMethod(String methodName) {
@@ -65,59 +116,13 @@ public class TransactionalMethodTransformer implements Opcodes {
     }
 
     private MethodNode findStaticInitializer() {
-        for (MethodNode method : (List<MethodNode>) originalClass.methods) {
+        for (MethodNode method : (List<MethodNode>) classNode.methods) {
             if (method.name.equals("<clinit>")) {
                 return method;
             }
         }
 
         return null;
-    }
-
-    public ClassNode transform() {
-        if (!metadataRepository.hasTransactionalMethods(originalClass)) {
-            return null;
-        }
-
-        MethodNode staticInitializer = findStaticInitializer();
-        if (staticInitializer == null) {
-            staticInitializer = new MethodNode(ACC_STATIC, "<clinit>", "()V", null, new String[]{});
-            staticInitializer.instructions.add(new InsnNode(RETURN));
-            originalClass.methods.add(staticInitializer);
-        }
-
-        for (MethodNode originalMethod : metadataRepository.getTransactionalMethods(originalClass)) {
-            if (originalMethod.name.equals("<clinit>")) {
-                //todo: improve exception
-                throw new RuntimeException();
-            }
-
-            MethodNode donor = getDonor(originalMethod);
-            if (!isAbstract(originalMethod)) {
-                originalClass.methods.remove(originalMethod);
-
-                TransactionalMethodParams params = metadataRepository.getTransactionalMethodParams(originalClass,
-                        originalMethod);
-
-                //txFactoryField is used to create the transaction fot this originalMethod
-                FieldNode txFactoryField = createTxFactoryField();
-                originalClass.fields.add(txFactoryField);
-
-                //add the txFactory initialization code to the front of the static initializer.
-                InsnList insnList = codeForTxFactoryInitialization(params, txFactoryField);
-                staticInitializer.instructions.insert(insnList);
-
-                //create the coordinating method (the method that does the tx management)
-                MethodNode coordinatingMethod = createCoordinatorMethod(originalMethod, donor, txFactoryField, params);
-                originalClass.methods.add(coordinatingMethod);
-
-                //creat the lift method (method that contains the 'original' logic).
-                MethodNode liftMethod = createLiftMethod(originalMethod);
-                originalClass.methods.add(liftMethod);
-            }
-        }
-
-        return originalClass;
     }
 
     private MethodNode getDonor(MethodNode originalTxMethod) {
@@ -144,17 +149,17 @@ public class TransactionalMethodTransformer implements Opcodes {
         return new FieldNode(access, name, desc, sig, value);
     }
 
-    private InsnList codeForTxFactoryInitialization(TransactionalMethodParams params, FieldNode txFactoryField) {
+    private InsnList codeForTxFactoryInitialization(TransactionMetadata params, FieldNode txFactoryField) {
         InsnList insnList = new InsnList();
 
-        //lets get the stm instance from the GlobalStmInstance
+        //lets getClassMetadata the stm instance from the GlobalStmInstance
         insnList.add(new MethodInsnNode(
                 INVOKESTATIC,
                 Type.getInternalName(GlobalStmInstance.class),
                 "getGlobalStmInstance",
                 "()" + Type.getDescriptor(Stm.class)));
 
-        //lets get the transactionFactoryBuilder from the stm.
+        //lets getClassMetadata the transactionFactoryBuilder from the stm.
         insnList.add(new MethodInsnNode(
                 INVOKEINTERFACE,
                 Type.getInternalName(Stm.class),
@@ -193,12 +198,12 @@ public class TransactionalMethodTransformer implements Opcodes {
                 "setInterruptible",
                 "(Z)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
 
-        //preventWriteSkew
-        insnList.add(new InsnNode(params.preventWriteSkew ? ICONST_1 : ICONST_0));
+        //allowWriteSkewProblem
+        insnList.add(new InsnNode(params.allowWriteSkewProblem ? ICONST_1 : ICONST_0));
         insnList.add(new MethodInsnNode(
                 INVOKEINTERFACE,
                 Type.getInternalName(TransactionFactoryBuilder.class),
-                "setPreventWriteSkew",
+                "setAllowWriteSkewProblem",
                 "(Z)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
 
         //smartTxLength.
@@ -227,7 +232,7 @@ public class TransactionalMethodTransformer implements Opcodes {
         //and store it in the txFactoryField
         insnList.add(new FieldInsnNode(
                 PUTSTATIC,
-                originalClass.name,
+                classNode.name,
                 txFactoryField.name,
                 Type.getDescriptor(TransactionFactory.class)));
 
@@ -237,7 +242,7 @@ public class TransactionalMethodTransformer implements Opcodes {
 
     /**
      * Creates a method that lifts on an already existing transaction and is going to contains the actual logic. The
-     * Transaction will be passed as extra argument to the method, so the method will get a different signature. The
+     * Transaction will be passed as extra argument to the method, so the method will getClassMetadata a different signature. The
      * transaction will be passed as the first argument, shifting all others one to the left.
      * <p/>
      * A new methodNode will be returned, originalMethod remains untouched.
@@ -255,7 +260,7 @@ public class TransactionalMethodTransformer implements Opcodes {
         //todo: synthetic needs to be added
 
         //introduce the transaction arg
-        result.desc = getLiftMethodDesc(originalClass.name, originalMethod);
+        result.desc = getLiftMethodDesc(classNode.name, originalMethod);
 
         result.signature = originalMethod.signature;
         result.exceptions = originalMethod.exceptions;
@@ -277,14 +282,14 @@ public class TransactionalMethodTransformer implements Opcodes {
         return result;
     }
 
-    private InsnList createLiftMethodInstructions(MethodNode originalMethod, CloneMap cloneMap,
+    private InsnList createLiftMethodInstructions(MethodNode methodNode, CloneMap cloneMap,
                                                   DebugInfo debugInfo, LabelNode startLabelNode, LabelNode endLabelNode) {
 
         InsnList instructions = new InsnList();
         instructions.add(startLabelNode);
         instructions.add(new LineNumberNode(debugInfo.beginLine, startLabelNode));
-        for (int k = 0; k < originalMethod.instructions.size(); k++) {
-            AbstractInsnNode originalInsn = originalMethod.instructions.get(k);
+        for (int k = 0; k < methodNode.instructions.size(); k++) {
+            AbstractInsnNode originalInsn = methodNode.instructions.get(k);
             AbstractInsnNode clonedInsn = null;
             switch (originalInsn.getOpcode()) {
                 case -1:
@@ -298,10 +303,8 @@ public class TransactionalMethodTransformer implements Opcodes {
                     //fall through
                 case INVOKESTATIC: {
                     MethodInsnNode methodInsn = (MethodInsnNode) originalInsn;
-                    boolean transactionalMethod = metadataRepository.isTransactionalMethod(
-                            methodInsn.owner, methodInsn.name, methodInsn.desc);
-
-                    if (transactionalMethod) {
+                    MethodMetadata methodMetadata = metadataRepository.getMethodMetadata(methodInsn.owner, methodInsn.name, methodInsn.desc);
+                    if (false && methodMetadata.isTransactional()) {
                         //if it is a transactional method, instead of calling the coordinating version,
                         //jump directly to the lifting version. This can be done by selecting the
                         //lifting method signature and add the transaction + optional tranlocal on the stack.
@@ -309,7 +312,7 @@ public class TransactionalMethodTransformer implements Opcodes {
                         boolean isStaticMethod = originalInsn.getOpcode() == INVOKESTATIC;
 
                         //add the transaction
-                        int transactionVar = getLiftMethodTransactionVar(originalMethod);
+                        int transactionVar = getLiftMethodTransactionVar(methodNode);
                         instructions.add(new VarInsnNode(ALOAD, transactionVar));
 
                         int tranlocalVarIndex = getLiftMethodTranlocalVar(
@@ -333,9 +336,11 @@ public class TransactionalMethodTransformer implements Opcodes {
                 break;
                 case PUTFIELD: {
                     FieldInsnNode fieldInsn = (FieldInsnNode) originalInsn;
+                    ClassMetadata ownerMetadata = metadataRepository.getClassMetadata(fieldInsn.owner);
+                    FieldMetadata fieldMetadata = ownerMetadata.getFieldMetadata(fieldInsn.name);
 
-                    if (metadataRepository.isManagedInstanceField(fieldInsn.owner, fieldInsn.name)) {
-                        AbstractInsnNode previous = (AbstractInsnNode) originalMethod.instructions.get(k - 1);
+                    if (fieldMetadata.isManagedField()) {
+                        AbstractInsnNode previous = methodNode.instructions.get(k - 1);
 
                         if (isCategory2(fieldInsn.desc)) {
                             //value(category2), owner(txobject),..
@@ -351,8 +356,9 @@ public class TransactionalMethodTransformer implements Opcodes {
                             //[owner(txobject), value(category1),..
                         }
 
-                        if (isTranlocalAvailable(originalMethod, previous) && false) {
-                            int tranlocalVar = getLiftMethodTranlocalVar(originalClass.name, originalMethod);
+                        //todo: what is this about.
+                        if (isTranlocalAvailable(methodNode, previous) && false) {
+                            int tranlocalVar = getLiftMethodTranlocalVar(classNode.name, methodNode);
 
                             instructions.add(new VarInsnNode(ALOAD, tranlocalVar));
 
@@ -362,7 +368,7 @@ public class TransactionalMethodTransformer implements Opcodes {
                             //        INVOKEVIRTUAL,
                             //));                                                        
                         } else {
-                            instructions.add(new VarInsnNode(ALOAD, getLiftMethodTransactionVar(originalMethod)));
+                            instructions.add(new VarInsnNode(ALOAD, getLiftMethodTransactionVar(methodNode)));
 
                             instructions.add(new InsnNode(SWAP));
 
@@ -372,10 +378,7 @@ public class TransactionalMethodTransformer implements Opcodes {
                                     "openForWrite",
                                     format("(%s)%s", getDescriptor(AlphaTransactionalObject.class), getDescriptor(AlphaTranlocal.class))));
 
-                            String tranlocalName = metadataRepository.getTranlocalName(fieldInsn.owner);
-
-                            instructions.add(new TypeInsnNode(CHECKCAST, tranlocalName));
-
+                            instructions.add(new TypeInsnNode(CHECKCAST, ownerMetadata.getTranlocalName()));
                             //if(isTranlocalAvailable())
                         }
 
@@ -393,8 +396,8 @@ public class TransactionalMethodTransformer implements Opcodes {
                             //[owner(txobject), value(category1),..
                         }
 
-                        String tranlocalName = metadataRepository.getTranlocalName(fieldInsn.owner);
-                        clonedInsn = new FieldInsnNode(PUTFIELD, tranlocalName, fieldInsn.name, fieldInsn.desc);
+
+                        clonedInsn = new FieldInsnNode(PUTFIELD, ownerMetadata.getTranlocalName(), fieldInsn.name, fieldInsn.desc);
                     } else {
                         clonedInsn = originalInsn.clone(cloneMap);
                     }
@@ -402,19 +405,21 @@ public class TransactionalMethodTransformer implements Opcodes {
                 break;
                 case GETFIELD: {
                     FieldInsnNode fieldInsn = (FieldInsnNode) originalInsn;
+                    ClassMetadata ownerMetadata = metadataRepository.getClassMetadata(fieldInsn.owner);
+                    FieldMetadata fieldMetadata = ownerMetadata.getFieldMetadata(fieldInsn.name);
 
-                    if (metadataRepository.isManagedInstanceField(fieldInsn.owner, fieldInsn.name)) {
-                        AbstractInsnNode previous = (AbstractInsnNode) originalMethod.instructions.get(k - 1);
+                    if (fieldMetadata.isManagedField()) {
+                        AbstractInsnNode previous = (AbstractInsnNode) methodNode.instructions.get(k - 1);
 
-                        if (isTranlocalAvailable(originalMethod, previous) && false) {
+                        if (isTranlocalAvailable(methodNode, previous) && false) {
                             //the original target can be popped from the stack.
                             instructions.add(new InsnNode(POP));
 
                             //load the tranlocal
-                            int tranlocalIndex = getLiftMethodTranlocalVar(originalClass.name, originalMethod);
+                            int tranlocalIndex = getLiftMethodTranlocalVar(classNode.name, methodNode);
                             instructions.add(new VarInsnNode(ALOAD, tranlocalIndex));
                         } else {
-                            instructions.add(new VarInsnNode(ALOAD, getLiftMethodTransactionVar(originalMethod)));
+                            instructions.add(new VarInsnNode(ALOAD, getLiftMethodTransactionVar(methodNode)));
 
                             instructions.add(new InsnNode(SWAP));
 
@@ -424,12 +429,10 @@ public class TransactionalMethodTransformer implements Opcodes {
                                     "openForRead",
                                     format("(%s)%s", getDescriptor(AlphaTransactionalObject.class), getDescriptor(AlphaTranlocal.class))));
 
-                            String tranlocalName = metadataRepository.getTranlocalName(fieldInsn.owner);
-                            instructions.add(new TypeInsnNode(CHECKCAST, tranlocalName));
+                            instructions.add(new TypeInsnNode(CHECKCAST, ownerMetadata.getTranlocalName()));
                         }
 
-                        String tranlocalName = metadataRepository.getTranlocalName(fieldInsn.owner);
-                        instructions.add(new FieldInsnNode(GETFIELD, tranlocalName, fieldInsn.name, fieldInsn.desc));
+                        instructions.add(new FieldInsnNode(GETFIELD, ownerMetadata.getTranlocalName(), fieldInsn.name, fieldInsn.desc));
                     } else {
                         clonedInsn = originalInsn.clone(cloneMap);
                     }
@@ -437,7 +440,7 @@ public class TransactionalMethodTransformer implements Opcodes {
                 break;
                 case IINC: {
                     IincInsnNode originalIncInsn = (IincInsnNode) originalInsn;
-                    int newPos = getLiftMethodLocalVarIndex(originalClass.name, originalMethod, originalIncInsn.var);
+                    int newPos = getLiftMethodLocalVarIndex(classNode.name, methodNode, originalIncInsn.var);
                     clonedInsn = new IincInsnNode(newPos, originalIncInsn.incr);
                 }
                 break;
@@ -452,7 +455,7 @@ public class TransactionalMethodTransformer implements Opcodes {
                 case DSTORE:
                 case ASTORE: {
                     VarInsnNode originalVarNode = (VarInsnNode) originalInsn;
-                    int newPos = getLiftMethodLocalVarIndex(originalClass.name, originalMethod, originalVarNode.var);
+                    int newPos = getLiftMethodLocalVarIndex(classNode.name, methodNode, originalVarNode.var);
                     clonedInsn = new VarInsnNode(originalInsn.getOpcode(), newPos);
                 }
                 break;
@@ -467,13 +470,13 @@ public class TransactionalMethodTransformer implements Opcodes {
         }
 
         //if it a init of a transactional object, we need to make sure that the openForWrite is called
-        if (originalMethod.name.equals("<init>") && isRealTransactionalObject) {
-            int indexOfFirst = firstIndexAfterSuper(originalMethod.name, instructions, originalClass.superName);
+        if (methodNode.name.equals("<init>") && classMetadata.isRealTransactionalObject()) {
+            int indexOfFirst = firstIndexAfterSuper(methodNode.name, instructions, classNode.superName);
 
             if (indexOfFirst >= 0) {
                 InsnList initTranlocal = new InsnList();
 
-                initTranlocal.add(new VarInsnNode(ALOAD, getLiftMethodTransactionVar(originalMethod)));
+                initTranlocal.add(new VarInsnNode(ALOAD, getLiftMethodTransactionVar(methodNode)));
 
                 initTranlocal.add(new VarInsnNode(ALOAD, 0));
 
@@ -501,7 +504,7 @@ public class TransactionalMethodTransformer implements Opcodes {
     }
 
     private boolean isTranlocalAvailable(MethodNode originalMethod, AbstractInsnNode previous) {
-        if (getLiftMethodTranlocalVar(originalClass.name, originalMethod) >= 0) {
+        if (getLiftMethodTranlocalVar(classNode.name, originalMethod) >= 0) {
             if (previous instanceof VarInsnNode) {
                 VarInsnNode varInsn = (VarInsnNode) previous;
                 if (varInsn.getOpcode() == ALOAD && varInsn.var == 0) {
@@ -544,7 +547,7 @@ public class TransactionalMethodTransformer implements Opcodes {
         result.add(transactionVar);
 
         //introduce the tranlocal if needed
-        int tranlocalVarIndex = getLiftMethodTranlocalVar(originalClass.name, originalMethod);
+        int tranlocalVarIndex = getLiftMethodTranlocalVar(classNode.name, originalMethod);
         if (tranlocalVarIndex >= 0) {
             LocalVariableNode tranlocalVar = new LocalVariableNode(
                     "tranlocalThis",
@@ -558,7 +561,7 @@ public class TransactionalMethodTransformer implements Opcodes {
 
         //copy all the rest of the local variables.
         for (LocalVariableNode originalLocalVar : (List<LocalVariableNode>) originalMethod.localVariables) {
-            int clonedVarIndex = getLiftMethodLocalVarIndex(originalClass.name, originalMethod, originalLocalVar.index);
+            int clonedVarIndex = getLiftMethodLocalVarIndex(classNode.name, originalMethod, originalLocalVar.index);
             LocalVariableNode clonedLocalVar = new LocalVariableNode(
                     originalLocalVar.name,
                     originalLocalVar.desc,
@@ -623,7 +626,7 @@ public class TransactionalMethodTransformer implements Opcodes {
      * @return the coordinating method.
      */
     public MethodNode createCoordinatorMethod(MethodNode originalMethod, MethodNode donorMethod,
-                                              FieldNode txFactoryField, TransactionalMethodParams params) {
+                                              FieldNode txFactoryField, TransactionMetadata params) {
 
         if (params.interruptible) {
             ensureInterruptibleExceptionCanBeThrown(originalMethod);
@@ -660,8 +663,8 @@ public class TransactionalMethodTransformer implements Opcodes {
 
 
         //at the moment the start end endscope are harvested from the original instructions.
-        //LabelNode startScope = cloneMap.get(originalMethod.instructions.getFirst());
-        //LabelNode endScope = cloneMap.get(originalMethod.instructions.getLast());
+        //LabelNode startScope = cloneMap.getClassMetadata(originalMethod.instructions.getFirst());
+        //LabelNode endScope = cloneMap.getClassMetadata(originalMethod.instructions.getLast());
         LabelNode startScope = new LabelNode();
         LabelNode endScope = new LabelNode();
 
@@ -777,7 +780,7 @@ public class TransactionalMethodTransformer implements Opcodes {
                         //push the transaction on the stack
                         result.instructions.add(new VarInsnNode(ALOAD, transactionVar.index));
 
-                        int tranlocalIndex = getLiftMethodTranlocalVar(originalClass.name, originalMethod);
+                        int tranlocalIndex = getLiftMethodTranlocalVar(classNode.name, originalMethod);
 
                         //push the tranlocal on the stack if needed
                         if (tranlocalIndex >= 0) {
@@ -802,9 +805,9 @@ public class TransactionalMethodTransformer implements Opcodes {
 
                         MethodInsnNode invokeInsn = new MethodInsnNode(
                                 getInvokeOpcode(originalMethod),
-                                originalClass.name,
+                                classNode.name,
                                 originalMethod.name,
-                                getLiftMethodDesc(originalClass.name, originalMethod));
+                                getLiftMethodDesc(classNode.name, originalMethod));
                         result.instructions.add(invokeInsn);
 
                         if (!returnType.equals(Type.VOID_TYPE)) {
@@ -822,7 +825,7 @@ public class TransactionalMethodTransformer implements Opcodes {
 
                     if (donorIsOwner && donorFieldInsnNode.name.equals("transactionFactory")) {
                         result.instructions.add(new FieldInsnNode(
-                                GETSTATIC, originalClass.name, txFactoryField.name, donorFieldInsnNode.desc));
+                                GETSTATIC, classNode.name, txFactoryField.name, donorFieldInsnNode.desc));
                     } else {
                         result.instructions.add(donorInsn.clone(cloneMap));
                     }
@@ -893,7 +896,7 @@ public class TransactionalMethodTransformer implements Opcodes {
         }
 
         String msg = format("Transaction on Method '%s.%s' can't be made interruptible since it doesn't throw "
-                + "InterruptedException or Exception ", originalClass.name.replace("/", "."), originalMethod.name);
+                + "InterruptedException or Exception ", classNode.name.replace("/", "."), originalMethod.name);
         throw new RuntimeException(msg);
     }
 
@@ -947,25 +950,26 @@ public class TransactionalMethodTransformer implements Opcodes {
         return getLiftMethodTransactionVar(isStatic(originalMethod), originalMethod.desc);
     }
 
-    public static int getLiftMethodTranlocalVar(boolean isStaticMethod, String owner, String methodName, String methodDesc) {
+    public int getLiftMethodTranlocalVar(boolean isStaticMethod, String owner, String methodName, String methodDesc) {
         if (isStaticMethod) {
             return -1;
         }
 
-        boolean isRealTransactionalObject = MetadataRepository.INSTANCE.isRealTransactionalObject(owner);
 
-        if (isRealTransactionalObject && !methodName.equals("<init>")) {
+        ClassMetadata ownerMetadata = metadataRepository.getClassMetadata(owner);
+
+        if (ownerMetadata.isRealTransactionalObject() && !methodName.equals("<init>")) {
             return getLiftMethodTransactionVar(isStaticMethod, methodDesc) + 1;
         } else {
             return -1;
         }
     }
 
-    public static int getLiftMethodTranlocalVar(String owner, MethodNode originalMethod) {
+    public int getLiftMethodTranlocalVar(String owner, MethodNode originalMethod) {
         return getLiftMethodTranlocalVar(isStatic(originalMethod), owner, originalMethod.name, originalMethod.desc);
     }
 
-    public static int getLiftMethodLocalVarIndex(String owner, MethodNode originalMethod, int var) {
+    public int getLiftMethodLocalVarIndex(String owner, MethodNode originalMethod, int var) {
         int firstLocalVar = sizeOfFormalParameters(originalMethod);
         if (!isStatic(originalMethod)) {
             firstLocalVar++;
@@ -982,17 +986,17 @@ public class TransactionalMethodTransformer implements Opcodes {
         }
     }
 
-    private static String getLiftMethodDesc(String owner, MethodNode originalMethod) {
+    private String getLiftMethodDesc(String owner, MethodNode originalMethod) {
         return getLiftMethodDesc(isStatic(originalMethod), owner, originalMethod.name, originalMethod.desc);
     }
 
-    private static String getLiftMethodDesc(boolean isStaticMethod, String owner, String methodName, String methodDesc) {
+    private String getLiftMethodDesc(boolean isStaticMethod, String owner, String methodName, String methodDesc) {
         Type returnType = Type.getReturnType(methodDesc);
         Type[] argTypes = Type.getArgumentTypes(methodDesc);
         Type[] newArgTypes;
         if (getLiftMethodTranlocalVar(isStaticMethod, owner, methodName, methodDesc) >= 0) {
             newArgTypes = new Type[argTypes.length + 2];
-            String tranlocalName = MetadataRepository.INSTANCE.getTranlocalName(owner);
+            String tranlocalName = metadataRepository.getClassMetadata(owner).getTranlocalName();
             newArgTypes[newArgTypes.length - 1] = getType(internalToDesc(tranlocalName));
         } else {
             newArgTypes = new Type[argTypes.length + 1];

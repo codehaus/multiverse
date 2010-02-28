@@ -13,14 +13,14 @@ public class SimpleTests {
     public void ref() {
         Ref1 ref1 = new Ref1();
         //ref1.set(10);
-        //assertEquals(10, ref1.get());
+        //assertEquals(10, ref1.getClassMetadata());
     }
 
     @TransactionalObject
     static class Ref1 {
         int value;
 
-        //public int get() {
+        //public int getClassMetadata() {
         //    return value;
         //}
 

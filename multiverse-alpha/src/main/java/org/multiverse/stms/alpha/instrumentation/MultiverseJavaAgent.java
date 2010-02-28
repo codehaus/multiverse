@@ -2,6 +2,8 @@ package org.multiverse.stms.alpha.instrumentation;
 
 import org.multiverse.MultiverseConstants;
 import org.multiverse.stms.alpha.instrumentation.asm.*;
+import org.multiverse.stms.alpha.instrumentation.metadata.ClassMetadata;
+import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
 import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -41,7 +43,7 @@ public class MultiverseJavaAgent {
         inst.addTransformer(new FieldGranularityClassFileTransformer());
         inst.addTransformer(new TranlocalClassFileTransformer());
         inst.addTransformer(new TranlocalSnapshotClassFileTransformer());
-        inst.addTransformer(new TransactionalObjectFieldAccessClassFileTransformer());
+        inst.addTransformer(new NonTransactionalObjectFieldAccessClassFileTransformer());
         inst.addTransformer(new TransactionalObjectClassFileTransformer());
         inst.addTransformer(new TransactionalMethodClassFileTransformer());
         //inst.addTransformer(new VerifyingClassFileTransformer());
@@ -116,9 +118,9 @@ public class MultiverseJavaAgent {
         }
     }
 
-    public static class TransactionalObjectFieldAccessClassFileTransformer extends AbstractClassFileTransformer {
+    public static class NonTransactionalObjectFieldAccessClassFileTransformer extends AbstractClassFileTransformer {
 
-        public TransactionalObjectFieldAccessClassFileTransformer() {
+        public NonTransactionalObjectFieldAccessClassFileTransformer() {
             super("NonTransactionalMethodFieldAccessTransformer");
         }
 
@@ -133,7 +135,7 @@ public class MultiverseJavaAgent {
             ClassNode transformed = transformer.transform();
             byte[] transformedBytecode = toBytecode(transformed);
             if (DUMP_BYTECODE) {
-                writeToFileInTmpDirectory(transformed.name + "_FixedFields.class", transformedBytecode);
+                writeToFileInTmpDirectory(transformed.name + "__NonTransactionalFieldAccess.class", transformedBytecode);
             }
 
             return transformedBytecode;
@@ -150,7 +152,9 @@ public class MultiverseJavaAgent {
         public byte[] doTransform(ClassLoader loader, String className, Class<?> classBeingRedefined,
                                   ProtectionDomain protectionDomain, byte[] bytecode)
                 throws IllegalClassFormatException {
-            if (metadataRepository.isRealTransactionalObject(className)) {
+
+            ClassMetadata classMetadata = metadataRepository.getClassMetadata(className);
+            if (classMetadata.isRealTransactionalObject()) {
                 ClassNode mixin = loadAsClassNode(DefaultTxObjectMixin.class);
                 ClassNode original = loadAsClassNode(bytecode);
                 TransactionalObjectTransformer transformer = new TransactionalObjectTransformer(original, mixin);
@@ -202,7 +206,9 @@ public class MultiverseJavaAgent {
         public byte[] doTransform(ClassLoader loader, String className, Class<?> classBeingRedefined,
                                   ProtectionDomain protectionDomain, byte[] bytecode)
                 throws IllegalClassFormatException {
-            if (metadataRepository.isRealTransactionalObject(className)) {
+
+            ClassMetadata classMetadata = metadataRepository.getClassMetadata(className);
+            if (classMetadata.isRealTransactionalObject()) {
                 ClassNode original = loadAsClassNode(bytecode);
                 TranlocalSnapshotFactory factory = new TranlocalSnapshotFactory(original);
                 ClassNode result = factory.create();
@@ -227,7 +233,9 @@ public class MultiverseJavaAgent {
         public byte[] doTransform(ClassLoader loader, String className, Class<?> classBeingRedefined,
                                   ProtectionDomain protectionDomain, byte[] bytecode)
                 throws IllegalClassFormatException {
-            if (metadataRepository.isRealTransactionalObject(className)) {
+
+            ClassMetadata classMetadata = metadataRepository.getClassMetadata(className);
+            if (classMetadata.isRealTransactionalObject()) {
                 ClassNode original = loadAsClassNode(bytecode);
                 TranlocalFactory transformer = new TranlocalFactory(original);
                 ClassNode result = transformer.create();
@@ -255,7 +263,8 @@ public class MultiverseJavaAgent {
                 throws IllegalClassFormatException {
 
 
-            if (metadataRepository.hasTransactionalMethods(className)) {
+            ClassMetadata classMetadata = metadataRepository.getClassMetadata(className);
+            if (classMetadata.hasTransactionalMethods()) {
                 boolean restore = InsnList.check;
                 InsnList.check = true;
                 try {
@@ -266,6 +275,9 @@ public class MultiverseJavaAgent {
 
                     TransactionalMethodTransformer transformer = new TransactionalMethodTransformer(original, donor);
                     ClassNode result = transformer.transform();
+                    if (result == null) {
+                        return null;
+                    }
 
                     byte[] resultBytecode = toBytecode(result);
 

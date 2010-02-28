@@ -47,7 +47,7 @@ public class TinyUpdateAlphaTransaction_registerRetryLatchTest {
                 null,
                 stmConfig.profiler,
                 stmConfig.maxRetryCount,
-                stmConfig.commitLockPolicy, true, optimalSize, false, true, true, false);
+                stmConfig.commitLockPolicy, true, optimalSize, true, true, true, false);
         return new TinyUpdateAlphaTransaction(config);
     }
 

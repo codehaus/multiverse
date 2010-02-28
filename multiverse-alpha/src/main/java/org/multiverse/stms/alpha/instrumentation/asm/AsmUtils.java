@@ -234,7 +234,7 @@ public final class AsmUtils implements Opcodes {
     /**
      * Loads a Class as ClassNode.
      *
-     * @param loader            the ClassLoader to get the resource stream of.
+     * @param loader            the ClassLoader to getClassMetadata the resource stream of.
      * @param classInternalForm the internal name of the Class to load.
      * @return the loaded ClassNode.
      */

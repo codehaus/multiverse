@@ -19,7 +19,7 @@ public class AnotherWriteSkewStressTest {
     private User user1;
     private User user2;
     private AtomicBoolean writeSkewEncountered = new AtomicBoolean();
-    private boolean preventWriteSkew;
+    private boolean allowWriteSkewProblem;
     private TransferThread[] threads;
 
     @Before
@@ -37,8 +37,8 @@ public class AnotherWriteSkewStressTest {
     }
 
     @Test
-    public void withoutPrevention() {
-        preventWriteSkew = false;
+    public void writeSkewAllowed() {
+        allowWriteSkewProblem = true;
         startAll(threads);
         joinAll(threads);
 
@@ -49,8 +49,8 @@ public class AnotherWriteSkewStressTest {
     }
 
     @Test
-    public void withPrevention() {
-        preventWriteSkew = true;
+    public void writeSkewProblemNotAllowed() {
+        allowWriteSkewProblem = false;
         startAll(threads);
         joinAll(threads);
 
@@ -74,7 +74,7 @@ public class AnotherWriteSkewStressTest {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
 
-                if (preventWriteSkew) {
+                if (allowWriteSkewProblem) {
                     runWithPreventWriteSkew();
                 } else {
                     runWithoutPreventWriteSkew();
@@ -87,7 +87,7 @@ public class AnotherWriteSkewStressTest {
             doIt();
         }
 
-        @TransactionalMethod(automaticReadTracking = true, preventWriteSkew = true)
+        @TransactionalMethod(automaticReadTracking = true, allowWriteSkewProblem = true)
         private void runWithPreventWriteSkew() {
             doIt();
         }

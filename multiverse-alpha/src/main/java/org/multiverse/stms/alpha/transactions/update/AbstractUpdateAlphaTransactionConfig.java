@@ -21,10 +21,10 @@ public class AbstractUpdateAlphaTransactionConfig extends AbstractTransactionCon
     public AbstractUpdateAlphaTransactionConfig(
             PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName, boolean readOnly,
             int maxRetryCount, boolean interruptible, CommitLockPolicy commitLockPolicy, ProfileRepository profiler,
-            boolean preventWriteSkew, boolean automaticReadTracking, boolean optimizedConflictDetection, boolean dirtyCheck) {
+            boolean allowWriteSkewProblem, boolean automaticReadTracking, boolean optimizedConflictDetection, boolean dirtyCheck) {
 
         super(clock,
-                backoffPolicy, familyName, readOnly, maxRetryCount, interruptible, preventWriteSkew, automaticReadTracking);
+                backoffPolicy, familyName, readOnly, maxRetryCount, interruptible, allowWriteSkewProblem, automaticReadTracking);
 
         this.profiler = profiler;
         this.commitLockPolicy = commitLockPolicy;

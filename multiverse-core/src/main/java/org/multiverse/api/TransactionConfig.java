@@ -60,7 +60,7 @@ public interface TransactionConfig {
     boolean isReadonly();
 
     /**
-     * Checks if this Transaction should prent writeskew. This is an isolation anomaly and could lead to an execution
+     * Checks if this Transaction allows writeskew. This is an isolation anomaly and could lead to an execution
      * of transactions that doesn't match any sequential execution. Writeskew detection can be expensive because
      * more checks needs to be done. It also leads to lower concurrency because certain executions of transactions
      * are not allowed and are aborted and retried.
@@ -68,7 +68,7 @@ public interface TransactionConfig {
      * If the transaction is readonly, the value is undefined since a readonly transaction can't suffer from the
      * writeskew problem.
      *
-     * @return true if the writeskew problem is prevented, false otherwise.
+     * @return true if the writeskew problem is allowed, false otherwise.
      */
-    boolean preventWriteSkew();
+    boolean allowWriteSkewProblem();
 }

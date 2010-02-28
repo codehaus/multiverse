@@ -6,6 +6,7 @@ import org.multiverse.annotations.FieldGranularity;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
+import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
 import org.multiverse.transactional.DefaultTransactionalReference;
 import org.multiverse.transactional.primitives.*;
 
@@ -48,7 +49,10 @@ public class FieldGranularityTransformerTest {
 
     @Test
     public void privateField() {
+        Class clazz = PrivateField.class;
+        MetadataRepository repo = MetadataRepository.INSTANCE;
         PrivateField field = new PrivateField(10);
+
         assertHasField(field.getClass(), "value", TransactionalInteger.class);
 
         assertFalse(field instanceof AlphaTransactionalObject);

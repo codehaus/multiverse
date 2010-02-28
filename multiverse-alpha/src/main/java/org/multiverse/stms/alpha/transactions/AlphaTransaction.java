@@ -23,7 +23,7 @@ public interface AlphaTransaction extends Transaction {
      * It doesn't matter if the transactionalObject has never been committed before. When an transactionalObject is
      * created, the constructor also needs to do a openForWrite.
      *
-     * @param txObject the transactional object to get the tranlocal for.
+     * @param txObject the transactional object to getClassMetadata the tranlocal for.
      * @return the opened tranlocal.
      * @throws org.multiverse.api.exceptions.LoadException
      *          if something goes wrong while opening the txObject.
@@ -39,7 +39,7 @@ public interface AlphaTransaction extends Transaction {
      * It doesn't matter if the transactional object has never been committed before. When an transactional object
      * is created, the constructor also needs to do a openForWrite.
      *
-     * @param txObject the transactional object to get the tranlocal for.
+     * @param txObject the transactional object to getClassMetadata the tranlocal for.
      * @return the opened tranlocal.
      * @throws NullPointerException if txObject is null. One can't write on a 'null' transactional object, that
      *                              would normally also cause a NullPointerException.

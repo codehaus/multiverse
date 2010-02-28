@@ -24,7 +24,7 @@ public class TransactionalMethod_ReadonlyTransactionTest {
     }
 
     @Test
-    public void test() {
+    public void whenReadIsDone() {
         intRef ref = new intRef(10);
 
         long version = stm.getVersion();
@@ -35,7 +35,7 @@ public class TransactionalMethod_ReadonlyTransactionTest {
     }
 
     @Test
-    public void updateIsDetected() {
+    public void whenUpdateDone_thenReadonlyException() {
         intRef ref = new intRef(10);
 
         long version = stm.getVersion();

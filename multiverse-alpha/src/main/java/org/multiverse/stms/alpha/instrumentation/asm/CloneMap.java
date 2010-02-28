@@ -8,7 +8,7 @@ import java.util.HashMap;
  * A HashMap tailored to be used with the
  * {@link org.objectweb.asm.tree.AbstractInsnNode#clone(java.util.Map)}
  * <p/>
- * It automatically creates replacement LabelNodes when a get is called. It appears to be the
+ * It automatically creates replacement LabelNodes when a getClassMetadata is called. It appears to be the
  * preferred way for cloning instructions.
  *
  * @author Peter Veentjer
@@ -19,7 +19,7 @@ public class CloneMap extends HashMap<LabelNode, LabelNode> {
 //            new HashMap<LabelNode, List<StackTraceElement[]>>();
 
 //    public void printTraces(LabelNode labelNode) {
-//        List<StackTraceElement[]> list = traceMap.get(labelNode);
+//        List<StackTraceElement[]> list = traceMap.getClassMetadata(labelNode);
 //        for(StackTraceElement[] elements : list){
 //            for(StackTraceElement element: elements){
 //                System.out.println(element);
@@ -34,7 +34,7 @@ public class CloneMap extends HashMap<LabelNode, LabelNode> {
     }
 
     public LabelNode get(LabelNode old) {
-//        List<StackTraceElement[]> list = traceMap.get(old);
+//        List<StackTraceElement[]> list = traceMap.getClassMetadata(old);
 //        if (list == null) {
 //            list = new LinkedList();
 //            traceMap.put(old, list);

@@ -46,6 +46,8 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
     private final AlphaTransactionFactoryBuilder transactionBuilder;
 
+    private final int maxRetryCount;
+
     private final int maxFixedUpdateSize;
 
     private final boolean smartTxLengthSelector;
@@ -53,6 +55,8 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
     private final boolean optimizeConflictDetection;
 
     private final boolean dirtyCheck;
+
+    private final boolean interruptible;
 
     public static AlphaStm createFast() {
         return new AlphaStm(AlphaStmConfig.createFastConfig());
@@ -90,8 +94,11 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         this.commitLockPolicy = config.commitLockPolicy;
         this.backoffPolicy = config.backoffPolicy;
         this.optimizeConflictDetection = config.optimizedConflictDetection;
-        this.transactionBuilder = new AlphaTransactionFactoryBuilder();
         this.dirtyCheck = config.dirtyCheck;
+        this.maxRetryCount = config.maxRetryCount;
+        this.interruptible = config.interruptible;
+
+        this.transactionBuilder = new AlphaTransactionFactoryBuilder();
 
         logger.info("Created a new AlphaStm instance");
     }
@@ -132,7 +139,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         private final boolean readonly;
         private final String familyName;
         private final boolean automaticReadTracking;
-        private final boolean preventWriteSkew;
+        private final boolean enableWriteSkewProblem;
         private final CommitLockPolicy commitLockPolicy;
         private final BackoffPolicy backoffPolicy;
         private final OptimalSize optimalSize;
@@ -141,7 +148,10 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         private final boolean dirtyCheck;
 
         public AlphaTransactionFactoryBuilder() {
-            this(false, true, null, 1000, false, AlphaStm.this.commitLockPolicy,
+            this(false, true, null,
+                    AlphaStm.this.maxRetryCount,
+                    true,
+                    AlphaStm.this.commitLockPolicy,
                     AlphaStm.this.backoffPolicy,
                     null,
                     false,
@@ -151,14 +161,14 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
         public AlphaTransactionFactoryBuilder(
                 boolean readonly, boolean automaticReadTracking, String familyName, int maxRetryCount,
-                boolean preventWriteSkew,
+                boolean enableWriteSkewProblem,
                 CommitLockPolicy commitLockPolicy, BackoffPolicy backoffPolicy, OptimalSize optimalSize,
                 boolean interruptible, boolean smartTxLengthSelector, boolean dirtyCheck) {
             this.readonly = readonly;
             this.familyName = familyName;
             this.maxRetryCount = maxRetryCount;
             this.automaticReadTracking = automaticReadTracking;
-            this.preventWriteSkew = preventWriteSkew;
+            this.enableWriteSkewProblem = enableWriteSkewProblem;
             this.commitLockPolicy = commitLockPolicy;
             this.backoffPolicy = backoffPolicy;
             this.optimalSize = optimalSize;
@@ -167,12 +177,11 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             this.dirtyCheck = dirtyCheck;
         }
 
-
         @Override
         public AlphaTransactionFactoryBuilder setFamilyName(String familyName) {
             if (familyName == null) {
                 return new AlphaTransactionFactoryBuilder(
-                        readonly, automaticReadTracking, null, maxRetryCount, preventWriteSkew,
+                        readonly, automaticReadTracking, null, maxRetryCount, enableWriteSkewProblem,
                         commitLockPolicy, backoffPolicy, null, interruptible, smartTxLengthSelector, dirtyCheck);
             }
 
@@ -184,7 +193,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             }
 
             return new AlphaTransactionFactoryBuilder(
-                    readonly, automaticReadTracking, familyName, maxRetryCount, preventWriteSkew, commitLockPolicy,
+                    readonly, automaticReadTracking, familyName, maxRetryCount, enableWriteSkewProblem, commitLockPolicy,
                     backoffPolicy, optimalSize, interruptible, smartTxLengthSelector, dirtyCheck);
         }
 
@@ -195,27 +204,27 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             }
 
             return new AlphaTransactionFactoryBuilder(
-                    readonly, automaticReadTracking, familyName, retryCount, preventWriteSkew, commitLockPolicy,
+                    readonly, automaticReadTracking, familyName, retryCount, enableWriteSkewProblem, commitLockPolicy,
                     backoffPolicy, optimalSize, interruptible, smartTxLengthSelector, dirtyCheck);
         }
 
         @Override
         public AlphaTransactionFactoryBuilder setReadonly(boolean readonly) {
             return new AlphaTransactionFactoryBuilder(
-                    readonly, automaticReadTracking, familyName, maxRetryCount, preventWriteSkew, commitLockPolicy,
+                    readonly, automaticReadTracking, familyName, maxRetryCount, enableWriteSkewProblem, commitLockPolicy,
                     backoffPolicy, optimalSize, interruptible, smartTxLengthSelector, dirtyCheck);
         }
 
         public AlphaTransactionFactoryBuilder setAutomaticReadTracking(boolean automaticReadTracking) {
             return new AlphaTransactionFactoryBuilder(
-                    readonly, automaticReadTracking, familyName, maxRetryCount, preventWriteSkew, commitLockPolicy,
+                    readonly, automaticReadTracking, familyName, maxRetryCount, enableWriteSkewProblem, commitLockPolicy,
                     backoffPolicy, optimalSize, interruptible, smartTxLengthSelector, dirtyCheck);
         }
 
         @Override
         public AlphaTransactionFactoryBuilder setInterruptible(boolean interruptible) {
             return new AlphaTransactionFactoryBuilder(
-                    readonly, automaticReadTracking, familyName, maxRetryCount, preventWriteSkew, commitLockPolicy,
+                    readonly, automaticReadTracking, familyName, maxRetryCount, enableWriteSkewProblem, commitLockPolicy,
                     backoffPolicy, optimalSize, interruptible, smartTxLengthSelector, dirtyCheck);
         }
 
@@ -225,21 +234,21 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             }
 
             return new AlphaTransactionFactoryBuilder(
-                    readonly, automaticReadTracking, familyName, maxRetryCount, preventWriteSkew, commitLockPolicy,
+                    readonly, automaticReadTracking, familyName, maxRetryCount, enableWriteSkewProblem, commitLockPolicy,
                     backoffPolicy, optimalSize, interruptible, smartTxLengthSelector, dirtyCheck);
         }
 
         @Override
         public AlphaTransactionFactoryBuilder setSmartTxLengthSelector(boolean smartTxLengthSelector) {
             return new AlphaTransactionFactoryBuilder(
-                    readonly, automaticReadTracking, familyName, maxRetryCount, preventWriteSkew, commitLockPolicy,
+                    readonly, automaticReadTracking, familyName, maxRetryCount, enableWriteSkewProblem, commitLockPolicy,
                     backoffPolicy, optimalSize, interruptible, smartTxLengthSelector, dirtyCheck);
         }
 
         @Override
-        public AlphaTransactionFactoryBuilder setPreventWriteSkew(boolean preventWriteSkew) {
+        public AlphaTransactionFactoryBuilder setAllowWriteSkewProblem(boolean allowWriteSkew) {
             return new AlphaTransactionFactoryBuilder(
-                    readonly, automaticReadTracking, familyName, maxRetryCount, preventWriteSkew, commitLockPolicy,
+                    readonly, automaticReadTracking, familyName, maxRetryCount, allowWriteSkew, commitLockPolicy,
                     backoffPolicy, optimalSize, interruptible, smartTxLengthSelector, dirtyCheck);
         }
 
@@ -250,7 +259,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             }
 
             return new AlphaTransactionFactoryBuilder(
-                    readonly, automaticReadTracking, familyName, maxRetryCount, preventWriteSkew, commitLockPolicy,
+                    readonly, automaticReadTracking, familyName, maxRetryCount, enableWriteSkewProblem, commitLockPolicy,
                     backoffPolicy, optimalSize, interruptible, smartTxLengthSelector, dirtyCheck);
         }
 
@@ -259,12 +268,13 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             if (readonly) {
                 return createReadonlyTxFactory();
             } else {
-                if (!automaticReadTracking && preventWriteSkew) {
-                    throw new IllegalStateException(
-                            format("Can't create transactionfactory for transaction family '%s' because an update "
-                                    + "transaction without automaticReadTracking but with preventWriteSkew is "
-                                    + "not possible", familyName
-                            ));
+                if (!automaticReadTracking && !enableWriteSkewProblem) {
+                    String msg = format("Can't create transactionfactory for transaction family '%s' because an update "
+                            + "transaction without automaticReadTracking and without allowWriteSkewProblem is "
+                            + "not possible", familyName
+                    );
+
+                    throw new IllegalStateException(msg);
                 }
 
                 return createUpdateTxFactory();
@@ -329,19 +339,19 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     GrowingUpdateAlphaTransaction.Config growingConfig =
                             new GrowingUpdateAlphaTransaction.Config(
                                     clock, backoffPolicy, familyName, profiler, commitLockPolicy,
-                                    maxRetryCount, preventWriteSkew, interruptible, optimizeConflictDetection, true,
+                                    maxRetryCount, enableWriteSkewProblem, interruptible, optimizeConflictDetection, true,
                                     automaticReadTracking);
 
                     FixedUpdateAlphaTransaction.Config fixedConfig =
                             new FixedUpdateAlphaTransaction.Config(
                                     clock, backoffPolicy, familyName, profiler, commitLockPolicy,
-                                    maxRetryCount, preventWriteSkew, optimalSize, interruptible,
+                                    maxRetryCount, enableWriteSkewProblem, optimalSize, interruptible,
                                     optimizeConflictDetection, true, automaticReadTracking, maxFixedUpdateSize);
 
                     TinyUpdateAlphaTransaction.Config tinyConfig =
                             new TinyUpdateAlphaTransaction.Config(
                                     clock, backoffPolicy, familyName, profiler, maxRetryCount,
-                                    commitLockPolicy, interruptible, optimalSize, preventWriteSkew,
+                                    commitLockPolicy, interruptible, optimalSize, enableWriteSkewProblem,
                                     optimizeConflictDetection, true, automaticReadTracking);
 
                     @Override
@@ -364,7 +374,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                 GrowingUpdateAlphaTransaction.Config config =
                         new GrowingUpdateAlphaTransaction.Config(
                                 clock, backoffPolicy, familyName, profiler, commitLockPolicy,
-                                maxRetryCount, preventWriteSkew, interruptible, optimizeConflictDetection, true,
+                                maxRetryCount, enableWriteSkewProblem, interruptible, optimizeConflictDetection, true,
                                 automaticReadTracking);
 
                 return new GrowingUpdateAlphaTransaction.Factory(config);

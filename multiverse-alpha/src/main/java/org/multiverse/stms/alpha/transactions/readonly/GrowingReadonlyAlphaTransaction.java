@@ -15,7 +15,7 @@ import java.util.Map;
 
 /**
  * A readonly {@link org.multiverse.stms.alpha.transactions.AlphaTransaction} that does do read tracking. The advantage
- * is that once an transactionalobject has been opened, you wont get load errors. Another advantage is that is
+ * is that once an transactionalobject has been opened, you wont getClassMetadata load errors. Another advantage is that is
  * can participate in retries. A disadvantage is that it it costs extra memory (because of the reads that need to
  * be tracked).
  *

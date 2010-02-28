@@ -23,7 +23,7 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
  */
 public class WriteSkewStressTest {
 
-    private AtomicBoolean writeSkewOccurred = new AtomicBoolean();
+    private AtomicBoolean writeSkewProblemOccurred = new AtomicBoolean();
     private int bankCustomerCount = 10;
     private int threadCount = 20;
     private int txCountPerThread = 1000;
@@ -33,7 +33,7 @@ public class WriteSkewStressTest {
 
     @Before
     public void setUp() {
-        writeSkewOccurred.set(false);
+        writeSkewProblemOccurred.set(false);
         clearThreadLocalTransaction();
 
         accounts = new TransactionalInteger[bankCustomerCount * 2];
@@ -62,7 +62,7 @@ public class WriteSkewStressTest {
         joinAll(threads);
 
         //this condition should fail
-        assertTrue(writeSkewOccurred.get());
+        assertTrue(writeSkewProblemOccurred.get());
 
         printAccounts();
 
@@ -106,7 +106,7 @@ public class WriteSkewStressTest {
             }
         }
 
-        @TransactionalMethod(automaticReadTracking = true, preventWriteSkew = false)
+        @TransactionalMethod(automaticReadTracking = true, allowWriteSkewProblem = false)
         public void transfer(int fromUser, int toUser, int amount) {
 
             TransactionalInteger fromAccount1 = accounts[fromUser * 2];
@@ -116,7 +116,7 @@ public class WriteSkewStressTest {
             int sum = fromAccount1.get() + fromAccount2.get();
             if (sum < 0) {
                 System.out.println("WriteSkew occurred");
-                writeSkewOccurred.set(true);
+                writeSkewProblemOccurred.set(true);
             }
 
             if (sum >= amount) {
@@ -143,11 +143,11 @@ public class WriteSkewStressTest {
     @Ignore
     public void simpleTestWithWriteSkewDetectionDisabledRepeated() {
         for (int k = 0; k < 100; k++) {
-            simpleTestWithWriteSkewDisabled();
+            simpleTestWithEnabledWriteSkewProblem();
         }
     }
 
-    public void simpleTestWithWriteSkewDisabled() {
+    public void simpleTestWithEnabledWriteSkewProblem() {
         TransactionalInteger from1 = new TransactionalInteger(100);
         TransactionalInteger from2 = new TransactionalInteger(0);
 
@@ -182,7 +182,7 @@ public class WriteSkewStressTest {
         }
 
         @Override
-        @TransactionalMethod(preventWriteSkew = false)
+        @TransactionalMethod(allowWriteSkewProblem = false)
         public void doRun() throws Exception {
             if (from1.get() + from2.get() >= 100) {
                 from1.dec(100);
@@ -231,7 +231,7 @@ public class WriteSkewStressTest {
         }
 
         @Override
-        @TransactionalMethod(preventWriteSkew = true)
+        @TransactionalMethod(allowWriteSkewProblem = true)
         public void doRun() throws Exception {
             if (from1.get() + from2.get() >= 100) {
                 from1.dec(100);
@@ -244,7 +244,7 @@ public class WriteSkewStressTest {
             Transaction tx = getThreadLocalTransaction();
             assertFalse(tx.getConfig().isReadonly());
             assertTrue(tx.getConfig().automaticReadTracking());
-            assertTrue(tx.getConfig().preventWriteSkew());
+            assertTrue(tx.getConfig().allowWriteSkewProblem());
 
             sleepMs(200);
         }
