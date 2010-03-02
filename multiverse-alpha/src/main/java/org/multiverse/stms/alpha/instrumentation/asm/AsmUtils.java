@@ -13,13 +13,111 @@ import org.objectweb.asm.util.TraceMethodVisitor;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import static java.lang.String.format;
-import static org.objectweb.asm.Type.getDescriptor;
-import static org.objectweb.asm.Type.getInternalName;
+import static org.objectweb.asm.Type.*;
 
 public final class AsmUtils implements Opcodes {
+
+    public static LocalVariableNode findThisVariable(MethodNode methodNode) {
+        if (methodNode.localVariables == null) {
+            return null;
+        }
+
+        for (LocalVariableNode localVar : (List<LocalVariableNode>) methodNode.localVariables) {
+            if (localVar.name.equals("this")) {
+                return localVar;
+            }
+        }
+        return null;
+    }
+
+
+    public static DebugInfo findDebugInfo(MethodNode method) {
+        DebugInfo info = new DebugInfo();
+
+        for (ListIterator<AbstractInsnNode> iterator = method.instructions.iterator(); iterator.hasNext();) {
+            AbstractInsnNode node = iterator.next();
+            if (node instanceof LineNumberNode) {
+                LineNumberNode lineNumberNode = (LineNumberNode) node;
+                if (lineNumberNode.line > info.endLine) {
+                    info.endLine = lineNumberNode.line;
+                }
+
+                if (info.beginLine == -1) {
+                    info.beginLine = lineNumberNode.line;
+                } else if (lineNumberNode.line < info.beginLine) {
+                    info.beginLine = lineNumberNode.line;
+                }
+            }
+        }
+
+        return info;
+    }
+
+
+    public static int getInvokeOpcode(MethodNode methodNode) {
+        if (isStatic(methodNode.access)) {
+            return INVOKESTATIC;
+        } else if (methodNode.name.equals("<init>")) {
+            return INVOKESPECIAL;
+        } else {
+            return INVOKEVIRTUAL;
+        }
+    }
+
+    public static List<TryCatchBlockNode> cloneTryCatchBlockNodes(List<TryCatchBlockNode> originalBlocks, CloneMap cloneMap) {
+        List<TryCatchBlockNode> result = new LinkedList<TryCatchBlockNode>();
+        for (TryCatchBlockNode originalBlock : originalBlocks) {
+            TryCatchBlockNode clonedBlock = new TryCatchBlockNode(
+                    cloneMap.get(originalBlock.start),
+                    cloneMap.get(originalBlock.end),
+                    cloneMap.get(originalBlock.handler),
+                    originalBlock.type
+            );
+            result.add(clonedBlock);
+        }
+        return result;
+    }
+
+    public static List<TryCatchBlockNode> cloneTryCatchBlocks(MethodNode originalMethod, CloneMap cloneMap) {
+        //clone the try catch blocks
+        List<TryCatchBlockNode> result = new LinkedList<TryCatchBlockNode>();
+
+        for (int k = 0; k < originalMethod.tryCatchBlocks.size(); k++) {
+            TryCatchBlockNode original = (TryCatchBlockNode) originalMethod.tryCatchBlocks.get(k);
+            TryCatchBlockNode cloned = new TryCatchBlockNode(
+                    cloneMap.get(original.start),
+                    cloneMap.get(original.end),
+                    cloneMap.get(original.handler),
+                    original.type);
+            result.add(cloned);
+        }
+
+        return result;
+    }
+
+    public static List cloneVariableTable(MethodNode methodNode, CloneMap cloneMap) {
+        List<LocalVariableNode> result = new LinkedList<LocalVariableNode>();
+
+        //copy all the rest of the local variables.
+        for (LocalVariableNode originalLocalVar : (List<LocalVariableNode>) methodNode.localVariables) {
+            LocalVariableNode clonedLocalVar = new LocalVariableNode(
+                    originalLocalVar.name,
+                    originalLocalVar.desc,
+                    originalLocalVar.signature,
+                    cloneMap.get(originalLocalVar.start),
+                    cloneMap.get(originalLocalVar.end),
+                    originalLocalVar.index);
+            result.add(clonedLocalVar);
+        }
+
+        return result;
+    }
+
 
     public static int firstIndexAfterSuper(String methodName, InsnList instructions, String superClass) {
         if (!methodName.equals("<init>")) {
@@ -147,21 +245,32 @@ public final class AsmUtils implements Opcodes {
      * A new constructor descriptor is created by adding the extraArgType as the first argument (so the other arguments
      * all shift one pos to the right).
      *
-     * @param oldDesc      the old method description
+     * @param methodDesc   the old method description
      * @param extraArgType the internal name of the type to introduce
      * @return the new method description.
      */
-    public static String createShiftedMethodDescriptor(String oldDesc, String extraArgType) {
-        Type[] oldArgTypes = Type.getArgumentTypes(oldDesc);
+    public static String createMethodDescriptorWithLeftIntroducedVariable(String methodDesc, String extraArgType) {
+        Type[] oldArgTypes = Type.getArgumentTypes(methodDesc);
         Type[] newArgTypes = new Type[oldArgTypes.length + 1];
         newArgTypes[0] = Type.getObjectType(extraArgType);
-
         System.arraycopy(oldArgTypes, 0, newArgTypes, 1, oldArgTypes.length);
-
-        Type returnType = Type.getReturnType(oldDesc);
+        Type returnType = Type.getReturnType(methodDesc);
         return Type.getMethodDescriptor(returnType, newArgTypes);
     }
 
+    /**
+     * @param methodDesc   the original method descriptor
+     * @param extraArgType internal name of extra argument to add to the right
+     * @return the new method descripion
+     */
+    public static String createMethodDescriptorWithRightIntroducedVariable(String methodDesc, String extraArgType) {
+        Type returnType = Type.getReturnType(methodDesc);
+        Type[] argTypes = Type.getArgumentTypes(methodDesc);
+        Type[] newArgTypes = new Type[argTypes.length + 1];
+        System.arraycopy(argTypes, 0, newArgTypes, 0, argTypes.length);
+        newArgTypes[argTypes.length] = Type.getObjectType(extraArgType);
+        return getMethodDescriptor(returnType, newArgTypes);
+    }
 
     public static MethodNode remap(MethodNode originalMethod, Remapper remapper) {
         String[] exceptions = getExceptions(originalMethod);
@@ -235,15 +344,15 @@ public final class AsmUtils implements Opcodes {
      * Loads a Class as ClassNode.
      *
      * @param loader            the ClassLoader to getClassMetadata the resource stream of.
-     * @param classInternalForm the internal name of the Class to load.
+     * @param classInternalName the internal name of the Class to load.
      * @return the loaded ClassNode.
      */
-    public static ClassNode loadAsClassNode(ClassLoader loader, String classInternalForm) {
-        if (loader == null || classInternalForm == null) {
+    public static ClassNode loadAsClassNode(ClassLoader loader, String classInternalName) {
+        if (loader == null || classInternalName == null) {
             throw new NullPointerException();
         }
 
-        String fileName = classInternalForm + ".class";
+        String fileName = classInternalName + ".class";
         InputStream is = loader.getResourceAsStream(fileName);
 
         try {
@@ -254,7 +363,7 @@ public final class AsmUtils implements Opcodes {
         } catch (FileNotFoundException ex) {
             throw new RuntimeException(format("Could not find file '%s' for class '%s': ",
                     fileName,
-                    classInternalForm));
+                    classInternalName));
         } catch (IOException e) {
             throw new RuntimeException("A problem ocurred while loading class: " + fileName, e);
         }

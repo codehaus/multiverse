@@ -1,14 +1,13 @@
 package org.multiverse.utils.latches;
 
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Test;
 import org.multiverse.TestThread;
-import org.multiverse.api.Latch;
-
-import static org.multiverse.TestUtils.*;
 
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.*;
+import static org.multiverse.TestUtils.*;
 
 /**
  * Created by IntelliJ IDEA. User: alarmnummer Date: Oct 29, 2009 Time: 7:43:06 PM To change this template use File |
@@ -141,7 +140,7 @@ public class StandardLatchTest {
     // ============================= tryAwaitUninteruptible ================
 
     @Test
-    public void tryAwaitUninterruptibleOnOpenLatch(){
+    public void tryAwaitUninterruptibleOnOpenLatch() {
         StandardLatch latch = new StandardLatch(true);
         boolean result = latch.tryAwaitUninterruptible(1, TimeUnit.NANOSECONDS);
         assertTrue(result);

@@ -9,11 +9,18 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.*;
 
+/**
+ * An Asm based {@link ClassMetadataExtractor}.
+ *
+ * @author Peter Veentjer.
+ */
 public class AsmClassMetadataExtractor implements ClassMetadataExtractor {
 
     private MetadataRepository metadataRepository;
@@ -28,53 +35,87 @@ public class AsmClassMetadataExtractor implements ClassMetadataExtractor {
 
     @Override
     public ClassMetadata extract(String className, ClassLoader classLoader) {
+        if (metadataRepository == null) {
+            throw new IllegalStateException("metadataRepository is not initialized");
+        }
+
+        if (className == null) {
+            throw new NullPointerException();
+        }
+
         ClassMetadata classMetadata = new ClassMetadata(className);
-        if (classLoader == null) {
+        ClassNode classNode = loadClassNode(className, classLoader);
+
+        if (classNode == null) {
             classMetadata.setIgnoredClass(true);
-            return classMetadata;
-        }
+        } else {
 
-        String fileName = className + ".class";
-        InputStream is = classLoader.getResourceAsStream(fileName);
-        if (is == null) {
-            classMetadata.setIgnoredClass(true);
-            return classMetadata;
-        }
+            classMetadata.setAccess(classNode.access);
 
-        ClassNode classNode = AsmUtils.loadAsClassNode(classLoader, className);
-        classMetadata.setIsInterface(AsmUtils.isInterface(classNode));
+            if (isTransactional(classLoader, classNode)) {
+                classMetadata.setIsTransactionalObject(true);
+            }
 
-        if (classNode.superName != null) {
-            ClassMetadata superClassMetadata = metadataRepository.getClassMetadata(classNode.superName);
-            classMetadata.setSuperClassMetadata(superClassMetadata);
-        }
+            if (classNode.superName != null) {
+                ClassMetadata superClassMetadata = metadataRepository.getClassMetadata(classLoader, classNode.superName);
+                classMetadata.setSuperClassMetadata(superClassMetadata);
+            }
 
-        if (isTransactionalObject(classNode)) {
-            classMetadata.setIsTransactionalObject(true);
-        }
+            for (String interfaceName : (List<String>) classNode.interfaces) {
+                ClassMetadata interfaceMetadata = metadataRepository.getClassMetadata(classLoader, interfaceName);
+                classMetadata.getInterfaces().add(interfaceMetadata);
+            }
 
-        for (String interfaceName : (List<String>) classNode.interfaces) {
-            ClassMetadata interfaceMetadata = metadataRepository.getClassMetadata(interfaceName);
-            classMetadata.getInterfaces().add(interfaceMetadata);
-        }
+            for (FieldNode fieldNode : (List<FieldNode>) classNode.fields) {
+                extractFieldMetadata(classMetadata, fieldNode);
+            }
 
-        for (FieldNode fieldNode : (List<FieldNode>) classNode.fields) {
-            extractFieldMetadata(classMetadata, fieldNode);
-        }
-
-        for (MethodNode methodNode : (List<MethodNode>) classNode.methods) {
-            extractMethodMetadata(classMetadata, methodNode);
+            for (MethodNode methodNode : (List<MethodNode>) classNode.methods) {
+                extractMethodMetadata(classMetadata, methodNode);
+            }
         }
 
         return classMetadata;
+    }
+
+    private ClassNode loadClassNode(String className, ClassLoader classLoader) {
+        if (classLoader == null) {
+            return null;
+        }
+
+        if (!existsClass(className, classLoader)) {
+            return null;
+        }
+
+        return AsmUtils.loadAsClassNode(classLoader, className);
+    }
+
+    private boolean existsClass(String className, ClassLoader classLoader) {
+        String fileName = className + ".class";
+        InputStream is = classLoader.getResourceAsStream(fileName);
+        if (is == null) {
+            return false;
+        } else {
+            try {
+                is.close();
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to close the inputstream", e);
+            }
+            return true;
+        }
     }
 
     private void extractMethodMetadata(ClassMetadata classMetadata, MethodNode methodNode) {
         MethodMetadata methodMetadata = classMetadata.createMethodMetadata(methodNode.name, methodNode.desc);
         methodMetadata.setAccess(methodNode.access);
 
-        TransactionMetadata transactionMetadata = null;
+        if (methodNode.exceptions != null) {
+            for (String exception : (List<String>) methodNode.exceptions) {
+                methodMetadata.addException(exception);
+            }
+        }
 
+        TransactionMetadata transactionMetadata = null;
         if (!isInvisibleMethod(methodNode)) {
             if (classMetadata.isTransactionalObject()) {
                 if (hasTransactionalMethodAnnotation(methodNode) || hasTransactionalConstructorAnnotation(methodNode)) {
@@ -90,7 +131,6 @@ public class AsmClassMetadataExtractor implements ClassMetadataExtractor {
         }
 
         methodMetadata.setTransactionalMetadata(transactionMetadata);
-        methodMetadata.setAccess(methodNode.access);
     }
 
     private boolean isInvisibleMethod(MethodNode methodNode) {
@@ -105,20 +145,32 @@ public class AsmClassMetadataExtractor implements ClassMetadataExtractor {
         return false;
     }
 
-    private FieldMetadata extractFieldMetadata(ClassMetadata classMetadata, FieldNode field) {
-        FieldMetadata fieldMetadata = classMetadata.createFieldMetadata(field.name);
-        fieldMetadata.setDesc(field.desc);
+    private FieldMetadata extractFieldMetadata(ClassMetadata classMetadata, FieldNode fieldNode) {
+        FieldMetadata fieldMetadata = classMetadata.createFieldMetadata(fieldNode.name);
+        fieldMetadata.setAccess(fieldNode.access);
+        fieldMetadata.setDesc(fieldNode.desc);
 
-        if (isManagedField(classMetadata, field)) {
+        if (isManagedField(classMetadata, fieldNode)) {
             fieldMetadata.setIsManagedField(true);
-        } else if (isManagedFieldWithFieldGranularity(classMetadata, field)) {
+        } else if (isManagedFieldWithFieldGranularity(classMetadata, fieldNode)) {
             fieldMetadata.setHasFieldGranularity(true);
         }
 
         return fieldMetadata;
     }
 
-    private boolean isTransactionalObject(ClassNode classNode) {
+    /**
+     * Checks if the class is transactional.
+     * <p/>
+     * A class is transactional if:
+     * - one of the implementing interfaces is transactional (recursive)
+     * - the parent is transactional (recursive)
+     *
+     * @param classLoader the ClassLoader that was used to load the ClassNode.
+     * @param classNode   the ClassNode to check
+     * @return true if it is transactional, false otherwise.
+     */
+    private boolean isTransactional(ClassLoader classLoader, ClassNode classNode) {
         String objectName = Type.getInternalName(Object.class);
         if (classNode.name.equals(objectName)) {
             return false;
@@ -128,13 +180,13 @@ public class AsmClassMetadataExtractor implements ClassMetadataExtractor {
             return true;
         }
 
-        ClassMetadata superClassMetadata = metadataRepository.getClassMetadata(classNode.superName);
+        ClassMetadata superClassMetadata = metadataRepository.getClassMetadata(classLoader, classNode.superName);
         if (superClassMetadata.isTransactionalObject()) {
             return true;
         }
 
         for (String interfaceName : (List<String>) classNode.interfaces) {
-            ClassMetadata interfaceMetadata = metadataRepository.getClassMetadata(interfaceName);
+            ClassMetadata interfaceMetadata = metadataRepository.getClassMetadata(classLoader, interfaceName);
             if (interfaceMetadata.isTransactionalObject()) {
                 return true;
             }
@@ -179,11 +231,11 @@ public class AsmClassMetadataExtractor implements ClassMetadataExtractor {
     }
 
     private boolean isInvisibleField(FieldNode fieldNode) {
-        if (isFinal(fieldNode)) {
+        if (isExcluded(fieldNode)) {
             return true;
         }
 
-        if (isExcluded(fieldNode)) {
+        if (isFinal(fieldNode)) {
             return true;
         }
 
@@ -203,26 +255,31 @@ public class AsmClassMetadataExtractor implements ClassMetadataExtractor {
     }
 
     private TransactionMetadata createDefaultTransactionMetadata(ClassMetadata classMetadata, MethodNode methodNode) {
-        TransactionMetadata params = new TransactionMetadata();
-        params.readOnly = false;
-        params.automaticReadTracking = true;
-        params.allowWriteSkewProblem = true;
-        params.interruptible = false;
-        params.familyName = createFamilyName(classMetadata.getName(), methodNode.name, methodNode.desc);
+        MethodMetadata methodMetadata = classMetadata.getMethodMetadata(methodNode.name, methodNode.desc);
+        boolean throwsInterruptedException = methodMetadata.checkIfSpecificTransactionIsThrown(InterruptedException.class);
+
+        TransactionMetadata transactionMetadata = new TransactionMetadata();
+        transactionMetadata.readOnly = false;
+        transactionMetadata.automaticReadTracking = true;
+        transactionMetadata.allowWriteSkewProblem = true;
+        transactionMetadata.interruptible = throwsInterruptedException;
+        transactionMetadata.familyName = createFamilyName(classMetadata.getName(), methodNode.name, methodNode.desc);
+        transactionMetadata.timeout = -1;
+        transactionMetadata.timeoutTimeUnit = TimeUnit.SECONDS;
 
         if (methodNode.name.equals("<init>")) {
-            params.maxRetryCount = 0;
-            params.smartTxLengthSelector = false;
+            transactionMetadata.maxRetryCount = 0;
+            transactionMetadata.smartTxLengthSelector = false;
         } else {
-            params.maxRetryCount = 1000;
-            params.smartTxLengthSelector = true;
+            transactionMetadata.maxRetryCount = 1000;
+            transactionMetadata.smartTxLengthSelector = true;
         }
 
-        return params;
+        return transactionMetadata;
     }
 
     private TransactionMetadata createTransactionMetadata(ClassMetadata classMetadata, MethodNode methodNode) {
-        TransactionMetadata params = new TransactionMetadata();
+        TransactionMetadata transactionMetadata = new TransactionMetadata();
 
         AnnotationNode annotationNode;
         if (methodNode.name.equals("<init>")) {
@@ -231,23 +288,28 @@ public class AsmClassMetadataExtractor implements ClassMetadataExtractor {
             annotationNode = AsmUtils.getVisibleAnnotation(methodNode, TransactionalMethod.class);
         }
 
-        params.readOnly = (Boolean) getValue(annotationNode, "readonly", false);
-        params.familyName = createFamilyName(classMetadata.getName(), methodNode.name, methodNode.desc);
-        params.interruptible = (Boolean) getValue(annotationNode, "interruptible", false);
-        params.allowWriteSkewProblem = (Boolean) getValue(annotationNode, "allowWriteSkewProblem", true);
-        boolean trackReadsDefault = !params.readOnly;
-        params.automaticReadTracking = (Boolean) getValue(annotationNode, "automaticReadTracking", trackReadsDefault);
+        MethodMetadata methodMetadata = classMetadata.getMethodMetadata(methodNode.name, methodNode.desc);
+        boolean throwsInterruptedException = methodMetadata.checkIfSpecificTransactionIsThrown(InterruptedException.class);
+        transactionMetadata.readOnly = (Boolean) getValue(annotationNode, "readonly", false);
+        transactionMetadata.familyName = createFamilyName(classMetadata.getName(), methodNode.name, methodNode.desc);
+        transactionMetadata.interruptible = (Boolean) getValue(annotationNode, "interruptible", throwsInterruptedException);
+        transactionMetadata.allowWriteSkewProblem = (Boolean) getValue(annotationNode, "allowWriteSkewProblem", true);
+        boolean trackReadsDefault = !transactionMetadata.readOnly;
+        transactionMetadata.automaticReadTracking = (Boolean) getValue(annotationNode, "automaticReadTracking", trackReadsDefault);
+        transactionMetadata.timeout = ((Number) getValue(annotationNode, "timeout", -1)).longValue();
+        transactionMetadata.timeoutTimeUnit = (TimeUnit) getValue(annotationNode, "timeoutTimeUnit", TimeUnit.SECONDS);
 
         if (methodNode.name.equals("<init>")) {
-            params.maxRetryCount = (Integer) getValue(annotationNode, "maxRetryCount", 0);
-            params.smartTxLengthSelector = false;
+            transactionMetadata.maxRetryCount = (Integer) getValue(annotationNode, "maxRetryCount", 0);
+            transactionMetadata.smartTxLengthSelector = false;
         } else {
-            params.maxRetryCount = (Integer) getValue(annotationNode, "maxRetryCount", 1000);
-            params.smartTxLengthSelector = true;
+            transactionMetadata.maxRetryCount = (Integer) getValue(annotationNode, "maxRetryCount", 1000);
+            transactionMetadata.smartTxLengthSelector = true;
         }
 
-        return params;
+        return transactionMetadata;
     }
+
 
     private String createFamilyName(String className, String methodName, String desc) {
         StringBuffer sb = new StringBuffer();
@@ -280,10 +342,6 @@ public class AsmClassMetadataExtractor implements ClassMetadataExtractor {
         }
 
         return defaultValue;
-    }
-
-    private static boolean hasCorrectMethodAccessForTransactionalMethod(int access) {
-        return !(AsmUtils.isSynthetic(access) || isNative(access));
     }
 
     public static boolean isExcluded(FieldNode field) {

@@ -1,13 +1,12 @@
 package org.multiverse.utils.latches;
 
 import org.multiverse.TestThread;
-import org.multiverse.api.Latch;
 
 public class AwaitUninterruptibleThread extends TestThread {
 
     private final Latch latch;
 
-    public AwaitUninterruptibleThread(Latch latch){
+    public AwaitUninterruptibleThread(Latch latch) {
         this(latch, false);
     }
 

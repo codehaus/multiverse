@@ -43,7 +43,6 @@ public class TransactionalMethod_settingTest {
         assertEquals(51 + 1, tryCounter.get());
     }
 
-
     @TransactionalObject
     public static class ObjectWithRetryCount {
 
@@ -150,6 +149,8 @@ public class TransactionalMethod_settingTest {
         o.defaultMethodIsNotInterruptible();
         o.defaultMethodWithEmptyTransactionalMethodIsNotInterruptible();
         o.withInterruptibleSet();
+        o.withNoTransactionalMethodButThrowingInterruptibleException();
+        o.withEmptyTransactionalMethodException();
     }
 
     @TransactionalObject
@@ -174,6 +175,17 @@ public class TransactionalMethod_settingTest {
 
         @TransactionalMethod(interruptible = true)
         public void withInterruptibleSet() throws InterruptedException {
+            Transaction tx = getThreadLocalTransaction();
+            assertTrue(tx.getConfig().isInterruptible());
+        }
+
+        @TransactionalMethod
+        public void withEmptyTransactionalMethodException() throws InterruptedException {
+            Transaction tx = getThreadLocalTransaction();
+            assertTrue(tx.getConfig().isInterruptible());
+        }
+
+        public void withNoTransactionalMethodButThrowingInterruptibleException() throws InterruptedException {
             Transaction tx = getThreadLocalTransaction();
             assertTrue(tx.getConfig().isInterruptible());
         }

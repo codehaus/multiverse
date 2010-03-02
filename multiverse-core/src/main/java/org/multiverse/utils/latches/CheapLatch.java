@@ -1,11 +1,9 @@
 package org.multiverse.utils.latches;
 
-import org.multiverse.api.Latch;
-
 import java.util.concurrent.TimeUnit;
 
 /**
- * A {@link org.multiverse.api.Latch} based on the intrinsic lock and uses the minimal amount of resources. It uses the CheapLatch object
+ * A {@link Latch} based on the intrinsic lock and uses the minimal amount of resources. It uses the CheapLatch object
  * itself for the monitor lock. It can't do any timed waits.
  * <p/>
  * If bounded waits are needed, a new latch needs to be added. A simple implementation would be one

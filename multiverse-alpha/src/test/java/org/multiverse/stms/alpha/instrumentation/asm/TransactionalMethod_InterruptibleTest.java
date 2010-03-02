@@ -1,5 +1,6 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestUtils;
@@ -19,12 +20,16 @@ public class TransactionalMethod_InterruptibleTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
+        TestUtils.resetInstrumentationProblemMonitor();
+    }
+
+    @After
+    public void tearDown() {
+        TestUtils.resetInstrumentationProblemMonitor();
     }
 
     @Test
     public void whenNoException_thenError() {
-        TestUtils.resetInstrumentationProblemMonitor();
-
         MethodWithoutException o = new MethodWithoutException();
 
         assertTrue(InstrumentationProblemMonitor.INSTANCE.isProblemFound());

@@ -19,6 +19,7 @@ import org.multiverse.utils.profiling.ProfileRepository;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import static java.lang.String.format;
@@ -175,6 +176,12 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             this.interruptible = interruptible;
             this.smartTxLengthSelector = smartTxLengthSelector;
             this.dirtyCheck = dirtyCheck;
+        }
+
+        @Override
+        public AlphaTransactionFactoryBuilder setTimeout(long timeout, TimeUnit unit) {
+            //todo: this needs to be done.            
+            return this;
         }
 
         @Override

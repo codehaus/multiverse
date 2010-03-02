@@ -1,7 +1,5 @@
 package org.multiverse.utils.latches;
 
-import org.multiverse.api.Latch;
-
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;

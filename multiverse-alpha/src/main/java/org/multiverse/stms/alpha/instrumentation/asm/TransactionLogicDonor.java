@@ -1,6 +1,5 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
-import org.multiverse.api.Latch;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.RecoverableThrowable;
@@ -10,6 +9,7 @@ import org.multiverse.api.exceptions.TransactionTooSmallException;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.latches.CheapLatch;
+import org.multiverse.utils.latches.Latch;
 
 import static java.lang.String.format;
 import static org.multiverse.api.ThreadLocalTransaction.*;
@@ -59,7 +59,6 @@ public class TransactionLogicDonor {
             clearThreadLocalTransaction();
         }
     }
-
 
     public static void donorMethod() throws Exception {
         AlphaTransaction tx = (AlphaTransaction) getThreadLocalTransaction();

@@ -34,9 +34,13 @@ public class TransactionalObject_InterfaceTest {
         Class clazz = TransactionalInterface.class;
 
         String internalName = Type.getInternalName(clazz);
-        ClassMetadata classMetadata = repository.getClassMetadata(internalName);
+        ClassMetadata classMetadata = repository.getClassMetadata(ClassLoader.getSystemClassLoader(), internalName);
+
+        assertFalse(classMetadata.isIgnoredClass());
         assertTrue(classMetadata.isTransactionalObject());
         assertFalse(classMetadata.isRealTransactionalObject());
+        assertTrue(classMetadata.getInterfaces().isEmpty());
+        assertTrue(classMetadata.isInterface());
 
         clazz.getMethod("someMethod");
     }
@@ -48,13 +52,15 @@ public class TransactionalObject_InterfaceTest {
 
     @Test
     public void extendingInterface() {
-        Class clazz = ExtendingInterface.class;
+        ClassMetadata classMetadata = repository.getClassMetadata(ExtendingInterface.class);
+        ClassMetadata interfaceMetadata = repository.getClassMetadata(TransactionalInterface.class);
 
-        String internalName = Type.getInternalName(clazz);
-        ClassMetadata classMetadata = repository.getClassMetadata(internalName);
-
+        assertTrue(classMetadata.isInterface());
+        assertFalse(classMetadata.isIgnoredClass());
         assertTrue(classMetadata.isTransactionalObject());
         assertFalse(classMetadata.isRealTransactionalObject());
+        assertEquals(1, classMetadata.getInterfaces().size());
+        assertEquals(classMetadata.getInterfaces().get(0), interfaceMetadata);
     }
 
     interface ExtendingInterface extends TransactionalInterface {
@@ -68,6 +74,16 @@ public class TransactionalObject_InterfaceTest {
         o.someMethod();
 
         assertEquals(1, o.getValue());
+
+        ClassMetadata interfaceMetadata = repository.getClassMetadata(TransactionalInterface.class);
+        ClassMetadata classMetadata = repository.getClassMetadata(ObjectImplementingTransactionalInterface.class);
+
+        assertFalse(classMetadata.isInterface());
+        assertFalse(classMetadata.isIgnoredClass());
+        assertTrue(classMetadata.isTransactionalObject());
+        assertTrue(classMetadata.isRealTransactionalObject());
+        assertEquals(1, classMetadata.getInterfaces().size());
+        assertEquals(classMetadata.getInterfaces().get(0), interfaceMetadata);
     }
 
 
@@ -92,8 +108,17 @@ public class TransactionalObject_InterfaceTest {
         o.someMethod();
 
         assertEquals(1, o.getValue());
-    }
 
+        ClassMetadata interfaceMetadata = repository.getClassMetadata(ExtendingInterface.class);
+        ClassMetadata classMetadata = repository.getClassMetadata(ObjectImplementingExtendingInterface.class);
+
+        assertFalse(classMetadata.isInterface());
+        assertFalse(classMetadata.isIgnoredClass());
+        assertTrue(classMetadata.isTransactionalObject());
+        assertTrue(classMetadata.isRealTransactionalObject());
+        assertEquals(1, classMetadata.getInterfaces().size());
+        assertEquals(classMetadata.getInterfaces().get(0), interfaceMetadata);
+    }
 
     public class ObjectImplementingExtendingInterface implements ExtendingInterface {
         private int value;

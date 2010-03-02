@@ -71,4 +71,5 @@ public interface TransactionConfig {
      * @return true if the writeskew problem is allowed, false otherwise.
      */
     boolean allowWriteSkewProblem();
+
 }

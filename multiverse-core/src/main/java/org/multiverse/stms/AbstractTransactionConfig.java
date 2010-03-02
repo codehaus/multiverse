@@ -6,6 +6,8 @@ import org.multiverse.utils.backoff.ExponentialBackoffPolicy;
 import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.clock.StrictPrimitiveClock;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Contains the configuration for the AbstractTransaction.
  * <p/>
@@ -24,6 +26,8 @@ public class AbstractTransactionConfig implements TransactionConfig {
     public final boolean interruptible;
     public final boolean allowWriteSkewProblem;
     public final boolean automaticReadTracking;
+    private long timeout;
+    private TimeUnit timeoutTimeUnit;
 
     /**
      * This method should be removed, only used for testing purposes.
@@ -35,6 +39,7 @@ public class AbstractTransactionConfig implements TransactionConfig {
     public AbstractTransactionConfig(
             PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName, boolean readOnly,
             int maxRetryCount, boolean interruptible, boolean allowWriteSkewProblem, boolean automaticReadTracking) {
+
         if (clock == null) {
             throw new NullPointerException();
         }
@@ -92,4 +97,6 @@ public class AbstractTransactionConfig implements TransactionConfig {
     public BackoffPolicy getBackoffPolicy() {
         return backoffPolicy;
     }
+
+
 }

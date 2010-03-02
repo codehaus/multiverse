@@ -44,9 +44,9 @@ public abstract class AbstractClassFileTransformer implements ClassFileTransform
                                   ProtectionDomain protectionDomain, byte[] classfileBuffer)
             throws IllegalClassFormatException {
         try {
-            if (isIgnoredPackage(className)) {
+            if (loader == null || isIgnoredPackage(className)) {
                 if (logger.isLoggable(Level.FINE)) {
-                    String msg = format("Transformer '%s' is ignoring class '%s' because it is an ignored package",
+                    String msg = format("Transformer '%s' is ignoring class '%s' because it is an ignored package or has no loader",
                             transformerName, className);
                     logger.finer(msg);
                 }

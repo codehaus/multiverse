@@ -1,5 +1,8 @@
 package org.multiverse.stms.alpha.instrumentation.metadata;
 
+import org.multiverse.utils.Multikey;
+import org.objectweb.asm.Opcodes;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -7,17 +10,23 @@ import java.util.Map;
 
 import static java.lang.String.format;
 
+/**
+ * Contains the metadata for a class.
+ *
+ * @author Peter Veentjer.
+ */
 public final class ClassMetadata {
 
     private final String className;
+
     private final Map<String, FieldMetadata> fields = new HashMap<String, FieldMetadata>();
-    private final Map<MethodKey, MethodMetadata> methods = new HashMap<MethodKey, MethodMetadata>();
+    private final Map<Multikey, MethodMetadata> methods = new HashMap<Multikey, MethodMetadata>();
+    private final List<ClassMetadata> interfaces = new LinkedList<ClassMetadata>();
 
     private boolean isTransactionalObject;
     private ClassMetadata superClassMetadata;
-    private final List<ClassMetadata> interfaces = new LinkedList<ClassMetadata>();
     private boolean ignoredClass;
-    private boolean isInterface;
+    private int access;
 
     public ClassMetadata(String className) {
         this.className = className;
@@ -28,7 +37,7 @@ public final class ClassMetadata {
             throw new NullPointerException();
         }
 
-        MethodKey methodKey = new MethodKey(methodName, desc);
+        Multikey methodKey = new Multikey(methodName, desc);
         if (methods.containsKey(methodKey)) {
             String msg = format("There already is method metadata for %s.%s%s", className, methodName, desc);
             throw new IllegalArgumentException(msg);
@@ -60,8 +69,9 @@ public final class ClassMetadata {
     }
 
     //todo: problem is with interfaces are not included in search
+
     public MethodMetadata getMethodMetadata(String name, String desc) {
-        MethodMetadata methodMetadata = methods.get(new MethodKey(name, desc));
+        MethodMetadata methodMetadata = methods.get(new Multikey(name, desc));
 
         if (methodMetadata == null && superClassMetadata != null) {
             methodMetadata = superClassMetadata.getMethodMetadata(name, desc);
@@ -166,6 +176,22 @@ public final class ClassMetadata {
         return false;
     }
 
+    public boolean isFirstGenerationRealTransactionalObject() {
+        if (!isTransactionalObject) {
+            return false;
+        }
+
+        if (!hasManagedFields()) {
+            return false;
+        }
+
+        if (superClassMetadata == null) {
+            return true;
+        }
+
+        return !superClassMetadata.isRealTransactionalObject();
+    }
+
     public String getTranlocalName() {
         return className + "__Tranlocal";
     }
@@ -174,40 +200,19 @@ public final class ClassMetadata {
         return className + "__TranlocalSnapshot";
     }
 
-    public void setIsInterface(boolean isInterface) {
-        this.isInterface = isInterface;
+    public int getAccess() {
+        return access;
+    }
+
+    public void setAccess(int access) {
+        this.access = access;
     }
 
     public boolean isInterface() {
-        return isInterface;
+        return (access & Opcodes.ACC_INTERFACE) != 0;
     }
 
-    static class MethodKey {
-        private final String name;
-        private final String desc;
-
-        MethodKey(String name, String desc) {
-            this.name = name;
-            this.desc = desc;
-        }
-
-        @Override
-        public boolean equals(Object thatObject) {
-            if (this == thatObject) {
-                return true;
-            }
-
-            if (!(thatObject instanceof MethodKey)) {
-                return false;
-            }
-
-            MethodKey that = (MethodKey) thatObject;
-            return this.name.equals(that.name) && this.desc.equals(that.desc);
-        }
-
-        @Override
-        public int hashCode() {
-            return name.hashCode() + 31 * desc.hashCode();
-        }
+    public String toString() {
+        return className;
     }
 }

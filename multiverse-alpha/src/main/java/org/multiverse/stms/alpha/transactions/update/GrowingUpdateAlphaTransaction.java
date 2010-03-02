@@ -1,6 +1,5 @@
 package org.multiverse.stms.alpha.transactions.update;
 
-import org.multiverse.api.Latch;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
@@ -11,6 +10,7 @@ import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.commitlock.CommitLock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
+import org.multiverse.utils.latches.Latch;
 import org.multiverse.utils.profiling.ProfileRepository;
 
 import java.util.Collection;

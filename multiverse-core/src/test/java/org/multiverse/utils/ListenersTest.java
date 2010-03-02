@@ -1,17 +1,18 @@
 package org.multiverse.utils;
 
-import static org.junit.Assert.*;
 import org.junit.Test;
-import org.multiverse.api.Latch;
 import org.multiverse.utils.latches.CheapLatch;
+import org.multiverse.utils.latches.Latch;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Veentjer
  */
 public class ListenersTest {
 
-     @Test
-    public void getNext(){
+    @Test
+    public void getNext() {
         Latch latch1 = new CheapLatch();
         Latch latch2 = new CheapLatch();
 
@@ -23,7 +24,7 @@ public class ListenersTest {
     }
 
     @Test
-    public void testOpenAllOnClosedListeners(){
+    public void testOpenAllOnClosedListeners() {
         Latch latch1 = new CheapLatch();
         Latch latch2 = new CheapLatch();
 
@@ -35,7 +36,7 @@ public class ListenersTest {
     }
 
     @Test
-    public void testOpenAllOnOpenListeners(){
+    public void testOpenAllOnOpenListeners() {
         Latch latch1 = new CheapLatch(true);
         Latch latch2 = new CheapLatch(true);
 

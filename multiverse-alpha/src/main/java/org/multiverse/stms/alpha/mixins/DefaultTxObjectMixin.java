@@ -1,7 +1,6 @@
 package org.multiverse.stms.alpha.mixins;
 
 import org.multiverse.MultiverseConstants;
-import org.multiverse.api.Latch;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.LoadLockedException;
 import org.multiverse.api.exceptions.LoadTooOldVersionException;
@@ -11,6 +10,7 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.RegisterRetryListenerResult;
 import org.multiverse.utils.Listeners;
+import org.multiverse.utils.latches.Latch;
 
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 

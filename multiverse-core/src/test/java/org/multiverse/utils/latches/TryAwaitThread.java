@@ -1,7 +1,6 @@
 package org.multiverse.utils.latches;
 
 import org.multiverse.TestThread;
-import org.multiverse.api.Latch;
 
 import java.util.concurrent.TimeUnit;
 
@@ -11,7 +10,7 @@ public class TryAwaitThread extends TestThread {
     private final TimeUnit unit;
     private Boolean result;
 
-    public TryAwaitThread(Latch latch, long timeout, TimeUnit unit){
+    public TryAwaitThread(Latch latch, long timeout, TimeUnit unit) {
         super("TryAwaitThread");
         this.latch = latch;
         this.timeout = timeout;

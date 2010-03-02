@@ -40,7 +40,7 @@ public class TransactionalObject_ExcludeMethodTest {
         ExcludePriorityObject o = new ExcludePriorityObject();
 
         ClassMetadata classMetadata = MetadataRepository.INSTANCE.getClassMetadata(
-                Type.getType(ExcludePriorityObject.class).getInternalName());
+                ClassLoader.getSystemClassLoader(), Type.getType(ExcludePriorityObject.class).getInternalName());
         boolean isTransactional = classMetadata.getMethodMetadata("excludedIncTwice", "()V").isTransactional();
 
         assertFalse(isTransactional);

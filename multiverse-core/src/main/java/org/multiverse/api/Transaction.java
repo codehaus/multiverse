@@ -1,5 +1,7 @@
 package org.multiverse.api;
 
+import org.multiverse.utils.latches.Latch;
+
 /**
  * All changes on transaction objects must be done through a Transaction. The transaction make sure that changes
  * on java objects are:
@@ -33,9 +35,9 @@ package org.multiverse.api;
  * <dd>
  * It is possible to let a transaction block until some state changes has happened; comparable with
  * the waitset/{@link java.util.concurrent.locks.Condition} functionality already provided. For more information see the
- * {@link #registerRetryLatch(Latch)}.
+ * {@link #registerRetryLatch(org.multiverse.utils.latches.Latch)}.
  * <p/>
- * Because a custom {@link Latch} implementation can be provided, you have a lot of control on the blocking behavior.
+ * Because a custom {@link org.multiverse.utils.latches.Latch} implementation can be provided, you have a lot of control on the blocking behavior.
  * But atm it is not possible to get fairness on when the Latch is opened. Policies to customize starvation,
  * lifelocking, deadlocking will be added in the future.
  * </dd>
@@ -182,4 +184,10 @@ public interface Transaction {
      *                              if transaction already is aborted or committed.
      */
     void registerLifecycleListener(TransactionLifecycleListener listener);
+
+    //long getTimeout();
+
+    //TimeUnit getTimeoutTimeUnit();
+
+    //void setTimeout(long timeout, TimeUnit timeUnit);
 }

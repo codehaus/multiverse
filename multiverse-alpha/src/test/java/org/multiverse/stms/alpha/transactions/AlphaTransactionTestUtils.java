@@ -1,9 +1,9 @@
 package org.multiverse.stms.alpha.transactions;
 
-import org.multiverse.api.Latch;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.utils.Listeners;
+import org.multiverse.utils.latches.Latch;
 
 import java.util.Arrays;
 import java.util.LinkedList;

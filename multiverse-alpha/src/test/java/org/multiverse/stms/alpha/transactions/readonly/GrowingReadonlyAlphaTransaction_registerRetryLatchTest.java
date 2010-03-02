@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
-import org.multiverse.api.Latch;
 import org.multiverse.api.exceptions.NoRetryPossibleException;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
@@ -13,6 +12,7 @@ import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.utils.Listeners;
 import org.multiverse.utils.latches.CheapLatch;
+import org.multiverse.utils.latches.Latch;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;

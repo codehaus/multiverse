@@ -18,18 +18,22 @@ public class NonTransactionalMethodFieldAccessTransformer implements Opcodes {
     private final ClassNode classNode;
     private final MetadataRepository metadataRepository;
     private final ClassMetadata classMetadata;
+    private final ClassLoader classLoader;
 
-    public NonTransactionalMethodFieldAccessTransformer(ClassNode classNode) {
+    public NonTransactionalMethodFieldAccessTransformer(ClassLoader classLoader, ClassNode classNode) {
+        if (classLoader == null || classNode == null) {
+            throw new NullPointerException();
+        }
+
         this.metadataRepository = MetadataRepository.INSTANCE;
         this.classNode = classNode;
-        this.classMetadata = metadataRepository.getClassMetadata(classNode.name);
+        this.classLoader = classLoader;
+        this.classMetadata = metadataRepository.getClassMetadata(classLoader, classNode.name);
     }
-
-    //todo: return null
 
     public ClassNode transform() {
         if (classMetadata.isIgnoredClass()) {
-            return classNode;
+            return null;
         }
 
         fixMethods();
@@ -65,7 +69,7 @@ public class NonTransactionalMethodFieldAccessTransformer implements Opcodes {
         fixedMethod.exceptions = methodNode.exceptions;
         fixedMethod.tryCatchBlocks = new LinkedList();//originalMethod.tryCatchBlocks;
 
-        methodNode.accept(new NonTransactionalMethodFieldAccessMethodAdapter(fixedMethod));
+        methodNode.accept(new NonTransactionalMethodFieldAccessMethodAdapter(classLoader, fixedMethod));
 
         return fixedMethod;
     }

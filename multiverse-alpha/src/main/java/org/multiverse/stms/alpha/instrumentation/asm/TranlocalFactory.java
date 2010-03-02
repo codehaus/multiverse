@@ -36,11 +36,13 @@ public final class TranlocalFactory implements Opcodes {
     private final String tranlocalName;
     private final String tranlocalSnapshotName;
     private final MetadataRepository metadataRepository;
+    private final ClassLoader classLoader;
 
-    public TranlocalFactory(ClassNode clazz) {
+    public TranlocalFactory(ClassLoader classLoader, ClassNode clazz) {
         this.metadataRepository = MetadataRepository.INSTANCE;
         this.clazz = clazz;
-        this.clazzMetadata = metadataRepository.getClassMetadata(clazz.name);
+        this.classLoader = classLoader;
+        this.clazzMetadata = metadataRepository.getClassMetadata(classLoader, clazz.name);
         this.tranlocalName = clazzMetadata.getTranlocalName();
         this.tranlocalSnapshotName = clazzMetadata.getTranlocalSnapshotName();
     }

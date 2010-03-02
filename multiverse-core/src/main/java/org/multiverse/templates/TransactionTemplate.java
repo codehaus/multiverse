@@ -4,6 +4,7 @@ import org.multiverse.api.*;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.latches.CheapLatch;
+import org.multiverse.utils.latches.Latch;
 
 import static java.lang.String.format;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;

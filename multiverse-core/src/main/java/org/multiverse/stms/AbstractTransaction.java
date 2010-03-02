@@ -4,6 +4,7 @@ import org.multiverse.MultiverseConstants;
 import org.multiverse.api.*;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.NoRetryPossibleException;
+import org.multiverse.utils.latches.Latch;
 
 import java.util.LinkedList;
 import java.util.List;

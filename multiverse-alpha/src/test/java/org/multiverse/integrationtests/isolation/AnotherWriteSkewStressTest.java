@@ -37,7 +37,7 @@ public class AnotherWriteSkewStressTest {
     }
 
     @Test
-    public void writeSkewAllowed() {
+    public void allowWriteSkewProblem() {
         allowWriteSkewProblem = true;
         startAll(threads);
         joinAll(threads);
@@ -49,7 +49,7 @@ public class AnotherWriteSkewStressTest {
     }
 
     @Test
-    public void writeSkewProblemNotAllowed() {
+    public void disallowedWriteSkewProblem() {
         allowWriteSkewProblem = false;
         startAll(threads);
         joinAll(threads);
@@ -75,20 +75,20 @@ public class AnotherWriteSkewStressTest {
                 }
 
                 if (allowWriteSkewProblem) {
-                    runWithPreventWriteSkew();
+                    runWithAllowWriteSkewProblem();
                 } else {
-                    runWithoutPreventWriteSkew();
+                    runWithDisallowedWriteSkewProblem();
                 }
             }
         }
 
-        @TransactionalMethod(automaticReadTracking = false)
-        private void runWithoutPreventWriteSkew() {
+        @TransactionalMethod(allowWriteSkewProblem = false)
+        private void runWithDisallowedWriteSkewProblem() {
             doIt();
         }
 
-        @TransactionalMethod(automaticReadTracking = true, allowWriteSkewProblem = true)
-        private void runWithPreventWriteSkew() {
+        @TransactionalMethod(allowWriteSkewProblem = true)
+        private void runWithAllowWriteSkewProblem() {
             doIt();
         }
 

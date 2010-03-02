@@ -1,8 +1,8 @@
 package org.multiverse.transactional.nonblocking;
 
-import org.multiverse.api.Latch;
 import org.multiverse.api.Transaction;
 import org.multiverse.utils.TodoException;
+import org.multiverse.utils.latches.Latch;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -12,8 +12,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * The default {@link TransactionSelector} implementation.
  *
- * @param <K>
  * @author Peter Veentjer.
+ * @param <K>
  */
 public class DefaultTransactionSelector<K extends TransactionSelectionKey>
         implements TransactionSelector<K> {

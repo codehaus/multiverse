@@ -4,6 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Annotation that can be added to a method and constructors to make them Transactional. A transactional method
@@ -43,4 +44,8 @@ public @interface TransactionalMethod {
     boolean readonly() default false;
 
     int maxRetryCount() default 1000;
+
+    long timeout() default -1;
+
+    TimeUnit timeoutTimeUnit() default TimeUnit.SECONDS;
 }

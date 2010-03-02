@@ -43,9 +43,9 @@ public class TransactionalObjectTransformer implements Opcodes {
     private final ClassNode mixinClassNode;
     private ClassMetadata classMetadata;
 
-    public TransactionalObjectTransformer(ClassNode originalClass, ClassNode mixinClassNode) {
+    public TransactionalObjectTransformer(ClassLoader classLoader, ClassNode originalClass, ClassNode mixinClassNode) {
         this.classNode = originalClass;
-        this.classMetadata = MetadataRepository.INSTANCE.getClassMetadata(originalClass.name);
+        this.classMetadata = MetadataRepository.INSTANCE.getClassMetadata(classLoader, originalClass.name);
         this.mixinClassNode = mixinClassNode;
     }
 

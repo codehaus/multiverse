@@ -22,15 +22,17 @@ public class FieldGranularityTransformer implements Opcodes {
 
     private final ClassNode classNode;
     private final ClassMetadata classMetadata;
-    private MetadataRepository metadataRepository;
+    private final MetadataRepository metadataRepository;
+    private final ClassLoader classLoader;
 
-    public FieldGranularityTransformer(ClassNode classNode) {
+    public FieldGranularityTransformer(ClassLoader classLoader, ClassNode classNode) {
         if (classNode == null) {
             throw new RuntimeException();
         }
 
+        this.classLoader = classLoader;
         this.classNode = classNode;
-        this.classMetadata = MetadataRepository.INSTANCE.getClassMetadata(classNode.name);
+        this.classMetadata = MetadataRepository.INSTANCE.getClassMetadata(classLoader, classNode.name);
         this.metadataRepository = MetadataRepository.INSTANCE;
     }
 
@@ -128,7 +130,7 @@ public class FieldGranularityTransformer implements Opcodes {
             switch (originalInsn.getOpcode()) {
                 case PUTFIELD: {
                     FieldInsnNode fieldInsn = (FieldInsnNode) originalInsn;
-                    ClassMetadata ownerMetadata = metadataRepository.getClassMetadata(fieldInsn.owner);
+                    ClassMetadata ownerMetadata = metadataRepository.getClassMetadata(classLoader, fieldInsn.owner);
                     FieldMetadata fieldMetadata = ownerMetadata.getFieldMetadata(fieldInsn.name);
 
                     if (fieldMetadata.hasFieldGranularity()) {
@@ -202,7 +204,8 @@ public class FieldGranularityTransformer implements Opcodes {
                 break;
                 case GETFIELD: {
                     FieldInsnNode fieldInsn = (FieldInsnNode) originalInsn;
-                    FieldMetadata fieldMetadata = metadataRepository.getClassMetadata(fieldInsn.owner).getFieldMetadata(fieldInsn.name);
+                    FieldMetadata fieldMetadata = metadataRepository.getClassMetadata(classLoader, fieldInsn.owner)
+                            .getFieldMetadata(fieldInsn.name);
                     if (fieldMetadata.hasFieldGranularity()) {
                         Class refClass = findReferenceClass(fieldInsn.desc);
 

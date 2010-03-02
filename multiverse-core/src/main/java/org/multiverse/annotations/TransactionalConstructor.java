@@ -4,6 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Annotation that can be placed on constructor. There is a lot of overlap with the {@link TransactionalMethod}
@@ -37,4 +38,20 @@ public @interface TransactionalConstructor {
      * @return true if the writeSkew problem is allowed.
      */
     boolean allowWriteSkewProblem() default true;
+
+    /**
+     * The timeout that is used to limit the time a transaction blocks.
+     * <p/>
+     * Value smaller than zero indicates that there is no limit on the timeout.
+     *
+     * @return the timeout.
+     */
+    long timeout() default -1;
+
+    /**
+     * The TimeUnit for the timeout argument.
+     *
+     * @return the TimeUnit for the timeout argument.
+     */
+    TimeUnit timeoutTimeUnit() default TimeUnit.SECONDS;
 }

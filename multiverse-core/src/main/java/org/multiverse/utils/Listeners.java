@@ -1,6 +1,6 @@
 package org.multiverse.utils;
 
-import org.multiverse.api.Latch;
+import org.multiverse.utils.latches.Latch;
 
 /**
  * A immutable single-linked list for storing listener-latches.

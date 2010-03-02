@@ -1,5 +1,10 @@
 package org.multiverse.stms.alpha.instrumentation.metadata;
 
+/**
+ * Contains the metadata for a class field.
+ *
+ * @author Peter Veentjer.
+ */
 public final class FieldMetadata {
 
     private final ClassMetadata classMetadata;
@@ -7,10 +12,23 @@ public final class FieldMetadata {
     private String desc;
     private boolean hasFieldGranularity;
     private boolean isManagedField;
+    private int access;
 
     public FieldMetadata(ClassMetadata classMetadata, String name) {
+        if (classMetadata == null || name == null) {
+            throw new NullPointerException();
+        }
+
         this.classMetadata = classMetadata;
         this.name = name;
+    }
+
+    public int getAccess() {
+        return access;
+    }
+
+    public void setAccess(int access) {
+        this.access = access;
     }
 
     public ClassMetadata getClassMetadata() {

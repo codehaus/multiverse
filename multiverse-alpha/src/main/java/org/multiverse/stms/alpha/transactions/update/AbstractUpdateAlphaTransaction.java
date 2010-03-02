@@ -1,6 +1,5 @@
 package org.multiverse.stms.alpha.transactions.update;
 
-import org.multiverse.api.Latch;
 import org.multiverse.api.exceptions.FailedToObtainCommitLocksException;
 import org.multiverse.api.exceptions.WriteConflictException;
 import org.multiverse.stms.AbstractTransactionSnapshot;
@@ -8,6 +7,7 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AbstractAlphaTransaction;
 import org.multiverse.utils.Listeners;
+import org.multiverse.utils.latches.Latch;
 
 import static java.lang.String.format;
 
@@ -241,18 +241,21 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
         }
 
         boolean hasConflict;
-        if (config.optimizedConflictDetection && getReadVersion() == config.clock.getVersion()) {
-            writeVersion = config.clock.tick();
-            //it could be that a different transaction also reached this part, so we need to make sure
-            hasConflict = writeVersion != getReadVersion() + 1;
-        } else if (!config.allowWriteSkewProblem) {
+        if (config.allowWriteSkewProblem) {
+            if (config.optimizedConflictDetection && getReadVersion() == config.clock.getVersion()) {
+                writeVersion = config.clock.tick();
+                //it could be that a different transaction also reached this part, so we need to make sure
+                hasConflict = writeVersion != getReadVersion() + 1;
+            } else {
+                hasConflict = hasWriteConflict();
+                if (!hasConflict) {
+                    writeVersion = config.clock.tick();
+                }
+            }
+        } else {
+            //todo: could here be a potential race problem because the reads are not locked, only the writes.
             writeVersion = config.clock.strictTick();
             hasConflict = hasReadConflict();
-        } else {
-            hasConflict = hasWriteConflict();
-            if (!hasConflict) {
-                writeVersion = config.clock.tick();
-            }
         }
 
         if (hasConflict) {

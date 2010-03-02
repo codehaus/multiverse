@@ -14,7 +14,6 @@ public class Queue<E> {
     public final Stack<E> readyToPopStack;
     public final int maxCapacity;
 
-
     public Queue(int maxCapacity) {
         if (maxCapacity < 0) {
             throw new IllegalArgumentException();

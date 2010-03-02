@@ -2,6 +2,8 @@ package org.multiverse.api;
 
 import org.multiverse.utils.backoff.BackoffPolicy;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * An implementation of the builder design pattern to create a {@link TransactionFactory}. This is the place to be
  * for transaction configuration. This approach also gives the freedom to access implementation specific
@@ -111,6 +113,8 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      * @throws NullPointerException if backoffPolicy is null.
      */
     B setBackoffPolicy(BackoffPolicy backoffPolicy);
+
+    B setTimeout(long timeout, TimeUnit unit);
 
     /**
      * Sets the the maximum count a transaction can be retried. The default is 1000.

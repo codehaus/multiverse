@@ -25,6 +25,24 @@ public class TestUtils {
         Thread.interrupted();
     }
 
+    public static boolean hasMethod(Class clazz, String method, Class... types) {
+        try {
+            clazz.getMethod(method, types);
+            return true;
+        } catch (NoSuchMethodException e) {
+            return false;
+        }
+    }
+
+    public static boolean hasField(Class clazz, String fieldname) {
+        try {
+            clazz.getDeclaredField(fieldname);
+            return true;
+        } catch (NoSuchFieldException e) {
+            return false;
+        }
+    }
+
     public static Object getField(Object o, String fieldname) {
         try {
             Field field = o.getClass().getDeclaredField(fieldname);

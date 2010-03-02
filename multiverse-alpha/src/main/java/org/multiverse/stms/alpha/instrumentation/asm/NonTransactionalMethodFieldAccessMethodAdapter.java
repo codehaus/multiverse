@@ -28,16 +28,18 @@ import static org.objectweb.asm.Type.getInternalName;
 public class NonTransactionalMethodFieldAccessMethodAdapter extends MethodAdapter implements Opcodes {
 
     private final MetadataRepository metadataRepository;
+    private final ClassLoader classLoader;
 
-    public NonTransactionalMethodFieldAccessMethodAdapter(MethodVisitor mv) {
+    public NonTransactionalMethodFieldAccessMethodAdapter(ClassLoader classLoader, MethodVisitor mv) {
         super(mv);
 
         this.metadataRepository = MetadataRepository.INSTANCE;
+        this.classLoader = classLoader;
     }
 
     @Override
     public void visitFieldInsn(int opcode, String owner, String fieldName, String valueDesc) {
-        ClassMetadata ownerMetadata = metadataRepository.getClassMetadata(owner);
+        ClassMetadata ownerMetadata = metadataRepository.getClassMetadata(classLoader, owner);
         FieldMetadata fieldMetadata = ownerMetadata.getFieldMetadata(fieldName);
 
         if (fieldMetadata.isManagedField()) {
@@ -91,8 +93,6 @@ public class NonTransactionalMethodFieldAccessMethodAdapter extends MethodAdapte
             //fields of unmanaged objects can be used as is, no need for change.
             mv.visitFieldInsn(opcode, owner, fieldName, valueDesc);
         }
-
-        //System.out.println("end "+owner+"."+name+" opcode="+opcode);
     }
 
     private void txObjectOnTopToTranlocal(String txObjectName, boolean write) {
@@ -116,7 +116,7 @@ public class NonTransactionalMethodFieldAccessMethodAdapter extends MethodAdapte
                 openMethod,
                 format("(%s)%s", getDescriptor(AlphaTransactionalObject.class), getDescriptor(AlphaTranlocal.class)));
 
-        String tranlocalName = metadataRepository.getClassMetadata(txObjectName).getTranlocalName();
+        String tranlocalName = metadataRepository.getClassMetadata(classLoader, txObjectName).getTranlocalName();
 
         super.visitTypeInsn(CHECKCAST, tranlocalName);
     }

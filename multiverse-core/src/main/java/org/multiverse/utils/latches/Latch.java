@@ -1,4 +1,4 @@
-package org.multiverse.api;
+package org.multiverse.utils.latches;
 
 import java.util.concurrent.TimeUnit;
 

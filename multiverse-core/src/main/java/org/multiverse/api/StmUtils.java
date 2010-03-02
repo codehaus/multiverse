@@ -57,6 +57,16 @@ public final class StmUtils {
         tx.commit();
     }
 
+    ///**
+    // * Sets the timeout
+    // * @param timeout
+    // * @param timeoutTimeUnit
+    // */
+    //public static void setTimeout(long timeout, TimeUnit timeoutTimeUnit) {
+    //    Transaction tx = getRequiredThreadLocalTransaction();
+    //    tx.setTimeout(timeout, timeoutTimeUnit);
+    //}
+
     /**
      * Scheduled an deferred task on the Transaction in the ThreadLocalTransaction. This task is executed after
      * the transaction commits and one of the use cases is starting transactions.

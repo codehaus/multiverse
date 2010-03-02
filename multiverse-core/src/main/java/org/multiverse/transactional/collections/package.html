@@ -1,6 +1,17 @@
 <html>
 <body>
 This package contains datastructures like queues and maps written to be used in
-STM transactions.
+STM transactions. The idea is to provide transactional implementations of the java
+collection framework interfaces. Also an additional interface is introduced for
+transactional collections that extend the original one. Using this transactional
+interface instead of the original one clearly indicates to a developer that an object
+of this type is transactional. Another advantage is that the instrumentation is able
+to do a instrumentation improvements.
+<p>
+    Since Multiverse 0.5 it is possible to add annotations on interfaces so that they are
+    used at the implementation. This is one of the things I normally hate with annotations
+    because they don't inherit; well in Multiverse they do. A practical example of this ugly ness
+    is the transaction support in Spring where you need to define the transaction settings on
+    the implementation instead of the interface.
 </body>
 </html>

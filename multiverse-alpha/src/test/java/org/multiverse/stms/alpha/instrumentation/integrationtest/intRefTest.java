@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestUtils;
+import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 import org.multiverse.utils.instrumentation.InstrumentationProblemMonitor;
@@ -33,7 +34,23 @@ public class intRefTest {
         TransactionalInteger.class.toString();
 
         MetadataRepository repo = MetadataRepository.INSTANCE;
-        assertFalse(existsField(TransactionalInteger.class, "value"));
-        assertTrue(existsTranlocalField(TransactionalInteger.class, "value"));
+        assertFalse(existsField(IntRef.class, "value"));
+        assertTrue(existsTranlocalField(IntRef.class, "value"));
+    }
+
+    @TransactionalObject
+    static class IntRef {
+        private int value;
+
+        public IntRef() {
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public void setValue(int value) {
+            this.value = value;
+        }
     }
 }

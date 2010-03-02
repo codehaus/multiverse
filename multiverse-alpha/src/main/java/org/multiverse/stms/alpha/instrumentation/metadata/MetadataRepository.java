@@ -1,6 +1,8 @@
 package org.multiverse.stms.alpha.instrumentation.metadata;
 
 import org.multiverse.stms.alpha.instrumentation.asm.AsmClassMetadataExtractor;
+import org.multiverse.utils.Multikey;
+import org.objectweb.asm.Type;
 
 import java.util.HashMap;
 
@@ -12,9 +14,7 @@ public final class MetadataRepository {
 
     public final static MetadataRepository INSTANCE = new MetadataRepository();
 
-    public static ClassLoader classLoader;
-
-    private final HashMap<String, ClassMetadata> map = new HashMap<String, ClassMetadata>();
+    private final HashMap<Multikey, ClassMetadata> map = new HashMap<Multikey, ClassMetadata>();
 
     private final ClassMetadataExtractor classMetadataExtractor;
 
@@ -23,22 +23,28 @@ public final class MetadataRepository {
         classMetadataExtractor.init(this);
     }
 
-    public ClassMetadata getClassMetadata(String className) {
+    public ClassMetadata getClassMetadata(Class clazz) {
+        if (clazz == null) {
+            throw new NullPointerException();
+        }
+
+        String name = Type.getInternalName(clazz);
+        return getClassMetadata(clazz.getClassLoader(), name);
+    }
+
+    public ClassMetadata getClassMetadata(ClassLoader classLoader, String className) {
         if (className == null) {
             throw new NullPointerException();
         }
 
-        ClassMetadata classMetadata = map.get(className);
+        Multikey key = new Multikey(classLoader, className);
+
+        ClassMetadata classMetadata = map.get(key);
         if (classMetadata == null) {
             classMetadata = classMetadataExtractor.extract(className, classLoader);
-            map.put(className, classMetadata);
+            map.put(key, classMetadata);
         }
 
         return classMetadata;
-    }
-
-    public MethodMetadata getMethodMetadata(String className, String methodName, String desc) {
-        ClassMetadata classMetadata = getClassMetadata(className);
-        return classMetadata.getMethodMetadata(methodName, desc);
     }
 }
