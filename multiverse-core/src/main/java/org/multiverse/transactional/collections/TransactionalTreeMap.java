@@ -33,6 +33,17 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
     }
 
     @Override
+    public void clear() {
+        //prevent doing an open for write.
+        if (size == 0) {
+            return;
+        }
+
+        size = 0;
+        root = null;
+    }
+
+    @Override
     public boolean containsKey(Object key) {
         if (key == null) {
             throw new NullPointerException();
@@ -52,6 +63,16 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
     }
 
     @Override
+    public V get(Object key) {
+        if (key == null) {
+            throw new NullPointerException();
+        }
+
+        Node<K, V> node = findNode(key);
+        return node == null ? null : node.value;
+    }
+
+    @Override
     public V put(K key, V value) {
         if (key == null) {
             throw new NullPointerException();
@@ -61,19 +82,46 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
             size++;
             root = new Node<K, V>(key, value);
             return null;
-        } else {
-            throw new TodoException();
+        }
+
+        Node<K, V> node = root;
+        while (true) {
+            int cmp = compareTo(key, node.key);
+            if (cmp < 0) {
+                if (node.left != null) {
+                    node = node.left;
+                } else {
+                    Node<K, V> newNode = new Node<K, V>(key, value);
+                    newNode.parent = node;
+                    node.left = newNode;
+                    size++;
+                    return null;
+                }
+            } else if (cmp > 0) {
+                if (node.right != null) {
+                    node = node.right;
+                } else {
+                    Node<K, V> newNode = new Node<K, V>(key, value);
+                    newNode.parent = node;
+                    node.right = newNode;
+                    size++;
+                    return null;
+                }
+            } else {
+                V oldValue = node.value;
+                node.value = value;
+                return oldValue;
+            }
         }
     }
 
-    @Override
-    public V get(Object key) {
-        if (key == null) {
-            throw new NullPointerException();
+    private int compareTo(K key1, K key2) {
+        if (comparator != null) {
+            return comparator.compare(key1, key2);
+        } else {
+            Comparable<? super K> k = (Comparable<? super K>) key1;
+            return k.compareTo(key2);
         }
-
-        Node<K, V> node = findNode(key);
-        return node == null ? null : node.value;
     }
 
     @Override
@@ -93,18 +141,24 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
 
     @Override
     public V remove(Object key) {
+        if (key == null) {
+            throw new NullPointerException();
+        }
+
         throw new TodoException();
     }
 
     @Override
     public void putAll(Map<? extends K, ? extends V> m) {
-        throw new TodoException();
-    }
+        if (m == null) {
+            throw new NullPointerException();
+        }
 
-    @Override
-    public void clear() {
-        size = 0;
-        root = null;
+        if (m.isEmpty()) {
+            return;
+        }
+
+        throw new TodoException();
     }
 
     @Override
@@ -215,8 +269,9 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
 
     @TransactionalObject
     static class Node<K, V> {
-        K key;
+        final K key;
         V value;
+        Node<K, V> parent;
         Node<K, V> left;
         Node<K, V> right;
 
@@ -225,6 +280,4 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
             this.value = value;
         }
     }
-
-
 }

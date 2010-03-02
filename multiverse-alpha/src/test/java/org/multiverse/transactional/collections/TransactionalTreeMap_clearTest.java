@@ -1,10 +1,10 @@
 package org.multiverse.transactional.collections;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.multiverse.transactional.collections.CollectionTestUtils.createTreeMap;
 
 /**
  * @author Peter Veentjer
@@ -31,8 +31,11 @@ public class TransactionalTreeMap_clearTest {
     }
 
     @Test
-    @Ignore
     public void whenMapContainsLotsOfStuff_thenCleared() {
+        TransactionalTreeMap<String, String> map = createTreeMap(100);
+        map.clear();
 
+        assertEquals(0, map.size());
+        assertTrue(map.isEmpty());
     }
 }

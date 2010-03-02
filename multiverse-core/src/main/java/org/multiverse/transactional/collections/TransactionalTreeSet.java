@@ -16,6 +16,9 @@ public class TransactionalTreeSet<E> implements TransactionalSet<E> {
 
     private final TransactionalTreeMap<E, Object> map = new TransactionalTreeMap<E, Object>();
 
+    public TransactionalTreeSet() {
+    }
+
     @Override
     public boolean add(E e) {
         return map.put(e, VALUE) == null;
@@ -58,22 +61,21 @@ public class TransactionalTreeSet<E> implements TransactionalSet<E> {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        throw new TodoException();
-    }
+        if (c == null) {
+            throw new NullPointerException();
+        }
 
-    @Override
-    public boolean addAll(Collection<? extends E> c) {
-        throw new TodoException();
-    }
+        if (c.isEmpty()) {
+            return true;
+        }
 
-    @Override
-    public boolean retainAll(Collection<?> c) {
-        throw new TodoException();
-    }
+        for (Object item : c) {
+            if (!contains(item)) {
+                return false;
+            }
+        }
 
-    @Override
-    public boolean removeAll(Collection<?> c) {
-        throw new TodoException();
+        return true;
     }
 
     @Override
@@ -87,7 +89,56 @@ public class TransactionalTreeSet<E> implements TransactionalSet<E> {
     }
 
     @Override
+    public boolean addAll(Collection<? extends E> c) {
+        if (c == null) {
+            throw new NullPointerException();
+        }
+
+        if (c.isEmpty()) {
+            return false;
+        }
+
+        boolean changed = false;
+        for (E item : c) {
+            if (add(item)) {
+                changed = true;
+            }
+        }
+
+        return changed;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        throw new TodoException();
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        if (c == null) {
+            throw new NullPointerException();
+        }
+
+        if (c.isEmpty()) {
+            return false;
+        }
+
+        boolean changed = false;
+        for (Object item : c) {
+            if (remove(item)) {
+                changed = true;
+            }
+        }
+
+        return changed;
+    }
+
+    @Override
     public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
         throw new TodoException();
     }
 
