@@ -158,16 +158,26 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
             return;
         }
 
-        throw new TodoException();
+        for (Entry<? extends K, ? extends V> entry : m.entrySet()) {
+            put(entry.getKey(), entry.getValue());
+        }
     }
 
     @Override
     public V putIfAbsent(K key, V value) {
+        if (key == null || value == null) {
+            throw new NullPointerException();
+        }
+
         throw new TodoException();
     }
 
     @Override
     public boolean remove(Object key, Object value) {
+        if (key == null || value == null) {
+            throw new NullPointerException();
+        }
+
         throw new TodoException();
     }
 
@@ -178,7 +188,18 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
 
     @Override
     public V replace(K key, V value) {
-        throw new TodoException();
+        if (key == null || value == null) {
+            throw new NullPointerException();
+        }
+
+        Node<K, V> node = findNode(key);
+        if (node == null) {
+            return null;
+        }
+
+        V oldValue = node.value;
+        node.value = value;
+        return oldValue;
     }
 
     @Override

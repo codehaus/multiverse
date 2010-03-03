@@ -1,15 +1,19 @@
 package org.multiverse.transactional.collections;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Veentjer
  */
 public class TransactionalTreeSet_addTest {
+
+    @Test(expected = NullPointerException.class)
+    public void whenItemNull_thenNullPointerException() {
+        TransactionalTreeSet<String> set = new TransactionalTreeSet<String>();
+        set.add(null);
+    }
 
     @Test
     public void whenSetEmpty() {
@@ -22,15 +26,28 @@ public class TransactionalTreeSet_addTest {
         assertEquals(1, set.size());
     }
 
-    @Ignore
     @Test
     public void whenItemNotAddedBefore() {
+        TransactionalTreeSet<String> set = new TransactionalTreeSet<String>();
+        set.add("a");
+        set.add("b");
 
+        boolean result = set.add("c");
+        assertTrue(result);
+        assertEquals(3, set.size());
+        assertTrue(set.contains("c"));
     }
 
-    @Ignore
     @Test
     public void whenItemAddedBefore() {
+        TransactionalTreeSet<String> set = new TransactionalTreeSet<String>();
+        set.add("a");
+        set.add("b");
+        set.add("c");
 
+        boolean result = set.add("b");
+        assertFalse(result);
+        assertEquals(3, set.size());
+        assertTrue(set.contains("b"));
     }
 }

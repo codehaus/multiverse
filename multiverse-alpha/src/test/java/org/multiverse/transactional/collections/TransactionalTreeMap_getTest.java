@@ -3,8 +3,9 @@ package org.multiverse.transactional.collections;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
+import static org.multiverse.transactional.collections.CollectionTestUtils.createTreeMapExcluding;
+import static org.multiverse.transactional.collections.CollectionTestUtils.createTreeMapIncluding;
 
 /**
  * @author Peter Veentjer
@@ -31,9 +32,19 @@ public class TransactionalTreeMap_getTest {
     }
 
     @Test
-    @Ignore
     public void whenKeyDoesNotExist() {
+        TransactionalTreeMap<String, String> map = createTreeMapExcluding(100, "1");
 
+        String value = map.get("1");
+        assertNull(value);
+    }
+
+    @Test
+    public void whenKeyDoesExist() {
+        TransactionalTreeMap<String, String> map = createTreeMapIncluding(100, "1", "one");
+
+        String value = map.get("1");
+        assertEquals("one", value);
     }
 
     @Test
@@ -42,8 +53,5 @@ public class TransactionalTreeMap_getTest {
 
     }
 
-    @Test
-    public void whenKeyInLeftBranch() {
 
-    }
 }

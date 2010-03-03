@@ -1,9 +1,9 @@
 package org.multiverse.transactional.collections;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Veentjer
@@ -17,7 +17,7 @@ public class TransactionalTreeSet_containsTest {
     }
 
     @Test
-    public void whenSetEmpty() {
+    public void whenSetEmpty_thenReturnFalse() {
         TransactionalTreeSet<String> set = new TransactionalTreeSet<String>();
 
         boolean result = set.contains("foo");
@@ -25,16 +25,24 @@ public class TransactionalTreeSet_containsTest {
     }
 
     @Test
-    @Ignore
-    public void whenItemNotFound() {
+    public void whenItemNotFound_thenReturnFalse() {
+        TransactionalTreeSet<String> set = new TransactionalTreeSet<String>();
+        set.add("1");
+        set.add("2");
+        set.add("3");
 
+        boolean result = set.contains("a");
+        assertFalse(result);
     }
 
     @Test
-    @Ignore
-    public void whenItemFound() {
+    public void whenItemFound_thenReturnTrue() {
+        TransactionalTreeSet<String> set = new TransactionalTreeSet<String>();
+        set.add("1");
+        set.add("2");
+        set.add("3");
 
+        boolean result = set.contains("2");
+        assertTrue(result);
     }
-
-
 }
