@@ -1,9 +1,9 @@
 package org.multiverse.transactional.collections;
 
-import org.multiverse.utils.TodoException;
-
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * A {@link TransactionalSet} that is backed up by a {@link TransactionalTreeMap}
@@ -14,9 +14,60 @@ public class TransactionalTreeSet<E> implements TransactionalSet<E> {
 
     private final static Object VALUE = new Object();
 
-    private final TransactionalTreeMap<E, Object> map = new TransactionalTreeMap<E, Object>();
+    private final TransactionalTreeMap<E, Object> map;
 
+    /**
+     * Constructs a new, empty tree set, sorted according to the natural ordering of its
+     * elements.  All elements inserted into the set must implement the {@link Comparable}
+     * interface. Furthermore, all such elements must be <i>mutually comparable</i>:
+     * {@code e1.compareTo(e2)} must not throw a {@code ClassCastException} for any elements
+     * {@code e1} and {@code e2} in the set.  If the user attempts to add an element
+     * to the set that violates this constraint (for example, the user attempts to add a
+     * string element to a set whose elements are integers), the {@code add} call will throw a
+     * {@code ClassCastException}.
+     */
     public TransactionalTreeSet() {
+        map = new TransactionalTreeMap<E, Object>();
+    }
+
+    /**
+     * Constructs a new, empty tree set, sorted according to the specified
+     * comparator.  All elements inserted into the set must be <i>mutually
+     * comparable</i> by the specified comparator: {@code comparator.compare(e1,
+     *e2)} must not throw a {@code ClassCastException} for any elements
+     * {@code e1} and {@code e2} in the set.  If the user attempts to add
+     * an element to the set that violates this constraint, the
+     * {@code add} call will throw a {@code ClassCastException}.
+     *
+     * @param comparator the comparator that will be used to order this set.
+     *                   If {@code null}, the {@linkplain Comparable natural
+     *                   ordering} of the elements will be used.
+     */
+    public TransactionalTreeSet(Comparator<? super E> comparator) {
+        map = new TransactionalTreeMap<E, Object>(comparator);
+    }
+
+    /**
+     * Constructs a new tree set containing the elements in the specified
+     * collection, sorted according to the <i>natural ordering</i> of its
+     * elements.  All elements inserted into the set must implement the
+     * {@link Comparable} interface.  Furthermore, all such elements must be
+     * <i>mutually comparable</i>: {@code e1.compareTo(e2)} must not throw a
+     * {@code ClassCastException} for any elements {@code e1} and
+     * {@code e2} in the set.
+     *
+     * @param c collection whose elements will comprise the new set
+     * @throws ClassCastException   if the elements in {@code c} are
+     *                              not {@link Comparable}, or are not mutually comparable
+     * @throws NullPointerException if the specified collection is null
+     */
+    public TransactionalTreeSet(Collection<? extends E> c) {
+        if (c == null) {
+            throw new NullPointerException();
+        }
+
+        map = new TransactionalTreeMap<E, Object>();
+        addAll(c);
     }
 
     @Override
@@ -84,11 +135,6 @@ public class TransactionalTreeSet<E> implements TransactionalSet<E> {
     }
 
     @Override
-    public String toString() {
-        return map.keySet().toString();
-    }
-
-    @Override
     public boolean addAll(Collection<? extends E> c) {
         if (c == null) {
             throw new NullPointerException();
@@ -110,7 +156,29 @@ public class TransactionalTreeSet<E> implements TransactionalSet<E> {
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        throw new TodoException();
+        if (c == null) {
+            throw new NullPointerException();
+        }
+
+        if (c.isEmpty()) {
+            if (isEmpty()) {
+                return false;
+            } else {
+                clear();
+                return true;
+            }
+        }
+
+        boolean modified = false;
+        Iterator<E> e = iterator();
+        while (e.hasNext()) {
+            if (!c.contains(e.next())) {
+                e.remove();
+                modified = true;
+            }
+        }
+
+        return modified;
     }
 
     @Override
@@ -134,12 +202,36 @@ public class TransactionalTreeSet<E> implements TransactionalSet<E> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o == this) {
+    public boolean equals(Object thatObj) {
+        if (thatObj == this) {
             return true;
         }
 
-        throw new TodoException();
+        if (!(thatObj instanceof Set)) {
+            return false;
+        }
+
+        Set that = (Set) thatObj;
+        if (that.size() != size()) {
+            return false;
+        }
+
+        try {
+            return containsAll(that);
+        } catch (ClassCastException unused) {
+            return false;
+        } catch (NullPointerException unused) {
+            return false;
+        }
+    }
+
+    @Override
+    public String toString() {
+        if (map.isEmpty()) {
+            return "[]";
+        }
+
+        return map.keySet().toString();
     }
 
     @Override

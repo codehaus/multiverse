@@ -4,6 +4,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.multiverse.transactional.collections.CollectionTestUtils.createTreeMapExcluding;
+import static org.multiverse.transactional.collections.CollectionTestUtils.createTreeMapIncluding;
 
 /**
  * @author Peter Veentjer
@@ -18,21 +20,13 @@ public class TransactionalTreeMap_containsKeyTest {
 
     @Test
     public void whenKeyNotFound() {
-        TransactionalTreeMap<String, String> map = new TransactionalTreeMap<String, String>();
-        map.put("1", "1");
-        map.put("2", "2");
-        map.put("3", "3");
-
-        assertFalse(map.containsKey("4"));
+        TransactionalTreeMap<String, String> map = createTreeMapExcluding(1000, "50");
+        assertFalse(map.containsKey("50"));
     }
 
     @Test
     public void whenKeyFound() {
-        TransactionalTreeMap<String, String> map = new TransactionalTreeMap<String, String>();
-        map.put("1", "1");
-        map.put("2", "2");
-        map.put("3", "3");
-
-        assertTrue(map.containsKey("2"));
+        TransactionalTreeMap<String, String> map = createTreeMapIncluding(1000, "50", "somevalue");
+        assertTrue(map.containsKey("50"));
     }
 }

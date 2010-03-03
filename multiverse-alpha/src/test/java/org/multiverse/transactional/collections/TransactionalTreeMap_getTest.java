@@ -52,6 +52,4 @@ public class TransactionalTreeMap_getTest {
     public void whenKeyIsRoot() {
 
     }
-
-
 }

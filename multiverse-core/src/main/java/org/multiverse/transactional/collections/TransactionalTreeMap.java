@@ -125,6 +125,38 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
     }
 
     @Override
+    public void putAll(Map<? extends K, ? extends V> m) {
+        if (m == null) {
+            throw new NullPointerException();
+        }
+
+        if (m.isEmpty()) {
+            return;
+        }
+
+        for (Entry<? extends K, ? extends V> entry : m.entrySet()) {
+            put(entry.getKey(), entry.getValue());
+        }
+    }
+
+    @Override
+    public V replace(K key, V value) {
+        if (key == null || value == null) {
+            throw new NullPointerException();
+        }
+
+        Node<K, V> node = findNode(key);
+        if (node == null) {
+            return null;
+        }
+
+        V oldValue = node.value;
+        node.value = value;
+        return oldValue;
+    }
+
+
+    @Override
     public boolean containsValue(Object value) {
         throw new TodoException();
     }
@@ -145,28 +177,24 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
             throw new NullPointerException();
         }
 
+        Node<K, V> node = findNode(key);
+        if (node == null) {
+            return null;
+        }
+
         throw new TodoException();
     }
 
-    @Override
-    public void putAll(Map<? extends K, ? extends V> m) {
-        if (m == null) {
-            throw new NullPointerException();
-        }
-
-        if (m.isEmpty()) {
-            return;
-        }
-
-        for (Entry<? extends K, ? extends V> entry : m.entrySet()) {
-            put(entry.getKey(), entry.getValue());
-        }
-    }
 
     @Override
     public V putIfAbsent(K key, V value) {
         if (key == null || value == null) {
             throw new NullPointerException();
+        }
+
+        Node<K, V> node = findNode(key);
+        if (node == null) {
+
         }
 
         throw new TodoException();
@@ -186,21 +214,6 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
         throw new TodoException();
     }
 
-    @Override
-    public V replace(K key, V value) {
-        if (key == null || value == null) {
-            throw new NullPointerException();
-        }
-
-        Node<K, V> node = findNode(key);
-        if (node == null) {
-            return null;
-        }
-
-        V oldValue = node.value;
-        node.value = value;
-        return oldValue;
-    }
 
     @Override
     public Set<Entry<K, V>> entrySet() {
