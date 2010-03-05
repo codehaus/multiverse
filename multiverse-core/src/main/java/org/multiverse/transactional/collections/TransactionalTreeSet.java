@@ -6,7 +6,8 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * A {@link TransactionalSet} that is backed up by a {@link TransactionalTreeMap}
+ * A {@link TransactionalSet} that is backed up by a {@link TransactionalTreeMap}. It is the
+ * transactional version of the {@link java.util.TreeSet}.
  *
  * @author Peter Veentjer
  */
@@ -17,7 +18,7 @@ public class TransactionalTreeSet<E> implements TransactionalSet<E> {
     private final TransactionalTreeMap<E, Object> map;
 
     /**
-     * Constructs a new, empty tree set, sorted according to the natural ordering of its
+     * Constructs a new, empty TransactionalTreeSet, sorted according to the natural ordering of its
      * elements.  All elements inserted into the set must implement the {@link Comparable}
      * interface. Furthermore, all such elements must be <i>mutually comparable</i>:
      * {@code e1.compareTo(e2)} must not throw a {@code ClassCastException} for any elements
@@ -31,7 +32,7 @@ public class TransactionalTreeSet<E> implements TransactionalSet<E> {
     }
 
     /**
-     * Constructs a new, empty tree set, sorted according to the specified
+     * Constructs a new, empty TransactionalTreeSet, sorted according to the specified
      * comparator.  All elements inserted into the set must be <i>mutually
      * comparable</i> by the specified comparator: {@code comparator.compare(e1,
      *e2)} must not throw a {@code ClassCastException} for any elements
@@ -48,7 +49,7 @@ public class TransactionalTreeSet<E> implements TransactionalSet<E> {
     }
 
     /**
-     * Constructs a new tree set containing the elements in the specified
+     * Constructs a new TransactionalTreeSet containing the elements in the specified
      * collection, sorted according to the <i>natural ordering</i> of its
      * elements.  All elements inserted into the set must implement the
      * {@link Comparable} interface.  Furthermore, all such elements must be

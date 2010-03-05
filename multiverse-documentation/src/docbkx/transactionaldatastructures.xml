@@ -1,0 +1,124 @@
+<chapter>
+    <beginpage/>
+    <title>Transactional Datastructures</title>
+    <para>...</para>
+    <sect1>
+        <title>Introduction</title>
+        <para>
+            Writing transactional datastructures is very easy with Multiverse. To prevent that
+            you need to rebuild the common datastructures from the Java (collection framework,
+            executors etc) in Multiverse, they are already created for you. Not all datastructures
+            have been implemented, but with every release we try to include a few additional ones.
+        </para>
+    </sect1>
+    <sect1>
+        <title>Transactional interface</title>
+        <para>
+            Multiverse provides transactional versions of Java interfaces. There are few important
+            reasons for that:
+            <itemizedlist>
+                <listitem>
+                    <para>provide a typesafe way to document that the datastructures is transaction.
+                        So it is is very useful for documentation purposes.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>provide a mechanism to add additional logic. This can be compared to the
+                        Concurrent collection interfaces like the ConcurrentMap or BlockingQueues that
+                        provide additional concurrency related functionality.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>make it easier for the instrumentation to generate better performing code.
+                        The instrumentation adds for every transactional method, an additional
+                        method that accepts a Transaction. So if within a transactional method another
+                        transactional method is called, instead of going to the original one, the new
+                        version is called that doesn't do any transaction management logic since the
+                        transaction already is provided. This is just one of the possible optimizations
+                        that can be done based on improved type information.
+                    </para>
+                </listitem>
+            </itemizedlist>
+        </para>
+    </sect1>
+    <sect1>
+        <title>TransactionalLinkedList</title>
+        <para>The TransactionalLinkedList is a transactional version of a linked list and
+            implements the following interfaces:
+            <itemizedlist>
+                <listitem>
+                    <para>java.util.Collection</para>
+                </listitem>
+                <listitem>
+                    <para>java.util.List</para>
+                </listitem>
+                <listitem>
+                    <para>java.util.Queue</para>
+                </listitem>
+                <listitem>
+                    <para>java.util.Deque</para>
+                </listitem>
+                <listitem>
+                    <para>java.util.concurrent.BlockingQueue</para>
+                </listitem>
+                <listitem>
+                    <para>java.util.concurrent.BlockingQueue</para>
+                </listitem>
+                <listitem>
+                    <para>org.multiverse.transactional.collections.TransactionalList</para>
+                </listitem>
+                <listitem>
+                    <para>org.multiverse.transactional.collections.TransactionalQueue</para>
+                </listitem>
+                <listitem>
+                    <para>org.multiverse.transactional.collections.TransactionalDeque</para>
+                </listitem>
+            </itemizedlist>
+        </para>
+    </sect1>
+    <sect1>
+        <title>TransactionalTreeMap</title>
+        <para>
+            This is the transactional version of the java.util.TreeMap.
+        </para>
+        <para>
+            It implements the following interfaces:
+            <itemizedlist>
+                <listitem>
+                    <para>java.util.Map</para>
+                </listitem>
+                <listitem>
+                    <para>java.util.concurrent.ConcurrentMap</para>
+                </listitem>
+                <listitem>
+                    <para>org.multiverse.transactional.collections.TransactionalMap</para>
+                </listitem>
+            </itemizedlist>
+        </para>
+    </sect1>
+    <sect1>
+        <title>TransactionalTreeSet</title>
+        <para>
+            This is the transactional version of the java.util.TreeSet that is backed up by the
+            TransactionalTreeMap.
+        </para>
+        <para>
+            It implements the following interfaces:
+            <itemizedlist>
+                <listitem>
+                    <para>java.util.Collection</para>
+                </listitem>
+                <listitem>
+                    <para>java.util.Set</para>
+                </listitem>
+                <listitem>
+                    <para>org.multiverse.transactional.collections.TransactionalSet</para>
+                </listitem>
+            </itemizedlist>
+        </para>
+    </sect1>
+    <sect1>
+        <title>TransactionalThreadPoolExecutor</title>
+        <para>...</para>
+    </sect1>
+</chapter>

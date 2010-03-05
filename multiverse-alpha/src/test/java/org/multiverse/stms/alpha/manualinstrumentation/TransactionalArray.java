@@ -14,8 +14,22 @@ public class TransactionalArray<E> {
         array = new AtomicReferenceArray<Ref>(length);
     }
 
-    @TransactionalMethod(readonly = true)
     public E get(int index) {
+        Ref ref = getRef(index);
+        return (E) ref.get();
+    }
+
+    public void set(E item, int index) {
+        Ref ref = getRef(index);
+        ref.set(item);
+    }
+
+    @TransactionalMethod(readonly = true)
+    public int length() {
+        return array.length();
+    }
+
+    private Ref getRef(int index) {
         Ref ref = array.get(index);
         if (ref == null) {
             ref = new Ref();
@@ -23,17 +37,6 @@ public class TransactionalArray<E> {
                 ref = array.get(index);
             }
         }
-
-        return (E) ref.get();
-    }
-
-    @TransactionalMethod
-    public void set(E item, int index) {
-
-    }
-
-    @TransactionalMethod(readonly = true)
-    public int length() {
-        return array.length();
+        return ref;
     }
 }

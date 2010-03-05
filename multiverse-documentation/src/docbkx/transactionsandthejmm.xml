@@ -1,0 +1,44 @@
+<chapter>
+    <beginpage/>
+    <title>Transactions and the JMM</title>
+    <subtitle>Introduction</subtitle>
+    <para>
+        Before Java 5, the Java Memory Model (JMM) was broken. It was possible to get
+        all kinds of strange results like unpredictable merged writes made by concurrent
+        executing threads, unexpected reorderings of instructions, and even final fields
+        were not guaranteed to be final. With Java 5 and JSR-133, the Java Memory Model is
+        clearly specified. This specification makes it possible to write code that performs
+        but doesn't cause concurrency problems.
+    </para>
+
+    <sect1>
+        <title>Happens before rules</title>
+        <para>The Java Memory Model is specified in happens before rules, e.g.:
+            <orderedlist>
+                <listitem>
+                    lock rule: all writes executed before some lock is released, are visible
+                    when the same lock is acquired.
+                </listitem>
+                <listitem>
+                    volatile variable rule: all writes executed before some volatile variable
+                    is written, are visible when the same volatile variable is read.
+                </listitem>
+            </orderedlist>
+        </para>
+    </sect1>
+
+    <sect1>
+        <title>Transaction rule</title>
+        <para>Multiverse also provides a happens before rule called the transaction rule.
+            It guarantees that all writes made before a transaction commits, are visible
+            after another transaction is starts. On a lower level this is realized by
+            lifting on the volatile variable or lock rule.
+        </para>
+        <para>
+            For developers this means that you don't need to worry about the JMM when
+            transactions are used and you don't need to define variable as volatile or
+            synchronized blocks to introduce the needed memory fences; this is all done for
+            you.
+        </para>
+    </sect1>
+</chapter>

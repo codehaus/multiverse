@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+        "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"
+        [
+                <!ENTITY chapter1 SYSTEM "transactionalmapping.xml">
+                <!ENTITY chapter2 SYSTEM "blockingtransactions.xml">
+                <!ENTITY chapter3 SYSTEM "transactionlifecycleevents.xml">
+                <!ENTITY chapter4 SYSTEM "transactionalreferencesandprimitives.xml">
+                <!ENTITY chapter5 SYSTEM "transactionaldatastructures.xml">
+                <!ENTITY chapter6 SYSTEM "transactionsandthejmm.xml">
+                <!ENTITY chapter7 SYSTEM "multiverseapi.xml">
+                <!ENTITY chapter8 SYSTEM "multiversetemplates.xml">
+                <!ENTITY chapter9 SYSTEM "transactionisolation.xml">
+                <!ENTITY chapter10 SYSTEM "2phasecommit.xml">
+                ]
+        >
+
+<book xmlns:xi="http://www.w3.org/2001/XInclude">
+
+    &chapter1;
+    &chapter2;
+    &chapter3;
+    &chapter4;
+    &chapter5;
+    &chapter6;
+    &chapter7;
+    &chapter8;
+    &chapter9;
+    &chapter10;
+
+</book>

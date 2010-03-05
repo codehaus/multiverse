@@ -1,5 +1,6 @@
 package org.multiverse.transactional.collections;
 
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.utils.TodoException;
 
@@ -8,8 +9,11 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 
+import static java.lang.Math.max;
+
 /**
- * A Tree based TransactionalMap implementation.
+ * A Tree based TransactionalMap implementation. Essentially is the transactional version of the
+ * {@link java.util.TreeMap}.
  *
  * @author Peter Veentjer
  */
@@ -28,8 +32,36 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
         this.comparator = comparator;
     }
 
+    /**
+     * Returns the Comparator uses by this TransactionalTreeMap to do comparisons between keys.
+     * If the keys
+     *
+     * @return the Comparator used.
+     */
     public final Comparator getComparator() {
         return comparator;
+    }
+
+    /**
+     * Returns the height of this TransactionalTreeMap. The height is the maximum number of nodes from
+     * the rootnode to a leaf node. An empty tree will return 0.
+     *
+     * @return the height of this TransactionalTreeMap.
+     */
+    @TransactionalMethod(readonly = true)
+    public int height() {
+        //todo: at the moment this method is recursive, but should be converted to iterative.
+        return height(root);
+    }
+
+    private int height(Node<K, V> node) {
+        if (node == null) {
+            return 0;
+        }
+
+        int left = height(node.left);
+        int right = height(node.right);
+        return 1 + max(left, right);
     }
 
     @Override
@@ -84,6 +116,7 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
             return null;
         }
 
+        //todo: no balancing is done yet.
         Node<K, V> node = root;
         while (true) {
             int cmp = compareTo(key, node.key);
@@ -184,7 +217,6 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
 
         throw new TodoException();
     }
-
 
     @Override
     public V putIfAbsent(K key, V value) {
@@ -304,14 +336,32 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
     @TransactionalObject
     static class Node<K, V> {
         final K key;
+
         V value;
         Node<K, V> parent;
         Node<K, V> left;
         Node<K, V> right;
+        int height;
 
         Node(K key, V value) {
             this.key = key;
             this.value = value;
+        }
+
+        void rotateLeft() {
+
+        }
+
+        void rotateRight() {
+
+        }
+
+        void doubleRotateLeft() {
+
+        }
+
+        void doubleRotateRight() {
+
         }
     }
 }

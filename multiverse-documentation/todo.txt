@@ -1,0 +1,16 @@
+todo
+
+- chapter numbering on subchapters
+
+- copy content from existing manual pages to docbook version
+
+- apply a random xsl to the html to show that pages can be created better
+
+- improved xsl
+
+- instead of one big html, also prive a more book like approach
+
+done
+
+- instead of having a single file, create file per chapter
+
