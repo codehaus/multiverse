@@ -4,12 +4,12 @@
     <name>Site of Multiverse</name>
     <description>Site of multiverse</description>
     <artifactId>multiverse-site</artifactId>
-    <version>0.4</version>
+    <version>0.4.1-SNAPSHOT</version>
 
     <parent>
         <groupId>org.multiverse</groupId>
         <artifactId>multiverse</artifactId>
-        <version>0.4</version>
+        <version>0.4.1-SNAPSHOT</version>
     </parent>
 
     <dependencies>
