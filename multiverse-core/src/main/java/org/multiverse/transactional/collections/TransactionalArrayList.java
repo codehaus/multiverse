@@ -38,6 +38,18 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
     }
 
     @Override
+    public boolean add(E e) {
+        if(size ==array.length()){
+
+        }
+
+        array.set(size, e);
+        size++;
+        return true;
+    }
+
+
+    @Override
     public void clear() {
         throw new TodoException();
     }
@@ -54,7 +66,11 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
 
     @Override
     public E get(int index) {
-        throw new TodoException();
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        return array.get(index);
     }
 
     @Override
@@ -109,11 +125,6 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
 
     @Override
     public <T> T[] toArray(T[] a) {
-        throw new TodoException();
-    }
-
-    @Override
-    public boolean add(E e) {
         throw new TodoException();
     }
 
