@@ -6,7 +6,7 @@ import static org.junit.Assert.assertEquals;
 
 public class TransactionalReferenceArray_constructionTest {
 
-    @Test(expected = NegativeArraySizeException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void whenSizeNegative_thenNegativeArraySizeException() {
         new TransactionalReferenceArray<String>(-1);
     }
