@@ -7,5 +7,6 @@ public class TransactionalArrayList_listIteratorTest {
 
     @Test
     @Ignore
-    public void test(){}    
+    public void test() {
+    }
 }

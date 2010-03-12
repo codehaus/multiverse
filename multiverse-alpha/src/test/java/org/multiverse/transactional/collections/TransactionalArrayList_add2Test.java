@@ -7,5 +7,6 @@ public class TransactionalArrayList_add2Test {
 
     @Test
     @Ignore
-    public void test(){}
+    public void test() {
+    }
 }

@@ -7,6 +7,7 @@ public class TransactionalArrayList_removeObjectTest {
 
     @Test
     @Ignore
-    public void test(){}
-    
+    public void test() {
+    }
+
 }

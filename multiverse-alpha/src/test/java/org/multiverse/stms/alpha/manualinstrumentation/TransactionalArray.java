@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
  * The TransactionalArray is the first support for working with transactional arrays.
  * Arrays can't be instrumented, so what we do is to upgrade the array of type X, to
  * an array of references to type X.
- * 
+ *
  * @param <E>
  */
 @TransactionalObject

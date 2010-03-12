@@ -7,6 +7,7 @@ public class TransactionalArrayList_containsAllTest {
 
     @Test
     @Ignore
-    public void test(){}
+    public void test() {
+    }
 
 }

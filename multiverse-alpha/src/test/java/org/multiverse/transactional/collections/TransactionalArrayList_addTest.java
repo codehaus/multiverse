@@ -37,17 +37,19 @@ public class TransactionalArrayList_addTest {
         list.add("two");
         list.add("three");
         list.add("four");
+
+        assertEquals("[one, two, three, four]", list.toString());
     }
 
     @Test
     public void complexScenario() {
         TransactionalArrayList<Integer> list = new TransactionalArrayList<Integer>();
 
-        for (int k = 0; k < 10000; k++) {
+        for (int k = 0; k < 100000; k++) {
             list.add(k);
         }
 
-        for (int k = 0; k < 10000; k++) {
+        for (int k = 0; k < 100000; k++) {
             assertEquals(k, (int) list.get(k));
         }
     }

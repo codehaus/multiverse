@@ -1,15 +1,26 @@
 package org.multiverse.transactional.collections;
 
-import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TransactionalArrayList_isEmptyTest {
 
     @Test
-    @Ignore
-    public void whenNonEmpty(){}
+    public void whenNonEmpty() {
+        TransactionalArrayList<String> list = new TransactionalArrayList<String>();
+        list.add("a");
+        list.add("b");
+
+        boolean result = list.isEmpty();
+        assertFalse(result);
+    }
 
     @Test
-    @Ignore
-    public void whenEmpty(){}
+    public void whenEmpty() {
+        TransactionalArrayList<String> list = new TransactionalArrayList<String>();
+        boolean result = list.isEmpty();
+        assertTrue(result);
+    }
 }
