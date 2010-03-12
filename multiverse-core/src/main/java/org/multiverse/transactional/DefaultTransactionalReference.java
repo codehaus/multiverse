@@ -71,9 +71,14 @@ public final class DefaultTransactionalReference<E> implements TransactionalRefe
     }
 
     @Override
-    public E set(E newRef) {
+    public E set(E newReference) {
+        //optimization to prevent loading the object if not needed.
+        if (reference == newReference) {
+            return newReference;
+        }
+
         E oldRef = reference;
-        this.reference = newRef;
+        reference = newReference;
         return oldRef;
     }
 
