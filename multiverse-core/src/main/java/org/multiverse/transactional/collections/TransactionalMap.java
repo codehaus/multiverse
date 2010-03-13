@@ -13,6 +13,8 @@ import java.util.concurrent.ConcurrentMap;
  * @author Peter Veentjer.
  * @param <K> the key type for the map
  * @param <V> the value type for the map
+ * @see java.util.concurrent.ConcurrentMap
+ * @see java.util.Map
  */
 @TransactionalObject
 public interface TransactionalMap<K, V> extends ConcurrentMap<K, V> {

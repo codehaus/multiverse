@@ -17,6 +17,14 @@ public class LoadLockedException extends LoadException implements RecoverableThr
     public final static boolean reuse = parseBoolean(
             getProperty(LoadLockedException.class.getName() + ".reuse", "true"));
 
+    public static LoadLockedException newLoadLockedException() {
+        if (LoadLockedException.reuse) {
+            throw LoadLockedException.INSTANCE;
+        } else {
+            throw new LoadLockedException();
+        }
+    }
+
     public LoadLockedException() {
     }
 
@@ -30,5 +38,5 @@ public class LoadLockedException extends LoadException implements RecoverableThr
 
     public LoadLockedException(Throwable cause) {
         super(cause);
-    }    
+    }
 }

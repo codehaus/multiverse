@@ -8,9 +8,16 @@ import java.util.*;
 
 /**
  * A general purposes collection structure that could be considered a work horse because it implements a lot of
- * interfaces: </ol> <li>{@link Iterable}</li> <li>{@link java.util.Collection}</li> <li>{@link java.util.List}</li>
- * <li>{@link java.util.Queue}</li> <li>{@link java.util.concurrent.BlockingQueue}</li> <li>{@link java.util.Deque}</li>
- * <li>{@link java.util.concurrent.BlockingDeque}</li> </ol>
+ * interfaces:
+ * </ol>
+ * <li>{@link Iterable}</li>
+ * <li>{@link java.util.Collection}</li>
+ * <li>{@link java.util.List}</li>
+ * <li>{@link java.util.Queue}</li>
+ * <li>{@link java.util.concurrent.BlockingQueue}</li>
+ * <li>{@link java.util.Deque}</li>
+ * <li>{@link java.util.concurrent.BlockingDeque}</li>
+ * </ol>
  * <p/>
  * Each operation on this TransactionalLinkedList is transactional by default, and of course can participate in already
  * running transactions.
@@ -24,6 +31,15 @@ import java.util.*;
  *
  * @author Peter Veentjer.
  * @param <E>
+ * @see org.multiverse.transactional.collections.TransactionalCollection
+ * @see org.multiverse.transactional.collections.TransactionalQueue
+ * @see org.multiverse.transactional.collections.TransactionalDeque
+ * @see org.multiverse.transactional.collections.TransactionalList
+ * @see java.util.concurrent.BlockingDeque
+ * @see java.util.concurrent.BlockingQueue
+ * @see java.util.Queue
+ * @see java.util.Deque
+ * @see java.util.List
  */
 @TransactionalObject
 public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> implements List<E> {

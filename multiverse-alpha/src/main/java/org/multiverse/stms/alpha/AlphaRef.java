@@ -1,17 +1,19 @@
 package org.multiverse.stms.alpha;
 
-import org.multiverse.api.Stm;
-import org.multiverse.api.Transaction;
-import org.multiverse.api.TransactionFactory;
+import org.multiverse.api.*;
+import org.multiverse.api.exceptions.LoadUncommittedException;
 import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
-import org.multiverse.transactional.TransactionalReference;
 import org.multiverse.utils.TodoException;
+import org.multiverse.utils.clock.PrimitiveClock;
+import org.multiverse.utils.latches.Latch;
 
 import static java.lang.String.format;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
+import static org.multiverse.api.exceptions.FailedToObtainCommitLocksException.newFailedToObtainCommitLocksException;
 
 /**
  * A manual instrumented {@link org.multiverse.transactional.TransactionalReference} implementation. If this class
@@ -19,7 +21,6 @@ import static org.multiverse.api.StmUtils.retry;
  * <p/>
  * It is added to getClassMetadata the Akka project up and running, but probably will removed when the instrumentation is 100% up
  * and running and this can be done compiletime instead of messing with javaagents.
- * <p/>
  * <h3>Lifting on a transaction</h3>
  * All methods automatically lift on a transaction if one is available, but to reduce the need for extra object
  * creation and unwanted ThreadLocal access, there also are methods available that have a
@@ -28,20 +29,34 @@ import static org.multiverse.api.StmUtils.retry;
  * All methods of this AlphaRef also have a version that accepts a {@link TransactionFactory}. TransactionFactories
  * can be quite expensive to create, so it is best to create them up front and reuse them. TransactionFactories
  * are threadsafe to use, so no worries about that as well.
- * <p/>
  * <h3>Performance</h3>
- * If performance of the AlphaRef becomes an issue, there is some room for improvement. Make sure that the transaction
- * familynames are set, and if needed we can also remove the TransactionTemplate because it causes additional
- * unwanted objects to be created.
+ * The AlphaRef already has been heavily optimized and prevents unwanted creation of objects like
+ * Transactions or TransactionTemplates. If you really need more performance you should talk to me
+ * about adding instrumentation.
  * <h3>Relying on GlobalStmInstance</h3>
  * This Ref implementation can be used without depending on the GlobalStmInstance (so you could create a local
  * one stm instance). If this is done, only the methods that rely on a Transaction or TransactionFactory
  * should be used.
+ * <h3>___ methods</h3>
+ * If you use code completion on this class you will also find ___ methods. These methods are not for you
+ * unless you really know what you do. So ignore them.
+ * <p/>
+ * TODO:
+ * The internal templates created here don't need to have lifecycle callbacks enabled.
  *
  * @author Peter Veentjer
  */
-public final class AlphaRef<E> extends DefaultTxObjectMixin implements TransactionalReference<E> {
+public final class AlphaRef<E> extends DefaultTxObjectMixin {
+
+    private final static TransactionFactory getOrAwaitTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
+            .setReadonly(true)
+            .setFamilyName(AlphaRef.class.getName() + ".getOrAwait()")
+            .setSmartTxLengthSelector(true)
+            .setAutomaticReadTracking(true).build();
+
     private static final String CREATE_COMMITTED_FAMILY_NAME = AlphaRef.class.getName() + ".createCommitted(Stm,E)";
+
+    private static final PrimitiveClock clock = ((AlphaStm) getGlobalStmInstance()).getClock();
 
     /**
      * Creates a committed ref with a null value using the Stm in the {@link org.multiverse.api.GlobalStmInstance}.
@@ -101,13 +116,6 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Transacti
         return ref;
     }
 
-    private final static TransactionFactory initTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
-            .setFamilyName(AlphaRef.class.getName() + ".init()")
-            .setSmartTxLengthSelector(true)
-            .setReadonly(false)
-            .setAutomaticReadTracking(false)
-            .setSmartTxLengthSelector(true).build();
-
 
     /**
      * Creates a new Ref.
@@ -115,7 +123,34 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Transacti
      * This method relies on the ThreadLocalTransaction and GlobalStmInstance.
      */
     public AlphaRef() {
-        this(initTxFactory, null);
+        this((E) null);
+    }
+
+    /**
+     * Creates a new Ref with the provided value.
+     * <p/>
+     * If there is no transaction active, the writeversion of the committed reference will
+     * be the same as the current version of the stm. Normally it increases after a commit to
+     * indicate that a change has been made. But for a transaction that only adds new transactional
+     * objects instead of modifying them this isn't needed. This reduces stress on the
+     * <p/>
+     * This method relies on the ThreadLocalTransaction.
+     * If no transaction is found, it also relies on the GlobalStmInstance.
+     *
+     * @param value the value this Ref should have.
+     */
+    public AlphaRef(E value) {
+        Transaction tx = getThreadLocalTransaction();
+
+        if (tx == null || tx.getStatus().isDead()) {
+            long writeVersion = clock.getVersion();
+            AlphaRefTranlocal<E> tranlocal = new AlphaRefTranlocal<E>(this);
+            tranlocal.value = value;
+            ___store(tranlocal, writeVersion);
+        } else {
+            AlphaRefTranlocal<E> tranlocal = openForWrite(tx);
+            tranlocal.value = value;
+        }
     }
 
     /**
@@ -126,74 +161,207 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Transacti
      * @param tx the Transaction used
      */
     public AlphaRef(Transaction tx) {
-        ((AlphaTransaction) tx).openForWrite(AlphaRef.this);
-    }
-
-    /**
-     * Creates a new Ref with the provided value.
-     * <p/>
-     * This method relies on the ThreadLocalTransaction.
-     * If no transaction is found, it also relies on the GlobalStmInstance.
-     *
-     * @param value the value this Ref should have.
-     */
-    public AlphaRef(final E value) {
-        this(initTxFactory, value);
-    }
-
-    public AlphaRef(TransactionFactory txFactory, final E value) {
-        new TransactionTemplate(txFactory) {
-            @Override
-            public Object execute(Transaction tx) throws Exception {
-                AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal<E>) ((AlphaTransaction) tx).openForWrite(AlphaRef.this);
-                tranlocal.value = value;
-                return null;
-            }
-        }.execute();
+        this(tx, null);
     }
 
     public AlphaRef(Transaction tx, E value) {
-        AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal<E>) ((AlphaTransaction) tx).openForWrite(AlphaRef.this);
+        AlphaRefTranlocal<E> tranlocal = openForWrite(tx);
         tranlocal.value = value;
     }
 
-    private final static TransactionFactory getTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
-            .setFamilyName(AlphaRef.class.getName() + ".get()")
-            .setSmartTxLengthSelector(true)
-            .setReadonly(true)
-            .setAutomaticReadTracking(false).build();
+    private AlphaRefTranlocal<E> openForRead(Transaction tx) {
+        return (AlphaRefTranlocal<E>) ((AlphaTransaction) tx).openForRead(AlphaRef.this);
+    }
 
+    private AlphaRefTranlocal<E> openForWrite(Transaction tx) {
+        return (AlphaRefTranlocal<E>) ((AlphaTransaction) tx).openForWrite(AlphaRef.this);
+    }
 
+    // ============================== getVersion ===============================
+
+    /**
+     * Gets the version of the last committed tranlocal without looking at a transaction.
+     * This call is very very fast since it doesn't need a transaction. See the {@link #getAtomic()}
+     * for more information.
+     * <p/>
+     * This functionality can be used for optimistic locking over multiple transactions.
+     *
+     * @return the version.
+     * @throws org.multiverse.api.exceptions.LoadException
+     *          if something fails while loading the reference.
+     */
+    public long getVersionAtomic() {
+        AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal<E>) ___load();
+
+        if (tranlocal == null) {
+            throw new LoadUncommittedException();
+        }
+
+        return tranlocal.___writeVersion;
+    }
+
+    /**
+     * Gets the version of the last committed tranlocal visible from the current transaction.
+     * If no active transaction is found, the {@link #getVersionAtomic()} is called instead
+     * (very very fast).
+     * <p/>
+     * If there is a using transaction, the transactional object will be added to the readset
+     * if the transaction is configured to do that.
+     * <p/>
+     * This functionality can be used for optimistic locking over multiple transactions.
+     *
+     * @return the version.
+     * @throws org.multiverse.api.exceptions.LoadException
+     *          if something fails while loading the reference.
+     */
+    public long getVersion() {
+        Transaction tx = getThreadLocalTransaction();
+
+        if (tx == null || tx.getStatus().isDead()) {
+            return getVersionAtomic();
+        } else {
+            return getVersion(tx);
+        }
+    }
+
+    /**
+     * Gets the version of the last committed tranlocal visible from the current transaction.
+     * <p/>
+     * So it could be that other transaction have committed after the tx is started, it will not
+     * see these.
+     * <p/>
+     * This functionality can be used for optimistic locking over multiple transactions.
+     *
+     * @param tx the transaction used
+     * @return the version
+     * @throws org.multiverse.api.exceptions.DeadTransactionException
+     *          if the tx isn't active anymore.
+     * @throws org.multiverse.api.exceptions.LoadException
+     *          if something fails while loading the reference.
+     */
+    public long getVersion(Transaction tx) {
+        AlphaRefTranlocal<E> tranlocal = openForRead(tx);
+        return tranlocal.___writeVersion;
+    }
+
+    // ============================== get ======================================
+
+    /**
+     * Gets the value. If a Transaction already is running, it will lift on that transaction,
+     * if not the {@link #getAtomic} is used. In that cases it will be very very cheap (roughly
+     * 2/3 of the performance of {@link #getAtomic()}. The reason why this call is more expensive
+     * than the {@link #getAtomic()} is that a getThreadlocalTransaction needs to be called and
+     * a check on the Transaction if that is running.
+     *
+     * @return the current value stored in this reference.
+     * @throws org.multiverse.api.exceptions.LoadException
+     *          if something fails while loading the reference.
+     */
     public E get() {
-        return get(getTxFactory);
+        Transaction tx = getThreadLocalTransaction();
+
+        if (tx == null || tx.getStatus().isDead()) {
+            return getAtomic();
+        } else {
+            return get(tx);
+        }
     }
 
-    public E get(TransactionFactory txFactory) {
-        return new TransactionTemplate<E>(txFactory) {
-            @Override
-            public E execute(Transaction tx) {
-                return get(tx);
-            }
-        }.execute();
-    }
+    /**
+     * Gets the value without looking at an existing transaction (it will run its 'own').
+     * <p/>
+     * This is a very cheap call since only one volatile read is needed an no additional
+     * objects are created. On my machine I'm able to do 150.000.000 getAtomics per second
+     * on a single thread to give some impression.
+     *
+     * @return the current value.
+     * @throws org.multiverse.api.exceptions.LoadException
+     *          if something fails while loading the reference.
+     */
+    public E getAtomic() {
+        AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal) ___load();
 
-    public E get(Transaction tx) {
-        AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal) ((AlphaTransaction) tx).openForRead(AlphaRef.this);
+        if (tranlocal == null) {
+            throw new LoadUncommittedException();
+        }
         return tranlocal.value;
     }
 
-    private final static TransactionFactory getOrAwaitTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
-            .setReadonly(true)
-            .setFamilyName(AlphaRef.class.getName() + ".getOrAwait()")
-            .setSmartTxLengthSelector(true)
-            .setAutomaticReadTracking(true).build();
+    /**
+     * Gets the value using the specified transaction.
+     *
+     * @param tx the Transaction used for reading the value.
+     * @return the value currently stored, could be null.
+     * @throws org.multiverse.api.exceptions.LoadException
+     *          if something fails while loading the reference.
+     */
+    public E get(Transaction tx) {
+        AlphaRefTranlocal<E> tranlocal = openForRead(tx);
+        return tranlocal.value;
+    }
 
-    @Override
+    // ======================== isNull =======================================
+
+    /**
+     * Checks if the value stored in this reference is null. This method doesn't lift on a
+     * transaction, so it is very very cheap. See the {@link #getAtomic()} for more information.
+     *
+     * @return true if the reference is null, false otherwise.
+     * @throws org.multiverse.api.exceptions.LoadException
+     *          if something fails while loading the reference.
+     */
+    public boolean isNullAtomic() {
+        return getAtomic() == null;
+    }
+
+    /**
+     * Checks if the value stored in this reference is null.
+     * <p/>
+     * If a Transaction currently is active, it will lift on that transaction. If not, the
+     * isNullAtomic is used, so very very cheap. See the {@link #get()} for more info since
+     * that method is used to retrieve the current value.
+     *
+     * @return true if the reference currently is null.
+     * @throws org.multiverse.api.exceptions.LoadException
+     *          if something fails while loading the reference.
+     */
+    public boolean isNull() {
+        return get() == null;
+    }
+
+    /**
+     * Checks if the value stored in this reference is null using the provided transaction.
+     *
+     * @param tx the transaction used
+     * @return true if the value is null, false otherwise.
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.DeadTransactionException
+     *                              is tx isn't active
+     * @throws org.multiverse.api.exceptions.LoadException
+     *                              if something fails while loading the reference.
+     */
+    public boolean isNull(Transaction tx) {
+        return get(tx) == null;
+    }
+
+    // ============================== getOrAwait ======================================
+
+    public E getOrAwaitAtomic() {
+        E item = getAtomic();
+
+        if (item != null) {
+            return item;
+        }
+
+        throw new TodoException();
+    }
+
     public E getOrAwait() {
         return getOrAwait(getOrAwaitTxFactory);
     }
 
     public E getOrAwait(TransactionFactory txFactory) {
+        //todo: better parameter settings disabling lifecyclecallbacks
         return new TransactionTemplate<E>(txFactory) {
             @Override
             public E execute(Transaction t) throws Exception {
@@ -203,7 +371,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Transacti
     }
 
     public E getOrAwait(Transaction tx) {
-        AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal) ((AlphaTransaction) tx).openForRead(AlphaRef.this);
+        AlphaRefTranlocal<E> tranlocal = openForRead(tx);
         if (tranlocal.value == null) {
             retry();
         }
@@ -211,120 +379,163 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Transacti
         return tranlocal.value;
     }
 
-    @Override
     public E getOrAwaitInterruptibly() throws InterruptedException {
         throw new TodoException("Not implemented yet");
     }
 
-    private final static TransactionFactory setTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
-            .setReadonly(false)
-            .setFamilyName(AlphaRef.class.getName() + ".set()")
-            .setSmartTxLengthSelector(true)
-            .setAutomaticReadTracking(false).build();
+    // ========================== set ==========================================
 
-    @Override
-    public E set(final E newRef) {
-        return set(setTxFactory, newRef);
+    /**
+     * Sets the new value on this AlphaRef using its own transaction (so it doesn't
+     * look at an existing transaction). This call is very fast (11M transactions/second
+     * on my machine with a single thread.
+     *
+     * @param newValue the new value.
+     * @return the old value.
+     * @throws org.multiverse.api.exceptions.CommitFailureException
+     *          if something failed while committing. If the commit fails, nothing bad will happen.
+     * @throws org.multiverse.api.exceptions.LoadException
+     *          if something fails while loading the reference.
+     */
+    public E setAtomic(E newValue) {
+        //if there is no difference we are done
+        E oldValue = getAtomic();
+
+        if (oldValue == newValue) {
+            return oldValue;
+        }
+
+        AlphaRefTranlocal newTranlocal = new AlphaRefTranlocal(this);
+        newTranlocal.value = newValue;
+
+        //the AlphaRefTranlocal also implements the Transaction interface to prevent us
+        //creating an additional objects even though we need an instance.
+        Transaction tx = newTranlocal;
+
+        //if we couldn't acquire the lock, we are done.
+        if (!___tryLock(tx)) {
+            throw newFailedToObtainCommitLocksException();
+        }
+
+        AlphaRefTranlocal<E> oldTranlocal = (AlphaRefTranlocal<E>) ___load();
+
+        long writeVersion = clock.tick();
+        try {
+            ___store(newTranlocal, writeVersion);
+        } finally {
+            ___releaseLock(tx);
+        }
+
+        return oldTranlocal.value;
     }
 
-    public E set(TransactionFactory txFactory, final E newRef) {
-        return new TransactionTemplate<E>(txFactory) {
-            @Override
-            public E execute(Transaction tx) throws Exception {
-                return set(tx, newRef);
-            }
-        }.execute();
+    /**
+     * Sets the new value on this reference. If an active transaction is available in the
+     * ThreadLocalTransaction that will be used. If not, the {@link #setAtomic(Object)} is used
+     * (which is very fast).
+     *
+     * @param newValue the new value to be stored in this reference. The newValue is allowed to
+     *                 be null.
+     * @return the value that is replaced, can be null.
+     * @throws org.multiverse.api.exceptions.CommitFailureException
+     *          if something failed while committing. If the commit fails, nothing bad will happen.
+     * @throws org.multiverse.api.exceptions.LoadException
+     *          if something fails while loading the reference.
+     */
+    public E set(E newValue) {
+        Transaction tx = getThreadLocalTransaction();
+
+        if (tx == null || tx.getStatus().isDead()) {
+            return setAtomic(newValue);
+        } else {
+            return set(tx, newValue);
+        }
     }
 
+    /**
+     * Sets the new value on this reference using the provided transaction.
+     * <p/>
+     * Use this call if you explicitly want to pass a transaction, instead of {@link #set(Object)}.
+     *
+     * @param tx       the transaction to use.
+     * @param newValue the new value, and is allowed to be null.
+     * @return the previous value stored in this reference.
+     * @throws org.multiverse.api.exceptions.DeadTransactionException
+     *          if tx is not active.
+     * @throws org.multiverse.api.exceptions.LoadException
+     *          if something fails while loading the reference.
+     */
     public E set(Transaction tx, E newValue) {
-        AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal) ((AlphaTransaction) tx).openForWrite(AlphaRef.this);
+        AlphaRefTranlocal<E> readonly = openForRead(tx);
+
+        //if there is no change, we are done.
+        if (readonly.value == newValue) {
+            return newValue;
+        }
+
+        AlphaRefTranlocal<E> tranlocal = openForWrite(tx);
+
+        if (newValue == tranlocal.value) {
+            return newValue;
+        }
+
         E oldValue = tranlocal.value;
         tranlocal.value = newValue;
         return oldValue;
     }
 
-    private final static TransactionFactory isNullTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
-            .setFamilyName(AlphaRef.class.getName() + ".isNull()")
-            .setSmartTxLengthSelector(true)
-            .setReadonly(true)
-            .setAutomaticReadTracking(false).build();
 
-
-    @Override
-    public boolean isNull() {
-        return isNull(isNullTxFactory);
+    public E setAtomic(E newValue, long expectedVersion) {
+        throw new TodoException();
     }
 
-    public boolean isNull(TransactionFactory txFactory) {
-        return new TransactionTemplate<Boolean>(txFactory) {
-            @Override
-            public Boolean execute(Transaction t) throws Exception {
-                return isNull(t);
-            }
-        }.execute();
+    public boolean compareAndSetAtomic(E expectedValue, E newValue) {
+        throw new TodoException();
     }
 
-    public boolean isNull(Transaction tx) {
-        AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal) ((AlphaTransaction) tx).openForRead(AlphaRef.this);
-        return tranlocal.value == null;
-    }
 
-    private final static TransactionFactory clearTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
-            .setFamilyName(AlphaRef.class.getName() + ".clear()")
-            .setSmartTxLengthSelector(true)
-            .setReadonly(false)
-            .setAutomaticReadTracking(false).build();
+    // ======================== clear ========================================
 
-
-    @Override
+    /**
+     * Clears the reference. It is the same as calling {@link #set(Object)} with a null value.
+     *
+     * @return the previous value.
+     */
     public E clear() {
-        return clear(clearTxFactory);
+        return set(null);
     }
 
-    public E clear(TransactionFactory txFactory) {
-        return new TransactionTemplate<E>(txFactory) {
-            @Override
-            public E execute(Transaction tx) throws Exception {
-                return clear(tx);
-            }
-        }.execute();
-    }
 
+    /**
+     * Clears the reference. It is the same as calling {@link #set(Transaction, Object)} with
+     * a null value.
+     *
+     * @return the previous value.
+     * @throws org.multiverse.api.exceptions.DeadTransactionException
+     *          if tx isn't active.
+     */
     public E clear(Transaction tx) {
-        AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal) ((AlphaTransaction) tx).openForWrite(AlphaRef.this);
-        E oldValue = tranlocal.value;
-        tranlocal.value = null;
-        return oldValue;
+        return set(tx, null);
     }
 
-    private final static TransactionFactory toStringTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
-            .setFamilyName(AlphaRef.class.getName() + ".toString()")
-            .setSmartTxLengthSelector(true)
-            .setReadonly(true)
-            .setAutomaticReadTracking(false).build();
-
+    // ======================= toString =============================================
 
     @Override
     public String toString() {
-        return toString(toStringTxFactory);
-    }
-
-    public String toString(TransactionFactory txFactory) {
-        return new TransactionTemplate<String>(txFactory) {
-            @Override
-            public String execute(Transaction tx) throws Exception {
-                return AlphaRef.this.toString(tx);
-            }
-
-        }.execute();
+        E value = get();
+        return toString(value);
     }
 
     public String toString(Transaction tx) {
-        AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal) ((AlphaTransaction) tx).openForRead(AlphaRef.this);
-        if (tranlocal.value == null) {
+        AlphaRefTranlocal<E> tranlocal = openForRead(tx);
+        return toString(tranlocal.value);
+    }
+
+    private String toString(E value) {
+        if (value == null) {
             return "DefaultTransactionalReference(reference=null)";
         } else {
-            return format("DefaultTransactionalReference(reference=%s)", tranlocal.value);
+            return format("DefaultTransactionalReference(reference=%s)", value);
         }
     }
 
@@ -335,7 +546,15 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Transacti
 }
 
 
-class AlphaRefTranlocal<E> extends AlphaTranlocal {
+/**
+ * The AlphaTranlocal for the AlphaRef. It is responsible for storing the state of the AlphaRef.
+ * <p/>
+ * The AlpaRefTranlocal also implements the Transaction interface because it can be
+ * used as a lockOwner. This is done as a performance optimization.
+ *
+ * @param <E>
+ */
+class AlphaRefTranlocal<E> extends AlphaTranlocal implements Transaction {
 
     //field belonging to the stm.
     AlphaRef ___txObject;
@@ -400,8 +619,52 @@ class AlphaRefTranlocal<E> extends AlphaTranlocal {
 
         return false;
     }
-}
 
+    @Override
+    public void abort() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public TransactionConfig getConfig() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long getReadVersion() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public TransactionStatus getStatus() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void commit() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void prepare() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void restart() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void registerRetryLatch(Latch latch) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void registerLifecycleListener(TransactionLifecycleListener listener) {
+        throw new UnsupportedOperationException();
+    }
+}
 
 class AlphaRefTranlocalSnapshot<E> extends AlphaTranlocalSnapshot {
 
@@ -423,3 +686,4 @@ class AlphaRefTranlocalSnapshot<E> extends AlphaTranlocalSnapshot {
         ___tranlocal.value = value;
     }
 }
+

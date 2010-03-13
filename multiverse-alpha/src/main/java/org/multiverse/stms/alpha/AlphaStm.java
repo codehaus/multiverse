@@ -133,6 +133,10 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         return clock.getVersion();
     }
 
+    public PrimitiveClock getClock() {
+        return clock;
+    }
+
     public class AlphaTransactionFactoryBuilder
             implements TransactionFactoryBuilder<AlphaTransaction, AlphaTransactionFactoryBuilder> {
 

@@ -10,6 +10,8 @@ import java.util.Set;
  * transactional version of the {@link java.util.TreeSet}.
  *
  * @author Peter Veentjer
+ * @see TransactionalSet
+ * @see java.util.Set
  */
 public class TransactionalTreeSet<E> implements TransactionalSet<E> {
 

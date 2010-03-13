@@ -1,7 +1,6 @@
 package org.multiverse.transactional.arrays;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 
@@ -35,8 +34,30 @@ public class TransactionalReferenceArray_copyToBiggerArrayTest {
     }
 
     @Test
-    @Ignore
-    public void when() {
+    public void whenArrayRemainsTheSame() {
+        TransactionalReferenceArray<String> array = new TransactionalReferenceArray<String>(3);
+        array.set(0, "a");
+        array.set(2, "c");
 
+        long version = stm.getVersion();
+        TransactionalReferenceArray<String> newarray = array.copyToBiggerArray(3);
+
+        assertEquals(version, stm.getVersion());
+        assertEquals(3, newarray.length());
+        assertEquals("[a, null, c]", newarray.toString());
+    }
+
+    @Test
+    public void whenArrayGrows() {
+        TransactionalReferenceArray<String> array = new TransactionalReferenceArray<String>(3);
+        array.set(0, "a");
+        array.set(2, "c");
+
+        long version = stm.getVersion();
+        TransactionalReferenceArray<String> newarray = array.copyToBiggerArray(5);
+
+        assertEquals(version + 1, stm.getVersion());
+        assertEquals(5, newarray.length());
+        assertEquals("[a, null, c, null, null]", newarray.toString());
     }
 }

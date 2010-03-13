@@ -35,4 +35,12 @@ public class FailedToObtainCommitLocksException extends CommitFailureException
     }
 
 
+    public static FailedToObtainCommitLocksException newFailedToObtainCommitLocksException() {
+        if (LoadLockedException.reuse) {
+            throw FailedToObtainCommitLocksException.INSTANCE;
+        } else {
+            throw new FailedToObtainCommitLocksException();
+        }
+    }
+
 }

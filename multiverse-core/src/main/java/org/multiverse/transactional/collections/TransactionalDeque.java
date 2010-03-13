@@ -9,6 +9,10 @@ import java.util.concurrent.BlockingDeque;
  *
  * @author Peter Veentjer.
  * @param <E>
+ * @see org.multiverse.transactional.collections.TransactionalCollection
+ * @see java.util.concurrent.BlockingDeque
+ * @see java.util.Queue
+ * @see java.util.Collection
  */
 public interface TransactionalDeque<E> extends TransactionalCollection<E>, BlockingDeque<E> {
 

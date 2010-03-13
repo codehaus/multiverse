@@ -38,6 +38,7 @@ public class TinyUpdateAlphaTransaction
 
     public TinyUpdateAlphaTransaction(Config config) {
         super(config);
+
         init();
     }
 

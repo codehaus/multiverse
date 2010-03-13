@@ -11,6 +11,9 @@ import java.util.ListIterator;
  *
  * @author Peter Veentjer.
  * @param <E>
+ * @see org.multiverse.transactional.collections.TransactionalCollection
+ * @see java.util.List
+ * @see java.util.Collection
  */
 public interface TransactionalList<E> extends List<E>, TransactionalCollection<E> {
 

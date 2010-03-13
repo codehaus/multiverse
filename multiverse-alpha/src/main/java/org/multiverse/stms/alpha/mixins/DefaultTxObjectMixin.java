@@ -196,14 +196,7 @@ public abstract class DefaultTxObjectMixin implements AlphaTransactionalObject, 
         ___TRANLOCAL_UPDATER.set(this, tranlocal);
 
         //it is important that the listeners are removed after the tranlocal write en before the lockrelease.
-        Listeners listeners = ___LISTENERS_UPDATER.getAndSet(this, null);
-
-        //release the listeners
-        // ___LOCKOWNER_UPDATER.set(this, null);
-
-        return listeners;
-
-        //return null;
+        return ___LISTENERS_UPDATER.getAndSet(this, null);
     }
 
 

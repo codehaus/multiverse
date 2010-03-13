@@ -11,6 +11,7 @@ import java.util.Iterator;
  *
  * @author Peter Veentjer.
  * @param <E>
+ * @see java.util.Collection
  */
 @TransactionalObject
 public interface TransactionalCollection<E> extends Collection<E> {

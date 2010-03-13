@@ -16,6 +16,9 @@ import static java.lang.Math.max;
  * {@link java.util.TreeMap}.
  *
  * @author Peter Veentjer
+ * @see org.multiverse.transactional.collections.TransactionalMap
+ * @see java.util.concurrent.ConcurrentMap
+ * @see java.util.Map
  */
 public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
 
