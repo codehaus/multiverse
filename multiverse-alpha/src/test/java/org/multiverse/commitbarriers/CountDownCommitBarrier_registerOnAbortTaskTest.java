@@ -66,7 +66,7 @@ public class CountDownCommitBarrier_registerOnAbortTaskTest {
     }
 
     @Test
-    public void whenCommitted_thenClosedCommitBarrierException() {
+    public void whenCommitted_thenCommitBarrierOpenException() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(0);
 
         Runnable task = mock(Runnable.class);
@@ -81,7 +81,7 @@ public class CountDownCommitBarrier_registerOnAbortTaskTest {
     }
 
     @Test
-    public void whenAborted_thenClosedCommitBarrierException() {
+    public void whenAborted_thenCommitBarrierOpenException() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
         barrier.abort();
 

@@ -141,7 +141,7 @@ public class VetoCommitBarrier_joinCommitTest {
     }
 
     @Test
-    public void whenBarrierAborted_thenClosedCommitBarrierException() throws InterruptedException {
+    public void whenBarrierAborted_thenCommitBarrierOpenException() throws InterruptedException {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
         barrier.abort();
 
@@ -158,7 +158,7 @@ public class VetoCommitBarrier_joinCommitTest {
     }
 
     @Test
-    public void whenCommitted_thenClosedCommitBarrierException() throws InterruptedException {
+    public void whenCommitted_thenCommitBarrierOpenException() throws InterruptedException {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
         barrier.vetoCommit();
 

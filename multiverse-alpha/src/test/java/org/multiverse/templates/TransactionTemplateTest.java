@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.LoadTooOldVersionException;
+import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.stms.alpha.AlphaStm;
@@ -268,7 +268,7 @@ public class TransactionTemplateTest {
                 public Object execute(Transaction t) throws Exception {
                     executeCounter.value++;
                     ref.inc();
-                    throw new LoadTooOldVersionException();
+                    throw new OldVersionNotFoundReadConflict();
                 }
             }.execute();
 

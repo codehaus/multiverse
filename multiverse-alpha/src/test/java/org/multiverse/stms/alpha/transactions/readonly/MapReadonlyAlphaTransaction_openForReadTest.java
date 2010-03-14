@@ -4,9 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.LoadLockedException;
-import org.multiverse.api.exceptions.LoadTooOldVersionException;
-import org.multiverse.api.exceptions.LoadUncommittedException;
+import org.multiverse.api.exceptions.LockNotFreeReadConflict;
+import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
+import org.multiverse.api.exceptions.UncommittedReadConflict;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -55,14 +55,14 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenNotCommittedBefore_thenLoadUncommittedException() {
+    public void whenNotCommittedBefore_thenUncommittedReadConflict() {
         ManualRef ref = ManualRef.createUncommitted();
 
         AlphaTransaction tx = startTransactionUnderTest();
         try {
             tx.openForRead(ref);
             fail();
-        } catch (LoadUncommittedException expected) {
+        } catch (UncommittedReadConflict expected) {
         }
 
         assertIsActive(tx);
@@ -95,7 +95,7 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
 
 
     @Test
-    public void whenVersionTooOld_thenLoadTooOldVersionException() {
+    public void whenVersionTooOld_thenOldVersionNotFoundReadConflict() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = startTransactionUnderTest();
@@ -107,7 +107,7 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
         try {
             tx.openForRead(ref);
             fail();
-        } catch (LoadTooOldVersionException expected) {
+        } catch (OldVersionNotFoundReadConflict expected) {
         }
 
         assertIsActive(tx);
@@ -115,7 +115,7 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenLocked_thenLoadLockedException() {
+    public void whenLocked_thenLockNotFreeReadConflict() {
         ManualRef ref = new ManualRef(stm);
         long expectedVersion = stm.getVersion();
         ManualRefTranlocal expectedTranlocal = (ManualRefTranlocal) ref.___load();
@@ -127,7 +127,7 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
         try {
             tx.openForRead(ref);
             fail();
-        } catch (LoadLockedException ex) {
+        } catch (LockNotFreeReadConflict ex) {
         }
 
         assertIsActive(tx);

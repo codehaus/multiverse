@@ -25,7 +25,7 @@ public interface AlphaTransaction extends Transaction {
      *
      * @param txObject the transactional object to getClassMetadata the tranlocal for.
      * @return the opened tranlocal.
-     * @throws org.multiverse.api.exceptions.LoadException
+     * @throws org.multiverse.api.exceptions.ReadConflict
      *          if something goes wrong while opening the txObject.
      * @throws org.multiverse.api.exceptions.DeadTransactionException
      *          if this transaction isn't active.
@@ -43,7 +43,7 @@ public interface AlphaTransaction extends Transaction {
      * @return the opened tranlocal.
      * @throws NullPointerException if txObject is null. One can't write on a 'null' transactional object, that
      *                              would normally also cause a NullPointerException.
-     * @throws org.multiverse.api.exceptions.LoadException
+     * @throws org.multiverse.api.exceptions.ReadConflict
      *                              if something goes wrong while opening the txObject for writing.
      * @throws org.multiverse.api.exceptions.DeadTransactionException
      *                              if this transaction isn't active.

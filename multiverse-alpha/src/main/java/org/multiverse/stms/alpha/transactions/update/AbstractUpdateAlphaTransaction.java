@@ -1,7 +1,7 @@
 package org.multiverse.stms.alpha.transactions.update;
 
-import org.multiverse.api.exceptions.FailedToObtainCommitLocksException;
-import org.multiverse.api.exceptions.WriteConflictException;
+import org.multiverse.api.exceptions.CommitLockNotFreeWriteConflict;
+import org.multiverse.api.exceptions.VersionTooOldWriteConflict;
 import org.multiverse.stms.AbstractTransactionSnapshot;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
@@ -276,26 +276,26 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
         openAll(listeners);
     }
 
-    private WriteConflictException createWriteConflictException() {
-        if (WriteConflictException.reuse) {
-            return WriteConflictException.INSTANCE;
+    private VersionTooOldWriteConflict createWriteConflictException() {
+        if (VersionTooOldWriteConflict.reuse) {
+            return VersionTooOldWriteConflict.INSTANCE;
         }
 
         String msg = format(
                 "Failed to commit transaction '%s' because there was a write conflict'", config.getFamilyName());
-        return new WriteConflictException(msg);
+        return new VersionTooOldWriteConflict(msg);
     }
 
-    private FailedToObtainCommitLocksException createFailedToObtainCommitLocksException() {
-        if (FailedToObtainCommitLocksException.reuse) {
-            return FailedToObtainCommitLocksException.INSTANCE;
+    private CommitLockNotFreeWriteConflict createFailedToObtainCommitLocksException() {
+        if (CommitLockNotFreeWriteConflict.reuse) {
+            return CommitLockNotFreeWriteConflict.INSTANCE;
         }
 
         String msg = format(
                 "Failed to commit transaction '%s' because not all the locks on the transactional objects " +
                         "in the writeset could be obtained",
                 config.getFamilyName());
-        return new FailedToObtainCommitLocksException(msg);
+        return new CommitLockNotFreeWriteConflict(msg);
     }
 
     /**

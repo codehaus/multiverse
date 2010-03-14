@@ -3,7 +3,7 @@ package org.multiverse.stms.alpha.integrationtests;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.exceptions.WriteConflictException;
+import org.multiverse.api.exceptions.VersionTooOldWriteConflict;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.manualinstrumentation.IntStack;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
@@ -54,7 +54,7 @@ public class WriteSkewDetectionTest {
         try {
             t2.commit();
             fail();
-        } catch (WriteConflictException expected) {
+        } catch (VersionTooOldWriteConflict expected) {
         }
     }
 

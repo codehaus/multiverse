@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.exceptions.WriteConflictException;
+import org.multiverse.api.exceptions.VersionTooOldWriteConflict;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -63,7 +63,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
     }
 
     @Test
-    public void whenDisallowedWriteSkewProblem_thenWriteConflictException() {
+    public void whenDisallowedWriteSkewProblem_thenVersionTooOldWriteConflict() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRefTranlocal committedRef1 = (ManualRefTranlocal) ref1.___load();
         ManualRef ref2 = new ManualRef(stm);
@@ -85,7 +85,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
         try {
             tx2.commit();
             fail();
-        } catch (WriteConflictException expected) {
+        } catch (VersionTooOldWriteConflict expected) {
         }
 
         assertIsAborted(tx2);
@@ -176,7 +176,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
         try {
             tx2.commit();
             fail();
-        } catch (WriteConflictException expected) {
+        } catch (VersionTooOldWriteConflict expected) {
         }
     }
 

@@ -4,8 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.LoadLockedException;
-import org.multiverse.api.exceptions.LoadTooOldVersionException;
+import org.multiverse.api.exceptions.LockNotFreeReadConflict;
+import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
@@ -91,7 +91,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
      * could escape before they are committed. For now this has been disallowed.
      */
     @Test
-    public void whenLockedAndEqualVersion_thenLoadLockedException() {
+    public void whenLockedAndEqualVersion_thenLockNotFreeReadConflict() {
         ManualRef ref = new ManualRef(stm, 0);
         Transaction owner = mock(Transaction.class);
         ref.___tryLock(owner);
@@ -100,7 +100,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
         try {
             tx.openForWrite(ref);
             fail();
-        } catch (LoadLockedException expected) {
+        } catch (LockNotFreeReadConflict expected) {
         }
 
         assertSame(owner, ref.___getLockOwner());
@@ -108,7 +108,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
     }
 
     @Test
-    public void whenVersionTooNew_thenLoadTooOldVersion() {
+    public void whenVersionTooNew_thenOldVersionNotFoundReadConflict() {
         ManualRef ref = new ManualRef(stm, 0);
 
         AlphaTransaction tx1 = startSutTransaction();
@@ -119,14 +119,14 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
         try {
             tx1.openForWrite(ref);
             fail();
-        } catch (LoadTooOldVersionException expected) {
+        } catch (OldVersionNotFoundReadConflict expected) {
         }
 
         assertIsActive(tx1);
     }
 
     @Test
-    public void whenLocked_thenLoadLockedException() {
+    public void whenLocked_thenLockNotFreeReadConflict() {
         ManualRef ref = new ManualRef(stm, 0);
 
         stmConfig.clock.tick();
@@ -138,7 +138,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
         try {
             tx.openForWrite(ref);
             fail();
-        } catch (LoadLockedException expected) {
+        } catch (LockNotFreeReadConflict expected) {
         }
 
         assertIsActive(tx);

@@ -2,10 +2,10 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.TransactionStatus;
-import org.multiverse.api.exceptions.RecoverableThrowable;
+import org.multiverse.api.exceptions.ControlFlowError;
 import org.multiverse.api.exceptions.RetryError;
 import org.multiverse.api.exceptions.TooManyRetriesException;
-import org.multiverse.api.exceptions.TransactionTooSmallException;
+import org.multiverse.api.exceptions.TransactionTooSmallError;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.latches.CheapLatch;
@@ -48,7 +48,8 @@ public class TransactionLogicDonor {
             tx = null;
         } catch (Throwable throwable) {
             tx.abort();
-            if (throwable instanceof RecoverableThrowable) {
+
+            if (throwable instanceof ControlFlowError) {
                 throw new TooManyRetriesException();
             } else if (throwable instanceof Error) {
                 throw (Error) throwable;
@@ -82,16 +83,12 @@ public class TransactionLogicDonor {
                     if (attempt - 1 < tx.getConfig().getMaxRetryCount()) {
                         waitForChange(tx);
                     }
-                } catch (TransactionTooSmallException tooSmallException) {
+                } catch (TransactionTooSmallError tooSmallException) {
                     tx = (AlphaTransaction) transactionFactory.start();
                     setThreadLocalTransaction(tx);
-                } catch (Throwable throwable) {
-                    if (throwable instanceof RecoverableThrowable) {
-                        BackoffPolicy backoffPolicy = tx.getConfig().getBackoffPolicy();
-                        backoffPolicy.delayedUninterruptible(tx, attempt);
-                    } else {
-                        rethrow(throwable);
-                    }
+                } catch (ControlFlowError throwable) {
+                    BackoffPolicy backoffPolicy = tx.getConfig().getBackoffPolicy();
+                    backoffPolicy.delayedUninterruptible(tx, attempt);
                 } finally {
                     if (tx.getStatus() != TransactionStatus.committed && attempt - 1 < tx.getConfig().getMaxRetryCount()) {
                         tx.restart();

@@ -102,7 +102,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenLocked_thenLoadLockedException() {
+    public void whenLocked_thenLockNotFreeReadConflict() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction owner = mock(AlphaTransaction.class);
@@ -113,7 +113,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
         try {
             tx.openForRead(ref);
             fail();
-        } catch (LoadLockedException expected) {
+        } catch (LockNotFreeReadConflict expected) {
         }
 
         assertIsActive(tx);
@@ -122,7 +122,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenReadConflict_thenLoadTooOldVersionException() {
+    public void whenReadConflict_thenOldVersionNotFoundReadConflict() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = startSutTransaction(10);
@@ -131,7 +131,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
         try {
             tx.openForRead(ref);
             fail();
-        } catch (LoadTooOldVersionException expected) {
+        } catch (OldVersionNotFoundReadConflict expected) {
         }
 
         assertIsActive(tx);
@@ -179,7 +179,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenCapacityExceeded_thenTransactionTooSmallException() {
+    public void whenCapacityExceeded_thenTransactionTooSmallError() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
         ManualRef ref3 = new ManualRef(stm);
@@ -191,7 +191,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
         try {
             tx.openForWrite(ref3);
             fail();
-        } catch (TransactionTooSmallException expected) {
+        } catch (TransactionTooSmallError expected) {
         }
 
         assertSame(4, optimalSize.get());

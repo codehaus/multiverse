@@ -10,7 +10,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.WriteConflictException;
+import org.multiverse.api.exceptions.VersionTooOldWriteConflict;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.junit.Assert.*;
@@ -95,13 +95,13 @@ public class VetoCommitBarrier_vetoCommitWithTransactionTest {
     public void whenTransactionFailedToPrepare_thenBarrierNotAbortedOrCommitted() {
         Transaction tx = mock(Transaction.class);
         doReturn(TransactionStatus.active).when(tx).getStatus();
-        doThrow(new WriteConflictException()).when(tx).prepare();
+        doThrow(new VersionTooOldWriteConflict()).when(tx).prepare();
 
         VetoCommitBarrier barrier = new VetoCommitBarrier();
         try {
             barrier.vetoCommit(tx);
             fail();
-        } catch (WriteConflictException expected) {
+        } catch (VersionTooOldWriteConflict expected) {
         }
 
         assertTrue(barrier.isClosed());
@@ -142,7 +142,7 @@ public class VetoCommitBarrier_vetoCommitWithTransactionTest {
     }
 
     @Test
-    public void whenBarrierCommitted_thenClosedCommitBarrierException() {
+    public void whenBarrierCommitted_thenCommitBarrierOpenException() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
         barrier.vetoCommit();
 
@@ -158,7 +158,7 @@ public class VetoCommitBarrier_vetoCommitWithTransactionTest {
     }
 
     @Test
-    public void whenBarrierAborted_thenClosedCommitBarrierException() {
+    public void whenBarrierAborted_thenCommitBarrierOpenException() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
         barrier.abort();
 

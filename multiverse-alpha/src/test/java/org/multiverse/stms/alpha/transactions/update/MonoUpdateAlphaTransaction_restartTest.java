@@ -109,5 +109,4 @@ public class MonoUpdateAlphaTransaction_restartTest {
         assertIsActive(tx);
         assertNull(ref.___getLockOwner());
     }
-
 }

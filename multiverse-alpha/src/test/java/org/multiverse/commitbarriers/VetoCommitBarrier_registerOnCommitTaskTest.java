@@ -66,7 +66,7 @@ public class VetoCommitBarrier_registerOnCommitTaskTest {
     }
 
     @Test
-    public void whenCommitted_thenClosedCommitBarrierException() {
+    public void whenCommitted_thenCommitBarrierOpenException() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
         barrier.vetoCommit();
 
@@ -82,7 +82,7 @@ public class VetoCommitBarrier_registerOnCommitTaskTest {
     }
 
     @Test
-    public void whenAborted_thenClosedCommitBarrierException() {
+    public void whenAborted_thenCommitBarrierOpenException() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
         barrier.abort();
 

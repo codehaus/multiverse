@@ -52,21 +52,21 @@ public class MonoReadonlyAlphaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenNotCommittedBefore_thenLoadUncommittedException() {
+    public void whenNotCommittedBefore_thenUncommittedReadConflict() {
         ManualRef ref = ManualRef.createUncommitted();
 
         AlphaTransaction tx = startSutTransaction();
         try {
             tx.openForRead(ref);
             fail();
-        } catch (LoadUncommittedException expected) {
+        } catch (UncommittedReadConflict expected) {
         }
 
         assertIsActive(tx);
     }
 
     @Test
-    public void whenLocked_thenLoadLockedException() {
+    public void whenLocked_thenLockNotFreeReadConflict() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction owner = mock(AlphaTransaction.class);
@@ -76,7 +76,7 @@ public class MonoReadonlyAlphaTransaction_openForReadTest {
         try {
             tx.openForRead(ref);
             fail();
-        } catch (LoadLockedException expected) {
+        } catch (LockNotFreeReadConflict expected) {
         }
 
         assertIsActive(tx);
@@ -95,7 +95,7 @@ public class MonoReadonlyAlphaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenReadConflict_thenLoadTooOldVersion() {
+    public void whenReadConflict_thenOldVersionNotFoundReadConflict() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = startSutTransaction();
@@ -103,7 +103,7 @@ public class MonoReadonlyAlphaTransaction_openForReadTest {
         try {
             tx.openForRead(ref);
             fail();
-        } catch (LoadTooOldVersionException expected) {
+        } catch (OldVersionNotFoundReadConflict expected) {
         }
 
         assertIsActive(tx);
@@ -132,7 +132,7 @@ public class MonoReadonlyAlphaTransaction_openForReadTest {
         try {
             tx.openForRead(ref2);
             fail();
-        } catch (TransactionTooSmallException expected) {
+        } catch (TransactionTooSmallError expected) {
         }
 
         assertIsActive(tx);

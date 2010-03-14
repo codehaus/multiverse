@@ -3,9 +3,9 @@ package org.multiverse.stms.alpha.transactions.update;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.exceptions.CommitLockNotFreeWriteConflict;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.FailedToObtainCommitLocksException;
-import org.multiverse.api.exceptions.WriteConflictException;
+import org.multiverse.api.exceptions.VersionTooOldWriteConflict;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -199,7 +199,7 @@ public class MapUpdateAlphaTransaction_commitTest {
     }
 
     @Test
-    public void whenWriteConflict_thenWriteConflictException() {
+    public void whenWriteConflict_thenVersionTooOldWriteConflict() {
         ManualRef ref = new ManualRef(stm, 0);
 
         AlphaTransaction tx = startSutTransaction();
@@ -213,7 +213,7 @@ public class MapUpdateAlphaTransaction_commitTest {
         try {
             tx.commit();
             fail();
-        } catch (WriteConflictException expected) {
+        } catch (VersionTooOldWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -223,7 +223,7 @@ public class MapUpdateAlphaTransaction_commitTest {
     }
 
     @Test
-    public void whenLocked_thenFailedToObtainCommitLocksException() {
+    public void whenLocked_thenCommitLockNotFreeWriteConflict() {
         ManualRef ref = new ManualRef(stm, 0);
 
         long version = stm.getVersion();
@@ -237,7 +237,7 @@ public class MapUpdateAlphaTransaction_commitTest {
         try {
             tx.commit();
             fail();
-        } catch (FailedToObtainCommitLocksException e) {
+        } catch (CommitLockNotFreeWriteConflict e) {
         }
 
         ref.___releaseLock(otherOwner);
@@ -367,7 +367,7 @@ public class MapUpdateAlphaTransaction_commitTest {
     }
 
     @Test
-    public void whenDisallowedWriteSkewProblem_theWriteConflict() {
+    public void whenDisallowedWriteSkewProblem_theVersionTooOldWriteConflict() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
@@ -384,7 +384,7 @@ public class MapUpdateAlphaTransaction_commitTest {
         try {
             tx2.commit();
             fail();
-        } catch (WriteConflictException expected) {
+        } catch (VersionTooOldWriteConflict expected) {
         }
 
         assertEquals(0, ref1.get(stm));

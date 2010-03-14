@@ -89,8 +89,8 @@ public interface Transaction {
      * <p/>
      * Commit will not throw any validation exceptions after the transaction is prepared.
      *
-     * @throws org.multiverse.api.exceptions.CommitFailureException
-     *          if the commit failed. Check the class hierarchy of the CommitFailureException for more information.
+     * @throws org.multiverse.api.exceptions.WriteConflict
+     *          if the commit failed. Check the class hierarchy of the WriteConflict for more information.
      * @throws org.multiverse.api.exceptions.DeadTransactionException
      *          if this transaction already is aborted.
      */
@@ -104,7 +104,7 @@ public interface Transaction {
      * It is very important that the transaction eventually commits or aborts, if it doesn't no other transaction
      * reading/writing the committed resources, can't commit.
      *
-     * @throws org.multiverse.api.exceptions.CommitFailureException
+     * @throws org.multiverse.api.exceptions.WriteConflict
      *          if the transaction can't be prepared.
      * @throws org.multiverse.api.exceptions.DeadTransactionException
      *          if the transaction already is committed or aborted.

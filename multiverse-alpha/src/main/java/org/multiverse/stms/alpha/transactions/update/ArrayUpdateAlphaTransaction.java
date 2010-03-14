@@ -1,7 +1,7 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.multiverse.api.exceptions.PanicError;
-import org.multiverse.api.exceptions.TransactionTooSmallException;
+import org.multiverse.api.exceptions.TransactionTooSmallError;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.UncommittedFilter;
@@ -16,8 +16,8 @@ import org.multiverse.utils.profiling.ProfileRepository;
 import static java.lang.System.arraycopy;
 
 /**
- * A {@link AbstractUpdateAlphaTransaction} where the tranlocals are stored in an array. An array is faster for very
- * small collection than a map.
+ * A {@link AbstractUpdateAlphaTransaction} where the tranlocals are stored in an array. An array
+ * is faster for very small collection than a {@link MapUpdateAlphaTransaction}.
  *
  * @author Peter Veentjer
  */
@@ -119,7 +119,7 @@ public class ArrayUpdateAlphaTransaction
             int newOptimalSize = attachedArray.length + 2;
             config.optimalSize.compareAndSet(attachedArray.length, newOptimalSize);
             if (attachedArray.length >= config.maximumSize) {
-                throw TransactionTooSmallException.INSTANCE;
+                throw TransactionTooSmallError.INSTANCE;
             }
 
             AlphaTranlocal[] newAttachedArray = new AlphaTranlocal[newOptimalSize];

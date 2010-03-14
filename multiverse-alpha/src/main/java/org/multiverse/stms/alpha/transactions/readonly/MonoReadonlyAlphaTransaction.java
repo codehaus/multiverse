@@ -1,7 +1,7 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.exceptions.TransactionTooSmallException;
+import org.multiverse.api.exceptions.TransactionTooSmallError;
 import org.multiverse.stms.AbstractTransactionConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
@@ -77,7 +77,7 @@ public class MonoReadonlyAlphaTransaction
     protected void attach(AlphaTranlocal tranlocal) {
         if (attached != null) {
             config.optimalSize.compareAndSet(1, 2);
-            throw TransactionTooSmallException.INSTANCE;
+            throw TransactionTooSmallError.INSTANCE;
         }
 
         attached = tranlocal;

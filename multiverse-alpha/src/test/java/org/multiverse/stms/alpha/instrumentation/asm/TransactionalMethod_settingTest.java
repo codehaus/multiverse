@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.LoadTooOldVersionException;
+import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
 import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.stms.alpha.AlphaStm;
 
@@ -58,7 +58,7 @@ public class TransactionalMethod_settingTest {
             int b = x;
 
             tryCounter.incrementAndGet();
-            throw new LoadTooOldVersionException();
+            throw new OldVersionNotFoundReadConflict();
         }
     }
 

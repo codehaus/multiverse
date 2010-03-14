@@ -1,7 +1,7 @@
 package org.multiverse.api.exceptions;
 
 /**
- * An {@link IllegalStateException} that is thrown when an object is loaded but has not been committed yet.
+ * An {@link ReadConflict} that is thrown when an object is loaded but has not been committed yet.
  * There are 2 why reasons this can happen:
  * <ol>
  * <li>
@@ -19,22 +19,22 @@ package org.multiverse.api.exceptions;
  *
  * @author Peter Veentjer.
  */
-public class LoadUncommittedException extends LoadException implements RecoverableThrowable {
+public class UncommittedReadConflict extends ReadConflict {
 
     private static final long serialVersionUID = 0;
 
-    public LoadUncommittedException() {
+    public UncommittedReadConflict() {
     }
 
-    public LoadUncommittedException(String message) {
+    public UncommittedReadConflict(String message) {
         super(message);
     }
 
-    public LoadUncommittedException(String message, Throwable cause) {
+    public UncommittedReadConflict(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public LoadUncommittedException(Throwable cause) {
+    public UncommittedReadConflict(Throwable cause) {
         super(cause);
     }
 }

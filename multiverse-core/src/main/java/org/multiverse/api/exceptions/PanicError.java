@@ -1,8 +1,8 @@
 package org.multiverse.api.exceptions;
 
 /**
- * An Error that is thrown if the system has entered an invalid state. Normally this should never
- * happen.
+ * An {@link Error} that is thrown if the system has entered an invalid state. Normally this
+ * should never happen.
  *
  * @author Peter Veentjer.
  */

@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.exceptions.TooManyRetriesException;
-import org.multiverse.api.exceptions.WriteConflictException;
+import org.multiverse.api.exceptions.VersionTooOldWriteConflict;
 import org.multiverse.stms.alpha.AlphaStm;
 
 import static org.junit.Assert.assertEquals;
@@ -39,7 +39,7 @@ public class RetryCountTest {
         @TransactionalMethod(maxRetryCount = 0)
         public void execute() {
             count++;
-            throw new WriteConflictException();
+            throw new VersionTooOldWriteConflict();
         }
     }
 
@@ -62,7 +62,7 @@ public class RetryCountTest {
         @TransactionalMethod(maxRetryCount = 1)
         public void execute() {
             count++;
-            throw new WriteConflictException();
+            throw new VersionTooOldWriteConflict();
         }
     }
 
@@ -85,7 +85,7 @@ public class RetryCountTest {
         @TransactionalMethod(maxRetryCount = 10)
         public void execute() {
             count++;
-            throw new WriteConflictException();
+            throw new VersionTooOldWriteConflict();
         }
     }
 }

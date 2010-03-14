@@ -2,7 +2,7 @@ package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.exceptions.WriteConflictException;
+import org.multiverse.api.exceptions.VersionTooOldWriteConflict;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
@@ -126,7 +126,7 @@ public class MonoUpdateAlphaTransaction_commitTest {
     }
 
     @Test
-    public void whenWriteConflict_thenWriteConflictException() {
+    public void whenWriteConflict_thenVersionTooOldWriteConflict() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = startSutTransaction();
@@ -141,7 +141,7 @@ public class MonoUpdateAlphaTransaction_commitTest {
         try {
             tx.commit();
             fail();
-        } catch (WriteConflictException ex) {
+        } catch (VersionTooOldWriteConflict ex) {
         }
 
         assertIsAborted(tx);

@@ -56,7 +56,7 @@ public class CountDownCommitBarrier_setTimeoutTest {
     }
 
     @Test
-    public void whenCommitted_thenClosedCommitBarrierException() {
+    public void whenCommitted_thenCommitBarrierOpenException() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(0);
 
         try {
@@ -69,7 +69,7 @@ public class CountDownCommitBarrier_setTimeoutTest {
     }
 
     @Test
-    public void whenAborted_thenClosedCommitBarrierException() {
+    public void whenAborted_thenCommitBarrierOpenException() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
         barrier.abort();
 

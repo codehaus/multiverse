@@ -2,10 +2,10 @@ package org.multiverse.stms.alpha.transactions.readonly;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.exceptions.LoadLockedException;
-import org.multiverse.api.exceptions.LoadTooOldVersionException;
-import org.multiverse.api.exceptions.LoadUncommittedException;
-import org.multiverse.api.exceptions.TransactionTooSmallException;
+import org.multiverse.api.exceptions.LockNotFreeReadConflict;
+import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
+import org.multiverse.api.exceptions.TransactionTooSmallError;
+import org.multiverse.api.exceptions.UncommittedReadConflict;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -53,14 +53,14 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenNotCommittedBefore_thenLoadUncommittedException() {
+    public void whenNotCommittedBefore_thenUncommittedReadConflict() {
         ManualRef ref = ManualRef.createUncommitted();
 
         AlphaTransaction tx = startTransactionUnderTest(10);
         try {
             tx.openForRead(ref);
             fail();
-        } catch (LoadUncommittedException expected) {
+        } catch (UncommittedReadConflict expected) {
         }
 
         assertIsActive(tx);
@@ -106,7 +106,7 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenLocked_thenLoadLockedFailure() {
+    public void whenLocked_thenLockNotFreeReadConflict() {
         ManualRef ref = new ManualRef(stm);
         AlphaTransaction owner = mock(AlphaTransaction.class);
         ref.___tryLock(owner);
@@ -116,7 +116,7 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
         try {
             tx.openForRead(ref);
             fail();
-        } catch (LoadLockedException expected) {
+        } catch (LockNotFreeReadConflict expected) {
         }
 
         assertIsActive(tx);
@@ -124,7 +124,7 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenVersionTooNew_thenLoadTooOldVersionException() {
+    public void whenVersionTooNew_thenOldVersionNotFoundReadConflict() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = startTransactionUnderTest(10);
@@ -135,7 +135,7 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
         try {
             tx.openForRead(ref);
             fail();
-        } catch (LoadTooOldVersionException expected) {
+        } catch (OldVersionNotFoundReadConflict expected) {
         }
 
         assertIsActive(tx);
@@ -143,7 +143,7 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenMaximumCapacityExceeded() {
+    public void whenMaximumCapacityExceeded_thenTransactionTooSmallError() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
         ManualRef ref3 = new ManualRef(stm);
@@ -157,7 +157,7 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
         try {
             tx.openForRead(ref4);
             fail();
-        } catch (TransactionTooSmallException expected) {
+        } catch (TransactionTooSmallError expected) {
         }
         assertEquals(5, optimalSize.get());
     }

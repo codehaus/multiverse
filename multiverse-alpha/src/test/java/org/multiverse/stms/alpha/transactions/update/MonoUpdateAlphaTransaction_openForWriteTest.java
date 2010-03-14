@@ -79,7 +79,7 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
 
 
     @Test
-    public void whenVersionTooNew_thenLoadTooOldVersionException() {
+    public void whenVersionTooNew_thenOldVersionNotFoundReadConflict() {
         ManualRef ref = new ManualRef(stm);
         AlphaTransaction tx = startSutTransaction();
         ref.inc(stm);
@@ -87,7 +87,7 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
         try {
             tx.openForWrite(ref);
             fail();
-        } catch (LoadTooOldVersionException expected) {
+        } catch (OldVersionNotFoundReadConflict expected) {
         }
 
         assertIsActive(tx);
@@ -95,7 +95,7 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
     }
 
     @Test
-    public void whenLocked_thenLoadLockedException() {
+    public void whenLocked_thenLockNotFreeReadConflict() {
         ManualRef ref = new ManualRef(stm);
         AlphaTransaction lockOwner = mock(AlphaTransaction.class);
         ref.___tryLock(lockOwner);
@@ -104,7 +104,7 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
         try {
             tx.openForWrite(ref);
             fail();
-        } catch (LoadLockedException ex) {
+        } catch (LockNotFreeReadConflict ex) {
         }
 
         assertIsActive(tx);
@@ -135,7 +135,7 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
     }
 
     @Test
-    public void whenAlreadyAnotherOpenForRead_thenTransactionTooSmallException() {
+    public void whenAlreadyAnotherOpenForRead_thenTransactionTooSmallError() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
@@ -145,14 +145,14 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
         try {
             tx.openForWrite(ref2);
             fail();
-        } catch (TransactionTooSmallException ex) {
+        } catch (TransactionTooSmallError ex) {
         }
 
         assertEquals(2, optimalSize.get());
     }
 
     @Test
-    public void whenAlreadyAnotherOpenForWrite_thenTransactionTooSmallException() {
+    public void whenAlreadyAnotherOpenForWrite_thenTransactionTooSmallError() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
@@ -162,7 +162,7 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
         try {
             tx.openForWrite(ref2);
             fail();
-        } catch (TransactionTooSmallException ex) {
+        } catch (TransactionTooSmallError ex) {
         }
 
         assertEquals(2, optimalSize.get());

@@ -2,7 +2,7 @@ package org.multiverse.stms.alpha.integrationtests;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.exceptions.WriteConflictException;
+import org.multiverse.api.exceptions.VersionTooOldWriteConflict;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTestUtils;
 import org.multiverse.stms.alpha.manualinstrumentation.IntRef;
@@ -55,7 +55,7 @@ public class AbaProblemOverMultipleTransactionsIsDetectedTest {
         try {
             t1.commit();
             fail();
-        } catch (WriteConflictException er) {
+        } catch (VersionTooOldWriteConflict er) {
         }
     }
 }

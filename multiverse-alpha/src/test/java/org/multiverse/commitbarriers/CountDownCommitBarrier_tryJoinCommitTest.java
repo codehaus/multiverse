@@ -54,7 +54,7 @@ public class CountDownCommitBarrier_tryJoinCommitTest {
     }
 
     @Test
-    public void whenAborted_thenClosedCommitBarrierException() {
+    public void whenAborted_thenCommitBarrierOpenException() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
         barrier.abort();
 

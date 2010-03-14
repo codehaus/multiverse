@@ -71,7 +71,7 @@ public class VetoCommitBarrier_vetoCommitTest {
     }
 
     @Test
-    public void whenBarrierAborted_thenClosedCommitBarrierException() {
+    public void whenBarrierAborted_thenCommitBarrierOpenException() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
         barrier.abort();
 

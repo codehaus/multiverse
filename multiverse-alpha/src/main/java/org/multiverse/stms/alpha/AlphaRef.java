@@ -1,11 +1,10 @@
 package org.multiverse.stms.alpha;
 
 import org.multiverse.api.*;
-import org.multiverse.api.exceptions.LoadUncommittedException;
+import org.multiverse.api.exceptions.UncommittedReadConflict;
 import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
-import org.multiverse.utils.TodoException;
 import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.latches.Latch;
 
@@ -13,7 +12,7 @@ import static java.lang.String.format;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.api.exceptions.FailedToObtainCommitLocksException.newFailedToObtainCommitLocksException;
+import static org.multiverse.api.exceptions.CommitLockNotFreeWriteConflict.newFailedToObtainCommitLocksException;
 
 /**
  * A manual instrumented {@link org.multiverse.transactional.TransactionalReference} implementation. If this class
@@ -43,6 +42,13 @@ import static org.multiverse.api.exceptions.FailedToObtainCommitLocksException.n
  * <p/>
  * TODO:
  * The internal templates created here don't need to have lifecycle callbacks enabled.
+ * <p/>
+ * <p/>
+ * Piossible optimization for the alpha engine, instead of placing the lock, listener on the
+ * transactional object, place it on the tranlocal. This would remove the writeLock after
+ * commit because when the new tranlocal is written, the lock automatically is null.
+ * <p/>
+ * The listener can also be read from the tranlocal so no need to
  *
  * @author Peter Veentjer
  */
@@ -99,7 +105,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
      * <p/>
      * If the value is an transactionalobject or has a reference to it (perhaps indirectly), and the transaction this
      * transactionalobject is created in is aborted (or hasn't committed) yet, you will getClassMetadata the dreaded {@link
-     * org.multiverse.api.exceptions.LoadUncommittedException}.
+     * org.multiverse.api.exceptions.UncommittedReadConflict}.
      *
      * @param stm   the {@link org.multiverse.api.Stm} used for committing the ref.
      * @param value the initial value of the ref. The value is allowed to be null.
@@ -159,6 +165,8 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
      * This method does not rely on a ThreadLocalTransaction and GlobalStmInstance.
      *
      * @param tx the Transaction used
+     * @throws IllegalThreadStateException if the transaction was not in the correct state for
+     *                                     creating this AlphaRef.
      */
     public AlphaRef(Transaction tx) {
         this(tx, null);
@@ -192,14 +200,14 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
      * This functionality can be used for optimistic locking over multiple transactions.
      *
      * @return the version.
-     * @throws org.multiverse.api.exceptions.LoadException
+     * @throws org.multiverse.api.exceptions.ReadConflict
      *          if something fails while loading the reference.
      */
     public long getVersionAtomic() {
         AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal<E>) ___load();
 
         if (tranlocal == null) {
-            throw new LoadUncommittedException();
+            throw new UncommittedReadConflict();
         }
 
         return tranlocal.___writeVersion;
@@ -216,7 +224,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
      * This functionality can be used for optimistic locking over multiple transactions.
      *
      * @return the version.
-     * @throws org.multiverse.api.exceptions.LoadException
+     * @throws org.multiverse.api.exceptions.ReadConflict
      *          if something fails while loading the reference.
      */
     public long getVersion() {
@@ -239,9 +247,9 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
      *
      * @param tx the transaction used
      * @return the version
-     * @throws org.multiverse.api.exceptions.DeadTransactionException
-     *          if the tx isn't active anymore.
-     * @throws org.multiverse.api.exceptions.LoadException
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if the transaction is not in the correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ReadConflict
      *          if something fails while loading the reference.
      */
     public long getVersion(Transaction tx) {
@@ -259,8 +267,10 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
      * a check on the Transaction if that is running.
      *
      * @return the current value stored in this reference.
-     * @throws org.multiverse.api.exceptions.LoadException
-     *          if something fails while loading the reference.
+     * @throws IllegalThreadStateException if the current transaction isn't in the right state
+     *                                     for this operation.
+     * @throws org.multiverse.api.exceptions.ReadConflict
+     *                                     if something fails while loading the reference.
      */
     public E get() {
         Transaction tx = getThreadLocalTransaction();
@@ -285,14 +295,14 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
      * since that is used under water.
      *
      * @return the current value.
-     * @throws org.multiverse.api.exceptions.LoadException
+     * @throws org.multiverse.api.exceptions.ReadConflict
      *          if something fails while loading the reference.
      */
     public E getAtomic() {
         AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal) ___load();
 
         if (tranlocal == null) {
-            throw new LoadUncommittedException();
+            throw new UncommittedReadConflict();
         }
         return tranlocal.value;
     }
@@ -302,7 +312,10 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
      *
      * @param tx the Transaction used for reading the value.
      * @return the value currently stored, could be null.
-     * @throws org.multiverse.api.exceptions.LoadException
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if the transaction is not
+     *          in the correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ReadConflict
      *          if something fails while loading the reference.
      */
     public E get(Transaction tx) {
@@ -317,7 +330,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
      * transaction, so it is very very cheap. See the {@link #getAtomic()} for more information.
      *
      * @return true if the reference is null, false otherwise.
-     * @throws org.multiverse.api.exceptions.LoadException
+     * @throws org.multiverse.api.exceptions.ReadConflict
      *          if something fails while loading the reference.
      */
     public boolean isNullAtomic() {
@@ -332,7 +345,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
      * that method is used to retrieve the current value.
      *
      * @return true if the reference currently is null.
-     * @throws org.multiverse.api.exceptions.LoadException
+     * @throws org.multiverse.api.exceptions.ReadConflict
      *          if something fails while loading the reference.
      */
     public boolean isNull() {
@@ -347,7 +360,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.DeadTransactionException
      *                              is tx isn't active
-     * @throws org.multiverse.api.exceptions.LoadException
+     * @throws org.multiverse.api.exceptions.ReadConflict
      *                              if something fails while loading the reference.
      */
     public boolean isNull(Transaction tx) {
@@ -355,16 +368,6 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
     }
 
     // ============================== getOrAwait ======================================
-
-    public E getOrAwaitAtomic() {
-        E item = getAtomic();
-
-        if (item != null) {
-            return item;
-        }
-
-        throw new TodoException();
-    }
 
     public E getOrAwait() {
         return getOrAwait(getOrAwaitTxFactory);
@@ -389,10 +392,6 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
         return tranlocal.value;
     }
 
-    public E getOrAwaitInterruptibly() throws InterruptedException {
-        throw new TodoException("Not implemented yet");
-    }
-
     // ========================== set ==========================================
 
     /**
@@ -402,9 +401,9 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
      *
      * @param newValue the new value.
      * @return the old value.
-     * @throws org.multiverse.api.exceptions.CommitFailureException
+     * @throws org.multiverse.api.exceptions.WriteConflict
      *          if something failed while committing. If the commit fails, nothing bad will happen.
-     * @throws org.multiverse.api.exceptions.LoadException
+     * @throws org.multiverse.api.exceptions.ReadConflict
      *          if something fails while loading the reference.
      */
     public E setAtomic(E newValue) {
@@ -447,10 +446,13 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
      * @param newValue the new value to be stored in this reference. The newValue is allowed to
      *                 be null.
      * @return the value that is replaced, can be null.
-     * @throws org.multiverse.api.exceptions.CommitFailureException
-     *          if something failed while committing. If the commit fails, nothing bad will happen.
-     * @throws org.multiverse.api.exceptions.LoadException
-     *          if something fails while loading the reference.
+     * @throws org.multiverse.api.exceptions.WriteConflict
+     *                                     if something failed while committing. If the commit fails, nothing bad will happen.
+     * @throws org.multiverse.api.exceptions.ReadConflict
+     *                                     if something fails while loading the reference.
+     * @throws IllegalThreadStateException if the transaction was not in the correct state for
+     *                                     this operations. If the transaction in the TransactionThreadLocal is dead (so aborted or
+     *                                     committed), a new transaction will be used.
      */
     public E set(E newValue) {
         Transaction tx = getThreadLocalTransaction();
@@ -470,9 +472,9 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
      * @param tx       the transaction to use.
      * @param newValue the new value, and is allowed to be null.
      * @return the previous value stored in this reference.
-     * @throws org.multiverse.api.exceptions.DeadTransactionException
-     *          if tx is not active.
-     * @throws org.multiverse.api.exceptions.LoadException
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if the transaction isn't in the correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ReadConflict
      *          if something fails while loading the reference.
      */
     public E set(Transaction tx, E newValue) {
@@ -496,13 +498,42 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
 
 
     public E setAtomic(E newValue, long expectedVersion) {
-        throw new TodoException();
-    }
+        AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal<E>) ___load();
+        if (tranlocal == null) {
+            throw new UncommittedReadConflict();
+        }
 
-    public boolean compareAndSetAtomic(E expectedValue, E newValue) {
-        throw new TodoException();
-    }
+        if (tranlocal.value == newValue) {
+            return newValue;
+        }
 
+        if (tranlocal.getWriteVersion() != expectedVersion) {
+            throw new OptimisticLockingFailureException();
+        }
+
+        AlphaRefTranlocal newTranlocal = new AlphaRefTranlocal(this);
+        newTranlocal.value = newValue;
+
+        //the AlphaRefTranlocal also implements the Transaction interface to prevent us
+        //creating an additional objects even though we need an instance.
+        Transaction tx = newTranlocal;
+
+        //if we couldn't acquire the lock, we are done.
+        if (!___tryLock(tx)) {
+            throw newFailedToObtainCommitLocksException();
+        }
+
+        AlphaRefTranlocal<E> oldTranlocal = (AlphaRefTranlocal<E>) ___load();
+
+        long writeVersion = clock.tick();
+        try {
+            ___store(newTranlocal, writeVersion);
+        } finally {
+            ___releaseLock(tx);
+        }
+
+        return oldTranlocal.value;
+    }
 
     // ======================== clear ========================================
 
@@ -511,7 +542,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
      * It is the same as calling {@link #setAtomic(Object)} with a null value.
      *
      * @return the old value (can be null).
-     * @throws org.multiverse.api.exceptions.CommitFailureException
+     * @throws org.multiverse.api.exceptions.WriteConflict
      *          if something failed while committing. If the commit fails, nothing bad will happen.
      */
     public E clearAtomic() {
@@ -522,7 +553,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
      * Clears the reference. It is the same as calling {@link #set(Object)} with a null value.
      *
      * @return the previous value.
-     * @throws org.multiverse.api.exceptions.LoadException
+     * @throws org.multiverse.api.exceptions.ReadConflict
      *          if something fails while loading the reference.
      */
     public E clear() {
@@ -534,8 +565,11 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
      * a null value.
      *
      * @return the previous value.
-     * @throws org.multiverse.api.exceptions.LoadException
+     * @throws org.multiverse.api.exceptions.ReadConflict
      *          if something fails while loading the reference.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if the transaction
+     *          isn't in the correct state for this operation.
      */
     public E clear(Transaction tx) {
         return set(tx, null);

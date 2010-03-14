@@ -2,8 +2,8 @@ package org.multiverse.stms.alpha.mixins;
 
 import org.multiverse.MultiverseConstants;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.LoadLockedException;
-import org.multiverse.api.exceptions.LoadTooOldVersionException;
+import org.multiverse.api.exceptions.LockNotFreeReadConflict;
+import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
 import org.multiverse.api.exceptions.PanicError;
 import org.multiverse.stms.alpha.AlphaStmUtils;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -53,7 +53,7 @@ public abstract class DefaultTxObjectMixin implements AlphaTransactionalObject, 
     @Override
     public AlphaTranlocal ___load(long readVersion) {
         if (___LOCKOWNER_UPDATER.get(this) != null) {
-            throw LoadLockedException.INSTANCE;
+            throw LockNotFreeReadConflict.INSTANCE;
         }
 
         AlphaTranlocal tranlocalTime1 = ___TRANLOCAL_UPDATER.get(this);
@@ -82,15 +82,15 @@ public abstract class DefaultTxObjectMixin implements AlphaTransactionalObject, 
         } else if (tranlocalTime1.getWriteVersion() > readVersion) {
             //the current tranlocal it too new to return, so we fail. In the future this would
             //be the location to search for tranlocal with the correct version.
-            if (LoadTooOldVersionException.reuse) {
-                throw LoadTooOldVersionException.INSTANCE;
+            if (OldVersionNotFoundReadConflict.reuse) {
+                throw OldVersionNotFoundReadConflict.INSTANCE;
             } else {
                 String msg = format(
                         "Can't load version '%s' for transactionalobject '%s', the oldest version found is '%s'",
                         readVersion,
                         AlphaStmUtils.toTxObjectString(this),
                         tranlocalTime1.getWriteVersion());
-                throw new LoadTooOldVersionException(msg);
+                throw new OldVersionNotFoundReadConflict(msg);
             }
         } else {
             Transaction lockOwner = ___LOCKOWNER_UPDATER.get(this);
@@ -99,12 +99,12 @@ public abstract class DefaultTxObjectMixin implements AlphaTransactionalObject, 
                 //this would be the location for spinning. As long as the lock is there,
                 //we are not sure if the version read is the version that can be returned (perhaps there are
                 //pending writes).
-                if (LoadLockedException.reuse) {
-                    throw LoadLockedException.INSTANCE;
+                if (LockNotFreeReadConflict.reuse) {
+                    throw LockNotFreeReadConflict.INSTANCE;
                 } else {
                     String msg = format("Failed to load already locked transactionalobject '%s'",
                             AlphaStmUtils.toTxObjectString(this));
-                    throw new LoadLockedException(msg);
+                    throw new LockNotFreeReadConflict(msg);
                 }
             }
 
@@ -120,15 +120,15 @@ public abstract class DefaultTxObjectMixin implements AlphaTransactionalObject, 
                 //we were not able to find the version we are looking for. It could be tranlocalT1
                 //or tranlocalT2 but it could also have been a write we didn't notice. So lets
                 //fails to indicate that we didn't find it.
-                if (LoadTooOldVersionException.reuse) {
-                    throw LoadTooOldVersionException.INSTANCE;
+                if (OldVersionNotFoundReadConflict.reuse) {
+                    throw OldVersionNotFoundReadConflict.INSTANCE;
                 } else {
                     String msg = format(
                             "Can't load version '%s' transactionalobject '%s', the oldest version found is '%s'",
                             readVersion,
                             AlphaStmUtils.toTxObjectString(this),
                             tranlocalTime2.getWriteVersion());
-                    throw new LoadTooOldVersionException(msg);
+                    throw new OldVersionNotFoundReadConflict(msg);
                 }
             } else {
                 //the tranlocal has not changed and it was unlocked. This means that we read

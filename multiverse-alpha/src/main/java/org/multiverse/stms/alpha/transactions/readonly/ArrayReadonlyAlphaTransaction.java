@@ -1,6 +1,6 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
-import org.multiverse.api.exceptions.TransactionTooSmallException;
+import org.multiverse.api.exceptions.TransactionTooSmallError;
 import org.multiverse.stms.AbstractTransactionConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
@@ -68,7 +68,7 @@ public class ArrayReadonlyAlphaTransaction
             config.optimalSize.compareAndSet(attachedArray.length, attachedArray.length + 2);
 
             if (attachedArray.length >= config.maximumSize) {
-                throw TransactionTooSmallException.INSTANCE;
+                throw TransactionTooSmallError.INSTANCE;
             }
 
             AlphaTranlocal[] newAttachedArray = new AlphaTranlocal[newOptimalSize];

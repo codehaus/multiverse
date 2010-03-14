@@ -183,7 +183,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
     }
 
     @Test
-    public void whenAborted_thenClosedCommitBarrierException() {
+    public void whenAborted_thenCommitBarrierOpenException() {
         barrier = new CountDownCommitBarrier(1);
         barrier.abort();
 
@@ -200,7 +200,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
     }
 
     @Test
-    public void whenCommitted_thenClosedCommitBarrierException() {
+    public void whenCommitted_thenCommitBarrierOpenException() {
         barrier = new CountDownCommitBarrier(0);
 
         Transaction tx = new AbstractTransactionImpl();

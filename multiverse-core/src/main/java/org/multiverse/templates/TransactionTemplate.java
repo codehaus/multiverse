@@ -1,7 +1,10 @@
 package org.multiverse.templates;
 
 import org.multiverse.api.*;
-import org.multiverse.api.exceptions.*;
+import org.multiverse.api.exceptions.ControlFlowError;
+import org.multiverse.api.exceptions.RetryError;
+import org.multiverse.api.exceptions.TooManyRetriesException;
+import org.multiverse.api.exceptions.TransactionTooSmallError;
 import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.latches.CheapLatch;
 import org.multiverse.utils.latches.Latch;
@@ -297,24 +300,19 @@ public abstract class TransactionTemplate<E> {
                     E result = execute(tx);
                     tx.commit();
                     return result;
-                } catch (RetryError er) {
+                } catch (RetryError e) {
                     if (attempt - 1 < tx.getConfig().getMaxRetryCount()) {
                         awaitChangeAndRestart(tx);
                     }
-                } catch (TransactionTooSmallException tooSmallException) {
+                } catch (TransactionTooSmallError ex) {
                     tx = txFactory.start();
                     if (threadLocalAware) {
                         setThreadLocalTransaction(tx);
                     }
-                } catch (Throwable throwable) {
-                    lastFailureCause = throwable;
-                    if (throwable instanceof RecoverableThrowable) {
-                        BackoffPolicy backoffPolicy = tx.getConfig().getBackoffPolicy();
-                        backoffPolicy.delayedUninterruptible(tx, attempt);
-                        tx.restart();
-                    } else {
-                        rethrow(throwable);
-                    }
+                } catch (ControlFlowError er) {
+                    BackoffPolicy backoffPolicy = tx.getConfig().getBackoffPolicy();
+                    backoffPolicy.delayedUninterruptible(tx, attempt);
+                    tx.restart();
                 }
             } while (attempt - 1 < tx.getConfig().getMaxRetryCount());
 
@@ -343,16 +341,6 @@ public abstract class TransactionTemplate<E> {
             latch.awaitUninterruptible();
         }
         tx.restart();
-    }
-
-    private static void rethrow(Throwable ex) throws Exception {
-        if (ex instanceof Exception) {
-            throw (Exception) ex;
-        } else if (ex instanceof Error) {
-            throw (Error) ex;
-        } else {
-            throw new PanicError("Unthrowable throwable", ex);
-        }
     }
 
     private boolean noActiveTransaction(Transaction t) {

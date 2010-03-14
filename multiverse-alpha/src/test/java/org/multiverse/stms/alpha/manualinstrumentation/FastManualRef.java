@@ -3,9 +3,9 @@ package org.multiverse.stms.alpha.manualinstrumentation;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.TransactionStatus;
-import org.multiverse.api.exceptions.RecoverableThrowable;
+import org.multiverse.api.exceptions.ControlFlowError;
 import org.multiverse.api.exceptions.TooManyRetriesException;
-import org.multiverse.api.exceptions.TransactionTooSmallException;
+import org.multiverse.api.exceptions.TransactionTooSmallError;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.mixins.FastTxObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
@@ -101,16 +101,10 @@ public class FastManualRef extends FastTxObjectMixin {
 
                     tx.commit();
                     return;
-                } catch (TransactionTooSmallException ex) {
+                } catch (TransactionTooSmallError ex) {
                     tx = (AlphaTransaction) txFactory.start();
-                } catch (Throwable throwable) {
-                    if (throwable instanceof RecoverableThrowable) {
-                        tx.getConfig().getBackoffPolicy().delayedUninterruptible(tx, attempt);
-                    } else if (throwable instanceof RuntimeException) {
-                        throw (RuntimeException) throwable;
-                    } else {
-                        throw (Error) throwable;
-                    }
+                } catch (ControlFlowError throwable) {
+                    tx.getConfig().getBackoffPolicy().delayedUninterruptible(tx, attempt);
                 } finally {
                     if (tx.getStatus() != TransactionStatus.committed) {
                         if (attempt - 1 < tx.getConfig().getMaxRetryCount()) {
@@ -142,16 +136,10 @@ public class FastManualRef extends FastTxObjectMixin {
 
                 tx.commit();
                 return;
-            } catch (TransactionTooSmallException ex) {
+            } catch (TransactionTooSmallError ex) {
                 tx = (AlphaTransaction) txFactory.start();
-            } catch (Throwable throwable) {
-                if (throwable instanceof RecoverableThrowable) {
-                    tx.getConfig().getBackoffPolicy().delayedUninterruptible(tx, attempt);
-                } else if (throwable instanceof RuntimeException) {
-                    throw (RuntimeException) throwable;
-                } else {
-                    throw (Error) throwable;
-                }
+            } catch (ControlFlowError throwable) {
+                tx.getConfig().getBackoffPolicy().delayedUninterruptible(tx, attempt);
             } finally {
                 if (tx.getStatus() != TransactionStatus.committed) {
                     if (attempt - 1 < tx.getConfig().getMaxRetryCount()) {

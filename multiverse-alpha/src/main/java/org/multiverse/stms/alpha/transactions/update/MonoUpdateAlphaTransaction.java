@@ -1,6 +1,6 @@
 package org.multiverse.stms.alpha.transactions.update;
 
-import org.multiverse.api.exceptions.TransactionTooSmallException;
+import org.multiverse.api.exceptions.TransactionTooSmallError;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.UncommittedFilter;
@@ -93,7 +93,7 @@ public class MonoUpdateAlphaTransaction
     protected void attach(AlphaTranlocal tranlocal) {
         if (attached != null) {
             config.optimalSize.compareAndSet(1, 2);
-            throw TransactionTooSmallException.INSTANCE;
+            throw TransactionTooSmallError.INSTANCE;
         }
 
         attached = tranlocal;
@@ -109,7 +109,7 @@ public class MonoUpdateAlphaTransaction
         if (attached != null) {
             if (attached.getTransactionalObject() != txObject) {
                 config.optimalSize.compareAndSet(1, 2);
-                throw TransactionTooSmallException.INSTANCE;
+                throw TransactionTooSmallError.INSTANCE;
             }
 
             if (attached.isCommitted()) {

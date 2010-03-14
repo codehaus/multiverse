@@ -1,7 +1,7 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
-import org.multiverse.api.exceptions.LoadUncommittedException;
 import org.multiverse.api.exceptions.ReadonlyException;
+import org.multiverse.api.exceptions.UncommittedReadConflict;
 import org.multiverse.stms.AbstractTransactionConfig;
 import org.multiverse.stms.AbstractTransactionSnapshot;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -39,14 +39,14 @@ public abstract class AbstractReadonlyAlphaTransaction<C extends AbstractTransac
         return tranlocal;
     }
 
-    protected LoadUncommittedException createLoadUncommittedException(AlphaTransactionalObject txObject) {
+    protected UncommittedReadConflict createLoadUncommittedException(AlphaTransactionalObject txObject) {
         String msg = format(
                 "Can't open for read transactional object '%s' in transaction '%s' because the " +
                         "readonly transactional object has not been committed before. The cause of this " +
                         "problem is very likely that a reference to this transactional object escaped " +
                         "the creating transaction before that transaction was committed.'",
                 toTxObjectString(txObject), config.getFamilyName());
-        return new LoadUncommittedException(msg);
+        return new UncommittedReadConflict(msg);
     }
 
     @Override

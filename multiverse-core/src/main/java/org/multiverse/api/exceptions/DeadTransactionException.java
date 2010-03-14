@@ -1,12 +1,12 @@
 package org.multiverse.api.exceptions;
 
 /**
- * An {@link IllegalStateException} that indicates that an action is executed on a transaction
- * that is not active.
+ * An {@link IllegalTransactionStateException} that indicates that an action is executed on a
+ * transaction that is committed or aborted.
  *
  * @author Peter Veentjer.
  */
-public class DeadTransactionException extends IllegalStateException {
+public class DeadTransactionException extends IllegalTransactionStateException {
 
     private static final long serialVersionUID = 0;
 

@@ -3,8 +3,8 @@ package org.multiverse.stms.alpha.transactions.update;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.LoadLockedException;
-import org.multiverse.api.exceptions.LoadTooOldVersionException;
+import org.multiverse.api.exceptions.LockNotFreeReadConflict;
+import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
@@ -96,7 +96,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenLocked_thenLoadLockedException() {
+    public void whenLocked_thenLockNotFreeReadConflict() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction lockOwner = mock(AlphaTransaction.class);
@@ -107,7 +107,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
         try {
             tx.openForRead(ref);
             fail();
-        } catch (LoadLockedException expected) {
+        } catch (LockNotFreeReadConflict expected) {
         }
 
         assertIsActive(tx);
@@ -142,7 +142,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenVersionTooNew_thenLoadTooOldVersionException() {
+    public void whenVersionTooNew_thenOldVersionNotFoundReadConflict() {
         ManualRef ref = new ManualRef(stm);
         AlphaTransaction tx = startSutTransaction();
         //the 'conflicting' update
@@ -151,7 +151,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
         try {
             tx.openForWrite(ref);
             fail();
-        } catch (LoadTooOldVersionException expected) {
+        } catch (OldVersionNotFoundReadConflict expected) {
         }
 
         assertIsActive(tx);
@@ -170,7 +170,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenCommitted_thenCallFails() {
+    public void whenCommitted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = startSutTransaction();
@@ -186,7 +186,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenAborted_thenCallFails() {
+    public void whenAborted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = startSutTransaction();

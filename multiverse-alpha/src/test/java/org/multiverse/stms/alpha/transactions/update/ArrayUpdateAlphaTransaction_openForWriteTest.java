@@ -69,7 +69,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
         try {
             tx.openForWrite(txObject2);
             fail();
-        } catch (TransactionTooSmallException ex) {
+        } catch (TransactionTooSmallError ex) {
         }
 
         assertIsActive(tx);
@@ -147,7 +147,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
     }
 
     @Test
-    public void whenMaximumCapacityExceeded_thenTransactionTooSmallException() {
+    public void whenMaximumCapacityExceeded_thenTransactionTooSmallError() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
         ManualRef ref3 = new ManualRef(stm);
@@ -161,7 +161,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
         try {
             tx.openForWrite(ref4);
             fail();
-        } catch (TransactionTooSmallException expected) {
+        } catch (TransactionTooSmallError expected) {
         }
 
         assertEquals(5, optimalSize.get());
@@ -170,7 +170,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
 
 
     @Test
-    public void whenLocked_thenLoadLockedException() {
+    public void whenLocked_thenLockNotFreeReadConflict() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction owner = mock(AlphaTransaction.class);
@@ -180,14 +180,14 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
         try {
             tx.openForWrite(ref);
             fail();
-        } catch (LoadLockedException expected) {
+        } catch (LockNotFreeReadConflict expected) {
         }
 
         assertIsActive(tx);
     }
 
     @Test
-    public void whenReadConflict_thenLoadTooOldVersionException() {
+    public void whenReadConflict_thenOldVersionNotFoundReadConflict() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = startSutTransaction(10);
@@ -196,7 +196,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
         try {
             tx.openForWrite(ref);
             fail();
-        } catch (LoadTooOldVersionException expected) {
+        } catch (OldVersionNotFoundReadConflict expected) {
         }
 
         assertIsActive(tx);

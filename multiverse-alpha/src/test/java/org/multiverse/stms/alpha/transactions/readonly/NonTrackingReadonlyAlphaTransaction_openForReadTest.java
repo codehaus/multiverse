@@ -4,9 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.LoadLockedException;
-import org.multiverse.api.exceptions.LoadTooOldVersionException;
-import org.multiverse.api.exceptions.LoadUncommittedException;
+import org.multiverse.api.exceptions.LockNotFreeReadConflict;
+import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
+import org.multiverse.api.exceptions.UncommittedReadConflict;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -66,14 +66,14 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenNotCommittedBefore_thenLoadUncommittedException() {
+    public void whenNotCommittedBefore_thenUncommittedReadConflict() {
         ManualRef ref = ManualRef.createUncommitted();
 
         AlphaTransaction tx = startSutTransaction();
         try {
             tx.openForRead(ref);
             fail();
-        } catch (LoadUncommittedException expected) {
+        } catch (UncommittedReadConflict expected) {
         }
 
         assertIsActive(tx);
@@ -115,7 +115,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
         try {
             tx.openForRead(ref);
             fail();
-        } catch (LoadLockedException expected) {
+        } catch (LockNotFreeReadConflict expected) {
         }
 
         assertIsActive(tx);
@@ -159,7 +159,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
         try {
             readonlyTx.openForRead(ref);
             fail();
-        } catch (LoadTooOldVersionException ex) {
+        } catch (OldVersionNotFoundReadConflict ex) {
         }
     }
 

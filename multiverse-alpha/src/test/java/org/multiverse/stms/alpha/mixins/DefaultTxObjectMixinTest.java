@@ -3,8 +3,8 @@ package org.multiverse.stms.alpha.mixins;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.LoadLockedException;
-import org.multiverse.api.exceptions.LoadTooOldVersionException;
+import org.multiverse.api.exceptions.LockNotFreeReadConflict;
+import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTranlocalSnapshot;
@@ -157,7 +157,7 @@ public class DefaultTxObjectMixinTest {
         try {
             txObject.___load(version);
             fail();
-        } catch (LoadTooOldVersionException ex) {
+        } catch (OldVersionNotFoundReadConflict ex) {
         }
     }
 
@@ -174,7 +174,7 @@ public class DefaultTxObjectMixinTest {
         try {
             intValue.___load(readVersion);
             fail();
-        } catch (LoadLockedException expected) {
+        } catch (LockNotFreeReadConflict expected) {
         }
 
         intValue.___releaseLock(owner);
@@ -193,7 +193,7 @@ public class DefaultTxObjectMixinTest {
         try {
             intValue.___load(readVersion);
             fail();
-        } catch (LoadLockedException ex) {
+        } catch (LockNotFreeReadConflict ex) {
         }
     }
 
@@ -209,7 +209,7 @@ public class DefaultTxObjectMixinTest {
         try {
             intValue.___load(readVersion);
             fail();
-        } catch (LoadLockedException ex) {
+        } catch (LockNotFreeReadConflict ex) {
         }
     }
 

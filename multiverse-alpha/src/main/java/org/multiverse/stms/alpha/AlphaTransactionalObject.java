@@ -22,7 +22,7 @@ public interface AlphaTransactionalObject extends CommitLock {
      *
      * @param readVersion the version of the Tranlocal to read.
      * @return the loaded Tranlocal. If nothing is committed, null is returned.
-     * @throws org.multiverse.api.exceptions.LoadException
+     * @throws org.multiverse.api.exceptions.ReadConflict
      *          if the system wasn't able to load the Tranlocal.
      */
     AlphaTranlocal ___load(long readVersion);

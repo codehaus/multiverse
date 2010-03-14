@@ -1,12 +1,12 @@
 package org.multiverse.api.exceptions;
 
 /**
- * A {StmException} that indicates that an action is executed on a readonly transaction
- * that requires an update.
+ * A {@link IllegalTransactionStateException} that indicates that an action is executed on a
+ * readonly transaction that requires an update.
  *
  * @author Peter Veentjer.
  */
-public class ReadonlyException extends IllegalStateException {
+public class ReadonlyException extends IllegalTransactionStateException {
 
     private static final long serialVersionUID = 0;
 
