@@ -116,9 +116,9 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
         return ref;
     }
 
-
     /**
-     * Creates a new Ref.
+     * Creates a new Ref with null as value. It has exactly the same {@link #AlphaRef(Object)}
+     * with null as value.
      * <p/>
      * This method relies on the ThreadLocalTransaction and GlobalStmInstance.
      */
@@ -183,6 +183,11 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
      * Gets the version of the last committed tranlocal without looking at a transaction.
      * This call is very very fast since it doesn't need a transaction. See the {@link #getAtomic()}
      * for more information.
+     * <p/>
+     * The only expensive thing that needs to be done is a single volatile read. So it is in the same
+     * league as a {@link java.util.concurrent.atomic.AtomicReference#get()}. To be more specific;
+     * it would have the same performance as {@link java.util.concurrent.atomic.AtomicReferenceFieldUpdater#get(Object)}
+     * since that is used under water.
      * <p/>
      * This functionality can be used for optimistic locking over multiple transactions.
      *
@@ -272,7 +277,12 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
      * <p/>
      * This is a very cheap call since only one volatile read is needed an no additional
      * objects are created. On my machine I'm able to do 150.000.000 getAtomics per second
-     * on a single thread to give some impression.
+     * on a single thread to give some indication.
+     * <p/>
+     * The only expensive thing that needs to be done is a single volatile read. So it is in the same
+     * league as a {@link java.util.concurrent.atomic.AtomicReference#get()}. To be more specific;
+     * it would have the same performance as {@link java.util.concurrent.atomic.AtomicReferenceFieldUpdater#get(Object)}
+     * since that is used under water.
      *
      * @return the current value.
      * @throws org.multiverse.api.exceptions.LoadException
@@ -497,22 +507,35 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
     // ======================== clear ========================================
 
     /**
+     * Clears the reference using its own transaction without looking at an existing transaction.
+     * It is the same as calling {@link #setAtomic(Object)} with a null value.
+     *
+     * @return the old value (can be null).
+     * @throws org.multiverse.api.exceptions.CommitFailureException
+     *          if something failed while committing. If the commit fails, nothing bad will happen.
+     */
+    public E clearAtomic() {
+        return setAtomic(null);
+    }
+
+    /**
      * Clears the reference. It is the same as calling {@link #set(Object)} with a null value.
      *
      * @return the previous value.
+     * @throws org.multiverse.api.exceptions.LoadException
+     *          if something fails while loading the reference.
      */
     public E clear() {
         return set(null);
     }
-
 
     /**
      * Clears the reference. It is the same as calling {@link #set(Transaction, Object)} with
      * a null value.
      *
      * @return the previous value.
-     * @throws org.multiverse.api.exceptions.DeadTransactionException
-     *          if tx isn't active.
+     * @throws org.multiverse.api.exceptions.LoadException
+     *          if something fails while loading the reference.
      */
     public E clear(Transaction tx) {
         return set(tx, null);

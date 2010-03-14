@@ -12,7 +12,7 @@ import org.multiverse.utils.profiling.ProfileRepository;
 /**
  * A readonly {@link org.multiverse.stms.alpha.transactions.AlphaTransaction} implementation that doesn't track reads.
  * <p/>
- * Unlike the {@link org.multiverse.stms.alpha.transactions.update.GrowingUpdateAlphaTransaction} a readonly transaction doesn't need track
+ * Unlike the {@link org.multiverse.stms.alpha.transactions.update.MapUpdateAlphaTransaction} a readonly transaction doesn't need track
  * any reads done. This has the advantage that a readonly transaction consumes a lot less resources (so no collection
  * needed to track all the reads) and commits are also a lot quicker (no dirtyness checking).
  * <p/>

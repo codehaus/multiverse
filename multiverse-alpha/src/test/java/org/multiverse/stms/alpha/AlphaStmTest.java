@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.stms.alpha.transactions.update.AbstractUpdateAlphaTransaction;
-import org.multiverse.stms.alpha.transactions.update.GrowingUpdateAlphaTransaction;
+import org.multiverse.stms.alpha.transactions.update.MapUpdateAlphaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.testIncomplete;
@@ -38,7 +38,7 @@ public class AlphaStmTest {
     @Test
     public void testDefaultUpdateTransaction() {
         Transaction t = stm.getTransactionFactoryBuilder().setReadonly(false).build().start();
-        assertTrue(t instanceof GrowingUpdateAlphaTransaction);
+        assertTrue(t instanceof MapUpdateAlphaTransaction);
 
         assertFalse(t.getConfig().isReadonly());
         assertTrue(t.getConfig().automaticReadTracking());
@@ -65,7 +65,7 @@ public class AlphaStmTest {
     public void testNonTrackingUpdate() {
         Transaction t = stm.getTransactionFactoryBuilder().setReadonly(false).setAutomaticReadTracking(true).build()
                 .start();
-        assertTrue(t instanceof GrowingUpdateAlphaTransaction);
+        assertTrue(t instanceof MapUpdateAlphaTransaction);
     }
 
     @Test(expected = IllegalStateException.class)

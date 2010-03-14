@@ -21,8 +21,8 @@ public class AbstractTrackingUpdateAlphaTransaction_performanceComparison {
     private AlphaStmConfig stmConfig;
     private AlphaStm stm;
     private OptimalSize optimalSize;
-    private FixedUpdateAlphaTransaction.Config fixedConfig;
-    private GrowingUpdateAlphaTransaction.Config growingConfig;
+    private ArrayUpdateAlphaTransaction.Config fixedConfig;
+    private MapUpdateAlphaTransaction.Config growingConfig;
     private ManualRef[] refs;
     //todo: very small size. 
     private int txCount = 1000;
@@ -33,7 +33,7 @@ public class AbstractTrackingUpdateAlphaTransaction_performanceComparison {
         stm = new AlphaStm(stmConfig);
         optimalSize = new OptimalSize(1);
 
-        fixedConfig = new FixedUpdateAlphaTransaction.Config(
+        fixedConfig = new ArrayUpdateAlphaTransaction.Config(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
@@ -44,7 +44,7 @@ public class AbstractTrackingUpdateAlphaTransaction_performanceComparison {
                 optimalSize, true, true, true, true, 10
         );
 
-        growingConfig = new GrowingUpdateAlphaTransaction.Config(
+        growingConfig = new MapUpdateAlphaTransaction.Config(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
@@ -55,11 +55,11 @@ public class AbstractTrackingUpdateAlphaTransaction_performanceComparison {
     }
 
     public AlphaTransaction startFixedTransaction(int size) {
-        return new FixedUpdateAlphaTransaction(fixedConfig, size);
+        return new ArrayUpdateAlphaTransaction(fixedConfig, size);
     }
 
     public AlphaTransaction startGrowingTransaction() {
-        return new GrowingUpdateAlphaTransaction(growingConfig);
+        return new MapUpdateAlphaTransaction(growingConfig);
     }
 
     @Test

@@ -5,13 +5,13 @@ import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.TransactionFactoryBuilder;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.OptimalSize;
-import org.multiverse.stms.alpha.transactions.readonly.FixedReadonlyAlphaTransaction;
-import org.multiverse.stms.alpha.transactions.readonly.GrowingReadonlyAlphaTransaction;
+import org.multiverse.stms.alpha.transactions.readonly.ArrayReadonlyAlphaTransaction;
+import org.multiverse.stms.alpha.transactions.readonly.MapReadonlyAlphaTransaction;
+import org.multiverse.stms.alpha.transactions.readonly.MonoReadonlyAlphaTransaction;
 import org.multiverse.stms.alpha.transactions.readonly.NonTrackingReadonlyAlphaTransaction;
-import org.multiverse.stms.alpha.transactions.readonly.TinyReadonlyAlphaTransaction;
-import org.multiverse.stms.alpha.transactions.update.FixedUpdateAlphaTransaction;
-import org.multiverse.stms.alpha.transactions.update.GrowingUpdateAlphaTransaction;
-import org.multiverse.stms.alpha.transactions.update.TinyUpdateAlphaTransaction;
+import org.multiverse.stms.alpha.transactions.update.ArrayUpdateAlphaTransaction;
+import org.multiverse.stms.alpha.transactions.update.MapUpdateAlphaTransaction;
+import org.multiverse.stms.alpha.transactions.update.MonoUpdateAlphaTransaction;
 import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
@@ -305,40 +305,40 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         private TransactionFactory<AlphaTransaction> createReadTrackingReadonlyTxFactory() {
             if (smartTxLengthSelector) {
                 return new TransactionFactory<AlphaTransaction>() {
-                    GrowingReadonlyAlphaTransaction.Config growingConfig =
-                            new GrowingReadonlyAlphaTransaction.Config(
+                    MapReadonlyAlphaTransaction.Config growingConfig =
+                            new MapReadonlyAlphaTransaction.Config(
                                     clock, backoffPolicy, familyName, profiler, maxRetryCount, interruptible);
 
-                    FixedReadonlyAlphaTransaction.Config fixedConfig =
-                            new FixedReadonlyAlphaTransaction.Config(
+                    ArrayReadonlyAlphaTransaction.Config fixedConfig =
+                            new ArrayReadonlyAlphaTransaction.Config(
                                     clock, backoffPolicy, familyName, profiler, maxRetryCount, interruptible,
                                     optimalSize, maxFixedUpdateSize);
 
-                    TinyReadonlyAlphaTransaction.Config tinyConfig =
-                            new TinyReadonlyAlphaTransaction.Config(
+                    MonoReadonlyAlphaTransaction.Config tinyConfig =
+                            new MonoReadonlyAlphaTransaction.Config(
                                     clock, backoffPolicy, familyName, profiler, maxRetryCount, interruptible,
                                     optimalSize);
 
                     @Override
                     public AlphaTransaction start() {
                         if (optimalSize == null) {
-                            return new GrowingReadonlyAlphaTransaction(growingConfig);
+                            return new MapReadonlyAlphaTransaction(growingConfig);
                         }
 
                         int size = optimalSize.get();
                         if (size == 1) {
-                            return new TinyReadonlyAlphaTransaction(tinyConfig);
+                            return new MonoReadonlyAlphaTransaction(tinyConfig);
                         } else if (size < maxFixedUpdateSize) {
-                            return new FixedReadonlyAlphaTransaction(fixedConfig, size);
+                            return new ArrayReadonlyAlphaTransaction(fixedConfig, size);
                         } else {
-                            return new GrowingReadonlyAlphaTransaction(growingConfig);
+                            return new MapReadonlyAlphaTransaction(growingConfig);
                         }
                     }
                 };
             } else {
-                GrowingReadonlyAlphaTransaction.Config config = new GrowingReadonlyAlphaTransaction.Config(
+                MapReadonlyAlphaTransaction.Config config = new MapReadonlyAlphaTransaction.Config(
                         clock, backoffPolicy, familyName, profiler, maxRetryCount, interruptible);
-                return new GrowingReadonlyAlphaTransaction.Factory(config);
+                return new MapReadonlyAlphaTransaction.Factory(config);
             }
         }
 
@@ -347,20 +347,20 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
             if (smartTxLengthSelector) {
                 return new TransactionFactory<AlphaTransaction>() {
-                    GrowingUpdateAlphaTransaction.Config growingConfig =
-                            new GrowingUpdateAlphaTransaction.Config(
+                    MapUpdateAlphaTransaction.Config growingConfig =
+                            new MapUpdateAlphaTransaction.Config(
                                     clock, backoffPolicy, familyName, profiler, commitLockPolicy,
                                     maxRetryCount, enableWriteSkewProblem, interruptible, optimizeConflictDetection, true,
                                     automaticReadTracking);
 
-                    FixedUpdateAlphaTransaction.Config fixedConfig =
-                            new FixedUpdateAlphaTransaction.Config(
+                    ArrayUpdateAlphaTransaction.Config fixedConfig =
+                            new ArrayUpdateAlphaTransaction.Config(
                                     clock, backoffPolicy, familyName, profiler, commitLockPolicy,
                                     maxRetryCount, enableWriteSkewProblem, optimalSize, interruptible,
                                     optimizeConflictDetection, true, automaticReadTracking, maxFixedUpdateSize);
 
-                    TinyUpdateAlphaTransaction.Config tinyConfig =
-                            new TinyUpdateAlphaTransaction.Config(
+                    MonoUpdateAlphaTransaction.Config tinyConfig =
+                            new MonoUpdateAlphaTransaction.Config(
                                     clock, backoffPolicy, familyName, profiler, maxRetryCount,
                                     commitLockPolicy, interruptible, optimalSize, enableWriteSkewProblem,
                                     optimizeConflictDetection, true, automaticReadTracking);
@@ -368,27 +368,27 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     @Override
                     public AlphaTransaction start() {
                         if (optimalSize == null) {
-                            return new GrowingUpdateAlphaTransaction(growingConfig);
+                            return new MapUpdateAlphaTransaction(growingConfig);
                         }
 
                         int size = optimalSize.get();
                         if (size == 1) {
-                            return new TinyUpdateAlphaTransaction(tinyConfig);
+                            return new MonoUpdateAlphaTransaction(tinyConfig);
                         } else if (size <= maxFixedUpdateSize) {
-                            return new FixedUpdateAlphaTransaction(fixedConfig, size);
+                            return new ArrayUpdateAlphaTransaction(fixedConfig, size);
                         } else {
-                            return new GrowingUpdateAlphaTransaction(growingConfig);
+                            return new MapUpdateAlphaTransaction(growingConfig);
                         }
                     }
                 };
             } else {
-                GrowingUpdateAlphaTransaction.Config config =
-                        new GrowingUpdateAlphaTransaction.Config(
+                MapUpdateAlphaTransaction.Config config =
+                        new MapUpdateAlphaTransaction.Config(
                                 clock, backoffPolicy, familyName, profiler, commitLockPolicy,
                                 maxRetryCount, enableWriteSkewProblem, interruptible, optimizeConflictDetection, true,
                                 automaticReadTracking);
 
-                return new GrowingUpdateAlphaTransaction.Factory(config);
+                return new MapUpdateAlphaTransaction.Factory(config);
             }
         }
     }
