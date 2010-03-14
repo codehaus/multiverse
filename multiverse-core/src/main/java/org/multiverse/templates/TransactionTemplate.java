@@ -287,7 +287,9 @@ public abstract class TransactionTemplate<E> {
         int attempt = 0;
         Throwable lastFailureCause = null;
 
-        onInit();
+        if (lifecycleListenersEnabled) {
+            onInit();
+        }
 
         try {
             do {
@@ -302,7 +304,7 @@ public abstract class TransactionTemplate<E> {
                     return result;
                 } catch (RetryError e) {
                     if (attempt - 1 < tx.getConfig().getMaxRetryCount()) {
-                        awaitChangeAndRestart(tx);
+                        awaitWriteAndRestart(tx);
                     }
                 } catch (TransactionTooSmallError ex) {
                     tx = txFactory.start();
@@ -331,7 +333,7 @@ public abstract class TransactionTemplate<E> {
         }
     }
 
-    private static void awaitChangeAndRestart(Transaction tx) throws InterruptedException {
+    private static void awaitWriteAndRestart(Transaction tx) throws InterruptedException {
         Latch latch = new CheapLatch();
         tx.registerRetryLatch(latch);
         tx.abort();

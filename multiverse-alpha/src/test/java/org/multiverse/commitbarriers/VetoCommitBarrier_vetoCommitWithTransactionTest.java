@@ -10,7 +10,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.VersionTooOldWriteConflict;
+import org.multiverse.api.exceptions.OptimisticLockFailedWriteConflict;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.junit.Assert.*;
@@ -95,13 +95,13 @@ public class VetoCommitBarrier_vetoCommitWithTransactionTest {
     public void whenTransactionFailedToPrepare_thenBarrierNotAbortedOrCommitted() {
         Transaction tx = mock(Transaction.class);
         doReturn(TransactionStatus.active).when(tx).getStatus();
-        doThrow(new VersionTooOldWriteConflict()).when(tx).prepare();
+        doThrow(new OptimisticLockFailedWriteConflict()).when(tx).prepare();
 
         VetoCommitBarrier barrier = new VetoCommitBarrier();
         try {
             barrier.vetoCommit(tx);
             fail();
-        } catch (VersionTooOldWriteConflict expected) {
+        } catch (OptimisticLockFailedWriteConflict expected) {
         }
 
         assertTrue(barrier.isClosed());

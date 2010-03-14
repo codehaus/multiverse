@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.exceptions.VersionTooOldWriteConflict;
+import org.multiverse.api.exceptions.OptimisticLockFailedWriteConflict;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -85,7 +85,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
         try {
             tx2.commit();
             fail();
-        } catch (VersionTooOldWriteConflict expected) {
+        } catch (OptimisticLockFailedWriteConflict expected) {
         }
 
         assertIsAborted(tx2);
@@ -176,7 +176,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
         try {
             tx2.commit();
             fail();
-        } catch (VersionTooOldWriteConflict expected) {
+        } catch (OptimisticLockFailedWriteConflict expected) {
         }
     }
 

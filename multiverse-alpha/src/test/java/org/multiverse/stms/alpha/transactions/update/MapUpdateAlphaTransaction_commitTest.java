@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.CommitLockNotFreeWriteConflict;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.VersionTooOldWriteConflict;
+import org.multiverse.api.exceptions.OptimisticLockFailedWriteConflict;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -213,7 +213,7 @@ public class MapUpdateAlphaTransaction_commitTest {
         try {
             tx.commit();
             fail();
-        } catch (VersionTooOldWriteConflict expected) {
+        } catch (OptimisticLockFailedWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -384,7 +384,7 @@ public class MapUpdateAlphaTransaction_commitTest {
         try {
             tx2.commit();
             fail();
-        } catch (VersionTooOldWriteConflict expected) {
+        } catch (OptimisticLockFailedWriteConflict expected) {
         }
 
         assertEquals(0, ref1.get(stm));

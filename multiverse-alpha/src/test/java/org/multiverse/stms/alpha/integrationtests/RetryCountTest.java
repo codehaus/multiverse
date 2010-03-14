@@ -3,8 +3,8 @@ package org.multiverse.stms.alpha.integrationtests;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.api.exceptions.OptimisticLockFailedWriteConflict;
 import org.multiverse.api.exceptions.TooManyRetriesException;
-import org.multiverse.api.exceptions.VersionTooOldWriteConflict;
 import org.multiverse.stms.alpha.AlphaStm;
 
 import static org.junit.Assert.assertEquals;
@@ -39,7 +39,7 @@ public class RetryCountTest {
         @TransactionalMethod(maxRetryCount = 0)
         public void execute() {
             count++;
-            throw new VersionTooOldWriteConflict();
+            throw new OptimisticLockFailedWriteConflict();
         }
     }
 
@@ -62,7 +62,7 @@ public class RetryCountTest {
         @TransactionalMethod(maxRetryCount = 1)
         public void execute() {
             count++;
-            throw new VersionTooOldWriteConflict();
+            throw new OptimisticLockFailedWriteConflict();
         }
     }
 
@@ -85,7 +85,7 @@ public class RetryCountTest {
         @TransactionalMethod(maxRetryCount = 10)
         public void execute() {
             count++;
-            throw new VersionTooOldWriteConflict();
+            throw new OptimisticLockFailedWriteConflict();
         }
     }
 }

@@ -2,10 +2,7 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.TransactionStatus;
-import org.multiverse.api.exceptions.ControlFlowError;
-import org.multiverse.api.exceptions.RetryError;
-import org.multiverse.api.exceptions.TooManyRetriesException;
-import org.multiverse.api.exceptions.TransactionTooSmallError;
+import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.latches.CheapLatch;
@@ -50,7 +47,7 @@ public class TransactionLogicDonor {
             tx.abort();
 
             if (throwable instanceof ControlFlowError) {
-                throw new TooManyRetriesException();
+                throw new ConstructorCantRetryException();
             } else if (throwable instanceof Error) {
                 throw (Error) throwable;
             } else {
@@ -105,14 +102,6 @@ public class TransactionLogicDonor {
             if (tx.getStatus() != TransactionStatus.committed) {
                 tx.abort();
             }
-        }
-    }
-
-    public static void rethrow(Throwable throwable) throws Exception {
-        if (throwable instanceof Exception) {
-            throw (Exception) throwable;
-        } else {
-            throw (Error) throwable;
         }
     }
 

@@ -1,7 +1,8 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.multiverse.api.exceptions.CommitLockNotFreeWriteConflict;
-import org.multiverse.api.exceptions.VersionTooOldWriteConflict;
+import org.multiverse.api.exceptions.OptimisticLockFailedWriteConflict;
+import org.multiverse.api.exceptions.WriteSkewConflict;
 import org.multiverse.stms.AbstractTransactionSnapshot;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
@@ -240,27 +241,35 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
             throw createFailedToObtainCommitLocksException();
         }
 
-        boolean hasConflict;
-        if (config.allowWriteSkewProblem) {
-            if (config.optimizedConflictDetection && getReadVersion() == config.clock.getVersion()) {
-                writeVersion = config.clock.tick();
-                //it could be that a different transaction also reached this part, so we need to make sure
-                hasConflict = writeVersion != getReadVersion() + 1;
-            } else {
-                hasConflict = hasWriteConflict();
-                if (!hasConflict) {
+        boolean hasConflict = false;
+        try {
+            if (config.allowWriteSkewProblem) {
+                if (config.optimizedConflictDetection && getReadVersion() == config.clock.getVersion()) {
                     writeVersion = config.clock.tick();
+                    //it could be that a different transaction also reached this part, so we need to make sure
+                    hasConflict = writeVersion != getReadVersion() + 1;
+                } else {
+                    hasConflict = hasWriteConflict();
+                    if (!hasConflict) {
+                        writeVersion = config.clock.tick();
+                    }
+                }
+                if (hasConflict) {
+                    throw createOptimisticLockFailedWriteConflict();
+                }
+            } else {
+                //todo: could here be a potential race problem because the reads are not locked, only the writes.
+                writeVersion = config.clock.strictTick();
+                hasConflict = hasReadConflict();
+
+                if (hasConflict) {
+                    throw createWriteSkewConflict();
                 }
             }
-        } else {
-            //todo: could here be a potential race problem because the reads are not locked, only the writes.
-            writeVersion = config.clock.strictTick();
-            hasConflict = hasReadConflict();
-        }
-
-        if (hasConflict) {
-            doReleaseWriteLocksForFailure();
-            throw createWriteConflictException();
+        } finally {
+            if (hasConflict) {
+                doReleaseWriteLocksForFailure();
+            }
         }
     }
 
@@ -276,14 +285,27 @@ public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlp
         openAll(listeners);
     }
 
-    private VersionTooOldWriteConflict createWriteConflictException() {
-        if (VersionTooOldWriteConflict.reuse) {
-            return VersionTooOldWriteConflict.INSTANCE;
+    private OptimisticLockFailedWriteConflict createOptimisticLockFailedWriteConflict() {
+        if (OptimisticLockFailedWriteConflict.reuse) {
+            return OptimisticLockFailedWriteConflict.INSTANCE;
         }
 
         String msg = format(
-                "Failed to commit transaction '%s' because there was a write conflict'", config.getFamilyName());
-        return new VersionTooOldWriteConflict(msg);
+                "Failed to commit transaction '%s' because there was a write conflict'",
+                config.getFamilyName());
+        return new OptimisticLockFailedWriteConflict(msg);
+    }
+
+    private WriteSkewConflict createWriteSkewConflict() {
+        if (WriteSkewConflict.reuse) {
+            return WriteSkewConflict.INSTANCE;
+        }
+
+        String msg = format(
+                "Failed to commit transaction '%s' because a writeconflict was detected. " +
+                        "The exact problem was a writeskew.",
+                config.getFamilyName());
+        return new WriteSkewConflict(msg);
     }
 
     private CommitLockNotFreeWriteConflict createFailedToObtainCommitLocksException() {

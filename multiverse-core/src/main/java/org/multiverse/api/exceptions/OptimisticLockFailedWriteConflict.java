@@ -9,27 +9,27 @@ import static java.lang.System.getProperty;
  *
  * @author Peter Veentjer.
  */
-public class VersionTooOldWriteConflict extends WriteConflict {
+public class OptimisticLockFailedWriteConflict extends WriteConflict {
 
     private static final long serialVersionUID = 0;
 
-    public final static VersionTooOldWriteConflict INSTANCE = new VersionTooOldWriteConflict();
+    public final static OptimisticLockFailedWriteConflict INSTANCE = new OptimisticLockFailedWriteConflict();
 
     public final static boolean reuse = parseBoolean(
-            getProperty(VersionTooOldWriteConflict.class.getName() + ".reuse", "true"));
+            getProperty(OptimisticLockFailedWriteConflict.class.getName() + ".reuse", "true"));
 
-    public VersionTooOldWriteConflict() {
+    public OptimisticLockFailedWriteConflict() {
     }
 
-    public VersionTooOldWriteConflict(String message) {
+    public OptimisticLockFailedWriteConflict(String message) {
         super(message);
     }
 
-    public VersionTooOldWriteConflict(String message, Throwable cause) {
+    public OptimisticLockFailedWriteConflict(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public VersionTooOldWriteConflict(Throwable cause) {
+    public OptimisticLockFailedWriteConflict(Throwable cause) {
         super(cause);
     }
 }
