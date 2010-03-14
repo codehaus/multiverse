@@ -1,14 +1,18 @@
 package org.multiverse.api.exceptions;
 
 /**
- * A {@link Error} that is used to regulate control flow, so it doesn't indicate a bad thing.
+ * A {@link Error} that is used to regulate control flow inside multiverse, to be more specific
+ * jump from code to the handler the transaction management logic (instrumented or
+ * {@link org.multiverse.api.exceptions.TransactionTooSmallError}) so it doesn't indicate a
+ * bad thing.
  * <p/>
  * Normally it would be a very bad thing to regulate control flow using an exception/error, but
  * to make seamless integration in the Java language possible, there is no better alternative.
+ * So you should not catch these exceptions unless you really know what you are doing.
  * <p/>
- * <p/>
- * It is an Error to prevent users trying to catch the error inside a try/catch(RuntimeException)
- * block and consuming important events like a ReadConflict or a WriteConflict.
+ * It is an Error instead of a RuntimeException, to prevent users trying to catch the error
+ * inside a try/catch(RuntimeException) block and consuming important events like a ReadConflict
+ * or a WriteConflict. In most cases these events can be solved by retrying the transaction.
  *
  * @author Peter Veentjer
  */

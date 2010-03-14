@@ -60,67 +60,8 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
             .setSmartTxLengthSelector(true)
             .setAutomaticReadTracking(true).build();
 
-    private static final String CREATE_COMMITTED_FAMILY_NAME = AlphaRef.class.getName() + ".createCommitted(Stm,E)";
-
     private static final PrimitiveClock clock = ((AlphaStm) getGlobalStmInstance()).getClock();
 
-    /**
-     * Creates a committed ref with a null value using the Stm in the {@link org.multiverse.api.GlobalStmInstance}.
-     *
-     * @return the created ref.
-     * @see #createCommittedRef(org.multiverse.api.Stm , Object)
-     */
-    public static <E> AlphaRef<E> createCommittedRef() {
-        return createCommittedRef(getGlobalStmInstance(), null);
-    }
-
-    /**
-     * Creates a committed ref with a null value.
-     *
-     * @param stm the {@link org.multiverse.api.Stm} used for committing the ref.
-     * @return the created ref.
-     * @see #createCommittedRef(org.multiverse.api.Stm , Object)
-     */
-    public static <E> AlphaRef<E> createCommittedRef(Stm stm) {
-        return createCommittedRef(stm, null);
-    }
-
-    /**
-     * Creates a committed ref with the given value using the Stm in the {@link org.multiverse.api.GlobalStmInstance}.
-     *
-     * @param value the initial value of the DefaultTransactionalReference.
-     * @return the created ref.
-     * @see #createCommittedRef(org.multiverse.api.Stm, Object)
-     */
-    public static <E> AlphaRef<E> createCommittedRef(E value) {
-        return createCommittedRef(getGlobalStmInstance(), value);
-    }
-
-    /**
-     * Creates a committed ref with the given value and using the given Stm.
-     * <p/>
-     * This factory method should be called when one doesn't want to lift on the current transaction, but you want
-     * something to be committed whatever happens. In the future behavior will be added propagation levels. But for the
-     * time being this is the 'expect_new' implementation of this propagation level.
-     * <p/>
-     * If the value is an transactionalobject or has a reference to it (perhaps indirectly), and the transaction this
-     * transactionalobject is created in is aborted (or hasn't committed) yet, you will getClassMetadata the dreaded {@link
-     * org.multiverse.api.exceptions.UncommittedReadConflict}.
-     *
-     * @param stm   the {@link org.multiverse.api.Stm} used for committing the ref.
-     * @param value the initial value of the ref. The value is allowed to be null.
-     * @return the created ref.
-     */
-    public static <E> AlphaRef<E> createCommittedRef(Stm stm, E value) {
-        Transaction tx = stm.getTransactionFactoryBuilder()
-                .setReadonly(false)
-                .setFamilyName(CREATE_COMMITTED_FAMILY_NAME)
-                .setSmartTxLengthSelector(true)
-                .build().start();
-        AlphaRef<E> ref = new AlphaRef<E>(tx, value);
-        tx.commit();
-        return ref;
-    }
 
     /**
      * Creates a new Ref with null as value. It has exactly the same {@link #AlphaRef(Object)}
@@ -147,7 +88,6 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
      */
     public AlphaRef(E value) {
         Transaction tx = getThreadLocalTransaction();
-
         if (tx == null || tx.getStatus().isDead()) {
             long writeVersion = clock.getVersion();
             AlphaRefTranlocal<E> tranlocal = new AlphaRefTranlocal<E>(this);

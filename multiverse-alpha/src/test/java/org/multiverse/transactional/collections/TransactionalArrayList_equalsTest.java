@@ -1,7 +1,6 @@
 package org.multiverse.transactional.collections;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 
@@ -70,14 +69,59 @@ public class TransactionalArrayList_equalsTest {
     }
 
     @Test
-    @Ignore
     public void whenContentSame() {
+        TransactionalArrayList<String> list = new TransactionalArrayList<String>();
+        list.add("1");
+        list.add("2");
+        list.add("3");
 
+        List<String> that = new LinkedList<String>();
+        that.add("1");
+        that.add("2");
+        that.add("3");
+
+        long version = stm.getVersion();
+        boolean result = list.equals(that);
+
+        assertTrue(result);
+        assertEquals(version, stm.getVersion());
     }
 
     @Test
-    @Ignore
-    public void whenContentDiffers() {
+    public void whenContentSameButOrderDifferent() {
+        TransactionalArrayList<String> list = new TransactionalArrayList<String>();
+        list.add("1");
+        list.add("2");
+        list.add("3");
 
+        List<String> that = new LinkedList<String>();
+        that.add("2");
+        that.add("3");
+        that.add("1");
+
+        long version = stm.getVersion();
+        boolean result = list.equals(that);
+
+        assertFalse(result);
+        assertEquals(version, stm.getVersion());
+    }
+
+    @Test
+    public void whenContentDiffers() {
+        TransactionalArrayList<String> list = new TransactionalArrayList<String>();
+        list.add("1");
+        list.add("2");
+        list.add("3");
+
+        List<String> that = new LinkedList<String>();
+        that.add("1");
+        that.add("2");
+        that.add("4");
+
+        long version = stm.getVersion();
+        boolean result = list.equals(that);
+
+        assertFalse(result);
+        assertEquals(version, stm.getVersion());
     }
 }

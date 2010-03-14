@@ -36,6 +36,7 @@ public class TransactionalArray<E> {
         return array.length();
     }
 
+
     private Ref getRef(int index) {
         Ref ref = array.get(index);
         if (ref == null) {

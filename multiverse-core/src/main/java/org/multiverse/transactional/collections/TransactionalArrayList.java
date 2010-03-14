@@ -3,6 +3,7 @@ package org.multiverse.transactional.collections;
 import org.multiverse.transactional.arrays.TransactionalReferenceArray;
 import org.multiverse.utils.TodoException;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +27,14 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
      */
     public TransactionalArrayList() {
         this(10);
+    }
+
+    public TransactionalArrayList(E... items) {
+        this();
+
+        for (E item : items) {
+            add(item);
+        }
     }
 
     /**
@@ -161,7 +170,94 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
     }
 
     @Override
+    public Object[] toArray() {
+        return array.toArray(size);
+    }
+
+    @Override
+    public <T> T[] toArray(T[] a) {
+
+        int size = this.size;
+
+        T[] r = a.length >= size ? a : (T[]) Array.newInstance(a.getClass().getComponentType(), size);
+
+        for (int k = 0; k < size; k++) {
+            r[k] = (T) array.get(k);
+        }
+
+        for (int k = size; k < a.length; k++) {
+            r[k] = null;
+        }
+
+        return r;
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        if (c == null) {
+            throw new NullPointerException();
+        }
+
+        if (c.isEmpty()) {
+            return true;
+        }
+
+        for (Iterator it = c.iterator(); it.hasNext();) {
+            if (!contains(it.next())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        int indexOf = indexOf(o);
+        if (indexOf == -1) {
+            return false;
+        }
+
+        remove(indexOf);
+        return true;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        if (c == null) {
+            throw new NullPointerException();
+        }
+
+        if (c.isEmpty()) {
+            return false;
+        }
+
+        boolean changed = false;
+        for (Object item : c) {
+            if (remove(item)) {
+                changed = true;
+            }
+        }
+
+        return changed;
+    }
+
+    @Override
+    public E remove(int index) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        throw new TodoException();
+    }
+
+    @Override
     public void add(int index, E element) {
+        throw new TodoException();
+    }
+
+    @Override
+    public boolean addAll(int index, Collection<? extends E> c) {
         throw new TodoException();
     }
 
@@ -186,42 +282,15 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
     }
 
     @Override
-    public Object[] toArray() {
-        throw new TodoException();
-    }
-
-    @Override
-    public <T> T[] toArray(T[] a) {
-        throw new TodoException();
-    }
-
-    @Override
-    public boolean remove(Object o) {
-        throw new TodoException();
-    }
-
-    @Override
-    public boolean containsAll(Collection<?> c) {
-        throw new TodoException();
-    }
-
-    @Override
-    public boolean addAll(int index, Collection<? extends E> c) {
-        throw new TodoException();
-    }
-
-    @Override
-    public boolean removeAll(Collection<?> c) {
-        throw new TodoException();
-    }
-
-    @Override
     public boolean retainAll(Collection<?> c) {
-        throw new TodoException();
-    }
+        if (c == null) {
+            throw new NullPointerException();
+        }
 
-    @Override
-    public E remove(int index) {
+        if (c.isEmpty()) {
+            return false;
+        }
+
         throw new TodoException();
     }
 
@@ -257,7 +326,18 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
             return false;
         }
 
-        throw new TodoException();
+        if (this.size() == 0) {
+            return true;
+        }
+
+        Iterator thatIt = that.iterator();
+        for (int k = 0; k < size; k++) {
+            if (!equals(array.get(k), thatIt.next())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override

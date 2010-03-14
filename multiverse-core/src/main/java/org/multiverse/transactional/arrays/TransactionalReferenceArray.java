@@ -5,6 +5,7 @@ import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.transactional.DefaultTransactionalReference;
 import org.multiverse.transactional.TransactionalReference;
+import org.multiverse.utils.TodoException;
 
 /**
  * An Transactional array. The elements in the array are of type {@link TransactionalReference}.
@@ -81,6 +82,10 @@ public final class TransactionalReferenceArray<E> {
         return array.length;
     }
 
+    public void shiftLeft(int index) {
+        throw new TodoException();
+    }
+
     /**
      * Copies the content of this TransactionalReferenceArray to a bigger TransactionalReferenceArray.
      *
@@ -121,5 +126,26 @@ public final class TransactionalReferenceArray<E> {
         }
         sb.append("]");
         return sb.toString();
+    }
+
+    /**
+     * Sends back an array containing the value of the references in this TransactionalReferenceArray.
+     *
+     * @param size the number of items to copy. If the size is smaller than the array length, it will
+     *             only copy till that length.
+     * @return the copied array.
+     * @throws IllegalArgumentException if size smaller than 0 or larger than the length
+     */
+    @TransactionalMethod(readonly = true)
+    public Object[] toArray(int size) {
+        if (size < 0 || size >= array.length) {
+            throw new IllegalArgumentException();
+        }
+
+        Object[] result = new Object[size];
+        for (int k = 0; k < size; k++) {
+            result[k] = array[k].get();
+        }
+        return result;
     }
 }
