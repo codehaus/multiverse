@@ -3,7 +3,7 @@ package org.multiverse.stms.alpha.integrationtests;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.exceptions.OptimisticLockFailedWriteConflict;
+import org.multiverse.api.exceptions.WriteSkewConflict;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.manualinstrumentation.IntStack;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
@@ -40,7 +40,7 @@ public class WriteSkewDetectionTest {
     }
 
     @Test
-    public void whenDisabledWriteSkewProblem_thenWriteConflictException() {
+    public void whenDisabledWriteSkewProblem_thenWriteSkewConflict() {
         TransactionFactory<AlphaTransaction> factory = stm.getTransactionFactoryBuilder()
                 .setAllowWriteSkewProblem(false).build();
 
@@ -54,7 +54,7 @@ public class WriteSkewDetectionTest {
         try {
             t2.commit();
             fail();
-        } catch (OptimisticLockFailedWriteConflict expected) {
+        } catch (WriteSkewConflict expected) {
         }
     }
 

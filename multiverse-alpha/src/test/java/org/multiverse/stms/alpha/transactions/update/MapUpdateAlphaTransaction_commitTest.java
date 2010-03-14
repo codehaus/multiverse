@@ -6,6 +6,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.CommitLockNotFreeWriteConflict;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.OptimisticLockFailedWriteConflict;
+import org.multiverse.api.exceptions.WriteSkewConflict;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -367,7 +368,7 @@ public class MapUpdateAlphaTransaction_commitTest {
     }
 
     @Test
-    public void whenDisallowedWriteSkewProblem_theVersionTooOldWriteConflict() {
+    public void whenDisallowedWriteSkewProblem_theWriteSkewConflict() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
@@ -384,7 +385,7 @@ public class MapUpdateAlphaTransaction_commitTest {
         try {
             tx2.commit();
             fail();
-        } catch (OptimisticLockFailedWriteConflict expected) {
+        } catch (WriteSkewConflict expected) {
         }
 
         assertEquals(0, ref1.get(stm));

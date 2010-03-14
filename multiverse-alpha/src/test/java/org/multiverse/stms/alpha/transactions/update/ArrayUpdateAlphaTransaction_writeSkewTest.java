@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.exceptions.OptimisticLockFailedWriteConflict;
+import org.multiverse.api.exceptions.WriteSkewConflict;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -63,7 +63,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
     }
 
     @Test
-    public void whenDisallowedWriteSkewProblem_thenVersionTooOldWriteConflict() {
+    public void whenDisallowedWriteSkewProblem_thenWriteSkewConflict() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRefTranlocal committedRef1 = (ManualRefTranlocal) ref1.___load();
         ManualRef ref2 = new ManualRef(stm);
@@ -85,7 +85,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
         try {
             tx2.commit();
             fail();
-        } catch (OptimisticLockFailedWriteConflict expected) {
+        } catch (WriteSkewConflict expected) {
         }
 
         assertIsAborted(tx2);
@@ -149,7 +149,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
 
 
     @Test
-    public void withFourAccountsAndDisallowedWriteSkewProblem_thenWriteConflictException() {
+    public void withFourAccountsAndDisallowedWriteSkewProblem_thenWriteSkewConflict() {
         ManualRef accountA1 = new ManualRef(stm);
         ManualRef accountA2 = new ManualRef(stm);
 
@@ -176,7 +176,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
         try {
             tx2.commit();
             fail();
-        } catch (OptimisticLockFailedWriteConflict expected) {
+        } catch (WriteSkewConflict expected) {
         }
     }
 
