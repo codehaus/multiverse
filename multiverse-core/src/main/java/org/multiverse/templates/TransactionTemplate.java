@@ -2,7 +2,7 @@ package org.multiverse.templates;
 
 import org.multiverse.api.*;
 import org.multiverse.api.exceptions.ControlFlowError;
-import org.multiverse.api.exceptions.RetryError;
+import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.api.exceptions.TransactionTooSmallError;
 import org.multiverse.utils.backoff.BackoffPolicy;
@@ -302,7 +302,7 @@ public abstract class TransactionTemplate<E> {
                     E result = execute(tx);
                     tx.commit();
                     return result;
-                } catch (RetryError e) {
+                } catch (Retry e) {
                     if (attempt - 1 < tx.getConfig().getMaxRetryCount()) {
                         awaitWriteAndRestart(tx);
                     }

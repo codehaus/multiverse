@@ -1,5 +1,8 @@
 package org.multiverse.api.exceptions;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
+
 /**
  * A {@link ControlFlowError} that indicates that current transaction implementation can't deal
  * with more transactional objects than it can handle. This Error is useful for the STM
@@ -10,6 +13,9 @@ package org.multiverse.api.exceptions;
  * @author Peter Veentjer.
  */
 public class TransactionTooSmallError extends ControlFlowError {
+
+    public final static boolean reuse = parseBoolean(getProperty(
+            TransactionTooSmallError.class.getName() + ".reuse", "true"));
 
     public static final TransactionTooSmallError INSTANCE = new TransactionTooSmallError();
 

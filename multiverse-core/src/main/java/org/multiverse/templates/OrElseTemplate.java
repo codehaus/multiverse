@@ -1,7 +1,8 @@
 package org.multiverse.templates;
 
 import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.RetryError;
+import org.multiverse.api.exceptions.Retry;
+
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 /**
@@ -81,7 +82,7 @@ public abstract class OrElseTemplate<E> {
     public final E execute() {
         try {
             return run(tx);
-        } catch (RetryError e) {
+        } catch (Retry e) {
             return orelserun(tx);
         }
     }

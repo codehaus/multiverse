@@ -7,7 +7,7 @@ import org.multiverse.TestThread;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.exceptions.RetryError;
+import org.multiverse.api.exceptions.Retry;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.junit.Assert.*;
@@ -242,7 +242,7 @@ public class OrElseTemplateTest {
                 }
             }.execute();
             fail();
-        } catch (RetryError e) {
+        } catch (Retry e) {
         }
 
         t.abort();

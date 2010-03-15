@@ -9,20 +9,19 @@ import static java.lang.System.getProperty;
  *
  * @author Peter Veentjer.
  */
-public class RetryError extends ControlFlowError {
+public class Retry extends ControlFlowError {
 
     private static final long serialVersionUID = 0;
 
-    private final static boolean reuse = parseBoolean(
-            getProperty(RetryError.class.getName() + ".reuse", "true"));
+    private final static boolean reuse = parseBoolean(getProperty(Retry.class.getName() + ".reuse", "true"));
 
-    public final static RetryError INSTANCE = new RetryError();
+    public final static Retry INSTANCE = new Retry();
 
-    public static RetryError create() {
+    public static Retry create() {
         if (reuse) {
-            return RetryError.INSTANCE;
+            return Retry.INSTANCE;
         } else {
-            return new RetryError();
+            return new Retry();
         }
     }
 }

@@ -9,7 +9,7 @@ import org.multiverse.api.TransactionFactory;
  * <li>it works with a transaction</li>
  * <li>it can be retried. Retrying </li>
  * </ol>
- *
+ * <p/>
  * Should this be the same as context? So is there a need for context?
  *
  * @author Peter Veentjer.
@@ -28,7 +28,8 @@ public interface NonBlockingTask {
      *
      * @param t the Transaction used to execute the task.
      * @return true if the task should be executed again, false otherwise.
-     * @throws org.multiverse.api.exceptions.RetryError
+     * @throws org.multiverse.api.exceptions.Retry
+     *
      */
     boolean execute(Transaction t);
 }

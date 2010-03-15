@@ -76,7 +76,7 @@ public class TransactionLogicDonor {
                     execute();
                     tx.commit();
                     return;
-                } catch (RetryError er) {
+                } catch (Retry er) {
                     if (attempt - 1 < tx.getConfig().getMaxRetryCount()) {
                         waitForChange(tx);
                     }

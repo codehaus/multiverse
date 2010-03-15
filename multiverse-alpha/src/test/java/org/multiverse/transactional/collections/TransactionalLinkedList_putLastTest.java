@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.exceptions.RetryError;
+import org.multiverse.api.exceptions.Retry;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -76,7 +76,7 @@ public class TransactionalLinkedList_putLastTest {
         try {
             list.putLast("3");
             fail();
-        } catch (RetryError expected) {
+        } catch (Retry expected) {
         }
         t.abort();
 

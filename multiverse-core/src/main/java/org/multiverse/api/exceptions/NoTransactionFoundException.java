@@ -1,7 +1,7 @@
 package org.multiverse.api.exceptions;
 
 /**
- * An exception that can be thrown when no transaction but if it was expected.
+ * An {@link IllegalStateException} that can be thrown when no transaction but if it was expected.
  *
  * @author Peter Veentjer
  */

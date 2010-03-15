@@ -4,7 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.NoTransactionFoundException;
-import org.multiverse.api.exceptions.RetryError;
+import org.multiverse.api.exceptions.Retry;
 import org.multiverse.stms.AbstractTransactionImpl;
 
 import static org.junit.Assert.fail;
@@ -28,7 +28,7 @@ public class StmUtilsTest {
         clearThreadLocalTransaction();
     }
 
-    @Test(expected = RetryError.class)
+    @Test(expected = Retry.class)
     public void retryWithTransactionThrowsRetryError() {
         Transaction t = mock(Transaction.class);
         setThreadLocalTransaction(t);

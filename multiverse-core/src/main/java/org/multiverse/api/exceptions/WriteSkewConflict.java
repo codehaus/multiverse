@@ -13,11 +13,9 @@ public class WriteSkewConflict extends WriteConflict {
 
     private static final long serialVersionUID = 0;
 
-    public final static boolean reuse = parseBoolean(
-            getProperty(WriteSkewConflict.class.getName() + ".reuse", "true"));
+    public final static boolean reuse = parseBoolean(getProperty(WriteSkewConflict.class.getName() + ".reuse", "true"));
 
     public final static WriteSkewConflict INSTANCE = new WriteSkewConflict();
-
 
     public WriteSkewConflict() {
     }

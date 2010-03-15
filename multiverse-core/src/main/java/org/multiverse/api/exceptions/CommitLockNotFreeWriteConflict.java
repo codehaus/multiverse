@@ -4,8 +4,8 @@ import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
 
 /**
- * A {@link WriteConflict} that indicates that the locks could not be acquired while doing a {@link
- * org.multiverse.api.Transaction#commit}.
+ * A {@link WriteConflict} that indicates that the locks could not be acquired while doing a
+ * {@link org.multiverse.api.Transaction#commit}.
  *
  * @author Peter Veentjer
  */
@@ -17,6 +17,14 @@ public class CommitLockNotFreeWriteConflict extends WriteConflict {
 
     public final static boolean reuse = parseBoolean(getProperty(
             CommitLockNotFreeWriteConflict.class.getName() + ".reuse", "true"));
+
+    public static CommitLockNotFreeWriteConflict newFailedToObtainCommitLocksException() {
+        if (LockNotFreeReadConflict.reuse) {
+            throw CommitLockNotFreeWriteConflict.INSTANCE;
+        } else {
+            throw new CommitLockNotFreeWriteConflict();
+        }
+    }
 
     public CommitLockNotFreeWriteConflict() {
     }
@@ -32,14 +40,4 @@ public class CommitLockNotFreeWriteConflict extends WriteConflict {
     public CommitLockNotFreeWriteConflict(Throwable cause) {
         super(cause);
     }
-
-
-    public static CommitLockNotFreeWriteConflict newFailedToObtainCommitLocksException() {
-        if (LockNotFreeReadConflict.reuse) {
-            throw CommitLockNotFreeWriteConflict.INSTANCE;
-        } else {
-            throw new CommitLockNotFreeWriteConflict();
-        }
-    }
-
 }

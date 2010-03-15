@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.exceptions.RetryError;
+import org.multiverse.api.exceptions.Retry;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -59,7 +59,7 @@ public class AlphaRef_getOrAwaitTest {
         try {
             ref.getOrAwait();
             fail();
-        } catch (RetryError retryError) {
+        } catch (Retry retry) {
 
         }
         assertEquals(version, stm.getVersion());

@@ -110,10 +110,10 @@ public class NonBlockingTaskThreadPoolExecutor implements NonBlockingTransaction
                     //todo: return value ignored here.. s
                     tasks.offer(new NonBlockingTaskWrapper(task.transactionalTask));
                 }
-            } catch (RetryError ex) {
+            } catch (Retry ex) {
                 Latch latch = new NonBlockingLatch(t, task.transactionalTask);
                 t.registerRetryLatch(latch);
-                ///System.out.println("RetryError encountered");
+                ///System.out.println("Retry encountered");
 
             } */
         }
