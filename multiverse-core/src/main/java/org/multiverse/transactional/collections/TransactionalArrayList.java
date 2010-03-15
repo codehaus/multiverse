@@ -1,14 +1,12 @@
 package org.multiverse.transactional.collections;
 
 import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.transactional.arrays.TransactionalReferenceArray;
 import org.multiverse.utils.TodoException;
 
 import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 /**
  * A {@link TransactionalList} based on a (transactional) array. It is the transactional version of the
@@ -340,7 +338,34 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
 
     @Override
     public Iterator<E> iterator() {
-        throw new TodoException();
+        return new IteratorImpl();
+    }
+
+    @TransactionalObject
+    private class IteratorImpl implements Iterator<E> {
+
+        private int index;
+
+        @Override
+        public boolean hasNext() {
+            return index < size();
+        }
+
+        @Override
+        public E next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+
+            E item = get(index);
+            index++;
+            return item;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
     }
 
     @Override
@@ -349,11 +374,27 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
             throw new NullPointerException();
         }
 
-        if (c.isEmpty()) {
+        if (isEmpty()) {
             return false;
         }
 
-        throw new TodoException();
+        if (c.isEmpty()) {
+            clear();
+            return true;
+        }
+
+        boolean changed = false;
+
+        for (int k = 0; k < size; k++) {
+            E item = array.get(k);
+            if (!c.contains(item)) {
+                remove(k);
+                k--;
+                changed = true;
+            }
+        }
+
+        return changed;
     }
 
     @Override
