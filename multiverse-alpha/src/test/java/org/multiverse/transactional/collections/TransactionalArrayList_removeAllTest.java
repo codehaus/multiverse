@@ -1,7 +1,6 @@
 package org.multiverse.transactional.collections;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 
@@ -61,7 +60,36 @@ public class TransactionalArrayList_removeAllTest {
     }
 
     @Test
-    @Ignore
-    public void test() {
+    public void whenMatchingElements() {
+        TransactionalArrayList<String> list = new TransactionalArrayList<String>("a", "b", "c", "d", "e");
+
+        Set<String> items = new HashSet<String>();
+        items.add("a");
+        items.add("c");
+        items.add("e");
+
+        long version = stm.getVersion();
+        boolean changed = list.removeAll(items);
+
+        assertTrue(changed);
+        assertEquals(version + 1, stm.getVersion());
+        assertEquals(2, list.size());
+        assertEquals("[b, d]", list.toString());
+    }
+
+    @Test
+    public void whenElementMatchingMultipleTimes() {
+        TransactionalArrayList<String> list = new TransactionalArrayList<String>("a", "b", "a", "d", "e");
+
+        Set<String> items = new HashSet<String>();
+        items.add("a");
+
+        long version = stm.getVersion();
+        boolean changed = list.removeAll(items);
+
+        assertTrue(changed);
+        assertEquals(version + 1, stm.getVersion());
+        assertEquals(3, list.size());
+        assertEquals("[b, d, e]", list.toString());
     }
 }
