@@ -27,6 +27,7 @@ public abstract class AbstractReadonlyAlphaTransaction<C extends AbstractTransac
         AlphaTranlocal tranlocal = findAttached(txObject);
         if (tranlocal == null) {
             tranlocal = txObject.___load(getReadVersion());
+
             if (tranlocal == null) {
                 throw createLoadUncommittedException(txObject);
             }

@@ -1,5 +1,6 @@
 package org.multiverse.transactional.collections;
 
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.transactional.arrays.TransactionalReferenceArray;
 import org.multiverse.utils.TodoException;
 
@@ -74,12 +75,13 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
                 newCapacity = minCapacity;
             }
 
-            System.out.println("growing: " + newCapacity);
             array = array.copyToBiggerArray(newCapacity);
         }
     }
 
     @Override
+    @TransactionalMethod(readonly = true)
+    //TODO: needs to be removed as the interface inheritance works
     public E get(int index) {
         if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException();
@@ -121,11 +123,12 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
         return -1;
     }
 
-    private boolean equals(E element, Object o) {
+    private static boolean equals(Object element, Object o) {
         return element == null ? o == null : element.equals(o);
     }
 
     @Override
+    @TransactionalMethod(automaticReadTracking = false)
     public E set(int index, E element) {
         if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException();
@@ -234,7 +237,9 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
 
         boolean changed = false;
         for (Object item : c) {
-            if (remove(item)) {
+            //can be made more efficient by using the previous found index instead
+            //of searching from the beginning again.
+            while (remove(item)) {
                 changed = true;
             }
         }
@@ -248,7 +253,10 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
             throw new IndexOutOfBoundsException();
         }
 
-        throw new TodoException();
+        E item = array.get(index);
+        array.shiftLeft(index + 1, size - index);
+        size--;
+        return item;
     }
 
     @Override

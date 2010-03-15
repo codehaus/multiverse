@@ -5,7 +5,6 @@ import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.transactional.DefaultTransactionalReference;
 import org.multiverse.transactional.TransactionalReference;
-import org.multiverse.utils.TodoException;
 
 /**
  * An Transactional array. The elements in the array are of type {@link TransactionalReference}.
@@ -82,8 +81,16 @@ public final class TransactionalReferenceArray<E> {
         return array.length;
     }
 
-    public void shiftLeft(int index) {
-        throw new TodoException();
+    public void shiftLeft(int index, int length) {
+        if (index < 1 || index >= array.length) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        for (int k = index; k <= index + length; k++) {
+            array[k - 1].set(array[k].get());
+        }
+
+        array[index + length] = null;
     }
 
     /**

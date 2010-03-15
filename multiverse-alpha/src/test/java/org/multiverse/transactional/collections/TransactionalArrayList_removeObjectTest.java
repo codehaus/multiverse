@@ -1,12 +1,10 @@
 package org.multiverse.transactional.collections;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 
 public class TransactionalArrayList_removeObjectTest {
@@ -40,20 +38,41 @@ public class TransactionalArrayList_removeObjectTest {
     }
 
     @Test
-    @Ignore
     public void whenObjectNull_thenRemovalAlsoSucces() {
+        TransactionalArrayList<String> list = new TransactionalArrayList<String>("a", null, "c");
 
+        long version = stm.getVersion();
+        boolean changed = list.remove(null);
+
+        assertTrue(changed);
+        assertEquals(version + 1, stm.getVersion());
+        assertEquals("[a, c]", list.toString());
+        assertEquals(2, list.size());
     }
 
     @Test
-    @Ignore
     public void whenObjectFound_thenRemoved() {
+        TransactionalArrayList<String> list = new TransactionalArrayList<String>("a", "b", "c");
 
+        long version = stm.getVersion();
+        boolean changed = list.remove("b");
+
+        assertTrue(changed);
+        assertEquals(version + 1, stm.getVersion());
+        assertEquals("[a, c]", list.toString());
+        assertEquals(2, list.size());
     }
 
     @Test
-    @Ignore
     public void whenMultipleOccurrences_thenOnlyFirstRemoved() {
+        TransactionalArrayList<String> list = new TransactionalArrayList<String>("a", "b", "c", "b");
 
+        long version = stm.getVersion();
+        boolean changed = list.remove("b");
+
+        assertTrue(changed);
+        assertEquals(version + 1, stm.getVersion());
+        assertEquals("[a, c, b]", list.toString());
+        assertEquals(3, list.size());
     }
 }

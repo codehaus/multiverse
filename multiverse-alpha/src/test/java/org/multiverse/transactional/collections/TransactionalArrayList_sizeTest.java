@@ -1,14 +1,28 @@
 package org.multiverse.transactional.collections;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.Stm;
 
 import static org.junit.Assert.assertEquals;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 
 public class TransactionalArrayList_sizeTest {
+    private Stm stm;
+
+    @Before
+    public void setUp() {
+        stm = getGlobalStmInstance();
+    }
 
     @Test
     public void whenEmpty() {
         TransactionalArrayList<String> array = new TransactionalArrayList<String>();
-        assertEquals(0, array.size());
+
+        long version = stm.getVersion();
+        int result = array.size();
+
+        assertEquals(0, result);
+        assertEquals(version, stm.getVersion());
     }
 }

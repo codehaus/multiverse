@@ -1,7 +1,6 @@
 package org.multiverse.transactional.collections;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 
@@ -67,8 +66,41 @@ public class TransactionalArrayList_removeIndexTest {
     }
 
     @Test
-    @Ignore
-    public void when() {
+    public void whenFirstItemRemoved() {
+        TransactionalArrayList<String> list = new TransactionalArrayList<String>("a", "b", "c");
 
+        long version = stm.getVersion();
+        String found = list.remove(0);
+
+        assertEquals("a", found);
+        assertEquals(version + 1, stm.getVersion());
+        assertEquals(2, list.size());
+        assertEquals("[b, c]", list.toString());
+    }
+
+    @Test
+    public void whenMiddleItemRemoved() {
+        TransactionalArrayList<String> list = new TransactionalArrayList<String>("a", "b", "c");
+
+        long version = stm.getVersion();
+        String found = list.remove(1);
+
+        assertEquals("b", found);
+        assertEquals(version + 1, stm.getVersion());
+        assertEquals(2, list.size());
+        assertEquals("[a, c]", list.toString());
+    }
+
+    @Test
+    public void whenLastItemRemoved() {
+        TransactionalArrayList<String> list = new TransactionalArrayList<String>("a", "b", "c");
+
+        long version = stm.getVersion();
+        String found = list.remove(2);
+
+        assertEquals("c", found);
+        assertEquals(version + 1, stm.getVersion());
+        assertEquals(2, list.size());
+        assertEquals("[a, b]", list.toString());
     }
 }

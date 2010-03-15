@@ -317,7 +317,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
         //todo: better parameter settings disabling lifecyclecallbacks
         return new TransactionTemplate<E>(txFactory) {
             @Override
-            public E execute(Transaction t) throws Exception {
+            public E execute(Transaction t) {
                 return getOrAwait(t);
             }
         }.execute();
