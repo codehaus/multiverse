@@ -67,15 +67,16 @@ public class TransactionalArrayList_removeIndexTest {
 
     @Test
     public void whenFirstItemRemoved() {
-        TransactionalArrayList<String> list = new TransactionalArrayList<String>("a", "b", "c");
+        TransactionalArrayList<String> list = new TransactionalArrayList<String>("a", "b", "c", "d", "e");
+
 
         long version = stm.getVersion();
         String found = list.remove(0);
 
         assertEquals("a", found);
         assertEquals(version + 1, stm.getVersion());
-        assertEquals(2, list.size());
-        assertEquals("[b, c]", list.toString());
+        assertEquals(4, list.size());
+        assertEquals("[b, c, d, e]", list.toString());
     }
 
     @Test

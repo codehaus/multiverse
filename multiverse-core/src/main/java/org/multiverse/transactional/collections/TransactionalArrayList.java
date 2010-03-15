@@ -30,13 +30,34 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
         this(10);
     }
 
+    /**
+     * Creates a new TransactionalArrayList that contains the items.
+     *
+     * @param items the items to add to this List.
+     * @throws NullPointerException if items is null.
+     */
     public TransactionalArrayList(E... items) {
-        this();
+        this(items.length);
 
         for (E item : items) {
             add(item);
         }
     }
+
+    /**
+     * Creates a new TransactionalArrayList that contains the items.
+     *
+     * @param items the items to add to this List.
+     * @throws NullPointerException if items is null.
+     */
+    public TransactionalArrayList(Collection<? extends E> items) {
+        this(items.size());
+
+        for (E item : items) {
+            add(item);
+        }
+    }
+
 
     /**
      * Creates a new TransactionalArrayList with the provided capacity.
@@ -254,18 +275,51 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
         }
 
         E item = array.get(index);
-        array.shiftLeft(index + 1, size - index);
+
+        if (index < size - 1) {
+            array.shiftLeft(index + 1, size - 1);
+        } else {
+            array.set(index, null);
+        }
+
         size--;
         return item;
     }
 
     @Override
     public void add(int index, E element) {
-        throw new TodoException();
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        ensureCapacity(size + 1);
+
+        array.shiftRight(index, size - 1);
+
+        size++;
+        array.set(index, element);
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        if (c == null) {
+            throw new NullPointerException();
+        }
+
+        if (c.isEmpty()) {
+            return false;
+        }
+
+        ensureCapacity(size + c.size());
+
+        //array.shiftRight(index, size - index);
+        //array.set(index, element);
+        //size+=c.size();
+        //return true;
         throw new TodoException();
     }
 
@@ -334,7 +388,7 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
             return false;
         }
 
-        if (this.size() == 0) {
+        if (size == 0) {
             return true;
         }
 

@@ -81,16 +81,49 @@ public final class TransactionalReferenceArray<E> {
         return array.length;
     }
 
-    public void shiftLeft(int index, int length) {
-        if (index < 1 || index >= array.length) {
+    /**
+     * Remove elements.
+     *
+     * @param firstIndex
+     * @param lastIndex
+     */
+    public void shiftLeft(int firstIndex, int lastIndex) {
+        if (firstIndex < 1 || firstIndex >= array.length) {
             throw new IndexOutOfBoundsException();
         }
 
-        for (int k = index; k <= index + length; k++) {
-            array[k - 1].set(array[k].get());
+        //[a,b,c
+        //[b,c,null
+        for (int k = firstIndex; k <= lastIndex; k++) {
+            E right = array[k].get();
+            array[k - 1].set(right);
         }
 
-        array[index + length] = null;
+        array[lastIndex].set(null);
+    }
+
+    /**
+     * Create room
+     *
+     * @param firstIndex
+     * @param lastIndex
+     */
+    public void shiftRight(int firstIndex, int lastIndex) {
+        if (firstIndex < 0 || firstIndex >= array.length - 1) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        //[a   , b, c
+        //[null, a, b, c
+
+
+        //endIndex not checked
+        for (int k = lastIndex; k >= firstIndex; k--) {
+            E left = array[k].get();
+            array[k + 1].set(left);
+        }
+
+        array[firstIndex].set(null);
     }
 
     /**
@@ -145,7 +178,7 @@ public final class TransactionalReferenceArray<E> {
      */
     @TransactionalMethod(readonly = true)
     public Object[] toArray(int size) {
-        if (size < 0 || size >= array.length) {
+        if (size < 0 || size > array.length) {
             throw new IllegalArgumentException();
         }
 
