@@ -27,7 +27,6 @@ public class ArrayUpdateAlphaTransaction_miscTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
                 false, optimalSize, true, true, true, true, 50);

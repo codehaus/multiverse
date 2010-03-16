@@ -35,7 +35,6 @@ public class MapUpdateAlphaTransaction_commitTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
                 true, true, true, true, true);
@@ -47,7 +46,6 @@ public class MapUpdateAlphaTransaction_commitTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
                 allowWriteSkewProblem, true, true, true, true);

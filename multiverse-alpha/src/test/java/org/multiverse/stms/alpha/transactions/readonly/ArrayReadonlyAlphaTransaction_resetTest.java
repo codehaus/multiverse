@@ -34,7 +34,6 @@ public class ArrayReadonlyAlphaTransaction_resetTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.maxRetryCount, true, optimalSize, size);
 
         return new ArrayReadonlyAlphaTransaction(config, size);

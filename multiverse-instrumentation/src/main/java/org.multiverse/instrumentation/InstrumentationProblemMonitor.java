@@ -1,4 +1,4 @@
-package org.multiverse.utils.instrumentation;
+package org.multiverse.instrumentation;
 
 import java.util.logging.Logger;
 

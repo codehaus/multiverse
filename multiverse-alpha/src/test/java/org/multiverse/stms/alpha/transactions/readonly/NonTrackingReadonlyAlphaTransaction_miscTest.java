@@ -25,7 +25,6 @@ public class NonTrackingReadonlyAlphaTransaction_miscTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.maxRetryCount);
         return new NonTrackingReadonlyAlphaTransaction(config);
     }

@@ -56,7 +56,6 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
         }
     }
 
-
     /**
      * Creates a new TransactionalArrayList with the provided capacity.
      *

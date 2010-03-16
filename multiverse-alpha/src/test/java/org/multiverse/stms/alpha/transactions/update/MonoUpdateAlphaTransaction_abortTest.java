@@ -33,7 +33,6 @@ public class MonoUpdateAlphaTransaction_abortTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.maxRetryCount,
                 stmConfig.commitLockPolicy, true, optimalSize, true, true, true, true);
         return new MonoUpdateAlphaTransaction(config);

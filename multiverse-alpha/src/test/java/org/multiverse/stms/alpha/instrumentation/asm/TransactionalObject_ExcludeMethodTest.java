@@ -6,17 +6,17 @@ import org.junit.Test;
 import org.multiverse.annotations.Exclude;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.exceptions.NoTransactionFoundException;
+import org.multiverse.instrumentation.InstrumentationProblemMonitor;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.instrumentation.metadata.ClassMetadata;
 import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
-import org.multiverse.utils.instrumentation.InstrumentationProblemMonitor;
 import org.objectweb.asm.Type;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.multiverse.TestUtils.resetInstrumentationProblemMonitor;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.instrumentation.InstrumentationTestUtils.resetInstrumentationProblemMonitor;
 
 public class TransactionalObject_ExcludeMethodTest {
     private AlphaStm stm;

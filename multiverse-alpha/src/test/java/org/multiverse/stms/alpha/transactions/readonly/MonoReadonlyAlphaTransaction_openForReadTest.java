@@ -34,7 +34,6 @@ public class MonoReadonlyAlphaTransaction_openForReadTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.maxRetryCount, true, optimalSize);
         return new MonoReadonlyAlphaTransaction(config);
     }

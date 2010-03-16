@@ -3,15 +3,15 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.TestUtils;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
+import org.multiverse.instrumentation.InstrumentationProblemMonitor;
 import org.multiverse.stms.alpha.AlphaStm;
-import org.multiverse.utils.instrumentation.InstrumentationProblemMonitor;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.instrumentation.InstrumentationTestUtils.resetInstrumentationProblemMonitor;
 
 public class TransactionalMethod_InterruptibleTest {
 
@@ -20,12 +20,12 @@ public class TransactionalMethod_InterruptibleTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
-        TestUtils.resetInstrumentationProblemMonitor();
+        resetInstrumentationProblemMonitor();
     }
 
     @After
     public void tearDown() {
-        TestUtils.resetInstrumentationProblemMonitor();
+        resetInstrumentationProblemMonitor();
     }
 
     @Test
@@ -48,7 +48,7 @@ public class TransactionalMethod_InterruptibleTest {
 
     @Test
     public void whenNoMatchingException() {
-        TestUtils.resetInstrumentationProblemMonitor();
+        resetInstrumentationProblemMonitor();
 
         MethodWithIncorrectException o = new MethodWithIncorrectException();
 
@@ -68,7 +68,7 @@ public class TransactionalMethod_InterruptibleTest {
 
     @Test
     public void whenInterruptedExceptionPresent() {
-        TestUtils.resetInstrumentationProblemMonitor();
+        resetInstrumentationProblemMonitor();
 
         MethodWithInterruptedException o = new MethodWithInterruptedException();
 
@@ -89,7 +89,7 @@ public class TransactionalMethod_InterruptibleTest {
 
     @Test
     public void whenExceptionPresent() {
-        TestUtils.resetInstrumentationProblemMonitor();
+        resetInstrumentationProblemMonitor();
 
         MethodWithException o = new MethodWithException();
 
@@ -109,7 +109,7 @@ public class TransactionalMethod_InterruptibleTest {
 
     @Test
     public void whenThrowablePresent() {
-        TestUtils.resetInstrumentationProblemMonitor();
+        resetInstrumentationProblemMonitor();
 
         MethodWithThrowable o = new MethodWithThrowable();
 
@@ -129,7 +129,7 @@ public class TransactionalMethod_InterruptibleTest {
 
     @Test
     public void whenMultipleExceptionsAndAtLeastOneMatching() {
-        TestUtils.resetInstrumentationProblemMonitor();
+        resetInstrumentationProblemMonitor();
 
         MethodWithMultipleExceptions o = new MethodWithMultipleExceptions();
 

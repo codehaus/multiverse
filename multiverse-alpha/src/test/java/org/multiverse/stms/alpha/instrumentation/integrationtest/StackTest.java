@@ -3,7 +3,6 @@ package org.multiverse.stms.alpha.instrumentation.integrationtest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.TestUtils;
 import org.multiverse.api.ThreadLocalTransaction;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
@@ -14,8 +13,9 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
 
 import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.assertNoInstrumentationProblems;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.instrumentation.InstrumentationTestUtils.assertNoInstrumentationProblems;
+import static org.multiverse.instrumentation.InstrumentationTestUtils.resetInstrumentationProblemMonitor;
 import static org.multiverse.stms.alpha.instrumentation.AlphaReflectionUtils.*;
 
 /**
@@ -30,7 +30,7 @@ public class StackTest {
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
         updateTxFactory = stm.getTransactionFactoryBuilder().build();
-        TestUtils.resetInstrumentationProblemMonitor();
+        resetInstrumentationProblemMonitor();
     }
 
     @After

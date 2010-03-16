@@ -35,7 +35,6 @@ public class MonoReadonlyAlphaTransaction_registerRetryLatchTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.maxRetryCount, true, optimalSize);
         return new MonoReadonlyAlphaTransaction(config);
     }

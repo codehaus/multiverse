@@ -31,7 +31,6 @@ public class MonoUpdateAlphaTransaction_restartTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.maxRetryCount,
                 stmConfig.commitLockPolicy, true, optimalSize, true, true, true, true);
         return new MonoUpdateAlphaTransaction(config);

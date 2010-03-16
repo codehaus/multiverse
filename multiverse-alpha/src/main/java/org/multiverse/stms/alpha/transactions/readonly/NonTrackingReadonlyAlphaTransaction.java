@@ -7,7 +7,6 @@ import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.clock.PrimitiveClock;
-import org.multiverse.utils.profiling.ProfileRepository;
 
 /**
  * A readonly {@link org.multiverse.stms.alpha.transactions.AlphaTransaction} implementation that doesn't track reads.
@@ -39,15 +38,11 @@ public class NonTrackingReadonlyAlphaTransaction
 
     public static class Config extends AbstractTransactionConfig {
 
-        public final ProfileRepository profiler;
-
         public Config(
                 PrimitiveClock clock, BackoffPolicy backoffPolicy,
                 String familyName,
-                ProfileRepository profiler,
                 int maxRetryCount) {
             super(clock, backoffPolicy, familyName, true, maxRetryCount, false, false, false);
-            this.profiler = profiler;
         }
     }
 

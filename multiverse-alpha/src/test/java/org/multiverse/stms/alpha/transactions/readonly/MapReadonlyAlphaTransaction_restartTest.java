@@ -29,7 +29,6 @@ public class MapReadonlyAlphaTransaction_restartTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.maxRetryCount, true);
         return new MapReadonlyAlphaTransaction(config);
     }

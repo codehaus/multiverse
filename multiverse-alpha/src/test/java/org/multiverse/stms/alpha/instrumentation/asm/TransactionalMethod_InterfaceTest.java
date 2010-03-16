@@ -4,9 +4,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.multiverse.TestUtils;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
+import org.multiverse.instrumentation.InstrumentationTestUtils;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.instrumentation.metadata.ClassMetadata;
 import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
@@ -14,9 +14,9 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.multiverse.TestUtils.assertNoInstrumentationProblems;
 import static org.multiverse.TestUtils.hasMethod;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.instrumentation.InstrumentationTestUtils.resetInstrumentationProblemMonitor;
 
 /**
  * @author Peter Veentjer
@@ -27,13 +27,13 @@ public class TransactionalMethod_InterfaceTest {
 
     @Before
     public void setUp() {
-        TestUtils.resetInstrumentationProblemMonitor();
+        resetInstrumentationProblemMonitor();
         stm = (AlphaStm) getGlobalStmInstance();
     }
 
     @After
     public void tearDown() {
-        assertNoInstrumentationProblems();
+        InstrumentationTestUtils.assertNoInstrumentationProblems();
     }
 
     @Test

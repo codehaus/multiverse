@@ -30,7 +30,6 @@ public class ArrayReadonlyAlphaTransaction_abortTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.maxRetryCount, true, optimalSize, 10);
         return new ArrayReadonlyAlphaTransaction(config, 5);
     }

@@ -33,7 +33,6 @@ public class NonTrackingReadonlyAlphaTransaction_registerRetryLatchTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.maxRetryCount);
         return new NonTrackingReadonlyAlphaTransaction(config);
     }

@@ -2,7 +2,6 @@ package org.multiverse;
 
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionStatus;
-import org.multiverse.utils.instrumentation.InstrumentationProblemMonitor;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -55,18 +54,6 @@ public class TestUtils {
         }
     }
 
-    public static void resetInstrumentationProblemMonitor() {
-        try {
-            Field field = InstrumentationProblemMonitor.class.getDeclaredField("problemFound");
-            field.setAccessible(true);
-            field.set(InstrumentationProblemMonitor.INSTANCE, false);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static void assertIsInterrupted(Thread t) {
         assertTrue(t.isInterrupted());
     }
@@ -102,10 +89,6 @@ public class TestUtils {
                 caller.getMethodName(), caller.getFileName(), caller.getLineNumber());
         System.out.printf("Reason: %s\n", reason);
         System.out.println("============================================================================");
-    }
-
-    public static void assertNoInstrumentationProblems() {
-        assertFalse(InstrumentationProblemMonitor.INSTANCE.isProblemFound());
     }
 
     public static void assertIsActive(Transaction... transactions) {

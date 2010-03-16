@@ -41,7 +41,6 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
                 allowWriteSkewProblem,

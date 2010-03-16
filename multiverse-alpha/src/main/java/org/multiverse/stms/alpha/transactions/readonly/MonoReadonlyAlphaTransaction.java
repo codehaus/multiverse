@@ -10,7 +10,6 @@ import org.multiverse.stms.alpha.transactions.OptimalSize;
 import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.latches.Latch;
-import org.multiverse.utils.profiling.ProfileRepository;
 
 /**
  * A tracking readonly transaction that is optimized for reading/tracking a single transactional object.
@@ -22,14 +21,12 @@ public class MonoReadonlyAlphaTransaction
 
     public static class Config extends AbstractTransactionConfig {
 
-        public final ProfileRepository profiler;
         public final OptimalSize optimalSize;
 
         public Config(PrimitiveClock clock, BackoffPolicy backoffPolicy,
-                      String familyName, ProfileRepository profiler, int maxRetryCount,
+                      String familyName, int maxRetryCount,
                       boolean interruptible, OptimalSize optimalSize) {
             super(clock, backoffPolicy, familyName, true, maxRetryCount, interruptible, false, true);
-            this.profiler = profiler;
             this.optimalSize = optimalSize;
         }
     }

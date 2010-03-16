@@ -10,7 +10,6 @@ import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
 import org.multiverse.utils.latches.Latch;
-import org.multiverse.utils.profiling.ProfileRepository;
 
 /**
  * A AbstractUpdateAlphaTransaction that can deal with a single transactional object.
@@ -25,12 +24,12 @@ public class MonoUpdateAlphaTransaction
         public final OptimalSize optimalSize;
 
         public Config(
-                PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName, ProfileRepository profiler,
+                PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName,
                 int maxRetryCount, CommitLockPolicy commitLockPolicy, boolean interruptible, OptimalSize optimalSize,
                 boolean allowWriteSkewProblem, boolean optimizeConflictDetection, boolean dirtyCheck,
                 boolean automaticReadTracking) {
             super(clock, backoffPolicy, familyName, false, maxRetryCount, interruptible, commitLockPolicy,
-                    profiler, allowWriteSkewProblem, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
+                    allowWriteSkewProblem, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
 
             this.optimalSize = optimalSize;
         }

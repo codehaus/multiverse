@@ -8,7 +8,6 @@ import org.multiverse.stms.alpha.transactions.OptimalSize;
 import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.latches.Latch;
-import org.multiverse.utils.profiling.ProfileRepository;
 
 import static java.lang.System.arraycopy;
 
@@ -17,15 +16,12 @@ public class ArrayReadonlyAlphaTransaction
 
     public static class Config extends AbstractTransactionConfig {
 
-        public final ProfileRepository profiler;
         public final OptimalSize optimalSize;
         private int maximumSize;
 
-        public Config(PrimitiveClock clock, BackoffPolicy backoffPolicy,
-                      String familyName, ProfileRepository profiler, int maxRetryCount, boolean interruptible,
+        public Config(PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName, int maxRetryCount, boolean interruptible,
                       OptimalSize optimalSize, int maximumSize) {
             super(clock, backoffPolicy, familyName, true, maxRetryCount, interruptible, false, true);
-            this.profiler = profiler;
             this.optimalSize = optimalSize;
             this.maximumSize = maximumSize;
         }

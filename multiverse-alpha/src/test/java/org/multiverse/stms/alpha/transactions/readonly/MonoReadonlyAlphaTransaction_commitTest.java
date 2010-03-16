@@ -31,7 +31,6 @@ public class MonoReadonlyAlphaTransaction_commitTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.maxRetryCount, true, optimalSize);
         return new MonoReadonlyAlphaTransaction(config);
     }

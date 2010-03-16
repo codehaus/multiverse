@@ -26,7 +26,6 @@ public class MapUpdateAlphaTransaction_prepareTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
                 false, true, true, true, true);

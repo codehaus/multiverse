@@ -4,14 +4,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalObject;
+import org.multiverse.instrumentation.InstrumentationProblemMonitor;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.instrumentation.metadata.ClassMetadata;
 import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
-import org.multiverse.utils.instrumentation.InstrumentationProblemMonitor;
 import org.objectweb.asm.Type;
 
 import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.resetInstrumentationProblemMonitor;
+import static org.multiverse.instrumentation.InstrumentationTestUtils.resetInstrumentationProblemMonitor;
 
 public class TransactionalObject_InterfaceTest {
 

@@ -31,7 +31,6 @@ public class ArrayUpdateAlphaTransaction_restartTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
                 true,

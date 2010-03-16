@@ -29,7 +29,6 @@ public class MonoReadonlyAlphaTransaction_performanceStressTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.maxRetryCount, true, optimalSize);
         return new MonoReadonlyAlphaTransaction(config);
     }

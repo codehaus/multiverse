@@ -31,7 +31,6 @@ public class NonTrackingReadonlyAlphaTransaction_commitTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.maxRetryCount);
         return new NonTrackingReadonlyAlphaTransaction(config);
     }

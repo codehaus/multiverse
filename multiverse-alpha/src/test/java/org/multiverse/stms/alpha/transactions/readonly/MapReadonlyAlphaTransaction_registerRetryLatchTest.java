@@ -34,7 +34,6 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.maxRetryCount, true);
         return new MapReadonlyAlphaTransaction(config);
     }

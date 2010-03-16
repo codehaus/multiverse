@@ -37,7 +37,6 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
                 false, true, true, true, true);

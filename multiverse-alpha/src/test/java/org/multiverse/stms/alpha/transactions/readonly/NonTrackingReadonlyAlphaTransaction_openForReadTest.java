@@ -38,7 +38,6 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.maxRetryCount);
         return new NonTrackingReadonlyAlphaTransaction(config);
     }

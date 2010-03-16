@@ -3,16 +3,16 @@ package org.multiverse.stms.alpha.instrumentation.integrationtest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.TestUtils;
 import org.multiverse.api.ThreadLocalTransaction;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
+import org.multiverse.instrumentation.InstrumentationProblemMonitor;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
-import org.multiverse.utils.instrumentation.InstrumentationProblemMonitor;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.instrumentation.InstrumentationTestUtils.resetInstrumentationProblemMonitor;
 import static org.multiverse.stms.alpha.instrumentation.AlphaReflectionUtils.*;
 
 /**
@@ -27,7 +27,7 @@ public class QueueTest {
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
         updateTxFactory = stm.getTransactionFactoryBuilder().build();
-        TestUtils.resetInstrumentationProblemMonitor();
+        resetInstrumentationProblemMonitor();
     }
 
     @After

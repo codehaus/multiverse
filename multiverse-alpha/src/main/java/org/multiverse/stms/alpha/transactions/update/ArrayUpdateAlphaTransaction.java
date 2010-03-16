@@ -11,7 +11,6 @@ import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
 import org.multiverse.utils.latches.Latch;
-import org.multiverse.utils.profiling.ProfileRepository;
 
 import static java.lang.System.arraycopy;
 
@@ -31,12 +30,12 @@ public class ArrayUpdateAlphaTransaction
 
         public Config(
                 PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName,
-                ProfileRepository profiler, CommitLockPolicy commitLockPolicy, int maxRetryCount,
+                CommitLockPolicy commitLockPolicy, int maxRetryCount,
                 boolean allowWriteSkewProblem, OptimalSize optimalSize, boolean interruptible,
                 boolean optimizeConflictDetection,
                 boolean dirtyCheck, boolean automaticReadTracking, int maximumSize) {
             super(clock, backoffPolicy, familyName, false, maxRetryCount, interruptible, commitLockPolicy,
-                    profiler, allowWriteSkewProblem, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
+                    allowWriteSkewProblem, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
 
             this.optimalSize = optimalSize;
             this.maximumSize = maximumSize;

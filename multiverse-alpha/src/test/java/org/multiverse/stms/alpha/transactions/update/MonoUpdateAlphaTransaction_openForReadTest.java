@@ -36,7 +36,6 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.maxRetryCount,
                 stmConfig.commitLockPolicy, true, optimalSize, true, true, true, true);
         return new MonoUpdateAlphaTransaction(config);
@@ -47,7 +46,6 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.maxRetryCount,
                 stmConfig.commitLockPolicy, true, optimalSize, true, true, true, false);
         return new MonoUpdateAlphaTransaction(config);

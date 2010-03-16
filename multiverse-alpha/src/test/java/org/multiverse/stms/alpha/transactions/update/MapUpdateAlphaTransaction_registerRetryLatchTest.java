@@ -40,7 +40,6 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
                 false, true, true, true, true);
@@ -52,7 +51,6 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.commitLockPolicy,
                 stmConfig.maxRetryCount,
                 true, true, true, true, false);

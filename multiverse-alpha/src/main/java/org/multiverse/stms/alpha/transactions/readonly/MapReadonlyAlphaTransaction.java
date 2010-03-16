@@ -8,7 +8,6 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.latches.Latch;
-import org.multiverse.utils.profiling.ProfileRepository;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -26,12 +25,9 @@ public class MapReadonlyAlphaTransaction
 
     public static class Config extends AbstractTransactionConfig {
 
-        public final ProfileRepository profiler;
-
         public Config(PrimitiveClock clock, BackoffPolicy backoffPolicy,
-                      String familyName, ProfileRepository profiler, int maxRetryCount, boolean interruptible) {
+                      String familyName, int maxRetryCount, boolean interruptible) {
             super(clock, backoffPolicy, familyName, true, maxRetryCount, interruptible, true, true);
-            this.profiler = profiler;
         }
     }
 

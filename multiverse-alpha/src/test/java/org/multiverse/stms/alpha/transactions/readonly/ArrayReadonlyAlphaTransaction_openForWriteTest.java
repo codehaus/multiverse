@@ -33,7 +33,6 @@ public class ArrayReadonlyAlphaTransaction_openForWriteTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.maxRetryCount, true, optimalSize, size);
 
         return new ArrayReadonlyAlphaTransaction(config, size);

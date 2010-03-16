@@ -1,9 +1,10 @@
-package org.multiverse.utils.instrumentation;
+package org.multiverse.instrumentation;
 
-import static java.lang.String.format;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import static java.lang.String.format;
 
 /**
  * A utility class for {@link Class}
@@ -13,12 +14,13 @@ import java.lang.reflect.Method;
 public class ClassUtils {
 
     //we don't want instances.
+
     private ClassUtils() {
     }
 
     private final static Method defineClassMethod;
 
-    static{
+    static {
         try {
             defineClassMethod = ClassLoader.class.getDeclaredMethod(
                     "defineClass",
@@ -42,9 +44,9 @@ public class ClassUtils {
                     0,
                     bytecode.length);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(format("A problem occurred while defining class '%s'", className),e);
+            throw new RuntimeException(format("A problem occurred while defining class '%s'", className), e);
         } catch (InvocationTargetException e) {
-            throw new RuntimeException(format("A problem occurred while defining class '%s'", className),e);
+            throw new RuntimeException(format("A problem occurred while defining class '%s'", className), e);
         }
     }
 

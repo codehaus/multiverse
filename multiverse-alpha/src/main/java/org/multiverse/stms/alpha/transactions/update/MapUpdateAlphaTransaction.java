@@ -11,7 +11,6 @@ import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.commitlock.CommitLock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
 import org.multiverse.utils.latches.Latch;
-import org.multiverse.utils.profiling.ProfileRepository;
 
 import java.util.Collection;
 import java.util.IdentityHashMap;
@@ -34,12 +33,12 @@ public class MapUpdateAlphaTransaction
 
         public Config(
                 PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName,
-                ProfileRepository profiler, CommitLockPolicy commitLockPolicy, int maxRetryCount,
+                CommitLockPolicy commitLockPolicy, int maxRetryCount,
                 boolean allowWriteSkewProblem, boolean interruptible, boolean optimizeConflictDetection, boolean dirtyCheck,
                 boolean automaticReadTracking) {
 
             super(clock, backoffPolicy, familyName, false, maxRetryCount, interruptible, commitLockPolicy,
-                    profiler, allowWriteSkewProblem, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
+                    allowWriteSkewProblem, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
         }
     }
 

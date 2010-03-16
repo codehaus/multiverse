@@ -4,13 +4,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.multiverse.TestUtils;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.stms.alpha.AlphaStm;
 
 import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
+import static org.multiverse.instrumentation.InstrumentationTestUtils.resetInstrumentationProblemMonitor;
 
 /**
  * Checks if AtomicMethods with different access modifiers are transformed correctly
@@ -21,13 +21,13 @@ public class TransactionalMethod_AccessModifierTest {
 
     @Before
     public void setUp() {
-        TestUtils.resetInstrumentationProblemMonitor();
+        resetInstrumentationProblemMonitor();
         stm = (AlphaStm) getGlobalStmInstance();
     }
 
     @After
     public void tearDown() {
-        TestUtils.resetInstrumentationProblemMonitor();
+        resetInstrumentationProblemMonitor();
     }
 
     public static void assertTransactionWorking() {

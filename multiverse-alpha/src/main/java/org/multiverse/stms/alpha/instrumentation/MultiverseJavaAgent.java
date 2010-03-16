@@ -16,8 +16,8 @@ import java.security.ProtectionDomain;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
+import static org.multiverse.instrumentation.ClassUtils.defineClass;
 import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.*;
-import static org.multiverse.utils.instrumentation.ClassUtils.defineClass;
 
 /**
  * The JavaAgent that enhances classfiles specifically for the multiverse alpha stm engine.

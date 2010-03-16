@@ -34,7 +34,6 @@ public class ArrayReadonlyAlphaTransaction_registerRetryLatchTest {
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.profiler,
                 stmConfig.maxRetryCount, true, optimalSize, size);
 
         return new ArrayReadonlyAlphaTransaction(config, size);

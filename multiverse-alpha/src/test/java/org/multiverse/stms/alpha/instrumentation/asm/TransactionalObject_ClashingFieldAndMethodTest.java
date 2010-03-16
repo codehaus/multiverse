@@ -2,7 +2,6 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.TestUtils;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Stm;
 import org.multiverse.stms.alpha.AlphaStm;
@@ -10,6 +9,7 @@ import org.multiverse.stms.alpha.AlphaStm;
 import static org.junit.Assert.fail;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.instrumentation.InstrumentationTestUtils.resetInstrumentationProblemMonitor;
 
 public class TransactionalObject_ClashingFieldAndMethodTest {
 
@@ -19,11 +19,11 @@ public class TransactionalObject_ClashingFieldAndMethodTest {
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
         clearThreadLocalTransaction();
-        TestUtils.resetInstrumentationProblemMonitor();
+        resetInstrumentationProblemMonitor();
     }
 
     public void tearDown() {
-        TestUtils.resetInstrumentationProblemMonitor();
+        resetInstrumentationProblemMonitor();
     }
 
     @Test

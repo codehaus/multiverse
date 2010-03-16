@@ -7,8 +7,6 @@ import org.multiverse.utils.clock.RelaxedPrimitiveClock;
 import org.multiverse.utils.clock.StrictPrimitiveClock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
 import org.multiverse.utils.commitlock.GenericCommitLockPolicy;
-import org.multiverse.utils.profiling.ProfileRepository;
-import org.multiverse.utils.profiling.SimpleProfileRepository;
 
 /**
  * An Object responsible for storing the configuration for an {@link AlphaStm}. So instead of having to deal with ever
@@ -36,7 +34,6 @@ public final class AlphaStmConfig {
 
     public static AlphaStmConfig createFastConfig() {
         AlphaStmConfig config = new AlphaStmConfig();
-        config.profiler = null;
         config.optimizedConflictDetection = true;
         config.smartTxImplementationChoice = true;
         config.clock = new RelaxedPrimitiveClock();
@@ -44,9 +41,6 @@ public final class AlphaStmConfig {
     }
 
     public PrimitiveClock clock = new StrictPrimitiveClock();
-
-    //nothing is done with the profiler;
-    public ProfileRepository profiler = new SimpleProfileRepository();
 
     public CommitLockPolicy commitLockPolicy =
             GenericCommitLockPolicy.FAIL_FAST_BUT_RETRY;
