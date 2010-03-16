@@ -4,7 +4,6 @@
     <name>Site of Multiverse</name>
     <description>Site of multiverse</description>
     <artifactId>multiverse-site</artifactId>
-    <version>0.5-SNAPSHOT</version>
 
     <parent>
         <groupId>org.multiverse</groupId>
@@ -33,9 +32,9 @@
                         </goals>
                         <configuration>
                             <properties>
-                                <basedir>${pom.basedir}/</basedir>
+                                <basedir>${project.basedir}/</basedir>
                             </properties>
-                            <source>${pom.basedir}/menu.groovy</source>
+                            <source>${project.basedir}/menu.groovy</source>
                         </configuration>
                     </execution>
                 </executions>
@@ -46,7 +45,6 @@
     <!-- reporting>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
                 <version>2.0-beta-7</version>
                 <configuration>
