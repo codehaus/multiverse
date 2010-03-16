@@ -97,7 +97,7 @@
 
     <modules>
         <module>multiverse-benchy</module>
-        <!-- module>multiverse-documentation</module -->
+        <module>multiverse-documentation</module>
         <module>multiverse-core</module>
         <module>multiverse-instrumentation</module>
         <module>multiverse-alpha</module>

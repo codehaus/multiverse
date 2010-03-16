@@ -1,4 +1,7 @@
+/.settings
+/.classpath
+/.project
 /target
-/multiversesite.iml
-/multiversesite.ipr
-/multiversesite.iws
+/multiverse-site.iml
+/multiverse-site.ipr
+/multiverse-site.iws
