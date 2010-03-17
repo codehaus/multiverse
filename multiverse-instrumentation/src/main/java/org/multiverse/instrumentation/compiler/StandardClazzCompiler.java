@@ -7,11 +7,17 @@ import org.multiverse.instrumentation.metadata.MetadataRepository;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static java.lang.String.format;
 
 /**
  * @author Peter Veentjer
  */
 public class StandardClazzCompiler implements ClazzCompiler {
+
+    private final static Logger logger = Logger.getLogger(StandardClazzCompiler.class.getName());
 
     private final MetadataRepository metadataRepository = new MetadataRepository();
     private final List<CompilePhase> compileSteps = new LinkedList<CompilePhase>();
@@ -20,12 +26,23 @@ public class StandardClazzCompiler implements ClazzCompiler {
     private Filer filer;
     private boolean dumpBytecode;
     private File dumpDir;
+    private String name;
+
+    public StandardClazzCompiler(String name) {
+        if (name == null) {
+            throw new NullPointerException();
+        }
+        this.name = name;
+    }
 
     protected final void add(CompilePhase phase) {
         if (compileSteps == null) {
             throw new NullPointerException();
         }
 
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("Adding CompilerPhase: " + phase.getName());
+        }
         compileSteps.add(phase);
     }
 
@@ -35,13 +52,8 @@ public class StandardClazzCompiler implements ClazzCompiler {
     }
 
     @Override
-    public void setDumpDirectory(File dumpDir) {
-        this.dumpDir = dumpDir;
-    }
-
-    @Override
-    public void prepare() {
-        //todo
+    public void setDumpDirectory(File dumpDirectory) {
+        this.dumpDir = dumpDirectory;
     }
 
     @Override
@@ -62,19 +74,44 @@ public class StandardClazzCompiler implements ClazzCompiler {
 
     @Override
     public Clazz process(Clazz clazz) {
-        if (clazz.getClassLoader() == null || isIgnoredPackage(clazz.getName())) {
+        if (clazz.getClassLoader() == null) {
+            if (logger.isLoggable(Level.FINE)) {
+                logger.info(format("Ignoring compilation of class '%s' because it is a system class", clazz.getName()));
+            }
             return clazz;
         }
 
-        Environment env = new EnvironmentImpl();
-        for (CompilePhase step : compileSteps) {
-            clazz = step.compile(env, clazz);
+        if (isExcluded(clazz.getName())) {
+            if (logger.isLoggable(Level.FINE)) {
+                logger.info(format("Ignoring compilation of class '%s' because it is excluded", clazz.getName()));
+            }
+            return clazz;
         }
 
-        return clazz;
+        if (logger.isLoggable(Level.FINE)) {
+            logger.info(format("Starting compilation of class '%s'", clazz.getName()));
+        }
+
+        Environment env = new EnvironmentImpl();
+        Clazz newClazz = clazz;
+        for (CompilePhase step : compileSteps) {
+            newClazz = step.compile(env, newClazz);
+        }
+
+        if (logger.isLoggable(Level.FINE)) {
+            if (clazz == newClazz) {
+                logger.info(format("Finished compilation of class '%s' (class was not modified)", clazz.getName()));
+            } else {
+                logger.info(format("Finished compilation of class '%s'", clazz.getName()));
+            }
+        }
+
+        return newClazz;
     }
 
-    private static boolean isIgnoredPackage(String className) {
+    //todo: ugly hack.
+
+    private static boolean isExcluded(String className) {
         return className.startsWith("java/") ||
                 className.startsWith("javax/") ||
                 className.startsWith("org/mockito") ||
@@ -114,5 +151,10 @@ public class StandardClazzCompiler implements ClazzCompiler {
         public MetadataRepository getMetadataRepository() {
             return metadataRepository;
         }
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

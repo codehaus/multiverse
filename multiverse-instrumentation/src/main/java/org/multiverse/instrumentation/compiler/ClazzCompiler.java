@@ -19,19 +19,17 @@ public interface ClazzCompiler {
 
     void setResolver(Resolver resolver);
 
-    void prepare();
+    void setDumpBytecode(boolean dumpBytecode);
+
+    void setDumpDirectory(File dumpDirectory);
 
     /**
      * Processes a clazz. If nothing needs to be processed, the provided clazz can be returned. The return
      * value should never be null.
      *
      * @param clazz the Clazz to transform.
-     * @return the transformed clazz. It is an array because additional new classes can be generated.
+     * @return the transformed clazz. If extra classes need to be generated, they are created using the Filer.
      * @throws CompileException
      */
     Clazz process(Clazz clazz);
-
-    void setDumpBytecode(boolean b);
-
-    void setDumpDirectory(File file);
 }

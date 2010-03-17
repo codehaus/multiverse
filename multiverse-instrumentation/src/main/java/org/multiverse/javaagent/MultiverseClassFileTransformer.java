@@ -49,12 +49,12 @@ public class MultiverseClassFileTransformer implements ClassFileTransformer {
         }
     }
 
-    private static void handleThrowable(String className, Throwable ex) {
+    private static void handleThrowable(String className, Throwable cause) {
         String msg = format("Failed while instrumenting class '%s'. " +
                 "It is not possible to abort the instrumentation process, so the JVM is going to continue, " +
                 "but since this class is partially instrumented, all bets are off.", className);
 
-        logger.log(Level.SEVERE, msg, ex);
-        JavaAgentProblemMonitor.INSTANCE.signalProblem();
+        logger.log(Level.SEVERE, msg, cause);
+        JavaAgentProblemMonitor.INSTANCE.signalProblem(className);
     }
 }

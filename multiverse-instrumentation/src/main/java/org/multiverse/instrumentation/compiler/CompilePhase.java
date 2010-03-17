@@ -5,6 +5,8 @@ package org.multiverse.instrumentation.compiler;
  */
 public interface CompilePhase {
 
+    String getName();
+
     /**
      * @param environment
      * @param clazz

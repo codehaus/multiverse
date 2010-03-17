@@ -25,6 +25,24 @@ public class MetadataRepositoryTest {
     }
 
     @Test
+    public void whenTransactionalInterface() {
+        ClassMetadata metadata = repository.getClassMetadata(TransactionalInterface.class);
+
+        assertNotNull(metadata);
+        assertFalse(metadata.isIgnoredClass());
+        assertTrue(metadata.isTransactionalObject());
+        assertTrue(metadata.isInterface());
+        assertFalse(metadata.isRealTransactionalObject());
+
+        assertTrue(metadata.hasTransactionalMethods());
+    }
+
+    @TransactionalObject
+    interface TransactionalInterface {
+        void someMethod();
+    }
+
+    @Test
     public void whenObjectTransactional() {
         ClassMetadata metadata = repository.getClassMetadata(Person.class);
 
@@ -32,10 +50,20 @@ public class MetadataRepositoryTest {
         assertFalse(metadata.isIgnoredClass());
         assertTrue(metadata.isTransactionalObject());
         assertTrue(metadata.isRealTransactionalObject());
+
+        assertTrue(metadata.hasTransactionalMethods());
     }
 
     @TransactionalObject
     class Person {
         int age;
+
+        public int getAge() {
+            return age;
+        }
+
+        public void setAge(int newAge) {
+            this.age = newAge;
+        }
     }
 }

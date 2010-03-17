@@ -1,9 +1,16 @@
 package org.multiverse.instrumentation.compiler;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static java.lang.String.format;
+
 /**
  * @author Peter Veentjer
  */
 public abstract class AbstractCompilePhase implements CompilePhase {
+
+    private final static Logger logger = Logger.getLogger(AbstractCompilePhase.class.getName());
 
     private final String name;
 
@@ -21,7 +28,12 @@ public abstract class AbstractCompilePhase implements CompilePhase {
 
     @Override
     public Clazz compile(Environment environment, Clazz clazz) {
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine(format("Compilephase %s is transforming class %s", name, clazz.getName()));
+        }
+
         doInit();
+
         return doCompile(environment, clazz);
     }
 

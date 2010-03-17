@@ -10,6 +10,7 @@ import org.multiverse.instrumentation.compiler.StandardClazzCompiler;
 public class AlphaClazzCompiler extends StandardClazzCompiler {
 
     public AlphaClazzCompiler() {
+        super("AlphaClazzCompiler");
         add(new JSRInlineCompilePhase());
         add(new FieldGranularityCompilePhase());
         add(new TranlocalCompilePhase());
