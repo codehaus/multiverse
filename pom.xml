@@ -19,6 +19,7 @@
     <properties>
         <sourceEncoding>UTF-8</sourceEncoding>
         <targetJdk>1.6</targetJdk>
+        <asm.version>3.2</asm.version>
     </properties>
 
     <licenses>
@@ -97,7 +98,7 @@
 
     <modules>
         <module>multiverse-benchy</module>
-        <module>multiverse-documentation</module>
+        <!-- module>multiverse-documentation</module -->
         <module>multiverse-core</module>
         <module>multiverse-instrumentation</module>
         <module>multiverse-alpha</module>

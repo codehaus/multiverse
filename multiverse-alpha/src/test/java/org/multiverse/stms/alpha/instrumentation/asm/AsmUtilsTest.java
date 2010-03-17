@@ -1,6 +1,7 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.junit.Test;
+import org.multiverse.instrumentation.asm.AsmUtils;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;

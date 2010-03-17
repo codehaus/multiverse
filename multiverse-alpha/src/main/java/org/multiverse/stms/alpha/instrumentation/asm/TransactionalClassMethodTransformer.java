@@ -4,9 +4,12 @@ import org.multiverse.api.GlobalStmInstance;
 import org.multiverse.api.Stm;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.TransactionFactoryBuilder;
+import org.multiverse.instrumentation.DebugInfo;
+import org.multiverse.instrumentation.asm.AsmUtils;
+import org.multiverse.instrumentation.asm.CloneMap;
+import org.multiverse.instrumentation.metadata.*;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
-import org.multiverse.stms.alpha.instrumentation.metadata.*;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -16,7 +19,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
-import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.*;
+import static org.multiverse.instrumentation.asm.AsmUtils.*;
 import static org.objectweb.asm.Type.*;
 
 /**
@@ -50,9 +53,9 @@ public class TransactionalClassMethodTransformer implements Opcodes {
     private final ClassLoader classLoader;
     private final Map<MethodNode, FieldNode> transactionFactoryFields = new HashMap<MethodNode, FieldNode>();
 
-    public TransactionalClassMethodTransformer(ClassLoader classLoader, ClassNode classNode, ClassNode donorClassNode) {
+    public TransactionalClassMethodTransformer(ClassLoader classLoader, ClassNode classNode, ClassNode donorClassNode, MetadataRepository metadataRepository) {
         this.classLoader = classLoader;
-        this.metadataRepository = MetadataRepository.INSTANCE;
+        this.metadataRepository = metadataRepository;
         this.classNode = classNode;
         this.classMetadata = metadataRepository.getClassMetadata(classLoader, classNode.name);
         this.tranlocalName = classMetadata.getTranlocalName();

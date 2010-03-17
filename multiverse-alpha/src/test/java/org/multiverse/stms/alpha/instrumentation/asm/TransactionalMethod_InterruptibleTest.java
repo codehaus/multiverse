@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
-import org.multiverse.instrumentation.InstrumentationProblemMonitor;
+import org.multiverse.javaagent.JavaAgentProblemMonitor;
 import org.multiverse.stms.alpha.AlphaStm;
 
 import static org.junit.Assert.assertFalse;
@@ -32,7 +32,7 @@ public class TransactionalMethod_InterruptibleTest {
     public void whenNoException_thenError() {
         MethodWithoutException o = new MethodWithoutException();
 
-        assertTrue(InstrumentationProblemMonitor.INSTANCE.isProblemFound());
+        assertTrue(JavaAgentProblemMonitor.INSTANCE.isProblemFound());
     }
 
     @TransactionalObject
@@ -52,7 +52,7 @@ public class TransactionalMethod_InterruptibleTest {
 
         MethodWithIncorrectException o = new MethodWithIncorrectException();
 
-        assertTrue(InstrumentationProblemMonitor.INSTANCE.isProblemFound());
+        assertTrue(JavaAgentProblemMonitor.INSTANCE.isProblemFound());
     }
 
     @TransactionalObject
@@ -72,7 +72,7 @@ public class TransactionalMethod_InterruptibleTest {
 
         MethodWithInterruptedException o = new MethodWithInterruptedException();
 
-        assertFalse(InstrumentationProblemMonitor.INSTANCE.isProblemFound());
+        assertFalse(JavaAgentProblemMonitor.INSTANCE.isProblemFound());
     }
 
 
@@ -93,7 +93,7 @@ public class TransactionalMethod_InterruptibleTest {
 
         MethodWithException o = new MethodWithException();
 
-        assertFalse(InstrumentationProblemMonitor.INSTANCE.isProblemFound());
+        assertFalse(JavaAgentProblemMonitor.INSTANCE.isProblemFound());
     }
 
     @TransactionalObject
@@ -113,7 +113,7 @@ public class TransactionalMethod_InterruptibleTest {
 
         MethodWithThrowable o = new MethodWithThrowable();
 
-        assertFalse(InstrumentationProblemMonitor.INSTANCE.isProblemFound());
+        assertFalse(JavaAgentProblemMonitor.INSTANCE.isProblemFound());
     }
 
     @TransactionalObject
@@ -133,7 +133,7 @@ public class TransactionalMethod_InterruptibleTest {
 
         MethodWithMultipleExceptions o = new MethodWithMultipleExceptions();
 
-        assertFalse(InstrumentationProblemMonitor.INSTANCE.isProblemFound());
+        assertFalse(JavaAgentProblemMonitor.INSTANCE.isProblemFound());
     }
 
     @TransactionalObject

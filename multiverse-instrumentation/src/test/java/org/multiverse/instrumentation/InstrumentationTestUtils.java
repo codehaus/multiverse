@@ -1,5 +1,7 @@
 package org.multiverse.instrumentation;
 
+import org.multiverse.javaagent.JavaAgentProblemMonitor;
+
 import java.lang.reflect.Field;
 
 import static org.junit.Assert.assertFalse;
@@ -11,9 +13,9 @@ public class InstrumentationTestUtils {
 
     public static void resetInstrumentationProblemMonitor() {
         try {
-            Field field = InstrumentationProblemMonitor.class.getDeclaredField("problemFound");
+            Field field = JavaAgentProblemMonitor.class.getDeclaredField("problemFound");
             field.setAccessible(true);
-            field.set(InstrumentationProblemMonitor.INSTANCE, false);
+            field.set(JavaAgentProblemMonitor.INSTANCE, false);
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
@@ -22,6 +24,6 @@ public class InstrumentationTestUtils {
     }
 
     public static void assertNoInstrumentationProblems() {
-        assertFalse(InstrumentationProblemMonitor.INSTANCE.isProblemFound());
+        assertFalse(JavaAgentProblemMonitor.INSTANCE.isProblemFound());
     }
 }

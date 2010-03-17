@@ -1,8 +1,8 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
-import org.multiverse.stms.alpha.instrumentation.metadata.ClassMetadata;
-import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
-import org.multiverse.stms.alpha.instrumentation.metadata.MethodMetadata;
+import org.multiverse.instrumentation.metadata.ClassMetadata;
+import org.multiverse.instrumentation.metadata.MetadataRepository;
+import org.multiverse.instrumentation.metadata.MethodMetadata;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -20,12 +20,12 @@ public class NonTransactionalMethodFieldAccessTransformer implements Opcodes {
     private final ClassMetadata classMetadata;
     private final ClassLoader classLoader;
 
-    public NonTransactionalMethodFieldAccessTransformer(ClassLoader classLoader, ClassNode classNode) {
+    public NonTransactionalMethodFieldAccessTransformer(ClassLoader classLoader, ClassNode classNode, MetadataRepository metadataRepository) {
         if (classLoader == null || classNode == null) {
             throw new NullPointerException();
         }
 
-        this.metadataRepository = MetadataRepository.INSTANCE;
+        this.metadataRepository = metadataRepository;
         this.classNode = classNode;
         this.classLoader = classLoader;
         this.classMetadata = metadataRepository.getClassMetadata(classLoader, classNode.name);
@@ -69,7 +69,7 @@ public class NonTransactionalMethodFieldAccessTransformer implements Opcodes {
         fixedMethod.exceptions = methodNode.exceptions;
         fixedMethod.tryCatchBlocks = new LinkedList();//originalMethod.tryCatchBlocks;
 
-        methodNode.accept(new NonTransactionalMethodFieldAccessMethodAdapter(classLoader, fixedMethod));
+        methodNode.accept(new NonTransactionalMethodFieldAccessMethodAdapter(classLoader, fixedMethod, metadataRepository));
 
         return fixedMethod;
     }

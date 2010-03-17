@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.multiverse.api.ThreadLocalTransaction;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.instrumentation.InstrumentationProblemMonitor;
+import org.multiverse.javaagent.JavaAgentProblemMonitor;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 
@@ -32,7 +32,7 @@ public class QueueTest {
 
     @After
     public void tearDown() {
-        assertFalse(InstrumentationProblemMonitor.INSTANCE.isProblemFound());
+        assertFalse(JavaAgentProblemMonitor.INSTANCE.isProblemFound());
     }
 
     @Test

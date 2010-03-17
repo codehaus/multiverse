@@ -3,8 +3,8 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalObject;
-import org.multiverse.instrumentation.InstrumentationProblemMonitor;
 import org.multiverse.instrumentation.InstrumentationTestUtils;
+import org.multiverse.javaagent.JavaAgentProblemMonitor;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
@@ -28,7 +28,7 @@ public class JmxMBeanServerRegressionTest {
     @Test
     public void test() {
         ProblemCausingObject object = new ProblemCausingObject();
-        assertFalse(InstrumentationProblemMonitor.INSTANCE.isProblemFound());
+        assertFalse(JavaAgentProblemMonitor.INSTANCE.isProblemFound());
     }
 
     @TransactionalObject

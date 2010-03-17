@@ -1,9 +1,10 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
-import org.multiverse.stms.alpha.instrumentation.metadata.ClassMetadata;
-import org.multiverse.stms.alpha.instrumentation.metadata.FieldMetadata;
-import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
-import org.multiverse.stms.alpha.instrumentation.metadata.MethodMetadata;
+import org.multiverse.instrumentation.asm.CloneMap;
+import org.multiverse.instrumentation.metadata.ClassMetadata;
+import org.multiverse.instrumentation.metadata.FieldMetadata;
+import org.multiverse.instrumentation.metadata.MetadataRepository;
+import org.multiverse.instrumentation.metadata.MethodMetadata;
 import org.multiverse.transactional.DefaultTransactionalReference;
 import org.multiverse.transactional.primitives.*;
 import org.objectweb.asm.Opcodes;
@@ -14,8 +15,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static java.lang.String.format;
-import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.firstIndexAfterSuper;
-import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.isCategory2;
+import static org.multiverse.instrumentation.asm.AsmUtils.firstIndexAfterSuper;
+import static org.multiverse.instrumentation.asm.AsmUtils.isCategory2;
 import static org.objectweb.asm.Type.*;
 
 public class FieldGranularityTransformer implements Opcodes {
@@ -25,15 +26,15 @@ public class FieldGranularityTransformer implements Opcodes {
     private final MetadataRepository metadataRepository;
     private final ClassLoader classLoader;
 
-    public FieldGranularityTransformer(ClassLoader classLoader, ClassNode classNode) {
+    public FieldGranularityTransformer(ClassLoader classLoader, ClassNode classNode, MetadataRepository metadataRepository) {
         if (classNode == null) {
             throw new RuntimeException();
         }
 
+        this.metadataRepository = metadataRepository;
         this.classLoader = classLoader;
         this.classNode = classNode;
-        this.classMetadata = MetadataRepository.INSTANCE.getClassMetadata(classLoader, classNode.name);
-        this.metadataRepository = MetadataRepository.INSTANCE;
+        this.classMetadata = metadataRepository.getClassMetadata(classLoader, classNode.name);
     }
 
     public ClassNode transform() {

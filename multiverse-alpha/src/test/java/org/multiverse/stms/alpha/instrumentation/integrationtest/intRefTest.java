@@ -4,8 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalObject;
-import org.multiverse.instrumentation.InstrumentationProblemMonitor;
-import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
+import org.multiverse.javaagent.JavaAgentProblemMonitor;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.junit.Assert.assertFalse;
@@ -26,14 +25,13 @@ public class intRefTest {
 
     @After
     public void tearDown() {
-        assertFalse(InstrumentationProblemMonitor.INSTANCE.isProblemFound());
+        assertFalse(JavaAgentProblemMonitor.INSTANCE.isProblemFound());
     }
 
     @Test
     public void testStructuralContent() {
         TransactionalInteger.class.toString();
 
-        MetadataRepository repo = MetadataRepository.INSTANCE;
         assertFalse(existsField(IntRef.class, "value"));
         assertTrue(existsTranlocalField(IntRef.class, "value"));
     }

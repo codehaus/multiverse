@@ -1,8 +1,8 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
-import org.multiverse.stms.alpha.instrumentation.metadata.ClassMetadata;
-import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
-import org.multiverse.stms.alpha.instrumentation.metadata.MethodMetadata;
+import org.multiverse.instrumentation.metadata.ClassMetadata;
+import org.multiverse.instrumentation.metadata.MetadataRepository;
+import org.multiverse.instrumentation.metadata.MethodMetadata;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
@@ -11,7 +11,7 @@ import org.objectweb.asm.tree.MethodNode;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.createMethodDescriptorWithRightIntroducedVariable;
+import static org.multiverse.instrumentation.asm.AsmUtils.createMethodDescriptorWithRightIntroducedVariable;
 
 /**
  * Responsible for transforming Transactional interfaces.
@@ -32,13 +32,13 @@ public class TransactionalInterfaceMethodTransformer {
     private final ClassMetadata classMetadata;
     private final ClassLoader classLoader;
 
-    public TransactionalInterfaceMethodTransformer(ClassLoader classLoader, ClassNode classNode) {
+    public TransactionalInterfaceMethodTransformer(ClassLoader classLoader, ClassNode classNode, MetadataRepository metadataRepository) {
         if (classLoader == null || classNode == null) {
             throw new NullPointerException();
         }
 
         this.classLoader = classLoader;
-        this.metadataRepository = MetadataRepository.INSTANCE;
+        this.metadataRepository = metadataRepository;
         this.classNode = classNode;
         this.classMetadata = metadataRepository.getClassMetadata(classLoader, classNode.name);
     }

@@ -20,8 +20,7 @@
 
     <properties>
         <multiverse.agentname>test-javaagent</multiverse.agentname>
-        <multiverse.agentclass>org.multiverse.stms.alpha.instrumentation.MultiverseJavaAgent</multiverse.agentclass>
-        <asm.version>3.2</asm.version>
+        <multiverse.agentclass>org.multiverse.javaagent.MultiverseJavaAgent</multiverse.agentclass>
     </properties>
 
     <build>

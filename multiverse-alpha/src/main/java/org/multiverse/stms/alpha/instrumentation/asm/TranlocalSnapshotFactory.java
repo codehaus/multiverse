@@ -1,10 +1,10 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
+import org.multiverse.instrumentation.metadata.ClassMetadata;
+import org.multiverse.instrumentation.metadata.FieldMetadata;
+import org.multiverse.instrumentation.metadata.MetadataRepository;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTranlocalSnapshot;
-import org.multiverse.stms.alpha.instrumentation.metadata.ClassMetadata;
-import org.multiverse.stms.alpha.instrumentation.metadata.FieldMetadata;
-import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
@@ -14,7 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static java.lang.String.format;
-import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.internalToDesc;
+import static org.multiverse.instrumentation.asm.AsmUtils.internalToDesc;
 import static org.objectweb.asm.Type.getDescriptor;
 import static org.objectweb.asm.Type.getInternalName;
 
@@ -33,8 +33,8 @@ public class TranlocalSnapshotFactory implements Opcodes {
     private final MetadataRepository metadataService;
     private final ClassMetadata classMetadata;
 
-    public TranlocalSnapshotFactory(ClassLoader classLoader, ClassNode classNode) {
-        this.metadataService = MetadataRepository.INSTANCE;
+    public TranlocalSnapshotFactory(ClassLoader classLoader, ClassNode classNode, MetadataRepository metadataRepository) {
+        this.metadataService = metadataRepository;
         this.classNode = classNode;
         this.classMetadata = metadataService.getClassMetadata(classLoader, classNode.name);
         this.tranlocalName = classMetadata.getTranlocalName();

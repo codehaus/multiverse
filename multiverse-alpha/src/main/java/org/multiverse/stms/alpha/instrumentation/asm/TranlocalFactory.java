@@ -1,11 +1,11 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
+import org.multiverse.instrumentation.metadata.ClassMetadata;
+import org.multiverse.instrumentation.metadata.FieldMetadata;
+import org.multiverse.instrumentation.metadata.MetadataRepository;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTranlocalSnapshot;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
-import org.multiverse.stms.alpha.instrumentation.metadata.ClassMetadata;
-import org.multiverse.stms.alpha.instrumentation.metadata.FieldMetadata;
-import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -17,8 +17,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static java.lang.String.format;
-import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.internalToDesc;
-import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.upgradeToProtected;
+import static org.multiverse.instrumentation.asm.AsmUtils.internalToDesc;
+import static org.multiverse.instrumentation.asm.AsmUtils.upgradeToProtected;
 import static org.objectweb.asm.Type.*;
 
 /**
@@ -38,8 +38,8 @@ public final class TranlocalFactory implements Opcodes {
     private final MetadataRepository metadataRepository;
     private final ClassLoader classLoader;
 
-    public TranlocalFactory(ClassLoader classLoader, ClassNode clazz) {
-        this.metadataRepository = MetadataRepository.INSTANCE;
+    public TranlocalFactory(ClassLoader classLoader, ClassNode clazz, MetadataRepository metadataRepository) {
+        this.metadataRepository = metadataRepository;
         this.clazz = clazz;
         this.classLoader = classLoader;
         this.clazzMetadata = metadataRepository.getClassMetadata(classLoader, clazz.name);

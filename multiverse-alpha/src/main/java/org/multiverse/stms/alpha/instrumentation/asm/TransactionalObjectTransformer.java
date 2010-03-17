@@ -1,9 +1,9 @@
 package org.multiverse.stms.alpha.instrumentation.asm;
 
+import org.multiverse.instrumentation.metadata.ClassMetadata;
+import org.multiverse.instrumentation.metadata.FieldMetadata;
+import org.multiverse.instrumentation.metadata.MetadataRepository;
 import org.multiverse.stms.alpha.AlphaTranlocal;
-import org.multiverse.stms.alpha.instrumentation.metadata.ClassMetadata;
-import org.multiverse.stms.alpha.instrumentation.metadata.FieldMetadata;
-import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.Remapper;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import static java.lang.String.format;
-import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.*;
+import static org.multiverse.instrumentation.asm.AsmUtils.*;
 
 /**
  * An object responsible for enhancing TransactionalObjects. It makes sure that an TransactionalObject implements the {@link
@@ -43,9 +43,9 @@ public class TransactionalObjectTransformer implements Opcodes {
     private final ClassNode mixinClassNode;
     private ClassMetadata classMetadata;
 
-    public TransactionalObjectTransformer(ClassLoader classLoader, ClassNode originalClass, ClassNode mixinClassNode) {
+    public TransactionalObjectTransformer(ClassLoader classLoader, ClassNode originalClass, ClassNode mixinClassNode, MetadataRepository metadataRepository) {
         this.classNode = originalClass;
-        this.classMetadata = MetadataRepository.INSTANCE.getClassMetadata(classLoader, originalClass.name);
+        this.classMetadata = metadataRepository.getClassMetadata(classLoader, originalClass.name);
         this.mixinClassNode = mixinClassNode;
     }
 

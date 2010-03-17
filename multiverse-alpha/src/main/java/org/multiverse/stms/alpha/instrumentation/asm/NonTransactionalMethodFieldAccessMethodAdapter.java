@@ -2,18 +2,18 @@ package org.multiverse.stms.alpha.instrumentation.asm;
 
 import org.multiverse.api.ThreadLocalTransaction;
 import org.multiverse.api.Transaction;
+import org.multiverse.instrumentation.metadata.FieldMetadata;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
-import org.multiverse.stms.alpha.instrumentation.metadata.ClassMetadata;
-import org.multiverse.stms.alpha.instrumentation.metadata.FieldMetadata;
-import org.multiverse.stms.alpha.instrumentation.metadata.MetadataRepository;
+import org.multiverse.instrumentation.metadata.ClassMetadata;
+import org.multiverse.instrumentation.metadata.MetadataRepository;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 import static java.lang.String.format;
-import static org.multiverse.stms.alpha.instrumentation.asm.AsmUtils.isCategory2;
+import static org.multiverse.instrumentation.asm.AsmUtils.isCategory2;
 import static org.objectweb.asm.Type.getDescriptor;
 import static org.objectweb.asm.Type.getInternalName;
 
@@ -30,10 +30,10 @@ public class NonTransactionalMethodFieldAccessMethodAdapter extends MethodAdapte
     private final MetadataRepository metadataRepository;
     private final ClassLoader classLoader;
 
-    public NonTransactionalMethodFieldAccessMethodAdapter(ClassLoader classLoader, MethodVisitor mv) {
+    public NonTransactionalMethodFieldAccessMethodAdapter(ClassLoader classLoader, MethodVisitor mv, MetadataRepository metadataRepository) {
         super(mv);
 
-        this.metadataRepository = MetadataRepository.INSTANCE;
+        this.metadataRepository = metadataRepository;
         this.classLoader = classLoader;
     }
 
