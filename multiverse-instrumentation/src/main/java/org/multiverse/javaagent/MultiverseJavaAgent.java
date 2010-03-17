@@ -2,14 +2,13 @@ package org.multiverse.javaagent;
 
 import org.multiverse.MultiverseConstants;
 import org.multiverse.instrumentation.compiler.ClazzCompiler;
+import org.multiverse.instrumentation.compiler.SystemOutLog;
 
 import java.io.File;
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
@@ -23,6 +22,7 @@ import static java.lang.System.getProperty;
  * properties:
  * org.multiverse.javaagent.compiler=org.multiverse.stms.alpha.instrumentation.AlphaCompiler
  * org.multiverse.javaagent.dumpBytecode=true/false
+ * org.multiverse.javaagent.verbose=true/false
  * org.multiverse.javaagent.dumpDirectory=directory for dumping classfiles (defaults to the tmp dir)
  * org.multiverse.javaagent.included=
  * org.multiverse.javaagent.excluded=
@@ -34,8 +34,6 @@ public class MultiverseJavaAgent {
 
     public final static String KEY = "org.multiverse.javaagent.compiler";
 
-    private final static Logger logger = Logger.getLogger(MultiverseJavaAgent.class.getName());
-
     public static void premain(String agentArgs, Instrumentation inst) throws UnmodifiableClassException {
         printInfo();
 
@@ -46,23 +44,21 @@ public class MultiverseJavaAgent {
     private static ClazzCompiler loadClazzCompiler() {
         ClazzCompiler compiler = createClazzCompiler();
 
-        compiler.setFiler(new JavaAgentFiler());
+        boolean verbose = getSystemBooleanProperty("verbose", false);
+        if (verbose) {
+            compiler.setLog(new SystemOutLog());
+        }
 
+        compiler.setFiler(new JavaAgentFiler());
         boolean dumpBytecode = getSystemBooleanProperty("dumpBytecode", false);
         compiler.setDumpBytecode(dumpBytecode);
         if (dumpBytecode) {
             String tmpDir = System.getProperty("java.io.tmpdir");
             File dumpDirectory = new File(getSystemProperty("dumpDirectory", tmpDir));
 
-            if (logger.isLoggable(Level.INFO)) {
-                logger.info(format("Bytecode will be dumped to %s", dumpDirectory.getAbsolutePath()));
-            }
+            System.out.println(format("Bytecode will be dumped to %s", dumpDirectory.getAbsolutePath()));
 
             compiler.setDumpDirectory(dumpDirectory);
-        } else {
-            if (logger.isLoggable(Level.INFO)) {
-                logger.info(format("Bytecode will not be dumped"));
-            }
         }
         return compiler;
     }
@@ -80,7 +76,7 @@ public class MultiverseJavaAgent {
                 "compiler",
                 "org.multiverse.stms.alpha.instrumentation.AlphaClazzCompiler");
 
-        logger.info(format("Using compiler '%s'", compilerClassName));
+        System.out.println(format("Using compiler '%s'", compilerClassName));
 
         Constructor constructor = getMethod(compilerClassName);
         try {
@@ -94,18 +90,18 @@ public class MultiverseJavaAgent {
             String msg = format("Failed to initialize Compiler through System property '%s' with value '%s'." +
                     "The constructor threw an exception.",
                     KEY, compilerClassName);
-            logger.info(msg);
+            System.out.println(msg);
             throw new IllegalArgumentException(msg, e);
         } catch (InstantiationException e) {
             String msg = format("Failed to initialize Compiler through System property '%s' with value '%s'." +
                     "The class could not be instantiated.",
                     KEY, compilerClassName);
-            logger.info(msg);
+            System.out.println(msg);
             throw new IllegalArgumentException(msg, e);
         }
     }
 
-    public static boolean getSystemBooleanProperty(String property, boolean defaultValue) {
+    private static boolean getSystemBooleanProperty(String property, boolean defaultValue) {
         String value = getSystemProperty(property, "" + defaultValue);
 
         if (value.equals("true")) {
@@ -118,7 +114,7 @@ public class MultiverseJavaAgent {
         }
     }
 
-    public static String getSystemProperty(String property, String defaultValue) {
+    private static String getSystemProperty(String property, String defaultValue) {
         String fullProperty = "org.multiverse.javaagent." + property;
         return getProperty(fullProperty, defaultValue);
     }
@@ -131,7 +127,7 @@ public class MultiverseJavaAgent {
             String msg = format("Failed to initialize Compiler through System property '%s' with value '%s'." +
                     "Is not an existing class (it can't be found using the Thread.currentThread.getContextClassLoader).",
                     KEY, className);
-            logger.info(msg);
+            System.out.println(msg);
             throw new IllegalArgumentException(msg, e);
         }
 
@@ -139,7 +135,7 @@ public class MultiverseJavaAgent {
             String msg = format("Failed to initialize Compiler through System property '%s' with value '%s'." +
                     "Is not an subclass of org.multiverse.compiler.ClazzCompiler).",
                     KEY, className);
-            logger.info(msg);
+            System.out.println(msg);
             throw new IllegalArgumentException(msg);
         }
 
@@ -150,7 +146,7 @@ public class MultiverseJavaAgent {
             String msg = format("Failed to initialize Compiler through System property '%s' with value '%s'." +
                     "A no arg constructor is not found.",
                     KEY, compilerClazz);
-            logger.info(msg);
+            System.out.println(msg);
             throw new IllegalArgumentException(msg, e);
         }
 

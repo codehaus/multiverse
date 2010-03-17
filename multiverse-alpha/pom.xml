@@ -97,7 +97,7 @@
                     </archive>
                 </configuration>
             </plugin>
-            <!-- plugin that integrates the asm library in the alpha library-->
+            <!-- plugin that integrates the fieldaccess library in the alpha library-->
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>

@@ -1,6 +1,5 @@
 package org.multiverse.instrumentation.compiler;
 
-import org.multiverse.instrumentation.Filer;
 import org.multiverse.instrumentation.metadata.MetadataRepository;
 
 import java.io.File;
@@ -17,14 +16,14 @@ public interface Environment {
      *
      * @return true if the class files should be dumped, false otherwise.
      */
-    boolean dumpClassFiles();
+    boolean dumpBytecode();
 
     /**
      * If verbose output should be generated.
      *
      * @return true if verbose output should be generated, false otherwise.
      */
-    boolean isVerbose();
+    Log getLog();
 
     /**
      * Returns the directory where classfiles can be dumped.

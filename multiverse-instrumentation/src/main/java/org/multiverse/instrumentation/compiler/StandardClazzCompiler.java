@@ -1,32 +1,25 @@
 package org.multiverse.instrumentation.compiler;
 
-import org.multiverse.instrumentation.Filer;
-import org.multiverse.instrumentation.Resolver;
+import org.multiverse.instrumentation.asm.AsmUtils;
 import org.multiverse.instrumentation.metadata.MetadataRepository;
 
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static java.lang.String.format;
 
 /**
  * @author Peter Veentjer
  */
 public class StandardClazzCompiler implements ClazzCompiler {
 
-    private final static Logger logger = Logger.getLogger(StandardClazzCompiler.class.getName());
-
     private final MetadataRepository metadataRepository = new MetadataRepository();
     private final List<CompilePhase> compileSteps = new LinkedList<CompilePhase>();
-    private boolean dumpClassFiles;
     private Resolver resolver;
     private Filer filer;
     private boolean dumpBytecode;
     private File dumpDir;
     private String name;
+    private Log log = new NullLog();
 
     public StandardClazzCompiler(String name) {
         if (name == null) {
@@ -40,10 +33,30 @@ public class StandardClazzCompiler implements ClazzCompiler {
             throw new NullPointerException();
         }
 
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Adding CompilerPhase: " + phase.getName());
-        }
+        // if (logger.isLoggable(Level.FINE)) {
+        //     logger.fine("Adding CompilerPhase: " + phase.getName());
+        // }
+
         compileSteps.add(phase);
+    }
+
+    @Override
+    public void addExcluded(String ignored) {
+        //todo
+    }
+
+    @Override
+    public void addIncluded(String included) {
+        //todo
+    }
+
+    @Override
+    public void setLog(Log log) {
+        if (log == null) {
+            this.log = new NullLog();
+        } else {
+            this.log = log;
+        }
     }
 
     @Override
@@ -73,40 +86,50 @@ public class StandardClazzCompiler implements ClazzCompiler {
     }
 
     @Override
-    public Clazz process(Clazz clazz) {
-        if (clazz.getClassLoader() == null) {
-            if (logger.isLoggable(Level.FINE)) {
-                logger.info(format("Ignoring compilation of class '%s' because it is a system class", clazz.getName()));
-            }
-            return clazz;
+    public Clazz process(Clazz originalClazz) {
+        if (originalClazz.getClassLoader() == null) {
+            log.important("Ignoring class '%s' because it is a system class", originalClazz.getName());
+            return originalClazz;
         }
 
-        if (isExcluded(clazz.getName())) {
-            if (logger.isLoggable(Level.FINE)) {
-                logger.info(format("Ignoring compilation of class '%s' because it is excluded", clazz.getName()));
-            }
-            return clazz;
+        if (isExcluded(originalClazz.getName())) {
+            log.important("Ignoring class '%s' because it is excluded", originalClazz.getName());
+            return originalClazz;
         }
 
-        if (logger.isLoggable(Level.FINE)) {
-            logger.info(format("Starting compilation of class '%s'", clazz.getName()));
-        }
+        log.important("Starting compilation of class '%s'", originalClazz.getName());
 
         Environment env = new EnvironmentImpl();
-        Clazz newClazz = clazz;
+        Clazz beforeClazz = originalClazz;
         for (CompilePhase step : compileSteps) {
-            newClazz = step.compile(env, newClazz);
+            Clazz afterClazz = step.compile(env, beforeClazz);
+            dump(step, beforeClazz, afterClazz);
+            beforeClazz = afterClazz;
         }
 
-        if (logger.isLoggable(Level.FINE)) {
-            if (clazz == newClazz) {
-                logger.info(format("Finished compilation of class '%s' (class was not modified)", clazz.getName()));
-            } else {
-                logger.info(format("Finished compilation of class '%s'", clazz.getName()));
-            }
+        if (originalClazz == beforeClazz) {
+            log.important("Finished compilation of class '%s' (class was not modified)", originalClazz.getName());
+        } else {
+            log.important("Finished compilation of class '%s'", originalClazz.getName());
         }
 
-        return newClazz;
+        return beforeClazz;
+    }
+
+    private void dump(CompilePhase step, Clazz beforeClazz, Clazz afterClazz) {
+        if (!dumpBytecode) {
+            return;
+        }
+
+        if (afterClazz == beforeClazz) {
+            return;
+        }
+
+        File begin = new File(dumpDir, beforeClazz.getName() + "_" + step.getName() + "_before.class");
+        AsmUtils.writeToFile(begin, beforeClazz.getBytecode());
+
+        File end = new File(dumpDir, beforeClazz.getName() + "_" + step.getName() + "_after.class");
+        AsmUtils.writeToFile(end, afterClazz.getBytecode());
     }
 
     //todo: ugly hack.
@@ -127,19 +150,24 @@ public class StandardClazzCompiler implements ClazzCompiler {
     }
 
     class EnvironmentImpl implements Environment {
+
         @Override
-        public boolean dumpClassFiles() {
-            return dumpClassFiles;
+        public boolean dumpBytecode() {
+            return dumpBytecode;
         }
 
         @Override
         public Filer getFiler() {
-            return filer;
+            if (dumpBytecode) {
+                return new DumpingFiler(filer, dumpDir);
+            } else {
+                return filer;
+            }
         }
 
         @Override
-        public boolean isVerbose() {
-            return true;
+        public Log getLog() {
+            return log;
         }
 
         @Override

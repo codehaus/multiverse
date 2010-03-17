@@ -1,8 +1,5 @@
 package org.multiverse.instrumentation.compiler;
 
-import org.multiverse.instrumentation.Filer;
-import org.multiverse.instrumentation.Resolver;
-
 import java.io.File;
 
 /**
@@ -23,13 +20,32 @@ public interface ClazzCompiler {
 
     void setDumpDirectory(File dumpDirectory);
 
+    void addExcluded(String ignored);
+
+    /**
+     * Sets the Log this ClazzCompiler uses to execute log statements on.
+     * <p/>
+     * So if you want to have verbose output, just plug in some logger.
+     *
+     * @param logger
+     */
+    void setLog(Log logger);
+
+    /**
+     * Add a pattern that is included. Default everything is included, unless it is explicitly
+     * excluded. The pattern is just the
+     *
+     * @param included
+     */
+    void addIncluded(String included);
+
     /**
      * Processes a clazz. If nothing needs to be processed, the provided clazz can be returned. The return
      * value should never be null.
      *
-     * @param clazz the Clazz to transform.
+     * @param originalClazz the Clazz to transform.
      * @return the transformed clazz. If extra classes need to be generated, they are created using the Filer.
-     * @throws CompileException
+     * @throws CompileException if something goes wrong while compile clazz.
      */
-    Clazz process(Clazz clazz);
+    Clazz process(Clazz originalClazz);
 }

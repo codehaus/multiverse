@@ -12,10 +12,10 @@ import java.util.List;
 public class Clazz {
 
     private final String name;
+    private final List<Clazz> createdList = new LinkedList<Clazz>();
     private byte[] bytecode;
     private ClassLoader classLoader;
     private Clazz original;
-    private List<Clazz> createdList = new LinkedList<Clazz>();
 
     public Clazz(String name) {
         this.name = name;
