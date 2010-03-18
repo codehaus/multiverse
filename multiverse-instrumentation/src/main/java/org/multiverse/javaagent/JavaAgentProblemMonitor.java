@@ -33,7 +33,7 @@ public final class JavaAgentProblemMonitor {
     private final boolean startLoggingDeamon;
 
     private volatile boolean problemFound;
-    private volatile List<String> problemClasses;
+    private volatile List<String> problemClasses = new LinkedList<String>();
 
     private JavaAgentProblemMonitor() {
         this.maxProblemListSize = parseInt(getProperty("org.multiverse.javaagent.problemmonitor.maxProblems", "10"));

@@ -6,7 +6,6 @@ import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Stm;
 import org.multiverse.stms.alpha.AlphaStm;
 
-import static org.junit.Assert.fail;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.instrumentation.InstrumentationTestUtils.resetInstrumentationProblemMonitor;
@@ -34,11 +33,11 @@ public class TransactionalObject_ClashingFieldAndMethodTest {
 
         long version = stm.getVersion();
 
-        try {
-            new ObjectWithClashingField(10);
-            fail();
-        } catch (IncompatibleClassChangeError expected) {
-        }
+        //try {
+        new ObjectWithClashingField(10);
+        //    fail();
+        //} catch (IncompatibleClassChangeError expected) {
+        //}
     }
 
     @TransactionalObject

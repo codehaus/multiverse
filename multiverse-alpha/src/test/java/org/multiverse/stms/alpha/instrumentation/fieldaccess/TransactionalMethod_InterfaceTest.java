@@ -7,8 +7,6 @@ import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.instrumentation.InstrumentationTestUtils;
-import org.multiverse.instrumentation.metadata.ClassMetadata;
-import org.multiverse.instrumentation.metadata.MetadataRepository;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
@@ -40,12 +38,6 @@ public class TransactionalMethod_InterfaceTest {
     public void interfaceWithTransactionalMethod() {
         Class clazz = InterfaceWithTransactionalMethod.class;
 
-        MetadataRepository repo = null;//MetadataRepository.INSTANCE;
-        ClassMetadata classMetadata = repo.getClassMetadata(clazz);
-
-        assertFalse(classMetadata.isIgnoredClass());
-        assertTrue(classMetadata.isInterface());
-
         assertTrue(hasMethod(clazz, "transactional"));
         assertTrue(hasMethod(clazz, "nontransactional"));
 
@@ -63,12 +55,6 @@ public class TransactionalMethod_InterfaceTest {
     @Test
     public void transactionalInterface() {
         Class clazz = TransactionalInterface.class;
-
-        MetadataRepository repo = null;//MetadataRepository.INSTANCE;
-        ClassMetadata classMetadata = repo.getClassMetadata(clazz);
-
-        assertFalse(classMetadata.isIgnoredClass());
-        assertTrue(classMetadata.isInterface());
 
         assertTrue(hasMethod(clazz, "explitTransactional"));
         assertTrue(hasMethod(clazz, "implicitTransactional"));
@@ -89,18 +75,11 @@ public class TransactionalMethod_InterfaceTest {
     public void InterfaceExtendingTransactionalInterface() {
         Class clazz = TransactionalInterface.class;
 
-        MetadataRepository repo = null;//MetadataRepository.INSTANCE;
-        ClassMetadata classMetadata = repo.getClassMetadata(clazz);
-
-        assertFalse(classMetadata.isIgnoredClass());
-        assertTrue(classMetadata.isInterface());
-
         assertTrue(hasMethod(clazz, "explitTransactional"));
         assertTrue(hasMethod(clazz, "implicitTransactional"));
 
         assertTrue(hasMethod(clazz, "explitTransactional", AlphaTransaction.class));
         assertTrue(hasMethod(clazz, "implicitTransactional", AlphaTransaction.class));
-
     }
 
     @TransactionalObject

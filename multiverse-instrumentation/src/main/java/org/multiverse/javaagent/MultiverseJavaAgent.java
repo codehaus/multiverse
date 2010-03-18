@@ -56,7 +56,7 @@ public class MultiverseJavaAgent {
             String tmpDir = System.getProperty("java.io.tmpdir");
             File dumpDirectory = new File(getSystemProperty("dumpDirectory", tmpDir));
 
-            System.out.println(format("Bytecode will be dumped to %s", dumpDirectory.getAbsolutePath()));
+            System.out.println(format("MultiverseJavaAgent: Bytecode will be dumped to '%s'", dumpDirectory.getAbsolutePath()));
 
             compiler.setDumpDirectory(dumpDirectory);
         }
@@ -64,7 +64,7 @@ public class MultiverseJavaAgent {
     }
 
     private static void printMultiverseJavaAgentInfo() {
-        System.out.println("Starting Multiverse JavaAgent");
+        System.out.println("MultiverseJavaAgent: Starting Multiverse JavaAgent 0.5-SNAPSHOT");
 
         if (MultiverseConstants.___SANITY_CHECKS_ENABLED) {
             System.out.println("Sanity checks are enabled.");
@@ -76,7 +76,7 @@ public class MultiverseJavaAgent {
                 "compiler",
                 "org.multiverse.stms.alpha.instrumentation.AlphaClazzCompiler");
 
-        System.out.println(format("Using compiler '%s'", compilerClassName));
+        System.out.println(format("MultiverseJavaAgent: Using compiler '%s'", compilerClassName));
 
         Constructor constructor = getMethod(compilerClassName);
         try {
