@@ -35,7 +35,7 @@ public class MultiverseJavaAgent {
     public final static String KEY = "org.multiverse.javaagent.compiler";
 
     public static void premain(String agentArgs, Instrumentation inst) throws UnmodifiableClassException {
-        printInfo();
+        printMultiverseJavaAgentInfo();
 
         ClazzCompiler compiler = loadClazzCompiler();
         inst.addTransformer(new MultiverseClassFileTransformer(compiler));
@@ -63,7 +63,7 @@ public class MultiverseJavaAgent {
         return compiler;
     }
 
-    private static void printInfo() {
+    private static void printMultiverseJavaAgentInfo() {
         System.out.println("Starting Multiverse JavaAgent");
 
         if (MultiverseConstants.___SANITY_CHECKS_ENABLED) {
