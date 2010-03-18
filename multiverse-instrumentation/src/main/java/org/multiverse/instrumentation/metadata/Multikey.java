@@ -2,7 +2,7 @@ package org.multiverse.instrumentation.metadata;
 
 import java.util.Arrays;
 
-public class Multikey {
+public final class Multikey {
     private final Object[] keys;
 
     public Multikey(Object... keys) {

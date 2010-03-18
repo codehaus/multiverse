@@ -14,7 +14,7 @@ import static java.lang.String.format;
 /**
  * @author Peter Veentjer
  */
-public class MultiverseClassFileTransformer implements ClassFileTransformer {
+public final class MultiverseClassFileTransformer implements ClassFileTransformer {
 
     private final static Logger logger = Logger.getLogger(MultiverseClassFileTransformer.class.getName());
 
@@ -51,11 +51,9 @@ public class MultiverseClassFileTransformer implements ClassFileTransformer {
     }
 
     private static void handleThrowable(String className, Throwable cause) {
-        System.out.println("MultiverseClassFileTransformer found a problem");
-
         String msg = format("Failed while instrumenting class '%s'. " +
                 "It is not possible to abort the instrumentation process, so the JVM is going to continue, " +
-                "but since this class is partially instrumented, all bets are off.", className);
+                "but since this class is not instrumented, it is not transactional so all bets are off.", className);
 
         logger.log(Level.SEVERE, msg, cause);
 

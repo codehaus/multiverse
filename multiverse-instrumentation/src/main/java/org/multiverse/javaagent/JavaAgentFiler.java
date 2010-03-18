@@ -15,7 +15,7 @@ import static org.multiverse.instrumentation.ClassUtils.defineClass;
  *
  * @author Peter Veentjer
  */
-public class JavaAgentFiler implements Filer {
+public final class JavaAgentFiler implements Filer {
 
     private final static Logger logger = Logger.getLogger(JavaAgentFiler.class.getName());
 

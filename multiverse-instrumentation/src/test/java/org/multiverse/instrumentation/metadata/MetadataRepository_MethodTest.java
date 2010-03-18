@@ -2,6 +2,7 @@ package org.multiverse.instrumentation.metadata;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.annotations.Exclude;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 
@@ -67,5 +68,24 @@ public class MetadataRepository_MethodTest {
     @TransactionalObject
     interface TransactionalInterfaceWithMethod {
         public void foo();
+    }
+
+
+    @Test
+    public void whenTransactionalObjectWithExcludedMethod() {
+        ClassMetadata classMetadata = repository.getClassMetadata(TransactionalObjectWithExcludedMethod.class);
+
+        MethodMetadata methodMetadata = classMetadata.getMethodMetadata("foo", "()V");
+        assertNotNull(methodMetadata);
+        assertFalse(methodMetadata.isTransactional());
+        assertFalse(methodMetadata.isAbstract());
+        assertFalse(methodMetadata.isConstructor());
+    }
+
+    @TransactionalObject
+    class TransactionalObjectWithExcludedMethod {
+        @Exclude
+        public void foo() {
+        }
     }
 }

@@ -93,7 +93,7 @@ public final class JavaAgentProblemMonitor {
                         "Partial instrumented classes could give unexpected results. Check the logging " +
                         "for the instrumentation exception(s).\n");
 
-                sb.append(format("List of STM problem classes: (%s max)\n", maxProblemListSize));
+                sb.append(format("List of problem classes: (%s max)\n", maxProblemListSize));
 
 
                 List<String> c = problemClasses;

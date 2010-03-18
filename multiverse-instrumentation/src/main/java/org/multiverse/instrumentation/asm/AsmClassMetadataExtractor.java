@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Peter Veentjer.
  */
-public class AsmClassMetadataExtractor implements ClassMetadataExtractor {
+public final class AsmClassMetadataExtractor implements ClassMetadataExtractor {
 
     private MetadataRepository metadataRepository;
 
@@ -33,10 +33,6 @@ public class AsmClassMetadataExtractor implements ClassMetadataExtractor {
 
     @Override
     public ClassMetadata extract(String className, ClassLoader classLoader) {
-        if (metadataRepository == null) {
-            throw new IllegalStateException("metadataRepository is not initialized");
-        }
-
         if (className == null) {
             throw new NullPointerException();
         }

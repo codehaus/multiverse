@@ -8,12 +8,10 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.commons.RemappingMethodAdapter;
 import org.objectweb.asm.tree.*;
-import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceMethodVisitor;
 
 import java.io.*;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -129,11 +127,9 @@ public final class AsmUtils implements Opcodes {
 
         int depth = 0;
         for (int k = 0; k < instructions.size(); k++) {
-            AbstractInsnNode insn = (AbstractInsnNode) instructions.get(k);
-            //System.out.println(insn+" opcode: "+insn.getOpcode());
+            AbstractInsnNode insn = instructions.get(k);
             if (insn.getOpcode() == INVOKESPECIAL) {
                 MethodInsnNode methodInsn = (MethodInsnNode) insn;
-                //System.out.printf("method %s.%s\n",methodInsn.owner,methodInsn.name);
                 if (methodInsn.name.equals("<init>") && methodInsn.owner.endsWith(superClass)) {
                     if (depth == 0) {
                         return k + 1;
@@ -168,37 +164,11 @@ public final class AsmUtils implements Opcodes {
         return sb.toString();
     }
 
-
-    public static int firstFreeIndex(MethodNode methodNode) {
-        int firstFreeIndex = 0;
-
-        for (LocalVariableNode localVariableNode : (List<LocalVariableNode>) methodNode.localVariables) {
-            firstFreeIndex += isCategory2(localVariableNode.desc) ? 2 : 1;
-        }
-
-        return firstFreeIndex;
-    }
-
-    public static int sizeOfFormalParameters(MethodNode methodNode) {
-        return sizeOfFormalParameters(methodNode.desc);
-    }
-
     public static int sizeOfFormalParameters(String desc) {
         int size = 0;
 
         for (Type argType : Type.getArgumentTypes(desc)) {
             size += argType.getSize();
-        }
-
-        return size;
-    }
-
-
-    public static int sizeOfLocalVariables(List<LocalVariableNode> localVariables) {
-        int size = 0;
-
-        for (LocalVariableNode localVariableNode : localVariables) {
-            size += isCategory2(localVariableNode.desc) ? 2 : 1;
         }
 
         return size;
@@ -239,23 +209,6 @@ public final class AsmUtils implements Opcodes {
         return access + ACC_PROTECTED;
     }
 
-
-    /**
-     * A new constructor descriptor is created by adding the extraArgType as the first argument (so the other arguments
-     * all shift one pos to the right).
-     *
-     * @param methodDesc   the old method description
-     * @param extraArgType the internal name of the type to introduce
-     * @return the new method description.
-     */
-    public static String createMethodDescriptorWithLeftIntroducedVariable(String methodDesc, String extraArgType) {
-        Type[] oldArgTypes = Type.getArgumentTypes(methodDesc);
-        Type[] newArgTypes = new Type[oldArgTypes.length + 1];
-        newArgTypes[0] = Type.getObjectType(extraArgType);
-        System.arraycopy(oldArgTypes, 0, newArgTypes, 1, oldArgTypes.length);
-        Type returnType = Type.getReturnType(methodDesc);
-        return Type.getMethodDescriptor(returnType, newArgTypes);
-    }
 
     /**
      * @param methodDesc   the original method descriptor
@@ -301,33 +254,6 @@ public final class AsmUtils implements Opcodes {
         return exceptions;
     }
 
-    public static void verify(ClassNode classNode) {
-        verify(toBytecode(classNode));
-    }
-
-    /**
-     * Checks if the bytecode is valid.
-     *
-     * @param bytes the bytecode to check.
-     */
-    public static void verify(byte[] bytes) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-
-        CheckClassAdapter.verify(new ClassReader(bytes), false, pw);
-        String msg = sw.toString();
-        if (msg.length() > 0) {
-            throw new RuntimeException(msg);
-        }
-    }
-
-    public static void printVariableTable(List<LocalVariableNode> variables) {
-        System.out.println("LocalVariables size = " + variables.size());
-        for (LocalVariableNode localVariableNode : variables) {
-            System.out.println(
-                    "\t" + localVariableNode.name + " " + localVariableNode.desc + " " + localVariableNode.index);
-        }
-    }
 
     /**
      * Loads a Class as ClassNode. The ClassLoader of the Class is used to retrieve a resource stream.
@@ -402,15 +328,6 @@ public final class AsmUtils implements Opcodes {
 
     public static String internalToDesc(String internalForm) {
         return format("L%s;", internalForm);
-    }
-
-
-    public static Method getMethod(Class clazz, String methodName, Class<?>... parameterTypes) {
-        try {
-            return clazz.getMethod(methodName, parameterTypes);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public static Field getField(Class clazz, String fieldName) {

@@ -25,6 +25,7 @@ public class MetadataRepository_FieldTest {
 
         FieldMetadata fieldMetadata = classMetadata.getFieldMetadata("field");
         assertNotNull(fieldMetadata);
+        assertEquals("field", fieldMetadata.getName());
         assertTrue(fieldMetadata.isManagedField());
     }
 
@@ -47,5 +48,36 @@ public class MetadataRepository_FieldTest {
     class TransactionalObjectWithExcludedField {
         @Exclude
         int field;
+    }
+
+    @Test
+    public void whenTransactionalObjectWithFinalField() {
+        ClassMetadata classMetadata = repository.getClassMetadata(TransactionalObjectWithFinalField.class);
+        assertFalse(classMetadata.isRealTransactionalObject());
+
+        FieldMetadata fieldMetadata = classMetadata.getFieldMetadata("field");
+        assertNotNull(fieldMetadata);
+        assertFalse(fieldMetadata.isManagedField());
+    }
+
+    @TransactionalObject
+    class TransactionalObjectWithFinalField {
+        final int field = 10;
+    }
+
+    @Test
+    public void whenTransactionalObjectWithVolatileField() {
+        ClassMetadata classMetadata = repository.getClassMetadata(TransactionalObjectWithVolatileField.class);
+        assertFalse(classMetadata.isRealTransactionalObject());
+
+        FieldMetadata fieldMetadata = classMetadata.getFieldMetadata("field");
+        assertNotNull(fieldMetadata);
+        assertFalse(fieldMetadata.isManagedField());
+
+    }
+
+    @TransactionalObject
+    class TransactionalObjectWithVolatileField {
+        volatile int field;
     }
 }

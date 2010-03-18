@@ -30,7 +30,7 @@ import static java.lang.System.getProperty;
  *
  * @author Peter Veentjer
  */
-public class MultiverseJavaAgent {
+public final class MultiverseJavaAgent {
 
     public final static String KEY = "org.multiverse.javaagent.compiler";
 
