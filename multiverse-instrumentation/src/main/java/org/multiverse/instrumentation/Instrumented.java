@@ -3,5 +3,8 @@ package org.multiverse.instrumentation;
 /**
  * @author Peter Veentjer
  */
-public class Instrumented {
+public @interface Instrumented {
+    String compilerName();
+
+    String compilerVersion();
 }

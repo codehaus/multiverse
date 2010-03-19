@@ -14,18 +14,22 @@ public class StandardClazzCompiler implements ClazzCompiler {
 
     private final MetadataRepository metadataRepository = new MetadataRepository();
     private final List<CompilePhase> compileSteps = new LinkedList<CompilePhase>();
+    private final String name;
+    private final String version;
     private Resolver resolver;
     private Filer filer;
     private boolean dumpBytecode;
     private File dumpDir;
-    private String name;
+
     private Log log = new NullLog();
 
-    public StandardClazzCompiler(String name) {
-        if (name == null) {
+
+    public StandardClazzCompiler(String name, String version) {
+        if (name == null || version == null) {
             throw new NullPointerException();
         }
         this.name = name;
+        this.version = version;
     }
 
     protected final void add(CompilePhase phase) {
@@ -38,6 +42,16 @@ public class StandardClazzCompiler implements ClazzCompiler {
         // }
 
         compileSteps.add(phase);
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getVersion() {
+        return version;
     }
 
     @Override
@@ -183,6 +197,6 @@ public class StandardClazzCompiler implements ClazzCompiler {
 
     @Override
     public String toString() {
-        return name;
+        return name + "-" + version;
     }
 }

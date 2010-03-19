@@ -58,4 +58,109 @@ public class MetadataRepository_TransactionTest {
         void method() {
         }
     }
+
+    @Test
+    public void whenAutomaticReadTracking() {
+        ClassMetadata classMetadata = repository.getClassMetadata(AutomaticReadTracking.class);
+        MethodMetadata enabledMethodMetadata = classMetadata.getMethodMetadata("enabled", "()V");
+        TransactionMetadata enabledTransactionMetadata = enabledMethodMetadata.getTransactionalMetadata();
+
+        assertNotNull(enabledTransactionMetadata);
+        assertTrue(enabledTransactionMetadata.automaticReadTracking);
+
+        MethodMetadata disabledMethodMetadata = classMetadata.getMethodMetadata("disabled", "()V");
+
+        TransactionMetadata disabledTransactionMetadata = disabledMethodMetadata.getTransactionalMetadata();
+        assertNotNull(disabledTransactionMetadata);
+        assertFalse(disabledTransactionMetadata.automaticReadTracking);
+    }
+
+    class AutomaticReadTracking {
+        @TransactionalMethod(automaticReadTracking = true)
+        void enabled() {
+        }
+
+        @TransactionalMethod(automaticReadTracking = false)
+        void disabled() {
+        }
+    }
+
+    @Test
+    public void whenInterrupted() {
+        ClassMetadata classMetadata = repository.getClassMetadata(Interrupted.class);
+        MethodMetadata enabledMethodMetadata = classMetadata.getMethodMetadata("enabled", "()V");
+        TransactionMetadata enabledTransactionMetadata = enabledMethodMetadata.getTransactionalMetadata();
+
+        assertNotNull(enabledTransactionMetadata);
+        assertTrue(enabledTransactionMetadata.interruptible);
+
+        MethodMetadata disabledMethodMetadata = classMetadata.getMethodMetadata("disabled", "()V");
+
+        TransactionMetadata disabledTransactionMetadata = disabledMethodMetadata.getTransactionalMetadata();
+        assertNotNull(disabledTransactionMetadata);
+        assertFalse(disabledTransactionMetadata.interruptible);
+    }
+
+    class Interrupted {
+        @TransactionalMethod(interruptible = true)
+        void enabled() throws InterruptedException {
+        }
+
+        @TransactionalMethod(automaticReadTracking = false)
+        void disabled() {
+        }
+    }
+
+
+    @Test
+    public void whenAllowWriteSkewProblem() {
+        ClassMetadata classMetadata = repository.getClassMetadata(AllowWriteSkewProblem.class);
+        MethodMetadata enabledMethodMetadata = classMetadata.getMethodMetadata("enabled", "()V");
+        TransactionMetadata enabledTransactionMetadata = enabledMethodMetadata.getTransactionalMetadata();
+
+        assertNotNull(enabledTransactionMetadata);
+        assertTrue(enabledTransactionMetadata.allowWriteSkewProblem);
+
+        MethodMetadata disabledMethodMetadata = classMetadata.getMethodMetadata("disabled", "()V");
+
+        TransactionMetadata disabledTransactionMetadata = disabledMethodMetadata.getTransactionalMetadata();
+        assertNotNull(disabledTransactionMetadata);
+        assertFalse(disabledTransactionMetadata.allowWriteSkewProblem);
+    }
+
+    class AllowWriteSkewProblem {
+        @TransactionalMethod(automaticReadTracking = true, allowWriteSkewProblem = true)
+        void enabled() {
+        }
+
+        @TransactionalMethod(automaticReadTracking = true, allowWriteSkewProblem = false)
+        void disabled() {
+        }
+    }
+
+    @Test
+    public void whenMaxRetryCount() {
+        ClassMetadata classMetadata = repository.getClassMetadata(MaxRetryCountProblem.class);
+        MethodMetadata explicitValueMethodMetadata = classMetadata.getMethodMetadata("explicitValue", "()V");
+        TransactionMetadata explicitValueTransactionMetadata = explicitValueMethodMetadata.getTransactionalMetadata();
+
+        assertNotNull(explicitValueTransactionMetadata);
+        assertEquals(100, explicitValueTransactionMetadata.maxRetryCount);
+
+        MethodMetadata defaultValueMethodMetadata = classMetadata.getMethodMetadata("defaultValue", "()V");
+
+        TransactionMetadata defaultValueTransactionMetadata = defaultValueMethodMetadata.getTransactionalMetadata();
+        assertNotNull(defaultValueTransactionMetadata);
+        assertEquals(1000, defaultValueTransactionMetadata.maxRetryCount);
+    }
+
+    class MaxRetryCountProblem {
+        @TransactionalMethod(maxRetryCount = 100)
+        void explicitValue() {
+        }
+
+        @TransactionalMethod
+        void defaultValue() {
+        }
+    }
 }

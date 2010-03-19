@@ -17,7 +17,7 @@ import org.multiverse.stms.alpha.instrumentation.transactionalobject.Transaction
 public class AlphaClazzCompiler extends StandardClazzCompiler {
 
     public AlphaClazzCompiler() {
-        super("AlphaClazzCompiler");
+        super("AlphaClazzCompiler", "0.5-SNAPSHOT");
 
         add(new JSRInlineCompilePhase());
         add(new FieldGranularityCompilePhase());
