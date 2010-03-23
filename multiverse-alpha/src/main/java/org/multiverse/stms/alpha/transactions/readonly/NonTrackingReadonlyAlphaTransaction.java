@@ -1,12 +1,9 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.stms.AbstractTransactionConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.utils.backoff.BackoffPolicy;
-import org.multiverse.utils.clock.PrimitiveClock;
 
 /**
  * A readonly {@link org.multiverse.stms.alpha.transactions.AlphaTransaction} implementation that doesn't track reads.
@@ -34,23 +31,13 @@ import org.multiverse.utils.clock.PrimitiveClock;
  * @author Peter Veentjer.
  */
 public class NonTrackingReadonlyAlphaTransaction
-        extends AbstractReadonlyAlphaTransaction<NonTrackingReadonlyAlphaTransaction.Config> {
-
-    public static class Config extends AbstractTransactionConfig {
-
-        public Config(
-                PrimitiveClock clock, BackoffPolicy backoffPolicy,
-                String familyName,
-                int maxRetryCount) {
-            super(clock, backoffPolicy, familyName, true, maxRetryCount, false, false, false);
-        }
-    }
+        extends AbstractReadonlyAlphaTransaction<ReadonlyAlphaTransactionConfig> {
 
     public static class Factory implements TransactionFactory<AlphaTransaction> {
 
-        private final Config config;
+        private final ReadonlyAlphaTransactionConfig config;
 
-        public Factory(Config config) {
+        public Factory(ReadonlyAlphaTransactionConfig config) {
             this.config = config;
         }
 
@@ -60,7 +47,7 @@ public class NonTrackingReadonlyAlphaTransaction
         }
     }
 
-    public NonTrackingReadonlyAlphaTransaction(Config config) {
+    public NonTrackingReadonlyAlphaTransaction(ReadonlyAlphaTransactionConfig config) {
         super(config);
         init();
     }

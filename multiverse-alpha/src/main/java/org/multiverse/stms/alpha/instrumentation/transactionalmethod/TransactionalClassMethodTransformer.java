@@ -199,12 +199,12 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                 "setAllowWriteSkewProblem",
                 "(Z)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
 
-        //smartTxLength.
-        insnList.add(new InsnNode(transactionMetadata.smartTxLengthSelector ? ICONST_1 : ICONST_0));
+        //speculativeConfigurationEnabled
+        insnList.add(new InsnNode(transactionMetadata.speculativeConfigurationEnabled ? ICONST_1 : ICONST_0));
         insnList.add(new MethodInsnNode(
                 INVOKEINTERFACE,
                 Type.getInternalName(TransactionFactoryBuilder.class),
-                "setSmartTxLengthSelector",
+                "setSpeculativeConfigurationEnabled",
                 "(Z)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
 
         //familyName

@@ -1,15 +1,11 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.multiverse.api.exceptions.PanicError;
-import org.multiverse.api.exceptions.TransactionTooSmallError;
+import org.multiverse.api.exceptions.SpeculativeConfigFailure;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.UncommittedFilter;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
 import org.multiverse.utils.Listeners;
-import org.multiverse.utils.backoff.BackoffPolicy;
-import org.multiverse.utils.clock.PrimitiveClock;
-import org.multiverse.utils.commitlock.CommitLockPolicy;
 import org.multiverse.utils.latches.Latch;
 
 import static java.lang.System.arraycopy;
@@ -21,32 +17,13 @@ import static java.lang.System.arraycopy;
  * @author Peter Veentjer
  */
 public class ArrayUpdateAlphaTransaction
-        extends AbstractUpdateAlphaTransaction<ArrayUpdateAlphaTransaction.Config> {
-
-    public static class Config extends AbstractUpdateAlphaTransactionConfig {
-
-        public final OptimalSize optimalSize;
-        public final int maximumSize;
-
-        public Config(
-                PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName,
-                CommitLockPolicy commitLockPolicy, int maxRetryCount,
-                boolean allowWriteSkewProblem, OptimalSize optimalSize, boolean interruptible,
-                boolean optimizeConflictDetection,
-                boolean dirtyCheck, boolean automaticReadTracking, int maximumSize) {
-            super(clock, backoffPolicy, familyName, false, maxRetryCount, interruptible, commitLockPolicy,
-                    allowWriteSkewProblem, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
-
-            this.optimalSize = optimalSize;
-            this.maximumSize = maximumSize;
-        }
-    }
+        extends AbstractUpdateAlphaTransaction<UpdateAlphaTransactionConfig> {
 
     private AlphaTranlocal[] attachedArray;
 
     private int firstFreeIndex;
 
-    public ArrayUpdateAlphaTransaction(Config config, int size) {
+    public ArrayUpdateAlphaTransaction(UpdateAlphaTransactionConfig config, int size) {
         super(config);
         attachedArray = new AlphaTranlocal[size];
         init();
@@ -117,8 +94,8 @@ public class ArrayUpdateAlphaTransaction
         if (firstFreeIndex == attachedArray.length) {
             int newOptimalSize = attachedArray.length + 2;
             config.optimalSize.compareAndSet(attachedArray.length, newOptimalSize);
-            if (attachedArray.length >= config.maximumSize) {
-                throw TransactionTooSmallError.INSTANCE;
+            if (attachedArray.length >= config.optimalSize.getMaximumSize()) {
+                throw SpeculativeConfigFailure.INSTANCE;
             }
 
             AlphaTranlocal[] newAttachedArray = new AlphaTranlocal[newOptimalSize];

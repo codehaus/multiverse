@@ -6,6 +6,7 @@ import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
+import org.multiverse.stms.alpha.transactions.OptimalSize;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.assertIsAborted;
@@ -25,11 +26,13 @@ public class NonTrackingReadonlyAlphaTransaction_abortTest {
     }
 
     public NonTrackingReadonlyAlphaTransaction startSutTransaction() {
-        NonTrackingReadonlyAlphaTransaction.Config config = new NonTrackingReadonlyAlphaTransaction.Config(
+        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.maxRetryCount);
+                new OptimalSize(10, 100),
+                stmConfig.maxRetryCount, false, false);
+
         return new NonTrackingReadonlyAlphaTransaction(config);
     }
 

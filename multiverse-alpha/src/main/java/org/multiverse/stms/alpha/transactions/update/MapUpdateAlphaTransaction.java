@@ -6,10 +6,7 @@ import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.UncommittedFilter;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.utils.Listeners;
-import org.multiverse.utils.backoff.BackoffPolicy;
-import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.commitlock.CommitLock;
-import org.multiverse.utils.commitlock.CommitLockPolicy;
 import org.multiverse.utils.latches.Latch;
 
 import java.util.Collection;
@@ -27,26 +24,13 @@ import java.util.Map;
  * @author Peter Veentjer.
  */
 public class MapUpdateAlphaTransaction
-        extends AbstractUpdateAlphaTransaction<MapUpdateAlphaTransaction.Config> {
-
-    public static class Config extends AbstractUpdateAlphaTransactionConfig {
-
-        public Config(
-                PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName,
-                CommitLockPolicy commitLockPolicy, int maxRetryCount,
-                boolean allowWriteSkewProblem, boolean interruptible, boolean optimizeConflictDetection, boolean dirtyCheck,
-                boolean automaticReadTracking) {
-
-            super(clock, backoffPolicy, familyName, false, maxRetryCount, interruptible, commitLockPolicy,
-                    allowWriteSkewProblem, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
-        }
-    }
+        extends AbstractUpdateAlphaTransaction<UpdateAlphaTransactionConfig> {
 
     public static class Factory implements TransactionFactory<AlphaTransaction> {
 
-        public final Config config;
+        public final UpdateAlphaTransactionConfig config;
 
-        public Factory(Config config) {
+        public Factory(UpdateAlphaTransactionConfig config) {
             this.config = config;
         }
 
@@ -59,7 +43,7 @@ public class MapUpdateAlphaTransaction
     private final Map<AlphaTransactionalObject, AlphaTranlocal> attachedMap =
             new IdentityHashMap<AlphaTransactionalObject, AlphaTranlocal>(30);
 
-    public MapUpdateAlphaTransaction(Config config) {
+    public MapUpdateAlphaTransaction(UpdateAlphaTransactionConfig config) {
         super(config);
         init();
         //todo: the size of the attachedMap could be chosen a littlebit better

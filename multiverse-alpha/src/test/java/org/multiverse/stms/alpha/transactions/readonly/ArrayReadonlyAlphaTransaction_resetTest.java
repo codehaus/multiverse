@@ -18,24 +18,20 @@ public class ArrayReadonlyAlphaTransaction_resetTest {
 
     private AlphaStm stm;
     private AlphaStmConfig stmConfig;
-    private OptimalSize optimalSize;
 
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
         stm = new AlphaStm(stmConfig);
-        optimalSize = new OptimalSize(1);
     }
 
     public ArrayReadonlyAlphaTransaction startTransactionUnderTest(int size) {
-        optimalSize.set(size);
-
-        ArrayReadonlyAlphaTransaction.Config config = new ArrayReadonlyAlphaTransaction.Config(
+        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.maxRetryCount, true, optimalSize, size);
-
+                new OptimalSize(size, 100),
+                stmConfig.maxRetryCount, false, true);
         return new ArrayReadonlyAlphaTransaction(config, size);
     }
 

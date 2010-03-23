@@ -3,8 +3,8 @@ package org.multiverse.templates;
 import org.multiverse.api.*;
 import org.multiverse.api.exceptions.ControlFlowError;
 import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.exceptions.SpeculativeConfigFailure;
 import org.multiverse.api.exceptions.TooManyRetriesException;
-import org.multiverse.api.exceptions.TransactionTooSmallError;
 import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.latches.CheapLatch;
 import org.multiverse.utils.latches.Latch;
@@ -306,7 +306,7 @@ public abstract class TransactionTemplate<E> {
                     if (attempt - 1 < tx.getConfig().getMaxRetryCount()) {
                         awaitWriteAndRestart(tx);
                     }
-                } catch (TransactionTooSmallError ex) {
+                } catch (SpeculativeConfigFailure ex) {
                     tx = txFactory.start();
                     if (threadLocalAware) {
                         setThreadLocalTransaction(tx);

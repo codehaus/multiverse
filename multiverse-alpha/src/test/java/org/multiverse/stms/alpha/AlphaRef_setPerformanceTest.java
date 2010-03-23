@@ -1,5 +1,6 @@
 package org.multiverse.stms.alpha;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
@@ -13,6 +14,7 @@ public class AlphaRef_setPerformanceTest {
 
     private long transactionCount = ((long) 1000) * 1000 * 1000;
 
+    @Before
     public void setUp() {
         clearThreadLocalTransaction();
     }

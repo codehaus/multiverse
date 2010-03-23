@@ -29,11 +29,12 @@ public class ArrayReadonlyAlphaTransaction_openForWriteTest {
     public ArrayReadonlyAlphaTransaction startTransactionUnderTest(int size) {
         optimalSize.set(size);
 
-        ArrayReadonlyAlphaTransaction.Config config = new ArrayReadonlyAlphaTransaction.Config(
+        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.maxRetryCount, true, optimalSize, size);
+                new OptimalSize(1, 100),
+                stmConfig.maxRetryCount, false, true);
 
         return new ArrayReadonlyAlphaTransaction(config, size);
     }

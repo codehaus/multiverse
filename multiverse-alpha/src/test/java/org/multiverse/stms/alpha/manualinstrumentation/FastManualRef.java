@@ -4,8 +4,8 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.ControlFlowError;
+import org.multiverse.api.exceptions.SpeculativeConfigFailure;
 import org.multiverse.api.exceptions.TooManyRetriesException;
-import org.multiverse.api.exceptions.TransactionTooSmallError;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.mixins.FastTxObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
@@ -101,7 +101,7 @@ public class FastManualRef extends FastTxObjectMixin {
 
                     tx.commit();
                     return;
-                } catch (TransactionTooSmallError ex) {
+                } catch (SpeculativeConfigFailure ex) {
                     tx = (AlphaTransaction) txFactory.start();
                 } catch (ControlFlowError throwable) {
                     tx.getConfig().getBackoffPolicy().delayedUninterruptible(tx, attempt);
@@ -136,7 +136,7 @@ public class FastManualRef extends FastTxObjectMixin {
 
                 tx.commit();
                 return;
-            } catch (TransactionTooSmallError ex) {
+            } catch (SpeculativeConfigFailure ex) {
                 tx = (AlphaTransaction) txFactory.start();
             } catch (ControlFlowError throwable) {
                 tx.getConfig().getBackoffPolicy().delayedUninterruptible(tx, attempt);

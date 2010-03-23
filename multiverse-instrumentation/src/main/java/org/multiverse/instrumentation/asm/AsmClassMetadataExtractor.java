@@ -263,10 +263,10 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor {
 
         if (methodNode.name.equals("<init>")) {
             transactionMetadata.maxRetryCount = 0;
-            transactionMetadata.smartTxLengthSelector = false;
+            transactionMetadata.speculativeConfigurationEnabled = false;
         } else {
             transactionMetadata.maxRetryCount = 1000;
-            transactionMetadata.smartTxLengthSelector = true;
+            transactionMetadata.speculativeConfigurationEnabled = true;
         }
 
         return transactionMetadata;
@@ -295,10 +295,10 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor {
 
         if (methodNode.name.equals("<init>")) {
             transactionMetadata.maxRetryCount = (Integer) getValue(annotationNode, "maxRetryCount", 0);
-            transactionMetadata.smartTxLengthSelector = false;
+            transactionMetadata.speculativeConfigurationEnabled = false;
         } else {
             transactionMetadata.maxRetryCount = (Integer) getValue(annotationNode, "maxRetryCount", 1000);
-            transactionMetadata.smartTxLengthSelector = true;
+            transactionMetadata.speculativeConfigurationEnabled = true;
         }
 
         return transactionMetadata;

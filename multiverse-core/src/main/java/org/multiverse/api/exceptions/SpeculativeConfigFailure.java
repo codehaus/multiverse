@@ -12,25 +12,25 @@ import static java.lang.System.getProperty;
  *
  * @author Peter Veentjer.
  */
-public class TransactionTooSmallError extends ControlFlowError {
+public class SpeculativeConfigFailure extends ControlFlowError {
 
     public final static boolean reuse = parseBoolean(getProperty(
-            TransactionTooSmallError.class.getName() + ".reuse", "true"));
+            SpeculativeConfigFailure.class.getName() + ".reuse", "true"));
 
-    public static final TransactionTooSmallError INSTANCE = new TransactionTooSmallError();
+    public static final SpeculativeConfigFailure INSTANCE = new SpeculativeConfigFailure();
 
-    public TransactionTooSmallError() {
+    public SpeculativeConfigFailure() {
     }
 
-    public TransactionTooSmallError(String message) {
+    public SpeculativeConfigFailure(String message) {
         super(message);
     }
 
-    public TransactionTooSmallError(String message, Throwable cause) {
+    public SpeculativeConfigFailure(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public TransactionTooSmallError(Throwable cause) {
+    public SpeculativeConfigFailure(Throwable cause) {
         super(cause);
     }
 }

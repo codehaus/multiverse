@@ -57,7 +57,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin {
     private final static TransactionFactory getOrAwaitTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
             .setReadonly(true)
             .setFamilyName(AlphaRef.class.getName() + ".getOrAwait()")
-            .setSmartTxLengthSelector(true)
+            .setSpeculativeConfigurationEnabled(true)
             .setAutomaticReadTracking(true).build();
 
     private static final PrimitiveClock clock = ((AlphaStm) getGlobalStmInstance()).getClock();

@@ -76,7 +76,7 @@ public class LargeNonParallelWriteonlyTransactionsStressTest {
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
                 .setFamilyName(getClass().getName() + ".test()")
-                .setSmartTxLengthSelector(true)
+                .setSpeculativeConfigurationEnabled(true)
                 .setAutomaticReadTracking(false).build();
 
         new TransactionTemplate(txFactory) {

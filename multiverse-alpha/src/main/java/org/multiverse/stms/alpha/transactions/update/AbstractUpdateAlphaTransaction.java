@@ -18,7 +18,7 @@ import static java.lang.String.format;
  *
  * @author Peter Veentjer.
  */
-public abstract class AbstractUpdateAlphaTransaction<C extends AbstractUpdateAlphaTransactionConfig>
+public abstract class AbstractUpdateAlphaTransaction<C extends UpdateAlphaTransactionConfig>
         extends AbstractAlphaTransaction<C, AbstractTransactionSnapshot> {
 
     private long writeVersion;

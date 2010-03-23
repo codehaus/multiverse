@@ -28,7 +28,7 @@ public class TransactionTemplate_growingTransactionsTest {
         txFactory = stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
                 .setFamilyName(getClass().getName())
-                .setSmartTxLengthSelector(true).build();
+                .setSpeculativeConfigurationEnabled(true).build();
 
         refs = new TransactionalInteger[refCount];
         for (int k = 0; k < refs.length; k++) {

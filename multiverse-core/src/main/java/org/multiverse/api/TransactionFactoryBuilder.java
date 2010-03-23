@@ -90,10 +90,10 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      * for the correct transaction length. Constructors are not able to deal with
      * retrying tx.
      *
-     * @param smartTxlengthSelector indicates if smartTxlength selection should be used.
+     * @param newValue indicates if smartTxlength selection should be used.
      * @return the new TransactionFactoryBuilder
      */
-    B setSmartTxLengthSelector(boolean smartTxlengthSelector);
+    B setSpeculativeConfigurationEnabled(boolean newValue);
 
     /**
      * If writeskew problem is allowed to happen. Defaults to true and can have a big impact on performance (the

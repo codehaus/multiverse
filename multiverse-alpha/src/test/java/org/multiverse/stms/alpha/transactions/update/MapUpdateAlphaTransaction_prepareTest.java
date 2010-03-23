@@ -6,6 +6,7 @@ import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
+import org.multiverse.stms.alpha.transactions.OptimalSize;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsCommitted;
@@ -22,13 +23,15 @@ public class MapUpdateAlphaTransaction_prepareTest {
     }
 
     public MapUpdateAlphaTransaction startSutTransaction() {
-        MapUpdateAlphaTransaction.Config config = new MapUpdateAlphaTransaction.Config(
+        OptimalSize optimalSize = new OptimalSize(1, 100);
+        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
-                null,
                 stmConfig.commitLockPolicy,
-                stmConfig.maxRetryCount,
-                false, true, true, true, true);
+                null,
+                optimalSize,
+                stmConfig.maxRetryCount, true, true, true, true, true);
+
         return new MapUpdateAlphaTransaction(config);
     }
 

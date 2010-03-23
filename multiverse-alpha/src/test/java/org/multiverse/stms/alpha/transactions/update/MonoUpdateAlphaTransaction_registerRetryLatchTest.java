@@ -20,32 +20,35 @@ public class MonoUpdateAlphaTransaction_registerRetryLatchTest {
 
     private AlphaStm stm;
     private AlphaStmConfig stmConfig;
-    private OptimalSize optimalSize;
 
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
         stm = new AlphaStm(stmConfig);
-        optimalSize = new OptimalSize(1);
     }
 
     public MonoUpdateAlphaTransaction startSutTransaction() {
-        MonoUpdateAlphaTransaction.Config config = new MonoUpdateAlphaTransaction.Config(
+        OptimalSize optimalSize = new OptimalSize(1, 100);
+        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
+                stmConfig.commitLockPolicy,
                 null,
-                stmConfig.maxRetryCount,
-                stmConfig.commitLockPolicy, true, optimalSize, true, true, true, true);
+                optimalSize,
+                stmConfig.maxRetryCount, true, true, true, true, true);
         return new MonoUpdateAlphaTransaction(config);
     }
 
     public MonoUpdateAlphaTransaction startSutTransactionWithoutAutomaticReadTracking() {
-        MonoUpdateAlphaTransaction.Config config = new MonoUpdateAlphaTransaction.Config(
+        OptimalSize optimalSize = new OptimalSize(1, 100);
+        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
+                stmConfig.commitLockPolicy,
                 null,
-                stmConfig.maxRetryCount,
-                stmConfig.commitLockPolicy, true, optimalSize, true, true, true, false);
+                optimalSize,
+                stmConfig.maxRetryCount, true, false, true, true, true);
+
         return new MonoUpdateAlphaTransaction(config);
     }
 

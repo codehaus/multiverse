@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * A performance comparison between the fixed and growing trackingupdatealpha transactions. Gives an indication
- * when one of the two is prefered.
+ * when one of the two is preferred.
  *
  * @author Peter Veentjer.
  */
@@ -21,8 +21,7 @@ public class AbstractTrackingUpdateAlphaTransaction_performanceComparison {
     private AlphaStmConfig stmConfig;
     private AlphaStm stm;
     private OptimalSize optimalSize;
-    private ArrayUpdateAlphaTransaction.Config fixedConfig;
-    private MapUpdateAlphaTransaction.Config growingConfig;
+    private UpdateAlphaTransactionConfig config;
     private ManualRef[] refs;
     //todo: very small size. 
     private int txCount = 1000;
@@ -31,33 +30,24 @@ public class AbstractTrackingUpdateAlphaTransaction_performanceComparison {
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
         stm = new AlphaStm(stmConfig);
-        optimalSize = new OptimalSize(1);
+        optimalSize = new OptimalSize(1, 100);
 
-        fixedConfig = new ArrayUpdateAlphaTransaction.Config(
+        config = new UpdateAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
-                null,
                 stmConfig.commitLockPolicy,
-                stmConfig.maxRetryCount,
-                true,
-                optimalSize, true, true, true, true, 10
-        );
+                null,
+                optimalSize,
+                stmConfig.maxRetryCount, true, true, true, true, true);
 
-        growingConfig = new MapUpdateAlphaTransaction.Config(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                null,
-                stmConfig.commitLockPolicy,
-                stmConfig.maxRetryCount, false, true, true, true, true
-        );
     }
 
     public AlphaTransaction startFixedTransaction(int size) {
-        return new ArrayUpdateAlphaTransaction(fixedConfig, size);
+        return new ArrayUpdateAlphaTransaction(config, size);
     }
 
     public AlphaTransaction startGrowingTransaction() {
-        return new MapUpdateAlphaTransaction(growingConfig);
+        return new MapUpdateAlphaTransaction(config);
     }
 
     @Test

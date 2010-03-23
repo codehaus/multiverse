@@ -6,6 +6,7 @@ import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
+import org.multiverse.stms.alpha.transactions.OptimalSize;
 
 import java.util.Map;
 
@@ -25,11 +26,12 @@ public class MapReadonlyAlphaTransaction_restartTest {
     }
 
     public MapReadonlyAlphaTransaction startSutTransaction() {
-        MapReadonlyAlphaTransaction.Config config = new MapReadonlyAlphaTransaction.Config(
+        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.maxRetryCount, true);
+                new OptimalSize(1, 100),
+                stmConfig.maxRetryCount, false, true);
         return new MapReadonlyAlphaTransaction(config);
     }
 

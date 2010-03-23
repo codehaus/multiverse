@@ -1,13 +1,10 @@
 package org.multiverse.stms.alpha.transactions.update;
 
-import org.multiverse.api.exceptions.TransactionTooSmallError;
+import org.multiverse.api.exceptions.SpeculativeConfigFailure;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.UncommittedFilter;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
 import org.multiverse.utils.Listeners;
-import org.multiverse.utils.backoff.BackoffPolicy;
-import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
 import org.multiverse.utils.latches.Latch;
 
@@ -17,27 +14,11 @@ import org.multiverse.utils.latches.Latch;
  * @author Peter Veentjer
  */
 public class MonoUpdateAlphaTransaction
-        extends AbstractUpdateAlphaTransaction<MonoUpdateAlphaTransaction.Config> {
-
-    public static class Config extends AbstractUpdateAlphaTransactionConfig {
-
-        public final OptimalSize optimalSize;
-
-        public Config(
-                PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName,
-                int maxRetryCount, CommitLockPolicy commitLockPolicy, boolean interruptible, OptimalSize optimalSize,
-                boolean allowWriteSkewProblem, boolean optimizeConflictDetection, boolean dirtyCheck,
-                boolean automaticReadTracking) {
-            super(clock, backoffPolicy, familyName, false, maxRetryCount, interruptible, commitLockPolicy,
-                    allowWriteSkewProblem, automaticReadTracking, optimizeConflictDetection, dirtyCheck);
-
-            this.optimalSize = optimalSize;
-        }
-    }
+        extends AbstractUpdateAlphaTransaction<UpdateAlphaTransactionConfig> {
 
     private AlphaTranlocal attached;
 
-    public MonoUpdateAlphaTransaction(Config config) {
+    public MonoUpdateAlphaTransaction(UpdateAlphaTransactionConfig config) {
         super(config);
 
         init();
@@ -92,7 +73,7 @@ public class MonoUpdateAlphaTransaction
     protected void attach(AlphaTranlocal tranlocal) {
         if (attached != null) {
             config.optimalSize.compareAndSet(1, 2);
-            throw TransactionTooSmallError.INSTANCE;
+            throw SpeculativeConfigFailure.INSTANCE;
         }
 
         attached = tranlocal;
@@ -108,7 +89,7 @@ public class MonoUpdateAlphaTransaction
         if (attached != null) {
             if (attached.getTransactionalObject() != txObject) {
                 config.optimalSize.compareAndSet(1, 2);
-                throw TransactionTooSmallError.INSTANCE;
+                throw SpeculativeConfigFailure.INSTANCE;
             }
 
             if (attached.isCommitted()) {

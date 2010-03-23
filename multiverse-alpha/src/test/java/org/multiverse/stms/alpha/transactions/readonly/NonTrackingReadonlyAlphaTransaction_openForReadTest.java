@@ -13,6 +13,7 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
+import org.multiverse.stms.alpha.transactions.OptimalSize;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -34,11 +35,12 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
     }
 
     public NonTrackingReadonlyAlphaTransaction startSutTransaction() {
-        NonTrackingReadonlyAlphaTransaction.Config config = new NonTrackingReadonlyAlphaTransaction.Config(
+        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.maxRetryCount);
+                new OptimalSize(10, 100),
+                stmConfig.maxRetryCount, false, false);
         return new NonTrackingReadonlyAlphaTransaction(config);
     }
 

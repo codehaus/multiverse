@@ -13,6 +13,7 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
+import org.multiverse.stms.alpha.transactions.OptimalSize;
 
 import java.util.Map;
 
@@ -36,26 +37,28 @@ public class MapUpdateAlphaTransaction_openForReadTest {
     }
 
     public MapUpdateAlphaTransaction startSutTransaction() {
-        MapUpdateAlphaTransaction.Config config = new MapUpdateAlphaTransaction.Config(
+        OptimalSize optimalSize = new OptimalSize(1, 100);
+        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
-                null,
                 stmConfig.commitLockPolicy,
-                stmConfig.maxRetryCount,
-                true,
-                true, true, true, true);
+                null,
+                optimalSize,
+                stmConfig.maxRetryCount, true, true, true, true, true);
+
         return new MapUpdateAlphaTransaction(config);
     }
 
     public MapUpdateAlphaTransaction startSutTransactionWithoutAutomaticReadTracking() {
-        MapUpdateAlphaTransaction.Config config = new MapUpdateAlphaTransaction.Config(
+        OptimalSize optimalSize = new OptimalSize(1, 100);
+        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
-                null,
                 stmConfig.commitLockPolicy,
-                stmConfig.maxRetryCount,
-                true,
-                true, true, true, false);
+                null,
+                optimalSize,
+                stmConfig.maxRetryCount, true, false, true, true, true);
+
         return new MapUpdateAlphaTransaction(config);
     }
 

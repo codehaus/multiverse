@@ -3,7 +3,7 @@ package org.multiverse.api.exceptions;
 /**
  * A {@link Error} that is used to regulate control flow inside multiverse, to be more specific
  * jump from code to the handler the transaction management logic (instrumented or
- * {@link org.multiverse.api.exceptions.TransactionTooSmallError}) so it doesn't indicate a
+ * {@link SpeculativeConfigFailure}) so it doesn't indicate a
  * bad thing.
  * <p/>
  * Normally it would be a very bad thing to regulate control flow using an exception/error, but

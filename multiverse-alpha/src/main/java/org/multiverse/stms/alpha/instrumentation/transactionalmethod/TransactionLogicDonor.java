@@ -80,7 +80,7 @@ public class TransactionLogicDonor {
                     if (attempt - 1 < tx.getConfig().getMaxRetryCount()) {
                         waitForChange(tx);
                     }
-                } catch (TransactionTooSmallError tooSmallException) {
+                } catch (SpeculativeConfigFailure tooSmallException) {
                     tx = (AlphaTransaction) transactionFactory.start();
                     setThreadLocalTransaction(tx);
                 } catch (ControlFlowError throwable) {

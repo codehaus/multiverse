@@ -14,22 +14,21 @@ public class MonoReadonlyAlphaTransaction_performanceStressTest {
 
     private AlphaStm stm;
     private AlphaStmConfig stmConfig;
-    private OptimalSize optimalSize;
     private int transactionCount = 200 * 1000 * 1000;
 
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createFastConfig();
         stm = new AlphaStm(stmConfig);
-        optimalSize = new OptimalSize(1);
     }
 
     public MonoReadonlyAlphaTransaction startSutTransaction() {
-        MonoReadonlyAlphaTransaction.Config config = new MonoReadonlyAlphaTransaction.Config(
+        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.maxRetryCount, true, optimalSize);
+                new OptimalSize(1, 100),
+                stmConfig.maxRetryCount, false, true);
         return new MonoReadonlyAlphaTransaction(config);
     }
 

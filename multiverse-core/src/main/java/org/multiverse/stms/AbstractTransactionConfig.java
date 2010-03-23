@@ -97,6 +97,4 @@ public class AbstractTransactionConfig implements TransactionConfig {
     public BackoffPolicy getBackoffPolicy() {
         return backoffPolicy;
     }
-
-
 }

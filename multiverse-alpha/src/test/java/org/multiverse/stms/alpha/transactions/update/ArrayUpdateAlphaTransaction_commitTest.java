@@ -21,42 +21,36 @@ public class ArrayUpdateAlphaTransaction_commitTest {
 
     private AlphaStmConfig stmConfig;
     private AlphaStm stm;
-    private OptimalSize optimalSize;
 
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
         stm = new AlphaStm(stmConfig);
-        optimalSize = new OptimalSize(1);
     }
 
     public AlphaTransaction startSutTransaction(int size) {
-        optimalSize.set(size);
-        ArrayUpdateAlphaTransaction.Config config = new ArrayUpdateAlphaTransaction.Config(
+        OptimalSize optimalSize = new OptimalSize(size, size * 10);
+        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
-                null,
                 stmConfig.commitLockPolicy,
-                stmConfig.maxRetryCount,
-                true,
+                null,
                 optimalSize,
-                true, true, true, true, size
-        );
+                stmConfig.maxRetryCount, true, true, true, true, true);
+
         return new ArrayUpdateAlphaTransaction(config, size);
     }
 
-    public AlphaTransaction startSutTransactionWithPreventWriteSkew(int size, boolean preventWriteSkew) {
-        optimalSize.set(size);
-        ArrayUpdateAlphaTransaction.Config config = new ArrayUpdateAlphaTransaction.Config(
+    public AlphaTransaction startSutTransactionWithAllowWriteSkewProblem(int size, boolean allowWriteSkewProblem) {
+        OptimalSize optimalSize = new OptimalSize(size, size + 1);
+        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
-                null,
                 stmConfig.commitLockPolicy,
-                stmConfig.maxRetryCount,
-                preventWriteSkew,
+                null,
                 optimalSize,
-                true, true, true, true, size
-        );
+                stmConfig.maxRetryCount, true, true, allowWriteSkewProblem, true, true);
+
         return new ArrayUpdateAlphaTransaction(config, size);
     }
 
@@ -167,11 +161,11 @@ public class ArrayUpdateAlphaTransaction_commitTest {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx1 = startSutTransactionWithPreventWriteSkew(10, true);
+        AlphaTransaction tx1 = startSutTransactionWithAllowWriteSkewProblem(10, true);
         tx1.openForRead(ref1);
         ref2.inc(tx1);
 
-        AlphaTransaction tx2 = startSutTransactionWithPreventWriteSkew(10, true);
+        AlphaTransaction tx2 = startSutTransactionWithAllowWriteSkewProblem(10, true);
         tx2.openForRead(ref2);
         ref1.inc(tx2);
 
@@ -187,11 +181,11 @@ public class ArrayUpdateAlphaTransaction_commitTest {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx1 = startSutTransactionWithPreventWriteSkew(10, false);
+        AlphaTransaction tx1 = startSutTransactionWithAllowWriteSkewProblem(10, false);
         tx1.openForRead(ref1);
         ref2.inc(tx1);
 
-        AlphaTransaction tx2 = startSutTransactionWithPreventWriteSkew(10, false);
+        AlphaTransaction tx2 = startSutTransactionWithAllowWriteSkewProblem(10, false);
         tx2.openForRead(ref2);
         ref1.inc(tx2);
 

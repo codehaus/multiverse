@@ -19,7 +19,7 @@ public class TransactionMetadata {
 
     public boolean interruptible;
 
-    public boolean smartTxLengthSelector;
+    public boolean speculativeConfigurationEnabled;
 
     public boolean allowWriteSkewProblem;
 

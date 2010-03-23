@@ -8,6 +8,7 @@ import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
+import org.multiverse.stms.alpha.transactions.OptimalSize;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsAborted;
@@ -28,11 +29,12 @@ public class MapReadonlyAlphaTransaction_commitTest {
     }
 
     public MapReadonlyAlphaTransaction startTransactionUnderTest() {
-        MapReadonlyAlphaTransaction.Config config = new MapReadonlyAlphaTransaction.Config(
+        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.maxRetryCount, true);
+                new OptimalSize(1, 100),
+                stmConfig.maxRetryCount, false, true);
         return new MapReadonlyAlphaTransaction(config);
     }
 

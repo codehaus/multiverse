@@ -1,12 +1,9 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.stms.AbstractTransactionConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.utils.backoff.BackoffPolicy;
-import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.latches.Latch;
 
 import java.util.IdentityHashMap;
@@ -21,21 +18,13 @@ import java.util.Map;
  * @author Peter Veentjer
  */
 public class MapReadonlyAlphaTransaction
-        extends AbstractReadonlyAlphaTransaction<MapReadonlyAlphaTransaction.Config> {
-
-    public static class Config extends AbstractTransactionConfig {
-
-        public Config(PrimitiveClock clock, BackoffPolicy backoffPolicy,
-                      String familyName, int maxRetryCount, boolean interruptible) {
-            super(clock, backoffPolicy, familyName, true, maxRetryCount, interruptible, true, true);
-        }
-    }
+        extends AbstractReadonlyAlphaTransaction<ReadonlyAlphaTransactionConfig> {
 
     public static class Factory implements TransactionFactory<AlphaTransaction> {
 
-        public final Config config;
+        public final ReadonlyAlphaTransactionConfig config;
 
-        public Factory(Config config) {
+        public Factory(ReadonlyAlphaTransactionConfig config) {
             this.config = config;
         }
 
@@ -48,7 +37,7 @@ public class MapReadonlyAlphaTransaction
     private final Map<AlphaTransactionalObject, AlphaTranlocal>
             attachedMap = new IdentityHashMap<AlphaTransactionalObject, AlphaTranlocal>();
 
-    public MapReadonlyAlphaTransaction(Config config) {
+    public MapReadonlyAlphaTransaction(ReadonlyAlphaTransactionConfig config) {
         super(config);
 
         init();

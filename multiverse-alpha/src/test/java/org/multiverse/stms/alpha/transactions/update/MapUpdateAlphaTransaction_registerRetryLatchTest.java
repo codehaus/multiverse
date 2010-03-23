@@ -10,6 +10,7 @@ import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
+import org.multiverse.stms.alpha.transactions.OptimalSize;
 import org.multiverse.templates.TransactionTemplate;
 import org.multiverse.utils.Listeners;
 import org.multiverse.utils.latches.CheapLatch;
@@ -36,24 +37,28 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
     }
 
     public MapUpdateAlphaTransaction startSutTransaction() {
-        MapUpdateAlphaTransaction.Config config = new MapUpdateAlphaTransaction.Config(
+        OptimalSize optimalSize = new OptimalSize(1, 100);
+        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
-                null,
                 stmConfig.commitLockPolicy,
-                stmConfig.maxRetryCount,
-                false, true, true, true, true);
+                null,
+                optimalSize,
+                stmConfig.maxRetryCount, true, true, true, true, true);
+
         return new MapUpdateAlphaTransaction(config);
     }
 
     public MapUpdateAlphaTransaction startSutTransactionWithoutReadTracking() {
-        MapUpdateAlphaTransaction.Config config = new MapUpdateAlphaTransaction.Config(
+        OptimalSize optimalSize = new OptimalSize(1, 100);
+        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
-                null,
                 stmConfig.commitLockPolicy,
-                stmConfig.maxRetryCount,
-                true, true, true, true, false);
+                null,
+                optimalSize,
+                stmConfig.maxRetryCount, true, false, true, true, true);
+
         return new MapUpdateAlphaTransaction(config);
     }
 

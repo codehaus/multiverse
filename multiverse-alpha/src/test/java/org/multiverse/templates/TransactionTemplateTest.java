@@ -41,7 +41,7 @@ public class TransactionTemplateTest {
      */
     public Transaction startThreadLocalUpdateTransaction() {
         Transaction t = stm.getTransactionFactoryBuilder()
-                .setSmartTxLengthSelector(false)
+                .setSpeculativeConfigurationEnabled(false)
                 .setReadonly(false)
                 .build().start();
         setThreadLocalTransaction(t);

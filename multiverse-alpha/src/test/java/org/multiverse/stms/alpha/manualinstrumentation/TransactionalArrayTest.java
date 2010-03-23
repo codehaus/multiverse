@@ -8,9 +8,8 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.templates.TransactionTemplate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
@@ -22,6 +21,7 @@ public class TransactionalArrayTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) GlobalStmInstance.getGlobalStmInstance();
+        clearThreadLocalTransaction();
     }
 
     @Test

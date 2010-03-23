@@ -13,6 +13,7 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
+import org.multiverse.stms.alpha.transactions.OptimalSize;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -31,24 +32,27 @@ public class MapUpdateAlphaTransaction_commitTest {
     }
 
     public MapUpdateAlphaTransaction startSutTransaction() {
-        MapUpdateAlphaTransaction.Config config = new MapUpdateAlphaTransaction.Config(
+        OptimalSize optimalSize = new OptimalSize(1, 100);
+        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
-                null,
                 stmConfig.commitLockPolicy,
-                stmConfig.maxRetryCount,
-                true, true, true, true, true);
+                null,
+                optimalSize,
+                stmConfig.maxRetryCount, true, true, true, true, true);
+
         return new MapUpdateAlphaTransaction(config);
     }
 
     public MapUpdateAlphaTransaction startSutTransactionWithAllowingWriteSkewProblem(boolean allowWriteSkewProblem) {
-        MapUpdateAlphaTransaction.Config config = new MapUpdateAlphaTransaction.Config(
+        OptimalSize optimalSize = new OptimalSize(1, 100);
+        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
-                null,
                 stmConfig.commitLockPolicy,
-                stmConfig.maxRetryCount,
-                allowWriteSkewProblem, true, true, true, true);
+                null,
+                optimalSize,
+                stmConfig.maxRetryCount, true, true, allowWriteSkewProblem, true, true);
         return new MapUpdateAlphaTransaction(config);
     }
 

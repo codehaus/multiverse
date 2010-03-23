@@ -23,7 +23,7 @@ public class IntStackPerformanceStressTest {
         stm = (AlphaStm) getGlobalStmInstance();
         setThreadLocalTransaction(null);
         txFactory = stm.getTransactionFactoryBuilder()
-                .setSmartTxLengthSelector(true)
+                .setSpeculativeConfigurationEnabled(true)
                 .setFamilyName("IntStackPerformanceStressTest")
                 .setAutomaticReadTracking(false).build();
     }

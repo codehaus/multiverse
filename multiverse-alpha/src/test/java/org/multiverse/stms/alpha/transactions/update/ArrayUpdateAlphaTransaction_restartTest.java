@@ -16,27 +16,22 @@ public class ArrayUpdateAlphaTransaction_restartTest {
 
     private AlphaStmConfig stmConfig;
     private AlphaStm stm;
-    private OptimalSize optimalSize;
 
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
         stm = new AlphaStm(stmConfig);
-        optimalSize = new OptimalSize(1);
     }
 
     public AlphaTransaction startSutTransaction(int size) {
-        optimalSize.set(size);
-        ArrayUpdateAlphaTransaction.Config config = new ArrayUpdateAlphaTransaction.Config(
+        OptimalSize optimalSize = new OptimalSize(size, 100);
+        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
-                null,
                 stmConfig.commitLockPolicy,
-                stmConfig.maxRetryCount,
-                true,
+                null,
                 optimalSize,
-                true, true, true, true, size
-        );
+                stmConfig.maxRetryCount, true, true, true, true, true);
         return new ArrayUpdateAlphaTransaction(config, size);
     }
 

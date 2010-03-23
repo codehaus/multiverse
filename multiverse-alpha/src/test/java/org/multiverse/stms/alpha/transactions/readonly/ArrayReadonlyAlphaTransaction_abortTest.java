@@ -16,7 +16,6 @@ import static org.multiverse.TestUtils.assertIsAborted;
 public class ArrayReadonlyAlphaTransaction_abortTest {
     private AlphaStm stm;
     private AlphaStmConfig stmConfig;
-    private OptimalSize optimalSize;
 
     @Before
     public void setUp() {
@@ -25,13 +24,13 @@ public class ArrayReadonlyAlphaTransaction_abortTest {
     }
 
     public ArrayReadonlyAlphaTransaction startTransactionUnderTest() {
-        optimalSize = new OptimalSize(100);
-        ArrayReadonlyAlphaTransaction.Config config = new ArrayReadonlyAlphaTransaction.Config(
+        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.maxRetryCount, true, optimalSize, 10);
-        return new ArrayReadonlyAlphaTransaction(config, 5);
+                new OptimalSize(1, 100),
+                stmConfig.maxRetryCount, false, true);
+        return new ArrayReadonlyAlphaTransaction(config, 1);
     }
 
     @Test

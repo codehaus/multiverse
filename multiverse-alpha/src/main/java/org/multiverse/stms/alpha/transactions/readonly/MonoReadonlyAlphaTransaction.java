@@ -1,14 +1,10 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.exceptions.TransactionTooSmallError;
-import org.multiverse.stms.AbstractTransactionConfig;
+import org.multiverse.api.exceptions.SpeculativeConfigFailure;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
-import org.multiverse.utils.backoff.BackoffPolicy;
-import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.latches.Latch;
 
 /**
@@ -17,25 +13,13 @@ import org.multiverse.utils.latches.Latch;
  * @author Peter Veentjer.
  */
 public class MonoReadonlyAlphaTransaction
-        extends AbstractReadonlyAlphaTransaction<MonoReadonlyAlphaTransaction.Config> {
-
-    public static class Config extends AbstractTransactionConfig {
-
-        public final OptimalSize optimalSize;
-
-        public Config(PrimitiveClock clock, BackoffPolicy backoffPolicy,
-                      String familyName, int maxRetryCount,
-                      boolean interruptible, OptimalSize optimalSize) {
-            super(clock, backoffPolicy, familyName, true, maxRetryCount, interruptible, false, true);
-            this.optimalSize = optimalSize;
-        }
-    }
+        extends AbstractReadonlyAlphaTransaction<ReadonlyAlphaTransactionConfig> {
 
     public static class Factory implements TransactionFactory<AlphaTransaction> {
 
-        public final Config config;
+        public final ReadonlyAlphaTransactionConfig config;
 
-        public Factory(Config config) {
+        public Factory(ReadonlyAlphaTransactionConfig config) {
             this.config = config;
         }
 
@@ -47,7 +31,7 @@ public class MonoReadonlyAlphaTransaction
 
     private AlphaTranlocal attached;
 
-    public MonoReadonlyAlphaTransaction(Config config) {
+    public MonoReadonlyAlphaTransaction(ReadonlyAlphaTransactionConfig config) {
         super(config);
         init();
     }
@@ -74,7 +58,7 @@ public class MonoReadonlyAlphaTransaction
     protected void attach(AlphaTranlocal tranlocal) {
         if (attached != null) {
             config.optimalSize.compareAndSet(1, 2);
-            throw TransactionTooSmallError.INSTANCE;
+            throw SpeculativeConfigFailure.INSTANCE;
         }
 
         attached = tranlocal;

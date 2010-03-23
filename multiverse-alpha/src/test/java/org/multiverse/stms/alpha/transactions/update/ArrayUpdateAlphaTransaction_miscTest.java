@@ -21,15 +21,14 @@ public class ArrayUpdateAlphaTransaction_miscTest {
     }
 
     public ArrayUpdateAlphaTransaction startSutTransaction() {
-        OptimalSize optimalSize = new OptimalSize(10);
-
-        ArrayUpdateAlphaTransaction.Config config = new ArrayUpdateAlphaTransaction.Config(
+        OptimalSize optimalSize = new OptimalSize(1, 100);
+        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
-                null,
                 stmConfig.commitLockPolicy,
-                stmConfig.maxRetryCount,
-                false, optimalSize, true, true, true, true, 50);
+                null,
+                optimalSize,
+                stmConfig.maxRetryCount, true, true, true, true, true);
         return new ArrayUpdateAlphaTransaction(config, 10);
     }
 

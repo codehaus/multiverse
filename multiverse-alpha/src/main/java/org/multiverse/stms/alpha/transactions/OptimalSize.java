@@ -7,9 +7,15 @@ import static java.lang.String.format;
 public final class OptimalSize {
 
     private final AtomicInteger size = new AtomicInteger();
+    private final int maximumSize;
 
     public OptimalSize(int initialSize) {
+        this(initialSize, initialSize);
+    }
+
+    public OptimalSize(int initialSize, int maximumSize) {
         this.size.set(initialSize);
+        this.maximumSize = maximumSize;
     }
 
     public void set(int newValue) {
@@ -26,5 +32,9 @@ public final class OptimalSize {
 
     public String toString() {
         return format("OptimalSize(size=%s)", size.get());
+    }
+
+    public int getMaximumSize() {
+        return maximumSize;
     }
 }

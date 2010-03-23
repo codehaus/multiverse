@@ -58,8 +58,6 @@ public final class AlphaStmConfig {
 
     public boolean dirtyCheck = true;
 
-    public boolean interruptible = false;
-
 
     /**
      * Check if the AlphaStmConfig has been configured correctly.

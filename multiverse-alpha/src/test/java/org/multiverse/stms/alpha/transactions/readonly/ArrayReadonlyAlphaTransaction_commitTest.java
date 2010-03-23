@@ -24,16 +24,14 @@ public class ArrayReadonlyAlphaTransaction_commitTest {
         optimalSize = new OptimalSize(1);
     }
 
-    public ArrayReadonlyAlphaTransaction startTransactionUnderTest(int size) {
-        optimalSize.set(size);
-
-        ArrayReadonlyAlphaTransaction.Config config = new ArrayReadonlyAlphaTransaction.Config(
+    public ArrayReadonlyAlphaTransaction startTransactionUnderTest(int maximumSize) {
+        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                stmConfig.maxRetryCount, true, optimalSize, size);
-
-        return new ArrayReadonlyAlphaTransaction(config, size);
+                new OptimalSize(1, maximumSize),
+                stmConfig.maxRetryCount, false, true);
+        return new ArrayReadonlyAlphaTransaction(config, maximumSize);
     }
 
     @Test

@@ -1,37 +1,20 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
-import org.multiverse.api.exceptions.TransactionTooSmallError;
-import org.multiverse.stms.AbstractTransactionConfig;
+import org.multiverse.api.exceptions.SpeculativeConfigFailure;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
-import org.multiverse.utils.backoff.BackoffPolicy;
-import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.latches.Latch;
 
 import static java.lang.System.arraycopy;
 
 public class ArrayReadonlyAlphaTransaction
-        extends AbstractReadonlyAlphaTransaction<ArrayReadonlyAlphaTransaction.Config> {
-
-    public static class Config extends AbstractTransactionConfig {
-
-        public final OptimalSize optimalSize;
-        private int maximumSize;
-
-        public Config(PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName, int maxRetryCount, boolean interruptible,
-                      OptimalSize optimalSize, int maximumSize) {
-            super(clock, backoffPolicy, familyName, true, maxRetryCount, interruptible, false, true);
-            this.optimalSize = optimalSize;
-            this.maximumSize = maximumSize;
-        }
-    }
+        extends AbstractReadonlyAlphaTransaction<ReadonlyAlphaTransactionConfig> {
 
     private AlphaTranlocal[] attachedArray;
 
     private int firstFreeIndex;
 
-    public ArrayReadonlyAlphaTransaction(Config config, int size) {
+    public ArrayReadonlyAlphaTransaction(ReadonlyAlphaTransactionConfig config, int size) {
         super(config);
         attachedArray = new AlphaTranlocal[size];
         init();
@@ -63,8 +46,8 @@ public class ArrayReadonlyAlphaTransaction
             int newOptimalSize = attachedArray.length + 2;
             config.optimalSize.compareAndSet(attachedArray.length, attachedArray.length + 2);
 
-            if (attachedArray.length >= config.maximumSize) {
-                throw TransactionTooSmallError.INSTANCE;
+            if (attachedArray.length >= config.optimalSize.getMaximumSize()) {
+                throw SpeculativeConfigFailure.INSTANCE;
             }
 
             AlphaTranlocal[] newAttachedArray = new AlphaTranlocal[newOptimalSize];
