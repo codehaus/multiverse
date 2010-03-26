@@ -1,7 +1,6 @@
 package org.multiverse.commitbarriers;
 
 import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.DeadTransactionException;
 
 import java.util.List;
 
@@ -88,7 +87,7 @@ public final class VetoCommitBarrier extends CommitBarrier {
      *
      * @param tx the Transaction to commit.
      * @throws NullPointerException       if tx is null.
-     * @throws DeadTransactionException   if the Transaction already is aborted or committed.
+     * @throws org.multiverse.api.exceptions.DeadTransactionException   if the Transaction already is aborted or committed.
      * @throws org.multiverse.api.exceptions.WriteConflict
      *                                    if the commit was not executed successfully.
      * @throws CommitBarrierOpenException if the VetoCommitBarrier already is open.
