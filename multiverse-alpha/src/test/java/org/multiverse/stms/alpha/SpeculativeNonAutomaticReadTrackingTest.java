@@ -9,6 +9,7 @@ import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Transaction;
 import org.multiverse.stms.alpha.transactions.readonly.MonoReadonlyAlphaTransaction;
 import org.multiverse.stms.alpha.transactions.readonly.NonTrackingReadonlyAlphaTransaction;
+import org.multiverse.stms.alpha.transactions.update.MonoUpdateAlphaTransaction;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -36,7 +37,7 @@ public class SpeculativeNonAutomaticReadTrackingTest {
     }
 
     @Test
-    public void whenRetryDone() {
+    public void whenReadonlyAndAutomaticReadtrackingNeeded() {
         SpeculativeNonAutomaticReadTracking o = new SpeculativeNonAutomaticReadTracking();
         o.set(1);
         new DelayedSetThread(o).start();
@@ -61,7 +62,7 @@ public class SpeculativeNonAutomaticReadTrackingTest {
     }
 
     @Test
-    public void whenNoRetryDone() {
+    public void whenReadonlyAndNoAutomaticReadtrackingNeeded() {
         SpeculativeNonAutomaticReadTracking o = new SpeculativeNonAutomaticReadTracking();
         o.getZeroOrFail();
 
@@ -73,6 +74,49 @@ public class SpeculativeNonAutomaticReadTrackingTest {
         o2.getZeroOrFail();
         assertEquals(1, o2.transactions.size());
         assertInstanceOf(o2.transactions.get(0), NonTrackingReadonlyAlphaTransaction.class);
+    }
+
+    @Test
+    public void whenUpdateAndAutomaticReadtrackingNeeded() {
+        SpeculativeNonAutomaticReadTracking o = new SpeculativeNonAutomaticReadTracking();
+        o.set(1);
+        new DelayedSetThread(o).start();
+        o.setOneIfZeroOrWait();
+
+        assertEquals(4, o.transactions.size());
+        assertInstanceOf(o.transactions.get(0), NonTrackingReadonlyAlphaTransaction.class);
+        assertInstanceOf(o.transactions.get(1), MonoReadonlyAlphaTransaction.class);
+        //this is the one after the wait
+        assertInstanceOf(o.transactions.get(2), MonoReadonlyAlphaTransaction.class);
+        assertInstanceOf(o.transactions.get(3), MonoUpdateAlphaTransaction.class);
+
+        //make sure that the system learned.
+        SpeculativeNonAutomaticReadTracking o2 = new SpeculativeNonAutomaticReadTracking();
+        o2.set(1);
+        new DelayedSetThread(o2).start();
+
+        o2.setOneIfZeroOrWait();
+        assertEquals(2, o2.transactions.size());
+        assertInstanceOf(o2.transactions.get(0), MonoUpdateAlphaTransaction.class);
+        assertInstanceOf(o2.transactions.get(1), MonoUpdateAlphaTransaction.class);
+    }
+
+    @Test
+    public void whenUpdateAndNoAutomaticReadTrackingNeeded() {
+        SpeculativeNonAutomaticReadTracking o = new SpeculativeNonAutomaticReadTracking();
+        o.setOneIfZeroOrFail();
+
+        assertEquals(2, o.transactions.size());
+        assertInstanceOf(o.transactions.get(0), NonTrackingReadonlyAlphaTransaction.class);
+        assertInstanceOf(o.transactions.get(1), MonoUpdateAlphaTransaction.class);
+
+        //make sure that the system learned.
+        SpeculativeNonAutomaticReadTracking o2 = new SpeculativeNonAutomaticReadTracking();
+        new DelayedSetThread(o2).start();
+
+        o2.setOneIfZeroOrFail();
+        assertEquals(1, o2.transactions.size());
+        assertInstanceOf(o2.transactions.get(0), MonoUpdateAlphaTransaction.class);
     }
 
     @TransactionalObject
@@ -97,6 +141,26 @@ public class SpeculativeNonAutomaticReadTrackingTest {
             transactions.add(getThreadLocalTransaction());
             if (value != 0) {
                 retry();
+            }
+        }
+
+        public void setOneIfZeroOrFail() {
+            transactions.add(getThreadLocalTransaction());
+
+            if (value != 0) {
+                throw new RuntimeException();
+            } else {
+                value = 1;
+            }
+        }
+
+        public void setOneIfZeroOrWait() {
+            transactions.add(getThreadLocalTransaction());
+
+            if (value != 0) {
+                retry();
+            } else {
+                value = 1;
             }
         }
     }
