@@ -14,6 +14,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static org.multiverse.instrumentation.asm.AsmUtils.isStatic;
+
 /**
  * An Asm based {@link org.multiverse.instrumentation.metadata.ClassMetadataExtractor}.
  *
@@ -114,7 +116,7 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor {
             if (classMetadata.isTransactionalObject()) {
                 if (hasTransactionalMethodAnnotation(methodNode) || hasTransactionalConstructorAnnotation(methodNode)) {
                     transactionMetadata = createTransactionMetadata(classMetadata, methodNode);
-                } else if (!AsmUtils.isStatic(methodNode)) {
+                } else if (!isStatic(methodNode)) {
                     transactionMetadata = createDefaultTransactionMetadata(classMetadata, methodNode);
                 }
             } else if (hasTransactionalMethodAnnotation(methodNode)) {
@@ -290,16 +292,7 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor {
         txMetadata.interruptible = (Boolean) getValue(annotationNode, "interruptible", throwsInterruptedException);
         txMetadata.allowWriteSkewProblem = (Boolean) getValue(annotationNode, "allowWriteSkewProblem", true);
 
-        Boolean automaticReadTrackingDefault;
-        if (txMetadata.readOnly == null) {
-            automaticReadTrackingDefault = null;
-        } else if (txMetadata.readOnly) {
-            automaticReadTrackingDefault = null;
-        } else {
-            automaticReadTrackingDefault = true;
-        }
-
-        txMetadata.automaticReadTracking = (Boolean) getValue(annotationNode, "automaticReadTracking", automaticReadTrackingDefault);
+        txMetadata.automaticReadTracking = (Boolean) getValue(annotationNode, "automaticReadTracking", null);
         txMetadata.timeout = ((Number) getValue(annotationNode, "timeout", -1)).longValue();
         txMetadata.timeoutTimeUnit = (TimeUnit) getValue(annotationNode, "timeoutTimeUnit", TimeUnit.SECONDS);
 

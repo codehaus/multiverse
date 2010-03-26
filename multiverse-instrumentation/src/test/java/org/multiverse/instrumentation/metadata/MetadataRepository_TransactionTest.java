@@ -60,6 +60,29 @@ public class MetadataRepository_TransactionTest {
     }
 
     @Test
+    public void whenUpdateMethod() {
+        ClassMetadata classMetadata = repository.getClassMetadata(DefaultUpdateMethod.class);
+        MethodMetadata methodMetadata = classMetadata.getMethodMetadata("method", "()V");
+        TransactionMetadata transactionMetadata = methodMetadata.getTransactionalMetadata();
+
+        assertNotNull(transactionMetadata);
+        assertFalse(transactionMetadata.readOnly);
+        assertNull(transactionMetadata.automaticReadTracking);
+        assertFalse(transactionMetadata.interruptible);
+        assertTrue(transactionMetadata.allowWriteSkewProblem);
+        assertEquals(1000, transactionMetadata.maxRetryCount);
+        assertEquals("org.multiverse.instrumentation.metadata.MetadataRepository_TransactionTest$DefaultUpdateMethod.method()", transactionMetadata.familyName);
+    }
+
+
+    class DefaultUpdateMethod {
+        @TransactionalMethod(readonly = false)
+        void method() {
+        }
+    }
+
+
+    @Test
     public void whenAutomaticReadTracking() {
         ClassMetadata classMetadata = repository.getClassMetadata(AutomaticReadTracking.class);
         MethodMetadata enabledMethodMetadata = classMetadata.getMethodMetadata("enabled", "()V");

@@ -8,10 +8,13 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
 import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.stms.alpha.AlphaStm;
+import org.multiverse.stms.alpha.transactions.update.MonoUpdateAlphaTransaction;
+import org.multiverse.stms.alpha.transactions.update.UpdateAlphaTransactionConfiguration;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
+import static org.multiverse.TestUtils.assertInstanceOf;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
@@ -81,7 +84,7 @@ public class TransactionalMethod_settingTest {
             x = 0;
         }
 
-        @TransactionalMethod(allowWriteSkewProblem = true)
+        @TransactionalMethod(readonly = false, allowWriteSkewProblem = true)
         public boolean updateWithAllowedWriteSkewProblem() {
             //force the loadForRead so that the retry doesn't find an empty transaction
             int b = x;
@@ -89,15 +92,17 @@ public class TransactionalMethod_settingTest {
             return getThreadLocalTransaction().getConfiguration().allowWriteSkewProblem();
         }
 
-        @TransactionalMethod(allowWriteSkewProblem = false, automaticReadTracking = true)
+        @TransactionalMethod(readonly = false, allowWriteSkewProblem = false, automaticReadTracking = true)
         public boolean updateWithDisallowedWriteSkewProblem() {
+            //Configuration = getThreadLocalTransaction().getConfiguration(); 
+
             //force the loadForRead so that the retry doesn't find an empty transaction
             int b = x;
 
             return getThreadLocalTransaction().getConfiguration().allowWriteSkewProblem();
         }
 
-        @TransactionalMethod
+        @TransactionalMethod(readonly = false)
         public boolean updateDefaultMethod() {
             //force the loadForRead so that the retry doesn't find an empty transaction
             int b = x;
@@ -194,13 +199,13 @@ public class TransactionalMethod_settingTest {
     @Test
     public void automaticReadTracking() {
         AutomaticReadTracking m = new AutomaticReadTracking();
-        m.defaultMethod();
-        m.readonlyMethod();
-        m.readonlyMethodWithReadTrackingDisabled();
-        m.readonlyMethodWithReadTrackingEnabled();
+        //m.defaultMethod();
+        //m.readonlyMethod();
+        //m.readonlyMethodWithReadTrackingDisabled();
+        //m.readonlyMethodWithReadTrackingEnabled();
         m.defaultUpdateMethod();
-        m.updateMethodWithReadTrackingDisabled();
-        m.updateMethodWithReadTrackingEnabled();
+        //m.updateMethodWithReadTrackingDisabled();
+        //m.updateMethodWithReadTrackingEnabled();
     }
 
     @TransactionalObject
@@ -234,12 +239,17 @@ public class TransactionalMethod_settingTest {
         @TransactionalMethod(readonly = false)
         public void defaultUpdateMethod() {
             Transaction tx = getThreadLocalTransaction();
+            UpdateAlphaTransactionConfiguration config = (UpdateAlphaTransactionConfiguration) tx.getConfiguration();
+            System.out.println(config.speculativeConfiguration);
+            assertInstanceOf(tx, MonoUpdateAlphaTransaction.class);
+
             assertFalse(tx.getConfiguration().automaticReadTracking());
         }
 
         @TransactionalMethod(readonly = false, automaticReadTracking = false)
         public void updateMethodWithReadTrackingDisabled() {
             Transaction tx = getThreadLocalTransaction();
+
             assertFalse(tx.getConfiguration().automaticReadTracking());
         }
 

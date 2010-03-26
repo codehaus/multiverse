@@ -318,7 +318,6 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     } else {
                         finalAutomaticReadTracking = automaticReadTracking;
                     }
-                    //System.out.println("finalAutomaticReadTracking: "+finalAutomaticReadTracking);
 
                     boolean speculativeSizeEnabled = speculativeConfig.isSpeculativeSizeEnabled();
 

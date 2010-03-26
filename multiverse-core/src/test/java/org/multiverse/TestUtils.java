@@ -24,6 +24,12 @@ public class TestUtils {
         Thread.interrupted();
     }
 
+    public static void assertInstanceOf(Object o, Class clazz) {
+        assertTrue(
+                String.format("o %s is not a subtype from clazz %s", o, clazz.getName()),
+                o.getClass().isAssignableFrom(clazz));
+    }
+
     public static boolean hasMethod(Class clazz, String method, Class... types) {
         try {
             clazz.getMethod(method, types);
