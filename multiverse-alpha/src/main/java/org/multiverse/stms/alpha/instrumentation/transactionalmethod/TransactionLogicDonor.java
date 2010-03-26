@@ -1,12 +1,12 @@
 package org.multiverse.stms.alpha.instrumentation.transactionalmethod;
 
+import org.multiverse.api.BackoffPolicy;
+import org.multiverse.api.Latch;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.latches.CheapLatch;
-import org.multiverse.utils.latches.Latch;
 
 import static java.lang.String.format;
 import static org.multiverse.api.ThreadLocalTransaction.*;

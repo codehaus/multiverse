@@ -16,7 +16,7 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
 /**
  * @author Peter Veentjer
  */
-public class AlphaRef_clearTest {
+public class AlphaProgrammaticReference_clearTest {
 
     private Stm stm;
     private TransactionFactory readonlyTxFactory;
@@ -36,7 +36,7 @@ public class AlphaRef_clearTest {
     @Test
     public void whenReferenceNotNull() {
         String value = "foo";
-        AlphaRef<String> ref = new AlphaRef<String>(value);
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>(value);
 
         long version = stm.getVersion();
         String result = ref.clear();
@@ -48,7 +48,7 @@ public class AlphaRef_clearTest {
 
     @Test
     public void whenReferenceNull() {
-        AlphaRef<String> ref = new AlphaRef<String>();
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>();
 
         long version = stm.getVersion();
         ref.clear();
@@ -60,7 +60,7 @@ public class AlphaRef_clearTest {
     @Test
     public void whenTransactionReadonly_thenReadonlyException() {
         String value = "foo";
-        AlphaRef<String> ref = new AlphaRef<String>(value);
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>(value);
         long version = stm.getVersion();
 
         Transaction tx = readonlyTxFactory.start();

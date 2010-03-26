@@ -5,9 +5,7 @@ import org.multiverse.api.exceptions.ControlFlowError;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.api.exceptions.TooManyRetriesException;
-import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.latches.CheapLatch;
-import org.multiverse.utils.latches.Latch;
 
 import static java.lang.String.format;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;

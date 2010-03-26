@@ -6,7 +6,6 @@ import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
 import org.multiverse.utils.clock.PrimitiveClock;
-import org.multiverse.utils.latches.Latch;
 
 import static java.lang.String.format;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -25,11 +24,11 @@ import static org.multiverse.api.exceptions.CommitLockNotFreeWriteConflict.newFa
  * creation and unwanted ThreadLocal access, there also are methods available that have a
  * {@link org.multiverse.api.Transaction} as first argument.
  * <h3>TransactionFactory</h3>
- * All methods of this AlphaRef also have a version that accepts a {@link TransactionFactory}. TransactionFactories
+ * All methods of this AlphaProgrammaticReference also have a version that accepts a {@link TransactionFactory}. TransactionFactories
  * can be quite expensive to create, so it is best to create them up front and reuse them. TransactionFactories
  * are threadsafe to use, so no worries about that as well.
  * <h3>Performance</h3>
- * The AlphaRef already has been heavily optimized and prevents unwanted creation of objects like
+ * The AlphaProgrammaticReference already has been heavily optimized and prevents unwanted creation of objects like
  * Transactions or TransactionTemplates. If you really need more performance you should talk to me
  * about adding instrumentation.
  * <h3>Relying on GlobalStmInstance</h3>
@@ -52,11 +51,11 @@ import static org.multiverse.api.exceptions.CommitLockNotFreeWriteConflict.newFa
  *
  * @author Peter Veentjer
  */
-public final class AlphaRef<E> extends DefaultTxObjectMixin implements ProgrammaticReference<E> {
+public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin implements ProgrammaticReference<E> {
 
     private final static TransactionFactory getOrAwaitTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
             .setReadonly(true)
-            .setFamilyName(AlphaRef.class.getName() + ".getOrAwait()")
+            .setFamilyName(AlphaProgrammaticReference.class.getName() + ".getOrAwait()")
             .setSpeculativeConfigurationEnabled(true)
             .setAutomaticReadTracking(true).build();
 
@@ -64,12 +63,12 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Programma
 
 
     /**
-     * Creates a new Ref with null as value. It has exactly the same {@link #AlphaRef(Object)}
+     * Creates a new Ref with null as value. It has exactly the same {@link #AlphaProgrammaticReference(Object)}
      * with null as value.
      * <p/>
      * This method relies on the ThreadLocalTransaction and GlobalStmInstance.
      */
-    public AlphaRef() {
+    public AlphaProgrammaticReference() {
         this((E) null);
     }
 
@@ -86,7 +85,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Programma
      *
      * @param value the value this Ref should have.
      */
-    public AlphaRef(E value) {
+    public AlphaProgrammaticReference(E value) {
         Transaction tx = getThreadLocalTransaction();
         if (tx == null || tx.getStatus().isDead()) {
             long writeVersion = clock.getVersion();
@@ -106,28 +105,28 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Programma
      *
      * @param tx the Transaction used
      * @throws IllegalThreadStateException if the transaction was not in the correct state for
-     *                                     creating this AlphaRef.
+     *                                     creating this AlphaProgrammaticReference.
      */
-    public AlphaRef(Transaction tx) {
+    public AlphaProgrammaticReference(Transaction tx) {
         this(tx, null);
     }
 
-    public AlphaRef(Transaction tx, E value) {
+    public AlphaProgrammaticReference(Transaction tx, E value) {
         AlphaRefTranlocal<E> tranlocal = openForWrite(tx);
         tranlocal.value = value;
     }
 
     private AlphaRefTranlocal<E> openForRead(Transaction tx) {
-        return (AlphaRefTranlocal<E>) ((AlphaTransaction) tx).openForRead(AlphaRef.this);
+        return (AlphaRefTranlocal<E>) ((AlphaTransaction) tx).openForRead(AlphaProgrammaticReference.this);
     }
 
     private AlphaRefTranlocal<E> openForWrite(Transaction tx) {
-        return (AlphaRefTranlocal<E>) ((AlphaTransaction) tx).openForWrite(AlphaRef.this);
+        return (AlphaRefTranlocal<E>) ((AlphaTransaction) tx).openForWrite(AlphaProgrammaticReference.this);
     }
 
     // ============================== getVersion ===============================
 
-      @Override
+    @Override
     public long getVersionAtomic() {
         AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal<E>) ___load();
 
@@ -138,7 +137,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Programma
         return tranlocal.___writeVersion;
     }
 
-      @Override
+    @Override
     public long getVersion() {
         Transaction tx = getThreadLocalTransaction();
 
@@ -157,7 +156,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Programma
 
     // ============================== get ======================================
 
-       @Override
+    @Override
     public E get() {
         Transaction tx = getThreadLocalTransaction();
 
@@ -168,7 +167,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Programma
         }
     }
 
-     @Override
+    @Override
     public E getAtomic() {
         AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal) ___load();
 
@@ -191,12 +190,12 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Programma
         return getAtomic() == null;
     }
 
-     @Override
+    @Override
     public boolean isNull() {
         return get() == null;
     }
 
-     @Override
+    @Override
     public boolean isNull(Transaction tx) {
         return get(tx) == null;
     }
@@ -231,7 +230,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Programma
 
     // ========================== set ==========================================
 
-      @Override
+    @Override
     public E setAtomic(E newValue) {
         //if there is no difference we are done
         E oldValue = getAtomic();
@@ -275,7 +274,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Programma
         }
     }
 
-     @Override
+    @Override
     public E set(Transaction tx, E newValue) {
         AlphaRefTranlocal<E> readonly = openForRead(tx);
 
@@ -342,12 +341,12 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Programma
         return setAtomic(null);
     }
 
-   @Override
+    @Override
     public E clear() {
         return set(null);
     }
 
-     @Override
+    @Override
     public E clear(Transaction tx) {
         return set(tx, null);
     }
@@ -382,7 +381,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Programma
 
 
 /**
- * The AlphaTranlocal for the AlphaRef. It is responsible for storing the state of the AlphaRef.
+ * The AlphaTranlocal for the AlphaProgrammaticReference. It is responsible for storing the state of the AlphaProgrammaticReference.
  * <p/>
  * The AlpaRefTranlocal also implements the Transaction interface because it can be
  * used as a lockOwner. This is done as a performance optimization.
@@ -392,7 +391,7 @@ public final class AlphaRef<E> extends DefaultTxObjectMixin implements Programma
 class AlphaRefTranlocal<E> extends AlphaTranlocal implements Transaction {
 
     //field belonging to the stm.
-    AlphaRef ___txObject;
+    AlphaProgrammaticReference ___txObject;
     AlphaRefTranlocal ___origin;
 
     E value;
@@ -403,11 +402,11 @@ class AlphaRefTranlocal<E> extends AlphaTranlocal implements Transaction {
         this.value = origin.value;
     }
 
-    AlphaRefTranlocal(AlphaRef<E> owner) {
+    AlphaRefTranlocal(AlphaProgrammaticReference<E> owner) {
         this(owner, null);
     }
 
-    AlphaRefTranlocal(AlphaRef<E> owner, E value) {
+    AlphaRefTranlocal(AlphaProgrammaticReference<E> owner, E value) {
         this.___txObject = owner;
         this.value = value;
     }

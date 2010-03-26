@@ -1,7 +1,5 @@
 package org.multiverse.api;
 
-import org.multiverse.utils.backoff.BackoffPolicy;
-
 import java.util.concurrent.TimeUnit;
 
 /**

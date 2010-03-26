@@ -10,7 +10,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 /**
  * @author Peter Veentjer
  */
-public class AlphaRef_getAtomicPerformanceTest {
+public class AlphaProgrammaticReference_isNullPerformanceTest {
 
     private long transactionCount = ((long) 1000) * 1000 * 1000 * 2;
 
@@ -20,13 +20,13 @@ public class AlphaRef_getAtomicPerformanceTest {
     }
 
     @Test
-    public void getAtomic() {
-        AlphaRef<String> ref = new AlphaRef<String>();
+    public void isNullAtomic() {
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>();
 
         long startNs = System.nanoTime();
 
         for (long k = 0; k < transactionCount; k++) {
-            ref.getAtomic();
+            ref.isNullAtomic();
 
             if (k % (100 * 1000 * 1000) == 0) {
                 System.out.println("at: " + k);
@@ -39,13 +39,13 @@ public class AlphaRef_getAtomicPerformanceTest {
     }
 
     @Test
-    public void get() {
-        AlphaRef<String> ref = new AlphaRef<String>();
+    public void isNull() {
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>();
 
         long startNs = System.nanoTime();
 
         for (long k = 0; k < transactionCount; k++) {
-            ref.get();
+            ref.isNull();
 
             if (k % (100 * 1000 * 1000) == 0) {
                 System.out.println("at: " + k);

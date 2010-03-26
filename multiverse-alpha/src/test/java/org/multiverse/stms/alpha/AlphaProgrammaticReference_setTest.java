@@ -16,7 +16,7 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
 /**
  * @author Peter Veentjer
  */
-public class AlphaRef_setTest {
+public class AlphaProgrammaticReference_setTest {
     private Stm stm;
     private TransactionFactory updateTxFactory;
     private TransactionFactory readonlyTxFactory;
@@ -40,7 +40,7 @@ public class AlphaRef_setTest {
 
     @Test
     public void testSetFromNullToNull() {
-        AlphaRef<String> ref = new AlphaRef<String>();
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>();
 
         long version = stm.getVersion();
         String result = ref.set(null);
@@ -51,7 +51,7 @@ public class AlphaRef_setTest {
 
     @Test
     public void testSetFromNullToNonNull() {
-        AlphaRef<String> ref = new AlphaRef<String>();
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>();
 
         long version = stm.getVersion();
         String newRef = "foo";
@@ -64,7 +64,7 @@ public class AlphaRef_setTest {
     @Test
     public void testSetFromNonNullToNull() {
         String oldRef = "foo";
-        AlphaRef<String> ref = new AlphaRef<String>(oldRef);
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>(oldRef);
 
         long version = stm.getVersion();
 
@@ -78,7 +78,7 @@ public class AlphaRef_setTest {
     public void testSetChangedReferenced() {
         String oldRef = "foo";
 
-        AlphaRef<String> ref = new AlphaRef<String>(oldRef);
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>(oldRef);
 
         long version = stm.getVersion();
 
@@ -93,7 +93,7 @@ public class AlphaRef_setTest {
     public void testSetUnchangedReferences() {
         String oldRef = "foo";
 
-        AlphaRef<String> ref = new AlphaRef<String>(oldRef);
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>(oldRef);
 
         long version = stm.getVersion();
 
@@ -107,7 +107,7 @@ public class AlphaRef_setTest {
     public void testSetEqualIsNotUsedButReferenceEquality() {
         String oldRef = new String("foo");
 
-        AlphaRef<String> ref = new AlphaRef<String>(oldRef);
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>(oldRef);
 
         long version = stm.getVersion();
 
@@ -121,7 +121,7 @@ public class AlphaRef_setTest {
     @Test
     public void testSetAndUnsetIsNotSeenAsChange() {
         String oldRef = "foo";
-        AlphaRef<String> ref = new AlphaRef<String>(oldRef);
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>(oldRef);
 
         long version = stm.getVersion();
         Transaction tx = updateTxFactory.start();
@@ -139,7 +139,7 @@ public class AlphaRef_setTest {
     @Test
     public void testSetOnReadonlyRefFailsWithReadonlyException() {
         String value = "foo";
-        AlphaRef<String> ref = new AlphaRef<String>(value);
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>(value);
         long version = stm.getVersion();
 
         Transaction tx = readonlyTxFactory.start();

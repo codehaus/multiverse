@@ -1,5 +1,6 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
+import org.multiverse.api.Latch;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.api.exceptions.UncommittedReadConflict;
@@ -8,7 +9,6 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AbstractAlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
-import org.multiverse.utils.latches.Latch;
 
 import static java.lang.String.format;
 import static org.multiverse.stms.alpha.AlphaStmUtils.toTxObjectString;

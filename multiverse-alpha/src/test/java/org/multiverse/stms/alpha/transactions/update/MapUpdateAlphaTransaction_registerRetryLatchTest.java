@@ -3,6 +3,7 @@ package org.multiverse.stms.alpha.transactions.update;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.api.Latch;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.NoRetryPossibleException;
@@ -15,7 +16,6 @@ import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.templates.TransactionTemplate;
 import org.multiverse.utils.Listeners;
 import org.multiverse.utils.latches.CheapLatch;
-import org.multiverse.utils.latches.Latch;
 
 import java.util.LinkedList;
 import java.util.List;

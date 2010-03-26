@@ -2,6 +2,7 @@ package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.Latch;
 import org.multiverse.api.exceptions.WriteSkewConflict;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
@@ -11,7 +12,6 @@ import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.utils.latches.CheapLatch;
-import org.multiverse.utils.latches.Latch;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsCommitted;

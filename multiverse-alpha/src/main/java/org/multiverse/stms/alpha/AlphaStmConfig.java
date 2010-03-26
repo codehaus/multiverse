@@ -1,6 +1,6 @@
 package org.multiverse.stms.alpha;
 
-import org.multiverse.utils.backoff.BackoffPolicy;
+import org.multiverse.api.BackoffPolicy;
 import org.multiverse.utils.backoff.ExponentialBackoffPolicy;
 import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.clock.RelaxedPrimitiveClock;

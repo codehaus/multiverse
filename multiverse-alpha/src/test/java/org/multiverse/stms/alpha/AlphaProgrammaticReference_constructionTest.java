@@ -5,14 +5,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
  */
-public class AlphaRef_isNullTest {
+public class AlphaProgrammaticReference_constructionTest {
     private Stm stm;
 
     @Before
@@ -27,24 +28,33 @@ public class AlphaRef_isNullTest {
     }
 
     @Test
-    public void whenValueNull() {
-        AlphaRef<String> ref = new AlphaRef<String>();
-
+    public void noArgConstruction() {
         long version = stm.getVersion();
-        boolean result = ref.isNull();
 
-        assertTrue(result);
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>();
+
         assertEquals(version, stm.getVersion());
+        assertNull(ref.get());
     }
 
     @Test
-    public void whenValueNotNull() {
-        AlphaRef<String> ref = new AlphaRef<String>("foo");
-
+    public void nullConstruction() {
         long version = stm.getVersion();
-        boolean result = ref.isNull();
 
-        assertFalse(result);
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>();
+
         assertEquals(version, stm.getVersion());
+        assertEquals(null, ref.get());
     }
+
+    @Test
+    public void nonNullConstruction() {
+        long version = stm.getVersion();
+        String s = "foo";
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>(s);
+
+        assertEquals(version, stm.getVersion());
+        assertEquals(s, ref.get());
+    }
+
 }

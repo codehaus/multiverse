@@ -1,9 +1,9 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
+import org.multiverse.api.Latch;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
-import org.multiverse.utils.latches.Latch;
 
 /**
  * A tracking readonly transaction that is optimized for reading/tracking a single transactional object.

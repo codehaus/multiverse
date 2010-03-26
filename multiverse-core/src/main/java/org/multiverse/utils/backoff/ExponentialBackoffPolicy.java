@@ -1,5 +1,6 @@
 package org.multiverse.utils.backoff;
 
+import org.multiverse.api.BackoffPolicy;
 import org.multiverse.api.Transaction;
 
 import java.util.concurrent.TimeUnit;
@@ -8,7 +9,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.locks.LockSupport.parkNanos;
 
 /**
- * A {@link BackoffPolicy} that does an exponential backoff. So each next attempt, the delay is doubled until a
+ * A {@link org.multiverse.api.BackoffPolicy} that does an exponential backoff. So each next attempt, the delay is doubled until a
  * configurable maximum delay has been reached.
  * <p/>
  * The exponential growth of delay can be truncated by providing a maxDelay. If no max delay is provided, the maximum

@@ -3,6 +3,7 @@ package org.multiverse.utils.latches;
 import org.junit.After;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.api.Latch;
 
 import java.util.concurrent.TimeUnit;
 

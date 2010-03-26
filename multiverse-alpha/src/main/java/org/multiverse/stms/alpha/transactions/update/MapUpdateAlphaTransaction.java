@@ -1,5 +1,6 @@
 package org.multiverse.stms.alpha.transactions.update;
 
+import org.multiverse.api.Latch;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
@@ -7,7 +8,6 @@ import org.multiverse.stms.alpha.UncommittedFilter;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.utils.Listeners;
 import org.multiverse.utils.commitlock.CommitLock;
-import org.multiverse.utils.latches.Latch;
 
 import java.util.Collection;
 import java.util.IdentityHashMap;

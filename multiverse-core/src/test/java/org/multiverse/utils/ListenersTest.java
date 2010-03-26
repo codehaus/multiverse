@@ -1,8 +1,8 @@
 package org.multiverse.utils;
 
 import org.junit.Test;
+import org.multiverse.api.Latch;
 import org.multiverse.utils.latches.CheapLatch;
-import org.multiverse.utils.latches.Latch;
 
 import static org.junit.Assert.*;
 

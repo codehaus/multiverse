@@ -15,7 +15,7 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
 /**
  * @author Peter Veentjer
  */
-public class AlphaRef_setAtomicTest {
+public class AlphaProgrammaticReference_setAtomicTest {
     private Stm stm;
     private TransactionFactory updateTxFactory;
     private TransactionFactory readonlyTxFactory;
@@ -36,7 +36,7 @@ public class AlphaRef_setAtomicTest {
 
     @Test
     public void whenNullAndNewValueNull() {
-        AlphaRef<String> ref = new AlphaRef<String>();
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>();
 
         long version = stm.getVersion();
         String result = ref.setAtomic(null);
@@ -49,7 +49,7 @@ public class AlphaRef_setAtomicTest {
     @Test
     public void whenNotNullAndNewValueNull() {
         String oldValue = "old";
-        AlphaRef<String> ref = new AlphaRef<String>("old");
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>("old");
 
         long version = stm.getVersion();
         String newValue = "foo";
@@ -63,7 +63,7 @@ public class AlphaRef_setAtomicTest {
     @Test
     public void whenNotNullAndValueNull() {
         String oldValue = "foo";
-        AlphaRef<String> ref = new AlphaRef<String>(oldValue);
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>(oldValue);
 
         long version = stm.getVersion();
         String result = ref.setAtomic(null);
@@ -77,7 +77,7 @@ public class AlphaRef_setAtomicTest {
     public void testSetChangedReferenced() {
         String oldValue = "foo";
 
-        AlphaRef<String> ref = new AlphaRef<String>(oldValue);
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>(oldValue);
 
         long version = stm.getVersion();
 
@@ -92,7 +92,7 @@ public class AlphaRef_setAtomicTest {
     public void testSetUnchangedReferences() {
         String oldValue = "foo";
 
-        AlphaRef<String> ref = new AlphaRef<String>(oldValue);
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>(oldValue);
 
         long version = stm.getVersion();
 
@@ -106,7 +106,7 @@ public class AlphaRef_setAtomicTest {
     public void testSetEqualIsNotUsedButReferenceEquality() {
         String oldValue = new String("foo");
 
-        AlphaRef<String> ref = new AlphaRef<String>(oldValue);
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>(oldValue);
 
         long version = stm.getVersion();
 
@@ -120,7 +120,7 @@ public class AlphaRef_setAtomicTest {
     @Test
     public void testSetAndUnsetIsNotSeenAsChange() {
         String oldValue = "foo";
-        AlphaRef<String> ref = new AlphaRef<String>(oldValue);
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>(oldValue);
 
         long version = stm.getVersion();
         Transaction tx = updateTxFactory.start();

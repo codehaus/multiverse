@@ -16,7 +16,7 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
 /**
  * @author Peter Veentjer
  */
-public class AlphaRef_getOrAwaitTest {
+public class AlphaProgrammaticReference_getOrAwaitTest {
 
     private Stm stm;
     private TransactionFactory updateTxFactory;
@@ -37,7 +37,7 @@ public class AlphaRef_getOrAwaitTest {
     public void whenNotNull_thenValueReturned() {
         String oldRef = "foo";
 
-        AlphaRef<String> ref = new AlphaRef<String>(oldRef);
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>(oldRef);
 
         long version = stm.getVersion();
 
@@ -48,7 +48,7 @@ public class AlphaRef_getOrAwaitTest {
 
     @Test
     public void whenNull_retryError() {
-        AlphaRef<String> ref = new AlphaRef<String>();
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>();
 
         long version = stm.getVersion();
 

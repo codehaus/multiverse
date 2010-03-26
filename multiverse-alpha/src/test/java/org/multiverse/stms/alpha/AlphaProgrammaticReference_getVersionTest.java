@@ -6,7 +6,7 @@ import org.junit.Test;
 /**
  * @author Peter Veentjer
  */
-public class AlphaRef_getVersionTest {
+public class AlphaProgrammaticReference_getVersionTest {
 
     @Test
     @Ignore

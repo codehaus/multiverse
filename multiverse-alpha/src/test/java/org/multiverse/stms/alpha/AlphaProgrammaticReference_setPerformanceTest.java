@@ -10,9 +10,9 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 /**
  * @author Peter Veentjer
  */
-public class AlphaRef_isNullPerformanceTest {
+public class AlphaProgrammaticReference_setPerformanceTest {
 
-    private long transactionCount = ((long) 1000) * 1000 * 1000 * 2;
+    private long transactionCount = ((long) 1000) * 1000 * 500;
 
     @Before
     public void setUp() {
@@ -20,15 +20,16 @@ public class AlphaRef_isNullPerformanceTest {
     }
 
     @Test
-    public void isNullAtomic() {
-        AlphaRef<String> ref = new AlphaRef<String>();
+    public void set() {
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>();
 
         long startNs = System.nanoTime();
 
-        for (long k = 0; k < transactionCount; k++) {
-            ref.isNullAtomic();
 
-            if (k % (100 * 1000 * 1000) == 0) {
+        for (long k = 0; k < transactionCount; k++) {
+            ref.set(k % 2 == 0 ? "foo" : "bar");
+
+            if (k % (10 * 1000 * 1000) == 0) {
                 System.out.println("at: " + k);
             }
         }
@@ -39,15 +40,15 @@ public class AlphaRef_isNullPerformanceTest {
     }
 
     @Test
-    public void isNull() {
-        AlphaRef<String> ref = new AlphaRef<String>();
+    public void setAtomic() {
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>();
 
         long startNs = System.nanoTime();
 
         for (long k = 0; k < transactionCount; k++) {
-            ref.isNull();
+            ref.setAtomic(k % 2 == 0 ? "foo" : "bar");
 
-            if (k % (100 * 1000 * 1000) == 0) {
+            if (k % (10 * 1000 * 1000) == 0) {
                 System.out.println("at: " + k);
             }
         }

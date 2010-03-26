@@ -1,7 +1,7 @@
 package org.multiverse.stms;
 
+import org.multiverse.api.BackoffPolicy;
 import org.multiverse.api.TransactionConfiguration;
-import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.backoff.ExponentialBackoffPolicy;
 import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.clock.StrictPrimitiveClock;

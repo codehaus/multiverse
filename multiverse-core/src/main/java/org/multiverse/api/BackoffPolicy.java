@@ -1,6 +1,4 @@
-package org.multiverse.utils.backoff;
-
-import org.multiverse.api.Transaction;
+package org.multiverse.api;
 
 /**
  * A policy that can be used to backoff when it can't make progress because other transactions are interfering.

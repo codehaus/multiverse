@@ -8,7 +8,6 @@ import org.multiverse.stms.alpha.transactions.update.ArrayUpdateAlphaTransaction
 import org.multiverse.stms.alpha.transactions.update.MapUpdateAlphaTransaction;
 import org.multiverse.stms.alpha.transactions.update.MonoUpdateAlphaTransaction;
 import org.multiverse.stms.alpha.transactions.update.UpdateAlphaTransactionConfiguration;
-import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
 
@@ -133,13 +132,13 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
     private final static class AlphaRefFactory<E> implements ProgrammaticReferenceFactory {
 
         @Override
-        public <E> ProgrammaticReference<E> create(Transaction t, E value) {
-            return new AlphaRef<E>(t, value);
+        public <E> ProgrammaticReference<E> create(Transaction tx, E value) {
+            return new AlphaProgrammaticReference<E>(tx, value);
         }
 
         @Override
         public <E> ProgrammaticReference<E> create(E value) {
-            return new AlphaRef<E>(value);
+            return new AlphaProgrammaticReference<E>(value);
         }
     }
 

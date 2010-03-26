@@ -1,5 +1,6 @@
 package org.multiverse.utils.backoff;
 
+import org.multiverse.api.BackoffPolicy;
 import org.multiverse.api.Transaction;
 
 /**

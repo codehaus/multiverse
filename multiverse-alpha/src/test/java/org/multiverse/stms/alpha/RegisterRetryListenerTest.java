@@ -2,11 +2,11 @@ package org.multiverse.stms.alpha;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.Latch;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.NoRetryPossibleException;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 import org.multiverse.utils.latches.CheapLatch;
-import org.multiverse.utils.latches.Latch;
 
 import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;

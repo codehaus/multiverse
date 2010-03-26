@@ -5,7 +5,7 @@ package org.multiverse.api;
  * {@link Transaction}. So see that for more details.
  * <p/>
  * It is important that an TransactionalObject only is used within a single stm. If it is 'shared' between different
- * stm's, isolation problems could start to appear. This can be caused by the fact that different stm's probably use
+ * stm's, isolation problems could happen. This can be caused by the fact that different stm's probably use
  * different clocks. And the clock is needed to prevent isolation problems.
  * <p/>
  * All methods on the Stm are of course thread safe.
@@ -13,14 +13,6 @@ package org.multiverse.api;
  * @author Peter Veentjer.
  */
 public interface Stm<B extends TransactionFactoryBuilder> {
-
-    /**
-     * Gets the {@link TransactionFactoryBuilder} that needs to be used to execute transactions on this Stm. See the
-     * {@link TransactionFactoryBuilder} for more info.
-     *
-     * @return the TransactionFactoryBuilder that needs to be used to execute transactions on this Stm.
-     */
-    B getTransactionFactoryBuilder();
 
     /**
      * Returns the current clock version (this is logical time). The returned value will always be equal or larger than
@@ -32,6 +24,14 @@ public interface Stm<B extends TransactionFactoryBuilder> {
      * @return the current clock version.
      */
     long getVersion();
+
+    /**
+     * Gets the {@link TransactionFactoryBuilder} that needs to be used to execute transactions on this Stm. See the
+     * {@link TransactionFactoryBuilder} for more info.
+     *
+     * @return the TransactionFactoryBuilder that needs to be used to execute transactions on this Stm.
+     */
+    B getTransactionFactoryBuilder();
 
     /**
      * Returns the programmatic reference factory this Stm exposes. See the

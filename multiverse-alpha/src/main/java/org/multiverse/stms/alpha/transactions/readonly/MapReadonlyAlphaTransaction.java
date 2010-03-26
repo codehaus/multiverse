@@ -1,10 +1,10 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
+import org.multiverse.api.Latch;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.utils.latches.Latch;
 
 import java.util.IdentityHashMap;
 import java.util.Map;

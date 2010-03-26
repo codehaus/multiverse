@@ -13,7 +13,7 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
-public class AlphaRef_rollbackTest {
+public class AlphaProgrammaticReference_rollbackTest {
 
     private Stm stm;
     private TransactionFactory updateTxFactory;
@@ -41,7 +41,7 @@ public class AlphaRef_rollbackTest {
     }
 
     public void rollback(String initialValue, String newValue) {
-        AlphaRef<String> ref = new AlphaRef<String>(initialValue);
+        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>(initialValue);
 
         long version = stm.getVersion();
 

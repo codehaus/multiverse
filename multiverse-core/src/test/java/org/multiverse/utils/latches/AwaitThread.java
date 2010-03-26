@@ -1,6 +1,7 @@
 package org.multiverse.utils.latches;
 
 import org.multiverse.TestThread;
+import org.multiverse.api.Latch;
 
 public class AwaitThread extends TestThread {
     private final Latch latch;
