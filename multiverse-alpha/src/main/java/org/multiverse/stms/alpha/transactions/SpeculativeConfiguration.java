@@ -110,8 +110,11 @@ public final class SpeculativeConfiguration {
     }
 
     public SpeculativeConfiguration withSpeculativeReadonlyDisabled() {
-        return new SpeculativeConfiguration(false, isSpeculativeNonAutomaticReadTrackingEnabled,
-                isSpeculativeSizeEnabled, maximumArraySize);
+        return new SpeculativeConfiguration(
+                false,
+                isSpeculativeNonAutomaticReadTrackingEnabled,
+                isSpeculativeSizeEnabled,
+                maximumArraySize);
     }
 
     // ================ automatic readtracking ===========================
@@ -133,8 +136,11 @@ public final class SpeculativeConfiguration {
     }
 
     public SpeculativeConfiguration withSpeculativeNonAutomaticReadTrackingDisabled() {
-        return new SpeculativeConfiguration(isSpeculativeReadonlyEnabled, false,
-                isSpeculativeSizeEnabled, maximumArraySize);
+        return new SpeculativeConfiguration(
+                isSpeculativeReadonlyEnabled,
+                false,
+                isSpeculativeSizeEnabled,
+                maximumArraySize);
     }
 
     // ============= misc ===========================
@@ -144,7 +150,11 @@ public final class SpeculativeConfiguration {
         return format("SpeculativeConfiguration(size=%s, " +
                 "isSpeculativeReadonlyEnabled=%s, " +
                 "isSpeculativeNonAutomaticReadTrackingEnabled=%s, " +
-                "isSpeculativeNonAutomaticReadTrackingEnabled=%s" +
-                ")", size.get(), isSpeculativeReadonlyEnabled, isSpeculativeNonAutomaticReadTrackingEnabled, isSpeculativeNonAutomaticReadTrackingEnabled);
+                "isSpeculativeSizeEnabled=%s" +
+                ")",
+                size.get(),
+                isSpeculativeReadonlyEnabled,
+                isSpeculativeNonAutomaticReadTrackingEnabled,
+                isSpeculativeSizeEnabled);
     }
 }

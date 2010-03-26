@@ -244,11 +244,9 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
         @Override
         public AlphaTransactionFactoryBuilder setAllowWriteSkewProblem(boolean allowWriteSkew) {
-            SpeculativeConfiguration newSpeculativeConfig = speculativeConfig.withSpeculativeNonAutomaticReadTrackingDisabled();
-
             return new AlphaTransactionFactoryBuilder(
                     readonly, automaticReadTracking, familyName, maxRetryCount,
-                    allowWriteSkew, commitLockPolicy, backoffPolicy, newSpeculativeConfig,
+                    allowWriteSkew, commitLockPolicy, backoffPolicy, speculativeConfig,
                     interruptible, dirtyCheck);
         }
 

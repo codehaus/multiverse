@@ -5,12 +5,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.api.Transaction;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 /**
  * The cause of the dining philosophers problem is that the take of the left and right fork are not atomic. So it
@@ -30,12 +32,12 @@ public class DiningPhilosophersStressTest {
 
     @Before
     public void setUp() {
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
     }
 
     @After
     public void tearDown() {
-        //   stm.getProfiler().print();
+        clearThreadLocalTransaction();
     }
 
     @Test
@@ -111,6 +113,7 @@ public class DiningPhilosophersStressTest {
 
         @TransactionalMethod(maxRetryCount = 10000)
         public void takeForks() {
+            Transaction tx = getThreadLocalTransaction();
             if (leftFork.get() == 1) {
                 retry();
             } else {
