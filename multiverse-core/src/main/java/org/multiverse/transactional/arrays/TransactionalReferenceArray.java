@@ -78,6 +78,7 @@ public final class TransactionalReferenceArray<E> {
      */
     @Exclude
     public int length() {
+        //it doesn't need a transaction, so it is excluded.
         return array.length;
     }
 

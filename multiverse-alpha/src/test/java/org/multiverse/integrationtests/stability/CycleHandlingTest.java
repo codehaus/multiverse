@@ -36,7 +36,10 @@ public class CycleHandlingTest {
     }
 
     public Transaction startUpdateTransaction() {
-        Transaction t = stm.getTransactionFactoryBuilder().build().start();
+        Transaction t = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .build()
+                .start();
         setThreadLocalTransaction(t);
         return t;
     }

@@ -292,6 +292,8 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor {
         txMetadata.interruptible = (Boolean) getValue(annotationNode, "interruptible", throwsInterruptedException);
         txMetadata.allowWriteSkewProblem = (Boolean) getValue(annotationNode, "allowWriteSkewProblem", true);
 
+        //Boolean defaultAutomaticReadTracking = txMetadata.allowWriteSkewProblem?null        
+
         txMetadata.automaticReadTracking = (Boolean) getValue(annotationNode, "automaticReadTracking", null);
         txMetadata.timeout = ((Number) getValue(annotationNode, "timeout", -1)).longValue();
         txMetadata.timeoutTimeUnit = (TimeUnit) getValue(annotationNode, "timeoutTimeUnit", TimeUnit.SECONDS);
@@ -306,7 +308,6 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor {
 
         return txMetadata;
     }
-
 
     private String createFamilyName(String className, String methodName, String desc) {
         StringBuffer sb = new StringBuffer();
