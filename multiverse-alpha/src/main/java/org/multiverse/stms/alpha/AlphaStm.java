@@ -279,7 +279,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             final ReadonlyAlphaTransactionConfiguration ro_nort =
                     new ReadonlyAlphaTransactionConfiguration(
                             clock, backoffPolicy, familyName, speculativeConfig,
-                            maxRetryCount, false, false);
+                            maxRetryCount, interruptible, false);
             final ReadonlyAlphaTransactionConfiguration ro_rt =
                     new ReadonlyAlphaTransactionConfiguration(
                             clock, backoffPolicy, familyName, speculativeConfig,
