@@ -1,5 +1,6 @@
 package org.multiverse.stms.alpha.integrationtests;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.TransactionFactory;
@@ -11,7 +12,7 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * MVCC suffers from a problem that serialized transactions are not completely serialized. For more information check
@@ -34,15 +35,23 @@ public class WriteSkewDetectionTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
         stack1 = new IntStack();
         stack2 = new IntStack();
+    }
+
+    @After
+    public void tearDown() {
+        clearThreadLocalTransaction();
     }
 
     @Test
     public void whenDisabledWriteSkewProblem_thenWriteSkewConflict() {
         TransactionFactory<AlphaTransaction> factory = stm.getTransactionFactoryBuilder()
-                .setAllowWriteSkewProblem(false).build();
+                .setAutomaticReadTracking(true)
+                .setSpeculativeConfigurationEnabled(false)
+                .setAllowWriteSkewProblem(false)
+                .build();
 
         AlphaTransaction t1 = factory.start();
         AlphaTransaction t2 = factory.start();
@@ -66,7 +75,9 @@ public class WriteSkewDetectionTest {
     @Test
     public void whenEnabledWriteSkewProblem_thenWriteSkewHappens() {
         TransactionFactory<AlphaTransaction> txFactory = stm.getTransactionFactoryBuilder()
-                .setAllowWriteSkewProblem(true).build();
+                .setSpeculativeConfigurationEnabled(false)
+                .setAllowWriteSkewProblem(true)
+                .build();
 
         AlphaTransaction tx1 = txFactory.start();
         AlphaTransaction tx2 = txFactory.start();
@@ -84,6 +95,7 @@ public class WriteSkewDetectionTest {
     @Test
     public void whenNonTrackingUpdateTransaction_thenWriteSkewNotDetected() {
         TransactionFactory<AlphaTransaction> txFactory = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
                 .setAutomaticReadTracking(false)
                 .setReadonly(false).build();
 
