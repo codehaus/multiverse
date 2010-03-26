@@ -5,12 +5,13 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
+import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.NoRetryPossibleException;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.utils.Listeners;
 import org.multiverse.utils.latches.CheapLatch;
 import org.multiverse.utils.latches.Latch;
@@ -18,6 +19,8 @@ import org.multiverse.utils.latches.Latch;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
 
@@ -28,14 +31,15 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
         stm = new AlphaStm(stmConfig);
+        clearThreadLocalTransaction();
     }
 
     public MapReadonlyAlphaTransaction startSutTransaction() {
-        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
+        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                new OptimalSize(1, 100),
+                new SpeculativeConfiguration(100),
                 stmConfig.maxRetryCount, false, true);
         return new MapReadonlyAlphaTransaction(config);
     }
@@ -200,6 +204,9 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
 
         @TransactionalMethod(readonly = true, automaticReadTracking = true)
         public void await(int value) {
+            Transaction tx = getThreadLocalTransaction();
+            ReadonlyAlphaTransactionConfiguration config = (ReadonlyAlphaTransactionConfiguration) tx.getConfiguration();
+            System.out.println("tx.config: " + config.speculativeConfig);
             if (this.value != value) {
                 retry();
             }

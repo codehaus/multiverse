@@ -6,6 +6,7 @@ import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Transaction;
 import org.multiverse.stms.alpha.transactions.readonly.AbstractReadonlyAlphaTransaction;
+import org.multiverse.stms.alpha.transactions.readonly.NonTrackingReadonlyAlphaTransaction;
 import org.multiverse.stms.alpha.transactions.update.AbstractUpdateAlphaTransaction;
 
 import static org.junit.Assert.assertFalse;
@@ -45,7 +46,7 @@ public class TransactionSelectionTest {
 
         public void noAnnotations() {
             Transaction tx = getThreadLocalTransaction();
-            assertTrue(tx instanceof AbstractUpdateAlphaTransaction);
+            assertTrue(tx instanceof NonTrackingReadonlyAlphaTransaction);
         }
 
         @TransactionalMethod(readonly = true)
@@ -63,15 +64,15 @@ public class TransactionSelectionTest {
         @TransactionalMethod(readonly = false, automaticReadTracking = true)
         public void updateTracking() {
             Transaction tx = getThreadLocalTransaction();
-            assertFalse(tx.getConfig().isReadonly());
-            assertTrue(tx.getConfig().automaticReadTracking());
+            assertFalse(tx.getConfiguration().isReadonly());
+            assertTrue(tx.getConfiguration().automaticReadTracking());
             assertTrue(tx instanceof AbstractUpdateAlphaTransaction);
         }
 
         @TransactionalMethod(automaticReadTracking = false)
         public void updateNonTracking() {
             Transaction tx = getThreadLocalTransaction();
-            assertTrue(tx instanceof AbstractUpdateAlphaTransaction);
+            assertTrue(tx instanceof NonTrackingReadonlyAlphaTransaction);
         }
     }
 }

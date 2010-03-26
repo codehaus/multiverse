@@ -12,25 +12,29 @@ import static java.lang.System.getProperty;
  *
  * @author Peter Veentjer.
  */
-public class SpeculativeConfigFailure extends ControlFlowError {
+public class SpeculativeConfigurationFailure extends ControlFlowError {
 
     public final static boolean reuse = parseBoolean(getProperty(
-            SpeculativeConfigFailure.class.getName() + ".reuse", "true"));
+            SpeculativeConfigurationFailure.class.getName() + ".reuse", "true"));
 
-    public static final SpeculativeConfigFailure INSTANCE = new SpeculativeConfigFailure();
+    public static final SpeculativeConfigurationFailure INSTANCE = new SpeculativeConfigurationFailure();
 
-    public SpeculativeConfigFailure() {
+    public static SpeculativeConfigurationFailure create() {
+        return reuse ? new SpeculativeConfigurationFailure() : INSTANCE;
     }
 
-    public SpeculativeConfigFailure(String message) {
+    public SpeculativeConfigurationFailure() {
+    }
+
+    public SpeculativeConfigurationFailure(String message) {
         super(message);
     }
 
-    public SpeculativeConfigFailure(String message, Throwable cause) {
+    public SpeculativeConfigurationFailure(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public SpeculativeConfigFailure(Throwable cause) {
+    public SpeculativeConfigurationFailure(Throwable cause) {
         super(cause);
     }
 }

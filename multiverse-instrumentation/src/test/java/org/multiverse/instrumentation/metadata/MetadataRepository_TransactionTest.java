@@ -24,10 +24,10 @@ public class MetadataRepository_TransactionTest {
         TransactionMetadata transactionMetadata = methodMetadata.getTransactionalMetadata();
 
         assertNotNull(transactionMetadata);
-        assertFalse(transactionMetadata.readOnly);
+        assertNull(transactionMetadata.automaticReadTracking);
+        assertNull(transactionMetadata.readOnly);
         assertFalse(transactionMetadata.interruptible);
         assertTrue(transactionMetadata.allowWriteSkewProblem);
-        assertTrue(transactionMetadata.automaticReadTracking);
         assertEquals(1000, transactionMetadata.maxRetryCount);
         assertEquals("org.multiverse.instrumentation.metadata.MetadataRepository_TransactionTest$DefaultSettings.method()", transactionMetadata.familyName);
     }
@@ -46,9 +46,9 @@ public class MetadataRepository_TransactionTest {
 
         assertNotNull(transactionMetadata);
         assertTrue(transactionMetadata.readOnly);
+        assertNull(transactionMetadata.automaticReadTracking);
         assertFalse(transactionMetadata.interruptible);
         assertTrue(transactionMetadata.allowWriteSkewProblem);
-        assertFalse(transactionMetadata.automaticReadTracking);
         assertEquals(1000, transactionMetadata.maxRetryCount);
         assertEquals("org.multiverse.instrumentation.metadata.MetadataRepository_TransactionTest$ReadonlyMethod.method()", transactionMetadata.familyName);
     }

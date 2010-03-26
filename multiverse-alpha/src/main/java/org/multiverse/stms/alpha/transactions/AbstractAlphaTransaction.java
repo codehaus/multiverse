@@ -3,7 +3,7 @@ package org.multiverse.stms.alpha.transactions;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.stms.AbstractTransaction;
-import org.multiverse.stms.AbstractTransactionConfig;
+import org.multiverse.stms.AbstractTransactionConfiguration;
 import org.multiverse.stms.AbstractTransactionSnapshot;
 import org.multiverse.stms.alpha.AlphaStmUtils;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -19,7 +19,7 @@ import static org.multiverse.stms.alpha.AlphaStmUtils.toTxObjectString;
  * @param <C>
  * @param <S>
  */
-public abstract class AbstractAlphaTransaction<C extends AbstractTransactionConfig, S extends AbstractTransactionSnapshot>
+public abstract class AbstractAlphaTransaction<C extends AbstractTransactionConfiguration, S extends AbstractTransactionSnapshot>
         extends AbstractTransaction<C, S> implements AlphaTransaction {
 
     public AbstractAlphaTransaction(C config) {

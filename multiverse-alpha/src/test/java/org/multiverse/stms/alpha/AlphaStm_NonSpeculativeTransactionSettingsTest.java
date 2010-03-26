@@ -15,7 +15,7 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
 /**
  * @author Peter Veentjer
  */
-public class AlphaStmTest {
+public class AlphaStm_NonSpeculativeTransactionSettingsTest {
 
     private AlphaStm stm;
 
@@ -27,7 +27,10 @@ public class AlphaStmTest {
 
     @Test
     public void testDefaultTransaction() {
-        Transaction t = stm.getTransactionFactoryBuilder().build().start();
+        Transaction t = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .build()
+                .start();
 
         assertTrue(t instanceof AbstractUpdateAlphaTransaction);
 
@@ -37,50 +40,66 @@ public class AlphaStmTest {
 
     @Test
     public void testDefaultUpdateTransaction() {
-        Transaction t = stm.getTransactionFactoryBuilder().setReadonly(false).build().start();
+        Transaction t = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
+                .build()
+                .start();
         assertTrue(t instanceof MapUpdateAlphaTransaction);
 
-        assertFalse(t.getConfig().isReadonly());
-        assertTrue(t.getConfig().automaticReadTracking());
-        assertTrue(t.getConfig().allowWriteSkewProblem());
-        assertEquals(1000, t.getConfig().getMaxRetryCount());
-        assertFalse(t.getConfig().isInterruptible());
+        assertFalse(t.getConfiguration().isReadonly());
+        assertFalse(t.getConfiguration().automaticReadTracking());
+        assertTrue(t.getConfiguration().allowWriteSkewProblem());
+        assertEquals(1000, t.getConfiguration().getMaxRetryCount());
+        assertFalse(t.getConfiguration().isInterruptible());
     }
 
     @Test
     public void test() {
         Transaction t = stm.getTransactionFactoryBuilder()
-                .setAutomaticReadTracking(true).build().start();
+                .setSpeculativeConfigurationEnabled(false)
+                .setAutomaticReadTracking(true)
+                .build()
+                .start();
 
         assertTrue(t instanceof AbstractUpdateAlphaTransaction);
 
-        assertFalse(t.getConfig().isReadonly());
-        assertTrue(t.getConfig().automaticReadTracking());
-        assertTrue(t.getConfig().allowWriteSkewProblem());
-        assertEquals(1000, t.getConfig().getMaxRetryCount());
-        assertFalse(t.getConfig().isInterruptible());
+        assertFalse(t.getConfiguration().isReadonly());
+        assertTrue(t.getConfiguration().automaticReadTracking());
+        assertTrue(t.getConfiguration().allowWriteSkewProblem());
+        assertEquals(1000, t.getConfiguration().getMaxRetryCount());
+        assertFalse(t.getConfiguration().isInterruptible());
     }
 
     @Test
     public void testNonTrackingUpdate() {
-        Transaction t = stm.getTransactionFactoryBuilder().setReadonly(false).setAutomaticReadTracking(true).build()
+        Transaction t = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
+                .setAutomaticReadTracking(true)
+                .build()
                 .start();
+
         assertTrue(t instanceof MapUpdateAlphaTransaction);
     }
 
     @Test(expected = IllegalStateException.class)
     public void whenUpdateTransactionWithWriteSkewDetectionAndNoAutomaticReadTracking_thenIllegalStateException() {
         stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
                 .setReadonly(false)
                 .setAutomaticReadTracking(false)
-                .setAllowWriteSkewProblem(false).build();
+                .setAllowWriteSkewProblem(false)
+                .build();
     }
 
     @Test
     public void whenReadonlyTransactionWithWriteSkewDetectionAndNoAutomaticReadTracking_thenIgnore() {
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
                 .setReadonly(true)
                 .setAutomaticReadTracking(false)
-                .setAllowWriteSkewProblem(true).build();
+                .setAllowWriteSkewProblem(true)
+                .build();
     }
 }

@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -23,11 +23,11 @@ public class MapReadonlyAlphaTransaction_miscTest {
     }
 
     public MapReadonlyAlphaTransaction startTransactionUnderTest() {
-        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
+        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                new OptimalSize(1, 100),
+                new SpeculativeConfiguration(100),
                 stmConfig.maxRetryCount, false, true);
         return new MapReadonlyAlphaTransaction(config);
     }
@@ -37,8 +37,8 @@ public class MapReadonlyAlphaTransaction_miscTest {
         AlphaTransaction tx = startTransactionUnderTest();
         assertIsActive(tx);
         assertEquals(stm.getVersion(), tx.getReadVersion());
-        assertTrue(tx.getConfig().isReadonly());
-        assertTrue(tx.getConfig().automaticReadTracking());
+        assertTrue(tx.getConfiguration().isReadonly());
+        assertTrue(tx.getConfiguration().automaticReadTracking());
 
     }
 }

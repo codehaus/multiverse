@@ -3,11 +3,12 @@ package org.multiverse.stms.alpha.transactions.update;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.NoRetryPossibleException;
+import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.utils.latches.CheapLatch;
 import org.multiverse.utils.latches.Latch;
 
@@ -27,37 +28,38 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public AlphaTransaction startSutTransaction(int size) {
-        OptimalSize optimalSize = new OptimalSize(1, 100);
-        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
+    public AlphaTransaction startSutTransaction() {
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
+
+        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 stmConfig.commitLockPolicy,
                 null,
-                optimalSize,
+                speculativeConfig,
                 stmConfig.maxRetryCount, true, true, true, true, true);
 
-        return new ArrayUpdateAlphaTransaction(config, size);
+        return new ArrayUpdateAlphaTransaction(config, speculativeConfig.getOptimalSize());
     }
 
-    public AlphaTransaction startSutTransactionWithoutAutomaticReadTracking(int size) {
-        OptimalSize optimalSize = new OptimalSize(1, 100);
-        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
+    public AlphaTransaction startSutTransactionWithoutAutomaticReadTracking(SpeculativeConfiguration speculativeConfig) {
+        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 stmConfig.commitLockPolicy,
                 null,
-                optimalSize,
+                speculativeConfig,
                 stmConfig.maxRetryCount, true, false, true, true, true);
 
-        return new ArrayUpdateAlphaTransaction(config, size);
+        return new ArrayUpdateAlphaTransaction(config, speculativeConfig.getMaximumArraySize());
     }
 
     @Test
     public void whenNoAutomaticReadtracking_thenNoRetryPossibleException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransactionWithoutAutomaticReadTracking(10);
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, false, false, 100);
+        AlphaTransaction tx = startSutTransactionWithoutAutomaticReadTracking(speculativeConfig);
         tx.openForWrite(ref);
 
         Latch latch = new CheapLatch();
@@ -70,10 +72,28 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
         assertFalse(latch.isOpen());
     }
 
+    @Test
+    public void whenSpeculativeNoAutomaticReadtracking_thenSpeculativeConfigurationFailure() {
+        ManualRef ref = new ManualRef(stm);
+
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, false, 100);
+        AlphaTransaction tx = startSutTransactionWithoutAutomaticReadTracking(speculativeConfig);
+        tx.openForWrite(ref);
+
+        Latch latch = new CheapLatch();
+        try {
+            tx.registerRetryLatch(latch);
+            fail();
+        } catch (SpeculativeConfigurationFailure expected) {
+        }
+
+        assertFalse(latch.isOpen());
+        assertTrue(speculativeConfig.isAutomaticReadTracking());
+    }
 
     @Test
     public void whenUnused_thenNoRetryPossibleException() {
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = startSutTransaction();
 
         Latch latch = new CheapLatch();
 
@@ -91,7 +111,7 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
     public void whenOnlyFresh_thenNoRetryPossibleException() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = startSutTransaction();
         tx.openForWrite(ref);
 
         Latch latch = new CheapLatch();
@@ -110,7 +130,7 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
     public void whenOpenedForWrite_thenListenerAppended() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = startSutTransaction();
         tx.openForWrite(ref);
 
         Latch latch = new CheapLatch();
@@ -125,7 +145,7 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
     public void whenOpenedForRead_thenListenerAppended() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = startSutTransaction();
         tx.openForRead(ref);
 
         Latch latch = new CheapLatch();
@@ -143,11 +163,11 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
         Latch latch1 = new CheapLatch();
         Latch latch2 = new CheapLatch();
 
-        AlphaTransaction tx1 = startSutTransaction(10);
+        AlphaTransaction tx1 = startSutTransaction();
         tx1.openForRead(ref);
         tx1.registerRetryLatch(latch1);
 
-        AlphaTransaction tx2 = startSutTransaction(10);
+        AlphaTransaction tx2 = startSutTransaction();
         tx2.openForRead(ref);
         tx2.registerRetryLatch(latch2);
 
@@ -163,7 +183,7 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
         ManualRef ref2 = new ManualRef(stm);
         ManualRef ref3 = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = startSutTransaction();
         tx.openForRead(ref1);
         tx.openForRead(ref2);
         tx.openForRead(ref3);
@@ -182,7 +202,7 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
     public void whenListenVersionAlreadyIsThere_thenLatchIsOpenedAndNothingIsRegistered() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = startSutTransaction();
         tx.openForRead(ref);
 
         //do the desired update

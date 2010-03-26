@@ -10,7 +10,7 @@ import org.multiverse.utils.clock.StrictPrimitiveClock;
 public class AbstractTransactionImpl extends AbstractTransaction {
 
     public AbstractTransactionImpl() {
-        super(new AbstractTransactionConfig(
+        super(new AbstractTransactionConfiguration(
                 new StrictPrimitiveClock(1),
                 ExponentialBackoffPolicy.INSTANCE_10_MS_MAX,
                 null,
@@ -21,7 +21,7 @@ public class AbstractTransactionImpl extends AbstractTransaction {
     }
 
     public AbstractTransactionImpl(PrimitiveClock clock) {
-        super(new AbstractTransactionConfig(
+        super(new AbstractTransactionConfiguration(
                 clock,
                 ExponentialBackoffPolicy.INSTANCE_10_MS_MAX,
                 null,
@@ -32,7 +32,7 @@ public class AbstractTransactionImpl extends AbstractTransaction {
     }
 
     public AbstractTransactionImpl(String familyName, PrimitiveClock clock) {
-        super(new AbstractTransactionConfig(
+        super(new AbstractTransactionConfiguration(
                 clock,
                 ExponentialBackoffPolicy.INSTANCE_10_MS_MAX,
                 familyName,

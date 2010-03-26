@@ -9,7 +9,7 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -28,16 +28,19 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MonoUpdateAlphaTransaction startSutTransaction() {
-        OptimalSize optimalSize = new OptimalSize(1, 100);
-        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
+    public MonoUpdateAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfig) {
+        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 stmConfig.commitLockPolicy,
                 null,
-                optimalSize,
+                speculativeConfig,
                 stmConfig.maxRetryCount, true, true, true, true, true);
         return new MonoUpdateAlphaTransaction(config);
+    }
+
+    public MonoUpdateAlphaTransaction startSutTransaction() {
+        return startSutTransaction(new SpeculativeConfiguration(100));
     }
 
     @Test
@@ -75,7 +78,6 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
         assertFreshTranlocal(ref, tranlocal);
         assertSame(tranlocal, getField(tx, "attached"));
     }
-
 
     @Test
     public void whenVersionTooNew_thenOldVersionNotFoundReadConflict() {
@@ -134,39 +136,41 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
     }
 
     @Test
-    public void whenAlreadyAnotherOpenForRead_thenTransactionTooSmallError() {
+    public void whenAlreadyAnotherOpenForRead_thenSpeculativeConfigurationFailure() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
+        AlphaTransaction tx = startSutTransaction(speculativeConfig);
         tx.openForRead(ref1);
 
         try {
             tx.openForWrite(ref2);
             fail();
-        } catch (SpeculativeConfigFailure ex) {
+        } catch (SpeculativeConfigurationFailure ex) {
         }
 
-        //todo
-        //assertEquals(2, optimalSize.get());
+        assertIsActive(tx);
+        assertEquals(2, speculativeConfig.getOptimalSize());
     }
 
     @Test
-    public void whenAlreadyAnotherOpenForWrite_thenTransactionTooSmallError() {
+    public void whenAlreadyAnotherOpenForWrite_thenSpeculativeConfigurationFailure() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
+        AlphaTransaction tx = startSutTransaction(speculativeConfig);
         tx.openForWrite(ref1);
 
         try {
             tx.openForWrite(ref2);
             fail();
-        } catch (SpeculativeConfigFailure ex) {
+        } catch (SpeculativeConfigurationFailure ex) {
         }
 
-        //todo:
-        //assertEquals(2, optimalSize.get());
+        assertIsActive(tx);
+        assertEquals(2, speculativeConfig.getOptimalSize());
     }
 
     @Test

@@ -24,8 +24,12 @@ public class AlphaRef_setTest {
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
-        updateTxFactory = stm.getTransactionFactoryBuilder().build();
-        readonlyTxFactory = stm.getTransactionFactoryBuilder().setReadonly(true).build();
+        updateTxFactory = stm.getTransactionFactoryBuilder()
+                .setReadonly(false)
+                .build();
+        readonlyTxFactory = stm.getTransactionFactoryBuilder()
+                .setReadonly(true)
+                .build();
         clearThreadLocalTransaction();
     }
 

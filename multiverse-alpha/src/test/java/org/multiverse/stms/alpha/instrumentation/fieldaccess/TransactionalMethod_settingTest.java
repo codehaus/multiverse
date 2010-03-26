@@ -86,15 +86,15 @@ public class TransactionalMethod_settingTest {
             //force the loadForRead so that the retry doesn't find an empty transaction
             int b = x;
 
-            return getThreadLocalTransaction().getConfig().allowWriteSkewProblem();
+            return getThreadLocalTransaction().getConfiguration().allowWriteSkewProblem();
         }
 
-        @TransactionalMethod(allowWriteSkewProblem = false)
+        @TransactionalMethod(allowWriteSkewProblem = false, automaticReadTracking = true)
         public boolean updateWithDisallowedWriteSkewProblem() {
             //force the loadForRead so that the retry doesn't find an empty transaction
             int b = x;
 
-            return getThreadLocalTransaction().getConfig().allowWriteSkewProblem();
+            return getThreadLocalTransaction().getConfiguration().allowWriteSkewProblem();
         }
 
         @TransactionalMethod
@@ -104,7 +104,7 @@ public class TransactionalMethod_settingTest {
 
             Transaction tx = getThreadLocalTransaction();
 
-            return getThreadLocalTransaction().getConfig().allowWriteSkewProblem();
+            return getThreadLocalTransaction().getConfiguration().allowWriteSkewProblem();
         }
     }
 
@@ -127,19 +127,19 @@ public class TransactionalMethod_settingTest {
 
         public void defaultMethod() {
             Transaction tx = getThreadLocalTransaction();
-            assertFalse(tx.getConfig().isReadonly());
+            assertTrue(tx.getConfiguration().isReadonly());
         }
 
         @TransactionalMethod(readonly = true)
         public void explicitReadonlyMethod() {
             Transaction tx = getThreadLocalTransaction();
-            assertTrue(tx.getConfig().isReadonly());
+            assertTrue(tx.getConfiguration().isReadonly());
         }
 
         @TransactionalMethod(readonly = false)
         public void explicitUpdateMethod() {
             Transaction tx = getThreadLocalTransaction();
-            assertFalse(tx.getConfig().isReadonly());
+            assertFalse(tx.getConfiguration().isReadonly());
         }
     }
 
@@ -164,30 +164,30 @@ public class TransactionalMethod_settingTest {
 
         public void defaultMethodIsNotInterruptible() {
             Transaction tx = getThreadLocalTransaction();
-            assertFalse(tx.getConfig().isInterruptible());
+            assertFalse(tx.getConfiguration().isInterruptible());
         }
 
         @TransactionalMethod
         public void defaultMethodWithEmptyTransactionalMethodIsNotInterruptible() {
             Transaction tx = getThreadLocalTransaction();
-            assertFalse(tx.getConfig().isInterruptible());
+            assertFalse(tx.getConfiguration().isInterruptible());
         }
 
         @TransactionalMethod(interruptible = true)
         public void withInterruptibleSet() throws InterruptedException {
             Transaction tx = getThreadLocalTransaction();
-            assertTrue(tx.getConfig().isInterruptible());
+            assertTrue(tx.getConfiguration().isInterruptible());
         }
 
         @TransactionalMethod
         public void withEmptyTransactionalMethodException() throws InterruptedException {
             Transaction tx = getThreadLocalTransaction();
-            assertTrue(tx.getConfig().isInterruptible());
+            assertTrue(tx.getConfiguration().isInterruptible());
         }
 
         public void withNoTransactionalMethodButThrowingInterruptibleException() throws InterruptedException {
             Transaction tx = getThreadLocalTransaction();
-            assertTrue(tx.getConfig().isInterruptible());
+            assertTrue(tx.getConfiguration().isInterruptible());
         }
     }
 
@@ -210,43 +210,43 @@ public class TransactionalMethod_settingTest {
 
         public void defaultMethod() {
             Transaction tx = getThreadLocalTransaction();
-            assertTrue(tx.getConfig().automaticReadTracking());
+            assertFalse(tx.getConfiguration().automaticReadTracking());
         }
 
         @TransactionalMethod(readonly = true)
         public void readonlyMethod() {
             Transaction tx = getThreadLocalTransaction();
-            assertFalse(tx.getConfig().automaticReadTracking());
+            assertFalse(tx.getConfiguration().automaticReadTracking());
         }
 
         @TransactionalMethod(readonly = true, automaticReadTracking = false)
         public void readonlyMethodWithReadTrackingDisabled() {
             Transaction tx = getThreadLocalTransaction();
-            assertFalse(tx.getConfig().automaticReadTracking());
+            assertFalse(tx.getConfiguration().automaticReadTracking());
         }
 
         @TransactionalMethod(readonly = true, automaticReadTracking = true)
         public void readonlyMethodWithReadTrackingEnabled() {
             Transaction tx = getThreadLocalTransaction();
-            assertTrue(tx.getConfig().automaticReadTracking());
+            assertTrue(tx.getConfiguration().automaticReadTracking());
         }
 
         @TransactionalMethod(readonly = false)
         public void defaultUpdateMethod() {
             Transaction tx = getThreadLocalTransaction();
-            assertTrue(tx.getConfig().automaticReadTracking());
+            assertFalse(tx.getConfiguration().automaticReadTracking());
         }
 
         @TransactionalMethod(readonly = false, automaticReadTracking = false)
         public void updateMethodWithReadTrackingDisabled() {
             Transaction tx = getThreadLocalTransaction();
-            assertFalse(tx.getConfig().automaticReadTracking());
+            assertFalse(tx.getConfiguration().automaticReadTracking());
         }
 
         @TransactionalMethod(readonly = false, automaticReadTracking = true)
         public void updateMethodWithReadTrackingEnabled() {
             Transaction tx = getThreadLocalTransaction();
-            assertTrue(tx.getConfig().automaticReadTracking());
+            assertTrue(tx.getConfiguration().automaticReadTracking());
         }
     }
 }

@@ -21,7 +21,10 @@ public class StackTest {
     }
 
     public Transaction startUpdateTransaction() {
-        Transaction t = stm.getTransactionFactoryBuilder().build().start();
+        Transaction t = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
+                .build().start();
         setThreadLocalTransaction(t);
         return t;
     }

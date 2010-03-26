@@ -9,7 +9,7 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.utils.latches.CheapLatch;
 import org.multiverse.utils.latches.Latch;
 
@@ -29,26 +29,26 @@ public class ArrayUpdateAlphaTransaction_commitTest {
     }
 
     public AlphaTransaction startSutTransaction(int size) {
-        OptimalSize optimalSize = new OptimalSize(size, size * 10);
-        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(size * 10);
+        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 stmConfig.commitLockPolicy,
                 null,
-                optimalSize,
+                speculativeConfig,
                 stmConfig.maxRetryCount, true, true, true, true, true);
 
         return new ArrayUpdateAlphaTransaction(config, size);
     }
 
     public AlphaTransaction startSutTransactionWithAllowWriteSkewProblem(int size, boolean allowWriteSkewProblem) {
-        OptimalSize optimalSize = new OptimalSize(size, size + 1);
-        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(size + 1);
+        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 stmConfig.commitLockPolicy,
                 null,
-                optimalSize,
+                speculativeConfig,
                 stmConfig.maxRetryCount, true, true, allowWriteSkewProblem, true, true);
 
         return new ArrayUpdateAlphaTransaction(config, size);

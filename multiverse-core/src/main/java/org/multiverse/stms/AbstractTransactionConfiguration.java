@@ -1,12 +1,14 @@
 package org.multiverse.stms;
 
-import org.multiverse.api.TransactionConfig;
+import org.multiverse.api.TransactionConfiguration;
 import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.backoff.ExponentialBackoffPolicy;
 import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.clock.StrictPrimitiveClock;
 
 import java.util.concurrent.TimeUnit;
+
+import static java.lang.String.format;
 
 /**
  * Contains the configuration for the AbstractTransaction.
@@ -16,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Peter Veentjer.
  */
-public class AbstractTransactionConfig implements TransactionConfig {
+public class AbstractTransactionConfiguration implements TransactionConfiguration {
 
     public final PrimitiveClock clock;
     public final BackoffPolicy backoffPolicy;
@@ -32,13 +34,15 @@ public class AbstractTransactionConfig implements TransactionConfig {
     /**
      * This method should be removed, only used for testing purposes.
      */
-    public AbstractTransactionConfig() {
-        this(new StrictPrimitiveClock(), ExponentialBackoffPolicy.INSTANCE_10_MS_MAX, null, true, 1000, true, true, true);
+    public AbstractTransactionConfiguration() {
+        this(new StrictPrimitiveClock(), ExponentialBackoffPolicy.INSTANCE_10_MS_MAX,
+                null, true, 1000, true, true, true);
     }
 
-    public AbstractTransactionConfig(
-            PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName, boolean readOnly,
-            int maxRetryCount, boolean interruptible, boolean allowWriteSkewProblem, boolean automaticReadTracking) {
+    public AbstractTransactionConfiguration(
+            PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName,
+            boolean readOnly, int maxRetryCount, boolean interruptible,
+            boolean allowWriteSkewProblem, boolean automaticReadTracking) {
 
         if (clock == null) {
             throw new NullPointerException();
@@ -58,43 +62,46 @@ public class AbstractTransactionConfig implements TransactionConfig {
         this.allowWriteSkewProblem = allowWriteSkewProblem;
 
         if (!readOnly && !automaticReadTracking && !allowWriteSkewProblem) {
-            throw new IllegalArgumentException("It isn't allowed to have a update transaction with allowWriteSkewProblem " +
-                    "disabled and automaticReadTracking disabled. The last is needed to do the first.");
+            String msg = format("Update transaction '%s' isn't  " +
+                    "allowed with allowWriteSkewProblem " +
+                    "disabled and automaticReadTracking disabled. The last is needed to do the first.",
+                    familyName);
+            throw new IllegalArgumentException(msg);
         }
     }
 
     @Override
-    public String getFamilyName() {
+    public final String getFamilyName() {
         return familyName;
     }
 
     @Override
-    public int getMaxRetryCount() {
+    public final int getMaxRetryCount() {
         return maxRetryCount;
     }
 
     @Override
-    public boolean isInterruptible() {
+    public final boolean isInterruptible() {
         return interruptible;
     }
 
     @Override
-    public boolean isReadonly() {
+    public final boolean isReadonly() {
         return readOnly;
     }
 
     @Override
-    public boolean allowWriteSkewProblem() {
+    public final boolean allowWriteSkewProblem() {
         return allowWriteSkewProblem;
     }
 
     @Override
-    public boolean automaticReadTracking() {
+    public final boolean automaticReadTracking() {
         return automaticReadTracking;
     }
 
     @Override
-    public BackoffPolicy getBackoffPolicy() {
+    public final BackoffPolicy getBackoffPolicy() {
         return backoffPolicy;
     }
 }

@@ -1,20 +1,19 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
-import org.multiverse.api.exceptions.SpeculativeConfigFailure;
+import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.utils.latches.Latch;
 
 import static java.lang.System.arraycopy;
 
-public class ArrayReadonlyAlphaTransaction
-        extends AbstractReadonlyAlphaTransaction<ReadonlyAlphaTransactionConfig> {
+public class ArrayReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransaction {
 
     private AlphaTranlocal[] attachedArray;
 
     private int firstFreeIndex;
 
-    public ArrayReadonlyAlphaTransaction(ReadonlyAlphaTransactionConfig config, int size) {
+    public ArrayReadonlyAlphaTransaction(ReadonlyAlphaTransactionConfiguration config, int size) {
         super(config);
         attachedArray = new AlphaTranlocal[size];
         init();
@@ -44,10 +43,10 @@ public class ArrayReadonlyAlphaTransaction
     protected void attach(AlphaTranlocal tranlocal) {
         if (firstFreeIndex == attachedArray.length) {
             int newOptimalSize = attachedArray.length + 2;
-            config.optimalSize.compareAndSet(attachedArray.length, attachedArray.length + 2);
+            config.speculativeConfig.signalSpeculativeSizeFailure(attachedArray.length);
 
-            if (attachedArray.length >= config.optimalSize.getMaximumSize()) {
-                throw SpeculativeConfigFailure.INSTANCE;
+            if (attachedArray.length >= config.speculativeConfig.getMaximumArraySize()) {
+                throw SpeculativeConfigurationFailure.create();
             }
 
             AlphaTranlocal[] newAttachedArray = new AlphaTranlocal[newOptimalSize];

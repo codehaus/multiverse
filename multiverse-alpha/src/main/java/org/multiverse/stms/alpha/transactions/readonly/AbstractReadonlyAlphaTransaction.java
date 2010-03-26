@@ -1,20 +1,22 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
 import org.multiverse.api.exceptions.ReadonlyException;
+import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.api.exceptions.UncommittedReadConflict;
-import org.multiverse.stms.AbstractTransactionConfig;
 import org.multiverse.stms.AbstractTransactionSnapshot;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AbstractAlphaTransaction;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
+import org.multiverse.utils.latches.Latch;
 
 import static java.lang.String.format;
 import static org.multiverse.stms.alpha.AlphaStmUtils.toTxObjectString;
 
-public abstract class AbstractReadonlyAlphaTransaction<C extends AbstractTransactionConfig>
-        extends AbstractAlphaTransaction<C, AbstractTransactionSnapshot> {
+public abstract class AbstractReadonlyAlphaTransaction
+        extends AbstractAlphaTransaction<ReadonlyAlphaTransactionConfiguration, AbstractTransactionSnapshot> {
 
-    public AbstractReadonlyAlphaTransaction(C config) {
+    public AbstractReadonlyAlphaTransaction(ReadonlyAlphaTransactionConfiguration config) {
         super(config);
     }
 
@@ -51,7 +53,24 @@ public abstract class AbstractReadonlyAlphaTransaction<C extends AbstractTransac
     }
 
     @Override
+    protected boolean doRegisterRetryLatch(Latch latch, long wakeupVersion) {
+        SpeculativeConfiguration speculativeConfig = config.speculativeConfig;
+        if (speculativeConfig.isSpeculativeNonAutomaticReadTrackingEnabled()) {
+            speculativeConfig.signalSpeculativeNonAutomaticReadtrackingFailure();
+            throw SpeculativeConfigurationFailure.create();
+        }
+
+        return super.doRegisterRetryLatch(latch, wakeupVersion);
+    }
+
+    @Override
     protected final AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {
+        SpeculativeConfiguration speculativeConfig = config.speculativeConfig;
+        if (speculativeConfig.isSpeculativeReadonlyEnabled()) {
+            speculativeConfig.signalSpeculativeReadonlyFailure();
+            throw SpeculativeConfigurationFailure.create();
+        }
+
         String msg = format(
                 "Can't open for write transactional object '%s' because transaction '%s' is readonly'",
                 toTxObjectString(txObject), config.getFamilyName());

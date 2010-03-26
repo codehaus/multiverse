@@ -42,12 +42,12 @@ public class TransactionalMethod_FamilyNameTest {
 
         @TransactionalMethod
         public void execute() {
-            found = getThreadLocalTransaction().getConfig().getFamilyName();
+            found = getThreadLocalTransaction().getConfiguration().getFamilyName();
         }
 
         @TransactionalMethod
         public void execute(int a, boolean b, String c) {
-            found = getThreadLocalTransaction().getConfig().getFamilyName();
+            found = getThreadLocalTransaction().getConfiguration().getFamilyName();
         }
     }
 }

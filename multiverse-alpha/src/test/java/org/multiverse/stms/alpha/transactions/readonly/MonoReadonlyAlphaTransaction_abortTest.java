@@ -6,7 +6,7 @@ import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.multiverse.TestUtils.assertIsAborted;
 
@@ -22,11 +22,11 @@ public class MonoReadonlyAlphaTransaction_abortTest {
     }
 
     public MonoReadonlyAlphaTransaction startSutTransaction() {
-        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
+        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                new OptimalSize(1, 100),
+                new SpeculativeConfiguration(100),
                 stmConfig.maxRetryCount, false, true);
         return new MonoReadonlyAlphaTransaction(config);
     }

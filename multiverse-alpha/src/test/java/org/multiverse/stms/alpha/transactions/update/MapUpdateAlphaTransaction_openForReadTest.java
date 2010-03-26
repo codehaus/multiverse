@@ -13,7 +13,7 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import java.util.Map;
 
@@ -37,26 +37,26 @@ public class MapUpdateAlphaTransaction_openForReadTest {
     }
 
     public MapUpdateAlphaTransaction startSutTransaction() {
-        OptimalSize optimalSize = new OptimalSize(1, 100);
-        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
+        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 stmConfig.commitLockPolicy,
                 null,
-                optimalSize,
+                speculativeConfig,
                 stmConfig.maxRetryCount, true, true, true, true, true);
 
         return new MapUpdateAlphaTransaction(config);
     }
 
     public MapUpdateAlphaTransaction startSutTransactionWithoutAutomaticReadTracking() {
-        OptimalSize optimalSize = new OptimalSize(1, 100);
-        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
+        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 stmConfig.commitLockPolicy,
                 null,
-                optimalSize,
+                speculativeConfig,
                 stmConfig.maxRetryCount, true, false, true, true, true);
 
         return new MapUpdateAlphaTransaction(config);

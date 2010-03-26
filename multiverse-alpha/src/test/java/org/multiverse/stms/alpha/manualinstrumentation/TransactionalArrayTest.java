@@ -47,6 +47,8 @@ public class TransactionalArrayTest {
     @Test
     public void changesAreAtomic() {
         final TransactionalArray<String> array = new TransactionalArray<String>(10);
+        //assertNull(array.get(0));
+        //assertNull(array.get(1));
 
         try {
             new TransactionTemplate() {
@@ -62,6 +64,7 @@ public class TransactionalArrayTest {
         } catch (DeadTransactionException expected) {
         }
 
+        clearThreadLocalTransaction();
         assertNull(array.get(0));
         assertNull(array.get(1));
     }

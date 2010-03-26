@@ -7,7 +7,7 @@ import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.utils.latches.CheapLatch;
 import org.multiverse.utils.latches.Latch;
 
@@ -18,23 +18,23 @@ import static org.multiverse.stms.alpha.transactions.AlphaTransactionTestUtils.a
 public class ArrayReadonlyAlphaTransaction_registerRetryLatchTest {
     private AlphaStm stm;
     private AlphaStmConfig stmConfig;
-    private OptimalSize optimalSize;
+    private SpeculativeConfiguration speculativeConfig;
 
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
         stm = new AlphaStm(stmConfig);
-        optimalSize = new OptimalSize(1);
+        speculativeConfig = new SpeculativeConfiguration(1);
     }
 
     public ArrayReadonlyAlphaTransaction startTransactionUnderTest(int size) {
-        optimalSize.set(size);
+        speculativeConfig.setOptimalSize(size);
 
-        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
+        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                new OptimalSize(size, 100),
+                new SpeculativeConfiguration(100),
                 stmConfig.maxRetryCount, false, true);
 
         return new ArrayReadonlyAlphaTransaction(config, size);

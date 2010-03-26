@@ -185,7 +185,7 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
             if (lockOwner.getStatus() != TransactionStatus.active) {
                 String msg = format(
                         "Can't tryLockAndDetectConflicts with non active transaction '%s'",
-                        lockOwner.getConfig().getFamilyName());
+                        lockOwner.getConfiguration().getFamilyName());
                 throw new PanicError(msg);
             }
         }
@@ -203,7 +203,7 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
             if (expectedLockOwner.getStatus() != TransactionStatus.active) {
                 String msg = format(
                         "Can't tryLockAndDetectConflicts with non active transaction '%s'",
-                        expectedLockOwner.getConfig().getFamilyName());
+                        expectedLockOwner.getConfiguration().getFamilyName());
                 throw new PanicError(msg);
             }
         }

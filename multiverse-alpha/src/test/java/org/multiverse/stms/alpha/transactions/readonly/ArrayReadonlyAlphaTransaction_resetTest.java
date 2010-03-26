@@ -7,7 +7,7 @@ import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -25,19 +25,19 @@ public class ArrayReadonlyAlphaTransaction_resetTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public ArrayReadonlyAlphaTransaction startTransactionUnderTest(int size) {
-        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
+    public ArrayReadonlyAlphaTransaction startTransactionUnderTest() {
+        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                new OptimalSize(size, 100),
+                new SpeculativeConfiguration(100),
                 stmConfig.maxRetryCount, false, true);
-        return new ArrayReadonlyAlphaTransaction(config, size);
+        return new ArrayReadonlyAlphaTransaction(config, 100);
     }
 
     @Test
     public void whenUnused() {
-        AlphaTransaction tx = startTransactionUnderTest(10);
+        AlphaTransaction tx = startTransactionUnderTest();
         tx.restart();
 
         assertEquals(0, getField(tx, "firstFreeIndex"));
@@ -46,7 +46,7 @@ public class ArrayReadonlyAlphaTransaction_resetTest {
 
     @Test
     public void whenOtherTxCommitted_thenReadVersionUpdated() {
-        AlphaTransaction tx = startTransactionUnderTest(10);
+        AlphaTransaction tx = startTransactionUnderTest();
 
         stmConfig.clock.tick();
 
@@ -60,7 +60,7 @@ public class ArrayReadonlyAlphaTransaction_resetTest {
         ManualRef ref2 = new ManualRef(stm);
         ManualRef ref3 = new ManualRef(stm);
 
-        AlphaTransaction tx = startTransactionUnderTest(10);
+        AlphaTransaction tx = startTransactionUnderTest();
         tx.openForRead(ref1);
         tx.openForRead(ref2);
         tx.openForRead(ref3);

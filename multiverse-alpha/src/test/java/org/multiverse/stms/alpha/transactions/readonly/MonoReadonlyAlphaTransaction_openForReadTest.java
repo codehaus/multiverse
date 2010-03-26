@@ -1,7 +1,6 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.alpha.AlphaStm;
@@ -10,7 +9,7 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -29,11 +28,15 @@ public class MonoReadonlyAlphaTransaction_openForReadTest {
     }
 
     public MonoReadonlyAlphaTransaction startSutTransaction() {
-        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
+        return startSutTransaction(new SpeculativeConfiguration(true, true, true, 100));
+    }
+
+    public MonoReadonlyAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfig) {
+        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                new OptimalSize(1, 100),
+                speculativeConfig,
                 stmConfig.maxRetryCount, false, true);
         return new MonoReadonlyAlphaTransaction(config);
     }
@@ -121,23 +124,32 @@ public class MonoReadonlyAlphaTransaction_openForReadTest {
     }
 
     @Test
-    @Ignore
     public void whenMaximumCapacityIsReached_thenTransactionTooSmallException() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(true, true, true, 100);
+        AlphaTransaction tx = startSutTransaction(speculativeConfig);
         tx.openForRead(ref1);
 
         try {
             tx.openForRead(ref2);
             fail();
-        } catch (SpeculativeConfigFailure expected) {
+        } catch (SpeculativeConfigurationFailure expected) {
         }
 
         assertIsActive(tx);
+        assertEquals(2, speculativeConfig.getOptimalSize());
+    }
 
-        //assertEquals(2, optimalSize.get());
+    @Test(expected = PreparedTransactionException.class)
+    public void whenPrepared_thenPreparedTransactionException() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction tx = startSutTransaction();
+        tx.prepare();
+
+        tx.openForRead(ref);
     }
 
     @Test(expected = DeadTransactionException.class)

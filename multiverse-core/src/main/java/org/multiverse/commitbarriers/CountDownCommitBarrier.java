@@ -173,7 +173,7 @@ public final class CountDownCommitBarrier extends CommitBarrier {
 
         if (tx.getStatus().isDead()) {
             String msg = format("Can't call incParties on dead transaction '%s' because it is %s",
-                    tx.getConfig().getFamilyName(),
+                    tx.getConfiguration().getFamilyName(),
                     tx.getStatus());
             throw new DeadTransactionException(msg);
         }

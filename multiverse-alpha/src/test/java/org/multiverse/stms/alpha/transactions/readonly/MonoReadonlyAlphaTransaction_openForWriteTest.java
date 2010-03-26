@@ -3,17 +3,17 @@ package org.multiverse.stms.alpha.transactions.readonly;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadonlyException;
+import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-import static org.multiverse.TestUtils.assertIsActive;
-import static org.multiverse.TestUtils.getField;
+import static org.junit.Assert.*;
+import static org.multiverse.TestUtils.*;
 
 public class MonoReadonlyAlphaTransaction_openForWriteTest {
 
@@ -27,20 +27,27 @@ public class MonoReadonlyAlphaTransaction_openForWriteTest {
     }
 
     public MonoReadonlyAlphaTransaction startSutTransaction() {
-        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
+        return startSutTransaction(new SpeculativeConfiguration(100));
+    }
+
+    public MonoReadonlyAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfiguration) {
+        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                new OptimalSize(1, 100),
+                speculativeConfiguration,
                 stmConfig.maxRetryCount, false, true);
         return new MonoReadonlyAlphaTransaction(config);
     }
 
     @Test
-    public void whenUnused_thenReadonlyException() {
+    public void whenExplicitReadonly_thenReadonlyException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, false, false, 100);
+        AlphaTransaction tx = startSutTransaction(speculativeConfig);
+
+        long version = stm.getVersion();
         try {
             tx.openForWrite(ref);
             fail();
@@ -48,26 +55,82 @@ public class MonoReadonlyAlphaTransaction_openForWriteTest {
         }
 
         assertIsActive(tx);
+        assertEquals(version, stm.getVersion());
         assertNull(getField(tx, "attached"));
+        assertTrue(speculativeConfig.isReadonly());
     }
 
-    @Test(expected = DeadTransactionException.class)
+    @Test
+    public void whenSpeculativeReadonly_thenSpeculativeConfigurationFailure() {
+        ManualRef ref = new ManualRef(stm);
+
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
+        AlphaTransaction tx = startSutTransaction(speculativeConfig);
+
+        long version = stm.getVersion();
+        try {
+            tx.openForWrite(ref);
+            fail();
+        } catch (SpeculativeConfigurationFailure expected) {
+        }
+
+        assertIsActive(tx);
+        assertNull(getField(tx, "attached"));
+        assertEquals(version, stm.getVersion());
+        assertFalse(speculativeConfig.isReadonly());
+    }
+
+    @Test
+    public void whenPrepared_thenDeadTransactionException() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction tx = startSutTransaction();
+        tx.prepare();
+        long version = stm.getVersion();
+
+        try {
+            tx.openForWrite(ref);
+            fail();
+        } catch (PreparedTransactionException expected) {
+        }
+
+        assertIsPrepared(tx);
+        assertEquals(version, stm.getVersion());
+    }
+
+    @Test
     public void whenAborted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = startSutTransaction();
         tx.abort();
+        long version = stm.getVersion();
 
-        tx.openForWrite(ref);
+        try {
+            tx.openForWrite(ref);
+            fail();
+        } catch (DeadTransactionException expected) {
+        }
+
+        assertIsAborted(tx);
+        assertEquals(version, stm.getVersion());
     }
 
-    @Test(expected = DeadTransactionException.class)
+    @Test
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = startSutTransaction();
         tx.commit();
 
-        tx.openForWrite(ref);
+        long version = stm.getVersion();
+        try {
+            tx.openForWrite(ref);
+            fail();
+        } catch (DeadTransactionException expected) {
+        }
+
+        assertIsCommitted(tx);
+        assertEquals(version, stm.getVersion());
     }
 }

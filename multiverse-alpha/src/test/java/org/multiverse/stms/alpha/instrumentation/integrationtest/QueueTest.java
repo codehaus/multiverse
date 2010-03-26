@@ -21,12 +21,10 @@ import static org.multiverse.stms.alpha.instrumentation.AlphaReflectionUtils.*;
 public class QueueTest {
 
     private AlphaStm stm;
-    private TransactionFactory updateTxFactory;
 
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
-        updateTxFactory = stm.getTransactionFactoryBuilder().build();
         resetInstrumentationProblemMonitor();
     }
 
@@ -81,13 +79,17 @@ public class QueueTest {
 
         long version = stm.getVersion();
 
-        Transaction t = updateTxFactory.start();
-        ThreadLocalTransaction.setThreadLocalTransaction(t);
+        TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .build();
+
+        Transaction tx = txFactory.start();
+        ThreadLocalTransaction.setThreadLocalTransaction(tx);
 
         queue.push("foo");
         queue.push("bar");
 
-        t.abort();
+        tx.abort();
 
         assertEquals(version, stm.getVersion());
         assertTrue(queue.isEmpty());

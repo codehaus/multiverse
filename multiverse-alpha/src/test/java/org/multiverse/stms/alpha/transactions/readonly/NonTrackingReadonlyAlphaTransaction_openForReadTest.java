@@ -3,17 +3,14 @@ package org.multiverse.stms.alpha.transactions.readonly;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.LockNotFreeReadConflict;
-import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
-import org.multiverse.api.exceptions.UncommittedReadConflict;
+import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -35,17 +32,13 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
     }
 
     public NonTrackingReadonlyAlphaTransaction startSutTransaction() {
-        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
+        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                new OptimalSize(10, 100),
+                new SpeculativeConfiguration(10),
                 stmConfig.maxRetryCount, false, false);
         return new NonTrackingReadonlyAlphaTransaction(config);
-    }
-
-    public AlphaTransaction startUpdateTransaction() {
-        return startTrackingUpdateTransaction(stm);
     }
 
     @Test
@@ -165,12 +158,31 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
     }
 
     @Test
+    public void whenPrepared_thenPreparedTransactionException() {
+        ManualRef value = new ManualRef(stm, 10);
+
+        AlphaTransaction tx = startSutTransaction();
+        tx.prepare();
+
+        long version = stm.getVersion();
+        try {
+            tx.openForRead(value);
+            fail();
+        } catch (PreparedTransactionException ex) {
+        }
+
+        assertIsPrepared(tx);
+        assertEquals(version, stm.getVersion());
+    }
+
+    @Test
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef value = new ManualRef(stm, 10);
 
         AlphaTransaction tx = startSutTransaction();
         tx.commit();
 
+        long version = stm.getVersion();
         try {
             tx.openForRead(value);
             fail();
@@ -178,6 +190,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
         }
 
         assertIsCommitted(tx);
+        assertEquals(version, stm.getVersion());
     }
 
     @Test
@@ -187,6 +200,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
         AlphaTransaction tx = startSutTransaction();
         tx.abort();
 
+        long version = stm.getVersion();
         try {
             tx.openForRead(value);
             fail();
@@ -194,5 +208,6 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
         }
 
         assertIsAborted(tx);
+        assertEquals(version, stm.getVersion());
     }
 }

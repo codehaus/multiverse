@@ -8,7 +8,7 @@ import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsCommitted;
@@ -28,11 +28,11 @@ public class NonTrackingReadonlyAlphaTransaction_commitTest {
     }
 
     public NonTrackingReadonlyAlphaTransaction startSutTransaction() {
-        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
+        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                new OptimalSize(10, 100),
+                new SpeculativeConfiguration(100),
                 stmConfig.maxRetryCount, false, false);
         return new NonTrackingReadonlyAlphaTransaction(config);
     }

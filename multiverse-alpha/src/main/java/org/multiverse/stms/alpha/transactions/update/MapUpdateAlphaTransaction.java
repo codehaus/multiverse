@@ -23,14 +23,13 @@ import java.util.Map;
  *
  * @author Peter Veentjer.
  */
-public class MapUpdateAlphaTransaction
-        extends AbstractUpdateAlphaTransaction<UpdateAlphaTransactionConfig> {
+public class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
 
     public static class Factory implements TransactionFactory<AlphaTransaction> {
 
-        public final UpdateAlphaTransactionConfig config;
+        public final UpdateAlphaTransactionConfiguration config;
 
-        public Factory(UpdateAlphaTransactionConfig config) {
+        public Factory(UpdateAlphaTransactionConfiguration config) {
             this.config = config;
         }
 
@@ -43,7 +42,7 @@ public class MapUpdateAlphaTransaction
     private final Map<AlphaTransactionalObject, AlphaTranlocal> attachedMap =
             new IdentityHashMap<AlphaTransactionalObject, AlphaTranlocal>(30);
 
-    public MapUpdateAlphaTransaction(UpdateAlphaTransactionConfig config) {
+    public MapUpdateAlphaTransaction(UpdateAlphaTransactionConfiguration config) {
         super(config);
         init();
         //todo: the size of the attachedMap could be chosen a littlebit better

@@ -3,7 +3,7 @@ package org.multiverse.templates;
 import org.multiverse.api.*;
 import org.multiverse.api.exceptions.ControlFlowError;
 import org.multiverse.api.exceptions.Retry;
-import org.multiverse.api.exceptions.SpeculativeConfigFailure;
+import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.utils.backoff.BackoffPolicy;
 import org.multiverse.utils.latches.CheapLatch;
@@ -303,24 +303,24 @@ public abstract class TransactionTemplate<E> {
                     tx.commit();
                     return result;
                 } catch (Retry e) {
-                    if (attempt - 1 < tx.getConfig().getMaxRetryCount()) {
+                    if (attempt - 1 < tx.getConfiguration().getMaxRetryCount()) {
                         awaitWriteAndRestart(tx);
                     }
-                } catch (SpeculativeConfigFailure ex) {
+                } catch (SpeculativeConfigurationFailure ex) {
                     tx = txFactory.start();
                     if (threadLocalAware) {
                         setThreadLocalTransaction(tx);
                     }
                 } catch (ControlFlowError er) {
-                    BackoffPolicy backoffPolicy = tx.getConfig().getBackoffPolicy();
+                    BackoffPolicy backoffPolicy = tx.getConfiguration().getBackoffPolicy();
                     backoffPolicy.delayedUninterruptible(tx, attempt);
                     tx.restart();
                 }
-            } while (attempt - 1 < tx.getConfig().getMaxRetryCount());
+            } while (attempt - 1 < tx.getConfiguration().getMaxRetryCount());
 
             String msg = format("Too many retries on transaction '%s', maxRetryCount = %s",
-                    tx.getConfig().getFamilyName(),
-                    tx.getConfig().getMaxRetryCount());
+                    tx.getConfiguration().getFamilyName(),
+                    tx.getConfiguration().getMaxRetryCount());
             throw new TooManyRetriesException(msg, lastFailureCause);
         } finally {
             if (tx != null && tx.getStatus() != TransactionStatus.committed) {
@@ -337,7 +337,7 @@ public abstract class TransactionTemplate<E> {
         Latch latch = new CheapLatch();
         tx.registerRetryLatch(latch);
         tx.abort();
-        if (tx.getConfig().isInterruptible()) {
+        if (tx.getConfiguration().isInterruptible()) {
             latch.await();
         } else {
             latch.awaitUninterruptible();

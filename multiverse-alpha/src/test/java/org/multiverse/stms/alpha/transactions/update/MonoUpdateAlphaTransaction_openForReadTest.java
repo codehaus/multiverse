@@ -2,17 +2,14 @@ package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.LockNotFreeReadConflict;
-import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
-import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -29,26 +26,29 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MonoUpdateAlphaTransaction startSutTransaction() {
-        OptimalSize optimalSize = new OptimalSize(1, 100);
-        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
+    public MonoUpdateAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfig) {
+        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 stmConfig.commitLockPolicy,
                 null,
-                optimalSize,
+                speculativeConfig,
                 stmConfig.maxRetryCount, true, true, true, true, true);
         return new MonoUpdateAlphaTransaction(config);
     }
 
+    public MonoUpdateAlphaTransaction startSutTransaction() {
+        return startSutTransaction(new SpeculativeConfiguration(100));
+    }
+
     public MonoUpdateAlphaTransaction startSutTransactionWithoutAutomaticReadTracking() {
-        OptimalSize optimalSize = new OptimalSize(1, 100);
-        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
+        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 stmConfig.commitLockPolicy,
                 null,
-                optimalSize,
+                speculativeConfig,
                 stmConfig.maxRetryCount, true, false, true, true, true);
 
         return new MonoUpdateAlphaTransaction(config);
@@ -57,10 +57,10 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     @Test
     public void testAutomaticReadTrackingProperty() {
         AlphaTransaction tx = startSutTransactionWithoutAutomaticReadTracking();
-        assertFalse(tx.getConfig().automaticReadTracking());
+        assertFalse(tx.getConfiguration().automaticReadTracking());
 
         tx = startSutTransaction();
-        assertTrue(tx.getConfig().automaticReadTracking());
+        assertTrue(tx.getConfiguration().automaticReadTracking());
     }
 
     @Test
@@ -168,6 +168,27 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
         AlphaTranlocal found = tx.openForRead(ref);
 
         assertSame(tranlocal, found);
+    }
+
+    @Test
+    public void whenMaximumCapacityExceeded_thenSpeculativeConfigurationFailure() {
+        ManualRef ref1 = new ManualRef(stm);
+        ManualRef ref2 = new ManualRef(stm);
+
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
+        AlphaTransaction tx = startSutTransaction(speculativeConfig);
+        tx.openForRead(ref1);
+
+        long version = stm.getVersion();
+        try {
+            tx.openForRead(ref2);
+            fail();
+        } catch (SpeculativeConfigurationFailure expected) {
+        }
+
+        assertIsActive(tx);
+        assertEquals(2, speculativeConfig.getOptimalSize());
+        assertEquals(version, stm.getVersion());
     }
 
     @Test

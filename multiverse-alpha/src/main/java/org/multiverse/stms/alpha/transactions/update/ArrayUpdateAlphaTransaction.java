@@ -1,7 +1,7 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.multiverse.api.exceptions.PanicError;
-import org.multiverse.api.exceptions.SpeculativeConfigFailure;
+import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.UncommittedFilter;
@@ -16,14 +16,13 @@ import static java.lang.System.arraycopy;
  *
  * @author Peter Veentjer
  */
-public class ArrayUpdateAlphaTransaction
-        extends AbstractUpdateAlphaTransaction<UpdateAlphaTransactionConfig> {
+public class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
 
     private AlphaTranlocal[] attachedArray;
 
     private int firstFreeIndex;
 
-    public ArrayUpdateAlphaTransaction(UpdateAlphaTransactionConfig config, int size) {
+    public ArrayUpdateAlphaTransaction(UpdateAlphaTransactionConfiguration config, int size) {
         super(config);
         attachedArray = new AlphaTranlocal[size];
         init();
@@ -93,9 +92,10 @@ public class ArrayUpdateAlphaTransaction
 
         if (firstFreeIndex == attachedArray.length) {
             int newOptimalSize = attachedArray.length + 2;
-            config.optimalSize.compareAndSet(attachedArray.length, newOptimalSize);
-            if (attachedArray.length >= config.optimalSize.getMaximumSize()) {
-                throw SpeculativeConfigFailure.INSTANCE;
+            config.speculativeConfiguration.signalSpeculativeSizeFailure(attachedArray.length);
+
+            if (attachedArray.length >= config.speculativeConfiguration.getMaximumArraySize()) {
+                throw SpeculativeConfigurationFailure.create();
             }
 
             AlphaTranlocal[] newAttachedArray = new AlphaTranlocal[newOptimalSize];

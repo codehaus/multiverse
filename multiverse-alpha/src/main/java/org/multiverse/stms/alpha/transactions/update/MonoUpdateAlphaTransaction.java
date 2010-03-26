@@ -1,6 +1,6 @@
 package org.multiverse.stms.alpha.transactions.update;
 
-import org.multiverse.api.exceptions.SpeculativeConfigFailure;
+import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.UncommittedFilter;
@@ -13,12 +13,11 @@ import org.multiverse.utils.latches.Latch;
  *
  * @author Peter Veentjer
  */
-public class MonoUpdateAlphaTransaction
-        extends AbstractUpdateAlphaTransaction<UpdateAlphaTransactionConfig> {
+public class MonoUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
 
     private AlphaTranlocal attached;
 
-    public MonoUpdateAlphaTransaction(UpdateAlphaTransactionConfig config) {
+    public MonoUpdateAlphaTransaction(UpdateAlphaTransactionConfiguration config) {
         super(config);
 
         init();
@@ -72,8 +71,8 @@ public class MonoUpdateAlphaTransaction
     @Override
     protected void attach(AlphaTranlocal tranlocal) {
         if (attached != null) {
-            config.optimalSize.compareAndSet(1, 2);
-            throw SpeculativeConfigFailure.INSTANCE;
+            config.speculativeConfiguration.signalSpeculativeSizeFailure(1);
+            throw SpeculativeConfigurationFailure.create();
         }
 
         attached = tranlocal;
@@ -88,8 +87,8 @@ public class MonoUpdateAlphaTransaction
     protected AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {
         if (attached != null) {
             if (attached.getTransactionalObject() != txObject) {
-                config.optimalSize.compareAndSet(1, 2);
-                throw SpeculativeConfigFailure.INSTANCE;
+                config.speculativeConfiguration.signalSpeculativeSizeFailure(1);
+                throw SpeculativeConfigurationFailure.create();
             }
 
             if (attached.isCommitted()) {

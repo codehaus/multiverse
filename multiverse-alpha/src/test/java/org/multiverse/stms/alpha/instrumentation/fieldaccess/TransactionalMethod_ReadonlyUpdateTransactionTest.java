@@ -31,6 +31,8 @@ public class TransactionalMethod_ReadonlyUpdateTransactionTest {
 
         AlphaTransaction transaction = method.transaction;
 
+
+        System.out.println("transaction.class: " + transaction.getClass());
         assertTrue(transaction instanceof NonTrackingReadonlyAlphaTransaction);
         assertEquals(version, stm.getVersion());
         assertNotNull(transaction);

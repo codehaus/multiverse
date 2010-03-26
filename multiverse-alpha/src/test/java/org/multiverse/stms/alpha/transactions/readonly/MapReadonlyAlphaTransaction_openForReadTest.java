@@ -3,17 +3,14 @@ package org.multiverse.stms.alpha.transactions.readonly;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.LockNotFreeReadConflict;
-import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
-import org.multiverse.api.exceptions.UncommittedReadConflict;
+import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -34,11 +31,11 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
     }
 
     public MapReadonlyAlphaTransaction startTransactionUnderTest() {
-        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
+        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                new OptimalSize(1, 100),
+                new SpeculativeConfiguration(100),
                 stmConfig.maxRetryCount, false, true);
         return new MapReadonlyAlphaTransaction(config);
     }
@@ -147,6 +144,24 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
 
         AlphaTranlocal found = tx.openForRead(ref);
         assertSame(expected, found);
+    }
+
+    @Test
+    public void whenPrepared_thenPreparedTransactionException() {
+        ManualRef ref = new ManualRef(stm, 10);
+
+        AlphaTransaction tx = startTransactionUnderTest();
+        tx.prepare();
+
+        long version = stm.getVersion();
+        try {
+            tx.openForRead(ref);
+            fail();
+        } catch (PreparedTransactionException expected) {
+        }
+
+        assertIsPrepared(tx);
+        assertEquals(version, stm.getVersion());
     }
 
     @Test

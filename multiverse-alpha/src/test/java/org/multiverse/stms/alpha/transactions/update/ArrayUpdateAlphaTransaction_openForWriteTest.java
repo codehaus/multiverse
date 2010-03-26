@@ -9,7 +9,7 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -28,26 +28,26 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
     }
 
     public AlphaTransaction startSutTransaction(int size) {
-        OptimalSize optimalSize = new OptimalSize(size, 100);
-        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
+        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 stmConfig.commitLockPolicy,
                 null,
-                optimalSize,
+                speculativeConfig,
                 stmConfig.maxRetryCount, true, true, true, true, true);
 
         return new ArrayUpdateAlphaTransaction(config, size);
     }
 
     public AlphaTransaction startSutTransaction(int size, int maximumSize) {
-        OptimalSize optimalSize = new OptimalSize(size, maximumSize);
-        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(maximumSize);
+        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 stmConfig.commitLockPolicy,
                 null,
-                optimalSize,
+                speculativeConfig,
                 stmConfig.maxRetryCount, true, true, true, true, true);
 
         return new ArrayUpdateAlphaTransaction(config, size);
@@ -77,12 +77,12 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
         try {
             tx.openForWrite(txObject2);
             fail();
-        } catch (SpeculativeConfigFailure ex) {
+        } catch (SpeculativeConfigurationFailure ex) {
         }
 
         assertIsActive(tx);
         //todo
-        //assertEquals(3, optimalSize.get());
+        //assertEquals(3, speculativeConfig.get());
     }
 
     @Test
@@ -170,11 +170,11 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
         try {
             tx.openForWrite(ref4);
             fail();
-        } catch (SpeculativeConfigFailure expected) {
+        } catch (SpeculativeConfigurationFailure expected) {
         }
 
         //todo
-        //assertEquals(5, optimalSize.get());
+        //assertEquals(5, speculativeConfig.get());
         assertIsActive(tx);
     }
 

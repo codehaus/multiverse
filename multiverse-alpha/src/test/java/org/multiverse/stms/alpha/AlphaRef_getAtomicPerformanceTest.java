@@ -12,7 +12,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class AlphaRef_getAtomicPerformanceTest {
 
-    private long transactionCount = ((long) 1000) * 1000 * 1000 * 10;
+    private long transactionCount = ((long) 1000) * 1000 * 1000 * 2;
 
     @Before
     public void setUp() {

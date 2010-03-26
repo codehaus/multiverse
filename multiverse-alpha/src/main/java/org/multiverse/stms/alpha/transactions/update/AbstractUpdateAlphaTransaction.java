@@ -2,11 +2,13 @@ package org.multiverse.stms.alpha.transactions.update;
 
 import org.multiverse.api.exceptions.CommitLockNotFreeWriteConflict;
 import org.multiverse.api.exceptions.OptimisticLockFailedWriteConflict;
+import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.api.exceptions.WriteSkewConflict;
 import org.multiverse.stms.AbstractTransactionSnapshot;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AbstractAlphaTransaction;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.utils.Listeners;
 import org.multiverse.utils.latches.Latch;
 
@@ -18,18 +20,25 @@ import static java.lang.String.format;
  *
  * @author Peter Veentjer.
  */
-public abstract class AbstractUpdateAlphaTransaction<C extends UpdateAlphaTransactionConfig>
-        extends AbstractAlphaTransaction<C, AbstractTransactionSnapshot> {
+public abstract class AbstractUpdateAlphaTransaction
+        extends AbstractAlphaTransaction<UpdateAlphaTransactionConfiguration, AbstractTransactionSnapshot> {
 
     private long writeVersion;
 
-    public AbstractUpdateAlphaTransaction(C config) {
+    public AbstractUpdateAlphaTransaction(UpdateAlphaTransactionConfiguration config) {
         super(config);
     }
 
     @Override
     protected final boolean doRegisterRetryLatch(Latch latch, long wakeupVersion) {
+        SpeculativeConfiguration speculativeConfig = config.speculativeConfiguration;
+
         if (!config.automaticReadTracking) {
+            if (speculativeConfig.isSpeculativeNonAutomaticReadTrackingEnabled()) {
+                speculativeConfig.signalSpeculativeNonAutomaticReadtrackingFailure();
+                throw SpeculativeConfigurationFailure.create();
+            }
+
             return false;
         }
 

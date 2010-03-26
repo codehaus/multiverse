@@ -26,16 +26,16 @@ import org.multiverse.utils.commitlock.GenericCommitLockPolicy;
 public final class AlphaStmConfig {
     public static AlphaStmConfig createDebugConfig() {
         AlphaStmConfig config = new AlphaStmConfig();
-        config.smartTxImplementationChoice = false;
-        config.optimizedConflictDetection = false;
+        config.speculativeConfigurationEnabled = false;
+        config.optimizedConflictDetectionEnabled = false;
         config.clock = new StrictPrimitiveClock();
         return config;
     }
 
     public static AlphaStmConfig createFastConfig() {
         AlphaStmConfig config = new AlphaStmConfig();
-        config.optimizedConflictDetection = true;
-        config.smartTxImplementationChoice = true;
+        config.optimizedConflictDetectionEnabled = true;
+        config.speculativeConfigurationEnabled = true;
         config.clock = new RelaxedPrimitiveClock();
         return config;
     }
@@ -48,15 +48,15 @@ public final class AlphaStmConfig {
     public BackoffPolicy backoffPolicy =
             ExponentialBackoffPolicy.INSTANCE_10_MS_MAX;
 
-    public boolean smartTxImplementationChoice = false;
+    public boolean speculativeConfigurationEnabled = false;
 
     public int maxRetryCount = 1000;
 
     public int maxFixedUpdateSize = 20;
 
-    public boolean optimizedConflictDetection = true;
+    public boolean optimizedConflictDetectionEnabled = true;
 
-    public boolean dirtyCheck = true;
+    public boolean dirtyCheckEnabled = true;
 
 
     /**

@@ -23,7 +23,9 @@ public class TransactionalAbaRefTest {
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
-        updateTxFactory = stm.getTransactionFactoryBuilder().build();
+        updateTxFactory = stm.getTransactionFactoryBuilder()
+                .setReadonly(false)
+                .build();
         setThreadLocalTransaction(null);
     }
 
@@ -47,7 +49,9 @@ public class TransactionalAbaRefTest {
 
         long version = stm.getVersion();
 
-        Transaction tx = stm.getTransactionFactoryBuilder().build().start();
+        Transaction tx = stm.getTransactionFactoryBuilder()
+                .setReadonly(false)
+                .build().start();
         setThreadLocalTransaction(tx);
         ref.set(newValue);
         tx.abort();

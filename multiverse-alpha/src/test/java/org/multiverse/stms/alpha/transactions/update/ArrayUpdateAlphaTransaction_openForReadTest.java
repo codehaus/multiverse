@@ -9,7 +9,7 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -26,50 +26,50 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public AlphaTransaction startSutTransaction(int size) {
-        OptimalSize optimalSize = new OptimalSize(size, 20);
-        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
+    public AlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfig) {
+        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 stmConfig.commitLockPolicy,
                 null,
-                optimalSize,
+                speculativeConfig,
                 stmConfig.maxRetryCount, true, true, true, true, true);
 
-        return new ArrayUpdateAlphaTransaction(config, size);
+        return new ArrayUpdateAlphaTransaction(config, speculativeConfig.getMaximumArraySize());
     }
 
-    public AlphaTransaction startSutTransaction(int size, int maximumSize) {
-        OptimalSize optimalSize = new OptimalSize(size, maximumSize);
-        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
+    public AlphaTransaction startSutTransactionWithoutAutomaticReadTracking() {
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
+        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 stmConfig.commitLockPolicy,
                 null,
-                optimalSize,
-                stmConfig.maxRetryCount, true, true, true, true, true);
-
-        return new ArrayUpdateAlphaTransaction(config, size);
-    }
-
-    public AlphaTransaction startSutTransactionWithoutAutomaticReadTracking(int size) {
-        OptimalSize optimalSize = new OptimalSize(size, 20);
-        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                stmConfig.commitLockPolicy,
-                null,
-                optimalSize,
+                speculativeConfig,
                 stmConfig.maxRetryCount, true, false, true, true, true);
 
-        return new ArrayUpdateAlphaTransaction(config, size);
+        return new ArrayUpdateAlphaTransaction(config, 100);
     }
+
+    public AlphaTransaction startSutTransaction() {
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
+        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
+                stmConfig.clock,
+                stmConfig.backoffPolicy,
+                stmConfig.commitLockPolicy,
+                null,
+                speculativeConfig,
+                stmConfig.maxRetryCount, true, true, true, true, true);
+
+        return new ArrayUpdateAlphaTransaction(config, 100);
+    }
+
 
     @Test
     public void whenAutomaticReadTrackingDisabled_openForReadIsNotTracked() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransactionWithoutAutomaticReadTracking(10);
+        AlphaTransaction tx = startSutTransactionWithoutAutomaticReadTracking();
         tx.openForRead(ref);
 
         assertEquals(0, getField(tx, "firstFreeIndex"));
@@ -77,7 +77,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
 
     @Test
     public void whenTxObjectNull_thenNullReturned() {
-        AlphaTransaction tx = startSutTransaction(1);
+        AlphaTransaction tx = startSutTransaction();
         AlphaTranlocal found = tx.openForRead(null);
         assertNull(found);
     }
@@ -87,7 +87,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
         ManualRef ref = new ManualRef(stm);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = startSutTransaction();
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForRead(ref);
 
         assertSame(committed, found);
@@ -98,7 +98,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
     public void whenNotCommittedBefore_thenFreshTranlocalReturned() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = startSutTransaction();
         AlphaTranlocal found = tx.openForRead(ref);
 
         assertNotNull(found);
@@ -113,7 +113,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
         AlphaTransaction owner = mock(AlphaTransaction.class);
         ref.___tryLock(owner);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = startSutTransaction();
 
         try {
             tx.openForRead(ref);
@@ -130,7 +130,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
     public void whenReadConflict_thenOldVersionNotFoundReadConflict() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = startSutTransaction();
         ref.inc(stm);
 
         try {
@@ -147,7 +147,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
     public void whenAlreadyOpenedForWrite_thenOpenedVersionReturned() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = startSutTransaction();
         ManualRefTranlocal expected = (ManualRefTranlocal) tx.openForWrite(ref);
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForRead(ref);
 
@@ -159,7 +159,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
     public void whenPreviouslyLoadedForRead_thenSameVersionReturned() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = startSutTransaction();
         ManualRefTranlocal expected = (ManualRefTranlocal) tx.openForRead(ref);
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForRead(ref);
 
@@ -174,7 +174,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
         ManualRef ref2 = new ManualRef(stm);
         ManualRefTranlocal committed2 = (ManualRefTranlocal) ref2.___load();
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = startSutTransaction();
         ManualRefTranlocal found1 = (ManualRefTranlocal) tx.openForRead(ref1);
         ManualRefTranlocal found2 = (ManualRefTranlocal) tx.openForRead(ref2);
 
@@ -184,31 +184,31 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenCapacityExceeded_thenTransactionTooSmallError() {
+    public void whenCapacityExceeded_thenSpeculativeConfigurationFailure() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
         ManualRef ref3 = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(2, 2);
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(true, false, false, 2);
+        AlphaTransaction tx = startSutTransaction(speculativeConfig);
         tx.openForWrite(ref1);
         tx.openForWrite(ref2);
 
         try {
             tx.openForWrite(ref3);
             fail();
-        } catch (SpeculativeConfigFailure expected) {
+        } catch (SpeculativeConfigurationFailure expected) {
         }
 
-
-        //todo
-        //assertSame(4, optimalSize.get());
+        assertIsActive(tx);
+        assertEquals(4, speculativeConfig.getOptimalSize());
     }
 
     @Test
     public void whenAlreadyOpenedForWrite_thenNotSubjectToWriteConflict() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = startSutTransaction();
         ManualRefTranlocal expected = (ManualRefTranlocal) tx.openForWrite(ref);
 
         //conflicting write
@@ -222,7 +222,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
     public void whenAlreadyOpenedForRead_thenNotSubjectToWriteConflict() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = startSutTransaction();
         ManualRefTranlocal expected = (ManualRefTranlocal) tx.openForRead(ref);
 
         //conflicting write
@@ -236,7 +236,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
     public void whenAborted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(1);
+        AlphaTransaction tx = startSutTransaction();
         tx.abort();
 
         try {
@@ -252,7 +252,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(1);
+        AlphaTransaction tx = startSutTransaction();
         tx.commit();
 
         try {
@@ -268,7 +268,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
     public void whenPrepared_thenPreparedTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(1);
+        AlphaTransaction tx = startSutTransaction();
         tx.prepare();
 
         try {

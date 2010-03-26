@@ -3,40 +3,44 @@ package org.multiverse.stms.alpha.transactions.readonly;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadonlyException;
+import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 
 public class ArrayReadonlyAlphaTransaction_openForWriteTest {
 
     private AlphaStm stm;
     private AlphaStmConfig stmConfig;
-    private OptimalSize optimalSize;
 
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
         stm = new AlphaStm(stmConfig);
-        optimalSize = new OptimalSize(1);
     }
 
     public ArrayReadonlyAlphaTransaction startTransactionUnderTest(int size) {
-        optimalSize.set(size);
+        SpeculativeConfiguration speculativeConfiguration = new SpeculativeConfiguration(100);
+        speculativeConfiguration.setOptimalSize(size);
+        return startTransactionUnderTest(speculativeConfiguration);
+    }
 
-        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
+    public ArrayReadonlyAlphaTransaction startTransactionUnderTest(SpeculativeConfiguration speculativeConfiguration) {
+        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                new OptimalSize(1, 100),
+                speculativeConfiguration,
                 stmConfig.maxRetryCount, false, true);
 
-        return new ArrayReadonlyAlphaTransaction(config, size);
+        return new ArrayReadonlyAlphaTransaction(config, speculativeConfiguration.getOptimalSize());
     }
 
     @Test
@@ -53,11 +57,13 @@ public class ArrayReadonlyAlphaTransaction_openForWriteTest {
     }
 
     @Test
-    public void withActive_thenReadonlyException() {
+    public void withExplicitReadlonly_thenReadonlyException() {
         ManualRef ref = new ManualRef(stm, 0);
 
-        AlphaTransaction tx = startTransactionUnderTest(10);
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, true, 100);
+        AlphaTransaction tx = startTransactionUnderTest(speculativeConfig);
 
+        long version = stm.getVersion();
         try {
             tx.openForWrite(ref);
             fail();
@@ -65,6 +71,44 @@ public class ArrayReadonlyAlphaTransaction_openForWriteTest {
         }
 
         assertIsActive(tx);
+        assertEquals(version, stm.getVersion());
+    }
+
+    @Test
+    public void withSpeculativeReadlonly_thenSpeculativeConfigurationFailure() {
+        ManualRef ref = new ManualRef(stm, 0);
+
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(true, false, false, 100);
+        AlphaTransaction tx = startTransactionUnderTest(speculativeConfig);
+
+        long version = stm.getVersion();
+        try {
+            tx.openForWrite(ref);
+            fail();
+        } catch (SpeculativeConfigurationFailure expected) {
+        }
+
+        assertIsActive(tx);
+        assertEquals(version, stm.getVersion());
+        assertFalse(speculativeConfig.isReadonly());
+    }
+
+    @Test
+    public void whenPrepared() {
+        ManualRef value = new ManualRef(stm, 10);
+
+        AlphaTransaction tx = startTransactionUnderTest(10);
+        tx.prepare();
+
+        long version = stm.getVersion();
+        try {
+            tx.openForRead(value);
+            fail();
+        } catch (PreparedTransactionException expected) {
+        }
+
+        assertIsPrepared(tx);
+        assertEquals(version, stm.getVersion());
     }
 
     @Test
@@ -74,6 +118,7 @@ public class ArrayReadonlyAlphaTransaction_openForWriteTest {
         AlphaTransaction tx = startTransactionUnderTest(10);
         tx.commit();
 
+        long version = stm.getVersion();
         try {
             tx.openForRead(value);
             fail();
@@ -81,8 +126,8 @@ public class ArrayReadonlyAlphaTransaction_openForWriteTest {
         }
 
         assertIsCommitted(tx);
+        assertEquals(version, stm.getVersion());
     }
-
 
     @Test
     public void whenAborted_thenDeadTransactionException() {
@@ -91,6 +136,7 @@ public class ArrayReadonlyAlphaTransaction_openForWriteTest {
         AlphaTransaction tx = startTransactionUnderTest(10);
         tx.abort();
 
+        long version = stm.getVersion();
         try {
             tx.openForRead(value);
             fail();
@@ -98,5 +144,6 @@ public class ArrayReadonlyAlphaTransaction_openForWriteTest {
         }
 
         assertIsAborted(tx);
+        assertEquals(version, stm.getVersion());
     }
 }

@@ -29,7 +29,9 @@ public class StackTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
-        updateTxFactory = stm.getTransactionFactoryBuilder().build();
+        updateTxFactory = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .build();
         resetInstrumentationProblemMonitor();
     }
 

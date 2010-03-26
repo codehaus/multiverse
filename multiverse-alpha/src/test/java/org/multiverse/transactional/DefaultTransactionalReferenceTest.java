@@ -186,7 +186,10 @@ public class DefaultTransactionalReferenceTest {
         DefaultTransactionalReference<String> ref = new DefaultTransactionalReference<String>(oldRef);
 
         long version = stm.getVersion();
-        Transaction tx = stm.getTransactionFactoryBuilder().build().start();
+        Transaction tx = stm.getTransactionFactoryBuilder()
+                .setReadonly(false)
+                .build()
+                .start();
         setThreadLocalTransaction(tx);
         String newRef = "bar";
         ref.set(newRef);

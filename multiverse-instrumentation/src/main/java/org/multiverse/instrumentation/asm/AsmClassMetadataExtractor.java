@@ -253,13 +253,6 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor {
         boolean throwsInterruptedException = methodMetadata.checkIfSpecificTransactionIsThrown(InterruptedException.class);
 
         TransactionMetadata transactionMetadata = new TransactionMetadata();
-        transactionMetadata.readOnly = false;
-        transactionMetadata.automaticReadTracking = true;
-        transactionMetadata.allowWriteSkewProblem = true;
-        transactionMetadata.interruptible = throwsInterruptedException;
-        transactionMetadata.familyName = createFamilyName(classMetadata.getName(), methodNode.name, methodNode.desc);
-        transactionMetadata.timeout = -1;
-        transactionMetadata.timeoutTimeUnit = TimeUnit.SECONDS;
 
         if (methodNode.name.equals("<init>")) {
             transactionMetadata.maxRetryCount = 0;
@@ -269,11 +262,19 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor {
             transactionMetadata.speculativeConfigurationEnabled = true;
         }
 
+        transactionMetadata.readOnly = null;
+        transactionMetadata.automaticReadTracking = null;
+        transactionMetadata.allowWriteSkewProblem = true;
+        transactionMetadata.interruptible = throwsInterruptedException;
+        transactionMetadata.familyName = createFamilyName(classMetadata.getName(), methodNode.name, methodNode.desc);
+        transactionMetadata.timeout = -1;
+        transactionMetadata.timeoutTimeUnit = TimeUnit.SECONDS;
+
         return transactionMetadata;
     }
 
     private TransactionMetadata createTransactionMetadata(ClassMetadata classMetadata, MethodNode methodNode) {
-        TransactionMetadata transactionMetadata = new TransactionMetadata();
+        TransactionMetadata txMetadata = new TransactionMetadata();
 
         AnnotationNode annotationNode;
         if (methodNode.name.equals("<init>")) {
@@ -284,24 +285,33 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor {
 
         MethodMetadata methodMetadata = classMetadata.getMethodMetadata(methodNode.name, methodNode.desc);
         boolean throwsInterruptedException = methodMetadata.checkIfSpecificTransactionIsThrown(InterruptedException.class);
-        transactionMetadata.readOnly = (Boolean) getValue(annotationNode, "readonly", false);
-        transactionMetadata.familyName = createFamilyName(classMetadata.getName(), methodNode.name, methodNode.desc);
-        transactionMetadata.interruptible = (Boolean) getValue(annotationNode, "interruptible", throwsInterruptedException);
-        transactionMetadata.allowWriteSkewProblem = (Boolean) getValue(annotationNode, "allowWriteSkewProblem", true);
-        boolean trackReadsDefault = !transactionMetadata.readOnly;
-        transactionMetadata.automaticReadTracking = (Boolean) getValue(annotationNode, "automaticReadTracking", trackReadsDefault);
-        transactionMetadata.timeout = ((Number) getValue(annotationNode, "timeout", -1)).longValue();
-        transactionMetadata.timeoutTimeUnit = (TimeUnit) getValue(annotationNode, "timeoutTimeUnit", TimeUnit.SECONDS);
+        txMetadata.readOnly = (Boolean) getValue(annotationNode, "readonly", null);
+        txMetadata.familyName = createFamilyName(classMetadata.getName(), methodNode.name, methodNode.desc);
+        txMetadata.interruptible = (Boolean) getValue(annotationNode, "interruptible", throwsInterruptedException);
+        txMetadata.allowWriteSkewProblem = (Boolean) getValue(annotationNode, "allowWriteSkewProblem", true);
 
-        if (methodNode.name.equals("<init>")) {
-            transactionMetadata.maxRetryCount = (Integer) getValue(annotationNode, "maxRetryCount", 0);
-            transactionMetadata.speculativeConfigurationEnabled = false;
+        Boolean automaticReadTrackingDefault;
+        if (txMetadata.readOnly == null) {
+            automaticReadTrackingDefault = null;
+        } else if (txMetadata.readOnly) {
+            automaticReadTrackingDefault = null;
         } else {
-            transactionMetadata.maxRetryCount = (Integer) getValue(annotationNode, "maxRetryCount", 1000);
-            transactionMetadata.speculativeConfigurationEnabled = true;
+            automaticReadTrackingDefault = true;
         }
 
-        return transactionMetadata;
+        txMetadata.automaticReadTracking = (Boolean) getValue(annotationNode, "automaticReadTracking", automaticReadTrackingDefault);
+        txMetadata.timeout = ((Number) getValue(annotationNode, "timeout", -1)).longValue();
+        txMetadata.timeoutTimeUnit = (TimeUnit) getValue(annotationNode, "timeoutTimeUnit", TimeUnit.SECONDS);
+
+        if (methodNode.name.equals("<init>")) {
+            txMetadata.maxRetryCount = (Integer) getValue(annotationNode, "maxRetryCount", 0);
+            txMetadata.speculativeConfigurationEnabled = false;
+        } else {
+            txMetadata.maxRetryCount = (Integer) getValue(annotationNode, "maxRetryCount", 1000);
+            txMetadata.speculativeConfigurationEnabled = true;
+        }
+
+        return txMetadata;
     }
 
 

@@ -5,11 +5,11 @@ import org.multiverse.utils.backoff.BackoffPolicy;
 /**
  * Contains the transaction configuration used by a {@link Transaction}. In the beginning this was all placed in the
  * Transaction, adding a lot of 'informational' methods to the transaction and therefor complicating its usage. So
- * all the configurational stuff was moved to a specialized object: the TransactionConfig.
+ * all the configurational stuff was moved to a specialized object: the TransactionConfiguration.
  *
  * @author Peter Veentjer.
  */
-public interface TransactionConfig {
+public interface TransactionConfiguration {
 
     /**
      * Returns the BackoffPolicy used by the Stm when a transaction conflicts with another transaction.

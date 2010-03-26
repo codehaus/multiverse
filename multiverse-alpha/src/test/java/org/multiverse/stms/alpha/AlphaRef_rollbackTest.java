@@ -21,7 +21,9 @@ public class AlphaRef_rollbackTest {
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
-        updateTxFactory = stm.getTransactionFactoryBuilder().build();
+        updateTxFactory = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .build();
         clearThreadLocalTransaction();
     }
 

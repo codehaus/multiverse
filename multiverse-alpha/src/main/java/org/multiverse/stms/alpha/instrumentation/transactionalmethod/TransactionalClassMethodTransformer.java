@@ -146,18 +146,35 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                 "getTransactionFactoryBuilder",
                 "()" + Type.getDescriptor(TransactionFactoryBuilder.class)));
 
-        //timeout
-        insnList.add(new LdcInsnNode(transactionMetadata.timeout));
-        insnList.add(new FieldInsnNode(
-                GETSTATIC,
-                Type.getInternalName(TimeUnit.class),
-                transactionMetadata.timeoutTimeUnit.name(),
-                Type.getDescriptor(TimeUnit.class)));
+        boolean speculative = transactionMetadata.speculativeConfigurationEnabled;
+
+        //speculativeConfigurationEnabled
+        insnList.add(new InsnNode(speculative ? ICONST_1 : ICONST_0));
         insnList.add(new MethodInsnNode(
                 INVOKEINTERFACE,
                 Type.getInternalName(TransactionFactoryBuilder.class),
-                "setTimeout",
-                "(JLjava/util/concurrent/TimeUnit;)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
+                "setSpeculativeConfigurationEnabled",
+                "(Z)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
+
+        //readonly                    
+        if (transactionMetadata.readOnly != null) {
+            insnList.add(new InsnNode(transactionMetadata.readOnly ? ICONST_1 : ICONST_0));
+            insnList.add(new MethodInsnNode(
+                    INVOKEINTERFACE,
+                    Type.getInternalName(TransactionFactoryBuilder.class),
+                    "setReadonly",
+                    "(Z)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
+        }
+
+        //trackreads
+        if (transactionMetadata.automaticReadTracking != null) {
+            insnList.add(new InsnNode(transactionMetadata.automaticReadTracking ? ICONST_1 : ICONST_0));
+            insnList.add(new MethodInsnNode(
+                    INVOKEINTERFACE,
+                    Type.getInternalName(TransactionFactoryBuilder.class),
+                    "setAutomaticReadTracking",
+                    "(Z)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
+        }
 
         //familyName
         insnList.add(new LdcInsnNode(transactionMetadata.familyName));
@@ -166,22 +183,6 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                 Type.getInternalName(TransactionFactoryBuilder.class),
                 "setFamilyName",
                 "(Ljava/lang/String;)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
-
-        //readonly
-        insnList.add(new InsnNode(transactionMetadata.readOnly ? ICONST_1 : ICONST_0));
-        insnList.add(new MethodInsnNode(
-                INVOKEINTERFACE,
-                Type.getInternalName(TransactionFactoryBuilder.class),
-                "setReadonly",
-                "(Z)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
-
-        //trackreads
-        insnList.add(new InsnNode(transactionMetadata.automaticReadTracking ? ICONST_1 : ICONST_0));
-        insnList.add(new MethodInsnNode(
-                INVOKEINTERFACE,
-                Type.getInternalName(TransactionFactoryBuilder.class),
-                "setAutomaticReadTracking",
-                "(Z)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
 
         //interruptible.
         insnList.add(new InsnNode(transactionMetadata.interruptible ? ICONST_1 : ICONST_0));
@@ -199,15 +200,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                 "setAllowWriteSkewProblem",
                 "(Z)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
 
-        //speculativeConfigurationEnabled
-        insnList.add(new InsnNode(transactionMetadata.speculativeConfigurationEnabled ? ICONST_1 : ICONST_0));
-        insnList.add(new MethodInsnNode(
-                INVOKEINTERFACE,
-                Type.getInternalName(TransactionFactoryBuilder.class),
-                "setSpeculativeConfigurationEnabled",
-                "(Z)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
-
-        //familyName
+        //maxRetryCount
         insnList.add(new LdcInsnNode(transactionMetadata.maxRetryCount));
         insnList.add(new MethodInsnNode(
                 INVOKEINTERFACE,
@@ -215,12 +208,26 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                 "setMaxRetryCount",
                 "(I)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
 
+        //timeout
+        insnList.add(new LdcInsnNode(transactionMetadata.timeout));
+        insnList.add(new FieldInsnNode(
+                GETSTATIC,
+                Type.getInternalName(TimeUnit.class),
+                transactionMetadata.timeoutTimeUnit.name(),
+                Type.getDescriptor(TimeUnit.class)));
+        insnList.add(new MethodInsnNode(
+                INVOKEINTERFACE,
+                Type.getInternalName(TransactionFactoryBuilder.class),
+                "setTimeout",
+                "(JLjava/util/concurrent/TimeUnit;)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
+
         //now lets build the TransactionFactory
         insnList.add(new MethodInsnNode(
                 INVOKEINTERFACE,
                 Type.getInternalName(TransactionFactoryBuilder.class),
                 "build",
                 "()" + Type.getDescriptor(TransactionFactory.class)));
+
 
         //and store it in the txFactoryField
         insnList.add(new FieldInsnNode(

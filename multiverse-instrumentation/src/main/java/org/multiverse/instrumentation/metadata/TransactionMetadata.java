@@ -9,19 +9,27 @@ import java.util.concurrent.TimeUnit;
  */
 public class TransactionMetadata {
 
-    public boolean readOnly;
+    /**
+     * Indicates if a Transaction is readonly.
+     * <p/>
+     * True: Readonly
+     * False: Not readonly
+     * Null: Speculative readonly
+     */
+    public Boolean readOnly;
+
+    //todo: needs to be transformed to Object boolean
+    public boolean allowWriteSkewProblem;
+
+    public Boolean automaticReadTracking;
+
+    public Boolean interruptible;
 
     public String familyName;
 
     public int maxRetryCount;
 
-    public boolean automaticReadTracking;
-
-    public boolean interruptible;
-
     public boolean speculativeConfigurationEnabled;
-
-    public boolean allowWriteSkewProblem;
 
     public long timeout;
 

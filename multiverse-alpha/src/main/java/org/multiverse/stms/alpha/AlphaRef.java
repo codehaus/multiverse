@@ -623,7 +623,7 @@ class AlphaRefTranlocal<E> extends AlphaTranlocal implements Transaction {
     }
 
     @Override
-    public TransactionConfig getConfig() {
+    public TransactionConfiguration getConfiguration() {
         throw new UnsupportedOperationException();
     }
 

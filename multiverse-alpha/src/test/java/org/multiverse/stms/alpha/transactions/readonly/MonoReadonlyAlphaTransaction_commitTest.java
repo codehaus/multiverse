@@ -7,7 +7,7 @@ import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -25,11 +25,11 @@ public class MonoReadonlyAlphaTransaction_commitTest {
     }
 
     public MonoReadonlyAlphaTransaction startSutTransaction() {
-        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
+        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                new OptimalSize(1, 100),
+                new SpeculativeConfiguration(100),
                 stmConfig.maxRetryCount, false, true);
         return new MonoReadonlyAlphaTransaction(config);
     }
@@ -58,6 +58,21 @@ public class MonoReadonlyAlphaTransaction_commitTest {
         assertIsCommitted(tx);
         assertEquals(version, stm.getVersion());
         assertSame(committed, ref.___load());
+    }
+
+    @Test
+    public void whenPrepared_thenSuccess() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction tx = startSutTransaction();
+        tx.openForRead(ref);
+        tx.prepare();
+
+        long version = stm.getVersion();
+        tx.commit();
+
+        assertEquals(version, stm.getVersion());
+        assertIsCommitted(tx);
     }
 
     @Test

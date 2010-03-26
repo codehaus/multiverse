@@ -25,7 +25,7 @@ import static java.text.MessageFormat.format;
  *
  * @author Peter Veentjer.
  */
-public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S extends AbstractTransactionSnapshot>
+public abstract class AbstractTransaction<C extends AbstractTransactionConfiguration, S extends AbstractTransactionSnapshot>
         implements Transaction, MultiverseConstants {
 
     protected final C config;
@@ -52,7 +52,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfig, S
     }
 
     @Override
-    public TransactionConfig getConfig() {
+    public TransactionConfiguration getConfiguration() {
         return config;
     }
 

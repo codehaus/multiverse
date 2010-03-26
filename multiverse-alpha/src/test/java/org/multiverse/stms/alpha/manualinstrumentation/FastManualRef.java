@@ -4,7 +4,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.ControlFlowError;
-import org.multiverse.api.exceptions.SpeculativeConfigFailure;
+import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.mixins.FastTxObjectMixin;
@@ -101,23 +101,23 @@ public class FastManualRef extends FastTxObjectMixin {
 
                     tx.commit();
                     return;
-                } catch (SpeculativeConfigFailure ex) {
+                } catch (SpeculativeConfigurationFailure ex) {
                     tx = (AlphaTransaction) txFactory.start();
                 } catch (ControlFlowError throwable) {
-                    tx.getConfig().getBackoffPolicy().delayedUninterruptible(tx, attempt);
+                    tx.getConfiguration().getBackoffPolicy().delayedUninterruptible(tx, attempt);
                 } finally {
                     if (tx.getStatus() != TransactionStatus.committed) {
-                        if (attempt - 1 < tx.getConfig().getMaxRetryCount()) {
+                        if (attempt - 1 < tx.getConfiguration().getMaxRetryCount()) {
                             tx.restart();
                         } else {
                             tx.abort();
                         }
                     }
                 }
-            } while (attempt - 1 < tx.getConfig().getMaxRetryCount());
+            } while (attempt - 1 < tx.getConfiguration().getMaxRetryCount());
 
             String msg = format("Could not complete transaction '%s' within %s retries",
-                    tx.getConfig().getFamilyName(), tx.getConfig().getMaxRetryCount());
+                    tx.getConfiguration().getFamilyName(), tx.getConfiguration().getMaxRetryCount());
             throw new TooManyRetriesException(msg);
         } finally {
             clearThreadLocalTransaction();
@@ -136,23 +136,23 @@ public class FastManualRef extends FastTxObjectMixin {
 
                 tx.commit();
                 return;
-            } catch (SpeculativeConfigFailure ex) {
+            } catch (SpeculativeConfigurationFailure ex) {
                 tx = (AlphaTransaction) txFactory.start();
             } catch (ControlFlowError throwable) {
-                tx.getConfig().getBackoffPolicy().delayedUninterruptible(tx, attempt);
+                tx.getConfiguration().getBackoffPolicy().delayedUninterruptible(tx, attempt);
             } finally {
                 if (tx.getStatus() != TransactionStatus.committed) {
-                    if (attempt - 1 < tx.getConfig().getMaxRetryCount()) {
+                    if (attempt - 1 < tx.getConfiguration().getMaxRetryCount()) {
                         tx.restart();
                     } else {
                         tx.abort();
                     }
                 }
             }
-        } while (attempt - 1 < tx.getConfig().getMaxRetryCount());
+        } while (attempt - 1 < tx.getConfiguration().getMaxRetryCount());
 
         String msg = format("Could not complete transaction '%s' within %s retries",
-                tx.getConfig().getFamilyName(), tx.getConfig().getMaxRetryCount());
+                tx.getConfiguration().getFamilyName(), tx.getConfiguration().getMaxRetryCount());
         throw new TooManyRetriesException(msg);
     }
 

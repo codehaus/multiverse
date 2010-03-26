@@ -49,11 +49,11 @@ import org.multiverse.utils.latches.Latch;
 public interface Transaction {
 
     /**
-     * Gets the {@link TransactionConfig} that is used by this Transaction.
+     * Gets the {@link TransactionConfiguration} that is used by this Transaction.
      *
-     * @return the used TransactionConfig.
+     * @return the used TransactionConfiguration.
      */
-    TransactionConfig getConfig();
+    TransactionConfiguration getConfiguration();
 
     /**
      * Returns the clock version of the stm when this Transaction started. This version is needed to provide a

@@ -6,11 +6,12 @@ import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.NoRetryPossibleException;
+import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.templates.TransactionTemplate;
 import org.multiverse.utils.Listeners;
 import org.multiverse.utils.latches.CheapLatch;
@@ -37,26 +38,25 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
     }
 
     public MapUpdateAlphaTransaction startSutTransaction() {
-        OptimalSize optimalSize = new OptimalSize(1, 100);
-        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
+        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 stmConfig.commitLockPolicy,
                 null,
-                optimalSize,
+                speculativeConfig,
                 stmConfig.maxRetryCount, true, true, true, true, true);
 
         return new MapUpdateAlphaTransaction(config);
     }
 
-    public MapUpdateAlphaTransaction startSutTransactionWithoutReadTracking() {
-        OptimalSize optimalSize = new OptimalSize(1, 100);
-        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
+    public MapUpdateAlphaTransaction startSutTransactionWithoutReadTracking(SpeculativeConfiguration speculativeConfig) {
+        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 stmConfig.commitLockPolicy,
                 null,
-                optimalSize,
+                speculativeConfig,
                 stmConfig.maxRetryCount, true, false, true, true, true);
 
         return new MapUpdateAlphaTransaction(config);
@@ -75,10 +75,11 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
     }
 
     @Test
-    public void whenNoAutomaticReadtracking_thenNoRetryPossibleException() {
+    public void whenExplicitNoAutomaticReadtracking_thenNoRetryPossibleException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransactionWithoutReadTracking();
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, false, false, 100);
+        AlphaTransaction tx = startSutTransactionWithoutReadTracking(speculativeConfig);
         tx.openForWrite(ref);
 
         Latch latch = new CheapLatch();
@@ -88,8 +89,31 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
         } catch (NoRetryPossibleException expected) {
         }
 
+        assertIsActive(tx);
+        assertFalse(speculativeConfig.isAutomaticReadTracking());
         assertFalse(latch.isOpen());
     }
+
+    @Test
+    public void whenSpeculativeNoAutomaticReadtracking_thenSpeculativeFailureException() {
+        ManualRef ref = new ManualRef(stm);
+
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, false, 100);
+        AlphaTransaction tx = startSutTransactionWithoutReadTracking(speculativeConfig);
+        tx.openForWrite(ref);
+
+        Latch latch = new CheapLatch();
+        try {
+            tx.registerRetryLatch(latch);
+            fail();
+        } catch (SpeculativeConfigurationFailure expected) {
+        }
+
+        assertIsActive(tx);
+        assertTrue(speculativeConfig.isAutomaticReadTracking());
+        assertFalse(latch.isOpen());
+    }
+
 
     // =================== unit tests =======================================
 

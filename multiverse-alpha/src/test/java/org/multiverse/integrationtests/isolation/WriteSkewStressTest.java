@@ -242,9 +242,9 @@ public class WriteSkewStressTest {
             }
 
             Transaction tx = getThreadLocalTransaction();
-            assertFalse(tx.getConfig().isReadonly());
-            assertTrue(tx.getConfig().automaticReadTracking());
-            assertTrue(tx.getConfig().allowWriteSkewProblem());
+            assertFalse(tx.getConfiguration().isReadonly());
+            assertTrue(tx.getConfiguration().automaticReadTracking());
+            assertTrue(tx.getConfiguration().allowWriteSkewProblem());
 
             sleepMs(200);
         }

@@ -18,19 +18,14 @@ import java.util.concurrent.TimeUnit;
  * are immutable. If you don't do this, your transactions don't get the properties you want them to have.
  * <p/>
  * <h2>Transaction familyName</h2>
- * The same TransactionFactory instance should not be used as general purpose transaction factory for the entire
- * system. Each location
- * that needs transactions, wants to receive its own TransactionFactory instance because it can be optimization
- * for that specific situation (readonly vs update, automatic readtracking enabled and disabled etc). Besides these
- * static optimizations, the TransactionFactories also are able to do runtime optimizations (like selecting better
- * suiting transaction implementations) based on previous executions. For this to work, the transaction familyName
- * needs to be set.
+ * This is purely used for debugging purposes. In the instrumentation the familyname is determined by the
+ * full method signature including the owning class.
  * <p/>
  * <h2>Default configuration</h2>
  * Default a TransactionFactoryBuilder will be configured with:
  * <ol>
  * <li><b>readonly</b>false</li>
- * <li><b>automatic read tracking</b>true</li>
+ * <li><b>automatic read tracking</b>false</li>
  * <li><b>familyName</b> null</li>
  * <li><b>maxRetryCount</b> 1000</li>
  * </ol>
@@ -86,11 +81,14 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     B setInterruptible(boolean interruptible);
 
     /**
-     * Work around for making sure that on some locations there is a choice
-     * for the correct transaction length. Constructors are not able to deal with
-     * retrying tx.
+     * With the speculative configuration enabled, the stm is allowed to determine optimal settings
+     * for transactions. Some behavior like readonly or the need for tracking reads can be determined
+     * runtime. The system can start with a readonly non readtracking transaction and upgrade to an
+     * update or a read tracking once a write or retry happens.
+     * <p/>
+     * The value defaults to true and in most cases is the best setting.
      *
-     * @param newValue indicates if smartTxlength selection should be used.
+     * @param newValue indicates if speculative configuration should be enabled.
      * @return the new TransactionFactoryBuilder
      */
     B setSpeculativeConfigurationEnabled(boolean newValue);

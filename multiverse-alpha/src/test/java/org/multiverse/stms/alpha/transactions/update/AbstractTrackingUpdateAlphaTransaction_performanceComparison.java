@@ -6,7 +6,7 @@ import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import java.util.concurrent.TimeUnit;
 
@@ -20,8 +20,8 @@ public class AbstractTrackingUpdateAlphaTransaction_performanceComparison {
 
     private AlphaStmConfig stmConfig;
     private AlphaStm stm;
-    private OptimalSize optimalSize;
-    private UpdateAlphaTransactionConfig config;
+    private SpeculativeConfiguration speculativeConfig;
+    private UpdateAlphaTransactionConfiguration config;
     private ManualRef[] refs;
     //todo: very small size. 
     private int txCount = 1000;
@@ -30,14 +30,14 @@ public class AbstractTrackingUpdateAlphaTransaction_performanceComparison {
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
         stm = new AlphaStm(stmConfig);
-        optimalSize = new OptimalSize(1, 100);
+        speculativeConfig = new SpeculativeConfiguration(100);
 
-        config = new UpdateAlphaTransactionConfig(
+        config = new UpdateAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 stmConfig.commitLockPolicy,
                 null,
-                optimalSize,
+                speculativeConfig,
                 stmConfig.maxRetryCount, true, true, true, true, true);
 
     }
@@ -157,7 +157,7 @@ public class AbstractTrackingUpdateAlphaTransaction_performanceComparison {
             refs[k] = new ManualRef(stm);
         }
 
-        optimalSize.set(transactionSize);
+        speculativeConfig.setOptimalSize(transactionSize);
         long startFixedNs = System.nanoTime();
 
         for (int k = 0; k < txCount; k++) {
@@ -198,7 +198,7 @@ public class AbstractTrackingUpdateAlphaTransaction_performanceComparison {
             refs[k] = new ManualRef(stm);
         }
 
-        optimalSize.set(transactionSize);
+        speculativeConfig.setOptimalSize(transactionSize);
         long startFixedNs = System.nanoTime();
 
         AlphaTransaction tx = startFixedTransaction(transactionSize);

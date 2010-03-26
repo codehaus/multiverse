@@ -17,14 +17,13 @@ import java.util.Map;
  *
  * @author Peter Veentjer
  */
-public class MapReadonlyAlphaTransaction
-        extends AbstractReadonlyAlphaTransaction<ReadonlyAlphaTransactionConfig> {
+public class MapReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransaction {
 
     public static class Factory implements TransactionFactory<AlphaTransaction> {
 
-        public final ReadonlyAlphaTransactionConfig config;
+        public final ReadonlyAlphaTransactionConfiguration config;
 
-        public Factory(ReadonlyAlphaTransactionConfig config) {
+        public Factory(ReadonlyAlphaTransactionConfiguration config) {
             this.config = config;
         }
 
@@ -37,7 +36,7 @@ public class MapReadonlyAlphaTransaction
     private final Map<AlphaTransactionalObject, AlphaTranlocal>
             attachedMap = new IdentityHashMap<AlphaTransactionalObject, AlphaTranlocal>();
 
-    public MapReadonlyAlphaTransaction(ReadonlyAlphaTransactionConfig config) {
+    public MapReadonlyAlphaTransaction(ReadonlyAlphaTransactionConfiguration config) {
         super(config);
 
         init();

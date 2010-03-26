@@ -30,14 +30,13 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
  *
  * @author Peter Veentjer.
  */
-public class NonTrackingReadonlyAlphaTransaction
-        extends AbstractReadonlyAlphaTransaction<ReadonlyAlphaTransactionConfig> {
+public class NonTrackingReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransaction {
 
     public static class Factory implements TransactionFactory<AlphaTransaction> {
 
-        private final ReadonlyAlphaTransactionConfig config;
+        private final ReadonlyAlphaTransactionConfiguration config;
 
-        public Factory(ReadonlyAlphaTransactionConfig config) {
+        public Factory(ReadonlyAlphaTransactionConfiguration config) {
             this.config = config;
         }
 
@@ -47,7 +46,7 @@ public class NonTrackingReadonlyAlphaTransaction
         }
     }
 
-    public NonTrackingReadonlyAlphaTransaction(ReadonlyAlphaTransactionConfig config) {
+    public NonTrackingReadonlyAlphaTransaction(ReadonlyAlphaTransactionConfiguration config) {
         super(config);
         init();
     }

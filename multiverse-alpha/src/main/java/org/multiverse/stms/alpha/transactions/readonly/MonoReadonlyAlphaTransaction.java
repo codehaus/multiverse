@@ -1,10 +1,8 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
-import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.exceptions.SpeculativeConfigFailure;
+import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
-import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.utils.latches.Latch;
 
 /**
@@ -12,26 +10,11 @@ import org.multiverse.utils.latches.Latch;
  *
  * @author Peter Veentjer.
  */
-public class MonoReadonlyAlphaTransaction
-        extends AbstractReadonlyAlphaTransaction<ReadonlyAlphaTransactionConfig> {
-
-    public static class Factory implements TransactionFactory<AlphaTransaction> {
-
-        public final ReadonlyAlphaTransactionConfig config;
-
-        public Factory(ReadonlyAlphaTransactionConfig config) {
-            this.config = config;
-        }
-
-        @Override
-        public AlphaTransaction start() {
-            return new MonoReadonlyAlphaTransaction(config);
-        }
-    }
+public class MonoReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransaction {
 
     private AlphaTranlocal attached;
 
-    public MonoReadonlyAlphaTransaction(ReadonlyAlphaTransactionConfig config) {
+    public MonoReadonlyAlphaTransaction(ReadonlyAlphaTransactionConfiguration config) {
         super(config);
         init();
     }
@@ -57,8 +40,8 @@ public class MonoReadonlyAlphaTransaction
     @Override
     protected void attach(AlphaTranlocal tranlocal) {
         if (attached != null) {
-            config.optimalSize.compareAndSet(1, 2);
-            throw SpeculativeConfigFailure.INSTANCE;
+            config.speculativeConfig.signalSpeculativeSizeFailure(1);
+            throw SpeculativeConfigurationFailure.create();
         }
 
         attached = tranlocal;

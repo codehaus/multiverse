@@ -2,13 +2,13 @@ package org.multiverse.stms.alpha.transactions.readonly;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.NoRetryPossibleException;
+import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.utils.latches.CheapLatch;
 import org.multiverse.utils.latches.Latch;
 
@@ -30,18 +30,67 @@ public class NonTrackingReadonlyAlphaTransaction_registerRetryLatchTest {
     }
 
     public NonTrackingReadonlyAlphaTransaction startSutTransaction() {
-        ReadonlyAlphaTransactionConfig config = new ReadonlyAlphaTransactionConfig(
+        return startSutTransaction(new SpeculativeConfiguration(100));
+    }
+
+    public NonTrackingReadonlyAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfiguration) {
+        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 null,
-                new OptimalSize(10, 100),
+                speculativeConfiguration,
                 stmConfig.maxRetryCount, false, false);
         return new NonTrackingReadonlyAlphaTransaction(config);
     }
 
     @Test
-    public void whenUnused_thenNoRetryPossibleException() {
-        Transaction tx = startSutTransaction();
+    public void whenSpeculativeNonAutomaticReadTrackingAndUsed_thenSpeculativeConfigurationFailure() {
+        ManualRef ref = new ManualRef(stm);
+
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, false, 100);
+        AlphaTransaction tx = startSutTransaction(speculativeConfig);
+        tx.openForRead(ref);
+
+        Latch latch = new CheapLatch();
+
+        try {
+            tx.registerRetryLatch(latch);
+            fail();
+        } catch (SpeculativeConfigurationFailure expected) {
+        }
+
+        assertFalse(latch.isOpen());
+        assertIsActive(tx);
+        assertNull(ref.___getListeners());
+        assertTrue(speculativeConfig.isAutomaticReadTracking());
+    }
+
+    @Test
+    public void whenSpeculativeNonAutomaticReadTrackingAndUnused_thenSpeculativeConfigurationFailure() {
+        ManualRef ref = new ManualRef(stm);
+
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, false, 100);
+        AlphaTransaction tx = startSutTransaction(speculativeConfig);
+
+        Latch latch = new CheapLatch();
+
+        try {
+            tx.registerRetryLatch(latch);
+            fail();
+        } catch (SpeculativeConfigurationFailure expected) {
+        }
+
+        assertFalse(latch.isOpen());
+        assertIsActive(tx);
+        assertNull(ref.___getListeners());
+        assertTrue(speculativeConfig.isAutomaticReadTracking());
+    }
+
+    @Test
+    public void whenExplicitNonAutomaticReadTrackingAndUnused_thenNoRetryPossibleException() {
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, false, false, 100);
+        AlphaTransaction tx = startSutTransaction(speculativeConfig);
+
         Latch latch = new CheapLatch();
 
         try {
@@ -52,13 +101,15 @@ public class NonTrackingReadonlyAlphaTransaction_registerRetryLatchTest {
 
         assertFalse(latch.isOpen());
         assertIsActive(tx);
+        assertFalse(speculativeConfig.isAutomaticReadTracking());
     }
 
     @Test
-    public void whenUsed_thenNoRetryPossibleException() {
+    public void whenExplicitNonAutomaticReadTrackingAndUsed_thenNoRetryPossibleException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(true, false, true, 100);
+        AlphaTransaction tx = startSutTransaction(speculativeConfig);
         tx.openForRead(ref);
 
         Latch latch = new CheapLatch();
@@ -72,5 +123,6 @@ public class NonTrackingReadonlyAlphaTransaction_registerRetryLatchTest {
         assertFalse(latch.isOpen());
         assertIsActive(tx);
         assertNull(ref.___getListeners());
+        assertFalse(speculativeConfig.isAutomaticReadTracking());
     }
 }

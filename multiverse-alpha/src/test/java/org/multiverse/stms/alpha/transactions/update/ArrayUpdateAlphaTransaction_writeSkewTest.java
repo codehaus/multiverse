@@ -13,7 +13,7 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.OptimalSize;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.templates.TransactionTemplate;
 
 import static org.junit.Assert.*;
@@ -34,13 +34,13 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
     }
 
     public AlphaTransaction startSutTransaction(int size, boolean allowWriteSkewProblem) {
-        OptimalSize optimalSize = new OptimalSize(size, 100);
-        UpdateAlphaTransactionConfig config = new UpdateAlphaTransactionConfig(
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
+        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 stmConfig.commitLockPolicy,
                 null,
-                optimalSize,
+                speculativeConfig,
                 stmConfig.maxRetryCount, true, true, allowWriteSkewProblem, true, true);
 
         return new ArrayUpdateAlphaTransaction(config, size);
@@ -49,12 +49,12 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
     @Test
     public void testSettings() {
         AlphaTransaction tx1 = startSutTransaction(10, true);
-        assertTrue(tx1.getConfig().allowWriteSkewProblem());
-        assertTrue(tx1.getConfig().automaticReadTracking());
+        assertTrue(tx1.getConfiguration().allowWriteSkewProblem());
+        assertTrue(tx1.getConfiguration().automaticReadTracking());
 
         AlphaTransaction tx2 = startSutTransaction(10, false);
-        assertFalse(tx2.getConfig().allowWriteSkewProblem());
-        assertTrue(tx2.getConfig().automaticReadTracking());
+        assertFalse(tx2.getConfiguration().allowWriteSkewProblem());
+        assertTrue(tx2.getConfiguration().automaticReadTracking());
     }
 
     @Test
