@@ -91,7 +91,7 @@ public class TransactionLogicDonor {
                     tx = (AlphaTransaction) transactionFactory.start();
                     setThreadLocalTransaction(tx);
                 } catch (ControlFlowError throwable) {
-                    //System.out.println(throwable.getClass());
+                    System.out.println(throwable.getClass());
                     BackoffPolicy backoffPolicy = tx.getConfiguration().getBackoffPolicy();
                     backoffPolicy.delayedUninterruptible(tx, attempt);
                 } finally {

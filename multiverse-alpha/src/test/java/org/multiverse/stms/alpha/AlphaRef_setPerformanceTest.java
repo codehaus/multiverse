@@ -12,7 +12,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class AlphaRef_setPerformanceTest {
 
-    private long transactionCount = ((long) 1000) * 1000 * 1000;
+    private long transactionCount = ((long) 1000) * 1000 * 500;
 
     @Before
     public void setUp() {
