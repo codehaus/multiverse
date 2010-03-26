@@ -1,8 +1,6 @@
 package org.multiverse.stms.alpha;
 
-import org.multiverse.api.Stm;
-import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.TransactionFactoryBuilder;
+import org.multiverse.api.*;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.stms.alpha.transactions.readonly.*;
@@ -49,6 +47,8 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
     private final boolean dirtyCheckEnabled;
 
+    private final ProgrammaticReferenceFactory refFactory;
+
     public static AlphaStm createFast() {
         return new AlphaStm(AlphaStmConfig.createFastConfig());
     }
@@ -87,6 +87,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         this.backoffPolicy = config.backoffPolicy;
         this.maxRetryCount = config.maxRetryCount;
         this.transactionBuilder = new AlphaTransactionFactoryBuilder();
+        this.refFactory = new AlphaRefFactory();
 
         logger.info("Created a new AlphaStm instance");
     }
@@ -122,6 +123,24 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
     public PrimitiveClock getClock() {
         return clock;
+    }
+
+    @Override
+    public ProgrammaticReferenceFactory getProgrammaticReferenceFactory() {
+        return refFactory;
+    }
+
+    private final static class AlphaRefFactory<E> implements ProgrammaticReferenceFactory {
+
+        @Override
+        public <E> ProgrammaticReference<E> create(Transaction t, E value) {
+            return new AlphaRef<E>(t, value);
+        }
+
+        @Override
+        public <E> ProgrammaticReference<E> create(E value) {
+            return new AlphaRef<E>(value);
+        }
     }
 
     public class AlphaTransactionFactoryBuilder
