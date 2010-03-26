@@ -49,7 +49,8 @@ public class SpeculativeSizeTest {
         assertInstanceOf(o.transactions.get(1), ArrayReadonlyAlphaTransaction.class);
         assertInstanceOf(o.transactions.get(2), MapReadonlyAlphaTransaction.class);
 
-        //and try another transaction and see that the system worked
+        //and try another transaction and see that the system learned
+        //from he speculative executions
         SpeculativeSize o2 = new SpeculativeSize();
         o2.trackingRead();
         assertEquals(1, o2.transactions.size());
@@ -64,8 +65,9 @@ public class SpeculativeSizeTest {
         assertEquals(1, o.transactions.size());
         assertInstanceOf(o.transactions.get(0), NonTrackingReadonlyAlphaTransaction.class);
 
+        //and try another transaction and see that the system learned
+        //from he speculative executions
         SpeculativeSize o2 = new SpeculativeSize();
-
         o2.read();
         assertEquals(1, o2.transactions.size());
         assertInstanceOf(o2.transactions.get(0), NonTrackingReadonlyAlphaTransaction.class);
@@ -82,7 +84,8 @@ public class SpeculativeSizeTest {
         assertInstanceOf(o.transactions.get(2), ArrayUpdateAlphaTransaction.class);
         assertInstanceOf(o.transactions.get(3), MapUpdateAlphaTransaction.class);
 
-        //and try another transaction and see that the system worked
+        //and try another transaction and see that the system learned
+        //from he speculative executions
         SpeculativeSize o2 = new SpeculativeSize();
         o2.update();
         assertEquals(1, o2.transactions.size());
