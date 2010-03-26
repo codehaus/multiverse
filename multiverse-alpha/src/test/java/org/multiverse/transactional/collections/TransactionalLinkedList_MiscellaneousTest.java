@@ -19,7 +19,10 @@ public class TransactionalLinkedList_MiscellaneousTest {
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
-        updateTxFactory = stm.getTransactionFactoryBuilder().build();
+        updateTxFactory = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
+                .build();
         clearThreadLocalTransaction();
     }
 

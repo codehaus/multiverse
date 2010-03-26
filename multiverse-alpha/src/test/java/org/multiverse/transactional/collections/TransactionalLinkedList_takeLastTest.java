@@ -20,7 +20,10 @@ public class TransactionalLinkedList_takeLastTest {
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
-        updateTxFactory = stm.getTransactionFactoryBuilder().build();
+        updateTxFactory = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .setAutomaticReadTracking(true)
+                .build();
         setThreadLocalTransaction(null);
     }
 

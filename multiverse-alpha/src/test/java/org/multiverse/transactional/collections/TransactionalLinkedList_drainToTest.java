@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.multiverse.api.Stm;
 
 import java.util.Collection;
-import java.util.LinkedList;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -26,7 +25,7 @@ public class TransactionalLinkedList_drainToTest {
     public void drainToWithEmptyDeque() {
         TransactionalLinkedList<String> list = new TransactionalLinkedList<String>();
 
-        Collection<String> c = new LinkedList<String>();
+        Collection<String> c = new TransactionalLinkedList<String>();
         int result = list.drainTo(c);
         assertEquals(0, result);
 
@@ -41,7 +40,7 @@ public class TransactionalLinkedList_drainToTest {
         list.add("2");
         list.add("3");
 
-        Collection<String> c = new LinkedList<String>();
+        Collection<String> c = new TransactionalLinkedList<String>();
         long version = stm.getVersion();
         int result = list.drainTo(c);
         assertEquals(3, result);

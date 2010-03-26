@@ -8,6 +8,7 @@ import org.multiverse.api.Transaction;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import static java.lang.System.identityHashCode;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.TestUtils.testIncomplete;
@@ -39,9 +40,9 @@ public class TransactionalThreadPoolExecutor_miscStressTest {
         Runnable task = new Runnable() {
             @Override
             public void run() {
-                System.out.println("Start " + System.identityHashCode(Thread.currentThread()));
+                System.out.println("Start " + identityHashCode(Thread.currentThread()));
                 sleepMs(5000);
-                System.out.println("Finished " + System.identityHashCode(Thread.currentThread()));
+                System.out.println("Finished " + identityHashCode(Thread.currentThread()));
             }
         };
 
@@ -57,7 +58,11 @@ public class TransactionalThreadPoolExecutor_miscStressTest {
         TransactionalThreadPoolExecutor executor = new TransactionalThreadPoolExecutor();
         Runnable command = mock(Runnable.class);
 
-        Transaction t = stm.getTransactionFactoryBuilder().setReadonly(false).build().start();
+        Transaction t = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
+                .build()
+                .start();
         setThreadLocalTransaction(t);
 
         executor.execute(command);

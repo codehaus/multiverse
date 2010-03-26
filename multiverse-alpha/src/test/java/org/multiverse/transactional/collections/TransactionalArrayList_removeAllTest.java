@@ -1,5 +1,6 @@
 package org.multiverse.transactional.collections;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Stm;
@@ -9,6 +10,7 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class TransactionalArrayList_removeAllTest {
     private Stm stm;
@@ -16,6 +18,12 @@ public class TransactionalArrayList_removeAllTest {
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
+        clearThreadLocalTransaction();
+    }
+
+    @After
+    public void tearDown() {
+        clearThreadLocalTransaction();
     }
 
     @Test
@@ -81,6 +89,8 @@ public class TransactionalArrayList_removeAllTest {
     public void whenElementMatchingMultipleTimes() {
         TransactionalArrayList<String> list = new TransactionalArrayList<String>("a", "b", "a", "d", "e");
 
+        //todo: a problem here since items is not transactional and incombination with speculative
+        //execution this could cause problems.
         Set<String> items = new HashSet<String>();
         items.add("a");
 
