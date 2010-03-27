@@ -1,6 +1,9 @@
 package org.multiverse.stms.alpha;
 
-import org.multiverse.api.*;
+import org.multiverse.api.BackoffPolicy;
+import org.multiverse.api.Stm;
+import org.multiverse.api.TransactionFactory;
+import org.multiverse.api.TransactionFactoryBuilder;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.stms.alpha.transactions.readonly.*;
@@ -24,7 +27,7 @@ import static org.multiverse.stms.alpha.transactions.SpeculativeConfiguration.cr
  *
  * @author Peter Veentjer.
  */
-public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuilder> {
+public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuilder, AlphaProgrammaticReferenceFactoryBuilder> {
 
     private final static Logger logger = Logger.getLogger(AlphaStm.class.getName());
 
@@ -34,7 +37,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
     private final BackoffPolicy backoffPolicy;
 
-    private final AlphaTransactionFactoryBuilder transactionBuilder;
+    private final AlphaTransactionFactoryBuilder transactionFactoryBuilder;
 
     private final int maxRetryCount;
 
@@ -46,7 +49,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
     private final boolean dirtyCheckEnabled;
 
-    private final ProgrammaticReferenceFactory refFactory;
+    private final AlphaProgrammaticReferenceFactoryBuilder referenceFactoryBuilder;
 
     public static AlphaStm createFast() {
         return new AlphaStm(AlphaStmConfig.createFastConfig());
@@ -85,15 +88,15 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         this.commitLockPolicy = config.commitLockPolicy;
         this.backoffPolicy = config.backoffPolicy;
         this.maxRetryCount = config.maxRetryCount;
-        this.transactionBuilder = new AlphaTransactionFactoryBuilder();
-        this.refFactory = new AlphaRefFactory();
+        this.transactionFactoryBuilder = new AlphaTransactionFactoryBuilder();
+        this.referenceFactoryBuilder = new AlphaProgrammaticReferenceFactoryBuilder();
 
         logger.info("Created a new AlphaStm instance");
     }
 
     @Override
     public AlphaTransactionFactoryBuilder getTransactionFactoryBuilder() {
-        return transactionBuilder;
+        return transactionFactoryBuilder;
     }
 
     /**
@@ -125,21 +128,8 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
     }
 
     @Override
-    public ProgrammaticReferenceFactory getProgrammaticReferenceFactory() {
-        return refFactory;
-    }
-
-    private final static class AlphaRefFactory<E> implements ProgrammaticReferenceFactory {
-
-        @Override
-        public <E> ProgrammaticReference<E> create(Transaction tx, E value) {
-            return new AlphaProgrammaticReference<E>(tx, value);
-        }
-
-        @Override
-        public <E> ProgrammaticReference<E> create(E value) {
-            return new AlphaProgrammaticReference<E>(value);
-        }
+    public AlphaProgrammaticReferenceFactoryBuilder getProgrammaticReferenceFactoryBuilder() {
+        return referenceFactoryBuilder;
     }
 
     public class AlphaTransactionFactoryBuilder

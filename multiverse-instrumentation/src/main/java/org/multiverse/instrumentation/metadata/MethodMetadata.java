@@ -115,4 +115,8 @@ public final class MethodMetadata {
     public void setTransactionalMetadata(TransactionMetadata transactionMetadata) {
         this.transactionMetadata = transactionMetadata;
     }
+
+    public String toFullName() {
+        return classMetadata.getName() + "." + name + desc;
+    }
 }

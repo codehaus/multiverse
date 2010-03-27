@@ -2,7 +2,7 @@ package org.multiverse.integration.scala
 
 import org.junit.runner.RunWith
 import org.multiverse.integration.scala.StmUtils._
-import org.multiverse.stms.alpha.{AlphaRef}
+import org.multiverse.api._
 import org.scalatest.Spec
 import org.scalatest.junit.JUnitRunner
 
@@ -25,14 +25,16 @@ class StmUtilsSpec extends Spec {
 
   describe("atomic") {
     it("will execute a simple block when invoked") {
-      val intVal: AlphaRef[Int] = new AlphaRef()
+      val intVal: ProgrammaticReference[Int] = createProgrammaticReference[Int]()
+
       atomic {
         intVal.set(1)
       }
       assert(intVal.get === 1)
     }
     it("will execute only the either block if successful") {
-      val intVal: AlphaRef[Int] = new AlphaRef()
+      val intVal: ProgrammaticReference[Int] = createProgrammaticReference[Int]()
+
       atomic {
         {
           intVal.set(1)
@@ -43,7 +45,7 @@ class StmUtilsSpec extends Spec {
       assert(intVal.get === 1)
     }
     it("will execute the orelse block if the either block fails") {
-      val intVal: AlphaRef[Int] = new AlphaRef()
+      val intVal: ProgrammaticReference[Int] = createProgrammaticReference()
       atomic {
         {
           intVal.set(1)

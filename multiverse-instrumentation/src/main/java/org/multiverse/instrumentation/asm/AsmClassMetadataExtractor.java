@@ -292,9 +292,18 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor {
         txMetadata.interruptible = (Boolean) getValue(annotationNode, "interruptible", throwsInterruptedException);
         txMetadata.allowWriteSkewProblem = (Boolean) getValue(annotationNode, "allowWriteSkewProblem", true);
 
-        //Boolean defaultAutomaticReadTracking = txMetadata.allowWriteSkewProblem?null        
+        if (txMetadata.allowWriteSkewProblem) {
+            txMetadata.automaticReadTracking = (Boolean) getValue(annotationNode, "automaticReadTracking", null);
+        } else {
+            Boolean tracking = (Boolean) getValue(annotationNode, "automaticReadTracking", null);
+            if (tracking == null || tracking) {
+                txMetadata.automaticReadTracking = true;
+            } else {
+                //String msg = "method "+methodMetadata.toFullName()+" has automatic readtracking disabled"
+                //throw new RuntimeException();
+            }
+        }
 
-        txMetadata.automaticReadTracking = (Boolean) getValue(annotationNode, "automaticReadTracking", null);
         txMetadata.timeout = ((Number) getValue(annotationNode, "timeout", -1)).longValue();
         txMetadata.timeoutTimeUnit = (TimeUnit) getValue(annotationNode, "timeoutTimeUnit", TimeUnit.SECONDS);
 

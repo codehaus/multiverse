@@ -39,6 +39,7 @@ import org.multiverse.templates.{TransactionTemplate, OrElseTemplate}
  * @see org.multiverse.api.StmUtils # retry ( )
  */
 object StmUtils {
+
   /**
    * Requests an abort and retry of the currently executing transaction.
    * See  { @link org.multiverse.api.StmUtils # retry ( ) StmUtils#retry() }.
@@ -46,6 +47,10 @@ object StmUtils {
   def retry() {
     JavaStmUtils.retry()
   }
+
+  def createProgrammaticReference[E] =
+    (E)JavaStmUtils.createProgrammaticReference()
+  
 
   /**
    * Wraps a statement block in an  { @link AtomicTemplate } and executes the template.

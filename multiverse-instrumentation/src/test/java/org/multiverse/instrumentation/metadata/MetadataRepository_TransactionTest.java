@@ -138,20 +138,42 @@ public class MetadataRepository_TransactionTest {
     @Test
     public void whenAllowWriteSkewProblem() {
         ClassMetadata classMetadata = repository.getClassMetadata(AllowWriteSkewProblem.class);
+
         MethodMetadata enabledMethodMetadata = classMetadata.getMethodMetadata("enabled", "()V");
         TransactionMetadata enabledTransactionMetadata = enabledMethodMetadata.getTransactionalMetadata();
-
         assertNotNull(enabledTransactionMetadata);
         assertTrue(enabledTransactionMetadata.allowWriteSkewProblem);
 
         MethodMetadata disabledMethodMetadata = classMetadata.getMethodMetadata("disabled", "()V");
-
         TransactionMetadata disabledTransactionMetadata = disabledMethodMetadata.getTransactionalMetadata();
         assertNotNull(disabledTransactionMetadata);
         assertFalse(disabledTransactionMetadata.allowWriteSkewProblem);
+
+        MethodMetadata nowAllowedAndDefaultNonAutomaticReadTracking = classMetadata.getMethodMetadata("nowAllowedAndDefaultNonAutomaticReadTracking", "()V");
+        TransactionMetadata nowAllowedAndDefaultNonAutomaticReadTrackingMetadata = disabledMethodMetadata.getTransactionalMetadata();
+        assertNotNull(nowAllowedAndDefaultNonAutomaticReadTracking);
+        assertFalse(nowAllowedAndDefaultNonAutomaticReadTrackingMetadata.allowWriteSkewProblem);
+        assertTrue(nowAllowedAndDefaultNonAutomaticReadTrackingMetadata.automaticReadTracking);
+
+        MethodMetadata nowAllowedAndAutomaticReadTracking = classMetadata.getMethodMetadata("nowAllowedAndAutomaticReadTracking", "()V");
+        TransactionMetadata nowAllowedAndAutomaticReadTrackingMetadata = disabledMethodMetadata.getTransactionalMetadata();
+        assertNotNull(nowAllowedAndAutomaticReadTracking);
+        assertFalse(nowAllowedAndAutomaticReadTrackingMetadata.allowWriteSkewProblem);
+        assertTrue(nowAllowedAndAutomaticReadTrackingMetadata.automaticReadTracking);
+
     }
 
     class AllowWriteSkewProblem {
+
+        @TransactionalMethod(allowWriteSkewProblem = false)
+        void nowAllowedAndDefaultNonAutomaticReadTracking() {
+        }
+
+        @TransactionalMethod(allowWriteSkewProblem = false, automaticReadTracking = false)
+        void nowAllowedAndAutomaticReadTracking() {
+        }
+
+
         @TransactionalMethod(automaticReadTracking = true, allowWriteSkewProblem = true)
         void enabled() {
         }

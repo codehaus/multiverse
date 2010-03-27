@@ -12,7 +12,7 @@ package org.multiverse.api;
  *
  * @author Peter Veentjer.
  */
-public interface Stm<B extends TransactionFactoryBuilder> {
+public interface Stm<B extends TransactionFactoryBuilder, P extends ProgrammaticReferenceFactoryBuilder> {
 
     /**
      * Returns the current clock version (this is logical time). The returned value will always be equal or larger than
@@ -39,5 +39,5 @@ public interface Stm<B extends TransactionFactoryBuilder> {
      *
      * @return the used ProgrammaticReferenceFactory.
      */
-    ProgrammaticReferenceFactory getProgrammaticReferenceFactory();
+    P getProgrammaticReferenceFactoryBuilder();
 }
