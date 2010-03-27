@@ -11,7 +11,8 @@ import java.util.concurrent.TimeUnit;
 
 import static org.multiverse.api.StmUtils.retry;
 
-public abstract class AbstractBlockingDeque<E> extends AbstractCollection<E> implements BlockingDeque<E> {
+public abstract class AbstractBlockingDeque<E>
+        extends AbstractCollection<E> implements BlockingDeque<E> {
 
     @Override
     @TransactionalMethod(interruptible = true)
@@ -78,7 +79,7 @@ public abstract class AbstractBlockingDeque<E> extends AbstractCollection<E> imp
     abstract protected void doAddLast(E e);
 
     @Override
-    @TransactionalMethod(interruptible = true)
+    @TransactionalMethod
     public void putFirst(E e) throws InterruptedException {
         if (hasNoStorageCapacity()) {
             retry();
@@ -88,7 +89,7 @@ public abstract class AbstractBlockingDeque<E> extends AbstractCollection<E> imp
     }
 
     @Override
-    @TransactionalMethod(interruptible = true)
+    @TransactionalMethod
     public void putLast(E e) throws InterruptedException {
         if (hasNoStorageCapacity()) {
             retry();
@@ -98,7 +99,7 @@ public abstract class AbstractBlockingDeque<E> extends AbstractCollection<E> imp
     }
 
     @Override
-    @TransactionalMethod(interruptible = true)
+    @TransactionalMethod
     public E takeFirst() throws InterruptedException {
         if (isEmpty()) {
             retry();
@@ -110,7 +111,7 @@ public abstract class AbstractBlockingDeque<E> extends AbstractCollection<E> imp
     protected abstract E doRemoveFirst();
 
     @Override
-    @TransactionalMethod(interruptible = true)
+    @TransactionalMethod
     public E takeLast() throws InterruptedException {
         if (isEmpty()) {
             retry();
@@ -124,7 +125,7 @@ public abstract class AbstractBlockingDeque<E> extends AbstractCollection<E> imp
     @Override
     @TransactionalMethod
     public E removeFirst() {
-        if (isEmpty()) {
+         if (isEmpty()) {
             throw new NoSuchElementException();
         }
 
@@ -210,31 +211,31 @@ public abstract class AbstractBlockingDeque<E> extends AbstractCollection<E> imp
     }
 
     @Override
-    @TransactionalMethod(interruptible = true)
+    @TransactionalMethod
     public E pollFirst(long timeout, TimeUnit unit) throws InterruptedException {
         throw new TodoException();
     }
 
     @Override
-    @TransactionalMethod(interruptible = true)
+    @TransactionalMethod
     public E pollLast(long timeout, TimeUnit unit) throws InterruptedException {
         throw new TodoException();
     }
 
     @Override
-    @TransactionalMethod(interruptible = true)
+    @TransactionalMethod
     public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException {
         throw new TodoException();
     }
 
     @Override
-    @TransactionalMethod(interruptible = true)
+    @TransactionalMethod
     public E poll(long timeout, TimeUnit unit) throws InterruptedException {
         throw new TodoException();
     }
 
     @Override
-    @TransactionalMethod(interruptible = true)
+    @TransactionalMethod
     public E take() throws InterruptedException {
         return takeFirst();
     }

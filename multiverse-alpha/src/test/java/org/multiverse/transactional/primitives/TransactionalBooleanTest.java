@@ -1,13 +1,22 @@
 package org.multiverse.transactional.primitives;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.api.Stm;
 import org.multiverse.api.exceptions.DeadTransactionException;
 
 import static org.junit.Assert.*;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 public class TransactionalBooleanTest {
+    private Stm stm;
+
+    @Before
+    public void setUp() {
+        stm = getGlobalStmInstance();
+    }
 
     @Test
     public void constructorWithNoArg() {

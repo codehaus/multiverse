@@ -5,8 +5,6 @@ import org.multiverse.instrumentation.metadata.ClassMetadata;
 import org.multiverse.instrumentation.metadata.FieldMetadata;
 import org.multiverse.instrumentation.metadata.MetadataRepository;
 import org.multiverse.instrumentation.metadata.MethodMetadata;
-import org.multiverse.transactional.DefaultTransactionalReference;
-import org.multiverse.transactional.primitives.*;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
@@ -38,13 +36,9 @@ public class FieldGranularityTransformer implements Opcodes {
     }
 
     public ClassNode transform() {
-        if (classMetadata == null || classMetadata.isIgnoredClass() || !classMetadata.hasFieldsWithFieldGranularity()) {
-            return classNode;
-        }
-
         fixFields();
         fixFieldAccessInMethods();
-        addInitializationLogicToConstructors();
+        addInitializationLogicToConstructors();            
         return classNode;
     }
 
@@ -129,14 +123,17 @@ public class FieldGranularityTransformer implements Opcodes {
         for (int k = 0; k < originalMethod.instructions.size(); k++) {
             AbstractInsnNode originalInsn = originalMethod.instructions.get(k);
             switch (originalInsn.getOpcode()) {
+                //the put on the field granular field is transformed to a fieldref.set
                 case PUTFIELD: {
                     FieldInsnNode fieldInsn = (FieldInsnNode) originalInsn;
                     ClassMetadata ownerMetadata = metadataRepository.getClassMetadata(classLoader, fieldInsn.owner);
                     FieldMetadata fieldMetadata = ownerMetadata.getFieldMetadata(fieldInsn.name);
-
+                    Type originalFieldType = Type.getType(fieldMetadata.getDesc());
+                                                              
                     if (fieldMetadata.hasFieldGranularity()) {
-                        Type originalFieldType = getType(fieldInsn.desc);
-                        boolean fieldIsCategory2 = isCategory2(fieldInsn.desc);
+
+                        boolean fieldIsCategory2 = isCategory2(fieldMetadata.getDesc());
+
                         if (fieldIsCategory2) {
                             //value(category2), owner,..
 
@@ -151,13 +148,14 @@ public class FieldGranularityTransformer implements Opcodes {
                             //[owner, value(category1),..
                         }
 
-                        Class referenceClass = findReferenceClass(fieldInsn.desc);
+                        String referenceDesc = findReferenceDesc(fieldMetadata.getDesc());
+                        String referenceName = Type.getType(referenceDesc).getInternalName();
 
                         instructions.add(new FieldInsnNode(
                                 GETFIELD,
                                 fieldInsn.owner,
                                 fieldInsn.name,
-                                getDescriptor(referenceClass)
+                                referenceDesc
                         ));
 
                         if (fieldIsCategory2) {
@@ -174,21 +172,21 @@ public class FieldGranularityTransformer implements Opcodes {
                             //[value(category1), owner..
                         }
 
-                        //call the set.
+                        //call the set
                         if (originalFieldType.getSort() == Type.ARRAY || originalFieldType.getSort() == Type.OBJECT) {
                             String objectDesc = Type.getDescriptor(Object.class);
                             MethodInsnNode methodInsn = new MethodInsnNode(
                                     INVOKEVIRTUAL,
-                                    Type.getInternalName(referenceClass),
+                                    referenceName,
                                     "set",
                                     format("(%s)%s", objectDesc, objectDesc));
                             instructions.add(methodInsn);
                         } else {
                             MethodInsnNode methodInsn = new MethodInsnNode(
                                     INVOKEVIRTUAL,
-                                    Type.getInternalName(referenceClass),
+                                    referenceName,
                                     "set",
-                                    format("(%s)%s", fieldInsn.desc, fieldInsn.desc));
+                                    format("(%s)%s", fieldMetadata.getDesc(), fieldMetadata.getDesc()));
                             instructions.add(methodInsn);
                         }
 
@@ -203,25 +201,32 @@ public class FieldGranularityTransformer implements Opcodes {
                     }
                 }
                 break;
+                //the get on the field granular field is transformed to a fieldref.get
                 case GETFIELD: {
                     FieldInsnNode fieldInsn = (FieldInsnNode) originalInsn;
                     FieldMetadata fieldMetadata = metadataRepository.getClassMetadata(classLoader, fieldInsn.owner)
                             .getFieldMetadata(fieldInsn.name);
-                    if (fieldMetadata.hasFieldGranularity()) {
-                        Class refClass = findReferenceClass(fieldInsn.desc);
+                    if (!fieldMetadata.hasFieldGranularity()) {
+                        //if it is not getter on a field granular field
+                        instructions.add(originalInsn.clone(cloneMap));
+                    } else {
+                        //it is a getter on a field granular field.
+                        String referenceDesc = findReferenceDesc(fieldMetadata.getDesc());
+                        String referenceName = Type.getType(referenceDesc).getInternalName();
 
+                        //place the fieldref on the stack.
                         instructions.add(new FieldInsnNode(
                                 GETFIELD,
                                 fieldInsn.owner,
                                 fieldInsn.name,
-                                getDescriptor(refClass)
+                                referenceDesc
                         ));
 
-                        Type originalFieldType = getType(fieldInsn.desc);
+                        Type originalFieldType = Type.getType(fieldMetadata.getDesc());
                         if (originalFieldType.getSort() == Type.ARRAY || originalFieldType.getSort() == Type.OBJECT) {
                             instructions.add(new MethodInsnNode(
                                     INVOKEVIRTUAL,
-                                    getInternalName(refClass),
+                                    referenceName,
                                     "get",
                                     format("()%s", getDescriptor(Object.class))
                             ));
@@ -232,13 +237,11 @@ public class FieldGranularityTransformer implements Opcodes {
                         } else {
                             instructions.add(new MethodInsnNode(
                                     INVOKEVIRTUAL,
-                                    getInternalName(refClass),
+                                    referenceName,
                                     "get",
-                                    format("()%s", fieldInsn.desc)
+                                    format("()%s", fieldMetadata.getDesc())
                             ));
                         }
-                    } else {
-                        instructions.add(originalInsn.clone(cloneMap));
                     }
                 }
                 break;
@@ -270,20 +273,21 @@ public class FieldGranularityTransformer implements Opcodes {
                         if (fieldMetadata.hasFieldGranularity()) {
                             extraInstructions.add(new VarInsnNode(ALOAD, 0));
 
-                            Class referenceClass = findReferenceClass(fieldMetadata.getDesc());
-                            extraInstructions.add(new TypeInsnNode(NEW, getInternalName(referenceClass)));
+                            String referenceDesc = findReferenceDesc(fieldMetadata.getDesc());
+                            String referenceName = Type.getType(referenceDesc).getInternalName();
+
+                            extraInstructions.add(new TypeInsnNode(NEW, referenceName));
                             extraInstructions.add(new InsnNode(DUP));
 
-                            String owner = getInternalName(referenceClass);
-                            extraInstructions.add(new MethodInsnNode(INVOKESPECIAL, owner, "<init>", "()V"));
+                            extraInstructions.add(
+                                    new MethodInsnNode(INVOKESPECIAL, referenceName, "<init>", "()V"));
 
 
-                            String d = Type.getDescriptor(referenceClass);
                             extraInstructions.add(new FieldInsnNode(
                                     PUTFIELD,
                                     classNode.name,
                                     fieldNode.name,
-                                    Type.getDescriptor(referenceClass)));
+                                    referenceDesc));
                         }
 
                         AbstractInsnNode first = methodNode.instructions.get(firstAfterSuper);
@@ -296,17 +300,16 @@ public class FieldGranularityTransformer implements Opcodes {
 
     private void fixFields() {
         List<FieldNode> fields = new LinkedList<FieldNode>();
-        //todo: concurrent modification error here.
         for (FieldNode fieldNode : (List<FieldNode>) classNode.fields) {
             FieldMetadata fieldMetadata = classMetadata.getFieldMetadata(fieldNode.name);
             if (fieldMetadata.hasFieldGranularity()) {
-                Class referenceClass = findReferenceClass(fieldNode.desc);
+                String referenceDesc = findReferenceDesc(fieldNode.desc);
 
                 //todo: should not select public automatically
                 FieldNode fixedFieldNode = new FieldNode(
                         ACC_SYNTHETIC + ACC_FINAL + ACC_PUBLIC,
                         fieldNode.name,
-                        getDescriptor(referenceClass), null, null
+                        referenceDesc, null, null
                 );
 
                 fields.add(fixedFieldNode);
@@ -321,29 +324,30 @@ public class FieldGranularityTransformer implements Opcodes {
     /**
      * Returns the reference/primitive class to store the
      */
-    private static Class findReferenceClass(String desc) {
+    private static String findReferenceDesc(String desc) {
         Type type = Type.getType(desc);
+
         switch (type.getSort()) {
             case Type.ARRAY:
-                return DefaultTransactionalReference.class;
+                return "Lorg/multiverse/transactional/DefaultTransactionalReference;";
             case Type.BOOLEAN:
-                return TransactionalBoolean.class;
+                return "Lorg/multiverse/transactional/primitives/TransactionalBoolean;";
             case Type.BYTE:
-                return TransactionalByte.class;
+                return "Lorg/multiverse/transactional/primitives/TransactionalByte;";
             case Type.CHAR:
-                return TransactionalCharacter.class;
+                return "Lorg/multiverse/transactional/primitives/TransactionalCharacter;";
             case Type.DOUBLE:
-                return TransactionalDouble.class;
+                return "Lorg/multiverse/transactional/primitives/TransactionalDouble;";
             case Type.FLOAT:
-                return TransactionalFloat.class;
+                return "Lorg/multiverse/transactional/primitives/TransactionalFloat;";
             case Type.INT:
-                return TransactionalInteger.class;
+                return "Lorg/multiverse/transactional/primitives/TransactionalInteger;";
             case Type.LONG:
-                return TransactionalLong.class;
-            case Type.OBJECT:
-                return DefaultTransactionalReference.class;
+                return "Lorg/multiverse/transactional/primitives/TransactionalLong;";
             case Type.SHORT:
-                return TransactionalShort.class;
+                return "Lorg/multiverse/transactional/primitives/TransactionalShort;";
+            case Type.OBJECT:
+                return "Lorg/multiverse/transactional/DefaultTransactionalReference;";
             default:
                 throw new IllegalStateException("Unhandeled sort: " + type.getSort());
         }

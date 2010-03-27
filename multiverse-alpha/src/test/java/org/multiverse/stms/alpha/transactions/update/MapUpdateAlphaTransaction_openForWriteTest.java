@@ -152,6 +152,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
         AlphaTransaction tx = startSutTransaction();
         ManualRefTranlocal exected = (ManualRefTranlocal) tx.openForWrite(ref);
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForWrite(ref);
+
         assertSame(exected, found);
         assertIsActive(tx);
     }

@@ -24,6 +24,7 @@ public class TransactionalAbaRefTest {
     public void setUp() {
         stm = getGlobalStmInstance();
         updateTxFactory = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
                 .setReadonly(false)
                 .build();
         setThreadLocalTransaction(null);

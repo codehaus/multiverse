@@ -1,21 +1,42 @@
 package org.multiverse.transactional.primitives;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.api.Stm;
 import org.multiverse.api.exceptions.DeadTransactionException;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 public class TransactionalIntegerTest {
+    private Stm stm;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
+        stm = getGlobalStmInstance();
+    }
+
+    @After
+    public void tearDown(){
+        clearThreadLocalTransaction();
+    }
+
+    @Test
+    public void test() {
+        TransactionalInteger ref = new TransactionalInteger(1);
+
+        long version = stm.getVersion();
+        ref.inc();
+
+        assertEquals(version+1, stm.getVersion());
+        assertEquals(2, ref.get());
     }
 
     @Test

@@ -226,7 +226,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
                 //fall through
             case prepared:
                 try {
-                    doStore();
+                    makeChangesPermanent();
                     status = TransactionStatus.committed;
                     notifyAll(TransactionLifecycleEvent.postCommit);
                 } finally {
@@ -246,7 +246,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
         }
     }
 
-    protected void doStore() {
+    protected void makeChangesPermanent() {
     }
 
     @Override

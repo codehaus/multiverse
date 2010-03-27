@@ -18,7 +18,7 @@ import static org.multiverse.api.StmUtils.retry;
  */
 @TransactionalObject
 public final class DefaultTransactionalReference<E> implements TransactionalReference<E> {
-    private E reference;
+    private E value;
 
     /**
      * Creates a DefaultTransactionalReference with a null reference.
@@ -32,56 +32,55 @@ public final class DefaultTransactionalReference<E> implements TransactionalRefe
      * Creates a new DefaultTransactionalReference with the provided reference. This reference is allowed to
      * be null.
      *
-     * @param reference the reference to store in this DefaultTransactionalReference.
+     * @param value the reference to store in this DefaultTransactionalReference.
      */
-    public DefaultTransactionalReference(E reference) {
-        this.reference = reference;
+    public DefaultTransactionalReference(E value) {
+        this.value = value;
     }
 
     @Override
     @TransactionalMethod(readonly = true, automaticReadTracking = true)
     public E getOrAwait() {
-        if (reference == null) {
+        if (value == null) {
             retry();
         }
 
-        return reference;
+        return value;
     }
 
     @Override
     @TransactionalMethod(readonly = true, automaticReadTracking = true, interruptible = true)
     public E getOrAwaitInterruptibly() throws InterruptedException {
-        if (reference == null) {
+        if (value == null) {
             retry();
         }
 
-        return reference;
+        return value;
     }
 
     @Override
     @TransactionalMethod(readonly = true)
     public boolean isNull() {
-        return reference == null;
+        return value == null;
     }
 
     @Override
     @TransactionalMethod(readonly = true)
     public E get() {
-        return reference;
+        return value;
     }
 
     @Override
-    public E set(E newReference) {
+    public E set(E newValue) {
         //optimization to prevent loading the object if not needed.
-        if (reference == newReference) {
-            return newReference;
+        if (value == newValue) {
+            return newValue;
         }
 
-        E oldRef = reference;
-        reference = newReference;
+        E oldRef = value;
+        value = newValue;
         return oldRef;
     }
-
     @Override
     public E clear() {
         return set(null);
@@ -90,10 +89,10 @@ public final class DefaultTransactionalReference<E> implements TransactionalRefe
     @Override
     @TransactionalMethod(readonly = true)
     public String toString() {
-        if (reference == null) {
+        if (value == null) {
             return "DefaultTransactionalReference(ref=null)";
         } else {
-            return format("DefaultTransactionalReference(ref=%s)", reference);
+            return format("DefaultTransactionalReference(ref=%s)", value);
         }
     }
 }

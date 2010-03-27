@@ -3,6 +3,7 @@ package org.multiverse.stms.alpha.instrumentation.fieldgranularity;
 import org.multiverse.instrumentation.compiler.AbstractCompilePhase;
 import org.multiverse.instrumentation.compiler.Clazz;
 import org.multiverse.instrumentation.compiler.Environment;
+import org.multiverse.instrumentation.metadata.ClassMetadata;
 import org.objectweb.asm.tree.ClassNode;
 
 import static org.multiverse.instrumentation.asm.AsmUtils.loadAsClassNode;
@@ -20,6 +21,13 @@ public class FieldGranularityCompilePhase extends AbstractCompilePhase {
     @Override
     protected Clazz doCompile(Environment environment, Clazz clazz) {
         ClassNode original = loadAsClassNode(clazz.getBytecode());
+
+        ClassMetadata metadata = environment.getMetadataRepository().getClassMetadata(
+                clazz.getClassLoader(), clazz.getName());
+
+        if(!metadata.hasFieldsWithFieldGranularity()){
+            return clazz;
+        }
 
         FieldGranularityTransformer transformer = new FieldGranularityTransformer(
                 clazz.getClassLoader(), original, environment.getMetadataRepository());

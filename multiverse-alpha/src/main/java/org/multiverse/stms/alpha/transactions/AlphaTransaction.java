@@ -13,6 +13,8 @@ import org.multiverse.stms.alpha.AlphaTransactionalObject;
  */
 public interface AlphaTransaction extends Transaction {
 
+    AlphaTranlocal openForCommutingWrite(AlphaTransactionalObject txObject);
+
     /**
      * Opens the transactional object for reading purposes. It is not allowed to be used for writing purposes, because
      * it could be used by other transactions. If the transactional object already is opened for writing, that

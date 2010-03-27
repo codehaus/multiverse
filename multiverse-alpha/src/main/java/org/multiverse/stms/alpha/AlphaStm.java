@@ -1,9 +1,6 @@
 package org.multiverse.stms.alpha;
 
-import org.multiverse.api.BackoffPolicy;
-import org.multiverse.api.Stm;
-import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.TransactionFactoryBuilder;
+import org.multiverse.api.*;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.stms.alpha.transactions.readonly.*;
@@ -97,6 +94,11 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
     @Override
     public AlphaTransactionFactoryBuilder getTransactionFactoryBuilder() {
         return transactionFactoryBuilder;
+    }
+
+    @Override
+    public ProgrammaticLong createProgrammaticLong() {
+        return new AlphaProgrammaticLong(0);
     }
 
     /**

@@ -2,6 +2,7 @@ package org.multiverse.stms.alpha.transactions.update;
 
 import org.multiverse.api.Latch;
 import org.multiverse.api.TransactionFactory;
+import org.multiverse.api.exceptions.UncommittedReadConflict;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.UncommittedFilter;
@@ -120,13 +121,13 @@ public class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
     }
 
     @Override
-    protected Listeners[] store(long writeVersion) {
+    protected Listeners[] makeChangesPermanent(long writeVersion) {
         Listeners[] listenersArray = null;
 
         int index = 0;
         int listenersIndex = 0;
         for (AlphaTranlocal attached : attachedMap.values()) {
-            Listeners listeners = store(attached, writeVersion);
+            Listeners listeners = makePermanent(attached, writeVersion);
 
             if (listeners != null) {
                 if (listenersArray == null) {
@@ -140,6 +141,22 @@ public class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
         }
 
         return listenersArray;
+    }
+
+    @Override
+    protected AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject txObject) {
+        AlphaTranlocal attached = attachedMap.get(txObject);
+
+
+        if(attached == null){
+            attached = txObject.___openForCommutingOperation();
+            attachedMap.put(txObject, attached);
+        }else if(attached.isCommitted()){
+            attached = attached.openForWrite();
+            attachedMap.put(txObject, attached);
+        }
+
+        return attached;
     }
 
     @Override
@@ -161,8 +178,13 @@ public class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
             //from now on.
             attached = attached.openForWrite();
             attachedMap.put(txObject, attached);
-        } else if (attached.isUnfixated()) {
-            attached.fixate(this);
+        } else if (attached.isCommuting()) {
+            AlphaTranlocal origin = txObject.___load(getReadVersion());
+            if(origin == null){
+                throw new UncommittedReadConflict();
+            }
+
+            attached.fixatePremature(this, origin);
         }
 
         return attached;

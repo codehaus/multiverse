@@ -14,7 +14,7 @@ import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.alpha.transactions.AlphaTransactionTestUtils.assertUpdatableClone;
+import static org.multiverse.stms.alpha.transactions.AlphaTransactionTestUtils.assertIsUpdatableClone;
 
 public class ArrayUpdateAlphaTransaction_openForWriteTest {
 
@@ -125,7 +125,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForWrite(ref);
 
         assertIsActive(tx);
-        assertUpdatableClone(ref, committed, found);
+        assertIsUpdatableClone(ref, committed, found);        
     }
 
     @Test
@@ -139,7 +139,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
 
         assertEquals(1, getField(tx, "firstFreeIndex"));
         assertIsActive(tx);
-        assertUpdatableClone(ref, committed, found);
+        assertIsUpdatableClone(ref, committed, found);
     }
 
     @Test

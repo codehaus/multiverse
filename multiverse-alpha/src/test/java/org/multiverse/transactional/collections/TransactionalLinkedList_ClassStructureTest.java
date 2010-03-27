@@ -1,6 +1,9 @@
 package org.multiverse.transactional.collections;
 
 import org.junit.Test;
+import org.multiverse.instrumentation.metadata.ClassMetadata;
+import org.multiverse.instrumentation.metadata.FieldMetadata;
+import org.multiverse.instrumentation.metadata.MetadataRepository;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import static org.junit.Assert.assertFalse;
@@ -18,12 +21,33 @@ public class TransactionalLinkedList_ClassStructureTest {
         Class clazz = TransactionalLinkedList.class;
 
         assertTrue(hasField(clazz, "maxCapacity"));
-        assertFalse(hasField(clazz, "size"));
-        assertFalse(hasField(clazz, "head"));
-        assertFalse(hasField(clazz, "tail"));
+        assertTrue(hasField(clazz, "size"));
+        assertTrue(hasField(clazz, "head"));
+        assertTrue(hasField(clazz, "tail"));
 
         assertTrue(hasMethod(clazz, "remainingCapacity"));
         assertTrue(hasMethod(clazz, "remainingCapacity", AlphaTransaction.class));
+    }
+
+    @Test
+    public void testMetadata() {
+        MetadataRepository repo = new MetadataRepository();
+        ClassMetadata metadata = repo.getClassMetadata(TransactionalLinkedList.class);
+
+        assertTrue(metadata.isTransactionalObject());
+        assertFalse(metadata.isRealTransactionalObject());
+
+        FieldMetadata sizeMetadata = metadata.getFieldMetadata("size");
+        assertFalse(sizeMetadata.isManagedField());
+        assertFalse(sizeMetadata.hasFieldGranularity());
+
+        FieldMetadata headMetadata = metadata.getFieldMetadata("head");
+        assertFalse(headMetadata.isManagedField());
+        assertTrue(headMetadata.hasFieldGranularity());
+
+        FieldMetadata tailMetadata = metadata.getFieldMetadata("tail");
+        assertFalse(tailMetadata.isManagedField());
+        assertTrue(tailMetadata.hasFieldGranularity());
     }
 
 }

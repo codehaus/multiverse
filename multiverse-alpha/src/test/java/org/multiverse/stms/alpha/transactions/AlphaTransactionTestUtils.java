@@ -28,7 +28,7 @@ public class AlphaTransactionTestUtils {
         assertEquals(Arrays.asList(expectedLatches), found);
     }
 
-    public static void assertUpdatableClone(ManualRef ref, AlphaTranlocal committed, AlphaTranlocal found) {
+    public static void assertIsUpdatableClone(ManualRef ref, AlphaTranlocal committed, AlphaTranlocal found) {
         assertNotNull(found);
         assertSame(committed, found.getOrigin());
         assertSame(ref, found.getTransactionalObject());

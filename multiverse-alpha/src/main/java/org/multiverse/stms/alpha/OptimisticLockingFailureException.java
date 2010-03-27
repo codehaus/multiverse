@@ -9,6 +9,7 @@ package org.multiverse.stms.alpha;
  * @author Peter Veentjer
  */
 public class OptimisticLockingFailureException extends RuntimeException {
+
     public OptimisticLockingFailureException() {
     }
 

@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.Retry;
 
 import static org.junit.Assert.*;
@@ -17,16 +18,35 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
 public class DefaultTransactionalReferenceTest {
 
     private Stm stm;
+    private TransactionFactory txFactory;
 
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
+        txFactory = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
+                .build();
         setThreadLocalTransaction(null);
     }
 
     @After
     public void tearDown() {
         setThreadLocalTransaction(null);
+    }
+
+
+    @Test
+    public void constructorLifts() {
+        long version = stm.getVersion();
+
+        Transaction tx = txFactory.start();
+        setThreadLocalTransaction(tx);
+
+        DefaultTransactionalReference ref = new DefaultTransactionalReference();
+
+        tx.commit();
+        assertEquals(version + 1, stm.getVersion());
     }
 
     // ============== rollback =================

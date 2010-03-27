@@ -3,6 +3,7 @@ package org.multiverse.stms.alpha.transactions.update;
 import org.multiverse.api.Latch;
 import org.multiverse.api.exceptions.PanicError;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
+import org.multiverse.api.exceptions.UncommittedReadConflict;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.UncommittedFilter;
@@ -51,6 +52,29 @@ public class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction 
     }
 
     @Override
+    public AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject txObject) {
+        int indexOf = indexOf(txObject);
+
+        AlphaTranlocal opened;
+        if (indexOf == -1) {
+            opened = txObject.___openForCommutingOperation();
+            attach(opened);
+        } else {
+            opened = attachedArray[indexOf];
+
+            if (opened.isCommitted()) {
+                //it is loaded before but it is a readonly
+                //make an updatable clone of the tranlocal already is committed and use that
+                //from now on.
+                opened = opened.openForWrite();
+                attachedArray[indexOf] = opened;
+            }
+        }
+
+        return opened;
+    }
+
+    @Override
     protected AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {
         int indexOf = indexOf(txObject);
 
@@ -75,8 +99,13 @@ public class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction 
                 //from now on.
                 attached = attached.openForWrite();
                 attachedArray[indexOf] = attached;
-            } else if (attached.isUnfixated()) {
-                attached.fixate(this);
+            } else if (attached.isCommuting()) {
+                AlphaTranlocal origin = txObject.___load(getReadVersion());
+                if(origin == null){
+                    throw new UncommittedReadConflict();
+                }
+
+                attached.fixatePremature(this,origin);
             }
             return attached;
         }
@@ -202,12 +231,14 @@ public class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction 
     }
 
     @Override
-    protected Listeners[] store(long writeVersion) {
+    protected Listeners[] makeChangesPermanent(long writeVersion) {
         Listeners[] listenersArray = null;
-        int listenersIndex = 0;
+
+        int listenersIndex = 0;        
         for (int k = 0; k < firstFreeIndex; k++) {
             AlphaTranlocal attached = attachedArray[k];
-            Listeners listeners = store(attached, writeVersion);
+           
+            Listeners listeners = makePermanent(attached, writeVersion);
             if (listeners != null) {
                 if (listenersArray == null) {
                     listenersArray = new Listeners[firstFreeIndex - k];

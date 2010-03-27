@@ -43,6 +43,8 @@ public interface AlphaTransactionalObject extends CommitLock {
      */
     AlphaTranlocal ___openUnconstructed();
 
+    AlphaTranlocal ___openForCommutingOperation();
+
     /**
      * Stores the the content and releases the lock.
      * <p/>

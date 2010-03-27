@@ -27,4 +27,9 @@ public interface TransactionalQueue<E> extends BlockingQueue<E>, TransactionalCo
     @Override
     @TransactionalMethod(readonly = true)
     E peek();
+
+
+    //todo: putUninterruptible
+
+    //todo: takeUninterruptible
 }

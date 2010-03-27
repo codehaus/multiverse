@@ -5,6 +5,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.PanicError;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
+import org.multiverse.utils.TodoException;
 import org.multiverse.utils.commitlock.CommitLock;
 
 import static java.lang.String.format;
@@ -30,7 +31,10 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
     /**
      * Contains the write version
      * <p/>
-     * 0 indicates not committed. positive indicates committed (so readonly).
+     * -2: indicates commute
+     * -1: indicates opened for write and marked as dirty,
+     * 0: opened for write and not marked as dirty
+     * larger than 0 indicates committed (so readonly).
      */
     public long ___writeVersion = 0;
 
@@ -101,6 +105,10 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
             return false;
         }
 
+        if (isCommuting()) {
+            return true;
+        }
+
         if (isDirty()) {
             ___writeVersion = -1;
             return true;
@@ -117,11 +125,7 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
      * @return true if dirty, false otherwise.
      */
     public boolean getPrecalculatedIsDirty() {
-        if (isCommitted()) {
-            return false;
-        }
-
-        return ___writeVersion == -1;
+        return ___writeVersion < 0;
     }
 
     public final boolean isCommitted() {
@@ -132,11 +136,18 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
         return !isCommitted();
     }
 
-    public final boolean isUnfixated() {
-        return ___writeVersion == -1;
+    public final boolean isCommuting() {
+        return ___writeVersion == -2;
     }
 
-    public void fixate(AlphaTransaction tx) {
+    public void fixatePremature(AlphaTransaction tx, AlphaTranlocal origin) {
+        throw new TodoException();
+    }
+
+    public void ifCommutingThenFixate(AlphaTransaction tx) {
+        if (isCommuting()) {
+            throw new TodoException();
+        }
     }
 
     public long getWriteVersion() {
@@ -144,6 +155,10 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
     }
 
     public final boolean hasWriteConflict() {
+        if (isCommuting()) {
+            return false;
+        }
+
         if (isCommitted()) {
             return false;
         }
@@ -155,6 +170,10 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
     }
 
     public final boolean hasReadConflict(Transaction allowedLockOwner) {
+        if (isCommuting()) {
+            return false;
+        }
+
         AlphaTransactionalObject txObject = getTransactionalObject();
 
         Transaction lockOwner = txObject.___getLockOwner();

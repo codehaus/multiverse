@@ -79,7 +79,7 @@ public class TransactionalLinkedList_ConnectionPoolRegressionStressTest {
 
         final int produceCount;
         final TransactionalLinkedList<String> list;
-        final List<String> producedList = new LinkedList();
+        final List<String> producedList = new LinkedList<String>();
         final boolean first;
 
         public PutFirstThread(int id, int produceCount, TransactionalLinkedList<String> list, boolean first) {

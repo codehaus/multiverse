@@ -76,4 +76,18 @@ public class TransactionalLinkedList_addTest {
         assertEquals(1, list.size());
     }
 
+    @Test
+    public void addVeryMany(){
+        TransactionalLinkedList<String> list = new TransactionalLinkedList<String>();
+        int count = 10000;
+
+        for(int k=0;k< count;k++){
+            list.add(""+k);
+        }
+
+        assertEquals(list.size(), count);
+        for(int k=0;k<count;k++){
+            assertEquals(""+k, list.get(k));            
+        }
+    }
 }

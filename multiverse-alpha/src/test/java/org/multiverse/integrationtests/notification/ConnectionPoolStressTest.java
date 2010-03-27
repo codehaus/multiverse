@@ -43,7 +43,7 @@ public class ConnectionPoolStressTest {
     @TransactionalObject
     static class ConnectionPool {
 
-        final BlockingDeque<Connection> deque = new TransactionalLinkedList<Connection>();
+        final TransactionalLinkedList<Connection> deque = new TransactionalLinkedList<Connection>();
 
         ConnectionPool(int poolsize) {
             fill(poolsize);

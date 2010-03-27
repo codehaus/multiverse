@@ -1,10 +1,15 @@
 package org.multiverse.transactional.collections;
 
+import org.multiverse.annotations.FieldGranularity;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
+import org.multiverse.api.ProgrammaticLong;
 import org.multiverse.utils.TodoException;
 
 import java.util.*;
+
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.StmUtils.retry;
 
 /**
  * A general purposes collection structure that could be considered a work horse because it implements a lot of
@@ -46,18 +51,29 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
 
     private final int maxCapacity;
 
-    //in the future the size needs to be changed using a 'commute' operation like
-    //clojure provides to prevent unwanted writeconflicts.
-    private int size;
+    private final ProgrammaticLong size;
 
-    //@FieldGranularity
-    private Node<E> head;
+    @FieldGranularity
+    public Node<E> head;
 
-    //@FieldGranularity
-    private Node<E> tail;
+    @FieldGranularity
+    public Node<E> tail;
 
     public TransactionalLinkedList() {
         this(Integer.MAX_VALUE);
+    }
+
+    @TransactionalMethod(readonly = true)
+    public boolean isEmpty() {
+        return head == null;
+    }
+
+    public TransactionalLinkedList(E... items) {
+        this(Integer.MAX_VALUE);
+
+        for (E item : items) {
+            add(item);
+        }
     }
 
     public TransactionalLinkedList(int maxCapacity) {
@@ -65,11 +81,16 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
             throw new IllegalArgumentException("maxCapacity can't be smaller than 0");
         }
         this.maxCapacity = maxCapacity;
+        this.size = getGlobalStmInstance().createProgrammaticLong();
     }
 
     @Override
     public void clear() {
-        size = 0;
+        if (head == null) {
+            return;
+        }
+
+        size.set(0);
         head = null;
         tail = null;
     }
@@ -87,7 +108,7 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
 
         Node<E> newNode = new Node<E>(e);
 
-        if (size == 0) {
+        if (head == null) {
             head = newNode;
             tail = newNode;
         } else {
@@ -95,7 +116,7 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
             newNode.prev = tail;
             tail = newNode;
         }
-        size++;
+        size.commutingInc(1);
     }
 
     @Override
@@ -105,7 +126,7 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
         }
 
         Node<E> node = new Node<E>(e);
-        if (size == 0) {
+        if (head == null) {
             head = node;
             tail = node;
         } else {
@@ -114,14 +135,23 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
             head = node;
         }
 
-        size++;
+        size.commutingInc(1);
+    }
+
+    public Node<E> getHead() {
+        return head;
     }
 
     @Override
-    protected E doRemoveFirst() {
+    @TransactionalMethod(maxRetryCount = 1000)
+    public E removeFirst() {
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+
         E value = head.value;
 
-        if (size == 1) {
+        if (head.next == null) {
             head = null;
             tail = null;
         } else {
@@ -129,14 +159,51 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
             head = head.next;
         }
 
-        size--;
+        size.commutingInc(-1);
         return value;
+    }
+
+    @Override
+    protected E doRemoveFirst() {
+        E value = head.value;
+
+        if (head.next == null) {
+            head = null;
+            tail = null;
+        } else {
+            head.next.prev = null;
+            head = head.next;
+        }
+
+        size.commutingInc(-1);
+        return value;
+    }
+
+    @Override
+    public E takeLast() throws InterruptedException {
+        if (head == null) {
+            retry();
+        }
+
+        return doRemoveLast();
+    }
+
+    @Override
+    public void putFirst(E e) throws InterruptedException {
+        if (hasNoStorageCapacity()) {
+            //force A READ.
+            Object x = head;
+            retry();
+        }
+
+        doAddFirst(e);
     }
 
     @Override
     protected E doRemoveLast() {
         E value = tail.value;
-        if (size == 1) {
+
+        if (head.next == null) {
             head = null;
             tail = null;
         } else {
@@ -144,26 +211,26 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
             tail = tail.prev;
         }
 
-        size--;
+        size.commutingInc(-1);
         return value;
     }
 
     @Override
     @TransactionalMethod(readonly = true)
     public int size() {
-        return size;
+        return (int) size.get();
     }
 
     @Override
     //@TransactionalMethod(readonly = true)
     public Iterator<E> iterator() {
-        return new IteratorImpl();
+        return new IteratorImpl(head);
     }
 
     @Override
     @TransactionalMethod(readonly = true)
     public int remainingCapacity() {
-        return maxCapacity - size;
+        return Math.max(0, maxCapacity - (int) size.getAtomic());
     }
 
     @Override
@@ -181,7 +248,7 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
     @Override
     //@TransactionalMethod(readonly = true)
     public Iterator<E> descendingIterator() {
-        return new DescendingIteratorImpl();
+        return new DescendingIteratorImpl(tail);
     }
 
     @Override
@@ -192,16 +259,17 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
     @Override
     @TransactionalMethod(readonly = true)
     public E get(int index) {
-        if (index < 0 || index >= size) {
+        if (index < 0 || index >= size.get()) {
             throw new IndexOutOfBoundsException();
         }
 
         return getNode(index).value;
     }
 
+
     @Override
     public E set(int index, E element) {
-        if (index < 0 || index >= size) {
+        if (index < 0 || index >= size.get()) {
             throw new IndexOutOfBoundsException();
         }
 
@@ -222,7 +290,7 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
 
     @Override
     public E remove(int index) {
-        if (index < 0 || index >= size) {
+        if (index < 0 || index >= size.get()) {
             throw new IndexOutOfBoundsException();
         }
 
@@ -233,14 +301,14 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
 
     private Node<E> getNode(int index) {
         Node<E> node;
-        if (index < size / 2) {
+        if (index < size.get() / 2) {
             node = head;
             for (int k = 0; k < index; k++) {
                 node = node.next;
             }
         } else {
             node = tail;
-            for (int k = size - 1; k > index; k--) {
+            for (int k = (int) size.get() - 1; k > index; k--) {
                 node = node.prev;
             }
         }
@@ -274,7 +342,7 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
             throw new NullPointerException();
         }
 
-        int index = size - 1;
+        int index = (int) size.get() - 1;
         for (Node node = tail; node != null; node = node.prev) {
             if (node.value.equals(o)) {
                 return index;
@@ -293,7 +361,7 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
 
     @Override
     public ListIterator<E> listIterator(int index) {
-        if (index < 0 || index >= size) {
+        if (index < 0 || index >= size.get()) {
             throw new IndexOutOfBoundsException();
         }
 
@@ -318,7 +386,7 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
     }
 
     private void removeNode(Node<E> node) {
-        size--;
+        size.commutingInc(-1);
 
         if (node == head) {
             head = node.next;
@@ -465,7 +533,7 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
         private Node<E> next;
         private Node<E> current;
 
-        private IteratorImpl() {
+        private IteratorImpl(Node<E> head) {
             this.current = null;
             this.next = head;
         }
@@ -503,7 +571,7 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
         private Node<E> previous;
         private Node<E> current;
 
-        private DescendingIteratorImpl() {
+        private DescendingIteratorImpl(Node<E> tail) {
             this.current = null;
             this.previous = tail;
         }

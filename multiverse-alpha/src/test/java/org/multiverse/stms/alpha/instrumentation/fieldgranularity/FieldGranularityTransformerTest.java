@@ -1,4 +1,4 @@
-package org.multiverse.stms.alpha.instrumentation.fieldaccess;
+package org.multiverse.stms.alpha.instrumentation.fieldgranularity;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,16 +20,7 @@ public class FieldGranularityTransformerTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
-        new TransactionalBoolean();
-        new TransactionalByte();
-        new TransactionalCharacter();
-        new TransactionalFloat();
-        new TransactionalInteger();
-        new TransactionalShort();
-        new TransactionalLong();
-        new TransactionalDouble();
-        new DefaultTransactionalReference();
-    }
+       }
 
 
     //test with different forms of references.
@@ -44,7 +35,8 @@ public class FieldGranularityTransformerTest {
 
     //test that annotationo on excluded field is ignored
 
-    //test with different access modifiers test.
+
+    // ================ access modifiers =================
 
     @Test
     public void privateField() {
@@ -173,6 +165,8 @@ public class FieldGranularityTransformerTest {
             this.value = value;
         }
     }
+
+    // ================ different types =================
 
     @Test
     public void intField_structure() {

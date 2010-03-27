@@ -11,6 +11,7 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.RegisterRetryListenerResult;
 import org.multiverse.utils.Listeners;
+import org.multiverse.utils.TodoException;
 
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
@@ -134,6 +135,11 @@ public abstract class FastTxObjectMixin implements AlphaTransactionalObject, Mul
                 return tranlocalTime1;
             }
         }
+    }
+
+    @Override
+    public AlphaTranlocal ___openForCommutingOperation() {
+        throw new TodoException();
     }
 
     @Override

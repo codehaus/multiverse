@@ -1,5 +1,6 @@
 package org.multiverse.transactional.collections;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Stm;
@@ -9,7 +10,7 @@ import java.util.NoSuchElementException;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class TransactionalLinkedList_removeFirstTest {
 
@@ -18,7 +19,12 @@ public class TransactionalLinkedList_removeFirstTest {
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
+    }
+
+    @After
+    public void tearDown(){
+        clearThreadLocalTransaction();
     }
 
     @Test

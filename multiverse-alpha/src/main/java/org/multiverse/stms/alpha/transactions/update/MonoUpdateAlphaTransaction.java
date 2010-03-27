@@ -2,6 +2,7 @@ package org.multiverse.stms.alpha.transactions.update;
 
 import org.multiverse.api.Latch;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
+import org.multiverse.api.exceptions.UncommittedReadConflict;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.UncommittedFilter;
@@ -63,8 +64,8 @@ public class MonoUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
     }
 
     @Override
-    protected Listeners[] store(long writeVersion) {
-        Listeners listeners = store(attached, writeVersion);
+    protected Listeners[] makeChangesPermanent(long writeVersion) {
+        Listeners listeners = makePermanent(attached, writeVersion);
         return listeners == null ? null : new Listeners[]{listeners};
     }
 
@@ -84,6 +85,22 @@ public class MonoUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
     }
 
     @Override
+    protected AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject txObject) {
+        if (attached == null) {
+            attached = txObject.___openForCommutingOperation();
+        } else if (attached.getTransactionalObject() == txObject) {
+            if(attached.isCommitted()){
+                attached = attached.openForWrite();
+            }
+        } else {
+            config.speculativeConfiguration.signalSpeculativeSizeFailure(1);
+            throw SpeculativeConfigurationFailure.create();
+        }
+
+        return attached;
+    }
+
+    @Override
     protected AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {
         if (attached != null) {
             if (attached.getTransactionalObject() != txObject) {
@@ -93,8 +110,12 @@ public class MonoUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
 
             if (attached.isCommitted()) {
                 attached = attached.openForWrite();
-            } else if (attached.isUnfixated()) {
-                attached.fixate(this);
+            } else if (attached.isCommuting()) {
+                AlphaTranlocal origin = txObject.___load(getReadVersion());
+                if (origin == null) {
+                    throw new UncommittedReadConflict();
+                }
+                attached.fixatePremature(this, origin);
             }
         } else {
             AlphaTranlocal committed = txObject.___load(getReadVersion());

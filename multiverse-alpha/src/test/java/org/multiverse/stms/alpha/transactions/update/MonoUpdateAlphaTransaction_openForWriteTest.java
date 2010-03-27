@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.alpha.transactions.AlphaTransactionTestUtils.assertFreshTranlocal;
-import static org.multiverse.stms.alpha.transactions.AlphaTransactionTestUtils.assertUpdatableClone;
+import static org.multiverse.stms.alpha.transactions.AlphaTransactionTestUtils.assertIsUpdatableClone;
 
 public class MonoUpdateAlphaTransaction_openForWriteTest {
 
@@ -64,7 +64,7 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
 
         AlphaTranlocal found = tx.openForWrite(ref);
 
-        assertUpdatableClone(ref, committed, found);
+        assertIsUpdatableClone(ref, committed, found);
         assertSame(found, getField(tx, "attached"));
     }
 
@@ -131,7 +131,7 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
         tx.openForRead(ref);
         AlphaTranlocal found = tx.openForWrite(ref);
 
-        assertUpdatableClone(ref, committed, found);
+        assertIsUpdatableClone(ref, committed, found);
         assertSame(found, getField(tx, "attached"));
     }
 

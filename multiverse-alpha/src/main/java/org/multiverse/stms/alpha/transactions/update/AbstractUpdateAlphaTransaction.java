@@ -1,10 +1,7 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.multiverse.api.Latch;
-import org.multiverse.api.exceptions.CommitLockNotFreeWriteConflict;
-import org.multiverse.api.exceptions.OptimisticLockFailedWriteConflict;
-import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
-import org.multiverse.api.exceptions.WriteSkewConflict;
+import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.AbstractTransactionSnapshot;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
@@ -50,9 +47,15 @@ public abstract class AbstractUpdateAlphaTransaction
     @Override
     protected final AlphaTranlocal doOpenForRead(AlphaTransactionalObject txObject) {
         AlphaTranlocal attached = find(txObject);
+
         if (attached != null) {
-            if (!attached.isUnfixated()) {
-                attached.fixate(this);
+            if (attached.isCommuting()) {
+                AlphaTranlocal origin = txObject.___load(getReadVersion());
+                if (origin == null) {
+                    throw new UncommittedReadConflict();
+                }
+
+                attached.fixatePremature(this, origin);
             }
 
             return attached;
@@ -216,9 +219,9 @@ public abstract class AbstractUpdateAlphaTransaction
      * <p/>
      * It is important that a store always completes. If it doesn't it could cause partially committed transactions.
      */
-    protected abstract Listeners[] store(long writeVersion);
+    protected abstract Listeners[] makeChangesPermanent(long writeVersion);
 
-    protected final Listeners store(AlphaTranlocal tranlocal, long writeVersion) {
+    protected final Listeners makePermanent(AlphaTranlocal tranlocal, long writeVersion) {
         if (tranlocal == null) {
             return null;
         }
@@ -228,6 +231,8 @@ public abstract class AbstractUpdateAlphaTransaction
         if (tranlocal.isCommitted()) {
             return null;
         }
+
+        tranlocal.ifCommutingThenFixate(this);
 
         if (config.dirtyCheck) {
             if (tranlocal.getPrecalculatedIsDirty()) {
@@ -263,6 +268,7 @@ public abstract class AbstractUpdateAlphaTransaction
                         writeVersion = config.clock.tick();
                     }
                 }
+
                 if (hasConflict) {
                     throw createOptimisticLockFailedWriteConflict();
                 }
@@ -288,8 +294,8 @@ public abstract class AbstractUpdateAlphaTransaction
     }
 
     @Override
-    protected void doStore() {
-        Listeners[] listeners = store(writeVersion);
+    protected void makeChangesPermanent() {
+        Listeners[] listeners = makeChangesPermanent(writeVersion);
         doReleaseWriteLocksForSuccess(writeVersion);
         openAll(listeners);
     }

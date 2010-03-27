@@ -112,7 +112,7 @@ public class AbstractTransaction_commitTest {
         tx.prepare();
 
         tx.commit();
-        verify(tx, times(1)).doStore();
+        verify(tx, times(1)).makeChangesPermanent();
     }
 
     @Test
@@ -121,7 +121,7 @@ public class AbstractTransaction_commitTest {
         tx.prepare();
 
         RuntimeException expected = new RuntimeException();
-        doThrow(expected).when(tx).doStore();
+        doThrow(expected).when(tx).makeChangesPermanent();
 
         try {
             tx.commit();

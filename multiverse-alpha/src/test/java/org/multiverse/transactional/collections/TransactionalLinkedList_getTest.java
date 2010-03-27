@@ -64,5 +64,4 @@ public class TransactionalLinkedList_getTest {
         assertEquals(version, stm.getVersion());
         assertEquals("[1, 2, 3]", list.toString());
     }
-
 }
