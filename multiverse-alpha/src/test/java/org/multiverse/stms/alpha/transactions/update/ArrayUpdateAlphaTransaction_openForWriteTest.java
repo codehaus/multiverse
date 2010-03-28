@@ -1,6 +1,7 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.alpha.AlphaStm;
@@ -153,6 +154,12 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
         assertSame(expected, found);
         assertEquals(1, getField(tx, "firstFreeIndex"));
         assertIsActive(tx);
+    }
+
+    @Test
+    @Ignore
+    public void whenAlreadyOpenedForCommutingWrite(){
+
     }
 
     @Test

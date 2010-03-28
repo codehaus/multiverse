@@ -1,6 +1,7 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.alpha.AlphaStm;
@@ -160,7 +161,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenOpenForReadWhenAlreadyOpenedForWrite_thenSameTranlocalReturned() {
+    public void whenAlreadyOpenedForWrite_thenSameTranlocalReturned() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = startSutTransaction();
@@ -168,6 +169,12 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
         AlphaTranlocal found = tx.openForRead(ref);
 
         assertSame(tranlocal, found);
+    }
+
+    @Test
+    @Ignore
+    public void whenAlreadyOpenedForComuttingWrite(){
+
     }
 
     @Test

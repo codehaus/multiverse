@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Latch;
 import org.multiverse.api.exceptions.WriteSkewConflict;
+import org.multiverse.stms.alpha.AlphaProgrammaticLong;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -54,7 +55,6 @@ public class ArrayUpdateAlphaTransaction_commitTest {
         return new ArrayUpdateAlphaTransaction(config, size);
     }
 
-
     @Test
     public void whenUnused_thenCommitSuccess() {
         AlphaTransaction tx = startSutTransaction(2);
@@ -103,6 +103,25 @@ public class ArrayUpdateAlphaTransaction_commitTest {
         assertNull(txObject.___getLockOwner());
     }
 
+ @Test
+    public void whenCommutingWrites() {
+        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(1);
+
+        AlphaTransaction tx = startSutTransaction(10);
+        ref.commutingInc(tx, 1);
+        AlphaTranlocal tranlocal = tx.openForCommutingWrite(ref);
+        assertTrue(tranlocal.isCommuting());
+        long version = stm.getVersion();
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertEquals(version+1, stm.getVersion());
+        assertEquals(2, ref.get());
+        assertSame(tranlocal, ref.___load());
+        assertTrue(tranlocal.isCommitted());
+        assertEquals(version+1, tranlocal.getWriteVersion());
+        assertNull(tranlocal.getOrigin());
+    }
     @Test
     public void whenListenersRegistered_theyAreRemovedAndNotified() {
         ManualRef ref = new ManualRef(stm);

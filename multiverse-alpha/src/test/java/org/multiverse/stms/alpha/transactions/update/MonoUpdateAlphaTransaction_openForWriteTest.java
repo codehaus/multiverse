@@ -1,6 +1,7 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.alpha.AlphaStm;
@@ -123,7 +124,7 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
     }
 
     @Test
-    public void whenAkreadyOpenedForRead_thenUpgradedToOpenedForWrite() {
+    public void whenAlreadyOpenedForRead_thenUpgradedToOpenedForWrite() {
         ManualRef ref = new ManualRef(stm);
         AlphaTranlocal committed = ref.___load();
 
@@ -134,6 +135,13 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
         assertIsUpdatableClone(ref, committed, found);
         assertSame(found, getField(tx, "attached"));
     }
+
+    @Test
+    @Ignore
+    public void whenAlreadyOpenedForCommutingWrite(){
+
+    }
+
 
     @Test
     public void whenAlreadyAnotherOpenForRead_thenSpeculativeConfigurationFailure() {
@@ -153,6 +161,7 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
         assertIsActive(tx);
         assertEquals(2, speculativeConfig.getOptimalSize());
     }
+
 
     @Test
     public void whenAlreadyAnotherOpenForWrite_thenSpeculativeConfigurationFailure() {

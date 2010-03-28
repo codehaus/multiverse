@@ -1,6 +1,7 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
@@ -242,6 +243,12 @@ public class MapUpdateAlphaTransaction_openForReadTest {
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForRead(ref);
 
         assertSame(expected, found);
+    }
+
+    @Test
+    @Ignore
+    public void whenAlreadyOpenedForCommutingWrite_thenItIsFixated(){
+
     }
 
     @Test

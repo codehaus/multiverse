@@ -4,8 +4,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Latch;
 import org.multiverse.api.exceptions.OptimisticLockFailedWriteConflict;
+import org.multiverse.stms.alpha.AlphaProgrammaticLong;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
+import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
@@ -104,6 +106,26 @@ public class MonoUpdateAlphaTransaction_commitTest {
         assertSame(tranlocal, ref.___load());
         assertNull(ref.___getListeners());
         assertTrue(tranlocal.isCommitted());
+    }
+
+    @Test
+    public void whenCommutingWrites() {
+        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(1);
+
+        AlphaTransaction tx = startSutTransaction();
+        ref.commutingInc(tx, 1);
+        AlphaTranlocal tranlocal = tx.openForCommutingWrite(ref);
+        assertTrue(tranlocal.isCommuting());
+        long version = stm.getVersion();
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertEquals(version+1, stm.getVersion());
+        assertEquals(2, ref.get());
+        assertSame(tranlocal, ref.___load());
+        assertTrue(tranlocal.isCommitted());
+        assertEquals(version+1, tranlocal.getWriteVersion());
+        assertNull(tranlocal.getOrigin());
     }
 
     @Test

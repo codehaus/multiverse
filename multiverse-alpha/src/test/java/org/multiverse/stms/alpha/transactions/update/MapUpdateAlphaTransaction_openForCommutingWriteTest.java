@@ -1,6 +1,7 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
@@ -22,8 +23,7 @@ import static org.multiverse.stms.alpha.AlphaTestUtils.startTrackingUpdateTransa
 /**
  * @author Peter Veentjer
  */
-public class MapUpdateAlphaTransaction_openForWriteTest {
-
+public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
     private AlphaStm stm;
     private AlphaStmConfig stmConfig;
 
@@ -46,6 +46,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
     }
 
     @Test
+    @Ignore
     public void whenVersionMatches() {
         ManualRef ref = new ManualRef(stm, 0);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
@@ -66,7 +67,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
         AlphaTransaction tx = startSutTransaction();
 
         try {
-            tx.openForWrite(null);
+            tx.openForCommutingWrite(null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -75,6 +76,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
     }
 
     @Test
+    @Ignore
     public void openForWriteDoesNotLockAtomicObjects() {
         ManualRef ref = new ManualRef(stm);
 
@@ -92,6 +94,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
      * could escape before they are committed. For now this has been disallowed.
      */
     @Test
+    @Ignore
     public void whenLockedAndEqualVersion_thenLockNotFreeReadConflict() {
         ManualRef ref = new ManualRef(stm, 0);
         Transaction owner = mock(Transaction.class);
@@ -109,6 +112,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
     }
 
     @Test
+    @Ignore
     public void whenVersionTooNew_thenOldVersionNotFoundReadConflict() {
         ManualRef ref = new ManualRef(stm, 0);
 
@@ -127,6 +131,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
     }
 
     @Test
+    @Ignore
     public void whenLocked_thenLockNotFreeReadConflict() {
         ManualRef ref = new ManualRef(stm, 0);
 
@@ -146,6 +151,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
     }
 
     @Test
+    @Ignore
     public void whenAlreadyOpenedForWrite_thenSameTranlocalReturned() {
         ManualRef ref = new ManualRef(stm, 0);
 
@@ -158,18 +164,25 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
     }
 
     @Test
+    @Ignore
     public void whenAlreadyOpenedForRead_thenItIsUpgradedToOpenForWrite() {
         ManualRef ref = new ManualRef(stm, 20);
 
         AlphaTransaction tx = startSutTransaction();
         ManualRefTranlocal read1 = (ManualRefTranlocal) tx.openForRead(ref);
-        ManualRefTranlocal read2 = (ManualRefTranlocal) tx.openForWrite(ref);
+        ManualRefTranlocal read2 = (ManualRefTranlocal) tx.openForCommutingWrite(ref);
 
         assertNotSame(read1, read2);
         assertSame(read2.getOrigin(), read1);
         assertTrue(read2.isUncommitted());
         assertSame(read1.___txObject, read2.___txObject);
         assertIsActive(tx);
+    }
+
+    @Test
+    @Ignore
+    public void whenAlreadyOpenendForCommutingWrite_thenSameTranlocalReturned(){
+
     }
 
     @Test
@@ -209,7 +222,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
 
         long expectedVersion = stm.getVersion();
         try {
-            tx.openForWrite(ref);
+            tx.openForCommutingWrite(ref);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -227,7 +240,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
 
         long expectedVersion = stm.getVersion();
         try {
-            tx.openForWrite(ref);
+            tx.openForCommutingWrite(ref);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -244,7 +257,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
         tx.prepare();
 
         try {
-            tx.openForWrite(ref);
+            tx.openForCommutingWrite(ref);
             fail();
         } catch (PreparedTransactionException expected) {
         }
