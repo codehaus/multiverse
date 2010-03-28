@@ -103,7 +103,7 @@ public class MapReadonlyAlphaTransaction_openForWriteTest {
 
         long expectedVersion = stm.getVersion();
         try {
-            tx.openForRead(ref);
+            tx.openForWrite(ref);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -122,7 +122,7 @@ public class MapReadonlyAlphaTransaction_openForWriteTest {
         long expectedVersion = stm.getVersion();
 
         try {
-            tx.openForRead(ref);
+            tx.openForWrite(ref);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -140,7 +140,7 @@ public class MapReadonlyAlphaTransaction_openForWriteTest {
         tx.abort();
 
         try {
-            tx.openForRead(ref);
+            tx.openForWrite(ref);
             fail();
         } catch (DeadTransactionException expected) {
         }

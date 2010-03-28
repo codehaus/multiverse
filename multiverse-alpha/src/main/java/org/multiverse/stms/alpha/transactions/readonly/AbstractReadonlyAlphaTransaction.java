@@ -64,7 +64,7 @@ public abstract class AbstractReadonlyAlphaTransaction
     }
 
     @Override
-    public AlphaTranlocal openForCommutingWrite(AlphaTransactionalObject txObject) {
+    public AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject txObject) {
         //forward it to the write
         return doOpenForWrite(txObject);
     }

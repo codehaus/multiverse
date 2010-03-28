@@ -102,7 +102,7 @@ public class ArrayReadonlyAlphaTransaction_openForWriteTest {
 
         long version = stm.getVersion();
         try {
-            tx.openForRead(value);
+            tx.openForWrite(value);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -120,7 +120,7 @@ public class ArrayReadonlyAlphaTransaction_openForWriteTest {
 
         long version = stm.getVersion();
         try {
-            tx.openForRead(value);
+            tx.openForWrite(value);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -138,7 +138,7 @@ public class ArrayReadonlyAlphaTransaction_openForWriteTest {
 
         long version = stm.getVersion();
         try {
-            tx.openForRead(value);
+            tx.openForWrite(value);
             fail();
         } catch (DeadTransactionException expected) {
         }

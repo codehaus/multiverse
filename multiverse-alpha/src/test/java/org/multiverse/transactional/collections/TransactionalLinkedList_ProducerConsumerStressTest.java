@@ -27,10 +27,10 @@ public class TransactionalLinkedList_ProducerConsumerStressTest {
     
     private TransactionalLinkedList<Integer>[] queues;
     private int queueCount = 50;
-    private int itemCount = 5000;
+    private int itemCount = 50000;
     private int delayMs = 2;
     private boolean runWithAborts;
-    private int queueCapacity = 50;
+    private int queueCapacity = 5000;
     private int concurrentHandoverCount;
 
     @Before
@@ -131,7 +131,7 @@ public class TransactionalLinkedList_ProducerConsumerStressTest {
 
         public void doRun() throws InterruptedException {
             for (int k = 0; k < itemCount; k++) {
-                if (k % 500 == 0) {
+                if (k % 200 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
 
@@ -172,7 +172,7 @@ public class TransactionalLinkedList_ProducerConsumerStressTest {
 
         public void doRun() throws InterruptedException {
             for (int k = 0; k < itemCount; k++) {
-                if (k % 500 == 0) {
+                if (k % 2000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
 
@@ -187,7 +187,7 @@ public class TransactionalLinkedList_ProducerConsumerStressTest {
                 }
 
                 int item = consumeOneItem(false);
-                sleepRandomMs(delayMs);
+                //sleepRandomMs(delayMs);
                 consumedList.add(item);
             }
         }
@@ -220,7 +220,7 @@ public class TransactionalLinkedList_ProducerConsumerStressTest {
         public void doRun() throws InterruptedException {
             int k = 0;
             while (remainingCounter.getAndDecrement() > 0) {
-                if (k % 1000 == 0) {
+                if (k % 2000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
 
@@ -244,7 +244,7 @@ public class TransactionalLinkedList_ProducerConsumerStressTest {
         @TransactionalMethod
         public void moveOneItem(boolean abort) throws InterruptedException {
             int item = from.takeLast();
-            sleepRandomMs(aliveCount.get() * delayMs);
+            //sleepRandomMs(aliveCount.get() * delayMs);
             to.putFirst(item);
 
             if (abort) {
