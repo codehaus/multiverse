@@ -86,15 +86,23 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenNotCommittedBefore_thenFreshTranlocalReturned() {
+    public void whenNotCommittedBefore_thenLoadUncommittedReadConflict() {
         ManualRef ref = ManualRef.createUncommitted();
 
         AlphaTransaction tx = startSutTransaction();
-        AlphaTranlocal found = tx.openForRead(ref);
 
-        assertNotNull(found);
-        assertSame(ref, found.getTransactionalObject());
-        assertTrue(found.isUncommitted());
+        long version = stm.getVersion();
+        try {
+            tx.openForRead(ref);
+            fail();
+        } catch (UncommittedReadConflict expected) {
+
+        }
+
+        assertEquals(version, stm.getVersion());
+        assertIsActive(tx);
+        assertNull(ref.___load());
+        assertNull(ref.___getLockOwner());
     }
 
     @Test
@@ -173,7 +181,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
 
     @Test
     @Ignore
-    public void whenAlreadyOpenedForComuttingWrite(){
+    public void whenAlreadyOpenedForComuttingWrite() {
 
     }
 

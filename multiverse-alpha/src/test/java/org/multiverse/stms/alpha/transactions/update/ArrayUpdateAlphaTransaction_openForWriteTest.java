@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
-import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
@@ -55,22 +54,29 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
     }
 
     @Test
-    public void whenFirstTime() {
+    public void whenOpeningUncommittedObject() {
         ManualRef txObject = ManualRef.createUncommitted();
 
         AlphaTransaction tx = startSutTransaction(2);
-        AlphaTranlocal tranlocal = tx.openForWrite(txObject);
 
-        assertNotNull(tranlocal);
-        assertSame(txObject, tranlocal.getTransactionalObject());
-        assertTrue(tranlocal.isUncommitted());
+        long version = stm.getVersion();
+        try{
+            tx.openForWrite(txObject);
+            fail();
+        }catch(UncommittedReadConflict expected){
+
+        }
+
+        assertNull(txObject.___load());
         assertNull(txObject.___getLockOwner());
+        assertEquals(version, stm.getVersion());
+        assertIsActive(tx);
     }
 
     @Test
     public void whenFull() {
-        ManualRef txObject1 = ManualRef.createUncommitted();
-        ManualRef txObject2 = ManualRef.createUncommitted();
+        ManualRef txObject1 = new ManualRef(stm, 1);
+        ManualRef txObject2 = new ManualRef(stm, 1);
 
         AlphaTransaction tx = startSutTransaction(1, 1);
         tx.openForWrite(txObject1);
