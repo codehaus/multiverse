@@ -39,7 +39,7 @@ public class NonTransactionalMethodFieldAccessMethodAdapter extends MethodAdapte
 
     @Override
     public void visitFieldInsn(int opcode, String owner, String fieldName, String valueDesc) {
-        ClassMetadata ownerMetadata = metadataRepository.getClassMetadata(classLoader, owner);
+        ClassMetadata ownerMetadata = metadataRepository.loadClassMetadata(classLoader, owner);
         FieldMetadata fieldMetadata = ownerMetadata.getFieldMetadata(fieldName);
 
         if (fieldMetadata.isManagedField()) {
@@ -116,7 +116,7 @@ public class NonTransactionalMethodFieldAccessMethodAdapter extends MethodAdapte
                 openMethod,
                 format("(%s)%s", getDescriptor(AlphaTransactionalObject.class), getDescriptor(AlphaTranlocal.class)));
 
-        String tranlocalName = metadataRepository.getClassMetadata(classLoader, txObjectName).getTranlocalName();
+        String tranlocalName = metadataRepository.loadClassMetadata(classLoader, txObjectName).getTranlocalName();
 
         super.visitTypeInsn(CHECKCAST, tranlocalName);
     }

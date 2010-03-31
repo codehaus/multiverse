@@ -53,12 +53,12 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor {
             }
 
             if (classNode.superName != null) {
-                ClassMetadata superClassMetadata = metadataRepository.getClassMetadata(classLoader, classNode.superName);
+                ClassMetadata superClassMetadata = metadataRepository.loadClassMetadata(classLoader, classNode.superName);
                 classMetadata.setSuperClassMetadata(superClassMetadata);
             }
 
             for (String interfaceName : (List<String>) classNode.interfaces) {
-                ClassMetadata interfaceMetadata = metadataRepository.getClassMetadata(classLoader, interfaceName);
+                ClassMetadata interfaceMetadata = metadataRepository.loadClassMetadata(classLoader, interfaceName);
                 classMetadata.getInterfaces().add(interfaceMetadata);
             }
 
@@ -176,13 +176,13 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor {
             return true;
         }
 
-        ClassMetadata superClassMetadata = metadataRepository.getClassMetadata(classLoader, classNode.superName);
+        ClassMetadata superClassMetadata = metadataRepository.loadClassMetadata(classLoader, classNode.superName);
         if (superClassMetadata.isTransactionalObject()) {
             return true;
         }
 
         for (String interfaceName : (List<String>) classNode.interfaces) {
-            ClassMetadata interfaceMetadata = metadataRepository.getClassMetadata(classLoader, interfaceName);
+            ClassMetadata interfaceMetadata = metadataRepository.loadClassMetadata(classLoader, interfaceName);
             if (interfaceMetadata.isTransactionalObject()) {
                 return true;
             }

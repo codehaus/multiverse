@@ -62,7 +62,8 @@ public class Queue<E> {
         }.execute();
     }
 
-    private final static TransactionFactory sizeTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
+    private final static TransactionFactory sizeTxFactory = getGlobalStmInstance()
+            .getTransactionFactoryBuilder()
             .setReadonly(true)
             .setAutomaticReadTracking(false).build();
 
@@ -76,7 +77,8 @@ public class Queue<E> {
         }.execute();
     }
 
-    private final static TransactionFactory isEmptyTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
+    private final static TransactionFactory isEmptyTxFactory = getGlobalStmInstance()
+            .getTransactionFactoryBuilder()
             .setReadonly(true)
             .setAutomaticReadTracking(false).build();
 

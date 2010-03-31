@@ -56,8 +56,8 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
     private final static TransactionFactory getOrAwaitTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
             .setReadonly(true)
             .setFamilyName(AlphaProgrammaticReference.class.getName() + ".getOrAwait()")
-            .setSpeculativeConfigurationEnabled(true)
-            .setAutomaticReadTracking(true).build();
+            .setAutomaticReadTracking(true)
+            .build();
 
     private static final PrimitiveClock clock = ((AlphaStm) getGlobalStmInstance()).getClock();
 
@@ -93,7 +93,8 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
             tranlocal.value = value;
             ___store(tranlocal, writeVersion);
         } else {
-            AlphaRefTranlocal<E> tranlocal = openForWrite(tx);
+            AlphaTransaction alphaTx = (AlphaTransaction)tx;                
+            AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal<E>) alphaTx.openForConstruction(this);
             tranlocal.value = value;
         }
     }
@@ -112,7 +113,8 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
     }
 
     public AlphaProgrammaticReference(Transaction tx, E value) {
-        AlphaRefTranlocal<E> tranlocal = openForWrite(tx);
+        AlphaTransaction alphaTx = (AlphaTransaction)tx;
+        AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal<E>) alphaTx.openForConstruction(this);
         tranlocal.value = value;
     }
 

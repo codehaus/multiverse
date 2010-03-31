@@ -59,7 +59,8 @@ public final class IntQueue {
         }.execute();
     }
 
-    private final static TransactionFactory sizeTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
+    private final static TransactionFactory sizeTxFactory = getGlobalStmInstance()
+            .getTransactionFactoryBuilder()
             .setReadonly(true)
             .setAutomaticReadTracking(false).build();
 
@@ -73,7 +74,8 @@ public final class IntQueue {
         }.execute();
     }
 
-    private final static TransactionFactory isEmptyTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
+    private final static TransactionFactory isEmptyTxFactory = getGlobalStmInstance()
+            .getTransactionFactoryBuilder()
             .setReadonly(true)
             .setAutomaticReadTracking(false).build();
 

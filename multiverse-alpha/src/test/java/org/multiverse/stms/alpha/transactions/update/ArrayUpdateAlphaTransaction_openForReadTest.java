@@ -91,6 +91,8 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
         AlphaTransaction tx = startSutTransaction();
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForRead(ref);
 
+        assertTrue(found.isCommitted());
+        assertFalse(found.isCommuting());
         assertSame(committed, found);
         testIncomplete();
     }
@@ -103,6 +105,8 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
         AlphaTranlocal found = tx.openForRead(ref);
 
         assertNotNull(found);
+        assertFalse(found.isCommitted());
+        assertFalse(found.isCommuting());
         assertSame(ref, found.getTransactionalObject());
         assertTrue(found.isUncommitted());
     }
@@ -209,6 +213,12 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
 
         assertIsActive(tx);
         assertEquals(4, speculativeConfig.getOptimalSize());
+    }
+
+    @Test
+    @Ignore
+    public void whenAlreadyOpenedForConstruction(){
+
     }
 
     @Test

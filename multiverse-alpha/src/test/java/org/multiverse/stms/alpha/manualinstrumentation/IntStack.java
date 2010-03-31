@@ -19,13 +19,14 @@ public final class IntStack extends DefaultTxObjectMixin {
         new TransactionTemplate() {
             @Override
             public Object execute(Transaction t) {
-                IntStackTranlocal tranlocal = (IntStackTranlocal) ((AlphaTransaction) t).openForWrite(IntStack.this);
+                IntStackTranlocal tranlocal = (IntStackTranlocal) ((AlphaTransaction) t).openForConstruction(IntStack.this);
                 return null;
             }
         }.execute();
     }
 
-    private final static TransactionFactory sizeTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
+    private final static TransactionFactory sizeTxFactory = getGlobalStmInstance()
+            .getTransactionFactoryBuilder()
             .setReadonly(true)
             .setAutomaticReadTracking(false).build();
 
@@ -44,7 +45,8 @@ public final class IntStack extends DefaultTxObjectMixin {
         return tranlocal.size;
     }
 
-    private final static TransactionFactory isEmptyTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
+    private final static TransactionFactory isEmptyTxFactory = getGlobalStmInstance()
+            .getTransactionFactoryBuilder()
             .setReadonly(true)
             .setAutomaticReadTracking(false).build();
 
@@ -60,12 +62,14 @@ public final class IntStack extends DefaultTxObjectMixin {
         }.execute();
     }
 
-    public final static TransactionFactory popTxFactory = GlobalStmInstance.getGlobalStmInstance().getTransactionFactoryBuilder().
-            setReadonly(false).
-            setSpeculativeConfigurationEnabled(true).
-            setAllowWriteSkewProblem(true).
-            setFamilyName("IntStack.pop()").
-            setAutomaticReadTracking(true).build();
+    public final static TransactionFactory popTxFactory = GlobalStmInstance
+            .getGlobalStmInstance().getTransactionFactoryBuilder()
+            .setReadonly(false)
+            .setSpeculativeConfigurationEnabled(true)
+            .setAllowWriteSkewProblem(true)
+            .setFamilyName("IntStack.pop()")
+            .setAutomaticReadTracking(true)
+            .build();
 
     public int pop() {
         return new TransactionTemplate<Integer>(popTxFactory) {
@@ -89,12 +93,14 @@ public final class IntStack extends DefaultTxObjectMixin {
         return oldHead.value;
     }
 
-    public final static TransactionFactory pushTxFactory = GlobalStmInstance.getGlobalStmInstance().getTransactionFactoryBuilder().
-            setReadonly(false).
-            setSpeculativeConfigurationEnabled(true).
-            setAllowWriteSkewProblem(true).
-            setFamilyName("IntStack.push()").
-            setAutomaticReadTracking(false).build();
+    public final static TransactionFactory pushTxFactory = GlobalStmInstance
+            .getGlobalStmInstance().getTransactionFactoryBuilder()
+            .setReadonly(false)
+            .setSpeculativeConfigurationEnabled(true)
+            .setAllowWriteSkewProblem(true)
+            .setFamilyName("IntStack.push()")
+            .setAutomaticReadTracking(false)
+            .build();
 
 
     public void push(final int value) {

@@ -19,7 +19,7 @@ public class MetadataRepository_ObjectTest {
 
     @Test
     public void whenNonTransactionalObject() {
-        ClassMetadata metadata = repository.getClassMetadata(Object.class);
+        ClassMetadata metadata = repository.loadClassMetadata(Object.class);
 
         assertNotNull(metadata);
         assertTrue(metadata.isIgnoredClass());
@@ -28,7 +28,7 @@ public class MetadataRepository_ObjectTest {
 
     @Test
     public void whenObjectTransactional() {
-        ClassMetadata metadata = repository.getClassMetadata(Person.class);
+        ClassMetadata metadata = repository.loadClassMetadata(Person.class);
 
         assertNotNull(metadata);
         assertFalse(metadata.isIgnoredClass());
@@ -53,7 +53,7 @@ public class MetadataRepository_ObjectTest {
 
     @Test
     public void whenObjectImplementingTransactionalInterface() {
-        ClassMetadata metadata = repository.getClassMetadata(ObjectImplementingTransactionalInterface.class);
+        ClassMetadata metadata = repository.loadClassMetadata(ObjectImplementingTransactionalInterface.class);
 
         assertNotNull(metadata);
         assertFalse(metadata.isInterface());
@@ -72,7 +72,7 @@ public class MetadataRepository_ObjectTest {
 
     @Test
     public void whenObjectExtendsTransactionalObject() {
-        ClassMetadata metadata = repository.getClassMetadata(ObjectExtendingTransactionalObject.class);
+        ClassMetadata metadata = repository.loadClassMetadata(ObjectExtendingTransactionalObject.class);
 
         assertNotNull(metadata);
         assertFalse(metadata.isInterface());

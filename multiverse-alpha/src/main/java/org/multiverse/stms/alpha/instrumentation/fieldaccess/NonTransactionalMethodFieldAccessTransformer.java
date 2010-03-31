@@ -28,7 +28,7 @@ public class NonTransactionalMethodFieldAccessTransformer implements Opcodes {
         this.metadataRepository = metadataRepository;
         this.classNode = classNode;
         this.classLoader = classLoader;
-        this.classMetadata = metadataRepository.getClassMetadata(classLoader, classNode.name);
+        this.classMetadata = metadataRepository.loadClassMetadata(classLoader, classNode.name);
     }
 
     public ClassNode transform() {

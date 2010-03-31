@@ -71,7 +71,7 @@ public class ArrayUpdateAlphaTransaction_commitTest {
         ManualRef txObject = ManualRef.createUncommitted();
 
         AlphaTransaction tx = startSutTransaction(2);
-        AlphaTranlocal tranlocal = tx.openForWrite(txObject);
+        AlphaTranlocal tranlocal = tx.openForConstruction(txObject);
 
         long version = stm.getVersion();
         tx.commit();
@@ -162,7 +162,7 @@ public class ArrayUpdateAlphaTransaction_commitTest {
         ManualRefTranlocal updateTranlocal = (ManualRefTranlocal) tx.openForWrite(updateRef);
         updateTranlocal.value++;
         tx.openForRead(readonlyRef);
-        ManualRefTranlocal freshTranlocal = (ManualRefTranlocal) tx.openForWrite(freshRef);
+        ManualRefTranlocal freshTranlocal = (ManualRefTranlocal) tx.openForConstruction(freshRef);
         freshTranlocal.value++;
 
         long version = stm.getVersion();

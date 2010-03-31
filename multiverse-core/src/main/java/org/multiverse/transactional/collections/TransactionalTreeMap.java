@@ -1,7 +1,9 @@
 package org.multiverse.transactional.collections;
 
+import org.multiverse.annotations.Exclude;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
+import org.multiverse.api.ProgrammaticLong;
 import org.multiverse.utils.TodoException;
 
 import java.util.Collection;
@@ -10,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.lang.Math.max;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 
 /**
  * A Tree based TransactionalMap implementation. Essentially is the transactional version of the
@@ -24,7 +27,8 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
 
     private final Comparator<? super K> comparator;
 
-    private int size;
+    private final ProgrammaticLong size = getGlobalStmInstance().createProgrammaticLong();
+
     private Node<K, V> root;
 
     public TransactionalTreeMap() {
@@ -70,11 +74,11 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
     @Override
     public void clear() {
         //prevent doing an open for write.
-        if (size == 0) {
+        if (root == null) {
             return;
         }
 
-        size = 0;
+        size.set(0);
         root = null;
     }
 
@@ -89,7 +93,13 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
 
     @Override
     public int size() {
-        return size;
+        return (int)size.get();
+    }
+
+    @Override
+    @Exclude
+    public int getCurrentSize() {
+        return (int)size.getAtomic();
     }
 
     @Override
@@ -114,7 +124,7 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
         }
 
         if (root == null) {
-            size++;
+            size.commutingInc(1);
             root = new Node<K, V>(key, value);
             return null;
         }
@@ -130,7 +140,7 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
                     Node<K, V> newNode = new Node<K, V>(key, value);
                     newNode.parent = node;
                     node.left = newNode;
-                    size++;
+                    size.commutingInc(1);
                     return null;
                 }
             } else if (cmp > 0) {
@@ -140,7 +150,7 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
                     Node<K, V> newNode = new Node<K, V>(key, value);
                     newNode.parent = node;
                     node.right = newNode;
-                    size++;
+                    size.commutingInc(1);
                     return null;
                 }
             } else {

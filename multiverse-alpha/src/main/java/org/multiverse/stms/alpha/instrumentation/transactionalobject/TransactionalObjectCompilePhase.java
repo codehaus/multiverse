@@ -21,7 +21,7 @@ public class TransactionalObjectCompilePhase extends AbstractCompilePhase {
 
     @Override
     protected Clazz doCompile(Environment environment, Clazz originalClazz) {
-        ClassMetadata classMetadata = environment.getMetadataRepository().getClassMetadata(
+        ClassMetadata classMetadata = environment.getMetadataRepository().loadClassMetadata(
                 originalClazz.getClassLoader(), originalClazz.getName());
 
         if (!classMetadata.isRealTransactionalObject()) {

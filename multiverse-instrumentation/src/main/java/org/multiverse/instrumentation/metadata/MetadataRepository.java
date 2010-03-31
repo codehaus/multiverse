@@ -37,23 +37,23 @@ public final class MetadataRepository {
         this.extractor.init(this);
     }
 
-    public ClassMetadata getClassMetadata(Class clazz) {
+    public ClassMetadata loadClassMetadata(Class clazz) {
         if (clazz == null) {
             throw new NullPointerException();
         }
 
         String name = Type.getInternalName(clazz);
-        return getClassMetadata(clazz.getClassLoader(), name);
+        return loadClassMetadata(clazz.getClassLoader(), name);
     }
 
     /**
-     * Retries the ClassMetadata for a class.
+     * Retrieves the ClassMetadata for a class.
      *
      * @param classLoader
      * @param className   the className of the class to look for.
      * @return the ClassMetadata (will never be null).
      */
-    public ClassMetadata getClassMetadata(ClassLoader classLoader, String className) {
+    public ClassMetadata loadClassMetadata(ClassLoader classLoader, String className) {
         if (className == null) {
             throw new NullPointerException();
         }

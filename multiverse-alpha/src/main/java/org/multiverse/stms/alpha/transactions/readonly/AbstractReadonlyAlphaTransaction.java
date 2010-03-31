@@ -70,6 +70,12 @@ public abstract class AbstractReadonlyAlphaTransaction
     }
 
     @Override
+    public AlphaTranlocal doOpenForConstruction(AlphaTransactionalObject txObject) {
+        //forward it to the write
+        return doOpenForWrite(txObject);
+    }
+
+    @Override
     protected final AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {
         SpeculativeConfiguration speculativeConfig = config.speculativeConfig;
         if (speculativeConfig.isSpeculativeReadonlyEnabled()) {

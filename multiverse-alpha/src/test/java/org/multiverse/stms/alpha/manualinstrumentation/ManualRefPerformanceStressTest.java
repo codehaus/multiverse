@@ -168,42 +168,4 @@ public class ManualRefPerformanceStressTest {
         double transactionPerSecond = (transactionCount * TimeUnit.SECONDS.toNanos(1)) / periodNs;
         System.out.printf("%s inc/second\n", transactionPerSecond);
     }
-
-    @Test
-    public void testMultipleTransactionWithFastRef() {
-        FastManualRef ref = new FastManualRef(stm);
-
-        long startNs = System.nanoTime();
-
-        for (int k = 0; k < transactionCount; k++) {
-            ref.fastIncWithThreadLocal(txFactory);
-
-            if (k % 1000000 == 0) {
-                System.out.println("at " + k);
-            }
-        }
-
-        long periodNs = System.nanoTime() - startNs;
-        double transactionPerSecond = (transactionCount * TimeUnit.SECONDS.toNanos(1)) / periodNs;
-        System.out.printf("%s inc/second\n", transactionPerSecond);
-    }
-
-    @Test
-    public void testMultipleTransactionWithFastRefAndNoThreadLocalUsage() {
-        FastManualRef ref = new FastManualRef(stm);
-
-        long startNs = System.nanoTime();
-
-        for (int k = 0; k < transactionCount; k++) {
-            ref.fastIncWithoutThreadLocal(txFactory);
-
-            if (k % 1000000 == 0) {
-                System.out.println("at " + k);
-            }
-        }
-
-        long periodNs = System.nanoTime() - startNs;
-        double transactionPerSecond = (transactionCount * TimeUnit.SECONDS.toNanos(1)) / periodNs;
-        System.out.printf("%s inc/second\n", transactionPerSecond);
-    }
 }

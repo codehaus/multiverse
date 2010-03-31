@@ -13,8 +13,7 @@ import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
-import static org.multiverse.TestUtils.assertIsActive;
-import static org.multiverse.TestUtils.getField;
+import static org.multiverse.TestUtils.*;
 
 public class MonoReadonlyAlphaTransaction_openForReadTest {
 
@@ -49,6 +48,8 @@ public class MonoReadonlyAlphaTransaction_openForReadTest {
         AlphaTransaction tx = startSutTransaction();
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForRead(ref);
 
+        assertTrue(found.isCommitted());
+        assertFalse(found.isCommuting());
         assertSame(committed, found);
         assertSame(committed, getField(tx, "attached"));
     }
@@ -93,6 +94,8 @@ public class MonoReadonlyAlphaTransaction_openForReadTest {
         ManualRefTranlocal found1 = (ManualRefTranlocal) tx.openForRead(ref);
         ManualRefTranlocal found2 = (ManualRefTranlocal) tx.openForRead(ref);
 
+        assertTrue(found2.isCommitted());
+        assertFalse(found2.isCommuting());
         assertSame(found1, found2);
     }
 
@@ -142,33 +145,57 @@ public class MonoReadonlyAlphaTransaction_openForReadTest {
         assertEquals(2, speculativeConfig.getOptimalSize());
     }
 
-    @Test(expected = PreparedTransactionException.class)
+    @Test
     public void whenPrepared_thenPreparedTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = startSutTransaction();
         tx.prepare();
 
-        tx.openForRead(ref);
+        long version = stm.getVersion();
+        try {
+            tx.openForRead(ref);
+            fail();
+        } catch (PreparedTransactionException expected) {
+        }
+
+        assertIsPrepared(tx);
+        assertEquals(version, stm.getVersion());
     }
 
-    @Test(expected = DeadTransactionException.class)
+    @Test
     public void whenAborted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = startSutTransaction();
         tx.abort();
 
-        tx.openForRead(ref);
+        long version = stm.getVersion();
+        try {
+            tx.openForRead(ref);
+            fail();
+        } catch (DeadTransactionException expected) {
+        }
+
+        assertIsAborted(tx);
+        assertEquals(version, stm.getVersion());
     }
 
-    @Test(expected = DeadTransactionException.class)
+    @Test
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = startSutTransaction();
         tx.commit();
 
+        long version = stm.getVersion();
+        try{
         tx.openForRead(ref);
+            fail();
+        }catch(DeadTransactionException expected){
+        }
+
+        assertIsCommitted(tx);
+        assertEquals(version, stm.getVersion());
     }
 }

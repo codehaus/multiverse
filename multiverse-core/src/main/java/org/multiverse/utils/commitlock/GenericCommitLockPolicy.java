@@ -133,7 +133,6 @@ public final class GenericCommitLockPolicy implements CommitLockPolicy {
             for (lockIndex = 0; lockIndex < locks.length; lockIndex++) {
                 CommitLock lock = locks[lockIndex];
 
-
                 if (lock == null) {
                     locksNeedToBeReleased = false;
                     return true;
@@ -214,7 +213,6 @@ public final class GenericCommitLockPolicy implements CommitLockPolicy {
             lock.___releaseLock(owner);
         }
     }
-
 
     @Override
     public String toString() {

@@ -80,7 +80,7 @@ public class MonoUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
     }
 
     @Override
-    protected AlphaTranlocal find(AlphaTransactionalObject txObject) {
+    protected AlphaTranlocal findAttached(AlphaTransactionalObject txObject) {
         return attached == null || attached.getTransactionalObject() != txObject ? null : attached;
     }
 

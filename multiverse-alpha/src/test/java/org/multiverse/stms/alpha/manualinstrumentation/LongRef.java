@@ -22,7 +22,7 @@ public class LongRef extends DefaultTxObjectMixin {
         new TransactionTemplate() {
             @Override
             public Object execute(Transaction t) {
-                LongRefTranlocal tranlocal = (LongRefTranlocal) ((AlphaTransaction) t).openForWrite(LongRef.this);
+                LongRefTranlocal tranlocal = (LongRefTranlocal) ((AlphaTransaction) t).openForConstruction(LongRef.this);
                 tranlocal.value = value;
                 return null;
             }

@@ -78,7 +78,7 @@ public final class SpeculativeConfiguration {
         while (true) {
             int currentSize = this.size.get();
             if (currentSize >= newOptimalSize) {
-                return;
+                return ;
             }
 
             if (size.compareAndSet(currentSize, newOptimalSize)) {

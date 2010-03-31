@@ -74,6 +74,8 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
         AlphaTransaction tx = startTransactionUnderTest();
         AlphaTranlocal found = tx.openForRead(ref);
 
+        assertTrue(found.isCommitted());
+        assertFalse(found.isCommuting());
         assertSame(found, committed);
         assertIsActive(tx);
     }
@@ -86,6 +88,8 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
 
         AlphaTranlocal found = tx.openForRead(ref);
 
+        assertTrue(found.isCommitted());
+        assertFalse(found.isCommuting());
         assertSame(expected, found);
         assertIsActive(tx);
     }

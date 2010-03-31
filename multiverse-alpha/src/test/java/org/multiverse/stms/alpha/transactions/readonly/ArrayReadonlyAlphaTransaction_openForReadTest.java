@@ -69,6 +69,9 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
 
         AlphaTransaction tx = startTransactionUnderTest();
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForRead(ref);
+
+        assertTrue(found.isCommitted());
+        assertFalse(found.isCommuting());
         assertSame(committed, found);
         assertEquals(1, getField(tx, "firstFreeIndex"));
     }
@@ -80,6 +83,9 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
         AlphaTransaction tx = startTransactionUnderTest();
         ManualRefTranlocal expected = (ManualRefTranlocal) tx.openForRead(ref);
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForRead(ref);
+
+        assertTrue(found.isCommitted());
+        assertFalse(found.isCommuting());
         assertSame(expected, found);
         assertEquals(1, getField(tx, "firstFreeIndex"));
     }

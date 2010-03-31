@@ -25,7 +25,7 @@ public class AbaRef<E> extends DefaultTxObjectMixin {
         new TransactionTemplate() {
             @Override
             public Object execute(Transaction t) throws Exception {
-                AbaRefTranlocal<E> tranlocal = (AbaRefTranlocal) ((AlphaTransaction) t).openForWrite(AbaRef.this);
+                AbaRefTranlocal<E> tranlocal = (AbaRefTranlocal) ((AlphaTransaction) t).openForConstruction(AbaRef.this);
                 return null;
             }
         }.execute();
@@ -35,16 +35,19 @@ public class AbaRef<E> extends DefaultTxObjectMixin {
         new TransactionTemplate() {
             @Override
             public Object execute(Transaction t) throws Exception {
-                AbaRefTranlocal<E> tranlocal = (AbaRefTranlocal) ((AlphaTransaction) t).openForWrite(AbaRef.this);
+                AbaRefTranlocal<E> tranlocal = (AbaRefTranlocal) ((AlphaTransaction) t).openForConstruction(AbaRef.this);
                 tranlocal.value = value;
                 return null;
             }
         }.execute();
     }
 
-    private final static TransactionFactory getTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
+    private final static TransactionFactory getTxFactory = getGlobalStmInstance()
+            .getTransactionFactoryBuilder()
+            .setSpeculativeConfigurationEnabled(false)
             .setReadonly(true)
-            .setAutomaticReadTracking(false).build();
+            .setAutomaticReadTracking(false)
+            .build();
 
     public E get() {
         return new TransactionTemplate<E>(getTxFactory) {
@@ -57,8 +60,15 @@ public class AbaRef<E> extends DefaultTxObjectMixin {
         }.execute();
     }
 
+    private final static TransactionFactory setTxFactory = getGlobalStmInstance()
+               .getTransactionFactoryBuilder()
+               .setSpeculativeConfigurationEnabled(false)
+               .setReadonly(false)
+               .setAutomaticReadTracking(false)
+               .build();
+
     public void set(final E newValue) {
-        new TransactionTemplate<E>() {
+        new TransactionTemplate<E>(setTxFactory) {
             @Override
             public E execute(Transaction t) throws Exception {
                 AbaRefTranlocal<E> tranlocal = (AbaRefTranlocal) ((AlphaTransaction) t).openForWrite(AbaRef.this);

@@ -7,6 +7,7 @@ import org.multiverse.api.ProgrammaticLong;
 import org.multiverse.utils.TodoException;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
@@ -613,5 +614,271 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
         public Node(E value) {
             this.value = value;
         }
+    }
+
+    //code that 'inserts' the logic in this class. Needed for the time being to do
+    //bytecode optimization
+
+   @Override
+    @TransactionalMethod(interruptible = true)
+    public boolean offerFirst(E e, long timeout, TimeUnit unit) throws InterruptedException {
+        throw new TodoException();
+    }
+
+    @Override
+    @TransactionalMethod(interruptible = true)
+    public boolean offerLast(E e, long timeout, TimeUnit unit) throws InterruptedException {
+        throw new TodoException();
+    }
+
+    @Override
+    @TransactionalMethod
+    public boolean addAll(Collection<? extends E> c) {
+        return super.addAll(c);
+    }
+
+    @Override
+    @TransactionalMethod
+    public void addFirst(E e) {
+        if (hasNoStorageCapacity()) {
+            throw new IllegalStateException();
+        }
+
+        doAddFirst(e);
+    }
+
+    @Override
+    @TransactionalMethod
+    public void addLast(E e) {
+        if (hasNoStorageCapacity()) {
+            throw new IllegalStateException();
+        }
+
+        doAddLast(e);
+    }
+
+    @Override
+    @TransactionalMethod
+    public boolean offerFirst(E e) {
+        if (hasNoStorageCapacity()) {
+            return false;
+        }
+
+        doAddFirst(e);
+        return true;
+    }
+
+    @Override
+    @TransactionalMethod
+    public boolean offerLast(E e) {
+        if (hasNoStorageCapacity()) {
+            return false;
+        }
+
+        doAddLast(e);
+        return true;
+    }
+
+    @Override
+    @TransactionalMethod
+    public void putLast(E e) throws InterruptedException {
+        if (hasNoStorageCapacity()) {
+            retry();
+        }
+
+        doAddLast(e);
+    }
+
+    @Override
+    @TransactionalMethod
+    public E takeFirst() throws InterruptedException {
+        if (isEmpty()) {
+            retry();
+        }
+
+        return doRemoveFirst();
+    }
+
+    @Override
+    @TransactionalMethod
+    public E removeLast() {
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+
+        return doRemoveLast();
+    }
+
+    @Override
+    @TransactionalMethod
+    public boolean removeFirstOccurrence(Object o) {
+        throw new TodoException();
+    }
+
+    @Override
+    @TransactionalMethod
+    public boolean removeLastOccurrence(Object o) {
+        throw new TodoException();
+    }
+
+    @Override
+    @TransactionalMethod(readonly = false)
+    public boolean add(E e) {
+        addLast(e);
+        return true;
+    }
+
+    @TransactionalMethod
+    protected boolean hasNoStorageCapacity() {
+        return remainingCapacity() == 0;
+    }
+
+    @Override
+    @TransactionalMethod
+    public boolean offer(E e) {
+        return offerLast(e);
+    }
+
+    @Override
+    @TransactionalMethod
+    public void put(E e) throws InterruptedException {
+        putLast(e);
+    }
+
+    @Override
+    @TransactionalMethod
+    public E remove() {
+        return removeFirst();
+    }
+
+    @Override
+    @TransactionalMethod
+    public E poll() {
+        return pollFirst();
+    }
+
+    @Override
+    @TransactionalMethod
+    public E pollFirst() {
+        if (isEmpty()) {
+            return null;
+        }
+
+        return doRemoveFirst();
+    }
+
+    @Override
+    @TransactionalMethod
+    public E pollLast() {
+        if (isEmpty()) {
+            return null;
+        }
+
+        return doRemoveLast();
+    }
+
+    @Override
+    @TransactionalMethod
+    public E pollFirst(long timeout, TimeUnit unit) throws InterruptedException {
+        throw new TodoException();
+    }
+
+    @Override
+    @TransactionalMethod
+    public E pollLast(long timeout, TimeUnit unit) throws InterruptedException {
+        throw new TodoException();
+    }
+
+    @Override
+    @TransactionalMethod
+    public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException {
+        throw new TodoException();
+    }
+
+    @Override
+    @TransactionalMethod
+    public E poll(long timeout, TimeUnit unit) throws InterruptedException {
+        throw new TodoException();
+    }
+
+    @Override
+    @TransactionalMethod
+    public E take() throws InterruptedException {
+        return takeFirst();
+    }
+
+    @TransactionalMethod
+    public E takeUninterruptible() {
+        if (isEmpty()) {
+            retry();
+        }
+
+        return doRemoveFirst();
+    }
+
+    @Override
+    @TransactionalMethod(readonly = true)
+    public E element() {
+        return getFirst();
+    }
+
+    @Override
+    @TransactionalMethod(readonly = true)
+    public E peek() {
+        return peekFirst();
+    }
+
+    @Override
+    @TransactionalMethod
+    public void push(E e) {
+        addFirst(e);
+    }
+
+    @Override
+    @TransactionalMethod
+    public int drainTo(Collection<? super E> c) {
+        if(isEmpty()){
+            return 0;
+        }
+
+        for (E item : this) {
+            c.add(item);
+        }
+
+        int oldSize = size();
+        clear();
+        return oldSize;
+    }
+
+    @Override
+    @TransactionalMethod
+    public int drainTo(Collection<? super E> c, int maxElements) {
+        throw new TodoException();
+    }
+
+    @Override
+    @TransactionalMethod
+    public E pop() {
+        return removeFirst();
+    }
+
+    @Override
+    @TransactionalMethod(readonly = true)
+    public E getFirst() {
+        if (size() == 0) {
+            throw new NoSuchElementException();
+        }
+
+        return peekFirst();
+    }
+
+    @Override
+    @TransactionalMethod(readonly = true)
+    public E getLast() {
+        if (size() == 0) {
+            throw new NoSuchElementException();
+        }
+
+        return peekLast();
     }
 }

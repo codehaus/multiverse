@@ -7,6 +7,7 @@ import org.multiverse.api.exceptions.UncommittedReadConflict;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.UncommittedFilter;
+import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.utils.Listeners;
 
 import static java.lang.System.arraycopy;
@@ -84,15 +85,15 @@ public class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction 
 
             AlphaTranlocal opened;
             if (committed == null) {
-                opened = txObject.___openUnconstructed();
-            } else {
-                opened = committed.openForWrite();
+                throw new UncommittedReadConflict();
             }
 
+            opened = committed.openForWrite();
             attach(opened);
             return opened;
         } else {
             AlphaTranlocal attached = attachedArray[indexOf];
+
             if (attached.isCommitted()) {
                 //it is loaded before but it is a readonly
                 //make an updatable clone of the tranlocal already is committed and use that
@@ -101,11 +102,11 @@ public class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction 
                 attachedArray[indexOf] = attached;
             } else if (attached.isCommuting()) {
                 AlphaTranlocal origin = txObject.___load(getReadVersion());
-                if(origin == null){
+                if (origin == null) {
                     throw new UncommittedReadConflict();
                 }
 
-                attached.fixatePremature(this,origin);
+                attached.fixatePremature(this, origin);
             }
             return attached;
         }
@@ -120,10 +121,11 @@ public class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction 
         }
 
         if (firstFreeIndex == attachedArray.length) {
-            int newOptimalSize = attachedArray.length + 2;
-            config.speculativeConfiguration.signalSpeculativeSizeFailure(attachedArray.length);
+            SpeculativeConfiguration speculativeConfig = config.speculativeConfiguration;
+            speculativeConfig.signalSpeculativeSizeFailure(attachedArray.length);
 
-            if (attachedArray.length >= config.speculativeConfiguration.getMaximumArraySize()) {
+            int newOptimalSize = speculativeConfig.getOptimalSize();
+            if (newOptimalSize >= speculativeConfig.getMaximumArraySize()) {
                 throw SpeculativeConfigurationFailure.create();
             }
 
@@ -137,10 +139,16 @@ public class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction 
     }
 
     @Override
-    protected AlphaTranlocal find(AlphaTransactionalObject txObject) {
+    protected AlphaTranlocal findAttached(AlphaTransactionalObject txObject) {
         for (int k = 0; k < firstFreeIndex; k++) {
             AlphaTranlocal attached = attachedArray[k];
+
             if (attached.getTransactionalObject() == txObject) {
+                if (k != 0) {
+                    AlphaTranlocal old = attachedArray[0];
+                    attachedArray[0] = attached;
+                    attachedArray[k] = old;
+                }
                 return attached;
             }
         }
@@ -181,10 +189,6 @@ public class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction 
 
         return false;
     }
-
-    //public String toDebug(AlphaTranlocal tranlocal){
-    //    Field field = tranlocal.getClass().getField("")
-    //}
 
     @Override
     protected boolean dodoRegisterRetryLatch(Latch latch, long wakeupVersion) {
@@ -234,10 +238,10 @@ public class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction 
     protected Listeners[] makeChangesPermanent(long writeVersion) {
         Listeners[] listenersArray = null;
 
-        int listenersIndex = 0;        
+        int listenersIndex = 0;
         for (int k = 0; k < firstFreeIndex; k++) {
             AlphaTranlocal attached = attachedArray[k];
-           
+
             Listeners listeners = makePermanent(attached, writeVersion);
             if (listeners != null) {
                 if (listenersArray == null) {

@@ -27,49 +27,30 @@ public abstract class AbstractUpdateAlphaTransaction
     }
 
     @Override
-    protected final boolean doRegisterRetryLatch(Latch latch, long wakeupVersion) {
-        SpeculativeConfiguration speculativeConfig = config.speculativeConfiguration;
-
-        if (!config.automaticReadTracking) {
-            if (speculativeConfig.isSpeculativeNonAutomaticReadTrackingEnabled()) {
-                speculativeConfig.signalSpeculativeNonAutomaticReadtrackingFailure();
-                throw SpeculativeConfigurationFailure.create();
-            }
-
-            return false;
-        }
-
-        return dodoRegisterRetryLatch(latch, wakeupVersion);
-    }
-
-    protected abstract boolean dodoRegisterRetryLatch(Latch latch, long wakeupVersion);
-
-    @Override
     protected final AlphaTranlocal doOpenForRead(AlphaTransactionalObject txObject) {
-        AlphaTranlocal attached = find(txObject);
+        AlphaTranlocal opened = findAttached(txObject);
 
-        if (attached != null) {
-            if (attached.isCommuting()) {
+        if (opened != null) {
+            if (opened.isCommuting()) {
                 AlphaTranlocal origin = txObject.___load(getReadVersion());
                 if (origin == null) {
                     throw new UncommittedReadConflict();
                 }
 
-                attached.fixatePremature(this, origin);
+                opened.fixatePremature(this, origin);
             }
 
-            return attached;
+            return opened;
         }
 
-        attached = txObject.___load(getReadVersion());
-        if (attached == null) {
-            attached = txObject.___openUnconstructed();
-            attach(attached);
+        opened = txObject.___load(getReadVersion());
+        if (opened == null) {
+            throw new UncommittedReadConflict();
         } else if (config.automaticReadTracking) {
-            attach(attached);
+            attach(opened);
         }
 
-        return attached;
+        return opened;
     }
 
     /**
@@ -87,7 +68,55 @@ public abstract class AbstractUpdateAlphaTransaction
      * @param txObject the transactional object to find the tranlocal for.
      * @return the found tranlocal. If no tranlocal was found in the set of attached tranlocals, null is returned.
      */
-    protected abstract AlphaTranlocal find(AlphaTransactionalObject txObject);
+    protected abstract AlphaTranlocal findAttached(AlphaTransactionalObject txObject);
+
+    @Override
+    public final AlphaTranlocal doOpenForConstruction(AlphaTransactionalObject txObject) {
+        AlphaTranlocal opened = findAttached(txObject);
+
+        if (opened != null) {
+
+            if (opened.isCommitted()) {
+                //todo
+                throw new RuntimeException();
+            }
+
+            if (opened.isCommuting()) {
+                //todo
+                throw new RuntimeException();
+            }
+
+            if (opened.getOrigin() != null) {
+                //todo
+                throw new RuntimeException();
+            }
+
+            return opened;
+        }
+
+        AlphaTranlocal fresh = txObject.___openUnconstructed();
+        attach(fresh);
+        return fresh;
+    }
+
+    @Override
+    protected final boolean doRegisterRetryLatch(Latch latch, long wakeupVersion) {
+        SpeculativeConfiguration speculativeConfig = config.speculativeConfiguration;
+
+        if (!config.automaticReadTracking) {
+            if (speculativeConfig.isSpeculativeNonAutomaticReadTrackingEnabled()) {
+                speculativeConfig.signalSpeculativeNonAutomaticReadtrackingFailure();
+                throw SpeculativeConfigurationFailure.create();
+            }
+
+            return false;
+        }
+
+        return dodoRegisterRetryLatch(latch, wakeupVersion);
+    }
+
+    protected abstract boolean dodoRegisterRetryLatch(Latch latch, long wakeupVersion);
+
 
     /**
      * Returns the state of the attached tranlocals. This information is needed for the transaction to decide what to do
@@ -226,14 +255,13 @@ public abstract class AbstractUpdateAlphaTransaction
             return null;
         }
 
-        AlphaTransactionalObject txObject = tranlocal.getTransactionalObject();
-
         if (tranlocal.isCommitted()) {
             return null;
         }
 
         tranlocal.ifCommutingThenFixate(this);
 
+        AlphaTransactionalObject txObject = tranlocal.getTransactionalObject();
         if (config.dirtyCheck) {
             if (tranlocal.getPrecalculatedIsDirty()) {
                 return txObject.___store(tranlocal, writeVersion);

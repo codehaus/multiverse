@@ -32,7 +32,7 @@ public class TransactionalLinkedList_ClassStructureTest {
     @Test
     public void testMetadata() {
         MetadataRepository repo = new MetadataRepository();
-        ClassMetadata metadata = repo.getClassMetadata(TransactionalLinkedList.class);
+        ClassMetadata metadata = repo.loadClassMetadata(TransactionalLinkedList.class);
 
         assertTrue(metadata.isTransactionalObject());
         assertFalse(metadata.isRealTransactionalObject());

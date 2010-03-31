@@ -32,7 +32,7 @@ public class FieldGranularityTransformer implements Opcodes {
         this.metadataRepository = metadataRepository;
         this.classLoader = classLoader;
         this.classNode = classNode;
-        this.classMetadata = metadataRepository.getClassMetadata(classLoader, classNode.name);
+        this.classMetadata = metadataRepository.loadClassMetadata(classLoader, classNode.name);
     }
 
     public ClassNode transform() {
@@ -126,7 +126,7 @@ public class FieldGranularityTransformer implements Opcodes {
                 //the put on the field granular field is transformed to a fieldref.set
                 case PUTFIELD: {
                     FieldInsnNode fieldInsn = (FieldInsnNode) originalInsn;
-                    ClassMetadata ownerMetadata = metadataRepository.getClassMetadata(classLoader, fieldInsn.owner);
+                    ClassMetadata ownerMetadata = metadataRepository.loadClassMetadata(classLoader, fieldInsn.owner);
                     FieldMetadata fieldMetadata = ownerMetadata.getFieldMetadata(fieldInsn.name);
                     Type originalFieldType = Type.getType(fieldMetadata.getDesc());
                                                               
@@ -204,7 +204,7 @@ public class FieldGranularityTransformer implements Opcodes {
                 //the get on the field granular field is transformed to a fieldref.get
                 case GETFIELD: {
                     FieldInsnNode fieldInsn = (FieldInsnNode) originalInsn;
-                    FieldMetadata fieldMetadata = metadataRepository.getClassMetadata(classLoader, fieldInsn.owner)
+                    FieldMetadata fieldMetadata = metadataRepository.loadClassMetadata(classLoader, fieldInsn.owner)
                             .getFieldMetadata(fieldInsn.name);
                     if (!fieldMetadata.hasFieldGranularity()) {
                         //if it is not getter on a field granular field

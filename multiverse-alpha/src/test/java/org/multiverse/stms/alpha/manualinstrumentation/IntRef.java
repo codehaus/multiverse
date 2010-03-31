@@ -29,7 +29,7 @@ public class IntRef extends DefaultTxObjectMixin {
         new TransactionTemplate(stm) {
             @Override
             public Object execute(Transaction t) {
-                IntRefTranlocal tranlocal = (IntRefTranlocal) ((AlphaTransaction) t).openForWrite(IntRef.this);
+                IntRefTranlocal tranlocal = (IntRefTranlocal) ((AlphaTransaction) t).openForConstruction(IntRef.this);
                 tranlocal.value = value;
                 return null;
             }
@@ -37,7 +37,7 @@ public class IntRef extends DefaultTxObjectMixin {
     }
 
     public IntRef(AlphaTransaction t, final int value) {
-        IntRefTranlocal tranlocal = (IntRefTranlocal) ((AlphaTransaction) t).openForWrite(IntRef.this);
+        IntRefTranlocal tranlocal = (IntRefTranlocal) ((AlphaTransaction) t).openForConstruction(IntRef.this);
         tranlocal.value = value;
     }
 
@@ -45,7 +45,7 @@ public class IntRef extends DefaultTxObjectMixin {
         new TransactionTemplate() {
             @Override
             public Object execute(Transaction t) {
-                IntRefTranlocal tranlocal = (IntRefTranlocal) ((AlphaTransaction) t).openForWrite(IntRef.this);
+                IntRefTranlocal tranlocal = (IntRefTranlocal) ((AlphaTransaction) t).openForConstruction(IntRef.this);
                 tranlocal.value = value;
                 return null;
             }

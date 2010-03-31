@@ -19,7 +19,7 @@ public class MetadataRepository_TransactionTest {
 
     @Test
     public void whenDefaultSettings() {
-        ClassMetadata classMetadata = repository.getClassMetadata(DefaultSettings.class);
+        ClassMetadata classMetadata = repository.loadClassMetadata(DefaultSettings.class);
         MethodMetadata methodMetadata = classMetadata.getMethodMetadata("method", "()V");
         TransactionMetadata transactionMetadata = methodMetadata.getTransactionalMetadata();
 
@@ -40,7 +40,7 @@ public class MetadataRepository_TransactionTest {
 
     @Test
     public void whenReadonlyMethod() {
-        ClassMetadata classMetadata = repository.getClassMetadata(ReadonlyMethod.class);
+        ClassMetadata classMetadata = repository.loadClassMetadata(ReadonlyMethod.class);
         MethodMetadata methodMetadata = classMetadata.getMethodMetadata("method", "()V");
         TransactionMetadata transactionMetadata = methodMetadata.getTransactionalMetadata();
 
@@ -61,7 +61,7 @@ public class MetadataRepository_TransactionTest {
 
     @Test
     public void whenUpdateMethod() {
-        ClassMetadata classMetadata = repository.getClassMetadata(DefaultUpdateMethod.class);
+        ClassMetadata classMetadata = repository.loadClassMetadata(DefaultUpdateMethod.class);
         MethodMetadata methodMetadata = classMetadata.getMethodMetadata("method", "()V");
         TransactionMetadata transactionMetadata = methodMetadata.getTransactionalMetadata();
 
@@ -84,7 +84,7 @@ public class MetadataRepository_TransactionTest {
 
     @Test
     public void whenAutomaticReadTracking() {
-        ClassMetadata classMetadata = repository.getClassMetadata(AutomaticReadTracking.class);
+        ClassMetadata classMetadata = repository.loadClassMetadata(AutomaticReadTracking.class);
         MethodMetadata enabledMethodMetadata = classMetadata.getMethodMetadata("enabled", "()V");
         TransactionMetadata enabledTransactionMetadata = enabledMethodMetadata.getTransactionalMetadata();
 
@@ -110,7 +110,7 @@ public class MetadataRepository_TransactionTest {
 
     @Test
     public void whenInterrupted() {
-        ClassMetadata classMetadata = repository.getClassMetadata(Interrupted.class);
+        ClassMetadata classMetadata = repository.loadClassMetadata(Interrupted.class);
         MethodMetadata enabledMethodMetadata = classMetadata.getMethodMetadata("enabled", "()V");
         TransactionMetadata enabledTransactionMetadata = enabledMethodMetadata.getTransactionalMetadata();
 
@@ -137,7 +137,7 @@ public class MetadataRepository_TransactionTest {
 
     @Test
     public void whenAllowWriteSkewProblem() {
-        ClassMetadata classMetadata = repository.getClassMetadata(AllowWriteSkewProblem.class);
+        ClassMetadata classMetadata = repository.loadClassMetadata(AllowWriteSkewProblem.class);
 
         MethodMetadata enabledMethodMetadata = classMetadata.getMethodMetadata("enabled", "()V");
         TransactionMetadata enabledTransactionMetadata = enabledMethodMetadata.getTransactionalMetadata();
@@ -185,7 +185,7 @@ public class MetadataRepository_TransactionTest {
 
     @Test
     public void whenMaxRetryCount() {
-        ClassMetadata classMetadata = repository.getClassMetadata(MaxRetryCountProblem.class);
+        ClassMetadata classMetadata = repository.loadClassMetadata(MaxRetryCountProblem.class);
         MethodMetadata explicitValueMethodMetadata = classMetadata.getMethodMetadata("explicitValue", "()V");
         TransactionMetadata explicitValueTransactionMetadata = explicitValueMethodMetadata.getTransactionalMetadata();
 

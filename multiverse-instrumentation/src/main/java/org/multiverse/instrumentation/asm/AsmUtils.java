@@ -420,34 +420,8 @@ public final class AsmUtils implements Opcodes {
         return cw.toByteArray();
     }
 
-    public static void writeToFixedTmpFile(Class clazz) {
-        byte[] bytecode = toBytecode(loadAsClassNode(clazz));
-        writeToFixedTmpFile(bytecode);
-    }
-
-    public static void writeToFixedTmpFile(ClassNode clazz) {
-        byte[] bytecode = toBytecode(clazz);
-        writeToFixedTmpFile(bytecode);
-    }
-
-    public static void writeToFixedTmpFile(byte[] bytecode) {
-        File file = new File(getTmpDir(), "debug.class");
-        writeToFile(file, bytecode);
-    }
-
-    public static String getTmpDir() {
+     public static String getTmpDir() {
         return System.getProperty("java.io.tmpdir");
-    }
-
-    public static File writeToFileInTmpDirectory(String filename, byte[] bytecode) {
-        File file = new File(getTmpDir(), filename);
-        writeToFile(file, bytecode);
-        return file;
-    }
-
-    public static void writeToTmpFile(byte[] bytecode) throws IOException {
-        File file = File.createTempFile("foo", ".class");
-        writeToFile(file, bytecode);
     }
 
     public static void writeToFile(File file, byte[] bytecode) {

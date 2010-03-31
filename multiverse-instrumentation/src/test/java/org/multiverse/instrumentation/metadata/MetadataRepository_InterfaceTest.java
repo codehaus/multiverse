@@ -19,7 +19,7 @@ public class MetadataRepository_InterfaceTest {
 
     @Test
     public void whenNonTransactionalInterface() {
-        ClassMetadata metadata = repository.getClassMetadata(NonTransactionalInterface.class);
+        ClassMetadata metadata = repository.loadClassMetadata(NonTransactionalInterface.class);
 
         assertNotNull(metadata);
         assertTrue(metadata.isInterface());
@@ -36,7 +36,7 @@ public class MetadataRepository_InterfaceTest {
 
     @Test
     public void whenEmptyTransactionalInterface() {
-        ClassMetadata metadata = repository.getClassMetadata(EmptyTransactionalInterface.class);
+        ClassMetadata metadata = repository.loadClassMetadata(EmptyTransactionalInterface.class);
 
         assertNotNull(metadata);
         assertTrue(metadata.isInterface());
@@ -54,7 +54,7 @@ public class MetadataRepository_InterfaceTest {
 
     @Test
     public void whenNonEmptyTransactionalInterface() {
-        ClassMetadata metadata = repository.getClassMetadata(NonEmptyTransactionalInterface.class);
+        ClassMetadata metadata = repository.loadClassMetadata(NonEmptyTransactionalInterface.class);
 
         assertNotNull(metadata);
         assertTrue(metadata.isInterface());
@@ -78,7 +78,7 @@ public class MetadataRepository_InterfaceTest {
 
     @Test
     public void whenInterfaceExtendsTransactionalInterface() {
-        ClassMetadata metadata = repository.getClassMetadata(InterfaceExtendsTransactionalInterface.class);
+        ClassMetadata metadata = repository.loadClassMetadata(InterfaceExtendsTransactionalInterface.class);
 
         assertNotNull(metadata);
         assertTrue(metadata.isInterface());

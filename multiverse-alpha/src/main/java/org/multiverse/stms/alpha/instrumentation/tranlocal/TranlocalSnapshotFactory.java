@@ -36,7 +36,7 @@ public class TranlocalSnapshotFactory implements Opcodes {
     public TranlocalSnapshotFactory(ClassLoader classLoader, ClassNode classNode, MetadataRepository metadataRepository) {
         this.metadataService = metadataRepository;
         this.classNode = classNode;
-        this.classMetadata = metadataService.getClassMetadata(classLoader, classNode.name);
+        this.classMetadata = metadataService.loadClassMetadata(classLoader, classNode.name);
         this.tranlocalName = classMetadata.getTranlocalName();
         this.tranlocalSnapshotName = classMetadata.getTranlocalSnapshotName();
     }

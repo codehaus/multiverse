@@ -1,6 +1,7 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
@@ -157,6 +158,7 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
     }
 
     @Test
+    @Ignore
     public void integrationTest() {
         SomeRef ref = new SomeRef(0);
 

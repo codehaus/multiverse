@@ -21,7 +21,7 @@ public class MetadataRepository_MethodTest {
 
     @Test
     public void whenObjectWithTransactionalMethod() {
-        ClassMetadata classMetadata = repository.getClassMetadata(ObjectWithTransactionalMethod.class);
+        ClassMetadata classMetadata = repository.loadClassMetadata(ObjectWithTransactionalMethod.class);
 
         MethodMetadata methodMetadata = classMetadata.getMethodMetadata("foo", "()V");
         assertNotNull(methodMetadata);
@@ -39,7 +39,7 @@ public class MetadataRepository_MethodTest {
 
     @Test
     public void whenTransactionalObjectWithMethod() {
-        ClassMetadata classMetadata = repository.getClassMetadata(TransactionalObjectWithMethod.class);
+        ClassMetadata classMetadata = repository.loadClassMetadata(TransactionalObjectWithMethod.class);
 
         MethodMetadata methodMetadata = classMetadata.getMethodMetadata("foo", "()V");
         assertNotNull(methodMetadata);
@@ -56,7 +56,7 @@ public class MetadataRepository_MethodTest {
 
     @Test
     public void whenTransactionalInterfaceWithMethod() {
-        ClassMetadata classMetadata = repository.getClassMetadata(TransactionalInterfaceWithMethod.class);
+        ClassMetadata classMetadata = repository.loadClassMetadata(TransactionalInterfaceWithMethod.class);
 
         MethodMetadata methodMetadata = classMetadata.getMethodMetadata("foo", "()V");
         assertNotNull(methodMetadata);
@@ -73,7 +73,7 @@ public class MetadataRepository_MethodTest {
 
     @Test
     public void whenTransactionalObjectWithExcludedMethod() {
-        ClassMetadata classMetadata = repository.getClassMetadata(TransactionalObjectWithExcludedMethod.class);
+        ClassMetadata classMetadata = repository.loadClassMetadata(TransactionalObjectWithExcludedMethod.class);
 
         MethodMetadata methodMetadata = classMetadata.getMethodMetadata("foo", "()V");
         assertNotNull(methodMetadata);

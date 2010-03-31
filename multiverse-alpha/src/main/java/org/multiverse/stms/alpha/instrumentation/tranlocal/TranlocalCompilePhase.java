@@ -22,7 +22,7 @@ public class TranlocalCompilePhase extends AbstractCompilePhase {
     protected Clazz doCompile(Environment environment, Clazz originalClazz) {
         ClassLoader classLoader = originalClazz.getClassLoader();
 
-        ClassMetadata classMetadata = environment.getMetadataRepository().getClassMetadata(
+        ClassMetadata classMetadata = environment.getMetadataRepository().loadClassMetadata(
                 classLoader, originalClazz.getName());
 
         if (!classMetadata.isRealTransactionalObject()) {

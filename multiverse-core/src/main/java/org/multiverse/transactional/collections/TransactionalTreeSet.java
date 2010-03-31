@@ -1,5 +1,7 @@
 package org.multiverse.transactional.collections;
 
+import org.multiverse.annotations.Exclude;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -76,6 +78,12 @@ public class TransactionalTreeSet<E> implements TransactionalSet<E> {
     @Override
     public boolean add(E e) {
         return map.put(e, VALUE) == null;
+    }
+
+    @Override
+    @Exclude
+    public int currentSize() {
+        return map.getCurrentSize();
     }
 
     @Override

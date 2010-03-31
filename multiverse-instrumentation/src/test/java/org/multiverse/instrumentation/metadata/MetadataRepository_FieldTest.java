@@ -20,7 +20,7 @@ public class MetadataRepository_FieldTest {
 
     @Test
     public void whenTransactionalObjectWithField() {
-        ClassMetadata classMetadata = repository.getClassMetadata(TransactionalObjectWithField.class);
+        ClassMetadata classMetadata = repository.loadClassMetadata(TransactionalObjectWithField.class);
         assertTrue(classMetadata.isRealTransactionalObject());
 
         FieldMetadata fieldMetadata = classMetadata.getFieldMetadata("field");
@@ -36,7 +36,7 @@ public class MetadataRepository_FieldTest {
 
     @Test
     public void whenTransactionalObjectWithExcludedField() {
-        ClassMetadata classMetadata = repository.getClassMetadata(TransactionalObjectWithExcludedField.class);
+        ClassMetadata classMetadata = repository.loadClassMetadata(TransactionalObjectWithExcludedField.class);
         assertFalse(classMetadata.isRealTransactionalObject());
 
         FieldMetadata fieldMetadata = classMetadata.getFieldMetadata("field");
@@ -52,7 +52,7 @@ public class MetadataRepository_FieldTest {
 
     @Test
     public void whenTransactionalObjectWithFinalField() {
-        ClassMetadata classMetadata = repository.getClassMetadata(TransactionalObjectWithFinalField.class);
+        ClassMetadata classMetadata = repository.loadClassMetadata(TransactionalObjectWithFinalField.class);
         assertFalse(classMetadata.isRealTransactionalObject());
 
         FieldMetadata fieldMetadata = classMetadata.getFieldMetadata("field");
@@ -67,7 +67,7 @@ public class MetadataRepository_FieldTest {
 
     @Test
     public void whenTransactionalObjectWithVolatileField() {
-        ClassMetadata classMetadata = repository.getClassMetadata(TransactionalObjectWithVolatileField.class);
+        ClassMetadata classMetadata = repository.loadClassMetadata(TransactionalObjectWithVolatileField.class);
         assertFalse(classMetadata.isRealTransactionalObject());
 
         FieldMetadata fieldMetadata = classMetadata.getFieldMetadata("field");

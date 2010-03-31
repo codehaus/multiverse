@@ -25,7 +25,7 @@ public class ManualRef extends DefaultTxObjectMixin {
         new TransactionTemplate(stm.getTransactionFactoryBuilder().build(), false, false) {
             @Override
             public Object execute(Transaction t) {
-                ManualRefTranlocal tranlocal = (ManualRefTranlocal) ((AlphaTransaction) t).openForWrite(ManualRef.this);
+                ManualRefTranlocal tranlocal = (ManualRefTranlocal) ((AlphaTransaction) t).openForConstruction(ManualRef.this);
                 tranlocal.value = value;
                 return null;
             }
@@ -33,7 +33,7 @@ public class ManualRef extends DefaultTxObjectMixin {
     }
 
     public ManualRef(AlphaTransaction tx, final int value) {
-        ManualRefTranlocal tranlocal = (ManualRefTranlocal) ((AlphaTransaction) tx).openForWrite(ManualRef.this);
+        ManualRefTranlocal tranlocal = (ManualRefTranlocal)tx.openForConstruction(ManualRef.this);
         tranlocal.value = value;
     }
 
@@ -43,7 +43,9 @@ public class ManualRef extends DefaultTxObjectMixin {
     }
 
     public int get(AlphaStm stm) {
-        TransactionFactory txFactory = stm.getTransactionFactoryBuilder().setReadonly(true).build();
+        TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+                .setReadonly(true)
+                .build();
         return get(txFactory);
     }
 
@@ -62,7 +64,9 @@ public class ManualRef extends DefaultTxObjectMixin {
     }
 
     public void inc(AlphaStm stm) {
-        TransactionFactory txFactory = stm.getTransactionFactoryBuilder().setReadonly(false).build();
+        TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+                .setReadonly(false)
+                .build();
         inc(txFactory);
     }
 
@@ -87,7 +91,9 @@ public class ManualRef extends DefaultTxObjectMixin {
     }
 
     public void set(AlphaStm stm, int value) {
-        TransactionFactory factory = stm.getTransactionFactoryBuilder().setReadonly(false).build();
+        TransactionFactory factory = stm.getTransactionFactoryBuilder()
+                .setReadonly(false)
+                .build();
         set(factory, value);
     }
 

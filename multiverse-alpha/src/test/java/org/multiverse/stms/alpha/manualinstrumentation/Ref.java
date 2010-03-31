@@ -25,7 +25,7 @@ public class Ref<E> extends DefaultTxObjectMixin {
         new TransactionTemplate() {
             @Override
             public Object execute(Transaction t) throws Exception {
-                RefTranlocal<E> tranlocal = (RefTranlocal) ((AlphaTransaction) t).openForWrite(Ref.this);
+                RefTranlocal<E> tranlocal = (RefTranlocal) ((AlphaTransaction) t).openForConstruction(Ref.this);
                 return null;
             }
         }.execute();
@@ -35,14 +35,15 @@ public class Ref<E> extends DefaultTxObjectMixin {
         new TransactionTemplate() {
             @Override
             public Object execute(Transaction t) throws Exception {
-                RefTranlocal<E> tranlocal = (RefTranlocal) ((AlphaTransaction) t).openForWrite(Ref.this);
+                RefTranlocal<E> tranlocal = (RefTranlocal) ((AlphaTransaction) t).openForConstruction(Ref.this);
                 tranlocal.value = value;
                 return null;
             }
         }.execute();
     }
 
-    private final static TransactionFactory getTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
+    private final static TransactionFactory getTxFactory = getGlobalStmInstance()
+            .getTransactionFactoryBuilder()
             .setReadonly(false)
             .setAutomaticReadTracking(false).build();
 
@@ -67,7 +68,8 @@ public class Ref<E> extends DefaultTxObjectMixin {
         }.execute();
     }
 
-    private final static TransactionFactory isNullTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
+    private final static TransactionFactory isNullTxFactory = getGlobalStmInstance()
+            .getTransactionFactoryBuilder()
             .setReadonly(true)
             .setAutomaticReadTracking(false).build();
 

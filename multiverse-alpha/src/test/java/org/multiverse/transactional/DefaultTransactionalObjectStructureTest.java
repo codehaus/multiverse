@@ -16,7 +16,7 @@ public class DefaultTransactionalObjectStructureTest {
     @Test
     public void test(){
         MetadataRepository repository = new MetadataRepository();
-        ClassMetadata metadata = repository.getClassMetadata(DefaultTransactionalReference.class);
+        ClassMetadata metadata = repository.loadClassMetadata(DefaultTransactionalReference.class);
 
         assertTrue(metadata.isTransactionalObject());
         assertTrue(metadata.isRealTransactionalObject());

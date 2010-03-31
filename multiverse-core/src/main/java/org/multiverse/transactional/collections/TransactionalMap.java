@@ -1,5 +1,6 @@
 package org.multiverse.transactional.collections;
 
+import org.multiverse.annotations.Exclude;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 
@@ -23,6 +24,17 @@ public interface TransactionalMap<K, V> extends ConcurrentMap<K, V> {
     @TransactionalMethod(readonly = true)
     int size();
 
+    /**
+     * Returns the current size of the TransactionalMap. The big difference between
+     * the normal {@link #size()} method is that this one returns the actual size of
+     * this map and doesn't look at the current transaction. So you could see changes
+     * made by other threads.
+     *
+     * @return the current size of the TransactionalMap.
+     */
+    @Exclude
+    int getCurrentSize();
+    
     @Override
     @TransactionalMethod(readonly = true)
     boolean isEmpty();

@@ -1,12 +1,17 @@
 package org.multiverse.transactional.collections;
 
+import org.multiverse.annotations.Exclude;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
+import org.multiverse.api.ProgrammaticLong;
 import org.multiverse.transactional.arrays.TransactionalReferenceArray;
 import org.multiverse.utils.TodoException;
 
 import java.lang.reflect.Array;
 import java.util.*;
+
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 /**
  * A {@link TransactionalList} based on a (transactional) array. It is the transactional version of the
@@ -18,7 +23,8 @@ import java.util.*;
 public class TransactionalArrayList<E> implements TransactionalList<E> {
 
     private TransactionalReferenceArray<E> array;
-    private int size;
+
+    private final ProgrammaticLong size = getGlobalStmInstance().createProgrammaticLong();
 
     /**
      * Creates a new TransactionalArrayList with capacity 10. This is the same initial capacity as
@@ -67,19 +73,26 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
 
     @Override
     public int size() {
-        return size;
+        return (int) size.get();
+    }
+
+    @Override
+    @Exclude
+    public int currentSize() {
+        return (int) size.getAtomic();
     }
 
     @Override
     public boolean isEmpty() {
-        return size == 0;
+        return size.get() == 0;
     }
 
     @Override
     public boolean add(E e) {
-        ensureCapacity(size + 1);
-        array.set(size, e);
-        size++;
+        int s = size();
+        ensureCapacity(s + 1);
+        array.set(s, e);
+        size.commutingInc(1);
         return true;
     }
 
@@ -101,7 +114,7 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
     @TransactionalMethod(readonly = true)
     //TODO: needs to be removed as the interface inheritance works
     public E get(int index) {
-        if (index < 0 || index >= size) {
+        if (index < 0 || index >= size.get()) {
             throw new IndexOutOfBoundsException();
         }
 
@@ -115,7 +128,7 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
 
     @Override
     public int indexOf(Object o) {
-        int copiedSize = size;
+        int copiedSize = size();
 
         for (int k = 0; k < copiedSize; k++) {
             E element = array.get(k);
@@ -129,7 +142,7 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
 
     @Override
     public int lastIndexOf(Object o) {
-        int copiedSize = size;
+        int copiedSize = size();
 
         for (int k = copiedSize - 1; k >= 0; k--) {
             E element = array.get(k);
@@ -148,7 +161,7 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
     @Override
     @TransactionalMethod(automaticReadTracking = false)
     public E set(int index, E element) {
-        if (index < 0 || index >= size) {
+        if (index < 0 || index >= size()) {
             throw new IndexOutOfBoundsException();
         }
 
@@ -165,10 +178,10 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
             return false;
         }
 
-        int oldSize = size;
+        int oldSize = size();
         int newSize = oldSize + c.size();
         ensureCapacity(newSize);
-        size = newSize;
+        size.commutingInc(c.size());
 
         Iterator<? extends E> it = c.iterator();
         for (int k = oldSize; k < newSize; k++) {
@@ -180,33 +193,34 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
 
     @Override
     public void clear() {
-        if (size == 0) {
+        if (isEmpty()) {
             return;
         }
 
-        for (int k = 0; k < size; k++) {
+        int localSize = size();
+        for (int k = 0; k < localSize; k++) {
             array.set(0, null);
         }
-        size = 0;
+        size.set(0);
     }
 
     @Override
     public Object[] toArray() {
-        return array.toArray(size);
+        return array.toArray(size());
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
 
-        int size = this.size;
+        int localSize = (int) this.size.get();
 
-        T[] r = a.length >= size ? a : (T[]) Array.newInstance(a.getClass().getComponentType(), size);
+        T[] r = a.length >= localSize ? a : (T[]) Array.newInstance(a.getClass().getComponentType(), localSize);
 
-        for (int k = 0; k < size; k++) {
+        for (int k = 0; k < localSize; k++) {
             r[k] = (T) array.get(k);
         }
 
-        for (int k = size; k < a.length; k++) {
+        for (int k = localSize; k < a.length; k++) {
             r[k] = null;
         }
 
@@ -267,39 +281,45 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
 
     @Override
     public E remove(int index) {
-        if (index < 0 || index >= size) {
+        int localSize = size();
+
+        if (index < 0 || index >= localSize) {
             throw new IndexOutOfBoundsException();
         }
 
         E item = array.get(index);
 
-        if (index < size - 1) {
-            array.shiftLeft(index + 1, size - 1);
+        if (index < localSize - 1) {
+            array.shiftLeft(index + 1, localSize - 1);
         } else {
             array.set(index, null);
         }
 
-        size--;
+        size.inc(getThreadLocalTransaction(), -1);
         return item;
     }
 
     @Override
     public void add(int index, E element) {
-        if (index < 0 || index > size) {
+        int localSize = size();
+
+        if (index < 0 || index > localSize) {
             throw new IndexOutOfBoundsException();
         }
 
-        ensureCapacity(size + 1);
+        ensureCapacity(localSize + 1);
 
-        array.shiftRight(index, size - 1);
+        array.shiftRight(index, localSize - 1);
 
-        size++;
+        size.inc(getThreadLocalTransaction(), 1);
         array.set(index, element);
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
-        if (index < 0 || index > size) {
+        int localSize = size();
+
+        if (index < 0 || index > localSize) {
             throw new IndexOutOfBoundsException();
         }
 
@@ -311,7 +331,7 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
             return false;
         }
 
-        ensureCapacity(size + c.size());
+        ensureCapacity(localSize + c.size());
 
         //array.shiftRight(index, size - index);
         //array.set(index, element);
@@ -373,7 +393,8 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
             throw new NullPointerException();
         }
 
-        if (isEmpty()) {
+        int localSize = size();
+        if (localSize == 0) {
             return false;
         }
 
@@ -383,12 +404,12 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
         }
 
         boolean changed = false;
-
-        for (int k = 0; k < size; k++) {
+        for (int k = 0; k < localSize; k++) {
             E item = array.get(k);
             if (!c.contains(item)) {
                 remove(k);
                 k--;
+                localSize--;
                 changed = true;
             }
         }
@@ -398,7 +419,7 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
 
     @Override
     public int hashCode() {
-        int localSize = size;
+        int localSize = size();
         int hashCode = 1;
 
         if (localSize == 0) {
@@ -424,16 +445,18 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
         }
 
         List that = (List) thatObj;
-        if (that.size() != size) {
+        int localSize = size();
+
+        if (that.size() != localSize) {
             return false;
         }
 
-        if (size == 0) {
+        if (localSize == 0) {
             return true;
         }
 
         Iterator thatIt = that.iterator();
-        for (int k = 0; k < size; k++) {
+        for (int k = 0; k < localSize; k++) {
             if (!equals(array.get(k), thatIt.next())) {
                 return false;
             }
@@ -444,7 +467,7 @@ public class TransactionalArrayList<E> implements TransactionalList<E> {
 
     @Override
     public String toString() {
-        int localSize = size;
+        int localSize = size();
 
         if (localSize == 0) {
             return "[]";

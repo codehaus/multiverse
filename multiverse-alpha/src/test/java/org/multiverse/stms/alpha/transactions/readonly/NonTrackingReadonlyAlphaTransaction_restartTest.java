@@ -1,17 +1,14 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
-import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.assertIsActive;
-import static org.multiverse.TestUtils.testIncomplete;
 
 /**
  * @author Peter Veentjer
@@ -61,46 +58,46 @@ public class NonTrackingReadonlyAlphaTransaction_restartTest {
         assertIsActive(tx);
     }
 
-
     @Test
-    public void whenUsedAndNoOtherUpdates() {
-        ManualRef ref = new ManualRef(stm);
-
-        AlphaTransaction tx = startSutTransaction();
-        tx.openForRead(ref);
-
-        testIncomplete();
-    }
-
-    @Test
-    @Ignore
     public void whenPrepared() {
+        AlphaTransaction tx = startSutTransaction();
+        tx.prepare();
 
+        stmConfig.clock.tick();
+
+        long version = stm.getVersion();
+        tx.restart();
+
+        assertEquals(version, stm.getVersion());
+        assertIsActive(tx);
+        assertEquals(version, tx.getReadVersion());
     }
 
     @Test
     public void whenAborted() {
         AlphaTransaction tx = startSutTransaction();
         tx.abort();
+        stmConfig.clock.tick();
 
         long version = stm.getVersion();
         tx.restart();
 
-        //todo: read version
         assertEquals(version, stm.getVersion());
         assertIsActive(tx);
+        assertEquals(version, tx.getReadVersion());
     }
 
     @Test
     public void whenCommitted() {
         AlphaTransaction tx = startSutTransaction();
         tx.commit();
+        stmConfig.clock.tick();
 
         long version = stm.getVersion();
         tx.restart();
 
-        //todo: read version
         assertEquals(version, stm.getVersion());
         assertIsActive(tx);
+        assertEquals(version, tx.getReadVersion());
     }
 }

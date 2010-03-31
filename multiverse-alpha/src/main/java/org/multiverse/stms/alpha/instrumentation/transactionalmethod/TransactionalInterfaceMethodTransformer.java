@@ -40,24 +40,12 @@ public class TransactionalInterfaceMethodTransformer {
         this.classLoader = classLoader;
         this.metadataRepository = metadataRepository;
         this.classNode = classNode;
-        this.classMetadata = metadataRepository.getClassMetadata(classLoader, classNode.name);
+        this.classMetadata = metadataRepository.loadClassMetadata(classLoader, classNode.name);
     }
 
     public ClassNode transform() {
-        if (ignore()) {
-            return null;
-        }
-
         classNode.methods = createInterfaceMethods();
         return classNode;
-    }
-
-    private boolean ignore() {
-        if (classMetadata.isIgnoredClass()) {
-            return true;
-        }
-
-        return false;
     }
 
     private List<MethodNode> createInterfaceMethods() {

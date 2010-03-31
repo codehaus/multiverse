@@ -22,7 +22,7 @@ public class FieldGranularityCompilePhase extends AbstractCompilePhase {
     protected Clazz doCompile(Environment environment, Clazz clazz) {
         ClassNode original = loadAsClassNode(clazz.getBytecode());
 
-        ClassMetadata metadata = environment.getMetadataRepository().getClassMetadata(
+        ClassMetadata metadata = environment.getMetadataRepository().loadClassMetadata(
                 clazz.getClassLoader(), clazz.getName());
 
         if(!metadata.hasFieldsWithFieldGranularity()){

@@ -35,7 +35,6 @@ public class DefaultTransactionalReferenceTest {
         setThreadLocalTransaction(null);
     }
 
-
     @Test
     public void constructorLifts() {
         long version = stm.getVersion();
@@ -64,7 +63,10 @@ public class DefaultTransactionalReferenceTest {
 
         long version = stm.getVersion();
 
-        Transaction tx = stm.getTransactionFactoryBuilder().setReadonly(false).build().start();
+        Transaction tx = stm.getTransactionFactoryBuilder()
+                .setReadonly(false)
+                .build()
+                .start();
         setThreadLocalTransaction(tx);
         ref.set(newValue);
         tx.abort();

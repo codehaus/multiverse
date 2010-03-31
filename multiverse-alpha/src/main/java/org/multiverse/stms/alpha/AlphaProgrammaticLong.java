@@ -1,6 +1,7 @@
 package org.multiverse.stms.alpha;
 
 import org.multiverse.api.ProgrammaticLong;
+import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.UncommittedReadConflict;
@@ -21,7 +22,19 @@ public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements Progr
             @Override
             public Object execute(Transaction tx) throws Exception {
                 AlphaTransaction alphaTx = (AlphaTransaction) tx;
-                AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) alphaTx.openForWrite(AlphaProgrammaticLong.this);
+                AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) alphaTx.openForConstruction(AlphaProgrammaticLong.this);
+                tranlocal.value = value;
+                return null;
+            }
+        }.execute();
+    }
+
+     public AlphaProgrammaticLong(Stm stm , final long value) {
+        new TransactionTemplate(stm) {
+            @Override
+            public Object execute(Transaction tx) throws Exception {
+                AlphaTransaction alphaTx = (AlphaTransaction) tx;
+                AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) alphaTx.openForConstruction(AlphaProgrammaticLong.this);
                 tranlocal.value = value;
                 return null;
             }
@@ -29,7 +42,7 @@ public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements Progr
     }
 
     public AlphaProgrammaticLong(AlphaTransaction tx, long value) {
-        AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) tx.openForWrite(this);
+        AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) tx.openForConstruction(this);
         tranlocal.value = value;
     }
 

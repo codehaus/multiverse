@@ -40,7 +40,9 @@ public class TransactionalLinkedList_addTest {
         TransactionalLinkedList<String> list = new TransactionalLinkedList<String>();
 
         long version = stm.getVersion();
+        System.out.println("------------------------------------------");
         boolean result = list.add("1");
+        System.out.println("------------------------------------------");
         assertTrue(result);
         assertEquals(version + 1, stm.getVersion());
         assertEquals("[1]", list.toString());

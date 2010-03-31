@@ -21,19 +21,21 @@ import static java.lang.String.format;
 import static org.multiverse.instrumentation.asm.AsmUtils.*;
 
 /**
- * An object responsible for enhancing TransactionalObjects. It makes sure that an TransactionalObject implements the {@link
- * org.multiverse.stms.alpha.AlphaTransactionalObject} interface.
+ * An object responsible for enhancing TransactionalObjects. It makes sure that an
+ * TransactionalObject implements the
+ * {@link org.multiverse.stms.alpha.AlphaTransactionalObject} interface.
  * <p/>
  * It does the following things:
  * <ol>
  * <li>All managed fields are removed (copied to the tranlocal).</li>
- * <li>All instance methods become transactional object.</li>
+ * <li>All instance methods become transactional methods.</li>
  * <li>All method content is moved to the tranlocal version of the method</li>
  * </ol>
  * <p/>
  * An instance should not be reused.
  * <p/>
- * The constructor of the donor is not copied. So what out with relying on a constructor in the donor.
+ * The constructor of the donor is not copied. So what out with relying on a constructor
+ *  in the donor.
  *
  * @author Peter Veentjer
  */
@@ -41,19 +43,16 @@ public class TransactionalObjectTransformer implements Opcodes {
 
     private final ClassNode classNode;
     private final ClassNode mixinClassNode;
-    private ClassMetadata classMetadata;
+    private final ClassMetadata classMetadata;
 
-    public TransactionalObjectTransformer(ClassLoader classLoader, ClassNode originalClass, ClassNode mixinClassNode, MetadataRepository metadataRepository) {
+    public TransactionalObjectTransformer(
+            ClassLoader classLoader, ClassNode originalClass, ClassNode mixinClassNode, MetadataRepository metadataRepository) {
         this.classNode = originalClass;
-        this.classMetadata = metadataRepository.getClassMetadata(classLoader, originalClass.name);
+        this.classMetadata = metadataRepository.loadClassMetadata(classLoader, originalClass.name);
         this.mixinClassNode = mixinClassNode;
     }
 
     public ClassNode transform() {
-        if (classMetadata.isIgnoredClass() || !classMetadata.isRealTransactionalObject()) {
-            return null;
-        }
-
         ensureNoProblems();
 
         removeManagedFields();
@@ -81,7 +80,7 @@ public class TransactionalObjectTransformer implements Opcodes {
         //check for conflicting fields 
         for (FieldNode fieldNode : (List<FieldNode>) classNode.fields) {
             if (fieldNode.name.startsWith("___")) {
-                String msg = format("Field '%s.%s' begin with illegal pattern '___'",
+                String msg = format("Field '%s.%s' begins with illegal pattern '___'",
                         classNode.name,
                         fieldNode.name);
                 throw new IllegalStateException(msg);
@@ -216,12 +215,14 @@ public class TransactionalObjectTransformer implements Opcodes {
     private MethodNode createOpenUnconstructedMethod() {
         String desc = "()" + Type.getDescriptor(AlphaTranlocal.class);
 
-        MethodNode m = new MethodNode(ACC_PUBLIC + ACC_SYNTHETIC, "___openUnconstructed", desc, null, new String[]{});
+        MethodNode m = new MethodNode(
+                ACC_PUBLIC + ACC_SYNTHETIC, "___openUnconstructed", desc, null, new String[]{});
         m.visitTypeInsn(NEW, classMetadata.getTranlocalName());
         m.visitInsn(DUP);
         m.visitVarInsn(ALOAD, 0);
         String constructorDesc = format("(%s)V", internalToDesc(classNode.name));
-        m.visitMethodInsn(INVOKESPECIAL, classMetadata.getTranlocalName(), "<init>", constructorDesc);
+        m.visitMethodInsn(
+                INVOKESPECIAL, classMetadata.getTranlocalName(), "<init>", constructorDesc);
         m.visitInsn(ARETURN);
         return m;
     }
