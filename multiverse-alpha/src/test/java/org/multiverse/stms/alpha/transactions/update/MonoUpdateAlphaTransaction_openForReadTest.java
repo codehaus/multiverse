@@ -181,7 +181,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
 
     @Test
     @Ignore
-    public void whenAlreadyOpenedForComuttingWrite() {
+    public void whenAlreadyOpenedForCommutingWrite() {
 
     }
 

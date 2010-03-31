@@ -1,13 +1,14 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
+import org.multiverse.stms.alpha.AlphaProgrammaticLong;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
+import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
@@ -43,8 +44,7 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
         return new ArrayUpdateAlphaTransaction(config, size);
     }
 
-    public AlphaTransaction startSutTransaction(int size, int maximumSize) {
-        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(maximumSize);
+    public AlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfig) {
         UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
@@ -53,8 +53,9 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
                 speculativeConfig,
                 stmConfig.maxRetryCount, true, true, true, true, true);
 
-        return new ArrayUpdateAlphaTransaction(config, size);
+        return new ArrayUpdateAlphaTransaction(config, speculativeConfig.getOptimalSize());
     }
+
 
     @Test
     public void whenNullTxObject_thenNullPointerException() {
@@ -90,12 +91,7 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
     }
 
     @Test
-    public void whenObjectNotInConstruction() {
-
-    }
-
-    @Test
-    public void whenAlreadyOpenedForConstruction() {
+    public void whenAlreadyOpenedForConstruction_sameInstanceReturned() {
         ManualRef ref = ManualRef.createUncommitted();
 
         AlphaTransaction tx = startSutTransaction(1);
@@ -113,21 +109,83 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
     }
 
     @Test
-    @Ignore
-    public void whenAlreadyOpenedForRead() {
+    public void whenObjectAlreadyHasCommits() {
+        ManualRef ref = new ManualRef(stm);
+        AlphaTranlocal committed = ref.___load();
 
+        AlphaTransaction tx = startSutTransaction(1);
+
+        long version = stm.getVersion();
+        try {
+            tx.openForConstruction(ref);
+            fail();
+        } catch (IllegalStateException expected) {
+        }
+
+        assertEquals(version, stm.getVersion());
+        assertIsActive(tx);
+        assertSame(committed, ref.___load());
+    }
+
+
+    @Test
+    public void whenAlreadyOpenedForRead_thenIllegalStateException() {
+        ManualRef ref = new ManualRef(stm);
+        AlphaTranlocal committed = ref.___load();
+
+        AlphaTransaction tx = startSutTransaction(1);
+        tx.openForRead(ref);
+
+        long version = stm.getVersion();
+        try {
+            tx.openForConstruction(ref);
+            fail();
+        } catch (IllegalStateException expected) {
+        }
+
+        assertEquals(version, stm.getVersion());
+        assertIsActive(tx);
+        assertSame(committed, ref.___load());
     }
 
     @Test
-    @Ignore
     public void whenAlreadyOpenedForWrite() {
+        ManualRef ref = new ManualRef(stm);
+        AlphaTranlocal committed = ref.___load();
 
+        AlphaTransaction tx = startSutTransaction(1);
+        tx.openForWrite(ref);
+
+        long version = stm.getVersion();
+        try {
+            tx.openForConstruction(ref);
+            fail();
+        } catch (IllegalStateException expected) {
+        }
+
+        assertEquals(version, stm.getVersion());
+        assertIsActive(tx);
+        assertSame(committed, ref.___load());
     }
 
     @Test
-    @Ignore
     public void whenAlreadyOpenedForCommutingWrite() {
+        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 10);
+        AlphaTranlocal committed = ref.___load();
 
+        AlphaTransaction tx = startSutTransaction(1);
+        tx.openForCommutingWrite(ref);
+
+        long version = stm.getVersion();
+        try {
+            tx.openForConstruction(ref);
+            fail();
+        } catch (IllegalStateException expected) {
+        }
+
+        assertEquals(version, stm.getVersion());
+        assertIsActive(tx);
+        assertSame(committed, ref.___load());
     }
 
     @Test
@@ -137,9 +195,11 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
         ManualRef ref3 = ManualRef.createUncommitted();
         ManualRef ref4 = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction(3, 3);
+        SpeculativeConfiguration config = new SpeculativeConfiguration(3);
+        AlphaTransaction tx = startSutTransaction(config);
         tx.openForConstruction(ref1);
         tx.openForConstruction(ref2);
+        System.out.println("config.optimalsize: "+config.getOptimalSize());
         tx.openForConstruction(ref3);
 
         long version = stm.getVersion();
@@ -149,8 +209,7 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
         } catch (SpeculativeConfigurationFailure expected) {
         }
 
-        //todo
-        //assertEquals(5, speculativeConfig.get());
+        assertEquals(5, config.getOptimalSize());
         assertIsActive(tx);
         assertEquals(version, stm.getVersion());
     }

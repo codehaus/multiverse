@@ -619,7 +619,7 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
     //code that 'inserts' the logic in this class. Needed for the time being to do
     //bytecode optimization
 
-   @Override
+    @Override
     @TransactionalMethod(interruptible = true)
     public boolean offerFirst(E e, long timeout, TimeUnit unit) throws InterruptedException {
         throw new TodoException();
@@ -634,7 +634,18 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
     @Override
     @TransactionalMethod
     public boolean addAll(Collection<? extends E> c) {
-        return super.addAll(c);
+        if (c.isEmpty()) {
+            return false;
+        }
+
+        boolean modified = false;
+        Iterator<? extends E> e = c.iterator();
+        while (e.hasNext()) {
+            if (add(e.next())){
+                modified = true;
+            }
+        }
+        return modified;
     }
 
     @Override
@@ -837,7 +848,7 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
     @Override
     @TransactionalMethod
     public int drainTo(Collection<? super E> c) {
-        if(isEmpty()){
+        if (isEmpty()) {
             return 0;
         }
 

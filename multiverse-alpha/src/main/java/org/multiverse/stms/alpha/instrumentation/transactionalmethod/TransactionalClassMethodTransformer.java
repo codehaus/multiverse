@@ -681,32 +681,32 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                     newInsn = new VarInsnNode(originalInsn.getOpcode(), newPos);
                 }
                 break;
-                case INVOKEVIRTUAL:
-                    MethodInsnNode methodInsnNode = (MethodInsnNode) originalInsn;
-
-                    ClassMetadata ownerMetadata = metadataRepository.loadClassMetadata(
-                            classLoader, methodInsnNode.owner);
-                    //System.out.println("ownerMetadata: "+ownerMetadata);
-                    MethodMetadata methodMetadata = ownerMetadata.getMethodMetadata(methodInsnNode.name, methodInsnNode.desc);
-                    //System.out.println("method: "+methodInsnNode.name);
-                    //System.out.println("methodMetadata: "+methodMetadata);
-
-                    boolean optimize = methodMetadata!=null
-                            && methodMetadata.isTransactional();
-
-                    if (optimize) {
-                    //    System.out.println("optimization ");
-                        newInstructions.add(new VarInsnNode(ALOAD, transactionVar));
-                        newInstructions.add(new MethodInsnNode(
-                                INVOKEVIRTUAL,
-                                methodInsnNode.owner,
-                                methodInsnNode.name,
-                                createTransactionMethodDesc(methodInsnNode.desc)
-                        ));
-                    } else {
-                        newInsn = originalInsn.clone(cloneMap);
-                    }
-                    break;
+//                case INVOKEVIRTUAL:
+//                    MethodInsnNode methodInsnNode = (MethodInsnNode) originalInsn;
+//
+//                    ClassMetadata ownerMetadata = metadataRepository.loadClassMetadata(
+//                            classLoader, methodInsnNode.owner);
+//                    //System.out.println("ownerMetadata: "+ownerMetadata);
+//                    MethodMetadata methodMetadata = ownerMetadata.getMethodMetadata(methodInsnNode.name, methodInsnNode.desc);
+//                    //System.out.println("method: "+methodInsnNode.name);
+//                    //System.out.println("methodMetadata: "+methodMetadata);
+//
+//                    boolean optimize = methodMetadata!=null
+//                            && methodMetadata.isTransactional();
+//
+//                    if (optimize) {
+//                    //    System.out.println("optimization ");
+//                        newInstructions.add(new VarInsnNode(ALOAD, transactionVar));
+//                        newInstructions.add(new MethodInsnNode(
+//                                INVOKEVIRTUAL,
+//                                methodInsnNode.owner,
+//                                methodInsnNode.name,
+//                                createTransactionMethodDesc(methodInsnNode.desc)
+//                        ));
+//                    } else {
+//                        newInsn = originalInsn.clone(cloneMap);
+//                    }
+//                    break;
                 default:
                     newInsn = originalInsn.clone(cloneMap);
                     break;

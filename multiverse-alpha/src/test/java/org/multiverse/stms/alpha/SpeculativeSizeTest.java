@@ -74,11 +74,11 @@ public class SpeculativeSizeTest {
     }
 
     @Test
-    public void whenSpeculativeSizeAndUpdateFailure_thenUpgradedTomap() {
+    public void whenSpeculativeSizeAndUpdateFailure_thenUpgradedToMap() {
         SpeculativeSize o = new SpeculativeSize();
 
         o.update();
-        assertEquals(4, o.transactions.size());
+        assertEquals(""+o.transactions,4, o.transactions.size());
         assertInstanceOf(o.transactions.get(0), NonTrackingReadonlyAlphaTransaction.class);
         assertInstanceOf(o.transactions.get(1), MonoUpdateAlphaTransaction.class);
         assertInstanceOf(o.transactions.get(2), ArrayUpdateAlphaTransaction.class);
@@ -91,7 +91,6 @@ public class SpeculativeSizeTest {
         assertEquals(1, o2.transactions.size());
         assertInstanceOf(o2.transactions.get(0), MapUpdateAlphaTransaction.class);
     }
-
 
     @TransactionalObject
     class SpeculativeSize {
@@ -123,6 +122,7 @@ public class SpeculativeSizeTest {
             for (int k = 0; k < array.length(); k++) {
                 array.set(k, array.get(k) + "a");
             }
+            
         }
     }
 }

@@ -10,6 +10,7 @@ import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.utils.Listeners;
 
 import static java.lang.String.format;
+import static org.multiverse.stms.alpha.AlphaStmUtils.toTxObjectString;
 
 /**
  * An abstract {@link org.multiverse.stms.alpha.transactions.AlphaTransaction} that provides all the pluming logic for
@@ -75,20 +76,28 @@ public abstract class AbstractUpdateAlphaTransaction
         AlphaTranlocal opened = findAttached(txObject);
 
         if (opened != null) {
-
             if (opened.isCommitted()) {
-                //todo
-                throw new RuntimeException();
+                String msg = format(
+                        "Can't open for construction transactional object '%s' using transaction '%s'" +
+                                "because the transactional object already has commits",
+                        toTxObjectString(txObject), config.getFamilyName());
+                throw new IllegalStateException(msg);
             }
 
             if (opened.isCommuting()) {
-                //todo
-                throw new RuntimeException();
+                String msg = format(
+                        "Can't open for construction transactional object '%s' using transaction '%s'" +
+                                "because the transactional object is opened for a commuting operations",
+                        toTxObjectString(txObject), config.getFamilyName());
+                throw new IllegalStateException(msg);
             }
 
             if (opened.getOrigin() != null) {
-                //todo
-                throw new RuntimeException();
+                String msg = format(
+                        "Can't open for construction transactional object '%s' using transaction '%s'" +
+                                "because the transactional object already has commits",
+                        toTxObjectString(txObject), config.getFamilyName());
+                throw new IllegalStateException(msg);
             }
 
             return opened;

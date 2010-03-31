@@ -71,7 +71,9 @@ public final class SpeculativeConfiguration {
             newOptimalSize = 1;
         } else if (failedSize == 1) {
             newOptimalSize = 2;
-        } else {
+        } else if (failedSize == 2) {
+            newOptimalSize = 3;
+        }else {
             newOptimalSize = failedSize + 2;
         }
 

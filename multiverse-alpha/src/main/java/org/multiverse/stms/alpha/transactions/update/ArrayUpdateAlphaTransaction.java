@@ -125,7 +125,7 @@ public class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction 
             speculativeConfig.signalSpeculativeSizeFailure(attachedArray.length);
 
             int newOptimalSize = speculativeConfig.getOptimalSize();
-            if (newOptimalSize >= speculativeConfig.getMaximumArraySize()) {
+            if (newOptimalSize > speculativeConfig.getMaximumArraySize()) {
                 throw SpeculativeConfigurationFailure.create();
             }
 
