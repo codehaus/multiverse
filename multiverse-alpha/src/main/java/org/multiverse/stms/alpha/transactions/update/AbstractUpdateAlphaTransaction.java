@@ -91,18 +91,18 @@ public abstract class AbstractUpdateAlphaTransaction
     // ======================= open for write =============================
 
     @Override
-    protected AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {        
-        updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
-
+    protected AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {
         AlphaTranlocal attached = findAttached(txObject);
         if (attached == null) {
             attached = doOpenForWritePreviousCommittedAndAttach(txObject);
+            updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
         } else if (attached.isCommitted()) {
             //it is loaded before but it is a readonly
             //make an updatable clone of the tranlocal already is committed and use that
             //from now on.
             attached = attached.openForWrite();
             attach(attached);
+            updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
         } else if (attached.isCommuting()) {
             AlphaTranlocal origin = txObject.___load(getReadVersion());
             if (origin == null) {
@@ -110,6 +110,7 @@ public abstract class AbstractUpdateAlphaTransaction
             }
 
             attached.fixatePremature(this, origin);
+            updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
         }
 
         return attached;
@@ -424,7 +425,6 @@ public abstract class AbstractUpdateAlphaTransaction
             return txObject.___store(tranlocal, writeVersion);
         }
     }
-
 
     @Override
     protected void doAbortPrepared() {

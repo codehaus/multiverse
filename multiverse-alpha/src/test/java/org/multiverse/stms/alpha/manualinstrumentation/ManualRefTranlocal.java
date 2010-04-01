@@ -2,38 +2,24 @@ package org.multiverse.stms.alpha.manualinstrumentation;
 
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTranlocalSnapshot;
-import org.multiverse.stms.alpha.AlphaTransactionalObject;
 
 public class ManualRefTranlocal extends AlphaTranlocal {
-
-    public ManualRef ___txObject;
-    private ManualRefTranlocal ___origin;
 
     public int value;
 
     public ManualRefTranlocal(ManualRefTranlocal origin) {
         this.___origin = origin;
-        this.___txObject = origin.___txObject;
+        this.___transactionalObject = origin.___transactionalObject;
         this.value = origin.value;
     }
 
     public ManualRefTranlocal(ManualRef txObject) {
-        this.___txObject = txObject;
+        this.___transactionalObject = txObject;
     }
 
     @Override
     public AlphaTranlocal openForWrite() {
         return new ManualRefTranlocal(this);
-    }
-
-    @Override
-    public AlphaTransactionalObject getTransactionalObject() {
-        return ___txObject;
-    }
-
-    @Override
-    public AlphaTranlocal getOrigin() {
-        return ___origin;
     }
 
     @Override
@@ -52,7 +38,8 @@ public class ManualRefTranlocal extends AlphaTranlocal {
             return true;
         }
 
-        if (___origin.value != value) {
+        ManualRefTranlocal origin = (ManualRefTranlocal) ___origin;
+        if (origin.value != value) {
             return true;
         }
 

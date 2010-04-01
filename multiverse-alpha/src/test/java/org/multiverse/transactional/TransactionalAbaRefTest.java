@@ -69,7 +69,7 @@ public class TransactionalAbaRefTest {
 
         TransactionalAbaReference<String> ref = new TransactionalAbaReference<String>();
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertNull(ref.get());
     }
 
@@ -79,7 +79,7 @@ public class TransactionalAbaRefTest {
 
         TransactionalAbaReference<String> ref = new TransactionalAbaReference<String>();
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertEquals(null, ref.get());
     }
 
@@ -89,7 +89,7 @@ public class TransactionalAbaRefTest {
         String s = "foo";
         TransactionalAbaReference<String> ref = new TransactionalAbaReference<String>(s);
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertEquals(s, ref.get());
     }
 

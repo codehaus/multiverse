@@ -88,7 +88,7 @@ public class TransactionalMethod_MiscTest {
         long version = stm.getVersion();
         o.doit(100);
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertEquals(100, o.getRef().get());
     }
 

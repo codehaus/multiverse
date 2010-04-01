@@ -125,7 +125,7 @@ public class CycleHandlingTest {
             }
         }.execute();
 
-        assertEquals(oldVersion + 1, stm.getVersion());
+        assertEquals(oldVersion, stm.getVersion());
     }
 
 
@@ -146,7 +146,7 @@ public class CycleHandlingTest {
 
         //multiply by 3 because each complexnode needs 3 primitives
         //assertEquals(oldWriteCount + 3 * nodeCount, stm.getProfiler().sumKey1("updatetransaction.individualwrite.count"));
-        assertEquals(oldVersion + 1, stm.getVersion());
+        assertEquals(oldVersion, stm.getVersion());
     }
 
 

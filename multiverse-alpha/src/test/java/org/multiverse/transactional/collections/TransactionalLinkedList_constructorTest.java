@@ -25,7 +25,7 @@ public class TransactionalLinkedList_constructorTest {
         TransactionalLinkedList<String> list = new TransactionalLinkedList<String>();
 
         assertEquals(0, list.size());
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertEquals(Integer.MAX_VALUE, list.getMaxCapacity());
         assertEquals("[]", list.toString());
     }
@@ -50,7 +50,7 @@ public class TransactionalLinkedList_constructorTest {
 
         TransactionalLinkedList<String> list = new TransactionalLinkedList<String>(10);
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertEquals(10, list.getMaxCapacity());
         assertEquals("[]", list.toString());
     }

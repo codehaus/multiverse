@@ -37,6 +37,9 @@ public final class TranlocalFactory implements Opcodes {
     private final String tranlocalSnapshotName;
     private final MetadataRepository metadataRepository;
     private final ClassLoader classLoader;
+    private final String alphaTranlocalName;
+    private final String alphaTransactionalObjectDesc;
+    private final String originDesc;
 
     public TranlocalFactory(ClassLoader classLoader, ClassNode clazz, MetadataRepository metadataRepository) {
         this.metadataRepository = metadataRepository;
@@ -45,6 +48,9 @@ public final class TranlocalFactory implements Opcodes {
         this.clazzMetadata = metadataRepository.loadClassMetadata(classLoader, clazz.name);
         this.tranlocalName = clazzMetadata.getTranlocalName();
         this.tranlocalSnapshotName = clazzMetadata.getTranlocalSnapshotName();
+        this.alphaTranlocalName = Type.getInternalName(AlphaTranlocal.class);
+        this.alphaTransactionalObjectDesc = Type.getDescriptor(AlphaTransactionalObject.class);
+        this.originDesc = Type.getDescriptor(AlphaTranlocal.class);
     }
 
     public ClassNode create() {
@@ -57,19 +63,11 @@ public final class TranlocalFactory implements Opcodes {
 
         result.fields.addAll(remapInstanceFields());
 
-        //if (isFirstGeneration) {
         result.superName = getInternalName(AlphaTranlocal.class);
-        result.fields.add(createOriginField());
-        result.fields.add(createTxObjectField());
-        result.methods.add(createGetOriginMethod());
-        //} else {
-        //    result.superName = metadataRepo.getTranlocalName(transactionalClass.superName);
-        //}
 
         result.methods.add(createOpenForWriteConstructor());
         result.methods.add(createPrepareForCommitMethod());
         result.methods.add(createIsDirtyMethod());
-        result.methods.add(createGetTransactionalObjectMethod());
         result.methods.add(createTakeSnapshotMethod());
         result.methods.add(createFreshConstructor());
         result.methods.add(createOpenForWriteMethod());
@@ -115,14 +113,6 @@ public final class TranlocalFactory implements Opcodes {
         return result;
     }
 
-    private FieldNode createOriginField() {
-        return new FieldNode(ACC_PUBLIC + ACC_SYNTHETIC, "___origin", internalToDesc(tranlocalName), null, null);
-    }
-
-    private FieldNode createTxObjectField() {
-        return new FieldNode(ACC_PUBLIC + ACC_SYNTHETIC + ACC_FINAL, "___txObject", internalToDesc(clazz.name), null, null);
-    }
-
     private MethodNode createFreshConstructor() {
         MethodNode m = new MethodNode(
                 ACC_PUBLIC + ACC_SYNTHETIC,
@@ -131,25 +121,14 @@ public final class TranlocalFactory implements Opcodes {
                 null,
                 new String[]{});
 
-        //if (isFirstGeneration) {
         //we need to call the no arg constructor of the AlphaTranlocal
         m.visitVarInsn(ALOAD, 0);
-        m.visitMethodInsn(INVOKESPECIAL, getInternalName(AlphaTranlocal.class), "<init>", "()V");
+        m.visitMethodInsn(INVOKESPECIAL, alphaTranlocalName, "<init>", "()V");
 
         //put the atomicobject
         m.visitVarInsn(ALOAD, 0);
         m.visitVarInsn(ALOAD, 1);
-        m.visitFieldInsn(PUTFIELD, tranlocalName, "___txObject", internalToDesc(clazz.name));
-        //} else {
-        //    //we need to call the constructor of the superTranlocal with the TransactionalObject
-        //    m.visitVarInsn(ALOAD, 0);
-        //    m.visitVarInsn(ALOAD, 1);
-        //
-        //    String superDesc = format("(%s)V", internalToDesc(transactionalClass.superName));
-        //    m.visitMethodInsn(
-        //            INVOKESPECIAL, tranlocalSuperName, "<init>", superDesc);
-        //}
-
+        m.visitFieldInsn(PUTFIELD, alphaTranlocalName, "___transactionalObject", alphaTransactionalObjectDesc);
 
         m.visitInsn(RETURN);
         m.visitMaxs(0, 0);//value's don't matter, will be reculculated, but call is needed
@@ -176,13 +155,13 @@ public final class TranlocalFactory implements Opcodes {
         //placement of the atomicObject
         m.visitVarInsn(ALOAD, 0);
         m.visitVarInsn(ALOAD, 1);
-        m.visitFieldInsn(GETFIELD, tranlocalName, "___txObject", internalToDesc(clazz.name));
-        m.visitFieldInsn(PUTFIELD, tranlocalName, "___txObject", internalToDesc(clazz.name));
+        m.visitFieldInsn(GETFIELD, tranlocalName, "___transactionalObject", alphaTransactionalObjectDesc);
+        m.visitFieldInsn(PUTFIELD, tranlocalName, "___transactionalObject", alphaTransactionalObjectDesc);
 
         //placement of the original
         m.visitVarInsn(ALOAD, 0);
         m.visitVarInsn(ALOAD, 1);
-        m.visitFieldInsn(PUTFIELD, tranlocalName, "___origin", internalToDesc(tranlocalName));
+        m.visitFieldInsn(PUTFIELD, tranlocalName, "___origin", originDesc);
 
         //} else {
         //    m.visitVarInsn(ALOAD, 0);
@@ -226,29 +205,9 @@ public final class TranlocalFactory implements Opcodes {
 
         m.visitVarInsn(ALOAD, 0);
         m.visitInsn(ACONST_NULL);
-        m.visitFieldInsn(PUTFIELD, tranlocalName, "___origin", internalToDesc(tranlocalName));
+        m.visitFieldInsn(PUTFIELD, tranlocalName, "___origin", originDesc);
         m.visitInsn(RETURN);
         m.visitMaxs(0, 0);
-        m.visitEnd();
-        return m;
-    }
-
-    /**
-     * Just override the original super.prepareForCommit if one exists.
-     */
-    private MethodNode createGetTransactionalObjectMethod() {
-        MethodNode m = new MethodNode(
-                ACC_PUBLIC + ACC_SYNTHETIC,
-                "getTransactionalObject",
-                format("()%s", getDescriptor(AlphaTransactionalObject.class)),
-                null,
-                new String[]{});
-
-        //check on committed
-        m.visitVarInsn(ALOAD, 0);
-        m.visitFieldInsn(GETFIELD, tranlocalName, "___txObject", internalToDesc(clazz.name));
-        m.visitInsn(ARETURN);
-        m.visitMaxs(0, 0);//value's don't matter, will be reculculated, but call is needed
         m.visitEnd();
         return m;
     }
@@ -265,8 +224,7 @@ public final class TranlocalFactory implements Opcodes {
                 new String[]{});
 
         Label next = new Label();
-        //if (isFirstGeneration) {
-        //check if it is readonly
+
         m.visitVarInsn(ALOAD, 0);
         m.visitFieldInsn(GETFIELD, tranlocalName, "___writeVersion", "J");
         m.visitLdcInsn(new Long(0));
@@ -278,27 +236,11 @@ public final class TranlocalFactory implements Opcodes {
         //check if it is fresh (so has no origin)
         m.visitLabel(next);
         m.visitVarInsn(ALOAD, 0);
-        m.visitFieldInsn(GETFIELD, tranlocalName, "___origin", internalToDesc(tranlocalName));
+        m.visitFieldInsn(GETFIELD, tranlocalName, "___origin", originDesc);
         next = new Label();
         m.visitJumpInsn(IFNONNULL, next);
         m.visitInsn(ICONST_1);
         m.visitInsn(IRETURN);
-        //} else {
-        //    //call the super.getDirtynessStatus
-        //    m.visitVarInsn(ALOAD, 0);
-        //    m.visitMethodInsn(
-        //            INVOKEVIRTUAL,
-        //            metadataRepo.getTranlocalName(transactionalClass.superName),
-        //            "isDirty",
-        //            "()Z");
-        //    //duplicate the returned value for later use
-        //    //do a comparison, and jump to next if the parent call returned a non clean
-        //    m.visitJumpInsn(IF_ACMPNE, next);
-        //    //so the parent returned a value different than clean,
-        //
-        //    m.visitInsn(ICONST_1);
-        //    m.visitInsn(IRETURN);
-        //}
 
         m.visitLabel(next);
 
@@ -306,14 +248,8 @@ public final class TranlocalFactory implements Opcodes {
             //if (isFirstGeneration) {
             m.visitVarInsn(ALOAD, 0);
 
-            m.visitFieldInsn(GETFIELD, tranlocalName, "___origin", internalToDesc(tranlocalName));
-            //} else {
-            //    m.visitVarInsn(ALOAD, 0);
-            //    //todo: the rootAtomicobject should be used, not the super
-            //    m.visitFieldInsn(
-            //            GETFIELD, tranlocalSuperName, "___origin", internalToDesc(tranlocalSuperName));
-            //    m.visitTypeInsn(CHECKCAST, tranlocalName);
-            //}
+            m.visitFieldInsn(GETFIELD, tranlocalName, "___origin", originDesc);
+            m.visitTypeInsn(CHECKCAST, tranlocalName);
 
             //check on managed fields.
 
@@ -389,25 +325,6 @@ public final class TranlocalFactory implements Opcodes {
         m.visitVarInsn(ALOAD, 0);
         String constructorDesc = format("(%s)V", internalToDesc(tranlocalName));
         m.visitMethodInsn(INVOKESPECIAL, tranlocalSnapshotName, "<init>", constructorDesc);
-        m.visitInsn(ARETURN);
-        m.visitMaxs(0, 0);//value's don't matter, will be reculculated, but call is needed
-        m.visitEnd();
-        return m;
-    }
-
-    /**
-     * Just override the original super.createTakeSnapshotMethod if one exists.
-     */
-    private MethodNode createGetOriginMethod() {
-        MethodNode m = new MethodNode(
-                ACC_PUBLIC + ACC_SYNTHETIC,
-                "getOrigin",
-                format("()%s", getDescriptor(AlphaTranlocal.class)),
-                null,
-                new String[]{});
-
-        m.visitVarInsn(ALOAD, 0);
-        m.visitFieldInsn(GETFIELD, tranlocalName, "___origin", internalToDesc(tranlocalName));
         m.visitInsn(ARETURN);
         m.visitMaxs(0, 0);//value's don't matter, will be reculculated, but call is needed
         m.visitEnd();

@@ -296,10 +296,8 @@ public class DefaultTxObjectMixinTest {
     // TODO: merge with org.multiverse.stms.alpha.DummyTranlocal?
     static class DummyTranlocal extends AlphaTranlocal {
 
-        private AlphaTransactionalObject transactionalObject;
-
         DummyTranlocal(AlphaTransactionalObject transactionalObject) {
-            this.transactionalObject = transactionalObject;
+            this.___transactionalObject = transactionalObject;
         }
 
         @Override
@@ -313,11 +311,6 @@ public class DefaultTxObjectMixinTest {
         }
 
         @Override
-        public AlphaTranlocal getOrigin() {
-            throw new RuntimeException();
-        }
-
-        @Override
         public AlphaTranlocalSnapshot takeSnapshot() {
             throw new RuntimeException();
         }
@@ -325,11 +318,6 @@ public class DefaultTxObjectMixinTest {
         @Override
         public boolean isDirty() {
             throw new RuntimeException();
-        }
-
-        @Override
-        public AlphaTransactionalObject getTransactionalObject() {
-            return transactionalObject;
         }
     }
 }

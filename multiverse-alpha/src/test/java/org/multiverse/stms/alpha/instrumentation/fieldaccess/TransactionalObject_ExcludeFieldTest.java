@@ -38,7 +38,7 @@ public class TransactionalObject_ExcludeFieldTest {
         long version = stm.getVersion();
         ExcludeOneOfTheFields o = new ExcludeOneOfTheFields(excludedValue, includedValue);
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertTrue(o instanceof AlphaTransactionalObject);
         assertEquals(excludedValue, o.excluded);
         assertEquals(excludedValue, o.getExcluded());
@@ -121,7 +121,7 @@ public class TransactionalObject_ExcludeFieldTest {
 
         ExcludeStaticField o = new ExcludeStaticField(instanceField, staticField);
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertTrue(o instanceof AlphaTransactionalObject);
         assertEquals(staticField, ExcludeStaticField.staticField);
         assertEquals(staticField, ExcludeStaticField.getStaticField());

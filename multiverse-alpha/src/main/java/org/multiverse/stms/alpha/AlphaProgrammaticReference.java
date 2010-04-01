@@ -93,7 +93,7 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
             tranlocal.value = value;
             ___store(tranlocal, writeVersion);
         } else {
-            AlphaTransaction alphaTx = (AlphaTransaction)tx;                
+            AlphaTransaction alphaTx = (AlphaTransaction) tx;
             AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal<E>) alphaTx.openForConstruction(this);
             tranlocal.value = value;
         }
@@ -113,7 +113,7 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
     }
 
     public AlphaProgrammaticReference(Transaction tx, E value) {
-        AlphaTransaction alphaTx = (AlphaTransaction)tx;
+        AlphaTransaction alphaTx = (AlphaTransaction) tx;
         AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal<E>) alphaTx.openForConstruction(this);
         tranlocal.value = value;
     }
@@ -392,15 +392,11 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
  */
 class AlphaRefTranlocal<E> extends AlphaTranlocal implements Transaction {
 
-    //field belonging to the stm.
-    AlphaProgrammaticReference ___txObject;
-    AlphaRefTranlocal ___origin;
-
     E value;
 
     AlphaRefTranlocal(AlphaRefTranlocal<E> origin) {
         this.___origin = origin;
-        this.___txObject = origin.___txObject;
+        this.___transactionalObject = origin.___transactionalObject;
         this.value = origin.value;
     }
 
@@ -409,23 +405,13 @@ class AlphaRefTranlocal<E> extends AlphaTranlocal implements Transaction {
     }
 
     AlphaRefTranlocal(AlphaProgrammaticReference<E> owner, E value) {
-        this.___txObject = owner;
+        this.___transactionalObject = owner;
         this.value = value;
     }
 
     @Override
     public AlphaTranlocal openForWrite() {
         return new AlphaRefTranlocal(this);
-    }
-
-    @Override
-    public AlphaTranlocal getOrigin() {
-        return ___origin;
-    }
-
-    @Override
-    public AlphaTransactionalObject getTransactionalObject() {
-        return ___txObject;
     }
 
     @Override
@@ -449,7 +435,8 @@ class AlphaRefTranlocal<E> extends AlphaTranlocal implements Transaction {
             return true;
         }
 
-        if (___origin.value != this.value) {
+        AlphaRefTranlocal origin = (AlphaRefTranlocal) ___origin;
+        if (origin.value != this.value) {
             return true;
         }
 

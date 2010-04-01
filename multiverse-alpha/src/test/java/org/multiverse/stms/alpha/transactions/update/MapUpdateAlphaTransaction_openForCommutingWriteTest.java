@@ -177,13 +177,13 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
         assertNotSame(read1, read2);
         assertSame(read2.getOrigin(), read1);
         assertTrue(read2.isUncommitted());
-        assertSame(read1.___txObject, read2.___txObject);
+        assertSame(read1.getTransactionalObject(), read2.getTransactionalObject());
         assertIsActive(tx);
     }
 
     @Test
     @Ignore
-    public void whenAlreadyOpenendForCommutingWrite_thenSameTranlocalReturned(){
+    public void whenAlreadyOpenendForCommutingWrite_thenSameTranlocalReturned() {
 
     }
 
@@ -206,7 +206,7 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
 
         AlphaTransaction tx = startTrackingUpdateTransaction(stm);
 
-        AlphaTranlocal tranlocal =  tx.openForCommutingWrite(ref);
+        AlphaTranlocal tranlocal = tx.openForCommutingWrite(ref);
         assertFalse(tranlocal.isCommitted());
         assertTrue(tranlocal.isUncommitted());
         assertSame(ref, tranlocal.getTransactionalObject());

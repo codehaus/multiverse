@@ -5,7 +5,6 @@ import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTranlocalSnapshot;
-import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
@@ -61,11 +60,11 @@ public class AbaRef<E> extends DefaultTxObjectMixin {
     }
 
     private final static TransactionFactory setTxFactory = getGlobalStmInstance()
-               .getTransactionFactoryBuilder()
-               .setSpeculativeConfigurationEnabled(false)
-               .setReadonly(false)
-               .setAutomaticReadTracking(false)
-               .build();
+            .getTransactionFactoryBuilder()
+            .setSpeculativeConfigurationEnabled(false)
+            .setReadonly(false)
+            .setAutomaticReadTracking(false)
+            .build();
 
     public void set(final E newValue) {
         new TransactionTemplate<E>(setTxFactory) {
@@ -134,13 +133,11 @@ public class AbaRef<E> extends DefaultTxObjectMixin {
 
 class AbaRefTranlocal<E> extends AlphaTranlocal {
 
-    AbaRef<E> ___txObject;
-    AbaRefTranlocal ___origin;
     E value;
     long writeVersion;
 
     AbaRefTranlocal(AbaRefTranlocal<E> origin) {
-        this.___txObject = origin.___txObject;
+        this.___transactionalObject = origin.___transactionalObject;
         this.___origin = origin;
         this.value = origin.value;
         this.writeVersion = origin.writeVersion;
@@ -151,7 +148,7 @@ class AbaRefTranlocal<E> extends AlphaTranlocal {
     }
 
     AbaRefTranlocal(AbaRef<E> owner, E value) {
-        this.___txObject = owner;
+        this.___transactionalObject = owner;
         this.value = value;
         this.writeVersion = Long.MIN_VALUE;
     }
@@ -159,16 +156,6 @@ class AbaRefTranlocal<E> extends AlphaTranlocal {
     @Override
     public AlphaTranlocal openForWrite() {
         return new AbaRefTranlocal<E>(this);
-    }
-
-    @Override
-    public AlphaTranlocal getOrigin() {
-        return ___origin;
-    }
-
-    @Override
-    public AlphaTransactionalObject getTransactionalObject() {
-        return ___txObject;
     }
 
     @Override
@@ -192,11 +179,13 @@ class AbaRefTranlocal<E> extends AlphaTranlocal {
             return true;
         }
 
-        if (___origin.value != value) {
+        AbaRefTranlocal origin = (AbaRefTranlocal) ___origin;
+
+        if (origin.value != value) {
             return true;
         }
 
-        if (___origin.writeVersion != writeVersion) {
+        if (origin.writeVersion != writeVersion) {
             return true;
         }
 

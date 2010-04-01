@@ -54,7 +54,7 @@ public class TransactionalObject_SubclassTest {
 
         Banana banana = new Banana();
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertEquals(0, banana.getLength());
     }
 
@@ -91,7 +91,7 @@ public class TransactionalObject_SubclassTest {
 
         Banana banana = new Banana(weight, length);
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertEquals(weight, banana.getWeight());
         assertEquals(length, banana.getLength());
     }

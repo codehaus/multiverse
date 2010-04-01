@@ -39,7 +39,7 @@ public class TransactionalObject_NonStaticInnerClassTest {
 
         NonStaticTxObject innerClass = new NonStaticTxObject(10);
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertEquals(10, innerClass.getValue());
     }
 
@@ -67,7 +67,7 @@ public class TransactionalObject_NonStaticInnerClassTest {
 
         Outer outer = new Outer();
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertNull(outer.getInner());
 
         version = stm.getVersion();

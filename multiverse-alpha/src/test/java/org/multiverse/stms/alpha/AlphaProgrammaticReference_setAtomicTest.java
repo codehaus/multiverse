@@ -18,7 +18,6 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
 public class AlphaProgrammaticReference_setAtomicTest {
     private Stm stm;
     private TransactionFactory updateTxFactory;
-    private TransactionFactory readonlyTxFactory;
 
     @Before
     public void setUp() {

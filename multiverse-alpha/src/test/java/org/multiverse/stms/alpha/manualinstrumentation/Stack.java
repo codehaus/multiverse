@@ -5,7 +5,6 @@ import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTranlocalSnapshot;
-import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
@@ -154,8 +153,6 @@ public final class Stack<E> extends DefaultTxObjectMixin {
 
     public static final class StackTranlocal<E> extends AlphaTranlocal {
 
-        private final Stack<E> ___txObject;
-        private StackTranlocal<E> ___origin;
         int size;
         Node<E> head;
 
@@ -165,7 +162,7 @@ public final class Stack<E> extends DefaultTxObjectMixin {
          * @param txObject
          */
         StackTranlocal(Stack<E> txObject) {
-            this.___txObject = txObject;
+            this.___transactionalObject = txObject;
         }
 
         /**
@@ -175,7 +172,7 @@ public final class Stack<E> extends DefaultTxObjectMixin {
          */
         StackTranlocal(StackTranlocal<E> origin) {
             this.___origin = origin;
-            this.___txObject = origin.___txObject;
+            this.___transactionalObject = origin.___transactionalObject;
             this.size = origin.size;
             this.head = origin.head;
         }
@@ -183,16 +180,6 @@ public final class Stack<E> extends DefaultTxObjectMixin {
         @Override
         public AlphaTranlocal openForWrite() {
             return new StackTranlocal<E>(this);
-        }
-
-        @Override
-        public AlphaTransactionalObject getTransactionalObject() {
-            return ___txObject;
-        }
-
-        @Override
-        public AlphaTranlocal getOrigin() {
-            return ___origin;
         }
 
         @Override
@@ -216,7 +203,8 @@ public final class Stack<E> extends DefaultTxObjectMixin {
                 return true;
             }
 
-            if (___origin.head != head) {
+            StackTranlocal origin = (StackTranlocal) ___origin;
+            if (origin.head != head) {
                 return true;
             }
 

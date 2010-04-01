@@ -116,7 +116,7 @@ public class StackTest {
 
         Stack stack = new Stack();
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertTrue(stack.isEmpty());
         assertEquals(0, stack.size());
     }

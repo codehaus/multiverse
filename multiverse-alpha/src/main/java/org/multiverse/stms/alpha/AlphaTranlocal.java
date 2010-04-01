@@ -38,19 +38,27 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
      */
     public long ___writeVersion = 0;
 
+    public AlphaTranlocal ___origin;
+
+    public AlphaTransactionalObject ___transactionalObject;
+
     /**
      * Returns the AlphaTransactionalObject that belongs to this AlphaTranlocal.
      *
      * @return the AlphaTransactionalObject that belongs to this AlphaTranlocal
      */
-    public abstract AlphaTransactionalObject getTransactionalObject();
+    public final AlphaTransactionalObject getTransactionalObject() {
+        return ___transactionalObject;
+    }
 
     /**
      * Returns the original committed AlphaTranlocal this AlphaTranlocal is a updatable version of.
      *
      * @return the origin. Undefined after AlphaTranlocal is committed.
      */
-    public abstract AlphaTranlocal getOrigin();
+    public final AlphaTranlocal getOrigin() {
+        return ___origin;
+    }
 
     /**
      * Creates the TranlocalSnapshot of the Tranlocal. A snapshot should only be made if this Tranlocal is not

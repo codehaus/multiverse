@@ -5,7 +5,6 @@ import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTranlocalSnapshot;
-import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
@@ -123,34 +122,22 @@ public class Ref<E> extends DefaultTxObjectMixin {
 
 class RefTranlocal<E> extends AlphaTranlocal {
 
-    Ref ___txObject;
-    RefTranlocal ___origin;
     E value;
 
 
     RefTranlocal(RefTranlocal<E> origin) {
-        this.___txObject = origin.___txObject;
+        this.___transactionalObject = origin.___transactionalObject;
         this.___origin = origin;
         this.value = origin.value;
     }
 
     RefTranlocal(Ref<E> txObject) {
-        this.___txObject = txObject;
+        this.___transactionalObject = txObject;
     }
 
     @Override
     public AlphaTranlocal openForWrite() {
         return new RefTranlocal<E>(this);
-    }
-
-    @Override
-    public AlphaTransactionalObject getTransactionalObject() {
-        return ___txObject;
-    }
-
-    @Override
-    public AlphaTranlocal getOrigin() {
-        return ___origin;
     }
 
     @Override
@@ -174,7 +161,8 @@ class RefTranlocal<E> extends AlphaTranlocal {
             return true;
         }
 
-        if (___origin.value != value) {
+        RefTranlocal origin = (RefTranlocal) ___origin;
+        if (origin.value != value) {
             return true;
         }
 

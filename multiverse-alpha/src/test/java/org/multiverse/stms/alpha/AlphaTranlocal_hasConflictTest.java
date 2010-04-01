@@ -32,20 +32,6 @@ public class AlphaTranlocal_hasConflictTest {
     }
 
     @Test
-    public void whenFreshAndConflictingTransaction_thenConflict() {
-        ManualRef ref = ManualRef.createUncommitted();
-
-        ManualRefTranlocal tranlocal = ref.___openUnconstructed();
-
-        //conflicting update
-        ref.inc(stm);
-
-        Transaction tx = mock(Transaction.class);
-        boolean hasConflict = tranlocal.hasReadConflict(tx);
-        assertTrue(hasConflict);
-    }
-
-    @Test
     public void whenUpdatedAndNoConflictingTransaction_thenNoConflict() {
         ManualRef ref = new ManualRef(stm);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();

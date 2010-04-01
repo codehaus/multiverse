@@ -56,7 +56,7 @@ public class TransactionalObject_StaticFieldsTest {
         long version = stm.getVersion();
 
         OneOfTheFieldsIsStatic o = new OneOfTheFieldsIsStatic(instanceValue, staticValue);
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertTrue(o instanceof AlphaTransactionalObject);
         assertEquals(instanceValue, o.getInstanceField());
         assertEquals(staticValue, o.getStaticFieldThroughInstance());

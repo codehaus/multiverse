@@ -76,7 +76,7 @@ public class TransactionalObject_WithFinalsTest {
         SomeFinalFields o = new SomeFinalFields(10, 20);
 
         assertTrue(o instanceof AlphaTransactionalObject);
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertEquals(10, o.getFinalValue());
         assertEquals(10, o.finalValue);
         assertEquals(20, o.getNonFinalValue());

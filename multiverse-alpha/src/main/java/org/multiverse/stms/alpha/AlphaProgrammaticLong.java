@@ -19,8 +19,8 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
  */
 public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements ProgrammaticLong {
 
-    public static AlphaProgrammaticLong createUncommitted(){
-        return new AlphaProgrammaticLong((File)null);
+    public static AlphaProgrammaticLong createUncommitted() {
+        return new AlphaProgrammaticLong((File) null);
     }
 
     public AlphaProgrammaticLong(final long value) {
@@ -35,7 +35,7 @@ public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements Progr
         }.execute();
     }
 
-     public AlphaProgrammaticLong(Stm stm , final long value) {
+    public AlphaProgrammaticLong(Stm stm, final long value) {
         new TransactionTemplate(stm) {
             @Override
             public Object execute(Transaction tx) throws Exception {
@@ -52,7 +52,7 @@ public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements Progr
         tranlocal.value = value;
     }
 
-    private AlphaProgrammaticLong(File file){
+    private AlphaProgrammaticLong(File file) {
     }
 
     @Override
@@ -171,17 +171,14 @@ class AlphaProgrammaticLongTranlocal extends AlphaTranlocal {
     public long value;
     public long pendingIncrements;
 
-    private final AlphaProgrammaticLong transactionalObject;
-    private AlphaProgrammaticLongTranlocal origin;
-
     public AlphaProgrammaticLongTranlocal(AlphaProgrammaticLong transactionalObject, boolean commuting) {
-        this.transactionalObject = transactionalObject;
+        this.___transactionalObject = transactionalObject;
         this.___writeVersion = commuting ? -2 : 0;
     }
 
     public AlphaProgrammaticLongTranlocal(AlphaProgrammaticLongTranlocal origin) {
-        this.origin = origin;
-        this.transactionalObject = origin.transactionalObject;
+        this.___origin = origin;
+        this.___transactionalObject = origin.___transactionalObject;
         this.value = origin.value;
     }
 
@@ -193,8 +190,8 @@ class AlphaProgrammaticLongTranlocal extends AlphaTranlocal {
 
         //System.out.println("premature fixation");
 
-        this.origin = (AlphaProgrammaticLongTranlocal) origin;
-        this.value = this.origin.value;
+        this.___origin = origin;
+        this.value = ((AlphaProgrammaticLongTranlocal) origin).value;
         this.value += pendingIncrements;
         this.pendingIncrements = 0;
         //-1 indicates that it is a normaly dirty that needs writing.
@@ -207,7 +204,7 @@ class AlphaProgrammaticLongTranlocal extends AlphaTranlocal {
             return;
         }
 
-        AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) transactionalObject.___load();
+        AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) ___transactionalObject.___load();
         if (tranlocal == null) {
             throw new UncommittedReadConflict();
         }
@@ -223,16 +220,6 @@ class AlphaProgrammaticLongTranlocal extends AlphaTranlocal {
     }
 
     @Override
-    public AlphaTranlocal getOrigin() {
-        return origin;
-    }
-
-    @Override
-    public AlphaTransactionalObject getTransactionalObject() {
-        return transactionalObject;
-    }
-
-    @Override
     public AlphaTranlocalSnapshot takeSnapshot() {
         throw new TodoException();
     }
@@ -244,7 +231,7 @@ class AlphaProgrammaticLongTranlocal extends AlphaTranlocal {
 
     @Override
     public void prepareForCommit(long writeVersion) {
-        origin = null;
+        ___origin = null;
         ___writeVersion = writeVersion;
     }
 
@@ -254,7 +241,7 @@ class AlphaProgrammaticLongTranlocal extends AlphaTranlocal {
             return false;
         }
 
-        if (origin == null) {
+        if (___origin == null) {
             return true;
         }
 
@@ -262,6 +249,7 @@ class AlphaProgrammaticLongTranlocal extends AlphaTranlocal {
             return pendingIncrements != 0;
         }
 
-        return origin.value != value;
+        AlphaProgrammaticLongTranlocal org = (AlphaProgrammaticLongTranlocal) ___origin;
+        return org.value != value;
     }
 }

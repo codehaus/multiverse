@@ -2,7 +2,6 @@ package org.multiverse.stms.alpha.manualinstrumentation;
 
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTranlocalSnapshot;
-import org.multiverse.stms.alpha.AlphaTransactionalObject;
 
 /**
  * access modifiers for fields are public because this object is used for testing purposes. For the instrumentation the
@@ -10,34 +9,21 @@ import org.multiverse.stms.alpha.AlphaTransactionalObject;
  */
 public class IntRefTranlocal extends AlphaTranlocal {
 
-    public IntRef ___txObject;
-    private IntRefTranlocal ___origin;
-
     public int value;
 
     public IntRefTranlocal(IntRefTranlocal origin) {
         this.___origin = origin;
-        this.___txObject = origin.___txObject;
+        this.___transactionalObject = origin.___transactionalObject;
         this.value = origin.value;
     }
 
     public IntRefTranlocal(IntRef txObject) {
-        this.___txObject = txObject;
+        this.___transactionalObject = txObject;
     }
 
     @Override
     public AlphaTranlocal openForWrite() {
         return new IntRefTranlocal(this);
-    }
-
-    @Override
-    public AlphaTransactionalObject getTransactionalObject() {
-        return ___txObject;
-    }
-
-    @Override
-    public AlphaTranlocal getOrigin() {
-        return ___origin;
     }
 
     @Override
@@ -56,7 +42,8 @@ public class IntRefTranlocal extends AlphaTranlocal {
             return true;
         }
 
-        if (___origin.value != value) {
+        IntRefTranlocal origin = (IntRefTranlocal) ___origin;
+        if (origin.value != value) {
             return true;
         }
 

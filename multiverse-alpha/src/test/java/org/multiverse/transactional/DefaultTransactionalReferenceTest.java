@@ -45,7 +45,7 @@ public class DefaultTransactionalReferenceTest {
         DefaultTransactionalReference ref = new DefaultTransactionalReference();
 
         tx.commit();
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
     }
 
     // ============== rollback =================
@@ -83,7 +83,7 @@ public class DefaultTransactionalReferenceTest {
 
         DefaultTransactionalReference<String> ref = new DefaultTransactionalReference<String>();
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertNull(ref.get());
     }
 
@@ -93,7 +93,7 @@ public class DefaultTransactionalReferenceTest {
 
         DefaultTransactionalReference<String> ref = new DefaultTransactionalReference<String>();
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertNull(ref.get());
     }
 
@@ -103,7 +103,7 @@ public class DefaultTransactionalReferenceTest {
         String s = "foo";
         DefaultTransactionalReference<String> ref = new DefaultTransactionalReference<String>(s);
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertEquals(s, ref.get());
     }
 

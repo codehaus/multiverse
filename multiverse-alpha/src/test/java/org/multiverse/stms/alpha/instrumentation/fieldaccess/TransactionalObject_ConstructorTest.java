@@ -76,7 +76,7 @@ public class TransactionalObject_ConstructorTest {
 
         testEmptyConstructor o = new testEmptyConstructor();
 
-        assertEquals(version , stm.getVersion());
+        assertEquals(version, stm.getVersion());
     }
 
     @TransactionalObject
@@ -133,7 +133,7 @@ public class TransactionalObject_ConstructorTest {
 
         TwoArgConstructor o = new TwoArgConstructor(20, 8);
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertEquals(20, o.getA());
         assertEquals(8, o.getB());
     }
@@ -164,7 +164,7 @@ public class TransactionalObject_ConstructorTest {
 
         FiveArgConstructor fiveArgConstructor = new FiveArgConstructor(10, 40, 2, 9, -1);
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertEquals(10, fiveArgConstructor.getA());
         assertEquals(40, fiveArgConstructor.getB());
         assertEquals(2, fiveArgConstructor.getC());
@@ -216,7 +216,7 @@ public class TransactionalObject_ConstructorTest {
 
         VarArgConstructor varArgConstructor = new VarArgConstructor(1, 2, 3, 4);
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertArrayEquals(new int[]{1, 2, 3, 4}, varArgConstructor.getArgs());
     }
 
@@ -241,7 +241,7 @@ public class TransactionalObject_ConstructorTest {
         int[] args = new int[]{1, 2, 3, 4};
         ArrayConstructor o = new ArrayConstructor(args);
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertSame(args, o.getArgs());
     }
 
@@ -267,7 +267,7 @@ public class TransactionalObject_ConstructorTest {
 
         TransactionalObjectConstructor o = new TransactionalObjectConstructor(intValue);
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertSame(intValue, o.getIntValue());
     }
 
@@ -293,7 +293,7 @@ public class TransactionalObject_ConstructorTest {
 
         NormalRefConstructor o = new NormalRefConstructor(value);
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertSame(value, o.getValue());
     }
 
@@ -317,7 +317,7 @@ public class TransactionalObject_ConstructorTest {
 
         CreateTxObjectInConstructor o = new CreateTxObjectInConstructor(10);
 
-        assertEquals(startVersion + 1, stm.getVersion());
+        assertEquals(startVersion, stm.getVersion());
         assertNotNull(o.getValue());
     }
 
@@ -369,7 +369,7 @@ public class TransactionalObject_ConstructorTest {
 
         TxObjectWithNoArgSuperCallingConstructor o = new TxObjectWithNoArgSuperCallingConstructor();
 
-        assertEquals(version , stm.getVersion());
+        assertEquals(version, stm.getVersion());
     }
 
     @TransactionalObject
@@ -487,7 +487,7 @@ public class TransactionalObject_ConstructorTest {
         TxObjectWithFinalRefThatIsCreatedInsideConstructor o = new TxObjectWithFinalRefThatIsCreatedInsideConstructor();
         assertFalse(o instanceof AlphaTransactionalObject);
         assertEquals(10, o.value.get());
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
     }
 
     @TransactionalObject

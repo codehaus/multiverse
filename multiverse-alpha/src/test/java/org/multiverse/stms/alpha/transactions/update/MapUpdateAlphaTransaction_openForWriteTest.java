@@ -165,7 +165,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
         assertNotSame(read1, read2);
         assertSame(read2.getOrigin(), read1);
         assertTrue(read2.isUncommitted());
-        assertSame(read1.___txObject, read2.___txObject);
+        assertSame(read1.getTransactionalObject(), read2.getTransactionalObject());
         assertIsActive(tx);
     }
 
@@ -189,10 +189,10 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
         AlphaTransaction tx = startTrackingUpdateTransaction(stm);
 
         long version = stm.getVersion();
-        try{
+        try {
             tx.openForWrite(ref);
             fail();
-        }catch(UncommittedReadConflict expected){
+        } catch (UncommittedReadConflict expected) {
         }
 
         assertEquals(version, stm.getVersion());
