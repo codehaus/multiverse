@@ -10,12 +10,18 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
 import org.multiverse.utils.TodoException;
 
+import java.io.File;
+
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
  */
 public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements ProgrammaticLong {
+
+    public static AlphaProgrammaticLong createUncommitted(){
+        return new AlphaProgrammaticLong((File)null);
+    }
 
     public AlphaProgrammaticLong(final long value) {
         new TransactionTemplate() {
@@ -44,6 +50,9 @@ public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements Progr
     public AlphaProgrammaticLong(AlphaTransaction tx, long value) {
         AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) tx.openForConstruction(this);
         tranlocal.value = value;
+    }
+
+    private AlphaProgrammaticLong(File file){
     }
 
     @Override

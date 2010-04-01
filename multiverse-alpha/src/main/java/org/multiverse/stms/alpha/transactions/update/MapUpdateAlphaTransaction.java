@@ -2,7 +2,6 @@ package org.multiverse.stms.alpha.transactions.update;
 
 import org.multiverse.api.Latch;
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.exceptions.UncommittedReadConflict;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.UncommittedFilter;
@@ -24,7 +23,7 @@ import java.util.Map;
  *
  * @author Peter Veentjer.
  */
-public class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
+public final class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
 
     public static class Factory implements TransactionFactory<AlphaTransaction> {
 
@@ -50,7 +49,7 @@ public class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
     }
 
     @Override
-    protected void doClear() {
+    protected void dodoClear() {
         attachedMap.clear();
     }
 
@@ -87,11 +86,11 @@ public class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
     }
 
     @Override
-    protected boolean hasWrites() {
+    protected boolean isDirty() {
         boolean isDirty = false;
 
         for (AlphaTranlocal attached : attachedMap.values()) {
-            if (hasWrite(attached)) {
+            if (isDirty(attached)) {
                 isDirty = true;
             }
         }
@@ -141,53 +140,6 @@ public class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
         }
 
         return listenersArray;
-    }
-
-    @Override
-    protected AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject txObject) {
-        AlphaTranlocal attached = attachedMap.get(txObject);
-
-
-        if(attached == null){
-            attached = txObject.___openForCommutingOperation();
-            attachedMap.put(txObject, attached);
-        }else if(attached.isCommitted()){
-            attached = attached.openForWrite();
-            attachedMap.put(txObject, attached);
-        }
-
-        return attached;
-    }
-
-    @Override
-    protected AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {
-        AlphaTranlocal attached = attachedMap.get(txObject);
-        if (attached == null) {
-            //it isnt loaded before.
-            AlphaTranlocal committed = txObject.___load(getReadVersion());
-            if (committed == null) {
-                attached = txObject.___openUnconstructed();
-            } else {
-                attached = committed.openForWrite();
-            }
-
-            attachedMap.put(txObject, attached);
-        } else if (attached.isCommitted()) {
-            //it is loaded before but it is a readonly
-            //make an updatable clone of the tranlocal already is committed and use that
-            //from now on.
-            attached = attached.openForWrite();
-            attachedMap.put(txObject, attached);
-        } else if (attached.isCommuting()) {
-            AlphaTranlocal origin = txObject.___load(getReadVersion());
-            if(origin == null){
-                throw new UncommittedReadConflict();
-            }
-
-            attached.fixatePremature(this, origin);
-        }
-
-        return attached;
     }
 
     @Override

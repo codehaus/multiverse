@@ -65,7 +65,6 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
         return new ArrayUpdateAlphaTransaction(config, 100);
     }
 
-
     @Test
     public void whenAutomaticReadTrackingDisabled_openForReadIsNotTracked() {
         ManualRef ref = new ManualRef(stm);
@@ -204,20 +203,22 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
         ManualRef ref3 = new ManualRef(stm);
+        ManualRef ref4 = new ManualRef(stm);
 
-        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(true, false, false, 2);
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(true, false, false, 3);
         AlphaTransaction tx = startSutTransaction(speculativeConfig);
         tx.openForWrite(ref1);
         tx.openForWrite(ref2);
+        tx.openForWrite(ref3);
 
         try {
-            tx.openForWrite(ref3);
+            tx.openForWrite(ref4);
             fail();
         } catch (SpeculativeConfigurationFailure expected) {
         }
 
         assertIsActive(tx);
-        assertEquals(4, speculativeConfig.getOptimalSize());
+        assertEquals(5, speculativeConfig.getOptimalSize());
     }
 
     @Test

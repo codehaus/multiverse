@@ -120,7 +120,7 @@ public abstract class AbstractAlphaTransaction<C extends AbstractTransactionConf
                     throw new NullPointerException(msg);
                 }
 
-                return doOpenForWrite(txObject);
+                return  doOpenForWrite(txObject);
             case prepared:
                 String preparedMsg = format(
                         "Can't open for write transactional object '%s' "

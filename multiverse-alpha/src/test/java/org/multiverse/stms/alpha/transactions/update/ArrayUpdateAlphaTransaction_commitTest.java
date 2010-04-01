@@ -67,7 +67,7 @@ public class ArrayUpdateAlphaTransaction_commitTest {
     }
 
     @Test
-    public void whenFresh() {
+    public void whenOnlyFreshObjects_thenVersionNotIncreasedAndLocksNotAcquired() {
         ManualRef txObject = ManualRef.createUncommitted();
 
         AlphaTransaction tx = startSutTransaction(2);
@@ -76,7 +76,7 @@ public class ArrayUpdateAlphaTransaction_commitTest {
         long version = stm.getVersion();
         tx.commit();
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertIsCommitted(tx);
         assertSame(tranlocal, txObject.___load());
         assertSame(stm.getVersion(), tranlocal.getWriteVersion());
@@ -116,7 +116,7 @@ public class ArrayUpdateAlphaTransaction_commitTest {
 
         assertIsCommitted(tx);
         assertEquals(version+1, stm.getVersion());
-        assertEquals(2, ref.get());
+        assertEquals(2, ref.getAtomic());
         assertSame(tranlocal, ref.___load());
         assertTrue(tranlocal.isCommitted());
         assertEquals(version+1, tranlocal.getWriteVersion());

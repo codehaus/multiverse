@@ -15,7 +15,6 @@ import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.alpha.transactions.AlphaTransactionTestUtils.assertFreshTranlocal;
 import static org.multiverse.stms.alpha.transactions.AlphaTransactionTestUtils.assertIsUpdatableClone;
 
 public class MonoUpdateAlphaTransaction_openForWriteTest {
@@ -70,14 +69,22 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
     }
 
     @Test
-    public void whenOpenForWriteOnFreshObject_thenAttached() {
+    public void whenOpenForWriteOnFreshObject_thenUncommittedReadConflict() {
         ManualRef ref = ManualRef.createUncommitted();
         AlphaTransaction tx = startSutTransaction();
 
-        AlphaTranlocal tranlocal = tx.openForWrite(ref);
+        long version = stm.getVersion();
+        try {
+            tx.openForWrite(ref);
+            fail();
+        } catch (UncommittedReadConflict expected) {
 
-        assertFreshTranlocal(ref, tranlocal);
-        assertSame(tranlocal, getField(tx, "attached"));
+        }
+
+        assertNull(ref.___load());
+        assertNull(getField(tx,"attached"));
+        assertEquals(version, stm.getVersion());
+        assertIsActive(tx);
     }
 
     @Test
@@ -138,7 +145,7 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
 
     @Test
     @Ignore
-    public void whenAlreadyOpenedForCommutingWrite(){
+    public void whenAlreadyOpenedForCommutingWrite() {
 
     }
 

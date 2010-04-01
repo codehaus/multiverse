@@ -2,7 +2,6 @@ package org.multiverse.stms.alpha.transactions.update;
 
 import org.multiverse.api.Latch;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
-import org.multiverse.api.exceptions.UncommittedReadConflict;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.UncommittedFilter;
@@ -14,28 +13,30 @@ import org.multiverse.utils.commitlock.CommitLockPolicy;
  *
  * @author Peter Veentjer
  */
-public class MonoUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
+public final class MonoUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
 
     private AlphaTranlocal attached;
 
     public MonoUpdateAlphaTransaction(UpdateAlphaTransactionConfiguration config) {
         super(config);
-
         init();
     }
 
     @Override
-    protected void doClear() {
+    protected void dodoClear() {
         attached = null;
     }
 
     @Override
     protected boolean tryWriteLocks() {
         CommitLockPolicy lockPolicy = config.commitLockPolicy;
-        return lockPolicy.tryAcquire(
-                attached,
-                config.dirtyCheck ? UncommittedFilter.DIRTY_CHECK : UncommittedFilter.NO_DIRTY_CHECK,
-                this);
+        UncommittedFilter commitLockFilter;
+        if (config.dirtyCheck) {
+            commitLockFilter = UncommittedFilter.DIRTY_CHECK;
+        } else {
+            commitLockFilter = UncommittedFilter.NO_DIRTY_CHECK;
+        }
+        return lockPolicy.tryAcquire(attached, commitLockFilter, this);
     }
 
     @Override
@@ -49,8 +50,8 @@ public class MonoUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
     }
 
     @Override
-    protected boolean hasWrites() {
-        return hasWrite(attached);
+    protected boolean isDirty() {
+        return isDirty(attached);
     }
 
     @Override
@@ -72,8 +73,12 @@ public class MonoUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
     @Override
     protected void attach(AlphaTranlocal tranlocal) {
         if (attached != null) {
-            config.speculativeConfiguration.signalSpeculativeSizeFailure(1);
-            throw SpeculativeConfigurationFailure.create();
+            if (attached.getTransactionalObject() != tranlocal.getTransactionalObject()) {
+                config.speculativeConfiguration.signalSpeculativeSizeFailure(1);
+                throw SpeculativeConfigurationFailure.create();
+            }
+
+            attached = tranlocal;
         }
 
         attached = tranlocal;
@@ -81,53 +86,11 @@ public class MonoUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
 
     @Override
     protected AlphaTranlocal findAttached(AlphaTransactionalObject txObject) {
-        return attached == null || attached.getTransactionalObject() != txObject ? null : attached;
-    }
-
-    @Override
-    protected AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject txObject) {
-        if (attached == null) {
-            attached = txObject.___openForCommutingOperation();
-        } else if (attached.getTransactionalObject() == txObject) {
-            if(attached.isCommitted()){
-                attached = attached.openForWrite();
-            }
+        if (attached == null || attached.getTransactionalObject() != txObject) {
+            return null;
         } else {
-            config.speculativeConfiguration.signalSpeculativeSizeFailure(1);
-            throw SpeculativeConfigurationFailure.create();
+            return attached;
         }
-
-        return attached;
-    }
-
-    @Override
-    protected AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {
-        if (attached != null) {
-            if (attached.getTransactionalObject() != txObject) {
-                config.speculativeConfiguration.signalSpeculativeSizeFailure(1);
-                throw SpeculativeConfigurationFailure.create();
-            }
-
-            if (attached.isCommitted()) {
-                attached = attached.openForWrite();
-            } else if (attached.isCommuting()) {
-                AlphaTranlocal origin = txObject.___load(getReadVersion());
-                if (origin == null) {
-                    throw new UncommittedReadConflict();
-                }
-                attached.fixatePremature(this, origin);
-            }
-        } else {
-            AlphaTranlocal committed = txObject.___load(getReadVersion());
-            if (committed == null) {
-                attached = txObject.___openUnconstructed();
-            } else {
-                attached = committed.openForWrite();
-            }
-        }
-
-        return attached;
-
     }
 
     @Override
@@ -139,6 +102,7 @@ public class MonoUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
         AlphaTransactionalObject txObject = attached.getTransactionalObject();
         switch (txObject.___registerRetryListener(latch, wakeupVersion)) {
             case registered:
+                //fall through
             case opened:
                 return true;
             case noregistration:

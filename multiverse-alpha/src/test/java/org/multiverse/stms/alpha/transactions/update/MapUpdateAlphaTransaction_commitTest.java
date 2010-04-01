@@ -112,14 +112,14 @@ public class MapUpdateAlphaTransaction_commitTest {
     }
 
     @Test
-    public void lockIsAcquiredOnFreshObject() {
+    public void lockIsNotAcquiredOnFreshObject() {
         AlphaTransaction tx = startSutTransaction();
         ManualRef ref = new ManualRef(tx, 0);
         tx.openForWrite(ref);
         ref.resetLockInfo();
         tx.commit();
 
-        assertTrue(ref.isTryLockCalled());
+        assertFalse(ref.isTryLockCalled());
     }
 
     // ================== commit =============================
@@ -180,9 +180,11 @@ public class MapUpdateAlphaTransaction_commitTest {
         long version = stm.getVersion();
         tx.commit();
 
+        assertNull(ref.___getLockOwner());
+        assertNull(ref.___getListeners());
         assertIsCommitted(tx);
         assertEquals(version + 1, stm.getVersion());
-        assertEquals(2, ref.get());
+        assertEquals(2, ref.getAtomic());
         assertSame(tranlocal, ref.___load());
         assertTrue(tranlocal.isCommitted());
         assertEquals(version + 1, tranlocal.getWriteVersion());
@@ -190,7 +192,7 @@ public class MapUpdateAlphaTransaction_commitTest {
     }
 
     @Test
-    public void whenFreshOnly() {
+    public void whenOnlyOpenedForConstruction_thenVersionNotIncreased() {
         AlphaTransaction tx = startSutTransaction();
 
         long startVersion = stm.getVersion();
@@ -198,7 +200,7 @@ public class MapUpdateAlphaTransaction_commitTest {
         tx.commit();
 
         assertIsCommitted(tx);
-        assertEquals(startVersion + 1, stm.getVersion());
+        assertEquals(startVersion , stm.getVersion());
         ManualRefTranlocal stored = (ManualRefTranlocal) ref.___load(stm.getVersion());
         assertEquals(10, stored.value);
         assertEquals(stm.getVersion(), stored.getWriteVersion());

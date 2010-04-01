@@ -54,7 +54,7 @@ public class QueueTest {
         long version = stm.getVersion();
         Queue queue = new Queue(100);
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertEquals(0, queue.size());
         assertTrue(queue.isEmpty());
     }

@@ -21,7 +21,7 @@ public class ManualRefTest {
 
         ManualRef ref = new ManualRef(stm, 10);
         assertEquals(10, ref.get(stm));
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
     }
 
     @Test

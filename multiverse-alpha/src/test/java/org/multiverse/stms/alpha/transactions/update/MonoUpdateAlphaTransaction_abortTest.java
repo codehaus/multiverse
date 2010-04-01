@@ -98,7 +98,7 @@ public class MonoUpdateAlphaTransaction_abortTest {
         ManualRef ref = ManualRef.createUncommitted();
 
         AlphaTransaction tx = startSutTransaction();
-        tx.openForWrite(ref);
+        tx.openForConstruction(ref);
 
         long version = stm.getVersion();
         tx.abort();

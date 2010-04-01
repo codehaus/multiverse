@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TransactionalArrayList_setPerformanceTest {
 
-    public final long transactionCount = 1000 * 1000 * 100;
+    public final long transactionCount = 1000 * 1000 * 10;
     public final int itemCount = 1000;
 
     @Test

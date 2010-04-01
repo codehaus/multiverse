@@ -112,7 +112,6 @@ public class MapUpdateAlphaTransaction_openForConstructionTest {
         assertSame(committed, ref.___load());
     }
 
-
     @Test
     public void whenAlreadyOpenedForRead_thenIllegalStateException() {
         ManualRef ref = new ManualRef(stm);

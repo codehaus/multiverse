@@ -80,13 +80,17 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         this.speculativeConfigEnabled = config.speculativeConfigurationEnabled;
         this.optimizeConflictDetectionEnabled = config.optimizedConflictDetectionEnabled;
         this.dirtyCheckEnabled = config.dirtyCheckEnabled;
-        this.clock = config.clock;
         this.maxArraySize = config.maxFixedUpdateSize;
         this.commitLockPolicy = config.commitLockPolicy;
         this.backoffPolicy = config.backoffPolicy;
         this.maxRetryCount = config.maxRetryCount;
         this.transactionFactoryBuilder = new AlphaTransactionFactoryBuilder();
         this.referenceFactoryBuilder = new AlphaProgrammaticReferenceFactoryBuilder();
+        this.clock = config.clock;
+
+        if(clock.getVersion()==0){
+            clock.tick();
+        }
 
         logger.info("Created a new AlphaStm instance");
     }

@@ -8,8 +8,10 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.LockNotFreeReadConflict;
 import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
 import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.stms.alpha.AlphaProgrammaticLong;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
+import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
@@ -200,14 +202,14 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
 
     @Test
     public void whenUncommitted_thenNewTranlocalReturned() {
-        ManualRef ref = ManualRef.createUncommitted();
+        AlphaProgrammaticLong ref = AlphaProgrammaticLong.createUncommitted();
 
         AlphaTransaction tx = startTrackingUpdateTransaction(stm);
 
-        ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForWrite(ref);
+        AlphaTranlocal tranlocal =  tx.openForCommutingWrite(ref);
         assertFalse(tranlocal.isCommitted());
         assertTrue(tranlocal.isUncommitted());
-        assertSame(ref, tranlocal.___txObject);
+        assertSame(ref, tranlocal.getTransactionalObject());
         assertNull(tranlocal.getOrigin());
 
         assertIsActive(tx);
@@ -215,7 +217,7 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
 
     @Test
     public void whenCommitted_thenDeadTransactionException() {
-        ManualRef ref = new ManualRef(stm, 0);
+        AlphaProgrammaticLong ref = AlphaProgrammaticLong.createUncommitted();
 
         AlphaTransaction tx = startSutTransaction();
         tx.commit();
@@ -233,7 +235,7 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
 
     @Test
     public void whenAborted_thenDeadTransactionException() {
-        ManualRef ref = new ManualRef(stm, 0);
+        AlphaProgrammaticLong ref = AlphaProgrammaticLong.createUncommitted();
 
         AlphaTransaction tx = startSutTransaction();
         tx.abort();

@@ -31,7 +31,7 @@ public class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction 
     }
 
     @Override
-    protected void doClear() {
+    protected void dodoClear() {
         firstFreeIndex = 0;
         for (int k = 0; k < attachedArray.length; k++) {
             attachedArray[k] = null;
@@ -39,12 +39,12 @@ public class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction 
     }
 
     @Override
-    protected boolean hasWrites() {
+    protected boolean isDirty() {
         boolean isDirty = false;
 
         for (int k = 0; k < firstFreeIndex; k++) {
             AlphaTranlocal attached = attachedArray[k];
-            if (hasWrite(attached)) {
+            if (isDirty(attached)) {
                 isDirty = true;
             }
         }
@@ -54,6 +54,9 @@ public class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction 
 
     @Override
     public AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject txObject) {
+        updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
+       
+
         int indexOf = indexOf(txObject);
 
         AlphaTranlocal opened;
@@ -77,10 +80,13 @@ public class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction 
 
     @Override
     protected AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {
+        updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
+
+
         int indexOf = indexOf(txObject);
 
         if (indexOf == -1) {
-            //it isnt loaded before.
+            //it isnt opened before.
             AlphaTranlocal committed = txObject.___load(getReadVersion());
 
             AlphaTranlocal opened;

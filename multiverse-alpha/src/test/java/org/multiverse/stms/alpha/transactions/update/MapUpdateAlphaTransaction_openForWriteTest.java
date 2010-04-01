@@ -3,10 +3,7 @@ package org.multiverse.stms.alpha.transactions.update;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.LockNotFreeReadConflict;
-import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
-import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
@@ -186,17 +183,19 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
     }
 
     @Test
-    public void whenUncommitted_thenNewTranlocalReturned() {
+    public void whenReferenceUncommitted_thenUncommittedReadConflict() {
         ManualRef ref = ManualRef.createUncommitted();
 
         AlphaTransaction tx = startTrackingUpdateTransaction(stm);
 
-        ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForWrite(ref);
-        assertFalse(tranlocal.isCommitted());
-        assertTrue(tranlocal.isUncommitted());
-        assertSame(ref, tranlocal.___txObject);
-        assertNull(tranlocal.getOrigin());
+        long version = stm.getVersion();
+        try{
+            tx.openForWrite(ref);
+            fail();
+        }catch(UncommittedReadConflict expected){
+        }
 
+        assertEquals(version, stm.getVersion());
         assertIsActive(tx);
     }
 

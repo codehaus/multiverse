@@ -46,7 +46,6 @@ public class MonoUpdateAlphaTransaction_openForConstructionTest {
         return startSutTransaction(new SpeculativeConfiguration(100));
     }
 
-
     @Test
     public void whenNullTxObject_thenNullPointerException() {
         AlphaTransaction tx = startSutTransaction();

@@ -121,7 +121,7 @@ public class MonoUpdateAlphaTransaction_commitTest {
 
         assertIsCommitted(tx);
         assertEquals(version+1, stm.getVersion());
-        assertEquals(2, ref.get());
+        assertEquals(2, ref.getAtomic());
         assertSame(tranlocal, ref.___load());
         assertTrue(tranlocal.isCommitted());
         assertEquals(version+1, tranlocal.getWriteVersion());
@@ -133,12 +133,12 @@ public class MonoUpdateAlphaTransaction_commitTest {
         ManualRef ref = ManualRef.createUncommitted();
 
         AlphaTransaction tx = startSutTransaction();
-        ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForWrite(ref);
+        ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForConstruction(ref);
         long version = stm.getVersion();
         tx.commit();
 
         assertIsCommitted(tx);
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version , stm.getVersion());
         assertSame(tranlocal, ref.___load());
         assertNull(ref.___getListeners());
         assertNull(ref.___getLockOwner());

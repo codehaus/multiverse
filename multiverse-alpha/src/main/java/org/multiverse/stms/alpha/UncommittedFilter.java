@@ -28,6 +28,10 @@ public class UncommittedFilter implements CommitLockFilter {
             return false;
         }
 
+        if(tranlocal.getOrigin() == null){
+            return false;
+        }
+
         if (dirtyCheck) {
             return tranlocal.getPrecalculatedIsDirty();
         }

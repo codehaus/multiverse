@@ -246,5 +246,4 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
                     getOrigin() == null ? null : getOrigin().toDebugString());
         }
     }
-
 }

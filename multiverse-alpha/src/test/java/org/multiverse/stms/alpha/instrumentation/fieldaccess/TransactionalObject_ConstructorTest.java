@@ -76,7 +76,7 @@ public class TransactionalObject_ConstructorTest {
 
         testEmptyConstructor o = new testEmptyConstructor();
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version , stm.getVersion());
     }
 
     @TransactionalObject
@@ -94,7 +94,7 @@ public class TransactionalObject_ConstructorTest {
 
         NoConstructor noConstructor = new NoConstructor();
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
     }
 
     @TransactionalObject
@@ -109,7 +109,7 @@ public class TransactionalObject_ConstructorTest {
 
         OneArgConstructor o = new OneArgConstructor(10);
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertEquals(10, o.getA());
     }
 
@@ -369,7 +369,7 @@ public class TransactionalObject_ConstructorTest {
 
         TxObjectWithNoArgSuperCallingConstructor o = new TxObjectWithNoArgSuperCallingConstructor();
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version , stm.getVersion());
     }
 
     @TransactionalObject

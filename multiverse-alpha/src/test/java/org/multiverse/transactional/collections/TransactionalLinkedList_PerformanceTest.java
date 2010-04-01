@@ -14,7 +14,7 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
  */
 public class TransactionalLinkedList_PerformanceTest {
     private Stm stm;
-    private int iterations = 5000;
+    private int iterations = 5;
     private int count = 1000 * 1000;
 
     @Before

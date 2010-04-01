@@ -49,4 +49,22 @@ public final class Listeners {
     }
 
 
+    /**
+     * Opens all listeners. Stops as soon as it finds a null, and can safely be called with a null listenersArray.
+     *
+     * @param arrayOfListeners the array of Listeners.
+     */
+    public static void openAll(Listeners[] arrayOfListeners) {
+        if (arrayOfListeners == null) {
+            return;
+        }
+
+        for (int k = 0; k < arrayOfListeners.length; k++) {
+            Listeners listeners = arrayOfListeners[k];
+            if (listeners == null) {
+                return;
+            }
+            listeners.openAll();
+        }
+    }
 }

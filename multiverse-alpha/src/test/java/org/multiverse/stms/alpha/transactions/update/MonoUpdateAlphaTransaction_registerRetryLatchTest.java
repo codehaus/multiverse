@@ -152,7 +152,7 @@ public class MonoUpdateAlphaTransaction_registerRetryLatchTest {
         ManualRef ref = ManualRef.createUncommitted();
 
         AlphaTransaction tx = startSutTransaction();
-        tx.openForWrite(ref);
+        tx.openForConstruction(ref);
         Latch latch = new CheapLatch();
 
         try {

@@ -23,9 +23,43 @@ public abstract class AbstractUpdateAlphaTransaction
 
     private long writeVersion;
 
+    //todo: for the time being
+    protected UpdateTransactionStatus updateTransactionStatus = UpdateTransactionStatus.nowrites;
+
     public AbstractUpdateAlphaTransaction(UpdateAlphaTransactionConfiguration config) {
         super(config);
     }
+
+    // ======================= clear =============================
+
+    @Override
+    protected final void doClear() {
+        updateTransactionStatus = UpdateTransactionStatus.nowrites;
+        dodoClear();
+    }
+
+    protected abstract void dodoClear();
+
+    // ======================= attach operations =========================
+
+    /**
+     * Attaches the tranlocal to this Transaction. The tranlocal will never be null and this call is only made when no
+     * read for the transactional object of the readonly has been made. It is important that an implementation doesn't
+     * ignore this call.
+     *
+     * @param opened the opened AlphaTranlocal to attach.
+     */
+    protected abstract void attach(AlphaTranlocal opened);
+
+    /**
+     * Finds the tranlocal for the given transactional object in the set of attached tranlocals.
+     *
+     * @param txObject the transactional object to find the tranlocal for.
+     * @return the found tranlocal. If no tranlocal was found in the set of attached tranlocals, null is returned.
+     */
+    protected abstract AlphaTranlocal findAttached(AlphaTransactionalObject txObject);
+
+    // ======================= open for read =============================
 
     @Override
     protected final AlphaTranlocal doOpenForRead(AlphaTransactionalObject txObject) {
@@ -54,22 +88,67 @@ public abstract class AbstractUpdateAlphaTransaction
         return opened;
     }
 
-    /**
-     * Attaches the tranlocal to this Transaction. The tranlocal will never be null and this call is only made when no
-     * read for the transactional object of the readonly has been made. It is important that an implementation doesn't
-     * ignore this call.
-     *
-     * @param opened the opened AlphaTranlocal to attach.
-     */
-    protected abstract void attach(AlphaTranlocal opened);
+    // ======================= open for write =============================
 
-    /**
-     * Finds the tranlocal for the given transactional object in the set of attached tranlocals.
-     *
-     * @param txObject the transactional object to find the tranlocal for.
-     * @return the found tranlocal. If no tranlocal was found in the set of attached tranlocals, null is returned.
-     */
-    protected abstract AlphaTranlocal findAttached(AlphaTransactionalObject txObject);
+    @Override
+    protected AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {        
+        updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
+
+        AlphaTranlocal attached = findAttached(txObject);
+        if (attached == null) {
+            attached = doOpenForWritePreviousCommittedAndAttach(txObject);
+        } else if (attached.isCommitted()) {
+            //it is loaded before but it is a readonly
+            //make an updatable clone of the tranlocal already is committed and use that
+            //from now on.
+            attached = attached.openForWrite();
+            attach(attached);
+        } else if (attached.isCommuting()) {
+            AlphaTranlocal origin = txObject.___load(getReadVersion());
+            if (origin == null) {
+                throw new UncommittedReadConflict();
+            }
+
+            attached.fixatePremature(this, origin);
+        }
+
+        return attached;
+    }
+
+    //todo: this method is going to be inlined.
+
+    protected final AlphaTranlocal doOpenForWritePreviousCommittedAndAttach(AlphaTransactionalObject txObject) {
+        AlphaTranlocal committed = txObject.___load(getReadVersion());
+
+        if (committed == null) {
+            throw new UncommittedReadConflict();
+        }
+
+        AlphaTranlocal opened = committed.openForWrite();
+        attach(opened);
+        return opened;
+    }
+
+
+    // ======================= open for commuting write =============================
+
+    @Override
+    protected AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject txObject) {
+        updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
+
+        AlphaTranlocal attached = findAttached(txObject);
+        if (attached == null) {
+            attached = txObject.___openForCommutingOperation();
+            attach(attached);
+        } else if (attached.isCommitted()) {
+            attached = attached.openForWrite();
+            attach(attached);
+        }
+
+        return attached;
+    }
+
+    // ======================= open for construction =============================
 
     @Override
     public final AlphaTranlocal doOpenForConstruction(AlphaTransactionalObject txObject) {
@@ -103,10 +182,14 @@ public abstract class AbstractUpdateAlphaTransaction
             return opened;
         }
 
+        updateTransactionStatus = updateTransactionStatus.upgradeToOpenForConstruction();
+
         AlphaTranlocal fresh = txObject.___openUnconstructed();
         attach(fresh);
         return fresh;
     }
+
+    // ======================= register retry latch =============================
 
     @Override
     protected final boolean doRegisterRetryLatch(Latch latch, long wakeupVersion) {
@@ -126,6 +209,64 @@ public abstract class AbstractUpdateAlphaTransaction
 
     protected abstract boolean dodoRegisterRetryLatch(Latch latch, long wakeupVersion);
 
+    // ======================= prepare/commit =============================
+
+    @Override
+    protected final void doPrepare() {
+        switch (updateTransactionStatus) {
+            case nowrites:
+                //we are done
+                break;
+            case newonly:
+                //if there are only fresh object, nothing needs to be locked and
+                //the write version doesn't need to be increased.
+                writeVersion = config.clock.getVersion();
+                break;
+            case updates:
+                if (!isDirty()) {
+                    return;
+                }
+
+                if (!tryWriteLocks()) {
+                    throw createFailedToObtainCommitLocksException();
+                }
+
+                boolean hasConflict = false;
+                try {
+                    if (config.allowWriteSkewProblem) {
+                        if (config.optimizedConflictDetection && getReadVersion() == config.clock.getVersion()) {
+                            writeVersion = config.clock.tick();
+                            //it could be that a different transaction also reached this part, so we need to make sure
+                            hasConflict = writeVersion != getReadVersion() + 1;
+                        } else {
+                            hasConflict = hasWriteConflict();
+                            if (!hasConflict) {
+                                writeVersion = config.clock.tick();
+                            }
+                        }
+
+                        if (hasConflict) {
+                            throw createOptimisticLockFailedWriteConflict();
+                        }
+                    } else {
+                        //todo: could here be a potential race problem because the reads are not locked, only the writes.
+                        writeVersion = config.clock.strictTick();
+                        hasConflict = hasReadConflict();
+
+                        if (hasConflict) {
+                            throw createWriteSkewConflict();
+                        }
+                    }
+                } finally {
+                    if (hasConflict) {
+                        doReleaseWriteLocksForFailure();
+                    }
+                }
+                break;
+            default:
+                throw new IllegalStateException();
+        }
+    }
 
     /**
      * Returns the state of the attached tranlocals. This information is needed for the transaction to decide what to do
@@ -135,9 +276,9 @@ public abstract class AbstractUpdateAlphaTransaction
      *
      * @return the AttachedState.
      */
-    protected abstract boolean hasWrites();
+    protected abstract boolean isDirty();
 
-    protected final boolean hasWrite(AlphaTranlocal attached) {
+    protected final boolean isDirty(AlphaTranlocal attached) {
         if (attached == null) {
             return false;
         }
@@ -146,13 +287,12 @@ public abstract class AbstractUpdateAlphaTransaction
             return false;
         }
 
-        if (config.dirtyCheck) {
-            return attached.isDirtyAndCacheValue();
-        } else {
+        if (!config.dirtyCheck) {
             return true;
         }
-    }
 
+        return attached.isDirtyAndCacheValue();
+    }
 
     /**
      * Checks if attached updated-items have a conflict. Call is made after the locks on the updates have been acquired.
@@ -251,11 +391,14 @@ public abstract class AbstractUpdateAlphaTransaction
         }
     }
 
-
     /**
      * Writes the tranlocals that need to be written to their transactional objects.
      * <p/>
      * It is important that a store always completes. If it doesn't it could cause partially committed transactions.
+     *
+     * @param writeVersion the version of the commit.
+     * @return the array of listeners that need to be notified of the write (array is allowed to be null
+     *         to prevent object creation).
      */
     protected abstract Listeners[] makeChangesPermanent(long writeVersion);
 
@@ -272,7 +415,7 @@ public abstract class AbstractUpdateAlphaTransaction
 
         AlphaTransactionalObject txObject = tranlocal.getTransactionalObject();
         if (config.dirtyCheck) {
-            if (tranlocal.getPrecalculatedIsDirty()) {
+            if (tranlocal.getOrigin() == null || tranlocal.getPrecalculatedIsDirty()) {
                 return txObject.___store(tranlocal, writeVersion);
             } else {
                 return null;
@@ -282,48 +425,6 @@ public abstract class AbstractUpdateAlphaTransaction
         }
     }
 
-    @Override
-    protected final void doPrepare() {
-        if (!hasWrites()) {
-            return;
-        }
-
-        if (!tryWriteLocks()) {
-            throw createFailedToObtainCommitLocksException();
-        }
-
-        boolean hasConflict = false;
-        try {
-            if (config.allowWriteSkewProblem) {
-                if (config.optimizedConflictDetection && getReadVersion() == config.clock.getVersion()) {
-                    writeVersion = config.clock.tick();
-                    //it could be that a different transaction also reached this part, so we need to make sure
-                    hasConflict = writeVersion != getReadVersion() + 1;
-                } else {
-                    hasConflict = hasWriteConflict();
-                    if (!hasConflict) {
-                        writeVersion = config.clock.tick();
-                    }
-                }
-
-                if (hasConflict) {
-                    throw createOptimisticLockFailedWriteConflict();
-                }
-            } else {
-                //todo: could here be a potential race problem because the reads are not locked, only the writes.
-                writeVersion = config.clock.strictTick();
-                hasConflict = hasReadConflict();
-
-                if (hasConflict) {
-                    throw createWriteSkewConflict();
-                }
-            }
-        } finally {
-            if (hasConflict) {
-                doReleaseWriteLocksForFailure();
-            }
-        }
-    }
 
     @Override
     protected void doAbortPrepared() {
@@ -334,8 +435,10 @@ public abstract class AbstractUpdateAlphaTransaction
     protected void makeChangesPermanent() {
         Listeners[] listeners = makeChangesPermanent(writeVersion);
         doReleaseWriteLocksForSuccess(writeVersion);
-        openAll(listeners);
+        Listeners.openAll(listeners);
     }
+
+    // ======================= building exceptions ============================
 
     private OptimisticLockFailedWriteConflict createOptimisticLockFailedWriteConflict() {
         if (OptimisticLockFailedWriteConflict.reuse) {
@@ -370,24 +473,5 @@ public abstract class AbstractUpdateAlphaTransaction
                         "in the writeset could be obtained",
                 config.getFamilyName());
         return new CommitLockNotFreeWriteConflict(msg);
-    }
-
-    /**
-     * Opens all listeners. Stops as soon as it finds a null, and can safely be called with a null listenersArray.
-     *
-     * @param arrayOfListeners the array of Listeners.
-     */
-    private static void openAll(Listeners[] arrayOfListeners) {
-        if (arrayOfListeners == null) {
-            return;
-        }
-
-        for (int k = 0; k < arrayOfListeners.length; k++) {
-            Listeners listeners = arrayOfListeners[k];
-            if (listeners == null) {
-                return;
-            }
-            listeners.openAll();
-        }
     }
 }

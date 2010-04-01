@@ -82,7 +82,7 @@ public class IntRefTest {
 
         IntRef intValue = new IntRef(10);
 
-        assertEquals(startVersion + 1, stm.getVersion());
+        assertEquals(startVersion, stm.getVersion());
         assertNull(getThreadLocalTransaction());
         assertEquals(10, intValue.get());
     }
