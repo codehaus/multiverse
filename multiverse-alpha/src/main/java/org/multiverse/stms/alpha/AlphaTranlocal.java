@@ -88,7 +88,10 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
      * @param writeVersion the version of the commit. This is the version this tranlocal from now on will be known. It
      *                     is never going to change anymore.
      */
-    public abstract void prepareForCommit(long writeVersion);
+    public final void prepareForCommit(long writeVersion) {
+        ___origin = null;
+        ___writeVersion = writeVersion;
+    }
 
     /**
      * Checks if this Tranlocal should be committed.
@@ -108,7 +111,7 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
      *
      * @return
      */
-    public boolean isDirtyAndCacheValue() {
+    public final boolean isDirtyAndCacheValue() {
         if (isCommitted()) {
             return false;
         }
@@ -132,7 +135,7 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
      *
      * @return true if dirty, false otherwise.
      */
-    public boolean getPrecalculatedIsDirty() {
+    public final boolean getPrecalculatedIsDirty() {
         return ___writeVersion < 0;
     }
 
@@ -152,13 +155,15 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
         throw new TodoException();
     }
 
+    //todo: inline
+
     public void ifCommutingThenFixate(AlphaTransaction tx) {
         if (isCommuting()) {
             throw new TodoException();
         }
     }
 
-    public long getWriteVersion() {
+    public final long getWriteVersion() {
         return ___writeVersion;
     }
 
@@ -171,9 +176,7 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
             return false;
         }
 
-        AlphaTransactionalObject txObject = getTransactionalObject();
-
-        AlphaTranlocal current = txObject.___load();
+        AlphaTranlocal current = ___transactionalObject.___load();
         return current != getOrigin();
     }
 
@@ -199,7 +202,7 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
 
     @Override
     public final Transaction ___getLockOwner() {
-        return getTransactionalObject().___getLockOwner();
+        return ___transactionalObject.___getLockOwner();
     }
 
     @Override
@@ -217,7 +220,7 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
             }
         }
 
-        return getTransactionalObject().___tryLock(lockOwner);
+        return ___transactionalObject.___tryLock(lockOwner);
     }
 
     @Override
@@ -235,7 +238,7 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
             }
         }
 
-        getTransactionalObject().___releaseLock(expectedLockOwner);
+        ___transactionalObject.___releaseLock(expectedLockOwner);
     }
 
     /**

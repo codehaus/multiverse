@@ -18,10 +18,10 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import static java.lang.String.format;
 
 /**
- * Doesn't support blocking operations.
- * <p/>
- * Base AlphaTransactionalObject implementation that also can be used to transplant methods from during
- * instrumentation.
+ * Doesn't support blocking operations. Essentially it is the same as the DefaultTxobjectMixin except
+ * that no Listeners field is added for the blocking operations. At the moment this class only is used
+ * for performance comparisons, but in the future it perhaps it is going to be added. (perhaps
+ * through the programmatic reference interface).
  * <p/>
  * It is important that the constructor doesn't contain any donorMethod because the constructor code is not copied when
  * this class is 'mixed' in. In the future perhaps this is fixed when there needs to be a constructor. So you are
@@ -161,7 +161,14 @@ public abstract class FastTxObjectMixin implements AlphaTransactionalObject, Mul
     }
 
     @Override
-    public Listeners ___store(AlphaTranlocal tranlocal, long writeVersion) {
+    public void ___storeInitial(AlphaTranlocal tranlocal, long writeVersion) {
+        tranlocal.prepareForCommit(writeVersion);
+        ___TRANLOCAL_UPDATER.set(this, tranlocal);
+    }
+
+
+    @Override
+    public Listeners ___storeUpdate(AlphaTranlocal tranlocal, long writeVersion, boolean releaseLock) {
         assert tranlocal != null;
 
         if (___SANITY_CHECKS_ENABLED) {
@@ -199,9 +206,12 @@ public abstract class FastTxObjectMixin implements AlphaTransactionalObject, Mul
 
         ___TRANLOCAL_UPDATER.set(this, tranlocal);
 
+        if (releaseLock) {
+            ___LOCKOWNER_UPDATER.set(this, null);
+        }
+
         return null;
     }
-
 
     @Override
     public RegisterRetryListenerResult ___registerRetryListener(Latch listener, long minimumWakeupVersion) {

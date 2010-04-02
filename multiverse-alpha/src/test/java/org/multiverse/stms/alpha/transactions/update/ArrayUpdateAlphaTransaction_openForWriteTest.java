@@ -35,7 +35,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true);
+                stmConfig.maxRetryCount, true, true, true, true, true, true);
 
         return new ArrayUpdateAlphaTransaction(config, size);
     }
@@ -48,7 +48,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true);
+                stmConfig.maxRetryCount, true, true, true, true, true, true);
 
         return new ArrayUpdateAlphaTransaction(config, size);
     }
@@ -60,10 +60,10 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
         AlphaTransaction tx = startSutTransaction(2);
 
         long version = stm.getVersion();
-        try{
+        try {
             tx.openForWrite(txObject);
             fail();
-        }catch(UncommittedReadConflict expected){
+        } catch (UncommittedReadConflict expected) {
 
         }
 
@@ -132,7 +132,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForWrite(ref);
 
         assertIsActive(tx);
-        assertIsUpdatableClone(ref, committed, found);        
+        assertIsUpdatableClone(ref, committed, found);
     }
 
     @Test
@@ -164,7 +164,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
 
     @Test
     @Ignore
-    public void whenAlreadyOpenedForCommutingWrite(){
+    public void whenAlreadyOpenedForCommutingWrite() {
 
     }
 

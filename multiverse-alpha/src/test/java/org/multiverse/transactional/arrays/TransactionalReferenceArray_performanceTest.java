@@ -1,33 +1,32 @@
-package org.multiverse.stms.alpha;
+package org.multiverse.transactional.arrays;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
-
-import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
- * @author Peter Veentjer
+ * The performance difference atm is that the transactionalreferencearray is almost
+ * 10 times slower than the  AtomicReferenceArray.
+ *
+ * @author Peter Veentjer.
  */
-public class AlphaProgrammaticReference_setPerformanceTest {
+public class TransactionalReferenceArray_performanceTest {
 
-    private long transactionCount = ((long) 1000) * 1000 * 100;
 
-    @Before
-    public void setUp() {
-        clearThreadLocalTransaction();
-    }
+    public final long transactionCount = 1000 * 1000 * 1000;
+    public final int itemCount = 1000;
 
     @Test
-    public void set() {
-        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>();
+    public void testTransactionalReferenceArray() {
+        TransactionalReferenceArray<String> list = new TransactionalReferenceArray<String>(itemCount);
 
         long startNs = System.nanoTime();
 
-
         for (long k = 0; k < transactionCount; k++) {
-            ref.set(k % 2 == 0 ? "foo" : "bar");
+            String s = (k % 2) == 0 ? "foo" : "bar";
+
+            list.set((int) k % itemCount, s);
 
             if (k % (10 * 1000 * 1000) == 0) {
                 System.out.println("at: " + k);
@@ -40,13 +39,15 @@ public class AlphaProgrammaticReference_setPerformanceTest {
     }
 
     @Test
-    public void setAtomic() {
-        AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>();
+    public void testAtomicReferenceArray() {
+        AtomicReferenceArray<String> list = new AtomicReferenceArray<String>(itemCount);
 
         long startNs = System.nanoTime();
 
         for (long k = 0; k < transactionCount; k++) {
-            ref.setAtomic(k % 2 == 0 ? "foo" : "bar");
+            String s = (k % 2) == 0 ? "foo" : "bar";
+
+            list.set((int) k % itemCount, s);
 
             if (k % (10 * 1000 * 1000) == 0) {
                 System.out.println("at: " + k);
@@ -57,4 +58,5 @@ public class AlphaProgrammaticReference_setPerformanceTest {
         double transactionsPerSecond = (1.0d * transactionCount * TimeUnit.SECONDS.toNanos(1)) / durationNs;
         System.out.printf("Performance %s transactions/second\n", transactionsPerSecond);
     }
+
 }

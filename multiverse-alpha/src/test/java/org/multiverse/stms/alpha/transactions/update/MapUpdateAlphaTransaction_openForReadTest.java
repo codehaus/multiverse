@@ -42,7 +42,7 @@ public class MapUpdateAlphaTransaction_openForReadTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true);
+                stmConfig.maxRetryCount, true, true, true, true, true, true);
 
         return new MapUpdateAlphaTransaction(config);
     }
@@ -55,7 +55,7 @@ public class MapUpdateAlphaTransaction_openForReadTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, false, true, true, true);
+                stmConfig.maxRetryCount, true, false, true, true, true, true);
 
         return new MapUpdateAlphaTransaction(config);
     }
@@ -78,9 +78,9 @@ public class MapUpdateAlphaTransaction_openForReadTest {
         AlphaTransaction tx = startSutTransaction();
 
         long version = stm.getVersion();
-        try{
+        try {
             tx.openForRead(ref);
-        }catch(UncommittedReadConflict o){
+        } catch (UncommittedReadConflict o) {
 
         }
 
@@ -97,7 +97,8 @@ public class MapUpdateAlphaTransaction_openForReadTest {
         ref.resetLockInfo();
         tx.openForRead(ref);
 
-        assertFalse(ref.isTryLockCalled());
+        ref.assertNoLocksReleased();
+        ref.assertNoLockAcquired();
     }
 
     @Test
@@ -208,7 +209,8 @@ public class MapUpdateAlphaTransaction_openForReadTest {
         ref.resetLockInfo();
         tx.openForRead(ref);
 
-        assertFalse(ref.isTryLockCalled());
+        ref.assertNoLocksReleased();
+        ref.assertNoLockAcquired();
     }
 
     @Test
@@ -250,7 +252,7 @@ public class MapUpdateAlphaTransaction_openForReadTest {
 
     @Test
     @Ignore
-    public void whenAlreadyOpenedForCommutingWrite_thenItIsFixated(){
+    public void whenAlreadyOpenedForCommutingWrite_thenItIsFixated() {
 
     }
 

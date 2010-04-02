@@ -230,12 +230,6 @@ class AlphaProgrammaticLongTranlocal extends AlphaTranlocal {
     }
 
     @Override
-    public void prepareForCommit(long writeVersion) {
-        ___origin = null;
-        ___writeVersion = writeVersion;
-    }
-
-    @Override
     public boolean isDirty() {
         if (isCommitted()) {
             return false;

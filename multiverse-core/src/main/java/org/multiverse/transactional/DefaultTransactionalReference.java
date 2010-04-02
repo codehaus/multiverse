@@ -71,16 +71,20 @@ public final class DefaultTransactionalReference<E> implements TransactionalRefe
     }
 
     @Override
+    @TransactionalMethod(automaticReadTracking = true)
     public E set(E newValue) {
+        E currentValue = value;
+
         //optimization to prevent loading the object if not needed.
-        if (value == newValue) {
+        if (currentValue == newValue) {
             return newValue;
         }
 
-        E oldRef = value;
+        E oldRef = currentValue;
         value = newValue;
         return oldRef;
     }
+
     @Override
     public E clear() {
         return set(null);

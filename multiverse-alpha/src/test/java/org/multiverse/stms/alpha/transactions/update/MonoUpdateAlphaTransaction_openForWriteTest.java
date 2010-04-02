@@ -35,7 +35,7 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true);
+                stmConfig.maxRetryCount, true, true, true, true, true, true);
         return new MonoUpdateAlphaTransaction(config);
     }
 
@@ -82,7 +82,7 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
         }
 
         assertNull(ref.___load());
-        assertNull(getField(tx,"attached"));
+        assertNull(getField(tx, "attached"));
         assertEquals(version, stm.getVersion());
         assertIsActive(tx);
     }

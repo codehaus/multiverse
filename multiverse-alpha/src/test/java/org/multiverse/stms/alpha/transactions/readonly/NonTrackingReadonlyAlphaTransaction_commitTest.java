@@ -10,7 +10,8 @@ import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static org.multiverse.TestUtils.assertIsCommitted;
 
 /**
@@ -38,7 +39,7 @@ public class NonTrackingReadonlyAlphaTransaction_commitTest {
     }
 
     @Test
-    public void commitDoesNotLockTxObjects() {
+    public void commitDoesNotLockTransactionalObjects() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = startSutTransaction();
@@ -46,7 +47,8 @@ public class NonTrackingReadonlyAlphaTransaction_commitTest {
         ref.resetLockInfo();
         tx.commit();
 
-        assertFalse(ref.isTryLockCalled());
+        ref.assertNoLockAcquired();
+        ref.assertNoLocksReleased();
     }
 
     @Test

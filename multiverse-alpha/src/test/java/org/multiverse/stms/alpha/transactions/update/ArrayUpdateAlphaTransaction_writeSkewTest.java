@@ -41,7 +41,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, allowWriteSkewProblem, true, true);
+                stmConfig.maxRetryCount, true, true, allowWriteSkewProblem, true, true, true);
 
         return new ArrayUpdateAlphaTransaction(config, size);
     }

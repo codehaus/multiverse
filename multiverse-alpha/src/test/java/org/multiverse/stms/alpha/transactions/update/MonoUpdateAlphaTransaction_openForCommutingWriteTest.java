@@ -37,7 +37,7 @@ public class MonoUpdateAlphaTransaction_openForCommutingWriteTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true);
+                stmConfig.maxRetryCount, true, true, true, true, true, true);
         return new MonoUpdateAlphaTransaction(config);
     }
 
@@ -52,7 +52,7 @@ public class MonoUpdateAlphaTransaction_openForCommutingWriteTest {
         AlphaTransaction tx = startSutTransaction();
         AlphaTranlocal found = tx.openForCommutingWrite(ref);
 
-        assertSame(found, getField(tx, "attached"));              
+        assertSame(found, getField(tx, "attached"));
         assertFalse(found.isCommitted());
         assertTrue(found.isCommuting());
         assertEquals(-2, found.getWriteVersion());
@@ -60,7 +60,7 @@ public class MonoUpdateAlphaTransaction_openForCommutingWriteTest {
 
     @Test
     @Ignore
-    public void whenLocked(){
+    public void whenLocked() {
 
     }
 

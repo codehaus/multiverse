@@ -49,7 +49,8 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
         ref.resetLockInfo();
         tx.openForRead(ref);
 
-        assertFalse(ref.isTryLockCalled());
+        ref.assertNoLocksReleased();
+        ref.assertNoLockAcquired();
     }
 
     @Test

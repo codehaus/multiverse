@@ -38,8 +38,26 @@ public class MonoUpdateAlphaTransaction_commitTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true);
+                stmConfig.maxRetryCount, true, true, true, true, true, true);
         return new MonoUpdateAlphaTransaction(config);
+    }
+
+    @Test
+    public void freshObjectIsNotLocked() {
+        ManualRef ref = ManualRef.createUncommitted();
+
+        AlphaTransaction tx = startSutTransaction();
+        tx.openForConstruction(ref);
+
+        long version = stm.getVersion();
+
+        ref.resetLockInfo();
+        tx.commit();
+
+        assertEquals(version, stm.getVersion());
+        assertIsCommitted(tx);
+        ref.assertNoLockAcquired();
+        ref.assertNoLocksReleased();
     }
 
     @Test
@@ -120,11 +138,11 @@ public class MonoUpdateAlphaTransaction_commitTest {
         tx.commit();
 
         assertIsCommitted(tx);
-        assertEquals(version+1, stm.getVersion());
+        assertEquals(version + 1, stm.getVersion());
         assertEquals(2, ref.getAtomic());
         assertSame(tranlocal, ref.___load());
         assertTrue(tranlocal.isCommitted());
-        assertEquals(version+1, tranlocal.getWriteVersion());
+        assertEquals(version + 1, tranlocal.getWriteVersion());
         assertNull(tranlocal.getOrigin());
     }
 
@@ -138,7 +156,7 @@ public class MonoUpdateAlphaTransaction_commitTest {
         tx.commit();
 
         assertIsCommitted(tx);
-        assertEquals(version , stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertSame(tranlocal, ref.___load());
         assertNull(ref.___getListeners());
         assertNull(ref.___getLockOwner());

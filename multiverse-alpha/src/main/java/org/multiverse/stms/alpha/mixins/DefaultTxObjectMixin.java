@@ -81,32 +81,12 @@ public abstract class DefaultTxObjectMixin implements AlphaTransactionalObject, 
             //we are lucky, the tranlocal is exactly the one we are looking for.
             return tranlocalTime1;
         } else if (tranlocalTime1.getWriteVersion() > readVersion) {
-            //the current tranlocal it too new to return, so we fail. In the future this would
-            //be the location to search for tranlocal with the correct version.
-            if (OldVersionNotFoundReadConflict.reuse) {
-                throw OldVersionNotFoundReadConflict.INSTANCE;
-            } else {
-                String msg = format(
-                        "Can't load version '%s' for transactionalobject '%s', the oldest version found is '%s'",
-                        readVersion,
-                        AlphaStmUtils.toTxObjectString(this),
-                        tranlocalTime1.getWriteVersion());
-                throw new OldVersionNotFoundReadConflict(msg);
-            }
+            throw createOldVersionNotFoundReadConflict(readVersion, tranlocalTime1);
         } else {
             Transaction lockOwner = ___LOCKOWNER_UPDATER.get(this);
 
             if (lockOwner != null) {
-                //this would be the location for spinning. As long as the lock is there,
-                //we are not sure if the version read is the version that can be returned (perhaps there are
-                //pending writes).
-                if (LockNotFreeReadConflict.reuse) {
-                    throw LockNotFreeReadConflict.INSTANCE;
-                } else {
-                    String msg = format("Failed to load already locked transactionalobject '%s'",
-                            AlphaStmUtils.toTxObjectString(this));
-                    throw new LockNotFreeReadConflict(msg);
-                }
+                throw createLockNotFreeReadConflict();
             }
 
             AlphaTranlocal tranlocalTime2 = ___TRANLOCAL_UPDATER.get(this);
@@ -118,24 +98,41 @@ public abstract class DefaultTxObjectMixin implements AlphaTransactionalObject, 
                     return tranlocalTime2;
                 }
 
-                //we were not able to find the version we are looking for. It could be tranlocalT1
-                //or tranlocalT2 but it could also have been a write we didn't notice. So lets
-                //fails to indicate that we didn't find it.
-                if (OldVersionNotFoundReadConflict.reuse) {
-                    throw OldVersionNotFoundReadConflict.INSTANCE;
-                } else {
-                    String msg = format(
-                            "Can't load version '%s' transactionalobject '%s', the oldest version found is '%s'",
-                            readVersion,
-                            AlphaStmUtils.toTxObjectString(this),
-                            tranlocalTime2.getWriteVersion());
-                    throw new OldVersionNotFoundReadConflict(msg);
-                }
+                throw createOldVersionNotFoundReadConflict(readVersion, tranlocalTime2);
             } else {
                 //the tranlocal has not changed and it was unlocked. This means that we read
                 //an old version that we can use.
                 return tranlocalTime1;
             }
+        }
+    }
+
+    private LockNotFreeReadConflict createLockNotFreeReadConflict() {
+        //this would be the location for spinning. As long as the lock is there,
+        //we are not sure if the version read is the version that can be returned (perhaps there are
+        //pending writes).
+        if (LockNotFreeReadConflict.reuse) {
+            return LockNotFreeReadConflict.INSTANCE;
+        } else {
+            String msg = format("Failed to load already locked transactionalobject '%s'",
+                    AlphaStmUtils.toTxObjectString(this));
+            return new LockNotFreeReadConflict(msg);
+        }
+    }
+
+    private OldVersionNotFoundReadConflict createOldVersionNotFoundReadConflict(long readVersion, AlphaTranlocal tranlocalTime2) {
+        //we were not able to find the version we are looking for. It could be tranlocalT1
+        //or tranlocalT2 but it could also have been a write we didn't notice. So lets
+        //fails to indicate that we didn't find it.
+        if (OldVersionNotFoundReadConflict.reuse) {
+            return OldVersionNotFoundReadConflict.INSTANCE;
+        } else {
+            String msg = format(
+                    "Can't load version '%s' transactionalobject '%s', the oldest version found is '%s'",
+                    readVersion,
+                    AlphaStmUtils.toTxObjectString(this),
+                    tranlocalTime2.getWriteVersion());
+            return new OldVersionNotFoundReadConflict(msg);
         }
     }
 
@@ -163,7 +160,7 @@ public abstract class DefaultTxObjectMixin implements AlphaTransactionalObject, 
     }
 
     @Override
-    public Listeners ___store(AlphaTranlocal tranlocal, long writeVersion) {
+    public Listeners ___storeUpdate(AlphaTranlocal tranlocal, long writeVersion, boolean releaseLock) {
         assert tranlocal != null;
 
         if (___SANITY_CHECKS_ENABLED) {
@@ -202,9 +199,20 @@ public abstract class DefaultTxObjectMixin implements AlphaTransactionalObject, 
         ___TRANLOCAL_UPDATER.set(this, tranlocal);
 
         //it is important that the listeners are removed after the tranlocal write en before the lockrelease.
-        return ___LISTENERS_UPDATER.getAndSet(this, null);
+        Listeners listeners = ___LISTENERS_UPDATER.getAndSet(this, null);
+
+        if (releaseLock) {
+            ___LOCKOWNER_UPDATER.set(this, null);
+        }
+
+        return listeners;
     }
 
+    @Override
+    public void ___storeInitial(AlphaTranlocal tranlocal, long writeVersion) {
+        tranlocal.prepareForCommit(writeVersion);
+        ___TRANLOCAL_UPDATER.set(this, tranlocal);
+    }
 
     @Override
     public RegisterRetryListenerResult ___registerRetryListener(Latch listener, long minimumWakeupVersion) {

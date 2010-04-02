@@ -14,9 +14,8 @@ import org.multiverse.utils.TodoException;
 /**
  * A threadunsafe tx object mixin that can be used for benchmarking purposes if you want to
  * see what the overhead is caused by cas/volatile read/volatile write operations.
- *
+ * <p/>
  * Can't be used in a multithreaded program.
- *
  */
 public abstract class ThreadUnsafeTxObjectMixin implements AlphaTransactionalObject, MultiverseConstants {
 
@@ -109,13 +108,26 @@ public abstract class ThreadUnsafeTxObjectMixin implements AlphaTransactionalObj
     }
 
     @Override
-    public Listeners ___store(AlphaTranlocal tranlocal, long writeVersion) {
+    public AlphaTranlocal ___openUnconstructed() {
+        return null;  //todo
+    }
+
+    @Override
+    public Listeners ___storeUpdate(AlphaTranlocal tranlocal, long writeVersion, boolean releaseLock) {
         assert tranlocal != null;
         tranlocal.prepareForCommit(writeVersion);
         ___tranlocal = tranlocal;
+        if (releaseLock) {
+            ___lockOwner = null;
+        }
         return null;
     }
 
+    @Override
+    public void ___storeInitial(AlphaTranlocal tranlocal, long writeVersion) {
+        tranlocal.prepareForCommit(writeVersion);
+        ___tranlocal = tranlocal;
+    }
 
     @Override
     public RegisterRetryListenerResult ___registerRetryListener(Latch listener, long minimumWakeupVersion) {

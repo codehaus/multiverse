@@ -31,7 +31,7 @@ public class ArrayUpdateAlphaTransaction_restartTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true);
+                stmConfig.maxRetryCount, true, true, true, true, true, true);
         return new ArrayUpdateAlphaTransaction(config, size);
     }
 

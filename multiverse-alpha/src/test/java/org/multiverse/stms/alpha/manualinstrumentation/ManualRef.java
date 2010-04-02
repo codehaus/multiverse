@@ -3,15 +3,22 @@ package org.multiverse.stms.alpha.manualinstrumentation;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.stms.alpha.AlphaStm;
+import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
+import org.multiverse.utils.Listeners;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ManualRef extends DefaultTxObjectMixin {
 
-    private boolean tryLockCalled = false;
+    private List<Transaction> lockTransactions = new LinkedList<Transaction>();
+    private List<Transaction> releaseLockTransactions = new LinkedList<Transaction>();
 
     public static ManualRef createUncommitted() {
         return new ManualRef(String.class);
@@ -33,7 +40,7 @@ public class ManualRef extends DefaultTxObjectMixin {
     }
 
     public ManualRef(AlphaTransaction tx, final int value) {
-        ManualRefTranlocal tranlocal = (ManualRefTranlocal)tx.openForConstruction(ManualRef.this);
+        ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForConstruction(ManualRef.this);
         tranlocal.value = value;
     }
 
@@ -118,22 +125,45 @@ public class ManualRef extends DefaultTxObjectMixin {
     }
 
     @Override
+    public Listeners ___storeUpdate(AlphaTranlocal tranlocal, long writeVersion, boolean releaseLock) {
+        if (releaseLock) {
+            releaseLockTransactions.add(___getLockOwner());
+        }
+        return super.___storeUpdate(tranlocal, writeVersion, releaseLock);
+    }
+
+    @Override
     public boolean ___tryLock(Transaction lockOwner) {
         boolean success = super.___tryLock(lockOwner);
-        tryLockCalled = true;
+        lockTransactions.add(lockOwner);
         return success;
     }
 
+    @Override
+    public void ___releaseLock(Transaction expectedLockOwner) {
+        releaseLockTransactions.add(expectedLockOwner);
+        super.___releaseLock(expectedLockOwner);
+    }
+
     public void resetLockInfo() {
-        tryLockCalled = false;
+        lockTransactions.clear();
+        releaseLockTransactions.clear();
     }
 
-    public boolean isTryLockCalled() {
-        return tryLockCalled;
+    public void assertNoLockAcquired() {
+        assertTrue(lockTransactions.isEmpty());
     }
 
-    public void assertNoLocksCalled() {
-        assertFalse(tryLockCalled);
+    public void assertLockAcquired() {
+        assertFalse(lockTransactions.isEmpty());
+    }
+
+    public void assertNoLocksReleased() {
+        assertTrue(releaseLockTransactions.isEmpty());
+    }
+
+    public void assertLockReleased() {
+        assertFalse(releaseLockTransactions.isEmpty());
     }
 }
 

@@ -66,7 +66,6 @@ public final class TranlocalFactory implements Opcodes {
         result.superName = getInternalName(AlphaTranlocal.class);
 
         result.methods.add(createOpenForWriteConstructor());
-        result.methods.add(createPrepareForCommitMethod());
         result.methods.add(createIsDirtyMethod());
         result.methods.add(createTakeSnapshotMethod());
         result.methods.add(createFreshConstructor());
@@ -184,30 +183,6 @@ public final class TranlocalFactory implements Opcodes {
 
         m.visitInsn(RETURN);
         m.visitMaxs(0, 0);//value's don't matter, will be reculculated, but call is needed
-        m.visitEnd();
-        return m;
-    }
-
-    /**
-     * Just override the original super.prepareForCommit if one exists.
-     */
-    private MethodNode createPrepareForCommitMethod() {
-        MethodNode m = new MethodNode(
-                ACC_PUBLIC + ACC_SYNTHETIC,
-                "prepareForCommit",
-                "(J)V",
-                null,
-                new String[]{});
-
-        m.visitVarInsn(ALOAD, 0);
-        m.visitVarInsn(LLOAD, 1);
-        m.visitFieldInsn(PUTFIELD, tranlocalName, "___writeVersion", "J");
-
-        m.visitVarInsn(ALOAD, 0);
-        m.visitInsn(ACONST_NULL);
-        m.visitFieldInsn(PUTFIELD, tranlocalName, "___origin", originDesc);
-        m.visitInsn(RETURN);
-        m.visitMaxs(0, 0);
         m.visitEnd();
         return m;
     }

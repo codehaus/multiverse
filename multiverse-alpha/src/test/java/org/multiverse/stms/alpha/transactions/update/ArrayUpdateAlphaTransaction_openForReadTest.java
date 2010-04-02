@@ -34,7 +34,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true);
+                stmConfig.maxRetryCount, true, true, true, true, true, true);
 
         return new ArrayUpdateAlphaTransaction(config, speculativeConfig.getMaximumArraySize());
     }
@@ -47,7 +47,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, false, true, true, true);
+                stmConfig.maxRetryCount, true, false, true, true, true, true);
 
         return new ArrayUpdateAlphaTransaction(config, 100);
     }
@@ -60,7 +60,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true);
+                stmConfig.maxRetryCount, true, true, true, true, true, true);
 
         return new ArrayUpdateAlphaTransaction(config, 100);
     }

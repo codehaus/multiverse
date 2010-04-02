@@ -39,7 +39,7 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true);
+                stmConfig.maxRetryCount, true, true, true, true, true, true);
 
         return new ArrayUpdateAlphaTransaction(config, size);
     }
@@ -51,7 +51,7 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true);
+                stmConfig.maxRetryCount, true, true, true, true, true, true);
 
         return new ArrayUpdateAlphaTransaction(config, speculativeConfig.getOptimalSize());
     }
@@ -199,7 +199,7 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
         AlphaTransaction tx = startSutTransaction(config);
         tx.openForConstruction(ref1);
         tx.openForConstruction(ref2);
-        System.out.println("config.optimalsize: "+config.getOptimalSize());
+        System.out.println("config.optimalsize: " + config.getOptimalSize());
         tx.openForConstruction(ref3);
 
         long version = stm.getVersion();

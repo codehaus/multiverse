@@ -641,7 +641,7 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
         boolean modified = false;
         Iterator<? extends E> e = c.iterator();
         while (e.hasNext()) {
-            if (add(e.next())){
+            if (add(e.next())) {
                 modified = true;
             }
         }
@@ -733,7 +733,7 @@ public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> impleme
     }
 
     @Override
-    @TransactionalMethod(readonly = false)
+    @TransactionalMethod(readonly = false, automaticReadTracking = true)
     public boolean add(E e) {
         addLast(e);
         return true;

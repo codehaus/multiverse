@@ -38,7 +38,7 @@ public class ArrayUpdateAlphaTransaction_openForCommutingWriteTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true);
+                stmConfig.maxRetryCount, true, true, true, true, true, true);
 
         return new ArrayUpdateAlphaTransaction(config, size);
     }
@@ -51,7 +51,7 @@ public class ArrayUpdateAlphaTransaction_openForCommutingWriteTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true);
+                stmConfig.maxRetryCount, true, true, true, true, true, true);
 
         return new ArrayUpdateAlphaTransaction(config, size);
     }

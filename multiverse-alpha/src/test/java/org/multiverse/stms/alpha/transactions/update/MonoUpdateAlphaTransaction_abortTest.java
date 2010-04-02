@@ -34,7 +34,7 @@ public class MonoUpdateAlphaTransaction_abortTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true);
+                stmConfig.maxRetryCount, true, true, true, true, true, true);
         return new MonoUpdateAlphaTransaction(config);
     }
 

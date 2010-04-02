@@ -37,7 +37,7 @@ public class ArrayUpdateAlphaTransaction_commitTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true);
+                stmConfig.maxRetryCount, true, true, true, true, true, true);
 
         return new ArrayUpdateAlphaTransaction(config, size);
     }
@@ -50,7 +50,7 @@ public class ArrayUpdateAlphaTransaction_commitTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, allowWriteSkewProblem, true, true);
+                stmConfig.maxRetryCount, true, true, allowWriteSkewProblem, true, true, true);
 
         return new ArrayUpdateAlphaTransaction(config, size);
     }
@@ -67,7 +67,7 @@ public class ArrayUpdateAlphaTransaction_commitTest {
     }
 
     @Test
-    public void whenOnlyFreshObjects_thenVersionNotIncreasedAndLocksNotAcquired() {
+    public void whenOnlyFreshObjects_thenVersionNotIncreased() {
         ManualRef txObject = ManualRef.createUncommitted();
 
         AlphaTransaction tx = startSutTransaction(2);
@@ -82,6 +82,30 @@ public class ArrayUpdateAlphaTransaction_commitTest {
         assertSame(stm.getVersion(), tranlocal.getWriteVersion());
         assertSame(txObject, tranlocal.getTransactionalObject());
         assertNull(txObject.___getLockOwner());
+    }
+
+    @Test
+    public void freshObjectIsNotLocked() {
+        ManualRef ref1 = new ManualRef(stm);
+        ManualRef ref2 = ManualRef.createUncommitted();
+
+        AlphaTransaction tx = startSutTransaction(2);
+        ref1.inc(tx);
+        AlphaTranlocal tranlocal2 = tx.openForConstruction(ref2);
+
+        long version = stm.getVersion();
+
+        ref1.resetLockInfo();
+        ref2.resetLockInfo();
+        tx.commit();
+
+        assertEquals(version + 1, stm.getVersion());
+        assertIsCommitted(tx);
+
+        ref2.assertNoLockAcquired();
+        ref1.assertLockAcquired();
+        assertNull(ref1.___getLockOwner());
+        assertNull(ref2.___getLockOwner());
     }
 
     @Test
@@ -103,7 +127,7 @@ public class ArrayUpdateAlphaTransaction_commitTest {
         assertNull(txObject.___getLockOwner());
     }
 
- @Test
+    @Test
     public void whenCommutingWrites() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(1);
 
@@ -115,13 +139,14 @@ public class ArrayUpdateAlphaTransaction_commitTest {
         tx.commit();
 
         assertIsCommitted(tx);
-        assertEquals(version+1, stm.getVersion());
+        assertEquals(version + 1, stm.getVersion());
         assertEquals(2, ref.getAtomic());
         assertSame(tranlocal, ref.___load());
         assertTrue(tranlocal.isCommitted());
-        assertEquals(version+1, tranlocal.getWriteVersion());
+        assertEquals(version + 1, tranlocal.getWriteVersion());
         assertNull(tranlocal.getOrigin());
     }
+
     @Test
     public void whenListenersRegistered_theyAreRemovedAndNotified() {
         ManualRef ref = new ManualRef(stm);

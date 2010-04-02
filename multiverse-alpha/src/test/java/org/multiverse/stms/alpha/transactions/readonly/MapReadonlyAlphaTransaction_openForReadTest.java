@@ -48,7 +48,8 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
         ref.resetLockInfo();
         tx.openForRead(ref);
 
-        assertFalse(ref.isTryLockCalled());
+        ref.assertNoLockAcquired();
+        ref.assertNoLocksReleased();
     }
 
     @Test

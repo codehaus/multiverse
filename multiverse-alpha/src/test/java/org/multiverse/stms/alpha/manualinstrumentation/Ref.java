@@ -141,12 +141,6 @@ class RefTranlocal<E> extends AlphaTranlocal {
     }
 
     @Override
-    public void prepareForCommit(long writeVersion) {
-        this.___writeVersion = writeVersion;
-        this.___origin = null;
-    }
-
-    @Override
     public AlphaTranlocalSnapshot takeSnapshot() {
         return new RefTranlocalSnapshot<E>(this);
     }

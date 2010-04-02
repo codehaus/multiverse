@@ -61,7 +61,6 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
 
     private static final PrimitiveClock clock = ((AlphaStm) getGlobalStmInstance()).getClock();
 
-
     /**
      * Creates a new Ref with null as value. It has exactly the same {@link #AlphaProgrammaticReference(Object)}
      * with null as value.
@@ -91,7 +90,7 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
             long writeVersion = clock.getVersion();
             AlphaRefTranlocal<E> tranlocal = new AlphaRefTranlocal<E>(this);
             tranlocal.value = value;
-            ___store(tranlocal, writeVersion);
+            ___storeInitial(tranlocal, writeVersion);
         } else {
             AlphaTransaction alphaTx = (AlphaTransaction) tx;
             AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal<E>) alphaTx.openForConstruction(this);
@@ -256,12 +255,7 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
         AlphaRefTranlocal<E> oldTranlocal = (AlphaRefTranlocal<E>) ___load();
 
         long writeVersion = clock.tick();
-        try {
-            ___store(newTranlocal, writeVersion);
-        } finally {
-            ___releaseLock(tx);
-        }
-
+        ___storeUpdate(newTranlocal, writeVersion, true);
         return oldTranlocal.value;
     }
 
@@ -327,12 +321,7 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
         AlphaRefTranlocal<E> oldTranlocal = (AlphaRefTranlocal<E>) ___load();
 
         long writeVersion = clock.tick();
-        try {
-            ___store(newTranlocal, writeVersion);
-        } finally {
-            ___releaseLock(tx);
-        }
-
+        ___storeUpdate(newTranlocal, writeVersion, true);
         return oldTranlocal.value;
     }
 
@@ -412,12 +401,6 @@ class AlphaRefTranlocal<E> extends AlphaTranlocal implements Transaction {
     @Override
     public AlphaTranlocal openForWrite() {
         return new AlphaRefTranlocal(this);
-    }
-
-    @Override
-    public void prepareForCommit(long writeVersion) {
-        this.___writeVersion = writeVersion;
-        this.___origin = null;
     }
 
     @Override

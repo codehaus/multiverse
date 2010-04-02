@@ -1,6 +1,7 @@
 package org.multiverse.stms.alpha.manualinstrumentation;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.stms.alpha.AlphaStm;
@@ -22,6 +23,7 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
  *
  * @author Peter Veentjer.
  */
+@Ignore
 public class ManualRefPerformanceStressTest {
     private AlphaStm stm;
     private int transactionCount = 40 * 1000 * 1000;

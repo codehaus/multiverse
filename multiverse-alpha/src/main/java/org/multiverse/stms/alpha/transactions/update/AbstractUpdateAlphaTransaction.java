@@ -415,15 +415,31 @@ public abstract class AbstractUpdateAlphaTransaction
         tranlocal.ifCommutingThenFixate(this);
 
         AlphaTransactionalObject txObject = tranlocal.getTransactionalObject();
-        if (config.dirtyCheck) {
-            if (tranlocal.getOrigin() == null || tranlocal.getPrecalculatedIsDirty()) {
-                return txObject.___store(tranlocal, writeVersion);
-            } else {
-                return null;
-            }
+
+        AlphaTranlocal origin = tranlocal.getOrigin();
+
+        boolean store = false;
+        if (!config.dirtyCheck) {
+            store = true;
         } else {
-            return txObject.___store(tranlocal, writeVersion);
+
+            if (origin == null) {
+                store = true;
+            } else if (tranlocal.getPrecalculatedIsDirty()) {
+                store = true;
+            }
         }
+
+        if (!store) {
+            return null;
+        }
+
+        if (origin == null) {
+            txObject.___storeInitial(tranlocal, writeVersion);
+            return null;
+        }
+
+        return txObject.___storeUpdate(tranlocal, writeVersion, config.quickReleaseLocks);
     }
 
     @Override
@@ -434,7 +450,9 @@ public abstract class AbstractUpdateAlphaTransaction
     @Override
     protected void makeChangesPermanent() {
         Listeners[] listeners = makeChangesPermanent(writeVersion);
-        doReleaseWriteLocksForSuccess(writeVersion);
+        if (!config.quickReleaseLocks) {
+            doReleaseWriteLocksForSuccess(writeVersion);
+        }
         Listeners.openAll(listeners);
     }
 

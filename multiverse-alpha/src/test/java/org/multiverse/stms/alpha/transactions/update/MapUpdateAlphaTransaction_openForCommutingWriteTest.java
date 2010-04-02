@@ -43,7 +43,7 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true);
+                stmConfig.maxRetryCount, true, true, true, true, true, true);
         return new MapUpdateAlphaTransaction(config);
     }
 
@@ -86,7 +86,8 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
         ref.resetLockInfo();
         tx.openForWrite(ref);
 
-        assertFalse(ref.isTryLockCalled());
+        ref.assertNoLocksReleased();
+        ref.assertNoLockAcquired();
     }
 
     /**

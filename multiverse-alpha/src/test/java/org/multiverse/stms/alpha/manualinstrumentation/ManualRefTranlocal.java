@@ -23,12 +23,6 @@ public class ManualRefTranlocal extends AlphaTranlocal {
     }
 
     @Override
-    public void prepareForCommit(long writeVersion) {
-        this.___writeVersion = writeVersion;
-        this.___origin = null;
-    }
-
-    @Override
     public boolean isDirty() {
         if (isCommitted()) {
             return false;

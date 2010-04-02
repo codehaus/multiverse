@@ -35,7 +35,7 @@ public class MapUpdateAlphaTransaction_abortTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true);
+                stmConfig.maxRetryCount, true, true, true, true, true, true);
 
         return new MapUpdateAlphaTransaction(config);
     }
@@ -50,7 +50,8 @@ public class MapUpdateAlphaTransaction_abortTest {
         ref.resetLockInfo();
         tx.abort();
 
-        assertFalse(ref.isTryLockCalled());
+        ref.assertNoLocksReleased();
+        ref.assertNoLockAcquired();
     }
 
     @Test
@@ -62,7 +63,8 @@ public class MapUpdateAlphaTransaction_abortTest {
         ref.resetLockInfo();
         tx.abort();
 
-        assertFalse(ref.isTryLockCalled());
+        ref.assertNoLocksReleased();
+        ref.assertNoLockAcquired();
     }
 
     @Test
@@ -73,7 +75,8 @@ public class MapUpdateAlphaTransaction_abortTest {
         ref.resetLockInfo();
         tx.abort();
 
-        assertFalse(ref.isTryLockCalled());
+        ref.assertNoLocksReleased();
+        ref.assertNoLockAcquired();
     }
 
     @Test

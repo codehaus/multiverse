@@ -49,12 +49,17 @@ public interface AlphaTransactionalObject extends CommitLock {
      * Stores the the content and releases the lock.
      * <p/>
      * It is important that this call only is made when the lock already was acquired.
+     * <p/>
+     * This call will not fail (unless something is terribly wrong)
      *
      * @param tranlocal    the Tranlocal to storeAndReleaseLock.
      * @param writeVersion the version to storeAndReleaseLock the Tranlocal with.
      * @return the Listeners to wake up. Could be null if there are no listeners to wake up.
      */
-    Listeners ___store(AlphaTranlocal tranlocal, long writeVersion);
+    Listeners ___storeUpdate(AlphaTranlocal tranlocal, long writeVersion, boolean releaseLock);
+
+    void ___storeInitial(AlphaTranlocal tranlocal, long writeVersion);
+
 
     /**
      * Registers a listener for retrying (the condition variable version for STM's). The Latch is a concurrency

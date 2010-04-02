@@ -183,12 +183,6 @@ public final class Stack<E> extends DefaultTxObjectMixin {
         }
 
         @Override
-        public void prepareForCommit(long writeVersion) {
-            this.___writeVersion = writeVersion;
-            this.___origin = null;
-        }
-
-        @Override
         public AlphaTranlocalSnapshot takeSnapshot() {
             throw new RuntimeException();
         }

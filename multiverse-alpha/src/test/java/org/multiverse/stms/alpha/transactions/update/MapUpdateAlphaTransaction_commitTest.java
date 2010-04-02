@@ -40,7 +40,7 @@ public class MapUpdateAlphaTransaction_commitTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true);
+                stmConfig.maxRetryCount, true, true, true, true, true, true);
 
         return new MapUpdateAlphaTransaction(config);
     }
@@ -53,12 +53,36 @@ public class MapUpdateAlphaTransaction_commitTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, allowWriteSkewProblem, true, true);
+                stmConfig.maxRetryCount, true, true, allowWriteSkewProblem, true, true, true);
         return new MapUpdateAlphaTransaction(config);
     }
 
 
     // ===================== lock related functionality =====================================
+
+    @Test
+    public void freshObjectIsNotLocked() {
+        ManualRef ref1 = new ManualRef(stm);
+        ManualRef ref2 = ManualRef.createUncommitted();
+
+        AlphaTransaction tx = startSutTransaction();
+        ref1.inc(tx);
+        AlphaTranlocal tranlocal2 = tx.openForConstruction(ref2);
+
+        long version = stm.getVersion();
+
+        ref1.resetLockInfo();
+        ref2.resetLockInfo();
+        tx.commit();
+
+        assertEquals(version + 1, stm.getVersion());
+        assertIsCommitted(tx);
+
+        ref2.assertNoLockAcquired();
+        ref1.assertLockAcquired();
+        assertNull(ref1.___getLockOwner());
+        assertNull(ref2.___getLockOwner());
+    }
 
     @Test
     public void lockIsNotAcquiredOnReadonlyTransaction() {
@@ -69,7 +93,8 @@ public class MapUpdateAlphaTransaction_commitTest {
         ref.resetLockInfo();
         tx.commit();
 
-        assertFalse(ref.isTryLockCalled());
+        ref.assertNoLocksReleased();
+        ref.assertNoLockAcquired();
     }
 
     @Test
@@ -83,7 +108,8 @@ public class MapUpdateAlphaTransaction_commitTest {
         ref2.resetLockInfo();
         tx.commit();
 
-        assertFalse(ref2.isTryLockCalled());
+        ref2.assertNoLocksReleased();
+        ref2.assertNoLockAcquired();
     }
 
     @Test
@@ -95,7 +121,8 @@ public class MapUpdateAlphaTransaction_commitTest {
         ref.resetLockInfo();
         tx.commit();
 
-        assertFalse(ref.isTryLockCalled());
+        ref.assertNoLocksReleased();
+        ref.assertNoLockAcquired();
     }
 
     @Test
@@ -108,7 +135,8 @@ public class MapUpdateAlphaTransaction_commitTest {
         ref.resetLockInfo();
         tx.commit();
 
-        assertTrue(ref.isTryLockCalled());
+        ref.assertLockAcquired();
+        ref.assertLockReleased();
     }
 
     @Test
@@ -119,7 +147,8 @@ public class MapUpdateAlphaTransaction_commitTest {
         ref.resetLockInfo();
         tx.commit();
 
-        assertFalse(ref.isTryLockCalled());
+        ref.assertNoLocksReleased();
+        ref.assertNoLockAcquired();
     }
 
     // ================== commit =============================
@@ -200,7 +229,7 @@ public class MapUpdateAlphaTransaction_commitTest {
         tx.commit();
 
         assertIsCommitted(tx);
-        assertEquals(startVersion , stm.getVersion());
+        assertEquals(startVersion, stm.getVersion());
         ManualRefTranlocal stored = (ManualRefTranlocal) ref.___load(stm.getVersion());
         assertEquals(10, stored.value);
         assertEquals(stm.getVersion(), stored.getWriteVersion());

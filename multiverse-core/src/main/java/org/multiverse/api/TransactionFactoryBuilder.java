@@ -101,6 +101,17 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     B setAllowWriteSkewProblem(boolean allowWriteSkew);
 
     /**
+     * Checks if the quick release on locks is enabled. When a transaction commits, it
+     * needs to acquire the writelocks. If quick release is disabled, first all writes are
+     * executed before any lock is released. With quick release enabled, the lock on the
+     * transactional object is released as soon as the write is done.
+     *
+     * @param enabled
+     * @return the created TransactionFactoryBuilder
+     */
+    B setQuickReleaseEnabled(boolean enabled);
+
+    /**
      * Sets the new backoff policy. Policy is used to backoff when a transaction conflicts with another transaction.
      * See the {@link BackoffPolicy} for more information.
      *

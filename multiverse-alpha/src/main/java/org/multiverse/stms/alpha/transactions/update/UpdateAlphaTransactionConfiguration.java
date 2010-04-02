@@ -17,13 +17,13 @@ public final class UpdateAlphaTransactionConfiguration extends AbstractTransacti
     public final boolean optimizedConflictDetection;
     public final boolean dirtyCheck;
     public final SpeculativeConfiguration speculativeConfiguration;
+    public final boolean quickReleaseLocks;
 
     public UpdateAlphaTransactionConfiguration(
-            PrimitiveClock clock, BackoffPolicy backoffPolicy,
-            CommitLockPolicy commitLockPolicy, String familyName, SpeculativeConfiguration speculativeConfiguration,
-            int maxRetryCount, boolean interruptible,
-            boolean automaticReadTracking, boolean allowWriteSkewProblem,
-            boolean optimizedConflictDetection, boolean dirtyCheck) {
+            PrimitiveClock clock, BackoffPolicy backoffPolicy, CommitLockPolicy commitLockPolicy,
+            String familyName, SpeculativeConfiguration speculativeConfiguration, int maxRetryCount,
+            boolean interruptible, boolean automaticReadTracking, boolean allowWriteSkewProblem,
+            boolean optimizedConflictDetection, boolean dirtyCheck, boolean quickReleaseLocks) {
 
         super(clock, backoffPolicy, familyName, false, maxRetryCount, interruptible,
                 allowWriteSkewProblem, automaticReadTracking);
@@ -32,6 +32,7 @@ public final class UpdateAlphaTransactionConfiguration extends AbstractTransacti
         this.optimizedConflictDetection = optimizedConflictDetection;
         this.dirtyCheck = dirtyCheck;
         this.speculativeConfiguration = speculativeConfiguration;
+        this.quickReleaseLocks = quickReleaseLocks;
     }
 
 }

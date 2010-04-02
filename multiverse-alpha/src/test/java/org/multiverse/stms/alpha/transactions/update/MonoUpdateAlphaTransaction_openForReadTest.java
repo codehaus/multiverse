@@ -34,7 +34,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true);
+                stmConfig.maxRetryCount, true, true, true, true, true, true);
         return new MonoUpdateAlphaTransaction(config);
     }
 
@@ -50,7 +50,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, false, true, true, true);
+                stmConfig.maxRetryCount, true, false, true, true, true, true);
 
         return new MonoUpdateAlphaTransaction(config);
     }

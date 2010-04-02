@@ -38,7 +38,7 @@ public class DefaultTxObjectMixinTest {
 
         txObject.___tryLock(lockOwner);
         int writeVersion = 10;
-        txObject.___store(tranlocal, writeVersion);
+        txObject.___storeUpdate(tranlocal, writeVersion, false);
 
         AlphaTranlocal found = txObject.___load();
         assertSame(tranlocal, found);
@@ -53,12 +53,12 @@ public class DefaultTxObjectMixinTest {
         DummyTranlocal tranlocal1 = new DummyTranlocal(txObject);
 
         txObject.___tryLock(lockOwner);
-        txObject.___store(tranlocal1, 10);
+        txObject.___storeUpdate(tranlocal1, 10, false);
         txObject.___releaseLock(lockOwner);
 
         DummyTranlocal tranlocal2 = new DummyTranlocal(txObject);
         txObject.___tryLock(lockOwner);
-        txObject.___store(tranlocal2, 11);
+        txObject.___storeUpdate(tranlocal2, 11, false);
         txObject.___releaseLock(lockOwner);
 
         AlphaTranlocal found = txObject.___load();
@@ -85,7 +85,7 @@ public class DefaultTxObjectMixinTest {
         DummyTranlocal tranlocal = new DummyTranlocal(txObject);
 
         txObject.___tryLock(lockOwner);
-        txObject.___store(tranlocal, 10);
+        txObject.___storeUpdate(tranlocal, 10, false);
 
 
         AlphaTranlocal found = txObject.___load();
@@ -100,7 +100,7 @@ public class DefaultTxObjectMixinTest {
         DummyTranlocal tranlocal = new DummyTranlocal(txObject);
 
         txObject.___tryLock(lockOwner);
-        txObject.___store(tranlocal, 10);
+        txObject.___storeUpdate(tranlocal, 10, false);
         txObject.___releaseLock(lockOwner);
 
         AlphaTranlocal found = txObject.___load();
@@ -117,7 +117,7 @@ public class DefaultTxObjectMixinTest {
         DummyTranlocal tranlocal = new DummyTranlocal(txObject);
         long writeVersion = 10;
         txObject.___tryLock(lockOwner);
-        txObject.___store(tranlocal, writeVersion);
+        txObject.___storeUpdate(tranlocal, writeVersion, false);
         txObject.___releaseLock(lockOwner);
 
         AlphaTranlocal result = txObject.___load(writeVersion);
@@ -132,7 +132,7 @@ public class DefaultTxObjectMixinTest {
         DummyTranlocal tranlocal = new DummyTranlocal(txObject);
         long writeVersion = 10;
         txObject.___tryLock(lockOwner);
-        txObject.___store(tranlocal, writeVersion);
+        txObject.___storeUpdate(tranlocal, writeVersion, false);
         txObject.___releaseLock(lockOwner);
 
         AlphaTranlocal result = txObject.___load(writeVersion + 1);
@@ -298,11 +298,6 @@ public class DefaultTxObjectMixinTest {
 
         DummyTranlocal(AlphaTransactionalObject transactionalObject) {
             this.___transactionalObject = transactionalObject;
-        }
-
-        @Override
-        public void prepareForCommit(long writeVersion) {
-            ___writeVersion = writeVersion;
         }
 
         @Override
