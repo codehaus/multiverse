@@ -17,7 +17,7 @@ public final class MonoUpdateAlphaTransaction extends AbstractUpdateAlphaTransac
 
     private AlphaTranlocal attached;
 
-    public MonoUpdateAlphaTransaction(UpdateAlphaTransactionConfiguration config) {
+    public MonoUpdateAlphaTransaction(UpdateConfiguration config) {
         super(config);
         init();
     }

@@ -13,8 +13,6 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 
 /**
@@ -23,7 +21,7 @@ import static org.multiverse.TestUtils.*;
 public class MapReadonlyAlphaTransaction_openForCommutingWriteTest {
 
 
-     private AlphaStm stm;
+    private AlphaStm stm;
     private AlphaStmConfig stmConfig;
 
     @Before
@@ -37,12 +35,8 @@ public class MapReadonlyAlphaTransaction_openForCommutingWriteTest {
     }
 
     public MapReadonlyAlphaTransaction startTransactionUnderTest(SpeculativeConfiguration speculativeConfig) {
-        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                null,
-                speculativeConfig,
-                stmConfig.maxRetryCount, false, true);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock)
+                .withSpeculativeConfig(speculativeConfig);
         return new MapReadonlyAlphaTransaction(config);
     }
 

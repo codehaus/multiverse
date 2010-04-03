@@ -34,12 +34,10 @@ public class NonTrackingReadonlyAlphaTransaction_registerRetryLatchTest {
     }
 
     public NonTrackingReadonlyAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfiguration) {
-        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                null,
-                speculativeConfiguration,
-                stmConfig.maxRetryCount, false, false);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock)
+                .withAutomaticReadTracking(false)
+                .withSpeculativeConfig(speculativeConfiguration);
+
         return new NonTrackingReadonlyAlphaTransaction(config);
     }
 

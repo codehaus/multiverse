@@ -13,7 +13,6 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.templates.TransactionTemplate;
 
 import static org.junit.Assert.*;
@@ -34,14 +33,8 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
     }
 
     public AlphaTransaction startSutTransaction(int size, boolean allowWriteSkewProblem) {
-        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
-        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                stmConfig.commitLockPolicy,
-                null,
-                speculativeConfig,
-                stmConfig.maxRetryCount, true, true, allowWriteSkewProblem, true, true, true);
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withAllowWriteSkewProblem(allowWriteSkewProblem);
 
         return new ArrayUpdateAlphaTransaction(config, size);
     }

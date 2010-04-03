@@ -12,7 +12,7 @@ import static org.multiverse.api.StmUtils.retry;
  * @author Peter Veentjer
  */
 @TransactionalObject
-public class TransactionalShort {
+public final class TransactionalShort {
 
     private short value;
 

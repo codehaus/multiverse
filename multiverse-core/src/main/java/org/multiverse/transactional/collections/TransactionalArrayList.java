@@ -20,7 +20,7 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
  * @author Peter Veentjer.
  * @param <E>
  */
-public class TransactionalArrayList<E> implements TransactionalList<E> {
+public final class TransactionalArrayList<E> implements TransactionalList<E> {
 
     private TransactionalReferenceArray<E> array;
 

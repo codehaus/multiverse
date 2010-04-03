@@ -13,8 +13,6 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 
 /**
@@ -36,12 +34,10 @@ public class NonTrackingReadonlyAlphaTransaction_openForCommutingWriteTest {
     }
 
     public NonTrackingReadonlyAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfiguration) {
-        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                null,
-                speculativeConfiguration,
-                stmConfig.maxRetryCount, false, false);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock)
+                .withAutomaticReadTracking(false)
+                .withSpeculativeConfig(speculativeConfiguration);
+
         return new NonTrackingReadonlyAlphaTransaction(config);
     }
 

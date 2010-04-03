@@ -30,13 +30,9 @@ public class MonoReadonlyAlphaTransaction_openForWriteTest {
         return startSutTransaction(new SpeculativeConfiguration(100));
     }
 
-    public MonoReadonlyAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfiguration) {
-        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                null,
-                speculativeConfiguration,
-                stmConfig.maxRetryCount, false, true);
+    public MonoReadonlyAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfig) {
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock)
+                .withSpeculativeConfig(speculativeConfig);
         return new MonoReadonlyAlphaTransaction(config);
     }
 

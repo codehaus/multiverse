@@ -30,15 +30,10 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
         return startTransactionUnderTest(new SpeculativeConfiguration(100));
     }
 
-    public ArrayReadonlyAlphaTransaction startTransactionUnderTest(SpeculativeConfiguration speculativeConfiguration) {
-        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                null,
-                speculativeConfiguration,
-                stmConfig.maxRetryCount, false, true);
-
-        return new ArrayReadonlyAlphaTransaction(config, speculativeConfiguration.getMaximumArraySize());
+    public ArrayReadonlyAlphaTransaction startTransactionUnderTest(SpeculativeConfiguration speculativeConfig) {
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock)
+                .withSpeculativeConfig(speculativeConfig);
+        return new ArrayReadonlyAlphaTransaction(config, speculativeConfig.getMaximumArraySize());
     }
 
     @Test

@@ -29,13 +29,8 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
     }
 
     public MonoUpdateAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfig) {
-        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                stmConfig.commitLockPolicy,
-                null,
-                speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true, true);
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withSpeculativeConfiguration(speculativeConfig);
         return new MonoUpdateAlphaTransaction(config);
     }
 

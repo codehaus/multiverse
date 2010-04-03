@@ -8,7 +8,6 @@ import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.utils.latches.CheapLatch;
 
 import static org.junit.Assert.*;
@@ -27,14 +26,8 @@ public class MonoUpdateAlphaTransaction_abortTest {
     }
 
     public MonoUpdateAlphaTransaction startSutTransaction() {
-        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
-        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                stmConfig.commitLockPolicy,
-                null,
-                speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true, true);
+        UpdateConfiguration config =
+                new UpdateConfiguration(stmConfig.clock);
         return new MonoUpdateAlphaTransaction(config);
     }
 

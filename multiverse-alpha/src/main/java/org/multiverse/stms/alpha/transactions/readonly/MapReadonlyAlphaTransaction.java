@@ -21,9 +21,9 @@ public class MapReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransactio
 
     public static class Factory implements TransactionFactory<AlphaTransaction> {
 
-        public final ReadonlyAlphaTransactionConfiguration config;
+        public final ReadonlyConfiguration config;
 
-        public Factory(ReadonlyAlphaTransactionConfiguration config) {
+        public Factory(ReadonlyConfiguration config) {
             this.config = config;
         }
 
@@ -36,7 +36,7 @@ public class MapReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransactio
     private final Map<AlphaTransactionalObject, AlphaTranlocal>
             attachedMap = new IdentityHashMap<AlphaTransactionalObject, AlphaTranlocal>();
 
-    public MapReadonlyAlphaTransaction(ReadonlyAlphaTransactionConfiguration config) {
+    public MapReadonlyAlphaTransaction(ReadonlyConfiguration config) {
         super(config);
 
         init();

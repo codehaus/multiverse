@@ -34,12 +34,8 @@ public class MonoReadonlyAlphaTransaction_openForConstructionTest {
     }
 
     public MonoReadonlyAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfiguration) {
-        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                null,
-                speculativeConfiguration,
-                stmConfig.maxRetryCount, false, true);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock)
+                .withSpeculativeConfig(speculativeConfiguration);
         return new MonoReadonlyAlphaTransaction(config);
     }
 

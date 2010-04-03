@@ -28,13 +28,8 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     }
 
     public MonoUpdateAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfig) {
-        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                stmConfig.commitLockPolicy,
-                null,
-                speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true, true);
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withSpeculativeConfiguration(speculativeConfig);
         return new MonoUpdateAlphaTransaction(config);
     }
 
@@ -43,14 +38,8 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     }
 
     public MonoUpdateAlphaTransaction startSutTransactionWithoutAutomaticReadTracking() {
-        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
-        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                stmConfig.commitLockPolicy,
-                null,
-                speculativeConfig,
-                stmConfig.maxRetryCount, true, false, true, true, true, true);
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withAutomaticReadTracking(false);
 
         return new MonoUpdateAlphaTransaction(config);
     }

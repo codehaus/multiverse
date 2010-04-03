@@ -27,9 +27,9 @@ public final class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransact
 
     public static class Factory implements TransactionFactory<AlphaTransaction> {
 
-        public final UpdateAlphaTransactionConfiguration config;
+        public final UpdateConfiguration config;
 
-        public Factory(UpdateAlphaTransactionConfiguration config) {
+        public Factory(UpdateConfiguration config) {
             this.config = config;
         }
 
@@ -42,7 +42,7 @@ public final class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransact
     private final Map<AlphaTransactionalObject, AlphaTranlocal> attachedMap =
             new IdentityHashMap<AlphaTransactionalObject, AlphaTranlocal>(30);
 
-    public MapUpdateAlphaTransaction(UpdateAlphaTransactionConfiguration config) {
+    public MapUpdateAlphaTransaction(UpdateConfiguration config) {
         super(config);
         init();
         //todo: the size of the attachedMap could be chosen a littlebit better

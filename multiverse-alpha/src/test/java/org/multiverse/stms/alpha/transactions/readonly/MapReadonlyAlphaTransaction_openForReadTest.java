@@ -10,7 +10,6 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -31,12 +30,7 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
     }
 
     public MapReadonlyAlphaTransaction startTransactionUnderTest() {
-        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                null,
-                new SpeculativeConfiguration(100),
-                stmConfig.maxRetryCount, false, true);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock);
         return new MapReadonlyAlphaTransaction(config);
     }
 

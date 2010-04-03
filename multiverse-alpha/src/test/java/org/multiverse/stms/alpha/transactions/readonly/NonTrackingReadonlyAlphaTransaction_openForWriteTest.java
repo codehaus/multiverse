@@ -30,13 +30,11 @@ public class NonTrackingReadonlyAlphaTransaction_openForWriteTest {
         return startSutTransaction(new SpeculativeConfiguration(100));
     }
 
-    public NonTrackingReadonlyAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfiguration) {
-        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                null,
-                speculativeConfiguration,
-                stmConfig.maxRetryCount, false, false);
+    public NonTrackingReadonlyAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfig) {
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock)
+                .withSpeculativeConfig(speculativeConfig)
+                .withAutomaticReadTracking(false);
+
         return new NonTrackingReadonlyAlphaTransaction(config);
     }
 

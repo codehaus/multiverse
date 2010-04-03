@@ -9,7 +9,6 @@ import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.utils.latches.CheapLatch;
 
 import static org.junit.Assert.*;
@@ -29,12 +28,7 @@ public class MonoReadonlyAlphaTransaction_registerRetryLatchTest {
     }
 
     public MonoReadonlyAlphaTransaction startSutTransaction() {
-        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                null,
-                new SpeculativeConfiguration(100),
-                stmConfig.maxRetryCount, false, true);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock);
         return new MonoReadonlyAlphaTransaction(config);
     }
 

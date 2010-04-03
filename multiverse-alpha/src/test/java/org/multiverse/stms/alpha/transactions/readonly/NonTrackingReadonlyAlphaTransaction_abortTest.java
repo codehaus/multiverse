@@ -6,7 +6,6 @@ import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.assertIsAborted;
@@ -26,12 +25,8 @@ public class NonTrackingReadonlyAlphaTransaction_abortTest {
     }
 
     public NonTrackingReadonlyAlphaTransaction startSutTransaction() {
-        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                null,
-                new SpeculativeConfiguration(100),
-                stmConfig.maxRetryCount, false, false);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock)
+                .withAutomaticReadTracking(false);
 
         return new NonTrackingReadonlyAlphaTransaction(config);
     }

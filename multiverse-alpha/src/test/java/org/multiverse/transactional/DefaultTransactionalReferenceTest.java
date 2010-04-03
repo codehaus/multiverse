@@ -15,7 +15,7 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
 /**
  * @author Peter Veentjer
  */
-public class DefaultTransactionalReferenceTest {
+public final class DefaultTransactionalReferenceTest {
 
     private Stm stm;
     private TransactionFactory txFactory;

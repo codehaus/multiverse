@@ -15,7 +15,7 @@ import java.util.Set;
  * @see TransactionalSet
  * @see java.util.Set
  */
-public class TransactionalTreeSet<E> implements TransactionalSet<E> {
+public final class TransactionalTreeSet<E> implements TransactionalSet<E> {
 
     private final static Object VALUE = new Object();
 

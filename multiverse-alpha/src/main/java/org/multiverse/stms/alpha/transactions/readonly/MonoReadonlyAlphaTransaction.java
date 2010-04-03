@@ -14,7 +14,7 @@ public class MonoReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransacti
 
     private AlphaTranlocal attached;
 
-    public MonoReadonlyAlphaTransaction(ReadonlyAlphaTransactionConfiguration config) {
+    public MonoReadonlyAlphaTransaction(ReadonlyConfiguration config) {
         super(config);
         init();
     }

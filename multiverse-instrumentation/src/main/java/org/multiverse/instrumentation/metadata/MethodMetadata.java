@@ -20,12 +20,35 @@ public final class MethodMetadata {
     private final String name;
     private final String desc;
     private int access;
-    private List<String> exceptions = new LinkedList<String>();
+    private final List<String> exceptions = new LinkedList<String>();
+    private GetterSetter getterSetter = GetterSetter.unknown;
+    private FieldMetadata getterSetterField;
 
     public MethodMetadata(ClassMetadata classMetadata, String name, String desc) {
         this.classMetadata = classMetadata;
         this.name = name;
         this.desc = desc;
+    }
+
+    public FieldMetadata getGetterSetterField() {
+        return getterSetterField;
+    }
+
+    public GetterSetter getGetterSetter() {
+        return getterSetter;
+    }
+
+    public void setGetterSetter(GetterSetter getterSetter, FieldMetadata getterSetterField) {
+        this.getterSetterField = getterSetterField;
+        this.getterSetter = getterSetter;
+    }
+
+    public TransactionMetadata getTransactionMetadata() {
+        return transactionMetadata;
+    }
+
+    public void setTransactionMetadata(TransactionMetadata transactionMetadata) {
+        this.transactionMetadata = transactionMetadata;
     }
 
     /**
@@ -78,6 +101,10 @@ public final class MethodMetadata {
 
     public boolean isStatic() {
         return AsmUtils.isStatic(access);
+    }
+
+    public boolean isFinal() {
+        return classMetadata.isFinal() || AsmUtils.isFinal(access);
     }
 
     public int getAccess() {

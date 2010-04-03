@@ -34,9 +34,9 @@ public class NonTrackingReadonlyAlphaTransaction extends AbstractReadonlyAlphaTr
 
     public static class Factory implements TransactionFactory<AlphaTransaction> {
 
-        private final ReadonlyAlphaTransactionConfiguration config;
+        private final ReadonlyConfiguration config;
 
-        public Factory(ReadonlyAlphaTransactionConfiguration config) {
+        public Factory(ReadonlyConfiguration config) {
             this.config = config;
         }
 
@@ -46,7 +46,7 @@ public class NonTrackingReadonlyAlphaTransaction extends AbstractReadonlyAlphaTr
         }
     }
 
-    public NonTrackingReadonlyAlphaTransaction(ReadonlyAlphaTransactionConfiguration config) {
+    public NonTrackingReadonlyAlphaTransaction(ReadonlyConfiguration config) {
         super(config);
         init();
     }

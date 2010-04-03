@@ -14,7 +14,6 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -33,27 +32,15 @@ public class MapUpdateAlphaTransaction_commitTest {
     }
 
     public MapUpdateAlphaTransaction startSutTransaction() {
-        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
-        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                stmConfig.commitLockPolicy,
-                null,
-                speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true, true);
-
+        UpdateConfiguration config =
+                new UpdateConfiguration(stmConfig.clock);
         return new MapUpdateAlphaTransaction(config);
     }
 
     public MapUpdateAlphaTransaction startSutTransactionWithAllowingWriteSkewProblem(boolean allowWriteSkewProblem) {
-        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
-        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                stmConfig.commitLockPolicy,
-                null,
-                speculativeConfig,
-                stmConfig.maxRetryCount, true, true, allowWriteSkewProblem, true, true, true);
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withAllowWriteSkewProblem(allowWriteSkewProblem);
+
         return new MapUpdateAlphaTransaction(config);
     }
 

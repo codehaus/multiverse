@@ -13,7 +13,7 @@ import static org.multiverse.api.StmUtils.retry;
  * @author Peter Veentjer.
  */
 @TransactionalObject
-public class TransactionalDouble {
+public final class TransactionalDouble {
 
     private double value;
 

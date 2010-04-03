@@ -31,12 +31,8 @@ public class MonoReadonlyAlphaTransaction_openForReadTest {
     }
 
     public MonoReadonlyAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfig) {
-        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                null,
-                speculativeConfig,
-                stmConfig.maxRetryCount, false, true);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock)
+                .withSpeculativeConfig(speculativeConfig);
         return new MonoReadonlyAlphaTransaction(config);
     }
 
@@ -189,10 +185,10 @@ public class MonoReadonlyAlphaTransaction_openForReadTest {
         tx.commit();
 
         long version = stm.getVersion();
-        try{
-        tx.openForRead(ref);
+        try {
+            tx.openForRead(ref);
             fail();
-        }catch(DeadTransactionException expected){
+        } catch (DeadTransactionException expected) {
         }
 
         assertIsCommitted(tx);

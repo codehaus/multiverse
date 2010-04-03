@@ -9,7 +9,7 @@ import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
 import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.transactions.update.MonoUpdateAlphaTransaction;
-import org.multiverse.stms.alpha.transactions.update.UpdateAlphaTransactionConfiguration;
+import org.multiverse.stms.alpha.transactions.update.UpdateConfiguration;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -239,7 +239,7 @@ public class TransactionalMethod_settingTest {
         @TransactionalMethod(readonly = false)
         public void defaultUpdateMethod() {
             Transaction tx = getThreadLocalTransaction();
-            UpdateAlphaTransactionConfiguration config = (UpdateAlphaTransactionConfiguration) tx.getConfiguration();
+            UpdateConfiguration config = (UpdateConfiguration) tx.getConfiguration();
             System.out.println(config.speculativeConfiguration);
             assertInstanceOf(tx, MonoUpdateAlphaTransaction.class);
 

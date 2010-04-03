@@ -7,7 +7,7 @@ import org.multiverse.stms.alpha.transactions.readonly.*;
 import org.multiverse.stms.alpha.transactions.update.ArrayUpdateAlphaTransaction;
 import org.multiverse.stms.alpha.transactions.update.MapUpdateAlphaTransaction;
 import org.multiverse.stms.alpha.transactions.update.MonoUpdateAlphaTransaction;
-import org.multiverse.stms.alpha.transactions.update.UpdateAlphaTransactionConfiguration;
+import org.multiverse.stms.alpha.transactions.update.UpdateConfiguration;
 import org.multiverse.utils.clock.PrimitiveClock;
 import org.multiverse.utils.commitlock.CommitLockPolicy;
 
@@ -300,22 +300,22 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         }
 
         private TransactionFactory<AlphaTransaction> createSpeculativeTxFactory() {
-            final ReadonlyAlphaTransactionConfiguration ro_nort =
-                    new ReadonlyAlphaTransactionConfiguration(
+            final ReadonlyConfiguration ro_nort =
+                    new ReadonlyConfiguration(
                             clock, backoffPolicy, familyName, speculativeConfig,
                             maxRetryCount, interruptible, false);
-            final ReadonlyAlphaTransactionConfiguration ro_rt =
-                    new ReadonlyAlphaTransactionConfiguration(
+            final ReadonlyConfiguration ro_rt =
+                    new ReadonlyConfiguration(
                             clock, backoffPolicy, familyName, speculativeConfig,
                             maxRetryCount, interruptible, true);
-            final UpdateAlphaTransactionConfiguration up_rt =
-                    new UpdateAlphaTransactionConfiguration(
+            final UpdateConfiguration up_rt =
+                    new UpdateConfiguration(
                             clock, backoffPolicy, commitLockPolicy, familyName,
                             speculativeConfig, maxRetryCount, interruptible,
                             true, allowWriteSkewProblem,
                             optimizeConflictDetectionEnabled, true, quickReleaseEnabled);
-            final UpdateAlphaTransactionConfiguration up_nort =
-                    new UpdateAlphaTransactionConfiguration(
+            final UpdateConfiguration up_nort =
+                    new UpdateConfiguration(
                             clock, backoffPolicy, commitLockPolicy, familyName,
                             speculativeConfig, maxRetryCount, interruptible,
                             false, true,
@@ -367,7 +367,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                         }
                     } else {
 
-                        UpdateAlphaTransactionConfiguration config;
+                        UpdateConfiguration config;
                         if (finalAutomaticReadTracking) {
                             config = up_rt;
                         } else {
@@ -393,8 +393,8 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         }
 
         private TransactionFactory<AlphaTransaction> createNonSpeculativeReadonlyTxFactory() {
-            ReadonlyAlphaTransactionConfiguration config =
-                    new ReadonlyAlphaTransactionConfiguration(
+            ReadonlyConfiguration config =
+                    new ReadonlyConfiguration(
                             clock, backoffPolicy, familyName, speculativeConfig,
                             maxRetryCount, interruptible, automaticReadTracking);
 
@@ -415,8 +415,8 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                 throw new IllegalStateException(msg);
             }
 
-            UpdateAlphaTransactionConfiguration config =
-                    new UpdateAlphaTransactionConfiguration(
+            UpdateConfiguration config =
+                    new UpdateConfiguration(
                             clock, backoffPolicy, commitLockPolicy, familyName,
                             speculativeConfig, maxRetryCount, interruptible,
                             automaticReadTracking, allowWriteSkewProblem,

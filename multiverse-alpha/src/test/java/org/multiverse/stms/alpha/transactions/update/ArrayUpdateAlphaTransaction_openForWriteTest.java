@@ -28,27 +28,16 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
     }
 
     public AlphaTransaction startSutTransaction(int size) {
-        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
-        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                stmConfig.commitLockPolicy,
-                null,
-                speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true, true);
-
+        UpdateConfiguration config =
+                new UpdateConfiguration(stmConfig.clock);
         return new ArrayUpdateAlphaTransaction(config, size);
     }
 
     public AlphaTransaction startSutTransaction(int size, int maximumSize) {
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(maximumSize);
-        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                stmConfig.commitLockPolicy,
-                null,
-                speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true, true);
+
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withSpeculativeConfiguration(speculativeConfig);
 
         return new ArrayUpdateAlphaTransaction(config, size);
     }

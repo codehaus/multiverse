@@ -13,7 +13,7 @@ public class ArrayReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransact
 
     private int firstFreeIndex;
 
-    public ArrayReadonlyAlphaTransaction(ReadonlyAlphaTransactionConfiguration config, int size) {
+    public ArrayReadonlyAlphaTransaction(ReadonlyConfiguration config, int size) {
         super(config);
         attachedArray = new AlphaTranlocal[size];
         init();

@@ -38,26 +38,15 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
     }
 
     public MapUpdateAlphaTransaction startSutTransaction() {
-        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
-        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                stmConfig.commitLockPolicy,
-                null,
-                speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true, true);
-
+        UpdateConfiguration config =
+                new UpdateConfiguration(stmConfig.clock);
         return new MapUpdateAlphaTransaction(config);
     }
 
     public MapUpdateAlphaTransaction startSutTransactionWithoutReadTracking(SpeculativeConfiguration speculativeConfig) {
-        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                stmConfig.commitLockPolicy,
-                null,
-                speculativeConfig,
-                stmConfig.maxRetryCount, true, false, true, true, true, true);
+        UpdateConfiguration config = new UpdateConfiguration(stm.getClock())
+                .withSpeculativeConfiguration(speculativeConfig)
+                .withAutomaticReadTracking(false);
 
         return new MapUpdateAlphaTransaction(config);
     }

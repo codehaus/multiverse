@@ -13,7 +13,6 @@ import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.utils.Listeners;
 import org.multiverse.utils.latches.CheapLatch;
 
@@ -36,12 +35,7 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
     }
 
     public MapReadonlyAlphaTransaction startSutTransaction() {
-        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                null,
-                new SpeculativeConfiguration(100),
-                stmConfig.maxRetryCount, false, true);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock);
         return new MapReadonlyAlphaTransaction(config);
     }
 
@@ -207,7 +201,7 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
         @TransactionalMethod(readonly = true, automaticReadTracking = true)
         public void await(int value) {
             Transaction tx = getThreadLocalTransaction();
-            ReadonlyAlphaTransactionConfiguration config = (ReadonlyAlphaTransactionConfiguration) tx.getConfiguration();
+            ReadonlyConfiguration config = (ReadonlyConfiguration) tx.getConfiguration();
             System.out.println("tx.config: " + config.speculativeConfig);
             if (this.value != value) {
                 retry();

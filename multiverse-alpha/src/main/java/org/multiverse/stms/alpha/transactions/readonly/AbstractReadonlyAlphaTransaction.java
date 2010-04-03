@@ -14,9 +14,9 @@ import static java.lang.String.format;
 import static org.multiverse.stms.alpha.AlphaStmUtils.toTxObjectString;
 
 public abstract class AbstractReadonlyAlphaTransaction
-        extends AbstractAlphaTransaction<ReadonlyAlphaTransactionConfiguration, AbstractTransactionSnapshot> {
+        extends AbstractAlphaTransaction<ReadonlyConfiguration, AbstractTransactionSnapshot> {
 
-    public AbstractReadonlyAlphaTransaction(ReadonlyAlphaTransactionConfiguration config) {
+    public AbstractReadonlyAlphaTransaction(ReadonlyConfiguration config) {
         super(config);
     }
 

@@ -11,7 +11,6 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.utils.latches.CheapLatch;
 
 import static org.junit.Assert.*;
@@ -30,28 +29,8 @@ public class ArrayUpdateAlphaTransaction_commitTest {
     }
 
     public AlphaTransaction startSutTransaction(int size) {
-        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(size * 10);
-        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                stmConfig.commitLockPolicy,
-                null,
-                speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true, true);
-
-        return new ArrayUpdateAlphaTransaction(config, size);
-    }
-
-    public AlphaTransaction startSutTransactionWithAllowWriteSkewProblem(int size, boolean allowWriteSkewProblem) {
-        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(size + 1);
-        UpdateAlphaTransactionConfiguration config = new UpdateAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                stmConfig.commitLockPolicy,
-                null,
-                speculativeConfig,
-                stmConfig.maxRetryCount, true, true, allowWriteSkewProblem, true, true, true);
-
+        UpdateConfiguration config =
+                new UpdateConfiguration(stmConfig.clock);
         return new ArrayUpdateAlphaTransaction(config, size);
     }
 
@@ -205,11 +184,13 @@ public class ArrayUpdateAlphaTransaction_commitTest {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx1 = startSutTransactionWithAllowWriteSkewProblem(10, true);
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock);
+
+        AlphaTransaction tx1 = new ArrayUpdateAlphaTransaction(config, 10);
         tx1.openForRead(ref1);
         ref2.inc(tx1);
 
-        AlphaTransaction tx2 = startSutTransactionWithAllowWriteSkewProblem(10, true);
+        AlphaTransaction tx2 = new ArrayUpdateAlphaTransaction(config, 10);
         tx2.openForRead(ref2);
         ref1.inc(tx2);
 
@@ -225,11 +206,14 @@ public class ArrayUpdateAlphaTransaction_commitTest {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx1 = startSutTransactionWithAllowWriteSkewProblem(10, false);
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withAllowWriteSkewProblem(false);
+
+        AlphaTransaction tx1 = new ArrayUpdateAlphaTransaction(config, 10);
         tx1.openForRead(ref1);
         ref2.inc(tx1);
 
-        AlphaTransaction tx2 = startSutTransactionWithAllowWriteSkewProblem(10, false);
+        AlphaTransaction tx2 = new ArrayUpdateAlphaTransaction(config, 10);
         tx2.openForRead(ref2);
         ref1.inc(tx2);
 

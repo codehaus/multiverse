@@ -19,14 +19,14 @@ import static org.multiverse.stms.alpha.AlphaStmUtils.toTxObjectString;
  * @author Peter Veentjer.
  */
 public abstract class AbstractUpdateAlphaTransaction
-        extends AbstractAlphaTransaction<UpdateAlphaTransactionConfiguration, AbstractTransactionSnapshot> {
+        extends AbstractAlphaTransaction<UpdateConfiguration, AbstractTransactionSnapshot> {
 
     private long writeVersion;
 
     //todo: for the time being
     protected UpdateTransactionStatus updateTransactionStatus = UpdateTransactionStatus.nowrites;
 
-    public AbstractUpdateAlphaTransaction(UpdateAlphaTransactionConfiguration config) {
+    public AbstractUpdateAlphaTransaction(UpdateConfiguration config) {
         super(config);
     }
 

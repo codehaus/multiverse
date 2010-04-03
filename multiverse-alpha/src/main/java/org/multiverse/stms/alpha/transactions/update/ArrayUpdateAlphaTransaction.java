@@ -24,7 +24,7 @@ public class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction 
 
     private int firstFreeIndex;
 
-    public ArrayUpdateAlphaTransaction(UpdateAlphaTransactionConfiguration config, int size) {
+    public ArrayUpdateAlphaTransaction(UpdateConfiguration config, int size) {
         super(config);
         attachedArray = new AlphaTranlocal[size];
         init();
@@ -55,7 +55,7 @@ public class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction 
     @Override
     public AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject txObject) {
         updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
-       
+
 
         int indexOf = indexOf(txObject);
 

@@ -25,6 +25,8 @@ public class TransactionLogicDonor {
     public static void execute() {
     }
 
+    // =================== for constructors ====================
+
     //fields can't be made final, the compiler could inline the values so can't be replaced by instrumentation.
     //By the instrumentation these static fields will be replaced by the actual TransactionalMethod parameters
     public static TransactionFactory transactionFactory;
@@ -57,6 +59,19 @@ public class TransactionLogicDonor {
             clearThreadLocalTransaction();
         }
     }
+
+    // ============ for transactional getters and setters ================
+
+    public static int donorGetter() {
+        return 0;
+    }
+
+    public static void donorSetter(int value) {
+
+    }
+
+    // ================ for other transactional methods ===============
+
 
     public static void donorMethod() throws Exception {
         AlphaTransaction tx = (AlphaTransaction) getThreadLocalTransaction();
@@ -111,6 +126,8 @@ public class TransactionLogicDonor {
             }
         }
     }
+
+    // ===================== support methods ===========================
 
     public static void waitForChange(AlphaTransaction tx) throws InterruptedException {
         Latch latch = new CheapLatch();

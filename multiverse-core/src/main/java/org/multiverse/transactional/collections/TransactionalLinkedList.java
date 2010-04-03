@@ -48,7 +48,7 @@ import static org.multiverse.api.StmUtils.retry;
  * @see java.util.List
  */
 @TransactionalObject
-public class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> implements List<E> {
+public final class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> implements List<E> {
 
     private final int maxCapacity;
 

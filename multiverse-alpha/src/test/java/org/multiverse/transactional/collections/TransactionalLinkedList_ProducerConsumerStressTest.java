@@ -15,16 +15,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.multiverse.TestUtils.joinAll;
-import static org.multiverse.TestUtils.sleepRandomMs;
-import static org.multiverse.TestUtils.startAll;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
  */
 public class TransactionalLinkedList_ProducerConsumerStressTest {
-    
+
     private TransactionalLinkedList<Integer>[] queues;
     private int queueCount = 50;
     private int itemCount = 50000;
@@ -50,12 +48,12 @@ public class TransactionalLinkedList_ProducerConsumerStressTest {
 
     @Test
     public void testConcurrentHandoverWithAborts() {
-        runTest(true, 5);
+        runTest(true, 2);
     }
 
     @Test
     public void testConcurrentHandoverWithoutAborts() {
-        runTest(false, 5);
+        runTest(false, 2);
     }
 
     public void runTest(boolean runWithAborts, int concurrentHandoverCount) {
@@ -86,12 +84,7 @@ public class TransactionalLinkedList_ProducerConsumerStressTest {
     }
 
     public HandoverThread[] createHandoverThreads(int concurrentHandoverCount) {
-        System.out.println("queueCount " + queueCount);
-        System.out.println("concurrentHandoverthreads " + concurrentHandoverCount);
-        System.out.println("items " + ((queueCount - 1) * concurrentHandoverCount));
-
         HandoverThread[] threads = new HandoverThread[(queueCount - 1) * concurrentHandoverCount];
-        System.out.println("thread.local: " + threads.length);
         int index = 0;
         for (int k = 0; k < queueCount - 1; k++) {
             TransactionalLinkedList from = queues[k];
@@ -131,7 +124,7 @@ public class TransactionalLinkedList_ProducerConsumerStressTest {
 
         public void doRun() throws InterruptedException {
             for (int k = 0; k < itemCount; k++) {
-                if (k % 200 == 0) {
+                if (k % 2000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
 
@@ -152,7 +145,7 @@ public class TransactionalLinkedList_ProducerConsumerStressTest {
             }
         }
 
-        @TransactionalMethod (automaticReadTracking = true)
+        @TransactionalMethod(automaticReadTracking = true)
         public void produceOneItem(int item, boolean abort) throws InterruptedException {
             TransactionalLinkedList queue = queues[0];
             queue.putFirst(item);
@@ -192,7 +185,7 @@ public class TransactionalLinkedList_ProducerConsumerStressTest {
             }
         }
 
-        @TransactionalMethod
+        @TransactionalMethod(automaticReadTracking = true)
         public int consumeOneItem(boolean abort) throws InterruptedException {
             TransactionalLinkedList<Integer> queue = queues[queues.length - 1];
             int r = queue.takeLast();
@@ -241,7 +234,7 @@ public class TransactionalLinkedList_ProducerConsumerStressTest {
             aliveCount.decrementAndGet();
         }
 
-        @TransactionalMethod
+        @TransactionalMethod(automaticReadTracking = true)
         public void moveOneItem(boolean abort) throws InterruptedException {
             int item = from.takeLast();
             //sleepRandomMs(aliveCount.get() * delayMs);
@@ -252,5 +245,5 @@ public class TransactionalLinkedList_ProducerConsumerStressTest {
             }
         }
     }
-    
+
 }

@@ -23,7 +23,7 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
  * @see java.util.concurrent.ConcurrentMap
  * @see java.util.Map
  */
-public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
+public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
 
     private final Comparator<? super K> comparator;
 
@@ -93,13 +93,13 @@ public class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
 
     @Override
     public int size() {
-        return (int)size.get();
+        return (int) size.get();
     }
 
     @Override
     @Exclude
     public int getCurrentSize() {
-        return (int)size.getAtomic();
+        return (int) size.getAtomic();
     }
 
     @Override

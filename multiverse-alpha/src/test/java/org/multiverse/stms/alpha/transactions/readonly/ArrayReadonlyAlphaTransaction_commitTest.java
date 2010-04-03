@@ -6,7 +6,6 @@ import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.assertIsCommitted;
@@ -15,22 +14,15 @@ public class ArrayReadonlyAlphaTransaction_commitTest {
 
     private AlphaStm stm;
     private AlphaStmConfig stmConfig;
-    private SpeculativeConfiguration speculativeConfig;
 
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
         stm = new AlphaStm(stmConfig);
-        speculativeConfig = new SpeculativeConfiguration(1);
     }
 
     public ArrayReadonlyAlphaTransaction startTransactionUnderTest(int maximumSize) {
-        ReadonlyAlphaTransactionConfiguration config = new ReadonlyAlphaTransactionConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                null,
-                new SpeculativeConfiguration(maximumSize),
-                stmConfig.maxRetryCount, false, true);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock);
         return new ArrayReadonlyAlphaTransaction(config, maximumSize);
     }
 

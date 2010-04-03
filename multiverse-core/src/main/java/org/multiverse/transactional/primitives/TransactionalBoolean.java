@@ -9,7 +9,7 @@ import static org.multiverse.api.StmUtils.retry;
  * @author Peter Veentjer
  */
 @TransactionalObject
-public class TransactionalBoolean {
+public final class TransactionalBoolean {
 
     private boolean value;
 

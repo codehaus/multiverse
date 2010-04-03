@@ -207,6 +207,10 @@ public final class ClassMetadata {
         this.access = access;
     }
 
+    public final boolean isFinal() {
+        return (access & Opcodes.ACC_FINAL) != 0;
+    }
+
     public boolean isInterface() {
         return (access & Opcodes.ACC_INTERFACE) != 0;
     }

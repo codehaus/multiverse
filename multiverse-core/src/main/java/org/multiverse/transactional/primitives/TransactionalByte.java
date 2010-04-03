@@ -12,7 +12,7 @@ import static org.multiverse.api.StmUtils.retry;
  * @author Peter Veentjer
  */
 @TransactionalObject
-public class TransactionalByte {
+public final class TransactionalByte {
 
     private byte value;
 

@@ -21,7 +21,7 @@ public class AbstractTrackingUpdateAlphaTransaction_performanceComparison {
     private AlphaStmConfig stmConfig;
     private AlphaStm stm;
     private SpeculativeConfiguration speculativeConfig;
-    private UpdateAlphaTransactionConfiguration config;
+    private UpdateConfiguration config;
     private ManualRef[] refs;
     //todo: very small size. 
     private int txCount = 1000;
@@ -32,7 +32,7 @@ public class AbstractTrackingUpdateAlphaTransaction_performanceComparison {
         stm = new AlphaStm(stmConfig);
         speculativeConfig = new SpeculativeConfiguration(100);
 
-        config = new UpdateAlphaTransactionConfiguration(
+        config = new UpdateConfiguration(
                 stmConfig.clock,
                 stmConfig.backoffPolicy,
                 stmConfig.commitLockPolicy,
