@@ -32,49 +32,30 @@ public final class GlobalStmInstance {
     private static final Stm instance;
 
     static {
+        String factoryMethod = System.getProperty(KEY, DEFAULT_FACTORY_METHOD);
+        logger.info(format("Initializing GlobalStmInstance using factoryMethod '%s'.", factoryMethod));
         try {
-            String factoryMethod = System.getProperty(KEY, DEFAULT_FACTORY_METHOD);
-            logger.info(format("Initializing GlobalStmInstance using factoryMethod '%s'.", factoryMethod));
-            try {
-                Method method = getMethod(factoryMethod);
-                instance = (Stm) method.invoke(null);
-                logger.info(format("Successfully initialized GlobalStmInstance using factoryMethod '%s'.", factoryMethod));
-            } catch (IllegalAccessException e) {
-                String msg = format("Failed to initialize GlobalStmInstance through System property '%s' with value '%s'." +
-                        "'%s' is not accessable (it should be public)').",
-                        KEY, factoryMethod, factoryMethod);
-                logger.severe(msg);
-                throw new IllegalArgumentException(msg, e);
-            } catch (ClassCastException e) {
-                String msg = format("Failed to initialize GlobalStmInstance through System property '%s' with value '%s'." +
-                        "'%s' is not accessable (it should be public)').",
-                        KEY, factoryMethod, factoryMethod);
-                logger.severe(msg);
-                throw new IllegalArgumentException(msg, e);
-            } catch (InvocationTargetException e) {
-                String msg = format("Failed to initialize GlobalStmInstance through System property '%s' with value '%s'." +
-                        "'%s' failed to be invoked.",
-                        KEY, factoryMethod, factoryMethod);
-                logger.severe(msg);
-                throw new IllegalArgumentException(msg, e);
-            }
-
-            // XXX: think about a better place for this
-            //if (instance instanceof ProfilerAware) {
-            //    ProfileRepository profiler = ((ProfilerAware) instance).getProfiler();
-            //    if (profiler != null) {
-            //        ProfilePublisher publisher = new ProfilePublisher(profiler.getCollator());
-            //        String mBeanName = "uncomment following for class circularity error"; //JmxUtils.registerMBean(publisher);
-            //        logger.info(format("Successfully registered '%s' as an MBean under name '%s'",
-            //                publisher, mBeanName));
-            //    }
-            //}
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            throw e;
-        } catch (Error e) {
-            e.printStackTrace();
-            throw e;
+            Method method = getMethod(factoryMethod);
+            instance = (Stm) method.invoke(null);
+            logger.info(format("Successfully initialized GlobalStmInstance using factoryMethod '%s'.", factoryMethod));
+        } catch (IllegalAccessException e) {
+            String msg = format("Failed to initialize GlobalStmInstance through System property '%s' with value '%s'." +
+                    "'%s' is not accessable (it should be public)').",
+                    KEY, factoryMethod, factoryMethod);
+            logger.severe(msg);
+            throw new IllegalArgumentException(msg, e);
+        } catch (ClassCastException e) {
+            String msg = format("Failed to initialize GlobalStmInstance through System property '%s' with value '%s'." +
+                    "'%s' is not accessable (it should be public)').",
+                    KEY, factoryMethod, factoryMethod);
+            logger.severe(msg);
+            throw new IllegalArgumentException(msg, e);
+        } catch (InvocationTargetException e) {
+            String msg = format("Failed to initialize GlobalStmInstance through System property '%s' with value '%s'." +
+                    "'%s' failed to be invoked.",
+                    KEY, factoryMethod, factoryMethod);
+            logger.severe(msg);
+            throw new IllegalArgumentException(msg, e);
         }
     }
 

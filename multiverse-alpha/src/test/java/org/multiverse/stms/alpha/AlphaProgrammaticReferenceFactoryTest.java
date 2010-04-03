@@ -2,10 +2,10 @@ package org.multiverse.stms.alpha;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.ProgrammaticReference;
-import org.multiverse.api.ProgrammaticReferenceFactory;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
+import org.multiverse.api.programmatic.ProgrammaticReference;
+import org.multiverse.api.programmatic.ProgrammaticReferenceFactory;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import static org.junit.Assert.assertNotNull;

@@ -1,13 +1,13 @@
 package org.multiverse.stms.alpha.transactions.update;
 
-import org.multiverse.api.Latch;
+import org.multiverse.api.Listeners;
 import org.multiverse.api.exceptions.*;
+import org.multiverse.api.latches.Latch;
 import org.multiverse.stms.AbstractTransactionSnapshot;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AbstractAlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
-import org.multiverse.utils.Listeners;
 
 import static java.lang.String.format;
 import static org.multiverse.stms.alpha.AlphaStmUtils.toTxObjectString;

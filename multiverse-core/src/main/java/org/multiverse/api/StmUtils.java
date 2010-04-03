@@ -1,6 +1,8 @@
 package org.multiverse.api;
 
 import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
+import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 
 import static org.multiverse.api.ThreadLocalTransaction.getRequiredThreadLocalTransaction;
 

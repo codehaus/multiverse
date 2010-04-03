@@ -1,6 +1,11 @@
 package org.multiverse.stms.alpha;
 
-import org.multiverse.api.*;
+import org.multiverse.api.Stm;
+import org.multiverse.api.TransactionFactory;
+import org.multiverse.api.TransactionFactoryBuilder;
+import org.multiverse.api.backoff.BackoffPolicy;
+import org.multiverse.api.clock.PrimitiveClock;
+import org.multiverse.api.commitlock.CommitLockPolicy;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.stms.alpha.transactions.readonly.*;
@@ -8,8 +13,6 @@ import org.multiverse.stms.alpha.transactions.update.ArrayUpdateAlphaTransaction
 import org.multiverse.stms.alpha.transactions.update.MapUpdateAlphaTransaction;
 import org.multiverse.stms.alpha.transactions.update.MonoUpdateAlphaTransaction;
 import org.multiverse.stms.alpha.transactions.update.UpdateConfiguration;
-import org.multiverse.utils.clock.PrimitiveClock;
-import org.multiverse.utils.commitlock.CommitLockPolicy;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -45,6 +48,8 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
     private final boolean optimizeConflictDetectionEnabled;
 
     private final boolean dirtyCheckEnabled;
+
+    private final boolean quickReleaseWriteLocksEnabled;
 
     private final AlphaProgrammaticReferenceFactoryBuilder referenceFactoryBuilder;
 
@@ -87,6 +92,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         this.transactionFactoryBuilder = new AlphaTransactionFactoryBuilder();
         this.referenceFactoryBuilder = new AlphaProgrammaticReferenceFactoryBuilder();
         this.clock = config.clock;
+        this.quickReleaseWriteLocksEnabled = config.quickReleaseWriteLocksEnabled;
 
         if (clock.getVersion() == 0) {
             clock.tick();
@@ -98,11 +104,6 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
     @Override
     public AlphaTransactionFactoryBuilder getTransactionFactoryBuilder() {
         return transactionFactoryBuilder;
-    }
-
-    @Override
-    public ProgrammaticLong createProgrammaticLong() {
-        return new AlphaProgrammaticLong(0);
     }
 
     /**
@@ -122,6 +123,34 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
      */
     public BackoffPolicy getBackoffPolicy() {
         return backoffPolicy;
+    }
+
+    public CommitLockPolicy getCommitLockPolicy() {
+        return commitLockPolicy;
+    }
+
+    public boolean isDirtyCheckEnabled() {
+        return dirtyCheckEnabled;
+    }
+
+    public int getMaxArraySize() {
+        return maxArraySize;
+    }
+
+    public int getMaxRetryCount() {
+        return maxRetryCount;
+    }
+
+    public boolean isOptimizeConflictDetectionEnabled() {
+        return optimizeConflictDetectionEnabled;
+    }
+
+    public boolean isQuickReleaseWriteLocksEnabled() {
+        return quickReleaseWriteLocksEnabled;
+    }
+
+    public boolean isSpeculativeConfigEnabled() {
+        return speculativeConfigEnabled;
     }
 
     @Override
@@ -164,7 +193,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     createSpeculativeConfiguration(speculativeConfigEnabled, maxArraySize),
                     false,//interruptible
                     AlphaStm.this.dirtyCheckEnabled,
-                    true);
+                    AlphaStm.this.quickReleaseWriteLocksEnabled);
         }
 
         public AlphaTransactionFactoryBuilder(
@@ -247,6 +276,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     speculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled);
         }
 
+        @Override
         public AlphaTransactionFactoryBuilder setCommitLockPolicy(CommitLockPolicy commitLockPolicy) {
             if (commitLockPolicy == null) {
                 throw new NullPointerException();

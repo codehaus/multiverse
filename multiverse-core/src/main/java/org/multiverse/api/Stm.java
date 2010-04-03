@@ -1,5 +1,7 @@
 package org.multiverse.api;
 
+import org.multiverse.api.programmatic.ProgrammaticReferenceFactoryBuilder;
+
 /**
  * The main interface for software transactional memory. Updates/reads in the stm should only be done through the
  * {@link Transaction}. So see that for more details.
@@ -33,11 +35,10 @@ public interface Stm<B extends TransactionFactoryBuilder, P extends Programmatic
      */
     B getTransactionFactoryBuilder();
 
-    ProgrammaticLong createProgrammaticLong();
 
     /**
      * Returns the programmatic reference factory this Stm exposes. See the
-     * {@link org.multiverse.api.ProgrammaticReference} for more information when to use it.
+     * {@link org.multiverse.api.programmatic.ProgrammaticReference} for more information when to use it.
      *
      * @return the used ProgrammaticReferenceFactory.
      */

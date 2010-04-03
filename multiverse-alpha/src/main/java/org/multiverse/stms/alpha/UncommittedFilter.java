@@ -1,7 +1,7 @@
 package org.multiverse.stms.alpha;
 
-import org.multiverse.utils.commitlock.CommitLock;
-import org.multiverse.utils.commitlock.CommitLockFilter;
+import org.multiverse.api.commitlock.CommitLock;
+import org.multiverse.api.commitlock.CommitLockFilter;
 
 /**
  * A {@link CommitLockFilter} that filters out all tranlocals that don't need locking.
@@ -28,7 +28,7 @@ public class UncommittedFilter implements CommitLockFilter {
             return false;
         }
 
-        if(tranlocal.getOrigin() == null){
+        if (tranlocal.getOrigin() == null) {
             return false;
         }
 

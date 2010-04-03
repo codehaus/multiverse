@@ -1,5 +1,6 @@
 package org.multiverse.stms.alpha.manualinstrumentation;
 
+import org.multiverse.api.Listeners;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.stms.alpha.AlphaStm;
@@ -7,7 +8,6 @@ import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
-import org.multiverse.utils.Listeners;
 
 import java.util.LinkedList;
 import java.util.List;

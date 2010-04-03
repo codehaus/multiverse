@@ -1,8 +1,8 @@
 package org.multiverse.stms;
 
-import org.multiverse.utils.backoff.ExponentialBackoffPolicy;
-import org.multiverse.utils.clock.PrimitiveClock;
-import org.multiverse.utils.clock.StrictPrimitiveClock;
+import org.multiverse.api.backoff.ExponentialBackoffPolicy;
+import org.multiverse.api.clock.PrimitiveClock;
+import org.multiverse.api.clock.StrictPrimitiveClock;
 
 /**
  * @author Peter Veentjer

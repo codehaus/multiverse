@@ -1,14 +1,14 @@
 package org.multiverse.stms.alpha.transactions.update;
 
-import org.multiverse.api.Latch;
+import org.multiverse.api.Listeners;
 import org.multiverse.api.exceptions.PanicError;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.api.exceptions.UncommittedReadConflict;
+import org.multiverse.api.latches.Latch;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.UncommittedFilter;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
-import org.multiverse.utils.Listeners;
 
 import static java.lang.System.arraycopy;
 

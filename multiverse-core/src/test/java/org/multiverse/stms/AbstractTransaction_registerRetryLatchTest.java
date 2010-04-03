@@ -1,10 +1,10 @@
 package org.multiverse.stms;
 
 import org.junit.Test;
-import org.multiverse.api.Latch;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.NoRetryPossibleException;
-import org.multiverse.utils.latches.CheapLatch;
+import org.multiverse.api.latches.CheapLatch;
+import org.multiverse.api.latches.Latch;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;

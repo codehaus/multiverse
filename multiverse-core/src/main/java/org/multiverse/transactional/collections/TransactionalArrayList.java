@@ -3,7 +3,8 @@ package org.multiverse.transactional.collections;
 import org.multiverse.annotations.Exclude;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
-import org.multiverse.api.ProgrammaticLong;
+import org.multiverse.api.programmatic.ProgrammaticLong;
+import org.multiverse.api.programmatic.ProgrammaticReferenceFactory;
 import org.multiverse.transactional.arrays.TransactionalReferenceArray;
 import org.multiverse.utils.TodoException;
 
@@ -22,9 +23,13 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
  */
 public final class TransactionalArrayList<E> implements TransactionalList<E> {
 
+    private final static ProgrammaticReferenceFactory sizeFactory = getGlobalStmInstance()
+            .getProgrammaticReferenceFactoryBuilder()
+            .build();
+
     private TransactionalReferenceArray<E> array;
 
-    private final ProgrammaticLong size = getGlobalStmInstance().createProgrammaticLong();
+    private final ProgrammaticLong size = sizeFactory.createLong(0);
 
     /**
      * Creates a new TransactionalArrayList with capacity 10. This is the same initial capacity as

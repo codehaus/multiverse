@@ -1,6 +1,6 @@
 package org.multiverse.stms;
 
-import org.multiverse.api.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 
 public abstract class AbstractTransactionSnapshot {
 

@@ -3,8 +3,8 @@ package org.multiverse.transactional.executors;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.TransactionLifecycleEvent;
-import org.multiverse.api.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
+import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.transactional.collections.TransactionalLinkedList;
 
 import java.util.Collections;

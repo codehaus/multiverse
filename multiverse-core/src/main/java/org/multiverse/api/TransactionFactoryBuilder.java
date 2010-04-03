@@ -1,5 +1,8 @@
 package org.multiverse.api;
 
+import org.multiverse.api.backoff.BackoffPolicy;
+import org.multiverse.api.commitlock.CommitLockPolicy;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -55,6 +58,8 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      * Creates a new {@link TransactionFactoryBuilder} based on the this TransactionFactoryBuilder but now
      * configured with the readonly setting. A readonly transaction normally is a lot faster than an update
      * transaction and it also provides protection against unwanted changes.
+     * <p/>
+     * If this property is set, the stm will not speculate on this property anymore.
      *
      * @param readonly true if the transaction should be readonly, false otherwise.
      * @return the new TransactionFactoryBuilder
@@ -64,6 +69,8 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     /**
      * If the transaction should automatically track all reads that have been done. This is needed for blocking
      * operations, but also for other features like writeskew detection.
+     * <p/>
+     * If this property is set, the stm will not speculate on this property anymore.
      *
      * @param automaticReadTracking true if readtracking enabled, false otherwise.
      * @return the new TransactionFactoryBuilder
@@ -77,6 +84,9 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      * @return the new TransactionFactoryBuilder
      */
     B setInterruptible(boolean interruptible);
+
+    B setCommitLockPolicy(CommitLockPolicy commitLockPolicy);
+
 
     /**
      * With the speculative configuration enabled, the stm is allowed to determine optimal settings

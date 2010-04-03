@@ -3,7 +3,8 @@ package org.multiverse.transactional.collections;
 import org.multiverse.annotations.Exclude;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
-import org.multiverse.api.ProgrammaticLong;
+import org.multiverse.api.programmatic.ProgrammaticLong;
+import org.multiverse.api.programmatic.ProgrammaticReferenceFactory;
 import org.multiverse.utils.TodoException;
 
 import java.util.Collection;
@@ -25,9 +26,14 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
  */
 public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
 
+    private final static ProgrammaticReferenceFactory sizeFactory = getGlobalStmInstance()
+            .getProgrammaticReferenceFactoryBuilder()
+            .build();
+
+
     private final Comparator<? super K> comparator;
 
-    private final ProgrammaticLong size = getGlobalStmInstance().createProgrammaticLong();
+    private final ProgrammaticLong size = sizeFactory.createLong(0);
 
     private Node<K, V> root;
 

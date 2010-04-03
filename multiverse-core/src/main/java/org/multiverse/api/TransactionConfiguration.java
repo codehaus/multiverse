@@ -1,5 +1,7 @@
 package org.multiverse.api;
 
+import org.multiverse.api.backoff.BackoffPolicy;
+
 /**
  * Contains the transaction configuration used by a {@link Transaction}. In the beginning this was all placed in the
  * Transaction, adding a lot of 'informational' methods to the transaction and therefor complicating its usage. So

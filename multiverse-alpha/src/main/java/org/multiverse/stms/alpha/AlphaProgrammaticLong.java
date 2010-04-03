@@ -1,10 +1,10 @@
 package org.multiverse.stms.alpha;
 
-import org.multiverse.api.ProgrammaticLong;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.UncommittedReadConflict;
+import org.multiverse.api.programmatic.ProgrammaticLong;
 import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;

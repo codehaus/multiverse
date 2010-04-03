@@ -1,7 +1,7 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
-import org.multiverse.api.Latch;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
+import org.multiverse.api.latches.Latch;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 

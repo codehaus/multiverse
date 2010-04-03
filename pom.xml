@@ -129,7 +129,9 @@
                     <configuration>
                         <excludes>
                             <exclude>**/*StressTest.java</exclude>
+                            <exclude>**/*stressTest.java</exclude>
                             <exclude>**/*PerformanceTest.java</exclude>
+                            <exclude>**/*performanceTest.java</exclude>
                         </excludes>
                         <includes>
                             <include>**/*Test.java</include>

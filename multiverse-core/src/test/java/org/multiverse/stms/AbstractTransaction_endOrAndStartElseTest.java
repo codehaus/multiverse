@@ -2,8 +2,8 @@ package org.multiverse.stms;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.clock.StrictPrimitiveClock;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.utils.clock.StrictPrimitiveClock;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;

@@ -1,12 +1,12 @@
 package org.multiverse.stms.alpha;
 
-import org.multiverse.api.BackoffPolicy;
-import org.multiverse.utils.backoff.ExponentialBackoffPolicy;
-import org.multiverse.utils.clock.PrimitiveClock;
-import org.multiverse.utils.clock.RelaxedPrimitiveClock;
-import org.multiverse.utils.clock.StrictPrimitiveClock;
-import org.multiverse.utils.commitlock.CommitLockPolicy;
-import org.multiverse.utils.commitlock.GenericCommitLockPolicy;
+import org.multiverse.api.backoff.BackoffPolicy;
+import org.multiverse.api.backoff.ExponentialBackoffPolicy;
+import org.multiverse.api.clock.PrimitiveClock;
+import org.multiverse.api.clock.RelaxedPrimitiveClock;
+import org.multiverse.api.clock.StrictPrimitiveClock;
+import org.multiverse.api.commitlock.CommitLockPolicy;
+import org.multiverse.api.commitlock.GenericCommitLockPolicy;
 
 /**
  * An Object responsible for storing the configuration for an {@link AlphaStm}. So instead of having to deal with ever
@@ -24,10 +24,12 @@ import org.multiverse.utils.commitlock.GenericCommitLockPolicy;
  * @author Peter Veentjer.
  */
 public final class AlphaStmConfig {
+
     public static AlphaStmConfig createDebugConfig() {
         AlphaStmConfig config = new AlphaStmConfig();
         config.speculativeConfigurationEnabled = false;
         config.optimizedConflictDetectionEnabled = false;
+        config.quickReleaseWriteLocksEnabled = false;
         config.clock = new StrictPrimitiveClock();
         return config;
     }
@@ -36,6 +38,7 @@ public final class AlphaStmConfig {
         AlphaStmConfig config = new AlphaStmConfig();
         config.optimizedConflictDetectionEnabled = true;
         config.speculativeConfigurationEnabled = true;
+        config.quickReleaseWriteLocksEnabled = true;
         config.clock = new RelaxedPrimitiveClock();
         return config;
     }
@@ -47,6 +50,8 @@ public final class AlphaStmConfig {
 
     public BackoffPolicy backoffPolicy =
             ExponentialBackoffPolicy.INSTANCE_10_MS_MAX;
+
+    public boolean quickReleaseWriteLocksEnabled = true;
 
     public boolean speculativeConfigurationEnabled = false;
 

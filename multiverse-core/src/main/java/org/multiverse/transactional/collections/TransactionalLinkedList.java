@@ -3,7 +3,8 @@ package org.multiverse.transactional.collections;
 import org.multiverse.annotations.FieldGranularity;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
-import org.multiverse.api.ProgrammaticLong;
+import org.multiverse.api.programmatic.ProgrammaticLong;
+import org.multiverse.api.programmatic.ProgrammaticReferenceFactory;
 import org.multiverse.utils.TodoException;
 
 import java.util.*;
@@ -50,6 +51,10 @@ import static org.multiverse.api.StmUtils.retry;
 @TransactionalObject
 public final class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> implements List<E> {
 
+    private final static ProgrammaticReferenceFactory sizeFactory = getGlobalStmInstance()
+            .getProgrammaticReferenceFactoryBuilder()
+            .build();
+
     private final int maxCapacity;
 
     private final ProgrammaticLong size;
@@ -82,7 +87,7 @@ public final class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> i
             throw new IllegalArgumentException("maxCapacity can't be smaller than 0");
         }
         this.maxCapacity = maxCapacity;
-        this.size = getGlobalStmInstance().createProgrammaticLong();
+        this.size = sizeFactory.createLong(0);
     }
 
     @Override

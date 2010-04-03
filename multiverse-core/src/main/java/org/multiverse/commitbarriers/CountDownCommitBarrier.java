@@ -1,9 +1,9 @@
 package org.multiverse.commitbarriers;
 
 import org.multiverse.api.Transaction;
-import org.multiverse.api.TransactionLifecycleEvent;
-import org.multiverse.api.TransactionLifecycleListener;
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
+import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 
 import java.util.List;
 

@@ -1,11 +1,17 @@
 package org.multiverse.stms.alpha;
 
-import org.multiverse.api.*;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionConfiguration;
+import org.multiverse.api.TransactionFactory;
+import org.multiverse.api.TransactionStatus;
+import org.multiverse.api.clock.PrimitiveClock;
 import org.multiverse.api.exceptions.UncommittedReadConflict;
+import org.multiverse.api.latches.Latch;
+import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.programmatic.ProgrammaticReference;
 import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
-import org.multiverse.utils.clock.PrimitiveClock;
 
 import static java.lang.String.format;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -68,7 +74,7 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
      * This method relies on the ThreadLocalTransaction and GlobalStmInstance.
      */
     public AlphaProgrammaticReference() {
-        this((E) null);
+        this(getThreadLocalTransaction(), null);
     }
 
     /**
@@ -85,17 +91,7 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
      * @param value the value this Ref should have.
      */
     public AlphaProgrammaticReference(E value) {
-        Transaction tx = getThreadLocalTransaction();
-        if (tx == null || tx.getStatus().isDead()) {
-            long writeVersion = clock.getVersion();
-            AlphaRefTranlocal<E> tranlocal = new AlphaRefTranlocal<E>(this);
-            tranlocal.value = value;
-            ___storeInitial(tranlocal, writeVersion);
-        } else {
-            AlphaTransaction alphaTx = (AlphaTransaction) tx;
-            AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal<E>) alphaTx.openForConstruction(this);
-            tranlocal.value = value;
-        }
+        this(getThreadLocalTransaction(), value);
     }
 
     /**
@@ -113,16 +109,25 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
 
     public AlphaProgrammaticReference(Transaction tx, E value) {
         AlphaTransaction alphaTx = (AlphaTransaction) tx;
-        AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal<E>) alphaTx.openForConstruction(this);
-        tranlocal.value = value;
+        if (tx == null || tx.getStatus().isDead()) {
+            long writeVersion = clock.getVersion();
+            AlphaRefTranlocal<E> tranlocal = new AlphaRefTranlocal<E>(this);
+            tranlocal.value = value;
+            ___storeInitial(tranlocal, writeVersion);
+        } else {
+            AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal<E>) alphaTx.openForConstruction(this);
+            tranlocal.value = value;
+        }
     }
 
     private AlphaRefTranlocal<E> openForRead(Transaction tx) {
-        return (AlphaRefTranlocal<E>) ((AlphaTransaction) tx).openForRead(AlphaProgrammaticReference.this);
+        AlphaTransaction alphaTx = (AlphaTransaction) tx;
+        return (AlphaRefTranlocal<E>) alphaTx.openForRead(this);
     }
 
     private AlphaRefTranlocal<E> openForWrite(Transaction tx) {
-        return (AlphaRefTranlocal<E>) ((AlphaTransaction) tx).openForWrite(AlphaProgrammaticReference.this);
+        AlphaTransaction alphaTx = (AlphaTransaction) tx;
+        return (AlphaRefTranlocal<E>) alphaTx.openForWrite(this);
     }
 
     // ============================== getVersion ===============================

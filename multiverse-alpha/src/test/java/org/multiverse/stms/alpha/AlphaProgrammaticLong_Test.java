@@ -3,9 +3,9 @@ package org.multiverse.stms.alpha;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalObject;
-import org.multiverse.api.ProgrammaticLong;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
+import org.multiverse.api.programmatic.ProgrammaticLong;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import static org.junit.Assert.assertEquals;
@@ -76,13 +76,16 @@ public class AlphaProgrammaticLong_Test {
 
     @TransactionalObject
     class Foo {
-        final ProgrammaticLong size = getGlobalStmInstance().createProgrammaticLong();
+        final ProgrammaticLong size = getGlobalStmInstance()
+                .getProgrammaticReferenceFactoryBuilder()
+                .build()
+                .createLong(0);
 
         public void inc() {
             size.inc(getThreadLocalTransaction(), 1);
         }
 
-        public long get(){
+        public long get() {
             return size.get();
         }
     }

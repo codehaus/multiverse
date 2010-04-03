@@ -1,11 +1,15 @@
 package org.multiverse.templates;
 
 import org.multiverse.api.*;
+import org.multiverse.api.backoff.BackoffPolicy;
 import org.multiverse.api.exceptions.ControlFlowError;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.api.exceptions.TooManyRetriesException;
-import org.multiverse.utils.latches.CheapLatch;
+import org.multiverse.api.latches.CheapLatch;
+import org.multiverse.api.latches.Latch;
+import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
+import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 
 import static java.lang.String.format;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;

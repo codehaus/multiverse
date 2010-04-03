@@ -3,10 +3,10 @@ package org.multiverse.stms.alpha;
 import org.multiverse.MultiverseConstants;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionStatus;
+import org.multiverse.api.commitlock.CommitLock;
 import org.multiverse.api.exceptions.PanicError;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.utils.TodoException;
-import org.multiverse.utils.commitlock.CommitLock;
 
 import static java.lang.String.format;
 

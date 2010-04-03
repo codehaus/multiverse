@@ -1,8 +1,8 @@
 package org.multiverse.stms.alpha;
 
-import org.multiverse.api.Latch;
-import org.multiverse.utils.Listeners;
-import org.multiverse.utils.commitlock.CommitLock;
+import org.multiverse.api.Listeners;
+import org.multiverse.api.commitlock.CommitLock;
+import org.multiverse.api.latches.Latch;
 
 /**
  * This is the interface placed on the POJO's that want to participate in the alpha STM.

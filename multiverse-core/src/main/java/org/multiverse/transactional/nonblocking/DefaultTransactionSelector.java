@@ -1,7 +1,7 @@
 package org.multiverse.transactional.nonblocking;
 
-import org.multiverse.api.Latch;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.latches.Latch;
 import org.multiverse.utils.TodoException;
 
 import java.util.concurrent.BlockingQueue;

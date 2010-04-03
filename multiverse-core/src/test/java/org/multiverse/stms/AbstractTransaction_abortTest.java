@@ -4,10 +4,10 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.TransactionLifecycleEvent;
-import org.multiverse.api.TransactionLifecycleListener;
+import org.multiverse.api.clock.StrictPrimitiveClock;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.utils.clock.StrictPrimitiveClock;
+import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
+import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
