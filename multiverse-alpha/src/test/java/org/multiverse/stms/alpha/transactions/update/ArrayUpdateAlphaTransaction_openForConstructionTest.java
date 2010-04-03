@@ -1,6 +1,7 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
@@ -97,6 +98,7 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
     }
 
     @Test
+    @Ignore
     public void whenObjectAlreadyHasCommits() {
         ManualRef ref = new ManualRef(stm);
         AlphaTranlocal committed = ref.___load();
