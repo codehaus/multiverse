@@ -19,6 +19,8 @@ import static org.multiverse.api.exceptions.LockNotFreeWriteConflict.createFaile
 import static org.multiverse.api.exceptions.UncommittedReadConflict.createUncommittedReadConflict;
 
 /**
+ * Test
+ *
  * @author Peter Veentjer
  */
 public final class AlphaProgrammaticLong extends DefaultTxObjectMixin implements ProgrammaticLong {
