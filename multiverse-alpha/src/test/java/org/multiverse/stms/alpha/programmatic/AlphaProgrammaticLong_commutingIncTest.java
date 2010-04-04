@@ -4,9 +4,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.exceptions.LockNotFreeWriteConflict;
+import org.multiverse.api.exceptions.UncommittedReadConflict;
 import org.multiverse.stms.alpha.AlphaStm;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
@@ -44,7 +48,6 @@ public class AlphaProgrammaticLong_commutingIncTest {
     public void whenNoTransactionIsRunning_thenItIsExecutedAtomically() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 10);
 
-
         long version = stm.getVersion();
         ref.commutingInc(3);
 
@@ -57,9 +60,39 @@ public class AlphaProgrammaticLong_commutingIncTest {
     }
 
     @Test
-    @Ignore
     public void whenNoTransactionIsRunningAndNoCommits() {
+        AlphaProgrammaticLong ref = AlphaProgrammaticLong.createUncommitted();
 
+        long version = stm.getVersion();
+        try {
+            ref.commutingInc(1);
+            fail();
+        } catch (UncommittedReadConflict expected) {
+        }
+
+        assertEquals(version, stm.getVersion());
+        assertNull(ref.___load());
+        assertNull(ref.___getLockOwner());
+    }
+
+    @Test
+    public void whenNoTransactionAndLocked_thenLockNotFreeWriteConflict() {
+        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 1);
+        AlphaProgrammaticLongTranlocal committed = (AlphaProgrammaticLongTranlocal) ref.___load();
+
+        Transaction lockOwner = mock(Transaction.class);
+        ref.___tryLock(lockOwner);
+
+        long version = stm.getVersion();
+        try {
+            ref.commutingInc(10);
+            fail();
+        } catch (LockNotFreeWriteConflict expected) {
+        }
+
+        assertEquals(version, stm.getVersion());
+        assertSame(committed, ref.___load());
+        assertSame(lockOwner, ref.___getLockOwner());
     }
 
     @Test
