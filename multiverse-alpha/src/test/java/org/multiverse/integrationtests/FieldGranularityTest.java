@@ -53,7 +53,7 @@ public class FieldGranularityTest {
         }
 
         @Override
-        @TransactionalMethod
+        @TransactionalMethod(readonly = false)
         public void doRun() throws Exception {
             pair.setLeft(10);
             sleepMs(1000);
@@ -71,7 +71,7 @@ public class FieldGranularityTest {
         }
 
         @Override
-        @TransactionalMethod
+        @TransactionalMethod(readonly = false)
         public void doRun() throws Exception {
             pair.setRight(10);
             sleepMs(1000);
