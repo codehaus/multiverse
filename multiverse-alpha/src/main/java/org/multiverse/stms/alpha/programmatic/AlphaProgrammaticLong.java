@@ -9,54 +9,53 @@ import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.templates.TransactionTemplate;
 import org.multiverse.utils.TodoException;
 
 import java.io.File;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.api.exceptions.CommitLockNotFreeWriteConflict.createFailedToObtainCommitLocksException;
+import static org.multiverse.api.exceptions.LockNotFreeWriteConflict.createFailedToObtainCommitLocksException;
 import static org.multiverse.api.exceptions.UncommittedReadConflict.createUncommittedReadConflict;
 
 /**
  * @author Peter Veentjer
  */
-public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements ProgrammaticLong {
+public final class AlphaProgrammaticLong extends DefaultTxObjectMixin implements ProgrammaticLong {
 
-    private static final PrimitiveClock clock = ((AlphaStm) getGlobalStmInstance()).getClock();
+    private final PrimitiveClock clock;
 
     public static AlphaProgrammaticLong createUncommitted() {
         return new AlphaProgrammaticLong((File) null);
     }
 
-    public AlphaProgrammaticLong(final long value) {
-        //template can be removed.
-        new TransactionTemplate() {
-            @Override
-            public Object execute(Transaction tx) throws Exception {
-                AlphaTransaction alphaTx = (AlphaTransaction) tx;
-                AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) alphaTx.openForConstruction(AlphaProgrammaticLong.this);
-                tranlocal.value = value;
-                return null;
-            }
-        }.execute();
+    public AlphaProgrammaticLong(long value) {
+        clock = ((AlphaStm) getGlobalStmInstance()).getClock();
+        AlphaTransaction tx = (AlphaTransaction) getThreadLocalTransaction();
+        if (tx == null || tx.getStatus().isDead()) {
+            AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) ___openUnconstructed();
+            tranlocal.value = value;
+            long writeVersion = clock.getVersion();
+            ___storeInitial(tranlocal, writeVersion);
+        } else {
+            AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) tx.openForConstruction(this);
+            tranlocal.value = value;
+        }
     }
 
-    public AlphaProgrammaticLong(Stm stm, final long value) {
-        //template can be removed.
-        new TransactionTemplate(stm) {
-            @Override
-            public Object execute(Transaction tx) throws Exception {
-                AlphaTransaction alphaTx = (AlphaTransaction) tx;
-                AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) alphaTx.openForConstruction(AlphaProgrammaticLong.this);
-                tranlocal.value = value;
-                return null;
-            }
-        }.execute();
+    public AlphaProgrammaticLong(Stm stm, long value) {
+        clock = ((AlphaStm) stm).getClock();
+
+        AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) ___openUnconstructed();
+        tranlocal.value = value;
+        long writeVersion = clock.getVersion();
+        this.___storeInitial(tranlocal, writeVersion);
     }
 
     public AlphaProgrammaticLong(AlphaTransaction tx, long value) {
+        //todo: this is not correct.
+        clock = ((AlphaStm) getGlobalStmInstance()).getClock();
+
         if (tx == null) {
             throw new NullPointerException();
         }
@@ -66,6 +65,7 @@ public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements Progr
     }
 
     private AlphaProgrammaticLong(File file) {
+        clock = null;
     }
 
     public long get() {
@@ -127,6 +127,17 @@ public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements Progr
 
     @Override
     public long atomicSet(long newValue) {
+        AlphaProgrammaticLongTranlocal committed = (AlphaProgrammaticLongTranlocal) ___load();
+        //if it isn't committed.
+        if (committed == null) {
+            throw createUncommittedReadConflict();
+        }
+
+        //if there is no change
+        if (committed.value == newValue) {
+            return newValue;
+        }
+
         AlphaProgrammaticLongTranlocal newTranlocal = new AlphaProgrammaticLongTranlocal(
                 this, false);
         Transaction lockOwner = (Transaction) newTranlocal;
@@ -134,11 +145,7 @@ public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements Progr
             throw createFailedToObtainCommitLocksException();
         }
 
-        AlphaProgrammaticLongTranlocal current = (AlphaProgrammaticLongTranlocal) ___load();
-        if (current == null) {
-            ___releaseLock(lockOwner);
-            throw createUncommittedReadConflict();
-        }
+        committed = (AlphaProgrammaticLongTranlocal) ___load();
 
         long writeVersion = clock.tick();
         newTranlocal.value = newValue;
@@ -148,7 +155,7 @@ public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements Progr
         if (listeners != null) {
             listeners.openAll();
         }
-        return current.value;
+        return committed.value;
     }
 
     // ============================= inc ============================
@@ -227,7 +234,7 @@ public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements Progr
         }
 
         long writeVersion = clock.tick();
-        updateTranlocal.value = currentTranlocal.value += amount;
+        updateTranlocal.value = currentTranlocal.value + amount;
         updateTranlocal.prepareForCommit(writeVersion);
         Listeners listeners = ___storeUpdate(updateTranlocal, writeVersion, true);
 
@@ -247,6 +254,10 @@ public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements Progr
 
         if (readonly.value != expected) {
             return false;
+        }
+
+        if (readonly.value == update) {
+            return true;
         }
 
         AlphaProgrammaticLongTranlocal updateTranlocal = new AlphaProgrammaticLongTranlocal(

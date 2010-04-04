@@ -17,28 +17,28 @@ import org.multiverse.utils.TodoException;
  *
  * @param <E>
  */
-public class AlphaProgrammaticRefeferenceTranlocal<E> extends AlphaTranlocal implements Transaction {
+public final class AlphaProgrammaticReferenceTranlocal<E> extends AlphaTranlocal implements Transaction {
 
     E value;
 
-    public AlphaProgrammaticRefeferenceTranlocal(AlphaProgrammaticRefeferenceTranlocal<E> origin) {
+    public AlphaProgrammaticReferenceTranlocal(AlphaProgrammaticReferenceTranlocal<E> origin) {
         this.___origin = origin;
         this.___transactionalObject = origin.___transactionalObject;
         this.value = origin.value;
     }
 
-    public AlphaProgrammaticRefeferenceTranlocal(AlphaProgrammaticReference<E> owner) {
+    public AlphaProgrammaticReferenceTranlocal(AlphaProgrammaticReference<E> owner) {
         this(owner, null);
     }
 
-    public AlphaProgrammaticRefeferenceTranlocal(AlphaProgrammaticReference<E> owner, E value) {
+    public AlphaProgrammaticReferenceTranlocal(AlphaProgrammaticReference<E> owner, E value) {
         this.___transactionalObject = owner;
         this.value = value;
     }
 
     @Override
     public AlphaTranlocal openForWrite() {
-        return new AlphaProgrammaticRefeferenceTranlocal(this);
+        return new AlphaProgrammaticReferenceTranlocal(this);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class AlphaProgrammaticRefeferenceTranlocal<E> extends AlphaTranlocal imp
             return true;
         }
 
-        AlphaProgrammaticRefeferenceTranlocal origin = (AlphaProgrammaticRefeferenceTranlocal) ___origin;
+        AlphaProgrammaticReferenceTranlocal origin = (AlphaProgrammaticReferenceTranlocal) ___origin;
         if (origin.value != this.value) {
             return true;
         }

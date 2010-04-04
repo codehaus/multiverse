@@ -60,7 +60,6 @@ public interface ProgrammaticLong {
      */
     long get(Transaction tx);
 
-
     /**
      * Gets the last committed value atomically without looking at a Transaction stored in the
      * ThreadLocalTransaction.

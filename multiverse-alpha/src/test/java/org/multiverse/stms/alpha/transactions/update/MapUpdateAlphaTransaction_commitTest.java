@@ -3,8 +3,8 @@ package org.multiverse.stms.alpha.transactions.update;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.CommitLockNotFreeWriteConflict;
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.LockNotFreeWriteConflict;
 import org.multiverse.api.exceptions.OptimisticLockFailedWriteConflict;
 import org.multiverse.api.exceptions.WriteSkewConflict;
 import org.multiverse.stms.alpha.AlphaStm;
@@ -279,7 +279,7 @@ public class MapUpdateAlphaTransaction_commitTest {
         try {
             tx.commit();
             fail();
-        } catch (CommitLockNotFreeWriteConflict e) {
+        } catch (LockNotFreeWriteConflict e) {
         }
 
         ref.___releaseLock(otherOwner);

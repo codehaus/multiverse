@@ -6,8 +6,8 @@ import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.stms.alpha.AlphaStm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
@@ -50,6 +50,23 @@ public class AlphaProgrammaticLong_atomicGetTest {
         assertEquals(0, value);
         assertEquals(version, stm.getVersion());
         assertNull(ref.___load());
+    }
+
+    @Test
+    public void whenLocked_thenNoProblem() {
+        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 10);
+        AlphaProgrammaticLongTranlocal committed = (AlphaProgrammaticLongTranlocal) ref.___load();
+
+        Transaction lockOwner = mock(Transaction.class);
+        ref.___tryLock(lockOwner);
+
+        long version = stm.getVersion();
+        long value = ref.atomicGet();
+
+        assertEquals(version, stm.getVersion());
+        assertEquals(value, 10);
+        assertSame(committed, ref.___load());
+        assertSame(lockOwner, ref.___getLockOwner());
     }
 
     @Test

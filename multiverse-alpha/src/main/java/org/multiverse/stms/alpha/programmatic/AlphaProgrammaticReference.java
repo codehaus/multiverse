@@ -15,7 +15,7 @@ import static java.lang.String.format;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.api.exceptions.CommitLockNotFreeWriteConflict.createFailedToObtainCommitLocksException;
+import static org.multiverse.api.exceptions.LockNotFreeWriteConflict.createFailedToObtainCommitLocksException;
 
 /**
  * A manual instrumented {@link org.multiverse.transactional.TransactionalReference} implementation. If this class
@@ -110,24 +110,24 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
 
         if (tx == null || tx.getStatus().isDead()) {
             long writeVersion = clock.getVersion();
-            AlphaProgrammaticRefeferenceTranlocal<E> tranlocal = new AlphaProgrammaticRefeferenceTranlocal<E>(this);
+            AlphaProgrammaticReferenceTranlocal<E> tranlocal = new AlphaProgrammaticReferenceTranlocal<E>(this);
             tranlocal.value = value;
             ___storeInitial(tranlocal, writeVersion);
             return;
         }
 
-        AlphaProgrammaticRefeferenceTranlocal<E> tranlocal = (AlphaProgrammaticRefeferenceTranlocal<E>) alphaTx.openForConstruction(this);
+        AlphaProgrammaticReferenceTranlocal<E> tranlocal = (AlphaProgrammaticReferenceTranlocal<E>) alphaTx.openForConstruction(this);
         tranlocal.value = value;
     }
 
-    private AlphaProgrammaticRefeferenceTranlocal<E> openForRead(Transaction tx) {
+    private AlphaProgrammaticReferenceTranlocal<E> openForRead(Transaction tx) {
         AlphaTransaction alphaTx = (AlphaTransaction) tx;
-        return (AlphaProgrammaticRefeferenceTranlocal<E>) alphaTx.openForRead(this);
+        return (AlphaProgrammaticReferenceTranlocal<E>) alphaTx.openForRead(this);
     }
 
-    private AlphaProgrammaticRefeferenceTranlocal<E> openForWrite(Transaction tx) {
+    private AlphaProgrammaticReferenceTranlocal<E> openForWrite(Transaction tx) {
         AlphaTransaction alphaTx = (AlphaTransaction) tx;
-        return (AlphaProgrammaticRefeferenceTranlocal<E>) alphaTx.openForWrite(this);
+        return (AlphaProgrammaticReferenceTranlocal<E>) alphaTx.openForWrite(this);
     }
 
     // ============================== getVersion ===============================
@@ -150,13 +150,13 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
             throw new NullPointerException();
         }
 
-        AlphaProgrammaticRefeferenceTranlocal<E> tranlocal = openForRead(tx);
+        AlphaProgrammaticReferenceTranlocal<E> tranlocal = openForRead(tx);
         return tranlocal.___writeVersion;
     }
 
     @Override
     public long atomicGetVersion() {
-        AlphaProgrammaticRefeferenceTranlocal<E> tranlocal = (AlphaProgrammaticRefeferenceTranlocal<E>) ___load();
+        AlphaProgrammaticReferenceTranlocal<E> tranlocal = (AlphaProgrammaticReferenceTranlocal<E>) ___load();
 
         if (tranlocal == null) {
             throw new UncommittedReadConflict();
@@ -184,13 +184,13 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
             throw new NullPointerException();
         }
 
-        AlphaProgrammaticRefeferenceTranlocal<E> tranlocal = openForRead(tx);
+        AlphaProgrammaticReferenceTranlocal<E> tranlocal = openForRead(tx);
         return tranlocal.value;
     }
 
     @Override
     public E atomicGet() {
-        AlphaProgrammaticRefeferenceTranlocal<E> tranlocal = (AlphaProgrammaticRefeferenceTranlocal) ___load();
+        AlphaProgrammaticReferenceTranlocal<E> tranlocal = (AlphaProgrammaticReferenceTranlocal) ___load();
 
         if (tranlocal == null) {
             throw new UncommittedReadConflict();
@@ -236,7 +236,7 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
 
     @Override
     public E getOrAwait(Transaction tx) {
-        AlphaProgrammaticRefeferenceTranlocal<E> tranlocal = openForRead(tx);
+        AlphaProgrammaticReferenceTranlocal<E> tranlocal = openForRead(tx);
         if (tranlocal.value == null) {
             retry();
         }
@@ -264,14 +264,14 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
             throw new NullPointerException();
         }
 
-        AlphaProgrammaticRefeferenceTranlocal<E> readonly = openForRead(tx);
+        AlphaProgrammaticReferenceTranlocal<E> readonly = openForRead(tx);
 
         //if there is no change, we are done.
         if (readonly.value == newValue) {
             return newValue;
         }
 
-        AlphaProgrammaticRefeferenceTranlocal<E> tranlocal = openForWrite(tx);
+        AlphaProgrammaticReferenceTranlocal<E> tranlocal = openForWrite(tx);
 
         if (newValue == tranlocal.value) {
             return newValue;
@@ -291,10 +291,10 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
             return oldValue;
         }
 
-        AlphaProgrammaticRefeferenceTranlocal newTranlocal = new AlphaProgrammaticRefeferenceTranlocal(this);
+        AlphaProgrammaticReferenceTranlocal newTranlocal = new AlphaProgrammaticReferenceTranlocal(this);
         newTranlocal.value = newValue;
 
-        //the AlphaProgrammaticRefeferenceTranlocal also implements the Transaction interface to prevent us
+        //the AlphaProgrammaticReferenceTranlocal also implements the Transaction interface to prevent us
         //creating an additional objects even though we need an instance.
         Transaction tx = newTranlocal;
 
@@ -303,7 +303,7 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
             throw createFailedToObtainCommitLocksException();
         }
 
-        AlphaProgrammaticRefeferenceTranlocal<E> oldTranlocal = (AlphaProgrammaticRefeferenceTranlocal<E>) ___load();
+        AlphaProgrammaticReferenceTranlocal<E> oldTranlocal = (AlphaProgrammaticReferenceTranlocal<E>) ___load();
 
         long writeVersion = clock.tick();
         ___storeUpdate(newTranlocal, writeVersion, true);
@@ -312,7 +312,7 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
 
     @Override
     public boolean atomicCompareAndSet(E expected, E update) {
-        AlphaProgrammaticRefeferenceTranlocal<E> tranlocal = (AlphaProgrammaticRefeferenceTranlocal<E>) ___load();
+        AlphaProgrammaticReferenceTranlocal<E> tranlocal = (AlphaProgrammaticReferenceTranlocal<E>) ___load();
 
         if (tranlocal == null) {
             throw new UncommittedReadConflict();
@@ -322,7 +322,7 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
             return false;
         }
 
-        AlphaProgrammaticRefeferenceTranlocal newTranlocal = new AlphaProgrammaticRefeferenceTranlocal(this);
+        AlphaProgrammaticReferenceTranlocal newTranlocal = new AlphaProgrammaticReferenceTranlocal(this);
         Transaction lockOwner = (Transaction) newTranlocal;
         newTranlocal.value = update;
 
@@ -331,7 +331,7 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
             throw createFailedToObtainCommitLocksException();
         }
 
-        AlphaProgrammaticRefeferenceTranlocal<E> oldTranlocal = (AlphaProgrammaticRefeferenceTranlocal<E>) ___load();
+        AlphaProgrammaticReferenceTranlocal<E> oldTranlocal = (AlphaProgrammaticReferenceTranlocal<E>) ___load();
 
         if (oldTranlocal.value != expected) {
             ___releaseLock(lockOwner);
@@ -377,7 +377,7 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
             throw new NullPointerException();
         }
 
-        AlphaProgrammaticRefeferenceTranlocal<E> tranlocal = openForRead(tx);
+        AlphaProgrammaticReferenceTranlocal<E> tranlocal = openForRead(tx);
         return toString(tranlocal.value);
     }
 
@@ -390,7 +390,7 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
     }
 
     @Override
-    public AlphaProgrammaticRefeferenceTranlocal<E> ___openUnconstructed() {
-        return new AlphaProgrammaticRefeferenceTranlocal<E>(this);
+    public AlphaProgrammaticReferenceTranlocal<E> ___openUnconstructed() {
+        return new AlphaProgrammaticReferenceTranlocal<E>(this);
     }
 }

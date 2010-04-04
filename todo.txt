@@ -2,13 +2,15 @@
 todo engine
 ---------------------------------------------------------------
 
+- AlphaProgrammaticLong.atomic methods should use the backoff policy
+
+- AlphaProgrammaticLong.atomic method should use the LockPolicy to do locking
+
 - if a good transaction is available, it should be reused.
 
 - support for a history in the ProgrammaticReference
 
 - support for a history in the ProgrammaticLong
-
-- Templates need to be removed in constructors of AlphaProgrammaticLong
 
 - back off policy needs to be used when a load is done
 
@@ -23,12 +25,6 @@ threads, so the whole mechanism should be made thread safe.
 - version should start with 0 again; so all other status should shift one down.
 
 - back off policy needs to be used when atomic calls are done
-
-- AlphaProgrammaticLong. atomicInc(long amount)
-
-- AlphaProgrammaticLong.atomicSet(long newValue
-
-- AlphaProgrammaticLong. atomicCompareAndSet(long expected, long update)
 
 - AlphaProgrammaticLong atomicGetVersion
 
@@ -331,3 +327,16 @@ done
 - good working default transaction familyname added.
 
 - all readonly tests up and running again
+
+- AlphaProgrammaticLong.atomicSet(long newValue
+
+- AlphaProgrammaticLong.atomicCompareAndSet(long expected, long update)
+
+- AlphaProgrammaticLong.atomicGet 
+
+- AlphaProgrammaticLong.set test
+
+- Templates need to be removed in constructors of AlphaProgrammaticLong
+
+- AlphaProgrammaticLong. atomicInc(long amount)
+

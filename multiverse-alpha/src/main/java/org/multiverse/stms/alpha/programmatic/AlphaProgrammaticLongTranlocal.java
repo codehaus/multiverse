@@ -12,9 +12,13 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.utils.TodoException;
 
 /**
+ * The AlphaProgrammaticLongTranlocal also implement the transaction interface. This is an
+ * optimization to prevent creating a transaction object. It will only be used for
+ * atomic operations on the AlphaProgrammaticLong.
+ *
  * @author Peter Veentjer
  */
-public class AlphaProgrammaticLongTranlocal extends AlphaTranlocal implements Transaction {
+public final class AlphaProgrammaticLongTranlocal extends AlphaTranlocal implements Transaction {
 
     public long value;
     public long pendingIncrements;

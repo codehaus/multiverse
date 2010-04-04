@@ -481,15 +481,15 @@ public abstract class AbstractUpdateAlphaTransaction
         return new WriteSkewConflict(msg);
     }
 
-    private CommitLockNotFreeWriteConflict createFailedToObtainCommitLocksException() {
-        if (CommitLockNotFreeWriteConflict.reuse) {
-            return CommitLockNotFreeWriteConflict.INSTANCE;
+    private LockNotFreeWriteConflict createFailedToObtainCommitLocksException() {
+        if (LockNotFreeWriteConflict.reuse) {
+            return LockNotFreeWriteConflict.INSTANCE;
         }
 
         String msg = format(
                 "Failed to commit transaction '%s' because not all the locks on the transactional objects " +
                         "in the writeset could be obtained",
                 config.getFamilyName());
-        return new CommitLockNotFreeWriteConflict(msg);
+        return new LockNotFreeWriteConflict(msg);
     }
 }
