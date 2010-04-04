@@ -192,7 +192,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
     }
 
     /**
-     * Sets the thread factory used to create new threads.
+     * Sets the thread factory used to createReference new threads.
      *
      * @param threadFactory the new thread factory
      * @throws NullPointerException if threadFactory is null
@@ -207,7 +207,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
     }
 
     /**
-     * Returns the thread factory used to create new threads.
+     * Returns the thread factory used to createReference new threads.
      *
      * @return the current thread factory
      * @see #setThreadFactory

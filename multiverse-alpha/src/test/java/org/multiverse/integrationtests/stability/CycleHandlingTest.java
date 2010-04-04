@@ -252,7 +252,7 @@ public class CycleHandlingTest {
 
         ComplexNode current = root;
 
-        //create an initial set all linked on edge2.
+        //createReference an initial set all linked on edge2.
         for (int k = 1; k < nodeCount; k++) {
             ComplexNode newNode = new ComplexNode();
             nodes[k] = newNode;

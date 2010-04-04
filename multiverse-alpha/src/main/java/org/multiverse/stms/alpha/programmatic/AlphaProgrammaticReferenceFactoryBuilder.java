@@ -1,11 +1,11 @@
-package org.multiverse.stms.alpha;
+package org.multiverse.stms.alpha.programmatic;
 
 import org.multiverse.api.programmatic.ProgrammaticReferenceFactory;
 import org.multiverse.api.programmatic.ProgrammaticReferenceFactoryBuilder;
 import org.multiverse.utils.TodoException;
 
 /**
- * A {@link ProgrammaticReferenceFactoryBuilder} specific for the {@link AlphaStm}.
+ * A {@link ProgrammaticReferenceFactoryBuilder} specific for the {@link org.multiverse.stms.alpha.AlphaStm}.
  *
  * @author Peter Veentjer
  */
@@ -18,7 +18,7 @@ public final class AlphaProgrammaticReferenceFactoryBuilder
     }
 
     @Override
-    public ProgrammaticReferenceFactoryBuilder withRetrySupport(boolean enabled) {
+    public ProgrammaticReferenceFactoryBuilder withBlockingSupport(boolean enabled) {
         throw new TodoException();
     }
 

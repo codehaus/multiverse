@@ -1,13 +1,12 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
+import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Listeners;
-import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.NoRetryPossibleException;
 import org.multiverse.api.latches.CheapLatch;
 import org.multiverse.api.latches.Latch;
@@ -20,7 +19,6 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
 
@@ -31,6 +29,11 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
         stm = new AlphaStm(stmConfig);
+        clearThreadLocalTransaction();
+    }
+
+    @After
+    public void tearDown() {
         clearThreadLocalTransaction();
     }
 
@@ -152,7 +155,6 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
     }
 
     @Test
-    @Ignore
     public void integrationTest() {
         SomeRef ref = new SomeRef(0);
 
@@ -200,9 +202,6 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
 
         @TransactionalMethod(readonly = true, automaticReadTracking = true)
         public void await(int value) {
-            Transaction tx = getThreadLocalTransaction();
-            ReadonlyConfiguration config = (ReadonlyConfiguration) tx.getConfiguration();
-            System.out.println("tx.config: " + config.speculativeConfig);
             if (this.value != value) {
                 retry();
             }

@@ -30,7 +30,10 @@ public class RefTest {
     }
 
     public Transaction startTransaction() {
-        Transaction t = stm.getTransactionFactoryBuilder().build().start();
+        Transaction t = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .build()
+                .start();
         setThreadLocalTransaction(t);
         return t;
     }

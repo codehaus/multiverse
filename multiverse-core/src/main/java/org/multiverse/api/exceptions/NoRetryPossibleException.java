@@ -4,7 +4,7 @@ package org.multiverse.api.exceptions;
  * An {@link IllegalTransactionStateException} that indicates that a retry is done, without the
  * possibility of progress, for example when the readset is empty.
  * <p/>
- * No reason to create a singleton for performance reasons since this exception should not
+ * No reason to createReference a singleton for performance reasons since this exception should not
  * occur. So if it does, we want a complete stacktrace.
  *
  * @author Peter Veentjer.

@@ -1,7 +1,6 @@
 package org.multiverse.integrationtests;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.FieldGranularity;
@@ -29,7 +28,6 @@ public class FieldGranularityTest {
         new TransactionalInteger();
     }
 
-    @Ignore
     @Test
     public void testFieldGranularityCausesNoWriteConflicts() {
         Pair pair = new Pair(0, 0);

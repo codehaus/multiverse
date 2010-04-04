@@ -13,7 +13,7 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
 
 public class IntStackPerformanceStressTest {
 
-    private int count = 50 * 1000 * 1000;
+    private int count = 20 * 1000 * 1000;
 
     private AlphaStm stm;
     private TransactionFactory txFactory;

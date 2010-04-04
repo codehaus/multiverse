@@ -1,19 +1,19 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.LockNotFreeReadConflict;
 import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.stms.alpha.AlphaProgrammaticLong;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
+import org.multiverse.stms.alpha.programmatic.AlphaProgrammaticLong;
+import org.multiverse.stms.alpha.programmatic.AlphaProgrammaticLongTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import static org.junit.Assert.*;
@@ -41,7 +41,6 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
     }
 
     @Test
-    @Ignore
     public void whenVersionMatches() {
         ManualRef ref = new ManualRef(stm, 0);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
@@ -71,7 +70,6 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
     }
 
     @Test
-    @Ignore
     public void openForWriteDoesNotLockAtomicObjects() {
         ManualRef ref = new ManualRef(stm);
 
@@ -90,9 +88,8 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
      * could escape before they are committed. For now this has been disallowed.
      */
     @Test
-    @Ignore
     public void whenLockedAndEqualVersion_thenLockNotFreeReadConflict() {
-        ManualRef ref = new ManualRef(stm, 0);
+        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
         Transaction owner = mock(Transaction.class);
         ref.___tryLock(owner);
 
@@ -108,7 +105,6 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
     }
 
     @Test
-    @Ignore
     public void whenVersionTooNew_thenOldVersionNotFoundReadConflict() {
         ManualRef ref = new ManualRef(stm, 0);
 
@@ -127,9 +123,8 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
     }
 
     @Test
-    @Ignore
     public void whenLocked_thenLockNotFreeReadConflict() {
-        ManualRef ref = new ManualRef(stm, 0);
+        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
 
         stmConfig.clock.tick();
 
@@ -147,26 +142,24 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
     }
 
     @Test
-    @Ignore
     public void whenAlreadyOpenedForWrite_thenSameTranlocalReturned() {
-        ManualRef ref = new ManualRef(stm, 0);
+        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
 
         AlphaTransaction tx = startSutTransaction();
-        ManualRefTranlocal exected = (ManualRefTranlocal) tx.openForWrite(ref);
-        ManualRefTranlocal found = (ManualRefTranlocal) tx.openForWrite(ref);
+        AlphaProgrammaticLongTranlocal exected = (AlphaProgrammaticLongTranlocal) tx.openForWrite(ref);
+        AlphaProgrammaticLongTranlocal found = (AlphaProgrammaticLongTranlocal) tx.openForWrite(ref);
 
         assertSame(exected, found);
         assertIsActive(tx);
     }
 
     @Test
-    @Ignore
     public void whenAlreadyOpenedForRead_thenItIsUpgradedToOpenForWrite() {
-        ManualRef ref = new ManualRef(stm, 20);
+        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 20);
 
         AlphaTransaction tx = startSutTransaction();
-        ManualRefTranlocal read1 = (ManualRefTranlocal) tx.openForRead(ref);
-        ManualRefTranlocal read2 = (ManualRefTranlocal) tx.openForCommutingWrite(ref);
+        AlphaProgrammaticLongTranlocal read1 = (AlphaProgrammaticLongTranlocal) tx.openForRead(ref);
+        AlphaProgrammaticLongTranlocal read2 = (AlphaProgrammaticLongTranlocal) tx.openForCommutingWrite(ref);
 
         assertNotSame(read1, read2);
         assertSame(read2.getOrigin(), read1);
@@ -176,20 +169,42 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
     }
 
     @Test
-    @Ignore
     public void whenAlreadyOpenendForCommutingWrite_thenSameTranlocalReturned() {
+        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 20);
 
+        AlphaTransaction tx = startSutTransaction();
+        AlphaTranlocal read1 = tx.openForCommutingWrite(ref);
+        AlphaTranlocal read2 = tx.openForCommutingWrite(ref);
+
+        assertSame(read1, read2);
+        assertTrue(read2.isUncommitted());
+        assertTrue(read2.isCommuting());
+        assertIsActive(tx);
+    }
+
+    @Test
+    public void whenAlreadyOpenedForConstruction() {
+        AlphaProgrammaticLong ref = AlphaProgrammaticLong.createUncommitted();
+
+        AlphaTransaction tx = startSutTransaction();
+        AlphaTranlocal openedForConstruction = tx.openForConstruction(ref);
+        AlphaTranlocal found = tx.openForCommutingWrite(ref);
+
+        assertSame(openedForConstruction, found);
+        assertFalse(found.isCommitted());
+        assertFalse(found.isCommuting());
+        assertIsActive(tx);
     }
 
     @Test
     public void whenOpenedForWriteOnDifferentTransactions_thenDifferentTranlocalsAreReturned() {
-        ManualRef ref = new ManualRef(stm, 1);
+        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 1);
 
         AlphaTransaction tx1 = startTrackingUpdateTransaction(stm);
-        ManualRefTranlocal found1 = (ManualRefTranlocal) tx1.openForWrite(ref);
+        AlphaTranlocal found1 = tx1.openForCommutingWrite(ref);
 
         AlphaTransaction tx2 = startTrackingUpdateTransaction(stm);
-        ManualRefTranlocal found2 = (ManualRefTranlocal) tx2.openForWrite(ref);
+        AlphaTranlocal found2 = tx2.openForCommutingWrite(ref);
 
         assertNotSame(found1, found2);
     }

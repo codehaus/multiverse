@@ -1,13 +1,14 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
+import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
+import org.multiverse.stms.alpha.programmatic.AlphaProgrammaticLong;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
@@ -152,9 +153,16 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
     }
 
     @Test
-    @Ignore
-    public void whenAlreadyOpenedForCommutingWrite() {
+    public void whenAlreadyOpenedForCommutingWrite_thenFixated() {
+        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
 
+        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTranlocal openedForCommutingWrite = tx.openForCommutingWrite(ref);
+        AlphaTranlocal found = tx.openForWrite(ref);
+
+        assertSame(openedForCommutingWrite, found);
+        assertFalse(found.isCommuting());
+        assertFalse(found.isCommitted());
     }
 
     @Test

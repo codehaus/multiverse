@@ -3,8 +3,11 @@ package org.multiverse.transactional.arrays;
 import org.multiverse.annotations.Exclude;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
-import org.multiverse.transactional.DefaultTransactionalReference;
+import org.multiverse.api.programmatic.ProgrammaticReference;
+import org.multiverse.api.programmatic.ProgrammaticReferenceFactory;
 import org.multiverse.transactional.TransactionalReference;
+
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 
 /**
  * An Transactional array. The elements in the array are of type {@link TransactionalReference}.
@@ -21,7 +24,11 @@ import org.multiverse.transactional.TransactionalReference;
 @TransactionalObject
 public final class TransactionalReferenceArray<E> {
 
-    private final TransactionalReference<E>[] array;
+    private final static ProgrammaticReferenceFactory referenceFactory = getGlobalStmInstance()
+            .getProgrammaticReferenceFactoryBuilder()
+            .build();
+
+    private final ProgrammaticReference<E>[] array;
 
     /**
      * Creates a new TransactionalReferenceArray with the specified length.
@@ -34,13 +41,13 @@ public final class TransactionalReferenceArray<E> {
             throw new IllegalArgumentException();
         }
 
-        array = new TransactionalReference[length];
+        array = new ProgrammaticReference[length];
         for (int k = 0; k < length; k++) {
-            array[k] = new DefaultTransactionalReference<E>();
+            array[k] = referenceFactory.atomicCreateReference(null);
         }
     }
 
-    private TransactionalReferenceArray(TransactionalReference<E>[] array) {
+    private TransactionalReferenceArray(ProgrammaticReference<E>[] array) {
         if (array == null) {
             throw new NullPointerException();
         }
@@ -55,20 +62,71 @@ public final class TransactionalReferenceArray<E> {
      * @return the element at the specified index.
      * @throws IndexOutOfBoundsException if the index is out of bounds.
      */
-    @TransactionalMethod(readonly = true)
+    @Exclude
     public E get(int index) {
         return array[index].get();
     }
 
     /**
-     * Sets the element at the specified index
+     * Returns the currently stored item at the specified index. This call doesn't
+     * look at a transaction running in the ThreadLocalTransaction.
+     * <p/>
+     * todo: explain what happens when value uncommitted.
+     *
+     * @param index the index of the item to get
+     * @return the value of the item
+     * @throws IndexOutOfBoundsException if index is out of bounds.
+     */
+    @Exclude
+    public E atomicGet(int index) {
+        return array[index].atomicGet();
+    }
+
+    /**
+     * Sets the element at the specified index.
+     * <p/>
+     * If a transaction currently is running in the ThreadLocalTransaction, that transaction
+     * is used, otherwise this call is executed atomically (and very very fast).
      *
      * @param index the index of the element to set.
      * @return the previous content of element at the specified index.
      * @throws IndexOutOfBoundsException if the index is out of bounds.
      */
+    @Exclude
     public E set(int index, E item) {
         return array[index].set(item);
+    }
+
+    /**
+     * Atomically sets the element at the specified index. If a transaction
+     * is running in the ThreadLocalTransaction, it is ignored. That is why
+     * this call is very fast.
+     * <p/>
+     * todo: explain what happens when value uncommitted.
+     *
+     * @param index  the index of the element to atomically set.
+     * @param update the new value
+     * @return the previous stored value.
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     */
+    @Exclude
+    public E atomicSet(int index, E update) {
+        //it doesn't need a transaction, so it is excluded.
+        return array[index].atomicSet(update);
+    }
+
+    /**
+     * todo: explain what happens when value uncommitted.
+     *
+     * @param index
+     * @param expected
+     * @param update
+     * @return
+     */
+    @Exclude
+    public boolean atomicCompareAndSet(int index, E expected, E update) {
+        //it doesn't need a transaction, so it is excluded.
+        return array[index].atomicCompareAndSet(expected, update);
     }
 
     /**
@@ -139,11 +197,11 @@ public final class TransactionalReferenceArray<E> {
             throw new IllegalArgumentException();
         }
 
-        TransactionalReference[] newArray = new TransactionalReference[newLength];
+        ProgrammaticReference[] newArray = new ProgrammaticReference[newLength];
         System.arraycopy(array, 0, newArray, 0, array.length);
 
         for (int k = array.length; k < newLength; k++) {
-            newArray[k] = new DefaultTransactionalReference();
+            newArray[k] = referenceFactory.atomicCreateReference(null);
         }
 
         return new TransactionalReferenceArray<E>(newArray);

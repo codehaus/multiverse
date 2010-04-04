@@ -1,4 +1,4 @@
-package org.multiverse.stms.alpha;
+package org.multiverse.stms.alpha.programmatic;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -10,9 +10,9 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 /**
  * @author Peter Veentjer
  */
-public class AlphaProgrammaticReference_setPerformanceTest {
+public class AlphaProgrammaticReference_atomicGetPerformanceTest {
 
-    private long transactionCount = ((long) 1000) * 1000 * 100;
+    private long transactionCount = ((long) 1000) * 1000 * 1000 * 2;
 
     @Before
     public void setUp() {
@@ -20,16 +20,15 @@ public class AlphaProgrammaticReference_setPerformanceTest {
     }
 
     @Test
-    public void set() {
+    public void getAtomic() {
         AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>();
 
         long startNs = System.nanoTime();
 
-
         for (long k = 0; k < transactionCount; k++) {
-            ref.set(k % 2 == 0 ? "foo" : "bar");
+            ref.atomicGet();
 
-            if (k % (10 * 1000 * 1000) == 0) {
+            if (k % (100 * 1000 * 1000) == 0) {
                 System.out.println("at: " + k);
             }
         }
@@ -40,15 +39,15 @@ public class AlphaProgrammaticReference_setPerformanceTest {
     }
 
     @Test
-    public void setAtomic() {
+    public void get() {
         AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>();
 
         long startNs = System.nanoTime();
 
         for (long k = 0; k < transactionCount; k++) {
-            ref.setAtomic(k % 2 == 0 ? "foo" : "bar");
+            ref.get();
 
-            if (k % (10 * 1000 * 1000) == 0) {
+            if (k % (100 * 1000 * 1000) == 0) {
                 System.out.println("at: " + k);
             }
         }

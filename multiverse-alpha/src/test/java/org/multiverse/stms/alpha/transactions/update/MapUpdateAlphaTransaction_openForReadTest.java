@@ -1,7 +1,6 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.*;
@@ -10,6 +9,7 @@ import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
+import org.multiverse.stms.alpha.programmatic.AlphaProgrammaticLong;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import java.util.Map;
@@ -234,12 +234,21 @@ public class MapUpdateAlphaTransaction_openForReadTest {
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForRead(ref);
 
         assertSame(expected, found);
+        assertFalse(found.isCommuting());
+        assertFalse(found.isCommitted());
     }
 
     @Test
-    @Ignore
     public void whenAlreadyOpenedForCommutingWrite_thenItIsFixated() {
+        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
 
+        AlphaTransaction tx = startSutTransaction();
+        AlphaTranlocal openedForCommutingWrite = tx.openForCommutingWrite(ref);
+        AlphaTranlocal found = tx.openForRead(ref);
+
+        assertSame(openedForCommutingWrite, found);
+        assertFalse(found.isCommuting());
+        assertFalse(found.isCommitted());
     }
 
     @Test

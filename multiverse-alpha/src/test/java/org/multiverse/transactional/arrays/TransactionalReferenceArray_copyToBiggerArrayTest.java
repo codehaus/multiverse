@@ -56,7 +56,7 @@ public class TransactionalReferenceArray_copyToBiggerArrayTest {
         long version = stm.getVersion();
         TransactionalReferenceArray<String> newarray = array.copyToBiggerArray(5);
 
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertEquals(5, newarray.length());
         assertEquals("[a, null, c, null, null]", newarray.toString());
     }

@@ -6,6 +6,7 @@ import org.multiverse.api.TransactionFactoryBuilder;
 import org.multiverse.api.backoff.BackoffPolicy;
 import org.multiverse.api.clock.PrimitiveClock;
 import org.multiverse.api.commitlock.CommitLockPolicy;
+import org.multiverse.stms.alpha.programmatic.AlphaProgrammaticReferenceFactoryBuilder;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.stms.alpha.transactions.readonly.*;
@@ -15,6 +16,7 @@ import org.multiverse.stms.alpha.transactions.update.MonoUpdateAlphaTransaction;
 import org.multiverse.stms.alpha.transactions.update.UpdateConfiguration;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
 import static java.lang.String.format;
@@ -31,13 +33,17 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
     private final static Logger logger = Logger.getLogger(AlphaStm.class.getName());
 
+    private final static AtomicLong anonoymousFamilyNameGenerator = new AtomicLong();
+
+    private static String createAnonymousFamilyName() {
+        return "TransactionFamily-" + anonoymousFamilyNameGenerator.incrementAndGet();
+    }
+
     private final PrimitiveClock clock;
 
     private final CommitLockPolicy commitLockPolicy;
 
     private final BackoffPolicy backoffPolicy;
-
-    private final AlphaTransactionFactoryBuilder transactionFactoryBuilder;
 
     private final int maxRetryCount;
 
@@ -89,7 +95,6 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         this.commitLockPolicy = config.commitLockPolicy;
         this.backoffPolicy = config.backoffPolicy;
         this.maxRetryCount = config.maxRetryCount;
-        this.transactionFactoryBuilder = new AlphaTransactionFactoryBuilder();
         this.referenceFactoryBuilder = new AlphaProgrammaticReferenceFactoryBuilder();
         this.clock = config.clock;
         this.quickReleaseWriteLocksEnabled = config.quickReleaseWriteLocksEnabled;
@@ -103,7 +108,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
     @Override
     public AlphaTransactionFactoryBuilder getTransactionFactoryBuilder() {
-        return transactionFactoryBuilder;
+        return new AlphaTransactionFactoryBuilder();
     }
 
     /**
@@ -185,7 +190,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         public AlphaTransactionFactoryBuilder() {
             this(false, //readonly
                     false,//automaticReadTracking
-                    null,//familyname
+                    createAnonymousFamilyName(),//familyname
                     AlphaStm.this.maxRetryCount,//maxRetryCount
                     true,//allowWriteSkewProblem
                     AlphaStm.this.commitLockPolicy,
@@ -354,17 +359,12 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             return new TransactionFactory<AlphaTransaction>() {
                 @Override
                 public AlphaTransaction start() {
-                    //System.out.println(familyName);
-                    //System.out.println(automaticReadTracking);
-
                     boolean finalReadonly;
                     if (speculativeConfig.isSpeculativeReadonlyEnabled()) {
                         finalReadonly = speculativeConfig.isReadonly();
                     } else {
                         finalReadonly = readonly;
                     }
-
-                    //System.out.println("readonly: "+finalReadonly);
 
                     boolean finalAutomaticReadTracking;
                     if (speculativeConfig.isSpeculativeNonAutomaticReadTrackingEnabled()) {
@@ -374,8 +374,6 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     }
 
                     boolean speculativeSizeEnabled = speculativeConfig.isSpeculativeSizeEnabled();
-
-                    //System.out.println("speculativeSizeEnabled: "+speculativeSizeEnabled);
 
                     if (finalReadonly) {
                         if (finalAutomaticReadTracking) {
@@ -437,7 +435,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
         private TransactionFactory<AlphaTransaction> createNonSpeculativeUpdateTxFactory() {
             if (!automaticReadTracking && !allowWriteSkewProblem) {
-                String msg = format("Can't create transactionfactory for transaction family '%s' because an update "
+                String msg = format("Can't createReference transactionfactory for transaction family '%s' because an update "
                         + "transaction without automaticReadTracking and without allowWriteSkewProblem is "
                         + "not possible", familyName
                 );

@@ -62,7 +62,7 @@ public final class StandardThreadFactory implements ThreadFactory {
      * Constructs a new StandardThreadFactory with the given priority and with a newly created
      * ThreadGroup with the given groupname.  The created threads are not daemons.
      *
-     * @param priority  the priority of the threads this StandardThreadFactory is going to create.
+     * @param priority  the priority of the threads this StandardThreadFactory is going to createReference.
      * @param groupName the name of the ThreadGroup (is allowed to be null).
      * @throws IllegalArgumentException if priority is not a valid value.
      */
@@ -90,7 +90,7 @@ public final class StandardThreadFactory implements ThreadFactory {
     /**
      * Constructs a new StandardThreadFactory with the given priority and threadgroup.
      *
-     * @param priority    the priority of the threads this StandardThreadFactory is going to create.
+     * @param priority    the priority of the threads this StandardThreadFactory is going to createReference.
      * @param threadGroup the threadgroup the thread is part of
      * @param daemon      if the thread should be a daemon.
      * @throws IllegalArgumentException if the priority is not valid.

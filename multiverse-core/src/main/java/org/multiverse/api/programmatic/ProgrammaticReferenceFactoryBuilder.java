@@ -1,7 +1,7 @@
 package org.multiverse.api.programmatic;
 
 /**
- * With the ProgrammaticReferenceFactoryBuilder you can create a ProgrammaticReference. This ProgrammaticFactoryBuilder
+ * With the ProgrammaticReferenceFactoryBuilder you can createReference a ProgrammaticReference. This ProgrammaticFactoryBuilder
  * gives the ability to use different configured ProgrammaticReferencesFactories for the same
  * STM. At the moment there is nothing to configure on this ProgrammaticReferenceFactoryBuilder,
  * but in the future there will be additions like history or durability for example.
@@ -14,7 +14,7 @@ package org.multiverse.api.programmatic;
  */
 public interface ProgrammaticReferenceFactoryBuilder {
 
-    ProgrammaticReferenceFactoryBuilder withRetrySupport(boolean enabled);
+    ProgrammaticReferenceFactoryBuilder withBlockingSupport(boolean enabled);
 
     ProgrammaticReferenceFactoryBuilder withAbaDetection(boolean enabled);
 

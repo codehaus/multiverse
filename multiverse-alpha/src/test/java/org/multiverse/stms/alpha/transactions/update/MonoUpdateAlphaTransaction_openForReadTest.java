@@ -1,7 +1,6 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.alpha.AlphaStm;
@@ -9,6 +8,7 @@ import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
+import org.multiverse.stms.alpha.programmatic.AlphaProgrammaticLong;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
@@ -169,9 +169,28 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     }
 
     @Test
-    @Ignore
-    public void whenAlreadyOpenedForCommutingWrite() {
+    public void whenAlreadyOpenedForCommutingWrite_thenPrematureFixation() {
+        AlphaProgrammaticLong ref1 = new AlphaProgrammaticLong(stm, 0);
 
+        AlphaTransaction tx = startSutTransaction();
+        AlphaTranlocal tranlocal = tx.openForCommutingWrite(ref1);
+        AlphaTranlocal found = tx.openForRead(ref1);
+
+        assertSame(tranlocal, found);
+        assertFalse(found.isCommitted());
+        assertFalse(found.isCommuting());
+    }
+
+    @Test
+    public void whenAlreadyOpenedForConstruction_thenSameTranlocalReturned() {
+        ManualRef ref1 = ManualRef.createUncommitted();
+
+        AlphaTransaction tx = startSutTransaction();
+        AlphaTranlocal tranlocal = tx.openForConstruction(ref1);
+        AlphaTranlocal found = tx.openForCommutingWrite(ref1);
+
+        assertSame(tranlocal, found);
+        assertFalse(tranlocal.isCommuting());
     }
 
     @Test

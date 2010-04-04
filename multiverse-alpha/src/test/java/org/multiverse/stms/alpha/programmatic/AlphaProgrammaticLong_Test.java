@@ -1,4 +1,4 @@
-package org.multiverse.stms.alpha;
+package org.multiverse.stms.alpha.programmatic;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -6,6 +6,7 @@ import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.programmatic.ProgrammaticLong;
+import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import static org.junit.Assert.assertEquals;

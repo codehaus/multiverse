@@ -1,4 +1,4 @@
-package org.multiverse.stms.alpha;
+package org.multiverse.stms.alpha.programmatic;
 
 import org.junit.After;
 import org.junit.Before;
@@ -15,7 +15,7 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
 /**
  * @author Peter Veentjer
  */
-public class AlphaProgrammaticReference_setAtomicTest {
+public class AlphaProgrammaticReference_atomicSetTest {
     private Stm stm;
     private TransactionFactory updateTxFactory;
 
@@ -38,7 +38,7 @@ public class AlphaProgrammaticReference_setAtomicTest {
         AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>();
 
         long version = stm.getVersion();
-        String result = ref.setAtomic(null);
+        String result = ref.atomicSet(null);
 
         assertNull(result);
         assertEquals(version, stm.getVersion());
@@ -52,7 +52,7 @@ public class AlphaProgrammaticReference_setAtomicTest {
 
         long version = stm.getVersion();
         String newValue = "foo";
-        String result = ref.setAtomic(newValue);
+        String result = ref.atomicSet(newValue);
 
         assertSame(oldValue, result);
         assertEquals(version + 1, stm.getVersion());
@@ -65,7 +65,7 @@ public class AlphaProgrammaticReference_setAtomicTest {
         AlphaProgrammaticReference<String> ref = new AlphaProgrammaticReference<String>(oldValue);
 
         long version = stm.getVersion();
-        String result = ref.setAtomic(null);
+        String result = ref.atomicSet(null);
 
         assertSame(oldValue, result);
         assertEquals(version + 1, stm.getVersion());
@@ -81,7 +81,7 @@ public class AlphaProgrammaticReference_setAtomicTest {
         long version = stm.getVersion();
 
         String newRef = "bar";
-        String result = ref.setAtomic(newRef);
+        String result = ref.atomicSet(newRef);
         assertSame(oldValue, result);
         assertEquals(version + 1, stm.getVersion());
         assertSame(newRef, ref.get());
@@ -95,7 +95,7 @@ public class AlphaProgrammaticReference_setAtomicTest {
 
         long version = stm.getVersion();
 
-        String result = ref.setAtomic(oldValue);
+        String result = ref.atomicSet(oldValue);
         assertSame(oldValue, result);
         assertEquals(version, stm.getVersion());
         assertSame(oldValue, ref.get());

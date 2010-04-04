@@ -1,13 +1,31 @@
 package org.multiverse.transactional.arrays;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.stms.alpha.AlphaStm;
 
 import static org.junit.Assert.assertEquals;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
  */
 public class TransactionalReferenceArray_toStringTest {
+
+    private AlphaStm stm;
+
+    @Before
+    public void setUp() {
+        stm = (AlphaStm) getGlobalStmInstance();
+        clearThreadLocalTransaction();
+    }
+
+    @After
+    public void tearDown() {
+        clearThreadLocalTransaction();
+    }
 
     @Test
     public void whenNoElements() {

@@ -6,7 +6,7 @@ import org.multiverse.api.commitlock.CommitLockPolicy;
 import java.util.concurrent.TimeUnit;
 
 /**
- * An implementation of the builder design pattern to create a {@link TransactionFactory}. This is the place to be
+ * An implementation of the builder design pattern to createReference a {@link TransactionFactory}. This is the place to be
  * for transaction configuration. This approach also gives the freedom to access implementation specific
  * setters by implementing and extending the {@link TransactionFactoryBuilder} interface.
  * <p/>

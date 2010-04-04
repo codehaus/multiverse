@@ -1,4 +1,4 @@
-package org.multiverse.stms.alpha;
+package org.multiverse.stms.alpha.programmatic;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -6,6 +6,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.programmatic.ProgrammaticReference;
 import org.multiverse.api.programmatic.ProgrammaticReferenceFactory;
+import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import static org.junit.Assert.assertNotNull;
@@ -37,14 +38,14 @@ public class AlphaProgrammaticReferenceFactoryTest {
 
     @Test
     public void create() {
-        ProgrammaticReference ref = refFactory.create(null);
+        ProgrammaticReference ref = refFactory.createReference(null);
         assertInstanceOf(ref, AlphaProgrammaticReference.class);
     }
 
     @Test
     public void createWithTransaction() {
         Transaction tx = txFactory.start();
-        ProgrammaticReference ref = refFactory.create(tx, null);
+        ProgrammaticReference ref = refFactory.createReference(tx, null);
         tx.commit();
 
         assertInstanceOf(ref, AlphaProgrammaticReference.class);

@@ -27,34 +27,34 @@ public abstract class AbstractAlphaTransaction<C extends AbstractTransactionConf
     }
 
     @Override
-    public final AlphaTranlocal openForCommutingWrite(AlphaTransactionalObject txObject) {
-         switch (getStatus()) {
+    public final AlphaTranlocal openForCommutingWrite(AlphaTransactionalObject transactionalObject) {
+        switch (getStatus()) {
             case active:
-                if (txObject == null) {
+                if (transactionalObject == null) {
                     String msg = format(
                             "Can't open for write a null transactional object on transaction '%s' ",
                             config.getFamilyName());
                     throw new NullPointerException(msg);
                 }
 
-                return doOpenForCommutingWrite(txObject);
+                return doOpenForCommutingWrite(transactionalObject);
             case prepared:
                 String preparedMsg = format(
                         "Can't open for write transactional object '%s' "
                                 + "because transaction '%s' already is prepared to commit.",
-                        toTxObjectString(txObject), config.getFamilyName());
+                        toTxObjectString(transactionalObject), config.getFamilyName());
                 throw new PreparedTransactionException(preparedMsg);
             case committed:
                 String committedMsg = format(
                         "Can't open for write transactional object '%s' "
                                 + "because transaction '%s' already is committed.",
-                        toTxObjectString(txObject), config.getFamilyName());
+                        toTxObjectString(transactionalObject), config.getFamilyName());
                 throw new DeadTransactionException(committedMsg);
             case aborted:
                 String abortedMsg = format(
                         "Can't open for commuting write transactional object '%s' "
                                 + "because transaction '%s' already is aborted.",
-                        toTxObjectString(txObject), config.getFamilyName());
+                        toTxObjectString(transactionalObject), config.getFamilyName());
                 throw new DeadTransactionException(abortedMsg);
             default:
                 throw new IllegalStateException();
@@ -70,31 +70,31 @@ public abstract class AbstractAlphaTransaction<C extends AbstractTransactionConf
     }
 
     @Override
-    public final AlphaTranlocal openForRead(AlphaTransactionalObject txObject) {
+    public final AlphaTranlocal openForRead(AlphaTransactionalObject transactionalObject) {
         switch (getStatus()) {
             case active:
-                if (txObject == null) {
+                if (transactionalObject == null) {
                     return null;
                 }
 
-                return doOpenForRead(txObject);
+                return doOpenForRead(transactionalObject);
             case prepared:
                 String preparedMsg = format(
                         "Can't open for read transactional object '%s' " +
                                 "because transaction '%s' is prepared to commit.",
-                        toTxObjectString(txObject), config.getFamilyName());
+                        toTxObjectString(transactionalObject), config.getFamilyName());
                 throw new PreparedTransactionException(preparedMsg);
             case committed:
                 String committedMsg = format(
                         "Can't open for read transactional object '%s' " +
                                 "because transaction '%s' already is committed.",
-                        toTxObjectString(txObject), config.getFamilyName());
+                        toTxObjectString(transactionalObject), config.getFamilyName());
                 throw new DeadTransactionException(committedMsg);
             case aborted:
                 String abortedMsg = format(
                         "Can't open for read transactional object '%s' " +
                                 "because transaction '%s' already is aborted.",
-                        AlphaStmUtils.toTxObjectString(txObject), config.getFamilyName());
+                        AlphaStmUtils.toTxObjectString(transactionalObject), config.getFamilyName());
                 throw new DeadTransactionException(abortedMsg);
             default:
                 throw new IllegalStateException();
@@ -110,34 +110,34 @@ public abstract class AbstractAlphaTransaction<C extends AbstractTransactionConf
     }
 
     @Override
-    public final AlphaTranlocal openForWrite(AlphaTransactionalObject txObject) {
+    public final AlphaTranlocal openForWrite(AlphaTransactionalObject transactionalObject) {
         switch (getStatus()) {
             case active:
-                if (txObject == null) {
+                if (transactionalObject == null) {
                     String msg = format(
                             "Can't open for write a null transactional object on transaction '%s' ",
                             config.getFamilyName());
                     throw new NullPointerException(msg);
                 }
 
-                return  doOpenForWrite(txObject);
+                return doOpenForWrite(transactionalObject);
             case prepared:
                 String preparedMsg = format(
                         "Can't open for write transactional object '%s' "
                                 + "because transaction '%s' already is prepared to commit.",
-                        toTxObjectString(txObject), config.getFamilyName());
+                        toTxObjectString(transactionalObject), config.getFamilyName());
                 throw new PreparedTransactionException(preparedMsg);
             case committed:
                 String committedMsg = format(
                         "Can't open for write transactional object '%s' "
                                 + "because transaction '%s' already is committed.",
-                        toTxObjectString(txObject), config.getFamilyName());
+                        toTxObjectString(transactionalObject), config.getFamilyName());
                 throw new DeadTransactionException(committedMsg);
             case aborted:
                 String abortedMsg = format(
                         "Can't open for commuting write transactional object '%s' "
                                 + "because transaction '%s' already is aborted.",
-                        toTxObjectString(txObject), config.getFamilyName());
+                        toTxObjectString(transactionalObject), config.getFamilyName());
                 throw new DeadTransactionException(abortedMsg);
             default:
                 throw new IllegalStateException();
@@ -153,34 +153,34 @@ public abstract class AbstractAlphaTransaction<C extends AbstractTransactionConf
     }
 
     @Override
-    public final AlphaTranlocal openForConstruction(AlphaTransactionalObject txObject) {
+    public final AlphaTranlocal openForConstruction(AlphaTransactionalObject transactionalObject) {
         switch (getStatus()) {
             case active:
-                if (txObject == null) {
+                if (transactionalObject == null) {
                     String msg = format(
                             "Can't open for construction a null transactional object on transaction '%s' ",
                             config.getFamilyName());
                     throw new NullPointerException(msg);
                 }
 
-                return doOpenForConstruction(txObject);
+                return doOpenForConstruction(transactionalObject);
             case prepared:
                 String preparedMsg = format(
                         "Can't open for construction transactional object '%s' "
                                 + "because transaction '%s' already is prepared to commit.",
-                        toTxObjectString(txObject), config.getFamilyName());
+                        toTxObjectString(transactionalObject), config.getFamilyName());
                 throw new PreparedTransactionException(preparedMsg);
             case committed:
                 String committedMsg = format(
                         "Can't open for construction transactional object '%s' "
                                 + "because transaction '%s' already is committed.",
-                        toTxObjectString(txObject), config.getFamilyName());
+                        toTxObjectString(transactionalObject), config.getFamilyName());
                 throw new DeadTransactionException(committedMsg);
             case aborted:
                 String abortedMsg = format(
                         "Can't open for construction transactional object '%s' "
                                 + "because transaction '%s' already is aborted.",
-                        toTxObjectString(txObject), config.getFamilyName());
+                        toTxObjectString(transactionalObject), config.getFamilyName());
                 throw new DeadTransactionException(abortedMsg);
             default:
                 throw new IllegalStateException();

@@ -40,7 +40,7 @@ public final class MultiverseCompiler {
 
     public static Options createOptions() {
 
-        // create Options object
+        // createReference Options object
         Options options = new Options();
         //options.addOption(new Option())
 

@@ -31,12 +31,12 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
  * </pre>
  * <p/>
  * <h2>TransactionFactories</h2> Some of the methods of the TransactionTemplate don't need a {@link TransactionFactory}
- * and create read tracking update transaction by default. But if you want a better performance, you need to pass your
+ * and createReference read tracking update transaction by default. But if you want a better performance, you need to pass your
  * own TransactionFactory. One of the biggest reasons is that the system else is not able to do runtime optimizations
  * like selecting better transaction implementation.
  * <p/>
  * <h2>Ignoring ThreadLocalTransaction</h2> Out of the box the TransactionTemplate checks the {@link
- * ThreadLocalTransaction} for a running transaction, and if one is available, it doesn't create its own. But in some
+ * ThreadLocalTransaction} for a running transaction, and if one is available, it doesn't createReference its own. But in some
  * cases you don't want to rely on a threadlocal, for example when you are not using instrumentation, it is possible to
  * totally ignore the ThreadLocalTransaction.
  * <p/>
@@ -88,7 +88,7 @@ public abstract class TransactionTemplate<E> {
      * Creates a new TransactionTemplate with the provided TransactionFactory and that is aware of the
      * ThreadLocalTransaction.
      *
-     * @param txFactory the TransactionFactory used to create Transactions.
+     * @param txFactory the TransactionFactory used to createReference Transactions.
      * @throws NullPointerException if txFactory is null.
      */
     public TransactionTemplate(TransactionFactory txFactory) {
@@ -98,7 +98,7 @@ public abstract class TransactionTemplate<E> {
     /**
      * Creates a new TransactionTemplate with the provided TransactionFactory.
      *
-     * @param txFactory                 the TransactionFactory used to create Transactions.
+     * @param txFactory                 the TransactionFactory used to createReference Transactions.
      * @param threadLocalAware          true if this TransactionTemplate should look at the ThreadLocalTransaction and publish
      *                                  the running transaction there.
      * @param lifecycleListenersEnabled true if the lifecycle callback methods should be enabled. Enabling them causes
@@ -135,9 +135,9 @@ public abstract class TransactionTemplate<E> {
     }
 
     /**
-     * Returns the TransactionFactory this TransactionTemplate uses to create Transactions.
+     * Returns the TransactionFactory this TransactionTemplate uses to createReference Transactions.
      *
-     * @return the TransactionFactory this TransactionTemplate uses to create Transactions.
+     * @return the TransactionFactory this TransactionTemplate uses to createReference Transactions.
      */
     public final TransactionFactory getTransactionFactory() {
         return txFactory;

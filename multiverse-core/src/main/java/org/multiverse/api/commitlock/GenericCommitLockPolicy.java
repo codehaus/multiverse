@@ -9,7 +9,7 @@ import static java.lang.String.format;
 /**
  * An {@link CommitLockPolicy} that spins when it can't acquire a lock. When the lock can't
  * be acquired, all locks are released and the locks are tries to be acquired again. The number
- * of spins and retries can be configured. So you can create a version that doesn't spin, but doesn't
+ * of spins and retries can be configured. So you can createReference a version that doesn't spin, but doesn't
  * retry, or a version that does spin but doesn't retry, etc.
  * <p/>
  * Because spinning increases the time a lock is hold, it could prevent other transactions from

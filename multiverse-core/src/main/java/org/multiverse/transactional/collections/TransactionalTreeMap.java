@@ -105,7 +105,7 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
     @Override
     @Exclude
     public int getCurrentSize() {
-        return (int) size.getAtomic();
+        return (int) size.atomicGet();
     }
 
     @Override

@@ -2,33 +2,97 @@
 todo engine
 ---------------------------------------------------------------
 
-- make sure that all the transformers stop modifying the original class node but return new ones instead
+- if a good transaction is available, it should be reused.
 
-- big zip of the project for easy download
+- support for a history in the ProgrammaticReference
 
-- big zip of the project should be added to the downloads of the site
+- support for a history in the ProgrammaticLong
 
-- the integration tests should be executed from maven using the stress 
+- Templates need to be removed in constructors of AlphaProgrammaticLong
 
-- Test 'testContentOfFastAtomicObjectIsCopied' incomplete in file 'AtomicObject_clashingFieldTest.java' at line 62
+- back off policy needs to be used when a load is done
 
-- Test 'hash' incomplete in file 'TransactionalLinkedList.java' at line 1122
+- make sure that load still succeeds if the value is locked, but the current value
+still has the expected value.
 
-- TransactionalThreadPoolExecutor_miscTest
+- threadsafety of the java agent fucntionality; classes can be created by different
+threads, so the whole mechanism should be made thread safe.
 
-- TransactionalThreadPoolExecutor_setCorePoolSizeTest
+- expose dirty check in transaction factory builder
 
-- test for the writeskew problem; activation disabled
+- version should start with 0 again; so all other status should shift one down.
 
-- better message when there are too many failures.. atm it is unclear (write conflict? lock conflict?)
+- back off policy needs to be used when atomic calls are done
 
-    - add to donor logic
+- AlphaProgrammaticLong. atomicInc(long amount)
 
-    - add to transaction template
+- AlphaProgrammaticLong.atomicSet(long newValue
 
-- writeskew detection tests
+- AlphaProgrammaticLong. atomicCompareAndSet(long expected, long update)
 
-    - tinyupdatealphatransaction
+- AlphaProgrammaticLong atomicGetVersion
+
+- AlphaProgrammaticLong. getVersion
+
+- AlphaProgrammaticLong. read+version atomically
+
+- AlphaProgrammaticLong that sets if the version of the value still is correct
+
+- AlphaProgrammaticLong.getVersion(Transaction tx)
+
+- AlphaProgrammaticReference. read+version atomically
+
+- AlphaProgrammaticLong.getOrAwait
+
+- AlphaProgrammaticReference that sets if the version of the value still is correct
+
+- MapUpdateTransaction: when a read is done on a commuting object
+
+- MapUpdateTransaction: when a write is done on a commuting object
+
+- ArrayUpdateTransaction: when a read is done on a commuting object
+
+- ArrayUpdateTransaction: when a write is done on a commuting object
+
+- MonoUpdateTransaction: when a read is done on a commuting object
+
+- MonoUpdateTransaction: when a write is done on a commuting object
+
+- inline getters and setters for transactional objects
+
+- cheapen tranlocal access inside methods for the 'this' variable
+
+- cheapen tranlocal access for the this variable by passing that tranlocal
+  if possible. First step: only needs to be done in methods in the same class
+
+- cheapen tranlocal access for the this variable by passing that tranlocal
+  if possible. First step 2: also for other classes.
+
+- Fix test for AlphaProgrammaticLong
+
+- Fix tes for AlphaProgrammaticReference
+
+- static compilation
+
+- AlphaProgrammaticReferenceFactory.atomicCreateLong
+
+- AlphaProgrammaticReferenceFactory.atomicCreateReference
+
+- AlphaProgrammaticReferenceFactoryBuilder
+
+- AlphaProgrammaticReferenceFactoryBuilder.withAbaDetection
+
+- AlphaProgrammaticReferenceFactoryBuilder.withBlockingSupport
+
+- AlphaProgrammaticLong should use the stm for all its operations once it has
+been build using that stm.
+
+- AlphaProgrammaticReference should use the stm for all its operations once
+it has been build using that stm.
+
+- balancing of the treemap
+
+- interface parameter inheritance.
 
 ---------------------------------------------------------------
 todo unclear
@@ -264,37 +328,6 @@ but a normal object using a managed ref.
 done
 ---------------------------------------------------------------
 
-- exclude can now also be placed on method to exclude it from being transactional.
+- good working default transaction familyname added.
 
-- the exponentialbackoffpolicy now uses LockSupport.partNanos instead of the unreliable (for short delays)
-Thread.sleep.
-
-- TransactionalThreadPoolExecutor_constructorTest
-
-- TransactionalThreadPoolExecutor need correct worker names by using some kind of counter
-
-- relaxed clock in combination with writeskew
-
-- upgrade to clover
-
-- growing/schrinking of the TransactionalThreadPool is not perfect
-
-- TransactionalThreadPoolExecutor_setMaxPoolSizeTest
-
-- TransactionalThreadPoolExecutor_stressLongTest
-
-- TransactionalThreadPoolExecutor is not doing anything with the maximum pool size
-  (it also needs to rely on some kind of timeout so that unused threads are dropped).
-
-- the long running tests are not part of the normal maven install anymore..
-
- - clover should be disabled while executing the integration tests.
-
-- Test 'equals' incomplete in file 'TransactionalLinkedList.java' at line 1117
-
-- the barriers should have the uninterruptible version excplicitly be named uniterruptble to indicate to the
-programmer that something special is going on.
-
-- project jars for the alpha module are now fine to look at (so no ugly names anymore)
-
-- date on the website is set automatically.
+- all readonly tests up and running again

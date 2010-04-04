@@ -5,12 +5,12 @@ import org.junit.Test;
 import org.multiverse.api.exceptions.OptimisticLockFailedWriteConflict;
 import org.multiverse.api.latches.CheapLatch;
 import org.multiverse.api.latches.Latch;
-import org.multiverse.stms.alpha.AlphaProgrammaticLong;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
+import org.multiverse.stms.alpha.programmatic.AlphaProgrammaticLong;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import static org.junit.Assert.*;
@@ -132,7 +132,7 @@ public class MonoUpdateAlphaTransaction_commitTest {
 
         assertIsCommitted(tx);
         assertEquals(version + 1, stm.getVersion());
-        assertEquals(2, ref.getAtomic());
+        assertEquals(2, ref.atomicGet());
         assertSame(tranlocal, ref.___load());
         assertTrue(tranlocal.isCommitted());
         assertEquals(version + 1, tranlocal.getWriteVersion());

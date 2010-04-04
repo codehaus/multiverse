@@ -90,7 +90,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
             MethodMetadata methodMetadata = classMetadata.getMethodMetadata(methodNode.name, methodNode.desc);
 
             if (methodMetadata != null && methodMetadata.isTransactional() && !methodMetadata.isAbstract()) {
-                //txFactoryField is used to create the transaction fot this methodNode
+                //txFactoryField is used to createReference the transaction fot this methodNode
                 FieldNode txFactoryField = createTransactionFactoryField();
                 classNode.fields.add(txFactoryField);
 
@@ -100,7 +100,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                 if (staticInitializerNode == null) {
                     MethodNode existingStaticInitializerNode = findStaticInitializer();
                     if (existingStaticInitializerNode == null) {
-                        //lets create a static initializer since it doesn't exist.
+                        //lets createReference a static initializer since it doesn't exist.
                         staticInitializerNode = new MethodNode(ACC_STATIC, "<clinit>", "()V", null, new String[]{});
                         staticInitializerNode.instructions.add(new InsnNode(RETURN));
                         extraMethods.add(staticInitializerNode);
@@ -845,7 +845,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
 
         int var = 0;
 
-        //create local variable for the 'this' if needed.
+        //createReference local variable for the 'this' if needed.
         if (!isStatic(originalMethod)) {
             LocalVariableNode originalThis = findThisVariable(originalMethod);
 
@@ -860,7 +860,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
             var++;
         }
 
-        //create local variables for all the method arguments.
+        //createReference local variables for all the method arguments.
         for (Type argType : getArgumentTypes(originalMethod.desc)) {
             LocalVariableNode clonedVar = new LocalVariableNode(
                     "arg" + result.localVariables.size(),
@@ -873,7 +873,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
             result.localVariables.add(clonedVar);
         }
 
-        //create local variables based on the local variables of the donor method.
+        //createReference local variables based on the local variables of the donor method.
         for (LocalVariableNode donorVar : (List<LocalVariableNode>) donorMethodNode.localVariables) {
             LocalVariableNode clonedVar = new LocalVariableNode(
                     donorVar.name,
@@ -892,7 +892,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
             var += Type.getType(clonedVar.desc).getSize();
         }
 
-        //create the variable containing the result
+        //createReference the variable containing the result
         LocalVariableNode resultVariable = null;
         Type returnType = Type.getReturnType(originalMethod.desc);
         if (!returnType.equals(Type.VOID_TYPE)) {
@@ -1007,7 +1007,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                     if (foundVar == null) {
                         //it could be that a variable is found that is not in the localvariable table.
                         //these variables are the secret throwable storage location needed to compile
-                        //finally clauses. So for these variables, we just create a new 
+                        //finally clauses. So for these variables, we just createReference a new
                         index = var;
                         varMapping.put(donorVarInsn.var, var);
                         var++;

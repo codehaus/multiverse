@@ -18,7 +18,7 @@ public class CommitLockNotFreeWriteConflict extends WriteConflict {
     public final static boolean reuse = parseBoolean(getProperty(
             CommitLockNotFreeWriteConflict.class.getName() + ".reuse", "true"));
 
-    public static CommitLockNotFreeWriteConflict newFailedToObtainCommitLocksException() {
+    public static CommitLockNotFreeWriteConflict createFailedToObtainCommitLocksException() {
         if (LockNotFreeReadConflict.reuse) {
             throw CommitLockNotFreeWriteConflict.INSTANCE;
         } else {

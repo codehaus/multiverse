@@ -13,7 +13,7 @@ import java.util.Collection;
  * If the locks could not be acquired, the policy is responsible for making sure that all locks are released. So a
  * callee is guaranteed to own all locks or no locks at all.
  * <p/>
- * The reason that the WriteSetLockPolicy works with an array, is that it doesn't create a lot of gc-litter.
+ * The reason that the WriteSetLockPolicy works with an array, is that it doesn't createReference a lot of gc-litter.
  * <p/>
  * It is important to realize that locks should be acquired and if that fails, should all be released. The implementer
  * has to realize that ... 2 phase locking (todo: better explanation).

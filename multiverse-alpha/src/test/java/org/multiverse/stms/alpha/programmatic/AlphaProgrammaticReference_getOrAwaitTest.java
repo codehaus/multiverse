@@ -1,4 +1,4 @@
-package org.multiverse.stms.alpha;
+package org.multiverse.stms.alpha.programmatic;
 
 import org.junit.After;
 import org.junit.Before;

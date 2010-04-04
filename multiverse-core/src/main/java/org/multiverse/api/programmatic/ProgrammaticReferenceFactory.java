@@ -19,14 +19,49 @@ import org.multiverse.api.Transaction;
  */
 public interface ProgrammaticReferenceFactory {
 
+    /**
+     * Creates a new ProgrammaticLong.
+     * <p/>
+     * If a Transaction is running in the ThreadLocalTransaction that will be used. If none
+     * is running this call is atomic.
+     * <p/>
+     * If the ProgrammaticLong leaves the transaction it was created in before
+     * that transaction commits, you will get the
+     * {@link org.multiverse.api.exceptions.UncommittedReadConflict}.
+     *
+     * @param value the initial value of the ProgrammaticLong.
+     * @return the created ProgrammaticLong.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
+     */
     ProgrammaticLong createLong(long value);
 
+    /**
+     * Creates a new ProgrammaticLong.
+     *
+     * @param tx    the transaction to use for creating this ProgrammaticLong.
+     * @param value the initial value of the ProgrammaticLong.
+     * @return the created ProgrammaticLong
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if the transaction is
+     *                              not in the correct state for this operation.
+     */
     ProgrammaticLong createLong(Transaction tx, long value);
 
     /**
+     * Atomically creates a new ProgrammaticLong. So this call doesn't look at the
+     * Transaction stores in the ThreadLocalTransaction.
+     *
+     * @param value the value stored in the ProgrammaticLong.
+     * @return the created ProgrammaticLong
+     */
+    ProgrammaticLong atomicCreateLong(long value);
+
+    /**
      * Creates a new ProgrammaticReference with the provided value. If a
-     * transaction already is running, it will lift on that transaction. If no
-     * transaction is running, then this method will be run in its own transaction.
+     * transaction already is running in the ThreadLocalTransaction, it will lift on that
+     * transaction. If no transaction is running, then this method will be run atomic.
      * <p/>
      * If the ProgrammaticReference leaves the transaction it was created in before
      * that transaction commits, you will get the
@@ -36,7 +71,7 @@ public interface ProgrammaticReferenceFactory {
      * @param <E>   the type of the value stored in the reference
      * @return the created ProgrammaticReference.
      */
-    <E> ProgrammaticReference<E> create(E value);
+    <E> ProgrammaticReference<E> createReference(E value);
 
     /**
      * Creates a new ProgrammaticReference with the provided value and lifting
@@ -47,14 +82,25 @@ public interface ProgrammaticReferenceFactory {
      * that transaction commits, you will get the
      * {@link org.multiverse.api.exceptions.UncommittedReadConflict}.
      *
-     * @param tx    the Transaction used to create the ProgrammaticReference.
+     * @param tx    the Transaction used to createReference the ProgrammaticReference.
      * @param value the value stored in the reference (is allowed to be null).
      * @param <E>   the type of the value stored in the reference
      * @return the created ProgrammaticReference.
      * @throws NullPointerException if t is null.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if t is not
-     *                              active.
+     *                              if t is not active.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
-    <E> ProgrammaticReference<E> create(Transaction tx, E value);
+    <E> ProgrammaticReference<E> createReference(Transaction tx, E value);
+
+    /**
+     * Creates a new ProgrammaticReference atomically. So this call doesn't look at the
+     * {@link org.multiverse.api.ThreadLocalTransaction}.
+     *
+     * @param value the value stores in the reference (is allowed to be null).
+     * @param <E>   type of the value
+     * @return the created ProgrammaticReference.
+     */
+    <E> ProgrammaticReference<E> atomicCreateReference(E value);
 }

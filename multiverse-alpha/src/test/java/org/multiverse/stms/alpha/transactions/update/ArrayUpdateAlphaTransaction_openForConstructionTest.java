@@ -1,17 +1,16 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
-import org.multiverse.stms.alpha.AlphaProgrammaticLong;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
+import org.multiverse.stms.alpha.programmatic.AlphaProgrammaticLong;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
@@ -98,25 +97,21 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
     }
 
     @Test
-    @Ignore
-    public void whenObjectAlreadyHasCommits() {
+    public void whenObjectAlreadyHasCommits_thenItWillBeOverwrittenAndNotDetected() {
         ManualRef ref = new ManualRef(stm);
-        AlphaTranlocal committed = ref.___load();
+        ref.___load();
 
-        AlphaTransaction tx = startSutTransaction(1);
+        AlphaTransaction tx = startSutTransaction(10);
 
         long version = stm.getVersion();
-        try {
-            tx.openForConstruction(ref);
-            fail();
-        } catch (IllegalStateException expected) {
-        }
+        AlphaTranlocal opened = tx.openForConstruction(ref);
+
+        tx.commit();
 
         assertEquals(version, stm.getVersion());
-        assertIsActive(tx);
-        assertSame(committed, ref.___load());
+        assertIsCommitted(tx);
+        assertSame(opened, ref.___load());
     }
-
 
     @Test
     public void whenAlreadyOpenedForRead_thenIllegalStateException() {

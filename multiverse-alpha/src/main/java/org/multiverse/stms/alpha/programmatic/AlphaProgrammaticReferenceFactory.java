@@ -1,8 +1,11 @@
-package org.multiverse.stms.alpha;
+package org.multiverse.stms.alpha.programmatic;
 
 import org.multiverse.api.Transaction;
+import org.multiverse.api.programmatic.ProgrammaticLong;
+import org.multiverse.api.programmatic.ProgrammaticReference;
 import org.multiverse.api.programmatic.ProgrammaticReferenceFactory;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
+import org.multiverse.utils.TodoException;
 
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
@@ -23,13 +26,23 @@ public final class AlphaProgrammaticReferenceFactory implements ProgrammaticRefe
     }
 
     @Override
-    public <E> AlphaProgrammaticReference<E> create(Transaction tx, E value) {
+    public ProgrammaticLong atomicCreateLong(long value) {
+        throw new TodoException();
+    }
+
+    @Override
+    public <E> AlphaProgrammaticReference<E> createReference(Transaction tx, E value) {
         return new AlphaProgrammaticReference<E>(tx, value);
     }
 
     @Override
-    public <E> AlphaProgrammaticReference<E> create(E value) {
+    public <E> AlphaProgrammaticReference<E> createReference(E value) {
         AlphaTransaction tx = (AlphaTransaction) getThreadLocalTransaction();
         return new AlphaProgrammaticReference<E>(tx, value);
+    }
+
+    @Override
+    public <E> ProgrammaticReference<E> atomicCreateReference(E value) {
+        return new AlphaProgrammaticReference<E>((AlphaTransaction) null, value);
     }
 }

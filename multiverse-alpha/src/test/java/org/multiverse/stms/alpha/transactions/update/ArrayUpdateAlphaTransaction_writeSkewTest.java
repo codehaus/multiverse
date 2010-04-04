@@ -1,7 +1,6 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
@@ -34,6 +33,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
 
     public AlphaTransaction startSutTransaction(int size, boolean allowWriteSkewProblem) {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withAutomaticReadTracking(true)
                 .withAllowWriteSkewProblem(allowWriteSkewProblem);
 
         return new ArrayUpdateAlphaTransaction(config, size);
@@ -194,7 +194,6 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
     }
 
     @Test
-    @Ignore
     public void testConcurrentWithoutWriteSkewDetection() {
         ManualRef accountA1 = new ManualRef(stm);
         ManualRef accountA2 = new ManualRef(stm);
@@ -205,11 +204,11 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
         accountA1.set(stm, 1000);
         accountB1.set(stm, 1000);
 
-        TransferThread t1 = new TransferThread(0, accountA1, accountA2, accountB1, accountB1, false);//todo:
-        TransferThread t2 = new TransferThread(0, accountB1, accountB2, accountA1, accountA1, false);//todo:
+        TransferThread thread1 = new TransferThread(0, accountA1, accountA2, accountB1, accountB1, false);//todo:
+        TransferThread thread2 = new TransferThread(0, accountB1, accountB2, accountA1, accountA1, false);//todo:
 
-        startAll(t1, t2);
-        joinAll(t1, t2);
+        startAll(thread1, thread2);
+        joinAll(thread1, thread2);
 
         System.out.println("account1 " + accountA1.get(stm));
         System.out.println("account2 " + accountA2.get(stm));
@@ -233,17 +232,17 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
         final ManualRef accountFrom2;
         final ManualRef accountTo1;
         final ManualRef accountTo2;
-        final boolean enabled;
+        final boolean allowWriteSkew;
 
         public TransferThread(int id, ManualRef accountFrom1, ManualRef accountFrom2, ManualRef accountTo1,
-                              ManualRef accountTo2, boolean enabled) {
+                              ManualRef accountTo2, boolean allowWriteSkew) {
             super("TransferThread-" + id);
 
             this.accountFrom1 = accountFrom1;
             this.accountFrom2 = accountFrom2;
             this.accountTo1 = accountTo1;
             this.accountTo2 = accountTo2;
-            this.enabled = enabled;
+            this.allowWriteSkew = allowWriteSkew;
         }
 
         @Override
@@ -251,7 +250,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
             TransactionFactory txFactory = new TransactionFactory() {
                 @Override
                 public Transaction start() {
-                    return startSutTransaction(10, enabled);
+                    return startSutTransaction(10, allowWriteSkew);
                 }
             };
 
@@ -262,6 +261,8 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
                         AlphaTransaction tx = (AlphaTransaction) t;
                         ManualRefTranlocal tranlocalAccountFrom1 = (ManualRefTranlocal) tx.openForRead(accountFrom1);
                         ManualRefTranlocal tranlocalAccountFrom2 = (ManualRefTranlocal) tx.openForRead(accountFrom2);
+
+                        sleepRandomMs(100);
 
                         if (tranlocalAccountFrom1.value + tranlocalAccountFrom2.value >= 100) {
                             ManualRef from = random(accountFrom1, accountFrom2);
@@ -277,6 +278,8 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
 
                         return null;
                     }
+
+
                 }.execute();
             }
         }

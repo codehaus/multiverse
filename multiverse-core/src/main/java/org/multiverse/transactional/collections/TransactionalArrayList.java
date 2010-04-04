@@ -84,7 +84,7 @@ public final class TransactionalArrayList<E> implements TransactionalList<E> {
     @Override
     @Exclude
     public int currentSize() {
-        return (int) size.getAtomic();
+        return (int) size.atomicGet();
     }
 
     @Override

@@ -18,39 +18,96 @@ public interface AlphaTransaction extends Transaction {
      * it could be used by other transactions. If the transactional object already is opened for writing, that
      * tranlocal is returned.
      * <p/>
-     * If txObject is null, the return value is null.
+     * If transactional object is null, the return value is null.
      * <p/>
-     * It doesn't matter if the transactionalObject has never been committed before. When an transactionalObject is
-     * created, the constructor also needs to do a openForWrite.
+     * If a openForRead is done on a transactional object that never has been committed
+     * before, a UncommittedReadConflict is thrown.
+     * <p/>
+     * If the transactional object already is opened for write, that version is returned.
+     * <p/>
+     * If the transactional object already was opened for a commuting operation, it is fixated
+     * and returned and now can be used for direct writing purposes.
+     * <p/>
+     * If the transactional object already was opened for construction, that tranlocal is returned.
      *
-     * @param txObject the transactional object to getClassMetadata the tranlocal for.
+     * @param transactionalObject the transactional object to getClassMetadata the tranlocal for.
      * @return the opened tranlocal.
-     * @throws org.multiverse.api.exceptions.ReadConflict
-     *          if something goes wrong while opening the txObject.
-     * @throws org.multiverse.api.exceptions.DeadTransactionException
-     *          if this transaction isn't active.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
+     * @throws IllegalThreadStateException if the transaction isn't active.
      */
-    AlphaTranlocal openForRead(AlphaTransactionalObject txObject);
+    AlphaTranlocal openForRead(AlphaTransactionalObject transactionalObject);
 
     /**
-     * Opens the txObject for writing purposes. It depends on the transaction if this operations is
-     * supported.
+     * Opens the transactional object for writing purposes.
      * <p/>
-     * It doesn't matter if the transactional object has never been committed before. When an transactional object
-     * is created, the constructor also needs to do a openForWrite.
+     * It depends on the transaction if this operations is supported.
+     * <p/>
+     * If a openForWrite is done on a transactional object that never has been committed
+     * before, a UncommittedReadConflict is thrown.
+     * <p/>
+     * If the transactional object already was opened for read, it is now upgraded to an
+     * open for write (if it was tracked).
+     * <p/>
+     * If the transactional object was opened for write, it will be fixated that tranlocal
+     * can now be used for writing purposes.
+     * <p/>
+     * If the transactional object already was opened for construction, that tranlocal
+     * is returned.
      *
-     * @param txObject the transactional object to getClassMetadata the tranlocal for.
+     * @param transactionalObject the transactional object to getClassMetadata the tranlocal for.
      * @return the opened tranlocal.
-     * @throws NullPointerException if txObject is null. One can't write on a 'null' transactional object, that
-     *                              would normally also cause a NullPointerException.
-     * @throws org.multiverse.api.exceptions.ReadConflict
-     *                              if something goes wrong while opening the txObject for writing.
-     * @throws org.multiverse.api.exceptions.DeadTransactionException
-     *                              if this transaction isn't active.
+     * @throws NullPointerException        if transactional object is null.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
+     * @throws IllegalThreadStateException if the transaction isn't active.
      */
-    AlphaTranlocal openForWrite(AlphaTransactionalObject txObject);
+    AlphaTranlocal openForWrite(AlphaTransactionalObject transactionalObject);
 
-    AlphaTranlocal openForCommutingWrite(AlphaTransactionalObject txObject);
+    /**
+     * Opens the transactional object for a commuting operation.
+     * <p/>
+     * It depends on the transaction if this operations is supported.
+     * <p/>
+     * If the transactional object has never been committed before, a UncommittedReadConflict
+     * is thrown.
+     * If the transactional object has been opened for read and is tracked, it will
+     * be upgraded to an opened for write.
+     * <p/>
+     * If the transactional object already was opened for write, that tranlocal
+     * is returned and no commuting operations are possible for that tranlocal.
+     * <p/>
+     * If the transactional object already was opened for construction, that tranlocal
+     * is returned.
+     *
+     * @param transactionalObject the transactional object to open
+     * @return the opened tranlocal.
+     * @throws NullPointerException        if transactional object is null.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
+     * @throws IllegalThreadStateException if the transaction isn't active.
+     */
+    AlphaTranlocal openForCommutingWrite(AlphaTransactionalObject transactionalObject);
 
-    AlphaTranlocal openForConstruction(AlphaTransactionalObject txObject);    
+    /**
+     * Opens the transactional object for construction (and writing) purposes.
+     * <p/>
+     * It depends on the transaction if this operation is supported.
+     * <p/>
+     * It is extremely important that this call is done only once for a
+     * transactional objects (when it is constructed). There is no protection against
+     * doing this multiple times, and when this happens it could overwrite already
+     * committed changes when the transaction commits.
+     * <p/>
+     * Normally this call only is made by instrumented code or by Multiverse provided
+     * transactional structure.
+     *
+     * @param transactionalObject the transactional object to open for construction
+     * @return the opened tranlocal.
+     * @throws NullPointerException        if transactional object is null.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
+     * @throws IllegalThreadStateException if the transaction isn't active.
+     */
+    AlphaTranlocal openForConstruction(AlphaTransactionalObject transactionalObject);
 }

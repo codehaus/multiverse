@@ -17,7 +17,7 @@ import org.multiverse.api.TransactionFactory;
 public interface NonBlockingTask {
 
     /**
-     * The TransactionFactory used to create transactions for executing this task.
+     * The TransactionFactory used to createReference transactions for executing this task.
      *
      * @return the TransactionFactory used for creating transactions.
      */

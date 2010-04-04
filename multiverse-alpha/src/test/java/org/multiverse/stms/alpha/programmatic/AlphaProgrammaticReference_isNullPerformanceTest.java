@@ -1,4 +1,4 @@
-package org.multiverse.stms.alpha;
+package org.multiverse.stms.alpha.programmatic;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +12,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class AlphaProgrammaticReference_isNullPerformanceTest {
 
-    private long transactionCount = ((long) 1000) * 1000 * 1000 * 2;
+    private long transactionCount = ((long) 1000) * 1000 * 100;
 
     @Before
     public void setUp() {
@@ -26,7 +26,7 @@ public class AlphaProgrammaticReference_isNullPerformanceTest {
         long startNs = System.nanoTime();
 
         for (long k = 0; k < transactionCount; k++) {
-            ref.isNullAtomic();
+            ref.atomicIsNull();
 
             if (k % (100 * 1000 * 1000) == 0) {
                 System.out.println("at: " + k);

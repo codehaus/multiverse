@@ -1,15 +1,14 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.stms.alpha.AlphaProgrammaticLong;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
+import org.multiverse.stms.alpha.programmatic.AlphaProgrammaticLong;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
@@ -31,8 +30,7 @@ public class ArrayUpdateAlphaTransaction_openForCommutingWriteTest {
     }
 
     public AlphaTransaction startSutTransaction(int size) {
-        UpdateConfiguration config =
-                new UpdateConfiguration(stmConfig.clock);
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock);
         return new ArrayUpdateAlphaTransaction(config, size);
     }
 
@@ -45,8 +43,16 @@ public class ArrayUpdateAlphaTransaction_openForCommutingWriteTest {
     }
 
     @Test
-    @Ignore
-    public void test() {
+    public void whenTransactionalObjectAlreadyOpenedForConstruction() {
+        AlphaProgrammaticLong ref = AlphaProgrammaticLong.createUncommitted();
+
+        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTranlocal openedForConstruction = tx.openForConstruction(ref);
+        AlphaTranlocal found = tx.openForCommutingWrite(ref);
+
+        assertSame(openedForConstruction, found);
+        assertFalse(found.isCommuting());
+        assertFalse(found.isCommitted());
     }
 
     @Test

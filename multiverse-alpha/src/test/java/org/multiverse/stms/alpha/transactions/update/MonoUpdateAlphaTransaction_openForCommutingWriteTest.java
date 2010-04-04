@@ -1,15 +1,16 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.stms.alpha.AlphaProgrammaticLong;
+import org.multiverse.stms.AbstractTransactionImpl;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
+import org.multiverse.stms.alpha.programmatic.AlphaProgrammaticLong;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
@@ -55,9 +56,20 @@ public class MonoUpdateAlphaTransaction_openForCommutingWriteTest {
     }
 
     @Test
-    @Ignore
     public void whenLocked() {
+        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 1);
+        Transaction lockOwner = new AbstractTransactionImpl();
+        ref.___tryLock(lockOwner);
 
+        AlphaTransaction tx = startSutTransaction();
+        AlphaTranlocal found = tx.openForCommutingWrite(ref);
+
+        assertSame(found, getField(tx, "attached"));
+        assertNull(found.getOrigin());
+        assertFalse(found.isCommitted());
+        assertTrue(found.isCommuting());
+        assertEquals(-2, found.getWriteVersion());
+        assertSame(lockOwner, ref.___getLockOwner());
     }
 
     @Test

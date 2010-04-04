@@ -1,14 +1,12 @@
-package org.multiverse.stms.alpha;
+package org.multiverse.stms.alpha.programmatic;
 
+import org.multiverse.api.Listeners;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.TransactionConfiguration;
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.clock.PrimitiveClock;
 import org.multiverse.api.exceptions.UncommittedReadConflict;
-import org.multiverse.api.latches.Latch;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.api.programmatic.ProgrammaticReference;
+import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
@@ -17,7 +15,7 @@ import static java.lang.String.format;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.api.exceptions.CommitLockNotFreeWriteConflict.newFailedToObtainCommitLocksException;
+import static org.multiverse.api.exceptions.CommitLockNotFreeWriteConflict.createFailedToObtainCommitLocksException;
 
 /**
  * A manual instrumented {@link org.multiverse.transactional.TransactionalReference} implementation. If this class
@@ -30,15 +28,15 @@ import static org.multiverse.api.exceptions.CommitLockNotFreeWriteConflict.newFa
  * creation and unwanted ThreadLocal access, there also are methods available that have a
  * {@link org.multiverse.api.Transaction} as first argument.
  * <h3>TransactionFactory</h3>
- * All methods of this AlphaProgrammaticReference also have a version that accepts a {@link TransactionFactory}. TransactionFactories
- * can be quite expensive to create, so it is best to create them up front and reuse them. TransactionFactories
+ * All methods of this AlphaProgrammaticReference also have a version that accepts a {@link org.multiverse.api.TransactionFactory}. TransactionFactories
+ * can be quite expensive to createReference, so it is best to createReference them up front and reuse them. TransactionFactories
  * are threadsafe to use, so no worries about that as well.
  * <h3>Performance</h3>
  * The AlphaProgrammaticReference already has been heavily optimized and prevents unwanted creation of objects like
  * Transactions or TransactionTemplates. If you really need more performance you should talk to me
  * about adding instrumentation.
  * <h3>Relying on GlobalStmInstance</h3>
- * This Ref implementation can be used without depending on the GlobalStmInstance (so you could create a local
+ * This Ref implementation can be used without depending on the GlobalStmInstance (so you could createReference a local
  * one stm instance). If this is done, only the methods that rely on a Transaction or TransactionFactory
  * should be used.
  * <h3>___ methods</h3>
@@ -49,7 +47,7 @@ import static org.multiverse.api.exceptions.CommitLockNotFreeWriteConflict.newFa
  * The internal templates created here don't need to have lifecycle callbacks enabled.
  * <p/>
  * <p/>
- * Piossible optimization for the alpha engine, instead of placing the lock, listener on the
+ * Possible optimization for the alpha engine, instead of placing the lock, listener on the
  * transactional object, place it on the tranlocal. This would remove the writeLock after
  * commit because when the new tranlocal is written, the lock automatically is null.
  * <p/>
@@ -109,54 +107,61 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
 
     public AlphaProgrammaticReference(Transaction tx, E value) {
         AlphaTransaction alphaTx = (AlphaTransaction) tx;
+
         if (tx == null || tx.getStatus().isDead()) {
             long writeVersion = clock.getVersion();
-            AlphaRefTranlocal<E> tranlocal = new AlphaRefTranlocal<E>(this);
+            AlphaProgrammaticRefeferenceTranlocal<E> tranlocal = new AlphaProgrammaticRefeferenceTranlocal<E>(this);
             tranlocal.value = value;
             ___storeInitial(tranlocal, writeVersion);
-        } else {
-            AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal<E>) alphaTx.openForConstruction(this);
-            tranlocal.value = value;
+            return;
         }
+
+        AlphaProgrammaticRefeferenceTranlocal<E> tranlocal = (AlphaProgrammaticRefeferenceTranlocal<E>) alphaTx.openForConstruction(this);
+        tranlocal.value = value;
     }
 
-    private AlphaRefTranlocal<E> openForRead(Transaction tx) {
+    private AlphaProgrammaticRefeferenceTranlocal<E> openForRead(Transaction tx) {
         AlphaTransaction alphaTx = (AlphaTransaction) tx;
-        return (AlphaRefTranlocal<E>) alphaTx.openForRead(this);
+        return (AlphaProgrammaticRefeferenceTranlocal<E>) alphaTx.openForRead(this);
     }
 
-    private AlphaRefTranlocal<E> openForWrite(Transaction tx) {
+    private AlphaProgrammaticRefeferenceTranlocal<E> openForWrite(Transaction tx) {
         AlphaTransaction alphaTx = (AlphaTransaction) tx;
-        return (AlphaRefTranlocal<E>) alphaTx.openForWrite(this);
+        return (AlphaProgrammaticRefeferenceTranlocal<E>) alphaTx.openForWrite(this);
     }
 
     // ============================== getVersion ===============================
 
-    @Override
-    public long getVersionAtomic() {
-        AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal<E>) ___load();
-
-        if (tranlocal == null) {
-            throw new UncommittedReadConflict();
-        }
-
-        return tranlocal.___writeVersion;
-    }
 
     @Override
     public long getVersion() {
         Transaction tx = getThreadLocalTransaction();
 
         if (tx == null || tx.getStatus().isDead()) {
-            return getVersionAtomic();
-        } else {
-            return getVersion(tx);
+            return atomicGetVersion();
         }
+
+        return getVersion(tx);
     }
 
     @Override
     public long getVersion(Transaction tx) {
-        AlphaRefTranlocal<E> tranlocal = openForRead(tx);
+        if (tx == null) {
+            throw new NullPointerException();
+        }
+
+        AlphaProgrammaticRefeferenceTranlocal<E> tranlocal = openForRead(tx);
+        return tranlocal.___writeVersion;
+    }
+
+    @Override
+    public long atomicGetVersion() {
+        AlphaProgrammaticRefeferenceTranlocal<E> tranlocal = (AlphaProgrammaticRefeferenceTranlocal<E>) ___load();
+
+        if (tranlocal == null) {
+            throw new UncommittedReadConflict();
+        }
+
         return tranlocal.___writeVersion;
     }
 
@@ -167,34 +172,34 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
         Transaction tx = getThreadLocalTransaction();
 
         if (tx == null || tx.getStatus().isDead()) {
-            return getAtomic();
-        } else {
-            return get(tx);
+            return atomicGet();
         }
-    }
 
-    @Override
-    public E getAtomic() {
-        AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal) ___load();
-
-        if (tranlocal == null) {
-            throw new UncommittedReadConflict();
-        }
-        return tranlocal.value;
+        return get(tx);
     }
 
     @Override
     public E get(Transaction tx) {
-        AlphaRefTranlocal<E> tranlocal = openForRead(tx);
+        if (tx == null) {
+            throw new NullPointerException();
+        }
+
+        AlphaProgrammaticRefeferenceTranlocal<E> tranlocal = openForRead(tx);
+        return tranlocal.value;
+    }
+
+    @Override
+    public E atomicGet() {
+        AlphaProgrammaticRefeferenceTranlocal<E> tranlocal = (AlphaProgrammaticRefeferenceTranlocal) ___load();
+
+        if (tranlocal == null) {
+            throw new UncommittedReadConflict();
+        }
+
         return tranlocal.value;
     }
 
     // ======================== isNull =======================================
-
-    @Override
-    public boolean isNullAtomic() {
-        return getAtomic() == null;
-    }
 
     @Override
     public boolean isNull() {
@@ -204,6 +209,11 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
     @Override
     public boolean isNull(Transaction tx) {
         return get(tx) == null;
+    }
+
+    @Override
+    public boolean atomicIsNull() {
+        return atomicGet() == null;
     }
 
     // ============================== getOrAwait ======================================
@@ -226,7 +236,7 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
 
     @Override
     public E getOrAwait(Transaction tx) {
-        AlphaRefTranlocal<E> tranlocal = openForRead(tx);
+        AlphaProgrammaticRefeferenceTranlocal<E> tranlocal = openForRead(tx);
         if (tranlocal.value == null) {
             retry();
         }
@@ -236,55 +246,32 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
 
     // ========================== set ==========================================
 
-    @Override
-    public E setAtomic(E newValue) {
-        //if there is no difference we are done
-        E oldValue = getAtomic();
-
-        if (oldValue == newValue) {
-            return oldValue;
-        }
-
-        AlphaRefTranlocal newTranlocal = new AlphaRefTranlocal(this);
-        newTranlocal.value = newValue;
-
-        //the AlphaRefTranlocal also implements the Transaction interface to prevent us
-        //creating an additional objects even though we need an instance.
-        Transaction tx = newTranlocal;
-
-        //if we couldn't acquire the lock, we are done.
-        if (!___tryLock(tx)) {
-            throw newFailedToObtainCommitLocksException();
-        }
-
-        AlphaRefTranlocal<E> oldTranlocal = (AlphaRefTranlocal<E>) ___load();
-
-        long writeVersion = clock.tick();
-        ___storeUpdate(newTranlocal, writeVersion, true);
-        return oldTranlocal.value;
-    }
 
     @Override
     public E set(E newValue) {
         Transaction tx = getThreadLocalTransaction();
 
         if (tx == null || tx.getStatus().isDead()) {
-            return setAtomic(newValue);
-        } else {
-            return set(tx, newValue);
+            return atomicSet(newValue);
         }
+
+        return set(tx, newValue);
     }
 
     @Override
     public E set(Transaction tx, E newValue) {
-        AlphaRefTranlocal<E> readonly = openForRead(tx);
+        if (tx == null) {
+            throw new NullPointerException();
+        }
+
+        AlphaProgrammaticRefeferenceTranlocal<E> readonly = openForRead(tx);
 
         //if there is no change, we are done.
         if (readonly.value == newValue) {
             return newValue;
         }
 
-        AlphaRefTranlocal<E> tranlocal = openForWrite(tx);
+        AlphaProgrammaticRefeferenceTranlocal<E> tranlocal = openForWrite(tx);
 
         if (newValue == tranlocal.value) {
             return newValue;
@@ -295,47 +282,71 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
         return oldValue;
     }
 
-
     @Override
-    public E setAtomic(E newValue, long expectedVersion) {
-        AlphaRefTranlocal<E> tranlocal = (AlphaRefTranlocal<E>) ___load();
-        if (tranlocal == null) {
-            throw new UncommittedReadConflict();
+    public E atomicSet(E newValue) {
+        //if there is no difference we are done
+        E oldValue = atomicGet();
+
+        if (oldValue == newValue) {
+            return oldValue;
         }
 
-        if (tranlocal.value == newValue) {
-            return newValue;
-        }
-
-        if (tranlocal.getWriteVersion() != expectedVersion) {
-            throw new OptimisticLockingFailureException();
-        }
-
-        AlphaRefTranlocal newTranlocal = new AlphaRefTranlocal(this);
+        AlphaProgrammaticRefeferenceTranlocal newTranlocal = new AlphaProgrammaticRefeferenceTranlocal(this);
         newTranlocal.value = newValue;
 
-        //the AlphaRefTranlocal also implements the Transaction interface to prevent us
+        //the AlphaProgrammaticRefeferenceTranlocal also implements the Transaction interface to prevent us
         //creating an additional objects even though we need an instance.
         Transaction tx = newTranlocal;
 
         //if we couldn't acquire the lock, we are done.
         if (!___tryLock(tx)) {
-            throw newFailedToObtainCommitLocksException();
+            throw createFailedToObtainCommitLocksException();
         }
 
-        AlphaRefTranlocal<E> oldTranlocal = (AlphaRefTranlocal<E>) ___load();
+        AlphaProgrammaticRefeferenceTranlocal<E> oldTranlocal = (AlphaProgrammaticRefeferenceTranlocal<E>) ___load();
 
         long writeVersion = clock.tick();
         ___storeUpdate(newTranlocal, writeVersion, true);
         return oldTranlocal.value;
     }
 
-    // ======================== clear ========================================
-
     @Override
-    public E clearAtomic() {
-        return setAtomic(null);
+    public boolean atomicCompareAndSet(E expected, E update) {
+        AlphaProgrammaticRefeferenceTranlocal<E> tranlocal = (AlphaProgrammaticRefeferenceTranlocal<E>) ___load();
+
+        if (tranlocal == null) {
+            throw new UncommittedReadConflict();
+        }
+
+        if (tranlocal.value != expected) {
+            return false;
+        }
+
+        AlphaProgrammaticRefeferenceTranlocal newTranlocal = new AlphaProgrammaticRefeferenceTranlocal(this);
+        Transaction lockOwner = (Transaction) newTranlocal;
+        newTranlocal.value = update;
+
+        //if we couldn't acquire the lock, we are done.
+        if (!___tryLock(lockOwner)) {
+            throw createFailedToObtainCommitLocksException();
+        }
+
+        AlphaProgrammaticRefeferenceTranlocal<E> oldTranlocal = (AlphaProgrammaticRefeferenceTranlocal<E>) ___load();
+
+        if (oldTranlocal.value != expected) {
+            ___releaseLock(lockOwner);
+            return false;
+        }
+
+        long writeVersion = clock.tick();
+        Listeners listeners = ___storeUpdate(newTranlocal, writeVersion, true);
+        if (listeners != null) {
+            listeners.openAll();
+        }
+        return true;
     }
+
+    // ======================== clear ========================================
 
     @Override
     public E clear() {
@@ -345,6 +356,11 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
     @Override
     public E clear(Transaction tx) {
         return set(tx, null);
+    }
+
+    @Override
+    public E atomicClear() {
+        return atomicSet(null);
     }
 
     // ======================= toString =============================================
@@ -357,7 +373,11 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
 
     @Override
     public String toString(Transaction tx) {
-        AlphaRefTranlocal<E> tranlocal = openForRead(tx);
+        if (tx == null) {
+            throw new NullPointerException();
+        }
+
+        AlphaProgrammaticRefeferenceTranlocal<E> tranlocal = openForRead(tx);
         return toString(tranlocal.value);
     }
 
@@ -370,131 +390,7 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
     }
 
     @Override
-    public AlphaRefTranlocal<E> ___openUnconstructed() {
-        return new AlphaRefTranlocal<E>(this);
+    public AlphaProgrammaticRefeferenceTranlocal<E> ___openUnconstructed() {
+        return new AlphaProgrammaticRefeferenceTranlocal<E>(this);
     }
 }
-
-
-/**
- * The AlphaTranlocal for the AlphaProgrammaticReference. It is responsible for storing the state of the AlphaProgrammaticReference.
- * <p/>
- * The AlpaRefTranlocal also implements the Transaction interface because it can be
- * used as a lockOwner. This is done as a performance optimization.
- *
- * @param <E>
- */
-class AlphaRefTranlocal<E> extends AlphaTranlocal implements Transaction {
-
-    E value;
-
-    AlphaRefTranlocal(AlphaRefTranlocal<E> origin) {
-        this.___origin = origin;
-        this.___transactionalObject = origin.___transactionalObject;
-        this.value = origin.value;
-    }
-
-    AlphaRefTranlocal(AlphaProgrammaticReference<E> owner) {
-        this(owner, null);
-    }
-
-    AlphaRefTranlocal(AlphaProgrammaticReference<E> owner, E value) {
-        this.___transactionalObject = owner;
-        this.value = value;
-    }
-
-    @Override
-    public AlphaTranlocal openForWrite() {
-        return new AlphaRefTranlocal(this);
-    }
-
-    @Override
-    public AlphaTranlocalSnapshot takeSnapshot() {
-        return new AlphaRefTranlocalSnapshot<E>(this);
-    }
-
-    @Override
-    public boolean isDirty() {
-        if (isCommitted()) {
-            return false;
-        }
-
-        if (___origin == null) {
-            return true;
-        }
-
-        AlphaRefTranlocal origin = (AlphaRefTranlocal) ___origin;
-        if (origin.value != this.value) {
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public void abort() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public TransactionConfiguration getConfiguration() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public long getReadVersion() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public TransactionStatus getStatus() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void commit() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void prepare() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void restart() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void registerRetryLatch(Latch latch) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void registerLifecycleListener(TransactionLifecycleListener listener) {
-        throw new UnsupportedOperationException();
-    }
-}
-
-class AlphaRefTranlocalSnapshot<E> extends AlphaTranlocalSnapshot {
-
-    final AlphaRefTranlocal ___tranlocal;
-    final E value;
-
-    AlphaRefTranlocalSnapshot(AlphaRefTranlocal<E> tranlocal) {
-        this.___tranlocal = tranlocal;
-        this.value = tranlocal.value;
-    }
-
-    @Override
-    public AlphaTranlocal getTranlocal() {
-        return ___tranlocal;
-    }
-
-    @Override
-    public void restore() {
-        ___tranlocal.value = value;
-    }
-}
-
