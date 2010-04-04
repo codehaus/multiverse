@@ -8,6 +8,14 @@ import java.util.concurrent.TimeUnit;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
+ * Performance comparison between AlphaProgrammaticReference.atomicGet and the
+ * AtomicReference.get
+ * <p/>
+ * On my machine on a single core both are around the 75M transactions/second.
+ * The reason why the performance is the same, is the both only need a volatile
+ * read and all transaction overhead has been removed from the atomicGet
+ * (transaction is completely inlined).
+ *
  * @author Peter Veentjer
  */
 public class AlphaProgrammaticReference_atomicGetPerformanceTest {

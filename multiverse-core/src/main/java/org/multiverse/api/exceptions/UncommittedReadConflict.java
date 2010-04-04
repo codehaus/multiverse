@@ -1,5 +1,8 @@
 package org.multiverse.api.exceptions;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
+
 /**
  * An {@link ReadConflict} that is thrown when an object is loaded but has not been committed yet.
  * There are 2 why reasons this can happen:
@@ -21,6 +24,19 @@ package org.multiverse.api.exceptions;
  */
 public class UncommittedReadConflict extends ReadConflict {
 
+    public final static UncommittedReadConflict INSTANCE = new UncommittedReadConflict();
+
+    public final static boolean reuse = parseBoolean(getProperty(
+            UncommittedReadConflict.class.getName() + ".reuse", "true"));
+
+    public static UncommittedReadConflict createUncommittedReadConflict() {
+        if (LockNotFreeReadConflict.reuse) {
+            throw UncommittedReadConflict.INSTANCE;
+        } else {
+            throw new UncommittedReadConflict();
+        }
+    }
+
     private static final long serialVersionUID = 0;
 
     public UncommittedReadConflict() {
@@ -36,5 +52,9 @@ public class UncommittedReadConflict extends ReadConflict {
 
     public UncommittedReadConflict(Throwable cause) {
         super(cause);
+    }
+
+    public static Exception create() {
+        return null;  //To change body of created methods use File | Settings | File Templates.
     }
 }

@@ -195,6 +195,7 @@ public final class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> i
     }
 
     @Override
+    @TransactionalMethod(automaticReadTracking = true)
     public void putFirst(E e) throws InterruptedException {
         if (hasNoStorageCapacity()) {
             //force A READ.
@@ -222,7 +223,7 @@ public final class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> i
     }
 
     @Override
-    @TransactionalMethod(readonly = true)
+    @TransactionalMethod(readonly = true, automaticReadTracking = false)
     public int size() {
         return (int) size.get();
     }
@@ -699,6 +700,8 @@ public final class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> i
     @TransactionalMethod
     public void putLast(E e) throws InterruptedException {
         if (hasNoStorageCapacity()) {
+            //force load
+            size.get();
             retry();
         }
 
@@ -709,6 +712,8 @@ public final class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> i
     @TransactionalMethod
     public E takeFirst() throws InterruptedException {
         if (isEmpty()) {
+            //force load
+            Node<E> readHead = head;
             retry();
         }
 

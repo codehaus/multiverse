@@ -2,6 +2,7 @@ package org.multiverse.stms.alpha.instrumentation.fieldaccess;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
@@ -31,6 +32,7 @@ public class TransactionalObject_ConstructorTest {
     }
 
     @Test
+    @Ignore
     public void testConstructorWithReadFirst() {
         ConstructorWithReadFirst object = new ConstructorWithReadFirst();
         assertEquals(0, object.getField());

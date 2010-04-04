@@ -1,44 +1,58 @@
 package org.multiverse.integrationtests.isolation;
 
-import org.junit.Ignore;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.api.ThreadLocalTransaction;
-import org.multiverse.transactional.DefaultTransactionalReference;
+import org.multiverse.transactional.collections.TransactionalArrayList;
+import org.multiverse.transactional.collections.TransactionalLinkedList;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
- * A phantom read is a read that returns inconsistent values based on the number of atomicobjects. In
- * databases you have the concept of table. But raw Java memory doesn't have this concept. So we need
- * to execute the readtest on some sort of collection.
+ * A phantom read is a read that returns inconsistent values based on the number of
+ * atomicobjects. In databases you have the concept of table. But raw Java memory
+ * doesn't have this concept. So we need to execute the readtest on some sort
+ * of collection.
  *
  * @author Peter Veentjer
  */
 public class PhantomReadStressTest {
 
-    private int readCount = 10000;
+    private int readCount = 1000;
     private int readThreadCount = 10;
     private int modifyThreadCount = 2;
-    private int tableLength = 1000;
-    private DefaultTransactionalReference<Integer>[] table;
-    private volatile boolean readersFinished = false;
+    private List table;
+    private volatile boolean readersFinished;
 
-
-    @Test
+    @Before
     public void setUp() {
-        ThreadLocalTransaction.setThreadLocalTransaction(null);
-        table = new DefaultTransactionalReference[tableLength];
-        for (int k = 0; k < table.length; k++) {
-            table[k] = new DefaultTransactionalReference<Integer>();
-        }
+        readersFinished = false;
+        clearThreadLocalTransaction();
     }
 
-    @Ignore
+    @After
+    public void tearDown() {
+        clearThreadLocalTransaction();
+    }
+
     @Test
-    public void test() {
+    public void testTransactionalLinkedList() {
+        test(new TransactionalLinkedList());
+    }
+
+    @Test
+    public void testTransactionalArrayList() {
+        test(new TransactionalArrayList());
+    }
+
+    public void test(List table) {
+        this.table = table;
         ModifyThread[] modifyThreads = new ModifyThread[modifyThreadCount];
         for (int k = 0; k < modifyThreadCount; k++) {
             modifyThreads[k] = new ModifyThread(k);
@@ -53,8 +67,6 @@ public class PhantomReadStressTest {
         startAll(readerThread);
         joinAll(modifyThreads);
         joinAll(readerThread);
-
-        testIncomplete();
     }
 
     class ModifyThread extends TestThread {
@@ -66,13 +78,20 @@ public class PhantomReadStressTest {
         public void doRun() {
             int k = 0;
             while (!readersFinished) {
+                doLogic();
+                k++;
+
                 if (k % 500 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
-                k++;
-
-                sleepRandomMs(2);
             }
+        }
+
+        @TransactionalMethod(readonly = false)
+        private void doLogic() {
+            table.add("foo");
+            sleepRandomMs(10);
+            table.add("foo");
         }
     }
 
@@ -90,7 +109,13 @@ public class PhantomReadStressTest {
                 } else {
                     readWithUpdateTransaction();
                 }
+
+                if (k % 500 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), k);
+                }
             }
+
+            readersFinished = true;
         }
 
         @TransactionalMethod(readonly = false)
@@ -98,19 +123,17 @@ public class PhantomReadStressTest {
             readLogic();
         }
 
-        @TransactionalMethod(readonly = false)
+        @TransactionalMethod(readonly = true)
         private void readWithReadonlyTransaction() {
             readLogic();
         }
 
         private void readLogic() {
-            //todo
-            int firstCount = 0;
-            int secondCount = 0;
+            int sizeT1 = table.size();
+            sleepRandomMs(10);
+            int sizeT2 = table.size();
 
-            assertEquals(firstCount, secondCount);
+            assertEquals(sizeT1, sizeT2);
         }
     }
-
-
 }

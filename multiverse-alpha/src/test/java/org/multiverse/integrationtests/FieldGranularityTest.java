@@ -1,5 +1,6 @@
 package org.multiverse.integrationtests;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
@@ -12,6 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * A test that makes sure that when fieldgranularity is used instead of the default object granularity/
@@ -22,10 +24,16 @@ public class FieldGranularityTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         executedCounter = new AtomicInteger();
 
         //force loading of the transactional integer class.
         new TransactionalInteger();
+    }
+
+    @After
+    public void tearDown() {
+        clearThreadLocalTransaction();
     }
 
     @Test

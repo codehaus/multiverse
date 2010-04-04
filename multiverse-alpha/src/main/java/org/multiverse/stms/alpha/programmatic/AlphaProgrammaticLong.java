@@ -1,8 +1,11 @@
 package org.multiverse.stms.alpha.programmatic;
 
+import org.multiverse.api.Listeners;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.clock.PrimitiveClock;
 import org.multiverse.api.programmatic.ProgrammaticLong;
+import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
@@ -11,14 +14,17 @@ import org.multiverse.utils.TodoException;
 
 import java.io.File;
 
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
+import static org.multiverse.api.exceptions.CommitLockNotFreeWriteConflict.createFailedToObtainCommitLocksException;
+import static org.multiverse.api.exceptions.UncommittedReadConflict.createUncommittedReadConflict;
 
 /**
  * @author Peter Veentjer
  */
 public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements ProgrammaticLong {
 
-    //private final Stm stm;
+    private static final PrimitiveClock clock = ((AlphaStm) getGlobalStmInstance()).getClock();
 
     public static AlphaProgrammaticLong createUncommitted() {
         return new AlphaProgrammaticLong((File) null);
@@ -62,15 +68,14 @@ public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements Progr
     private AlphaProgrammaticLong(File file) {
     }
 
-    @Override
-    public long atomicGet() {
-        AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) ___load();
+    public long get() {
+        Transaction tx = getThreadLocalTransaction();
 
-        if (tranlocal == null) {
-            return 0;
+        if (tx == null || tx.getStatus().isDead()) {
+            return atomicGet();
         }
 
-        return tranlocal.value;
+        return get(tx);
     }
 
     @Override
@@ -84,14 +89,15 @@ public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements Progr
         return tranlocal.value;
     }
 
-    public long get() {
-        Transaction tx = getThreadLocalTransaction();
+    @Override
+    public long atomicGet() {
+        AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) ___load();
 
-        if (tx == null || tx.getStatus().isDead()) {
-            return atomicGet();
+        if (tranlocal == null) {
+            return 0;
         }
 
-        return get(tx);
+        return tranlocal.value;
     }
 
     // =========================== set =========================
@@ -121,19 +127,28 @@ public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements Progr
 
     @Override
     public long atomicSet(long newValue) {
-        /*
-        AlphaProgrammaticLong update = new AlphaProgrammaticLong();
-        Transaction lockOwner = (Transaction) update;
-
+        AlphaProgrammaticLongTranlocal newTranlocal = new AlphaProgrammaticLongTranlocal(
+                this, false);
+        Transaction lockOwner = (Transaction) newTranlocal;
         if (!___tryLock(lockOwner)) {
             throw createFailedToObtainCommitLocksException();
         }
 
-        long writeVersion =
+        AlphaProgrammaticLongTranlocal current = (AlphaProgrammaticLongTranlocal) ___load();
+        if (current == null) {
+            ___releaseLock(lockOwner);
+            throw createUncommittedReadConflict();
+        }
 
-        ___storeUpdate(update, writeVersion, true);
-        */
-        throw new TodoException();
+        long writeVersion = clock.tick();
+        newTranlocal.value = newValue;
+        newTranlocal.prepareForCommit(writeVersion);
+        Listeners listeners = ___storeUpdate(newTranlocal, writeVersion, true);
+
+        if (listeners != null) {
+            listeners.openAll();
+        }
+        return current.value;
     }
 
     // ============================= inc ============================
@@ -161,7 +176,7 @@ public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements Progr
     }
 
     @Override
-    public void commutingInc(final long amount) {
+    public void commutingInc(long amount) {
         Transaction tx = getThreadLocalTransaction();
 
         if (tx == null || tx.getStatus().isDead()) {
@@ -169,7 +184,7 @@ public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements Progr
             return;
         }
 
-        inc(tx, amount);
+        commutingInc(tx, amount);
     }
 
     @Override
@@ -198,13 +213,66 @@ public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements Progr
             return atomicGet();
         }
 
-        throw new TodoException();
-    }
+        AlphaProgrammaticLongTranlocal updateTranlocal = new AlphaProgrammaticLongTranlocal(
+                this, false);
+        Transaction lockOwner = (Transaction) updateTranlocal;
+        if (!___tryLock(lockOwner)) {
+            throw createFailedToObtainCommitLocksException();
+        }
 
+        AlphaProgrammaticLongTranlocal currentTranlocal = (AlphaProgrammaticLongTranlocal) ___load();
+        if (currentTranlocal == null) {
+            ___releaseLock(lockOwner);
+            throw createUncommittedReadConflict();
+        }
+
+        long writeVersion = clock.tick();
+        updateTranlocal.value = currentTranlocal.value += amount;
+        updateTranlocal.prepareForCommit(writeVersion);
+        Listeners listeners = ___storeUpdate(updateTranlocal, writeVersion, true);
+
+        if (listeners != null) {
+            listeners.openAll();
+        }
+
+        return currentTranlocal.value;
+    }
 
     @Override
     public boolean atomicCompareAndSet(long expected, long update) {
-        throw new TodoException();
+        AlphaProgrammaticLongTranlocal readonly = (AlphaProgrammaticLongTranlocal) ___load();
+        if (readonly == null) {
+            throw createUncommittedReadConflict();
+        }
+
+        if (readonly.value != expected) {
+            return false;
+        }
+
+        AlphaProgrammaticLongTranlocal updateTranlocal = new AlphaProgrammaticLongTranlocal(
+                this, false);
+
+        Transaction lockOwner = (Transaction) updateTranlocal;
+        if (!___tryLock(lockOwner)) {
+            throw createFailedToObtainCommitLocksException();
+        }
+
+        AlphaProgrammaticLongTranlocal current = (AlphaProgrammaticLongTranlocal) ___load();
+
+        if (current.value != expected) {
+            ___releaseLock(lockOwner);
+            return false;
+        }
+
+        long writeVersion = clock.tick();
+        updateTranlocal.value = update;
+        updateTranlocal.prepareForCommit(writeVersion);
+        Listeners listeners = ___storeUpdate(updateTranlocal, writeVersion, true);
+
+        if (listeners != null) {
+            listeners.openAll();
+        }
+        return true;
     }
 
     @Override
@@ -231,6 +299,5 @@ public class AlphaProgrammaticLong extends DefaultTxObjectMixin implements Progr
     public AlphaTranlocal ___openUnconstructed() {
         return new AlphaProgrammaticLongTranlocal(this, false);
     }
-
 }
 

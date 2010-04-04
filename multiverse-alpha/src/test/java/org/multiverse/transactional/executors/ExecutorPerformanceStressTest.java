@@ -1,5 +1,6 @@
 package org.multiverse.transactional.executors;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,6 +20,11 @@ public class ExecutorPerformanceStressTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
+    }
+
+    @After
+    public void tearDown() {
         clearThreadLocalTransaction();
     }
 

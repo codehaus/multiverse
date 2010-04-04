@@ -69,4 +69,19 @@ public class TransactionalLinkedList_offerFirstTest {
         assertEquals(version, stm.getVersion());
         assertEquals("[1]", list.toString());
     }
+
+    @Test
+    public void offerOnUnboundList() {
+        TransactionalLinkedList<Integer> list = new TransactionalLinkedList<Integer>();
+
+        long version = stm.getVersion();
+        int txCount = 1000 * 1000;
+        for (int k = 0; k < txCount; k++) {
+            if (!list.offerFirst(k)) {
+                fail();
+            }
+        }
+
+        assertEquals(version + txCount, stm.getVersion());
+    }
 }

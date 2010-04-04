@@ -1,5 +1,6 @@
 package org.multiverse.transactional.collections;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Stm;
@@ -10,6 +11,7 @@ import org.multiverse.api.exceptions.OptimisticLockFailedWriteConflict;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 /**
@@ -27,6 +29,12 @@ public class TransactionalLinkedList_commutingTest {
                 .setAutomaticReadTracking(true)
                 .setReadonly(false)
                 .build();
+        clearThreadLocalTransaction();
+    }
+
+    @After
+    public void tearDown() {
+        clearThreadLocalTransaction();
     }
 
     @Test
@@ -68,10 +76,10 @@ public class TransactionalLinkedList_commutingTest {
 
         tx1.commit();
 
-        try{
+        try {
             tx2.commit();
             fail();
-        }catch(OptimisticLockFailedWriteConflict expected){
+        } catch (OptimisticLockFailedWriteConflict expected) {
 
         }
 

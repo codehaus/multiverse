@@ -1,5 +1,6 @@
 package org.multiverse.transactional.collections;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
@@ -8,6 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * A stress test that tests concurrent takeFirst and putLasts on a TransactionalLinkedList.
@@ -36,6 +38,8 @@ public class TransactionalLinkedList_TakeFirstPutLastStressTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
+
         itemGenerator = new AtomicLong();
         takeCounter = new AtomicLong(putLastThreadCount * produceCount);
 
@@ -48,6 +52,11 @@ public class TransactionalLinkedList_TakeFirstPutLastStressTest {
         for (int k = 0; k < takeFirstThreadCount; k++) {
             takeFirstThreads[k] = new TakeFirstThread(k);
         }
+    }
+
+    @After
+    public void tearDown() {
+        clearThreadLocalTransaction();
     }
 
     @Test

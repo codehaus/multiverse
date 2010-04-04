@@ -26,7 +26,9 @@ public class VetoCommitBarrier_joinCommitTest {
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
-        txFactory = stm.getTransactionFactoryBuilder().build();
+        txFactory = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .build();
         clearThreadLocalTransaction();
         clearCurrentThreadInterruptedStatus();
     }
@@ -35,7 +37,6 @@ public class VetoCommitBarrier_joinCommitTest {
     public void tearDown() {
         clearCurrentThreadInterruptedStatus();
     }
-
 
     @Test
     public void whenTransactionNull_thenNullPointerException() throws InterruptedException {
