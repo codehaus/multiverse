@@ -2,7 +2,6 @@ package org.multiverse.stms.alpha.programmatic;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.LockNotFreeWriteConflict;
@@ -102,8 +101,7 @@ public class AlphaProgrammaticLong_incTest {
     }
 
     @Test
-    @Ignore
-    public void whenTransactionOnThreadLocal_thenItIsIgnored() {
+    public void whenTransactionOnThreadLocal_thenItIsUsed() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 10);
 
         Transaction tx = stm.getTransactionFactoryBuilder()
@@ -115,11 +113,11 @@ public class AlphaProgrammaticLong_incTest {
         setThreadLocalTransaction(tx);
 
         long version = stm.getVersion();
-        long found = ref.inc(5);
+        ref.inc(5);
+        tx.abort();
 
-        assertEquals(10, found);
-        assertEquals(11, ref.atomicGet());
-        assertEquals(version + 1, stm.getVersion());
-        assertEquals(version + 1, ref.___load().getWriteVersion());
+        assertEquals(10, ref.atomicGet());
+        assertEquals(version, stm.getVersion());
+        assertEquals(version, ref.___load().getWriteVersion());
     }
 }

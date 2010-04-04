@@ -23,6 +23,7 @@ public class AlphaProgrammaticReference_atomicSetTest {
     public void setUp() {
         stm = getGlobalStmInstance();
         updateTxFactory = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
                 .setReadonly(false)
                 .build();
         clearThreadLocalTransaction();

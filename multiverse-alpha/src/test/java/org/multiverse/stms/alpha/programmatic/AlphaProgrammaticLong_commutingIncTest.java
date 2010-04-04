@@ -2,7 +2,6 @@ package org.multiverse.stms.alpha.programmatic;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.LockNotFreeWriteConflict;
@@ -13,6 +12,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
@@ -96,20 +96,20 @@ public class AlphaProgrammaticLong_commutingIncTest {
     }
 
     @Test
-    @Ignore
     public void whenTransactionRunning() {
+        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 1);
 
-    }
+        Transaction tx = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .build()
+                .start();
+        setThreadLocalTransaction(tx);
 
-    @Test
-    @Ignore
-    public void whenTransactionRunning_andAlreadyOpenedForUpdate() {
+        long version = stm.getVersion();
+        ref.commutingInc(10);
+        tx.commit();
 
-    }
-
-    @Test
-    @Ignore
-    public void whenTransactionRunning_andAlreadyOpenedForRead() {
-
+        assertEquals(version + 1, stm.getVersion());
+        assertEquals(11, ref.atomicGet());
     }
 }

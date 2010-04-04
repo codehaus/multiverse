@@ -138,9 +138,8 @@ public interface ProgrammaticLong {
      * will be used, otherwise this call will be atomic.
      *
      * @param amount the amount to increase the value with.
-     * @return the old amount.
      */
-    long inc(long amount);
+    void inc(long amount);
 
     /**
      * Increments the value stored in this ProgrammaticLong using the provided transaction.
@@ -153,7 +152,7 @@ public interface ProgrammaticLong {
      * @return the old value.
      * @throws NullPointerException if tx is null.
      */
-    long inc(Transaction tx, long amount);
+    void inc(Transaction tx, long amount);
 
     /**
      * Atomically increments the value stores in this ProgrammaticLong. This call doesn't look
@@ -166,7 +165,7 @@ public interface ProgrammaticLong {
      * @param amount the amount to increase the value with.
      * @return the old value.
      */
-    long atomicInc(long amount);
+    void atomicInc(long amount);
 
     /**
      * Increments the value stored in this ProgrammaticReference.

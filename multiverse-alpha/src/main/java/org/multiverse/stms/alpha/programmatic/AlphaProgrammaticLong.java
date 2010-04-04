@@ -162,18 +162,19 @@ public final class AlphaProgrammaticLong extends DefaultTxObjectMixin implements
 
     // ============================= inc ============================
 
-    public long inc(long amount) {
+    public void inc(long amount) {
         Transaction tx = getThreadLocalTransaction();
 
         if (tx == null || tx.getStatus().isDead()) {
-            return atomicInc(amount);
+            atomicInc(amount);
+            return;
         }
 
-        return inc(tx, amount);
+        inc(tx, amount);
     }
 
     @Override
-    public long inc(Transaction tx, long amount) {
+    public void inc(Transaction tx, long amount) {
         if (tx == null) {
             throw new NullPointerException();
         }
@@ -181,7 +182,6 @@ public final class AlphaProgrammaticLong extends DefaultTxObjectMixin implements
         AlphaTransaction alphaTx = (AlphaTransaction) tx;
         AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) alphaTx.openForWrite(this);
         tranlocal.value += amount;
-        return tranlocal.value;
     }
 
     @Override
@@ -217,9 +217,9 @@ public final class AlphaProgrammaticLong extends DefaultTxObjectMixin implements
     }
 
     @Override
-    public long atomicInc(long amount) {
+    public void atomicInc(long amount) {
         if (amount == 0) {
-            return atomicGet();
+            return;
         }
 
         AlphaProgrammaticLongTranlocal updateTranlocal = new AlphaProgrammaticLongTranlocal(
@@ -243,8 +243,6 @@ public final class AlphaProgrammaticLong extends DefaultTxObjectMixin implements
         if (listeners != null) {
             listeners.openAll();
         }
-
-        return currentTranlocal.value;
     }
 
     @Override

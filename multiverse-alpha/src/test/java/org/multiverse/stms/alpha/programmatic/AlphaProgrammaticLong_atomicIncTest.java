@@ -114,9 +114,8 @@ public class AlphaProgrammaticLong_atomicIncTest {
         setThreadLocalTransaction(tx);
 
         long version = stm.getVersion();
-        long found = ref.atomicInc(1);
+        ref.atomicInc(1);
 
-        assertEquals(10, found);
         assertEquals(11, ref.atomicGet());
         assertEquals(version + 1, stm.getVersion());
         assertEquals(version + 1, ref.___load().getWriteVersion());
