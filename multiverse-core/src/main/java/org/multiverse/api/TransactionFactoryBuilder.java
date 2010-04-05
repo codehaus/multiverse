@@ -27,7 +27,6 @@ import java.util.concurrent.TimeUnit;
  * <ol>
  * <li><b>readonly</b>false</li>
  * <li><b>automatic read tracking</b>false</li>
- * <li><b>familyName</b> null</li>
  * <li><b>maxRetryCount</b> 1000</li>
  * </ol>
  * <p/>
@@ -45,9 +44,7 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      * Creates a new {@link TransactionFactoryBuilder} based on the this TransactionFactoryBuilder but now
      * configured with the provided familyName.
      * <p/>
-     * The transaction familyName is useful for a lot of reasons. It can be used for identification in logging but also
-     * can be used to make optimizations based on the transaction familyName. A stm could decide to return optimized
-     * transaction implementations for example.
+     * The transaction familyName is useful debugging purposes.
      *
      * @param familyName the familyName of the transaction.
      * @return the new TransactionFactoryBuilder
@@ -85,8 +82,13 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      */
     B setInterruptible(boolean interruptible);
 
+    /**
+     * Sets the commit
+     *
+     * @param commitLockPolicy
+     * @return
+     */
     B setCommitLockPolicy(CommitLockPolicy commitLockPolicy);
-
 
     /**
      * With the speculative configuration enabled, the stm is allowed to determine optimal settings
@@ -115,8 +117,14 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      * needs to acquire the writelocks. If quick release is disabled, first all writes are
      * executed before any lock is released. With quick release enabled, the lock on the
      * transactional object is released as soon as the write is done.
+     * <p/>
+     * The 'disadvantage' of having this enabled is that it could happen that some objects modified in a
+     * transaction are releases and some are not. If another transaction picks up these objects, it could
+     * be that it is able to read some and fails on other. Normally this isn't an issue because the transaction
+     * is retried in combination with a back off policy.
      *
-     * @param enabled
+     * @param enabled true if the lock of a transaction object should be releases as soon as possible instead
+     *                of waiting for the whole transaction to commit.
      * @return the created TransactionFactoryBuilder
      */
     B setQuickReleaseEnabled(boolean enabled);
@@ -149,6 +157,4 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      *                               TransactionFactory can't be created.
      */
     TransactionFactory<T> build();
-
-    // B setLoggingEnabled(boolean loggingEnabled);
 }

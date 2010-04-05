@@ -9,7 +9,6 @@ import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.utils.TodoException;
 
 import java.io.File;
 
@@ -19,11 +18,12 @@ import static org.multiverse.api.exceptions.LockNotFreeWriteConflict.createFaile
 import static org.multiverse.api.exceptions.UncommittedReadConflict.createUncommittedReadConflict;
 
 /**
- * Test
+ * The {@link AlphaStm} specific implementation of the ProgrammaticLong.
  *
  * @author Peter Veentjer
  */
-public final class AlphaProgrammaticLong extends DefaultTxObjectMixin implements ProgrammaticLong {
+public final class AlphaProgrammaticLong
+        extends DefaultTxObjectMixin implements ProgrammaticLong {
 
     private final PrimitiveClock clock;
 
@@ -70,6 +70,7 @@ public final class AlphaProgrammaticLong extends DefaultTxObjectMixin implements
         clock = null;
     }
 
+    @Override
     public long get() {
         Transaction tx = getThreadLocalTransaction();
 
@@ -140,6 +141,7 @@ public final class AlphaProgrammaticLong extends DefaultTxObjectMixin implements
             return newValue;
         }
 
+        //try to acquire the lock
         AlphaProgrammaticLongTranlocal newTranlocal = new AlphaProgrammaticLongTranlocal(
                 this, false);
         Transaction lockOwner = (Transaction) newTranlocal;
@@ -147,6 +149,7 @@ public final class AlphaProgrammaticLong extends DefaultTxObjectMixin implements
             throw createFailedToObtainCommitLocksException();
         }
 
+        //lock was acquired successfully, we can now store the changes.
         committed = (AlphaProgrammaticLongTranlocal) ___load();
 
         long writeVersion = clock.tick();
@@ -284,21 +287,6 @@ public final class AlphaProgrammaticLong extends DefaultTxObjectMixin implements
             listeners.openAll();
         }
         return true;
-    }
-
-    @Override
-    public long atomicGetVersion() {
-        throw new TodoException();
-    }
-
-    @Override
-    public long getVersion() {
-        throw new TodoException();
-    }
-
-    @Override
-    public long getVersion(Transaction tx) {
-        throw new TodoException();
     }
 
     @Override

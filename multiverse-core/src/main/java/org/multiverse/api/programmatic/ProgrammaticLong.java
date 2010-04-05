@@ -149,7 +149,6 @@ public interface ProgrammaticLong {
      *
      * @param tx     the Transaction to use.
      * @param amount the amount the increase this ProgrammaticLong with.
-     * @return the old value.
      * @throws NullPointerException if tx is null.
      */
     void inc(Transaction tx, long amount);
@@ -163,7 +162,6 @@ public interface ProgrammaticLong {
      * transaction.
      *
      * @param amount the amount to increase the value with.
-     * @return the old value.
      */
     void atomicInc(long amount);
 
@@ -188,68 +186,4 @@ public interface ProgrammaticLong {
      * @throws IllegalThreadStateException if not in the correct state for this operation.
      */
     void commutingInc(Transaction tx, long amount);
-
-    // ======================= getVersion ====================
-
-    /**
-     * Gets the version of the last committed tranlocal visible from the current transaction.
-     * If no active transaction is found, the {@link #atomicGetVersion()} is called instead
-     * (very very fast).
-     * <p/>
-     * If there is a using transaction, the transactional object will be added to the readset
-     * if the transaction is configured to do that.
-     * <p/>
-     * This functionality can be used for optimistic locking over multiple transactions.
-     *
-     * @return the version.
-     * @throws org.multiverse.api.exceptions.ReadConflict
-     *          if something fails while loading the reference.
-     */
-    long getVersion();
-
-    /**
-     * Gets the version of the last committed tranlocal visible from the current transaction.
-     * <p/>
-     * So it could be that other transaction have committed after the tx is started, it will not
-     * see these.
-     * <p/>
-     * This functionality can be used for optimistic locking over multiple transactions.
-     *
-     * @param tx the transaction used
-     * @return the version
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is not in the correct state for this operation.
-     * @throws NullPointerException if tx is null
-     * @throws org.multiverse.api.exceptions.ReadConflict
-     *                              if something fails while loading the reference.
-     */
-    long getVersion(Transaction tx);
-
-    /**
-     * Gets the version of the last commit without looking at a transaction. This call
-     * is very very fast since it doesn't need a transaction. See the {@link #atomicGet()}
-     * for more information.
-     * <p/>
-     * The only expensive thing that needs to be done is a single volatile read. So
-     * it is in the same league as a {@link java.util.concurrent.atomic.AtomicReference#get()}.
-     * To be more specific; it would have the same performance as
-     * {@link java.util.concurrent.atomic.AtomicReferenceFieldUpdater#get(Object)}
-     * since that is used under water.
-     * <p/>
-     * This functionality can be used for optimistic locking over multiple transactions.
-     *
-     * @return the version.
-     *         UncommittedReadConflict
-     */
-    long atomicGetVersion();
-
-    static class AtomicGet<E> {
-        public final E value;
-        public final long version;
-
-        public AtomicGet(E value, long version) {
-            this.value = value;
-            this.version = version;
-        }
-    }
 }

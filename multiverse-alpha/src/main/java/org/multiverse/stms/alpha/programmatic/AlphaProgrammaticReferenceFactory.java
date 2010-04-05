@@ -10,12 +10,22 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 /**
+ * The {@link ProgrammaticReferenceFactory} implementation specific for
+ * the AlphaStm.
+ *
  * @author Peter Veentjer
  */
-public final class AlphaProgrammaticReferenceFactory implements ProgrammaticReferenceFactory {
+public final class AlphaProgrammaticReferenceFactory
+        implements ProgrammaticReferenceFactory {
 
     private final AlphaStm stm;
 
+    /**
+     * Creates a new AlphaProgrammaticReferenceFactory with the provided stm.
+     *
+     * @param stm this AlphaProgrammaticReference belongs to.
+     * @throws NullPointerException if stm is null.
+     */
     public AlphaProgrammaticReferenceFactory(AlphaStm stm) {
         if (stm == null) {
             throw new NullPointerException();

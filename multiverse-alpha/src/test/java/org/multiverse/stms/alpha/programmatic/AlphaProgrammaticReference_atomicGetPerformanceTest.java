@@ -1,5 +1,6 @@
 package org.multiverse.stms.alpha.programmatic;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,6 +25,11 @@ public class AlphaProgrammaticReference_atomicGetPerformanceTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
+    }
+
+    @After
+    public void tearDown() {
         clearThreadLocalTransaction();
     }
 

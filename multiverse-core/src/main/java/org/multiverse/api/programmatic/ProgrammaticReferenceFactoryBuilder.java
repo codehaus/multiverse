@@ -14,10 +14,6 @@ package org.multiverse.api.programmatic;
  */
 public interface ProgrammaticReferenceFactoryBuilder {
 
-    ProgrammaticReferenceFactoryBuilder withBlockingSupport(boolean enabled);
-
-    ProgrammaticReferenceFactoryBuilder withAbaDetection(boolean enabled);
-
     /**
      * Builds a new ProgrammaticReferenceFactory.
      *

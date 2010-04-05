@@ -11,11 +11,14 @@ import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
 
+import java.io.File;
+
 import static java.lang.String.format;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 import static org.multiverse.api.exceptions.LockNotFreeWriteConflict.createFailedToObtainCommitLocksException;
+import static org.multiverse.api.exceptions.UncommittedReadConflict.createUncommittedReadConflict;
 
 /**
  * A manual instrumented {@link org.multiverse.transactional.TransactionalReference} implementation. If this class
@@ -55,7 +58,12 @@ import static org.multiverse.api.exceptions.LockNotFreeWriteConflict.createFaile
  *
  * @author Peter Veentjer
  */
-public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin implements ProgrammaticReference<E> {
+public final class AlphaProgrammaticReference<E>
+        extends DefaultTxObjectMixin implements ProgrammaticReference<E> {
+
+    public static AlphaProgrammaticReference createUncommitted() {
+        return new AlphaProgrammaticReference((File) null);
+    }
 
     private final static TransactionFactory getOrAwaitTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
             .setReadonly(true)
@@ -73,6 +81,9 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
      */
     public AlphaProgrammaticReference() {
         this(getThreadLocalTransaction(), null);
+    }
+
+    private AlphaProgrammaticReference(File file) {
     }
 
     /**
@@ -105,6 +116,13 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
         this(tx, null);
     }
 
+    public AlphaProgrammaticReference(AlphaStm stm, E value) {
+        long writeVersion = clock.getVersion();
+        AlphaProgrammaticReferenceTranlocal<E> tranlocal = new AlphaProgrammaticReferenceTranlocal<E>(this);
+        tranlocal.value = value;
+        ___storeInitial(tranlocal, writeVersion);
+    }
+
     public AlphaProgrammaticReference(Transaction tx, E value) {
         AlphaTransaction alphaTx = (AlphaTransaction) tx;
 
@@ -128,41 +146,6 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
     private AlphaProgrammaticReferenceTranlocal<E> openForWrite(Transaction tx) {
         AlphaTransaction alphaTx = (AlphaTransaction) tx;
         return (AlphaProgrammaticReferenceTranlocal<E>) alphaTx.openForWrite(this);
-    }
-
-    // ============================== getVersion ===============================
-
-
-    @Override
-    public long getVersion() {
-        Transaction tx = getThreadLocalTransaction();
-
-        if (tx == null || tx.getStatus().isDead()) {
-            return atomicGetVersion();
-        }
-
-        return getVersion(tx);
-    }
-
-    @Override
-    public long getVersion(Transaction tx) {
-        if (tx == null) {
-            throw new NullPointerException();
-        }
-
-        AlphaProgrammaticReferenceTranlocal<E> tranlocal = openForRead(tx);
-        return tranlocal.___writeVersion;
-    }
-
-    @Override
-    public long atomicGetVersion() {
-        AlphaProgrammaticReferenceTranlocal<E> tranlocal = (AlphaProgrammaticReferenceTranlocal<E>) ___load();
-
-        if (tranlocal == null) {
-            throw new UncommittedReadConflict();
-        }
-
-        return tranlocal.___writeVersion;
     }
 
     // ============================== get ======================================
@@ -236,7 +219,12 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
 
     @Override
     public E getOrAwait(Transaction tx) {
+        if (tx == null) {
+            throw new NullPointerException();
+        }
+
         AlphaProgrammaticReferenceTranlocal<E> tranlocal = openForRead(tx);
+
         if (tranlocal.value == null) {
             retry();
         }
@@ -284,11 +272,13 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
 
     @Override
     public E atomicSet(E newValue) {
-        //if there is no difference we are done
-        E oldValue = atomicGet();
+        AlphaProgrammaticReferenceTranlocal committed = (AlphaProgrammaticReferenceTranlocal) ___load();
+        if (committed == null) {
+            throw createUncommittedReadConflict();
+        }
 
-        if (oldValue == newValue) {
-            return oldValue;
+        if (committed.value == newValue) {
+            return newValue;
         }
 
         AlphaProgrammaticReferenceTranlocal newTranlocal = new AlphaProgrammaticReferenceTranlocal(this);
@@ -306,7 +296,10 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
         AlphaProgrammaticReferenceTranlocal<E> oldTranlocal = (AlphaProgrammaticReferenceTranlocal<E>) ___load();
 
         long writeVersion = clock.tick();
-        ___storeUpdate(newTranlocal, writeVersion, true);
+        Listeners listeners = ___storeUpdate(newTranlocal, writeVersion, true);
+        if (listeners != null) {
+            listeners.openAll();
+        }
         return oldTranlocal.value;
     }
 
@@ -327,7 +320,7 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
         }
 
         AlphaProgrammaticReferenceTranlocal updateTranlocal = new AlphaProgrammaticReferenceTranlocal(this);
-        Transaction lockOwner = (Transaction) updateTranlocal;
+        Transaction lockOwner = updateTranlocal;
         updateTranlocal.value = update;
 
         //if we couldn't acquire the lock, we are done.
@@ -350,23 +343,6 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
         return true;
     }
 
-    // ======================== clear ========================================
-
-    @Override
-    public E clear() {
-        return set(null);
-    }
-
-    @Override
-    public E clear(Transaction tx) {
-        return set(tx, null);
-    }
-
-    @Override
-    public E atomicClear() {
-        return atomicSet(null);
-    }
-
     // ======================= toString =============================================
 
     @Override
@@ -387,9 +363,9 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
 
     private String toString(E value) {
         if (value == null) {
-            return "DefaultTransactionalReference(reference=null)";
+            return "AlphaProgrammaticReference(reference=null)";
         } else {
-            return format("DefaultTransactionalReference(reference=%s)", value);
+            return format("AlphaProgrammaticReference(reference=%s)", value);
         }
     }
 

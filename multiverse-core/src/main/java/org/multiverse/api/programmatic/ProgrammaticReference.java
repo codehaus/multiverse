@@ -8,9 +8,7 @@ import org.multiverse.api.TransactionFactory;
  * don't want to rely on instrumentation, but do want to have managed references.
  * <p/>
  * It provides a lot of methods and I don't think that exposing this method is
- * very wise. I would expect that some nice language sugar is added on top where
- * the method calls are translated to one or more methods on this
- * ProgrammaticReference.
+ * very wise. I would expect that some nice language sugar is added on top.
  * <p/>
  * If you also want to coordinate transactions without relying on instrumentation,
  * you need to have a look at the {@link org.multiverse.templates.TransactionTemplate}
@@ -38,60 +36,6 @@ import org.multiverse.api.TransactionFactory;
  * @author Peter Veentjer
  */
 public interface ProgrammaticReference<E> {
-
-    // =================== version ============================
-
-    /**
-     * Gets the version of the last committed tranlocal visible from the current transaction.
-     * If no active transaction is found, the {@link #atomicGetVersion()} is called instead
-     * (very very fast).
-     * <p/>
-     * If there is a using transaction, the transactional object will be added to the readset
-     * if the transaction is configured to do that.
-     * <p/>
-     * This functionality can be used for optimistic locking over multiple transactions.
-     *
-     * @return the version.
-     * @throws org.multiverse.api.exceptions.ReadConflict
-     *          if something fails while loading the reference.
-     */
-    long getVersion();
-
-    /**
-     * Gets the version of the last committed tranlocal visible from the current transaction.
-     * <p/>
-     * So it could be that other transaction have committed after the tx is started, it will not
-     * see these.
-     * <p/>
-     * This functionality can be used for optimistic locking over multiple transactions.
-     *
-     * @param tx the transaction used
-     * @return the version
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is not in the correct state for this operation.
-     * @throws NullPointerException if tx is null
-     * @throws org.multiverse.api.exceptions.ReadConflict
-     *                              if something fails while loading the reference.
-     */
-    long getVersion(Transaction tx);
-
-    /**
-     * Gets the version of the last commit without looking at a transaction. This call
-     * is very very fast since it doesn't need a transaction. See the {@link #atomicGet()}
-     * for more information.
-     * <p/>
-     * The only expensive thing that needs to be done is a single volatile read. So
-     * it is in the same league as a {@link java.util.concurrent.atomic.AtomicReference#get()}.
-     * To be more specific; it would have the same performance as
-     * {@link java.util.concurrent.atomic.AtomicReferenceFieldUpdater#get(Object)}
-     * since that is used under water.
-     * <p/>
-     * This functionality can be used for optimistic locking over multiple transactions.
-     *
-     * @return the version.
-     *         UncommittedReadConflict
-     */
-    long atomicGetVersion();
 
     // =================== get ============================
 
@@ -128,7 +72,7 @@ public interface ProgrammaticReference<E> {
      * Gets the value without looking at an existing transaction (it will run its 'own').
      * <p/>
      * This is a very cheap call since only one volatile read is needed an no additional
-     * objects are created. On my machine I'm able to do 150.000.000 getAtomics per second
+     * objects are created. On my machine I'm able to do 150.000.000 atomic gets per second
      * on a single thread to give some indication.
      * <p/>
      * The only expensive thing that needs to be done is a single volatile read. So it is in the same
@@ -179,7 +123,7 @@ public interface ProgrammaticReference<E> {
     E set(Transaction tx, E newValue);
 
     /**
-     * Sets the new value on this AlphaRef using its own transaction (so it doesn't
+     * Sets the new value on this ProgrammaticReference using its own transaction (so it doesn't
      * look at an existing transaction). This call is very fast (11M transactions/second
      * on my machine with a single thread.
      *
@@ -191,46 +135,6 @@ public interface ProgrammaticReference<E> {
      *          if something fails while loading the reference.
      */
     E atomicSet(E newValue);
-
-    // ============= clear ==================================
-
-    /**
-     * Clears the reference. It is the same as calling {@link #set(Object)} with a null value.
-     * <p/>
-     * If a Transaction already is running, it is used. Otherwise the call will be atomic
-     * (so executing in its own transaction).
-     *
-     * @return the old value.
-     * @throws org.multiverse.api.exceptions.ReadConflict
-     *          if something fails while loading the reference.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *          if the transaction is not usable for this operation. If the available transaction
-     *          is committed or aborted, the call will also be atomic.
-     */
-    E clear();
-
-    /**
-     * Clears the reference using the provided transaction.
-     *
-     * @param tx the transaction used.
-     * @return the old value.
-     * @throws org.multiverse.api.exceptions.ReadConflict
-     *                              if something fails while loading the reference.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction isn't in the correct state for this operation.
-     * @throws NullPointerException if tx is null
-     */
-    E clear(Transaction tx);
-
-    /**
-     * Clears the reference using its own transaction without looking at an existing transaction.
-     * It is the same as calling {@link #atomicSet(Object)} with a null value.
-     *
-     * @return the old value (can be null).
-     * @throws org.multiverse.api.exceptions.WriteConflict
-     *          if something failed while committing. If the commit fails, nothing bad will happen.
-     */
-    E atomicClear();
 
     // ======================= compareAndSet ========================
 
