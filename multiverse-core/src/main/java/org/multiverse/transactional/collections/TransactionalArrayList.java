@@ -29,7 +29,7 @@ public final class TransactionalArrayList<E> implements TransactionalList<E> {
 
     private TransactionalReferenceArray<E> array;
 
-    private final ProgrammaticLong size = sizeFactory.createLong(0);
+    private final ProgrammaticLong size = sizeFactory.atomicCreateLong(0);
 
     /**
      * Creates a new TransactionalArrayList with capacity 10. This is the same initial capacity as

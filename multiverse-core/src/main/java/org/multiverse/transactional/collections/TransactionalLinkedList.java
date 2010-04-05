@@ -87,7 +87,7 @@ public final class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> i
             throw new IllegalArgumentException("maxCapacity can't be smaller than 0");
         }
         this.maxCapacity = maxCapacity;
-        this.size = sizeFactory.createLong(0);
+        this.size = sizeFactory.atomicCreateLong(0);
     }
 
     @Override
@@ -700,8 +700,7 @@ public final class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> i
     @TransactionalMethod
     public void putLast(E e) throws InterruptedException {
         if (hasNoStorageCapacity()) {
-            //force load
-            size.get();
+            Node<E> readHead = tail;
             retry();
         }
 

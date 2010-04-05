@@ -33,7 +33,7 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
 
     private final Comparator<? super K> comparator;
 
-    private final ProgrammaticLong size = sizeFactory.createLong(0);
+    private final ProgrammaticLong size = sizeFactory.atomicCreateLong(0);
 
     private Node<K, V> root;
 

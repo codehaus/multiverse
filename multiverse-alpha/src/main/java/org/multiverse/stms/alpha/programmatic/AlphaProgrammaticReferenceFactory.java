@@ -4,8 +4,8 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.programmatic.ProgrammaticLong;
 import org.multiverse.api.programmatic.ProgrammaticReference;
 import org.multiverse.api.programmatic.ProgrammaticReferenceFactory;
+import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.utils.TodoException;
 
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
@@ -13,6 +13,15 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
  * @author Peter Veentjer
  */
 public final class AlphaProgrammaticReferenceFactory implements ProgrammaticReferenceFactory {
+
+    private final AlphaStm stm;
+
+    public AlphaProgrammaticReferenceFactory(AlphaStm stm) {
+        if (stm == null) {
+            throw new NullPointerException();
+        }
+        this.stm = stm;
+    }
 
     @Override
     public AlphaProgrammaticLong createLong(Transaction tx, long value) {
@@ -27,7 +36,7 @@ public final class AlphaProgrammaticReferenceFactory implements ProgrammaticRefe
 
     @Override
     public ProgrammaticLong atomicCreateLong(long value) {
-        throw new TodoException();
+        return new AlphaProgrammaticLong(stm, value);
     }
 
     @Override

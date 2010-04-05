@@ -95,9 +95,9 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         this.commitLockPolicy = config.commitLockPolicy;
         this.backoffPolicy = config.backoffPolicy;
         this.maxRetryCount = config.maxRetryCount;
-        this.referenceFactoryBuilder = new AlphaProgrammaticReferenceFactoryBuilder();
         this.clock = config.clock;
         this.quickReleaseWriteLocksEnabled = config.quickReleaseWriteLocksEnabled;
+        this.referenceFactoryBuilder = new AlphaProgrammaticReferenceFactoryBuilder(this);
 
         if (clock.getVersion() == 0) {
             clock.tick();

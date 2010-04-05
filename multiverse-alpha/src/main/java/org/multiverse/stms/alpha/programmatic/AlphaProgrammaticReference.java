@@ -296,10 +296,10 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
 
         //the AlphaProgrammaticReferenceTranlocal also implements the Transaction interface to prevent us
         //creating an additional objects even though we need an instance.
-        Transaction tx = newTranlocal;
+        Transaction lockOwner = newTranlocal;
 
         //if we couldn't acquire the lock, we are done.
-        if (!___tryLock(tx)) {
+        if (!___tryLock(lockOwner)) {
             throw createFailedToObtainCommitLocksException();
         }
 
@@ -312,19 +312,23 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
 
     @Override
     public boolean atomicCompareAndSet(E expected, E update) {
-        AlphaProgrammaticReferenceTranlocal<E> tranlocal = (AlphaProgrammaticReferenceTranlocal<E>) ___load();
+        AlphaProgrammaticReferenceTranlocal<E> committed = (AlphaProgrammaticReferenceTranlocal<E>) ___load();
 
-        if (tranlocal == null) {
+        if (committed == null) {
             throw new UncommittedReadConflict();
         }
 
-        if (tranlocal.value != expected) {
+        if (committed.value != expected) {
             return false;
         }
 
-        AlphaProgrammaticReferenceTranlocal newTranlocal = new AlphaProgrammaticReferenceTranlocal(this);
-        Transaction lockOwner = (Transaction) newTranlocal;
-        newTranlocal.value = update;
+        if (committed.value == update) {
+            return true;
+        }
+
+        AlphaProgrammaticReferenceTranlocal updateTranlocal = new AlphaProgrammaticReferenceTranlocal(this);
+        Transaction lockOwner = (Transaction) updateTranlocal;
+        updateTranlocal.value = update;
 
         //if we couldn't acquire the lock, we are done.
         if (!___tryLock(lockOwner)) {
@@ -339,7 +343,7 @@ public final class AlphaProgrammaticReference<E> extends DefaultTxObjectMixin im
         }
 
         long writeVersion = clock.tick();
-        Listeners listeners = ___storeUpdate(newTranlocal, writeVersion, true);
+        Listeners listeners = ___storeUpdate(updateTranlocal, writeVersion, true);
         if (listeners != null) {
             listeners.openAll();
         }

@@ -2,6 +2,7 @@ package org.multiverse.stms.alpha.programmatic;
 
 import org.multiverse.api.programmatic.ProgrammaticReferenceFactory;
 import org.multiverse.api.programmatic.ProgrammaticReferenceFactoryBuilder;
+import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.utils.TodoException;
 
 /**
@@ -11,6 +12,15 @@ import org.multiverse.utils.TodoException;
  */
 public final class AlphaProgrammaticReferenceFactoryBuilder
         implements ProgrammaticReferenceFactoryBuilder {
+
+    private final AlphaStm stm;
+
+    public AlphaProgrammaticReferenceFactoryBuilder(AlphaStm stm) {
+        if (stm == null) {
+            throw new NullPointerException();
+        }
+        this.stm = stm;
+    }
 
     @Override
     public ProgrammaticReferenceFactoryBuilder withAbaDetection(boolean enabled) {
@@ -24,6 +34,6 @@ public final class AlphaProgrammaticReferenceFactoryBuilder
 
     @Override
     public ProgrammaticReferenceFactory build() {
-        return new AlphaProgrammaticReferenceFactory();
+        return new AlphaProgrammaticReferenceFactory(stm);
     }
 }
