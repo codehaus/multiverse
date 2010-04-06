@@ -1,4 +1,4 @@
-package java;
+package ${package};
 
 import org.multiverse.annotations.TransactionalMethod;
 
@@ -17,12 +17,12 @@ public class TransferService {
 
     @TransactionalMethod
     public void transactionalTransfer(Account from, Account to, int sum){
-        from.set(from.get()-sum);
-        to.set(to.get()+sum);
+        from.set(from.get() - sum);
+        to.set(to.get() + sum);
     }
 
     public void nonTransactionalTransfer(Account from, Account to, int sum){
-        from.set(from.get()-sum);
-        to.set(to.get()+sum);
+        from.set(from.get() - sum);
+        to.set(to.get() + sum);
     }
 }

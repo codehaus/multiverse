@@ -21,7 +21,7 @@ public final class Account{
     }
 
     public void set(int newBalance) {
-        if(newBalance<0){
+        if(newBalance < 0){
              throw new IllegalArgumentException("An account can't have a negative balance");
         }
         this.balance = newBalance;

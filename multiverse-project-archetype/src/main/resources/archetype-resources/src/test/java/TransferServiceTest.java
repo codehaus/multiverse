@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 
-import java.TransferService;
+import ${package}.TransferService;
 
 /**
  * Unit tests for the {@link TransferService}.
