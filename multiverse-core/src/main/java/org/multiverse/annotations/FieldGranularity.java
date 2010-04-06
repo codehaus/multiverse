@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation that can be placed above a field to indicate that the stm should use a field level granularity
+ * Annotation that can be placed above a field to indicate that the STM should use a field level granularity
  * instead of object level granularity. If you have a transactional object with 2 mutable fields, 2
  * transactions could conflict even if they are writing to a different one. This reduce this 'unneeded'
  * failure, this annotation can be placed on fields.
