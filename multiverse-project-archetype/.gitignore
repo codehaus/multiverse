@@ -1,4 +1,5 @@
 /.settings
+/.classpath
 /target
 /.project
 /multiverse-project-archetype.iml
