@@ -16,11 +16,11 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
 
 /**
  * The cause of the dining philosophers problem is that the take of the left and right fork are not atomic. So it
- * could happen that all philosopers have their left fork, but won't getClassMetadata the right for because the philosopher sitting
+ * could happen that all philosophers have their left fork, but won't get the right for because the philosopher sitting
  * right to them has that fork.
  * <p/>
- * Within the MultiversionedStm both forks are aquired atomically (so a philosopher gets them both, or won't
- * getClassMetadata them at all).
+ * Within the MultiversionedStm both forks are acquired atomically (so a philosopher gets them both, or won't
+ * get them at all).
  *
  * @author Peter Veentjer.
  */
