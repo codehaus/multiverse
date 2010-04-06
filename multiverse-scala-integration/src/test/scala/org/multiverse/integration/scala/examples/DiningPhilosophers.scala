@@ -78,7 +78,7 @@ class DiningPhilosophers {
         }
 
         private def stuffHole() {
-            //simulate the eating
+            // simulate the eating
             Thread.sleep((Math.random * 50).asInstanceOf[Long])
             Thread.`yield`()
         }
@@ -92,16 +92,13 @@ class DiningPhilosophers {
     }
 }
 
-
 /*
  * The 'main' method can't be defined on the companion object - see bug 
  * http://lampsvn.epfl.ch/trac/scala/ticket/363.
  */ 
 object DiningPhilosophersRunner {
-    import org.multiverse.api.GlobalStmInstance
-    import org.multiverse.stms.alpha.AlphaStm
-    
-    def main(args: Array[String]) {
+
+  def main(args: Array[String]) {
         new DiningPhilosophers().run()
     }
 }
