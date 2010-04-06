@@ -102,9 +102,9 @@
         <module>multiverse-core</module>
         <module>multiverse-instrumentation</module>
         <module>multiverse-alpha</module>
-        <!-- module>multiverse-scala-integration</module -->
+        <module>multiverse-scala-integration</module>
         <module>multiverse-site</module>
-        <!-- module>multiverse-project-archetype</module -->
+        <module>multiverse-project-archetype</module>
     </modules>
 
     <build>
