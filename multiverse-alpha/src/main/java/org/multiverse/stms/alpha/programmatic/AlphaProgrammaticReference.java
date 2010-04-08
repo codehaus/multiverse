@@ -71,7 +71,7 @@ public final class AlphaProgrammaticReference<E>
             .setAutomaticReadTracking(true)
             .build();
 
-    private static final PrimitiveClock clock = ((AlphaStm) getGlobalStmInstance()).getClock();
+    private final PrimitiveClock clock;
 
     /**
      * Creates a new Ref with null as value. It has exactly the same {@link #AlphaProgrammaticReference(Object)}
@@ -84,6 +84,7 @@ public final class AlphaProgrammaticReference<E>
     }
 
     private AlphaProgrammaticReference(File file) {
+        this.clock = null;
     }
 
     /**
@@ -117,6 +118,7 @@ public final class AlphaProgrammaticReference<E>
     }
 
     public AlphaProgrammaticReference(AlphaStm stm, E value) {
+        this.clock = stm.getClock();
         long writeVersion = clock.getVersion();
         AlphaProgrammaticReferenceTranlocal<E> tranlocal = new AlphaProgrammaticReferenceTranlocal<E>(this);
         tranlocal.value = value;
@@ -124,6 +126,8 @@ public final class AlphaProgrammaticReference<E>
     }
 
     public AlphaProgrammaticReference(Transaction tx, E value) {
+        clock = ((AlphaStm) getGlobalStmInstance()).getClock();
+
         AlphaTransaction alphaTx = (AlphaTransaction) tx;
 
         if (tx == null || tx.getStatus().isDead()) {

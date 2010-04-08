@@ -1,6 +1,7 @@
 package org.multiverse.stms.alpha.instrumentation;
 
 import org.multiverse.instrumentation.asm.JSRInlineCompilePhase;
+import org.multiverse.instrumentation.compiler.PreventReinstrumentationCompilePhase;
 import org.multiverse.instrumentation.compiler.StandardClazzCompiler;
 import org.multiverse.stms.alpha.instrumentation.fieldaccess.NonTransactionalObjectFieldAccessCompilePhase;
 import org.multiverse.stms.alpha.instrumentation.fieldgranularity.FieldGranularityCompilePhase;
@@ -17,8 +18,9 @@ import org.multiverse.stms.alpha.instrumentation.transactionalobject.Transaction
 public class AlphaClazzCompiler extends StandardClazzCompiler {
 
     public AlphaClazzCompiler() {
-        super("AlphaClazzCompiler", "0.5-SNAPSHOT");
+        super("AlphaClazzCompiler", "0.5-SNAPSHOT", "AlphaStm");
 
+        add(new PreventReinstrumentationCompilePhase(this));
         add(new JSRInlineCompilePhase());
         add(new FieldGranularityCompilePhase());
         add(new TranlocalCompilePhase());

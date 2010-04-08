@@ -17,18 +17,26 @@ public interface ClazzCompiler {
      * purpuses.
      *
      * @return the name of this ClazzCompiler.
-     * @see #getVersion()
+     * @see #getCompilerVersion()
      */
-    String getName();
+    String getCompilerName();
 
     /**
      * Returns the version of this ClazzCompiler. Needed for identification and
      * logging purposes.
      *
      * @return the version of this ClazzCompiler.
-     * @see #getName()
+     * @see #getCompilerName()
      */
-    String getVersion();
+    String getCompilerVersion();
+
+    /**
+     * Returns the name of the Stm this ClazzCompiler is going to do the instrumentation
+     * for. It is purely used for debugging/logging purposes.
+     *
+     * @return the name of the Stm
+     */
+    String getStmName();
 
     /**
      * Sets the Filer for this ClazzCompiler. The Filer can be used to do callbacks for

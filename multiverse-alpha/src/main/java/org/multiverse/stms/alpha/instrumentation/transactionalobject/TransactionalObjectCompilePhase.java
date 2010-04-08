@@ -28,10 +28,11 @@ public class TransactionalObjectCompilePhase extends AbstractCompilePhase {
             return originalClazz;
         }
 
-        ClassNode mixin = loadAsClassNode(DefaultTxObjectMixin.class);
-        ClassNode original = loadAsClassNode(originalClazz.getBytecode());
+        ClassNode mixinClassNode = loadAsClassNode(DefaultTxObjectMixin.class);
+        ClassNode originalClassNode = loadAsClassNode(originalClazz.getBytecode());
+
         TransactionalObjectTransformer transformer = new TransactionalObjectTransformer(
-                originalClazz.getClassLoader(), original, mixin, environment.getMetadataRepository());
+                originalClazz.getClassLoader(), originalClassNode, mixinClassNode, environment.getMetadataRepository());
 
         ClassNode result = transformer.transform();
         return new Clazz(originalClazz, toBytecode(result));

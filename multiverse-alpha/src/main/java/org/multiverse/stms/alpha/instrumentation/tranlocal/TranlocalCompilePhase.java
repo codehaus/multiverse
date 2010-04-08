@@ -29,9 +29,10 @@ public class TranlocalCompilePhase extends AbstractCompilePhase {
             return originalClazz;
         }
 
-        ClassNode original = loadAsClassNode(originalClazz.getBytecode());
+        ClassNode originalClassNode = loadAsClassNode(originalClazz.getBytecode());
+
         TranlocalFactory transformer = new TranlocalFactory(
-                classLoader, original, environment.getMetadataRepository());
+                classLoader, originalClassNode, environment.getMetadataRepository());
         ClassNode result = transformer.create();
 
         Clazz tranlocalClazz = new Clazz(classMetadata.getTranlocalName());

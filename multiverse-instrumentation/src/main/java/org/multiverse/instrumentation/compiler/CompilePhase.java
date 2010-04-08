@@ -21,7 +21,9 @@ public interface CompilePhase {
      *
      * @param environment
      * @param originalClazz the originalClazz.
-     * @return the compiled clazz.
+     * @return the compiled clazz. Null means that following compile phases should
+     *         be skipped. This makes it possible to add control flow compile phases
+     *         (for example if the class already has been
      * @throws CompileException if something fails while doing the processing.
      */
     Clazz compile(Environment environment, Clazz originalClazz);

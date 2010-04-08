@@ -28,11 +28,12 @@ public class TransactionalMethodCompilePhase extends AbstractCompilePhase {
             return originalClazz;
         }
 
+        ClassNode original = loadAsClassNode(originalClazz.getBytecode());
+
         boolean restore = InsnList.check;
         InsnList.check = true;
         try {
 
-            ClassNode original = loadAsClassNode(originalClazz.getBytecode());
             ClassNode donor = loadAsClassNode(TransactionLogicDonor.class);
 
             ClassNode result;

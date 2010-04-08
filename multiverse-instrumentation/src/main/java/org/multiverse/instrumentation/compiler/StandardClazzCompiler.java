@@ -13,27 +13,29 @@ import java.util.List;
 public class StandardClazzCompiler implements ClazzCompiler {
 
     private final MetadataRepository metadataRepository = new MetadataRepository();
-    private final List<CompilePhase> compileSteps = new LinkedList<CompilePhase>();
-    private final String name;
-    private final String version;
+    private final List<CompilePhase> phases = new LinkedList<CompilePhase>();
+    private final String compilerName;
+    private final String compilerVersion;
     private Resolver resolver;
     private Filer filer;
     private boolean dumpBytecode;
     private File dumpDir;
 
     private Log log = new NullLog();
+    private final String stmName;
 
 
-    public StandardClazzCompiler(String name, String version) {
-        if (name == null || version == null) {
+    public StandardClazzCompiler(String compilerName, String compilerVersion, String stmName) {
+        if (compilerName == null || compilerVersion == null || stmName == null) {
             throw new NullPointerException();
         }
-        this.name = name;
-        this.version = version;
+        this.compilerName = compilerName;
+        this.compilerVersion = compilerVersion;
+        this.stmName = stmName;
     }
 
     protected final void add(CompilePhase phase) {
-        if (compileSteps == null) {
+        if (phases == null) {
             throw new NullPointerException();
         }
 
@@ -41,17 +43,21 @@ public class StandardClazzCompiler implements ClazzCompiler {
         //     logger.fine("Adding CompilerPhase: " + phase.getName());
         // }
 
-        compileSteps.add(phase);
+        phases.add(phase);
     }
 
     @Override
-    public String getName() {
-        return name;
+    public String getCompilerName() {
+        return compilerName;
     }
 
     @Override
-    public String getVersion() {
-        return version;
+    public String getCompilerVersion() {
+        return compilerVersion;
+    }
+
+    public String getStmName() {
+        return stmName;
     }
 
     @Override
@@ -115,9 +121,12 @@ public class StandardClazzCompiler implements ClazzCompiler {
 
         Environment env = new EnvironmentImpl();
         Clazz beforeClazz = originalClazz;
-        for (CompilePhase step : compileSteps) {
-            Clazz afterClazz = step.compile(env, beforeClazz);
-            dump(step, beforeClazz, afterClazz);
+        for (CompilePhase phase : phases) {
+            Clazz afterClazz = phase.compile(env, beforeClazz);
+            if (afterClazz == null) {
+                break;
+            }
+            dump(phase, beforeClazz, afterClazz);
             beforeClazz = afterClazz;
         }
 
@@ -197,6 +206,6 @@ public class StandardClazzCompiler implements ClazzCompiler {
 
     @Override
     public String toString() {
-        return name + "-" + version;
+        return compilerName + "-" + compilerVersion;
     }
 }

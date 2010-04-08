@@ -27,9 +27,12 @@ public class TranlocalSnapshotCompilePhase extends AbstractCompilePhase {
             return originalClazz;
         }
 
-        ClassNode original = loadAsClassNode(originalClazz.getBytecode());
+        ClassNode originalClassNode = loadAsClassNode(originalClazz.getBytecode());
+
         TranlocalSnapshotFactory factory = new TranlocalSnapshotFactory(
-                originalClazz.getClassLoader(), original, environment.getMetadataRepository());
+                originalClazz.getClassLoader(),
+                originalClassNode,
+                environment.getMetadataRepository());
 
         ClassNode result = factory.create();
 

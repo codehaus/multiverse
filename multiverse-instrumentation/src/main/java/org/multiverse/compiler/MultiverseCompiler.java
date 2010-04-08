@@ -1,8 +1,15 @@
 package org.multiverse.compiler;
 
-import org.apache.commons.cli.*;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import org.multiverse.instrumentation.asm.AsmUtils;
+import org.multiverse.instrumentation.compiler.Clazz;
 import org.multiverse.instrumentation.compiler.ClazzCompiler;
+import org.multiverse.instrumentation.compiler.FileSystemFiler;
+import org.multiverse.instrumentation.compiler.SystemOutLog;
+import org.objectweb.asm.tree.ClassNode;
 
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -21,35 +28,131 @@ import static java.lang.String.format;
  */
 public final class MultiverseCompiler {
 
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) {
         MultiverseCompiler multiverseCompiler = new MultiverseCompiler();
         multiverseCompiler.run(args);
     }
 
-    private void run(String[] args) throws ParseException {
-        System.out.println("Multiverse Compiler");
+    private ClassLoader compilerClassLoader;
 
-        Options options = createOptions();
-        CommandLineParser parser = new PosixParser();
-        CommandLine cmd = parser.parse(options, args);
+    private void run(String[] args) {
+        System.out.println("Initializing Multiverse Compiler");
 
-        ClazzCompiler compiler = createClazzCompiler("org.multiverse.alpha.instrumentation.AlphaClazzCompiler");
-        return;
+        OptionParser parser = new OptionParser();
+        parser.accepts("compiler")
+                .withRequiredArg()
+                .ofType(String.class)
+                .describedAs("The full class name of the ClazzCompiler to use");
+
+        parser.accepts("targetDirectory")
+                .withRequiredArg()
+                .ofType(String.class)
+                .describedAs("The path of the directory of classes to transform recursivly");
+
+        OptionSet options = parser.parse(args);
+
+        String clazzCompilerName = (String) options.valueOf("compiler");
+
+        ClazzCompiler compiler = createClazzCompiler(clazzCompilerName);
+        compiler.setLog(new SystemOutLog());
+
+        System.out.println("Using ClazzCompiler:" + compiler.getCompilerName() + " " + compiler.getCompilerVersion());
+
+        File targetDirectory = new File((String) options.valueOf("targetDirectory"));
+        compilerClassLoader = new MyClassLoader(targetDirectory, MultiverseCompiler.class.getClassLoader());
+
+        if (!targetDirectory.isDirectory()) {
+            String msg = format("Target directory '%s' is not a directory", targetDirectory);
+            throw new RuntimeException(msg);
+        }
+
+        compiler.setFiler(new FileSystemFiler(targetDirectory));
+
+        System.out.printf("Transforming classes in targetDirectory %s\n", targetDirectory);
+
+        recursiveApply(targetDirectory, compiler);
     }
 
+    public void recursiveApply(File directory, ClazzCompiler clazzCompiler) {
+        for (File file : directory.listFiles()) {
+            if (file.isDirectory()) {
+                recursiveApply(file, clazzCompiler);
+            } else if (file.getName().endsWith(".class")) {
+                transform(file, clazzCompiler);
+            }
+        }
+    }
 
-    public static Options createOptions() {
+    private void transform(File file, ClazzCompiler clazzCompiler) {
+        Clazz clazz = load(file);
+        Clazz result = clazzCompiler.process(clazz);
+        write(file, result);
+    }
 
-        // createReference Options object
-        Options options = new Options();
-        //options.addOption(new Option())
+    private Clazz load(File file) {
+        ClassNode node = AsmUtils.loadAsClassNode(file);
 
-        // add t option
-        options.addOption("compiler", true, "display current time");
-        options.addOption("verbose", false, "Outputting verbose logging information");
-        options.addOption("dumpbytecode", false, "Outputting transformed class files and intermediate states for debugging purposes");
+        Clazz clazz = new Clazz(node.name);
+        clazz.setBytecode(AsmUtils.toBytecode(node));
+        clazz.setClassLoader(compilerClassLoader);
+        return clazz;
+    }
 
-        return options;
+    class MyClassLoader extends ClassLoader {
+        private final File rootDirectory;
+
+        protected MyClassLoader(File rootDirectory, ClassLoader parent) {
+            super(parent);
+            this.rootDirectory = rootDirectory;
+        }
+
+        public Class findClass(String className) throws ClassNotFoundException {
+            String filename = className.replace('.', '/') + ".class";
+            File file = new File(rootDirectory, filename);
+
+            if (!file.exists()) {
+                return super.findClass(className);
+            }
+
+            ClassNode node = AsmUtils.loadAsClassNode(file);
+            byte[] bytecode = AsmUtils.toBytecode(node);
+            return defineClass(className, bytecode, 0, bytecode.length, null);
+        }
+
+        public InputStream getResourceAsStream(String resource) {
+            int indexOfLastDot = resource.lastIndexOf(".");
+            String filename;
+            if (indexOfLastDot == -1) {
+                filename = resource;
+            } else {
+                String begin = resource.substring(0, indexOfLastDot).replace('.', '/');
+                String end = resource.substring(indexOfLastDot);
+                filename = begin + end;
+            }
+            File file = new File(rootDirectory, filename);
+
+            if (file.exists()) {
+                try {
+                    return new FileInputStream(file);
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            return super.getResourceAsStream(resource);
+        }
+    }
+
+    public void write(File file, Clazz clazz) {
+        System.out.println("Writing file: " + file);
+
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            out.write(clazz.getBytecode());
+            out.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static ClazzCompiler createClazzCompiler(String compilerClassName) {
@@ -79,6 +182,9 @@ public final class MultiverseCompiler {
     }
 
     private static Constructor getMethod(String className) {
+        if (className == null) {
+            throw new NullPointerException();
+        }
         Class compilerClazz;
         try {
             compilerClazz = MultiverseCompiler.class.getClassLoader().loadClass(className);

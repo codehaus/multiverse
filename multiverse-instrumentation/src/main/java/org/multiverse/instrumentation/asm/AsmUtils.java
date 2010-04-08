@@ -21,6 +21,7 @@ import static org.objectweb.asm.Type.*;
 
 public final class AsmUtils implements Opcodes {
 
+
     public static LocalVariableNode findThisVariable(MethodNode methodNode) {
         if (methodNode.localVariables == null) {
             return null;
@@ -294,6 +295,40 @@ public final class AsmUtils implements Opcodes {
         }
     }
 
+    /**
+     * Loads a Class as ClassNode.
+     * <p/>
+     * todo: code of this method is very nasty with closing streams.
+     *
+     * @return the loaded ClassNode.
+     */
+    public static ClassNode loadAsClassNode(File file) {
+
+        try {
+            InputStream is = new FileInputStream(file);
+
+            ClassNode classNode = new ClassNode();
+            ClassReader reader = new ClassReader(is);
+            reader.accept(classNode, ClassReader.EXPAND_FRAMES);
+            return classNode;
+        } catch (IOException e) {
+            throw new RuntimeException("A problem ocurred while loading class: " + file, e);
+        }
+    }
+
+    public static byte[] loadAsBytecode(File file) {
+
+        try {
+            InputStream is = new FileInputStream(file);
+            ClassNode classNode = new ClassNode();
+            ClassReader reader = new ClassReader(is);
+            reader.accept(classNode, ClassReader.EXPAND_FRAMES);
+            return toBytecode(classNode);
+        } catch (IOException e) {
+            throw new RuntimeException("A problem ocurred while loading class: " + file, e);
+        }
+    }
+
 
     /**
      * Checks if a ClassNode has the specified visible annotation.
@@ -320,6 +355,22 @@ public final class AsmUtils implements Opcodes {
         for (AnnotationNode node : (List<AnnotationNode>) memberNode.visibleAnnotations) {
             if (annotationClassDescriptor.equals(node.desc)) {
                 return node;
+            }
+        }
+
+        return null;
+    }
+
+    public static Object getAnnotationValue(AnnotationNode annotationNode, String valueName) {
+        List values = annotationNode.values;
+
+        if (values == null) {
+            return null;
+        }
+
+        for (int k = 0; k < values.size(); k += 2) {
+            if (values.get(k).equals(valueName)) {
+                return values.get(k + 1);
             }
         }
 
@@ -420,7 +471,7 @@ public final class AsmUtils implements Opcodes {
         return cw.toByteArray();
     }
 
-     public static String getTmpDir() {
+    public static String getTmpDir() {
         return System.getProperty("java.io.tmpdir");
     }
 

@@ -19,21 +19,23 @@ public class FieldGranularityCompilePhase extends AbstractCompilePhase {
     }
 
     @Override
-    protected Clazz doCompile(Environment environment, Clazz clazz) {
-        ClassNode original = loadAsClassNode(clazz.getBytecode());
-
+    protected Clazz doCompile(Environment environment, Clazz originalClazz) {
         ClassMetadata metadata = environment.getMetadataRepository().loadClassMetadata(
-                clazz.getClassLoader(), clazz.getName());
+                originalClazz.getClassLoader(), originalClazz.getName());
 
-        if(!metadata.hasFieldsWithFieldGranularity()){
-            return clazz;
+        if (!metadata.hasFieldsWithFieldGranularity()) {
+            return originalClazz;
         }
 
+        ClassNode originalNode = loadAsClassNode(originalClazz.getBytecode());
+
         FieldGranularityTransformer transformer = new FieldGranularityTransformer(
-                clazz.getClassLoader(), original, environment.getMetadataRepository());
+                originalClazz.getClassLoader(),
+                originalNode,
+                environment.getMetadataRepository());
 
         ClassNode transformed = transformer.transform();
 
-        return new Clazz(clazz, toBytecode(transformed));
+        return new Clazz(originalClazz, toBytecode(transformed));
     }
 }

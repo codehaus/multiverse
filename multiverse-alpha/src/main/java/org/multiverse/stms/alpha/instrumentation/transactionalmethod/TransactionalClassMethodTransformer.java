@@ -848,14 +848,17 @@ public class TransactionalClassMethodTransformer implements Opcodes {
         //createReference local variable for the 'this' if needed.
         if (!isStatic(originalMethod)) {
             LocalVariableNode originalThis = findThisVariable(originalMethod);
+            if (originalThis == null) {
+
+            }
 
             LocalVariableNode clonedThis = new LocalVariableNode(
-                    originalThis.name,
-                    originalThis.desc,
-                    originalThis.signature,
+                    "this",
+                    AsmUtils.internalToDesc(classNode.name),
+                    null,
                     startScope,
                     endScope,
-                    originalThis.index);
+                    0);
             result.localVariables.add(clonedThis);
             var++;
         }

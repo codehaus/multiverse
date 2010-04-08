@@ -87,6 +87,14 @@
             <name>Codehaus Maven Repository</name>
             <url>http://repository.codehaus.org</url>
         </repository>
+        <repository>
+            <id>ibiblio</id>
+            <url>http://www.ibiblio.org/maven</url>
+        </repository>
+        <repository>
+            <id>sourceforge</id>
+            <url>http://maven-plugins.sourceforge.net/repository</url>
+        </repository>
     </repositories>
 
     <pluginRepositories>

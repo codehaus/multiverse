@@ -35,7 +35,7 @@ import static org.multiverse.instrumentation.asm.AsmUtils.*;
  * An instance should not be reused.
  * <p/>
  * The constructor of the donor is not copied. So what out with relying on a constructor
- *  in the donor.
+ * in the donor.
  *
  * @author Peter Veentjer
  */
@@ -53,6 +53,8 @@ public class TransactionalObjectTransformer implements Opcodes {
     }
 
     public ClassNode transform() {
+
+
         ensureNoProblems();
 
         removeManagedFields();
