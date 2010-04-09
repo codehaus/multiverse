@@ -15,8 +15,9 @@ public class MultiverseCompilerArguments {
     public boolean verbose;
 
     @Argument(required = true, index = 0, metaVar = "COMPILER",
-            usage = "the org.multiverse.instrumentation.compiler.ClazzCompiler to use")
-    public String compilerName;
+            usage = "the org.multiverse.instrumentation.Instrumentor to use " +
+                    "(most likely org.multiverse.stms.alpha.instrumentation.AlphaInstrumentor).")
+    public String instrumentorName;
 
     @Argument(required = true, index = 1, metaVar = "TARGET_DIRECTORY",
             usage = "target directory with the classes to transform")

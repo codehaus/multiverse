@@ -5,7 +5,7 @@ package org.multiverse.instrumentation;
  */
 public @interface Instrumented {
 
-    String compilerName();
+    String instrumentorName();
 
-    String compilerVersion();
+    String instrumentorVersion();
 }

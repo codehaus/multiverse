@@ -81,7 +81,9 @@ threads, so the whole mechanism should be made thread safe.
     - integration test of the compiler in combination with
       the java agent.
 
-    - make sure that the multiverse jars are pre-instrumented  
+    + make sure that the multiverse jars are pre-instrumented
+
+    - instrumented jar test
 
 - AlphaProgrammaticReferenceFactory.atomicCreateLong
 

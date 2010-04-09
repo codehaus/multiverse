@@ -1,13 +1,13 @@
-package org.multiverse.instrumentation.compiler;
+package org.multiverse.instrumentation;
 
 /**
  * @author Peter Veentjer
  */
-public abstract class AbstractCompilePhase implements CompilePhase {
+public abstract class AbstractInstrumentationPhase implements InstrumentationPhase {
 
     private final String name;
 
-    public AbstractCompilePhase(String name) {
+    public AbstractInstrumentationPhase(String name) {
         if (name == null) {
             throw new NullPointerException();
         }
@@ -20,14 +20,14 @@ public abstract class AbstractCompilePhase implements CompilePhase {
     }
 
     @Override
-    public Clazz compile(Environment environment, Clazz originalClazz) {
+    public Clazz instrument(Environment environment, Clazz originalClazz) {
         Log log = environment.getLog();
 
         log.important("%s: transforming class %s", name, originalClazz.getName());
 
         doInit();
 
-        return doCompile(environment, originalClazz);
+        return doInstrument(environment, originalClazz);
     }
 
     @Override
@@ -38,5 +38,5 @@ public abstract class AbstractCompilePhase implements CompilePhase {
     protected void doInit() {
     }
 
-    protected abstract Clazz doCompile(Environment environment, Clazz clazz);
+    protected abstract Clazz doInstrument(Environment environment, Clazz clazz);
 }

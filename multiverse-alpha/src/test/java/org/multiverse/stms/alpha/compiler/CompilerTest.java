@@ -19,7 +19,7 @@ public class CompilerTest {
     public void test() {
         MultiverseCompiler.main(new String[]{
                 "-compiler",
-                "org.multiverse.stms.alpha.instrumentation.AlphaClazzCompiler",
+                "org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor",
                 "-targetDirectory",
                 "/tmp/classes"
         });
