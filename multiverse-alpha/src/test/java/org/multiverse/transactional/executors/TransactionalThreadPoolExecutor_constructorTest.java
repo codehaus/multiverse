@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.transactional.collections.TransactionalLinkedList;
 
+import java.util.concurrent.BlockingQueue;
+
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.transactional.executors.TransactionalThreadPoolExecutorTestUtils.assertIsUnstarted;
@@ -11,8 +13,8 @@ import static org.multiverse.transactional.executors.TransactionalThreadPoolExec
 public class TransactionalThreadPoolExecutor_constructorTest {
 
     @Before
-    public void setUp(){
-           clearThreadLocalTransaction();
+    public void setUp() {
+        clearThreadLocalTransaction();
     }
 
     @Test
@@ -24,7 +26,7 @@ public class TransactionalThreadPoolExecutor_constructorTest {
 
     @Test(expected = NullPointerException.class)
     public void withWorkQueue_whenWorkQueueNull_thenNullPointerException() {
-        new TransactionalThreadPoolExecutor(null);
+        new TransactionalThreadPoolExecutor((BlockingQueue<Runnable>) null);
     }
 
     @Test

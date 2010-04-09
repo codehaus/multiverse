@@ -32,10 +32,6 @@ public class NonTransactionalMethodFieldAccessTransformer implements Opcodes {
     }
 
     public ClassNode transform() {
-        if (classMetadata.isIgnoredClass()) {
-            return null;
-        }
-
         fixMethods();
         return classNode;
     }
@@ -54,14 +50,15 @@ public class NonTransactionalMethodFieldAccessTransformer implements Opcodes {
     private MethodNode fixMethod(MethodNode methodNode) {
         MethodMetadata methodMetadata = classMetadata.getMethodMetadata(methodNode.name, methodNode.desc);
 
-        if (methodMetadata == null ||
-                methodMetadata.isAbstract() ||
-                methodMetadata.isNative() ||
-                methodMetadata.isTransactional()) {
+        if (methodMetadata == null
+                || methodMetadata.isAbstract()
+                || methodMetadata.isNative()
+                || methodMetadata.isTransactional()) {
             return methodNode;
         }
 
         MethodNode fixedMethod = new MethodNode();
+        fixedMethod.signature = methodNode.signature;
         fixedMethod.access = methodNode.access;
         fixedMethod.localVariables = new LinkedList();
         fixedMethod.name = methodNode.name;
@@ -70,7 +67,6 @@ public class NonTransactionalMethodFieldAccessTransformer implements Opcodes {
         fixedMethod.tryCatchBlocks = new LinkedList();//originalMethod.tryCatchBlocks;
 
         methodNode.accept(new NonTransactionalMethodFieldAccessMethodAdapter(classLoader, fixedMethod, metadataRepository));
-
         return fixedMethod;
     }
 }

@@ -58,6 +58,8 @@ public class PreventReinstrumentationCompilePhase extends AbstractCompilePhase {
         if (instrumentedAnnotationNode != null) {
             ensureCorrectClazzCompiler(instrumentedAnnotationNode, original);
 
+            environment.getLog().lessImportant("%s already is instrumented", originalClazz.getName());
+
             //null indicates that the other compile phases should not be
             //executed anymore.
             return null;

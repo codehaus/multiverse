@@ -70,6 +70,19 @@ threads, so the whole mechanism should be made thread safe.
 
 - static compilation
 
+    + basic instrumentation up and running
+
+    + prevention/detection conflicting compiler usage
+
+    - maven plugin for the compiler
+
+    - integration tests for the compiler
+
+    - integration test of the compiler in combination with
+      the java agent.
+
+    - make sure that the multiverse jars are pre-instrumented  
+
 - AlphaProgrammaticReferenceFactory.atomicCreateLong
 
 - AlphaProgrammaticReferenceFactory.atomicCreateReference

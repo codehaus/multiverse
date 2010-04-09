@@ -19,7 +19,7 @@ public class StandardClazzCompiler implements ClazzCompiler {
     private Resolver resolver;
     private Filer filer;
     private boolean dumpBytecode;
-    private File dumpDir;
+    private File dumpDir = new File(System.getProperty("java.io.tmpdir"));
 
     private Log log = new NullLog();
     private final String stmName;
@@ -86,6 +86,10 @@ public class StandardClazzCompiler implements ClazzCompiler {
 
     @Override
     public void setDumpDirectory(File dumpDirectory) {
+        if (dumpDirectory == null) {
+            throw new NullPointerException();
+        }
+
         this.dumpDir = dumpDirectory;
     }
 

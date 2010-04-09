@@ -21,6 +21,7 @@
     <properties>
         <multiverse.agentname>test-javaagent</multiverse.agentname>
         <multiverse.agentclass>org.multiverse.javaagent.MultiverseJavaAgent</multiverse.agentclass>
+        <multiverse.compiler>org.multiverse.stms.alpha.instrumentation.AlphaClazzCompiler</multiverse.compiler>
     </properties>
 
     <build>
@@ -48,15 +49,76 @@
                 </executions>
             </plugin>
 
+            <!-- unpacks the dependant jars in the target/classes directory -->
             <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
                 <groupId>org.apache.maven.plugins</groupId>
-                <configuration>
-                    <argLine>-javaagent:${project.build.directory}/${multiverse.agentname}.jar</argLine>
-                </configuration>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-dependencies</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                            <excludeGroupIds>junit,org.mockito,com.google.code.gson</excludeGroupIds>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
-            <!-- plugin>
+            <!-- 'preinstruments' the transactional classes so multiverse-asm library can
+        be used without instrumentation -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+                    <!-- responsible for transforming target/classes-->
+                    <execution>
+                        <id>fixed normal classes</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.multiverse.compiler.MultiverseCompiler</mainClass>
+                            <arguments>
+                                <argument>-d</argument>
+                                <!--argument>-v</argument -->
+                                <argument>${multiverse.compiler}</argument>
+                                <argument>${build.directory}/classes</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <!-- responsible for transforming target/test-classes-->
+                    <execution>
+                        <id>fixed test classes</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.multiverse.compiler.MultiverseCompiler</mainClass>
+                            <arguments>
+                                <!-- argument>-classpath</argument -->
+                                <!-- argument>
+                                    <classpath/>
+                                </argument -->
+                                <argument>-d</argument>
+                                <!--argument>-v</argument -->
+                                <argument>${multiverse.compiler}</argument>
+                                <argument>${build.directory}/test-classes</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+
+            </plugin>
+
+            <!-- creates the jar -->
+            <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
@@ -68,36 +130,15 @@
                 <executions>
                     <execution>
                         <id>jar</id>
+                        <phase>package</phase>
                         <goals>
                             <goal>jar</goal>
                         </goals>
                     </execution>
                 </executions>
-            </plugin -->
-
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <appendAssemblyId>false</appendAssemblyId>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <archive>
-                        <manifestEntries>
-                            <Premain-Class>${multiverse.agentclass}</Premain-Class>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
             </plugin>
-            <!-- plugin that integrates the fieldaccess library in the alpha library-->
+
+            <!-- plugin that integrates the asm library in the big fat jar-->
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
@@ -109,8 +150,15 @@
                         <configuration>
                             <tasks>
                                 <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"/>
-                                <jarjar destfile="${build.directory}/${artifactId}-${version}.jar" update="true">
-                                    <rule pattern="org.objectweb.asm.**" result="${groupId}.repackaged.@0"/>
+                                <jarjar destfile="${build.directory}/${artifactId}-${version}.jar"
+                                        update="true">
+                                    <rule pattern="org.objectweb.asm.**"
+                                          result="${groupId}.repackaged.@0"/>
+                                </jarjar>
+                                <jarjar destfile="${build.directory}/${artifactId}-${version}.jar"
+                                        update="true">
+                                    <rule pattern="org.kohsuke.args4j.**"
+                                          result="${groupId}.repackaged.@0"/>
                                 </jarjar>
                             </tasks>
                         </configuration>
@@ -125,6 +173,13 @@
                 </dependencies>
             </plugin>
         </plugins>
+
+        <resources>
+            <resource>
+                <directory>${basedir}/target/classes</directory>
+            </resource>
+        </resources>
+
     </build>
 
     <dependencies>
@@ -173,11 +228,11 @@
         </dependency>
 
         <dependency>
-            <groupId>net.sf.jopt-simple</groupId>
-            <artifactId>jopt-simple</artifactId>
-            <version>3.2</version>
+            <groupId>args4j</groupId>
+            <artifactId>args4j</artifactId>
+            <version>${args4j.version}</version>
+            <scope>provided</scope>
         </dependency>
-
 
         <!-- ASM dependencies -->
         <dependency>
@@ -206,6 +261,7 @@
             <version>${asm.version}</version>
         </dependency>
     </dependencies>
+
 
     <profiles>
         <profile>

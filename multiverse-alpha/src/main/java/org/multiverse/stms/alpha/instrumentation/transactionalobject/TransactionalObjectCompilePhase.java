@@ -25,9 +25,11 @@ public class TransactionalObjectCompilePhase extends AbstractCompilePhase {
                 originalClazz.getClassLoader(), originalClazz.getName());
 
         if (!classMetadata.isRealTransactionalObject()) {
+            environment.getLog().lessImportant("%s is not a real transactional object", originalClazz.getName());
             return originalClazz;
         }
 
+        environment.getLog().lessImportant("%s is a real transactional object", originalClazz.getName());
         ClassNode mixinClassNode = loadAsClassNode(DefaultTxObjectMixin.class);
         ClassNode originalClassNode = loadAsClassNode(originalClazz.getBytecode());
 

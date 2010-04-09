@@ -284,7 +284,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
         result.name = "<init>";
         result.access = methodNode.access;//todo: synthetic needs to be added
         result.desc = createTransactionMethodDesc(methodNode.desc);
-        result.signature = methodNode.signature;
+        //result.signature = methodNode.signature;
         result.exceptions = methodNode.exceptions;
         result.localVariables = cloneVariableTableForLogicMethod(methodNode, cloneMap, startLabelNode, endLabelNode);
         result.tryCatchBlocks = cloneTryCatchBlocks(methodNode, cloneMap);
@@ -337,6 +337,8 @@ public class TransactionalClassMethodTransformer implements Opcodes {
         transactionMethod.access = methodNode.access;//todo: should be made synthetic.
         transactionMethod.name = methodNode.name;
         transactionMethod.exceptions = methodNode.exceptions;
+        //todo: correct signature should be used here
+        //transactionMethod.signature = methodNode.signature;
         transactionMethod.desc = createTransactionMethodDesc(methodNode.desc);
         return transactionMethod;
     }
@@ -353,7 +355,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
         result.name = methodNode.name;
         result.access = methodNode.access;//todo: synthetic needs to be added
         result.desc = createTransactionMethodDesc(methodNode.desc);
-        result.signature = methodNode.signature;
+        //result.signature = methodNode.signature;
         result.exceptions = methodNode.exceptions;
 
         //todo: no clone
@@ -517,7 +519,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
         result.name = methodNode.name;
         result.access = methodNode.access;//todo: synthetic needs to be added
         result.desc = createTranlocalMethodDesc(methodNode.name, methodNode.desc);
-        result.signature = methodNode.signature;
+        //result.signature = methodNode.signature;
         result.exceptions = methodNode.exceptions;
         result.localVariables = cloneVariableTableForLogicMethod(methodNode, cloneMap, startLabelNode, endLabelNode);
         result.tryCatchBlocks = cloneTryCatchBlocks(methodNode, cloneMap);
@@ -754,7 +756,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
             LocalVariableNode tranlocalVar = new LocalVariableNode(
                     "tranlocalThis",
                     internalToDesc(tranlocalName),
-                    null,
+                    null,     //todo: signature
                     startLabelNode,
                     endLabelNode,
                     tranlocalVarIndex);
@@ -847,15 +849,10 @@ public class TransactionalClassMethodTransformer implements Opcodes {
 
         //createReference local variable for the 'this' if needed.
         if (!isStatic(originalMethod)) {
-            LocalVariableNode originalThis = findThisVariable(originalMethod);
-            if (originalThis == null) {
-
-            }
-
             LocalVariableNode clonedThis = new LocalVariableNode(
                     "this",
                     AsmUtils.internalToDesc(classNode.name),
-                    null,
+                    null, //todo: signature
                     startScope,
                     endScope,
                     0);
@@ -868,7 +865,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
             LocalVariableNode clonedVar = new LocalVariableNode(
                     "arg" + result.localVariables.size(),
                     argType.getDescriptor(),
-                    null,
+                    null, //todo: signature
                     startScope,
                     endScope,
                     var);
@@ -902,7 +899,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
             resultVariable = new LocalVariableNode(
                     "result",
                     returnType.getDescriptor(),
-                    null,
+                    null, //todo: signature
                     startScope,
                     endScope,
                     var);
