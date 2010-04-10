@@ -58,7 +58,7 @@ public class ReadonlyTransactionTest {
         assertEquals(version, stm.getVersion());
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTracking = true)
+    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
     public static void executeTrackingReadonlyMethod(DefaultTransactionalReference<Integer> ref, int expectedValue) {
         int found = ref.get();
         assertEquals(expectedValue, found);
@@ -80,7 +80,7 @@ public class ReadonlyTransactionTest {
         assertEquals(0, (int) ref.get());
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTracking = false)
+    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = false)
     public static void nonTrackingReadonlyMethodThatUpdates(DefaultTransactionalReference<Integer> ref) {
         ref.set(1);
     }
@@ -101,7 +101,7 @@ public class ReadonlyTransactionTest {
         assertEquals(0, (int) ref.get());
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTracking = false)
+    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = false)
     public static void trackingReadonlyMethodThatUpdates(DefaultTransactionalReference<Integer> ref) {
         ref.set(1);
     }

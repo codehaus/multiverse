@@ -24,7 +24,7 @@ public class IntStackPerformanceStressTest {
         setThreadLocalTransaction(null);
         txFactory = stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
-                .setAutomaticReadTracking(false)
+                .setAutomaticReadTrackingEnabled(false)
                 .build();
     }
 

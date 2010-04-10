@@ -5,7 +5,7 @@ import java.io.File;
 /**
  * The Instrumentor is responsible transforming a Clazz.
  * <p/>
- * The same clazzCompiler can be used for compiletime instrumentation and loadtime instrumentation,
+ * The same Instrumentor can be used for compiletime instrumentation and loadtime instrumentation,
  * so no worries about that anymore.
  *
  * @author Peter Veentjer
@@ -62,7 +62,7 @@ public interface Instrumentor {
      * Sets the location of this Instrumentor. The default is the tmp directory so
      * in most cases you don't need to worry about this property.
      *
-     * @param dumpDirectory
+     * @param dumpDirectory the directory to write the dumped classfiles to.
      */
     void setDumpDirectory(File dumpDirectory);
 

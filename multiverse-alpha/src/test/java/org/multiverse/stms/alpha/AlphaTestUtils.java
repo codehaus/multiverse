@@ -7,7 +7,7 @@ public class AlphaTestUtils {
     public static AlphaTransaction startTrackingUpdateTransaction(AlphaStm stm) {
         return stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
-                .setAutomaticReadTracking(true)
+                .setAutomaticReadTrackingEnabled(true)
                 .build()
                 .start();
     }

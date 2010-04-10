@@ -27,27 +27,6 @@
         <plugins>
             <!-- A plugin that creates alphaagent.jar so that the unit tests can be executed using the agent.
               This is done by creating a alphaagent.jar using the JAR plugin during the generate-test-resources phase. -->
-            <!-- plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>generate-test-javaagent</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <finalName>${multiverse.agentname}</finalName>
-                            <archive>
-                                <manifestEntries>
-                                    <Premain-Class>${multiverse.agentclass}</Premain-Class>
-                                </manifestEntries>
-                            </archive >
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin -->
-
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
@@ -74,7 +53,6 @@
                     </execution>
                 </executions>
             </plugin>
-
 
             <!-- unpacks the dependant jars in the target/classes directory -->
             <plugin>
@@ -165,7 +143,7 @@
                 </executions>
             </plugin>
 
-            <!-- plugin that integrates the asm/args4j library in the big fat jar-->
+            <!-- plugin that integrates the asm/args4j libraries to create big fat jar-->
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
@@ -303,35 +281,6 @@
                             <argLine>-Xmx256m</argLine>
                             <forkMode>once</forkMode>
                         </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>compile jar for ide</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>compile</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <tasks>
-                                        <echo message="foo"/>
-                                        <jar destfile="${project.build.directory}/${multiverse.agentname}.jar"
-                                             basedir="${project.build.directory}/classes">
-                                            <manifest>
-                                                <attribute name="Premain-class" value="${multiverse.agentclass}"/>
-                                            </manifest>
-                                        </jar>
-                                    </tasks>
-                                </configuration>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>

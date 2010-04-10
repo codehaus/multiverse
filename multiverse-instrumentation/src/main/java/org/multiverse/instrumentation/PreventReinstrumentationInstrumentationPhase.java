@@ -36,15 +36,16 @@ public class PreventReinstrumentationInstrumentationPhase extends AbstractInstru
     /**
      * Creates a new PreventReinstrumentationInstrumentationPhase.
      *
-     * @param compiler the Instrumentor that is going to compile the classes.
-     * @throws NullPointerException if clazzCompiler is null.
+     * @param instrumentor the Instrumentor that is going to compile the classes.
+     * @throws NullPointerException if instrumentor is null.
      */
-    public PreventReinstrumentationInstrumentationPhase(Instrumentor compiler) {
+    public PreventReinstrumentationInstrumentationPhase(Instrumentor instrumentor) {
         super("PreventReinstrumentationInstrumentationPhase");
-        if (compiler == null) {
+
+        if (instrumentor == null) {
             throw new NullPointerException();
         }
-        this.compiler = compiler;
+        this.compiler = instrumentor;
     }
 
     @Override
@@ -91,13 +92,14 @@ public class PreventReinstrumentationInstrumentationPhase extends AbstractInstru
         if (!compiler.getInstrumentorVersion().equals(foundCompilerVersion)) {
             String msg = format("Failed to instrument already instrumented class '%s'. " +
                     "The new compiler version '%s' does not match the previous compiler version. '%s'." +
-                    "And b ecause the instrumentation process is not backwards compatible, this" +
-                    "class can't be used " +
-                    "and therefor can't be used in combination with the current Stm. " +
+                    "And because the instrumentation process is not backwards compatible, this" +
+                    "class can't be used with the current Stm. " +
                     "The Multiverse instrumentation process is not backwards compatible. " +
                     "To solve the problem you need to delete the classes and reinstrument " +
-                    "them with this compiler.to solve the problem.",
-                    original.name, compiler.getInstrumentorVersion(), foundCompilerVersion);
+                    "them with this compiler %s.%s to solve the problem.",
+                    original.name, compiler.getInstrumentorVersion(),
+                    foundCompilerVersion, compiler.getInstrumentorName(),
+                    compiler.getInstrumentorVersion());
             throw new CompileException(msg);
         }
     }

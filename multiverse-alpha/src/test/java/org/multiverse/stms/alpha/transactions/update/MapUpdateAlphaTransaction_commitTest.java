@@ -39,7 +39,7 @@ public class MapUpdateAlphaTransaction_commitTest {
 
     public MapUpdateAlphaTransaction startSutTransactionWithAllowingWriteSkewProblem(boolean allowWriteSkewProblem) {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
-                .withAllowWriteSkewProblem(allowWriteSkewProblem);
+                .withWriteSkewProblemAllowed(allowWriteSkewProblem);
 
         return new MapUpdateAlphaTransaction(config);
     }

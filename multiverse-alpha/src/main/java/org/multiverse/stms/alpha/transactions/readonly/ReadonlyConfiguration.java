@@ -13,30 +13,31 @@ public final class ReadonlyConfiguration extends AbstractTransactionConfiguratio
 
     public final SpeculativeConfiguration speculativeConfig;
 
-    public ReadonlyConfiguration(PrimitiveClock clock) {
+    public ReadonlyConfiguration(PrimitiveClock clock, boolean retryEnabled) {
         this(clock, ExponentialBackoffPolicy.INSTANCE_10_MS_MAX, null, new SpeculativeConfiguration(100), 1000,
-                true, true);
+                true, retryEnabled, retryEnabled);
     }
 
     public ReadonlyConfiguration(
             PrimitiveClock clock, BackoffPolicy backoffPolicy,
             String familyName, SpeculativeConfiguration speculativeConfig, int maxRetryCount,
-            boolean interruptible, boolean automaticReadTracking) {
+            boolean interruptible, boolean automaticReadTracking, boolean explicitRetryAllowed) {
 
         super(clock, backoffPolicy, familyName, true, maxRetryCount, interruptible,
-                true, automaticReadTracking);
+                true, automaticReadTracking, explicitRetryAllowed);
 
         this.speculativeConfig = speculativeConfig;
     }
 
     public ReadonlyConfiguration withSpeculativeConfig(SpeculativeConfiguration speculativeConfig) {
         return new ReadonlyConfiguration(clock, backoffPolicy, familyName,
-                speculativeConfig, maxRetryCount, interruptible, automaticReadTracking);
+                speculativeConfig, maxRetryCount, interruptible, automaticReadTrackingEnabled,
+                explicitRetryAllowed);
     }
 
     public ReadonlyConfiguration withAutomaticReadTracking(boolean automaticReadTracking) {
         return new ReadonlyConfiguration(clock, backoffPolicy, familyName,
-                speculativeConfig, maxRetryCount, interruptible, automaticReadTracking);
+                speculativeConfig, maxRetryCount, interruptible, automaticReadTracking,
+                explicitRetryAllowed);
     }
-
 }

@@ -81,7 +81,7 @@ public abstract class AbstractUpdateAlphaTransaction
         opened = txObject.___load(getReadVersion());
         if (opened == null) {
             throw new UncommittedReadConflict();
-        } else if (config.automaticReadTracking) {
+        } else if (config.automaticReadTrackingEnabled) {
             attach(opened);
         }
 
@@ -196,13 +196,19 @@ public abstract class AbstractUpdateAlphaTransaction
     protected final boolean doRegisterRetryLatch(Latch latch, long wakeupVersion) {
         SpeculativeConfiguration speculativeConfig = config.speculativeConfiguration;
 
-        if (!config.automaticReadTracking) {
+        if (!config.automaticReadTrackingEnabled) {
             if (speculativeConfig.isSpeculativeNonAutomaticReadTrackingEnabled()) {
                 speculativeConfig.signalSpeculativeNonAutomaticReadtrackingFailure();
                 throw SpeculativeConfigurationFailure.create();
             }
 
             return false;
+        }
+
+        if (!config.explicitRetryAllowed) {
+            String msg = format("Transaction %s explicitly doesn't allow for a retry (needed for blocking operations)",
+                    config.getFamilyName());
+            throw new NoRetryPossibleException(msg);
         }
 
         return dodoRegisterRetryLatch(latch, wakeupVersion);
@@ -234,8 +240,8 @@ public abstract class AbstractUpdateAlphaTransaction
 
                 boolean hasConflict = false;
                 try {
-                    if (config.allowWriteSkewProblem) {
-                        if (config.optimizedConflictDetection && getReadVersion() == config.clock.getVersion()) {
+                    if (config.writeSkewProblemAllowed) {
+                        if (config.optimizedConflictDetectionEnabled && getReadVersion() == config.clock.getVersion()) {
                             writeVersion = config.clock.tick();
                             //it could be that a different transaction also reached this part, so we need to make sure
                             hasConflict = writeVersion != getReadVersion() + 1;
@@ -288,7 +294,7 @@ public abstract class AbstractUpdateAlphaTransaction
             return false;
         }
 
-        if (!config.dirtyCheck) {
+        if (!config.dirtyCheckEnabled) {
             return true;
         }
 
@@ -353,7 +359,7 @@ public abstract class AbstractUpdateAlphaTransaction
             release = false;
         } else if (tranlocal.isCommitted()) {
             release = false;
-        } else if (config.dirtyCheck && !tranlocal.getPrecalculatedIsDirty()) {
+        } else if (config.dirtyCheckEnabled && !tranlocal.getPrecalculatedIsDirty()) {
             release = false;
         }
 
@@ -419,7 +425,7 @@ public abstract class AbstractUpdateAlphaTransaction
         AlphaTranlocal origin = tranlocal.getOrigin();
 
         boolean store = false;
-        if (!config.dirtyCheck) {
+        if (!config.dirtyCheckEnabled) {
             store = true;
         } else {
 
@@ -439,7 +445,7 @@ public abstract class AbstractUpdateAlphaTransaction
             return null;
         }
 
-        return txObject.___storeUpdate(tranlocal, writeVersion, config.quickReleaseLocks);
+        return txObject.___storeUpdate(tranlocal, writeVersion, config.quickReleaseLocksEnabled);
     }
 
     @Override
@@ -450,7 +456,7 @@ public abstract class AbstractUpdateAlphaTransaction
     @Override
     protected void makeChangesPermanent() {
         Listeners[] listeners = makeChangesPermanent(writeVersion);
-        if (!config.quickReleaseLocks) {
+        if (!config.quickReleaseLocksEnabled) {
             doReleaseWriteLocksForSuccess(writeVersion);
         }
         Listeners.openAll(listeners);

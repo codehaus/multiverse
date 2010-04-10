@@ -81,7 +81,7 @@ public abstract class TransactionTemplate<E> {
     public TransactionTemplate(Stm stm) {
         this(stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
-                .setAutomaticReadTracking(true).build());
+                .setAutomaticReadTrackingEnabled(true).build());
     }
 
     /**
@@ -92,7 +92,7 @@ public abstract class TransactionTemplate<E> {
      * @throws NullPointerException if txFactory is null.
      */
     public TransactionTemplate(TransactionFactory txFactory) {
-        this(txFactory, true, true);
+        this(txFactory, true, true, true);
     }
 
     /**
@@ -105,7 +105,7 @@ public abstract class TransactionTemplate<E> {
      *                                  extra object creation, so if you want to squeeze out more performance, set this to false at the price of
      *                                  not having the lifecycle methods working.
      */
-    public TransactionTemplate(TransactionFactory txFactory, boolean threadLocalAware, boolean lifecycleListenersEnabled) {
+    public TransactionTemplate(TransactionFactory txFactory, boolean threadLocalAware, boolean lifecycleListenersEnabled, boolean retryEnabled) {
         if (txFactory == null) {
             throw new NullPointerException();
         }

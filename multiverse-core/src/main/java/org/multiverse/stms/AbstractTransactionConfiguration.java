@@ -26,23 +26,24 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
     public final boolean readOnly;
     public final int maxRetryCount;
     public final boolean interruptible;
-    public final boolean allowWriteSkewProblem;
-    public final boolean automaticReadTracking;
-    private long timeout;
-    private TimeUnit timeoutTimeUnit;
+    public final boolean writeSkewProblemAllowed;
+    public final boolean automaticReadTrackingEnabled;
+    public long timeout;
+    public TimeUnit timeoutTimeUnit;
+    public boolean explicitRetryAllowed;
 
     /**
      * This method should be removed, only used for testing purposes.
      */
     public AbstractTransactionConfiguration() {
         this(new StrictPrimitiveClock(), ExponentialBackoffPolicy.INSTANCE_10_MS_MAX,
-                null, true, 1000, true, true, true);
+                null, true, 1000, true, true, true, true);
     }
 
     public AbstractTransactionConfiguration(
             PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName,
             boolean readOnly, int maxRetryCount, boolean interruptible,
-            boolean allowWriteSkewProblem, boolean automaticReadTracking) {
+            boolean writeSkewProblemAllowed, boolean automaticReadTrackingEnabled, boolean explicitRetryAllowed) {
 
         if (clock == null) {
             throw new NullPointerException();
@@ -58,16 +59,23 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
         this.backoffPolicy = backoffPolicy;
         this.maxRetryCount = maxRetryCount;
         this.interruptible = interruptible;
-        this.automaticReadTracking = automaticReadTracking;
-        this.allowWriteSkewProblem = allowWriteSkewProblem;
+        this.automaticReadTrackingEnabled = automaticReadTrackingEnabled;
+        this.writeSkewProblemAllowed = writeSkewProblemAllowed;
+        this.explicitRetryAllowed = explicitRetryAllowed;
 
-        if (!readOnly && !automaticReadTracking && !allowWriteSkewProblem) {
+        if (!readOnly && !automaticReadTrackingEnabled && !writeSkewProblemAllowed) {
             String msg = format("Update transaction '%s' isn't  " +
-                    "allowed with allowWriteSkewProblem " +
-                    "disabled and automaticReadTracking disabled. The last is needed to do the first.",
+                    "allowed with writeSkewProblemAllowed " +
+                    "disabled and automaticReadTrackingEnabled disabled. " +
+                    "The last is needed to do the first.",
                     familyName);
             throw new IllegalArgumentException(msg);
         }
+    }
+
+    @Override
+    public boolean isExplictRetryEnabled() {
+        return explicitRetryAllowed;
     }
 
     @Override
@@ -91,13 +99,13 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
     }
 
     @Override
-    public final boolean allowWriteSkewProblem() {
-        return allowWriteSkewProblem;
+    public final boolean isWriteSkewProblemAllowed() {
+        return writeSkewProblemAllowed;
     }
 
     @Override
-    public final boolean automaticReadTracking() {
-        return automaticReadTracking;
+    public final boolean isAutomaticReadTrackingEnabled() {
+        return automaticReadTrackingEnabled;
     }
 
     @Override

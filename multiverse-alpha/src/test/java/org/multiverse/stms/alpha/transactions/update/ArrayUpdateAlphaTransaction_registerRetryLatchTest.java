@@ -36,11 +36,34 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
 
     public AlphaTransaction startSutTransactionWithoutAutomaticReadTracking(SpeculativeConfiguration speculativeConfig) {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withExplictRetryAllowed(false)
                 .withSpeculativeConfiguration(speculativeConfig)
-                .withAutomaticReadTracking(false);
+                .withAutomaticReadTrackingEnabled(false);
 
         return new ArrayUpdateAlphaTransaction(config, speculativeConfig.getMaximumArraySize());
     }
+
+    @Test
+    public void whenExplicitRetryNotAllowed_thenNoRetryPossibleException() {
+        ManualRef ref = new ManualRef(stm);
+
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withExplictRetryAllowed(false);
+
+        AlphaTransaction tx = new ArrayUpdateAlphaTransaction(config, 100);
+        tx.openForRead(ref);
+
+        Latch latch = new CheapLatch();
+        try {
+            tx.registerRetryLatch(latch);
+            fail();
+        } catch (NoRetryPossibleException expected) {
+        }
+
+        assertIsActive(tx);
+        assertFalse(latch.isOpen());
+    }
+
 
     @Test
     public void whenNoAutomaticReadtracking_thenNoRetryPossibleException() {

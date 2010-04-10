@@ -82,12 +82,12 @@ public class AnotherWriteSkewStressTest {
             }
         }
 
-        @TransactionalMethod(allowWriteSkewProblem = false)
+        @TransactionalMethod(writeSkewProblemAllowed = false)
         private void runWithDisallowedWriteSkewProblem() {
             doIt();
         }
 
-        @TransactionalMethod(allowWriteSkewProblem = true)
+        @TransactionalMethod(writeSkewProblemAllowed = true)
         private void runWithAllowWriteSkewProblem() {
             doIt();
         }

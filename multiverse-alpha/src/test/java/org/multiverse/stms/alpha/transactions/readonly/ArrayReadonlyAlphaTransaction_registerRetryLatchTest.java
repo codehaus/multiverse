@@ -25,7 +25,7 @@ public class ArrayReadonlyAlphaTransaction_registerRetryLatchTest {
     }
 
     public ArrayReadonlyAlphaTransaction startTransactionUnderTest(int size) {
-        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new ArrayReadonlyAlphaTransaction(config, size);
     }
 

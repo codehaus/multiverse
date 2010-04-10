@@ -116,7 +116,7 @@ public class AlphaProgrammaticLong_setTest {
 
         Transaction tx = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
-                .setAutomaticReadTracking(true)
+                .setAutomaticReadTrackingEnabled(true)
                 .build()
                 .start();
 

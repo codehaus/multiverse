@@ -38,7 +38,7 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
     }
 
     public MapReadonlyAlphaTransaction startSutTransaction() {
-        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new MapReadonlyAlphaTransaction(config);
     }
 
@@ -200,7 +200,7 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
             this.value = newValue;
         }
 
-        @TransactionalMethod(readonly = true, automaticReadTracking = true)
+        @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
         public void await(int value) {
             if (this.value != value) {
                 retry();

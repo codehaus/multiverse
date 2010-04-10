@@ -37,7 +37,8 @@ public interface ProgrammaticReferenceFactory {
     ProgrammaticLong createLong(long value);
 
     /**
-     * Creates a new ProgrammaticLong.
+     * Creates a new ProgrammaticLong that is created in the context of the
+     * provided transaction.
      *
      * @param tx    the transaction to use for creating this ProgrammaticLong.
      * @param value the initial value of the ProgrammaticLong.
@@ -52,6 +53,9 @@ public interface ProgrammaticReferenceFactory {
     /**
      * Atomically creates a new ProgrammaticLong. So this call doesn't look at the
      * Transaction stores in the ThreadLocalTransaction.
+     * <p/>
+     * This is the cheapest call for making a ProgrammaticLong, so in most cases this is
+     * the one you want to use.
      *
      * @param value the value stored in the ProgrammaticLong.
      * @return the created ProgrammaticLong
@@ -97,6 +101,9 @@ public interface ProgrammaticReferenceFactory {
     /**
      * Creates a new ProgrammaticReference atomically. So this call doesn't look at the
      * {@link org.multiverse.api.ThreadLocalTransaction}.
+     * <p/>
+     * This is the cheapest call for making a ProgrammaticReference, so in most cases
+     * this is the one you want to use.
      *
      * @param value the value stores in the reference (is allowed to be null).
      * @param <E>   type of the value

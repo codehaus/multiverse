@@ -22,7 +22,7 @@ public class ArrayReadonlyAlphaTransaction_commitTest {
     }
 
     public ArrayReadonlyAlphaTransaction startTransactionUnderTest(int maximumSize) {
-        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new ArrayReadonlyAlphaTransaction(config, maximumSize);
     }
 

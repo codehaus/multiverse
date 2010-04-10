@@ -4,13 +4,11 @@ todo engine
 
 - AlphaProgrammaticLong.atomic methods should use the backoff policy
 
+- AlphaProgrammaticReference should use backoff policy
+
 - AlphaProgrammaticLong.atomic method should use the LockPolicy to do locking
 
 - if a good transaction is available, it should be reused.
-
-- support for a history in the ProgrammaticReference
-
-- support for a history in the ProgrammaticLong
 
 - back off policy needs to be used when a load is done
 
@@ -20,23 +18,7 @@ still has the expected value.
 - threadsafety of the java agent fucntionality; classes can be created by different
 threads, so the whole mechanism should be made thread safe.
 
-- expose dirty check in transaction factory builder
-
 - version should start with 0 again; so all other status should shift one down.
-
-- back off policy needs to be used when atomic calls are done
-
-- AlphaProgrammaticLong atomicGetVersion
-
-- AlphaProgrammaticLong. getVersion
-
-- AlphaProgrammaticLong. read+version atomically
-
-- AlphaProgrammaticLong that sets if the version of the value still is correct
-
-- AlphaProgrammaticLong.getVersion(Transaction tx)
-
-- AlphaProgrammaticReference. read+version atomically
 
 - AlphaProgrammaticLong.getOrAwait
 
@@ -64,15 +46,7 @@ threads, so the whole mechanism should be made thread safe.
 - cheapen tranlocal access for the this variable by passing that tranlocal
   if possible. First step 2: also for other classes.
 
-- Fix test for AlphaProgrammaticLong
-
-- Fix tes for AlphaProgrammaticReference
-
 - static compilation
-
-    + basic instrumentation up and running
-
-    + prevention/detection conflicting compiler usage
 
     - maven plugin for the compiler
 
@@ -81,19 +55,7 @@ threads, so the whole mechanism should be made thread safe.
     - integration test of the compiler in combination with
       the java agent.
 
-    + make sure that the multiverse jars are pre-instrumented
-
     - instrumented jar test
-
-- AlphaProgrammaticReferenceFactory.atomicCreateLong
-
-- AlphaProgrammaticReferenceFactory.atomicCreateReference
-
-- AlphaProgrammaticReferenceFactoryBuilder
-
-- AlphaProgrammaticReferenceFactoryBuilder.withAbaDetection
-
-- AlphaProgrammaticReferenceFactoryBuilder.withBlockingSupport
 
 - AlphaProgrammaticLong should use the stm for all its operations once it has
 been build using that stm.
@@ -104,6 +66,27 @@ it has been build using that stm.
 - balancing of the treemap
 
 - interface parameter inheritance.
+
+- MonoReadonly preventing that a transaction that does not allow explicit retry,
+can't do an explicit retry
+
+- ArrayReadonly preventing that a transaction that does not allow explicit retry,
+can't do an explicit retry
+
+- MapReadonly preventing that a transaction that does not allow explicit retry,
+can't do an explicit retry
+
+- MonoUpdate preventing that a transaction that does not allow explicit retry,
+can't do an explicit retry
+
+- ArrayUpdate preventing that a transaction that does not allow explicit retry,
+can't do an explicit retry
+
+- MapUpdate preventing that a transaction that does not allow explicit retry,
+can't do an explicit retry
+
+
+
 
 ---------------------------------------------------------------
 todo unclear
@@ -160,6 +143,10 @@ Thread PingPongThread-1 has thrown an exception
 ---------------------------------------------------------------
 todo features
 ---------------------------------------------------------------
+
+- support for a history in the ProgrammaticReference
+
+- support for a history in the ProgrammaticLong
 
 - optimizations
 
@@ -224,10 +211,6 @@ start maintaining history. Increase the history as long as you get loadtoooldver
 
 - SkipList
 
-- Tree
-
-- Growing Array List
-
 - via een system property aangeven welke mixin gebruikt moet worden
 
 - het inlezen van de mixin hoeft niet iedere keer te gebeuren, maar
@@ -252,8 +235,6 @@ they are moved to the alpha package, so they have an stm to be tested against.
 - when a field access is done without a transaction, throw an error that contains the class/field
 
 - exceptions thrown in the fastmixin doen't show transaction
-
-- let the JavaAgent print the revision of subversion & the release version; this helps to locate problems.
 
 - stress test for strictlinkedblockingdeque
 
@@ -354,4 +335,22 @@ done
 - Templates need to be removed in constructors of AlphaProgrammaticLong
 
 - AlphaProgrammaticLong. atomicInc(long amount)
+
+- AlphaProgrammaticReferenceFactory.atomicCreateLong
+
+- AlphaProgrammaticReferenceFactory.atomicCreateReference
+
+- Fix test for AlphaProgrammaticLong
+
+- expose dirty check in transaction factory builder
+
+- basic instrumentation up and running
+
+- prevention/detection conflicting compiler usage
+
+- make sure that the multiverse jars are pre-instrumented
+
+- Fix tes for AlphaProgrammaticReference
+
+- let the JavaAgent print the revision of subversion & the release version; this helps to locate problems.
 

@@ -29,14 +29,14 @@ public final class TransactionalShort {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTracking = true)
+    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
     public void await(short desired) {
         if (desired != value) {
             retry();
         }
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTracking = true)
+    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
     public short awaitLargerThan(short than) {
         if (!(value > than)) {
             retry();
@@ -45,7 +45,7 @@ public final class TransactionalShort {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTracking = true)
+    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
     public short awaitLargerOrEqualThan(short than) {
         if (!(value >= than)) {
             retry();
@@ -54,7 +54,7 @@ public final class TransactionalShort {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTracking = true)
+    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
     public short awaitSmallerThan(short than) {
         if (!(value < than)) {
             retry();
@@ -63,7 +63,7 @@ public final class TransactionalShort {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTracking = true)
+    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
     public short awaitSmallerOrEqualThan(short than) {
         if (!(value <= than)) {
             retry();
@@ -72,7 +72,7 @@ public final class TransactionalShort {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTracking = true)
+    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
     public short awaitNotEqualTo(short than) {
         if (!(value != than)) {
             retry();

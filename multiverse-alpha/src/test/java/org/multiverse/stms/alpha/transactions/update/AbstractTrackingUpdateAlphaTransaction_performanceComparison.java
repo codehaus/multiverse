@@ -38,7 +38,7 @@ public class AbstractTrackingUpdateAlphaTransaction_performanceComparison {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true, true);
+                stmConfig.maxRetryCount, true, true, true, true, true, true, true);
 
     }
 

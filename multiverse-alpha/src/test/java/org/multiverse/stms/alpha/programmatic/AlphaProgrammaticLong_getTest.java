@@ -2,7 +2,6 @@ package org.multiverse.stms.alpha.programmatic;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.stms.alpha.AlphaStm;
@@ -12,6 +11,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
@@ -75,8 +75,20 @@ public class AlphaProgrammaticLong_getTest {
     }
 
     @Test
-    @Ignore
     public void whenTransactionAvailable() {
+        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 10);
 
+        Transaction tx = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .build()
+                .start();
+        setThreadLocalTransaction(tx);
+        ref.set(tx, 20);
+
+        long version = stm.getVersion();
+        long found = ref.get();
+
+        assertEquals(20, found);
+        assertEquals(version, stm.getVersion());
     }
 }

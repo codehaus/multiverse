@@ -145,7 +145,7 @@ public class TransactionalLinkedList_ProducerConsumerStressTest {
             }
         }
 
-        @TransactionalMethod(automaticReadTracking = true)
+        @TransactionalMethod(automaticReadTrackingEnabled = true)
         public void produceOneItem(int item, boolean abort) throws InterruptedException {
             TransactionalLinkedList queue = queues[0];
             queue.putFirst(item);
@@ -185,7 +185,7 @@ public class TransactionalLinkedList_ProducerConsumerStressTest {
             }
         }
 
-        @TransactionalMethod(automaticReadTracking = true)
+        @TransactionalMethod(automaticReadTrackingEnabled = true)
         public int consumeOneItem(boolean abort) throws InterruptedException {
             TransactionalLinkedList<Integer> queue = queues[queues.length - 1];
             int r = queue.takeLast();
@@ -234,7 +234,7 @@ public class TransactionalLinkedList_ProducerConsumerStressTest {
             aliveCount.decrementAndGet();
         }
 
-        @TransactionalMethod(automaticReadTracking = true)
+        @TransactionalMethod(automaticReadTrackingEnabled = true)
         public void moveOneItem(boolean abort) throws InterruptedException {
             int item = from.takeLast();
             //sleepRandomMs(aliveCount.get() * delayMs);

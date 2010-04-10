@@ -165,12 +165,12 @@ public class TransactionalClassMethodTransformer implements Opcodes {
         }
 
         //trackreads
-        if (transactionMetadata.automaticReadTracking != null) {
-            insnList.add(new InsnNode(transactionMetadata.automaticReadTracking ? ICONST_1 : ICONST_0));
+        if (transactionMetadata.automaticReadTrackingEnabled != null) {
+            insnList.add(new InsnNode(transactionMetadata.automaticReadTrackingEnabled ? ICONST_1 : ICONST_0));
             insnList.add(new MethodInsnNode(
                     INVOKEINTERFACE,
                     Type.getInternalName(TransactionFactoryBuilder.class),
-                    "setAutomaticReadTracking",
+                    "setAutomaticReadTrackingEnabled",
                     "(Z)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
         }
 
@@ -190,12 +190,12 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                 "setInterruptible",
                 "(Z)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
 
-        //allowWriteSkewProblem
-        insnList.add(new InsnNode(transactionMetadata.allowWriteSkewProblem ? ICONST_1 : ICONST_0));
+        //isWriteSkewProblemAllowed
+        insnList.add(new InsnNode(transactionMetadata.writeSkewProblemAllowed ? ICONST_1 : ICONST_0));
         insnList.add(new MethodInsnNode(
                 INVOKEINTERFACE,
                 Type.getInternalName(TransactionFactoryBuilder.class),
-                "setAllowWriteSkewProblem",
+                "setWriteSkewProblemAllowed",
                 "(Z)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
 
         //maxRetryCount
@@ -225,7 +225,6 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                 Type.getInternalName(TransactionFactoryBuilder.class),
                 "build",
                 "()" + Type.getDescriptor(TransactionFactory.class)));
-
 
         //and store it in the txFactoryField
         insnList.add(new FieldInsnNode(

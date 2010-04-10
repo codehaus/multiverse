@@ -24,7 +24,6 @@ import org.multiverse.api.commitlock.GenericCommitLockPolicy;
  * @author Peter Veentjer.
  */
 public final class AlphaStmConfig {
-
     public static AlphaStmConfig createDebugConfig() {
         AlphaStmConfig config = new AlphaStmConfig();
         config.speculativeConfigurationEnabled = false;
@@ -62,6 +61,14 @@ public final class AlphaStmConfig {
     public boolean optimizedConflictDetectionEnabled = true;
 
     public boolean dirtyCheckEnabled = true;
+
+    public boolean explicitRetryEnabled = false;
+
+    public boolean automaticReadTracking = false;
+
+    public boolean allowWriteSkewProblem = true;
+
+    public boolean interruptible;
 
 
     /**
