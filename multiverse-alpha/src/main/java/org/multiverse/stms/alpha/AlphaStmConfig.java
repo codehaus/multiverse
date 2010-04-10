@@ -62,14 +62,13 @@ public final class AlphaStmConfig {
 
     public boolean dirtyCheckEnabled = true;
 
-    public boolean explicitRetryEnabled = false;
+    public boolean explicitRetryAllowed = true;
 
-    public boolean automaticReadTracking = false;
+    public boolean automaticReadTrackingEnabled = false;
 
     public boolean allowWriteSkewProblem = true;
 
-    public boolean interruptible;
-
+    public boolean interruptible = false;
 
     /**
      * Check if the AlphaStmConfig has been configured correctly.

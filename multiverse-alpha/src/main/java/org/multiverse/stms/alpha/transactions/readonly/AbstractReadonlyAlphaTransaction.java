@@ -3,7 +3,6 @@ package org.multiverse.stms.alpha.transactions.readonly;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.api.exceptions.UncommittedReadConflict;
-import org.multiverse.api.latches.Latch;
 import org.multiverse.stms.AbstractTransactionSnapshot;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
@@ -53,17 +52,6 @@ public abstract class AbstractReadonlyAlphaTransaction
     }
 
     @Override
-    protected boolean doRegisterRetryLatch(Latch latch, long wakeupVersion) {
-        SpeculativeConfiguration speculativeConfig = config.speculativeConfig;
-        if (speculativeConfig.isSpeculativeNonAutomaticReadTrackingEnabled()) {
-            speculativeConfig.signalSpeculativeNonAutomaticReadtrackingFailure();
-            throw SpeculativeConfigurationFailure.create();
-        }
-
-        return super.doRegisterRetryLatch(latch, wakeupVersion);
-    }
-
-    @Override
     public AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject txObject) {
         //forward it to the write
         return doOpenForWrite(txObject);
@@ -77,7 +65,7 @@ public abstract class AbstractReadonlyAlphaTransaction
 
     @Override
     protected final AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {
-        SpeculativeConfiguration speculativeConfig = config.speculativeConfig;
+        SpeculativeConfiguration speculativeConfig = config.speculativeConfiguration;
         if (speculativeConfig.isSpeculativeReadonlyEnabled()) {
             speculativeConfig.signalSpeculativeReadonlyFailure();
             throw SpeculativeConfigurationFailure.create();

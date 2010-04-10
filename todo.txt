@@ -67,26 +67,6 @@ it has been build using that stm.
 
 - interface parameter inheritance.
 
-- MonoReadonly preventing that a transaction that does not allow explicit retry,
-can't do an explicit retry
-
-- ArrayReadonly preventing that a transaction that does not allow explicit retry,
-can't do an explicit retry
-
-- MapReadonly preventing that a transaction that does not allow explicit retry,
-can't do an explicit retry
-
-- MonoUpdate preventing that a transaction that does not allow explicit retry,
-can't do an explicit retry
-
-- ArrayUpdate preventing that a transaction that does not allow explicit retry,
-can't do an explicit retry
-
-- MapUpdate preventing that a transaction that does not allow explicit retry,
-can't do an explicit retry
-
-
-
 
 ---------------------------------------------------------------
 todo unclear
@@ -354,3 +334,20 @@ done
 
 - let the JavaAgent print the revision of subversion & the release version; this helps to locate problems.
 
+- MonoUpdate preventing that a transaction that does not allow explicit retry,
+can't do an explicit retry
+
+- ArrayUpdate preventing that a transaction that does not allow explicit retry,
+can't do an explicit retry
+
+- MapUpdate preventing that a transaction that does not allow explicit retry,
+can't do an explicit retry
+
+- MonoReadonly preventing that a transaction that does not allow explicit retry,
+can't do an explicit retry
+
+- ArrayReadonly preventing that a transaction that does not allow explicit retry,
+can't do an explicit retry
+
+- MapReadonly preventing that a transaction that does not allow explicit retry,
+can't do an explicit retry

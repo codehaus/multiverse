@@ -106,8 +106,8 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         this.clock = config.clock;
         this.quickReleaseWriteLocksEnabled = config.quickReleaseWriteLocksEnabled;
         this.referenceFactoryBuilder = new AlphaProgrammaticReferenceFactoryBuilder(this);
-        this.explicitRetryAllowed = config.explicitRetryEnabled;
-        this.automaticReadTracking = config.automaticReadTracking;
+        this.explicitRetryAllowed = config.explicitRetryAllowed;
+        this.automaticReadTracking = config.automaticReadTrackingEnabled;
         this.allowWriteSkewProblem = config.allowWriteSkewProblem;
         this.interruptible = config.interruptible;
 
@@ -448,21 +448,21 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             final ReadonlyConfiguration ro_nort =
                     new ReadonlyConfiguration(
                             clock, backoffPolicy, familyName, speculativeConfig, maxRetryCount,
-                            interruptible, false, false);
+                            interruptible, false, explicitRetryAllowed);
             final ReadonlyConfiguration ro_rt =
                     new ReadonlyConfiguration(
                             clock, backoffPolicy, familyName, speculativeConfig, maxRetryCount,
-                            interruptible, true, true);
+                            interruptible, true, explicitRetryAllowed);
             final UpdateConfiguration up_rt =
                     new UpdateConfiguration(
                             clock, backoffPolicy, commitLockPolicy, familyName, speculativeConfig,
                             maxRetryCount, interruptible, true, writeSkewProblemAllowed,
-                            optimizeConflictDetectionEnabled, true, quickReleaseEnabled, true);
+                            optimizeConflictDetectionEnabled, true, quickReleaseEnabled, explicitRetryAllowed);
             final UpdateConfiguration up_nort =
                     new UpdateConfiguration(
                             clock, backoffPolicy, commitLockPolicy, familyName,
                             speculativeConfig, maxRetryCount, interruptible, false, true,
-                            optimizeConflictDetectionEnabled, true, quickReleaseEnabled, false);
+                            optimizeConflictDetectionEnabled, true, quickReleaseEnabled, explicitRetryAllowed);
 
             return new TransactionFactory<AlphaTransaction>() {
                 @Override

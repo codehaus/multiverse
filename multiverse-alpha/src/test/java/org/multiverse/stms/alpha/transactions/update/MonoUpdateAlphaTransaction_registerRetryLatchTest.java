@@ -36,7 +36,7 @@ public class MonoUpdateAlphaTransaction_registerRetryLatchTest {
 
     public MonoUpdateAlphaTransaction startSutTransactionWithoutAutomaticReadTracking(SpeculativeConfiguration speculativeConfig) {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
-                .withExplictRetryAllowed(false)
+                .withExplictRetryAllowed(true)
                 .withAutomaticReadTrackingEnabled(false)
                 .withSpeculativeConfiguration(speculativeConfig);
 
@@ -76,7 +76,7 @@ public class MonoUpdateAlphaTransaction_registerRetryLatchTest {
     }
 
     @Test
-    public void whenSpeculativeNoAutomaticReadtracking_thenNoRetryPossibleException() {
+    public void whenSpeculativeNoAutomaticReadtracking_thenSpeculativeConfigurationFailure() {
         ManualRef ref = new ManualRef(stm);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, false, 100);

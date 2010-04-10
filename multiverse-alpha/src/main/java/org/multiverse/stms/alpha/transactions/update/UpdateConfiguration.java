@@ -5,7 +5,7 @@ import org.multiverse.api.backoff.ExponentialBackoffPolicy;
 import org.multiverse.api.clock.PrimitiveClock;
 import org.multiverse.api.commitlock.CommitLockPolicy;
 import org.multiverse.api.commitlock.GenericCommitLockPolicy;
-import org.multiverse.stms.AbstractTransactionConfiguration;
+import org.multiverse.stms.alpha.transactions.AbstractAlphaTransactionConfiguration;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 /**
@@ -13,12 +13,11 @@ import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
  *
  * @author Peter Veentjer.
  */
-public final class UpdateConfiguration extends AbstractTransactionConfiguration {
+public final class UpdateConfiguration extends AbstractAlphaTransactionConfiguration {
 
     public final CommitLockPolicy commitLockPolicy;
     public final boolean optimizedConflictDetectionEnabled;
     public final boolean dirtyCheckEnabled;
-    public final SpeculativeConfiguration speculativeConfiguration;
     public final boolean quickReleaseLocksEnabled;
 
     public UpdateConfiguration(PrimitiveClock clock) {
@@ -36,12 +35,11 @@ public final class UpdateConfiguration extends AbstractTransactionConfiguration 
             boolean explicitRetryAllowed) {
 
         super(clock, backoffPolicy, familyName, false, maxRetryCount, interruptible,
-                allowWriteSkewProblem, automaticReadTracking, explicitRetryAllowed);
+                allowWriteSkewProblem, automaticReadTracking, explicitRetryAllowed, speculativeConfiguration);
 
         this.commitLockPolicy = commitLockPolicy;
         this.optimizedConflictDetectionEnabled = optimizedConflictDetectionEnabled;
         this.dirtyCheckEnabled = dirtyCheckEnabled;
-        this.speculativeConfiguration = speculativeConfiguration;
         this.quickReleaseLocksEnabled = quickReleaseLocks;
     }
 

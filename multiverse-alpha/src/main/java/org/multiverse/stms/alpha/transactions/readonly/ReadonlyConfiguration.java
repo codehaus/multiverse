@@ -3,19 +3,17 @@ package org.multiverse.stms.alpha.transactions.readonly;
 import org.multiverse.api.backoff.BackoffPolicy;
 import org.multiverse.api.backoff.ExponentialBackoffPolicy;
 import org.multiverse.api.clock.PrimitiveClock;
-import org.multiverse.stms.AbstractTransactionConfiguration;
+import org.multiverse.stms.alpha.transactions.AbstractAlphaTransactionConfiguration;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 /**
  * @author Peter Veentjer
  */
-public final class ReadonlyConfiguration extends AbstractTransactionConfiguration {
+public final class ReadonlyConfiguration extends AbstractAlphaTransactionConfiguration {
 
-    public final SpeculativeConfiguration speculativeConfig;
-
-    public ReadonlyConfiguration(PrimitiveClock clock, boolean retryEnabled) {
+    public ReadonlyConfiguration(PrimitiveClock clock, boolean automaticReadTrackingEnabled) {
         this(clock, ExponentialBackoffPolicy.INSTANCE_10_MS_MAX, null, new SpeculativeConfiguration(100), 1000,
-                true, retryEnabled, retryEnabled);
+                true, automaticReadTrackingEnabled, true);
     }
 
     public ReadonlyConfiguration(
@@ -24,9 +22,7 @@ public final class ReadonlyConfiguration extends AbstractTransactionConfiguratio
             boolean interruptible, boolean automaticReadTracking, boolean explicitRetryAllowed) {
 
         super(clock, backoffPolicy, familyName, true, maxRetryCount, interruptible,
-                true, automaticReadTracking, explicitRetryAllowed);
-
-        this.speculativeConfig = speculativeConfig;
+                true, automaticReadTracking, explicitRetryAllowed, speculativeConfig);
     }
 
     public ReadonlyConfiguration withSpeculativeConfig(SpeculativeConfiguration speculativeConfig) {
@@ -35,9 +31,9 @@ public final class ReadonlyConfiguration extends AbstractTransactionConfiguratio
                 explicitRetryAllowed);
     }
 
-    public ReadonlyConfiguration withAutomaticReadTracking(boolean automaticReadTracking) {
+    public ReadonlyConfiguration withExplicitRetryAllowed(boolean explicitRetryAllowed) {
         return new ReadonlyConfiguration(clock, backoffPolicy, familyName,
-                speculativeConfig, maxRetryCount, interruptible, automaticReadTracking,
+                speculativeConfiguration, maxRetryCount, interruptible, automaticReadTrackingEnabled,
                 explicitRetryAllowed);
     }
 }

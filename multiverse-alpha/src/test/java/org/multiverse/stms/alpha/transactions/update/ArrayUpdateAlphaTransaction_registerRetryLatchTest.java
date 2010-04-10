@@ -34,15 +34,6 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
         return new ArrayUpdateAlphaTransaction(config, 100);
     }
 
-    public AlphaTransaction startSutTransactionWithoutAutomaticReadTracking(SpeculativeConfiguration speculativeConfig) {
-        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
-                .withExplictRetryAllowed(false)
-                .withSpeculativeConfiguration(speculativeConfig)
-                .withAutomaticReadTrackingEnabled(false);
-
-        return new ArrayUpdateAlphaTransaction(config, speculativeConfig.getMaximumArraySize());
-    }
-
     @Test
     public void whenExplicitRetryNotAllowed_thenNoRetryPossibleException() {
         ManualRef ref = new ManualRef(stm);
@@ -70,7 +61,11 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
         ManualRef ref = new ManualRef(stm);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, false, false, 100);
-        AlphaTransaction tx = startSutTransactionWithoutAutomaticReadTracking(speculativeConfig);
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withSpeculativeConfiguration(speculativeConfig)
+                .withAutomaticReadTrackingEnabled(false);
+
+        AlphaTransaction tx = new ArrayUpdateAlphaTransaction(config, 100);
         tx.openForWrite(ref);
 
         Latch latch = new CheapLatch();
@@ -88,7 +83,10 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
         ManualRef ref = new ManualRef(stm);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, false, 100);
-        AlphaTransaction tx = startSutTransactionWithoutAutomaticReadTracking(speculativeConfig);
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withSpeculativeConfiguration(speculativeConfig)
+                .withAutomaticReadTrackingEnabled(false);
+        AlphaTransaction tx = new ArrayUpdateAlphaTransaction(config, 100);
         tx.openForWrite(ref);
 
         Latch latch = new CheapLatch();

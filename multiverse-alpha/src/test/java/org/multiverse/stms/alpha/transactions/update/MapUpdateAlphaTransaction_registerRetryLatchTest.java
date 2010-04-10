@@ -46,7 +46,7 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
     public MapUpdateAlphaTransaction startSutTransactionWithoutReadTracking(SpeculativeConfiguration speculativeConfig) {
         UpdateConfiguration config = new UpdateConfiguration(stm.getClock())
                 .withSpeculativeConfiguration(speculativeConfig)
-                .withExplictRetryAllowed(false)
+                .withExplictRetryAllowed(true)
                 .withAutomaticReadTrackingEnabled(false);
 
         return new MapUpdateAlphaTransaction(config);

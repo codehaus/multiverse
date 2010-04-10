@@ -32,6 +32,26 @@ public class MonoReadonlyAlphaTransaction_registerRetryLatchTest {
         return new MonoReadonlyAlphaTransaction(config);
     }
 
+    @Test
+    public void whenExplicitRetryNotAllowed_thenNoRetryPossibleException() {
+        ManualRef ref = new ManualRef(stm);
+
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true)
+                .withExplicitRetryAllowed(false);
+
+        AlphaTransaction tx = new MonoReadonlyAlphaTransaction(config);
+        tx.openForRead(ref);
+
+        Latch latch = new CheapLatch();
+        try {
+            tx.registerRetryLatch(latch);
+            fail();
+        } catch (NoRetryPossibleException expected) {
+        }
+
+        assertIsActive(tx);
+        assertFalse(latch.isOpen());
+    }
 
     @Test
     public void whenUnused_thenNoRetryPossibleException() {

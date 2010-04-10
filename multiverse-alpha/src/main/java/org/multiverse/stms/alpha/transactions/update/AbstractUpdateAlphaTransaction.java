@@ -1,13 +1,14 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.multiverse.api.Listeners;
-import org.multiverse.api.exceptions.*;
-import org.multiverse.api.latches.Latch;
+import org.multiverse.api.exceptions.LockNotFreeWriteConflict;
+import org.multiverse.api.exceptions.OptimisticLockFailedWriteConflict;
+import org.multiverse.api.exceptions.UncommittedReadConflict;
+import org.multiverse.api.exceptions.WriteSkewConflict;
 import org.multiverse.stms.AbstractTransactionSnapshot;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AbstractAlphaTransaction;
-import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static java.lang.String.format;
 import static org.multiverse.stms.alpha.AlphaStmUtils.toTxObjectString;
@@ -189,32 +190,6 @@ public abstract class AbstractUpdateAlphaTransaction
         attach(fresh);
         return fresh;
     }
-
-    // ======================= register retry latch =============================
-
-    @Override
-    protected final boolean doRegisterRetryLatch(Latch latch, long wakeupVersion) {
-        SpeculativeConfiguration speculativeConfig = config.speculativeConfiguration;
-
-        if (!config.automaticReadTrackingEnabled) {
-            if (speculativeConfig.isSpeculativeNonAutomaticReadTrackingEnabled()) {
-                speculativeConfig.signalSpeculativeNonAutomaticReadtrackingFailure();
-                throw SpeculativeConfigurationFailure.create();
-            }
-
-            return false;
-        }
-
-        if (!config.explicitRetryAllowed) {
-            String msg = format("Transaction %s explicitly doesn't allow for a retry (needed for blocking operations)",
-                    config.getFamilyName());
-            throw new NoRetryPossibleException(msg);
-        }
-
-        return dodoRegisterRetryLatch(latch, wakeupVersion);
-    }
-
-    protected abstract boolean dodoRegisterRetryLatch(Latch latch, long wakeupVersion);
 
     // ======================= prepare/commit =============================
 

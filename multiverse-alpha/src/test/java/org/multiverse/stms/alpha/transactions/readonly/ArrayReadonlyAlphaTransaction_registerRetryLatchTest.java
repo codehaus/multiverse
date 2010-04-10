@@ -11,6 +11,7 @@ import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import static org.junit.Assert.*;
+import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.stms.alpha.transactions.AlphaTransactionTestUtils.assertHasListeners;
 import static org.multiverse.stms.alpha.transactions.AlphaTransactionTestUtils.assertHasNoListeners;
 
@@ -27,6 +28,27 @@ public class ArrayReadonlyAlphaTransaction_registerRetryLatchTest {
     public ArrayReadonlyAlphaTransaction startTransactionUnderTest(int size) {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new ArrayReadonlyAlphaTransaction(config, size);
+    }
+
+    @Test
+    public void whenExplicitRetryNotAllowed_thenNoRetryPossibleException() {
+        ManualRef ref = new ManualRef(stm);
+
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true)
+                .withExplicitRetryAllowed(false);
+
+        AlphaTransaction tx = new ArrayReadonlyAlphaTransaction(config, 100);
+        tx.openForRead(ref);
+
+        Latch latch = new CheapLatch();
+        try {
+            tx.registerRetryLatch(latch);
+            fail();
+        } catch (NoRetryPossibleException expected) {
+        }
+
+        assertIsActive(tx);
+        assertFalse(latch.isOpen());
     }
 
     @Test

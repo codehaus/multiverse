@@ -17,7 +17,7 @@ import java.util.Map;
  *
  * @author Peter Veentjer
  */
-public class MapReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransaction {
+public final class MapReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransaction {
 
     public static class Factory implements TransactionFactory<AlphaTransaction> {
 
@@ -58,7 +58,7 @@ public class MapReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransactio
     }
 
     @Override
-    protected boolean doRegisterRetryLatch(Latch latch, long wakeupVersion) {
+    protected boolean dodoRegisterRetryLatch(Latch latch, long wakeupVersion) {
         boolean trackedReads = false;
 
         for (AlphaTransactionalObject txObject : attachedMap.keySet()) {

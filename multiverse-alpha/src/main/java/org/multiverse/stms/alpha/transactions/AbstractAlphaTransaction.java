@@ -1,9 +1,11 @@
 package org.multiverse.stms.alpha.transactions;
 
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.NoRetryPossibleException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
+import org.multiverse.api.latches.Latch;
 import org.multiverse.stms.AbstractTransaction;
-import org.multiverse.stms.AbstractTransactionConfiguration;
 import org.multiverse.stms.AbstractTransactionSnapshot;
 import org.multiverse.stms.alpha.AlphaStmUtils;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -19,7 +21,7 @@ import static org.multiverse.stms.alpha.AlphaStmUtils.toTxObjectString;
  * @param <C>
  * @param <S>
  */
-public abstract class AbstractAlphaTransaction<C extends AbstractTransactionConfiguration, S extends AbstractTransactionSnapshot>
+public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactionConfiguration, S extends AbstractTransactionSnapshot>
         extends AbstractTransaction<C, S> implements AlphaTransaction {
 
     public AbstractAlphaTransaction(C config) {
@@ -194,4 +196,29 @@ public abstract class AbstractAlphaTransaction<C extends AbstractTransactionConf
                 toTxObjectString(txObject), config.getFamilyName(), getClass());
         throw new UnsupportedOperationException(msg);
     }
+
+    @Override
+    protected final boolean doRegisterRetryLatch(Latch latch, long wakeupVersion) {
+        if (!config.explicitRetryAllowed) {
+            String msg = format("Transaction %s explicitly doesn't allow for a retry (needed for blocking operations)",
+                    config.getFamilyName());
+            throw new NoRetryPossibleException(msg);
+        }
+
+        SpeculativeConfiguration speculativeConfig = config.speculativeConfiguration;
+
+        if (!config.automaticReadTrackingEnabled) {
+            if (speculativeConfig.isSpeculativeNonAutomaticReadTrackingEnabled()) {
+                speculativeConfig.signalSpeculativeNonAutomaticReadtrackingFailure();
+                throw SpeculativeConfigurationFailure.create();
+            }
+
+            return false;
+        }
+
+        return dodoRegisterRetryLatch(latch, wakeupVersion);
+    }
+
+    protected abstract boolean dodoRegisterRetryLatch(Latch latch, long wakeupVersion);
+
 }

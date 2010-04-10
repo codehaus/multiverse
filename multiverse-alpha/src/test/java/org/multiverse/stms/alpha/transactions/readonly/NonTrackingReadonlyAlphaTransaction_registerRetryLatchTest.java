@@ -35,6 +35,7 @@ public class NonTrackingReadonlyAlphaTransaction_registerRetryLatchTest {
 
     public NonTrackingReadonlyAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfiguration) {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, false)
+                .withExplicitRetryAllowed(true)
                 .withSpeculativeConfig(speculativeConfiguration);
 
         return new NonTrackingReadonlyAlphaTransaction(config);
@@ -44,7 +45,7 @@ public class NonTrackingReadonlyAlphaTransaction_registerRetryLatchTest {
     public void whenSpeculativeNonAutomaticReadTrackingAndUsed_thenSpeculativeConfigurationFailure() {
         ManualRef ref = new ManualRef(stm);
 
-        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, false, 100);
+        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(true, true, false, 100);
         AlphaTransaction tx = startSutTransaction(speculativeConfig);
         tx.openForRead(ref);
 
