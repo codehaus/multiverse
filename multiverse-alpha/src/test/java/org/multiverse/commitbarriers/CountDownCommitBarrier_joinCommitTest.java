@@ -2,10 +2,10 @@ package org.multiverse.commitbarriers;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.stms.AbstractTransactionImpl;
@@ -13,14 +13,17 @@ import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 public class CountDownCommitBarrier_joinCommitTest {
     private CountDownCommitBarrier barrier;
+    private Stm stm;
 
     @Before
     public void setUp() {
+        stm = getGlobalStmInstance();
         clearThreadLocalTransaction();
         clearCurrentThreadInterruptedStatus();
     }
@@ -45,9 +48,19 @@ public class CountDownCommitBarrier_joinCommitTest {
     }
 
     @Test
-    @Ignore
-    public void whenLastOneEntering() {
+    public void whenLastOneEntering() throws InterruptedException {
         barrier = new CountDownCommitBarrier(1);
+
+        Transaction tx = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .build()
+                .start();
+
+        barrier.joinCommit(tx);
+
+        assertIsCommitted(tx);
+        assertTrue(barrier.isCommitted());
+        assertEquals(0, barrier.getNumberWaiting());
     }
 
     @Test
@@ -80,11 +93,20 @@ public class CountDownCommitBarrier_joinCommitTest {
         assertEquals(0, ref.get());
     }
 
-
     @Test
-    @Ignore
     public void whenCommittedWhileWaiting() {
+        barrier = new CountDownCommitBarrier(3);
 
+        JoinCommitThread t1 = new JoinCommitThread(barrier);
+        JoinCommitThread t2 = new JoinCommitThread(barrier);
+
+        startAll(t1, t2);
+        sleepMs(500);
+
+        barrier.countDown();
+
+        joinAll(t1, t2);
+        assertTrue(barrier.isCommitted());
     }
 
     @Test
@@ -181,5 +203,4 @@ public class CountDownCommitBarrier_joinCommitTest {
         assertTrue(barrier.isCommitted());
         assertEquals(0, barrier.getNumberWaiting());
     }
-
 }

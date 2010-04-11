@@ -2,7 +2,6 @@ package org.multiverse.commitbarriers;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
@@ -66,13 +65,21 @@ public class VetoCommitBarrier_joinCommitTest {
     }
 
     @Test
-    @Ignore
-    public void whenTransactionPrepared() {
+    public void whenTransactionPrepared_thenAdded() {
+        VetoCommitBarrier barrier = new VetoCommitBarrier();
+
+        TransactionalInteger ref = new TransactionalInteger();
+        IncThread thread = new IncThread(ref, barrier, true);
+        thread.start();
+
+        sleepMs(500);
+        assertAlive(thread);
+        assertTrue(barrier.isClosed());
+        assertEquals(1, barrier.getNumberWaiting());
 
     }
 
     @Test
-    @Ignore
     public void whenPrepareFails() throws InterruptedException {
         final VetoCommitBarrier group = new VetoCommitBarrier();
         final TransactionalInteger ref = new TransactionalInteger();
@@ -179,11 +186,17 @@ public class VetoCommitBarrier_joinCommitTest {
         private final TransactionalInteger ref;
         private final VetoCommitBarrier barrier;
         private Transaction tx;
+        private boolean prepare;
 
         public IncThread(TransactionalInteger ref, VetoCommitBarrier barrier) {
+            this(ref, barrier, false);
+        }
+
+        public IncThread(TransactionalInteger ref, VetoCommitBarrier barrier, boolean prepare) {
             super("IncThread");
             this.barrier = barrier;
             this.ref = ref;
+            this.prepare = prepare;
         }
 
         @Override
@@ -191,6 +204,9 @@ public class VetoCommitBarrier_joinCommitTest {
         public void doRun() throws Exception {
             tx = getThreadLocalTransaction();
             ref.inc();
+            if (prepare) {
+                tx.prepare();
+            }
             barrier.joinCommit(tx);
         }
     }

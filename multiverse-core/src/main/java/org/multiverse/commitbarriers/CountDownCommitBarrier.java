@@ -79,7 +79,11 @@ public final class CountDownCommitBarrier extends CommitBarrier {
     }
 
     /**
-     * @throws CommitBarrierOpenException if the CountDownCommitBarrier already is aborted or committed.
+     * Signal that one party has returned. If this is the last party to returned, all transactions
+     * will commit.
+     * <p/>
+     * If the all parties already have returned, this call is ignored. This is the same behavior
+     * as the {@link java.util.concurrent.CountDownLatch#countDown()} method provides.
      */
     public void countDown() {
         List<Runnable> onCommitTasks = null;
@@ -95,11 +99,9 @@ public final class CountDownCommitBarrier extends CommitBarrier {
                     }
                     break;
                 case aborted:
-                    String abortMsg = "Can't call countDown on already aborted CountDownCommitBarrier";
-                    throw new CommitBarrierOpenException(abortMsg);
+                    break;
                 case committed:
-                    String commitMsg = "Can't call countDown on already committed CountDownCommitBarrier";
-                    throw new CommitBarrierOpenException(commitMsg);
+                    break;
                 default:
                     throw new IllegalStateException();
             }
@@ -114,6 +116,7 @@ public final class CountDownCommitBarrier extends CommitBarrier {
      * Adds 1 additional party to this CountDownCommitBarrier.
      *
      * @throws CommitBarrierOpenException if this CountDownCommitBarrier already is committed or aborted.
+     * @throws CommitBarrierOpenException if this CountDownCommitBarrier already is open.
      * @see #incParties(int)
      */
     public void incParties() {
@@ -121,7 +124,7 @@ public final class CountDownCommitBarrier extends CommitBarrier {
     }
 
     /**
-     * Adds additional parties to this CountDownCommitBarrier. This means that
+     * Adds additional parties to this CountDownCommitBarrier.
      * <p/>
      * Call is ignored when extra is 0.
      * <p/>
@@ -131,7 +134,7 @@ public final class CountDownCommitBarrier extends CommitBarrier {
      *
      * @param extra the additional parties.
      * @throws IllegalArgumentException   if extra smaller than 0.
-     * @throws CommitBarrierOpenException if this CountDownCommitBarrier already is committed or aborted.
+     * @throws CommitBarrierOpenException if this CountDownCommitBarrier already is open.
      */
     public void incParties(int extra) {
         if (extra < 0) {
@@ -162,7 +165,18 @@ public final class CountDownCommitBarrier extends CommitBarrier {
         }
     }
 
-    public void incParties(Transaction tx, final int extra) {
+    /**
+     * Increases the number of parties that need to return before this CommitBarrier can open.
+     * <p/>
+     * If extra is 0, this call is ignored.
+     *
+     * @param tx
+     * @param extra the number of extra parties
+     * @throws NullPointerException     if tx is null.
+     * @throws IllegalArgumentException is extra smaller than zero.
+     * @throws DeadTransactionException if the transaction is dead
+     */
+    public void incParties(Transaction tx, int extra) {
         if (tx == null) {
             throw new NullPointerException();
         }
@@ -203,6 +217,10 @@ public final class CountDownCommitBarrier extends CommitBarrier {
         }
     }
 
+    /**
+     * A TransactionLifecycleListener that is responsible for restoring the the number of
+     * parties after the transaction that increased them, was aborted.
+     */
     private class RestorePartiesCompensatingTask implements TransactionLifecycleListener {
         private final int extra;
 
