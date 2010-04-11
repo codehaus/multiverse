@@ -25,7 +25,7 @@ public class MapReadonlyAlphaTransaction_restartTest {
     }
 
     public MapReadonlyAlphaTransaction startSutTransaction() {
-        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new MapReadonlyAlphaTransaction(config);
     }
 

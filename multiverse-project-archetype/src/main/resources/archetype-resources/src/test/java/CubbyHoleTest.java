@@ -5,7 +5,6 @@ package ${package};
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 import org.junit.After;
@@ -13,7 +12,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.RetryError;
+import org.multiverse.api.TransactionFactory;
+import org.multiverse.api.exceptions.Retry;
+import ${package}.CubbyHole;
 
 /**
  * Unit tests for the {@link CubbyHole}.
@@ -23,20 +24,39 @@ import org.multiverse.api.exceptions.RetryError;
  * for the correct VM argument to set.
  * 
  * @author Andrew Phillips
- * @see org.multiverse.transactional.primitives.RefTest
+ * @see org.multiverse.transactional.DefaultTransactionalReferenceTest
  */
-public class CubbyHoleTest {
+public final class CubbyHoleTest {
+
     private Stm stm;
+    private TransactionFactory txFactory;
 
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
-        clearThreadLocalTransaction();
+        txFactory = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
+                .build();
+        setThreadLocalTransaction(null);
     }
 
     @After
     public void tearDown() {
-        clearThreadLocalTransaction();
+        setThreadLocalTransaction(null);
+    }
+
+    @Test
+    public void constructorLifts() {
+        long version = stm.getVersion();
+
+        Transaction tx = txFactory.start();
+        setThreadLocalTransaction(tx);
+
+        CubbyHole<Object> cubbyHole = new CubbyHole<Object>();
+
+        tx.commit();
+        assertEquals(version, stm.getVersion());
     }
 
     // ============== rollback =================
@@ -49,65 +69,104 @@ public class CubbyHoleTest {
         rollback("bar", null);
     }
 
-    private void rollback(String initialContents, String newContents) {
-        CubbyHole<String> cubbyHole = new CubbyHole<String>(initialContents);
+    public void rollback(String initialValue, String newContents) {
+        CubbyHole<String> cubbyHole = new CubbyHole<String>(initialValue);
 
-        long version = stm.getTime();
+        long version = stm.getVersion();
 
-        Transaction t = stm.startUpdateTransaction("rollback");
-        setThreadLocalTransaction(t);
+        Transaction tx = stm.getTransactionFactoryBuilder()
+                .setReadonly(false)
+                .build()
+                .start();
+        setThreadLocalTransaction(tx);
         cubbyHole.set(newContents);
-        t.abort();
+        tx.abort();
 
-        assertEquals(version, stm.getTime());
-        assertSame(initialContents, cubbyHole.get());
+        assertEquals(version, stm.getVersion());
+        assertSame(initialValue, cubbyHole.get());
     }
 
     // ========== constructors ==================
 
     @Test
     public void noArgConstruction() {
-        long version = stm.getTime();
+        long version = stm.getVersion();
 
         CubbyHole<String> cubbyHole = new CubbyHole<String>();
 
-        assertEquals(version + 1, stm.getTime());
+        assertEquals(version, stm.getVersion());
         assertNull(cubbyHole.get());
     }
 
     @Test
     public void nullConstruction() {
-        long version = stm.getTime();
+        long version = stm.getVersion();
 
         CubbyHole<String> cubbyHole = new CubbyHole<String>();
 
-        assertEquals(version + 1, stm.getTime());
-        assertEquals(null, cubbyHole.get());
+        assertEquals(version, stm.getVersion());
+        assertNull(cubbyHole.get());
     }
 
     @Test
     public void nonNullConstruction() {
-        long version = stm.getTime();
+        long version = stm.getVersion();
         String s = "foo";
         CubbyHole<String> cubbyHole = new CubbyHole<String>(s);
 
-        assertEquals(version + 1, stm.getTime());
+        assertEquals(version, stm.getVersion());
         assertEquals(s, cubbyHole.get());
     }
 
     @Test
-    public void testIsEmpty() {
+    public void testIsNull() {
         CubbyHole<String> cubbyHole = new CubbyHole<String>();
 
-        long version = stm.getTime();
-        assertTrue(cubbyHole.isEmpty());
-        assertEquals(version, stm.getTime());
+        long version = stm.getVersion();
+        assertNull(cubbyHole.get());
+        assertEquals(version, stm.getVersion());
 
         cubbyHole.set("foo");
 
-        version = stm.getTime();
-        assertFalse(cubbyHole.isEmpty());
-        assertEquals(version, stm.getTime());
+        version = stm.getVersion();
+        assertNotNull(cubbyHole.get());
+        assertEquals(version, stm.getVersion());
+    }
+
+    @Test
+    public void testSetFromNullToNull() {
+        CubbyHole<String> cubbyHole = new CubbyHole<String>();
+
+        long version = stm.getVersion();
+        String result = cubbyHole.set(null);
+        assertNull(result);
+        assertEquals(version, stm.getVersion());
+        assertNull(cubbyHole.get());
+    }
+
+    @Test
+    public void testSetFromNullToNonNull() {
+        CubbyHole<String> cubbyHole = new CubbyHole<String>();
+
+        long version = stm.getVersion();
+        String newContents = "foo";
+        String result = cubbyHole.set(newContents);
+        assertNull(result);
+        assertEquals(version + 1, stm.getVersion());
+        assertSame(newContents, cubbyHole.get());
+    }
+
+    @Test
+    public void testSetFromNonNullToNull() {
+        String oldContents = "foo";
+        CubbyHole<String> cubbyHole = new CubbyHole<String>(oldContents);
+
+        long version = stm.getVersion();
+
+        String result = cubbyHole.set(null);
+        assertSame(oldContents, result);
+        assertEquals(version + 1, stm.getVersion());
+        assertNull(cubbyHole.get());
     }
 
     @Test
@@ -116,11 +175,12 @@ public class CubbyHoleTest {
 
         CubbyHole<String> cubbyHole = new CubbyHole<String>(oldContents);
 
-        long version = stm.getTime();
+        long version = stm.getVersion();
 
         String newContents = "bar";
-        cubbyHole.set(newContents);
-        assertEquals(version + 1, stm.getTime());
+        String result = cubbyHole.set(newContents);
+        assertSame(oldContents, result);
+        assertEquals(version + 1, stm.getVersion());
         assertSame(newContents, cubbyHole.get());
     }
 
@@ -130,10 +190,47 @@ public class CubbyHoleTest {
 
         CubbyHole<String> cubbyHole = new CubbyHole<String>(oldContents);
 
-        long version = stm.getTime();
+        long version = stm.getVersion();
 
+        String result = cubbyHole.set(oldContents);
+        assertSame(oldContents, result);
+        assertEquals(version, stm.getVersion());
+        assertSame(oldContents, cubbyHole.get());
+    }
+
+    @Test
+    public void testSetEqualIsNotUsedButReferenceEquality() {
+        String oldContents = new String("foo");
+
+        CubbyHole<String> cubbyHole = new CubbyHole<String>(oldContents);
+
+        long version = stm.getVersion();
+
+        String newContents = new String("foo");
+        String result = cubbyHole.set(newContents);
+        assertSame(oldContents, result);
+        assertEquals(version + 1, stm.getVersion());
+        assertSame(newContents, cubbyHole.get());
+    }
+
+    @Test
+    public void testSetAndUnsetIsNotSeenAsChange() {
+        String oldContents = "foo";
+        CubbyHole<String> cubbyHole = new CubbyHole<String>(oldContents);
+
+        long version = stm.getVersion();
+        Transaction tx = stm.getTransactionFactoryBuilder()
+                .setReadonly(false)
+                .build()
+                .start();
+        setThreadLocalTransaction(tx);
+        String newContents = "bar";
+        cubbyHole.set(newContents);
         cubbyHole.set(oldContents);
-        assertEquals(version, stm.getTime());
+        tx.commit();
+        setThreadLocalTransaction(null);
+
+        assertEquals(version, stm.getVersion());
         assertSame(oldContents, cubbyHole.get());
     }
 
@@ -143,10 +240,10 @@ public class CubbyHoleTest {
 
         CubbyHole<String> cubbyHole = new CubbyHole<String>(oldContents);
 
-        long version = stm.getTime();
+        long version = stm.getVersion();
 
         String result = cubbyHole.getOrAwait();
-        assertEquals(version, stm.getTime());
+        assertEquals(version, stm.getVersion());
         assertSame(oldContents, result);
     }
 
@@ -154,18 +251,18 @@ public class CubbyHoleTest {
     public void getOrAwaitRetriesIfNull() {
         CubbyHole<String> cubbyHole = new CubbyHole<String>();
 
-        long version = stm.getTime();
+        long version = stm.getVersion();
 
         //we start a transaction because we don't want to lift on the retry mechanism
         //of the transaction that else would be started on the getOrAwait method.
-        Transaction t = stm.startUpdateTransaction(null);
+        Transaction t = stm.getTransactionFactoryBuilder().build().start();
         setThreadLocalTransaction(t);
         try {
             cubbyHole.getOrAwait();
             fail();
-        } catch (RetryError retryError) { 
-            // expected
+        } catch (Retry retry) {
+
         }
-        assertEquals(version, stm.getTime());
+        assertEquals(version, stm.getVersion());
     }
 }

@@ -72,6 +72,8 @@ public class TransactionalInterfaceMethodTransformer {
         transactionMethod.access = methodNode.access;//todo: should be made synthetic.
         transactionMethod.name = methodNode.name;
         transactionMethod.exceptions = methodNode.exceptions;
+        //todo: better signature should be used here
+        //transactionMethod.signature = methodNode.signature;
         transactionMethod.desc = createMethodDescriptorWithRightIntroducedVariable(
                 methodNode.desc, Type.getInternalName(AlphaTransaction.class));
         return transactionMethod;

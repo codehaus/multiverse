@@ -26,8 +26,7 @@ public class MonoUpdateAlphaTransaction_abortTest {
     }
 
     public MonoUpdateAlphaTransaction startSutTransaction() {
-        UpdateConfiguration config =
-                new UpdateConfiguration(stmConfig.clock);
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock);
         return new MonoUpdateAlphaTransaction(config);
     }
 
@@ -109,7 +108,10 @@ public class MonoUpdateAlphaTransaction_abortTest {
 
         AlphaTransaction listenTx = stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
-                .setAutomaticReadTracking(true).build().start();
+                .setAutomaticReadTrackingEnabled(true)
+                .setExplicitRetryAllowed(true)
+                .build()
+                .start();
         listenTx.openForRead(ref);
         listenTx.registerRetryLatch(latch);
 

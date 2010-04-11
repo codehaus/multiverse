@@ -31,9 +31,8 @@ public class NonTrackingReadonlyAlphaTransaction_openForWriteTest {
     }
 
     public NonTrackingReadonlyAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfig) {
-        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock)
-                .withSpeculativeConfig(speculativeConfig)
-                .withAutomaticReadTracking(false);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, false)
+                .withSpeculativeConfig(speculativeConfig);
 
         return new NonTrackingReadonlyAlphaTransaction(config);
     }

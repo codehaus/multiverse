@@ -41,15 +41,62 @@ import java.util.concurrent.TimeUnit;
 public interface TransactionFactoryBuilder<T extends Transaction, B extends TransactionFactoryBuilder> {
 
     /**
+     * Checks if dirty check is enabled.
+     *
+     * @return true if enabled, false otherwise.
+     * @see #setDirtyCheckEnabled(boolean)
+     */
+    boolean isDirtyCheckEnabled();
+
+    /**
+     * If the Transaction should do a dirty check on the transactional objects it has
+     * loaded that need to commit. Default is true. If this is disabled, the transaction
+     * is protected against the aba problem, at the cost of reduced concurrency (increased
+     * number of conflicts).
+     *
+     * @param dirtyCheckEnabled true if dirty check should be executed, false otherwise.
+     * @return the updated TransactionFactoryBuilder.
+     * @see #isDirtyCheckEnabled()
+     */
+    B setDirtyCheckEnabled(boolean dirtyCheckEnabled);
+
+    /**
+     * If the Transaction should be able to do an explicit retry (for a blocking operation).
+     *
+     * @param explicitRetryEnabled true if explicit retry is enabled, false otherwise.
+     * @return the updated TransactionFactoryBuilder
+     * @see #isExplicitRetryAllowed()
+     */
+    B setExplicitRetryAllowed(boolean explicitRetryEnabled);
+
+    /**
+     * Checks if explicit retry (for blocking operations) is allowed.
+     *
+     * @return true if allowed, false otherwise.
+     * @see #setExplicitRetryAllowed(boolean)
+     */
+    boolean isExplicitRetryAllowed();
+
+    /**
      * Creates a new {@link TransactionFactoryBuilder} based on the this TransactionFactoryBuilder but now
      * configured with the provided familyName.
      * <p/>
-     * The transaction familyName is useful debugging purposes.
+     * The transaction familyName is useful debugging purposes. With Multiverse 0.4 it was
+     * also needed for speculative configuration, but that requirement is dropped.
      *
      * @param familyName the familyName of the transaction.
-     * @return the new TransactionFactoryBuilder
+     * @return the updated TransactionFactoryBuilder
+     * @see #getFamilyName()
      */
     B setFamilyName(String familyName);
+
+    /**
+     * Returns the family name of the transaction.
+     *
+     * @return the familyname of the transaction.
+     * @see #setFamilyName(String)
+     */
+    String getFamilyName();
 
     /**
      * Creates a new {@link TransactionFactoryBuilder} based on the this TransactionFactoryBuilder but now
@@ -59,9 +106,18 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      * If this property is set, the stm will not speculate on this property anymore.
      *
      * @param readonly true if the transaction should be readonly, false otherwise.
-     * @return the new TransactionFactoryBuilder
+     * @return the updated TransactionFactoryBuilder
+     * @see #isReadonly()
      */
     B setReadonly(boolean readonly);
+
+    /**
+     * Checks if the transaction is readonly or an update.
+     *
+     * @return true if enabled, false otherwise.
+     * @see #setReadonly(boolean)
+     */
+    boolean isReadonly();
 
     /**
      * If the transaction should automatically track all reads that have been done. This is needed for blocking
@@ -69,26 +125,55 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      * <p/>
      * If this property is set, the stm will not speculate on this property anymore.
      *
-     * @param automaticReadTracking true if readtracking enabled, false otherwise.
-     * @return the new TransactionFactoryBuilder
+     * @param automaticReadTrackingEnabled true if read tracking enabled, false otherwise.
+     * @return the updated TransactionFactoryBuilder
+     * @see #isQuickReleaseEnabled()
      */
-    B setAutomaticReadTracking(boolean automaticReadTracking);
+    B setAutomaticReadTrackingEnabled(boolean automaticReadTrackingEnabled);
+
+    /**
+     * Checks if the transaction automatically tracks reads.
+     *
+     * @return true if automatic read tracking is enabled, false otherwise.
+     * @see #setAutomaticReadTrackingEnabled(boolean)
+     */
+    boolean isAutomaticReadTracking();
 
     /**
      * Sets if the transaction can be interrupted while doing blocking operations.
      *
      * @param interruptible if the transaction can be interrupted while doing blocking operations.
-     * @return the new TransactionFactoryBuilder
+     * @return the updated TransactionFactoryBuilder
+     * @see #isInterruptible()
      */
     B setInterruptible(boolean interruptible);
 
     /**
-     * Sets the commit
+     * Checks if the transaction is interruptible.
      *
-     * @param commitLockPolicy
-     * @return
+     * @return true if interruptible, false otherwise.
+     * @see #setInterruptible(boolean)
+     */
+    boolean isInterruptible();
+
+    /**
+     * Sets the CommitLockPolicy. The CommitLockPolicy is only used by update
+     * transactions that commit: when the stm commits, locks need to be
+     * acquired on dirty objects.
+     *
+     * @param commitLockPolicy the new CommitLockPolicy
+     * @return the updated TransactionFactoryBuilder.
+     * @throws NullPointerException if commitLockPolicy is null.
+     * @see #getCommitLockPolicy()
      */
     B setCommitLockPolicy(CommitLockPolicy commitLockPolicy);
+
+    /**
+     * Returns the CommitLockPolicy
+     *
+     * @return the CommitLockPolicy.
+     */
+    CommitLockPolicy getCommitLockPolicy();
 
     /**
      * With the speculative configuration enabled, the stm is allowed to determine optimal settings
@@ -99,18 +184,36 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      * The value defaults to true and in most cases is the best setting.
      *
      * @param newValue indicates if speculative configuration should be enabled.
-     * @return the new TransactionFactoryBuilder
+     * @return the updated TransactionFactoryBuilder
+     * @see #isSpeculativeConfigurationEnabled()
      */
     B setSpeculativeConfigurationEnabled(boolean newValue);
+
+    /**
+     * Checks if speculative configuration is enabled.
+     *
+     * @return true if enabled, false otherwise.
+     * @see #setSpeculativeConfigurationEnabled(boolean)
+     */
+    boolean isSpeculativeConfigurationEnabled();
 
     /**
      * If writeskew problem is allowed to happen. Defaults to true and can have a big impact on performance (the
      * complete read set needs to be validated and not just the writes). So disable it wisely.
      *
      * @param allowWriteSkew indicates if writeSkew problem is allowed.
-     * @return the new TransactionFactoryBuilder
+     * @return the updated TransactionFactoryBuilder
+     * @see #isWriteSkewProblemAllowed()
      */
-    B setAllowWriteSkewProblem(boolean allowWriteSkew);
+    B setWriteSkewProblemAllowed(boolean allowWriteSkew);
+
+    /**
+     * Checks if the writeskew problem is allowed to happen.
+     *
+     * @return true if allowed, false otherwise.
+     * @see #setWriteSkewProblemAllowed(boolean)
+     */
+    boolean isWriteSkewProblemAllowed();
 
     /**
      * Checks if the quick release on locks is enabled. When a transaction commits, it
@@ -125,29 +228,87 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      *
      * @param enabled true if the lock of a transaction object should be releases as soon as possible instead
      *                of waiting for the whole transaction to commit.
-     * @return the created TransactionFactoryBuilder
+     * @return the updated TransactionFactoryBuilder
+     * @see #isQuickReleaseEnabled()
      */
     B setQuickReleaseEnabled(boolean enabled);
+
+    /**
+     * Checks if quick release of locks while committing is enabled.
+     *
+     * @return true if enabled, false otherwise.
+     * @see #setQuickReleaseEnabled(boolean)
+     */
+    boolean isQuickReleaseEnabled();
 
     /**
      * Sets the new backoff policy. Policy is used to backoff when a transaction conflicts with another transaction.
      * See the {@link BackoffPolicy} for more information.
      *
      * @param backoffPolicy the backoff policy to use.
-     * @return the new TransactionFactoryBuilder
+     * @return the updated TransactionFactoryBuilder
      * @throws NullPointerException if backoffPolicy is null.
+     * @see #getBackoffPolicy()
      */
     B setBackoffPolicy(BackoffPolicy backoffPolicy);
 
+    /**
+     * Return the BackoffPolicy used.
+     *
+     * @return the BackoffPolicy.
+     * @see #setBackoffPolicy(org.multiverse.api.backoff.BackoffPolicy)
+     */
+    BackoffPolicy getBackoffPolicy();
+
+    /**
+     * Sets the timeout (the maximum time a transaction is allowed to block.
+     * Long.MAX_VALUE indicates that no timeout should be used.
+     *
+     * @param timeout the timeout (is allowed to be negative which indicates that
+     *                no timeout is available and fails immediately).
+     * @param unit    the TimeUnit for the timeout
+     * @return the updated TransactionFactoryBuilder
+     * @throws NullPointerException if unit is null.
+     */
     B setTimeout(long timeout, TimeUnit unit);
 
     /**
+     * Returns the timeout.
+     *
+     * @return the timeout.
+     * @see #getTimeoutTimeUnit()
+     * @see #setTimeout(long, java.util.concurrent.TimeUnit)
+     */
+    long getTimeout();
+
+    /**
+     * Returns the timeout.
+     *
+     * @return the TimeUnit for the Timeout.
+     * @see #getTimeout()
+     * @see #setTimeout(long, java.util.concurrent.TimeUnit)
+     */
+    TimeUnit getTimeoutTimeUnit();
+
+    /**
      * Sets the the maximum count a transaction can be retried. The default is 1000.
+     * Setting it to a very low value could mean that a transaction can't complete.
      *
      * @param retryCount the maximum number of times a transaction can be tried.
-     * @return the new TransactionFactoryBuilder
+     * @return the updated TransactionFactoryBuilder
+     * @throws IllegalArgumentException if retryCount smaller than 0.
      */
     B setMaxRetryCount(int retryCount);
+
+    /**
+     * Returns the maximum number of times a transaction can be retried. It doesn't
+     * matter if a retry is caused by explicit retries, or by more accidental retries
+     * (read/write conflicts).
+     *
+     * @return the maximum number of times a transaction can be retried. The returned
+     *         value will always be equal or larger than 0.
+     */
+    int getMaxRetryCount();
 
     /**
      * Builds a {@link TransactionFactory} with the provided configuration.

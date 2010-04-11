@@ -1,4 +1,4 @@
-package org.multiverse.instrumentation.compiler;
+package org.multiverse.instrumentation;
 
 import org.multiverse.instrumentation.asm.AsmUtils;
 import org.multiverse.instrumentation.metadata.MetadataRepository;
@@ -10,30 +10,32 @@ import java.util.List;
 /**
  * @author Peter Veentjer
  */
-public class StandardClazzCompiler implements ClazzCompiler {
+public class StandardInstrumentor implements Instrumentor {
 
     private final MetadataRepository metadataRepository = new MetadataRepository();
-    private final List<CompilePhase> compileSteps = new LinkedList<CompilePhase>();
-    private final String name;
-    private final String version;
+    private final List<InstrumentationPhase> phases = new LinkedList<InstrumentationPhase>();
+    private final String compilerName;
+    private final String compilerVersion;
     private Resolver resolver;
     private Filer filer;
     private boolean dumpBytecode;
-    private File dumpDir;
+    private File dumpDir = new File(System.getProperty("java.io.tmpdir"));
 
     private Log log = new NullLog();
+    private final String stmName;
 
 
-    public StandardClazzCompiler(String name, String version) {
-        if (name == null || version == null) {
+    public StandardInstrumentor(String compilerName, String compilerVersion, String stmName) {
+        if (compilerName == null || compilerVersion == null || stmName == null) {
             throw new NullPointerException();
         }
-        this.name = name;
-        this.version = version;
+        this.compilerName = compilerName;
+        this.compilerVersion = compilerVersion;
+        this.stmName = stmName;
     }
 
-    protected final void add(CompilePhase phase) {
-        if (compileSteps == null) {
+    protected final void add(InstrumentationPhase phase) {
+        if (phases == null) {
             throw new NullPointerException();
         }
 
@@ -41,17 +43,21 @@ public class StandardClazzCompiler implements ClazzCompiler {
         //     logger.fine("Adding CompilerPhase: " + phase.getName());
         // }
 
-        compileSteps.add(phase);
+        phases.add(phase);
     }
 
     @Override
-    public String getName() {
-        return name;
+    public String getInstrumentorName() {
+        return compilerName;
     }
 
     @Override
-    public String getVersion() {
-        return version;
+    public String getInstrumentorVersion() {
+        return compilerVersion;
+    }
+
+    public String getStmName() {
+        return stmName;
     }
 
     @Override
@@ -80,6 +86,10 @@ public class StandardClazzCompiler implements ClazzCompiler {
 
     @Override
     public void setDumpDirectory(File dumpDirectory) {
+        if (dumpDirectory == null) {
+            throw new NullPointerException();
+        }
+
         this.dumpDir = dumpDirectory;
     }
 
@@ -115,9 +125,12 @@ public class StandardClazzCompiler implements ClazzCompiler {
 
         Environment env = new EnvironmentImpl();
         Clazz beforeClazz = originalClazz;
-        for (CompilePhase step : compileSteps) {
-            Clazz afterClazz = step.compile(env, beforeClazz);
-            dump(step, beforeClazz, afterClazz);
+        for (InstrumentationPhase phase : phases) {
+            Clazz afterClazz = phase.instrument(env, beforeClazz);
+            if (afterClazz == null) {
+                break;
+            }
+            dump(phase, beforeClazz, afterClazz);
             beforeClazz = afterClazz;
         }
 
@@ -130,7 +143,7 @@ public class StandardClazzCompiler implements ClazzCompiler {
         return beforeClazz;
     }
 
-    private void dump(CompilePhase step, Clazz beforeClazz, Clazz afterClazz) {
+    private void dump(InstrumentationPhase step, Clazz beforeClazz, Clazz afterClazz) {
         if (!dumpBytecode) {
             return;
         }
@@ -160,6 +173,8 @@ public class StandardClazzCompiler implements ClazzCompiler {
                 className.startsWith("org/hamcrest/") ||
                 className.startsWith("com/intellij") ||
                 className.startsWith("org/eclipse") ||
+                className.startsWith("org/kohsuke/args4j") ||
+                className.startsWith("org/objectweb/asm") ||
                 className.startsWith("junit/");
     }
 
@@ -197,6 +212,6 @@ public class StandardClazzCompiler implements ClazzCompiler {
 
     @Override
     public String toString() {
-        return name + "-" + version;
+        return compilerName + "-" + compilerVersion;
     }
 }

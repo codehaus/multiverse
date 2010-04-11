@@ -42,7 +42,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
                 stmConfig.commitLockPolicy,
                 null,
                 speculativeConfig,
-                stmConfig.maxRetryCount, true, false, true, true, true, true);
+                stmConfig.maxRetryCount, true, false, true, true, true, true, false);
 
         return new ArrayUpdateAlphaTransaction(config, 100);
     }

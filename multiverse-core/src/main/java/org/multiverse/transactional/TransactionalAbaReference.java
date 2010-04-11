@@ -42,7 +42,7 @@ public final class TransactionalAbaReference<E> implements TransactionalReferenc
     }
 
     @Override
-    @TransactionalMethod(readonly = true, automaticReadTracking = true)
+    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
     public E getOrAwait() {
         if (reference == null) {
             retry();
@@ -52,7 +52,7 @@ public final class TransactionalAbaReference<E> implements TransactionalReferenc
     }
 
     @Override
-    @TransactionalMethod(readonly = true, automaticReadTracking = true, interruptible = true)
+    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true, interruptible = true)
     public E getOrAwaitInterruptibly() throws InterruptedException {
         if (reference == null) {
             retry();

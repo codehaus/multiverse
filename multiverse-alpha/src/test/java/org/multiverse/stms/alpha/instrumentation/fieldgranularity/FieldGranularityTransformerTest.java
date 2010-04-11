@@ -27,7 +27,7 @@ public class FieldGranularityTransformerTest {
 
     //test with array
 
-    //test that annotation on non transactional object doesnt cause problems.
+    //test that annotation on non transactional object doesn't cause problems.
 
     //test that annotation on final field is ignored.
 

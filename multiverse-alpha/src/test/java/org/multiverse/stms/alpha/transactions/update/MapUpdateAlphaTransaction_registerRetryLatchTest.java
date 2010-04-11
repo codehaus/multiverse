@@ -46,7 +46,8 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
     public MapUpdateAlphaTransaction startSutTransactionWithoutReadTracking(SpeculativeConfiguration speculativeConfig) {
         UpdateConfiguration config = new UpdateConfiguration(stm.getClock())
                 .withSpeculativeConfiguration(speculativeConfig)
-                .withAutomaticReadTracking(false);
+                .withExplictRetryAllowed(true)
+                .withAutomaticReadTrackingEnabled(false);
 
         return new MapUpdateAlphaTransaction(config);
     }
@@ -232,7 +233,9 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
         TestThread thread = new TestThread() {
             public void doRun() {
                 TransactionFactory factory = stm.getTransactionFactoryBuilder()
-                        .setAutomaticReadTracking(true).build();
+                        .setExplicitRetryAllowed(true)
+                        .setAutomaticReadTrackingEnabled(true)
+                        .build();
 
                 new TransactionTemplate(factory) {
                     @Override
@@ -265,7 +268,10 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
 
         TestThread thread = new TestThread() {
             public void doRun() {
-                TransactionFactory factory = stm.getTransactionFactoryBuilder().setAutomaticReadTracking(true).build();
+                TransactionFactory factory = stm.getTransactionFactoryBuilder()
+                        .setExplicitRetryAllowed(true)
+                        .setAutomaticReadTrackingEnabled(true)
+                        .build();
                 new TransactionTemplate(factory) {
                     @Override
                     public Object execute(Transaction t) throws Exception {

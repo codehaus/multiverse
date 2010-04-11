@@ -35,7 +35,7 @@ public class MapReadonlyAlphaTransaction_openForCommutingWriteTest {
     }
 
     public MapReadonlyAlphaTransaction startTransactionUnderTest(SpeculativeConfiguration speculativeConfig) {
-        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock)
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true)
                 .withSpeculativeConfig(speculativeConfig);
         return new MapReadonlyAlphaTransaction(config);
     }

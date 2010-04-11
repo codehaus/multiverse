@@ -1,8 +1,8 @@
 package org.multiverse.javaagent;
 
 import org.multiverse.MultiverseConstants;
-import org.multiverse.instrumentation.compiler.ClazzCompiler;
-import org.multiverse.instrumentation.compiler.SystemOutLog;
+import org.multiverse.instrumentation.Instrumentor;
+import org.multiverse.instrumentation.SystemOutLog;
 
 import java.io.File;
 import java.lang.instrument.Instrumentation;
@@ -20,7 +20,7 @@ import static java.lang.System.getProperty;
  * This agent is a general purpose agent that can be used for different STM implementation. And
  * can be configured through System.properties.
  * properties:
- * org.multiverse.javaagent.compiler=org.multiverse.stms.alpha.instrumentation.AlphaCompiler
+ * org.multiverse.javaagent.instrumentor=org.multiverse.stms.alpha.instrumentation.Instrumentor
  * org.multiverse.javaagent.dumpBytecode=true/false
  * org.multiverse.javaagent.verbose=true/false
  * org.multiverse.javaagent.dumpDirectory=directory for dumping classfiles (defaults to the tmp dir)
@@ -32,17 +32,17 @@ import static java.lang.System.getProperty;
  */
 public final class MultiverseJavaAgent {
 
-    public final static String KEY = "org.multiverse.javaagent.compiler";
+    public final static String KEY = "org.multiverse.javaagent.instrumentor";
 
     public static void premain(String agentArgs, Instrumentation inst) throws UnmodifiableClassException {
         printMultiverseJavaAgentInfo();
 
-        ClazzCompiler compiler = loadClazzCompiler();
+        Instrumentor compiler = loadClazzCompiler();
         inst.addTransformer(new MultiverseClassFileTransformer(compiler));
     }
 
-    private static ClazzCompiler loadClazzCompiler() {
-        ClazzCompiler compiler = createClazzCompiler();
+    private static Instrumentor loadClazzCompiler() {
+        Instrumentor compiler = createInstrumentor();
 
         boolean verbose = getSystemBooleanProperty("verbose", false);
         if (verbose) {
@@ -71,31 +71,31 @@ public final class MultiverseJavaAgent {
         }
     }
 
-    private static ClazzCompiler createClazzCompiler() {
-        String compilerClassName = getSystemProperty(
-                "compiler",
-                "org.multiverse.stms.alpha.instrumentation.AlphaClazzCompiler");
+    private static Instrumentor createInstrumentor() {
+        String instrumentorClassName = getSystemProperty(
+                "instrumentor",
+                "org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor");
 
-        System.out.println(format("MultiverseJavaAgent: Using compiler '%s'", compilerClassName));
+        System.out.println(format("MultiverseJavaAgent: Using org.multiverse.instrumentation.Instrumentor '%s'", instrumentorClassName));
 
-        Constructor constructor = getMethod(compilerClassName);
+        Constructor constructor = getMethod(instrumentorClassName);
         try {
-            return (ClazzCompiler) constructor.newInstance();
+            return (Instrumentor) constructor.newInstance();
         } catch (IllegalAccessException e) {
-            String msg = format("Failed to initialize Compiler through System property '%s' with value '%s'." +
+            String msg = format("Failed to initialize Instrumentor through System property '%s' with value '%s'." +
                     "The constructor is not accessable.",
-                    KEY, compilerClassName);
+                    KEY, instrumentorClassName);
             throw new IllegalArgumentException(msg, e);
         } catch (InvocationTargetException e) {
-            String msg = format("Failed to initialize Compiler through System property '%s' with value '%s'." +
+            String msg = format("Failed to initialize Instrumentor through System property '%s' with value '%s'." +
                     "The constructor threw an exception.",
-                    KEY, compilerClassName);
+                    KEY, instrumentorClassName);
             System.out.println(msg);
             throw new IllegalArgumentException(msg, e);
         } catch (InstantiationException e) {
-            String msg = format("Failed to initialize Compiler through System property '%s' with value '%s'." +
+            String msg = format("Failed to initialize Instrumentor through System property '%s' with value '%s'." +
                     "The class could not be instantiated.",
-                    KEY, compilerClassName);
+                    KEY, instrumentorClassName);
             System.out.println(msg);
             throw new IllegalArgumentException(msg, e);
         }
@@ -122,18 +122,18 @@ public final class MultiverseJavaAgent {
     private static Constructor getMethod(String className) {
         Class compilerClazz;
         try {
-            compilerClazz = Thread.currentThread().getContextClassLoader().loadClass(className);
+            compilerClazz = ClassLoader.getSystemClassLoader().loadClass(className);
         } catch (ClassNotFoundException e) {
-            String msg = format("Failed to initialize Compiler through System property '%s' with value '%s'." +
+            String msg = format("Failed to initialize Instrumentor through System property '%s' with value '%s'." +
                     "Is not an existing class (it can't be found using the Thread.currentThread.getContextClassLoader).",
                     KEY, className);
             System.out.println(msg);
             throw new IllegalArgumentException(msg, e);
         }
 
-        if (!ClazzCompiler.class.isAssignableFrom(compilerClazz)) {
-            String msg = format("Failed to initialize Compiler through System property '%s' with value '%s'." +
-                    "Is not an subclass of org.multiverse.compiler.ClazzCompiler).",
+        if (!Instrumentor.class.isAssignableFrom(compilerClazz)) {
+            String msg = format("Failed to initialize Instrumentor through System property '%s' with value '%s'." +
+                    "Is not an subclass of org.multiverse.compiler.Instrumentor).",
                     KEY, className);
             System.out.println(msg);
             throw new IllegalArgumentException(msg);
@@ -143,7 +143,7 @@ public final class MultiverseJavaAgent {
         try {
             method = compilerClazz.getConstructor();
         } catch (NoSuchMethodException e) {
-            String msg = format("Failed to initialize Compiler through System property '%s' with value '%s'." +
+            String msg = format("Failed to initialize Instrumentor through System property '%s' with value '%s'." +
                     "A no arg constructor is not found.",
                     KEY, compilerClazz);
             System.out.println(msg);

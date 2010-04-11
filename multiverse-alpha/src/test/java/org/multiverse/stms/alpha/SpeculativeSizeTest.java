@@ -78,7 +78,7 @@ public class SpeculativeSizeTest {
         SpeculativeSize o = new SpeculativeSize();
 
         o.update();
-        assertEquals(""+o.transactions,4, o.transactions.size());
+        assertEquals("" + o.transactions, 4, o.transactions.size());
         assertInstanceOf(o.transactions.get(0), NonTrackingReadonlyAlphaTransaction.class);
         assertInstanceOf(o.transactions.get(1), MonoUpdateAlphaTransaction.class);
         assertInstanceOf(o.transactions.get(2), ArrayUpdateAlphaTransaction.class);
@@ -108,7 +108,7 @@ public class SpeculativeSizeTest {
             }
         }
 
-        @TransactionalMethod(automaticReadTracking = true)
+        @TransactionalMethod(automaticReadTrackingEnabled = true)
         public void trackingRead() {
             transactions.add(getThreadLocalTransaction());
             for (int k = 0; k < array.length(); k++) {
@@ -122,7 +122,7 @@ public class SpeculativeSizeTest {
             for (int k = 0; k < array.length(); k++) {
                 array.set(k, array.get(k) + "a");
             }
-            
+
         }
     }
 }

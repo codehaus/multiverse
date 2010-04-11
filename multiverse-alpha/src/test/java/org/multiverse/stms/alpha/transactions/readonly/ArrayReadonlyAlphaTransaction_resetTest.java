@@ -25,7 +25,7 @@ public class ArrayReadonlyAlphaTransaction_resetTest {
     }
 
     public ArrayReadonlyAlphaTransaction startTransactionUnderTest() {
-        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new ArrayReadonlyAlphaTransaction(config, 100);
     }
 

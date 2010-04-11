@@ -1,4 +1,4 @@
-package org.multiverse.instrumentation.compiler;
+package org.multiverse.instrumentation;
 
 import java.util.LinkedList;
 import java.util.List;

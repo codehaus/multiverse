@@ -33,7 +33,7 @@ public class ArrayReadonlyAlphaTransaction_openForWriteTest {
     }
 
     public ArrayReadonlyAlphaTransaction startTransactionUnderTest(SpeculativeConfiguration speculativeConfiguration) {
-        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock)
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true)
                 .withSpeculativeConfig(speculativeConfiguration);
         return new ArrayReadonlyAlphaTransaction(config, speculativeConfiguration.getOptimalSize());
     }

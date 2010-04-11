@@ -150,7 +150,10 @@ public class ArrayUpdateAlphaTransaction_commitTest {
     private void registerRetryListener(ManualRef ref, Latch latch) {
         AlphaTransaction listenTx = stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
-                .setAutomaticReadTracking(true).build().start();
+                .setAutomaticReadTrackingEnabled(true)
+                .setExplicitRetryAllowed(true)
+                .build()
+                .start();
 
         listenTx.openForRead(ref);
         listenTx.registerRetryLatch(latch);
@@ -207,7 +210,7 @@ public class ArrayUpdateAlphaTransaction_commitTest {
         ManualRef ref2 = new ManualRef(stm);
 
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
-                .withAllowWriteSkewProblem(false);
+                .withWriteSkewProblemAllowed(false);
 
         AlphaTransaction tx1 = new ArrayUpdateAlphaTransaction(config, 10);
         tx1.openForRead(ref1);

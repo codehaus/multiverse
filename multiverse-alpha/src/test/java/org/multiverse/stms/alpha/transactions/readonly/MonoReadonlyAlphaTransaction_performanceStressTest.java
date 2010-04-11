@@ -22,7 +22,7 @@ public class MonoReadonlyAlphaTransaction_performanceStressTest {
     }
 
     public MonoReadonlyAlphaTransaction startSutTransaction() {
-        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new MonoReadonlyAlphaTransaction(config);
     }
 

@@ -28,8 +28,7 @@ public class ArrayUpdateAlphaTransaction_abortTest {
     }
 
     public AlphaTransaction startSutTransaction(int size) {
-        UpdateConfiguration config =
-                new UpdateConfiguration(stmConfig.clock);
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock);
         return new ArrayUpdateAlphaTransaction(config, size);
     }
 
@@ -87,7 +86,10 @@ public class ArrayUpdateAlphaTransaction_abortTest {
         Latch latch = new CheapLatch();
 
         AlphaTransaction listenTx = stm.getTransactionFactoryBuilder()
-                .setAutomaticReadTracking(true).build().start();
+                .setExplicitRetryAllowed(true)
+                .setAutomaticReadTrackingEnabled(true)
+                .build()
+                .start();
         listenTx.openForRead(ref);
         listenTx.registerRetryLatch(latch);
 

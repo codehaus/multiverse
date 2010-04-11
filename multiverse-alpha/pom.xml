@@ -9,8 +9,6 @@
         Contains the main Multiverse STM Implementation: the Alpha Engine. The Alpha engine supports
         readonly and update transactions. It also supports the retry/or else mechanism.
     </description>
-    <version>0.5-SNAPSHOT</version>
-    <packaging>jar</packaging>
 
     <parent>
         <groupId>org.multiverse</groupId>
@@ -21,6 +19,8 @@
     <properties>
         <multiverse.agentname>test-javaagent</multiverse.agentname>
         <multiverse.agentclass>org.multiverse.javaagent.MultiverseJavaAgent</multiverse.agentclass>
+        <multiverse.instrumentor>org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor
+        </multiverse.instrumentor>
     </properties>
 
     <build>
@@ -28,35 +28,102 @@
             <!-- A plugin that creates alphaagent.jar so that the unit tests can be executed using the agent.
               This is done by creating a alphaagent.jar using the JAR plugin during the generate-test-resources phase. -->
             <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
+                <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>generate-javaagent</id>
-                        <phase>compile</phase>
+                        <id>creating the jar for the ide</id>
+                        <phase>process-classes</phase>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>run</goal>
                         </goals>
                         <configuration>
-                            <finalName>${multiverse.agentname}</finalName>
-                            <archive>
-                                <manifestEntries>
-                                    <Premain-Class>${multiverse.agentclass}</Premain-Class>
-                                </manifestEntries>
-                            </archive>
+                            <tasks>
+                                <echo message="Creating the jar that can be used by the ide"/>
+
+                                <delete file="${project.build.directory}/${multiverse.agentname}.jar"/>
+
+                                <jar destfile="${project.build.directory}/${multiverse.agentname}.jar"
+                                     basedir="${project.build.directory}/classes">
+                                    <manifest>
+                                        <attribute name="Premain-class" value="${multiverse.agentclass}"/>
+                                    </manifest>
+                                </jar>
+                            </tasks>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
 
+            <!-- unpacks the dependant jars in the target/classes directory -->
             <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
                 <groupId>org.apache.maven.plugins</groupId>
-                <configuration>
-                    <argLine>-javaagent:${project.build.directory}/${multiverse.agentname}.jar</argLine>
-                </configuration>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-dependencies</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                            <excludeArtifactIds>junit,mockito-all,gson,multiverse-benchy</excludeArtifactIds>
+                            <excludes>**/*Test.class</excludes>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
-            <!-- plugin>
+            <!-- 'preinstruments' the transactional classes so multiverse-asm library can
+        be used without instrumentation -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+                    <!-- responsible for transforming target/classes-->
+                    <execution>
+                        <id>fixed normal classes</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.multiverse.compiler.MultiverseCompiler</mainClass>
+                            <arguments>
+                                <argument>-d</argument>
+                                <argument>${multiverse.instrumentor}</argument>
+                                <argument>${project.build.directory}/classes</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <!-- responsible for transforming target/test-classes-->
+                    <execution>
+                        <id>fixed test classes</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.multiverse.compiler.MultiverseCompiler</mainClass>
+                            <arguments>
+                                <!-- argument>-classpath</argument -->
+                                <!-- argument>
+                                    <classpath/>
+                                </argument -->
+                                <argument>-d</argument>
+                                <!--argument>-v</argument -->
+                                <argument>${multiverse.instrumentor}</argument>
+                                <argument>${build.directory}/test-classes</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+
+            </plugin>
+
+            <!-- creates the jar -->
+            <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
@@ -68,36 +135,15 @@
                 <executions>
                     <execution>
                         <id>jar</id>
+                        <phase>package</phase>
                         <goals>
                             <goal>jar</goal>
                         </goals>
                     </execution>
                 </executions>
-            </plugin -->
-
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <appendAssemblyId>false</appendAssemblyId>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <archive>
-                        <manifestEntries>
-                            <Premain-Class>${multiverse.agentclass}</Premain-Class>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
             </plugin>
-            <!-- plugin that integrates the fieldaccess library in the alpha library-->
+
+            <!-- plugin that integrates the asm/args4j libraries to create big fat jar-->
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
@@ -108,9 +154,14 @@
                         </goals>
                         <configuration>
                             <tasks>
+                                <echo message="Executing jarjar"/>
                                 <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"/>
-                                <jarjar destfile="${build.directory}/${artifactId}-${version}.jar" update="true">
-                                    <rule pattern="org.objectweb.asm.**" result="${groupId}.repackaged.@0"/>
+                                <jarjar destfile="${build.directory}/${artifactId}-${version}.jar"
+                                        update="true">
+                                    <rule pattern="org.objectweb.asm.**"
+                                          result="${groupId}.repackaged.@0"/>
+                                    <rule pattern="org.kohsuke.args4j.**"
+                                          result="${groupId}.repackaged.@0"/>
                                 </jarjar>
                             </tasks>
                         </configuration>
@@ -125,6 +176,13 @@
                 </dependencies>
             </plugin>
         </plugins>
+
+        <resources>
+            <resource>
+                <directory>${basedir}/target/classes</directory>
+            </resource>
+        </resources>
+
     </build>
 
     <dependencies>
@@ -172,6 +230,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>args4j</groupId>
+            <artifactId>args4j</artifactId>
+            <version>${args4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- ASM dependencies -->
         <dependency>

@@ -1,4 +1,4 @@
-package org.multiverse.instrumentation.compiler;
+package org.multiverse.instrumentation;
 
 /**
  * A {@link RuntimeException} that is thrown when the postprocessing of a Clazz fails.

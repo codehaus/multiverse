@@ -22,7 +22,7 @@ public class MapReadonlyAlphaTransaction_miscTest {
     }
 
     public MapReadonlyAlphaTransaction startTransactionUnderTest() {
-        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new MapReadonlyAlphaTransaction(config);
     }
 
@@ -32,7 +32,7 @@ public class MapReadonlyAlphaTransaction_miscTest {
         assertIsActive(tx);
         assertEquals(stm.getVersion(), tx.getReadVersion());
         assertTrue(tx.getConfiguration().isReadonly());
-        assertTrue(tx.getConfiguration().automaticReadTracking());
+        assertTrue(tx.getConfiguration().isAutomaticReadTrackingEnabled());
 
     }
 }

@@ -48,8 +48,8 @@ public class AlphaStm_NonSpeculativeTransactionSettingsTest {
         assertTrue(t instanceof MapUpdateAlphaTransaction);
 
         assertFalse(t.getConfiguration().isReadonly());
-        assertFalse(t.getConfiguration().automaticReadTracking());
-        assertTrue(t.getConfiguration().allowWriteSkewProblem());
+        assertFalse(t.getConfiguration().isAutomaticReadTrackingEnabled());
+        assertTrue(t.getConfiguration().isWriteSkewProblemAllowed());
         assertEquals(1000, t.getConfiguration().getMaxRetryCount());
         assertFalse(t.getConfiguration().isInterruptible());
     }
@@ -58,15 +58,15 @@ public class AlphaStm_NonSpeculativeTransactionSettingsTest {
     public void test() {
         Transaction t = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
-                .setAutomaticReadTracking(true)
+                .setAutomaticReadTrackingEnabled(true)
                 .build()
                 .start();
 
         assertTrue(t instanceof AbstractUpdateAlphaTransaction);
 
         assertFalse(t.getConfiguration().isReadonly());
-        assertTrue(t.getConfiguration().automaticReadTracking());
-        assertTrue(t.getConfiguration().allowWriteSkewProblem());
+        assertTrue(t.getConfiguration().isAutomaticReadTrackingEnabled());
+        assertTrue(t.getConfiguration().isWriteSkewProblemAllowed());
         assertEquals(1000, t.getConfiguration().getMaxRetryCount());
         assertFalse(t.getConfiguration().isInterruptible());
     }
@@ -76,7 +76,7 @@ public class AlphaStm_NonSpeculativeTransactionSettingsTest {
         Transaction t = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setReadonly(false)
-                .setAutomaticReadTracking(true)
+                .setAutomaticReadTrackingEnabled(true)
                 .build()
                 .start();
 
@@ -88,8 +88,8 @@ public class AlphaStm_NonSpeculativeTransactionSettingsTest {
         stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setReadonly(false)
-                .setAutomaticReadTracking(false)
-                .setAllowWriteSkewProblem(false)
+                .setAutomaticReadTrackingEnabled(false)
+                .setWriteSkewProblemAllowed(false)
                 .build();
     }
 
@@ -98,8 +98,8 @@ public class AlphaStm_NonSpeculativeTransactionSettingsTest {
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setReadonly(true)
-                .setAutomaticReadTracking(false)
-                .setAllowWriteSkewProblem(true)
+                .setAutomaticReadTrackingEnabled(false)
+                .setWriteSkewProblemAllowed(true)
                 .build();
     }
 }

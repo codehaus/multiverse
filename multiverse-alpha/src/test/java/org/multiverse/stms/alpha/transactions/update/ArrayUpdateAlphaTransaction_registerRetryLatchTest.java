@@ -34,20 +34,38 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
         return new ArrayUpdateAlphaTransaction(config, 100);
     }
 
-    public AlphaTransaction startSutTransactionWithoutAutomaticReadTracking(SpeculativeConfiguration speculativeConfig) {
-        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
-                .withSpeculativeConfiguration(speculativeConfig)
-                .withAutomaticReadTracking(false);
+    @Test
+    public void whenExplicitRetryNotAllowed_thenNoRetryPossibleException() {
+        ManualRef ref = new ManualRef(stm);
 
-        return new ArrayUpdateAlphaTransaction(config, speculativeConfig.getMaximumArraySize());
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withExplictRetryAllowed(false);
+
+        AlphaTransaction tx = new ArrayUpdateAlphaTransaction(config, 100);
+        tx.openForRead(ref);
+
+        Latch latch = new CheapLatch();
+        try {
+            tx.registerRetryLatch(latch);
+            fail();
+        } catch (NoRetryPossibleException expected) {
+        }
+
+        assertIsActive(tx);
+        assertFalse(latch.isOpen());
     }
+
 
     @Test
     public void whenNoAutomaticReadtracking_thenNoRetryPossibleException() {
         ManualRef ref = new ManualRef(stm);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, false, false, 100);
-        AlphaTransaction tx = startSutTransactionWithoutAutomaticReadTracking(speculativeConfig);
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withSpeculativeConfiguration(speculativeConfig)
+                .withAutomaticReadTrackingEnabled(false);
+
+        AlphaTransaction tx = new ArrayUpdateAlphaTransaction(config, 100);
         tx.openForWrite(ref);
 
         Latch latch = new CheapLatch();
@@ -65,7 +83,10 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
         ManualRef ref = new ManualRef(stm);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, false, 100);
-        AlphaTransaction tx = startSutTransactionWithoutAutomaticReadTracking(speculativeConfig);
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withSpeculativeConfiguration(speculativeConfig)
+                .withAutomaticReadTrackingEnabled(false);
+        AlphaTransaction tx = new ArrayUpdateAlphaTransaction(config, 100);
         tx.openForWrite(ref);
 
         Latch latch = new CheapLatch();

@@ -2,7 +2,6 @@ package org.multiverse.stms.alpha.programmatic;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
@@ -90,11 +89,5 @@ public class AlphaProgrammaticLong_commutingIncWithTransactionTest {
 
         assertEquals(14, ref.atomicGet());
         assertEquals(version + 1, stm.getVersion());
-    }
-
-    @Test
-    @Ignore
-    public void test() {
-
     }
 }

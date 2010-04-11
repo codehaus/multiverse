@@ -39,7 +39,7 @@ public final class DefaultTransactionalReference<E> implements TransactionalRefe
     }
 
     @Override
-    @TransactionalMethod(readonly = true, automaticReadTracking = true)
+    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
     public E getOrAwait() {
         if (value == null) {
             retry();
@@ -49,7 +49,7 @@ public final class DefaultTransactionalReference<E> implements TransactionalRefe
     }
 
     @Override
-    @TransactionalMethod(readonly = true, automaticReadTracking = true, interruptible = true)
+    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true, interruptible = true)
     public E getOrAwaitInterruptibly() throws InterruptedException {
         if (value == null) {
             retry();
@@ -71,7 +71,7 @@ public final class DefaultTransactionalReference<E> implements TransactionalRefe
     }
 
     @Override
-    @TransactionalMethod(automaticReadTracking = true)
+    @TransactionalMethod(automaticReadTrackingEnabled = true)
     public E set(E newValue) {
         E currentValue = value;
 

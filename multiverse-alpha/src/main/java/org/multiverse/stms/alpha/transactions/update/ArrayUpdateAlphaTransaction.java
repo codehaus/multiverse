@@ -222,7 +222,7 @@ public class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction 
     protected boolean tryWriteLocks() {
         return config.commitLockPolicy.tryAcquireAll(
                 attachedArray,
-                config.dirtyCheck ? UncommittedFilter.DIRTY_CHECK : UncommittedFilter.NO_DIRTY_CHECK,
+                config.dirtyCheckEnabled ? UncommittedFilter.DIRTY_CHECK : UncommittedFilter.NO_DIRTY_CHECK,
                 this);
     }
 

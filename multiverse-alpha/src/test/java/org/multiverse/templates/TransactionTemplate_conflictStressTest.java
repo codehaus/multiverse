@@ -88,7 +88,7 @@ public class TransactionTemplate_conflictStressTest {
             TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
                     .setReadonly(false)
                     .setFamilyName(getClass() + "action()")
-                    .setAutomaticReadTracking(false).build();
+                    .setAutomaticReadTrackingEnabled(false).build();
 
             new TransactionTemplate(txFactory) {
                 @Override

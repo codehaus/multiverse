@@ -30,7 +30,7 @@ public final class TransactionalFloat {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTracking = true)
+    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
     public void await(char desired) {
         if (floatToIntBits(this.value) != floatToIntBits(desired)) {
             retry();

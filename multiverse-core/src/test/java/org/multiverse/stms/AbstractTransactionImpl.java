@@ -16,7 +16,7 @@ public class AbstractTransactionImpl extends AbstractTransaction {
                 null,
                 true,
                 1000,
-                true, true, true));
+                true, true, true, true));
         init();
     }
 
@@ -27,7 +27,7 @@ public class AbstractTransactionImpl extends AbstractTransaction {
                 null,
                 true,
                 10000,
-                true, true, true));
+                true, true, true, true));
         init();
     }
 
@@ -38,7 +38,7 @@ public class AbstractTransactionImpl extends AbstractTransaction {
                 familyName,
                 true,
                 1000,
-                true, true, true));
+                true, true, true, true));
 
         init();
     }

@@ -6,17 +6,17 @@ package ${package};
 import static java.lang.String.format;
 import static org.multiverse.api.StmUtils.retry;
 
-import org.multiverse.api.annotations.AtomicMethod;
-import org.multiverse.api.annotations.AtomicObject;
-import org.multiverse.datastructures.refs.Ref;
+import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.annotations.TransactionalObject;
+import org.multiverse.transactional.TransactionalReference;
 
 /**
  * A CubbyHole that stores an object.
  *
  * @author Andrew Phillips
- * @see Ref
+ * @see TransactionalReference
  */
-@AtomicObject
+@TransactionalObject
 public final class CubbyHole<E> {
     private E contents;
 
@@ -37,7 +37,7 @@ public final class CubbyHole<E> {
         this.contents = contents;
     }
 
-    @AtomicMethod(readonly = true)
+    @TransactionalMethod(readonly = true)
     public E getOrAwait() {
         if (contents == null) {
             retry();
@@ -46,25 +46,27 @@ public final class CubbyHole<E> {
         return contents;
     }
 
-    @AtomicMethod(readonly = true)
+    @TransactionalMethod(readonly = true)
     public boolean isEmpty() {
         return contents == null;
     }
 
-    @AtomicMethod(readonly = true)
+    @TransactionalMethod(readonly = true)
     public E get() {
         return contents;
     }
 
-    public void set(E newContents) {
+    public E set(E newContents) {
+        E currentContents = contents;        
         this.contents = newContents;
+        return currentContents;
     }
 
     public void clear() {
         set(null);
     }
 
-    @AtomicMethod(readonly = true)
+    @TransactionalMethod(readonly = true)
     public String toString() {
         if (contents == null) {
             return "CubbyHole(contents=null)";

@@ -26,7 +26,7 @@ public class TransactionalLinkedList_commutingTest {
         stm = getGlobalStmInstance();
         txFactory = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
-                .setAutomaticReadTracking(true)
+                .setAutomaticReadTrackingEnabled(true)
                 .setReadonly(false)
                 .build();
         clearThreadLocalTransaction();

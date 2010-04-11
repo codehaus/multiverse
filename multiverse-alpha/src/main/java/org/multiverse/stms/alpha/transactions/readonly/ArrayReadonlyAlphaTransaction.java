@@ -7,7 +7,7 @@ import org.multiverse.stms.alpha.AlphaTransactionalObject;
 
 import static java.lang.System.arraycopy;
 
-public class ArrayReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransaction {
+public final class ArrayReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransaction {
 
     private AlphaTranlocal[] attachedArray;
 
@@ -43,9 +43,9 @@ public class ArrayReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransact
     protected void attach(AlphaTranlocal tranlocal) {
         if (firstFreeIndex == attachedArray.length) {
             int newOptimalSize = attachedArray.length + 2;
-            config.speculativeConfig.signalSpeculativeSizeFailure(attachedArray.length);
+            config.speculativeConfiguration.signalSpeculativeSizeFailure(attachedArray.length);
 
-            if (attachedArray.length >= config.speculativeConfig.getMaximumArraySize()) {
+            if (attachedArray.length >= config.speculativeConfiguration.getMaximumArraySize()) {
                 throw SpeculativeConfigurationFailure.create();
             }
 
@@ -59,7 +59,7 @@ public class ArrayReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransact
     }
 
     @Override
-    protected boolean doRegisterRetryLatch(Latch latch, long wakeupVersion) {
+    protected boolean dodoRegisterRetryLatch(Latch latch, long wakeupVersion) {
         boolean trackedReads = false;
 
         for (int k = 0; k < firstFreeIndex; k++) {
