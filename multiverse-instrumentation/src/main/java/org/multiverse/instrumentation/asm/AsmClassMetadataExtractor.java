@@ -130,7 +130,11 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
         extractGetterMetadata(methodMetadata, methodNode);
     }
 
-    private void extractSetterMetadata(MethodMetadata methodMetada, MethodNode methodNode) {
+    private void extractSetterMetadata(MethodMetadata methodMetadata, MethodNode methodNode) {
+        if (methodMetadata.isStatic() || methodMetadata.isNative() || methodMetadata.isAbstract()) {
+            return;
+        }
+
         Type[] argTypes = Type.getArgumentTypes(methodNode.desc);
         if (argTypes.length != 1) {
             return;
@@ -141,12 +145,51 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
             return;
         }
 
+        if (methodNode.name.equals("setWithAutoUnboxing")) {
+            System.out.println("hello");
+        }
+
         List<AbstractInsnNode> filteredInstructions = filterNoOps(methodNode.instructions);
+        if (filteredInstructions.size() != 4) {
+            return;
+        }
 
+        if (filteredInstructions.get(0).getOpcode() != ALOAD) {
+            return;
+        }
 
+        VarInsnNode insn1 = (VarInsnNode) filteredInstructions.get(0);
+        if (insn1.var != 0) {
+            return;
+        }
+
+        if (filteredInstructions.get(1).getType() != AbstractInsnNode.VAR_INSN) {
+            return;
+        }
+
+        VarInsnNode insn2 = (VarInsnNode) filteredInstructions.get(1);
+        if (insn2.var != 1) {
+            return;
+        }
+
+        if (filteredInstructions.get(2).getOpcode() != PUTFIELD) {
+            return;
+        }
+        FieldInsnNode insn3 = (FieldInsnNode) filteredInstructions.get(2);
+
+        if (filteredInstructions.get(3).getOpcode() != RETURN) {
+            return;
+        }
+
+        FieldMetadata field = methodMetadata.getClassMetadata().getFieldMetadata(insn3.name);
+        methodMetadata.setGetterSetter(MethodType.setter, field);
     }
 
     private void extractGetterMetadata(MethodMetadata methodMetadata, MethodNode methodNode) {
+        if (methodMetadata.isStatic() || methodMetadata.isNative() || methodMetadata.isAbstract()) {
+            return;
+        }
+
         Type[] argTypes = Type.getArgumentTypes(methodNode.desc);
         if (argTypes.length != 0) {
             return;
@@ -195,8 +238,9 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
         }
 
         FieldInsnNode fieldInsnNode = (FieldInsnNode) instr2;
+
         FieldMetadata field = methodMetadata.getClassMetadata().getFieldMetadata(fieldInsnNode.name);
-        methodMetadata.setGetterSetter(GetterSetter.getter, field);
+        methodMetadata.setGetterSetter(MethodType.getter, field);
     }
 
     private List<AbstractInsnNode> filterNoOps(InsnList instructions) {

@@ -21,7 +21,7 @@ public final class MethodMetadata {
     private final String desc;
     private int access;
     private final List<String> exceptions = new LinkedList<String>();
-    private GetterSetter getterSetter = GetterSetter.unknown;
+    private MethodType getterSetter = MethodType.unknown;
     private FieldMetadata getterSetterField;
 
     public MethodMetadata(ClassMetadata classMetadata, String name, String desc) {
@@ -34,11 +34,11 @@ public final class MethodMetadata {
         return getterSetterField;
     }
 
-    public GetterSetter getGetterSetter() {
+    public MethodType getMethodType() {
         return getterSetter;
     }
 
-    public void setGetterSetter(GetterSetter getterSetter, FieldMetadata getterSetterField) {
+    public void setGetterSetter(MethodType getterSetter, FieldMetadata getterSetterField) {
         this.getterSetterField = getterSetterField;
         this.getterSetter = getterSetter;
     }

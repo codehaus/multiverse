@@ -6,6 +6,6 @@ package org.multiverse.instrumentation.metadata;
  *
  * @author Peter Veentjer
  */
-public enum GetterSetter {
+public enum MethodType {
     unknown, getter, setter
 }

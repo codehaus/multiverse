@@ -4,8 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.*;
-import org.multiverse.api.latches.CheapLatch;
-import org.multiverse.api.latches.Latch;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -48,28 +46,6 @@ public class MapUpdateAlphaTransaction_openForReadTest {
 
         return new MapUpdateAlphaTransaction(config);
     }
-
-    @Test
-    public void whenExplicitRetryNotAllowed() {
-        ManualRef ref = new ManualRef(stm);
-
-        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
-                .withExplictRetryAllowed(false);
-
-        AlphaTransaction tx = new MapUpdateAlphaTransaction(config);
-        tx.openForRead(ref);
-
-        Latch latch = new CheapLatch();
-        try {
-            tx.registerRetryLatch(latch);
-            fail();
-        } catch (NoRetryPossibleException expected) {
-        }
-
-        assertIsActive(tx);
-        assertFalse(latch.isOpen());
-    }
-
 
     @Test
     public void whenAutomaticReadTrackingDisabled_openForReadIsNotTracked() {
@@ -330,9 +306,5 @@ public class MapUpdateAlphaTransaction_openForReadTest {
         }
 
         assertIsPrepared(tx);
-    }
-
-    public Map getReadWriteMap(AlphaTransaction tx) {
-        return (Map) getField(tx, "readWriteMap");
     }
 }

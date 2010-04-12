@@ -2,6 +2,37 @@
 todo engine
 ---------------------------------------------------------------
 
+- instrumentation
+
+    - static compilation
+
+        - maven plugin for the compiler
+
+        - integration tests for the compiler
+
+        - integration test of the compiler in combination with
+        the java agent.
+
+        - instrumented jar test
+
+    - inlining
+
+        - inlining getter
+
+        - inlining setter
+
+        - inlining transaction in transactional getter
+
+        - inlining transaction in transactional setter
+
+    - cheapen tranlocal access inside methods for the 'this' variable
+
+    - cheapen tranlocal access for the this variable by passing that tranlocal
+    if possible. First step: only needs to be done in methods in the same class
+
+    - cheapen tranlocal access for the this variable by passing that tranlocal
+    if possible. First step 2: also for other classes.
+
 - AlphaProgrammaticLong.atomic methods should use the backoff policy
 
 - AlphaProgrammaticReference should use backoff policy
@@ -18,46 +49,11 @@ still has the expected value.
 - threadsafety of the java agent fucntionality; classes can be created by different
 threads, so the whole mechanism should be made thread safe.
 
-- MapUpdateTransaction: when a read is done on a commuting object
-
-- MapUpdateTransaction: when a write is done on a commuting object
-
-- ArrayUpdateTransaction: when a read is done on a commuting object
-
-- ArrayUpdateTransaction: when a write is done on a commuting object
-
-- MonoUpdateTransaction: when a read is done on a commuting object
-
-- MonoUpdateTransaction: when a write is done on a commuting object
-
-- inline getters and setters for transactional objects
-
-- cheapen tranlocal access inside methods for the 'this' variable
-
-- cheapen tranlocal access for the this variable by passing that tranlocal
-  if possible. First step: only needs to be done in methods in the same class
-
-- cheapen tranlocal access for the this variable by passing that tranlocal
-  if possible. First step 2: also for other classes.
-
-- static compilation
-
-    - maven plugin for the compiler
-
-    - integration tests for the compiler
-
-    - integration test of the compiler in combination with
-      the java agent.
-
-    - instrumented jar test
-
 - AlphaProgrammaticLong should use the stm for all its operations once it has
 been build using that stm.
 
 - AlphaProgrammaticReference should use the stm for all its operations once
 it has been build using that stm.
-
-- 
 
 - balancing of the treemap
 
@@ -350,3 +346,20 @@ can't do an explicit retry
 
 - MapReadonly preventing that a transaction that does not allow explicit retry,
 can't do an explicit retry
+
+- analysis of getter
+
+- analysis of setter
+
+- MapUpdateTransaction: when a read is done on a commuting object
+
+- ArrayUpdateTransaction: when a read is done on a commuting object
+
+- MonoUpdateTransaction: when a read is done on a commuting object
+
+- ArrayUpdateTransaction: when a write is done on a commuting object
+
+- MapUpdateTransaction: when a write is done on a commuting object
+
+- MonoUpdateTransaction: when a write is done on a commuting object
+
