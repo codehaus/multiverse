@@ -5,15 +5,15 @@ import java.util.concurrent.atomic.AtomicLong;
 import static java.lang.String.format;
 
 /**
- * The RelaxedPrimitiveClock is less strict about increasing the clock. It finds it ok if someone has increased the
- * clock instead of it encysting that it wants to increase the clock as well. Synchronization (commit locks) should
+ * The RelaxedPrimitiveClock is less strict about increasing the clock. It finds it OK if someone has increased the
+ * clock instead of it insisting that it wants to increase the clock as well. Synchronization (commit locks) should
  * prevent transactions sharing state to execute concurrently, so only independent transaction increase the clock.
  * <p/>
  * The reason why this implementation exists, is that it causes less stress on the memory bus because compare and swaps
  * are done. This clock is based on the optimization TL2 V4 made by David Dice.
  * <p/>
  * The RelaxedPrimitiveClock is a first and simple step forwards to prevent contention on the memory bus. The ideal
- * situation would be if the stm didn't rely on a shared clock, so that independent transactions can scale
+ * situation would be if the STM didn't rely on a shared clock, so that independent transactions can scale
  * linearly. The experimental STM implementation for the .NET platform already has realized this, at the cause of
  * having potential zombie threads; threads that have entered an illegal state and possibly could enter some kind
  * of non terminating loop 'before' being aborted because the transaction failed to commit.

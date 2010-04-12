@@ -17,10 +17,10 @@ import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 /**
- * A transactional {@link java.util.concurrent.Executor} implementation that looks a lot like the
- * {@link java.util.concurrent.ThreadPoolExecutor}.
+ * A transactional {@link java.util.concurrent.Executor Executor} implementation that looks a lot like the
+ * {@link java.util.concurrent.ThreadPoolExecutor ThreadPoolExecutor}.
  * <p/>
- * Known concurrent limitations
+ * Known concurrent limitations:
  * <ol>
  * <li>no concurrent takes and puts</li>
  * <li>no concurrent takes (not really a big
@@ -31,7 +31,7 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
  * <p/>
  * todo:
  * <ol>
- * <li> Shutdown now not implemented</li>
+ * <li>Shutdown not currently implemented</li>
  * </ol>
  * <p/>
  * <dt>Exception handling</dt>
@@ -41,7 +41,7 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
  * provided yet. So the best thing that you can do is wrap the command in a logging Runnable that catches and
  * logs the exception.
  * <p/>
- * A task executes by a TransactionalThreadPoolExecutor will not automatically receives its own transaction.
+ * A task executed by a TransactionalThreadPoolExecutor will not automatically receive its own transaction.
  *
  * @author Peter Veentjer.
  */
