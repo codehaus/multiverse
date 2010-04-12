@@ -10,7 +10,7 @@ import org.multiverse.stms.alpha.AlphaTransactionalObject;
  *
  * @author Peter Veentjer.
  */
-public class MonoReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransaction {
+public final class MonoReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransaction {
 
     private AlphaTranlocal attached;
 

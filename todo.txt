@@ -18,12 +18,6 @@ still has the expected value.
 - threadsafety of the java agent fucntionality; classes can be created by different
 threads, so the whole mechanism should be made thread safe.
 
-- version should start with 0 again; so all other status should shift one down.
-
-- AlphaProgrammaticLong.getOrAwait
-
-- AlphaProgrammaticReference that sets if the version of the value still is correct
-
 - MapUpdateTransaction: when a read is done on a commuting object
 
 - MapUpdateTransaction: when a write is done on a commuting object
@@ -63,10 +57,11 @@ been build using that stm.
 - AlphaProgrammaticReference should use the stm for all its operations once
 it has been build using that stm.
 
+- 
+
 - balancing of the treemap
 
 - interface parameter inheritance.
-
 
 ---------------------------------------------------------------
 todo unclear
@@ -123,6 +118,10 @@ Thread PingPongThread-1 has thrown an exception
 ---------------------------------------------------------------
 todo features
 ---------------------------------------------------------------
+
+- version should start with 0 again; so all other status should shift one down.
+
+- AlphaProgrammaticLong.getOrAwait
 
 - support for a history in the ProgrammaticReference
 
