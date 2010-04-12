@@ -64,7 +64,7 @@ public final class MultiverseJavaAgent {
     }
 
     private static void printMultiverseJavaAgentInfo() {
-        System.out.println("MultiverseJavaAgent: Starting Multiverse JavaAgent 0.5-SNAPSHOT");
+        System.out.println("MultiverseJavaAgent");
 
         if (MultiverseConstants.___SANITY_CHECKS_ENABLED) {
             System.out.println("Sanity checks are enabled.");
@@ -76,11 +76,15 @@ public final class MultiverseJavaAgent {
                 "instrumentor",
                 "org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor");
 
-        System.out.println(format("MultiverseJavaAgent: Using org.multiverse.instrumentation.Instrumentor '%s'", instrumentorClassName));
+        System.out.println(format("MultiverseJavaAgent: Initializing org.multiverse.instrumentation.Instrumentor '%s'",
+                instrumentorClassName));
 
         Constructor constructor = getMethod(instrumentorClassName);
         try {
-            return (Instrumentor) constructor.newInstance();
+            Instrumentor instrumentor = (Instrumentor) constructor.newInstance();
+            System.out.println(format("MultiverseJavaAgent: Initialized '%s-%s'",
+                    instrumentor.getInstrumentorName(), instrumentor.getInstrumentorVersion()));
+            return instrumentor;
         } catch (IllegalAccessException e) {
             String msg = format("Failed to initialize Instrumentor through System property '%s' with value '%s'." +
                     "The constructor is not accessable.",
