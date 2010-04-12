@@ -1,9 +1,9 @@
-package org.multiverse.instrumentation.compiler;
+package org.multiverse.instrumentation;
 
 /**
- * An abstraction for logging. This makes it easier to connect the ClazzCompiler
+ * An abstraction for logging. This makes it easier to connect the Instrumentor
  * to various logging systems that can be determined by applications using the
- * ClazzCompiler api.
+ * Instrumentor api.
  *
  * @author Peter Veentjer
  */

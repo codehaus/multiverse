@@ -67,7 +67,7 @@ public final class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransact
     protected boolean tryWriteLocks() {
         return config.commitLockPolicy.tryAcquireAll(
                 (Collection<CommitLock>) ((Object) attachedMap.values()),
-                config.dirtyCheck ? UncommittedFilter.DIRTY_CHECK : UncommittedFilter.NO_DIRTY_CHECK,
+                config.dirtyCheckEnabled ? UncommittedFilter.DIRTY_CHECK : UncommittedFilter.NO_DIRTY_CHECK,
                 this);
     }
 

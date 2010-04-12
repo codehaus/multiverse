@@ -304,20 +304,32 @@ public final class AsmUtils implements Opcodes {
      */
     public static ClassNode loadAsClassNode(File file) {
 
+        InputStream is = null;
         try {
-            InputStream is = new FileInputStream(file);
-
+            is = new FileInputStream(file);
             ClassNode classNode = new ClassNode();
             ClassReader reader = new ClassReader(is);
             reader.accept(classNode, ClassReader.EXPAND_FRAMES);
             return classNode;
         } catch (IOException e) {
             throw new RuntimeException("A problem ocurred while loading class: " + file, e);
+        } finally {
+            closeQuietly(is);
+        }
+    }
+
+    private static void closeQuietly(InputStream is) {
+        if (is == null) {
+            return;
+        }
+
+        try {
+            is.close();
+        } catch (IOException ignore) {
         }
     }
 
     public static byte[] loadAsBytecode(File file) {
-
         try {
             InputStream is = new FileInputStream(file);
             ClassNode classNode = new ClassNode();

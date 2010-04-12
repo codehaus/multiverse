@@ -118,7 +118,7 @@ public class TransactionTemplateTest {
         final Transaction outerTx = txFactory.start();
         setThreadLocalTransaction(outerTx);
 
-        new TransactionTemplate(txFactory, false, true) {
+        new TransactionTemplate(txFactory, false, true, true) {
             @Override
             public Object execute(Transaction innerTx) throws Exception {
                 assertNotSame(innerTx, outerTx);
@@ -151,7 +151,6 @@ public class TransactionTemplateTest {
         } catch (DeadTransactionException ignore) {
         }
 
-        /*assertEquals(1, stm.getProfiler().sumKey1("updatetransaction.aborted.count"));*/
         assertNull(getThreadLocalTransaction());
         assertEquals(version, stm.getVersion());
         assertEquals(0, value.get());

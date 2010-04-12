@@ -18,6 +18,10 @@ import java.util.concurrent.locks.ReentrantLock;
 import static java.lang.String.format;
 
 /**
+ * A CommitBarrier is a blocking structure like the {@link java.util.concurrent.CyclicBarrier} but
+ * tailored to work with transactions. Based on this functionality, it is possible to create
+ * a 2-phase commit for example.
+ *
  * @author Peter Veentjer.
  */
 public abstract class CommitBarrier {
@@ -36,6 +40,13 @@ public abstract class CommitBarrier {
     private List<Runnable> onAbortTasks;
     private List<Runnable> onCommitTasks;
 
+    /**
+     * Creates a new CommitBarrier.
+     *
+     * @param status the initial status of the CommitBarrier.
+     * @param fair   if waking up threads is going to be fair.
+     * @throws NullPointerException if status is null.
+     */
     public CommitBarrier(Status status, boolean fair) {
         if (status == null) {
             throw new NullPointerException();
@@ -60,7 +71,7 @@ public abstract class CommitBarrier {
     }
 
     /**
-     * Checks if this VetoCommitBarrier is closed. This is the initial status of the barrier.
+     * Checks if this CommitBarrier is closed. This is the initial status of the barrier.
      *
      * @return true if closed, false otherwise.
      */
@@ -69,7 +80,7 @@ public abstract class CommitBarrier {
     }
 
     /**
-     * Checks if this VetoCommitBarrier already is committed.
+     * Checks if this CommitBarrier already is committed.
      *
      * @return true if committed, false otherwise.
      */
@@ -78,7 +89,7 @@ public abstract class CommitBarrier {
     }
 
     /**
-     * Checks if this VetoCommitBarrier already is aborted.
+     * Checks if this CommitBarrier already is aborted.
      *
      * @return true if aborted, false otherwise.
      */
@@ -118,11 +129,11 @@ public abstract class CommitBarrier {
 
     /**
      * Aborts this CommitBarrier. If there are any prepared transactions that are waiting for this CommitBarrier
-     * to complete, they are aborted.
+     * to complete, they are aborted as well.
      * <p/>
      * If the CommitBarrier already is aborted, this call is ignored.
      *
-     * @throws CommitBarrierOpenException if the VetoCommitBarrier already is committed.
+     * @throws CommitBarrierOpenException if this CommitBarrier already is committed.
      */
     public final void abort() {
         List<Runnable> postAbortTasks = null;
@@ -552,7 +563,7 @@ public abstract class CommitBarrier {
      * <p/>
      * If the CommitBarrier already is aborted or committed, the transaction is aborted.
      *
-     * @param tx the Transaction to commit.
+     * @param tx the Transaction to join in the commit.
      * @throws NullPointerException       if tx is null.
      * @throws DeadTransactionException   if tx is committed/aborted.
      * @throws CommitBarrierOpenException if this VetoCommitBarrier is committed or aborted.

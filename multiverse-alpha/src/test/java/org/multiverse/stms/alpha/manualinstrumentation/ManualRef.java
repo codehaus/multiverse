@@ -29,7 +29,7 @@ public class ManualRef extends DefaultTxObjectMixin {
     }
 
     public ManualRef(AlphaStm stm, final int value) {
-        new TransactionTemplate(stm.getTransactionFactoryBuilder().build(), false, false) {
+        new TransactionTemplate(stm.getTransactionFactoryBuilder().build(), false, false, true) {
             @Override
             public Object execute(Transaction t) {
                 ManualRefTranlocal tranlocal = (ManualRefTranlocal) ((AlphaTransaction) t).openForConstruction(ManualRef.this);
@@ -57,7 +57,7 @@ public class ManualRef extends DefaultTxObjectMixin {
     }
 
     public int get(TransactionFactory txFactory) {
-        return new TransactionTemplate<Integer>(txFactory, false, false) {
+        return new TransactionTemplate<Integer>(txFactory, false, false, true) {
             @Override
             public Integer execute(Transaction t) throws Exception {
                 return get((AlphaTransaction) t);
@@ -78,7 +78,7 @@ public class ManualRef extends DefaultTxObjectMixin {
     }
 
     public void inc(TransactionFactory txFactory) {
-        new TransactionTemplate(txFactory, false, false) {
+        new TransactionTemplate(txFactory, false, false, true) {
             @Override
             public Object execute(Transaction t) {
                 inc((AlphaTransaction) t);
@@ -105,7 +105,7 @@ public class ManualRef extends DefaultTxObjectMixin {
     }
 
     public void set(TransactionFactory txFactory, final int value) {
-        new TransactionTemplate(txFactory, false, false) {
+        new TransactionTemplate(txFactory, false, false, true) {
             @Override
             public Object execute(Transaction t) throws Exception {
                 set((AlphaTransaction) t, value);

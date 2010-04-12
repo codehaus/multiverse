@@ -1,4 +1,4 @@
-package org.multiverse.instrumentation.compiler;
+package org.multiverse.instrumentation;
 
 /**
  * The Filer is responsible for creating class definitions. It is used as a callback

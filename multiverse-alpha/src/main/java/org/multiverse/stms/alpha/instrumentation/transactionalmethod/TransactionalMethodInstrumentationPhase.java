@@ -1,8 +1,8 @@
 package org.multiverse.stms.alpha.instrumentation.transactionalmethod;
 
-import org.multiverse.instrumentation.compiler.AbstractCompilePhase;
-import org.multiverse.instrumentation.compiler.Clazz;
-import org.multiverse.instrumentation.compiler.Environment;
+import org.multiverse.instrumentation.AbstractInstrumentationPhase;
+import org.multiverse.instrumentation.Clazz;
+import org.multiverse.instrumentation.Environment;
 import org.multiverse.instrumentation.metadata.ClassMetadata;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
@@ -13,14 +13,14 @@ import static org.multiverse.instrumentation.asm.AsmUtils.toBytecode;
 /**
  * @author Peter Veentjer
  */
-public class TransactionalMethodCompilePhase extends AbstractCompilePhase {
+public class TransactionalMethodInstrumentationPhase extends AbstractInstrumentationPhase {
 
-    public TransactionalMethodCompilePhase() {
-        super("TransactionalMethodCompilePhase");
+    public TransactionalMethodInstrumentationPhase() {
+        super("TransactionalMethodInstrumentationPhase");
     }
 
     @Override
-    protected Clazz doCompile(Environment environment, Clazz originalClazz) {
+    protected Clazz doInstrument(Environment environment, Clazz originalClazz) {
         ClassMetadata classMetadata = environment.getMetadataRepository().loadClassMetadata(
                 originalClazz.getClassLoader(), originalClazz.getName());
 

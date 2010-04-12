@@ -39,7 +39,8 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
 
     public MonoUpdateAlphaTransaction startSutTransactionWithoutAutomaticReadTracking() {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
-                .withAutomaticReadTracking(false);
+                .withExplictRetryAllowed(false)
+                .withAutomaticReadTrackingEnabled(false);
 
         return new MonoUpdateAlphaTransaction(config);
     }
@@ -47,10 +48,10 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     @Test
     public void testAutomaticReadTrackingProperty() {
         AlphaTransaction tx = startSutTransactionWithoutAutomaticReadTracking();
-        assertFalse(tx.getConfiguration().automaticReadTracking());
+        assertFalse(tx.getConfiguration().isAutomaticReadTrackingEnabled());
 
         tx = startSutTransaction();
-        assertTrue(tx.getConfiguration().automaticReadTracking());
+        assertTrue(tx.getConfiguration().isAutomaticReadTrackingEnabled());
     }
 
     @Test

@@ -106,7 +106,7 @@ public class AlphaProgrammaticLong_incTest {
 
         Transaction tx = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
-                .setAutomaticReadTracking(true)
+                .setAutomaticReadTrackingEnabled(true)
                 .build()
                 .start();
 

@@ -19,9 +19,9 @@ public class TransactionMetadata {
     public Boolean readOnly;
 
     //todo: needs to be transformed to Object boolean
-    public boolean allowWriteSkewProblem;
+    public boolean writeSkewProblemAllowed;
 
-    public Boolean automaticReadTracking;
+    public Boolean automaticReadTrackingEnabled;
 
     public Boolean interruptible;
 

@@ -60,8 +60,9 @@ public final class TranlocalFactory implements Opcodes {
         result.access = ACC_PUBLIC + ACC_SYNTHETIC;
         result.sourceFile = clazz.sourceFile;
         result.sourceDebug = clazz.sourceDebug;
+        result.signature = clazz.signature;
 
-        result.fields.addAll(remapInstanceFields());
+        result.fields.addAll(remapManagedFields());
 
         result.superName = getInternalName(AlphaTranlocal.class);
 
@@ -92,7 +93,7 @@ public final class TranlocalFactory implements Opcodes {
         return m;
     }
 
-    private List<FieldNode> remapInstanceFields() {
+    private List<FieldNode> remapManagedFields() {
         List<FieldNode> result = new LinkedList<FieldNode>();
 
         for (FieldNode fieldNode : (List<FieldNode>) clazz.fields) {

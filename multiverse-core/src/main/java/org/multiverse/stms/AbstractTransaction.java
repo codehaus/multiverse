@@ -268,7 +268,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
                 if (!success) {
                     String msg = format("No retry is possible on transaction '%s' because it has no tracked reads, "
-                            + "or not all reads are known (because it doesn''t support automaticReadTracking) ",
+                            + "or not all reads are known (because it doesn''t support isAutomaticReadTrackingEnabled) ",
                             config.getFamilyName());
                     throw new NoRetryPossibleException(msg);
                 }

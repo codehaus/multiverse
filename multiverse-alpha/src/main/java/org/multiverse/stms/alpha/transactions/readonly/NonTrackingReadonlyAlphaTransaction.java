@@ -1,6 +1,7 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
 import org.multiverse.api.TransactionFactory;
+import org.multiverse.api.latches.Latch;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
@@ -49,6 +50,11 @@ public class NonTrackingReadonlyAlphaTransaction extends AbstractReadonlyAlphaTr
     public NonTrackingReadonlyAlphaTransaction(ReadonlyConfiguration config) {
         super(config);
         init();
+    }
+
+    @Override
+    protected boolean dodoRegisterRetryLatch(Latch latch, long wakeupVersion) {
+        return false;
     }
 
     @Override

@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.Stm;
+import org.multiverse.api.Transaction;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.multiverse.TestUtils.*;
@@ -49,7 +50,13 @@ public class TransactionTemplate_blockingTransactionTest {
 
         @Override
         public void doRun() throws Exception {
-            ref.await(number);
+            new TransactionTemplate() {
+                @Override
+                public Object execute(Transaction tx) throws Exception {
+                    ref.await(number);
+                    return null;
+                }
+            }.execute();
         }
     }
 }

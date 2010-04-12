@@ -38,8 +38,29 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
     }
 
     public MapReadonlyAlphaTransaction startSutTransaction() {
-        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new MapReadonlyAlphaTransaction(config);
+    }
+
+    @Test
+    public void whenExplicitRetryNotAllowed_thenNoRetryPossibleException() {
+        ManualRef ref = new ManualRef(stm);
+
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true)
+                .withExplicitRetryAllowed(false);
+
+        AlphaTransaction tx = new MapReadonlyAlphaTransaction(config);
+        tx.openForRead(ref);
+
+        Latch latch = new CheapLatch();
+        try {
+            tx.registerRetryLatch(latch);
+            fail();
+        } catch (NoRetryPossibleException expected) {
+        }
+
+        assertIsActive(tx);
+        assertFalse(latch.isOpen());
     }
 
     @Test
@@ -200,7 +221,7 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
             this.value = newValue;
         }
 
-        @TransactionalMethod(readonly = true, automaticReadTracking = true)
+        @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
         public void await(int value) {
             if (this.value != value) {
                 retry();

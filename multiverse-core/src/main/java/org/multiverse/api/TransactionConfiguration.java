@@ -11,6 +11,8 @@ import org.multiverse.api.backoff.BackoffPolicy;
  */
 public interface TransactionConfiguration {
 
+    boolean isExplictRetryEnabled();
+
     /**
      * Returns the BackoffPolicy used by the Stm when a transaction conflicts with another transaction.
      *
@@ -19,13 +21,13 @@ public interface TransactionConfiguration {
     BackoffPolicy getBackoffPolicy();
 
     /**
-     * Checks if this transaction does automaticReadTracking. Read tracking is needed for blocking transactions,
+     * Checks if this transaction does isAutomaticReadTrackingEnabled. Read tracking is needed for blocking transactions,
      * but also for writeskew detection. Disadvantage of read tracking is that it is more expensive because
      * the reads not to be registered on some datastructure so that they are tracked.
      *
      * @return true if the transaction does automatic read tracking, false otherwise.
      */
-    boolean automaticReadTracking();
+    boolean isAutomaticReadTrackingEnabled();
 
     /**
      * Returns the family name of this Transaction. Every transaction in principle should have a family name. This
@@ -70,6 +72,6 @@ public interface TransactionConfiguration {
      *
      * @return true if the writeskew problem is allowed, false otherwise.
      */
-    boolean allowWriteSkewProblem();
+    boolean isWriteSkewProblemAllowed();
 
 }

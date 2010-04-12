@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionFactory;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -36,7 +37,9 @@ public class TransactionTemplate_threadLocalTest {
         Transaction active = stm.getTransactionFactoryBuilder().build().start();
         setThreadLocalTransaction(active);
 
-        Transaction found = new TransactionTemplate<Transaction>(stm.getTransactionFactoryBuilder().build(), false, false) {
+        TransactionFactory txFactory = stm.getTransactionFactoryBuilder().build();
+
+        Transaction found = new TransactionTemplate<Transaction>(txFactory, false, false, true) {
             @Override
             public Transaction execute(Transaction tx) throws Exception {
                 return tx;

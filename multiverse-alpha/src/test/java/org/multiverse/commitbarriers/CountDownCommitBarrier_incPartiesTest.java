@@ -1,9 +1,9 @@
 package org.multiverse.commitbarriers;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import static org.multiverse.TestUtils.*;
 
 public class CountDownCommitBarrier_incPartiesTest {
 
@@ -56,9 +56,24 @@ public class CountDownCommitBarrier_incPartiesTest {
     }
 
     @Test
-    @Ignore
     public void whenPendingTransactions() {
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(3);
 
+        JoinCommitThread t1 = new JoinCommitThread(barrier);
+        JoinCommitThread t2 = new JoinCommitThread(barrier);
+
+        startAll(t1, t2);
+
+        sleepMs(500);
+        assertTrue(barrier.isClosed());
+
+        barrier.incParties(1);
+
+        sleepMs(500);
+        assertAlive(t1, t2);
+        assertTrue(barrier.isClosed());
+        assertEquals(2, barrier.getNumberWaiting());
+        assertEquals(4, barrier.getParties());
     }
 
     @Test

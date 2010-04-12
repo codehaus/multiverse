@@ -21,8 +21,7 @@ public class NonTrackingReadonlyAlphaTransaction_miscTest {
     }
 
     public NonTrackingReadonlyAlphaTransaction startSutTransaction() {
-        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock)
-                .withAutomaticReadTracking(false);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, false);
 
         return new NonTrackingReadonlyAlphaTransaction(config);
     }

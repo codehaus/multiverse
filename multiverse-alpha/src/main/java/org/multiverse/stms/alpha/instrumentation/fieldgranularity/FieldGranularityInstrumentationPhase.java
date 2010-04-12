@@ -1,8 +1,8 @@
 package org.multiverse.stms.alpha.instrumentation.fieldgranularity;
 
-import org.multiverse.instrumentation.compiler.AbstractCompilePhase;
-import org.multiverse.instrumentation.compiler.Clazz;
-import org.multiverse.instrumentation.compiler.Environment;
+import org.multiverse.instrumentation.AbstractInstrumentationPhase;
+import org.multiverse.instrumentation.Clazz;
+import org.multiverse.instrumentation.Environment;
 import org.multiverse.instrumentation.metadata.ClassMetadata;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -12,14 +12,14 @@ import static org.multiverse.instrumentation.asm.AsmUtils.toBytecode;
 /**
  * @author Peter Veentjer
  */
-public class FieldGranularityCompilePhase extends AbstractCompilePhase {
+public class FieldGranularityInstrumentationPhase extends AbstractInstrumentationPhase {
 
-    public FieldGranularityCompilePhase() {
-        super("FieldGranularityCompilePhase");
+    public FieldGranularityInstrumentationPhase() {
+        super("FieldGranularityInstrumentationPhase");
     }
 
     @Override
-    protected Clazz doCompile(Environment environment, Clazz originalClazz) {
+    protected Clazz doInstrument(Environment environment, Clazz originalClazz) {
         ClassMetadata metadata = environment.getMetadataRepository().loadClassMetadata(
                 originalClazz.getClassLoader(), originalClazz.getName());
 

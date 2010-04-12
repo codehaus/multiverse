@@ -1,7 +1,7 @@
 package org.multiverse.javaagent;
 
-import org.multiverse.instrumentation.compiler.Clazz;
-import org.multiverse.instrumentation.compiler.ClazzCompiler;
+import org.multiverse.instrumentation.Clazz;
+import org.multiverse.instrumentation.Instrumentor;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
@@ -18,9 +18,9 @@ public final class MultiverseClassFileTransformer implements ClassFileTransforme
 
     private final static Logger logger = Logger.getLogger(MultiverseClassFileTransformer.class.getName());
 
-    private final ClazzCompiler compiler;
+    private final Instrumentor compiler;
 
-    public MultiverseClassFileTransformer(ClazzCompiler compiler) {
+    public MultiverseClassFileTransformer(Instrumentor compiler) {
         if (compiler == null) {
             throw new NullPointerException();
         }

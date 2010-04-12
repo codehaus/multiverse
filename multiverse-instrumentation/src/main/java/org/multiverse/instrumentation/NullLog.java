@@ -1,4 +1,4 @@
-package org.multiverse.instrumentation.compiler;
+package org.multiverse.instrumentation;
 
 /**
  * The NullLog is a Log that doesn't do anything. It is useful if you don't want to have logging.

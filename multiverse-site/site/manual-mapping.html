@@ -17,7 +17,6 @@
         <ul>
             <li><a href="#transactionalmethod.readonly">1.3.1 @TransactionalMethod.readonly</a></li>
             <li><a href="#transactionalmethod.maxretrycount">1.3.2 @TransactionalMethod.maxRetryCount</a></li>
-            <li><a href="#transactionalmethod.familyname">1.3.3 @TransactionalMethod.familyName</a></li>
             <li><a href="#transactionalmethod.automaticreadtracking">1.3.3
                 @TransactionalMethod.automaticReadTracking</a></li>
             <li><a href="">1.3.3 @TransactionalMethod.writeSkew</a></li>
@@ -209,11 +208,6 @@ But be careful:
 On a lower level the maxRetryCount is combined with a customizable restartBackoffPolicy (with an exponential
 backoff policy as the default implementation) to eliviate pressure on contention. In the future this backoff
 policy will be exposed through annotations.
-
-<h3 id="transactionalmethod.familyname">@TransactionalMethod.familyName</h3>
-The familyName of a transaction described a lot about the behavior of that transaction. Luckily when no
-transaction familyName is set, the instrumentation will automatically derive one based on the
-classpath, methodname and signature. So in 99% of the cases you can ignore the property completely.
 
 <h3 id="transactionalmethod.automaticreadtracking">@TransactionalMethod.automaticReadTracking</h3>
 When a transaction reads from transactional objects, it can decide to track that read. Readtracking is useful

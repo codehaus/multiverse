@@ -1,12 +1,12 @@
 package org.multiverse.compiler;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+import org.multiverse.instrumentation.Clazz;
+import org.multiverse.instrumentation.FileSystemFiler;
+import org.multiverse.instrumentation.Instrumentor;
+import org.multiverse.instrumentation.SystemOutLog;
 import org.multiverse.instrumentation.asm.AsmUtils;
-import org.multiverse.instrumentation.compiler.Clazz;
-import org.multiverse.instrumentation.compiler.ClazzCompiler;
-import org.multiverse.instrumentation.compiler.FileSystemFiler;
-import org.multiverse.instrumentation.compiler.SystemOutLog;
 import org.objectweb.asm.tree.ClassNode;
 
 import java.io.*;
@@ -18,10 +18,10 @@ import static java.lang.String.format;
 /**
  * The MultiverseCompiler is responsible for transforming class files. It is a general purpose
  * compiler since it doesn't do any compiling itself, but forwards everything a
- * {@link ClazzCompiler}  The advantage is that not yet another MultiverseCompiler needs to
+ * {@link org.multiverse.instrumentation.Instrumentor}  The advantage is that not yet another MultiverseCompiler needs to
  * be written; so shared plumbing.
  * <p/>
- * Another advange is that the same ClazzCompiler can be used for the MultiverseJavaAgent
+ * Another advange is that the same Instrumentor can be used for the MultiverseJavaAgent
  * and the MultiverseCompiler.
  *
  * @author Peter Veentjer
@@ -29,61 +29,75 @@ import static java.lang.String.format;
 public final class MultiverseCompiler {
 
     public static void main(String[] args) {
+        MultiverseCompilerArguments cli = createCli(args);
         MultiverseCompiler multiverseCompiler = new MultiverseCompiler();
-        multiverseCompiler.run(args);
+        multiverseCompiler.run(cli);
     }
 
     private ClassLoader compilerClassLoader;
 
-    private void run(String[] args) {
+    private void run(MultiverseCompilerArguments cli) {
         System.out.println("Initializing Multiverse Compiler");
 
-        OptionParser parser = new OptionParser();
-        parser.accepts("compiler")
-                .withRequiredArg()
-                .ofType(String.class)
-                .describedAs("The full class name of the ClazzCompiler to use");
-
-        parser.accepts("targetDirectory")
-                .withRequiredArg()
-                .ofType(String.class)
-                .describedAs("The path of the directory of classes to transform recursivly");
-
-        OptionSet options = parser.parse(args);
-
-        String clazzCompilerName = (String) options.valueOf("compiler");
-
-        ClazzCompiler compiler = createClazzCompiler(clazzCompilerName);
-        compiler.setLog(new SystemOutLog());
-
-        System.out.println("Using ClazzCompiler:" + compiler.getCompilerName() + " " + compiler.getCompilerVersion());
-
-        File targetDirectory = new File((String) options.valueOf("targetDirectory"));
+        Instrumentor instrumentor = createInstrumentor(cli.instrumentorName);
+        File targetDirectory = new File(cli.targetDirectory);
         compilerClassLoader = new MyClassLoader(targetDirectory, MultiverseCompiler.class.getClassLoader());
 
         if (!targetDirectory.isDirectory()) {
-            String msg = format("Target directory '%s' is not a directory", targetDirectory);
-            throw new RuntimeException(msg);
+            System.out.printf("Target directory '%s' is not found, skipping instrumentation\n", targetDirectory);
+            return;
         }
 
-        compiler.setFiler(new FileSystemFiler(targetDirectory));
+        if (cli.dumpBytecode) {
+            System.out.println("Bytecode is dumped for debugging purposes");
+            instrumentor.setDumpBytecode(true);
+        }
+
+        if (cli.verbose) {
+            instrumentor.setLog(new SystemOutLog());
+        }
+
+        System.out.printf("Using org.multiverse.instrumentation.Instrumentor %s-%s\n",
+                instrumentor.getInstrumentorName(),
+                instrumentor.getInstrumentorVersion());
+
+        instrumentor.setFiler(new FileSystemFiler(targetDirectory));
 
         System.out.printf("Transforming classes in targetDirectory %s\n", targetDirectory);
 
-        recursiveApply(targetDirectory, compiler);
+        applyRecursive(targetDirectory, instrumentor);
     }
 
-    public void recursiveApply(File directory, ClazzCompiler clazzCompiler) {
+    private static MultiverseCompilerArguments createCli(String[] args) {
+        CmdLineParser parser = null;
+        try {
+            MultiverseCompilerArguments cli = new MultiverseCompilerArguments();
+            parser = new CmdLineParser(cli);
+            parser.parseArgument(args);
+            return cli;
+        } catch (CmdLineException e) {
+            e.printStackTrace();
+            System.err.println(e.getMessage());
+            System.err.println("java -jar myprogram.jar [options...] compilername target");
+            if (parser != null) {
+                parser.printUsage(System.out);
+            }
+            System.exit(-1);
+            return null;
+        }
+    }
+
+    public void applyRecursive(File directory, Instrumentor clazzCompiler) {
         for (File file : directory.listFiles()) {
             if (file.isDirectory()) {
-                recursiveApply(file, clazzCompiler);
+                applyRecursive(file, clazzCompiler);
             } else if (file.getName().endsWith(".class")) {
                 transform(file, clazzCompiler);
             }
         }
     }
 
-    private void transform(File file, ClazzCompiler clazzCompiler) {
+    private void transform(File file, Instrumentor clazzCompiler) {
         Clazz clazz = load(file);
         Clazz result = clazzCompiler.process(clazz);
         write(file, result);
@@ -91,7 +105,6 @@ public final class MultiverseCompiler {
 
     private Clazz load(File file) {
         ClassNode node = AsmUtils.loadAsClassNode(file);
-
         Clazz clazz = new Clazz(node.name);
         clazz.setBytecode(AsmUtils.toBytecode(node));
         clazz.setClassLoader(compilerClassLoader);
@@ -144,8 +157,6 @@ public final class MultiverseCompiler {
     }
 
     public void write(File file, Clazz clazz) {
-        System.out.println("Writing file: " + file);
-
         try {
             FileOutputStream out = new FileOutputStream(file);
             out.write(clazz.getBytecode());
@@ -155,25 +166,25 @@ public final class MultiverseCompiler {
         }
     }
 
-    private static ClazzCompiler createClazzCompiler(String compilerClassName) {
-        System.out.println(format("Multiverse Compiler: using ClazzCompiler '%s'", compilerClassName));
+    private static Instrumentor createInstrumentor(String compilerClassName) {
+        System.out.println(format("Multiverse Compiler: using Instrumentor '%s'", compilerClassName));
 
         Constructor constructor = getMethod(compilerClassName);
         try {
-            return (ClazzCompiler) constructor.newInstance();
+            return (Instrumentor) constructor.newInstance();
         } catch (IllegalAccessException e) {
-            String msg = format("Failed to initialize ClazzCompiler '%s'." +
+            String msg = format("Failed to initialize Instrumentor '%s'." +
                     "The constructor is not accessable.",
                     compilerClassName);
             throw new IllegalArgumentException(msg, e);
         } catch (InvocationTargetException e) {
-            String msg = format("Failed to initialize ClazzCompiler '%s'." +
+            String msg = format("Failed to initialize Instrumentor '%s'." +
                     "The constructor threw an exception.",
                     compilerClassName);
             System.out.println(msg);
             throw new IllegalArgumentException(msg, e);
         } catch (InstantiationException e) {
-            String msg = format("Failed to initialize ClazzCompiler '%s'." +
+            String msg = format("Failed to initialize Instrumentor '%s'." +
                     "The class could not be instantiated.",
                     compilerClassName);
             System.out.println(msg);
@@ -189,16 +200,16 @@ public final class MultiverseCompiler {
         try {
             compilerClazz = MultiverseCompiler.class.getClassLoader().loadClass(className);
         } catch (ClassNotFoundException e) {
-            String msg = format("Failed to initialize ClazzCompiler '%s'." +
+            String msg = format("Failed to initialize Instrumentor '%s'." +
                     "Is not an existing class (it can't be found using the Thread.currentThread.getContextClassLoader).",
                     className);
             System.out.println(msg);
             throw new IllegalArgumentException(msg, e);
         }
 
-        if (!ClazzCompiler.class.isAssignableFrom(compilerClazz)) {
-            String msg = format("Failed to initialize ClazzCompiler '%s'." +
-                    "Is not an subclass of org.multiverse.compiler.ClazzCompiler).",
+        if (!Instrumentor.class.isAssignableFrom(compilerClazz)) {
+            String msg = format("Failed to initialize Instrumentor '%s'." +
+                    "Is not an subclass of org.multiverse.compiler.Instrumentor).",
                     className);
             System.out.println(msg);
             throw new IllegalArgumentException(msg);
@@ -208,7 +219,7 @@ public final class MultiverseCompiler {
         try {
             method = compilerClazz.getConstructor();
         } catch (NoSuchMethodException e) {
-            String msg = format("Failed to initialize ClazzCompiler '%s'." +
+            String msg = format("Failed to initialize Instrumentor '%s'." +
                     "A no arg constructor is not found.",
                     compilerClazz);
             System.out.println(msg);

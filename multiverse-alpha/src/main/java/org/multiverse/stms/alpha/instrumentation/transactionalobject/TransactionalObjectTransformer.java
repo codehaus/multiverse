@@ -53,17 +53,13 @@ public class TransactionalObjectTransformer implements Opcodes {
     }
 
     public ClassNode transform() {
-
-
         ensureNoProblems();
 
         removeManagedFields();
 
         fixUnmanagedFields();
 
-        //if (classMetadata.isFirstGeneration()) {
         mergeMixin();
-        // }
 
         classNode.methods.add(createOpenUnconstructedMethod());
 

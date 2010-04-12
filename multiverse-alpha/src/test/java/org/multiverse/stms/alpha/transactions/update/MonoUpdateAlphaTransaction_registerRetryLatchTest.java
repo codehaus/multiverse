@@ -36,7 +36,8 @@ public class MonoUpdateAlphaTransaction_registerRetryLatchTest {
 
     public MonoUpdateAlphaTransaction startSutTransactionWithoutAutomaticReadTracking(SpeculativeConfiguration speculativeConfig) {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
-                .withAutomaticReadTracking(false)
+                .withExplictRetryAllowed(true)
+                .withAutomaticReadTrackingEnabled(false)
                 .withSpeculativeConfiguration(speculativeConfig);
 
         return new MonoUpdateAlphaTransaction(config);
@@ -75,7 +76,7 @@ public class MonoUpdateAlphaTransaction_registerRetryLatchTest {
     }
 
     @Test
-    public void whenSpeculativeNoAutomaticReadtracking_thenNoRetryPossibleException() {
+    public void whenSpeculativeNoAutomaticReadtracking_thenSpeculativeConfigurationFailure() {
         ManualRef ref = new ManualRef(stm);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, false, 100);
@@ -135,6 +136,27 @@ public class MonoUpdateAlphaTransaction_registerRetryLatchTest {
         assertIsActive(tx);
         assertFalse(latch.isOpen());
         assertHasListeners(ref, latch);
+    }
+
+    @Test
+    public void whenExplicitRetryNotAllowed() {
+        ManualRef ref = new ManualRef(stm);
+
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withExplictRetryAllowed(false);
+
+        AlphaTransaction tx = new MonoUpdateAlphaTransaction(config);
+        tx.openForRead(ref);
+
+        Latch latch = new CheapLatch();
+        try {
+            tx.registerRetryLatch(latch);
+            fail();
+        } catch (NoRetryPossibleException expected) {
+        }
+
+        assertIsActive(tx);
+        assertFalse(latch.isOpen());
     }
 
     @Test

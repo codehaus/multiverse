@@ -36,7 +36,7 @@ public class TransactionalArrayList_toArray1Test {
 
         long version = stm.getVersion();
         try {
-            list.toArray(null);
+            list.toArray((Object[]) null);
             fail();
         } catch (NullPointerException expected) {
         }

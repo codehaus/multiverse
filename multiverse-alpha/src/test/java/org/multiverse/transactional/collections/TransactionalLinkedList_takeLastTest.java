@@ -22,7 +22,7 @@ public class TransactionalLinkedList_takeLastTest {
         stm = getGlobalStmInstance();
         updateTxFactory = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
-                .setAutomaticReadTracking(true)
+                .setAutomaticReadTrackingEnabled(true)
                 .build();
         setThreadLocalTransaction(null);
     }

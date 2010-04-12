@@ -32,7 +32,7 @@ public class NonBlockingTransactionExecutorTest {
         }
         transactionFactory = stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
-                .setAutomaticReadTracking(true)
+                .setAutomaticReadTrackingEnabled(true)
                 .build();
     }
 

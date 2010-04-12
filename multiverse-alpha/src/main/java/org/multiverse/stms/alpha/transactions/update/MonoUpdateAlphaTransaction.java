@@ -31,7 +31,7 @@ public final class MonoUpdateAlphaTransaction extends AbstractUpdateAlphaTransac
     protected boolean tryWriteLocks() {
         CommitLockPolicy lockPolicy = config.commitLockPolicy;
         UncommittedFilter commitLockFilter;
-        if (config.dirtyCheck) {
+        if (config.dirtyCheckEnabled) {
             commitLockFilter = UncommittedFilter.DIRTY_CHECK;
         } else {
             commitLockFilter = UncommittedFilter.NO_DIRTY_CHECK;

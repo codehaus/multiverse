@@ -40,7 +40,7 @@ public class MonoReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransacti
     @Override
     protected void attach(AlphaTranlocal tranlocal) {
         if (attached != null) {
-            config.speculativeConfig.signalSpeculativeSizeFailure(1);
+            config.speculativeConfiguration.signalSpeculativeSizeFailure(1);
             throw SpeculativeConfigurationFailure.create();
         }
 
@@ -48,7 +48,7 @@ public class MonoReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransacti
     }
 
     @Override
-    protected boolean doRegisterRetryLatch(Latch latch, long wakeupVersion) {
+    protected boolean dodoRegisterRetryLatch(Latch latch, long wakeupVersion) {
         if (attached == null) {
             return false;
         }

@@ -136,7 +136,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
      * @throws IllegalArgumentException if newCorePoolSize is smaller than 0.
      * @throws IllegalStateException    if this TransactionalThreadPoolExecutor is shutdown or terminated.
      */
-    @TransactionalMethod(automaticReadTracking = false)
+    @TransactionalMethod(automaticReadTrackingEnabled = false)
     public void setCorePoolSize(int newCorePoolSize) {
         if (newCorePoolSize < 0) {
             throw new IllegalArgumentException();
@@ -198,7 +198,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
      * @throws NullPointerException if threadFactory is null
      * @see #getThreadFactory
      */
-    @TransactionalMethod(automaticReadTracking = false)
+    @TransactionalMethod(automaticReadTrackingEnabled = false)
     public void setThreadFactory(ThreadFactory threadFactory) {
         if (threadFactory == null) {
             throw new NullPointerException();
@@ -238,7 +238,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
     }
 
     @Override
-    @TransactionalMethod(automaticReadTracking = false)
+    @TransactionalMethod(automaticReadTrackingEnabled = false)
     public List<Runnable> shutdownNow() {
         switch (state) {
             case unstarted:
@@ -285,7 +285,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
     }
 
     @Override
-    @TransactionalMethod(readonly = true, automaticReadTracking = true)
+    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
     public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
         switch (state) {
             case unstarted:
@@ -306,7 +306,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
      *
      * @throws InterruptedException if the Thread was interrupted.
      */
-    @TransactionalMethod(readonly = true, automaticReadTracking = true, interruptible = true)
+    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true, interruptible = true)
     public void awaitTermination() throws InterruptedException {
         if (state != State.terminated) {
             retry();
@@ -316,7 +316,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
     /**
      * Awaits for this TransactionalThreadPoolExecutor to complete without the possibility of being interrupted.
      */
-    @TransactionalMethod(readonly = true, automaticReadTracking = true)
+    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
     public void awaitTerminationUninterruptibly() {
         if (state != State.terminated) {
             retry();
