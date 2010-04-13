@@ -11,7 +11,8 @@ import java.util.concurrent.TimeUnit;
 
 import static org.multiverse.api.StmUtils.retry;
 
-public abstract class AbstractBlockingDeque<E>
+//todo: check the inferfaces that are implemented
+public abstract class AbstractTransactionalDeque<E>
         extends AbstractCollection<E> implements BlockingDeque<E> {
 
     @Override
@@ -125,7 +126,7 @@ public abstract class AbstractBlockingDeque<E>
     @Override
     @TransactionalMethod
     public E removeFirst() {
-         if (isEmpty()) {
+        if (isEmpty()) {
             throw new NoSuchElementException();
         }
 
@@ -270,7 +271,7 @@ public abstract class AbstractBlockingDeque<E>
     @Override
     @TransactionalMethod
     public int drainTo(Collection<? super E> c) {
-        if(isEmpty()){
+        if (isEmpty()) {
             return 0;
         }
 

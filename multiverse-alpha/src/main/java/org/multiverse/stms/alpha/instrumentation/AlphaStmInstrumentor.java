@@ -5,6 +5,7 @@ import org.multiverse.instrumentation.StandardInstrumentor;
 import org.multiverse.instrumentation.asm.JSRInlineInstrumentationPhase;
 import org.multiverse.stms.alpha.instrumentation.fieldaccess.NonTransactionalObjectFieldAccessInstrumentationPhase;
 import org.multiverse.stms.alpha.instrumentation.fieldgranularity.FieldGranularityInstrumentationPhase;
+import org.multiverse.stms.alpha.instrumentation.gettersetter.GetterSetterInlineInstrumentationPhase;
 import org.multiverse.stms.alpha.instrumentation.tranlocal.TranlocalInstrumentationPhase;
 import org.multiverse.stms.alpha.instrumentation.tranlocal.TranlocalSnapshotInstrumentationPhase;
 import org.multiverse.stms.alpha.instrumentation.transactionalmethod.TransactionalMethodInstrumentationPhase;
@@ -22,6 +23,7 @@ public class AlphaStmInstrumentor extends StandardInstrumentor {
 
         add(new PreventReinstrumentationInstrumentationPhase(this));
         add(new JSRInlineInstrumentationPhase());
+        add(new GetterSetterInlineInstrumentationPhase());
         add(new FieldGranularityInstrumentationPhase());
         add(new TranlocalInstrumentationPhase());
         add(new TranlocalSnapshotInstrumentationPhase());

@@ -14,7 +14,7 @@ import java.util.concurrent.BlockingDeque;
  * @see java.util.Queue
  * @see java.util.Collection
  */
-public interface TransactionalDeque<E> extends TransactionalCollection<E>, BlockingDeque<E> {
+public interface TransactionalDeque<E> extends TransactionalQueue<E>, BlockingDeque<E> {
 
     @Override
     @TransactionalMethod(readonly = true)

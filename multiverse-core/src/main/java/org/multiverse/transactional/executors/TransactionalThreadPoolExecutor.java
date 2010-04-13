@@ -245,7 +245,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
                 state = State.terminated;
                 return Collections.EMPTY_LIST;
             case started:
-                //fall through                
+                //fall through
             case shutdown:
                 LinkedList<Runnable> sink = new LinkedList<Runnable>();
                 workQueue.drainTo(sink);

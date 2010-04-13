@@ -49,7 +49,8 @@ import static org.multiverse.api.StmUtils.retry;
  * @see java.util.List
  */
 @TransactionalObject
-public final class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> implements List<E> {
+public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque<E>
+        implements TransactionalList<E> {
 
     private final static ProgrammaticReferenceFactory sizeFactory = getGlobalStmInstance()
             .getProgrammaticReferenceFactoryBuilder()
@@ -59,9 +60,11 @@ public final class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> i
 
     private final ProgrammaticLong size;
 
+    //todo: should be made private again
     @FieldGranularity
     public Node<E> head;
 
+    //todo: should be made private again
     @FieldGranularity
     public Node<E> tail;
 
@@ -88,6 +91,11 @@ public final class TransactionalLinkedList<E> extends AbstractBlockingDeque<E> i
         }
         this.maxCapacity = maxCapacity;
         this.size = sizeFactory.atomicCreateLong(0);
+    }
+
+    @Override
+    public int currentSize() {
+        return (int) size.get();
     }
 
     @Override

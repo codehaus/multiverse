@@ -4,6 +4,8 @@ todo engine
 
 - instrumentation
 
+    - the version in the AlphaInstrumentor needs to be modified by maven instead of manually
+
     - static compilation
 
         - maven plugin for the compiler
@@ -16,6 +18,8 @@ todo engine
         - instrumented jar test
 
     - inlining
+
+        - setter should be able to deal with returning old value
 
         - inlining getter
 
@@ -91,7 +95,9 @@ it will not be fixated.
 
     - boolean removeLastOccurrence(Object o)
 
+- JRuby integration
 
+- Groovy Integration
 
 ---------------------------------------------------------------
 todo unclear
@@ -251,7 +257,7 @@ idea:
 ---------------------------------------------------------------
 
 - tx reuse? So if an aborted or committed transaction is found and a new tx needs to start,
-could this old tx be reused? 
+could this old tx be reused?
 
 - a tranlocal that can't be used for listening to; causes less space, but also reduces
 stress on the memory bus because of no reads need to be done on the listeners (no
@@ -336,7 +342,7 @@ done
 
 - AlphaProgrammaticLong.atomicCompareAndSet(long expected, long update)
 
-- AlphaProgrammaticLong.atomicGet 
+- AlphaProgrammaticLong.atomicGet
 
 - AlphaProgrammaticLong.set test
 
