@@ -18,7 +18,7 @@ import static java.lang.System.arraycopy;
  *
  * @author Peter Veentjer
  */
-public class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
+public final class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
 
     private AlphaTranlocal[] attachedArray;
 

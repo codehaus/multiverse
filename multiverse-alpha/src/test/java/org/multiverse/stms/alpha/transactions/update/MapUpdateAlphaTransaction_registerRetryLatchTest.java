@@ -65,6 +65,27 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
     }
 
     @Test
+    public void whenExplicitRetryNotAllowed() {
+        ManualRef ref = new ManualRef(stm);
+
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withExplictRetryAllowed(false);
+
+        AlphaTransaction tx = new MapUpdateAlphaTransaction(config);
+        tx.openForRead(ref);
+
+        Latch latch = new CheapLatch();
+        try {
+            tx.registerRetryLatch(latch);
+            fail();
+        } catch (NoRetryPossibleException expected) {
+        }
+
+        assertIsActive(tx);
+        assertFalse(latch.isOpen());
+    }
+
+    @Test
     public void whenExplicitNoAutomaticReadtracking_thenNoRetryPossibleException() {
         ManualRef ref = new ManualRef(stm);
 

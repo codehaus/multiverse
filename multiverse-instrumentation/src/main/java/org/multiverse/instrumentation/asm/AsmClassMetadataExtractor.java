@@ -4,13 +4,11 @@ import org.multiverse.annotations.*;
 import org.multiverse.instrumentation.metadata.*;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.AnnotationNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -21,7 +19,7 @@ import static org.multiverse.instrumentation.asm.AsmUtils.isStatic;
  *
  * @author Peter Veentjer.
  */
-public final class AsmClassMetadataExtractor implements ClassMetadataExtractor {
+public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, Opcodes {
 
     private MetadataRepository metadataRepository;
 
@@ -127,6 +125,139 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor {
         }
 
         methodMetadata.setTransactionalMetadata(transactionMetadata);
+
+        extractSetterMetadata(methodMetadata, methodNode);
+        extractGetterMetadata(methodMetadata, methodNode);
+    }
+
+    private void extractSetterMetadata(MethodMetadata methodMetadata, MethodNode methodNode) {
+        if (methodMetadata.isStatic() || methodMetadata.isNative() || methodMetadata.isAbstract()) {
+            return;
+        }
+
+        Type[] argTypes = Type.getArgumentTypes(methodNode.desc);
+        if (argTypes.length != 1) {
+            return;
+        }
+
+        Type retType = Type.getReturnType(methodNode.desc);
+        if (!Type.VOID_TYPE.equals(retType)) {
+            return;
+        }
+
+        if (methodNode.name.equals("setWithAutoUnboxing")) {
+            System.out.println("hello");
+        }
+
+        List<AbstractInsnNode> filteredInstructions = filterNoOps(methodNode.instructions);
+        if (filteredInstructions.size() != 4) {
+            return;
+        }
+
+        if (filteredInstructions.get(0).getOpcode() != ALOAD) {
+            return;
+        }
+
+        VarInsnNode insn1 = (VarInsnNode) filteredInstructions.get(0);
+        if (insn1.var != 0) {
+            return;
+        }
+
+        if (filteredInstructions.get(1).getType() != AbstractInsnNode.VAR_INSN) {
+            return;
+        }
+
+        VarInsnNode insn2 = (VarInsnNode) filteredInstructions.get(1);
+        if (insn2.var != 1) {
+            return;
+        }
+
+        if (filteredInstructions.get(2).getOpcode() != PUTFIELD) {
+            return;
+        }
+        FieldInsnNode insn3 = (FieldInsnNode) filteredInstructions.get(2);
+
+        if (filteredInstructions.get(3).getOpcode() != RETURN) {
+            return;
+        }
+
+        FieldMetadata field = methodMetadata.getClassMetadata().getFieldMetadata(insn3.name);
+        methodMetadata.setGetterSetter(MethodType.setter, field);
+    }
+
+    private void extractGetterMetadata(MethodMetadata methodMetadata, MethodNode methodNode) {
+        if (methodMetadata.isStatic() || methodMetadata.isNative() || methodMetadata.isAbstract()) {
+            return;
+        }
+
+        Type[] argTypes = Type.getArgumentTypes(methodNode.desc);
+        if (argTypes.length != 0) {
+            return;
+        }
+
+        Type retType = Type.getReturnType(methodNode.desc);
+        if (Type.VOID_TYPE.equals(retType)) {
+            return;
+        }
+
+        List<AbstractInsnNode> filteredInstructions = filterNoOps(methodNode.instructions);
+
+        if (filteredInstructions.size() != 3) {
+            return;
+        }
+
+        AbstractInsnNode instr1 = filteredInstructions.get(0);
+        if (instr1.getOpcode() != ALOAD) {
+            return;
+        }
+
+        VarInsnNode varInsnNode = (VarInsnNode) instr1;
+        if (varInsnNode.var != 0) {
+            return;
+        }
+
+        AbstractInsnNode instr2 = filteredInstructions.get(1);
+        if (instr2.getOpcode() != GETFIELD) {
+            return;
+        }
+
+        AbstractInsnNode instr3 = filteredInstructions.get(2);
+        switch (instr3.getOpcode()) {
+            case IRETURN:
+                break;
+            case LRETURN:
+                break;
+            case FRETURN:
+                break;
+            case DRETURN:
+                break;
+            case ARETURN:
+                break;
+            default:
+                return;
+        }
+
+        FieldInsnNode fieldInsnNode = (FieldInsnNode) instr2;
+
+        FieldMetadata field = methodMetadata.getClassMetadata().getFieldMetadata(fieldInsnNode.name);
+        methodMetadata.setGetterSetter(MethodType.getter, field);
+    }
+
+    private List<AbstractInsnNode> filterNoOps(InsnList instructions) {
+        List<AbstractInsnNode> result = new LinkedList<AbstractInsnNode>();
+
+        if (instructions == null) {
+            return result;
+        }
+
+        for (int k = 0; k < instructions.size(); k++) {
+            AbstractInsnNode node = instructions.get(k);
+            if (node.getOpcode() != -1) {
+                result.add(node);
+            }
+        }
+
+        return result;
     }
 
     private boolean isInvisibleMethod(MethodNode methodNode) {
