@@ -30,6 +30,7 @@
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
+
                     <execution>
                         <id>create-main-jar</id>
                         <phase>compile</phase>
@@ -58,6 +59,10 @@
                                 <unzip src="${settings.localRepository}/org/multiverse/multiverse-alpha-unborn/${project.version}/multiverse-alpha-unborn-${project.version}.jar"
                                        dest="${project.build.outputDirectory}"/>
 
+                                <echo message="-------------------------------------------"/>
+                                <echo message="${settings.localRepository}/asm/asm-all/${asm.version}/asm-all-${asm.version}.jar"/>
+                                <echo message="-------------------------------------------"/>
+
                                 <java classname="org.multiverse.compiler.MultiverseCompiler">
                                     <arg value="-v"/>
                                     <arg value="-d"/>
@@ -77,9 +82,35 @@
                                     </classpath>
                                 </java>
 
+                                <!-- we are going create a new set of class files where the dependant
+                                    jars are integrated. Unfortunately jarjar only works on jars, so
+                                    we temporarily create the jar, unzip it and remove it again-->
+                                <echo message="Creating Jar"/>
+                                <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"/>
+                                <jarjar destfile="${project.build.directory}/${artifactId}-${project.version}.jar"
+                                        update="true">
+                                    <rule pattern="org.objectweb.asm.**"
+                                          result="${groupId}.repackaged.@0"/>
+                                    <rule pattern="org.kohsuke.args4j.**"
+                                          result="${groupId}.repackaged.@0"/>
+                                    <fileset dir="${project.build.outputDirectory}"/>
+
+                                    <manifest>
+                                        <attribute name="Premain-Class"
+                                                   value="${multiverse.agentclass}"/>
+                                    </manifest>
+                                </jarjar>
+
+                                <delete dir="${project.build.outputDirectory}"/>
+                                <mkdir dir="${project.build.outputDirectory}"/>
+                                <unzip src="${project.build.directory}/${artifactId}-${project.version}.jar"
+                                       dest="${project.build.outputDirectory}"/>
+
+                                <delete file="${project.build.directory}/${artifactId}-${project.version}.jar"/>
                             </tasks>
                         </configuration>
                     </execution>
+
                     <execution>
                         <id>Compiles the tests</id>
                         <phase>test-compile</phase>
@@ -88,6 +119,8 @@
                         </goals>
                         <configuration>
                             <tasks>
+                                <echo message="Successfully created ${project.build.directory}/${artifactId}-${project.version}.jar"/>
+
                                 <echo message="-------------------------------------------"/>
                                 <echo message="Instrumenting the Multiverse-alpha test classes"/>
                                 <echo message="-------------------------------------------"/>
@@ -130,105 +163,11 @@
                                 </java>
 
                                 <echo message="Successfully instrumented the test classes"/>
+
                             </tasks>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>Builds the jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <echo message="-------------------------------------------"/>
-                                <echo message="Creating the jar"/>
-                                <echo message="-------------------------------------------"/>
 
-                                <echo message="Creating Jar"/>
-                                <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"/>
-                                <jarjar destfile="${project.build.directory}/${artifactId}-${project.version}.jar"
-
-                                        update="true">
-                                    <rule pattern="org.objectweb.asm.**"
-                                          result="${groupId}.repackaged.@0"/>
-                                    <rule pattern="org.kohsuke.args4j.**"
-                                          result="${groupId}.repackaged.@0"/>
-                                    <fileset dir="${project.build.outputDirectory}"/>
-                                    <manifest>
-                                        <attribute name="Premain-Class"
-                                                   value="${multiverse.agentclass}"/>
-                                    </manifest>
-                                </jarjar>
-
-                                <echo message="Successfully created ${project.build.directory}/${artifactId}-${project.version}.jar"/>
-                            </tasks>
-                        </configuration>
-                    </execution>
-                    <!-- execution>
-                        <id>Execute the tests</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <echo message="Executing unit tests"/>
-                                
-                                <mkdir dir="${project.build.directory}/junit-reports"/>
-                                <echo message="${settings.localRepository}/junit/${junit.version}/junit-${junit.version}.jar"/>
-
-                                <fileset id="test.classes"
-                                         dir="${project.build.testOutputDirectory}"
-                                         includes="**/*Test.class"
-                                         excludes="**/*StressTest.class,**/*PerformanceTest.class,**/*performanceTest.class"/>
-
-                                <pathconvert pathsep=" "
-                                             property="classestotest"
-                                             refid="test.classes">
-                                    <mapper>
-                                        <chainedmapper>
-                                            <globmapper from="${project.build.testOutputDirectory}/*.class" to="*"/>
-                                            <packagemapper from="*" to="*"/>
-                                        </chainedmapper>
-                                    </mapper>
-                                </pathconvert>
-
-                                <echo message="${classestotest}"/>
-
-                                <java classname="org.junit.runner.JUnitCore"
-                                      dir="${project.build.testOutputDirectory}"
-                                      jvmargs="-Xms256m"
-                                      args="${classestotest}"
-                                      fork="true">
-
-                                    <classpath>
-                                        <pathelement
-                                                location="${project.build.directory}/${artifactId}-${project.version}.jar"/>
-                                        <pathelement
-                                                location="${settings.localRepository}/org/mockito/mockito-all/${mockito.version}/mockito-all-${mockito.version}.jar"/>
-                                        <pathelement
-                                                location="${settings.localRepository}/junit/junit/${junit.version}/junit-${junit.version}.jar"/>
-                                        <pathelement
-                                                location="${project.build.testOutputDirectory}"/>
-                                    </classpath>
-                                </java>
-                            </tasks>
-                        </configuration>
-                    </execution -->
-                    <!-- execution>
-                        <id>Installs the jar</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <copy file="${project.build.directory}/${artifactId}-${project.version}.jar"
-                                      tofile="${settings.localRepository}/org/multiverse/${artifactId}/${version}/${artifactId}-${project.version}.jar"/>
-                            </tasks>
-                        </configuration>
-                    </execution -->
                 </executions>
                 <dependencies>
                     <dependency>
@@ -255,19 +194,18 @@
             </plugin>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <finalName>onzin.jar</finalName>
-                        </configuration>
-                    </execution>
-                </executions>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Premain-Class>${multiverse.agentclass}</Premain-Class>
+                        </manifestEntries>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
             </plugin>
+
         </plugins>
     </build>
 

@@ -144,11 +144,8 @@ public class StandardInstrumentor implements Instrumentor {
     }
 
     private void dump(InstrumentationPhase step, Clazz beforeClazz, Clazz afterClazz) {
-        if (!dumpBytecode) {
-            return;
-        }
-
-        if (afterClazz == beforeClazz) {
+        if (!dumpBytecode
+                || afterClazz == beforeClazz) {
             return;
         }
 
@@ -162,20 +159,21 @@ public class StandardInstrumentor implements Instrumentor {
     //todo: ugly hack.
 
     private static boolean isExcluded(String className) {
-        return className.startsWith("java/") ||
-                className.startsWith("javax/") ||
-                className.startsWith("org/mockito") ||
-                className.startsWith("com/jprofiler/") ||
-                className.startsWith("org/junit") ||
-                className.startsWith("sun/") ||
-                className.startsWith("com/sun") ||
-                className.startsWith("org/apache/") ||
-                className.startsWith("org/hamcrest/") ||
-                className.startsWith("com/intellij") ||
-                className.startsWith("org/eclipse") ||
-                className.startsWith("org/kohsuke/args4j") ||
-                className.startsWith("org/objectweb/asm") ||
-                className.startsWith("junit/");
+        return className.startsWith("java/")
+                || className.startsWith("javax/")
+                || className.startsWith("org/mockito")
+                || className.startsWith("com/jprofiler/")
+                || className.startsWith("org/junit")
+                || className.startsWith("sun/")
+                || className.startsWith("com/sun")
+                || className.startsWith("org/apache/")
+                || className.startsWith("org/hamcrest/")
+                || className.startsWith("com/intellij")
+                || className.startsWith("org/eclipse")
+                || className.startsWith("org/kohsuke/args4j")
+                || className.startsWith("org/objectweb/asm")
+                || className.startsWith("org/multiverse/repackaged")
+                || className.startsWith("junit/");
     }
 
     class EnvironmentImpl implements Environment {

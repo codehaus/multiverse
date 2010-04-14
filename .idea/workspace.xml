@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" readonly="true" id="cff582b0-9bd4-4e3c-995c-91f41f9cae86" name="Default" comment="" />
+    <list default="true" readonly="true" id="cff582b0-9bd4-4e3c-995c-91f41f9cae86" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/multiverse-instrumentation/src/main/java/org/multiverse/instrumentation/StandardInstrumentor.java" afterPath="$PROJECT_DIR$/multiverse-instrumentation/src/main/java/org/multiverse/instrumentation/StandardInstrumentor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/multiverse-alpha/pom.xml" afterPath="$PROJECT_DIR$/multiverse-alpha/pom.xml" />
+    </list>
     <ignored path=".idea/workspace.xml" />
     <ignored path="multiverse.iws" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -118,92 +122,64 @@
   <component name="FileColors" enabled="true" enabledForTabs="true" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="TransactionalTreeSet_isEmptyTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_isEmptyTest.java">
+      <file leaf-file-name=".gitignore" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/multiverse-alpha/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="19" column="0" selection-start="529" selection-end="529" vertical-scroll-proportion="0.0">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TransactionalTreeSet_iteratorTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_iteratorTest.java">
+      <file leaf-file-name=".gitignore" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="0" selection-start="378" selection-end="378" vertical-scroll-proportion="0.0">
+            <state line="6" column="2" selection-start="87" selection-end="87" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TransactionalTreeSet_removeAllTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_removeAllTest.java">
+      <file leaf-file-name="pom.xml" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/multiverse-alpha/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="0" selection-start="379" selection-end="379" vertical-scroll-proportion="0.0">
+            <state line="193" column="17" selection-start="12136" selection-end="12136" vertical-scroll-proportion="0.45083207">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TransactionalTreeSet_removeTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_removeTest.java">
+      <file leaf-file-name="pom.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/multiverse-instrumentation/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="1" selection-start="295" selection-end="376" vertical-scroll-proportion="0.0">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TransactionalTreeSet_retainAllTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_retainAllTest.java">
+      <file leaf-file-name="MultiverseCompiler.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/multiverse-instrumentation/src/main/java/org/multiverse/compiler/MultiverseCompiler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="18" column="0" selection-start="380" selection-end="380" vertical-scroll-proportion="0.0">
+            <state line="28" column="19" selection-start="1091" selection-end="1091" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TransactionalTreeSet_sizeTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_sizeTest.java">
+      <file leaf-file-name="StandardInstrumentor.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/multiverse-instrumentation/src/main/java/org/multiverse/instrumentation/StandardInstrumentor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="4" selection-start="429" selection-end="429" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TransactionalTreeSet_StressTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_StressTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="0" selection-start="382" selection-end="382" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TransactionalTreeSet_toArray0Test.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_toArray0Test.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="0" selection-start="384" selection-end="384" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TransactionalTreeSet_toArray1Test.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_toArray1Test.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="0" selection-start="378" selection-end="378" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TransactionalTreeSet_toStringTest.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_toStringTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="31" column="0" selection-start="681" selection-end="681" vertical-scroll-proportion="0.45146015">
-              <folding />
+            <state line="153" column="22" selection-start="4444" selection-end="4444" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="method#getInstrumentorName#0;class#StandardInstrumentor#0" expanded="true" />
+                <element signature="method#getInstrumentorVersion#0;class#StandardInstrumentor#0" expanded="true" />
+                <element signature="method#getStmName#0;class#StandardInstrumentor#0" expanded="true" />
+                <element signature="method#setDumpBytecode#0;class#StandardInstrumentor#0" expanded="true" />
+                <element signature="method#getLog#0;class#EnvironmentImpl#0;class#StandardInstrumentor#0" expanded="true" />
+                <element signature="method#getDumpDirectory#0;class#EnvironmentImpl#0;class#StandardInstrumentor#0" expanded="true" />
+                <element signature="method#getMetadataRepository#0;class#EnvironmentImpl#0;class#StandardInstrumentor#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -218,8 +194,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_addTest.java" />
-        <option value="$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_clearTest.java" />
         <option value="$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_containsAllTest.java" />
         <option value="$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_containsTest.java" />
         <option value="$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_equalsTest.java" />
@@ -234,6 +208,8 @@
         <option value="$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_toArray0Test.java" />
         <option value="$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_toArray1Test.java" />
         <option value="$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_toStringTest.java" />
+        <option value="$PROJECT_DIR$/multiverse-instrumentation/src/main/java/org/multiverse/instrumentation/StandardInstrumentor.java" />
+        <option value="$PROJECT_DIR$/multiverse-alpha/pom.xml" />
       </list>
     </option>
   </component>
@@ -359,7 +335,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="multiverse-core" />
+              <option name="myItemId" value="multiverse-instrumentation" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -373,7 +349,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="multiverse-core" />
+              <option name="myItemId" value="multiverse-instrumentation" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -391,37 +367,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="multiverse-core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="multiverse" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="master" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="master" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="multiverse-core" />
+              <option name="myItemId" value="multiverse-instrumentation" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -440,10 +386,6 @@
               <option name="myItemId" value="multiverse" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="transactional" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -455,7 +397,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="multiverse-core" />
+              <option name="myItemId" value="multiverse-instrumentation" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -475,11 +417,55 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="transactional" />
+              <option name="myItemId" value="instrumentation" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="master" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="master" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="primitives" />
+              <option name="myItemId" value="multiverse-instrumentation" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="multiverse" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="compiler" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="master" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="master" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="multiverse-core" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -507,55 +493,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="multiverse-alpha-unborn" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="test" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="multiverse" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="master" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="master" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="multiverse-alpha-unborn" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="master" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="master" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="multiverse-alpha-allinone" />
+              <option name="myItemId" value="multiverse-alpha" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -829,11 +767,15 @@
     <property name="dynamic.classpath" value="false" />
   </component>
   <component name="RecentsManager">
-    <key name="IntroduceConstantDialog.RECENTS_KEY">
-      <recent name="org.multiverse.stms.alpha.programmatic.AlphaProgrammaticReference_atomicCompareAndSetTest" />
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/multiverse-alpha-unborn" />
+      <recent name="$PROJECT_DIR$/multiverse-alpha" />
     </key>
     <key name="MoveMembersDialog.RECENTS_KEY">
       <recent name="org.multiverse.utils.Listeners" />
+    </key>
+    <key name="IntroduceConstantDialog.RECENTS_KEY">
+      <recent name="org.multiverse.stms.alpha.programmatic.AlphaProgrammaticReference_atomicCompareAndSetTest" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="org.multiverse.stms.alpha.programmatic" />
@@ -1121,7 +1063,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="25" width="1597" height="1524" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3297568" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="CheckStyle" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -1131,17 +1073,17 @@
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39914164" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="FindBugs-IDEA" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3297568" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3295129" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3273639" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3297568" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32898173" sideWeight="0.66523606" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.4423453" sideWeight="0.6676218" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27491856" sideWeight="0.6676218" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32879657" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Statistic" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32952926" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3273639" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3273639" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="SVN Repositories" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3297568" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="JProfiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32952926" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -1162,7 +1104,7 @@
     <option name="ENABLE_BACKGROUND_PROCESSES" value="true" />
     <option name="CHANGED_ON_SERVER_INTERVAL" value="60" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="- moved multiverse-alpha to multiverse-alpha-unborn&#10;- moved multiverse-alpha-all to multiverse-alpha" />
+    <option name="LAST_COMMIT_MESSAGE" value="- more work on the pom" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -1194,6 +1136,7 @@
     <MESSAGE value="- updated todo.txt (yes.. I know I'm a very bad person)" />
     <MESSAGE value="- cleanup the build, seperate maven module is now uses to create the final jar.." />
     <MESSAGE value="- moved multiverse-alpha to multiverse-alpha-unborn&#10;- moved multiverse-alpha-all to multiverse-alpha" />
+    <MESSAGE value="- more work on the pom" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -1203,41 +1146,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_addTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="0" selection-start="298" selection-end="298" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_clearTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="5" selection-start="527" selection-end="527" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_containsAllTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="0" selection-start="492" selection-end="492" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_containsTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="0" selection-start="440" selection-end="440" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_equalsTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="0" selection-start="419" selection-end="419" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_hashCodeTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="0" selection-start="378" selection-end="378" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_isEmptyTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="0" selection-start="529" selection-end="529" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_iteratorTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="17" column="0" selection-start="378" selection-end="378" vertical-scroll-proportion="0.0" />
@@ -1280,7 +1188,64 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/src/test/java/org/multiverse/transactional/collections/TransactionalTreeSet_toStringTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="31" column="0" selection-start="681" selection-end="681" vertical-scroll-proportion="0.45146015">
+        <state line="31" column="0" selection-start="681" selection-end="681" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/multiverse-alpha/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="6" column="2" selection-start="87" selection-end="87" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/multiverse-instrumentation/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/multiverse-instrumentation/src/main/java/org/multiverse/instrumentation/StandardInstrumentor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="153" column="22" selection-start="4444" selection-end="4444" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="method#getInstrumentorName#0;class#StandardInstrumentor#0" expanded="true" />
+            <element signature="method#getInstrumentorVersion#0;class#StandardInstrumentor#0" expanded="true" />
+            <element signature="method#getStmName#0;class#StandardInstrumentor#0" expanded="true" />
+            <element signature="method#setDumpBytecode#0;class#StandardInstrumentor#0" expanded="true" />
+            <element signature="method#getLog#0;class#EnvironmentImpl#0;class#StandardInstrumentor#0" expanded="true" />
+            <element signature="method#getDumpDirectory#0;class#EnvironmentImpl#0;class#StandardInstrumentor#0" expanded="true" />
+            <element signature="method#getMetadataRepository#0;class#EnvironmentImpl#0;class#StandardInstrumentor#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/multiverse-instrumentation/src/main/java/org/multiverse/compiler/MultiverseCompiler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="28" column="19" selection-start="1091" selection-end="1091" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/multiverse-alpha-unborn/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="67" column="18" selection-start="3051" selection-end="3051" vertical-scroll-proportion="0.71558243">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/multiverse-alpha/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="193" column="17" selection-start="12136" selection-end="12136" vertical-scroll-proportion="0.45083207">
           <folding />
         </state>
       </provider>
