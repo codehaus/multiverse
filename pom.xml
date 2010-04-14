@@ -112,8 +112,8 @@
         <!-- module>multiverse-documentation</module -->
         <module>multiverse-core</module>
         <module>multiverse-instrumentation</module>
+        <module>multiverse-alpha-unborn</module>
         <module>multiverse-alpha</module>
-        <module>multiverse-alpha-all</module>
         <module>multiverse-scala-integration</module>
         <module>multiverse-site</module>
         <module>multiverse-project-archetype</module>
