@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: org.multiverse.commitbarriers.CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
+-------------------------------------------------------------------------------
+Tests run: 10, Failures: 0, Errors: 0, Skipped: 2, Time elapsed: 3.007 sec

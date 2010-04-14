@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>multiverse-alpha-unborn</artifactId>
+    <name>Alpha Multiverse STM engine: Unborn</name>
+    <description>
+        Contains the main Multiverse STM Implementation: the Alpha Engine. The Alpha engine supports
+        readonly and update transactions. It also supports the retry/or else mechanism. This not
+        the jar you want to have in your final distribution because it isn't instrumented
+        (hence the name unborn). What this package does, is test the instrumentation for the
+        Javaagent. The compiletime instrumentation is tested in the multiverse-alpha package
+        (where all tests are copied and reexecuted but now with compiletime instrumentation).
+    </description>
+
+    <parent>
+        <groupId>org.multiverse</groupId>
+        <artifactId>multiverse</artifactId>
+        <version>0.5-SNAPSHOT</version>
+    </parent>
+
+    <properties>
+        <multiverse.agentname>test-javaagent</multiverse.agentname>
+        <multiverse.agentclass>org.multiverse.javaagent.MultiverseJavaAgent</multiverse.agentclass>
+        <multiverse.instrumentor>org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor
+        </multiverse.instrumentor>
+        <multiverse.compiler>org.multiverse.compiler.MultiverseCompiler</multiverse.compiler>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-javaagent</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>${multiverse.agentname}</finalName>
+                            <archive>
+                                <manifestEntries>
+                                    <Premain-Class>${multiverse.agentclass}</Premain-Class>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <configuration>
+                    <argLine>-javaagent:${project.build.directory}/${multiverse.agentname}.jar</argLine>
+                </configuration>
+            </plugin>
+
+            <!-- creates the jar -->
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Premain-Class>${multiverse.agentclass}</Premain-Class>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- creates a jar containing the test-code so that this can be reused -->
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <!-- Multiverse dependencies -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>multiverse-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>multiverse-instrumentation</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>multiverse-benchy</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- we also want access to the jar containing the test code from the multiverse-core project -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>multiverse-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>multiverse-instrumentation</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>multiverse-instrumentation</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>1.4</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>args4j</groupId>
+            <artifactId>args4j</artifactId>
+            <version>${args4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- ASM dependencies -->
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>${asm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-tree</artifactId>
+            <version>${asm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-analysis</artifactId>
+            <version>${asm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-commons</artifactId>
+            <version>${asm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-util</artifactId>
+            <version>${asm.version}</version>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>stress</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <argLine>-javaagent:${project.build.directory}/${multiverse.agentname}.jar</argLine>
+                            <includes>
+                                <include>**/*LongTest.java</include>
+                            </includes>
+                            <argLine>-Xmx256m</argLine>
+                            <forkMode>once</forkMode>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

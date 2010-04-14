@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: org.multiverse.commitbarriers.VetoCommitBarrier_tryJoinCommitTest
+-------------------------------------------------------------------------------
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 3, Time elapsed: 0.002 sec

@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: org.multiverse.transactional.collections.TransactionalTreeMap_replace3Test
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 1, Time elapsed: 0 sec

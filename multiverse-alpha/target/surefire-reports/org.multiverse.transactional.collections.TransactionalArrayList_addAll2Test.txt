@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: org.multiverse.transactional.collections.TransactionalArrayList_addAll2Test
+-------------------------------------------------------------------------------
+Tests run: 7, Failures: 0, Errors: 0, Skipped: 3, Time elapsed: 0.003 sec

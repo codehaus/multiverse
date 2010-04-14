@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite failures="0" time="0" errors="0" skipped="0" tests="1" name="org.multiverse.transactional.nonblocking.DefaultTransactionalTaskSelector_registerTest">
+  <properties>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="sun.boot.library.path" value="/java/jdk/jdk1.6.0_19/jre/lib/amd64"/>
+    <property name="java.vm.version" value="16.2-b04"/>
+    <property name="java.vm.vendor" value="Sun Microsystems Inc."/>
+    <property name="java.vendor.url" value="http://java.sun.com/"/>
+    <property name="path.separator" value=":"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="file.encoding.pkg" value="sun.io"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.os.patch.level" value="unknown"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="user.dir" value="/java/projects/multiverse/master/multiverse-alpha"/>
+    <property name="java.runtime.version" value="1.6.0_19-b04"/>
+    <property name="java.awt.graphicsenv" value="sun.awt.X11GraphicsEnvironment"/>
+    <property name="basedir" value="/java/projects/multiverse/master/multiverse-alpha"/>
+    <property name="java.endorsed.dirs" value="/java/jdk/jdk1.6.0_19/jre/lib/endorsed"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="surefire.real.class.path" value="/tmp/surefirebooter7557852841621091540.jar"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="line.separator" value="
+"/>
+    <property name="java.vm.specification.vendor" value="Sun Microsystems Inc."/>
+    <property name="os.name" value="Linux"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/java/jdk/jdk1.6.0_19/jre/lib/amd64/server:/java/jdk/jdk1.6.0_19/jre/lib/amd64:/java/jdk/jdk1.6.0_19/jre/../lib/amd64:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib"/>
+    <property name="surefire.test.class.path" value="/java/projects/multiverse/master/multiverse-alpha/target/test-classes:/java/projects/multiverse/master/multiverse-alpha/target/classes:/java/projects/multiverse/master/multiverse-alpha-unborn/target/multiverse-alpha-unborn-0.5-SNAPSHOT.jar:/java/projects/multiverse/master/multiverse-core/target/multiverse-core-0.5-SNAPSHOT.jar:/java/projects/multiverse/master/multiverse-instrumentation/target/multiverse-instrumentation-0.5-SNAPSHOT.jar:/home/alarmnummer/.m2/repository/asm/asm/3.2/asm-3.2.jar:/home/alarmnummer/.m2/repository/asm/asm-tree/3.2/asm-tree-3.2.jar:/home/alarmnummer/.m2/repository/asm/asm-analysis/3.2/asm-analysis-3.2.jar:/home/alarmnummer/.m2/repository/asm/asm-commons/3.2/asm-commons-3.2.jar:/home/alarmnummer/.m2/repository/asm/asm-util/3.2/asm-util-3.2.jar:/home/alarmnummer/.m2/repository/args4j/args4j/2.0.16/args4j-2.0.16.jar:/home/alarmnummer/.m2/repository/com/tonicsystems/jarjar/jarjar/1.0-rc8/jarjar-1.0-rc8.jar:/home/alarmnummer/.m2/repository/asm/asm-all/3.2/asm-all-3.2.jar:/home/alarmnummer/.m2/repository/junit/junit/4.8.1/junit-4.8.1.jar:/home/alarmnummer/.m2/repository/org/mockito/mockito-all/1.8.2/mockito-all-1.8.2.jar:"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.class.version" value="50.0"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Server Compiler"/>
+    <property name="os.version" value="2.6.32-19-generic"/>
+    <property name="user.home" value="/home/alarmnummer"/>
+    <property name="user.timezone" value="Europe/Amsterdam"/>
+    <property name="java.awt.printerjob" value="sun.print.PSPrinterJob"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.specification.version" value="1.6"/>
+    <property name="user.name" value="alarmnummer"/>
+    <property name="java.class.path" value="/java/projects/multiverse/master/multiverse-alpha/target/test-classes:/java/projects/multiverse/master/multiverse-alpha/target/classes:/java/projects/multiverse/master/multiverse-alpha-unborn/target/multiverse-alpha-unborn-0.5-SNAPSHOT.jar:/java/projects/multiverse/master/multiverse-core/target/multiverse-core-0.5-SNAPSHOT.jar:/java/projects/multiverse/master/multiverse-instrumentation/target/multiverse-instrumentation-0.5-SNAPSHOT.jar:/home/alarmnummer/.m2/repository/asm/asm/3.2/asm-3.2.jar:/home/alarmnummer/.m2/repository/asm/asm-tree/3.2/asm-tree-3.2.jar:/home/alarmnummer/.m2/repository/asm/asm-analysis/3.2/asm-analysis-3.2.jar:/home/alarmnummer/.m2/repository/asm/asm-commons/3.2/asm-commons-3.2.jar:/home/alarmnummer/.m2/repository/asm/asm-util/3.2/asm-util-3.2.jar:/home/alarmnummer/.m2/repository/args4j/args4j/2.0.16/args4j-2.0.16.jar:/home/alarmnummer/.m2/repository/com/tonicsystems/jarjar/jarjar/1.0-rc8/jarjar-1.0-rc8.jar:/home/alarmnummer/.m2/repository/asm/asm-all/3.2/asm-all-3.2.jar:/home/alarmnummer/.m2/repository/junit/junit/4.8.1/junit-4.8.1.jar:/home/alarmnummer/.m2/repository/org/mockito/mockito-all/1.8.2/mockito-all-1.8.2.jar:"/>
+    <property name="java.vm.specification.version" value="1.0"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.home" value="/java/jdk/jdk1.6.0_19/jre"/>
+    <property name="java.specification.vendor" value="Sun Microsystems Inc."/>
+    <property name="user.language" value="en"/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="java.version" value="1.6.0_19"/>
+    <property name="java.ext.dirs" value="/java/jdk/jdk1.6.0_19/jre/lib/ext:/usr/java/packages/lib/ext"/>
+    <property name="sun.boot.class.path" value="/java/jdk/jdk1.6.0_19/jre/lib/resources.jar:/java/jdk/jdk1.6.0_19/jre/lib/rt.jar:/java/jdk/jdk1.6.0_19/jre/lib/sunrsasign.jar:/java/jdk/jdk1.6.0_19/jre/lib/jsse.jar:/java/jdk/jdk1.6.0_19/jre/lib/jce.jar:/java/jdk/jdk1.6.0_19/jre/lib/charsets.jar:/java/jdk/jdk1.6.0_19/jre/classes"/>
+    <property name="java.vendor" value="Sun Microsystems Inc."/>
+    <property name="localRepository" value="/home/alarmnummer/.m2/repository"/>
+    <property name="file.separator" value="/"/>
+    <property name="java.vendor.url.bug" value="http://java.sun.com/cgi-bin/bugreport.cgi"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="sun.desktop" value="gnome"/>
+    <property name="sun.cpu.isalist" value=""/>
+  </properties>
+  <testcase time="0" classname="org.multiverse.transactional.nonblocking.DefaultTransactionalTaskSelector_registerTest" name="test"/>
+</testsuite>

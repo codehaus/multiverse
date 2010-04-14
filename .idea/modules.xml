@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/multiverse.iml" filepath="$PROJECT_DIR$/multiverse.iml" />
+      <module fileurl="file://$PROJECT_DIR$/multiverse-alpha/multiverse-alpha.iml" filepath="$PROJECT_DIR$/multiverse-alpha/multiverse-alpha.iml" />
+      <module fileurl="file://$PROJECT_DIR$/multiverse-alpha-allinone/multiverse-alpha-allinone.iml" filepath="$PROJECT_DIR$/multiverse-alpha-allinone/multiverse-alpha-allinone.iml" />
+      <module fileurl="file://$PROJECT_DIR$/multiverse-benchy/multiverse-benchy.iml" filepath="$PROJECT_DIR$/multiverse-benchy/multiverse-benchy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/multiverse-core/multiverse-core.iml" filepath="$PROJECT_DIR$/multiverse-core/multiverse-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/multiverse-instrumentation/multiverse-instrumentation.iml" filepath="$PROJECT_DIR$/multiverse-instrumentation/multiverse-instrumentation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/multiverse-project-archetype/multiverse-project-archetype.iml" filepath="$PROJECT_DIR$/multiverse-project-archetype/multiverse-project-archetype.iml" />
+      <module fileurl="file://$PROJECT_DIR$/multiverse-scala-integration/multiverse-scala-integration.iml" filepath="$PROJECT_DIR$/multiverse-scala-integration/multiverse-scala-integration.iml" />
+      <module fileurl="file://$PROJECT_DIR$/multiverse-site/multiverse-site.iml" filepath="$PROJECT_DIR$/multiverse-site/multiverse-site.iml" />
+    </modules>
+  </component>
+</project>
+
