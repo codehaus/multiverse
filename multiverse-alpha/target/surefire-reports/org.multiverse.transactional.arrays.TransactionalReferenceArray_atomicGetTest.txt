@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: org.multiverse.transactional.arrays.TransactionalReferenceArray_atomicGetTest
--------------------------------------------------------------------------------
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 2, Time elapsed: 0.021 sec
