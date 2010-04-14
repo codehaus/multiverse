@@ -112,16 +112,16 @@ public class StandardInstrumentor implements Instrumentor {
     @Override
     public Clazz process(Clazz originalClazz) {
         if (originalClazz.getClassLoader() == null) {
-            log.important("Ignoring class '%s' because it is a system class", originalClazz.getName());
+            log.important("Multiverse: Ignoring class '%s' because it is a system class", originalClazz.getName());
             return originalClazz;
         }
 
         if (isExcluded(originalClazz.getName())) {
-            log.important("Ignoring class '%s' because it is excluded", originalClazz.getName());
+            log.important("Multiverse: Ignoring class '%s' because it is excluded", originalClazz.getName());
             return originalClazz;
         }
 
-        log.important("Starting compilation of class '%s'", originalClazz.getName());
+        log.important("Multiverse: instrumenting %s", originalClazz.getName());
 
         Environment env = new EnvironmentImpl();
         Clazz beforeClazz = originalClazz;
@@ -135,9 +135,9 @@ public class StandardInstrumentor implements Instrumentor {
         }
 
         if (originalClazz == beforeClazz) {
-            log.important("Finished compilation of class '%s' (class was not modified)", originalClazz.getName());
+            log.lessImportant("Multiverse: Finished compilation of class '%s' (class was not modified)", originalClazz.getName());
         } else {
-            log.important("Finished compilation of class '%s'", originalClazz.getName());
+            log.lessImportant("Multiverse: Finished compilation of class '%s'", originalClazz.getName());
         }
 
         return beforeClazz;

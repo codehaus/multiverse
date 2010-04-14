@@ -3,7 +3,8 @@ package org.multiverse.instrumentation;
 /**
  * @author Peter Veentjer
  */
-public class SystemOutLog implements Log {
+public class SystemOutImportantLog implements Log {
+
 
     @Override
     public void important(String msg, Object... args) {
@@ -12,6 +13,6 @@ public class SystemOutLog implements Log {
 
     @Override
     public void lessImportant(String msg, Object... args) {
-        System.out.printf(msg + "\n", args);
+        //    System.out.printf(msg + "\n", args);
     }
 }

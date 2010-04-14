@@ -8,9 +8,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;

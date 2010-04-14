@@ -5,7 +5,7 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.multiverse.instrumentation.Clazz;
 import org.multiverse.instrumentation.FileSystemFiler;
 import org.multiverse.instrumentation.Instrumentor;
-import org.multiverse.instrumentation.SystemOutLog;
+import org.multiverse.instrumentation.SystemOutImportantLog;
 import org.multiverse.instrumentation.asm.AsmUtils;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -37,33 +37,33 @@ public final class MultiverseCompiler {
     private ClassLoader compilerClassLoader;
 
     private void run(MultiverseCompilerArguments cli) {
-        System.out.println("Initializing Multiverse Compiler");
+        System.out.println("Multiverse: initializing compiler");
 
         Instrumentor instrumentor = createInstrumentor(cli.instrumentorName);
         File targetDirectory = new File(cli.targetDirectory);
         compilerClassLoader = new MyClassLoader(targetDirectory, MultiverseCompiler.class.getClassLoader());
 
         if (!targetDirectory.isDirectory()) {
-            System.out.printf("Target directory '%s' is not found, skipping instrumentation\n", targetDirectory);
+            System.out.printf("Multiverse: target directory '%s' to instrument is not found, skipping instrumentation\n", targetDirectory);
             return;
         }
 
         if (cli.dumpBytecode) {
-            System.out.println("Bytecode is dumped for debugging purposes");
+            System.out.println("Multiverse: bytecode is dumped for debugging purposes");
             instrumentor.setDumpBytecode(true);
         }
 
         if (cli.verbose) {
-            instrumentor.setLog(new SystemOutLog());
+            instrumentor.setLog(new SystemOutImportantLog());
         }
 
-        System.out.printf("Using org.multiverse.instrumentation.Instrumentor %s-%s\n",
+        System.out.printf("Multiverse: using org.multiverse.instrumentation.Instrumentor %s version %s\n",
                 instrumentor.getInstrumentorName(),
                 instrumentor.getInstrumentorVersion());
 
         instrumentor.setFiler(new FileSystemFiler(targetDirectory));
 
-        System.out.printf("Transforming classes in targetDirectory %s\n", targetDirectory);
+        System.out.printf("Multiverse: instrumenting targetDirectory %s\n", targetDirectory);
 
         applyRecursive(targetDirectory, instrumentor);
     }
@@ -87,12 +87,12 @@ public final class MultiverseCompiler {
         }
     }
 
-    public void applyRecursive(File directory, Instrumentor clazzCompiler) {
+    public void applyRecursive(File directory, Instrumentor instrumentor) {
         for (File file : directory.listFiles()) {
             if (file.isDirectory()) {
-                applyRecursive(file, clazzCompiler);
+                applyRecursive(file, instrumentor);
             } else if (file.getName().endsWith(".class")) {
-                transform(file, clazzCompiler);
+                transform(file, instrumentor);
             }
         }
     }
@@ -167,7 +167,7 @@ public final class MultiverseCompiler {
     }
 
     private static Instrumentor createInstrumentor(String compilerClassName) {
-        System.out.println(format("Multiverse Compiler: using Instrumentor '%s'", compilerClassName));
+        System.out.println(format("Multiverse: using Instrumentor '%s'", compilerClassName));
 
         Constructor constructor = getMethod(compilerClassName);
         try {

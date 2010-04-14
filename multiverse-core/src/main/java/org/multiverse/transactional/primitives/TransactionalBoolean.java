@@ -11,7 +11,8 @@ import static org.multiverse.api.StmUtils.retry;
 @TransactionalObject
 public final class TransactionalBoolean {
 
-    private boolean value;
+    //todo: make private again
+    public boolean value;
 
     /**
      * Creates a new TransactionalBoolean with false as va

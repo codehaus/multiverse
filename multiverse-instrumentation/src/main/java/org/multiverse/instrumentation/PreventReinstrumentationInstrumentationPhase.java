@@ -17,7 +17,7 @@ import static org.multiverse.instrumentation.asm.AsmUtils.*;
  * <li>If the class already is instrumented, it checks if the compiler name and version
  * match. If not, an error is thrown. Multiverse compilation is not backwards compatible
  * yet.</li>
- * <li><If the class is not instrumented before, it add the {@link Instrumented}
+ * <li><If the class is not instrumented before, it add the {@link InstrumentationStamp}
  * with a instrumentorName and instrumentorVersion based on the provided compiler. So next
  * time this class is going to be re-instrumented, the multiverse instrumentation
  * is skipped or an error is thrown if the instrumentorName/instrumentorVersion don't match.
@@ -53,7 +53,7 @@ public class PreventReinstrumentationInstrumentationPhase extends AbstractInstru
         ClassNode original = loadAsClassNode(originalClazz.getBytecode());
 
         AnnotationNode instrumentedAnnotationNode = getVisibleAnnotation(
-                original, Instrumented.class);
+                original, InstrumentationStamp.class);
 
         if (instrumentedAnnotationNode != null) {
             ensureCorrectClazzCompiler(instrumentedAnnotationNode, original);
@@ -105,7 +105,7 @@ public class PreventReinstrumentationInstrumentationPhase extends AbstractInstru
     }
 
     private AnnotationNode createInstrumentedAnnotationNode() {
-        String desc = Type.getType(Instrumented.class).getDescriptor();
+        String desc = Type.getType(InstrumentationStamp.class).getDescriptor();
         AnnotationNode annotationNode = new AnnotationNode(desc);
         annotationNode.values = new LinkedList();
         annotationNode.values.add(INSTRUMENTOR_NAME);

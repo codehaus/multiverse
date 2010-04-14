@@ -14,7 +14,8 @@ import static org.multiverse.api.StmUtils.retry;
 @TransactionalObject
 public final class TransactionalShort {
 
-    private short value;
+    //todo: make private again
+    public short value;
 
     public TransactionalShort() {
         this((short) 0);

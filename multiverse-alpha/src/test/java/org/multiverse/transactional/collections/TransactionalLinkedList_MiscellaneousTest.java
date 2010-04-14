@@ -6,7 +6,7 @@ import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;

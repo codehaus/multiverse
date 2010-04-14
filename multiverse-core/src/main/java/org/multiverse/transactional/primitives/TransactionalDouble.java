@@ -15,7 +15,8 @@ import static org.multiverse.api.StmUtils.retry;
 @TransactionalObject
 public final class TransactionalDouble {
 
-    private double value;
+    //todo: make private again
+    public double value;
 
     public TransactionalDouble() {
         this((double) 0);

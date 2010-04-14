@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
-import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.*;
 
 public class TestUtils {

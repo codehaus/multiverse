@@ -19,104 +19,40 @@
     <properties>
         <multiverse.agentname>test-javaagent</multiverse.agentname>
         <multiverse.agentclass>org.multiverse.javaagent.MultiverseJavaAgent</multiverse.agentclass>
-        <multiverse.instrumentor>org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor</multiverse.instrumentor>
+        <multiverse.instrumentor>org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor
+        </multiverse.instrumentor>
         <multiverse.compiler>org.multiverse.compiler.MultiverseCompiler</multiverse.compiler>
     </properties>
 
     <build>
         <plugins>
-            <!--plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>creating the jar for the ide</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <echo message="Creating the jar that can be used by the ide"/>
-
-                                <move failonerror="false" file="${project.build.directory}/${multiverse.agentname}.jar" tofile="${project.build.directory}/${multiverse.agentname}.moved.jar"/>
-
-                                <jar destfile="${project.build.directory}/${multiverse.agentname}2.jar"
-                                     basedir="${project.build.directory}/classes">
-                                    <manifest>
-                                        <attribute name="Premain-class" value="${multiverse.agentclass}"/>
-                                    </manifest>
-                                </jar>
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin-->
-
-            <!-- unpacks the dependant jars in the target/classes directory -->
             <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
+                <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack-dependencies</id>
-                        <phase>generate-sources</phase>
+                        <id>generate-javaagent</id>
+                        <phase>compile</phase>
                         <goals>
-                            <goal>unpack-dependencies</goal>
+                            <goal>jar</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
-                            <excludeArtifactIds>junit,mockito-all,gson,multiverse-benchy</excludeArtifactIds>
-                            <excludes>**/*Test.class</excludes>
+                            <finalName>${multiverse.agentname}</finalName>
+                            <archive>
+                                <manifestEntries>
+                                    <Premain-Class>${multiverse.agentclass}</Premain-Class>
+                                </manifestEntries>
+                            </archive>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
 
-            <!-- 'preinstruments' the transactional classes so multiverse-asm library can
-                be used without instrumentation -->
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.1.1</version>
-                <executions>
-                    <!-- responsible for transforming target/classes-->
-                    <execution>
-                        <id>preinstrument-classes</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>${multiverse.compiler}</mainClass>
-                            <arguments>
-                                <argument>-d</argument>
-                                <argument>${multiverse.instrumentor}</argument>
-                                <argument>${project.build.outputDirectory}</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <!-- responsible for transforming target/test-classes-->
-                    <execution>
-                        <id>preinstrument-test-classes</id>
-                        <phase>process-test-classes</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>${multiverse.compiler}</mainClass>
-                            <arguments>
-                                <!-- argument>-classpath</argument -->
-                                <!-- argument>
-                                    <classpath/>
-                                </argument -->
-                                <argument>-d</argument>
-                                <!--argument>-v</argument -->
-                                <argument>${multiverse.instrumentor}</argument>
-                                <argument>${project.build.testOutputDirectory}</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-
+                <artifactId>maven-surefire-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <configuration>
+                    <argLine>-javaagent:${project.build.directory}/${multiverse.agentname}.jar</argLine>
+                </configuration>
             </plugin>
 
             <!-- creates the jar -->
@@ -129,61 +65,29 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
-                <!-- also executes by default in the package phase -->
                 <executions>
                     <execution>
-                        <id>generate-ide-agent</id>
-                        <phase>process-classes</phase>
+                        <id>jar</id>
+                        <phase>package</phase>
                         <goals>
                             <goal>jar</goal>
                         </goals>
-                        <configuration>
-                            <finalName>${multiverse.agentname}</finalName>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
 
-            <!-- plugin that integrates the asm/args4j libraries to create big fat jar-->
+            <!-- creates a jar containing the test-code so that this can be reused -->
             <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
+                <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>repackage-dependencies</id>
-                        <phase>package</phase>
                         <goals>
-                            <goal>run</goal>
+                            <goal>test-jar</goal>
                         </goals>
-                        <configuration>
-                            <tasks>
-                                <echo message="Executing JarJar..."/>
-                                <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"/>
-                                <jarjar destfile="${project.build.directory}/${project.build.finalName}.${project.packaging}"
-                                        update="true">
-                                    <rule pattern="org.objectweb.asm.**"
-                                          result="${project.groupId}.repackaged.@0"/>
-                                    <rule pattern="org.kohsuke.args4j.**"
-                                          result="${project.groupId}.repackaged.@0"/>
-                                </jarjar>
-                            </tasks>
-                        </configuration>
                     </execution>
                 </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.tonicsystems.jarjar</groupId>
-                        <artifactId>jarjar</artifactId>
-                        <version>1.0-rc8</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
-
-        <resources>
-            <resource>
-                <directory>${project.build.outputDirectory}</directory>
-            </resource>
-        </resources>
     </build>
 
     <dependencies>

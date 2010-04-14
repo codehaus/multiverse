@@ -15,7 +15,8 @@ import static org.multiverse.api.StmUtils.retry;
 @TransactionalObject
 public final class TransactionalFloat {
 
-    private float value;
+    //todo: make private again
+    public float value;
 
     public TransactionalFloat() {
         this(0f);

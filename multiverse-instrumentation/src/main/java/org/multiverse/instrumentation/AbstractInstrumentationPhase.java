@@ -23,7 +23,7 @@ public abstract class AbstractInstrumentationPhase implements InstrumentationPha
     public Clazz instrument(Environment environment, Clazz originalClazz) {
         Log log = environment.getLog();
 
-        log.important("%s: transforming class %s", name, originalClazz.getName());
+        log.lessImportant("   Multiverse: %s: instrumenting class %s", name, originalClazz.getName());
 
         doInit();
 

@@ -7,7 +7,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.Retry;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;

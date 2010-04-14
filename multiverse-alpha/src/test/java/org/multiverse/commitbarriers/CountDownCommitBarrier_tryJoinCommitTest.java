@@ -7,9 +7,7 @@ import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.stms.AbstractTransactionImpl;
 
-import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.clearCurrentThreadInterruptedStatus;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;

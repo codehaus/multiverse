@@ -2,6 +2,21 @@
 todo engine
 ---------------------------------------------------------------
 
+- extra multiverse alpha all in one
+
+    + create additional module
+
+    + make sure that it works from the ide again (multiverse-alpha)
+
+    + copy the unit test classes from the alpha module to the alpha all in one module
+
+    - the unit tests executed in the alpha engine, should be
+     reexecuted but now with the compiler: problem is that the surefire plugin is triggered
+     by java files and not by class files and since we have no java files, it isn't triggered
+
+    - the sources jar in the multiverse-alpha should not be created since there
+    are no sources
+     
 - instrumentation
 
     - the version in the AlphaInstrumentor needs to be modified by maven instead of manually

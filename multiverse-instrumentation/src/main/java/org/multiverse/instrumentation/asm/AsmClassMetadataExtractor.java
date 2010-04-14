@@ -145,10 +145,6 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
             return;
         }
 
-        if (methodNode.name.equals("setWithAutoUnboxing")) {
-            System.out.println("hello");
-        }
-
         List<AbstractInsnNode> filteredInstructions = filterNoOps(methodNode.instructions);
         if (filteredInstructions.size() != 4) {
             return;

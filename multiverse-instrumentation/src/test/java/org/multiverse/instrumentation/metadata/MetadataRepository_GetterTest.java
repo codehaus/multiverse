@@ -90,7 +90,7 @@ public class MetadataRepository_GetterTest {
         }
 
         public String getNameTooComplex() {
-            System.out.println("hello");
+            System.out.println("make me complex");
             return name;
         }
 

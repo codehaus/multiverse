@@ -8,8 +8,8 @@ import org.multiverse.api.ThreadLocalTransaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 

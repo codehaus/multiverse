@@ -7,7 +7,7 @@ import org.multiverse.api.Stm;
 
 import java.util.NoSuchElementException;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
@@ -23,7 +23,7 @@ public class TransactionalLinkedList_removeFirstTest {
     }
 
     @After
-    public void tearDown(){
+    public void tearDown() {
         clearThreadLocalTransaction();
     }
 

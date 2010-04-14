@@ -1,13 +1,13 @@
 package org.multiverse.instrumentation;
 
 /**
- * Annotation Multiverse placed on classfiles that have been instrumented. Needed
- * to prevent reinstrumentation or to detect that classes can't be used with this
- * specific Instrumentation/version.
+ * An Annotation Multiverse places on classfiles that have been instrumented. This is needed
+ * to prevent reinstrumentation or to detect that classes can't be used with this specific
+ * instrumentor or version of that instrumentor.
  *
  * @author Peter Veentjer
  */
-public @interface Instrumented {
+public @interface InstrumentationStamp {
 
     /**
      * The name of the Instrumentor.

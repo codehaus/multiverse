@@ -46,6 +46,23 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
     }
 
     /**
+     * Creates a new TransactionalTreeMap
+     *
+     * @param initial
+     */
+    public TransactionalTreeMap(Map<K, V> initial) {
+        this();
+
+        if (initial == null) {
+            throw new NullPointerException();
+        }
+
+        for (Map.Entry<K, V> entries : initial.entrySet()) {
+            put(entries.getKey(), entries.getValue());
+        }
+    }
+
+    /**
      * Returns the Comparator uses by this TransactionalTreeMap to do comparisons between keys.
      * If the keys
      *

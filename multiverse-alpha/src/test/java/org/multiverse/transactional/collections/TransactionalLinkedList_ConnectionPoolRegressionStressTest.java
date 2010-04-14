@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingDeque;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;

@@ -14,7 +14,8 @@ import static org.multiverse.api.StmUtils.retry;
 @TransactionalObject
 public final class TransactionalLong {
 
-    private long value;
+    //todo: make private again
+    public long value;
 
     public TransactionalLong() {
         this(0L);

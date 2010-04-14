@@ -8,9 +8,7 @@ import org.multiverse.api.latches.CheapLatch;
 import org.multiverse.api.latches.Latch;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
-import static junit.framework.Assert.fail;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 import static org.multiverse.stms.alpha.AlphaTestUtils.startTrackingUpdateTransaction;

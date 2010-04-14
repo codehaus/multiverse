@@ -4,9 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 
-import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
@@ -79,17 +77,17 @@ public class TransactionalLinkedList_addTest {
     }
 
     @Test
-    public void addVeryMany(){
+    public void addVeryMany() {
         TransactionalLinkedList<String> list = new TransactionalLinkedList<String>();
         int count = 10000;
 
-        for(int k=0;k< count;k++){
-            list.add(""+k);
+        for (int k = 0; k < count; k++) {
+            list.add("" + k);
         }
 
         assertEquals(list.size(), count);
-        for(int k=0;k<count;k++){
-            assertEquals(""+k, list.get(k));            
+        for (int k = 0; k < count; k++) {
+            assertEquals("" + k, list.get(k));
         }
     }
 }

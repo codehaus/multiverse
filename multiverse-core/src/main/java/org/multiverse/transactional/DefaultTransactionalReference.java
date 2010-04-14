@@ -18,7 +18,8 @@ import static org.multiverse.api.StmUtils.retry;
  */
 @TransactionalObject
 public final class DefaultTransactionalReference<E> implements TransactionalReference<E> {
-    private E value;
+    //todo: should be made private again
+    public E value;
 
     /**
      * Creates a DefaultTransactionalReference with a null reference.

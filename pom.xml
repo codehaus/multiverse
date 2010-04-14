@@ -21,6 +21,8 @@
         <targetJdk>1.6</targetJdk>
         <asm.version>3.2</asm.version>
         <args4j.version>2.0.16</args4j.version>
+        <junit.version>4.8.1</junit.version>
+        <mockito.version>1.8.2</mockito.version>
     </properties>
 
     <licenses>
@@ -111,6 +113,7 @@
         <module>multiverse-core</module>
         <module>multiverse-instrumentation</module>
         <module>multiverse-alpha</module>
+        <module>multiverse-alpha-all</module>
         <module>multiverse-scala-integration</module>
         <module>multiverse-site</module>
         <module>multiverse-project-archetype</module>
@@ -248,13 +251,13 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.8.1</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.8.2</version>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
