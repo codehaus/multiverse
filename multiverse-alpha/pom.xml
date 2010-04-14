@@ -216,7 +216,7 @@
                             </tasks>
                         </configuration>
                     </execution -->
-                    <execution>
+                    <!-- execution>
                         <id>Installs the jar</id>
                         <phase>install</phase>
                         <goals>
@@ -228,7 +228,7 @@
                                       tofile="${settings.localRepository}/org/multiverse/${artifactId}/${version}/${artifactId}-${project.version}.jar"/>
                             </tasks>
                         </configuration>
-                    </execution>
+                    </execution -->
                 </executions>
                 <dependencies>
                     <dependency>
@@ -253,15 +253,17 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
+                        <phase>package</phase>
                         <goals>
                             <goal>jar</goal>
                         </goals>
                         <configuration>
-                            <finalName>${project.build.directory}/onzin.jar</finalName>
+                            <finalName>onzin.jar</finalName>
                         </configuration>
                     </execution>
                 </executions>
