@@ -19,15 +19,13 @@
     <properties>
         <multiverse.agentname>test-javaagent</multiverse.agentname>
         <multiverse.agentclass>org.multiverse.javaagent.MultiverseJavaAgent</multiverse.agentclass>
-        <multiverse.instrumentor>org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor
-        </multiverse.instrumentor>
+        <multiverse.instrumentor>org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor</multiverse.instrumentor>
+        <multiverse.compiler>org.multiverse.compiler.MultiverseCompiler</multiverse.compiler>
     </properties>
 
     <build>
         <plugins>
-            <!-- A plugin that creates alphaagent.jar so that the unit tests can be executed using the agent.
-              This is done by creating a alphaagent.jar using the JAR plugin during the generate-test-resources phase. -->
-            <plugin>
+            <!--plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
@@ -40,9 +38,9 @@
                             <tasks>
                                 <echo message="Creating the jar that can be used by the ide"/>
 
-                                <delete file="${project.build.directory}/${multiverse.agentname}.jar"/>
+                                <move failonerror="false" file="${project.build.directory}/${multiverse.agentname}.jar" tofile="${project.build.directory}/${multiverse.agentname}.moved.jar"/>
 
-                                <jar destfile="${project.build.directory}/${multiverse.agentname}.jar"
+                                <jar destfile="${project.build.directory}/${multiverse.agentname}2.jar"
                                      basedir="${project.build.directory}/classes">
                                     <manifest>
                                         <attribute name="Premain-class" value="${multiverse.agentclass}"/>
@@ -52,11 +50,10 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin-->
 
             <!-- unpacks the dependant jars in the target/classes directory -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
@@ -75,7 +72,7 @@
             </plugin>
 
             <!-- 'preinstruments' the transactional classes so multiverse-asm library can
-        be used without instrumentation -->
+                be used without instrumentation -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -83,29 +80,29 @@
                 <executions>
                     <!-- responsible for transforming target/classes-->
                     <execution>
-                        <id>fixed normal classes</id>
+                        <id>preinstrument-classes</id>
                         <phase>process-classes</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>
                         <configuration>
-                            <mainClass>org.multiverse.compiler.MultiverseCompiler</mainClass>
+                            <mainClass>${multiverse.compiler}</mainClass>
                             <arguments>
                                 <argument>-d</argument>
                                 <argument>${multiverse.instrumentor}</argument>
-                                <argument>${project.build.directory}/classes</argument>
+                                <argument>${project.build.outputDirectory}</argument>
                             </arguments>
                         </configuration>
                     </execution>
                     <!-- responsible for transforming target/test-classes-->
                     <execution>
-                        <id>fixed test classes</id>
+                        <id>preinstrument-test-classes</id>
                         <phase>process-test-classes</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>
                         <configuration>
-                            <mainClass>org.multiverse.compiler.MultiverseCompiler</mainClass>
+                            <mainClass>${multiverse.compiler}</mainClass>
                             <arguments>
                                 <!-- argument>-classpath</argument -->
                                 <!-- argument>
@@ -114,7 +111,7 @@
                                 <argument>-d</argument>
                                 <!--argument>-v</argument -->
                                 <argument>${multiverse.instrumentor}</argument>
-                                <argument>${build.directory}/test-classes</argument>
+                                <argument>${project.build.testOutputDirectory}</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -132,13 +129,17 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
+                <!-- also executes by default in the package phase -->
                 <executions>
                     <execution>
-                        <id>jar</id>
-                        <phase>package</phase>
+                        <id>generate-ide-agent</id>
+                        <phase>process-classes</phase>
                         <goals>
                             <goal>jar</goal>
                         </goals>
+                        <configuration>
+                            <finalName>${multiverse.agentname}</finalName>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -148,20 +149,21 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>repackage-dependencies</id>
                         <phase>package</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
                         <configuration>
                             <tasks>
-                                <echo message="Executing jarjar"/>
+                                <echo message="Executing JarJar..."/>
                                 <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"/>
-                                <jarjar destfile="${build.directory}/${artifactId}-${version}.jar"
+                                <jarjar destfile="${project.build.directory}/${project.build.finalName}.${project.packaging}"
                                         update="true">
                                     <rule pattern="org.objectweb.asm.**"
-                                          result="${groupId}.repackaged.@0"/>
+                                          result="${project.groupId}.repackaged.@0"/>
                                     <rule pattern="org.kohsuke.args4j.**"
-                                          result="${groupId}.repackaged.@0"/>
+                                          result="${project.groupId}.repackaged.@0"/>
                                 </jarjar>
                             </tasks>
                         </configuration>
@@ -179,10 +181,9 @@
 
         <resources>
             <resource>
-                <directory>${basedir}/target/classes</directory>
+                <directory>${project.build.outputDirectory}</directory>
             </resource>
         </resources>
-
     </build>
 
     <dependencies>
@@ -271,7 +272,6 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <argLine>-javaagent:${project.build.directory}/${multiverse.agentname}.jar</argLine>
