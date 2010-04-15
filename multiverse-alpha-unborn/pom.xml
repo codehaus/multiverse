@@ -101,17 +101,20 @@
             <artifactId>multiverse-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>multiverse-instrumentation</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>multiverse-benchy</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+
         <!-- we also want access to the jar containing the test code from the multiverse-core project -->
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -149,27 +152,7 @@
         <!-- ASM dependencies -->
         <dependency>
             <groupId>asm</groupId>
-            <artifactId>asm</artifactId>
-            <version>${asm.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm-tree</artifactId>
-            <version>${asm.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm-analysis</artifactId>
-            <version>${asm.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm-commons</artifactId>
-            <version>${asm.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm-util</artifactId>
+            <artifactId>asm-all</artifactId>
             <version>${asm.version}</version>
         </dependency>
     </dependencies>

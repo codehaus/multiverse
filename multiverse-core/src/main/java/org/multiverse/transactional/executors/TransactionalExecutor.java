@@ -11,4 +11,7 @@ import java.util.concurrent.Executor;
  */
 @TransactionalObject
 public interface TransactionalExecutor extends Executor {
+
+    @Override
+    void execute(Runnable command);
 }

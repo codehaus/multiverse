@@ -3,7 +3,7 @@ package org.multiverse.transactional.arrays;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.stms.alpha.AlphaStm;
+import org.multiverse.api.Stm;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -14,11 +14,11 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class TransactionalReferenceArray_toStringTest {
 
-    private AlphaStm stm;
+    private Stm stm;
 
     @Before
     public void setUp() {
-        stm = (AlphaStm) getGlobalStmInstance();
+        stm = (Stm) getGlobalStmInstance();
         clearThreadLocalTransaction();
     }
 

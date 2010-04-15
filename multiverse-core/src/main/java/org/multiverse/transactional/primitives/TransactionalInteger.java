@@ -14,8 +14,7 @@ import static org.multiverse.api.StmUtils.retry;
 @TransactionalObject
 public final class TransactionalInteger {
 
-    //todo: make private again
-    public int value;
+    private int value;
 
     /**
      * Creates a new TransactionalInteger with the 0 as value.

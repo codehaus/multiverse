@@ -4,7 +4,7 @@ import org.multiverse.integration.scala.StmUtils._;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 /**
- * A &quot;port&quot; of the Java {@link org.multiverse.integrationtests.classicproblems.DiningPhilosophersStressTest DiningPhilosophers}
+ * A &quot;port&quot; of the Java {@link DiningPhilosophersStressTest DiningPhilosophers}
  * example to Scala.
  *
  * @author Andrew Phillips

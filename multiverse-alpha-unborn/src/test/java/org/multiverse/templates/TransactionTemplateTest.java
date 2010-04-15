@@ -3,13 +3,13 @@ package org.multiverse.templates;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.api.exceptions.TooManyRetriesException;
-import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import java.io.IOException;
@@ -21,11 +21,11 @@ import static org.multiverse.api.ThreadLocalTransaction.*;
 
 public class TransactionTemplateTest {
 
-    private AlphaStm stm;
+    private Stm stm;
 
     @Before
     public void setUp() {
-        stm = (AlphaStm) getGlobalStmInstance();
+        stm = getGlobalStmInstance();
         clearThreadLocalTransaction();
     }
 

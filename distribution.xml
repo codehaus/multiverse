@@ -14,7 +14,7 @@
             <outputDirectory/>
             <directory>multiverse-alpha/target</directory>
             <includes>
-                <include>multiverse-alpha-${project.version}-jar-with-dependencies.jar</include>
+                <include>multiverse-alpha-${project.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>

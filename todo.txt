@@ -2,21 +2,6 @@
 todo engine
 ---------------------------------------------------------------
 
-- extra multiverse alpha all in one
-
-    + create additional module
-
-    + make sure that it works from the ide again (multiverse-alpha)
-
-    + copy the unit test classes from the alpha module to the alpha all in one module
-
-    - the unit tests executed in the alpha engine, should be
-     reexecuted but now with the compiler: problem is that the surefire plugin is triggered
-     by java files and not by class files and since we have no java files, it isn't triggered
-
-    - the sources jar in the multiverse-alpha should not be created since there
-    are no sources
-     
 - instrumentation
 
     - the version in the AlphaInstrumentor needs to be modified by maven instead of manually
@@ -24,8 +9,6 @@ todo engine
     - static compilation
 
         - maven plugin for the compiler
-
-        - integration tests for the compiler
 
         - integration test of the compiler in combination with
         the java agent.
@@ -52,8 +35,8 @@ todo engine
     - cheapen tranlocal access for the this variable by passing that tranlocal
     if possible. First step 2: also for other classes.
 
-    - cheapen transactional method by directly accessing other transactional
-    methods instead of going through the master method.
+    - cheapen tranlocal access on this calling transactional methods by directly
+    accessing other tranlocal methods instead of going through the master method.
 
 - back off policy
 
@@ -349,71 +332,24 @@ but a normal object using a managed ref.
 done
 ---------------------------------------------------------------
 
-- good working default transaction familyname added.
+ - static compilation: integration tests for the compiler
 
-- all readonly tests up and running again
+ - field of the primtives should be made private again
 
-- AlphaProgrammaticLong.atomicSet(long newValue
+- extra multiverse alpha all in one
 
-- AlphaProgrammaticLong.atomicCompareAndSet(long expected, long update)
+    + create additional module
 
-- AlphaProgrammaticLong.atomicGet
+    + make sure that it works from the ide again (multiverse-alpha)
 
-- AlphaProgrammaticLong.set test
+    + copy the unit test classes from the alpha module to the alpha all in one module
 
-- Templates need to be removed in constructors of AlphaProgrammaticLong
+    + the unit tests executed in the alpha engine, should be
+     reexecuted but now with the compiler: problem is that the surefire plugin is triggered
+     by java files and not by class files and since we have no java files, it isn't triggered
 
-- AlphaProgrammaticLong. atomicInc(long amount)
+    + the sources jar in the multiverse-alpha should not be created since there
+    are no sources
 
-- AlphaProgrammaticReferenceFactory.atomicCreateLong
-
-- AlphaProgrammaticReferenceFactory.atomicCreateReference
-
-- Fix test for AlphaProgrammaticLong
-
-- expose dirty check in transaction factory builder
-
-- basic instrumentation up and running
-
-- prevention/detection conflicting compiler usage
-
-- make sure that the multiverse jars are pre-instrumented
-
-- Fix tes for AlphaProgrammaticReference
-
-- let the JavaAgent print the revision of subversion & the release version; this helps to locate problems.
-
-- MonoUpdate preventing that a transaction that does not allow explicit retry,
-can't do an explicit retry
-
-- ArrayUpdate preventing that a transaction that does not allow explicit retry,
-can't do an explicit retry
-
-- MapUpdate preventing that a transaction that does not allow explicit retry,
-can't do an explicit retry
-
-- MonoReadonly preventing that a transaction that does not allow explicit retry,
-can't do an explicit retry
-
-- ArrayReadonly preventing that a transaction that does not allow explicit retry,
-can't do an explicit retry
-
-- MapReadonly preventing that a transaction that does not allow explicit retry,
-can't do an explicit retry
-
-- analysis of getter
-
-- analysis of setter
-
-- MapUpdateTransaction: when a read is done on a commuting object
-
-- ArrayUpdateTransaction: when a read is done on a commuting object
-
-- MonoUpdateTransaction: when a read is done on a commuting object
-
-- ArrayUpdateTransaction: when a write is done on a commuting object
-
-- MapUpdateTransaction: when a write is done on a commuting object
-
-- MonoUpdateTransaction: when a write is done on a commuting object
-
+- cheapen transactional method by directly accessing other transactional
+    methods instead of going through the master method.

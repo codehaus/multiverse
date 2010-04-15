@@ -4,6 +4,7 @@ import org.multiverse.api.GlobalStmInstance;
 import org.multiverse.api.Stm;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.TransactionFactoryBuilder;
+import org.multiverse.instrumentation.CompileException;
 import org.multiverse.instrumentation.DebugInfo;
 import org.multiverse.instrumentation.asm.AsmUtils;
 import org.multiverse.instrumentation.asm.CloneMap;
@@ -14,6 +15,7 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
+import org.objectweb.asm.tree.analysis.*;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -52,10 +54,11 @@ public class TransactionalClassMethodTransformer implements Opcodes {
     private final ClassMetadata classMetadata;
     private final ClassLoader classLoader;
     private final Map<MethodNode, FieldNode> transactionFactoryFields = new HashMap<MethodNode, FieldNode>();
+    private final boolean optimize;
 
     public TransactionalClassMethodTransformer(
             ClassLoader classLoader, ClassNode classNode, ClassNode donorClassNode,
-            MetadataRepository metadataRepository) {
+            MetadataRepository metadataRepository, boolean optimize) {
         this.classLoader = classLoader;
         this.metadataRepository = metadataRepository;
         this.classNode = classNode;
@@ -64,6 +67,8 @@ public class TransactionalClassMethodTransformer implements Opcodes {
         this.donorClassNode = donorClassNode;
         this.donorMethodNode = getDonorMethod("donorMethod");
         this.donorConstructorNode = getDonorMethod("donorConstructor");
+        this.optimize = optimize;
+
     }
 
     public ClassNode transform() {
@@ -529,6 +534,32 @@ public class TransactionalClassMethodTransformer implements Opcodes {
     private InsnList transformOriginalLogic(MethodNode methodNode, CloneMap cloneMap,
                                             DebugInfo debugInfo, LabelNode startLabelNode, LabelNode endLabelNode) {
 
+        MethodMetadata metadata = classMetadata.getMethodMetadata(methodNode.name, methodNode.desc);
+
+//        if (classMetadata.getName().endsWith("PoolExecutor")) {
+        System.out.println(classMetadata.getName() + "." + methodNode.name);
+//        }
+
+        Analyzer a = new Analyzer(new SourceInterpreter());
+        Frame[] frames;
+        try {
+            frames = a.analyze(classNode.name, methodNode);
+        } catch (AnalyzerException e) {
+            throw new CompileException("failed to create frames for " + classMetadata.getName() + "." + methodNode.name);
+        }
+
+
+//        //if (classMetadata.getName().endsWith("PoolExecutor")) {
+//        for (Frame frame : frames) {
+//            if (frame == null) {
+//                System.out.println("null");
+//            } else {
+//                System.out.println(frame.getStackSize());
+//            }
+//        }
+//        //}
+
+
         int transactionVar = indexOfTransactionVariable(methodNode.name, methodNode.desc);
         int tranlocalVar = indexOfTranlocalVariable(methodNode.name, methodNode.desc);
 
@@ -546,14 +577,17 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                     }
                     break;
                 case PUTFIELD: {
-                    FieldInsnNode fieldInsn = (FieldInsnNode) originalInsn;
-                    ClassMetadata ownerMetadata = metadataRepository.loadClassMetadata(classLoader, fieldInsn.owner);
-                    FieldMetadata fieldMetadata = ownerMetadata.getFieldMetadata(fieldInsn.name);
+                    //TODO: Should be improvied by using frames instead of this
+                    //complexity
+
+                    FieldInsnNode originalFieldInsnNode = (FieldInsnNode) originalInsn;
+                    ClassMetadata ownerMetadata = metadataRepository.loadClassMetadata(classLoader, originalFieldInsnNode.owner);
+                    FieldMetadata fieldMetadata = ownerMetadata.getFieldMetadata(originalFieldInsnNode.name);
 
                     if (!fieldMetadata.isManagedField()) {
                         newInsn = originalInsn.clone(cloneMap);
                     } else {
-                        if (isCategory2(fieldInsn.desc)) {
+                        if (isCategory2(originalFieldInsnNode.desc)) {
                             //value(category2), owner(txobject),..
 
                             newInstructions.add(new InsnNode(DUP2_X1));
@@ -579,7 +613,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
 
                         newInstructions.add(new TypeInsnNode(CHECKCAST, ownerMetadata.getTranlocalName()));
 
-                        if (isCategory2(fieldInsn.desc)) {
+                        if (isCategory2(originalFieldInsnNode.desc)) {
                             //[owner(tranlocal), value(category2),..
 
                             newInstructions.add(new InsnNode(DUP_X2));
@@ -594,14 +628,14 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                         }
 
 
-                        newInsn = new FieldInsnNode(PUTFIELD, ownerMetadata.getTranlocalName(), fieldInsn.name, fieldInsn.desc);
+                        newInsn = new FieldInsnNode(PUTFIELD, ownerMetadata.getTranlocalName(), originalFieldInsnNode.name, originalFieldInsnNode.desc);
                     }
                 }
                 break;
                 case GETFIELD: {
-                    FieldInsnNode fieldInsn = (FieldInsnNode) originalInsn;
-                    ClassMetadata ownerMetadata = metadataRepository.loadClassMetadata(classLoader, fieldInsn.owner);
-                    FieldMetadata fieldMetadata = ownerMetadata.getFieldMetadata(fieldInsn.name);
+                    FieldInsnNode originalFieldInsnNode = (FieldInsnNode) originalInsn;
+                    ClassMetadata ownerMetadata = metadataRepository.loadClassMetadata(classLoader, originalFieldInsnNode.owner);
+                    FieldMetadata fieldMetadata = ownerMetadata.getFieldMetadata(originalFieldInsnNode.name);
 
                     if (!fieldMetadata.isManagedField()) {
                         newInsn = originalInsn.clone(cloneMap);
@@ -609,7 +643,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                         LabelNode readFromTransaction = new LabelNode();
                         LabelNode completed = new LabelNode();
 
-                        boolean optimizeThis = tranlocalVar > -1 && isPreviousAload0(fieldInsn);
+                        boolean optimizeThis = false && tranlocalVar > -1 && startsWithALOAD0(null, originalFieldInsnNode);
 
                         if (optimizeThis) {
                             newInstructions.add(new VarInsnNode(ALOAD, tranlocalVar));
@@ -657,7 +691,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
 
                         newInstructions.add(completed);
 
-                        newInstructions.add(new FieldInsnNode(GETFIELD, ownerMetadata.getTranlocalName(), fieldInsn.name, fieldInsn.desc));
+                        newInstructions.add(new FieldInsnNode(GETFIELD, ownerMetadata.getTranlocalName(), originalFieldInsnNode.name, originalFieldInsnNode.desc));
                     }
                 }
                 break;
@@ -682,32 +716,87 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                     newInsn = new VarInsnNode(originalInsn.getOpcode(), newPos);
                 }
                 break;
-//                case INVOKEVIRTUAL:
-//                    MethodInsnNode methodInsnNode = (MethodInsnNode) originalInsn;
-//
-//                    ClassMetadata ownerMetadata = metadataRepository.loadClassMetadata(
-//                            classLoader, methodInsnNode.owner);
-//                    //System.out.println("ownerMetadata: "+ownerMetadata);
-//                    MethodMetadata methodMetadata = ownerMetadata.getMethodMetadata(methodInsnNode.name, methodInsnNode.desc);
-//                    //System.out.println("method: "+methodInsnNode.name);
-//                    //System.out.println("methodMetadata: "+methodMetadata);
-//
-//                    boolean optimize = methodMetadata!=null
-//                            && methodMetadata.isTransactional();
-//
-//                    if (optimize) {
-//                    //    System.out.println("optimization ");
-//                        newInstructions.add(new VarInsnNode(ALOAD, transactionVar));
-//                        newInstructions.add(new MethodInsnNode(
-//                                INVOKEVIRTUAL,
-//                                methodInsnNode.owner,
-//                                methodInsnNode.name,
-//                                createTransactionMethodDesc(methodInsnNode.desc)
-//                        ));
-//                    } else {
-//                        newInsn = originalInsn.clone(cloneMap);
-//                    }
-//                    break;
+                case INVOKEINTERFACE:
+                case INVOKEVIRTUAL:
+                    MethodInsnNode originalMethodInsnNode = (MethodInsnNode) originalInsn;
+                 
+                    ClassMetadata ownerMetadata = metadataRepository.loadClassMetadata(
+                            classLoader, originalMethodInsnNode.owner);
+                    MethodMetadata ownerMethodMetadata = ownerMetadata.getMethodMetadata(originalMethodInsnNode.name, originalMethodInsnNode.desc);
+
+                    boolean optimizeTransactionalMethodCall = optimize
+                            && ownerMethodMetadata != null
+                            && ownerMethodMetadata.isTransactional();
+
+                    System.out.printf("  executing call %s transactional %s\n",
+                            originalMethodInsnNode.owner + "." + originalMethodInsnNode.name,
+                            ownerMethodMetadata != null && ownerMethodMetadata.isTransactional());
+
+                    if (optimizeTransactionalMethodCall) {
+                        Frame methodFrame = frames[methodNode.instructions.indexOf(originalMethodInsnNode)];
+                        int stackSlot = methodFrame.getStackSize();
+
+                        for (Type type : Type.getArgumentTypes(originalMethodInsnNode.desc)) {
+                            stackSlot -= type.getSize();
+                        }
+                        stackSlot--;
+
+                        SourceValue stackValue = (SourceValue) methodFrame.getStack(stackSlot);
+                        boolean aload0 = false;
+                        if (stackValue.insns.size() > 0) {
+                            if (stackValue.insns.size() > 1) {
+                                throw new RuntimeException();
+                            }
+
+                            AbstractInsnNode node = (AbstractInsnNode) stackValue.insns.iterator().next();
+                            if (node.getOpcode() == ALOAD) {
+                                VarInsnNode v = (VarInsnNode) node;
+                                VarInsnNode varNode = (VarInsnNode) node;
+                                if (varNode.var == 0) {
+                                    aload0 = true;
+                                }
+                            }
+
+                            if (node.getOpcode() == INVOKEVIRTUAL || node.getOpcode() == INVOKEINTERFACE) {
+                                MethodInsnNode m = (MethodInsnNode) node;
+                                //    System.out.println("  startinsn methodinsn:" + m.owner + "." + m.name + "" + m.desc);
+                            } else if (node.getOpcode() == GETFIELD || node.getOpcode() == PUTFIELD) {
+                                FieldInsnNode m = (FieldInsnNode) node;
+                                //    System.out.println("  startinsn fieldinsn:" + m.owner + "." + m.name + "" + m.desc);
+                            }
+                        }
+                        for (AbstractInsnNode o : (Set<AbstractInsnNode>) stackValue.insns) {
+                            //System.out.println("  target instruction: " + o);
+                        }
+
+                        boolean fullMonty = classMetadata.isRealTransactionalObject()
+                                && aload0
+                                && !methodNode.name.equals("<init>");
+                        if (fullMonty) {
+                            newInstructions.add(new VarInsnNode(ALOAD, transactionVar));
+                            //tranlocal needs to be used here.
+                            newInstructions.add(new VarInsnNode(ALOAD, tranlocalVar));
+                            newInstructions.add(new MethodInsnNode(
+                                    originalMethodInsnNode.getOpcode(),
+                                    originalMethodInsnNode.owner,
+                                    originalMethodInsnNode.name,
+                                    createTranlocalMethodDesc(ownerMetadata, originalMethodInsnNode.name, originalMethodInsnNode.desc)
+                            ));
+                            System.out.println("   ---full monty tranlocal method optimization " + classNode.name + "." + methodNode.name);
+                        } else {
+                            newInstructions.add(new VarInsnNode(ALOAD, transactionVar));
+                            newInstructions.add(new MethodInsnNode(
+                                    originalMethodInsnNode.getOpcode(),
+                                    originalMethodInsnNode.owner,
+                                    originalMethodInsnNode.name,
+                                    createTransactionMethodDesc(originalMethodInsnNode.desc)
+                            ));
+                            System.out.println("   ---transactional method optimization " + classNode.name + "." + methodNode.name);
+                        }
+                    } else {
+                        newInsn = originalInsn.clone(cloneMap);
+                    }
+                    break;
                 default:
                     newInsn = originalInsn.clone(cloneMap);
                     break;
@@ -722,18 +811,31 @@ public class TransactionalClassMethodTransformer implements Opcodes {
         return newInstructions;
     }
 
-    private boolean isPreviousAload0(AbstractInsnNode node) {
-        if (node.getPrevious() == null) {
-            return false;
+    private boolean startsWithALOAD0(Frame[] frames, AbstractInsnNode node) {
+        while (node != null) {
+            if (node.getPrevious() == null) {
+                return false;
+            }
+
+            AbstractInsnNode prev = node.getPrevious();
+
+            if (prev.getOpcode() == -1) {
+                node = prev.getPrevious();
+            } else if (prev.getOpcode() != ALOAD) {
+                return false;
+            } else {
+                VarInsnNode varInsnNode = (VarInsnNode) prev;
+                boolean result = varInsnNode.var == 0;
+                if (result) {
+                    //    System.out.println("--------------------------------");
+                    //    System.out.println("ALOAD 0 found");
+                    //    System.out.println("--------------------------------");
+                }
+                return result;
+            }
         }
 
-        AbstractInsnNode prev = node.getPrevious();
-        if (prev.getOpcode() != ALOAD) {
-            return false;
-        }
-
-        VarInsnNode varInsnNode = (VarInsnNode) prev;
-        return varInsnNode.var == 0;
+        return false;
     }
 
     private List cloneVariableTableForLogicMethod(MethodNode methodNode, CloneMap cloneMap, LabelNode startLabelNode, LabelNode endLabelNode) {
@@ -1090,11 +1192,8 @@ public class TransactionalClassMethodTransformer implements Opcodes {
     public int indexOfTranlocalVariable(String methodName, String methodDesc) {
         MethodMetadata methodMetadata = classMetadata.getMethodMetadata(methodName, methodDesc);
 
-        if (methodMetadata.isStatic()) {
-            return -1;
-        }
-
-        if (!methodMetadata.getClassMetadata().isTransactionalObject()) {
+        if (methodMetadata.isStatic() ||
+                !methodMetadata.getClassMetadata().isRealTransactionalObject()) {
             return -1;
         }
 
@@ -1117,7 +1216,19 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                 methodDesc, ALPHA_TRANSACTION_INTERNAL_NAME);
     }
 
+    /**
+     * Adds the transaction and then the tranlocal as extra parameters.
+     *
+     * @param methodName
+     * @param methodDesc
+     * @return
+     */
     private String createTranlocalMethodDesc(String methodName, String methodDesc) {
+        return createTranlocalMethodDesc(classMetadata, methodName, methodDesc);
+    }
+
+
+    private String createTranlocalMethodDesc(ClassMetadata classMetadata, String methodName, String methodDesc) {
         MethodMetadata methodMetadata = classMetadata.getMethodMetadata(methodName, methodDesc);
 
         if (methodMetadata.isStatic() || !methodMetadata.isTransactional()) {
@@ -1132,4 +1243,5 @@ public class TransactionalClassMethodTransformer implements Opcodes {
 
         return result;
     }
+
 }

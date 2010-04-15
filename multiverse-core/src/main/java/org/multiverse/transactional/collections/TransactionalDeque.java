@@ -1,8 +1,7 @@
 package org.multiverse.transactional.collections;
 
-import org.multiverse.annotations.TransactionalMethod;
-
 import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A Transactional version of the {@link BlockingDeque} interface.
@@ -17,15 +16,45 @@ import java.util.concurrent.BlockingDeque;
 public interface TransactionalDeque<E> extends TransactionalQueue<E>, BlockingDeque<E> {
 
     @Override
-    @TransactionalMethod(readonly = true)
-    int remainingCapacity();
+    void addFirst(E e);
 
     @Override
-    @TransactionalMethod(readonly = true)
-    E element();
+    void addLast(E e);
 
     @Override
-    @TransactionalMethod(readonly = true)
-    E peek();
+    boolean offerFirst(E e);
+
+    @Override
+    boolean offerLast(E e);
+
+    @Override
+    void putFirst(E e) throws InterruptedException;
+
+    @Override
+    void putLast(E e) throws InterruptedException;
+
+    @Override
+    boolean offerFirst(E e, long timeout, TimeUnit unit) throws InterruptedException;
+
+    @Override
+    boolean offerLast(E e, long timeout, TimeUnit unit) throws InterruptedException;
+
+    @Override
+    E takeFirst() throws InterruptedException;
+
+    @Override
+    E takeLast() throws InterruptedException;
+
+    @Override
+    E pollFirst(long timeout, TimeUnit unit) throws InterruptedException;
+
+    @Override
+    E pollLast(long timeout, TimeUnit unit) throws InterruptedException;
+
+    @Override
+    boolean removeFirstOccurrence(Object o);
+
+    @Override
+    boolean removeLastOccurrence(Object o);
 }
 

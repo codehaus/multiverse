@@ -95,4 +95,6 @@ public interface Instrumentor {
      *          if something goes wrong while compile clazz.
      */
     Clazz process(Clazz originalClazz);
+
+    void setOptimize(boolean optimize);
 }

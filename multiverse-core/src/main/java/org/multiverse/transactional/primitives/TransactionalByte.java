@@ -14,8 +14,7 @@ import static org.multiverse.api.StmUtils.retry;
 @TransactionalObject
 public final class TransactionalByte {
 
-    //todo: make private again
-    public byte value;
+    private byte value;
 
     public TransactionalByte() {
         this((byte) 0);

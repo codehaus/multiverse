@@ -5,6 +5,7 @@ import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
@@ -34,7 +35,7 @@ public interface TransactionalMap<K, V> extends ConcurrentMap<K, V> {
      */
     @Exclude
     int getCurrentSize();
-    
+
     @Override
     @TransactionalMethod(readonly = true)
     boolean isEmpty();
@@ -74,4 +75,30 @@ public interface TransactionalMap<K, V> extends ConcurrentMap<K, V> {
     @Override
     @TransactionalMethod(readonly = true)
     int hashCode();
+
+    // Query Operations
+
+    @Override
+    V put(K key, V value);
+
+    @Override
+    V remove(Object key);
+
+    @Override
+    void putAll(Map<? extends K, ? extends V> m);
+
+    @Override
+    void clear();
+
+    @Override
+    V putIfAbsent(K key, V value);
+
+    @Override
+    boolean remove(Object key, Object value);
+
+    @Override
+    boolean replace(K key, V oldValue, V newValue);
+
+    @Override
+    V replace(K key, V value);
 }

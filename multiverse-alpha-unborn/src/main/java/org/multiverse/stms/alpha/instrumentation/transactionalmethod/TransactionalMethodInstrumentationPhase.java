@@ -43,7 +43,8 @@ public class TransactionalMethodInstrumentationPhase extends AbstractInstrumenta
                 result = transformer.transform();
             } else {
                 TransactionalClassMethodTransformer transformer = new TransactionalClassMethodTransformer(
-                        originalClazz.getClassLoader(), original, donor, environment.getMetadataRepository());
+                        originalClazz.getClassLoader(), original, donor,
+                        environment.getMetadataRepository(), environment.optimize());
                 result = transformer.transform();
             }
 

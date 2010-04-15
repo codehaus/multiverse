@@ -1,10 +1,9 @@
 package org.multiverse.benchmarks;
 
 import org.benchy.AbstractBenchmarkDriver;
-import org.benchy.TestCaseResult;
 import org.benchy.TestCase;
+import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
-import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import java.util.concurrent.TimeUnit;

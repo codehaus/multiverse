@@ -48,6 +48,11 @@ public final class MultiverseCompiler {
             return;
         }
 
+        if (cli.optimize) {
+            System.out.println("Multiverse: bytecode is optimized");
+            instrumentor.setOptimize(true);
+        }
+
         if (cli.dumpBytecode) {
             System.out.println("Multiverse: bytecode is dumped for debugging purposes");
             instrumentor.setDumpBytecode(true);

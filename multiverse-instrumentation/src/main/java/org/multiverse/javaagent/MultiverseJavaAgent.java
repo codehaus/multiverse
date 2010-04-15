@@ -56,7 +56,7 @@ public final class MultiverseJavaAgent {
             String tmpDir = System.getProperty("java.io.tmpdir");
             File dumpDirectory = new File(getSystemProperty("dumpDirectory", tmpDir));
 
-            System.out.println(format("MultiverseJavaAgent: Bytecode will be dumped to '%s'", dumpDirectory.getAbsolutePath()));
+            System.out.println(format("Multiverse: Bytecode from Javaagent will be dumped to '%s'", dumpDirectory.getAbsolutePath()));
 
             compiler.setDumpDirectory(dumpDirectory);
         }
@@ -64,7 +64,7 @@ public final class MultiverseJavaAgent {
     }
 
     private static void printMultiverseJavaAgentInfo() {
-        System.out.println("MultiverseJavaAgent");
+        System.out.println("Multiverse: JavaAgent");
 
         if (MultiverseConstants.___SANITY_CHECKS_ENABLED) {
             System.out.println("Sanity checks are enabled.");
@@ -76,13 +76,13 @@ public final class MultiverseJavaAgent {
                 "instrumentor",
                 "org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor");
 
-        System.out.println(format("MultiverseJavaAgent: Initializing org.multiverse.instrumentation.Instrumentor '%s'",
+        System.out.println(format("Multiverse: Initializing org.multiverse.instrumentation.Instrumentor '%s'",
                 instrumentorClassName));
 
         Constructor constructor = getMethod(instrumentorClassName);
         try {
             Instrumentor instrumentor = (Instrumentor) constructor.newInstance();
-            System.out.println(format("MultiverseJavaAgent: Initialized '%s-%s'",
+            System.out.println(format("Multiverse: Initialized '%s-%s'",
                     instrumentor.getInstrumentorName(), instrumentor.getInstrumentorVersion()));
             return instrumentor;
         } catch (IllegalAccessException e) {

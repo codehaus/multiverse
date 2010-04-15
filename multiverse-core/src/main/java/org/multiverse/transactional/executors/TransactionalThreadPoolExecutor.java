@@ -6,6 +6,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.transactional.collections.TransactionalLinkedList;
+import org.multiverse.transactional.collections.TransactionalQueue;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -46,9 +47,9 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
  * @author Peter Veentjer.
  */
 @TransactionalObject
-public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
+public final class TransactionalThreadPoolExecutor extends AbstractExecutorService {
 
-    private final BlockingQueue<Runnable> workQueue;
+    private final TransactionalQueue<Runnable> workQueue;
     private final TransactionalLinkedList<Thread> threads = new TransactionalLinkedList<Thread>();
 
     private State state;
@@ -82,7 +83,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
      * @param workQueue the BlockingQueue to store unprocessed work.
      * @throws NullPointerException if workQueue is null.
      */
-    public TransactionalThreadPoolExecutor(BlockingQueue<Runnable> workQueue) {
+    public TransactionalThreadPoolExecutor(TransactionalQueue<Runnable> workQueue) {
         this(workQueue, 1);
     }
 
@@ -95,7 +96,7 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
      * @throws IllegalArgumentException if corePoolSize is smaller than zero or if maxPoolSize smaller than
      *                                  corePoolSize.
      */
-    public TransactionalThreadPoolExecutor(BlockingQueue<Runnable> workQueue, int corePoolSize) {
+    public TransactionalThreadPoolExecutor(TransactionalQueue<Runnable> workQueue, int corePoolSize) {
         if (workQueue == null) {
             throw new NullPointerException();
         }
@@ -346,6 +347,21 @@ public class TransactionalThreadPoolExecutor extends AbstractExecutorService {
             default:
                 throw new IllegalStateException();
         }
+    }
+
+    public void u() {
+        v();
+    }
+
+    public void v() {
+    }
+
+
+    public void x(int a) {
+        y(a);
+    }
+
+    public void y(int b) {
     }
 
     /**

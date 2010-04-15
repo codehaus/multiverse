@@ -14,6 +14,9 @@ public class MultiverseCompilerArguments {
     @Option(name = "-v", usage = "verbose output", required = false)
     public boolean verbose;
 
+    @Option(name = "-o", usage = "optimize the classes (should not be combined with agent)", required = false)
+    public boolean optimize = true;
+
     @Argument(required = true, index = 0, metaVar = "COMPILER",
             usage = "the org.multiverse.instrumentation.Instrumentor to use " +
                     "(most likely org.multiverse.stms.alpha.instrumentation.AlphaInstrumentor).")

@@ -9,6 +9,8 @@ import java.io.File;
  */
 public interface Environment {
 
+    boolean optimize();
+
     Filer getFiler();
 
     /**

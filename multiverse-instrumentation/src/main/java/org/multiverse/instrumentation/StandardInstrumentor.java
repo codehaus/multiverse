@@ -23,6 +23,7 @@ public class StandardInstrumentor implements Instrumentor {
 
     private Log log = new NullLog();
     private final String stmName;
+    private boolean optimize = false;
 
 
     public StandardInstrumentor(String compilerName, String compilerVersion, String stmName) {
@@ -110,6 +111,11 @@ public class StandardInstrumentor implements Instrumentor {
     }
 
     @Override
+    public void setOptimize(boolean optimize) {
+        this.optimize = optimize;
+    }
+
+    @Override
     public Clazz process(Clazz originalClazz) {
         if (originalClazz.getClassLoader() == null) {
             log.important("Multiverse: Ignoring class '%s' because it is a system class", originalClazz.getName());
@@ -177,6 +183,11 @@ public class StandardInstrumentor implements Instrumentor {
     }
 
     class EnvironmentImpl implements Environment {
+
+        @Override
+        public boolean optimize() {
+            return optimize;
+        }
 
         @Override
         public boolean dumpBytecode() {

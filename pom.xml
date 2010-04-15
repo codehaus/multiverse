@@ -111,6 +111,7 @@
         <module>multiverse-benchy</module>
         <!-- module>multiverse-documentation</module -->
         <module>multiverse-core</module>
+        <module>multiverse-core-tests</module>
         <module>multiverse-instrumentation</module>
         <module>multiverse-alpha-unborn</module>
         <module>multiverse-alpha</module>

@@ -14,8 +14,7 @@ import static org.multiverse.api.StmUtils.retry;
 @TransactionalObject
 public final class TransactionalCharacter {
 
-    //todo: make private again
-    public char value;
+    private char value;
 
     public TransactionalCharacter() {
         this((char) 0);

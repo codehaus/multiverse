@@ -2,7 +2,9 @@ package org.multiverse.transactional.collections;
 
 import org.multiverse.annotations.TransactionalMethod;
 
+import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A transactional {@link BlockingQueue} interface.
@@ -18,18 +20,45 @@ public interface TransactionalQueue<E> extends BlockingQueue<E>, TransactionalCo
 
     @Override
     @TransactionalMethod(readonly = true)
-    int remainingCapacity();
-
-    @Override
-    @TransactionalMethod(readonly = true)
     E element();
 
     @Override
     @TransactionalMethod(readonly = true)
     E peek();
 
+    @Override
+    boolean add(E e);
 
-    //todo: putUninterruptible
+    @Override
+    boolean offer(E e);
 
-    //todo: takeUninterruptible
+    @Override
+    void put(E e) throws InterruptedException;
+
+    @Override
+    boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException;
+
+    @Override
+    E take() throws InterruptedException;
+
+    @Override
+    E poll(long timeout, TimeUnit unit) throws InterruptedException;
+
+    @Override
+    int remainingCapacity();
+
+    @Override
+    boolean remove(Object o);
+
+    @Override
+    int drainTo(Collection<? super E> c);
+
+    @Override
+    int drainTo(Collection<? super E> c, int maxElements);
+
+    @Override
+    E remove();
+
+    @Override
+    E poll();
 }

@@ -6,7 +6,7 @@ import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.ThreadLocalTransaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.stms.alpha.manualinstrumentation.IntQueue;
+import org.multiverse.transactional.collections.TransactionalLinkedList;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,7 +32,7 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
  */
 public class ProducerConsumerStressTest {
 
-    private IntQueue[] queues;
+    private TransactionalLinkedList[] queues;
     private int queueCount = 50;
     private int itemCount = 5000;
     private int delayMs = 2;
@@ -101,8 +101,8 @@ public class ProducerConsumerStressTest {
         System.out.println("thread.local: " + threads.length);
         int index = 0;
         for (int k = 0; k < queueCount - 1; k++) {
-            IntQueue from = queues[k];
-            IntQueue to = queues[k + 1];
+            TransactionalLinkedList<Integer> from = queues[k];
+            TransactionalLinkedList<Integer> to = queues[k + 1];
             AtomicInteger remainingCounter = new AtomicInteger(itemCount);
             AtomicInteger delay = new AtomicInteger(1);
             for (int l = 0; l < concurrentHandoverCount; l++) {
@@ -114,17 +114,17 @@ public class ProducerConsumerStressTest {
     }
 
     public void assertQueuesAreEmpty() {
-        for (IntQueue queue : queues) {
+        for (TransactionalLinkedList queue : queues) {
             if (!queue.isEmpty()) {
                 fail();
             }
         }
     }
 
-    private IntQueue[] createQueues() {
-        IntQueue[] result = new IntQueue[queueCount];
+    private TransactionalLinkedList<Integer>[] createQueues() {
+        TransactionalLinkedList<Integer>[] result = new TransactionalLinkedList[queueCount];
         for (int k = 0; k < queueCount; k++) {
-            result[k] = new IntQueue(queueCapacity);
+            result[k] = new TransactionalLinkedList(queueCapacity);
         }
         return result;
     }
@@ -136,7 +136,7 @@ public class ProducerConsumerStressTest {
             setName("ProducerThread");
         }
 
-        public void doRun() {
+        public void doRun() throws InterruptedException {
             for (int k = 0; k < itemCount; k++) {
                 if (k % 500 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
@@ -160,9 +160,9 @@ public class ProducerConsumerStressTest {
         }
 
         @TransactionalMethod
-        public void produceOneItem(int item, boolean abort) {
-            IntQueue queue = queues[0];
-            queue.push(item);
+        public void produceOneItem(int item, boolean abort) throws InterruptedException {
+            TransactionalLinkedList<Integer> queue = queues[0];
+            queue.putFirst(item);
             if (abort) {
                 ThreadLocalTransaction.getThreadLocalTransaction().abort();
             }
@@ -176,7 +176,7 @@ public class ProducerConsumerStressTest {
             setName("ConsumeThread");
         }
 
-        public void doRun() {
+        public void doRun() throws InterruptedException {
             for (int k = 0; k < itemCount; k++) {
                 if (k % 500 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
@@ -199,9 +199,9 @@ public class ProducerConsumerStressTest {
         }
 
         @TransactionalMethod
-        public int consumeOneItem(boolean abort) {
-            IntQueue queue = queues[queues.length - 1];
-            int r = queue.pop();
+        public int consumeOneItem(boolean abort) throws InterruptedException {
+            TransactionalLinkedList<Integer> queue = queues[queues.length - 1];
+            int r = queue.takeLast();
             if (abort) {
                 ThreadLocalTransaction.getThreadLocalTransaction().abort();
             }
@@ -210,12 +210,13 @@ public class ProducerConsumerStressTest {
     }
 
     private class HandoverThread extends TestThread {
-        private final IntQueue from;
-        private final IntQueue to;
+        private final TransactionalLinkedList<Integer> from;
+        private final TransactionalLinkedList<Integer> to;
         private final AtomicInteger remainingCounter;
         private final AtomicInteger aliveCount;
 
-        public HandoverThread(int id, IntQueue from, IntQueue to, AtomicInteger remainingCounter, AtomicInteger aliveCount) {
+        public HandoverThread(int id, TransactionalLinkedList<Integer> from,
+                              TransactionalLinkedList<Integer> to, AtomicInteger remainingCounter, AtomicInteger aliveCount) {
             setName("HandoverThread-" + id);
             this.from = from;
             this.to = to;
@@ -223,7 +224,7 @@ public class ProducerConsumerStressTest {
             this.aliveCount = aliveCount;
         }
 
-        public void doRun() {
+        public void doRun() throws InterruptedException {
             int k = 0;
             while (remainingCounter.getAndDecrement() > 0) {
                 if (k % 1000 == 0) {
@@ -248,10 +249,10 @@ public class ProducerConsumerStressTest {
         }
 
         @TransactionalMethod
-        public void moveOneItem(boolean abort) {
-            int item = from.pop();
+        public void moveOneItem(boolean abort) throws InterruptedException {
+            int item = from.takeLast();
             sleepRandomMs(aliveCount.get() * delayMs);
-            to.push(item);
+            to.putFirst(item);
 
             if (abort) {
                 ThreadLocalTransaction.getThreadLocalTransaction().abort();

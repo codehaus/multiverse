@@ -174,53 +174,6 @@ public class ReadersWritersProblemStressTest {
         }
     }
 
-    //todo: lock implementation is not used yet.
-
-    @TransactionalObject
-    static class WriterPreferedReadWriteLock implements ReadWriteLock {
-
-        //-1
-        private int readerCount;
-        private boolean pendingWriteLock = false;
-
-        @Override
-        public void acquireReadLock() {
-            if (pendingWriteLock) {
-                retry();
-            }
-
-            if (readerCount == -1) {
-                retry();
-            }
-
-            readerCount++;
-        }
-
-        @Override
-        public void acquireWriteLock() {
-            if (readerCount != 0) {
-                pendingWriteLock = true;
-                //the problem is that the current transaction is aborted when the retry is done, and
-                //the pendingWriteLock is not committed.
-                retry();
-            }
-
-            pendingWriteLock = false;
-            readerCount--;
-        }
-
-        @Override
-        public void releaseWriteLock() {
-            readerCount = 0;
-        }
-
-        @Override
-        public void releaseReadLock() {
-            readerCount--;
-        }
-    }
-
-
     public interface ReadWriteLock {
 
         void acquireReadLock();

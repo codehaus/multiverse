@@ -62,7 +62,6 @@ public final class TransactionalReferenceArray<E> {
      * @return the element at the specified index.
      * @throws IndexOutOfBoundsException if the index is out of bounds.
      */
-    @Exclude
     public E get(int index) {
         return array[index].get();
     }
@@ -77,7 +76,6 @@ public final class TransactionalReferenceArray<E> {
      * @return the value of the item
      * @throws IndexOutOfBoundsException if index is out of bounds.
      */
-    @Exclude
     public E atomicGet(int index) {
         return array[index].atomicGet();
     }
@@ -92,7 +90,6 @@ public final class TransactionalReferenceArray<E> {
      * @return the previous content of element at the specified index.
      * @throws IndexOutOfBoundsException if the index is out of bounds.
      */
-    @Exclude
     public E set(int index, E item) {
         return array[index].set(item);
     }

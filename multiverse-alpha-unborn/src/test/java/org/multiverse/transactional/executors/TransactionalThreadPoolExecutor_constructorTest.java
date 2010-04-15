@@ -3,8 +3,7 @@ package org.multiverse.transactional.executors;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.transactional.collections.TransactionalLinkedList;
-
-import java.util.concurrent.BlockingQueue;
+import org.multiverse.transactional.collections.TransactionalQueue;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
@@ -26,7 +25,7 @@ public class TransactionalThreadPoolExecutor_constructorTest {
 
     @Test(expected = NullPointerException.class)
     public void withWorkQueue_whenWorkQueueNull_thenNullPointerException() {
-        new TransactionalThreadPoolExecutor((BlockingQueue<Runnable>) null);
+        new TransactionalThreadPoolExecutor((TransactionalQueue<Runnable>) null);
     }
 
     @Test

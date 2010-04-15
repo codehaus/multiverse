@@ -18,7 +18,7 @@ import java.util.List;
 
 import static java.lang.String.format;
 import static org.multiverse.instrumentation.asm.AsmUtils.internalToDesc;
-import static org.multiverse.instrumentation.asm.AsmUtils.upgradeToProtected;
+import static org.multiverse.instrumentation.asm.AsmUtils.upgradeToPublic;
 import static org.objectweb.asm.Type.*;
 
 /**
@@ -101,7 +101,7 @@ public final class TranlocalFactory implements Opcodes {
 
             if (fieldMetadata.isManagedField()) {
                 FieldNode fixedFieldNode = new FieldNode(
-                        upgradeToProtected(fieldNode.access),
+                        upgradeToPublic(fieldNode.access),
                         fieldNode.name,
                         fieldNode.desc,
                         fieldNode.signature,

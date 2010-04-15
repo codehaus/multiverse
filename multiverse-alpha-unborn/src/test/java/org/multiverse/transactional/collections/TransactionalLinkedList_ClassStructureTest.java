@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.multiverse.instrumentation.metadata.ClassMetadata;
 import org.multiverse.instrumentation.metadata.FieldMetadata;
 import org.multiverse.instrumentation.metadata.MetadataRepository;
-import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -20,8 +19,8 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 public class TransactionalLinkedList_ClassStructureTest {
 
     @Before
-    public void setUp(){
-     clearThreadLocalTransaction();
+    public void setUp() {
+        clearThreadLocalTransaction();
     }
 
     @Test
@@ -34,7 +33,7 @@ public class TransactionalLinkedList_ClassStructureTest {
         assertTrue(hasField(clazz, "tail"));
 
         assertTrue(hasMethod(clazz, "remainingCapacity"));
-        assertTrue(hasMethod(clazz, "remainingCapacity", AlphaTransaction.class));
+        //assertTrue(hasMethod(clazz, "remainingCapacity", AlphaTransaction.class));
     }
 
     @Test

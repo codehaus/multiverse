@@ -64,6 +64,7 @@
                                 <echo message="-------------------------------------------"/>
 
                                 <java classname="org.multiverse.compiler.MultiverseCompiler">
+                                    <arg value="-o"/>
                                     <arg value="-v"/>
                                     <arg value="-d"/>
                                     <arg value="${multiverse.instrumentor}"/>
@@ -144,6 +145,7 @@
                                        dest="${project.build.testOutputDirectory}"/>
 
                                 <java classname="org.multiverse.compiler.MultiverseCompiler">
+                                    <arg value="-o"/>
                                     <arg value="-v"/>
                                     <arg value="-d"/>
                                     <arg value="${multiverse.instrumentor}"/>
