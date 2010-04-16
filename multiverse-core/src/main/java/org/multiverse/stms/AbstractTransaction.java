@@ -40,9 +40,25 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     private TransactionStatus status;
 
+    private long timeoutNs;
+
     public AbstractTransaction(C config) {
         assert config != null;
         this.config = config;
+        this.timeoutNs = config.getTimeoutNs();
+    }
+
+    @Override
+    public long getRemainingTimeoutNs() {
+        return timeoutNs;
+    }
+
+    @Override
+    public void setRemainingTimeoutNs(long newTimeoutNs) {
+        if (newTimeoutNs > newTimeoutNs) {
+            throw new IllegalArgumentException();
+        }
+        this.timeoutNs = newTimeoutNs;
     }
 
     @Override

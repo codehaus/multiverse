@@ -64,9 +64,9 @@ public final class StmUtils {
     // * @param timeout
     // * @param timeoutTimeUnit
     // */
-    //public static void setTimeout(long timeout, TimeUnit timeoutTimeUnit) {
+    //public static void setTimeoutNs(long timeout, TimeUnit timeoutTimeUnit) {
     //    Transaction tx = getRequiredThreadLocalTransaction();
-    //    tx.setTimeout(timeout, timeoutTimeUnit);
+    //    tx.setTimeoutNs(timeout, timeoutTimeUnit);
     //}
 
     /**

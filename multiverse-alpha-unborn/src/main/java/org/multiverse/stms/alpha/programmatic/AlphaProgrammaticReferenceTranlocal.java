@@ -108,4 +108,14 @@ public final class AlphaProgrammaticReferenceTranlocal<E> extends AlphaTranlocal
     public void registerLifecycleListener(TransactionLifecycleListener listener) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public long getRemainingTimeoutNs() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setRemainingTimeoutNs(long timeoutNs) {
+        throw new UnsupportedOperationException();
+    }
 }

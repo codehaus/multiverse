@@ -45,7 +45,7 @@ public @interface TransactionalMethod {
 
     int maxRetryCount() default 1000;
 
-    long timeout() default -1;
+    long timeout() default Long.MAX_VALUE;
 
     TimeUnit timeoutTimeUnit() default TimeUnit.SECONDS;
 }

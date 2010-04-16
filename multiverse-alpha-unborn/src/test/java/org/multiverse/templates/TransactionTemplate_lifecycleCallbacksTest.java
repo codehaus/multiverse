@@ -1,5 +1,7 @@
 package org.multiverse.templates;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
@@ -8,8 +10,19 @@ import org.multiverse.stms.AbstractTransactionImpl;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class TransactionTemplate_lifecycleCallbacksTest {
+
+    @Before
+    public void setUp() {
+        clearThreadLocalTransaction();
+    }
+
+    @After
+    public void tearDown() {
+        clearThreadLocalTransaction();
+    }
 
     @Test
     public void testAbort() throws Exception {

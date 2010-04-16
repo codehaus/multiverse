@@ -186,9 +186,7 @@ public interface Transaction {
      */
     void registerLifecycleListener(TransactionLifecycleListener listener);
 
-    //long getTimeout();
+    long getRemainingTimeoutNs();
 
-    //TimeUnit getTimeoutTimeUnit();
-
-    //void setTimeout(long timeout, TimeUnit timeUnit);
+    void setRemainingTimeoutNs(long timeoutNs);
 }

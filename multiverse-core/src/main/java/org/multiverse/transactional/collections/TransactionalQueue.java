@@ -27,9 +27,6 @@ public interface TransactionalQueue<E> extends BlockingQueue<E>, TransactionalCo
     E peek();
 
     @Override
-    boolean add(E e);
-
-    @Override
     boolean offer(E e);
 
     @Override
@@ -46,9 +43,6 @@ public interface TransactionalQueue<E> extends BlockingQueue<E>, TransactionalCo
 
     @Override
     int remainingCapacity();
-
-    @Override
-    boolean remove(Object o);
 
     @Override
     int drainTo(Collection<? super E> c);

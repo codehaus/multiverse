@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static org.multiverse.instrumentation.asm.AsmUtils.isFinal;
 import static org.multiverse.instrumentation.asm.AsmUtils.isStatic;
 
 /**
@@ -257,15 +258,8 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
     }
 
     private boolean isInvisibleMethod(MethodNode methodNode) {
-        if (isExcluded(methodNode)) {
-            return true;
-        }
-
-        if (isSynthetic(methodNode.access)) {
-            return true;
-        }
-
-        return false;
+        return isExcluded(methodNode)
+                || isSynthetic(methodNode.access);
     }
 
     private FieldMetadata extractFieldMetadata(ClassMetadata classMetadata, FieldNode fieldNode) {
@@ -319,62 +313,26 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
     }
 
     private boolean isManagedFieldWithFieldGranularity(ClassMetadata classMetadata, FieldNode field) {
-        if (!classMetadata.isTransactionalObject()) {
-            return false;
-        }
-
-        if (!hasFieldGranularity(field)) {
-            return false;
-        }
-
-        if (isInvisibleField(field)) {
-            return false;
-        }
-
-        return true;
+        return classMetadata.isTransactionalObject()
+                && hasFieldGranularity(field)
+                && !isInvisibleField(field);
     }
 
     /**
      * Checks if the field is a managed field of a transactional object.
      */
     private boolean isManagedField(ClassMetadata classMetadata, FieldNode field) {
-        if (!classMetadata.isTransactionalObject()) {
-            return false;
-        }
-
-        if (hasFieldGranularity(field)) {
-            return false;
-        }
-
-        if (isInvisibleField(field)) {
-            return false;
-        }
-
-        return true;
+        return classMetadata.isTransactionalObject()
+                && !isInvisibleField(field)
+                && !hasFieldGranularity(field);
     }
 
     private boolean isInvisibleField(FieldNode fieldNode) {
-        if (isExcluded(fieldNode)) {
-            return true;
-        }
-
-        if (AsmUtils.isFinal(fieldNode)) {
-            return true;
-        }
-
-        if (AsmUtils.isStatic(fieldNode)) {
-            return true;
-        }
-
-        if (isSynthetic(fieldNode.access)) {
-            return true;
-        }
-
-        if (isVolatile(fieldNode)) {
-            return true;
-        }
-
-        return false;
+        return isExcluded(fieldNode)
+                || isFinal(fieldNode)
+                || isStatic(fieldNode)
+                || isSynthetic(fieldNode.access)
+                || isVolatile(fieldNode);
     }
 
     private TransactionMetadata createDefaultTransactionMetadata(ClassMetadata classMetadata, MethodNode methodNode) {
@@ -396,9 +354,7 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
         transactionMetadata.writeSkewProblemAllowed = true;
         transactionMetadata.interruptible = throwsInterruptedException;
         transactionMetadata.familyName = createFamilyName(classMetadata.getName(), methodNode.name, methodNode.desc);
-        transactionMetadata.timeout = -1;
-        transactionMetadata.timeoutTimeUnit = TimeUnit.SECONDS;
-
+        transactionMetadata.timeoutNs = Long.MAX_VALUE;
         return transactionMetadata;
     }
 
@@ -431,8 +387,14 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
             }
         }
 
-        txMetadata.timeout = ((Number) getValue(annotationNode, "timeout", -1)).longValue();
-        txMetadata.timeoutTimeUnit = (TimeUnit) getValue(annotationNode, "timeoutTimeUnit", TimeUnit.SECONDS);
+        long timeout = ((Number) getValue(annotationNode, "timeout", Long.MAX_VALUE)).longValue();
+        String[] unit = (String[]) getValue(annotationNode, "timeoutTimeUnit", new String[]{null, TimeUnit.SECONDS.name()});
+        TimeUnit timeoutTimeUnit = TimeUnit.valueOf(unit[1]);
+        if (timeout == Long.MAX_VALUE) {
+            txMetadata.timeoutNs = Long.MAX_VALUE;
+        } else {
+            txMetadata.timeoutNs = timeoutTimeUnit.toNanos(timeout);
+        }
 
         if (methodNode.name.equals("<init>")) {
             txMetadata.maxRetryCount = (Integer) getValue(annotationNode, "maxRetryCount", 0);

@@ -67,4 +67,23 @@ public interface TransactionalCollection<E> extends Collection<E> {
     @Override
     @TransactionalMethod(readonly = true)
     int hashCode();
+
+    @Override
+    boolean add(E e);
+
+    @Override
+    boolean remove(Object o);
+
+    @Override
+    boolean addAll(Collection<? extends E> c);
+
+    @Override
+    boolean removeAll(Collection<?> c);
+
+    @Override
+    boolean retainAll(Collection<?> c);
+
+    @Override
+    void clear();
+
 }

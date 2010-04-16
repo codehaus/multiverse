@@ -1,6 +1,5 @@
 package org.multiverse.transactional.collections;
 
-import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -13,21 +12,4 @@ import java.util.Set;
  */
 public interface TransactionalSet<E> extends Set<E>, TransactionalCollection<E> {
 
-    @Override
-    boolean add(E e);
-
-    @Override
-    boolean remove(Object o);
-
-    @Override
-    boolean addAll(Collection<? extends E> c);
-
-    @Override
-    boolean retainAll(Collection<?> c);
-
-    @Override
-    boolean removeAll(Collection<?> c);
-
-    @Override
-    void clear();
 }

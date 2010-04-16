@@ -72,15 +72,19 @@ public final class StandardLatch implements Latch {
             throw new NullPointerException();
         }
 
-        if (isOpen) {
-            return true;
-        }
+        return tryAwaitNs(unit.toNanos(timeout));
+    }
 
-        long remainingNs = tryAwait(unit.toNanos(timeout));
-        return remainingNs > 0;
+    @Override
+    public boolean tryAwaitNs(long timeoutNs) throws InterruptedException {
+        return tryAwait(timeoutNs) > 0;
     }
 
     private long tryAwait(long timeoutNs) throws InterruptedException {
+        if (isOpen) {
+            return timeoutNs;
+        }
+
         long startTimeNs = System.nanoTime();
 
         if (!lock.tryLock(timeoutNs, TimeUnit.NANOSECONDS)) {
@@ -104,16 +108,10 @@ public final class StandardLatch implements Latch {
     }
 
     @Override
-    public boolean tryAwaitUninterruptible(long timeout, TimeUnit unit) {
-        if (unit == null) {
-            throw new NullPointerException();
-        }
-
+    public boolean tryAwaitUninterruptibleNs(long timeoutNs) {
         if (isOpen) {
             return true;
         }
-
-        long timeoutNs = unit.toNanos(timeout);
 
         boolean restoreInterrupt = Thread.interrupted();
         try {
@@ -131,6 +129,15 @@ public final class StandardLatch implements Latch {
                 Thread.currentThread().interrupt();
             }
         }
+    }
+
+    @Override
+    public boolean tryAwaitUninterruptible(long timeout, TimeUnit unit) {
+        if (unit == null) {
+            throw new NullPointerException();
+        }
+
+        return tryAwaitUninterruptibleNs(unit.toNanos(timeout));
     }
 
     @Override

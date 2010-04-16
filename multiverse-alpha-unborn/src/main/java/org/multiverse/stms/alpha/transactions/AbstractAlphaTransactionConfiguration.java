@@ -16,8 +16,10 @@ public class AbstractAlphaTransactionConfiguration extends AbstractTransactionCo
             String familyName, boolean readOnly, int maxRetryCount,
             boolean interruptible, boolean writeSkewProblemAllowed,
             boolean automaticReadTrackingEnabled, boolean explicitRetryAllowed,
-            SpeculativeConfiguration speculativeConfiguration) {
-        super(clock, backoffPolicy, familyName, readOnly, maxRetryCount, interruptible, writeSkewProblemAllowed, automaticReadTrackingEnabled, explicitRetryAllowed);
+            SpeculativeConfiguration speculativeConfiguration, long timeoutNs) {
+        super(clock, backoffPolicy, familyName, readOnly, maxRetryCount, interruptible,
+                writeSkewProblemAllowed, automaticReadTrackingEnabled,
+                explicitRetryAllowed, timeoutNs);
 
         this.speculativeConfiguration = speculativeConfiguration;
     }

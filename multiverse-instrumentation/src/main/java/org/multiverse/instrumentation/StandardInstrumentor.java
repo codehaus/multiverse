@@ -40,10 +40,6 @@ public class StandardInstrumentor implements Instrumentor {
             throw new NullPointerException();
         }
 
-        // if (logger.isLoggable(Level.FINE)) {
-        //     logger.fine("Adding CompilerPhase: " + phase.getName());
-        // }
-
         phases.add(phase);
     }
 
@@ -168,6 +164,8 @@ public class StandardInstrumentor implements Instrumentor {
         return className.startsWith("java/")
                 || className.startsWith("javax/")
                 || className.startsWith("org/mockito")
+                || className.startsWith("org/gradle")
+                || className.startsWith("ch.qos")
                 || className.startsWith("com/jprofiler/")
                 || className.startsWith("org/junit")
                 || className.startsWith("sun/")

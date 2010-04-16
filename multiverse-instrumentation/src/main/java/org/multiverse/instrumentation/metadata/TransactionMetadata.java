@@ -1,7 +1,5 @@
 package org.multiverse.instrumentation.metadata;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * A container for all parameters passed to an transactional method.
  *
@@ -31,7 +29,5 @@ public class TransactionMetadata {
 
     public boolean speculativeConfigurationEnabled;
 
-    public long timeout;
-
-    public TimeUnit timeoutTimeUnit;
+    public long timeoutNs;
 }

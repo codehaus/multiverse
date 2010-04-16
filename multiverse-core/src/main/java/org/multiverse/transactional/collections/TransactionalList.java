@@ -2,6 +2,7 @@ package org.multiverse.transactional.collections;
 
 import org.multiverse.annotations.TransactionalMethod;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -40,4 +41,16 @@ public interface TransactionalList<E> extends List<E>, TransactionalCollection<E
     @Override
     @TransactionalMethod(readonly = true)
     List<E> subList(int fromIndex, int toIndex);
+
+    @Override
+    boolean addAll(int index, Collection<? extends E> c);
+
+    @Override
+    E set(int index, E element);
+
+    @Override
+    void add(int index, E element);
+
+    @Override
+    E remove(int index);
 }

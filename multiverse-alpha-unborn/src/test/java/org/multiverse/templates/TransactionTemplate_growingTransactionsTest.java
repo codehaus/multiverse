@@ -1,5 +1,6 @@
 package org.multiverse.templates;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Stm;
@@ -9,6 +10,7 @@ import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * Test to make sure that the TransactionTemplate is able to deal with growing transactions. Growing
@@ -25,15 +27,24 @@ public class TransactionTemplate_growingTransactionsTest {
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
+        clearThreadLocalTransaction();
+
         txFactory = stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
                 .setFamilyName(getClass().getName())
-                .setSpeculativeConfigurationEnabled(true).build();
+                .setSpeculativeConfigurationEnabled(true)
+                .build();
 
         refs = new TransactionalInteger[refCount];
+
         for (int k = 0; k < refs.length; k++) {
             refs[k] = new TransactionalInteger();
         }
+    }
+
+    @After
+    public void tearDown() {
+        clearThreadLocalTransaction();
     }
 
     @Test

@@ -1,6 +1,8 @@
 package org.multiverse.instrumentation;
 
 /**
+ * Abstract {@link InstrumentationPhase} that provides some basic plumbing.
+ *
  * @author Peter Veentjer
  */
 public abstract class AbstractInstrumentationPhase implements InstrumentationPhase {

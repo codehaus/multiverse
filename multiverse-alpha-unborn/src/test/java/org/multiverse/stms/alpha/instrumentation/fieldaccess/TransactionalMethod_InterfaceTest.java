@@ -41,7 +41,8 @@ public class TransactionalMethod_InterfaceTest {
         assertTrue(hasMethod(clazz, "transactional"));
         assertTrue(hasMethod(clazz, "nontransactional"));
 
-        assertTrue(hasMethod(clazz, "transactional", AlphaTransaction.class));
+        assertTrue(hasMethod(clazz, "transactional___ro", AlphaTransaction.class));
+        assertTrue(hasMethod(clazz, "transactional___up", AlphaTransaction.class));
         assertFalse(hasMethod(clazz, "nontransactional", AlphaTransaction.class));
     }
 
@@ -59,8 +60,10 @@ public class TransactionalMethod_InterfaceTest {
         assertTrue(hasMethod(clazz, "explitTransactional"));
         assertTrue(hasMethod(clazz, "implicitTransactional"));
 
-        assertTrue(hasMethod(clazz, "explitTransactional", AlphaTransaction.class));
-        assertTrue(hasMethod(clazz, "implicitTransactional", AlphaTransaction.class));
+        assertTrue(hasMethod(clazz, "explitTransactional___ro", AlphaTransaction.class));
+        assertTrue(hasMethod(clazz, "explitTransactional___up", AlphaTransaction.class));
+        assertTrue(hasMethod(clazz, "implicitTransactional___ro", AlphaTransaction.class));
+        assertTrue(hasMethod(clazz, "implicitTransactional___up", AlphaTransaction.class));
     }
 
     @TransactionalObject
@@ -78,8 +81,10 @@ public class TransactionalMethod_InterfaceTest {
         assertTrue(hasMethod(clazz, "explitTransactional"));
         assertTrue(hasMethod(clazz, "implicitTransactional"));
 
-        assertTrue(hasMethod(clazz, "explitTransactional", AlphaTransaction.class));
-        assertTrue(hasMethod(clazz, "implicitTransactional", AlphaTransaction.class));
+        assertTrue(hasMethod(clazz, "explitTransactional___ro", AlphaTransaction.class));
+        assertTrue(hasMethod(clazz, "explitTransactional___up", AlphaTransaction.class));
+        assertTrue(hasMethod(clazz, "implicitTransactional___ro", AlphaTransaction.class));
+        assertTrue(hasMethod(clazz, "implicitTransactional___up", AlphaTransaction.class));
     }
 
     @TransactionalObject

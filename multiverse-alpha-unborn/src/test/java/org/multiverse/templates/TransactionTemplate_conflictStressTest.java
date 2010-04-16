@@ -1,5 +1,6 @@
 package org.multiverse.templates;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
@@ -12,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * A test that makes sure that the TransactionTemplate behaves well with a lot of read and write conflicts.
@@ -36,6 +38,7 @@ public class TransactionTemplate_conflictStressTest {
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
+        clearThreadLocalTransaction();
 
         refs = new TransactionalInteger[refCount];
         for (int k = 0; k < refCount; k++) {
@@ -46,8 +49,11 @@ public class TransactionTemplate_conflictStressTest {
         for (int k = 0; k < threads.length; k++) {
             threads[k] = new IncThread(k);
         }
+    }
 
-
+    @After
+    public void tearDown() {
+        clearThreadLocalTransaction();
     }
 
     private int sum() {

@@ -66,6 +66,9 @@ public interface Latch {
      */
     boolean tryAwait(long timeout, TimeUnit unit) throws InterruptedException;
 
+    boolean tryAwaitNs(long timeoutNs) throws InterruptedException;
 
     boolean tryAwaitUninterruptible(long timeout, TimeUnit unit);
+
+    boolean tryAwaitUninterruptibleNs(long timeout);
 }

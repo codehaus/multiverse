@@ -1,5 +1,6 @@
 package org.multiverse.templates;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
@@ -9,6 +10,7 @@ import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class TransactionTemplate_blockingTransactionTest {
     private Stm stm;
@@ -17,7 +19,13 @@ public class TransactionTemplate_blockingTransactionTest {
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
+        clearThreadLocalTransaction();
         ref = new TransactionalInteger(0);
+    }
+
+    @After
+    public void tearDown() {
+        clearThreadLocalTransaction();
     }
 
     @Test

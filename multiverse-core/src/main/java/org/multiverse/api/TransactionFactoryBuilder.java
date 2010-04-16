@@ -3,8 +3,6 @@ package org.multiverse.api;
 import org.multiverse.api.backoff.BackoffPolicy;
 import org.multiverse.api.commitlock.CommitLockPolicy;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * An implementation of the builder design pattern to createReference a {@link TransactionFactory}. This is the place to be
  * for transaction configuration. This approach also gives the freedom to access implementation specific
@@ -264,31 +262,19 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      * Sets the timeout (the maximum time a transaction is allowed to block.
      * Long.MAX_VALUE indicates that no timeout should be used.
      *
-     * @param timeout the timeout (is allowed to be negative which indicates that
-     *                no timeout is available and fails immediately).
-     * @param unit    the TimeUnit for the timeout
+     * @param timeoutNs the timeout specified in nano seconds
      * @return the updated TransactionFactoryBuilder
      * @throws NullPointerException if unit is null.
      */
-    B setTimeout(long timeout, TimeUnit unit);
+    B setTimeoutNs(long timeoutNs);
 
     /**
      * Returns the timeout.
      *
      * @return the timeout.
-     * @see #getTimeoutTimeUnit()
-     * @see #setTimeout(long, java.util.concurrent.TimeUnit)
+     * @see #setTimeoutNs(long)
      */
-    long getTimeout();
-
-    /**
-     * Returns the timeout.
-     *
-     * @return the TimeUnit for the Timeout.
-     * @see #getTimeout()
-     * @see #setTimeout(long, java.util.concurrent.TimeUnit)
-     */
-    TimeUnit getTimeoutTimeUnit();
+    long getTimeoutNs();
 
     /**
      * Sets the the maximum count a transaction can be retried. The default is 1000.

@@ -35,14 +35,8 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
     }
 
     public AlphaTransaction startSutTransactionWithoutAutomaticReadTracking() {
-        SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
-        UpdateConfiguration config = new UpdateConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                stmConfig.commitLockPolicy,
-                null,
-                speculativeConfig,
-                stmConfig.maxRetryCount, true, false, true, true, true, true, false);
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withAutomaticReadTrackingEnabled(false);
 
         return new ArrayUpdateAlphaTransaction(config, 100);
     }

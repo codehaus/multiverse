@@ -2,12 +2,10 @@ package org.multiverse.templates;
 
 import org.multiverse.api.*;
 import org.multiverse.api.backoff.BackoffPolicy;
-import org.multiverse.api.exceptions.ControlFlowError;
-import org.multiverse.api.exceptions.Retry;
-import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
-import org.multiverse.api.exceptions.TooManyRetriesException;
+import org.multiverse.api.exceptions.*;
 import org.multiverse.api.latches.CheapLatch;
 import org.multiverse.api.latches.Latch;
+import org.multiverse.api.latches.StandardLatch;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 
@@ -297,19 +295,62 @@ public abstract class TransactionTemplate<E> {
             do {
                 attempt++;
                 try {
-                    if (listener != null) {
-                        tx.registerLifecycleListener(listener);
-                    }
-                    onStart(tx);
-                    E result = execute(tx);
-                    tx.commit();
-                    return result;
-                } catch (Retry e) {
-                    if (attempt - 1 < tx.getConfiguration().getMaxRetryCount()) {
-                        awaitWriteAndRestart(tx);
+                    try {
+                        if (listener != null) {
+                            tx.registerLifecycleListener(listener);
+                        }
+                        onStart(tx);
+                        E result = execute(tx);
+                        tx.commit();
+                        return result;
+                    } catch (Retry e) {
+                        if (attempt - 1 < tx.getConfiguration().getMaxRetryCount()) {
+
+                            Latch latch;
+                            if (tx.getRemainingTimeoutNs() == Long.MAX_VALUE) {
+                                latch = new CheapLatch();
+                            } else {
+                                latch = new StandardLatch();
+                            }
+
+                            tx.registerRetryLatch(latch);
+                            tx.abort();
+
+                            if (tx.getRemainingTimeoutNs() == Long.MAX_VALUE) {
+                                if (tx.getConfiguration().isInterruptible()) {
+                                    latch.await();
+                                } else {
+                                    latch.awaitUninterruptible();
+                                }
+                            } else {
+                                long beginNs = System.nanoTime();
+
+                                boolean timeout;
+                                if (tx.getConfiguration().isInterruptible()) {
+                                    timeout = !latch.tryAwaitNs(tx.getRemainingTimeoutNs());
+                                } else {
+                                    timeout = !latch.tryAwaitNs(tx.getRemainingTimeoutNs());
+                                }
+
+                                long durationNs = beginNs - System.nanoTime();
+                                tx.setRemainingTimeoutNs(tx.getRemainingTimeoutNs() - durationNs);
+
+                                if (timeout) {
+                                    String msg = format("Transaction %s has timed with a total timeout of %s ns",
+                                            tx.getConfiguration().getFamilyName(),
+                                            tx.getConfiguration().getTimeoutNs());
+                                    throw new RetryTimeoutException(msg);
+                                }
+                            }
+
+                            tx.restart();
+                        }
                     }
                 } catch (SpeculativeConfigurationFailure ex) {
+                    Transaction oldTransaction = tx;
                     tx = txFactory.start();
+                    tx.setRemainingTimeoutNs(oldTransaction.getRemainingTimeoutNs());
+
                     if (threadLocalAware) {
                         setThreadLocalTransaction(tx);
                     }
@@ -333,18 +374,6 @@ public abstract class TransactionTemplate<E> {
                 setThreadLocalTransaction(null);
             }
         }
-    }
-
-    private static void awaitWriteAndRestart(Transaction tx) throws InterruptedException {
-        Latch latch = new CheapLatch();
-        tx.registerRetryLatch(latch);
-        tx.abort();
-        if (tx.getConfiguration().isInterruptible()) {
-            latch.await();
-        } else {
-            latch.awaitUninterruptible();
-        }
-        tx.restart();
     }
 
     private boolean noActiveTransaction(Transaction t) {

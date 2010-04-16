@@ -6,8 +6,6 @@ import org.multiverse.api.backoff.ExponentialBackoffPolicy;
 import org.multiverse.api.clock.PrimitiveClock;
 import org.multiverse.api.clock.StrictPrimitiveClock;
 
-import java.util.concurrent.TimeUnit;
-
 import static java.lang.String.format;
 
 /**
@@ -28,22 +26,22 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
     public final boolean interruptible;
     public final boolean writeSkewProblemAllowed;
     public final boolean automaticReadTrackingEnabled;
-    public long timeout;
-    public TimeUnit timeoutTimeUnit;
-    public boolean explicitRetryAllowed;
+    public final long timeoutNs;
+    public final boolean explicitRetryAllowed;
 
     /**
      * This method should be removed, only used for testing purposes.
      */
     public AbstractTransactionConfiguration() {
         this(new StrictPrimitiveClock(), ExponentialBackoffPolicy.INSTANCE_10_MS_MAX,
-                null, true, 1000, true, true, true, true);
+                null, true, 1000, true, true, true, true, Long.MIN_VALUE);
     }
 
     public AbstractTransactionConfiguration(
             PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName,
             boolean readOnly, int maxRetryCount, boolean interruptible,
-            boolean writeSkewProblemAllowed, boolean automaticReadTrackingEnabled, boolean explicitRetryAllowed) {
+            boolean writeSkewProblemAllowed, boolean automaticReadTrackingEnabled,
+            boolean explicitRetryAllowed, long timeoutNs) {
 
         if (clock == null) {
             throw new NullPointerException();
@@ -62,6 +60,7 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
         this.automaticReadTrackingEnabled = automaticReadTrackingEnabled;
         this.writeSkewProblemAllowed = writeSkewProblemAllowed;
         this.explicitRetryAllowed = explicitRetryAllowed;
+        this.timeoutNs = timeoutNs;
 
         if (!readOnly && !automaticReadTrackingEnabled && !writeSkewProblemAllowed) {
             String msg = format("Update transaction '%s' isn't  " +
@@ -111,5 +110,10 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
     @Override
     public final BackoffPolicy getBackoffPolicy() {
         return backoffPolicy;
+    }
+
+    @Override
+    public long getTimeoutNs() {
+        return timeoutNs;
     }
 }

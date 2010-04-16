@@ -25,6 +25,10 @@ public class GetterSetterInlineInstrumentationPhase extends AbstractInstrumentat
 
     @Override
     protected Clazz doInstrument(Environment environment, Clazz originalClazz) {
+        if (!environment.optimize()) {
+            return originalClazz;
+        }
+
         ClassMetadata classMetadata = environment.getMetadataRepository().loadClassMetadata(
                 originalClazz.getClassLoader(), originalClazz.getName());
 

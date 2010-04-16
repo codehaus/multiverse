@@ -6,6 +6,7 @@ import org.multiverse.api.backoff.BackoffPolicy;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.latches.CheapLatch;
 import org.multiverse.api.latches.Latch;
+import org.multiverse.api.latches.StandardLatch;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import static java.lang.String.format;
@@ -87,23 +88,57 @@ public class TransactionLogicDonor {
             int attempt = 0;
             do {
                 try {
-                    attempt++;
-                    execute();
-                    tx.commit();
-                    return;
-                } catch (Retry er) {
-                    if (attempt - 1 < tx.getConfiguration().getMaxRetryCount()) {
-                        try {
-                            waitForChange(tx);
-                        } catch (SpeculativeConfigurationFailure e) {
-                            tx = (AlphaTransaction) transactionFactory.start();
-                            setThreadLocalTransaction(tx);
+                    try {
+                        attempt++;
+                        execute();
+                        tx.commit();
+                        return;
+                    } catch (Retry er) {
+                        if (attempt - 1 < tx.getConfiguration().getMaxRetryCount()) {
+                            Latch latch;
+                            if (tx.getRemainingTimeoutNs() == Long.MAX_VALUE) {
+                                latch = new CheapLatch();
+                            } else {
+                                latch = new StandardLatch();
+                            }
+
+                            tx.registerRetryLatch(latch);
+                            tx.abort();
+
+                            if (tx.getRemainingTimeoutNs() == Long.MAX_VALUE) {
+                                if (tx.getConfiguration().isInterruptible()) {
+                                    latch.await();
+                                } else {
+                                    latch.awaitUninterruptible();
+                                }
+                            } else {
+                                long beginNs = System.nanoTime();
+
+                                boolean timeout;
+                                if (tx.getConfiguration().isInterruptible()) {
+                                    timeout = !latch.tryAwaitNs(tx.getRemainingTimeoutNs());
+                                } else {
+                                    timeout = !latch.tryAwaitNs(tx.getRemainingTimeoutNs());
+                                }
+
+                                long durationNs = beginNs - System.nanoTime();
+                                tx.setRemainingTimeoutNs(tx.getRemainingTimeoutNs() - durationNs);
+
+                                if (timeout) {
+                                    String msg = format("Transaction %s has timed with a total timeout of %s ns",
+                                            tx.getConfiguration().getFamilyName(),
+                                            tx.getConfiguration().getTimeoutNs());
+                                    throw new RetryTimeoutException(msg);
+                                }
+                            }
+
+                            tx.restart();
                         }
                     }
                 } catch (SpeculativeConfigurationFailure tooSmallException) {
-                    //todo
-                    //tx.abort();
+                    AlphaTransaction oldTx = tx;
                     tx = (AlphaTransaction) transactionFactory.start();
+                    tx.setRemainingTimeoutNs(oldTx.getRemainingTimeoutNs());
                     setThreadLocalTransaction(tx);
                 } catch (ControlFlowError throwable) {
                     BackoffPolicy backoffPolicy = tx.getConfiguration().getBackoffPolicy();
@@ -128,16 +163,6 @@ public class TransactionLogicDonor {
     }
 
     // ===================== support methods ===========================
-
-    public static void waitForChange(AlphaTransaction tx) throws InterruptedException {
-        Latch latch = new CheapLatch();
-        tx.registerRetryLatch(latch);
-        if (tx.getConfiguration().isInterruptible()) {
-            latch.await();
-        } else {
-            latch.awaitUninterruptible();
-        }
-    }
 
     public static boolean isActiveTransaction(AlphaTransaction t) {
         return t != null && t.getStatus() == TransactionStatus.active;

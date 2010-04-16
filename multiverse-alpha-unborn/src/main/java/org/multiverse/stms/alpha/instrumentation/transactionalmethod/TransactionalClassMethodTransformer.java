@@ -18,10 +18,10 @@ import org.objectweb.asm.tree.*;
 import org.objectweb.asm.tree.analysis.*;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
 import static org.multiverse.instrumentation.asm.AsmUtils.*;
+import static org.multiverse.stms.alpha.instrumentation.transactionalmethod.TransactionalMethodUtils.toTransactedMethodName;
 import static org.objectweb.asm.Type.*;
 
 /**
@@ -212,17 +212,12 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                 "(I)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
 
         //timeout
-        insnList.add(new LdcInsnNode(transactionMetadata.timeout));
-        insnList.add(new FieldInsnNode(
-                GETSTATIC,
-                Type.getInternalName(TimeUnit.class),
-                transactionMetadata.timeoutTimeUnit.name(),
-                Type.getDescriptor(TimeUnit.class)));
+        insnList.add(new LdcInsnNode(transactionMetadata.timeoutNs));
         insnList.add(new MethodInsnNode(
                 INVOKEINTERFACE,
                 Type.getInternalName(TransactionFactoryBuilder.class),
-                "setTimeout",
-                "(JLjava/util/concurrent/TimeUnit;)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
+                "setTimeoutNs",
+                "(J)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
 
         //now lets build the TransactionFactory
         insnList.add(new MethodInsnNode(
@@ -255,21 +250,26 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                 fixedMethods.add(methodNode);
             } else if (methodMetadata.isAbstract()) {
                 fixedMethods.add(methodNode);
-                fixedMethods.add(createAbstractTransactionMethod(methodNode));
+                fixedMethods.add(createAbstractTransactedMethod(methodNode, true));
+                fixedMethods.add(createAbstractTransactedMethod(methodNode, false));
             } else if (methodMetadata.isStatic()) {
-                fixedMethods.add(createMasterMethod(methodNode));
-                fixedMethods.add(createLogicMethod(methodNode));
+                fixedMethods.add(createTransactionalMethod(methodNode));
+                fixedMethods.add(createTransactedMethod(methodNode, true));
+                fixedMethods.add(createTransactedMethod(methodNode, false));
             } else if (methodMetadata.isConstructor()) {
-                fixedMethods.add(createMasterMethod(methodNode));
-                fixedMethods.add(createLogicConstructor(methodNode));
+                fixedMethods.add(createTransactionalMethod(methodNode));
+                fixedMethods.add(createTransactedConstructor(methodNode));
             } else {
-                fixedMethods.add(createMasterMethod(methodNode));
+                fixedMethods.add(createTransactionalMethod(methodNode));
 
                 if (methodMetadata.getClassMetadata().isRealTransactionalObject()) {
-                    fixedMethods.add(createTranlocalRetrieveMethod(methodNode));
-                    fixedMethods.add(createTranlocalLogicMethod(methodNode));
+                    fixedMethods.add(createRealTransactionalObjectTransactedMethod(methodNode, true));
+                    fixedMethods.add(createRealTransactionalObjectTransactedMethod(methodNode, false));
+                    fixedMethods.add(createRealTransactionalObjectTransactedMethodWithTranlocal(methodNode, true));
+                    fixedMethods.add(createRealTransactionalObjectTransactedMethodWithTranlocal(methodNode, false));
                 } else {
-                    fixedMethods.add(createLogicMethod(methodNode));
+                    fixedMethods.add(createTransactedMethod(methodNode, true));
+                    fixedMethods.add(createTransactedMethod(methodNode, false));
                 }
             }
         }
@@ -277,7 +277,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
         return fixedMethods;
     }
 
-    private MethodNode createLogicConstructor(MethodNode methodNode) {
+    private MethodNode createTransactedConstructor(MethodNode methodNode) {
         CloneMap cloneMap = new CloneMap();
         DebugInfo debugInfo = findDebugInfo(methodNode);
 
@@ -287,12 +287,12 @@ public class TransactionalClassMethodTransformer implements Opcodes {
         MethodNode result = new MethodNode();
         result.name = "<init>";
         result.access = methodNode.access;//todo: synthetic needs to be added
-        result.desc = createTransactionMethodDesc(methodNode.desc);
+        result.desc = createTransactedMethodDesc(methodNode.desc);
         //result.signature = methodNode.signature;
         result.exceptions = methodNode.exceptions;
         result.localVariables = cloneVariableTableForLogicMethod(methodNode, cloneMap, startLabelNode, endLabelNode);
         result.tryCatchBlocks = cloneTryCatchBlocks(methodNode, cloneMap);
-        result.instructions = transformOriginalLogic(methodNode, cloneMap, debugInfo, startLabelNode, endLabelNode);
+        result.instructions = transformOriginalLogic(methodNode, cloneMap, debugInfo, startLabelNode, endLabelNode, false);
 
         int transactionVar = indexOfTransactionVariable(methodNode.name, methodNode.desc);
 
@@ -336,29 +336,29 @@ public class TransactionalClassMethodTransformer implements Opcodes {
      * @param methodNode the MethodNode for the method
      * @return the created abstract version of the method.
      */
-    private MethodNode createAbstractTransactionMethod(MethodNode methodNode) {
+    private MethodNode createAbstractTransactedMethod(MethodNode methodNode, boolean readonly) {
         MethodNode transactionMethod = new MethodNode();
         transactionMethod.access = methodNode.access;//todo: should be made synthetic.
-        transactionMethod.name = methodNode.name;
+        transactionMethod.name = toTransactedMethodName(methodNode.name, readonly);
         transactionMethod.exceptions = methodNode.exceptions;
         //todo: correct signature should be used here
         //transactionMethod.signature = methodNode.signature;
-        transactionMethod.desc = createTransactionMethodDesc(methodNode.desc);
+        transactionMethod.desc = createTransactedMethodDesc(methodNode.desc);
         return transactionMethod;
     }
 
     //forwards the logic to the tranlocal method.
 
-    private MethodNode createTranlocalRetrieveMethod(MethodNode methodNode) {
+    private MethodNode createRealTransactionalObjectTransactedMethod(MethodNode methodNode, boolean readonly) {
         CloneMap cloneMap = new CloneMap();
 
         LabelNode startLabelNode = new LabelNode();
         LabelNode endLabelNode = new LabelNode();
 
         MethodNode result = new MethodNode();
-        result.name = methodNode.name;
+        result.name = toTransactedMethodName(methodNode.name, readonly);
         result.access = methodNode.access;//todo: synthetic needs to be added
-        result.desc = createTransactionMethodDesc(methodNode.desc);
+        result.desc = createTransactedMethodDesc(methodNode.desc);
         //result.signature = methodNode.signature;
         result.exceptions = methodNode.exceptions;
 
@@ -406,7 +406,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
         MethodInsnNode invokeInsn = new MethodInsnNode(
                 getInvokeOpcode(methodNode),
                 classNode.name,
-                methodNode.name,
+                toTransactedMethodName(methodNode.name, readonly),
                 createTranlocalMethodDesc(methodNode.name, methodNode.desc));
         result.instructions.add(invokeInsn);
 
@@ -426,7 +426,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
      * @param methodNode
      * @return
      */
-    private MethodNode createLogicMethod(MethodNode methodNode) {
+    private MethodNode createTransactedMethod(MethodNode methodNode, boolean readonly) {
         CloneMap cloneMap = new CloneMap();
         DebugInfo debugInfo = findDebugInfo(methodNode);
 
@@ -434,9 +434,9 @@ public class TransactionalClassMethodTransformer implements Opcodes {
         LabelNode endLabelNode = new LabelNode();
 
         MethodNode result = new MethodNode();
-        result.name = methodNode.name;
+        result.name = toTransactedMethodName(methodNode.name, readonly);
         result.access = methodNode.access;//todo: synthetic needs to be added
-        result.desc = createTransactionMethodDesc(methodNode.desc);
+        result.desc = createTransactedMethodDesc(methodNode.desc);
         result.signature = methodNode.signature;
         result.exceptions = methodNode.exceptions;
         result.localVariables = cloneVariableTable(methodNode, cloneMap);
@@ -454,7 +454,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
 
         result.tryCatchBlocks = cloneTryCatchBlocks(methodNode, cloneMap);
 
-        result.instructions = transformOriginalLogic(methodNode, cloneMap, debugInfo, startLabelNode, endLabelNode);
+        result.instructions = transformOriginalLogic(methodNode, cloneMap, debugInfo, startLabelNode, endLabelNode, readonly);
         return result;
     }
 
@@ -512,7 +512,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
      * @param methodNode the original MethodNode where the variable table is cloned from.
      * @return the transformed MethodNode.
      */
-    public MethodNode createTranlocalLogicMethod(MethodNode methodNode) {
+    public MethodNode createRealTransactionalObjectTransactedMethodWithTranlocal(MethodNode methodNode, boolean readonly) {
         CloneMap cloneMap = new CloneMap();
         DebugInfo debugInfo = findDebugInfo(methodNode);
 
@@ -520,19 +520,20 @@ public class TransactionalClassMethodTransformer implements Opcodes {
         LabelNode endLabelNode = new LabelNode();
 
         MethodNode result = new MethodNode();
-        result.name = methodNode.name;
+        result.name = toTransactedMethodName(methodNode.name, readonly);
         result.access = methodNode.access;//todo: synthetic needs to be added
         result.desc = createTranlocalMethodDesc(methodNode.name, methodNode.desc);
         //result.signature = methodNode.signature;
         result.exceptions = methodNode.exceptions;
         result.localVariables = cloneVariableTableForLogicMethod(methodNode, cloneMap, startLabelNode, endLabelNode);
         result.tryCatchBlocks = cloneTryCatchBlocks(methodNode, cloneMap);
-        result.instructions = transformOriginalLogic(methodNode, cloneMap, debugInfo, startLabelNode, endLabelNode);
+        result.instructions = transformOriginalLogic(methodNode, cloneMap, debugInfo, startLabelNode, endLabelNode, readonly);
         return result;
     }
 
+
     private InsnList transformOriginalLogic(MethodNode methodNode, CloneMap cloneMap,
-                                            DebugInfo debugInfo, LabelNode startLabelNode, LabelNode endLabelNode) {
+                                            DebugInfo debugInfo, LabelNode startLabelNode, LabelNode endLabelNode, boolean readonly) {
 
         MethodMetadata metadata = classMetadata.getMethodMetadata(methodNode.name, methodNode.desc);
 
@@ -547,18 +548,6 @@ public class TransactionalClassMethodTransformer implements Opcodes {
         } catch (AnalyzerException e) {
             throw new CompileException("failed to create frames for " + classMetadata.getName() + "." + methodNode.name);
         }
-
-
-//        //if (classMetadata.getName().endsWith("PoolExecutor")) {
-//        for (Frame frame : frames) {
-//            if (frame == null) {
-//                System.out.println("null");
-//            } else {
-//                System.out.println(frame.getStackSize());
-//            }
-//        }
-//        //}
-
 
         int transactionVar = indexOfTransactionVariable(methodNode.name, methodNode.desc);
         int tranlocalVar = indexOfTranlocalVariable(methodNode.name, methodNode.desc);
@@ -577,7 +566,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                     }
                     break;
                 case PUTFIELD: {
-                    //TODO: Should be improvied by using frames instead of this
+                    //TODO: Should be improved by using frames instead of this
                     //complexity
 
                     FieldInsnNode originalFieldInsnNode = (FieldInsnNode) originalInsn;
@@ -719,10 +708,11 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                 case INVOKEINTERFACE:
                 case INVOKEVIRTUAL:
                     MethodInsnNode originalMethodInsnNode = (MethodInsnNode) originalInsn;
-                 
+
                     ClassMetadata ownerMetadata = metadataRepository.loadClassMetadata(
                             classLoader, originalMethodInsnNode.owner);
-                    MethodMetadata ownerMethodMetadata = ownerMetadata.getMethodMetadata(originalMethodInsnNode.name, originalMethodInsnNode.desc);
+                    MethodMetadata ownerMethodMetadata = ownerMetadata.getMethodMetadata(
+                            originalMethodInsnNode.name, originalMethodInsnNode.desc);
 
                     boolean optimizeTransactionalMethodCall = optimize
                             && ownerMethodMetadata != null
@@ -765,13 +755,11 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                                 //    System.out.println("  startinsn fieldinsn:" + m.owner + "." + m.name + "" + m.desc);
                             }
                         }
-                        for (AbstractInsnNode o : (Set<AbstractInsnNode>) stackValue.insns) {
-                            //System.out.println("  target instruction: " + o);
-                        }
 
                         boolean fullMonty = classMetadata.isRealTransactionalObject()
                                 && aload0
                                 && !methodNode.name.equals("<init>");
+
                         if (fullMonty) {
                             newInstructions.add(new VarInsnNode(ALOAD, transactionVar));
                             //tranlocal needs to be used here.
@@ -779,8 +767,8 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                             newInstructions.add(new MethodInsnNode(
                                     originalMethodInsnNode.getOpcode(),
                                     originalMethodInsnNode.owner,
-                                    originalMethodInsnNode.name,
-                                    createTranlocalMethodDesc(ownerMetadata, originalMethodInsnNode.name, originalMethodInsnNode.desc)
+                                    toTransactedMethodName(originalMethodInsnNode.name, readonly),
+                                    createTransactedWithTranlocalMethodDesc(ownerMetadata, originalMethodInsnNode.name, originalMethodInsnNode.desc)
                             ));
                             System.out.println("   ---full monty tranlocal method optimization " + classNode.name + "." + methodNode.name);
                         } else {
@@ -788,8 +776,8 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                             newInstructions.add(new MethodInsnNode(
                                     originalMethodInsnNode.getOpcode(),
                                     originalMethodInsnNode.owner,
-                                    originalMethodInsnNode.name,
-                                    createTransactionMethodDesc(originalMethodInsnNode.desc)
+                                    toTransactedMethodName(originalMethodInsnNode.name, readonly),
+                                    createTransactedMethodDesc(originalMethodInsnNode.desc)
                             ));
                             System.out.println("   ---transactional method optimization " + classNode.name + "." + methodNode.name);
                         }
@@ -898,7 +886,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
      * @param originalMethod the original MethodNode.
      * @return the coordinating method.
      */
-    public MethodNode createMasterMethod(MethodNode originalMethod) {
+    public MethodNode createTransactionalMethod(MethodNode originalMethod) {
         MethodNode donorMethodNode = getDonor(originalMethod);
 
         FieldNode txFactoryFieldNode = transactionFactoryFields.get(originalMethod);
@@ -1056,12 +1044,15 @@ public class TransactionalClassMethodTransformer implements Opcodes {
                         //push the transaction on the stack
                         result.instructions.add(new VarInsnNode(ALOAD, transactionVar.index));
 
+                        //todo: readonly stuff and selecting the correct method, atm always the
+                        //update version is called.
+
                         //do the method call
                         MethodInsnNode invokeInsn = new MethodInsnNode(
                                 getInvokeOpcode(originalMethod),
                                 classNode.name,
-                                originalMethod.name,
-                                createTransactionMethodDesc(originalMethod.desc));
+                                toTransactedMethodName(originalMethod.name, false),
+                                createTransactedMethodDesc(originalMethod.desc));
                         result.instructions.add(invokeInsn);
 
                         //deal with the return values
@@ -1211,7 +1202,7 @@ public class TransactionalClassMethodTransformer implements Opcodes {
         return methodMetadata.isStatic() ? sizeOfFormalParameters : sizeOfFormalParameters + 1;
     }
 
-    private String createTransactionMethodDesc(String methodDesc) {
+    private String createTransactedMethodDesc(String methodDesc) {
         return createMethodDescriptorWithRightIntroducedVariable(
                 methodDesc, ALPHA_TRANSACTION_INTERNAL_NAME);
     }
@@ -1224,11 +1215,11 @@ public class TransactionalClassMethodTransformer implements Opcodes {
      * @return
      */
     private String createTranlocalMethodDesc(String methodName, String methodDesc) {
-        return createTranlocalMethodDesc(classMetadata, methodName, methodDesc);
+        return createTransactedWithTranlocalMethodDesc(classMetadata, methodName, methodDesc);
     }
 
 
-    private String createTranlocalMethodDesc(ClassMetadata classMetadata, String methodName, String methodDesc) {
+    private String createTransactedWithTranlocalMethodDesc(ClassMetadata classMetadata, String methodName, String methodDesc) {
         MethodMetadata methodMetadata = classMetadata.getMethodMetadata(methodName, methodDesc);
 
         if (methodMetadata.isStatic() || !methodMetadata.isTransactional()) {

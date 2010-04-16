@@ -22,7 +22,6 @@ public final class AlphaStmUtils {
         return format("%s@%s", object.getClass().getName(), System.identityHashCode(object));
     }
 
-
     /**
      * Gets the TransactionalObject for the provided AlphaTranlocal.
      *

@@ -105,6 +105,16 @@ public final class CheapLatch implements Latch {
     }
 
     @Override
+    public boolean tryAwaitNs(long timeoutNs) throws InterruptedException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean tryAwaitUninterruptibleNs(long timeout) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean isOpen() {
         return isOpen;
     }

@@ -111,5 +111,15 @@ public class DefaultTransactionSelector<K extends TransactionSelectionKey>
         public boolean tryAwaitUninterruptible(long timeout, TimeUnit unit) {
             throw new UnsupportedOperationException();
         }
+
+        @Override
+        public boolean tryAwaitNs(long timeoutNs) throws InterruptedException {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean tryAwaitUninterruptibleNs(long timeout) {
+            throw new UnsupportedOperationException();
+        }
     }
 }

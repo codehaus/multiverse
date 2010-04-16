@@ -74,4 +74,11 @@ public interface TransactionConfiguration {
      */
     boolean isWriteSkewProblemAllowed();
 
+    /**
+     * Returns the total timeout in nanoseconds. Long.MAX_VALUE indicates
+     * that an indefinite wait should be done.
+     *
+     * @return the total remaining timeout.
+     */
+    long getTimeoutNs();
 }

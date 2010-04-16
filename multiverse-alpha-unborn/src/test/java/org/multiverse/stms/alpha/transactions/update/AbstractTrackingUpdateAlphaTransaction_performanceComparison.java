@@ -32,14 +32,8 @@ public class AbstractTrackingUpdateAlphaTransaction_performanceComparison {
         stm = new AlphaStm(stmConfig);
         speculativeConfig = new SpeculativeConfiguration(100);
 
-        config = new UpdateConfiguration(
-                stmConfig.clock,
-                stmConfig.backoffPolicy,
-                stmConfig.commitLockPolicy,
-                null,
-                speculativeConfig,
-                stmConfig.maxRetryCount, true, true, true, true, true, true, true);
-
+        config = new UpdateConfiguration(stmConfig.clock)
+                .withSpeculativeConfiguration(speculativeConfig);
     }
 
     public AlphaTransaction startFixedTransaction(int size) {

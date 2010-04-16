@@ -76,8 +76,6 @@ public interface TransactionalMap<K, V> extends ConcurrentMap<K, V> {
     @TransactionalMethod(readonly = true)
     int hashCode();
 
-    // Query Operations
-
     @Override
     V put(K key, V value);
 

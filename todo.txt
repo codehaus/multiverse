@@ -2,9 +2,25 @@
 todo engine
 ---------------------------------------------------------------
 
+- speculative atomic methods; at the moment only get/set can be made atomic but more complex methods can't.
+So enhance the speculative mechanism and the instrumentation so that methods start with the atomic mode.
+
 - instrumentation
 
+    - figure out which transacted method to call from the transactional method..the ro version
+    or the up version.
+
+    
+
+    - upgrade get-field access to use frames instead of copying/swapping etc
+
+    - upgrade put-field access to use frames instead of copying/swapping etc
+
     - the version in the AlphaInstrumentor needs to be modified by maven instead of manually
+
+    - ProgrammaticLong is not seen as transactional
+
+    - ProgrammaticReference is not seen as transactional
 
     - static compilation
 
@@ -19,24 +35,13 @@ todo engine
 
         - setter should be able to deal with returning old value
 
-        - inlining getter
-
-        - inlining setter
-
         - inlining transaction in transactional getter
 
         - inlining transaction in transactional setter
 
     - cheapen tranlocal access inside methods for the 'this' variable
-
-    - cheapen tranlocal access for the this variable by passing that tranlocal
-    if possible. First step: only needs to be done in methods in the same class
-
     - cheapen tranlocal access for the this variable by passing that tranlocal
     if possible. First step 2: also for other classes.
-
-    - cheapen tranlocal access on this calling transactional methods by directly
-    accessing other tranlocal methods instead of going through the master method.
 
 - back off policy
 
@@ -64,6 +69,8 @@ it has been build using that stm.
 
 - timeout on transaction.
 
+    - tests for instrumentation
+
 - commuting write and open for read; if non automatic read tracking then
 it will not be fixated.
 
@@ -86,6 +93,9 @@ it will not be fixated.
     - public String toString()
 
 - TransactionalLinkedList
+
+    - relaxed/strict maximum capacity.
+        (relaxed does commit and max does check).
 
     - ListIteratorImpl
 
@@ -161,21 +171,6 @@ todo features
 - support for a history in the ProgrammaticReference
 
 - support for a history in the ProgrammaticLong
-
-- optimizations
-
-    - test: the transaction call from another transaction call lifting method optimization
-
-    - test: different situations for the transactionalmethod->transactionalmethod call.
-
-    - GET_FIELD for tranlocal should use the tranlocal field
-
-    - PUT_FIELD for the tranlocal should use the tranlocal field
-
-    - when a loadForWrite is done, a check needs to be done if the current tranlocal is committed. If it is, it
-    should be replaced by the updatable version.
-
-- timeout op de transaction through annotations
 
 - locking
 
@@ -353,3 +348,22 @@ done
 
 - cheapen transactional method by directly accessing other transactional
     methods instead of going through the master method.
+
+- inlining transctional getter when inside transactional method
+
+- inlining transctional setter when inside transactional method
+
+- cheapen tranlocal access on this calling transactional methods by directly
+    accessing other tranlocal methods instead of going through the master method.
+
+- cheapen tranlocal access for the this variable by passing that tranlocal
+    if possible. First step: only needs to be done in methods in the same class
+
+- timeout configuration is now added on the alpha stm (the actual timeout logic
+in the transaction template / donor logic has not been implemented
+
+- test for transaction template
+
+- add timeout logic to donor method
+
+- add timeout logic to transaction template.

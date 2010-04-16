@@ -146,4 +146,15 @@ public final class AlphaProgrammaticLongTranlocal extends AlphaTranlocal impleme
     public void registerLifecycleListener(TransactionLifecycleListener listener) {
         //ignore
     }
+
+    @Override
+    public long getRemainingTimeoutNs() {
+        //ignore
+        return 0;
+    }
+
+    @Override
+    public void setRemainingTimeoutNs(long timeoutNs) {
+        //ignore
+    }
 }

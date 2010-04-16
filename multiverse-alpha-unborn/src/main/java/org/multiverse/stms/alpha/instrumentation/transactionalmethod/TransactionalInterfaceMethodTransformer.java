@@ -56,8 +56,8 @@ public class TransactionalInterfaceMethodTransformer {
 
             //if the method is transactional, a version with introduced transaction argument needs to be added.
             if (methodMetadata.isTransactional()) {
-                MethodNode transactionMethodNode = createInterfaceTransactionMethod(methodNode);
-                methods.add(transactionMethodNode);
+                methods.add(createInterfaceTransactionMethod(methodNode, true));
+                methods.add(createInterfaceTransactionMethod(methodNode, false));
             }
 
             //and the original one should be added as well.
@@ -67,10 +67,10 @@ public class TransactionalInterfaceMethodTransformer {
         return methods;
     }
 
-    private static MethodNode createInterfaceTransactionMethod(MethodNode methodNode) {
+    private static MethodNode createInterfaceTransactionMethod(MethodNode methodNode, boolean readonly) {
         MethodNode transactionMethod = new MethodNode();
         transactionMethod.access = methodNode.access;//todo: should be made synthetic.
-        transactionMethod.name = methodNode.name;
+        transactionMethod.name = TransactionalMethodUtils.toTransactedMethodName(methodNode.name, readonly);
         transactionMethod.exceptions = methodNode.exceptions;
         //todo: better signature should be used here
         //transactionMethod.signature = methodNode.signature;

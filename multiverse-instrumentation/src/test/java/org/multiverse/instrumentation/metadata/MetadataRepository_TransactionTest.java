@@ -3,8 +3,12 @@ package org.multiverse.instrumentation.metadata;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.api.Transaction;
+
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
@@ -206,6 +210,49 @@ public class MetadataRepository_TransactionTest {
 
         @TransactionalMethod
         void defaultValue() {
+        }
+    }
+
+    @Test
+    public void whenTimeout() {
+        ClassMetadata classMetadata = repository.loadClassMetadata(Timeout.class);
+        MethodMetadata explicitValueMethodMetadata = classMetadata.getMethodMetadata("explicitValue", "()V");
+        TransactionMetadata explicitValueTransactionMetadata = explicitValueMethodMetadata.getTransactionalMetadata();
+
+        assertNotNull(explicitValueTransactionMetadata);
+        assertEquals(TimeUnit.HOURS.toNanos(10), explicitValueTransactionMetadata.timeoutNs);
+
+        MethodMetadata defaultValueMethodMetadata = classMetadata.getMethodMetadata("defaultValue", "()V");
+
+        TransactionMetadata defaultValueTransactionMetadata = defaultValueMethodMetadata.getTransactionalMetadata();
+        assertNotNull(defaultValueTransactionMetadata);
+        assertEquals(Long.MAX_VALUE, defaultValueTransactionMetadata.timeoutNs);
+
+        MethodMetadata explicitValueWithoutTimeUnit = classMetadata.getMethodMetadata("explicitValueWithoutTimeUnit", "()V");
+
+        TransactionMetadata explicitValueWithoutTimeUnitTransactionMetadata = explicitValueWithoutTimeUnit.getTransactionalMetadata();
+        assertNotNull(explicitValueWithoutTimeUnitTransactionMetadata);
+        assertEquals(TimeUnit.SECONDS.toNanos(10), explicitValueWithoutTimeUnitTransactionMetadata.timeoutNs);
+    }
+
+    class Timeout {
+        @TransactionalMethod(timeout = 10, timeoutTimeUnit = TimeUnit.HOURS)
+        void explicitValue() {
+            Transaction tx = getThreadLocalTransaction();
+            assertEquals(TimeUnit.HOURS.toNanos(10), tx.getConfiguration().getTimeoutNs());
+        }
+
+        @TransactionalMethod(timeout = 10)
+        void explicitValueWithoutTimeUnit() {
+            Transaction tx = getThreadLocalTransaction();
+            assertEquals(TimeUnit.SECONDS.toNanos(10), tx.getConfiguration().getTimeoutNs());
+        }
+
+
+        @TransactionalMethod
+        void defaultValue() {
+            Transaction tx = getThreadLocalTransaction();
+            assertEquals(Long.MAX_VALUE, tx.getConfiguration().getTimeoutNs());
         }
     }
 }
