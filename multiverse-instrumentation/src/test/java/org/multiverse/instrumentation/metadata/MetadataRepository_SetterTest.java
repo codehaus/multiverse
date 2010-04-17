@@ -2,6 +2,7 @@ package org.multiverse.instrumentation.metadata;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.annotations.TransactionalObject;
 
 import static org.junit.Assert.assertEquals;
 
@@ -116,6 +117,22 @@ public class MetadataRepository_SetterTest {
         int setValueAndReturn(int newValue) {
             this.value = newValue;
             return value;
+        }
+    }
+
+    @Test
+    public void regressionTest() {
+        ClassMetadata classMetadata = repo.loadClassMetadata(RegressionStack.class);
+        MethodMetadata methodMetadata = classMetadata.getMethodMetadata("incSize", "(I)V");
+        assertEquals(MethodType.unknown, methodMetadata.getMethodType());
+    }
+
+    @TransactionalObject
+    class RegressionStack {
+        int size;
+
+        private void incSize(int amount) {
+            size += amount;
         }
     }
 }

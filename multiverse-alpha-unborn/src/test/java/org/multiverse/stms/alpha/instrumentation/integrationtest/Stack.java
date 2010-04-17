@@ -30,23 +30,27 @@ public final class Stack<E> {
         }
 
         head = new Node<E>(head, item);
-        size++;
+        incSize(1);
     }
 
     public E pop() {
-        if (size == 0) {
+        if (size() == 0) {
             retry();
         }
 
-        size--;
+        incSize(-1);
         Node<E> oldHead = head;
         head = oldHead.next;
         return oldHead.value;
     }
 
+    private void incSize(int amount) {
+        size += amount;
+    }
+
     @TransactionalMethod(readonly = true)
     public boolean isEmpty() {
-        return size == 0;
+        return size() == 0;
     }
 
     @TransactionalMethod(readonly = true)

@@ -7,10 +7,9 @@ So enhance the speculative mechanism and the instrumentation so that methods sta
 
 - instrumentation
 
-    - figure out which transacted method to call from the transactional method..the ro version
-    or the up version.
+    - cheapen tranlocal access in readonly transacted method with tranlocal
 
-    
+    - cheapen tranlocal access in update transacted method with tranlocal
 
     - upgrade get-field access to use frames instead of copying/swapping etc
 
@@ -24,8 +23,6 @@ So enhance the speculative mechanism and the instrumentation so that methods sta
 
     - static compilation
 
-        - maven plugin for the compiler
-
         - integration test of the compiler in combination with
         the java agent.
 
@@ -38,10 +35,6 @@ So enhance the speculative mechanism and the instrumentation so that methods sta
         - inlining transaction in transactional getter
 
         - inlining transaction in transactional setter
-
-    - cheapen tranlocal access inside methods for the 'this' variable
-    - cheapen tranlocal access for the this variable by passing that tranlocal
-    if possible. First step 2: also for other classes.
 
 - back off policy
 
@@ -66,10 +59,6 @@ been build using that stm.
 it has been build using that stm.
 
 - interface parameter inheritance.
-
-- timeout on transaction.
-
-    - tests for instrumentation
 
 - commuting write and open for read; if non automatic read tracking then
 it will not be fixated.
@@ -162,6 +151,8 @@ Thread PingPongThread-1 has thrown an exception
 todo features
 ---------------------------------------------------------------
 
+ - maven plugin for the compiler
+
 - if a good transaction is available, it should be reused.
 
 - version should start with 0 again; so all other status should shift one down.
@@ -171,11 +162,6 @@ todo features
 - support for a history in the ProgrammaticReference
 
 - support for a history in the ProgrammaticLong
-
-- locking
-
-    - transaction with only fresh objects doesnt need to increase the version, or
-    lock/unlock.
 
 - profiler
 
@@ -198,12 +184,7 @@ todo features
 
 -   measure avarage locking time with and without this (late wakening).
 
-- bug shaker inbouwen
-
 - work with a debug flag the enables exception reuse generally?
-
-- a transaction that only does no updates but insert instead: does this transactionneed to increase
-the clock?
 
 - history for stale objects
 
@@ -231,9 +212,6 @@ start maintaining history. Increase the history as long as you get loadtoooldver
 - a selector for transactions to make non blocking transaction processing possible, using more transactions
 than threads. Just like non blocking io.
 
-- on instance level control on the length of history; if load fails because no history can be found, \
-increase the length of the history to main and retry the transaction.
-
 - propagation support
 
 - a better way to run the tests of the stm dependant packages in the core package. Atm
@@ -256,23 +234,13 @@ could this old tx be reused?
 stress on the memory bus because of no reads need to be done on the listeners (no
 reads and no writes)/
 
-- profile: number of retries needed for a transaction to complete.
-
 - when a test fails, the report should be stored somewhere so that it won't be lost when
 clean is done.
-
-- instead of having a locked bit, the tranlocal could have access to the transaction. Once committed,
-this reference can be set to null. Can also be used for detecting if a tranlocal can in from a different
-transaction.
 
 - provide as much as possible to point to failures in the byteocode (missing
 parts for example) which class/method it was.. for debugging purposes of course
 
-- a performance test comparing the 'managed ref' approach vs the full blown multiverse approach.
-
 - a performance comparison between 'uninstrumented' code and instrumented code.
-
-- a performance comparison between profiled and unprofiled code.
 
 - statistics about number of loads that could get information from the transaction instead
 of loading from main memory. This is also needed for optimizing bytecode.
@@ -286,27 +254,12 @@ wait/notify.
 all objects loaded by a transaction are a reason to wake up (cause a change happens on them). But
 what if you are only interested in a specific field... this could reduce the stress on the mechanism
 
-- door onderscheid te maken tussen attachednew en loaded, zou je eventueel nog optimalisaties kunnen doen:
-     - op nieuw objecten hoef je geen lock aan te vragen
-     - op nieuw objecten hoef je niet te valideren
-     - op nieuw objecten hoef je geen lock te releasen
-     - op nieuw objecten hoef je je niet druk te maken over retrylisteners
-
 - online pessimistic locking
 
 - bloomfilter
 
-- abort silently
-
 - ipv de cheap latch zou je ook de monitor lock van de transactie kunnen gebruiken.
 Dit scheelt nog een object creatie.
-
-- timeout tijd.. spaarrekening waar je iedere keer vanaf kunt boeken.
-
-- de timeout tijds op de locks zetten
-
-- managed ref annotation: by setting a ref, you don't force an object to an atomic object
-but a normal object using a managed ref.
 
 - shake out concurrency bugs
 
@@ -318,10 +271,6 @@ but a normal object using a managed ref.
 
     - rerun tests with the bug shakers on
 
-- should the locks be released when the write is done, or should the locks be released
-  when the all the writes have been done. Normally this would not be an issue, but there are
-  problems when atomic objects refer to other atomic objects that have not been written. In
-  these cases you could run into a loadexception
 
 ---------------------------------------------------------------
 done
@@ -367,3 +316,11 @@ in the transaction template / donor logic has not been implemented
 - add timeout logic to donor method
 
 - add timeout logic to transaction template.
+
+- figure out which transacted method to call from the transactional method..the ro version
+    or the up version.
+
+- timeout on transaction.
+
+    - tests for instrumentation
+

@@ -22,6 +22,28 @@ import static org.objectweb.asm.Type.*;
 public final class AsmUtils implements Opcodes {
 
 
+    public static void printClassOfTopItem(InsnList instructions) {
+        System.out.println("invoke printClassOfTopItem");
+
+        instructions.add(new MethodInsnNode(
+                INVOKEVIRTUAL,
+                Type.getInternalName(Object.class),
+                "getClass",
+                "()Ljava/lang/Class;"));
+
+
+        instructions.add(new MethodInsnNode(
+                INVOKESTATIC,
+                Type.getInternalName(AsmUtils.class),
+                "printClazz",
+                "(Ljava/lang/Class;)V"
+        ));
+    }
+
+    public static void printClass(Class clazz) {
+        System.out.println("  class on top: " + clazz.getName());
+    }
+
     public static LocalVariableNode findThisVariable(MethodNode methodNode) {
         if (methodNode.localVariables == null) {
             return null;

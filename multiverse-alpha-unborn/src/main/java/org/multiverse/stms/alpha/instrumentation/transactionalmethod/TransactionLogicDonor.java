@@ -23,8 +23,12 @@ import static org.multiverse.api.ThreadLocalTransaction.*;
  */
 public class TransactionLogicDonor {
 
-    public static void execute() {
+    public static void execute___ro() {
     }
+
+    public static void execute___up() {
+    }
+
 
     // =================== for constructors ====================
 
@@ -36,14 +40,14 @@ public class TransactionLogicDonor {
         AlphaTransaction tx = (AlphaTransaction) getThreadLocalTransaction();
 
         if (isActiveTransaction(tx)) {
-            execute();
+            execute___up();
             return;
         }
 
         tx = (AlphaTransaction) transactionFactory.start();
         setThreadLocalTransaction(tx);
         try {
-            execute();
+            execute___ro();
             tx.commit();
             tx = null;
         } catch (Throwable throwable) {
@@ -78,7 +82,11 @@ public class TransactionLogicDonor {
         AlphaTransaction tx = (AlphaTransaction) getThreadLocalTransaction();
 
         if (isActiveTransaction(tx)) {
-            execute();
+            if (tx.getConfiguration().isReadonly()) {
+                execute___ro();
+            } else {
+                execute___up();
+            }
             return;
         }
 
@@ -90,7 +98,12 @@ public class TransactionLogicDonor {
                 try {
                     try {
                         attempt++;
-                        execute();
+                        if (tx.getConfiguration().isReadonly()) {
+                            execute___ro();
+                        } else {
+                            execute___up();
+                        }
+
                         tx.commit();
                         return;
                     } catch (Retry er) {

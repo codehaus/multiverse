@@ -12,12 +12,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.multiverse.instrumentation.asm.AsmUtils.createMethodDescriptorWithRightIntroducedVariable;
+import static org.multiverse.stms.alpha.instrumentation.transactionalmethod.TransactionalMethodUtils.toTransactedMethodName;
 
 /**
  * Responsible for transforming Transactional interfaces.
  * <p/>
- * The transformation is simple, for every method methodname(arg1..argn) an additional method
- * is created: metodname(arg1..argn,AlphaTransaction) is created (also abstract ofcourse).
+ * The transformation is simple, for every method methodname(arg1..argn) 2 additional methods
+ * are created:
+ * <ol>
+ * <li> metodname__ro(arg1..argn,AlphaTransaction) is created</li>
+ * <li>metodname__up(arg1..argn,AlphaTransaction) is created</li>
  * <p/>
  * This last method can be used if a transaction already is available, and instead of going
  * through the original method that does the transaction management, go to the method that
@@ -32,7 +36,8 @@ public class TransactionalInterfaceMethodTransformer {
     private final ClassMetadata classMetadata;
     private final ClassLoader classLoader;
 
-    public TransactionalInterfaceMethodTransformer(ClassLoader classLoader, ClassNode classNode, MetadataRepository metadataRepository) {
+    public TransactionalInterfaceMethodTransformer(ClassLoader classLoader, ClassNode classNode,
+                                                   MetadataRepository metadataRepository) {
         if (classLoader == null || classNode == null) {
             throw new NullPointerException();
         }
@@ -70,7 +75,7 @@ public class TransactionalInterfaceMethodTransformer {
     private static MethodNode createInterfaceTransactionMethod(MethodNode methodNode, boolean readonly) {
         MethodNode transactionMethod = new MethodNode();
         transactionMethod.access = methodNode.access;//todo: should be made synthetic.
-        transactionMethod.name = TransactionalMethodUtils.toTransactedMethodName(methodNode.name, readonly);
+        transactionMethod.name = toTransactedMethodName(methodNode.name, readonly);
         transactionMethod.exceptions = methodNode.exceptions;
         //todo: better signature should be used here
         //transactionMethod.signature = methodNode.signature;

@@ -66,6 +66,8 @@ public abstract class AbstractUpdateAlphaTransaction
     protected final AlphaTranlocal doOpenForRead(AlphaTransactionalObject txObject) {
         AlphaTranlocal opened = findAttached(txObject);
 
+        //System.out.println("opening for read");
+
         if (opened != null) {
             if (opened.isCommuting()) {
                 AlphaTranlocal origin = txObject.___load(getReadVersion());
@@ -93,6 +95,8 @@ public abstract class AbstractUpdateAlphaTransaction
 
     @Override
     protected AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {
+        //System.out.println("opening for write");
+
         AlphaTranlocal attached = findAttached(txObject);
         if (attached == null) {
             attached = doOpenForWritePreviousCommittedAndAttach(txObject);
