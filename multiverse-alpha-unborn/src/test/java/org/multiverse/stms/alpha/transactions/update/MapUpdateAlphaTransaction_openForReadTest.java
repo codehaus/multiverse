@@ -277,6 +277,47 @@ public class MapUpdateAlphaTransaction_openForReadTest {
     }
 
     @Test
+    public void whenAlreadyOpenedForCommutingWriteAndLockedButVersionMatches() {
+        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
+
+        AlphaTransaction tx = startSutTransaction();
+        AlphaTranlocal openedForCommutingWrite = tx.openForCommutingWrite(ref);
+
+        Transaction lockOwner = mock(Transaction.class);
+        ref.___tryLock(lockOwner);
+
+        AlphaTranlocal found = tx.openForRead(ref);
+
+        assertSame(openedForCommutingWrite, found);
+        assertFalse(found.isCommuting());
+        assertFalse(found.isCommitted());
+    }
+
+    @Test
+    public void whenAlreadyOpenedForCommutingWriteAndLockedAndVersionTooOld_thenOldVersionNotFoundReadConflict() {
+        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
+
+        AlphaTransaction tx = startSutTransaction();
+        AlphaTranlocal openedForCommutingWrite = tx.openForCommutingWrite(ref);
+
+        ref.atomicInc(10);
+
+        Transaction lockOwner = mock(Transaction.class);
+        ref.___tryLock(lockOwner);
+
+        long version = stm.getVersion();
+        try {
+            tx.openForRead(ref);
+            fail();
+        } catch (OldVersionNotFoundReadConflict expected) {
+        }
+
+        assertEquals(stm.getVersion(), version);
+        assertIsActive(tx);
+        assertTrue(openedForCommutingWrite.isCommuting());
+    }
+
+    @Test
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm, 0);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();

@@ -6,32 +6,6 @@ todo engine
 
     - getters/setter inliner should do verbose output
 
-- mapupdate: add test to openforwrite on locked but commuting tranlocal
-
-- mapupdate:  add test to openforread on locked but commuting tranlocal
-
-- mapupdate:  add test to openforwrite on version too new but commuting tranlocal
-
-- mapupdate:  add test to openforread on version too new but commuting tranlocal
-
-
-- arrayupdate:  add test to openforwrite on locked but commuting tranlocal
-
-- arrayupdate: add test to openforread on locked but commuting tranlocal
-
-- arrayupdate: add test to openforwrite on version too new but commuting tranlocal
-
-- arrayupdate: add test to openforread on version too new but commuting tranlocal
-
-
-- monoupdate: add test to openforwrite on locked but commuting tranlocal
-
-- monoupdate: add test to openforread on locked but commuting tranlocal
-
-- monoupdate: add test to openforwrite on version too new but commuting tranlocal
-
-- monoupdate: add test to openforread on version too new but commuting tranlocal
-
 - instrumentation
 
     - verbose output in the transactional method transformer needs to output to the Logger
@@ -125,8 +99,6 @@ it will not be fixated.
 todo unclear
 ---------------------------------------------------------------
 
-
-
 - tests that use different transaction size to cause all transaction implementations to be used
 
 - rethink about the or-else. There is no need to create a snapshot, but it can be used for nested transactions.
@@ -141,9 +113,6 @@ todo unclear
 
 - make sure (using bug shaker) that the registration of the listener contains no
 concurrency problem. I think it is possible that there are pending
-
-- class hierarchy of recoverableexceptions is strange (retry and transactiontoosmall are recoverable but don't
-implement this interface)
 
 - debug information for the atomic object is lost somehow:
 org.multiverse.api.exceptions.ReadonlyException
@@ -368,4 +337,30 @@ instructions is that invokevirtual invokes a method based on the class of the ob
 instruction is used to invoke instance initialization methods (§3.9)  as well as private methods and
 methods of a superclass of the current class. so getter/setter inlining also is allowed for
 invokespecial even though the getter/setter is not final
+
+- mapupdate: add test to openforwrite on locked but commuting tranlocal
+
+- mapupdate:  add test to openforread on locked but commuting tranlocal
+
+- mapupdate:  add test to openforwrite on version too new but commuting tranlocal
+
+- mapupdate:  add test to openforread on version too new but commuting tranlocal
+
+
+- arrayupdate:  add test to openforwrite on locked but commuting tranlocal
+
+- arrayupdate: add test to openforread on locked but commuting tranlocal
+
+- arrayupdate: add test to openforwrite on version too new but commuting tranlocal
+
+- arrayupdate: add test to openforread on version too new but commuting tranlocal
+
+
+- monoupdate: add test to openforwrite on locked but commuting tranlocal
+
+- monoupdate: add test to openforread on locked but commuting tranlocal
+
+- monoupdate: add test to openforwrite on version too new but commuting tranlocal
+
+- monoupdate: add test to openforread on version too new but commuting tranlocal
 
