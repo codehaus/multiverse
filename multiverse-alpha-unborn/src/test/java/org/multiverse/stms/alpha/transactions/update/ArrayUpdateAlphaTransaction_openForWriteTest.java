@@ -2,6 +2,7 @@ package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
@@ -188,22 +189,51 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
         assertIsActive(tx);
     }
 
-
     @Test
-    public void whenLocked_thenLockNotFreeReadConflict() {
+    public void whenLockedButExactVersionMatch_thenSuccess() {
         ManualRef ref = new ManualRef(stm);
+        AlphaTranlocal readonly = ref.___load();
 
         AlphaTransaction owner = mock(AlphaTransaction.class);
         ref.___tryLock(owner);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = startSutTransaction(100);
+
+        AlphaTranlocal tranlocal = tx.openForWrite(ref);
+
+        assertIsActive(tx);
+        assertSame(readonly, tranlocal.getOrigin());
+        assertFalse(tranlocal.isCommitted());
+    }
+
+    @Test
+    public void whenLockedAndVersionTooOld_thenOldVersionNotFoundReadConflict() {
+        ManualRef ref = new ManualRef(stm, 1);
+
+        //start the transaction to sets its readversion
+        AlphaTransaction tx = startSutTransaction(100);
+
+        //do an atomic and conflicting update
+        ref.set(stm, 10);
+
+        ManualRefTranlocal expectedTranlocal = (ManualRefTranlocal) ref.___load();
+
+        //lock it
+        Transaction owner = mock(Transaction.class);
+        ref.___tryLock(owner);
+
+        //try to load it, it should fail because the version stored is newer than the
+        //readversion is the transaction allows.
+        long version = stm.getVersion();
         try {
             tx.openForWrite(ref);
             fail();
-        } catch (LockNotFreeReadConflict expected) {
+        } catch (OldVersionNotFoundReadConflict ex) {
         }
 
         assertIsActive(tx);
+        assertEquals(version, stm.getVersion());
+        assertEquals(expectedTranlocal, ref.___load());
     }
 
     @Test

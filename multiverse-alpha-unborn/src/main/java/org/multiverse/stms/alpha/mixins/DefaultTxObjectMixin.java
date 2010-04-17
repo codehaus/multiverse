@@ -53,10 +53,6 @@ public abstract class DefaultTxObjectMixin implements AlphaTransactionalObject, 
 
     @Override
     public AlphaTranlocal ___load(long readVersion) {
-        if (___LOCKOWNER_UPDATER.get(this) != null) {
-            throw LockNotFreeReadConflict.INSTANCE;
-        }
-
         AlphaTranlocal tranlocalTime1 = ___TRANLOCAL_UPDATER.get(this);
 
         if (tranlocalTime1 == null) {

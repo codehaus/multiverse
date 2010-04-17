@@ -61,7 +61,7 @@ public final class MultiverseJavaAgent {
             compiler.setDumpDirectory(dumpDirectory);
         }
 
-        System.out.println("Multiverse: Javaaagent can't do code optimizations (");
+        System.out.println("Multiverse: Javaaagent won't apply code optimizations (see compiletime instrumentation)");
 
         return compiler;
     }

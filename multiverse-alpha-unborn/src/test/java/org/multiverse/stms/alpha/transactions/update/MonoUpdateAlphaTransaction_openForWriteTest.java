@@ -2,6 +2,7 @@ package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
@@ -99,20 +100,49 @@ public class MonoUpdateAlphaTransaction_openForWriteTest {
     }
 
     @Test
-    public void whenLocked_thenLockNotFreeReadConflict() {
-        ManualRef ref = new ManualRef(stm);
-        AlphaTransaction lockOwner = mock(AlphaTransaction.class);
-        ref.___tryLock(lockOwner);
+    public void whenLockedAndVersionTooOld_thenOldVersionNotFoundReadConflict() {
+        ManualRef ref = new ManualRef(stm, 1);
 
+        //start the transaction to sets its readversion
         AlphaTransaction tx = startSutTransaction();
+
+        //do an atomic and conflicting update
+        ref.set(stm, 10);
+
+        ManualRefTranlocal expectedTranlocal = (ManualRefTranlocal) ref.___load();
+
+        //lock it
+        Transaction owner = mock(Transaction.class);
+        ref.___tryLock(owner);
+
+        //try to load it, it should fail because the version stored is newer than the
+        //readversion is the transaction allows.
+        long version = stm.getVersion();
         try {
             tx.openForWrite(ref);
             fail();
-        } catch (LockNotFreeReadConflict ex) {
+        } catch (OldVersionNotFoundReadConflict ex) {
         }
 
         assertIsActive(tx);
-        assertNull(getField(tx, "attached"));
+        assertEquals(version, stm.getVersion());
+        assertEquals(expectedTranlocal, ref.___load());
+    }
+
+    @Test
+    public void whenReadConflict_thenOldVersionNotFoundReadConflict() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction tx = startSutTransaction();
+        //conflicting write
+        ref.inc(stm);
+        try {
+            tx.openForWrite(ref);
+            fail();
+        } catch (OldVersionNotFoundReadConflict expected) {
+        }
+
+        assertIsActive(tx);
     }
 
     @Test

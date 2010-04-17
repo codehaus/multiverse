@@ -163,53 +163,50 @@ public class DefaultTxObjectMixinTest {
 
     @Test
     public void loadWithVersion_whileLockedFailsIfCommittedVersionEqualToReadVersion() {
-        IntRef intValue = new IntRef(0);
+        IntRef ref = new IntRef(0);
 
         long readVersion = stm.getVersion();
 
         Transaction owner = mock(Transaction.class);
-        IntRefTranlocal old = (IntRefTranlocal) intValue.___load();
-        intValue.___tryLock(owner);
+        IntRefTranlocal readonly = (IntRefTranlocal) ref.___load();
+        ref.___tryLock(owner);
 
-        try {
-            intValue.___load(readVersion);
-            fail();
-        } catch (LockNotFreeReadConflict expected) {
-        }
+        AlphaTranlocal found = ref.___load(readVersion);
 
-        intValue.___releaseLock(owner);
-        assertSame(old, intValue.___load());
+        assertSame(readonly, found);
+        ref.___releaseLock(owner);
+        assertSame(readonly, ref.___load());
     }
 
     @Test
     public void loadWithVersion_whileLockedFailsIfTheCommittedVersionIsOlderThanReadVersion() {
-        IntRef intValue = new IntRef(0);
+        IntRef ref = new IntRef(0);
 
         Transaction owner = mock(Transaction.class);
-        intValue.___tryLock(owner);
+        ref.___tryLock(owner);
 
         long readVersion = stm.getVersion() + 1;
 
         try {
-            intValue.___load(readVersion);
+            ref.___load(readVersion);
             fail();
         } catch (LockNotFreeReadConflict ex) {
         }
     }
 
     @Test
-    public void loadWithVersion_WhileLockedFailsIfTheCommittedVersionIsNewerThanReadVersion() {
-        IntRef intValue = new IntRef(0);
+    public void loadWithVersion_whenLockedFailsIfTheCommittedVersionIsNewerThanReadVersion() {
+        IntRef ref = new IntRef(0);
         long readVersion = stm.getVersion();
-        intValue.inc();
+        ref.inc();
 
         Transaction owner = mock(Transaction.class);
-        intValue.___tryLock(owner);
+        ref.___tryLock(owner);
 
         try {
-            intValue.___load(readVersion);
+            ref.___load(readVersion);
             fail();
-        } catch (LockNotFreeReadConflict ex) {
+        } catch (OldVersionNotFoundReadConflict ex) {
         }
     }
 

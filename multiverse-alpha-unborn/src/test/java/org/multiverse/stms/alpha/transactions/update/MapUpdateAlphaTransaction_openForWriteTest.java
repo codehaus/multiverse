@@ -78,26 +78,49 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
         ref.assertNoLockAcquired();
     }
 
-    /**
-     * In the previous version multiverse, it was allowed to do a load of an atomicobject that was locked even the
-     * version of the current content matches the version of the transaction. If the atomicobject didn't have any
-     * primitives to other objects, this should be alright. But if an object does have dependencies, these dependencies
-     * could escape before they are committed. For now this has been disallowed.
-     */
     @Test
-    public void whenLockedAndEqualVersion_thenLockNotFreeReadConflict() {
-        ManualRef ref = new ManualRef(stm, 0);
+    public void whenLockedAndVersionTooOld_thenOldVersionNotFoundReadConflict() {
+        ManualRef ref = new ManualRef(stm, 1);
+
+        //start the transaction to sets its readversion
+        AlphaTransaction tx = startSutTransaction();
+
+        //do an atomic and conflicting update
+        ref.set(stm, 10);
+
+        ManualRefTranlocal expectedTranlocal = (ManualRefTranlocal) ref.___load();
+
+        //lock it
         Transaction owner = mock(Transaction.class);
         ref.___tryLock(owner);
 
-        AlphaTransaction tx = startSutTransaction();
+        //try to load it, it should fail because the version stored is newer than the
+        //readversion is the transaction allows.
+        long version = stm.getVersion();
         try {
             tx.openForWrite(ref);
             fail();
-        } catch (LockNotFreeReadConflict expected) {
+        } catch (OldVersionNotFoundReadConflict ex) {
         }
 
-        assertSame(owner, ref.___getLockOwner());
+        assertIsActive(tx);
+        assertEquals(version, stm.getVersion());
+        assertEquals(expectedTranlocal, ref.___load());
+    }
+
+    @Test
+    public void whenReadConflict_thenOldVersionNotFoundReadConflict() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction tx = startSutTransaction();
+        //conflicting write
+        ref.inc(stm);
+        try {
+            tx.openForWrite(ref);
+            fail();
+        } catch (OldVersionNotFoundReadConflict expected) {
+        }
+
         assertIsActive(tx);
     }
 

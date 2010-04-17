@@ -129,27 +129,51 @@ public class MapUpdateAlphaTransaction_openForReadTest {
         assertIsActive(tx);
     }
 
-    /**
-     * In the previous version multiverse, it was allowed to do a load of an txobject that was locked even the version
-     * of the current content matches the version of the transaction. If the atomicobject didn't have any primitives to
-     * other objects, this should be alright. But if an object does have dependencies, these dependencies could escape
-     * before they are committed. For now this has been disallowed.
-     */
     @Test
-    public void whenLockedAndVersionMatch_thenLockNotFreeReadConflict() {
-        ManualRef ref = new ManualRef(stm, 0);
-        Transaction owner = mock(Transaction.class);
+    public void whenLockedButExactVersionMatch_thenSuccess() {
+        ManualRef ref = new ManualRef(stm);
+        AlphaTranlocal readonly = ref.___load();
+
+        AlphaTransaction owner = mock(AlphaTransaction.class);
         ref.___tryLock(owner);
 
         AlphaTransaction tx = startSutTransaction();
+
+        AlphaTranlocal tranlocal = tx.openForRead(ref);
+
+        assertIsActive(tx);
+        assertSame(readonly, tranlocal);
+    }
+
+
+    @Test
+    public void whenLockedAndVersionTooOld_thenOldVersionNotFoundReadConflict() {
+        ManualRef ref = new ManualRef(stm, 1);
+
+        //start the transaction to sets its readversion
+        AlphaTransaction tx = startSutTransaction();
+
+        //do an atomic and conflicting update
+        ref.set(stm, 10);
+
+        ManualRefTranlocal expectedTranlocal = (ManualRefTranlocal) ref.___load();
+
+        //lock it
+        Transaction owner = mock(Transaction.class);
+        ref.___tryLock(owner);
+
+        //try to load it, it should fail because the version stored is newer than the
+        //readversion is the transaction allows.
+        long version = stm.getVersion();
         try {
-            tx.openForWrite(ref);
+            tx.openForRead(ref);
             fail();
-        } catch (LockNotFreeReadConflict expected) {
+        } catch (OldVersionNotFoundReadConflict ex) {
         }
 
-        assertSame(owner, ref.___getLockOwner());
         assertIsActive(tx);
+        assertEquals(version, stm.getVersion());
+        assertEquals(expectedTranlocal, ref.___load());
     }
 
     @Test

@@ -2,6 +2,7 @@ package org.multiverse.stms.alpha.transactions.update;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.stms.alpha.AlphaStm;
@@ -13,6 +14,7 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.*;
 
 /**
@@ -40,6 +42,19 @@ public class ArrayUpdateAlphaTransaction_openForCommutingWriteTest {
                 .withSpeculativeConfiguration(speculativeConfig);
 
         return new ArrayUpdateAlphaTransaction(config, size);
+    }
+
+    @Test
+    public void whenTransactionalObjectLocked() {
+        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 10);
+
+        AlphaTransaction tx = startSutTransaction(10);
+
+        Transaction lockOwner = mock(Transaction.class);
+        ref.___tryLock(lockOwner);
+
+        AlphaTranlocal loaded = tx.openForCommutingWrite(ref);
+        assertTrue(loaded.isCommuting());
     }
 
     @Test

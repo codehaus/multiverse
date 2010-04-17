@@ -43,6 +43,11 @@ public interface AlphaTransactionalObject extends CommitLock {
      */
     AlphaTranlocal ___openUnconstructed();
 
+    /**
+     * Opens this AlphaTransactionalObject for a commuting operation.
+     *
+     * @return the AlphaTranlocal opened
+     */
     AlphaTranlocal ___openForCommutingOperation();
 
     /**
@@ -54,12 +59,20 @@ public interface AlphaTransactionalObject extends CommitLock {
      *
      * @param tranlocal    the Tranlocal to storeAndReleaseLock.
      * @param writeVersion the version to storeAndReleaseLock the Tranlocal with.
+     * @param releaseLock  is the lock should be released immediately after the write. This
+     *                     functionality is needed for the quickReleaseWriteLocks optimization.
      * @return the Listeners to wake up. Could be null if there are no listeners to wake up.
      */
     Listeners ___storeUpdate(AlphaTranlocal tranlocal, long writeVersion, boolean releaseLock);
 
+    /**
+     * The store that is executed after a transactional object is constructed. Once committed,
+     * the {@link #___storeUpdate(AlphaTranlocal, long, boolean)} needs to be used.
+     *
+     * @param tranlocal    the tranlocal to store.
+     * @param writeVersion the version of the write.
+     */
     void ___storeInitial(AlphaTranlocal tranlocal, long writeVersion);
-
 
     /**
      * Registers a listener for retrying (the condition variable version for STM's). The Latch is a concurrency
