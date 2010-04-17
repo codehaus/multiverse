@@ -47,7 +47,7 @@ public class AlphaProgrammaticLong_getTest {
 
     @Test
     public void whenNoTransactionRunningAndUncommitted_() {
-        AlphaProgrammaticLong ref = AlphaProgrammaticLong.createUncommitted();
+        AlphaProgrammaticLong ref = AlphaProgrammaticLong.createUncommitted(stm);
 
         long version = stm.getVersion();
         long result = ref.get();

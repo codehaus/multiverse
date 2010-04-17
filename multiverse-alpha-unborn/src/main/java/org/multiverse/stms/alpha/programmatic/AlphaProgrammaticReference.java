@@ -3,7 +3,7 @@ package org.multiverse.stms.alpha.programmatic;
 import org.multiverse.api.Listeners;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.clock.PrimitiveClock;
+import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.api.exceptions.UncommittedReadConflict;
 import org.multiverse.api.programmatic.ProgrammaticReference;
 import org.multiverse.stms.alpha.AlphaStm;
@@ -17,7 +17,6 @@ import static java.lang.String.format;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.api.exceptions.LockNotFreeWriteConflict.createFailedToObtainCommitLocksException;
 import static org.multiverse.api.exceptions.UncommittedReadConflict.createUncommittedReadConflict;
 
 /**
@@ -61,6 +60,8 @@ import static org.multiverse.api.exceptions.UncommittedReadConflict.createUncomm
 public final class AlphaProgrammaticReference<E>
         extends DefaultTxObjectMixin implements ProgrammaticReference<E> {
 
+    //should only be used for testing purposes.
+
     public static AlphaProgrammaticReference createUncommitted() {
         return new AlphaProgrammaticReference((File) null);
     }
@@ -71,7 +72,7 @@ public final class AlphaProgrammaticReference<E>
             .setAutomaticReadTrackingEnabled(true)
             .build();
 
-    private final PrimitiveClock clock;
+    private final AlphaStm stm;
 
     /**
      * Creates a new Ref with null as value. It has exactly the same {@link #AlphaProgrammaticReference(Object)}
@@ -84,7 +85,7 @@ public final class AlphaProgrammaticReference<E>
     }
 
     private AlphaProgrammaticReference(File file) {
-        this.clock = null;
+        this.stm = null;
     }
 
     /**
@@ -118,20 +119,25 @@ public final class AlphaProgrammaticReference<E>
     }
 
     public AlphaProgrammaticReference(AlphaStm stm, E value) {
-        this.clock = stm.getClock();
-        long writeVersion = clock.getVersion();
+        if (stm == null) {
+            throw new NullPointerException();
+        }
+
+        this.stm = stm;
+        long writeVersion = this.stm.getVersion();
         AlphaProgrammaticReferenceTranlocal<E> tranlocal = new AlphaProgrammaticReferenceTranlocal<E>(this);
         tranlocal.value = value;
         ___storeInitial(tranlocal, writeVersion);
     }
 
     public AlphaProgrammaticReference(Transaction tx, E value) {
-        clock = ((AlphaStm) getGlobalStmInstance()).getClock();
+        //todo: this is not correct.
+        stm = (AlphaStm) getGlobalStmInstance();
 
         AlphaTransaction alphaTx = (AlphaTransaction) tx;
 
         if (tx == null || tx.getStatus().isDead()) {
-            long writeVersion = clock.getVersion();
+            long writeVersion = stm.getVersion();
             AlphaProgrammaticReferenceTranlocal<E> tranlocal = new AlphaProgrammaticReferenceTranlocal<E>(this);
             tranlocal.value = value;
             ___storeInitial(tranlocal, writeVersion);
@@ -292,19 +298,30 @@ public final class AlphaProgrammaticReference<E>
         //creating an additional objects even though we need an instance.
         Transaction lockOwner = newTranlocal;
 
-        //if we couldn't acquire the lock, we are done.
-        if (!___tryLock(lockOwner)) {
-            throw createFailedToObtainCommitLocksException();
-        }
+        lock(lockOwner);
+
 
         AlphaProgrammaticReferenceTranlocal<E> oldTranlocal = (AlphaProgrammaticReferenceTranlocal<E>) ___load();
 
-        long writeVersion = clock.tick();
+        long writeVersion = stm.getClock().tick();
         Listeners listeners = ___storeUpdate(newTranlocal, writeVersion, true);
         if (listeners != null) {
             listeners.openAll();
         }
         return oldTranlocal.value;
+    }
+
+    private void lock(Transaction lockOwner) {
+        //if we couldn't acquire the lock, we are done.
+        for (int attempt = 0; attempt <= stm.getMaxRetryCount(); attempt++) {
+            if (attempt == stm.getMaxRetryCount()) {
+                throw new TooManyRetriesException();
+            } else if (___tryLock(lockOwner)) {
+                return;
+            } else {
+                stm.getBackoffPolicy().delayedUninterruptible(lockOwner, attempt);
+            }
+        }
     }
 
     @Override
@@ -324,12 +341,11 @@ public final class AlphaProgrammaticReference<E>
         }
 
         AlphaProgrammaticReferenceTranlocal updateTranlocal = new AlphaProgrammaticReferenceTranlocal(this);
-        Transaction lockOwner = updateTranlocal;
         updateTranlocal.value = update;
 
-        //if we couldn't acquire the lock, we are done.
+        Transaction lockOwner = updateTranlocal;
         if (!___tryLock(lockOwner)) {
-            throw createFailedToObtainCommitLocksException();
+            return false;
         }
 
         AlphaProgrammaticReferenceTranlocal<E> oldTranlocal = (AlphaProgrammaticReferenceTranlocal<E>) ___load();
@@ -339,7 +355,7 @@ public final class AlphaProgrammaticReference<E>
             return false;
         }
 
-        long writeVersion = clock.tick();
+        long writeVersion = stm.getClock().tick();
         Listeners listeners = ___storeUpdate(updateTranlocal, writeVersion, true);
         if (listeners != null) {
             listeners.openAll();

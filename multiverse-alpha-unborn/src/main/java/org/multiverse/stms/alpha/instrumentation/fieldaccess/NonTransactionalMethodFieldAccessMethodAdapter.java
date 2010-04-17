@@ -25,7 +25,7 @@ import static org.objectweb.asm.Type.getInternalName;
  * <p/>
  * Where the persontranlocal is retrieved from the current transaction.
  */
-public class NonTransactionalMethodFieldAccessMethodAdapter extends MethodAdapter implements Opcodes {
+public final class NonTransactionalMethodFieldAccessMethodAdapter extends MethodAdapter implements Opcodes {
 
     private final MetadataRepository metadataRepository;
     private final ClassLoader classLoader;

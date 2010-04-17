@@ -39,7 +39,7 @@ import static org.multiverse.instrumentation.asm.AsmUtils.*;
  *
  * @author Peter Veentjer
  */
-public class TransactionalObjectTransformer implements Opcodes {
+public final class TransactionalObjectTransformer implements Opcodes {
 
     private final ClassNode classNode;
     private final ClassNode mixinClassNode;

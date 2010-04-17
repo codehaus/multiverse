@@ -13,7 +13,7 @@ import static org.multiverse.instrumentation.asm.AsmUtils.toBytecode;
 /**
  * @author Peter Veentjer
  */
-public class TransactionalMethodInstrumentationPhase extends AbstractInstrumentationPhase {
+public final class TransactionalMethodInstrumentationPhase extends AbstractInstrumentationPhase {
 
     public TransactionalMethodInstrumentationPhase() {
         super("TransactionalMethodInstrumentationPhase");

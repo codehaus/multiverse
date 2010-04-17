@@ -17,7 +17,7 @@ import static org.multiverse.instrumentation.asm.AsmUtils.toBytecode;
  *
  * @author Peter Veentjer
  */
-public class GetterSetterInlineInstrumentationPhase extends AbstractInstrumentationPhase {
+public final class GetterSetterInlineInstrumentationPhase extends AbstractInstrumentationPhase {
 
     public GetterSetterInlineInstrumentationPhase() {
         super("GetterSetterInlineInstrumentationPhase");
@@ -41,7 +41,8 @@ public class GetterSetterInlineInstrumentationPhase extends AbstractInstrumentat
                 originalClassNode,
                 classMetadata,
                 environment.getMetadataRepository(),
-                originalClazz.getClassLoader());
+                originalClazz.getClassLoader(),
+                environment.getLog());
 
         ClassNode transformed = transformer.transform();
         byte[] newBytecode = toBytecode(transformed);

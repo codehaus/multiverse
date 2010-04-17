@@ -7,7 +7,7 @@ package org.multiverse.instrumentation;
  *
  * @author Peter Veentjer
  */
-public interface Log {
+public interface InstrumenterLogger {
 
     void important(String msg, Object... args);
 

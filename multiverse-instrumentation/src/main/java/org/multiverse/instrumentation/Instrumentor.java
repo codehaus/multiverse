@@ -67,13 +67,13 @@ public interface Instrumentor {
     void setDumpDirectory(File dumpDirectory);
 
     /**
-     * Sets the Log this Instrumentor uses to execute log statements on.
+     * Sets the InstrumenterLogger this Instrumentor uses to execute log statements on.
      * <p/>
      * So if you want to have verbose output, just plug in some logger.
      *
      * @param logger
      */
-    void setLog(Log logger);
+    void setLog(InstrumenterLogger logger);
 
     /**
      * Add a pattern that is included. Default everything is included, unless it is explicitly

@@ -25,7 +25,7 @@ public interface Environment {
      *
      * @return true if verbose output should be generated, false otherwise.
      */
-    Log getLog();
+    InstrumenterLogger getLog();
 
     /**
      * Returns the directory where classfiles can be dumped.

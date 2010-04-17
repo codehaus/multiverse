@@ -2,6 +2,4 @@
 /.classpath
 /.project
 /target
-/multiverse-alpha.iml
-/multiverse-alpha.ipr
-/multiverse-alpha.iws
+/*.iml

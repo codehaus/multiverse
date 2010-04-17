@@ -5,7 +5,7 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.multiverse.instrumentation.Clazz;
 import org.multiverse.instrumentation.FileSystemFiler;
 import org.multiverse.instrumentation.Instrumentor;
-import org.multiverse.instrumentation.SystemOutImportantLog;
+import org.multiverse.instrumentation.SystemOutImportantInstrumenterLogger;
 import org.multiverse.instrumentation.asm.AsmUtils;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -59,7 +59,7 @@ public final class MultiverseCompiler {
         }
 
         if (cli.verbose) {
-            instrumentor.setLog(new SystemOutImportantLog());
+            instrumentor.setLog(new SystemOutImportantInstrumenterLogger());
         }
 
         System.out.printf("Multiverse: using org.multiverse.instrumentation.Instrumentor %s version %s\n",

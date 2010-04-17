@@ -59,7 +59,7 @@ public class ArrayUpdateAlphaTransaction_openForCommutingWriteTest {
 
     @Test
     public void whenTransactionalObjectAlreadyOpenedForConstruction() {
-        AlphaProgrammaticLong ref = AlphaProgrammaticLong.createUncommitted();
+        AlphaProgrammaticLong ref = AlphaProgrammaticLong.createUncommitted(stm);
 
         AlphaTransaction tx = startSutTransaction(10);
         AlphaTranlocal openedForConstruction = tx.openForConstruction(ref);

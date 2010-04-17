@@ -21,7 +21,7 @@ public class StandardInstrumentor implements Instrumentor {
     private boolean dumpBytecode;
     private File dumpDir = new File(System.getProperty("java.io.tmpdir"));
 
-    private Log log = new NullLog();
+    private InstrumenterLogger log = new NullInstrumenterLogger();
     private final String stmName;
     private boolean optimize = false;
 
@@ -68,9 +68,9 @@ public class StandardInstrumentor implements Instrumentor {
     }
 
     @Override
-    public void setLog(Log log) {
+    public void setLog(InstrumenterLogger log) {
         if (log == null) {
-            this.log = new NullLog();
+            this.log = new NullInstrumenterLogger();
         } else {
             this.log = log;
         }
@@ -202,7 +202,7 @@ public class StandardInstrumentor implements Instrumentor {
         }
 
         @Override
-        public Log getLog() {
+        public InstrumenterLogger getLog() {
             return log;
         }
 

@@ -53,7 +53,7 @@ public class TransactionLogicDonor {
         } catch (Throwable throwable) {
             tx.abort();
 
-            if (throwable instanceof ControlFlowError) {
+            if (throwable instanceof StmControlFlowError) {
                 throw new ConstructorCantRetryException();
             } else if (throwable instanceof Error) {
                 throw (Error) throwable;
@@ -66,15 +66,36 @@ public class TransactionLogicDonor {
     }
 
     // ============ for transactional getters and setters ================
+/*
+    public <E> E donorGet() {
+        Transaction tx = getThreadLocalTransaction();
 
-    public static int donorGetter() {
-        return 0;
+        if (tx == null || tx.getStatus().isDead()) {
+            return atomicGet();
+        }
+
+        return donorGet(tx);
     }
 
-    public static void donorSetter(int value) {
+    public <E> E donorGet(Transaction tx) {
+        if (tx == null) {
+            throw new NullPointerException();
+        }
 
+        AlphaProgrammaticReferenceTranlocal<E> tranlocal = openForRead(tx);
+        return tranlocal.value;
     }
 
+    public <E> E atomicGet() {
+        AlphaProgrammaticReferenceTranlocal<E> tranlocal = (AlphaProgrammaticReferenceTranlocal) ___load();
+
+        if (tranlocal == null) {
+            throw new UncommittedReadConflict();
+        }
+
+        return tranlocal.value;
+    }
+   */
     // ================ for other transactional methods ===============
 
 
@@ -153,7 +174,7 @@ public class TransactionLogicDonor {
                     tx = (AlphaTransaction) transactionFactory.start();
                     tx.setRemainingTimeoutNs(oldTx.getRemainingTimeoutNs());
                     setThreadLocalTransaction(tx);
-                } catch (ControlFlowError throwable) {
+                } catch (StmControlFlowError throwable) {
                     BackoffPolicy backoffPolicy = tx.getConfiguration().getBackoffPolicy();
                     backoffPolicy.delayedUninterruptible(tx, attempt);
                 } finally {

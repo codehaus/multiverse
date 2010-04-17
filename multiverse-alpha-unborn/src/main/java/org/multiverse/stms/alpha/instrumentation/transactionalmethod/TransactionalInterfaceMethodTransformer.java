@@ -29,7 +29,7 @@ import static org.multiverse.stms.alpha.instrumentation.transactionalmethod.Tran
  *
  * @author Peter Veentjer.
  */
-public class TransactionalInterfaceMethodTransformer {
+public final class TransactionalInterfaceMethodTransformer {
 
     private final ClassNode classNode;
     private final MetadataRepository metadataRepository;

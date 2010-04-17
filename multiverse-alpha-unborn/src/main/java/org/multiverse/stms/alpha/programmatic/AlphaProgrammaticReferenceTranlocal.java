@@ -19,7 +19,7 @@ import org.multiverse.utils.TodoException;
  */
 public final class AlphaProgrammaticReferenceTranlocal<E> extends AlphaTranlocal implements Transaction {
 
-    E value;
+    public E value;
 
     public AlphaProgrammaticReferenceTranlocal(AlphaProgrammaticReferenceTranlocal<E> origin) {
         this.___origin = origin;

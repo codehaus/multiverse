@@ -7,7 +7,7 @@ package org.multiverse.api.exceptions;
  *
  * @author Peter Veentjer
  */
-public class WriteConflict extends ControlFlowError {
+public class WriteConflict extends StmControlFlowError {
 
     private static final long serialVersionUID = 0;
 

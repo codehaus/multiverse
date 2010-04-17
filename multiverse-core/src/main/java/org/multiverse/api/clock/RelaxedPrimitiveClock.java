@@ -42,6 +42,7 @@ public final class RelaxedPrimitiveClock implements PrimitiveClock {
     @Override
     public long tick() {
         long oldTime = clock.get();
+
         //it doesn't matter if we increase it, or if someone else increases it.
         //so just try to set it the oldTime is still set.
         clock.compareAndSet(oldTime, oldTime + 1);

@@ -1,17 +1,18 @@
 package org.multiverse.instrumentation;
 
 /**
- * The NullLog is a Log that doesn't do anything. It is useful if you don't want to have logging.
- *
  * @author Peter Veentjer
  */
-public class NullLog implements Log {
+public class SystemOutImportantInstrumenterLogger implements InstrumenterLogger {
+
 
     @Override
     public void important(String msg, Object... args) {
+        System.out.printf(msg + "\n", args);
     }
 
     @Override
     public void lessImportant(String msg, Object... args) {
+        //    System.out.printf(msg + "\n", args);
     }
 }

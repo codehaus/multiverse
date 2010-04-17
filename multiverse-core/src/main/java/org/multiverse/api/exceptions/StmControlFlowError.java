@@ -16,20 +16,20 @@ package org.multiverse.api.exceptions;
  *
  * @author Peter Veentjer
  */
-public class ControlFlowError extends Error {
+public class StmControlFlowError extends Error {
 
-    public ControlFlowError() {
+    public StmControlFlowError() {
     }
 
-    public ControlFlowError(Throwable cause) {
+    public StmControlFlowError(Throwable cause) {
         super(cause);
     }
 
-    public ControlFlowError(String message) {
+    public StmControlFlowError(String message) {
         super(message);
     }
 
-    public ControlFlowError(String message, Throwable cause) {
+    public StmControlFlowError(String message, Throwable cause) {
         super(message, cause);
     }
 }

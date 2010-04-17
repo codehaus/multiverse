@@ -25,7 +25,7 @@ import static org.objectweb.asm.Type.getInternalName;
  *
  * @author Peter Veentjer
  */
-public class TranlocalSnapshotFactory implements Opcodes {
+public final class TranlocalSnapshotFactory implements Opcodes {
 
     private final ClassNode classNode;
     private final String tranlocalName;

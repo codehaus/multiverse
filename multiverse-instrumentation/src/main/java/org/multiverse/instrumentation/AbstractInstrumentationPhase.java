@@ -23,7 +23,7 @@ public abstract class AbstractInstrumentationPhase implements InstrumentationPha
 
     @Override
     public Clazz instrument(Environment environment, Clazz originalClazz) {
-        Log log = environment.getLog();
+        InstrumenterLogger log = environment.getLog();
 
         log.lessImportant("   Multiverse: %s: instrumenting class %s", name, originalClazz.getName());
 

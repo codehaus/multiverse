@@ -49,8 +49,8 @@ public interface ProgrammaticReference<E> {
      * @return the current value stored in this reference.
      * @throws IllegalThreadStateException if the current transaction isn't in the right state
      *                                     for this operation.
-     * @throws org.multiverse.api.exceptions.ReadConflict
-     *                                     if something fails while loading the reference.
+     * @throws org.multiverse.api.exceptions.StmControlFlowError
+     *
      */
     E get();
 
@@ -63,8 +63,8 @@ public interface ProgrammaticReference<E> {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not
      *                              in the correct state for this operation.
-     * @throws org.multiverse.api.exceptions.ReadConflict
-     *                              if something fails while loading the reference.
+     * @throws org.multiverse.api.exceptions.StmControlFlowError
+     *
      */
     E get(Transaction tx);
 
@@ -125,7 +125,8 @@ public interface ProgrammaticReference<E> {
     /**
      * Sets the new value on this ProgrammaticReference using its own transaction (so it doesn't
      * look at an existing transaction). This call is very fast (11M transactions/second
-     * on my machine with a single thread.
+     * on my machine with a single thread.  It could be that this called is delayed because it
+     * is retried. If you want to fail immediately, check the {@link #atomicCompareAndSet(Object, Object)}
      *
      * @param newValue the new value.
      * @return the old value.
@@ -138,6 +139,12 @@ public interface ProgrammaticReference<E> {
 
     // ======================= compareAndSet ========================
 
+
+    /**
+     * @param newValue
+     * @param update
+     * @return
+     */
     boolean atomicCompareAndSet(E newValue, E update);
 
     // ======================= isNull ========================

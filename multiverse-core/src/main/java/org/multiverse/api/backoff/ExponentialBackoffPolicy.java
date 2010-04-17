@@ -28,7 +28,7 @@ public class ExponentialBackoffPolicy implements BackoffPolicy {
      * delay.
      */
     public ExponentialBackoffPolicy() {
-        this(1000, MILLISECONDS.toNanos(10), TimeUnit.NANOSECONDS);
+        this(10, MILLISECONDS.toNanos(10), TimeUnit.NANOSECONDS);
     }
 
     /**
@@ -71,13 +71,36 @@ public class ExponentialBackoffPolicy implements BackoffPolicy {
         delayedUninterruptible(t, attempt);
     }
 
+
+//    public final AtomicLong smallest = new AtomicLong(Long.MAX_VALUE);
+
     @Override
     public void delayedUninterruptible(Transaction t, int attempt) {
         long delayNs = calcDelayNs(attempt);
-        parkNanos(delayNs);
+
+        long delay = System.nanoTime();
+
+        if (delayNs > 1000) {
+            parkNanos(delayNs);
+        }
+
+//        long found = System.nanoTime() - delay;
+//        if (found < smallest.get()) {
+//            smallest.set(found);
+        //           System.out.println("smallest delay: " + found + "desired delay: " + delayNs);
+//        }
     }
 
+    //public final AtomicLong maxAttempt = new AtomicLong();
+    //public final AtomicLong maxDelay = new AtomicLong();
+
     protected long calcDelayNs(int attempt) {
+
+        //    if(attempt>maxAttempt.get()){
+        //        maxAttempt.set(attempt);
+        //        System.out.println("maxAttempt: " + attempt);
+        //    }
+
         long delayNs;
         if (attempt <= 0) {
             delayNs = 0;
@@ -94,6 +117,11 @@ public class ExponentialBackoffPolicy implements BackoffPolicy {
         if (maxDelayNs > 0 && delayNs > maxDelayNs) {
             delayNs = maxDelayNs;
         }
+
+        //    if (maxDelay.get() < delayNs) {
+        //        maxDelay.set(delayNs);
+        //        System.out.println("delayNs: " + delayNs);
+        //    }
 
         return delayNs;
     }

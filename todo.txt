@@ -2,9 +2,11 @@
 todo engine
 ---------------------------------------------------------------
 
-- getter/setter optimization
+- back off policy
 
-    - getters/setter inliner should do verbose output
+    - back off policy needs to be used when a load is done and the value is locked
+
+    - integration test forthe alphaprogrammaticreference and atomic methods
 
 - instrumentation
 
@@ -38,17 +40,9 @@ todo engine
 
         - inlining transaction in transactional setter
 
-- back off policy
-
-    - AlphaProgrammaticLong.atomic methods should use the backoff policy
-
-    - AlphaProgrammaticReference should use backoff policy
-
-    - back off policy needs to be used when a load is done and the value is locked
-
 - AlphaProgrammaticLong.atomic method should use the LockPolicy to do locking
 
-- threadsafety of the java agent fucntionality; classes can be created by different
+- thread safety of the java agent functionality; classes can be created by different
 threads, so the whole mechanism should be made thread safe.
 
 - AlphaProgrammaticLong should use the stm for all its operations once it has
@@ -94,6 +88,10 @@ it will not be fixated.
 - JRuby integration
 
 - Groovy Integration
+
+- getter/setter optimization
+
+    - getters/setter inliner should do verbose output
 
 ---------------------------------------------------------------
 todo unclear
@@ -364,3 +362,10 @@ invokespecial even though the getter/setter is not final
 
 - monoupdate: add test to openforread on version too new but commuting tranlocal
 
+- AlphaProgrammaticLong.atomic methods should use the backoff policy
+
+- AlphaProgrammaticReference should use backoff policy
+
+ - integration test for the alphaprogrammatic long and atomic methods
+
+   

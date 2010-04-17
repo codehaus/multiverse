@@ -4,7 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.LockNotFreeWriteConflict;
+import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.api.exceptions.UncommittedReadConflict;
 import org.multiverse.api.latches.CheapLatch;
 import org.multiverse.api.latches.Latch;
@@ -63,7 +63,7 @@ public class AlphaProgrammaticLong_setTest {
 
     @Test
     public void whenNotCommittedBefore_thenUncommittedReadConflict() {
-        AlphaProgrammaticLong ref = AlphaProgrammaticLong.createUncommitted();
+        AlphaProgrammaticLong ref = AlphaProgrammaticLong.createUncommitted(stm);
 
         long version = stm.getVersion();
         try {
@@ -90,7 +90,7 @@ public class AlphaProgrammaticLong_setTest {
     }
 
     @Test
-    public void whenLocked_thenLockNotFreeWriteConflict() {
+    public void whenLocked_thenTooManyRetriesException() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 10);
         AlphaProgrammaticLongTranlocal committed = (AlphaProgrammaticLongTranlocal) ref.___load();
 
@@ -101,7 +101,7 @@ public class AlphaProgrammaticLong_setTest {
         try {
             ref.set(20);
             fail();
-        } catch (LockNotFreeWriteConflict expected) {
+        } catch (TooManyRetriesException expected) {
         }
 
         assertSame(lockOwner, ref.___getLockOwner());

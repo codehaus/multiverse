@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Transforms TransactionalObjects so that access to fields in non transactional method is transformed
  */
-public class NonTransactionalMethodFieldAccessTransformer implements Opcodes {
+public final class NonTransactionalMethodFieldAccessTransformer implements Opcodes {
 
     private final ClassNode classNode;
     private final MetadataRepository metadataRepository;

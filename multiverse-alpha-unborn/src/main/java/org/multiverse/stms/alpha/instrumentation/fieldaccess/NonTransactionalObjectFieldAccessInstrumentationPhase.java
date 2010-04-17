@@ -11,7 +11,7 @@ import static org.multiverse.instrumentation.asm.AsmUtils.toBytecode;
 /**
  * @author Peter Veentjer
  */
-public class NonTransactionalObjectFieldAccessInstrumentationPhase
+public final class NonTransactionalObjectFieldAccessInstrumentationPhase
         extends AbstractInstrumentationPhase {
 
     public NonTransactionalObjectFieldAccessInstrumentationPhase() {

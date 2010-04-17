@@ -1,9 +1,8 @@
 package org.multiverse.stms.alpha.programmatic;
 
 import org.multiverse.api.Listeners;
-import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.clock.PrimitiveClock;
+import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.api.programmatic.ProgrammaticLong;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -14,7 +13,6 @@ import java.io.File;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.api.exceptions.LockNotFreeWriteConflict.createFailedToObtainCommitLocksException;
 import static org.multiverse.api.exceptions.UncommittedReadConflict.createUncommittedReadConflict;
 
 /**
@@ -25,19 +23,22 @@ import static org.multiverse.api.exceptions.UncommittedReadConflict.createUncomm
 public final class AlphaProgrammaticLong
         extends DefaultTxObjectMixin implements ProgrammaticLong {
 
-    private final PrimitiveClock clock;
+    private final AlphaStm stm;
 
-    public static AlphaProgrammaticLong createUncommitted() {
-        return new AlphaProgrammaticLong((File) null);
+    //should only be used for testing purposes.
+
+    public static AlphaProgrammaticLong createUncommitted(AlphaStm stm) {
+        return new AlphaProgrammaticLong(stm, (File) null);
     }
 
     public AlphaProgrammaticLong(long value) {
-        clock = ((AlphaStm) getGlobalStmInstance()).getClock();
+        stm = (AlphaStm) getGlobalStmInstance();
+
         AlphaTransaction tx = (AlphaTransaction) getThreadLocalTransaction();
         if (tx == null || tx.getStatus().isDead()) {
             AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) ___openUnconstructed();
             tranlocal.value = value;
-            long writeVersion = clock.getVersion();
+            long writeVersion = stm.getVersion();
             ___storeInitial(tranlocal, writeVersion);
         } else {
             AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) tx.openForConstruction(this);
@@ -45,18 +46,22 @@ public final class AlphaProgrammaticLong
         }
     }
 
-    public AlphaProgrammaticLong(Stm stm, long value) {
-        clock = ((AlphaStm) stm).getClock();
+    public AlphaProgrammaticLong(AlphaStm stm, long value) {
+        if (stm == null) {
+            throw new NullPointerException();
+        }
+
+        this.stm = stm;
 
         AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) ___openUnconstructed();
         tranlocal.value = value;
-        long writeVersion = clock.getVersion();
+        long writeVersion = stm.getVersion();
         this.___storeInitial(tranlocal, writeVersion);
     }
 
     public AlphaProgrammaticLong(AlphaTransaction tx, long value) {
         //todo: this is not correct.
-        clock = ((AlphaStm) getGlobalStmInstance()).getClock();
+        this.stm = ((AlphaStm) getGlobalStmInstance());
 
         if (tx == null) {
             throw new NullPointerException();
@@ -66,8 +71,10 @@ public final class AlphaProgrammaticLong
         tranlocal.value = value;
     }
 
-    private AlphaProgrammaticLong(File file) {
-        clock = null;
+    //has a strange argument type to prevent name clashes.
+
+    private AlphaProgrammaticLong(AlphaStm stm, File file) {
+        this.stm = stm;
     }
 
     @Override
@@ -144,15 +151,15 @@ public final class AlphaProgrammaticLong
         //try to acquire the lock
         AlphaProgrammaticLongTranlocal newTranlocal = new AlphaProgrammaticLongTranlocal(
                 this, false);
-        Transaction lockOwner = (Transaction) newTranlocal;
-        if (!___tryLock(lockOwner)) {
-            throw createFailedToObtainCommitLocksException();
-        }
+        Transaction lockOwner = newTranlocal;
+
+        //if we couldn't acquire the lock, we are done.
+        lock(lockOwner);
 
         //lock was acquired successfully, we can now store the changes.
         committed = (AlphaProgrammaticLongTranlocal) ___load();
 
-        long writeVersion = clock.tick();
+        long writeVersion = stm.getClock().tick();
         newTranlocal.value = newValue;
         newTranlocal.prepareForCommit(writeVersion);
         Listeners listeners = ___storeUpdate(newTranlocal, writeVersion, true);
@@ -228,9 +235,8 @@ public final class AlphaProgrammaticLong
         AlphaProgrammaticLongTranlocal updateTranlocal = new AlphaProgrammaticLongTranlocal(
                 this, false);
         Transaction lockOwner = (Transaction) updateTranlocal;
-        if (!___tryLock(lockOwner)) {
-            throw createFailedToObtainCommitLocksException();
-        }
+
+        lock(lockOwner);
 
         AlphaProgrammaticLongTranlocal currentTranlocal = (AlphaProgrammaticLongTranlocal) ___load();
         if (currentTranlocal == null) {
@@ -238,13 +244,26 @@ public final class AlphaProgrammaticLong
             throw createUncommittedReadConflict();
         }
 
-        long writeVersion = clock.tick();
+        long writeVersion = stm.getClock().tick();
         updateTranlocal.value = currentTranlocal.value + amount;
         updateTranlocal.prepareForCommit(writeVersion);
         Listeners listeners = ___storeUpdate(updateTranlocal, writeVersion, true);
 
         if (listeners != null) {
             listeners.openAll();
+        }
+    }
+
+    private void lock(Transaction lockOwner) {
+        //if we couldn't acquire the lock, we are done.
+        for (int attempt = 0; attempt <= stm.getMaxRetryCount(); attempt++) {
+            if (attempt == stm.getMaxRetryCount()) {
+                throw new TooManyRetriesException();
+            } else if (___tryLock(lockOwner)) {
+                return;
+            } else {
+                stm.getBackoffPolicy().delayedUninterruptible(lockOwner, attempt);
+            }
         }
     }
 
@@ -268,7 +287,7 @@ public final class AlphaProgrammaticLong
 
         Transaction lockOwner = (Transaction) updateTranlocal;
         if (!___tryLock(lockOwner)) {
-            throw createFailedToObtainCommitLocksException();
+            return false;
         }
 
         AlphaProgrammaticLongTranlocal current = (AlphaProgrammaticLongTranlocal) ___load();
@@ -278,7 +297,7 @@ public final class AlphaProgrammaticLong
             return false;
         }
 
-        long writeVersion = clock.tick();
+        long writeVersion = stm.getClock().tick();
         updateTranlocal.value = update;
         updateTranlocal.prepareForCommit(writeVersion);
         Listeners listeners = ___storeUpdate(updateTranlocal, writeVersion, true);

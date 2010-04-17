@@ -97,7 +97,7 @@ public interface ProgrammaticLong {
      * @return the old value
      * @throws IllegalThreadStateException
      * @throws NullPointerException        if tx is null
-     * @throws org.multiverse.api.exceptions.ControlFlowError
+     * @throws org.multiverse.api.exceptions.StmControlFlowError
      *
      */
     long set(Transaction tx, long newValue);
@@ -106,7 +106,8 @@ public interface ProgrammaticLong {
      * Sets the new value and completely ignores the Transaction stored in the ThreadLocalTransaction.
      * <p/>
      * It is very likely that this call is very cheap since it doesn't need a full blown
-     * transaction.
+     * transaction, but it could be that multiple retries are attempted and the transaction is
+     * backed (delayed) on failure.
      *
      * @param newValue the new value
      *                 todo: exceptions

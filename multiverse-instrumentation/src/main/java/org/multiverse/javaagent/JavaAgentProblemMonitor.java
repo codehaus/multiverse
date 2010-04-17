@@ -14,7 +14,7 @@ import static java.lang.System.getProperty;
  * if problems are encountered, some kind of warning mechanism needs to be created. That is
  * the task of this JavaAgentProblemMonitor.
  * <p/>
- * What is does is it launches a thread that prints warning messages every X second to the Log.
+ * What is does is it launches a thread that prints warning messages every X second to the InstrumenterLogger.
  * severe when the first problem is signalled.
  * <p/>
  * Class is threadsafe to call.

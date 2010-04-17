@@ -41,7 +41,7 @@ import static org.objectweb.asm.Type.*;
  *
  * @author Peter Veentjer.
  */
-public class TransactionalClassMethodTransformer implements Opcodes {
+public final class TransactionalClassMethodTransformer implements Opcodes {
 
     private static final String ALPHA_TRANSACTION_INTERNAL_NAME = Type.getInternalName(AlphaTransaction.class);
 

@@ -42,7 +42,7 @@ public class AlphaProgrammaticLong_atomicGetTest {
 
     @Test
     public void whenNoCommitExecutedBefore() {
-        AlphaProgrammaticLong ref = AlphaProgrammaticLong.createUncommitted();
+        AlphaProgrammaticLong ref = AlphaProgrammaticLong.createUncommitted(stm);
 
         long version = stm.getVersion();
         long value = ref.atomicGet();

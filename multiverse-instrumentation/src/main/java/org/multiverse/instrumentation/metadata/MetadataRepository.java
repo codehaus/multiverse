@@ -3,7 +3,8 @@ package org.multiverse.instrumentation.metadata;
 import org.multiverse.instrumentation.asm.AsmClassMetadataExtractor;
 import org.objectweb.asm.Type;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * A repository for storing metadata about classes (and interfaces) and their internal structure.
@@ -14,7 +15,7 @@ import java.util.HashMap;
  */
 public final class MetadataRepository {
 
-    private final HashMap<Multikey, ClassMetadata> map = new HashMap<Multikey, ClassMetadata>();
+    private final ConcurrentMap<Multikey, ClassMetadata> map = new ConcurrentHashMap<Multikey, ClassMetadata>();
 
     private final ClassMetadataExtractor extractor;
 
@@ -27,6 +28,7 @@ public final class MetadataRepository {
      *
      * @param extractor the ClassMetadataExtractor used to extra metadata for classes that have not
      *                  been inspected.
+     * @throws NullPointerException if extractor is null.
      */
     public MetadataRepository(ClassMetadataExtractor extractor) {
         if (extractor == null) {
@@ -37,6 +39,12 @@ public final class MetadataRepository {
         this.extractor.init(this);
     }
 
+    /**
+     * Loads the ClassMetadata for the given Clazz.
+     *
+     * @param clazz the Clazz to get the ClassMetadata for.
+     * @return return the loaded ClassMetadata.
+     */
     public ClassMetadata loadClassMetadata(Class clazz) {
         if (clazz == null) {
             throw new NullPointerException();

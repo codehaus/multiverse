@@ -1,5 +1,6 @@
 package org.multiverse.stms.alpha.instrumentation.gettersetter;
 
+import org.multiverse.instrumentation.InstrumenterLogger;
 import org.multiverse.instrumentation.asm.CloneMap;
 import org.multiverse.instrumentation.metadata.ClassMetadata;
 import org.multiverse.instrumentation.metadata.FieldMetadata;
@@ -21,15 +22,17 @@ public final class GetterSetterInlineTransformer implements Opcodes {
     private final ClassMetadata classMetadata;
     private final MetadataRepository metadataRepository;
     private final ClassLoader classLoader;
+    private final InstrumenterLogger logger;
 
     public GetterSetterInlineTransformer(
             ClassNode originalClassNode, ClassMetadata classMetadata,
-            MetadataRepository metadataRepository, ClassLoader classLoader) {
+            MetadataRepository metadataRepository, ClassLoader classLoader, InstrumenterLogger logger) {
 
         this.classLoader = classLoader;
         this.originalClassNode = originalClassNode;
         this.classMetadata = classMetadata;
         this.metadataRepository = metadataRepository;
+        this.logger = logger;
     }
 
     public ClassNode transform() {
@@ -38,6 +41,7 @@ public final class GetterSetterInlineTransformer implements Opcodes {
             MethodNode transformed = transform(originalMethodNode);
             newMethods.add(transformed);
         }
+
         originalClassNode.methods = newMethods;
         return originalClassNode;
     }
@@ -78,17 +82,18 @@ public final class GetterSetterInlineTransformer implements Opcodes {
         MethodMetadata calleeMetadata = ownerMetadata.getMethodMetadata(
                 methodInsnNode.name, methodInsnNode.desc);
 
-        boolean implementationKnown = classMetadata.isFinal() || methodInsnNode.getOpcode() == INVOKESPECIAL;
+        boolean implementationKnown = classMetadata.isFinal()
+                || methodInsnNode.getOpcode() == INVOKESPECIAL;
 
-        FieldMetadata fieldMetadata = calleeMetadata.getGetterSetterField();
+        FieldMetadata fieldMetadata = calleeMetadata == null ? null : calleeMetadata.getGetterSetterField();
 
         if (!ownerMetadata.isTransactionalObject()
                 || calleeMetadata == null
                 || !implementationKnown
+                || fieldMetadata == null
                 || !fieldMetadata.isManagedField()) {
             return methodInsnNode.clone(cloneMap);
         }
-
 
         switch (calleeMetadata.getMethodType()) {
             case getter:

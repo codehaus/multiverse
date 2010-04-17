@@ -12,7 +12,7 @@ import static org.multiverse.instrumentation.asm.AsmUtils.toBytecode;
 /**
  * @author Peter Veentjer
  */
-public class FieldGranularityInstrumentationPhase extends AbstractInstrumentationPhase {
+public final class FieldGranularityInstrumentationPhase extends AbstractInstrumentationPhase {
 
     public FieldGranularityInstrumentationPhase() {
         super("FieldGranularityInstrumentationPhase");

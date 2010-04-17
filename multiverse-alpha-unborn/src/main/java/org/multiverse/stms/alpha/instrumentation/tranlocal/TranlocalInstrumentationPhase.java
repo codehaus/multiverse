@@ -12,7 +12,7 @@ import static org.multiverse.instrumentation.asm.AsmUtils.toBytecode;
 /**
  * @author Peter Veentjer
  */
-public class TranlocalInstrumentationPhase extends AbstractInstrumentationPhase {
+public final class TranlocalInstrumentationPhase extends AbstractInstrumentationPhase {
 
     public TranlocalInstrumentationPhase() {
         super("TranlocalInstrumentationPhase");

@@ -32,7 +32,7 @@ public interface AlphaTransaction extends Transaction {
      *
      * @param transactionalObject the transactional object to getClassMetadata the tranlocal for.
      * @return the opened tranlocal.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
+     * @throws org.multiverse.api.exceptions.StmControlFlowError
      *
      * @throws IllegalThreadStateException if the transaction isn't active.
      */
@@ -58,7 +58,7 @@ public interface AlphaTransaction extends Transaction {
      * @param transactionalObject the transactional object to getClassMetadata the tranlocal for.
      * @return the opened tranlocal.
      * @throws NullPointerException        if transactional object is null.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
+     * @throws org.multiverse.api.exceptions.StmControlFlowError
      *
      * @throws IllegalThreadStateException if the transaction isn't active.
      */
@@ -83,7 +83,7 @@ public interface AlphaTransaction extends Transaction {
      * @param transactionalObject the transactional object to open
      * @return the opened tranlocal.
      * @throws NullPointerException        if transactional object is null.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
+     * @throws org.multiverse.api.exceptions.StmControlFlowError
      *
      * @throws IllegalThreadStateException if the transaction isn't active.
      */
@@ -105,7 +105,7 @@ public interface AlphaTransaction extends Transaction {
      * @param transactionalObject the transactional object to open for construction
      * @return the opened tranlocal.
      * @throws NullPointerException        if transactional object is null.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
+     * @throws org.multiverse.api.exceptions.StmControlFlowError
      *
      * @throws IllegalThreadStateException if the transaction isn't active.
      */

@@ -50,7 +50,7 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
 
     @Test
     public void whenTransactionalObjectAlreadyOpenedForConstruction() {
-        AlphaProgrammaticLong ref = AlphaProgrammaticLong.createUncommitted();
+        AlphaProgrammaticLong ref = AlphaProgrammaticLong.createUncommitted(stm);
 
         AlphaTransaction tx = startSutTransaction();
         AlphaTranlocal openedForConstruction = tx.openForConstruction(ref);

@@ -2,7 +2,7 @@ package org.multiverse.javaagent;
 
 import org.multiverse.MultiverseConstants;
 import org.multiverse.instrumentation.Instrumentor;
-import org.multiverse.instrumentation.SystemOutImportantLog;
+import org.multiverse.instrumentation.SystemOutImportantInstrumenterLogger;
 
 import java.io.File;
 import java.lang.instrument.Instrumentation;
@@ -46,7 +46,7 @@ public final class MultiverseJavaAgent {
 
         boolean verbose = getSystemBooleanProperty("verbose", false);
         if (verbose) {
-            compiler.setLog(new SystemOutImportantLog());
+            compiler.setLog(new SystemOutImportantInstrumenterLogger());
         }
 
         compiler.setFiler(new JavaAgentFiler());

@@ -89,7 +89,7 @@ public class AlphaProgrammaticLong_setWithTransactionTest {
 
     @Test
     public void whenNotCommittedBefore() {
-        AlphaProgrammaticLong ref = AlphaProgrammaticLong.createUncommitted();
+        AlphaProgrammaticLong ref = AlphaProgrammaticLong.createUncommitted(stm);
 
         AlphaTransaction tx = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)

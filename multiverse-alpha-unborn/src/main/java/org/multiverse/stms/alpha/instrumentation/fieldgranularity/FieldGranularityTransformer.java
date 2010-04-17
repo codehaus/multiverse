@@ -16,7 +16,7 @@ import static java.lang.String.format;
 import static org.multiverse.instrumentation.asm.AsmUtils.*;
 import static org.objectweb.asm.Type.getDescriptor;
 
-public class FieldGranularityTransformer implements Opcodes {
+public final class FieldGranularityTransformer implements Opcodes {
 
     private final ClassNode classNode;
     private final ClassMetadata classMetadata;
