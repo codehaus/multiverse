@@ -32,6 +32,10 @@
 
 + performance improvements
 
+    + reading 'locked' structure to increase concurrency. In the previous version when something
+    was locked, the transaction fails, in this version it only fails when it is locked and the
+    version of the tranlocal doesn't match. So improved concurrency
+
     + new transactional datastructures don't need to be locked
 
     + quick releae of locks; instead of waiting for all writes to be done,

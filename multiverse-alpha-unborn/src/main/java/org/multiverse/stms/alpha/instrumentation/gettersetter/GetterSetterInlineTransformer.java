@@ -1,5 +1,6 @@
 package org.multiverse.stms.alpha.instrumentation.gettersetter;
 
+import org.multiverse.instrumentation.asm.CloneMap;
 import org.multiverse.instrumentation.metadata.ClassMetadata;
 import org.multiverse.instrumentation.metadata.FieldMetadata;
 import org.multiverse.instrumentation.metadata.MetadataRepository;
@@ -9,6 +10,8 @@ import org.objectweb.asm.tree.*;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.multiverse.instrumentation.asm.AsmUtils.cloneMethodWithoutInstructions;
 
 /**
  * @author Peter Veentjer
@@ -43,44 +46,63 @@ public final class GetterSetterInlineTransformer implements Opcodes {
         MethodMetadata methodMetadata = classMetadata.getMethodMetadata(
                 originalMethodNode.name, originalMethodNode.desc);
 
-        if (skip(methodMetadata)) {
+        if (skipMethod(methodMetadata)) {
             return originalMethodNode;
         }
+
+        CloneMap cloneMap = new CloneMap();
+        MethodNode result = cloneMethodWithoutInstructions(originalMethodNode, cloneMap);
 
         InsnList newInstructions = new InsnList();
         for (int k = 0; k < originalMethodNode.instructions.size(); k++) {
             AbstractInsnNode originalInsn = originalMethodNode.instructions.get(k);
-            if (originalInsn.getOpcode() == INVOKEVIRTUAL) {
-                newInstructions.add(optimizeInvokeVirtual((MethodInsnNode) originalInsn));
-            } else {
-                newInstructions.add(originalInsn);
+            switch (originalInsn.getOpcode()) {
+                case INVOKEVIRTUAL:
+                case INVOKESPECIAL:
+                    AbstractInsnNode fixedInsn = optimizeInvoke((MethodInsnNode) originalInsn, cloneMap);
+                    newInstructions.add(fixedInsn);
+                    break;
+                default:
+                    newInstructions.add(originalInsn.clone(cloneMap));
+                    break;
             }
         }
 
-        originalMethodNode.instructions = newInstructions;
-        return originalMethodNode;
+        result.instructions = newInstructions;
+        return result;
     }
 
-    private AbstractInsnNode optimizeInvokeVirtual(MethodInsnNode methodInsnNode) {
+    private AbstractInsnNode optimizeInvoke(MethodInsnNode methodInsnNode, CloneMap cloneMap) {
         ClassMetadata ownerMetadata = metadataRepository.loadClassMetadata(classLoader, methodInsnNode.owner);
 
         MethodMetadata calleeMetadata = ownerMetadata.getMethodMetadata(
                 methodInsnNode.name, methodInsnNode.desc);
 
-        if (!ownerMetadata.isTransactionalObject()
-                || calleeMetadata == null
-                || !calleeMetadata.isFinal()) {
-            return methodInsnNode;
-        }
+        boolean implementationKnown = classMetadata.isFinal() || methodInsnNode.getOpcode() == INVOKESPECIAL;
 
         FieldMetadata fieldMetadata = calleeMetadata.getGetterSetterField();
+
+        if (!ownerMetadata.isTransactionalObject()
+                || calleeMetadata == null
+                || !implementationKnown
+                || !fieldMetadata.isManagedField()) {
+            return methodInsnNode.clone(cloneMap);
+        }
+
+
         switch (calleeMetadata.getMethodType()) {
             case getter:
                 return new FieldInsnNode(
-                        GETFIELD, ownerMetadata.getName(), fieldMetadata.getName(), fieldMetadata.getDesc());
+                        GETFIELD,
+                        ownerMetadata.getName(),
+                        fieldMetadata.getName(),
+                        fieldMetadata.getDesc());
             case setter:
                 return new FieldInsnNode(
-                        PUTFIELD, ownerMetadata.getName(), fieldMetadata.getName(), fieldMetadata.getDesc());
+                        PUTFIELD,
+                        ownerMetadata.getName(),
+                        fieldMetadata.getName(),
+                        fieldMetadata.getDesc());
             case unknown:
                 return methodInsnNode;
             default:
@@ -88,7 +110,7 @@ public final class GetterSetterInlineTransformer implements Opcodes {
         }
     }
 
-    private boolean skip(MethodMetadata methodMetadata) {
+    private boolean skipMethod(MethodMetadata methodMetadata) {
         return methodMetadata.isAbstract()
                 || methodMetadata.isNative()
                 || !methodMetadata.isTransactional();

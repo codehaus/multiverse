@@ -13,9 +13,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static java.lang.String.format;
-import static org.multiverse.instrumentation.asm.AsmUtils.firstIndexAfterSuper;
-import static org.multiverse.instrumentation.asm.AsmUtils.isCategory2;
-import static org.objectweb.asm.Type.*;
+import static org.multiverse.instrumentation.asm.AsmUtils.*;
+import static org.objectweb.asm.Type.getDescriptor;
 
 public class FieldGranularityTransformer implements Opcodes {
 
@@ -38,8 +37,30 @@ public class FieldGranularityTransformer implements Opcodes {
     public ClassNode transform() {
         fixFields();
         fixFieldAccessInMethods();
-        addInitializationLogicToConstructors();            
+        addInitializationLogicToConstructors();
         return classNode;
+    }
+
+    private void fixFields() {
+        List<FieldNode> fields = new LinkedList<FieldNode>();
+        for (FieldNode fieldNode : (List<FieldNode>) classNode.fields) {
+            FieldMetadata fieldMetadata = classMetadata.getFieldMetadata(fieldNode.name);
+            if (fieldMetadata.hasFieldGranularity()) {
+                String referenceDesc = findReferenceDesc(fieldNode.desc);
+
+                FieldNode fixedFieldNode = new FieldNode(
+                        ACC_SYNTHETIC + ACC_FINAL + ACC_PUBLIC,
+                        fieldNode.name,
+                        referenceDesc, null, null
+                );
+
+                fields.add(fixedFieldNode);
+            } else {
+                fields.add(fieldNode);
+            }
+        }
+
+        classNode.fields = fields;
     }
 
     private void fixFieldAccessInMethods() {
@@ -60,64 +81,12 @@ public class FieldGranularityTransformer implements Opcodes {
 
     private MethodNode fixMethod(MethodNode originalMethod) {
         CloneMap cloneMap = new CloneMap();
-
-        MethodNode result = new MethodNode();
-        result.name = originalMethod.name;
-        result.access = originalMethod.access;
-        result.desc = originalMethod.desc;
-        result.signature = originalMethod.signature;
-        result.exceptions = originalMethod.exceptions;
-        result.annotationDefault = originalMethod.annotationDefault;
-        result.invisibleParameterAnnotations = originalMethod.invisibleParameterAnnotations;
-        result.visibleParameterAnnotations = originalMethod.visibleParameterAnnotations;
-        result.localVariables = createLocalVariableTable(originalMethod, cloneMap);
-        result.tryCatchBlocks = createTryCatchBlocks(originalMethod, cloneMap);
-        result.instructions = createInstructions(originalMethod, cloneMap);
+        MethodNode result = cloneMethodWithoutInstructions(originalMethod, cloneMap);
+        result.instructions = fixInstructions(originalMethod, cloneMap);
         return result;
     }
 
-    private List<LocalVariableNode> createLocalVariableTable(MethodNode originalMethod, CloneMap cloneMap) {
-        if (originalMethod.localVariables == null) {
-            return null;
-        }
-
-        List<LocalVariableNode> localVariableTable = new LinkedList<LocalVariableNode>();
-        for (LocalVariableNode localVariableNode : (List<LocalVariableNode>) originalMethod.localVariables) {
-
-            LocalVariableNode cloned = new LocalVariableNode(
-                    localVariableNode.name,
-                    localVariableNode.desc,
-                    localVariableNode.signature,
-                    cloneMap.get(localVariableNode.start),
-                    cloneMap.get(localVariableNode.end),
-                    localVariableNode.index
-            );
-            localVariableTable.add(cloned);
-        }
-        return localVariableTable;
-    }
-
-    private List<TryCatchBlockNode> createTryCatchBlocks(MethodNode originalMethod, CloneMap cloneMap) {
-        if (originalMethod.tryCatchBlocks == null) {
-            return null;
-        }
-
-        List<TryCatchBlockNode> tryCatchBlocks = new LinkedList<TryCatchBlockNode>();
-        for (TryCatchBlockNode tryCatchBlockNode : (List<TryCatchBlockNode>) originalMethod.tryCatchBlocks) {
-
-            TryCatchBlockNode cloned = new TryCatchBlockNode(
-                    cloneMap.get(tryCatchBlockNode.start),
-                    cloneMap.get(tryCatchBlockNode.end),
-                    cloneMap.get(tryCatchBlockNode.handler),
-                    tryCatchBlockNode.type
-            );
-
-            tryCatchBlocks.add(cloned);
-        }
-        return tryCatchBlocks;
-    }
-
-    private InsnList createInstructions(MethodNode originalMethod, CloneMap cloneMap) {
+    private InsnList fixInstructions(MethodNode originalMethod, CloneMap cloneMap) {
         InsnList instructions = new InsnList();
 
         for (int k = 0; k < originalMethod.instructions.size(); k++) {
@@ -129,7 +98,7 @@ public class FieldGranularityTransformer implements Opcodes {
                     ClassMetadata ownerMetadata = metadataRepository.loadClassMetadata(classLoader, fieldInsn.owner);
                     FieldMetadata fieldMetadata = ownerMetadata.getFieldMetadata(fieldInsn.name);
                     Type originalFieldType = Type.getType(fieldMetadata.getDesc());
-                                                              
+
                     if (fieldMetadata.hasFieldGranularity()) {
 
                         boolean fieldIsCategory2 = isCategory2(fieldMetadata.getDesc());
@@ -298,28 +267,6 @@ public class FieldGranularityTransformer implements Opcodes {
         }
     }
 
-    private void fixFields() {
-        List<FieldNode> fields = new LinkedList<FieldNode>();
-        for (FieldNode fieldNode : (List<FieldNode>) classNode.fields) {
-            FieldMetadata fieldMetadata = classMetadata.getFieldMetadata(fieldNode.name);
-            if (fieldMetadata.hasFieldGranularity()) {
-                String referenceDesc = findReferenceDesc(fieldNode.desc);
-
-                //todo: should not select public automatically
-                FieldNode fixedFieldNode = new FieldNode(
-                        ACC_SYNTHETIC + ACC_FINAL + ACC_PUBLIC,
-                        fieldNode.name,
-                        referenceDesc, null, null
-                );
-
-                fields.add(fixedFieldNode);
-            } else {
-                fields.add(fieldNode);
-            }
-        }
-
-        classNode.fields = fields;
-    }
 
     /**
      * Returns the reference/primitive class to store the

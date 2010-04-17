@@ -21,6 +21,66 @@ import static org.objectweb.asm.Type.*;
 
 public final class AsmUtils implements Opcodes {
 
+    public static MethodNode cloneMethodWithoutInstructions(MethodNode originalMethod, CloneMap cloneMap) {
+        if (originalMethod == null || cloneMap == null) {
+            throw new NullPointerException();
+        }
+
+        MethodNode result = new MethodNode();
+        result.name = originalMethod.name;
+        result.access = originalMethod.access;
+        result.desc = originalMethod.desc;
+        result.signature = originalMethod.signature;
+        result.exceptions = originalMethod.exceptions;
+        result.annotationDefault = originalMethod.annotationDefault;
+        result.invisibleParameterAnnotations = originalMethod.invisibleParameterAnnotations;
+        result.visibleParameterAnnotations = originalMethod.visibleParameterAnnotations;
+        result.localVariables = cloneLocalVariableTable(originalMethod, cloneMap);
+        result.tryCatchBlocks = cloneTryCatchBlocks(originalMethod, cloneMap);
+        return result;
+    }
+
+    public static List<LocalVariableNode> cloneLocalVariableTable(MethodNode originalMethod, CloneMap cloneMap) {
+        if (originalMethod.localVariables == null) {
+            return null;
+        }
+
+        List<LocalVariableNode> localVariableTable = new LinkedList<LocalVariableNode>();
+        for (LocalVariableNode localVariableNode : (List<LocalVariableNode>) originalMethod.localVariables) {
+
+            LocalVariableNode cloned = new LocalVariableNode(
+                    localVariableNode.name,
+                    localVariableNode.desc,
+                    localVariableNode.signature,
+                    cloneMap.get(localVariableNode.start),
+                    cloneMap.get(localVariableNode.end),
+                    localVariableNode.index
+            );
+            localVariableTable.add(cloned);
+        }
+        return localVariableTable;
+    }
+
+    public static List<TryCatchBlockNode> cloneTryCatchBlocks(MethodNode originalMethod, CloneMap cloneMap) {
+        if (originalMethod.tryCatchBlocks == null) {
+            return null;
+        }
+
+        List<TryCatchBlockNode> tryCatchBlocks = new LinkedList<TryCatchBlockNode>();
+        for (TryCatchBlockNode tryCatchBlockNode : (List<TryCatchBlockNode>) originalMethod.tryCatchBlocks) {
+
+            TryCatchBlockNode cloned = new TryCatchBlockNode(
+                    cloneMap.get(tryCatchBlockNode.start),
+                    cloneMap.get(tryCatchBlockNode.end),
+                    cloneMap.get(tryCatchBlockNode.handler),
+                    tryCatchBlockNode.type
+            );
+
+            tryCatchBlocks.add(cloned);
+        }
+        return tryCatchBlocks;
+    }
+
 
     public static void printClassOfTopItem(InsnList instructions) {
         System.out.println("invoke printClassOfTopItem");
@@ -100,23 +160,6 @@ public final class AsmUtils implements Opcodes {
             );
             result.add(clonedBlock);
         }
-        return result;
-    }
-
-    public static List<TryCatchBlockNode> cloneTryCatchBlocks(MethodNode originalMethod, CloneMap cloneMap) {
-        //clone the try catch blocks
-        List<TryCatchBlockNode> result = new LinkedList<TryCatchBlockNode>();
-
-        for (int k = 0; k < originalMethod.tryCatchBlocks.size(); k++) {
-            TryCatchBlockNode original = (TryCatchBlockNode) originalMethod.tryCatchBlocks.get(k);
-            TryCatchBlockNode cloned = new TryCatchBlockNode(
-                    cloneMap.get(original.start),
-                    cloneMap.get(original.end),
-                    cloneMap.get(original.handler),
-                    original.type);
-            result.add(cloned);
-        }
-
         return result;
     }
 

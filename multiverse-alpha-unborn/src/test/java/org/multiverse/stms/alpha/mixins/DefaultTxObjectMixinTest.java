@@ -66,9 +66,7 @@ public class DefaultTxObjectMixinTest {
         assertEquals(11, tranlocal2.getWriteVersion());
     }
 
-
     // ================= load() ==================================
-
 
     @Test
     public void loadUncommitted() {
@@ -209,7 +207,6 @@ public class DefaultTxObjectMixinTest {
         } catch (OldVersionNotFoundReadConflict ex) {
         }
     }
-
 
     // ================ tryLock ==========================
 
