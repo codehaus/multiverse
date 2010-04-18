@@ -1,0 +1,1 @@
+include 'multiverse-benchy', 'multiverse-core', 'multiverse-instrumentation', 'multiverse-core-tests', 'multiverse-alpha-unborn', 'multiverse-alpha'

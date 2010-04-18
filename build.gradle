@@ -1,0 +1,245 @@
+allprojects {
+  sourceCompatibility = 1.6
+  version = '0.5-SNAPSHOT'
+  group = 'org.multiverse'
+
+  apply plugin: 'java'
+  apply plugin: 'maven'
+  apply plugin: 'project-reports'
+
+  repositories {
+    mavenCentral()
+    mavenRepo(urls: ['http://snapshots.repository.codehaus.org', 'http://download.java.net/maven/2/'])
+  }
+
+
+  def localMavenRepo = 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
+
+  repositories {
+    mavenRepo urls: localMavenRepo
+  }
+
+// only run tests that don't start with 'Abstract' as their class name
+  test {
+    exclude("**/*StressTest*")
+    exclude("**/*PerformanceTest*")
+  }
+
+
+
+  install.dependsOn ':build'
+
+  dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.8.1'
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.8.2'
+  }
+
+//  uploadArchives {
+//    repositories {
+//      flatDir(dirs: file('repos'))
+//    }
+//  }
+
+//jar {
+//        manifest.attributes provider: 'gradle'
+//}
+}
+
+project(':multiverse-benchy') {
+  dependencies {
+    compile group: 'com.google.code.gson', name: 'gson', version: "1.4"
+  }
+}
+
+project(':multiverse-core') {
+
+  configurations {
+    testFixtures {
+      extendsFrom testRuntime
+    }
+  }
+
+  task testJar(type: Jar) {
+    from sourceSets.test.classes
+    classifier = 'test'
+  }
+
+  artifacts {
+    testFixtures testJar
+  }
+}
+
+project(':multiverse-instrumentation') {
+  configurations {
+    testFixtures {
+      extendsFrom testRuntime
+    }
+  }
+
+  task testJar(type: Jar) {
+    from sourceSets.test.classes
+    classifier = 'test'
+  }
+
+  artifacts {
+    testFixtures testJar
+  }
+
+  dependencies {
+    compile project(':multiverse-core')
+    compile group: 'args4j', name: 'args4j', version: "2.0.16"
+    compile group: 'asm', name: 'asm-all', version: "3.2"
+    testCompile project(path: ':multiverse-core', configuration: 'testFixtures')
+  }
+}
+
+project(':multiverse-core-tests') {
+  dependencies {
+    compile project(':multiverse-core')
+    compile project(':multiverse-instrumentation')
+    compile group: 'args4j', name: 'args4j', version: "2.0.16"
+    compile group: 'asm', name: 'asm-all', version: "3.2"
+    testCompile project(path: ':multiverse-core', configuration: 'testFixtures')
+  }
+}
+
+project(':multiverse-alpha-unborn') {
+  jar {
+    manifest {
+      attributes 'Premain-Class': 'org.multiverse.javaagent.MultiverseJavaAgent'
+    }
+  }
+
+  classes.doLast() {
+    println "=============================================================================="
+    println "Creating tmp jar"
+    println "=============================================================================="
+
+    def localRepo = "${gradle.gradleUserHomeDir}/cache/"
+
+    ant.unzip(dest: "${buildDir}/classes/main",
+            src: "${localRepo}/asm/asm-all/jars/asm-all-3.2.jar")
+    ant.unzip(dest: "${buildDir}/classes/main",
+            src: localRepo + 'args4j/args4j/jars/args4j-2.0.16.jar')
+    ant.unzip(dest: "${buildDir}/classes/main",
+            src: new File("${rootProject.projectDir}").absolutePath + "/multiverse-core/build/libs/multiverse-core-${project.version}.jar")
+    ant.unzip(dest: "${buildDir}/classes/main",
+            src: new File("${rootProject.projectDir}").absolutePath + "/multiverse-instrumentation/build/libs/multiverse-instrumentation-${project.version}.jar")
+    ant.delete(dir: "${buildDir}/classes/main/META-INF/")
+    ant.mkdir(dir: "${buildDir}/classes/main/META-INF/")
+    ant.copy(
+            file: "${projectDir}/MANIFEST.MF",
+            todir: "${buildDir}/classes/main/META-INF")
+    ant.zip(
+            basedir: "${buildDir}/classes/main",
+            destfile: "${buildDir}/libs/javaagent.jar") {
+    }
+
+    println "Finished creating tmp jar"
+  }
+
+  dependencies {
+    compile project(':multiverse-core')
+    compile project(':multiverse-instrumentation')
+    compile group: 'args4j', name: 'args4j', version: "2.0.16"
+    compile group: 'asm', name: 'asm-all', version: "3.2"
+    testCompile project(path: ':multiverse-core', configuration: 'testFixtures')
+    testCompile project(path: ':multiverse-instrumentation', configuration: 'testFixtures')
+    testCompile project(':multiverse-benchy')
+  }
+
+  test {
+    jvmArgs = ["-javaagent:${buildDir}/libs/javaagent.jar"]
+  }
+}
+
+project(':multiverse-alpha') {
+
+  def localRepo = "${gradle.gradleUserHomeDir}/cache/"
+  def projectRootDir = new File("${rootProject.projectDir}").absolutePath
+
+  classes.doLast() {
+    println "=============================================================================="
+    println "Enhancing "
+    println "=============================================================================="
+
+    ant.unzip(dest: "${buildDir}/classes/main",
+            src: localRepo + 'asm/asm-all/jars/asm-all-3.2.jar')
+    ant.unzip(dest: "${buildDir}/classes/main",
+            src: localRepo + 'args4j/args4j/jars/args4j-2.0.16.jar')
+    ant.unzip(dest: "${buildDir}/classes/main",
+            src: "${projectRootDir}/multiverse-core/build/libs/multiverse-core-${project.version}.jar")
+    ant.unzip(dest: "${buildDir}/classes/main",
+            src: "${projectRootDir}/multiverse-instrumentation/build/libs/multiverse-instrumentation-${project.version}.jar")
+    ant.unzip(dest: "${buildDir}/classes/main",
+            src: "${projectRootDir}/multiverse-alpha-unborn/build/libs/multiverse-alpha-unborn-${project.version}.jar")
+
+
+    ant.java(classname: "org.multiverse.compiler.MultiverseCompiler") {
+      arg value: '-o'
+      arg value: '-v'
+      arg value: '-d'
+      arg value: 'org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor'
+      arg value: "${buildDir}/classes/main"
+
+      classpath {
+        pathelement(
+                location: "${projectRootDir}/multiverse-core/build/libs/multiverse-core-${project.version}.jar")
+        pathelement(
+                location: "${projectRootDir}/multiverse-instrumentation/build/libs/multiverse-instrumentation-${project.version}.jar")
+        pathelement(
+                location: "${projectRootDir}/multiverse-alpha-unborn/build/libs/multiverse-alpha-unborn-${project.version}.jar")
+        pathelement(
+                location: "${localRepo}/args4j/args4j/jars/args4j-2.0.16.jar")
+        pathelement(
+                location: "${localRepo}/asm/asm-all/jars/asm-all-3.2.jar")
+      }
+    }
+    ant.echo message: "--------------------------------------------------"
+  }
+
+  testClasses.doLast() {
+    println "=============================================================================="
+    println "Extracting the test files"
+    println "=============================================================================="
+
+    ant.mkdir dir: "${buildDir}/classes/test"
+    ant.unzip(
+            dest: "${buildDir}/classes/test",
+            src: new File("${rootProject.projectDir}").absolutePath + "/multiverse-core/build/libs/multiverse-core-${project.version}-test.jar")
+
+    ant.java(classname: "org.multiverse.compiler.MultiverseCompiler") {
+      arg value: '-o'
+      arg value: '-v'
+      arg value: '-d'
+      arg value: 'org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor'
+      arg value: "${buildDir}/classes/test"
+
+      classpath {
+        pathelement(
+                location: "${projectRootDir}/multiverse-core/build/libs/multiverse-core-${project.version}.jar")
+        pathelement(
+                location: "${projectRootDir}/multiverse-instrumentation/build/libs/multiverse-instrumentation-${project.version}.jar")
+        pathelement(
+                location: "${projectRootDir}/multiverse-alpha-unborn/build/libs/multiverse-alpha-unborn-${project.version}.jar")
+        pathelement(
+                location: localRepo + 'args4j/args4j/jars/args4j-2.0.16.jar')
+        pathelement(
+                location: localRepo + 'asm/asm-all/jars/asm-all-3.2.jar')
+      }
+    }
+
+  }
+
+  dependencies {
+    compile project(':multiverse-core')
+    compile project(':multiverse-instrumentation')
+    compile project(':multiverse-alpha-unborn')
+    compile group: 'args4j', name: 'args4j', version: "2.0.16"
+    compile group: 'asm', name: 'asm-all', version: "3.2"
+    testCompile project(path: ':multiverse-core', configuration: 'testFixtures')
+    testCompile project(path: ':multiverse-instrumentation', configuration: 'testFixtures')
+    testCompile project(':multiverse-benchy')
+  }
+
+}
