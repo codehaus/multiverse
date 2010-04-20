@@ -9,9 +9,11 @@ allprojects {
 
   repositories {
     mavenCentral()
-    mavenRepo(urls: ['http://snapshots.repository.codehaus.org', 'http://download.java.net/maven/2/'])
+    mavenRepo(urls: [
+            'http://snapshots.repository.codehaus.org',
+            'http://download.java.net/maven/2/',
+            'https://maven.atlassian.com/content/groups/public'])
   }
-
 
   def localMavenRepo = 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
 
@@ -21,11 +23,10 @@ allprojects {
 
 // only run tests that don't start with 'Abstract' as their class name
   test {
+    exclude("**/*Abstract*")
     exclude("**/*StressTest*")
     exclude("**/*PerformanceTest*")
   }
-
-
 
   install.dependsOn ':build'
 
@@ -33,23 +34,17 @@ allprojects {
     testCompile group: 'junit', name: 'junit', version: '4.8.1'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.8.2'
   }
-
-//  uploadArchives {
-//    repositories {
-//      flatDir(dirs: file('repos'))
-//    }
-//  }
-
-//jar {
-//        manifest.attributes provider: 'gradle'
-//}
 }
+
+// ------------------------------------------------------------------------------------------------------------------
 
 project(':multiverse-benchy') {
   dependencies {
     compile group: 'com.google.code.gson', name: 'gson', version: "1.4"
   }
 }
+
+// ------------------------------------------------------------------------------------------------------------------
 
 project(':multiverse-core') {
 
@@ -67,7 +62,10 @@ project(':multiverse-core') {
   artifacts {
     testFixtures testJar
   }
+
 }
+
+// ------------------------------------------------------------------------------------------------------------------
 
 project(':multiverse-instrumentation') {
   configurations {
@@ -93,6 +91,8 @@ project(':multiverse-instrumentation') {
   }
 }
 
+// ------------------------------------------------------------------------------------------------------------------
+
 project(':multiverse-core-tests') {
   dependencies {
     compile project(':multiverse-core')
@@ -103,6 +103,8 @@ project(':multiverse-core-tests') {
   }
 }
 
+// ------------------------------------------------------------------------------------------------------------------
+
 project(':multiverse-alpha-unborn') {
   jar {
     manifest {
@@ -111,9 +113,9 @@ project(':multiverse-alpha-unborn') {
   }
 
   classes.doLast() {
-    println "=============================================================================="
-    println "Creating tmp jar"
-    println "=============================================================================="
+    println "------------------------------------------------------------------"
+    println "Creating temporary agent"
+    println "------------------------------------------------------------------"
 
     def localRepo = "${gradle.gradleUserHomeDir}/cache/"
 
@@ -153,15 +155,17 @@ project(':multiverse-alpha-unborn') {
   }
 }
 
+// ------------------------------------------------------------------------------------------------------------------
+
 project(':multiverse-alpha') {
 
   def localRepo = "${gradle.gradleUserHomeDir}/cache/"
   def projectRootDir = new File("${rootProject.projectDir}").absolutePath
 
   classes.doLast() {
-    println "=============================================================================="
-    println "Enhancing "
-    println "=============================================================================="
+    println "------------------------------------------------------------------"
+    println "Extracting dependant jars and doing preinstrumentation"
+    println "------------------------------------------------------------------"
 
     ant.unzip(dest: "${buildDir}/classes/main",
             src: localRepo + 'asm/asm-all/jars/asm-all-3.2.jar')
@@ -173,11 +177,11 @@ project(':multiverse-alpha') {
             src: "${projectRootDir}/multiverse-instrumentation/build/libs/multiverse-instrumentation-${project.version}.jar")
     ant.unzip(dest: "${buildDir}/classes/main",
             src: "${projectRootDir}/multiverse-alpha-unborn/build/libs/multiverse-alpha-unborn-${project.version}.jar")
-
+    ant.delete(file: "${buildDir}/classes/main/GiveMavenSomethingToCompile.class")
 
     ant.java(classname: "org.multiverse.compiler.MultiverseCompiler") {
       arg value: '-o'
-      arg value: '-v'
+//      arg value: '-v'
       arg value: '-d'
       arg value: 'org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor'
       arg value: "${buildDir}/classes/main"
@@ -195,13 +199,12 @@ project(':multiverse-alpha') {
                 location: "${localRepo}/asm/asm-all/jars/asm-all-3.2.jar")
       }
     }
-    ant.echo message: "--------------------------------------------------"
   }
 
   testClasses.doLast() {
-    println "=============================================================================="
+    println "------------------------------------------------------------------"
     println "Extracting the test files"
-    println "=============================================================================="
+    println "------------------------------------------------------------------"
 
     ant.mkdir dir: "${buildDir}/classes/test"
     ant.unzip(
@@ -210,7 +213,7 @@ project(':multiverse-alpha') {
 
     ant.java(classname: "org.multiverse.compiler.MultiverseCompiler") {
       arg value: '-o'
-      arg value: '-v'
+//      arg value: '-v'
       arg value: '-d'
       arg value: 'org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor'
       arg value: "${buildDir}/classes/test"
@@ -228,7 +231,21 @@ project(':multiverse-alpha') {
                 location: localRepo + 'asm/asm-all/jars/asm-all-3.2.jar')
       }
     }
+  }
 
+  jar.doLast() {
+    println "------------------------------------------------------------------"
+    println "Integrating dependencies in final jar"
+    println "------------------------------------------------------------------"
+
+    ant.taskdef(name: 'jarjar',
+            classname: 'com.tonicsystems.jarjar.JarJarTask',
+            classpath: "${localRepo}/com.tonicsystems.jarjar/jarjar/jars/jarjar-1.0-rc8.jar")
+
+    ant.jarjar(jarfile: "${projectRootDir}/multiverse-alpha/build/libs/multiverse-alpha-${project.version}.jar", update: true) {
+      rule pattern: 'org.objectweb.asm.**', result: 'org.multiverse.repackaged.@0'
+      rule pattern: 'org.kohsuke.args4j.**', result: 'org.multiverse.repackaged.@0'
+    }
   }
 
   dependencies {
@@ -237,9 +254,9 @@ project(':multiverse-alpha') {
     compile project(':multiverse-alpha-unborn')
     compile group: 'args4j', name: 'args4j', version: "2.0.16"
     compile group: 'asm', name: 'asm-all', version: "3.2"
+    compile group: 'com.tonicsystems.jarjar', name: 'jarjar', version: "1.0-rc8"
     testCompile project(path: ':multiverse-core', configuration: 'testFixtures')
     testCompile project(path: ':multiverse-instrumentation', configuration: 'testFixtures')
     testCompile project(':multiverse-benchy')
   }
-
 }

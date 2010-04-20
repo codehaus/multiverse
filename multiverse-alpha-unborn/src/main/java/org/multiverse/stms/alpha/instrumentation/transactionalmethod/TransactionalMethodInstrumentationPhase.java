@@ -44,7 +44,7 @@ public final class TransactionalMethodInstrumentationPhase extends AbstractInstr
             } else {
                 TransactionalClassMethodTransformer transformer = new TransactionalClassMethodTransformer(
                         originalClazz.getClassLoader(), original, donor,
-                        environment.getMetadataRepository(), environment.optimize());
+                        environment.getMetadataRepository(), environment.optimize(), environment.getLog());
                 result = transformer.transform();
             }
 

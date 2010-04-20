@@ -91,6 +91,11 @@ public class StandardInstrumentor implements Instrumentor {
     }
 
     @Override
+    public File getDumpDirectory() {
+        return dumpDir;
+    }
+
+    @Override
     public void setFiler(Filer filer) {
         if (filer == null) {
             throw new NullPointerException();

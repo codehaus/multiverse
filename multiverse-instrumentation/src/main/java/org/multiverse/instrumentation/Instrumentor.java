@@ -66,6 +66,8 @@ public interface Instrumentor {
      */
     void setDumpDirectory(File dumpDirectory);
 
+    File getDumpDirectory();
+
     /**
      * Sets the InstrumenterLogger this Instrumentor uses to execute log statements on.
      * <p/>

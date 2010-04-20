@@ -54,7 +54,7 @@ public final class MultiverseCompiler {
         }
 
         if (cli.dumpBytecode) {
-            System.out.println("Multiverse: bytecode is dumped for debugging purposes");
+            System.out.printf("Multiverse: bytecode is to dumped %s for debugging purposes\n", instrumentor.getDumpDirectory());
             instrumentor.setDumpBytecode(true);
         }
 

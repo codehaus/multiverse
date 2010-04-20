@@ -6,6 +6,7 @@ import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.TransactionFactoryBuilder;
 import org.multiverse.instrumentation.CompileException;
 import org.multiverse.instrumentation.DebugInfo;
+import org.multiverse.instrumentation.InstrumenterLogger;
 import org.multiverse.instrumentation.asm.AsmUtils;
 import org.multiverse.instrumentation.asm.CloneMap;
 import org.multiverse.instrumentation.metadata.*;
@@ -55,10 +56,11 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
     private final ClassLoader classLoader;
     private final Map<MethodNode, FieldNode> transactionFactoryFields = new HashMap<MethodNode, FieldNode>();
     private final boolean optimize;
+    private final InstrumenterLogger logger;
 
     public TransactionalClassMethodTransformer(
             ClassLoader classLoader, ClassNode classNode, ClassNode donorClassNode,
-            MetadataRepository metadataRepository, boolean optimize) {
+            MetadataRepository metadataRepository, boolean optimize, InstrumenterLogger logger) {
         this.classLoader = classLoader;
         this.metadataRepository = metadataRepository;
         this.classNode = classNode;
@@ -68,7 +70,7 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
         this.donorMethodNode = getDonorMethod("donorMethod");
         this.donorConstructorNode = getDonorMethod("donorConstructor");
         this.optimize = optimize;
-
+        this.logger = logger;
     }
 
     public ClassNode transform() {
@@ -159,7 +161,7 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
                 "setSpeculativeConfigurationEnabled",
                 "(Z)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
 
-        //readonly                    
+        //readonly
         if (transactionMetadata.readOnly != null) {
             insnList.add(new InsnNode(transactionMetadata.readOnly ? ICONST_1 : ICONST_0));
             insnList.add(new MethodInsnNode(
@@ -537,9 +539,7 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
 
         MethodMetadata metadata = classMetadata.getMethodMetadata(methodNode.name, methodNode.desc);
 
-//        if (classMetadata.getName().endsWith("PoolExecutor")) {
-        System.out.println("transactify " + classMetadata.getName() + "." + methodNode.name);
-//        }
+        logger.lessImportant("transactify %s.%s", classMetadata.getName(), methodNode.name);
 
         Analyzer a = new Analyzer(new SourceInterpreter());
         Frame[] frames;
@@ -593,7 +593,8 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
                                 VarInsnNode varNode = (VarInsnNode) node;
                                 if (varNode.var == 0) {
                                     aload0 = true;
-                                    System.out.println("   aload 0 found for candidate put optimization " + originalFieldInsnNode.owner + "." + originalFieldInsnNode.name);
+                                    logger.lessImportant("   aload 0 found for candidate put optimization %s.%s",
+                                            originalFieldInsnNode.owner, originalFieldInsnNode.name);
                                 }
                             }
                         }
@@ -617,7 +618,8 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
                         boolean fullMonty = aload0 && tranlocalVar > -1 && !methodNode.name.equals("<init>");
 
                         if (fullMonty) {
-                            System.out.println("   candidate for put optimization " + originalFieldInsnNode.owner + "." + originalFieldInsnNode.name);
+                            logger.lessImportant("   candidate for put optimization %s.%s",
+                                    originalFieldInsnNode.owner, originalFieldInsnNode.name);
 
                             newInstructions.add(new VarInsnNode(ALOAD, tranlocalVar));
 
@@ -631,7 +633,7 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
                             //if it already is committed, we need to do a full openForWrite.
                             newInstructions.add(new JumpInsnNode(IFNE, startFullLoadLabel));
 
-                            //it was not committed, so we are allowed to do the shortcut access to the tranlocal 
+                            //it was not committed, so we are allowed to do the shortcut access to the tranlocal
                             //remove the txObject and replace it by the tranlocal stored in the tranlocal var
                             newInstructions.add(new InsnNode(POP));
                             newInstructions.add(new VarInsnNode(ALOAD, tranlocalVar));
@@ -652,7 +654,7 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
 
                         newInstructions.add(new TypeInsnNode(CHECKCAST, ownerMetadata.getTranlocalName()));
 
-                        //store the loaded 
+                        //store the loaded
                         if (fullMonty) {
                             newInstructions.add(new InsnNode(DUP));
                             newInstructions.add(new VarInsnNode(ASTORE, tranlocalVar));
@@ -705,7 +707,8 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
                                 VarInsnNode varNode = (VarInsnNode) node;
                                 if (varNode.var == 0) {
                                     aload0 = true;
-                                    System.out.println("   aload 0 found for candidate get optimization " + originalFieldInsnNode.owner + "." + originalFieldInsnNode.name);
+                                    logger.lessImportant("   aload 0 found for candidate get optimization %s.%s",
+                                            originalFieldInsnNode.owner, originalFieldInsnNode.name);
                                 }
                             }
                         }
@@ -801,7 +804,7 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
                             && ownerMethodMetadata != null
                             && ownerMethodMetadata.isTransactional();
 
-                    System.out.printf("  executing call %s transactional %s   optimize allowed: %s\n",
+                    logger.lessImportant("  executing call %s transactional %s   optimize allowed: %s",
                             originalMethodInsnNode.owner + "." + originalMethodInsnNode.name,
                             ownerMethodMetadata != null && ownerMethodMetadata.isTransactional(), optimize);
 
@@ -853,7 +856,8 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
                                     toTransactedMethodName(originalMethodInsnNode.name, readonly),
                                     createTransactedWithTranlocalMethodDesc(ownerMetadata, originalMethodInsnNode.name, originalMethodInsnNode.desc)
                             ));
-                            System.out.println("   ---full monty tranlocal method optimization " + originalMethodInsnNode.owner + "." + originalMethodInsnNode.name);
+                            logger.lessImportant("   ---full monty tranlocal method optimization %s.%s",
+                                    originalMethodInsnNode.owner, originalMethodInsnNode.name);
                         } else {
                             newInstructions.add(new VarInsnNode(ALOAD, transactionVar));
                             newInstructions.add(new MethodInsnNode(
@@ -862,7 +866,8 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
                                     toTransactedMethodName(originalMethodInsnNode.name, readonly),
                                     createTransactedMethodDesc(originalMethodInsnNode.desc)
                             ));
-                            System.out.println("   ---transactional method optimization " + originalMethodInsnNode.owner + "." + originalMethodInsnNode.name);
+                            logger.lessImportant("   ---transactional method optimization %s.%s",
+                                    originalMethodInsnNode.owner, originalMethodInsnNode.name);
                         }
                     } else {
                         newInsn = originalInsn.clone(cloneMap);
