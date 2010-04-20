@@ -2,6 +2,7 @@
 /.classpath
 /.project
 /target
+/build
 /multiverse-instrumentation.iml
 /multiverse-instrumentation.ipr
 /multiverse-instrumentation.iws

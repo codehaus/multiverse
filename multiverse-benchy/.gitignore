@@ -2,6 +2,7 @@
 /.classpath
 /.project
 /target
+/build
 /multiverse-benchy.iml
 /multiverse-benchy.ipr
 /multiverse-benchy.iws
