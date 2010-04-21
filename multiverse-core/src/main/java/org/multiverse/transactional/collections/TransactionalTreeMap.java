@@ -1,4 +1,4 @@
-package org.multiMemverse.transactional.collections;
+package org.multiverse.transactional.collections;
 
 import org.multiverse.annotations.Exclude;
 import org.multiverse.annotations.TransactionalMethod;
@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.lang.Math.max;
-
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 
 /**
