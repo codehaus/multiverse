@@ -1,4 +1,4 @@
-package org.multiverse.transactional.collections;
+package org.multiMemverse.transactional.collections;
 
 import org.multiverse.annotations.Exclude;
 import org.multiverse.annotations.TransactionalMethod;
@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.lang.Math.max;
+
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 
 /**
@@ -142,6 +143,18 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
 
     @Override
     public V put(K key, V value) {
+        V oldValue = insert(key, value);
+
+        System.out.println("map.size: "+size.atomicGet());
+
+        if (!balanced()) {
+            root = balance(root);
+        }
+
+        return oldValue;
+    }
+
+    private V insert(K key, V value) {
         if (key == null) {
             throw new NullPointerException();
         }
@@ -153,6 +166,7 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
         }
 
         //todo: no balancing is done yet.
+
         Node<K, V> node = root;
         while (true) {
             int cmp = compareTo(key, node.key);
@@ -182,6 +196,49 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
                 return oldValue;
             }
         }
+    }
+
+    private Node balance(Node<K, V> node) {
+        if (isRightHeavy(node)) {
+            if (height(node.right) > 2) {
+                node.right = balance(node.right);
+            } else {
+                if (isLeftHeavy(node.right)) {
+                    node = node.doubleRotateLeft();
+                } else {
+                    node = node.rotateLeft();
+                }
+            }
+        } else if (isLeftHeavy(node)) {
+            if (height(node.left) > 2) {
+                node.left = balance(node.left);
+            } else {
+                if (isRightHeavy(node.left)) {
+                    node = node.doubleRotateRight();
+                } else {
+                    node = node.rotateRight();
+                }
+            }
+        }
+        return node;
+    }
+
+    private boolean isLeftHeavy(Node<K, V> node) {
+        if (node.left == null)
+            return false;
+        else if (node.left.right == null && node.left.left == null)
+            return node.right == null;
+        else
+            return height(node.left) - height(node.right) > 1;
+    }
+
+    private boolean isRightHeavy(Node<K, V> node) {
+        if (node.right == null)
+            return false;
+        else if (node.right.right == null && node.right.left == null)
+            return node.left == null;
+        else
+            return height(node.right) - height(node.left) > 1;
     }
 
     private int compareTo(K key1, K key2) {
@@ -368,8 +425,14 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
         return null;
     }
 
+    public boolean balanced() {
+        //some comments so I can commit
+        int rightMinusLeft = height(root.right) - height(root.left);
+        return rightMinusLeft == 1 || rightMinusLeft == 0;
+    }
+
     @TransactionalObject
-    static class Node<K, V> {
+    static final class Node<K, V> {
         final K key;
 
         V value;
@@ -383,20 +446,38 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
             this.value = value;
         }
 
-        void rotateLeft() {
-
+        Node rotateLeft() {
+            Node newRoot = this.right;
+            newRoot.left = this;
+            newRoot.parent = this.parent;
+            this.parent = newRoot;
+            this.right = null;
+            return newRoot;
         }
 
-        void rotateRight() {
-
+        Node rotateRight() {
+            Node newRoot = this.left;
+            newRoot.right = this;
+            newRoot.parent = this.parent;
+            this.parent = newRoot;
+            this.left = null;
+            return newRoot;
         }
 
-        void doubleRotateLeft() {
-
+        Node doubleRotateLeft() {
+            right = right.rotateRight();
+            return rotateLeft();
         }
 
-        void doubleRotateRight() {
+        Node doubleRotateRight() {
+            left = left.rotateLeft();
+            return rotateRight();
+        }
 
+        public Node getParent() {
+            return parent;
         }
     }
+
+    //more nonsense doc..
 }
