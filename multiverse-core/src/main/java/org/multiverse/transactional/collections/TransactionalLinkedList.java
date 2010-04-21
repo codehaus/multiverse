@@ -59,13 +59,11 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
 
     private final ProgrammaticLong size;
 
-    //todo: should be made private again
     @FieldGranularity
-    public Node<E> head;
+    private Node<E> head;
 
-    //todo: should be made private again
     @FieldGranularity
-    public Node<E> tail;
+    private Node<E> tail;
 
     public TransactionalLinkedList() {
         this(Integer.MAX_VALUE);
@@ -156,7 +154,6 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
     }
 
     @Override
-    @TransactionalMethod(maxRetryCount = 1000)
     public E removeFirst() {
         if (isEmpty()) {
             throw new NoSuchElementException();
@@ -206,7 +203,7 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
     public void putFirst(E e) throws InterruptedException {
         if (hasNoStorageCapacity()) {
             //force a read, the hasNoStorageCapacity doesn't do it for us
-            Object x = head;
+            size();
             retry();
         }
 
@@ -300,6 +297,23 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
     @Override
     public void add(int index, E element) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    @TransactionalMethod
+    public boolean addAll(Collection<? extends E> c) {
+        if (c.isEmpty()) {
+            return false;
+        }
+
+        boolean modified = false;
+        Iterator<? extends E> e = c.iterator();
+        while (e.hasNext()) {
+            if (add(e.next())) {
+                modified = true;
+            }
+        }
+        return modified;
     }
 
     @Override
@@ -580,7 +594,7 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
     }
 
     @TransactionalObject
-    public class DescendingIteratorImpl implements Iterator<E> {
+    public final class DescendingIteratorImpl implements Iterator<E> {
 
         private Node<E> previous;
         private Node<E> current;
@@ -618,7 +632,7 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
     }
 
     @TransactionalObject
-    public static class Node<E> {
+    public final static class Node<E> {
 
         public Node<E> next;
         public Node<E> prev;
@@ -629,23 +643,5 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
         }
     }
 
-    //code that 'inserts' the logic in this class. Needed for the time being to do
-    //bytecode optimization
 
-    @Override
-    @TransactionalMethod
-    public boolean addAll(Collection<? extends E> c) {
-        if (c.isEmpty()) {
-            return false;
-        }
-
-        boolean modified = false;
-        Iterator<? extends E> e = c.iterator();
-        while (e.hasNext()) {
-            if (add(e.next())) {
-                modified = true;
-            }
-        }
-        return modified;
-    }
 }

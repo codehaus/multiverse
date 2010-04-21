@@ -21,7 +21,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 /**
  * @author Peter Veentjer
  */
-public class TransactionalMethod_TimeoutTest {
+public class TransactionalMethod_TimeoutLongTest {
 
     private Stm stm;
 

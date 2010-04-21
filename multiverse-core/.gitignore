@@ -2,7 +2,4 @@
 /.classpath
 /.project
 /target
-/build
-/multiverse-core.iml
-/multiverse-core.ipr
-/multiverse-core.iws
+/*.iml

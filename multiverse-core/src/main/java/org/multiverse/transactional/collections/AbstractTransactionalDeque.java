@@ -69,6 +69,8 @@ public abstract class AbstractTransactionalDeque<E>
     @Override
     public void putFirst(E e) throws InterruptedException {
         if (hasNoStorageCapacity()) {
+            //force load or the size to listen on that field
+            size();
             retry();
         }
 
@@ -78,6 +80,8 @@ public abstract class AbstractTransactionalDeque<E>
     @Override
     public void putLast(E e) throws InterruptedException {
         if (hasNoStorageCapacity()) {
+            //force load or the size to listen on that field
+            size();
             retry();
         }
 

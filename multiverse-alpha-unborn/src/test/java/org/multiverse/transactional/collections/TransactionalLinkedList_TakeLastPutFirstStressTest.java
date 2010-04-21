@@ -1,5 +1,6 @@
 package org.multiverse.transactional.collections;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
@@ -36,6 +37,8 @@ public class TransactionalLinkedList_TakeLastPutFirstStressTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
+
         itemGenerator = new AtomicLong();
         takeCounter = new AtomicLong(putLastThreadCount * produceCount);
 
@@ -50,6 +53,10 @@ public class TransactionalLinkedList_TakeLastPutFirstStressTest {
         for (int k = 0; k < takeFirstThreadCount; k++) {
             takeFirstThreads[k] = new TakeLastThread(k);
         }
+    }
+
+    @After
+    public void tearDown() {
         clearThreadLocalTransaction();
     }
 

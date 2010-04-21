@@ -25,6 +25,7 @@ allprojects {
   test {
     exclude("**/*Abstract*")
     exclude("**/*StressTest*")
+    exclude("**/*LongTest*")
     exclude("**/*PerformanceTest*")
   }
 

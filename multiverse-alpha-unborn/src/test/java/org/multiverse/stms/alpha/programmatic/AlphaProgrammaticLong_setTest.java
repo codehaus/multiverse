@@ -4,14 +4,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.api.exceptions.UncommittedReadConflict;
 import org.multiverse.api.latches.CheapLatch;
 import org.multiverse.api.latches.Latch;
 import org.multiverse.stms.alpha.AlphaStm;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
@@ -89,25 +87,6 @@ public class AlphaProgrammaticLong_setTest {
         assertTrue(latch.isOpen());
     }
 
-    @Test
-    public void whenLocked_thenTooManyRetriesException() {
-        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 10);
-        AlphaProgrammaticLongTranlocal committed = (AlphaProgrammaticLongTranlocal) ref.___load();
-
-        Transaction lockOwner = mock(Transaction.class);
-        ref.___tryLock(lockOwner);
-
-        long version = stm.getVersion();
-        try {
-            ref.set(20);
-            fail();
-        } catch (TooManyRetriesException expected) {
-        }
-
-        assertSame(lockOwner, ref.___getLockOwner());
-        assertEquals(version, stm.getVersion());
-        assertSame(committed, ref.___load());
-    }
 
     @Test
     public void whenTransactionAvailable_thenItLiftsOnThatTransaction() {

@@ -80,7 +80,7 @@ public class WriteSkewStressTest {
 
         clearThreadLocalTransaction();
         int sum = from1.get() + from2.get();
-        assertTrue("sum " + sum, sum >= 0);
+        assertTrue("sumRefs " + sum, sum >= 0);
     }
 
     private class AnotherTransferThread extends TestThread {

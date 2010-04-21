@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.multiverse.api.Stm;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -78,7 +80,15 @@ public class TransactionalArrayList_addAll2Test {
     @Test
     @Ignore
     public void whenAddedInFront() {
+        TransactionalArrayList<String> list = new TransactionalArrayList<String>("c", "d");
 
+        List<String> items = new LinkedList<String>();
+        items.add("a");
+        items.add("b");
+
+        list.addAll(0, items);
+
+        assertEquals("[a, b, c, d]", list.toString());
     }
 
     @Test

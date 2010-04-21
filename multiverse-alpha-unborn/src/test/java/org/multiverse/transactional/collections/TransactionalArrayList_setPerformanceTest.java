@@ -12,11 +12,11 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class TransactionalArrayList_setPerformanceTest {
 
-    public final long transactionCount = 1000 * 1000 * 100;
+    public final long transactionCount = 1000 * 1000 * 10;
     public final int itemCount = 1000;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         clearThreadLocalTransaction();
     }
 

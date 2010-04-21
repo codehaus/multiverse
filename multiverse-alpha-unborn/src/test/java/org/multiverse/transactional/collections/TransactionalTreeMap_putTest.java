@@ -60,85 +60,21 @@ public class TransactionalTreeMap_putTest {
         assertEquals("newone", map.get("1"));
     }
 
-    @Test
-    public void shouldLeftRotateWhenRightHeavyTree() {
-        TransactionalTreeMap<Integer, String> map = new TransactionalTreeMap<Integer, String>();
-        map.put(1, "one");
-        map.put(2, "two");
-        map.put(3, "three");
-
-        assertTrue(map.height() == 2);
-        assertTrue(map.containsKey(1));
-        assertTrue(map.containsKey(2));
-        assertTrue(map.containsKey(3));
-    }
 
     @Test
-    public void shouldLeftRotateWhenRightHeavyTree2() {
-        TransactionalTreeMap<Integer, String> map = new TransactionalTreeMap<Integer, String>();
-        map.put(1, "one");
-        map.put(2, "two");
-        map.put(3, "three");
-        map.put(4, "four");
-        map.put(5, "five");
-        map.put(6, "six");
+    public void bigtest() {
+        TransactionalTreeMap<Integer, Integer> map = new TransactionalTreeMap<Integer, Integer>();
 
-        assertTrue(map.height() == 4);
-        assertTrue(map.containsKey(1));
-        assertTrue(map.containsKey(2));
-        assertTrue(map.containsKey(3));
-        assertTrue(map.containsKey(4));
-        assertTrue(map.containsKey(5));
-        assertTrue(map.containsKey(6));
-    }
+        int itemCount = 1000;
 
-    @Test
-    public void shouldDoubleLeftRotateWhenRightHeavyTreeWithLeftHeavyRightSubtree() {
-        TransactionalTreeMap<Integer, String> map = new TransactionalTreeMap<Integer, String>();
-        map.put(1, "one");
-        map.put(3, "three");
-        map.put(2, "two");
+        //todo: more diversity in the map.
+        for (int k = 0; k < itemCount; k++) {
+            map.put(k, k);
+        }
 
-        assertTrue(map.height() == 2);
-    }
+        for (int k = 0; k < itemCount; k++) {
+            assertTrue(map.containsKey(k));
+        }
 
-    @Test
-    public void shouldRightRotateWhenLeftHeavyTree() {
-        TransactionalTreeMap<Integer, String> map = new TransactionalTreeMap<Integer, String>();
-        map.put(3, "three");
-        map.put(2, "two");
-        map.put(1, "one");
-
-        assertTrue(map.height() == 2);
-    }
-
-    @Test
-    public void shouldRightRotateWhenLeftHeavyTree2() {
-        TransactionalTreeMap<Integer, String> map = new TransactionalTreeMap<Integer, String>();
-        map.put(6, "six");
-        map.put(5, "five");
-        map.put(4, "four");
-        map.put(3, "three");
-        map.put(2, "two");
-        map.put(1, "one");
-
-        assertTrue(map.height() == 4);
-        assertTrue(map.containsKey(1));
-        assertTrue(map.containsKey(2));
-        assertTrue(map.containsKey(3));
-        assertTrue(map.containsKey(4));
-        assertTrue(map.containsKey(5));
-        assertTrue(map.containsKey(6));
-        assertTrue(map.findNode(5).getParent() == null);
-    }
-
-    @Test
-    public void shouldDoubleRightRotateWhenLeftHeavyTreeWithRightHeavyLeftSubtree() {
-        TransactionalTreeMap<Integer, String> map = new TransactionalTreeMap<Integer, String>();
-        map.put(3, "three");
-        map.put(1, "one");
-        map.put(2, "two");
-
-        assertTrue(map.height() == 2);
     }
 }

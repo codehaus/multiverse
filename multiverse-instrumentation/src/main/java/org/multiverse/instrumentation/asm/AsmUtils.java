@@ -140,6 +140,7 @@ public final class AsmUtils implements Opcodes {
     }
 
     public static int getInvokeOpcode(MethodNode methodNode) {
+        //todo: invoke special is ignored.
         if (isStatic(methodNode.access)) {
             return INVOKESTATIC;
         } else if (methodNode.name.equals("<init>")) {

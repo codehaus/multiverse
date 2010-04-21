@@ -4,6 +4,7 @@
 /build
 /.classpath
 /.project
+/.idea
 /multiverse.iml
 /multiverse.ipr
 /multiverse.iws

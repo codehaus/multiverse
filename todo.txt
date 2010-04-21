@@ -6,24 +6,16 @@ todo engine
 
     - back off policy needs to be used when a load is done and the value is locked
 
-    - integration test forthe alphaprogrammaticreference and atomic methods
+    - integration test for the alphaprogrammaticreference and atomic methods
 
 - instrumentation
 
     - verbose output in the transactional method transformer needs to output to the Logger
     and not to the System.out
 
-    - when class definition is loaded, display it in the output.
-
     - upgrade get-field access to use frames instead of copying/swapping etc
 
     - upgrade put-field access to use frames instead of copying/swapping etc
-
-    - the version in the AlphaInstrumentor needs to be modified by maven instead of manually
-
-    - ProgrammaticLong is not seen as transactional
-
-    - ProgrammaticReference is not seen as transactional
 
     - static compilation
 
@@ -39,17 +31,6 @@ todo engine
         - inlining transaction in transactional getter
 
         - inlining transaction in transactional setter
-
-- AlphaProgrammaticLong.atomic method should use the LockPolicy to do locking
-
-- thread safety of the java agent functionality; classes can be created by different
-threads, so the whole mechanism should be made thread safe.
-
-- AlphaProgrammaticLong should use the stm for all its operations once it has
-been build using that stm.
-
-- AlphaProgrammaticReference should use the stm for all its operations once
-it has been build using that stm.
 
 - interface parameter inheritance.
 
@@ -144,6 +125,14 @@ Thread PingPongThread-1 has thrown an exception
 ---------------------------------------------------------------
 todo features
 ---------------------------------------------------------------
+
+- when class definition is loaded, display it in the output.
+
+- the version in the AlphaInstrumentor needs to be modified by maven instead of manually
+
+- ProgrammaticLong is not seen as transactional
+
+- ProgrammaticReference is not seen as transactional
 
 - speculative atomic methods; at the moment only get/set can be made atomic but more complex methods can't.
 So enhance the speculative mechanism and the instrumentation so that methods start with the atomic mode.
@@ -368,4 +357,12 @@ invokespecial even though the getter/setter is not final
 
  - integration test for the alphaprogrammatic long and atomic methods
 
-   
+- AlphaProgrammaticLong should use the stm for all its operations once it has
+been build using that stm.
+
+- AlphaProgrammaticReference should use the stm for all its operations once
+it has been build using that stm.
+
+- thread safety of the java agent functionality; classes can be created by different
+threads, so the whole mechanism should be made thread safe.
+

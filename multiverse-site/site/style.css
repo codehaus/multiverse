@@ -81,7 +81,6 @@ pre {
 body {
     margin: 0 0 1em 0;
     padding: 0; /* need for Opera */
-    background: #fff;
     color: #333;
     min-width: 610px;
     background: #efefef;
@@ -104,7 +103,6 @@ img {
 }
 
 #mainContent {
-
     float: right;
     width: 74%;
     margin-bottom: 3em;
@@ -245,7 +243,7 @@ h1.main-header-right {
     font-weight: bold; /*color: #eef;*/
     text-decoration: none;
     border: none;
-    margin: 0px 0px 0px 7px;
+    margin: 0 0 0 7px;
     padding: 4px 0px 0 0;
 }
 
