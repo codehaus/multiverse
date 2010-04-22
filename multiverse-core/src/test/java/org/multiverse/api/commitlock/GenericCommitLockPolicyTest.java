@@ -38,7 +38,6 @@ public class GenericCommitLockPolicyTest {
     // ====================tryLock ==========================
 
     @Test(expected = NullPointerException.class)
-    @Ignore
     public void tryLock_failsIfLockOwnerIsNull() {
         CommitLock commitLock = mock(CommitLock.class);
 

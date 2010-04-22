@@ -54,6 +54,10 @@ public final class GenericCommitLockPolicy implements CommitLockPolicy {
 
     @Override
     public boolean tryAcquire(CommitLock lock, CommitLockFilter filter, Transaction lockOwner) {
+        if (lockOwner == null) {
+            throw new NullPointerException();
+        }
+
         for (int k = 0; k < retryCount; k++) {
             if (singleLock(lock, filter, lockOwner, spinAttemptsPerLockCount) >= 0) {
                 return true;

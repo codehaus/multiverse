@@ -141,6 +141,8 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
                         <excludes>
+                            <exclude>**/*LongTest.java</exclude>
+                            <exclude>**/*longTest.java</exclude>
                             <exclude>**/*StressTest.java</exclude>
                             <exclude>**/*stressTest.java</exclude>
                             <exclude>**/*PerformanceTest.java</exclude>

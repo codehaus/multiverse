@@ -7,7 +7,6 @@ import org.multiverse.TestThread;
 import org.multiverse.annotations.FieldGranularity;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
-import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -20,15 +19,12 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class FieldGranularityTest {
 
-    public AtomicInteger executedCounter;
+    public AtomicInteger commitCounter;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        executedCounter = new AtomicInteger();
-
-        //force loading of the transactional integer class.
-        new TransactionalInteger();
+        commitCounter = new AtomicInteger();
     }
 
     @After
@@ -48,7 +44,7 @@ public class FieldGranularityTest {
         assertEquals(10, pair.getLeft());
         assertEquals(10, pair.getRight());
 
-        assertEquals(2, executedCounter.get());
+        assertEquals(2, commitCounter.get());
     }
 
     class SetLeftThread extends TestThread {
@@ -65,7 +61,7 @@ public class FieldGranularityTest {
         public void doRun() throws Exception {
             pair.setLeft(10);
             sleepMs(1000);
-            executedCounter.incrementAndGet();
+            commitCounter.incrementAndGet();
         }
     }
 
@@ -83,7 +79,7 @@ public class FieldGranularityTest {
         public void doRun() throws Exception {
             pair.setRight(10);
             sleepMs(1000);
-            executedCounter.incrementAndGet();
+            commitCounter.incrementAndGet();
         }
     }
 

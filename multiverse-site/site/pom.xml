@@ -9,8 +9,7 @@
     <version>1.0</version>
 
     <properties>
-        <multiverse.version>0.4-SNAPSHOT</multiverse.version>
-        <multiverse.agentname>multiverse-alpha-0.4</multiverse.agentname>
+        <multiverse.version>0.5</multiverse.version>
         <sourceEncoding>UTF-8</sourceEncoding>
         <targetJdk>1.6</targetJdk>
     </properties>
@@ -30,7 +29,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <configuration>
                     <argLine>
-                        -javaagent:${settings.localRepository}/org/multiverse/multiverse-alpha/${multiverse.version}/${multiverse.agentname}.jar
+                        -javaagent:${settings.localRepository}/org/multiverse/multiverse-alpha/${multiverse.version}/multiverse-alpha-${multiverse.version}.jar
                     </argLine>
                 </configuration>
             </plugin>

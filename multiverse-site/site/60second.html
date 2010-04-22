@@ -3,8 +3,8 @@
 Multiverse is a Software Transansactional Memory implementation and meant as an alternative to traditional lock
 based concurrency. If you have worked with databases before, Transactional Memory should feel familiar because
 both share one very important concept: transactions.
-<p/>
-In Multiverse a normal POJO can be made transactional by adding the <tt>TransactionalObject</tt> annotation, e.g.:
+<p>
+    In Multiverse a normal POJO can be made transactional by adding the <tt>TransactionalObject</tt> annotation, e.g.:
 <pre>
 
     import org.multiverse.annotations.TransactionalObject;
@@ -19,6 +19,10 @@ In Multiverse a normal POJO can be made transactional by adding the <tt>Transact
             setBalance(balance);
         }
 
+        public int getLastUpdate(){
+            return lastUpdate;
+        }
+
         public int getBalance(){
             return balance;
         }
@@ -30,10 +34,6 @@ In Multiverse a normal POJO can be made transactional by adding the <tt>Transact
                 throw new IllegalStateException("negative balance not allowed");
             }
             balance = newBalance;
-        }
-
-        public int getLastUpdate(){
-            return lastUpdate;
         }
     }
 </pre>
@@ -71,7 +71,8 @@ static method of a transactional object, e.g.:
         }
     }
 </pre>
-Money can safely be transferred from one account to another using the <tt>transfer</tt> method: no race problems, partial
+Money can safely be transferred from one account to another using the
+<tt>transfer</tt> method: no race problems, partial
 writes or deadlocks are possible.
 <p/>
 These examples only scratch the surface of Multiverse, but just having transactional methods can be
@@ -80,5 +81,6 @@ a very big step forward in a lot of cases. For more advanced features and in-dep
 are the best places to get started.
 
 <h3>Footnote</h3>
-To make this transactional behavior possible, you need to set up the Multiverse Java agent. For more information check
-the article on <a href="developconfiguration.html">configuring development environment</a>.
+To make this transactional behavior possible, you need to set up the Multiverse Java agent, or use the Multiverse compiler
+for static instrumentation. For more information check <a href="developconfiguration.html">configuring development
+    environment</a>.

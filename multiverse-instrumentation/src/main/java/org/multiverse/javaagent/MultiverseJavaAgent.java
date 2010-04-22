@@ -67,7 +67,7 @@ public final class MultiverseJavaAgent {
     }
 
     private static void printMultiverseJavaAgentInfo() {
-        System.out.println("Multiverse: JavaAgent");
+        System.out.println("Multiverse: Using JavaAgent");
 
         if (MultiverseConstants.___SANITY_CHECKS_ENABLED) {
             System.out.println("Sanity checks are enabled.");

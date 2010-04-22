@@ -2,6 +2,84 @@
 todo engine
 ---------------------------------------------------------------
 
+CountDownCommitBarrier_incPartiesWithTransactionTest.whenPendingTransactions
+
+CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest.whenTransactionFailsToPrepare
+
+CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest.whenStartingInterrupted
+
+CountDownCommitBarrier_tryAwaitOpenUninterruptiblyTest.whenInterruptedWhileWaiting
+
+CountDownCommitBarrier_tryAwaitOpenUninterruptiblyTest.whenAbortedWhileWaiting
+
+CountDownCommitBarrier_tryAwaitOpenUninterruptiblyTest.whenTimeout
+
+CountDownCommitBarrier_tryJoinCommitTest.whenOpenAndTransactionCommitted_thenIllegalStateException
+
+CountDownCommitBarrier_tryJoinCommitTest.whenOpenAndTransactionAborted_thenIllegalStateException
+
+CountDownCommitBarrier_tryJoinCommitWithTimeoutTest.whenNotLastOne
+
+CountDownCommitBarrier_tryJoinCommitWithTimeoutTest.whenInterruptedWhileWaiting
+
+CountDownCommitBarrier_tryJoinCommitWithTimeoutTest.whenTimeout
+
+CountDownCommitBarrier_tryJoinCommitWithTimeoutTest.whenAbortedWhileWaiting
+
+VetoCommitBarrier_tryJoinCommitTest.whenOpenAndTransactionPrepared_then
+
+VetoCommitBarrier_tryJoinCommitTest.whenOpenAndTransactionCommitted_then
+
+VetoCommitBarrier_tryJoinCommitTest.whenOpenAndTransactionAborted_then
+
+SpeculativeNonAutomaticReadTrackingTest
+
+TransactionalReferenceArray_atomicCompareAndSetTest.whenLocked
+
+TransactionalReferenceArray_atomicGetTest.whenNotCommittedBefore
+
+TransactionalReferenceArray_atomicGetTest.whenLocked
+
+TransactionalReferenceArray_atomicSetTest.whenLocked
+
+TransactionalReferenceArray_atomicSetTest.whenNotCommittedBefore
+
+TransactionalReferenceArray_atomicSetTest.whenNoValueChange
+
+TransactionalReferenceArray_atomicSetTest.whenValueChanged
+
+TransactionalReferenceArray_atomicSetTest.whenTransactionActiveThenIgnored
+
+TransactionalReferenceArray_getTest.whenNoTransactionAvailableAndLocked
+
+TransactionalReferenceArray_getTest.whenNoTransactionAvailableNotCommittedBefore
+
+TransactionalReferenceArray_getTest.whenTransactionAvailableAndNotCommittedBefore
+
+TransactionalReferenceArray_getTest.whenTransactionActiveAndLocked
+
+TransactionalReferenceArray_setTest.whenTransactionAvailable_thenThatTransactionIsUsed
+
+TransactionalReferenceArray_setTest._whenListenersAvailable_thenTheyAreNotified
+
+AbstractTransaction_abortTest.whenDoAbortThrowsError
+
+GenericCommitLockPolicyTest
+
+GenericCommitLockPolicyTest
+
+GenericCommitLockPolicyTest
+
+GenericCommitLockPolicyTest
+
+NonBlockingTaskThreadPoolExecutor_integrationTest.test
+
+TransactionalThreadPoolExecutor_awaitTerminationTest.whenShutdown
+
+TransactionalThreadPoolExecutor_setCorePoolSizeTest.whenPoolSizeIncreased
+
+- TransactionCollections need to be scanned for @Ignore
+
 - back off policy
 
     - back off policy needs to be used when a load is done and the value is locked
@@ -66,14 +144,6 @@ it will not be fixated.
 
     - boolean removeLastOccurrence(Object o)
 
-- JRuby integration
-
-- Groovy Integration
-
-- getter/setter optimization
-
-    - getters/setter inliner should do verbose output
-
 ---------------------------------------------------------------
 todo unclear
 ---------------------------------------------------------------
@@ -125,6 +195,10 @@ Thread PingPongThread-1 has thrown an exception
 ---------------------------------------------------------------
 todo features
 ---------------------------------------------------------------
+
+- JRuby integration
+
+- Groovy Integration
 
 - when class definition is loaded, display it in the output.
 
@@ -262,107 +336,7 @@ Dit scheelt nog een object creatie.
 done
 ---------------------------------------------------------------
 
- - static compilation: integration tests for the compiler
+- getter/setter optimization
 
- - field of the primtives should be made private again
-
-- extra multiverse alpha all in one
-
-    + create additional module
-
-    + make sure that it works from the ide again (multiverse-alpha)
-
-    + copy the unit test classes from the alpha module to the alpha all in one module
-
-    + the unit tests executed in the alpha engine, should be
-     reexecuted but now with the compiler: problem is that the surefire plugin is triggered
-     by java files and not by class files and since we have no java files, it isn't triggered
-
-    + the sources jar in the multiverse-alpha should not be created since there
-    are no sources
-
-- cheapen transactional method by directly accessing other transactional
-    methods instead of going through the master method.
-
-- inlining transctional getter when inside transactional method
-
-- inlining transctional setter when inside transactional method
-
-- cheapen tranlocal access on this calling transactional methods by directly
-    accessing other tranlocal methods instead of going through the master method.
-
-- cheapen tranlocal access for the this variable by passing that tranlocal
-    if possible. First step: only needs to be done in methods in the same class
-
-- timeout configuration is now added on the alpha stm (the actual timeout logic
-in the transaction template / donor logic has not been implemented
-
-- test for transaction template
-
-- add timeout logic to donor method
-
-- add timeout logic to transaction template.
-
-- figure out which transacted method to call from the transactional method..the ro version
-    or the up version.
-
-- timeout on transaction.
-
-    - tests for instrumentation
-
-- cheapen tranlocal access in readonly transacted method with tranlocal
-
-- cheapen tranlocal access in update transacted method with tranlocal
-
-- make sure that load still succeeds if the value is locked, but the current value
-still has the expected value.
-
-- getter/setter: non cloning error in the getter/setter optimization
-
-- getter/setter: optimization: The difference between the invokespecial and the invokevirtual
-instructions is that invokevirtual invokes a method based on the class of the object. The invokespecial
-instruction is used to invoke instance initialization methods (§3.9)  as well as private methods and
-methods of a superclass of the current class. so getter/setter inlining also is allowed for
-invokespecial even though the getter/setter is not final
-
-- mapupdate: add test to openforwrite on locked but commuting tranlocal
-
-- mapupdate:  add test to openforread on locked but commuting tranlocal
-
-- mapupdate:  add test to openforwrite on version too new but commuting tranlocal
-
-- mapupdate:  add test to openforread on version too new but commuting tranlocal
-
-
-- arrayupdate:  add test to openforwrite on locked but commuting tranlocal
-
-- arrayupdate: add test to openforread on locked but commuting tranlocal
-
-- arrayupdate: add test to openforwrite on version too new but commuting tranlocal
-
-- arrayupdate: add test to openforread on version too new but commuting tranlocal
-
-
-- monoupdate: add test to openforwrite on locked but commuting tranlocal
-
-- monoupdate: add test to openforread on locked but commuting tranlocal
-
-- monoupdate: add test to openforwrite on version too new but commuting tranlocal
-
-- monoupdate: add test to openforread on version too new but commuting tranlocal
-
-- AlphaProgrammaticLong.atomic methods should use the backoff policy
-
-- AlphaProgrammaticReference should use backoff policy
-
- - integration test for the alphaprogrammatic long and atomic methods
-
-- AlphaProgrammaticLong should use the stm for all its operations once it has
-been build using that stm.
-
-- AlphaProgrammaticReference should use the stm for all its operations once
-it has been build using that stm.
-
-- thread safety of the java agent functionality; classes can be created by different
-threads, so the whole mechanism should be made thread safe.
+    - getters/setter inliner should do verbose output
 

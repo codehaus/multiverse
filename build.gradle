@@ -107,11 +107,28 @@ project(':multiverse-core-tests') {
 // ------------------------------------------------------------------------------------------------------------------
 
 project(':multiverse-alpha-unborn') {
-  jar {
-    manifest {
-      attributes 'Premain-Class': 'org.multiverse.javaagent.MultiverseJavaAgent'
+
+  configurations {
+    testFixtures {
+      extendsFrom testRuntime
     }
   }
+
+  task testJar(type: Jar) {
+    from sourceSets.test.classes
+    classifier = 'test'
+  }
+
+  artifacts {
+    testFixtures testJar
+  }
+
+  //todo: remove? (it already is described in the manifest).
+  //jar {
+  //  manifest {
+  //    attributes 'Premain-Class': 'org.multiverse.javaagent.MultiverseJavaAgent'
+  //  }
+  //}
 
   classes.doLast() {
     println "------------------------------------------------------------------"
@@ -211,6 +228,10 @@ project(':multiverse-alpha') {
     ant.unzip(
             dest: "${buildDir}/classes/test",
             src: new File("${rootProject.projectDir}").absolutePath + "/multiverse-core/build/libs/multiverse-core-${project.version}-test.jar")
+    ant.unzip(
+            dest: "${buildDir}/classes/test",
+            src: new File("${rootProject.projectDir}").absolutePath + "/multiverse-alpha-unborn/build/libs/multiverse-alpha-unborn-${project.version}-test.jar")
+
 
     ant.java(classname: "org.multiverse.compiler.MultiverseCompiler") {
       arg value: '-o'
@@ -258,6 +279,7 @@ project(':multiverse-alpha') {
     compile group: 'com.tonicsystems.jarjar', name: 'jarjar', version: "1.0-rc8"
     testCompile project(path: ':multiverse-core', configuration: 'testFixtures')
     testCompile project(path: ':multiverse-instrumentation', configuration: 'testFixtures')
+    testCompile project(path: ':multiverse-alpha-unborn', configuration: 'testFixtures')
     testCompile project(':multiverse-benchy')
   }
 }

@@ -25,7 +25,7 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
  *
  * @author Peter Veentjer.
  */
-public class CycleHandlingTest {
+public class CycleHandlingStressTest {
 
     private Stm stm;
 
@@ -61,7 +61,7 @@ public class CycleHandlingTest {
             return next;
         }
 
-        public void setNext(CycleHandlingTest.SingleLinkedNode next) {
+        public void setNext(CycleHandlingStressTest.SingleLinkedNode next) {
             this.next = next;
         }
     }

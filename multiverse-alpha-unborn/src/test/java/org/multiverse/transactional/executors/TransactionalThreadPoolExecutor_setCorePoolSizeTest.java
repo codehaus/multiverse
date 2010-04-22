@@ -16,7 +16,6 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.transactional.executors.TransactionalThreadPoolExecutorTestUtils.*;
 
-@Ignore
 public class TransactionalThreadPoolExecutor_setCorePoolSizeTest {
     private Stm stm;
 
