@@ -2,7 +2,6 @@ package org.multiverse.transactional.arrays;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
@@ -60,18 +59,6 @@ public class TransactionalReferenceArray_getTest {
     }
 
     @Test
-    @Ignore
-    public void whenNoTransactionAvailableAndLocked() {
-
-    }
-
-    @Test
-    @Ignore
-    public void whenNoTransactionAvailableNotCommittedBefore() {
-
-    }
-
-    @Test
     public void whenTransactionActive() {
         TransactionalReferenceArray<String> array = new TransactionalReferenceArray<String>(10);
 
@@ -88,17 +75,5 @@ public class TransactionalReferenceArray_getTest {
 
         assertSame(update, found);
         assertEquals(version, stm.getVersion());
-    }
-
-    @Test
-    @Ignore
-    public void whenTransactionAvailableAndNotCommittedBefore() {
-
-    }
-
-    @Test
-    @Ignore
-    public void whenTransactionActiveAndLocked() {
-
     }
 }

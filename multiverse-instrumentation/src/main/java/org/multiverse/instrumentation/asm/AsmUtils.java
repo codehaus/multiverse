@@ -104,19 +104,6 @@ public final class AsmUtils implements Opcodes {
         System.out.println("  class on top: " + clazz.getName());
     }
 
-    public static LocalVariableNode findThisVariable(MethodNode methodNode) {
-        if (methodNode.localVariables == null) {
-            return null;
-        }
-
-        for (LocalVariableNode localVar : (List<LocalVariableNode>) methodNode.localVariables) {
-            if (localVar.name.equals("this")) {
-                return localVar;
-            }
-        }
-        return null;
-    }
-
     public static DebugInfo findDebugInfo(MethodNode method) {
         DebugInfo info = new DebugInfo();
 
@@ -406,7 +393,6 @@ public final class AsmUtils implements Opcodes {
             throw new RuntimeException("A problem ocurred while loading class: " + file, e);
         }
     }
-
 
     /**
      * Checks if a ClassNode has the specified visible annotation.

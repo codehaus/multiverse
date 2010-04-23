@@ -5,10 +5,12 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Stm;
+import org.multiverse.api.Transaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
@@ -52,9 +54,22 @@ public class TransactionalReferenceArray_setTest {
     }
 
     @Test
-    @Ignore
     public void whenTransactionAvailable_thenThatTransactionIsUsed() {
+        TransactionalReferenceArray<String> array = new TransactionalReferenceArray<String>(10);
 
+        Transaction tx = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
+                .build()
+                .start();
+
+        setThreadLocalTransaction(tx);
+        long version = stm.getVersion();
+        array.set(1, "foo");
+        tx.abort();
+
+        assertEquals(version, stm.getVersion());
+        assertNull(array.get(1));
     }
 
     @Test

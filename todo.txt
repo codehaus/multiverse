@@ -1,22 +1,10 @@
 ---------------------------------------------------------------
 todo engine
 ---------------------------------------------------------------
-TransactionalReferenceArray_atomicGetTest.whenNotCommittedBefore
-
-TransactionalReferenceArray_atomicGetTest.whenLocked
-
-TransactionalReferenceArray_getTest.whenNoTransactionAvailableAndLocked
-
-TransactionalReferenceArray_getTest.whenNoTransactionAvailableNotCommittedBefore
-
-TransactionalReferenceArray_getTest.whenTransactionAvailableAndNotCommittedBefore
-
-TransactionalReferenceArray_getTest.whenTransactionActiveAndLocked
 
 TransactionalReferenceArray_setTest.whenTransactionAvailable_thenThatTransactionIsUsed
 
-TransactionalReferenceArray_setTest._whenListenersAvailable_thenTheyAreNotified
-
+TransactionalReferenceArray_setTest.whenListenersAvailable_thenTheyAreNotified
 
 - convert manual from html to docbook
 
@@ -63,7 +51,6 @@ VetoCommitBarrier_tryJoinCommitTest.whenOpenAndTransactionPrepared_then
 VetoCommitBarrier_tryJoinCommitTest.whenOpenAndTransactionCommitted_then
 
 VetoCommitBarrier_tryJoinCommitTest.whenOpenAndTransactionAborted_then
-
 
 AbstractTransaction_abortTest.whenDoAbortThrowsError
 
@@ -428,3 +415,16 @@ TransactionalReferenceArray_atomicSetTest.whenNoValueChange
 TransactionalReferenceArray_atomicSetTest.whenValueChanged
 
 TransactionalReferenceArray_atomicSetTest.whenTransactionActiveThenIgnored
+
+TransactionalReferenceArray_getTest.whenNoTransactionAvailableAndLocked
+
+TransactionalReferenceArray_getTest.whenNoTransactionAvailableNotCommittedBefore
+
+TransactionalReferenceArray_getTest.whenTransactionAvailableAndNotCommittedBefore
+
+TransactionalReferenceArray_getTest.whenTransactionActiveAndLocked
+
+TransactionalReferenceArray_atomicGetTest.whenNotCommittedBefore
+
+TransactionalReferenceArray_atomicGetTest.whenLocked
+

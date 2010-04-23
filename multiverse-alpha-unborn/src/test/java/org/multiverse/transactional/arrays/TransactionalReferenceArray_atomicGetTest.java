@@ -2,7 +2,6 @@ package org.multiverse.transactional.arrays;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
@@ -28,7 +27,6 @@ public class TransactionalReferenceArray_atomicGetTest {
     public void tearDown() {
         clearThreadLocalTransaction();
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void whenIndexTooBig_thenIndexOutOfBoundsException() {
@@ -57,12 +55,6 @@ public class TransactionalReferenceArray_atomicGetTest {
         version = stm.getVersion();
         assertSame(update, array.atomicGet(index));
         assertEquals(version, stm.getVersion());
-    }
-
-    @Test
-    @Ignore
-    public void whenLocked() {
-
     }
 
     @Test

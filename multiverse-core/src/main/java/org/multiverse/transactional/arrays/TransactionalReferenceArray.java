@@ -55,10 +55,6 @@ public final class TransactionalReferenceArray<E> {
         this.array = array;
     }
 
-    ProgrammaticReference getReference(int index) {
-        return array[index];
-    }
-
     /**
      * Gets the element at the specified index.
      *

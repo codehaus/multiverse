@@ -72,6 +72,34 @@ public class TransactionalReferenceArray_setPerformanceTest {
     }
 
     @Test
+    public void testTransactionalReferenceArrayUsingAtomicSet() {
+        TransactionalReferenceArray<String> array = new TransactionalReferenceArray<String>(itemCount);
+
+        long version = stm.getVersion();
+        long startNs = System.nanoTime();
+
+        String value = "";
+
+        for (long k = 0; k < transactionCount; k++) {
+
+            array.atomicSet((int) k % itemCount, value);
+
+            if (k % (50 * 1000 * 1000) == 0) {
+                System.out.println("at: " + k);
+            }
+
+            if (k % itemCount == 0) {
+                value += " ";
+            }
+        }
+
+        long durationNs = System.nanoTime() - startNs;
+        assertEquals(version + transactionCount, stm.getVersion());
+        double transactionsPerSecond = (1.0d * transactionCount * TimeUnit.SECONDS.toNanos(1)) / durationNs;
+        System.out.printf("Performance %s transactions/second\n", transactionsPerSecond);
+    }
+
+    @Test
     public void testAtomicReferenceArray() {
         AtomicReferenceArray<String> array = new AtomicReferenceArray<String>(itemCount);
 

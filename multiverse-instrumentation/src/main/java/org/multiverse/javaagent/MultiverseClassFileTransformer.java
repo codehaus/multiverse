@@ -44,7 +44,6 @@ public final class MultiverseClassFileTransformer implements ClassFileTransforme
             handleThrowable(className, ex);
             throw ex;
         } catch (Error ex) {
-            System.out.println("MultiverseClassFileTransformer found a problem");
             handleThrowable(className, ex);
             throw ex;
         }
@@ -52,15 +51,10 @@ public final class MultiverseClassFileTransformer implements ClassFileTransforme
 
     private static void handleThrowable(String className, Throwable cause) {
         String msg = format("Failed while instrumenting class '%s'. " +
-                "It is not possible to abort the instrumentation process, so the JVM is going to continue, " +
+                "It is not possible to abort the Javaagent instrumentation process, so the JVM is going to continue, " +
                 "but since this class is not instrumented, it is not transactional so all bets are off.", className);
 
         logger.log(Level.SEVERE, msg, cause);
-
-        try {
-            JavaAgentProblemMonitor.INSTANCE.signalProblem(className);
-        } catch (RuntimeException expected) {
-            expected.printStackTrace();
-        }
+        JavaAgentProblemMonitor.INSTANCE.signalProblem(className);
     }
 }
