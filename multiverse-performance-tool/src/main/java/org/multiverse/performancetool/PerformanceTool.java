@@ -46,13 +46,12 @@ public class PerformanceTool {
     }
 
     private long executeBenchmark(PerformanceToolArguments arguments) throws InterruptedException {
-
         AtomicLong clock = new AtomicLong();
 
         Barrier startBarrier = new Barrier();
         Thread[] threads = new Thread[arguments.threadCount];
         for (int k = 0; k < arguments.threadCount; k++) {
-            threads[k] = new StressThread(k, arguments.transactionCount, clock, arguments.strict, startBarrier);
+            threads[k] = new StressThread(k + 1, arguments.transactionCount, clock, arguments.strict, startBarrier);
             threads[k].start();
         }
 
@@ -72,6 +71,7 @@ public class PerformanceTool {
     private void printSettings(PerformanceToolArguments cli) {
         NumberFormat nf = createNumberFormat();
         System.out.println("Update transaction count per thread: " + nf.format(cli.transactionCount));
+        System.out.println("Update transaction count in total: " + nf.format(cli.transactionCount * cli.threadCount));
         System.out.println("Threadcount:" + nf.format(cli.threadCount));
         System.out.println("Strict: " + cli.strict);
     }
