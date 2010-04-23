@@ -118,6 +118,7 @@
         <module>multiverse-scala</module>
         <module>multiverse-site</module>
         <module>multiverse-project-archetype</module>
+        <module>multiverse-performance-tool</module>
     </modules>
 
     <build>

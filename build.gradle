@@ -306,3 +306,10 @@ project(':multiverse-scala') {
     testCompile group: 'org.scalatest', name: 'scalatest', version: '1.0'
   }
 }
+
+project(':multiverse-performance-tool') {
+
+  dependencies {
+    compile group: 'args4j', name: 'args4j', version: "2.0.16"
+  }
+}
