@@ -1,6 +1,38 @@
 ---------------------------------------------------------------
 todo engine
 ---------------------------------------------------------------
+TransactionalReferenceArray_atomicGetTest.whenNotCommittedBefore
+
+TransactionalReferenceArray_atomicGetTest.whenLocked
+
+TransactionalReferenceArray_getTest.whenNoTransactionAvailableAndLocked
+
+TransactionalReferenceArray_getTest.whenNoTransactionAvailableNotCommittedBefore
+
+TransactionalReferenceArray_getTest.whenTransactionAvailableAndNotCommittedBefore
+
+TransactionalReferenceArray_getTest.whenTransactionActiveAndLocked
+
+TransactionalReferenceArray_setTest.whenTransactionAvailable_thenThatTransactionIsUsed
+
+TransactionalReferenceArray_setTest._whenListenersAvailable_thenTheyAreNotified
+
+
+- convert manual from html to docbook
+
+- generate manual from gradle
+
+- site needs to be generated from gradle
+
+- publish snapshot artifacts from gradle to codehaus
+
+- publish real artifacts from gradle to codehaus
+
+- upload site from gradle to codehaus
+
+- upload reports from gradle to codehaus
+
+- multiverse-scala compile project 
 
 CountDownCommitBarrier_incPartiesWithTransactionTest.whenPendingTransactions
 
@@ -32,35 +64,6 @@ VetoCommitBarrier_tryJoinCommitTest.whenOpenAndTransactionCommitted_then
 
 VetoCommitBarrier_tryJoinCommitTest.whenOpenAndTransactionAborted_then
 
-SpeculativeNonAutomaticReadTrackingTest
-
-TransactionalReferenceArray_atomicCompareAndSetTest.whenLocked
-
-TransactionalReferenceArray_atomicGetTest.whenNotCommittedBefore
-
-TransactionalReferenceArray_atomicGetTest.whenLocked
-
-TransactionalReferenceArray_atomicSetTest.whenLocked
-
-TransactionalReferenceArray_atomicSetTest.whenNotCommittedBefore
-
-TransactionalReferenceArray_atomicSetTest.whenNoValueChange
-
-TransactionalReferenceArray_atomicSetTest.whenValueChanged
-
-TransactionalReferenceArray_atomicSetTest.whenTransactionActiveThenIgnored
-
-TransactionalReferenceArray_getTest.whenNoTransactionAvailableAndLocked
-
-TransactionalReferenceArray_getTest.whenNoTransactionAvailableNotCommittedBefore
-
-TransactionalReferenceArray_getTest.whenTransactionAvailableAndNotCommittedBefore
-
-TransactionalReferenceArray_getTest.whenTransactionActiveAndLocked
-
-TransactionalReferenceArray_setTest.whenTransactionAvailable_thenThatTransactionIsUsed
-
-TransactionalReferenceArray_setTest._whenListenersAvailable_thenTheyAreNotified
 
 AbstractTransaction_abortTest.whenDoAbortThrowsError
 
@@ -78,7 +81,73 @@ TransactionalThreadPoolExecutor_awaitTerminationTest.whenShutdown
 
 TransactionalThreadPoolExecutor_setCorePoolSizeTest.whenPoolSizeIncreased
 
-- TransactionCollections need to be scanned for @Ignore
+TransactionalArrayList_addAll2Test.whenAddedInFront
+
+TransactionalArrayList_addAll2Test.whenAddedToEnd
+
+TransactionalArrayList_addAll2Test.whenAddedInBetween
+
+TransactionalArrayList_hashCodeTest
+
+TransactionalArrayList_listIterator1Test
+
+TransactionalArrayList_listIteratorTest
+
+TransactionalArrayList_sublistTest
+
+TransactionalLinkedList_ClassStructureTest
+
+TransactionalTreeMap_StressTest
+
+TransactionalTreeMap_containsValueTest
+
+TransactionalTreeMap_entrySetTest
+
+TransactionalTreeMap_equalsTest
+
+TransactionalTreeMap_getTest.whenKeyIsRoot
+
+TransactionalTreeMap_hashCodeTest
+
+TransactionalTreeMap_keySetTest
+
+TransactionalTreeMap.whenOneOfTheKeysContainsNull
+
+TransactionalTreeMap_putIfAbsentTest.test
+
+TransactionalTreeMap_remove1Test
+
+TransactionalTreeMap_remove2Test
+
+TransactionalTreeMap_replace3Test
+
+TransactionalTreeMap_toStringTest
+
+TransactionalTreeMap_valuesTest
+
+TransactionalTreeSet_StressTest
+
+TransactionalTreeSet_equalsTest
+
+TransactionalTreeSet_hashCodeTest
+
+TransactionalTreeSet_iteratorTest
+
+TransactionalTreeSet_removeAllTest
+
+TransactionalTreeSet_removeTest.whenSetEmpty_thenReturnFalse
+
+TransactionalTreeSet_removeTest.whenItemNotFound_thenNoChange
+
+TransactionalTreeSet_removeTest.whenItemFound_thenRemoved
+
+TransactionalTreeSet_retainAllTest.
+
+TransactionalTreeSet_toArray0Test
+
+TransactionalTreeSet_toArray1Test
+
+TransactionalTreeSet_toStringTest
 
 - back off policy
 
@@ -126,6 +195,10 @@ it will not be fixated.
 - TransactionalTreeMap
 
     - balancing of the treemap
+
+        - big performance problem
+
+        - deletion of nodes
 
     - public boolean replace(K key, V oldValue, V newValue)
 
@@ -340,3 +413,18 @@ done
 
     - getters/setter inliner should do verbose output
 
+SpeculativeNonAutomaticReadTrackingTest
+
+- multiverse scala integration needs to be added to gradle
+
+TransactionalReferenceArray_atomicCompareAndSetTest.whenLocked
+
+TransactionalReferenceArray_atomicSetTest.whenLocked
+
+TransactionalReferenceArray_atomicSetTest.whenNotCommittedBefore
+
+TransactionalReferenceArray_atomicSetTest.whenNoValueChange
+
+TransactionalReferenceArray_atomicSetTest.whenValueChanged
+
+TransactionalReferenceArray_atomicSetTest.whenTransactionActiveThenIgnored

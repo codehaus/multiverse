@@ -139,13 +139,15 @@ public interface ProgrammaticReference<E> {
 
     // ======================= compareAndSet ========================
 
-
     /**
-     * @param newValue
-     * @param update
-     * @return
+     * Executes a compare and swap without looking at a running transaction. This call essentially
+     * is being executed under its own transaction.
+     *
+     * @param expected the expected value
+     * @param update   the update
+     * @return true if was a success, false otherwise.
      */
-    boolean atomicCompareAndSet(E newValue, E update);
+    boolean atomicCompareAndSet(E expected, E update);
 
     // ======================= isNull ========================
 

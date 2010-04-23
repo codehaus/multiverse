@@ -2,8 +2,11 @@ allprojects {
   sourceCompatibility = 1.6
   version = '0.5-SNAPSHOT'
   group = 'org.multiverse'
+  //scalaVersion = '2.8.0.Beta1'
+  scalaVersion = '2.7.7'
 
   apply plugin: 'java'
+  apply plugin: 'scala'
   apply plugin: 'maven'
   apply plugin: 'project-reports'
 
@@ -281,5 +284,25 @@ project(':multiverse-alpha') {
     testCompile project(path: ':multiverse-instrumentation', configuration: 'testFixtures')
     testCompile project(path: ':multiverse-alpha-unborn', configuration: 'testFixtures')
     testCompile project(':multiverse-benchy')
+  }
+}
+
+// ------------------------------------------------------------------------------------------------------------------
+
+project(':multiverse-scala-integration') {
+  repositories {
+    mavenRepo urls: 'http://scala-tools.org/repo-releases/'
+  }
+
+  dependencies {
+    // Libraries needed to run the scala tools
+    scalaTools "org.scala-lang:scala-compiler:${scalaVersion}"
+    scalaTools "org.scala-lang:scala-library:${scalaVersion}"
+    // Libraries needed for scala api
+    compile "org.scala-lang:scala-library:${scalaVersion}"
+    compile project(':multiverse-core')
+    compile project(':multiverse-instrumentation')
+    compile project(':multiverse-alpha-unborn')
+    testCompile group: 'org.scalatest', name: 'scalatest', version: '1.0'
   }
 }

@@ -2,7 +2,6 @@ package org.multiverse.transactional.arrays;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
@@ -65,12 +64,6 @@ public class TransactionalReferenceArray_atomicCompareAndSetTest {
         assertFalse(result);
         assertEquals(version, stm.getVersion());
         assertNull(array.atomicGet(5));
-    }
-
-    @Test
-    @Ignore
-    public void whenLocked() {
-
     }
 
     @Test

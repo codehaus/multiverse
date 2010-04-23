@@ -61,12 +61,6 @@ public class TransactionalReferenceArray_atomicGetTest {
 
     @Test
     @Ignore
-    public void whenNotCommittedBefore() {
-
-    }
-
-    @Test
-    @Ignore
     public void whenLocked() {
 
     }

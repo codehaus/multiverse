@@ -57,5 +57,4 @@ public class TransactionalLinkedList_ClassStructureTest {
         assertFalse(tailMetadata.isManagedField());
         assertTrue(tailMetadata.hasFieldGranularity());
     }
-
 }

@@ -55,6 +55,10 @@ public final class TransactionalReferenceArray<E> {
         this.array = array;
     }
 
+    ProgrammaticReference getReference(int index) {
+        return array[index];
+    }
+
     /**
      * Gets the element at the specified index.
      *
@@ -62,6 +66,7 @@ public final class TransactionalReferenceArray<E> {
      * @return the element at the specified index.
      * @throws IndexOutOfBoundsException if the index is out of bounds.
      */
+    @TransactionalMethod(readonly = true)
     public E get(int index) {
         return array[index].get();
     }
@@ -69,13 +74,12 @@ public final class TransactionalReferenceArray<E> {
     /**
      * Returns the currently stored item at the specified index. This call doesn't
      * look at a transaction running in the ThreadLocalTransaction.
-     * <p/>
-     * todo: explain what happens when value uncommitted.
      *
      * @param index the index of the item to get
      * @return the value of the item
      * @throws IndexOutOfBoundsException if index is out of bounds.
      */
+    @Exclude
     public E atomicGet(int index) {
         return array[index].atomicGet();
     }
@@ -87,6 +91,7 @@ public final class TransactionalReferenceArray<E> {
      * is used, otherwise this call is executed atomically (and very very fast).
      *
      * @param index the index of the element to set.
+     * @param item  the item to set.
      * @return the previous content of element at the specified index.
      * @throws IndexOutOfBoundsException if the index is out of bounds.
      */
@@ -98,8 +103,6 @@ public final class TransactionalReferenceArray<E> {
      * Atomically sets the element at the specified index. If a transaction
      * is running in the ThreadLocalTransaction, it is ignored. That is why
      * this call is very fast.
-     * <p/>
-     * todo: explain what happens when value uncommitted.
      *
      * @param index  the index of the element to atomically set.
      * @param update the new value
@@ -113,12 +116,14 @@ public final class TransactionalReferenceArray<E> {
     }
 
     /**
-     * todo: explain what happens when value uncommitted.
+     * Executes an atomic compare and set, so this call doesn't look at a running transaction,
+     * but essentially runs with its own transaction.
      *
-     * @param index
-     * @param expected
-     * @param update
-     * @return
+     * @param index    the index of the reference where the compare and set action needs to be executed on.
+     * @param expected the value the reference is expected to have.
+     * @param update   the new value
+     * @return true if it was a success, false otherwise.
+     * @throws IndexOutOfBoundsException if index is smaller than 0, or larger than array.size.
      */
     @Exclude
     public boolean atomicCompareAndSet(int index, E expected, E update) {
@@ -138,10 +143,12 @@ public final class TransactionalReferenceArray<E> {
     }
 
     /**
-     * Remove elements.
+     * Shifts all the items in the array one to the left (so essentially removes items).
      *
-     * @param firstIndex
-     * @param lastIndex
+     * @param firstIndex the first index of the item to shift to the left.
+     * @param lastIndex  the index of the last item (inclusive) to shift to the left.
+     * @throws IndexOutOfBoundsException if firstIndex smaller than 1, or firstIndex larger or equal to
+     *                                   the array.length.
      */
     public void shiftLeft(int firstIndex, int lastIndex) {
         if (firstIndex < 1 || firstIndex >= array.length) {
@@ -171,7 +178,6 @@ public final class TransactionalReferenceArray<E> {
 
         //[a   , b, c
         //[null, a, b, c
-
 
         //endIndex not checked
         for (int k = lastIndex; k >= firstIndex; k--) {
