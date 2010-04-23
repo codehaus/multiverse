@@ -36,7 +36,7 @@ public class RetryCountTest {
     static class NoRetriesMethod {
         int count;
 
-        @TransactionalMethod(maxRetryCount = 0)
+        @TransactionalMethod(maxRetries = 0)
         public void execute() {
             count++;
             throw new OptimisticLockFailedWriteConflict();
@@ -59,7 +59,7 @@ public class RetryCountTest {
     static class OneRetriesMethod {
         int count;
 
-        @TransactionalMethod(maxRetryCount = 1)
+        @TransactionalMethod(maxRetries = 1)
         public void execute() {
             count++;
             throw new OptimisticLockFailedWriteConflict();
@@ -82,7 +82,7 @@ public class RetryCountTest {
     static class TenRetriesMethod {
         int count;
 
-        @TransactionalMethod(maxRetryCount = 10)
+        @TransactionalMethod(maxRetries = 10)
         public void execute() {
             count++;
             throw new OptimisticLockFailedWriteConflict();

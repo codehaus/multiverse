@@ -77,7 +77,7 @@ public class TransactionalMethod_TimeoutLongTest {
 
     //we need a high retry count because the reference could be getting a useless value very often
 
-    @TransactionalMethod(timeout = 5, maxRetryCount = 100000)
+    @TransactionalMethod(timeout = 5, maxRetries = 100000)
     public void tryAwaitFiveSeconds(TransactionalInteger ref, int minvalue) {
         if (ref.get() < minvalue) {
             System.out.println("ref.get: " + ref.get() + " and waiting for: " + minvalue);

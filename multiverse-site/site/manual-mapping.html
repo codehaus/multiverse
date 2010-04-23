@@ -16,7 +16,7 @@
         <a href="#transactionalmethod">1.3 @TransactionalMethod</a>
         <ul>
             <li><a href="#transactionalmethod.readonly">1.3.1 @TransactionalMethod.readonly</a></li>
-            <li><a href="#transactionalmethod.maxretrycount">1.3.2 @TransactionalMethod.maxRetryCount</a></li>
+            <li><a href="#transactionalmethod.maxRetries">1.3.2 @TransactionalMethod.maxRetries</a></li>
             <li><a href="#transactionalmethod.automaticreadtracking">1.3.3
                 @TransactionalMethod.automaticReadTracking</a></li>
             <li><a href="">1.3.3 @TransactionalMethod.writeSkew</a></li>
@@ -154,7 +154,7 @@ of the TransactionalMethod annotation, e.g.:
     }
 </pre>
 
-<h3 id="transactionalmethod.maxretrycount">1.3.2 @TransactionalMethod.maxRetryCount</h3>
+<h3 id="transactionalmethod.maxRetries">1.3.2 @TransactionalMethod.maxRetries</h3>
 Transactions run in Multiverse can fail for all kinds of reasons:
 <ol>
     <li><b>read conflicts:</b> when a transaction tries to load a transactional object for reading or writing,
@@ -179,7 +179,7 @@ The transaction management logic added to transactional method automatically ret
 the next time the transaction executed, it could succeed. But in some cases a transaction is not able to
 complete; perhaps the transaction is continuously runs into read or write conflicts caused by contention.
 To prevent uncontrolled retrying (this could lead to livelocking), the number of retries default is bound to
-1000. With the maxRetryCount this property can be influenced:
+1000. With the maxRetries this property can be influenced:
 
 <pre>
     import org.multiverse.annotations.TransactionalMethod;
@@ -192,20 +192,20 @@ To prevent uncontrolled retrying (this could lead to livelocking), the number of
 
         ...
 
-        @TransactionalMethod(readonly = true, maxRetryCount = 10)
+        @TransactionalMethod(readonly = true, maxRetries = 10)
         public int getBalance(){
             return balance;
         }
     }
 </pre>
-The maxRetryCount can be used in combination with all the other TransactionalMethod properties.
+The maxRetries can be used in combination with all the other TransactionalMethod properties.
 <p/>
 But be careful:
 <ol>
     <li>if you give it a too high value, the system could start to suffer from livelocking</li>
     <li>if you give it a too low value, some transactions will never commit</li>
 </ol>
-On a lower level the maxRetryCount is combined with a customizable restartBackoffPolicy (with an exponential
+On a lower level the maxRetries is combined with a customizable restartBackoffPolicy (with an exponential
 backoff policy as the default implementation) to eliviate pressure on contention. In the future this backoff
 policy will be exposed through annotations.
 

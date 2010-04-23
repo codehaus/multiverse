@@ -44,7 +44,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
     private final BackoffPolicy backoffPolicy;
 
-    private final int maxRetryCount;
+    private final int maxRetries;
 
     private final int maxArraySize;
 
@@ -101,7 +101,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         this.maxArraySize = config.maxFixedUpdateSize;
         this.commitLockPolicy = config.commitLockPolicy;
         this.backoffPolicy = config.backoffPolicy;
-        this.maxRetryCount = config.maxRetryCount;
+        this.maxRetries = config.maxRetries;
         this.clock = config.clock;
         this.quickReleaseWriteLocksEnabled = config.quickReleaseWriteLocksEnabled;
         this.referenceFactoryBuilder = new AlphaProgrammaticReferenceFactoryBuilder(this);
@@ -153,8 +153,8 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         return maxArraySize;
     }
 
-    public int getMaxRetryCount() {
-        return maxRetryCount;
+    public int getMaxRetries() {
+        return maxRetries;
     }
 
     public boolean isOptimizeConflictDetectionEnabled() {
@@ -186,7 +186,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
     public class AlphaTransactionFactoryBuilder
             implements TransactionFactoryBuilder<AlphaTransaction, AlphaTransactionFactoryBuilder> {
 
-        private final int maxRetryCount;
+        private final int maxRetries;
         private final boolean readonly;
         private final String familyName;
         private final boolean readTrackingEnabled;
@@ -204,7 +204,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             this(false, //readonly
                     AlphaStm.this.readTrackingEnabled,
                     createAnonymousFamilyName(),
-                    AlphaStm.this.maxRetryCount,
+                    AlphaStm.this.maxRetries,
                     AlphaStm.this.allowWriteSkewProblem,
                     AlphaStm.this.commitLockPolicy,
                     AlphaStm.this.backoffPolicy,
@@ -218,14 +218,14 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
         public AlphaTransactionFactoryBuilder(
                 boolean readonly, boolean readTrackingEnabled, String familyName,
-                int maxRetryCount, boolean writeSkewProblemAllowed,
+                int maxRetries, boolean writeSkewProblemAllowed,
                 CommitLockPolicy commitLockPolicy, BackoffPolicy backoffPolicy,
                 SpeculativeConfiguration speculativeConfig, boolean interruptible,
                 boolean dirtyCheck, boolean quickReleaseEnabled,
                 boolean explicitRetryAllowed, long timeoutNs) {
             this.readonly = readonly;
             this.familyName = familyName;
-            this.maxRetryCount = maxRetryCount;
+            this.maxRetries = maxRetries;
             this.readTrackingEnabled = readTrackingEnabled;
             this.writeSkewProblemAllowed = writeSkewProblemAllowed;
             this.commitLockPolicy = commitLockPolicy;
@@ -299,14 +299,14 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         }
 
         @Override
-        public int getMaxRetryCount() {
-            return maxRetryCount;
+        public int getMaxRetries() {
+            return maxRetries;
         }
 
         @Override
         public AlphaTransactionFactoryBuilder setTimeoutNs(long timeoutNs) {
             return new AlphaTransactionFactoryBuilder(
-                    readonly, readTrackingEnabled, familyName, maxRetryCount,
+                    readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewProblemAllowed, commitLockPolicy, backoffPolicy,
                     speculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
                     explicitRetryAllowed, timeoutNs);
@@ -315,7 +315,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         @Override
         public AlphaTransactionFactoryBuilder setFamilyName(String familyName) {
             return new AlphaTransactionFactoryBuilder(
-                    readonly, readTrackingEnabled, familyName, maxRetryCount,
+                    readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewProblemAllowed, commitLockPolicy, backoffPolicy,
                     speculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
                     explicitRetryAllowed, timeoutNs);
@@ -324,20 +324,20 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         @Override
         public AlphaTransactionFactoryBuilder setQuickReleaseEnabled(boolean quickReleaseEnabled) {
             return new AlphaTransactionFactoryBuilder(
-                    readonly, readTrackingEnabled, familyName, maxRetryCount,
+                    readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewProblemAllowed, commitLockPolicy, backoffPolicy,
                     speculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
                     explicitRetryAllowed, timeoutNs);
         }
 
         @Override
-        public AlphaTransactionFactoryBuilder setMaxRetryCount(int maxRetryCount) {
-            if (maxRetryCount < 0) {
-                throw new IllegalArgumentException(format("retryCount can't be smaller than 0, found %s", maxRetryCount));
+        public AlphaTransactionFactoryBuilder setMaxRetries(int maxRetries) {
+            if (maxRetries < 0) {
+                throw new IllegalArgumentException(format("retryCount can't be smaller than 0, found %s", maxRetries));
             }
 
             return new AlphaTransactionFactoryBuilder(
-                    readonly, readTrackingEnabled, familyName, maxRetryCount,
+                    readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewProblemAllowed, commitLockPolicy, backoffPolicy,
                     speculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
                     explicitRetryAllowed, timeoutNs);
@@ -348,7 +348,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             SpeculativeConfiguration newSpeculativeConfig = speculativeConfig.withSpeculativeReadonlyDisabled();
 
             return new AlphaTransactionFactoryBuilder(
-                    readonly, readTrackingEnabled, familyName, maxRetryCount,
+                    readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewProblemAllowed, commitLockPolicy, backoffPolicy,
                     newSpeculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
                     explicitRetryAllowed, timeoutNs);
@@ -358,7 +358,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             SpeculativeConfiguration newSpeculativeConfig = speculativeConfig.withSpeculativeNonAutomaticReadTrackingDisabled();
 
             return new AlphaTransactionFactoryBuilder(
-                    readonly, readTrackingEnabled, familyName, maxRetryCount,
+                    readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewProblemAllowed, commitLockPolicy, backoffPolicy,
                     newSpeculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
                     explicitRetryAllowed, timeoutNs);
@@ -367,7 +367,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         @Override
         public AlphaTransactionFactoryBuilder setInterruptible(boolean interruptible) {
             return new AlphaTransactionFactoryBuilder(
-                    readonly, readTrackingEnabled, familyName, maxRetryCount,
+                    readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewProblemAllowed, commitLockPolicy, backoffPolicy,
                     speculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
                     explicitRetryAllowed, timeoutNs);
@@ -380,7 +380,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             }
 
             return new AlphaTransactionFactoryBuilder(
-                    readonly, readTrackingEnabled, familyName, maxRetryCount,
+                    readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewProblemAllowed, commitLockPolicy, backoffPolicy,
                     speculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
                     explicitRetryAllowed, timeoutNs);
@@ -391,7 +391,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             SpeculativeConfiguration newSpeculativeConfig = createSpeculativeConfiguration(enabled, maxArraySize);
 
             return new AlphaTransactionFactoryBuilder(
-                    readonly, readTrackingEnabled, familyName, maxRetryCount,
+                    readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewProblemAllowed, commitLockPolicy, backoffPolicy, newSpeculativeConfig,
                     interruptible, dirtyCheck, quickReleaseEnabled, explicitRetryAllowed, timeoutNs);
         }
@@ -399,7 +399,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         @Override
         public AlphaTransactionFactoryBuilder setWriteSkewProblemAllowed(boolean allowWriteSkew) {
             return new AlphaTransactionFactoryBuilder(
-                    readonly, readTrackingEnabled, familyName, maxRetryCount,
+                    readonly, readTrackingEnabled, familyName, maxRetries,
                     allowWriteSkew, commitLockPolicy, backoffPolicy, speculativeConfig,
                     interruptible, dirtyCheck, quickReleaseEnabled, explicitRetryAllowed, timeoutNs);
         }
@@ -411,7 +411,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             }
 
             return new AlphaTransactionFactoryBuilder(
-                    readonly, readTrackingEnabled, familyName, maxRetryCount,
+                    readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewProblemAllowed, commitLockPolicy, backoffPolicy,
                     speculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
                     explicitRetryAllowed, timeoutNs);
@@ -420,7 +420,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         @Override
         public AlphaTransactionFactoryBuilder setDirtyCheckEnabled(boolean dirtyCheckEnabled) {
             return new AlphaTransactionFactoryBuilder(
-                    readonly, readTrackingEnabled, familyName, maxRetryCount,
+                    readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewProblemAllowed, commitLockPolicy, backoffPolicy,
                     speculativeConfig, interruptible, dirtyCheckEnabled, quickReleaseEnabled,
                     explicitRetryAllowed, timeoutNs);
@@ -429,7 +429,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         @Override
         public AlphaTransactionFactoryBuilder setExplicitRetryAllowed(boolean explicitRetryAllowed) {
             return new AlphaTransactionFactoryBuilder(
-                    readonly, readTrackingEnabled, familyName, maxRetryCount,
+                    readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewProblemAllowed, commitLockPolicy, backoffPolicy,
                     speculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
                     explicitRetryAllowed, timeoutNs);
@@ -449,22 +449,22 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         private TransactionFactory<AlphaTransaction> createSpeculativeTxFactory() {
             final ReadonlyConfiguration ro_nort =
                     new ReadonlyConfiguration(
-                            clock, backoffPolicy, familyName, speculativeConfig, maxRetryCount,
+                            clock, backoffPolicy, familyName, speculativeConfig, maxRetries,
                             interruptible, false, explicitRetryAllowed, timeoutNs);
             final ReadonlyConfiguration ro_rt =
                     new ReadonlyConfiguration(
-                            clock, backoffPolicy, familyName, speculativeConfig, maxRetryCount,
+                            clock, backoffPolicy, familyName, speculativeConfig, maxRetries,
                             interruptible, true, explicitRetryAllowed, timeoutNs);
             final UpdateConfiguration up_rt =
                     new UpdateConfiguration(
                             clock, backoffPolicy, commitLockPolicy, familyName, speculativeConfig,
-                            maxRetryCount, interruptible, true, writeSkewProblemAllowed,
+                            maxRetries, interruptible, true, writeSkewProblemAllowed,
                             optimizeConflictDetectionEnabled, true, quickReleaseEnabled,
                             explicitRetryAllowed, timeoutNs);
             final UpdateConfiguration up_nort =
                     new UpdateConfiguration(
                             clock, backoffPolicy, commitLockPolicy, familyName,
-                            speculativeConfig, maxRetryCount, interruptible, false, true,
+                            speculativeConfig, maxRetries, interruptible, false, true,
                             optimizeConflictDetectionEnabled, true, quickReleaseEnabled,
                             explicitRetryAllowed, timeoutNs);
 
@@ -536,7 +536,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             ReadonlyConfiguration config =
                     new ReadonlyConfiguration(
                             clock, backoffPolicy, familyName, speculativeConfig,
-                            maxRetryCount, interruptible, readTrackingEnabled,
+                            maxRetries, interruptible, readTrackingEnabled,
                             explicitRetryAllowed, timeoutNs);
 
             if (readTrackingEnabled) {
@@ -559,7 +559,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             UpdateConfiguration config =
                     new UpdateConfiguration(
                             clock, backoffPolicy, commitLockPolicy, familyName, speculativeConfig,
-                            maxRetryCount, interruptible, readTrackingEnabled, writeSkewProblemAllowed,
+                            maxRetries, interruptible, readTrackingEnabled, writeSkewProblemAllowed,
                             optimizeConflictDetectionEnabled, true, quickReleaseEnabled,
                             explicitRetryAllowed, timeoutNs);
 

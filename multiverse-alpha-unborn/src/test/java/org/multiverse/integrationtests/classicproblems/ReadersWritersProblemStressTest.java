@@ -144,7 +144,7 @@ public class ReadersWritersProblemStressTest {
         }
 
         @Override
-        @TransactionalMethod(maxRetryCount = 10000)
+        @TransactionalMethod(maxRetries = 10000)
         public void acquireReadLock() {
             if (readerCount == -1) {
                 retry();
@@ -154,7 +154,7 @@ public class ReadersWritersProblemStressTest {
         }
 
         @Override
-        @TransactionalMethod(maxRetryCount = 10000)
+        @TransactionalMethod(maxRetries = 10000)
         public void acquireWriteLock() {
             if (readerCount != 0) {
                 retry();

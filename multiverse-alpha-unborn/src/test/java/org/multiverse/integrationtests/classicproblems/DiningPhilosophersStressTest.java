@@ -111,7 +111,7 @@ public class DiningPhilosophersStressTest {
             rightFork.dec();
         }
 
-        @TransactionalMethod(maxRetryCount = 10000)
+        @TransactionalMethod(maxRetries = 10000)
         public void takeForks() {
             Transaction tx = getThreadLocalTransaction();
             if (leftFork.get() == 1) {

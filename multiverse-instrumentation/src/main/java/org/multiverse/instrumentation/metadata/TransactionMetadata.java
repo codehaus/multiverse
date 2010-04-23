@@ -25,7 +25,7 @@ public class TransactionMetadata {
 
     public String familyName;
 
-    public int maxRetryCount;
+    public int maxRetries;
 
     public boolean speculativeConfigurationEnabled;
 

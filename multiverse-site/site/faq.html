@@ -107,7 +107,7 @@ Multiverse is very optimistic, so it could be that while reading/writing to tran
 or when the transaction commits. The transaction management automatically retries the transaction in the hope that it
 will succeed next time. Oncontrolled retrying could lead to livelocking because resources are consumed (memory
 and cpu cycles) but no progress is made because transactions keep aborting. But retrying in Multiverse is bounded.
-And can be configured with the maxRetryCount property of the TransactionalMethod annotation.
+And can be configured with the maxRetries property of the TransactionalMethod annotation.
 
 <h2 id="question.14">Does Multiverse prevent starvation?</h2>
 No. Multiverse doesn't provide any guarantee that transaction that content over resources are going to commit. Meaning
@@ -243,7 +243,7 @@ areas of research for transactional memory to lower the amount of contention (fo
 
 <p>
     Multiverse provides basic support for preving transactions to livelock by limiting the maximum number of retries
-    ( can be configured with the maxRetryCount) in combination with a backoff policy. Bby default an exponential backoff
+    ( can be configured with the maxRetries) in combination with a backoff policy. Bby default an exponential backoff
     policy is used.
 
 <h2 id="question.34">Does Multiverse touch java.util classes?</h2>

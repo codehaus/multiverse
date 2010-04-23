@@ -106,7 +106,7 @@ public class VetoCommitBarrier_joinCommitTest {
         }
 
         @Override
-        @TransactionalMethod(maxRetryCount = 0)
+        @TransactionalMethod(maxRetries = 0)
         public void doRun() throws Exception {
             sleepMs(1000);
             ref.inc();

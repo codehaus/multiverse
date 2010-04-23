@@ -7,7 +7,6 @@ import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.transactional.collections.TransactionalLinkedList;
 
-import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
@@ -55,7 +54,7 @@ public class ConnectionPoolStressTest {
             }
         }
 
-        @TransactionalMethod(maxRetryCount = 10000)
+        @TransactionalMethod(maxRetries = 10000)
         Connection takeConnection() throws InterruptedException {
             return deque.takeFirst();
         }

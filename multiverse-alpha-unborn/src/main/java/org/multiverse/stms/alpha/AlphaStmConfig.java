@@ -54,7 +54,7 @@ public final class AlphaStmConfig {
 
     public boolean speculativeConfigurationEnabled = false;
 
-    public int maxRetryCount = 1000;
+    public int maxRetries = 1000;
 
     public int maxFixedUpdateSize = 20;
 
@@ -76,8 +76,8 @@ public final class AlphaStmConfig {
      * @throws IllegalStateException if the configuration isn't valid.
      */
     public void ensureValid() {
-        if (maxRetryCount < 0) {
-            throw new IllegalStateException("Invalid configuration, 'maxRetryCount' can't be smaller than 0");
+        if (maxRetries < 0) {
+            throw new IllegalStateException("Invalid configuration, 'maxRetries' can't be smaller than 0");
         }
 
         if (commitLockPolicy == null) {
@@ -96,7 +96,7 @@ public final class AlphaStmConfig {
             throw new IllegalStateException("Invalid configuration, fixedLengthMaximumSize can't be smaller than 0");
         }
 
-        if (maxRetryCount < 0) {
+        if (maxRetries < 0) {
             throw new IllegalStateException("Invalid configuration, defaultMaxRetryCount can't be smaller than 0");
         }
     }

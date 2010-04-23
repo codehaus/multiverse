@@ -43,7 +43,7 @@ public @interface TransactionalMethod {
 
     boolean readonly() default false;
 
-    int maxRetryCount() default 1000;
+    int maxRetries() default 1000;
 
     long timeout() default Long.MAX_VALUE;
 

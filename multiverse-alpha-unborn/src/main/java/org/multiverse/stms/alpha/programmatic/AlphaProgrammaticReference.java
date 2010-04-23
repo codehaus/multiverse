@@ -313,8 +313,8 @@ public final class AlphaProgrammaticReference<E>
 
     private void lock(Transaction lockOwner) {
         //if we couldn't acquire the lock, we are done.
-        for (int attempt = 0; attempt <= stm.getMaxRetryCount(); attempt++) {
-            if (attempt == stm.getMaxRetryCount()) {
+        for (int attempt = 0; attempt <= stm.getMaxRetries(); attempt++) {
+            if (attempt == stm.getMaxRetries()) {
                 throw new TooManyRetriesException();
             } else if (___tryLock(lockOwner)) {
                 return;

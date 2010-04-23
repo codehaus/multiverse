@@ -46,7 +46,7 @@ public class TransactionalConstructor_settingsTest {
             Transaction tx = getThreadLocalTransaction();
 
             assertFalse(tx.getConfiguration().isReadonly());
-            assertEquals(0, tx.getConfiguration().getMaxRetryCount());
+            assertEquals(0, tx.getConfiguration().getMaxRetries());
             assertFalse(tx.getConfiguration().isReadTrackingEnabled());
             assertTrue(tx.getConfiguration().isWriteSkewProblemAllowed());
         }

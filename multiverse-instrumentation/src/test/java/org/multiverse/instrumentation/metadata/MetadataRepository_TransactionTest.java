@@ -32,7 +32,7 @@ public class MetadataRepository_TransactionTest {
         assertNull(transactionMetadata.readOnly);
         assertFalse(transactionMetadata.interruptible);
         assertTrue(transactionMetadata.writeSkewProblemAllowed);
-        assertEquals(1000, transactionMetadata.maxRetryCount);
+        assertEquals(1000, transactionMetadata.maxRetries);
         assertEquals("org.multiverse.instrumentation.metadata.MetadataRepository_TransactionTest$DefaultSettings.method()", transactionMetadata.familyName);
     }
 
@@ -53,7 +53,7 @@ public class MetadataRepository_TransactionTest {
         assertNull(transactionMetadata.trackReads);
         assertFalse(transactionMetadata.interruptible);
         assertTrue(transactionMetadata.writeSkewProblemAllowed);
-        assertEquals(1000, transactionMetadata.maxRetryCount);
+        assertEquals(1000, transactionMetadata.maxRetries);
         assertEquals("org.multiverse.instrumentation.metadata.MetadataRepository_TransactionTest$ReadonlyMethod.method()", transactionMetadata.familyName);
     }
 
@@ -74,7 +74,7 @@ public class MetadataRepository_TransactionTest {
         assertNull(transactionMetadata.trackReads);
         assertFalse(transactionMetadata.interruptible);
         assertTrue(transactionMetadata.writeSkewProblemAllowed);
-        assertEquals(1000, transactionMetadata.maxRetryCount);
+        assertEquals(1000, transactionMetadata.maxRetries);
         assertEquals("org.multiverse.instrumentation.metadata.MetadataRepository_TransactionTest$DefaultUpdateMethod.method()", transactionMetadata.familyName);
     }
 
@@ -194,17 +194,17 @@ public class MetadataRepository_TransactionTest {
         TransactionMetadata explicitValueTransactionMetadata = explicitValueMethodMetadata.getTransactionalMetadata();
 
         assertNotNull(explicitValueTransactionMetadata);
-        assertEquals(100, explicitValueTransactionMetadata.maxRetryCount);
+        assertEquals(100, explicitValueTransactionMetadata.maxRetries);
 
         MethodMetadata defaultValueMethodMetadata = classMetadata.getMethodMetadata("defaultValue", "()V");
 
         TransactionMetadata defaultValueTransactionMetadata = defaultValueMethodMetadata.getTransactionalMetadata();
         assertNotNull(defaultValueTransactionMetadata);
-        assertEquals(1000, defaultValueTransactionMetadata.maxRetryCount);
+        assertEquals(1000, defaultValueTransactionMetadata.maxRetries);
     }
 
     class MaxRetryCountProblem {
-        @TransactionalMethod(maxRetryCount = 100)
+        @TransactionalMethod(maxRetries = 100)
         void explicitValue() {
         }
 

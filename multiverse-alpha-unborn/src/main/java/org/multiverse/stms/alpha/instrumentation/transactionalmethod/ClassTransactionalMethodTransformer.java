@@ -205,12 +205,12 @@ public final class ClassTransactionalMethodTransformer implements Opcodes {
                 "setWriteSkewProblemAllowed",
                 "(Z)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
 
-        //maxRetryCount
-        insnList.add(new LdcInsnNode(transactionMetadata.maxRetryCount));
+        //maxRetries
+        insnList.add(new LdcInsnNode(transactionMetadata.maxRetries));
         insnList.add(new MethodInsnNode(
                 INVOKEINTERFACE,
                 Type.getInternalName(TransactionFactoryBuilder.class),
-                "setMaxRetryCount",
+                "setMaxRetries",
                 "(I)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
 
         //timeout

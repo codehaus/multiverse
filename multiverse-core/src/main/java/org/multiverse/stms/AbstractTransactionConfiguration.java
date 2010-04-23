@@ -22,7 +22,7 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
     public final BackoffPolicy backoffPolicy;
     public final String familyName;
     public final boolean readOnly;
-    public final int maxRetryCount;
+    public final int maxRetries;
     public final boolean interruptible;
     public final boolean writeSkewProblemAllowed;
     public final boolean readTrackingEnabled;
@@ -39,7 +39,7 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
 
     public AbstractTransactionConfiguration(
             PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName,
-            boolean readOnly, int maxRetryCount, boolean interruptible,
+            boolean readOnly, int maxRetries, boolean interruptible,
             boolean writeSkewProblemAllowed, boolean readTrackingEnabled,
             boolean explicitRetryAllowed, long timeoutNs) {
 
@@ -55,7 +55,7 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
         this.familyName = familyName;
         this.readOnly = readOnly;
         this.backoffPolicy = backoffPolicy;
-        this.maxRetryCount = maxRetryCount;
+        this.maxRetries = maxRetries;
         this.interruptible = interruptible;
         this.readTrackingEnabled = readTrackingEnabled;
         this.writeSkewProblemAllowed = writeSkewProblemAllowed;
@@ -73,7 +73,7 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
     }
 
     @Override
-    public boolean isExplictRetryEnabled() {
+    public boolean isExplicitRetryAllowed() {
         return explicitRetryAllowed;
     }
 
@@ -83,8 +83,8 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
     }
 
     @Override
-    public final int getMaxRetryCount() {
-        return maxRetryCount;
+    public final int getMaxRetries() {
+        return maxRetries;
     }
 
     @Override

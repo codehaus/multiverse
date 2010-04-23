@@ -50,7 +50,7 @@ public class AlphaStm_NonSpeculativeTransactionSettingsTest {
         assertFalse(t.getConfiguration().isReadonly());
         assertFalse(t.getConfiguration().isReadTrackingEnabled());
         assertTrue(t.getConfiguration().isWriteSkewProblemAllowed());
-        assertEquals(1000, t.getConfiguration().getMaxRetryCount());
+        assertEquals(1000, t.getConfiguration().getMaxRetries());
         assertFalse(t.getConfiguration().isInterruptible());
     }
 
@@ -67,7 +67,7 @@ public class AlphaStm_NonSpeculativeTransactionSettingsTest {
         assertFalse(t.getConfiguration().isReadonly());
         assertTrue(t.getConfiguration().isReadTrackingEnabled());
         assertTrue(t.getConfiguration().isWriteSkewProblemAllowed());
-        assertEquals(1000, t.getConfiguration().getMaxRetryCount());
+        assertEquals(1000, t.getConfiguration().getMaxRetries());
         assertFalse(t.getConfiguration().isInterruptible());
     }
 

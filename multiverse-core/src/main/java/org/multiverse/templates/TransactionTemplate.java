@@ -304,7 +304,7 @@ public abstract class TransactionTemplate<E> {
                         tx.commit();
                         return result;
                     } catch (Retry e) {
-                        if (attempt - 1 < tx.getConfiguration().getMaxRetryCount()) {
+                        if (attempt - 1 < tx.getConfiguration().getMaxRetries()) {
 
                             Latch latch;
                             if (tx.getRemainingTimeoutNs() == Long.MAX_VALUE) {
@@ -359,11 +359,11 @@ public abstract class TransactionTemplate<E> {
                     backoffPolicy.delayedUninterruptible(tx, attempt);
                     tx.restart();
                 }
-            } while (attempt - 1 < tx.getConfiguration().getMaxRetryCount());
+            } while (attempt - 1 < tx.getConfiguration().getMaxRetries());
 
-            String msg = format("Too many retries on transaction '%s', maxRetryCount = %s",
+            String msg = format("Too many retries on transaction '%s', maxRetries = %s",
                     tx.getConfiguration().getFamilyName(),
-                    tx.getConfiguration().getMaxRetryCount());
+                    tx.getConfiguration().getMaxRetries());
             throw new TooManyRetriesException(msg, lastFailureCause);
         } finally {
             if (tx != null && tx.getStatus() != TransactionStatus.committed) {

@@ -55,7 +55,7 @@ public class TransactionalMethod_settingTest {
             x = 0;
         }
 
-        @TransactionalMethod(maxRetryCount = 51)
+        @TransactionalMethod(maxRetries = 51)
         public void doSomething(AtomicInteger tryCounter) {
             //force the loadForRead so that the retry doesn't find an empty transaction
             int b = x;

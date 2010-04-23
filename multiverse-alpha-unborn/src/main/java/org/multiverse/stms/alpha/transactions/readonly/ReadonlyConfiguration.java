@@ -18,22 +18,22 @@ public final class ReadonlyConfiguration extends AbstractAlphaTransactionConfigu
 
     public ReadonlyConfiguration(
             PrimitiveClock clock, BackoffPolicy backoffPolicy,
-            String familyName, SpeculativeConfiguration speculativeConfig, int maxRetryCount,
+            String familyName, SpeculativeConfiguration speculativeConfig, int maxRetries,
             boolean interruptible, boolean readTrackingEnabled, boolean explicitRetryAllowed, long timeoutNs) {
 
-        super(clock, backoffPolicy, familyName, true, maxRetryCount, interruptible,
+        super(clock, backoffPolicy, familyName, true, maxRetries, interruptible,
                 true, readTrackingEnabled, explicitRetryAllowed, speculativeConfig, timeoutNs);
     }
 
     public ReadonlyConfiguration withSpeculativeConfig(SpeculativeConfiguration speculativeConfig) {
         return new ReadonlyConfiguration(clock, backoffPolicy, familyName,
-                speculativeConfig, maxRetryCount, interruptible, readTrackingEnabled,
+                speculativeConfig, maxRetries, interruptible, readTrackingEnabled,
                 explicitRetryAllowed, timeoutNs);
     }
 
     public ReadonlyConfiguration withExplicitRetryAllowed(boolean explicitRetryAllowed) {
         return new ReadonlyConfiguration(clock, backoffPolicy, familyName,
-                speculativeConfiguration, maxRetryCount, interruptible, readTrackingEnabled,
+                speculativeConfiguration, maxRetries, interruptible, readTrackingEnabled,
                 explicitRetryAllowed, timeoutNs);
     }
 }

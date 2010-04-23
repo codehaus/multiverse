@@ -2,6 +2,11 @@
 todo engine
 ---------------------------------------------------------------
 
+- performance test swing tool that has configurable number of threads and puts load on an atomic clock long
+(relaxed and non relaxed) and calculates the maximum number of threads/second that are possible. Also use
+an transactional ref with the alphastm to do some real tests?
+
+
 - debug information is lost in transactional method (no visible in stacktrace)
 
 - convert manual from html to docbook

@@ -343,10 +343,10 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
         TransactionMetadata transactionMetadata = new TransactionMetadata();
 
         if (methodNode.name.equals("<init>")) {
-            transactionMetadata.maxRetryCount = 0;
+            transactionMetadata.maxRetries = 0;
             transactionMetadata.speculativeConfigurationEnabled = false;
         } else {
-            transactionMetadata.maxRetryCount = 1000;
+            transactionMetadata.maxRetries = 1000;
             transactionMetadata.speculativeConfigurationEnabled = true;
         }
 
@@ -398,10 +398,10 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
         }
 
         if (methodNode.name.equals("<init>")) {
-            txMetadata.maxRetryCount = (Integer) getValue(annotationNode, "maxRetryCount", 0);
+            txMetadata.maxRetries = (Integer) getValue(annotationNode, "maxRetries", 0);
             txMetadata.speculativeConfigurationEnabled = false;
         } else {
-            txMetadata.maxRetryCount = (Integer) getValue(annotationNode, "maxRetryCount", 1000);
+            txMetadata.maxRetries = (Integer) getValue(annotationNode, "maxRetries", 1000);
             txMetadata.speculativeConfigurationEnabled = true;
         }
 

@@ -128,7 +128,7 @@ public class TransactionLogicDonor {
                         tx.commit();
                         return;
                     } catch (Retry er) {
-                        if (attempt - 1 < tx.getConfiguration().getMaxRetryCount()) {
+                        if (attempt - 1 < tx.getConfiguration().getMaxRetries()) {
                             Latch latch;
                             if (tx.getRemainingTimeoutNs() == Long.MAX_VALUE) {
                                 latch = new CheapLatch();
@@ -178,14 +178,14 @@ public class TransactionLogicDonor {
                     BackoffPolicy backoffPolicy = tx.getConfiguration().getBackoffPolicy();
                     backoffPolicy.delayedUninterruptible(tx, attempt);
                 } finally {
-                    if (tx.getStatus() != TransactionStatus.committed && attempt - 1 < tx.getConfiguration().getMaxRetryCount()) {
+                    if (tx.getStatus() != TransactionStatus.committed && attempt - 1 < tx.getConfiguration().getMaxRetries()) {
                         tx.restart();
                     }
                 }
-            } while (attempt - 1 < tx.getConfiguration().getMaxRetryCount());
+            } while (attempt - 1 < tx.getConfiguration().getMaxRetries());
 
             String msg = format("Could not complete transaction '%s' within %s retries",
-                    tx.getConfiguration().getFamilyName(), tx.getConfiguration().getMaxRetryCount());
+                    tx.getConfiguration().getFamilyName(), tx.getConfiguration().getMaxRetries());
             throw new TooManyRetriesException(msg);
         } finally {
             clearThreadLocalTransaction();

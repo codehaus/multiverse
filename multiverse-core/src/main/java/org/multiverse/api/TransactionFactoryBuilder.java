@@ -25,7 +25,7 @@ import org.multiverse.api.commitlock.CommitLockPolicy;
  * <ol>
  * <li><b>readonly</b>false</li>
  * <li><b>automatic read tracking</b>false</li>
- * <li><b>maxRetryCount</b> 1000</li>
+ * <li><b>maxRetries</b> 1000</li>
  * </ol>
  * <p/>
  * The big advantage to a builder compared to just adding a big load of parameters or storing these parameters in a
@@ -280,11 +280,11 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      * Sets the the maximum count a transaction can be retried. The default is 1000.
      * Setting it to a very low value could mean that a transaction can't complete.
      *
-     * @param retryCount the maximum number of times a transaction can be tried.
+     * @param maxRetries the maximum number of times a transaction can be tried.
      * @return the updated TransactionFactoryBuilder
      * @throws IllegalArgumentException if retryCount smaller than 0.
      */
-    B setMaxRetryCount(int retryCount);
+    B setMaxRetries(int maxRetries);
 
     /**
      * Returns the maximum number of times a transaction can be retried. It doesn't
@@ -294,7 +294,7 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      * @return the maximum number of times a transaction can be retried. The returned
      *         value will always be equal or larger than 0.
      */
-    int getMaxRetryCount();
+    int getMaxRetries();
 
     /**
      * Builds a {@link TransactionFactory} with the provided configuration.

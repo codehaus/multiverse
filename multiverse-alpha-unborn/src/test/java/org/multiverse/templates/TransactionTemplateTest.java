@@ -253,7 +253,7 @@ public class TransactionTemplateTest {
 
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
-                .setMaxRetryCount(retryCount).build();
+                .setMaxRetries(retryCount).build();
 
 
         final TransactionalInteger ref = new TransactionalInteger();
