@@ -33,18 +33,23 @@ public final class TransactionalMethodInstrumentationPhase extends AbstractInstr
         boolean restore = InsnList.check;
         InsnList.check = true;
         try {
-
             ClassNode donor = loadAsClassNode(TransactionLogicDonor.class);
 
             ClassNode result;
             if (classMetadata.isInterface()) {
-                TransactionalInterfaceMethodTransformer transformer = new TransactionalInterfaceMethodTransformer(
-                        originalClazz.getClassLoader(), original, environment.getMetadataRepository());
+                InterfaceTransactionalMethodTransformer transformer = new InterfaceTransactionalMethodTransformer(
+                        originalClazz.getClassLoader(),
+                        original,
+                        environment.getMetadataRepository());
                 result = transformer.transform();
             } else {
-                TransactionalClassMethodTransformer transformer = new TransactionalClassMethodTransformer(
-                        originalClazz.getClassLoader(), original, donor,
-                        environment.getMetadataRepository(), environment.optimize(), environment.getLog());
+                ClassTransactionalMethodTransformer transformer = new ClassTransactionalMethodTransformer(
+                        originalClazz.getClassLoader(),
+                        original,
+                        donor,
+                        environment.getMetadataRepository(),
+                        environment.optimize(),
+                        environment.getLog());
                 result = transformer.transform();
             }
 

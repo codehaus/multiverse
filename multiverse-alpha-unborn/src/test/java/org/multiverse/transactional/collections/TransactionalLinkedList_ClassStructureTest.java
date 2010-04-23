@@ -43,18 +43,18 @@ public class TransactionalLinkedList_ClassStructureTest {
         ClassMetadata metadata = repo.loadClassMetadata(TransactionalLinkedList.class);
 
         assertTrue(metadata.isTransactionalObject());
-        assertFalse(metadata.isRealTransactionalObject());
+        assertFalse(metadata.isTransactionalObjectWithObjectGranularFields());
 
         FieldMetadata sizeMetadata = metadata.getFieldMetadata("size");
         assertFalse(sizeMetadata.isManagedField());
         assertFalse(sizeMetadata.hasFieldGranularity());
 
         FieldMetadata headMetadata = metadata.getFieldMetadata("head");
-        assertFalse(headMetadata.isManagedField());
+        assertTrue(headMetadata.isManagedField());
         assertTrue(headMetadata.hasFieldGranularity());
 
         FieldMetadata tailMetadata = metadata.getFieldMetadata("tail");
-        assertFalse(tailMetadata.isManagedField());
+        assertTrue(tailMetadata.isManagedField());
         assertTrue(tailMetadata.hasFieldGranularity());
     }
 }

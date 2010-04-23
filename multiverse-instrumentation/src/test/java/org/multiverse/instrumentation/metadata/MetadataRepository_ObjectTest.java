@@ -33,7 +33,7 @@ public class MetadataRepository_ObjectTest {
         assertNotNull(metadata);
         assertFalse(metadata.isIgnoredClass());
         assertTrue(metadata.isTransactionalObject());
-        assertTrue(metadata.isRealTransactionalObject());
+        assertTrue(metadata.isTransactionalObjectWithObjectGranularFields());
 
         assertTrue(metadata.hasTransactionalMethods());
     }
@@ -59,7 +59,7 @@ public class MetadataRepository_ObjectTest {
         assertFalse(metadata.isInterface());
         assertFalse(metadata.isIgnoredClass());
         assertTrue(metadata.isTransactionalObject());
-        assertFalse(metadata.isRealTransactionalObject());
+        assertFalse(metadata.isTransactionalObjectWithObjectGranularFields());
     }
 
 
@@ -78,7 +78,7 @@ public class MetadataRepository_ObjectTest {
         assertFalse(metadata.isInterface());
         assertFalse(metadata.isIgnoredClass());
         assertTrue(metadata.isTransactionalObject());
-        assertFalse(metadata.isRealTransactionalObject());
+        assertFalse(metadata.isTransactionalObjectWithObjectGranularFields());
     }
 
     @TransactionalObject

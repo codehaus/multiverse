@@ -23,7 +23,7 @@ public final class FieldGranularityInstrumentationPhase extends AbstractInstrume
         ClassMetadata metadata = environment.getMetadataRepository().loadClassMetadata(
                 originalClazz.getClassLoader(), originalClazz.getName());
 
-        if (!metadata.hasFieldsWithFieldGranularity()) {
+        if (!metadata.hasManagedFieldsWithFieldGranularity()) {
             return originalClazz;
         }
 

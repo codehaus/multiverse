@@ -23,7 +23,7 @@ public final class TranlocalSnapshotInstrumentationPhase extends AbstractInstrum
         ClassMetadata classMetadata = environment.getMetadataRepository().loadClassMetadata(
                 originalClazz.getClassLoader(), originalClazz.getName());
 
-        if (!classMetadata.isRealTransactionalObject()) {
+        if (!classMetadata.isTransactionalObjectWithObjectGranularFields()) {
             return originalClazz;
         }
 

@@ -2,13 +2,17 @@ package org.multiverse.transactional.arrays;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.TestThread;
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 
 import static org.junit.Assert.*;
+import static org.mockito.internal.util.StringJoiner.join;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
@@ -84,8 +88,39 @@ public class TransactionalReferenceArray_setTest {
     }
 
     @Test
-    @Ignore
     public void whenListenersAvailable_thenTheyAreNotified() {
+        TransactionalReferenceArray<Integer> array = new TransactionalReferenceArray<Integer>(10);
+        WaitThread t = new WaitThread(0, array);
+        startAll(t);
 
+        sleepMs(500);
+        assertAlive(t);
+
+        //do the update
+        array.set(3, 1);
+
+        //wait for the waitthread to complete
+        join(t);
+    }
+
+    class WaitThread extends TestThread {
+        final TransactionalReferenceArray<Integer> array;
+
+        WaitThread(int id, TransactionalReferenceArray<Integer> array) {
+            super("WaitThread-" + id);
+            this.array = array;
+        }
+
+        @Override
+        @TransactionalMethod
+        public void doRun() throws Exception {
+            for (int k = 0; k < array.length(); k++) {
+                if (array.get(k) != null) {
+                    return;
+                }
+            }
+
+            retry();
+        }
     }
 }

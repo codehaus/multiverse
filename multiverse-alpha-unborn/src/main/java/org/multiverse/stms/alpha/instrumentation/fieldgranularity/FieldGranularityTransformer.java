@@ -51,7 +51,9 @@ public final class FieldGranularityTransformer implements Opcodes {
                 FieldNode fixedFieldNode = new FieldNode(
                         ACC_SYNTHETIC + ACC_FINAL + ACC_PUBLIC,
                         fieldNode.name,
-                        referenceDesc, null, null
+                        referenceDesc,
+                        null,//signature
+                        null//value
                 );
 
                 fields.add(fixedFieldNode);
@@ -224,7 +226,7 @@ public final class FieldGranularityTransformer implements Opcodes {
     }
 
     private void addInitializationLogicToConstructors() {
-        if (!classMetadata.hasFieldsWithFieldGranularity()) {
+        if (!classMetadata.hasManagedFieldsWithFieldGranularity()) {
             return;
         }
 

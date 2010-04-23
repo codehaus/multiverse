@@ -55,11 +55,15 @@ public final class FieldMetadata {
         return hasFieldGranularity;
     }
 
-    public void setIsManagedField(boolean managedField) {
+    public void setIsManaged(boolean managedField) {
         this.isManagedField = managedField;
     }
 
     public boolean isManagedField() {
         return isManagedField;
+    }
+
+    public boolean isManagedFieldWithObjectGranularity() {
+        return isManagedField && !hasFieldGranularity;
     }
 }

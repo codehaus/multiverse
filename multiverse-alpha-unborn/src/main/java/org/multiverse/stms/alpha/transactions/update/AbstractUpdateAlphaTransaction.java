@@ -217,34 +217,40 @@ public abstract class AbstractUpdateAlphaTransaction
                     throw createFailedToObtainCommitLocksException();
                 }
 
-                boolean hasConflict = false;
+                boolean failure = false;
                 try {
                     if (config.writeSkewProblemAllowed) {
-                        if (config.optimizedConflictDetectionEnabled && getReadVersion() == config.clock.getVersion()) {
+                        boolean skipConflictDetection = config.optimizedConflictDetectionEnabled
+                                && getReadVersion() == config.clock.getVersion();
+
+                        if (skipConflictDetection) {
+                            //we don't need to check for conflicts because:
+                            //- writeskew is allowed (so we don't need to check reads for conflicts)
+                            //- and the dirty tranlocals are locked
+                            //- and no other transaction committed after this transaction started,
+                            //Based on these 3 arguments we can conclude that 
                             writeVersion = config.clock.tick();
-                            //it could be that a different transaction also reached this part, so we need to make sure
-                            hasConflict = writeVersion != getReadVersion() + 1;
                         } else {
-                            hasConflict = hasWriteConflict();
-                            if (!hasConflict) {
+                            failure = hasWriteConflict();
+                            if (!failure) {
                                 writeVersion = config.clock.tick();
                             }
                         }
 
-                        if (hasConflict) {
+                        if (failure) {
                             throw createOptimisticLockFailedWriteConflict();
                         }
                     } else {
                         //todo: could here be a potential race problem because the reads are not locked, only the writes.
                         writeVersion = config.clock.strictTick();
-                        hasConflict = hasReadConflict();
+                        failure = hasReadConflict();
 
-                        if (hasConflict) {
+                        if (failure) {
                             throw createWriteSkewConflict();
                         }
                     }
                 } finally {
-                    if (hasConflict) {
+                    if (failure) {
                         doReleaseWriteLocksForFailure();
                     }
                 }

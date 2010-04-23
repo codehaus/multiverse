@@ -42,7 +42,7 @@ public final class NonTransactionalMethodFieldAccessMethodAdapter extends Method
         ClassMetadata ownerMetadata = metadataRepository.loadClassMetadata(classLoader, owner);
         FieldMetadata fieldMetadata = ownerMetadata.getFieldMetadata(fieldName);
 
-        if (fieldMetadata.isManagedField()) {
+        if (fieldMetadata.isManagedField() && !fieldMetadata.hasFieldGranularity()) {
             switch (opcode) {
                 case GETFIELD:
                     txObjectOnTopToTranlocal(owner, false);

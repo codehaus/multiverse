@@ -268,8 +268,9 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
         fieldMetadata.setDesc(fieldNode.desc);
 
         if (isManagedField(classMetadata, fieldNode)) {
-            fieldMetadata.setIsManagedField(true);
+            fieldMetadata.setIsManaged(true);
         } else if (isManagedFieldWithFieldGranularity(classMetadata, fieldNode)) {
+            fieldMetadata.setIsManaged(true);
             fieldMetadata.setHasFieldGranularity(true);
         }
 

@@ -29,14 +29,14 @@ import static org.multiverse.stms.alpha.instrumentation.transactionalmethod.Tran
  *
  * @author Peter Veentjer.
  */
-public final class TransactionalInterfaceMethodTransformer {
+public final class InterfaceTransactionalMethodTransformer {
 
     private final ClassNode classNode;
     private final MetadataRepository metadataRepository;
     private final ClassMetadata classMetadata;
     private final ClassLoader classLoader;
 
-    public TransactionalInterfaceMethodTransformer(ClassLoader classLoader, ClassNode classNode,
+    public InterfaceTransactionalMethodTransformer(ClassLoader classLoader, ClassNode classNode,
                                                    MetadataRepository metadataRepository) {
         if (classLoader == null || classNode == null) {
             throw new NullPointerException();

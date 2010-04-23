@@ -25,7 +25,7 @@ public final class TranlocalInstrumentationPhase extends AbstractInstrumentation
         ClassMetadata classMetadata = environment.getMetadataRepository().loadClassMetadata(
                 classLoader, originalClazz.getName());
 
-        if (!classMetadata.isRealTransactionalObject()) {
+        if (!classMetadata.isTransactionalObjectWithObjectGranularFields()) {
             return originalClazz;
         }
 

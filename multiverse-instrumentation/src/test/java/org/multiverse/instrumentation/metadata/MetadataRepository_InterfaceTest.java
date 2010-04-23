@@ -25,8 +25,8 @@ public class MetadataRepository_InterfaceTest {
         assertTrue(metadata.isInterface());
         assertFalse(metadata.isIgnoredClass());
         assertFalse(metadata.isTransactionalObject());
-        assertFalse(metadata.isRealTransactionalObject());
-        assertFalse(metadata.hasFieldsWithFieldGranularity());
+        assertFalse(metadata.isTransactionalObjectWithObjectGranularFields());
+        assertFalse(metadata.hasManagedFieldsWithFieldGranularity());
         assertFalse(metadata.hasManagedFields());
         assertFalse(metadata.hasTransactionalMethods());
     }
@@ -42,8 +42,8 @@ public class MetadataRepository_InterfaceTest {
         assertTrue(metadata.isInterface());
         assertFalse(metadata.isIgnoredClass());
         assertTrue(metadata.isTransactionalObject());
-        assertFalse(metadata.isRealTransactionalObject());
-        assertFalse(metadata.hasFieldsWithFieldGranularity());
+        assertFalse(metadata.isTransactionalObjectWithObjectGranularFields());
+        assertFalse(metadata.hasManagedFieldsWithFieldGranularity());
         assertFalse(metadata.hasManagedFields());
         assertFalse(metadata.hasTransactionalMethods());
     }
@@ -60,8 +60,8 @@ public class MetadataRepository_InterfaceTest {
         assertTrue(metadata.isInterface());
         assertFalse(metadata.isIgnoredClass());
         assertTrue(metadata.isTransactionalObject());
-        assertFalse(metadata.isRealTransactionalObject());
-        assertFalse(metadata.hasFieldsWithFieldGranularity());
+        assertFalse(metadata.isTransactionalObjectWithObjectGranularFields());
+        assertFalse(metadata.hasManagedFieldsWithFieldGranularity());
         assertFalse(metadata.hasManagedFields());
         assertTrue(metadata.hasTransactionalMethods());
 
@@ -84,8 +84,8 @@ public class MetadataRepository_InterfaceTest {
         assertTrue(metadata.isInterface());
         assertFalse(metadata.isIgnoredClass());
         assertTrue(metadata.isTransactionalObject());
-        assertFalse(metadata.isRealTransactionalObject());
-        assertFalse(metadata.hasFieldsWithFieldGranularity());
+        assertFalse(metadata.isTransactionalObjectWithObjectGranularFields());
+        assertFalse(metadata.hasManagedFieldsWithFieldGranularity());
         assertFalse(metadata.hasManagedFields());
         assertFalse(metadata.hasTransactionalMethods());
     }

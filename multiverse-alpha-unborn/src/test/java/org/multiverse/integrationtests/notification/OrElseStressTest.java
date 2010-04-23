@@ -55,7 +55,7 @@ public class OrElseStressTest {
         @Override
         public void doRun() throws Exception {
             for (int k = 0; k < waitCountPerWaiter * waitingThreadCount; k++) {
-                if (k % 1000 == 0) {
+                if (k % 10000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
 

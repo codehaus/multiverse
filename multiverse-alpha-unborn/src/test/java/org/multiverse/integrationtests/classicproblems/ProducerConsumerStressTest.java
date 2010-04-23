@@ -1,6 +1,7 @@
 package org.multiverse.integrationtests.classicproblems;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
@@ -30,6 +31,7 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
  *
  * @author Peter Veentjer.
  */
+@Ignore
 public class ProducerConsumerStressTest {
 
     private TransactionalLinkedList[] queues;

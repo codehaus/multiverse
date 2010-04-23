@@ -7,24 +7,30 @@ import org.multiverse.TestThread;
 import org.multiverse.annotations.FieldGranularity;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.exceptions.WriteConflict;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.TestUtils.*;
+import static org.multiverse.TestUtils.joinAll;
+import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 /**
  * A test that makes sure that when fieldgranularity is used instead of the default object granularity/
  */
-public class FieldGranularityTest {
+public class FieldGranularityStressTest {
 
-    public AtomicInteger commitCounter;
+    public AtomicInteger conflictCounter;
+    private int transactionCount = 50 * 1000 * 1000;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        commitCounter = new AtomicInteger();
+        conflictCounter = new AtomicInteger();
+
     }
 
     @After
@@ -41,10 +47,10 @@ public class FieldGranularityTest {
         startAll(leftThread, rightThread);
         joinAll(leftThread, rightThread);
 
-        assertEquals(10, pair.getLeft());
-        assertEquals(10, pair.getRight());
+        assertEquals(transactionCount, pair.getLeft());
+        assertEquals(transactionCount, pair.getRight());
 
-        assertEquals(2, commitCounter.get());
+        assertEquals(0, conflictCounter.get());
     }
 
     class SetLeftThread extends TestThread {
@@ -57,11 +63,23 @@ public class FieldGranularityTest {
         }
 
         @Override
-        @TransactionalMethod(readonly = false)
         public void doRun() throws Exception {
-            pair.setLeft(10);
-            sleepMs(1000);
-            commitCounter.incrementAndGet();
+            for (int k = 0; k < transactionCount; k++) {
+                updateLeft();
+            }
+        }
+
+        @TransactionalMethod(readonly = false)
+        public void updateLeft() {
+            pair.setLeft(pair.getLeft() + 1);
+
+            Transaction tx = getThreadLocalTransaction();
+            try {
+                tx.prepare();
+            } catch (WriteConflict conflict) {
+                conflict.printStackTrace();
+                conflictCounter.incrementAndGet();
+            }
         }
     }
 
@@ -75,11 +93,23 @@ public class FieldGranularityTest {
         }
 
         @Override
-        @TransactionalMethod(readonly = false)
         public void doRun() throws Exception {
-            pair.setRight(10);
-            sleepMs(1000);
-            commitCounter.incrementAndGet();
+            for (int k = 0; k < transactionCount; k++) {
+                updateRight();
+            }
+        }
+
+        @TransactionalMethod(readonly = false)
+        public void updateRight() throws Exception {
+            pair.setRight(pair.getRight() + 1);
+            Transaction tx = getThreadLocalTransaction();
+
+            try {
+                tx.prepare();
+            } catch (WriteConflict conflict) {
+                conflict.printStackTrace();
+                conflictCounter.incrementAndGet();
+            }
         }
     }
 

@@ -117,15 +117,26 @@ public final class ClassMetadata {
         return fieldMetadata;
     }
 
-    public boolean hasFieldsWithFieldGranularity() {
+    public boolean hasManagedFieldsWithFieldGranularity() {
         for (FieldMetadata field : fields.values()) {
-            if (field.hasFieldGranularity()) {
+            if (field.isManagedField() && field.hasFieldGranularity()) {
                 return true;
             }
         }
 
         return false;
     }
+
+    public boolean hasManagedFieldsWithObjectGranularity() {
+        for (FieldMetadata field : fields.values()) {
+            if (field.isManagedField() && !field.hasFieldGranularity()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     public boolean hasManagedFields() {
         for (FieldMetadata field : fields.values()) {
@@ -149,20 +160,25 @@ public final class ClassMetadata {
         this.isTransactionalObject = isTransactionalObject;
     }
 
-    public boolean isRealTransactionalObject() {
-        if (superClassMetadata != null && superClassMetadata.isRealTransactionalObject()) {
+    public boolean isTransactionalObjectWithObjectGranularFields() {
+        if (isParentTransactionalObjectWithObjectGranularFields()) {
             return true;
         }
 
         if (isTransactionalObject()) {
             for (FieldMetadata fieldMetadata : fields.values()) {
-                if (fieldMetadata.isManagedField()) {
+                if (fieldMetadata.isManagedField() && !fieldMetadata.hasFieldGranularity()) {
                     return true;
                 }
             }
         }
 
         return false;
+    }
+
+    private boolean isParentTransactionalObjectWithObjectGranularFields() {
+        return superClassMetadata != null
+                && superClassMetadata.isTransactionalObjectWithObjectGranularFields();
     }
 
     public boolean hasTransactionalMethods() {
@@ -175,12 +191,12 @@ public final class ClassMetadata {
         return false;
     }
 
-    public boolean isFirstGenerationRealTransactionalObject() {
+    public boolean isFirstGenerationTransactionalObjectWithObjectGranularFields() {
         if (!isTransactionalObject) {
             return false;
         }
 
-        if (!hasManagedFields()) {
+        if (!hasManagedFieldsWithObjectGranularity()) {
             return false;
         }
 
@@ -188,7 +204,7 @@ public final class ClassMetadata {
             return true;
         }
 
-        return !superClassMetadata.isRealTransactionalObject();
+        return !superClassMetadata.isTransactionalObjectWithObjectGranularFields();
     }
 
     public String getTranlocalName() {

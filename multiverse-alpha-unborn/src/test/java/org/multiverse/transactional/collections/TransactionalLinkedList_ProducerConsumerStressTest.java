@@ -124,7 +124,7 @@ public class TransactionalLinkedList_ProducerConsumerStressTest {
 
         public void doRun() throws InterruptedException {
             for (int k = 0; k < itemCount; k++) {
-                if (k % 2000 == 0) {
+                if (k % 5000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
 
@@ -165,7 +165,7 @@ public class TransactionalLinkedList_ProducerConsumerStressTest {
 
         public void doRun() throws InterruptedException {
             for (int k = 0; k < itemCount; k++) {
-                if (k % 2000 == 0) {
+                if (k % 5000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
 
@@ -213,7 +213,7 @@ public class TransactionalLinkedList_ProducerConsumerStressTest {
         public void doRun() throws InterruptedException {
             int k = 0;
             while (remainingCounter.getAndDecrement() > 0) {
-                if (k % 2000 == 0) {
+                if (k % 5000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
 

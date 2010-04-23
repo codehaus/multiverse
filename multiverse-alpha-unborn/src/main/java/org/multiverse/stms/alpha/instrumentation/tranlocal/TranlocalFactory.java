@@ -220,7 +220,7 @@ public final class TranlocalFactory implements Opcodes {
 
         m.visitLabel(next);
 
-        if (clazzMetadata.hasManagedFields()) {
+        if (clazzMetadata.hasManagedFieldsWithObjectGranularity()) {
             //if (isFirstGeneration) {
             m.visitVarInsn(ALOAD, 0);
 

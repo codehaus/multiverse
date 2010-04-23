@@ -42,7 +42,7 @@ import static org.objectweb.asm.Type.*;
  *
  * @author Peter Veentjer.
  */
-public final class TransactionalClassMethodTransformer implements Opcodes {
+public final class ClassTransactionalMethodTransformer implements Opcodes {
 
     private static final String ALPHA_TRANSACTION_INTERNAL_NAME = Type.getInternalName(AlphaTransaction.class);
 
@@ -58,7 +58,7 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
     private final boolean optimize;
     private final InstrumenterLogger logger;
 
-    public TransactionalClassMethodTransformer(
+    public ClassTransactionalMethodTransformer(
             ClassLoader classLoader, ClassNode classNode, ClassNode donorClassNode,
             MetadataRepository metadataRepository, boolean optimize, InstrumenterLogger logger) {
         this.classLoader = classLoader;
@@ -264,11 +264,11 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
             } else {
                 fixedMethods.add(createTransactionalMethod(methodNode));
 
-                if (methodMetadata.getClassMetadata().isRealTransactionalObject()) {
-                    fixedMethods.add(createRealTransactionalObjectTransactedMethod(methodNode, true));
-                    fixedMethods.add(createRealTransactionalObjectTransactedMethod(methodNode, false));
-                    fixedMethods.add(createRealTransactionalObjectTransactedMethodWithTranlocal(methodNode, true));
-                    fixedMethods.add(createRealTransactionalObjectTransactedMethodWithTranlocal(methodNode, false));
+                if (classMetadata.isTransactionalObjectWithObjectGranularFields()) {
+                    fixedMethods.add(createTranlocalLoadMethod(methodNode, true));
+                    fixedMethods.add(createTranlocalLoadMethod(methodNode, false));
+                    fixedMethods.add(createTransactionalWithTranlocalMethod(methodNode, true));
+                    fixedMethods.add(createTransactionalWithTranlocalMethod(methodNode, false));
                 } else {
                     fixedMethods.add(createTransactedMethod(methodNode, true));
                     fixedMethods.add(createTransactedMethod(methodNode, false));
@@ -300,7 +300,7 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
 
         //if it a init of a transactional object, we need to make sure that the openForConstruction is called
         //this is done by adding it directly after calling the super call.
-        if (classMetadata.isFirstGenerationRealTransactionalObject()) {
+        if (classMetadata.isFirstGenerationTransactionalObjectWithObjectGranularFields()) {
             int indexOfFirst = firstIndexAfterSuper(methodNode.name, result.instructions, classNode.superName);
 
             if (indexOfFirst >= 0) {
@@ -348,12 +348,13 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
         //todo: correct signature should be used here
         //transactionMethod.signature = methodNode.signature;
         transactionMethod.desc = createTransactedMethodDesc(methodNode.desc);
+        transactionMethod.signature = methodNode.signature;
         return transactionMethod;
     }
 
     //forwards the logic to the tranlocal method.
 
-    private MethodNode createRealTransactionalObjectTransactedMethod(MethodNode methodNode, boolean readonly) {
+    private MethodNode createTranlocalLoadMethod(MethodNode methodNode, boolean readonly) {
         CloneMap cloneMap = new CloneMap();
 
         LabelNode startLabelNode = new LabelNode();
@@ -514,7 +515,7 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
      * @param methodNode the original MethodNode where the variable table is cloned from.
      * @return the transformed MethodNode.
      */
-    public MethodNode createRealTransactionalObjectTransactedMethodWithTranlocal(MethodNode methodNode, boolean readonly) {
+    public MethodNode createTransactionalWithTranlocalMethod(MethodNode methodNode, boolean readonly) {
         CloneMap cloneMap = new CloneMap();
         DebugInfo debugInfo = findDebugInfo(methodNode);
 
@@ -535,9 +536,8 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
 
 
     private InsnList transformOriginalLogic(MethodNode methodNode, CloneMap cloneMap,
-                                            DebugInfo debugInfo, LabelNode startLabelNode, LabelNode endLabelNode, boolean readonly) {
-
-        MethodMetadata metadata = classMetadata.getMethodMetadata(methodNode.name, methodNode.desc);
+                                            DebugInfo debugInfo, LabelNode startLabelNode,
+                                            LabelNode endLabelNode, boolean readonly) {
 
         logger.lessImportant("transactify %s.%s", classMetadata.getName(), methodNode.name);
 
@@ -573,7 +573,7 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
                     ClassMetadata ownerMetadata = metadataRepository.loadClassMetadata(classLoader, originalFieldInsnNode.owner);
                     FieldMetadata fieldMetadata = ownerMetadata.getFieldMetadata(originalFieldInsnNode.name);
 
-                    if (!fieldMetadata.isManagedField()) {
+                    if (!fieldMetadata.isManagedFieldWithObjectGranularity()) {
                         newInsn = originalInsn.clone(cloneMap);
                     } else {
                         Frame methodFrame = frames[methodNode.instructions.indexOf(originalFieldInsnNode)];
@@ -688,7 +688,7 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
                     ClassMetadata ownerMetadata = metadataRepository.loadClassMetadata(classLoader, originalFieldInsnNode.owner);
                     FieldMetadata fieldMetadata = ownerMetadata.getFieldMetadata(originalFieldInsnNode.name);
 
-                    if (!fieldMetadata.isManagedField()) {
+                    if (!fieldMetadata.isManagedFieldWithObjectGranularity()) {
                         newInsn = originalInsn.clone(cloneMap);
                     } else {
                         Frame methodFrame = frames[methodNode.instructions.indexOf(originalFieldInsnNode)];
@@ -842,7 +842,7 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
                             //}
                         }
 
-                        boolean fullMonty = classMetadata.isRealTransactionalObject()
+                        boolean fullMonty = classMetadata.isTransactionalObjectWithObjectGranularFields()
                                 && aload0
                                 && !methodNode.name.equals("<init>");
 
@@ -1099,8 +1099,7 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
         //======================================================
         result.instructions.add(startScope);
 
-        for (ListIterator<AbstractInsnNode> it = (ListIterator<AbstractInsnNode>) donorMethodNode.instructions
-                .iterator(); it.hasNext();) {
+        for (ListIterator<AbstractInsnNode> it = (ListIterator<AbstractInsnNode>) donorMethodNode.instructions.iterator(); it.hasNext();) {
             AbstractInsnNode donorInsn = it.next();
             switch (donorInsn.getOpcode()) {
                 case -1:
@@ -1240,8 +1239,8 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
     }
 
     public static boolean isReplacementMethod(MethodInsnNode donorMethodInsnNode) {
-        if (!donorMethodInsnNode.name.equals("execute___ro") &&
-                !donorMethodInsnNode.name.equals("execute___up")) {
+        if (!donorMethodInsnNode.name.equals("execute___ro")
+                && !donorMethodInsnNode.name.equals("execute___up")) {
             return false;
         }
 
@@ -1277,8 +1276,8 @@ public final class TransactionalClassMethodTransformer implements Opcodes {
     public int indexOfTranlocalVariable(String methodName, String methodDesc) {
         MethodMetadata methodMetadata = classMetadata.getMethodMetadata(methodName, methodDesc);
 
-        if (methodMetadata.isStatic() ||
-                !methodMetadata.getClassMetadata().isRealTransactionalObject()) {
+        if (methodMetadata.isStatic()
+                || !methodMetadata.getClassMetadata().isTransactionalObjectWithObjectGranularFields()) {
             return -1;
         }
 

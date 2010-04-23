@@ -37,6 +37,10 @@ import static org.multiverse.instrumentation.asm.AsmUtils.*;
  * The constructor of the donor is not copied. So what out with relying on a constructor
  * in the donor.
  *
+ * The TransactionalObjectTransformer is not responsible for making methods transactional,
+ * that is the task of the 
+ * {@link org.multiverse.stms.alpha.instrumentation.transactionalmethod.TransactionalMethodInstrumentationPhase}
+ *
  * @author Peter Veentjer
  */
 public final class TransactionalObjectTransformer implements Opcodes {
@@ -55,7 +59,7 @@ public final class TransactionalObjectTransformer implements Opcodes {
     public ClassNode transform() {
         ensureNoProblems();
 
-        removeManagedFields();
+        removeManagedFieldsWithObjectGranularity();
 
         fixUnmanagedFields();
 
@@ -115,13 +119,13 @@ public final class TransactionalObjectTransformer implements Opcodes {
         }
     }
 
-    private void removeManagedFields() {
+    private void removeManagedFieldsWithObjectGranularity() {
         List<FieldNode> fixedFields = new LinkedList<FieldNode>();
 
         for (FieldNode fieldNode : (List<FieldNode>) classNode.fields) {
             FieldMetadata fieldMetadata = classMetadata.getFieldMetadata(fieldNode.name);
 
-            if (!fieldMetadata.isManagedField()) {
+            if (!fieldMetadata.isManagedFieldWithObjectGranularity()) {
                 fixedFields.add(fieldNode);
             }
         }

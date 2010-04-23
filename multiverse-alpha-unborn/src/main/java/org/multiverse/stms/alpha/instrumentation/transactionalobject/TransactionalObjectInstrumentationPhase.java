@@ -24,7 +24,7 @@ public final class TransactionalObjectInstrumentationPhase extends AbstractInstr
         ClassMetadata classMetadata = environment.getMetadataRepository().loadClassMetadata(
                 originalClazz.getClassLoader(), originalClazz.getName());
 
-        if (!classMetadata.isRealTransactionalObject()) {
+        if (!classMetadata.isTransactionalObjectWithObjectGranularFields()) {
             environment.getLog().lessImportant("%s is not a real transactional object", originalClazz.getName());
             return originalClazz;
         }
