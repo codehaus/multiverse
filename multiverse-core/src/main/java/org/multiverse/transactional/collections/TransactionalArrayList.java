@@ -164,7 +164,7 @@ public final class TransactionalArrayList<E> implements TransactionalList<E> {
     }
 
     @Override
-    @TransactionalMethod(automaticReadTrackingEnabled = false)
+    @TransactionalMethod(trackReads = false)
     public E set(int index, E element) {
         if (index < 0 || index >= size()) {
             throw new IndexOutOfBoundsException();

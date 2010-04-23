@@ -37,7 +37,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
 
     public AlphaTransaction startSutTransactionWithoutAutomaticReadTracking() {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
-                .withAutomaticReadTrackingEnabled(false);
+                .withReadTrackingEnabled(false);
 
         return new ArrayUpdateAlphaTransaction(config, 100);
     }

@@ -28,7 +28,7 @@ public class MetadataRepository_TransactionTest {
         TransactionMetadata transactionMetadata = methodMetadata.getTransactionalMetadata();
 
         assertNotNull(transactionMetadata);
-        assertNull(transactionMetadata.automaticReadTrackingEnabled);
+        assertNull(transactionMetadata.trackReads);
         assertNull(transactionMetadata.readOnly);
         assertFalse(transactionMetadata.interruptible);
         assertTrue(transactionMetadata.writeSkewProblemAllowed);
@@ -50,7 +50,7 @@ public class MetadataRepository_TransactionTest {
 
         assertNotNull(transactionMetadata);
         assertTrue(transactionMetadata.readOnly);
-        assertNull(transactionMetadata.automaticReadTrackingEnabled);
+        assertNull(transactionMetadata.trackReads);
         assertFalse(transactionMetadata.interruptible);
         assertTrue(transactionMetadata.writeSkewProblemAllowed);
         assertEquals(1000, transactionMetadata.maxRetryCount);
@@ -71,7 +71,7 @@ public class MetadataRepository_TransactionTest {
 
         assertNotNull(transactionMetadata);
         assertFalse(transactionMetadata.readOnly);
-        assertNull(transactionMetadata.automaticReadTrackingEnabled);
+        assertNull(transactionMetadata.trackReads);
         assertFalse(transactionMetadata.interruptible);
         assertTrue(transactionMetadata.writeSkewProblemAllowed);
         assertEquals(1000, transactionMetadata.maxRetryCount);
@@ -93,21 +93,21 @@ public class MetadataRepository_TransactionTest {
         TransactionMetadata enabledTransactionMetadata = enabledMethodMetadata.getTransactionalMetadata();
 
         assertNotNull(enabledTransactionMetadata);
-        assertTrue(enabledTransactionMetadata.automaticReadTrackingEnabled);
+        assertTrue(enabledTransactionMetadata.trackReads);
 
         MethodMetadata disabledMethodMetadata = classMetadata.getMethodMetadata("disabled", "()V");
 
         TransactionMetadata disabledTransactionMetadata = disabledMethodMetadata.getTransactionalMetadata();
         assertNotNull(disabledTransactionMetadata);
-        assertFalse(disabledTransactionMetadata.automaticReadTrackingEnabled);
+        assertFalse(disabledTransactionMetadata.trackReads);
     }
 
     class AutomaticReadTracking {
-        @TransactionalMethod(automaticReadTrackingEnabled = true)
+        @TransactionalMethod(trackReads = true)
         void enabled() {
         }
 
-        @TransactionalMethod(automaticReadTrackingEnabled = false)
+        @TransactionalMethod(trackReads = false)
         void disabled() {
         }
     }
@@ -133,7 +133,7 @@ public class MetadataRepository_TransactionTest {
         void enabled() throws InterruptedException {
         }
 
-        @TransactionalMethod(automaticReadTrackingEnabled = false)
+        @TransactionalMethod(trackReads = false)
         void disabled() {
         }
     }
@@ -157,13 +157,13 @@ public class MetadataRepository_TransactionTest {
         TransactionMetadata nowAllowedAndDefaultNonAutomaticReadTrackingMetadata = disabledMethodMetadata.getTransactionalMetadata();
         assertNotNull(nowAllowedAndDefaultNonAutomaticReadTracking);
         assertFalse(nowAllowedAndDefaultNonAutomaticReadTrackingMetadata.writeSkewProblemAllowed);
-        assertTrue(nowAllowedAndDefaultNonAutomaticReadTrackingMetadata.automaticReadTrackingEnabled);
+        assertTrue(nowAllowedAndDefaultNonAutomaticReadTrackingMetadata.trackReads);
 
         MethodMetadata nowAllowedAndAutomaticReadTracking = classMetadata.getMethodMetadata("nowAllowedAndAutomaticReadTracking", "()V");
         TransactionMetadata nowAllowedAndAutomaticReadTrackingMetadata = disabledMethodMetadata.getTransactionalMetadata();
         assertNotNull(nowAllowedAndAutomaticReadTracking);
         assertFalse(nowAllowedAndAutomaticReadTrackingMetadata.writeSkewProblemAllowed);
-        assertTrue(nowAllowedAndAutomaticReadTrackingMetadata.automaticReadTrackingEnabled);
+        assertTrue(nowAllowedAndAutomaticReadTrackingMetadata.trackReads);
 
     }
 
@@ -173,16 +173,16 @@ public class MetadataRepository_TransactionTest {
         void nowAllowedAndDefaultNonAutomaticReadTracking() {
         }
 
-        @TransactionalMethod(writeSkewProblemAllowed = false, automaticReadTrackingEnabled = false)
+        @TransactionalMethod(writeSkewProblemAllowed = false, trackReads = false)
         void nowAllowedAndAutomaticReadTracking() {
         }
 
 
-        @TransactionalMethod(automaticReadTrackingEnabled = true, writeSkewProblemAllowed = true)
+        @TransactionalMethod(trackReads = true, writeSkewProblemAllowed = true)
         void enabled() {
         }
 
-        @TransactionalMethod(automaticReadTrackingEnabled = true, writeSkewProblemAllowed = false)
+        @TransactionalMethod(trackReads = true, writeSkewProblemAllowed = false)
         void disabled() {
         }
     }

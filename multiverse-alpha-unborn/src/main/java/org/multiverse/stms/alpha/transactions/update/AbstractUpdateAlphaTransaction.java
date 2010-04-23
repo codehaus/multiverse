@@ -84,7 +84,7 @@ public abstract class AbstractUpdateAlphaTransaction
         opened = txObject.___load(getReadVersion());
         if (opened == null) {
             throw new UncommittedReadConflict();
-        } else if (config.automaticReadTrackingEnabled) {
+        } else if (config.readTrackingEnabled) {
             attach(opened);
         }
 

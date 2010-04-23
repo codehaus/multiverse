@@ -45,7 +45,7 @@ public class AbaRef<E> extends DefaultTxObjectMixin {
             .getTransactionFactoryBuilder()
             .setSpeculativeConfigurationEnabled(false)
             .setReadonly(true)
-            .setAutomaticReadTrackingEnabled(false)
+            .setReadTrackingEnabled(false)
             .build();
 
     public E get() {
@@ -63,7 +63,7 @@ public class AbaRef<E> extends DefaultTxObjectMixin {
             .getTransactionFactoryBuilder()
             .setSpeculativeConfigurationEnabled(false)
             .setReadonly(false)
-            .setAutomaticReadTrackingEnabled(false)
+            .setReadTrackingEnabled(false)
             .build();
 
     public void set(final E newValue) {
@@ -79,7 +79,7 @@ public class AbaRef<E> extends DefaultTxObjectMixin {
 
     private final static TransactionFactory isNullTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
             .setReadonly(true)
-            .setAutomaticReadTrackingEnabled(false).build();
+            .setReadTrackingEnabled(false).build();
 
 
     public boolean isNull() {

@@ -30,7 +30,7 @@ public final class TransactionalDouble {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+    @TransactionalMethod(readonly = true, trackReads = true)
     public void await(double desired) {
         if (doubleToLongBits(this.value) != doubleToLongBits(desired)) {
             retry();

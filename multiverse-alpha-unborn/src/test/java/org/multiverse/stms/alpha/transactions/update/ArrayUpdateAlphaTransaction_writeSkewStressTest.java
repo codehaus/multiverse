@@ -39,7 +39,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewStressTest {
 
     public AlphaTransaction startSutTransaction(int size, boolean allowWriteSkewProblem) {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
-                .withAutomaticReadTrackingEnabled(true)
+                .withReadTrackingEnabled(true)
                 .withWriteSkewProblemAllowed(allowWriteSkewProblem);
 
         return new ArrayUpdateAlphaTransaction(config, size);

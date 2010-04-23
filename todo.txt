@@ -2,9 +2,7 @@
 todo engine
 ---------------------------------------------------------------
 
-TransactionalReferenceArray_setTest.whenTransactionAvailable_thenThatTransactionIsUsed
-
-TransactionalReferenceArray_setTest.whenListenersAvailable_thenTheyAreNotified
+- debug information is lost in transactional method (no visible in stacktrace)
 
 - convert manual from html to docbook
 
@@ -427,4 +425,8 @@ TransactionalReferenceArray_getTest.whenTransactionActiveAndLocked
 TransactionalReferenceArray_atomicGetTest.whenNotCommittedBefore
 
 TransactionalReferenceArray_atomicGetTest.whenLocked
+
+TransactionalReferenceArray_setTest.whenTransactionAvailable_thenThatTransactionIsUsed
+
+TransactionalReferenceArray_setTest.whenListenersAvailable_thenTheyAreNotified
 

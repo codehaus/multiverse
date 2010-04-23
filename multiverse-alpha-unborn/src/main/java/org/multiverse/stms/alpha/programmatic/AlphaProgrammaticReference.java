@@ -69,7 +69,7 @@ public final class AlphaProgrammaticReference<E>
     private final static TransactionFactory getOrAwaitTxFactory = getGlobalStmInstance().getTransactionFactoryBuilder()
             .setReadonly(true)
             .setFamilyName(AlphaProgrammaticReference.class.getName() + ".getOrAwait()")
-            .setAutomaticReadTrackingEnabled(true)
+            .setReadTrackingEnabled(true)
             .build();
 
     private final AlphaStm stm;

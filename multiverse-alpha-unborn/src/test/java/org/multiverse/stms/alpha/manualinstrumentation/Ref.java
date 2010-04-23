@@ -44,7 +44,7 @@ public class Ref<E> extends DefaultTxObjectMixin {
     private final static TransactionFactory getTxFactory = getGlobalStmInstance()
             .getTransactionFactoryBuilder()
             .setReadonly(false)
-            .setAutomaticReadTrackingEnabled(false).build();
+            .setReadTrackingEnabled(false).build();
 
     public E get() {
         return new TransactionTemplate<E>(getTxFactory) {
@@ -70,7 +70,7 @@ public class Ref<E> extends DefaultTxObjectMixin {
     private final static TransactionFactory isNullTxFactory = getGlobalStmInstance()
             .getTransactionFactoryBuilder()
             .setReadonly(true)
-            .setAutomaticReadTrackingEnabled(false).build();
+            .setReadTrackingEnabled(false).build();
 
 
     public boolean isNull() {

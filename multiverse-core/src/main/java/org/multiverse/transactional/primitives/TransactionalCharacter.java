@@ -29,14 +29,14 @@ public final class TransactionalCharacter {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+    @TransactionalMethod(readonly = true, trackReads = true)
     public void await(char desired) {
         if (desired != value) {
             retry();
         }
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+    @TransactionalMethod(readonly = true, trackReads = true)
     public char awaitLargerThan(char than) {
         if (!(value > than)) {
             retry();
@@ -45,7 +45,7 @@ public final class TransactionalCharacter {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+    @TransactionalMethod(readonly = true, trackReads = true)
     public char awaitLargerOrEqualThan(char than) {
         if (!(value >= than)) {
             retry();
@@ -54,7 +54,7 @@ public final class TransactionalCharacter {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+    @TransactionalMethod(readonly = true, trackReads = true)
     public char awaitSmallerThan(char than) {
         if (!(value < than)) {
             retry();
@@ -63,7 +63,7 @@ public final class TransactionalCharacter {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+    @TransactionalMethod(readonly = true, trackReads = true)
     public char awaitSmallerOrEqualThan(char than) {
         if (!(value <= than)) {
             retry();
@@ -72,7 +72,7 @@ public final class TransactionalCharacter {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+    @TransactionalMethod(readonly = true, trackReads = true)
     public char awaitNotEqualTo(char than) {
         if (!(value != than)) {
             retry();

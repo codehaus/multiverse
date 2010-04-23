@@ -199,7 +199,7 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
     }
 
     @Override
-    @TransactionalMethod(automaticReadTrackingEnabled = true)
+    @TransactionalMethod(trackReads = true)
     public void putFirst(E e) throws InterruptedException {
         if (hasNoStorageCapacity()) {
             //force a read, the hasNoStorageCapacity doesn't do it for us
@@ -227,7 +227,7 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
     }
 
     @Override
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = false)
+    @TransactionalMethod(readonly = true, trackReads = false)
     public int size() {
         return (int) size.get();
     }

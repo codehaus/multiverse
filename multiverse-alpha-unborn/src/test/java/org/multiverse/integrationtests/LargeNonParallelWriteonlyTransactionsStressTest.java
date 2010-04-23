@@ -77,7 +77,7 @@ public class LargeNonParallelWriteonlyTransactionsStressTest {
                 .setReadonly(false)
                 .setFamilyName(getClass().getName() + ".test()")
                 .setSpeculativeConfigurationEnabled(true)
-                .setAutomaticReadTrackingEnabled(false).build();
+                .setReadTrackingEnabled(false).build();
 
         new TransactionTemplate(txFactory) {
             @Override

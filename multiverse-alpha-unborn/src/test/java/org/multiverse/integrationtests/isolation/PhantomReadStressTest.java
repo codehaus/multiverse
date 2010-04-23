@@ -41,6 +41,9 @@ public class PhantomReadStressTest {
         clearThreadLocalTransaction();
     }
 
+    //todo: test with map
+    //todo: test with set
+
     @Test
     public void testTransactionalLinkedList() {
         test(new TransactionalLinkedList());

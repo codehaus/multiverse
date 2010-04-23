@@ -11,29 +11,29 @@ import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
  */
 public final class ReadonlyConfiguration extends AbstractAlphaTransactionConfiguration {
 
-    public ReadonlyConfiguration(PrimitiveClock clock, boolean automaticReadTrackingEnabled) {
+    public ReadonlyConfiguration(PrimitiveClock clock, boolean readTrackingEnabled) {
         this(clock, ExponentialBackoffPolicy.INSTANCE_10_MS_MAX, null, new SpeculativeConfiguration(100), 1000,
-                true, automaticReadTrackingEnabled, true, Long.MAX_VALUE);
+                true, readTrackingEnabled, true, Long.MAX_VALUE);
     }
 
     public ReadonlyConfiguration(
             PrimitiveClock clock, BackoffPolicy backoffPolicy,
             String familyName, SpeculativeConfiguration speculativeConfig, int maxRetryCount,
-            boolean interruptible, boolean automaticReadTracking, boolean explicitRetryAllowed, long timeoutNs) {
+            boolean interruptible, boolean readTrackingEnabled, boolean explicitRetryAllowed, long timeoutNs) {
 
         super(clock, backoffPolicy, familyName, true, maxRetryCount, interruptible,
-                true, automaticReadTracking, explicitRetryAllowed, speculativeConfig, timeoutNs);
+                true, readTrackingEnabled, explicitRetryAllowed, speculativeConfig, timeoutNs);
     }
 
     public ReadonlyConfiguration withSpeculativeConfig(SpeculativeConfiguration speculativeConfig) {
         return new ReadonlyConfiguration(clock, backoffPolicy, familyName,
-                speculativeConfig, maxRetryCount, interruptible, automaticReadTrackingEnabled,
+                speculativeConfig, maxRetryCount, interruptible, readTrackingEnabled,
                 explicitRetryAllowed, timeoutNs);
     }
 
     public ReadonlyConfiguration withExplicitRetryAllowed(boolean explicitRetryAllowed) {
         return new ReadonlyConfiguration(clock, backoffPolicy, familyName,
-                speculativeConfiguration, maxRetryCount, interruptible, automaticReadTrackingEnabled,
+                speculativeConfiguration, maxRetryCount, interruptible, readTrackingEnabled,
                 explicitRetryAllowed, timeoutNs);
     }
 }

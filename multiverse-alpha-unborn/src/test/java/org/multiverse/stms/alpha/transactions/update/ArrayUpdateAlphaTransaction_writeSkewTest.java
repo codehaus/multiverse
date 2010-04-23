@@ -37,7 +37,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
 
     public AlphaTransaction startSutTransaction(int size, boolean allowWriteSkewProblem) {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
-                .withAutomaticReadTrackingEnabled(true)
+                .withReadTrackingEnabled(true)
                 .withWriteSkewProblemAllowed(allowWriteSkewProblem);
 
         return new ArrayUpdateAlphaTransaction(config, size);
@@ -47,11 +47,11 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
     public void testSettings() {
         AlphaTransaction tx1 = startSutTransaction(10, true);
         assertTrue(tx1.getConfiguration().isWriteSkewProblemAllowed());
-        assertTrue(tx1.getConfiguration().isAutomaticReadTrackingEnabled());
+        assertTrue(tx1.getConfiguration().isReadTrackingEnabled());
 
         AlphaTransaction tx2 = startSutTransaction(10, false);
         assertFalse(tx2.getConfiguration().isWriteSkewProblemAllowed());
-        assertTrue(tx2.getConfiguration().isAutomaticReadTrackingEnabled());
+        assertTrue(tx2.getConfiguration().isReadTrackingEnabled());
     }
 
     @Test

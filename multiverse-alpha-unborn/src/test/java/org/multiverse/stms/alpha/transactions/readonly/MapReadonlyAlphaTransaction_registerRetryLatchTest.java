@@ -221,7 +221,7 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
             this.value = newValue;
         }
 
-        @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+        @TransactionalMethod(readonly = true, trackReads = true)
         public void await(int value) {
             if (this.value != value) {
                 retry();

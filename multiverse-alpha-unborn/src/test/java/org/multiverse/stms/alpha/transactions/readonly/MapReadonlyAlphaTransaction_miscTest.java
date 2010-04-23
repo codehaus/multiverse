@@ -32,7 +32,7 @@ public class MapReadonlyAlphaTransaction_miscTest {
         assertIsActive(tx);
         assertEquals(stm.getVersion(), tx.getReadVersion());
         assertTrue(tx.getConfiguration().isReadonly());
-        assertTrue(tx.getConfiguration().isAutomaticReadTrackingEnabled());
+        assertTrue(tx.getConfiguration().isReadTrackingEnabled());
 
     }
 }

@@ -65,7 +65,7 @@ public class Queue<E> {
     private final static TransactionFactory sizeTxFactory = getGlobalStmInstance()
             .getTransactionFactoryBuilder()
             .setReadonly(true)
-            .setAutomaticReadTrackingEnabled(false).build();
+            .setReadTrackingEnabled(false).build();
 
 
     public int size() {
@@ -80,7 +80,7 @@ public class Queue<E> {
     private final static TransactionFactory isEmptyTxFactory = getGlobalStmInstance()
             .getTransactionFactoryBuilder()
             .setReadonly(true)
-            .setAutomaticReadTrackingEnabled(false).build();
+            .setReadTrackingEnabled(false).build();
 
     public boolean isEmpty() {
         return new TransactionTemplate<Boolean>(isEmptyTxFactory) {

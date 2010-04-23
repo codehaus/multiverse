@@ -34,7 +34,7 @@ public class OrElseTemplateTest {
 
     public Transaction startUpdateTransaction() {
         Transaction t = stm.getTransactionFactoryBuilder()
-                .setAutomaticReadTrackingEnabled(true)
+                .setReadTrackingEnabled(true)
                 .setReadonly(false)
                 .build().start();
         setThreadLocalTransaction(t);
@@ -116,7 +116,7 @@ public class OrElseTemplateTest {
         public void doRun() throws Exception {
             TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
                     .setReadonly(false)
-                    .setAutomaticReadTrackingEnabled(true).build();
+                    .setReadTrackingEnabled(true).build();
 
             result = new TransactionTemplate<String>(txFactory) {
                 @Override

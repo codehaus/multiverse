@@ -19,7 +19,7 @@ public class TransactionMetadata {
     //todo: needs to be transformed to Object boolean
     public boolean writeSkewProblemAllowed;
 
-    public Boolean automaticReadTrackingEnabled;
+    public Boolean trackReads;
 
     public Boolean interruptible;
 

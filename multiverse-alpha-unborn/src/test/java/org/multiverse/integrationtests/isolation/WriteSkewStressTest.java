@@ -105,12 +105,12 @@ public class WriteSkewStressTest {
             }
         }
 
-        @TransactionalMethod(automaticReadTrackingEnabled = true, writeSkewProblemAllowed = false)
+        @TransactionalMethod(trackReads = true, writeSkewProblemAllowed = false)
         public void doRunWriteSkewProblemDisallowed() throws Exception {
             doIt();
         }
 
-        @TransactionalMethod(automaticReadTrackingEnabled = true, writeSkewProblemAllowed = true)
+        @TransactionalMethod(trackReads = true, writeSkewProblemAllowed = true)
         public void doRunWriteSkewProblemAllowed() throws Exception {
             doIt();
         }

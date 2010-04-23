@@ -33,7 +33,7 @@ public abstract class AbstractReadonlyAlphaTransaction
                 throw createLoadUncommittedException(txObject);
             }
 
-            if (config.automaticReadTrackingEnabled) {
+            if (config.readTrackingEnabled) {
                 attach(tranlocal);
             }
         }

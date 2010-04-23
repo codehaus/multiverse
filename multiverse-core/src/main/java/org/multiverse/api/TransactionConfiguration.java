@@ -21,13 +21,13 @@ public interface TransactionConfiguration {
     BackoffPolicy getBackoffPolicy();
 
     /**
-     * Checks if this transaction does isAutomaticReadTrackingEnabled. Read tracking is needed for blocking transactions,
+     * Checks if this transaction does automatic read tracking. Read tracking is needed for blocking transactions,
      * but also for writeskew detection. Disadvantage of read tracking is that it is more expensive because
      * the reads not to be registered on some datastructure so that they are tracked.
      *
      * @return true if the transaction does automatic read tracking, false otherwise.
      */
-    boolean isAutomaticReadTrackingEnabled();
+    boolean isReadTrackingEnabled();
 
     /**
      * Returns the family name of this Transaction. Every transaction in principle should have a family name. This

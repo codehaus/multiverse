@@ -108,7 +108,7 @@ public class MonoUpdateAlphaTransaction_abortTest {
 
         AlphaTransaction listenTx = stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
-                .setAutomaticReadTrackingEnabled(true)
+                .setReadTrackingEnabled(true)
                 .setExplicitRetryAllowed(true)
                 .build()
                 .start();

@@ -31,7 +31,7 @@ public class MonoUpdateAlphaTransaction_commitTest {
 
     public MonoUpdateAlphaTransaction startSutTransaction() {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
-                .withAutomaticReadTrackingEnabled(true)
+                .withReadTrackingEnabled(true)
                 .withExplictRetryAllowed(true);
 
         return new MonoUpdateAlphaTransaction(config);
@@ -207,7 +207,7 @@ public class MonoUpdateAlphaTransaction_commitTest {
     private void registerRetryListener(ManualRef ref, Latch latch) {
         AlphaTransaction listenTx = stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
-                .setAutomaticReadTrackingEnabled(true)
+                .setReadTrackingEnabled(true)
                 .setExplicitRetryAllowed(true)
                 .build()
                 .start();

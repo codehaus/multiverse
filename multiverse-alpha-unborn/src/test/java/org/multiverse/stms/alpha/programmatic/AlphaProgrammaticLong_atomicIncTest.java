@@ -107,7 +107,7 @@ public class AlphaProgrammaticLong_atomicIncTest {
 
         Transaction tx = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
-                .setAutomaticReadTrackingEnabled(true)
+                .setReadTrackingEnabled(true)
                 .build()
                 .start();
 

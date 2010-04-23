@@ -55,21 +55,21 @@ public class TransactionSelectionTest {
             assertTrue(tx instanceof AbstractReadonlyAlphaTransaction);
         }
 
-        @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+        @TransactionalMethod(readonly = true, trackReads = true)
         public void readOnlyAndTrackReads() {
             Transaction tx = getThreadLocalTransaction();
             assertTrue(tx instanceof AbstractReadonlyAlphaTransaction);
         }
 
-        @TransactionalMethod(readonly = false, automaticReadTrackingEnabled = true)
+        @TransactionalMethod(readonly = false, trackReads = true)
         public void updateTracking() {
             Transaction tx = getThreadLocalTransaction();
             assertFalse(tx.getConfiguration().isReadonly());
-            assertTrue(tx.getConfiguration().isAutomaticReadTrackingEnabled());
+            assertTrue(tx.getConfiguration().isReadTrackingEnabled());
             assertTrue(tx instanceof AbstractUpdateAlphaTransaction);
         }
 
-        @TransactionalMethod(automaticReadTrackingEnabled = false)
+        @TransactionalMethod(trackReads = false)
         public void updateNonTracking() {
             Transaction tx = getThreadLocalTransaction();
             assertTrue(tx instanceof NonTrackingReadonlyAlphaTransaction);

@@ -69,7 +69,7 @@ public class OrElseStressTest {
             }
         }
 
-        @TransactionalMethod(readonly = false, automaticReadTrackingEnabled = true)
+        @TransactionalMethod(readonly = false, trackReads = true)
         public void awaitAllZero() {
             for (int k = 0; k < refs.length; k++) {
                 if (refs[k].get() == 1) {

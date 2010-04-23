@@ -28,7 +28,7 @@ public final class IntStack extends DefaultTxObjectMixin {
     private final static TransactionFactory sizeTxFactory = getGlobalStmInstance()
             .getTransactionFactoryBuilder()
             .setReadonly(true)
-            .setAutomaticReadTrackingEnabled(false).build();
+            .setReadTrackingEnabled(false).build();
 
 
     public int size() {
@@ -48,7 +48,7 @@ public final class IntStack extends DefaultTxObjectMixin {
     private final static TransactionFactory isEmptyTxFactory = getGlobalStmInstance()
             .getTransactionFactoryBuilder()
             .setReadonly(true)
-            .setAutomaticReadTrackingEnabled(false).build();
+            .setReadTrackingEnabled(false).build();
 
 
     public boolean isEmpty() {
@@ -68,7 +68,7 @@ public final class IntStack extends DefaultTxObjectMixin {
             .setSpeculativeConfigurationEnabled(true)
             .setWriteSkewProblemAllowed(true)
             .setFamilyName("IntStack.pop()")
-            .setAutomaticReadTrackingEnabled(true)
+            .setReadTrackingEnabled(true)
             .build();
 
     public int pop() {
@@ -99,7 +99,7 @@ public final class IntStack extends DefaultTxObjectMixin {
             .setSpeculativeConfigurationEnabled(true)
             .setWriteSkewProblemAllowed(true)
             .setFamilyName("IntStack.push()")
-            .setAutomaticReadTrackingEnabled(false)
+            .setReadTrackingEnabled(false)
             .build();
 
 

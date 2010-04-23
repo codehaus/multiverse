@@ -289,7 +289,7 @@ project(':multiverse-alpha') {
 
 // ------------------------------------------------------------------------------------------------------------------
 
-project(':multiverse-scala-integration') {
+project(':multiverse-scala') {
   repositories {
     mavenRepo urls: 'http://scala-tools.org/repo-releases/'
   }

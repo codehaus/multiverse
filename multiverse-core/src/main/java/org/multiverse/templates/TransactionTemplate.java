@@ -79,7 +79,7 @@ public abstract class TransactionTemplate<E> {
     public TransactionTemplate(Stm stm) {
         this(stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
-                .setAutomaticReadTrackingEnabled(true).build());
+                .setReadTrackingEnabled(true).build());
     }
 
     /**

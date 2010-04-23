@@ -29,14 +29,14 @@ public final class TransactionalByte {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+    @TransactionalMethod(readonly = true, trackReads = true)
     public void await(byte desired) {
         if (desired != value) {
             retry();
         }
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+    @TransactionalMethod(readonly = true, trackReads = true)
     public byte awaitLargerThan(byte than) {
         if (!(value > than)) {
             retry();
@@ -45,7 +45,7 @@ public final class TransactionalByte {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+    @TransactionalMethod(readonly = true, trackReads = true)
     public byte awaitLargerOrEqualThan(byte than) {
         if (!(value >= than)) {
             retry();
@@ -54,7 +54,7 @@ public final class TransactionalByte {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+    @TransactionalMethod(readonly = true, trackReads = true)
     public byte awaitSmallerThan(byte than) {
         if (!(value < than)) {
             retry();
@@ -63,7 +63,7 @@ public final class TransactionalByte {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+    @TransactionalMethod(readonly = true, trackReads = true)
     public byte awaitSmallerOrEqualThan(byte than) {
         if (!(value <= than)) {
             retry();
@@ -72,7 +72,7 @@ public final class TransactionalByte {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+    @TransactionalMethod(readonly = true, trackReads = true)
     public byte awaitNotEqualTo(byte than) {
         if (!(value != than)) {
             retry();

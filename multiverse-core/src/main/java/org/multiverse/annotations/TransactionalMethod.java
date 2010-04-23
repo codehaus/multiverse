@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 @Target({ElementType.METHOD})
 public @interface TransactionalMethod {
 
-    boolean automaticReadTrackingEnabled() default false;
+    boolean trackReads() default false;
 
     boolean writeSkewProblemAllowed() default true;
 

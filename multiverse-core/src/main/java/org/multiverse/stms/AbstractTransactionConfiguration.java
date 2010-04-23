@@ -25,7 +25,7 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
     public final int maxRetryCount;
     public final boolean interruptible;
     public final boolean writeSkewProblemAllowed;
-    public final boolean automaticReadTrackingEnabled;
+    public final boolean readTrackingEnabled;
     public final long timeoutNs;
     public final boolean explicitRetryAllowed;
 
@@ -40,7 +40,7 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
     public AbstractTransactionConfiguration(
             PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName,
             boolean readOnly, int maxRetryCount, boolean interruptible,
-            boolean writeSkewProblemAllowed, boolean automaticReadTrackingEnabled,
+            boolean writeSkewProblemAllowed, boolean readTrackingEnabled,
             boolean explicitRetryAllowed, long timeoutNs) {
 
         if (clock == null) {
@@ -57,15 +57,15 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
         this.backoffPolicy = backoffPolicy;
         this.maxRetryCount = maxRetryCount;
         this.interruptible = interruptible;
-        this.automaticReadTrackingEnabled = automaticReadTrackingEnabled;
+        this.readTrackingEnabled = readTrackingEnabled;
         this.writeSkewProblemAllowed = writeSkewProblemAllowed;
         this.explicitRetryAllowed = explicitRetryAllowed;
         this.timeoutNs = timeoutNs;
 
-        if (!readOnly && !automaticReadTrackingEnabled && !writeSkewProblemAllowed) {
+        if (!readOnly && !readTrackingEnabled && !writeSkewProblemAllowed) {
             String msg = format("Update transaction '%s' isn't  " +
                     "allowed with writeSkewProblemAllowed " +
-                    "disabled and automaticReadTrackingEnabled disabled. " +
+                    "disabled and trackReads disabled. " +
                     "The last is needed to do the first.",
                     familyName);
             throw new IllegalArgumentException(msg);
@@ -103,8 +103,8 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
     }
 
     @Override
-    public final boolean isAutomaticReadTrackingEnabled() {
-        return automaticReadTrackingEnabled;
+    public final boolean isReadTrackingEnabled() {
+        return readTrackingEnabled;
     }
 
     @Override

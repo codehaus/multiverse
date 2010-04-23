@@ -29,7 +29,7 @@ public final class TransactionalBoolean {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+    @TransactionalMethod(readonly = true, trackReads = true)
     public void await(boolean desired) {
         if (desired != value) {
             retry();

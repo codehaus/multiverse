@@ -42,7 +42,7 @@ public class MapUpdateAlphaTransaction_openForReadTest {
     public MapUpdateAlphaTransaction startSutTransactionWithoutAutomaticReadTracking() {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
                 .withExplictRetryAllowed(false)
-                .withAutomaticReadTrackingEnabled(false);
+                .withReadTrackingEnabled(false);
 
         return new MapUpdateAlphaTransaction(config);
     }

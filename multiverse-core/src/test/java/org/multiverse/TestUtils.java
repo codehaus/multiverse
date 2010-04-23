@@ -166,6 +166,10 @@ public class TestUtils {
         sleepUs(us);
     }
 
+    public static void sleepRandomUs(int maxUs) {
+        sleepUs((long) randomInt(maxUs));
+    }
+
     public static void sleepUs(long us) {
         if (us <= 0) {
             return;

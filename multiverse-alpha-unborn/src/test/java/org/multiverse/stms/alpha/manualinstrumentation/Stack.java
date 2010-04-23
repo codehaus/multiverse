@@ -27,7 +27,7 @@ public final class Stack<E> extends DefaultTxObjectMixin {
     private final static TransactionFactory sizeTxFactory = getGlobalStmInstance()
             .getTransactionFactoryBuilder()
             .setReadonly(true)
-            .setAutomaticReadTrackingEnabled(false).build();
+            .setReadTrackingEnabled(false).build();
 
 
     public int size() {
@@ -44,7 +44,7 @@ public final class Stack<E> extends DefaultTxObjectMixin {
     private final static TransactionFactory isEmptyTxFactory = getGlobalStmInstance()
             .getTransactionFactoryBuilder()
             .setReadonly(true)
-            .setAutomaticReadTrackingEnabled(false).build();
+            .setReadTrackingEnabled(false).build();
 
 
     public boolean isEmpty() {

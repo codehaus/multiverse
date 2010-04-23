@@ -108,7 +108,7 @@ public class SpeculativeSizeTest {
             }
         }
 
-        @TransactionalMethod(automaticReadTrackingEnabled = true)
+        @TransactionalMethod(trackReads = true)
         public void trackingRead() {
             transactions.add(getThreadLocalTransaction());
             for (int k = 0; k < array.length(); k++) {

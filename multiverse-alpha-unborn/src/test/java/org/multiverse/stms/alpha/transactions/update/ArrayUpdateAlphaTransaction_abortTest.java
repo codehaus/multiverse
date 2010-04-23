@@ -87,7 +87,7 @@ public class ArrayUpdateAlphaTransaction_abortTest {
 
         AlphaTransaction listenTx = stm.getTransactionFactoryBuilder()
                 .setExplicitRetryAllowed(true)
-                .setAutomaticReadTrackingEnabled(true)
+                .setReadTrackingEnabled(true)
                 .build()
                 .start();
         listenTx.openForRead(ref);

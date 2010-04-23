@@ -28,10 +28,10 @@ public @interface TransactionalConstructor {
      *
      * @return true if it should do automatic read tracking, false otherwise.
      */
-    boolean automaticReadTrackingEnabled() default true;
+    boolean trackReads() default true;
 
     /**
-     * If the write skew problem is allowed to happen. If set to false, the isAutomaticReadTrackingEnabled also has to
+     * If the write skew problem is allowed to happen. If set to false, the readtracking also has to
      * be set to true otherwise you will get an Exception.
      *
      * @return true if the writeSkew problem is allowed.

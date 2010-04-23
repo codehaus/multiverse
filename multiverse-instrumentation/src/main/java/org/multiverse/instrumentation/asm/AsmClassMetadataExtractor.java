@@ -351,7 +351,7 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
         }
 
         transactionMetadata.readOnly = null;
-        transactionMetadata.automaticReadTrackingEnabled = null;
+        transactionMetadata.trackReads = null;
         transactionMetadata.writeSkewProblemAllowed = true;
         transactionMetadata.interruptible = throwsInterruptedException;
         transactionMetadata.familyName = createFamilyName(classMetadata.getName(), methodNode.name, methodNode.desc);
@@ -377,11 +377,11 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
         txMetadata.writeSkewProblemAllowed = (Boolean) getValue(annotationNode, "writeSkewProblemAllowed", true);
 
         if (txMetadata.writeSkewProblemAllowed) {
-            txMetadata.automaticReadTrackingEnabled = (Boolean) getValue(annotationNode, "automaticReadTrackingEnabled", null);
+            txMetadata.trackReads = (Boolean) getValue(annotationNode, "trackReads", null);
         } else {
-            Boolean tracking = (Boolean) getValue(annotationNode, "automaticReadTrackingEnabled", null);
+            Boolean tracking = (Boolean) getValue(annotationNode, "trackReads", null);
             if (tracking == null || tracking) {
-                txMetadata.automaticReadTrackingEnabled = true;
+                txMetadata.trackReads = true;
             } else {
                 //String msg = "method "+methodMetadata.toFullName()+" has automatic readtracking disabled"
                 //throw new RuntimeException();

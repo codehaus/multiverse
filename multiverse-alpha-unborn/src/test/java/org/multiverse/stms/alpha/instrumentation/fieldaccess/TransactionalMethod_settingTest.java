@@ -93,7 +93,7 @@ public class TransactionalMethod_settingTest {
             return getThreadLocalTransaction().getConfiguration().isWriteSkewProblemAllowed();
         }
 
-        @TransactionalMethod(readonly = false, writeSkewProblemAllowed = false, automaticReadTrackingEnabled = true)
+        @TransactionalMethod(readonly = false, writeSkewProblemAllowed = false, trackReads = true)
         public boolean updateWithDisallowedWriteSkewProblem() {
             //Configuration = getThreadLocalTransaction().getConfiguration(); 
 
@@ -105,7 +105,7 @@ public class TransactionalMethod_settingTest {
 
         @TransactionalMethod(readonly = false, writeSkewProblemAllowed = false)
         public boolean updateWithDisallowedWriteSkewProblemAndDefaultAutomaticReadTracking() {
-            assertTrue(getThreadLocalTransaction().getConfiguration().isAutomaticReadTrackingEnabled());
+            assertTrue(getThreadLocalTransaction().getConfiguration().isReadTrackingEnabled());
 
             //force the loadForRead so that the retry doesn't find an empty transaction
             int b = x;
@@ -226,25 +226,25 @@ public class TransactionalMethod_settingTest {
 
         public void defaultMethod() {
             Transaction tx = getThreadLocalTransaction();
-            assertFalse(tx.getConfiguration().isAutomaticReadTrackingEnabled());
+            assertFalse(tx.getConfiguration().isReadTrackingEnabled());
         }
 
         @TransactionalMethod(readonly = true)
         public void readonlyMethod() {
             Transaction tx = getThreadLocalTransaction();
-            assertFalse(tx.getConfiguration().isAutomaticReadTrackingEnabled());
+            assertFalse(tx.getConfiguration().isReadTrackingEnabled());
         }
 
-        @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = false)
+        @TransactionalMethod(readonly = true, trackReads = false)
         public void readonlyMethodWithReadTrackingDisabled() {
             Transaction tx = getThreadLocalTransaction();
-            assertFalse(tx.getConfiguration().isAutomaticReadTrackingEnabled());
+            assertFalse(tx.getConfiguration().isReadTrackingEnabled());
         }
 
-        @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+        @TransactionalMethod(readonly = true, trackReads = true)
         public void readonlyMethodWithReadTrackingEnabled() {
             Transaction tx = getThreadLocalTransaction();
-            assertTrue(tx.getConfiguration().isAutomaticReadTrackingEnabled());
+            assertTrue(tx.getConfiguration().isReadTrackingEnabled());
         }
 
         @TransactionalMethod(readonly = false)
@@ -254,20 +254,20 @@ public class TransactionalMethod_settingTest {
             System.out.println(config.speculativeConfiguration);
             assertInstanceOf(tx, MonoUpdateAlphaTransaction.class);
 
-            assertFalse(tx.getConfiguration().isAutomaticReadTrackingEnabled());
+            assertFalse(tx.getConfiguration().isReadTrackingEnabled());
         }
 
-        @TransactionalMethod(readonly = false, automaticReadTrackingEnabled = false)
+        @TransactionalMethod(readonly = false, trackReads = false)
         public void updateMethodWithReadTrackingDisabled() {
             Transaction tx = getThreadLocalTransaction();
 
-            assertFalse(tx.getConfiguration().isAutomaticReadTrackingEnabled());
+            assertFalse(tx.getConfiguration().isReadTrackingEnabled());
         }
 
-        @TransactionalMethod(readonly = false, automaticReadTrackingEnabled = true)
+        @TransactionalMethod(readonly = false, trackReads = true)
         public void updateMethodWithReadTrackingEnabled() {
             Transaction tx = getThreadLocalTransaction();
-            assertTrue(tx.getConfiguration().isAutomaticReadTrackingEnabled());
+            assertTrue(tx.getConfiguration().isReadTrackingEnabled());
         }
     }
 }

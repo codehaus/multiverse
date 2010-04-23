@@ -43,7 +43,7 @@ public class RetryInterruptibleTest {
             }
         }
 
-        @TransactionalMethod(automaticReadTrackingEnabled = true, interruptible = true)
+        @TransactionalMethod(trackReads = true, interruptible = true)
         public void await() throws InterruptedException {
             ref.await(1);
         }

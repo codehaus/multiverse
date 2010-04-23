@@ -63,7 +63,7 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, false, false, 100);
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
                 .withSpeculativeConfiguration(speculativeConfig)
-                .withAutomaticReadTrackingEnabled(false);
+                .withReadTrackingEnabled(false);
 
         AlphaTransaction tx = new ArrayUpdateAlphaTransaction(config, 100);
         tx.openForWrite(ref);
@@ -85,7 +85,7 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, false, 100);
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
                 .withSpeculativeConfiguration(speculativeConfig)
-                .withAutomaticReadTrackingEnabled(false);
+                .withReadTrackingEnabled(false);
         AlphaTransaction tx = new ArrayUpdateAlphaTransaction(config, 100);
         tx.openForWrite(ref);
 

@@ -172,12 +172,12 @@ public final class ClassTransactionalMethodTransformer implements Opcodes {
         }
 
         //trackreads
-        if (transactionMetadata.automaticReadTrackingEnabled != null) {
-            insnList.add(new InsnNode(transactionMetadata.automaticReadTrackingEnabled ? ICONST_1 : ICONST_0));
+        if (transactionMetadata.trackReads != null) {
+            insnList.add(new InsnNode(transactionMetadata.trackReads ? ICONST_1 : ICONST_0));
             insnList.add(new MethodInsnNode(
                     INVOKEINTERFACE,
                     Type.getInternalName(TransactionFactoryBuilder.class),
-                    "setAutomaticReadTrackingEnabled",
+                    "setReadTrackingEnabled",
                     "(Z)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
         }
 

@@ -123,19 +123,19 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      * <p/>
      * If this property is set, the stm will not speculate on this property anymore.
      *
-     * @param automaticReadTrackingEnabled true if read tracking enabled, false otherwise.
+     * @param enabled true if read tracking enabled, false otherwise.
      * @return the updated TransactionFactoryBuilder
      * @see #isQuickReleaseEnabled()
      */
-    B setAutomaticReadTrackingEnabled(boolean automaticReadTrackingEnabled);
+    B setReadTrackingEnabled(boolean enabled);
 
     /**
      * Checks if the transaction automatically tracks reads.
      *
      * @return true if automatic read tracking is enabled, false otherwise.
-     * @see #setAutomaticReadTrackingEnabled(boolean)
+     * @see #setReadTrackingEnabled(boolean)
      */
-    boolean isAutomaticReadTracking();
+    boolean isReadTrackingEnabled();
 
     /**
      * Sets if the transaction can be interrupted while doing blocking operations.

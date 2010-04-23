@@ -101,7 +101,7 @@ public final class TransactionalInteger {
      *
      * @param desired the value to wait for.
      */
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+    @TransactionalMethod(readonly = true, trackReads = true)
     public void await(int desired) {
         if (desired != value) {
             retry();
@@ -114,7 +114,7 @@ public final class TransactionalInteger {
      * @param than the value to wait for.
      * @return the value that currently is active.
      */
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+    @TransactionalMethod(readonly = true, trackReads = true)
     public int awaitLargerThan(int than) {
         if (!(value > than)) {
             retry();
@@ -129,7 +129,7 @@ public final class TransactionalInteger {
      * @param than
      * @return
      */
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+    @TransactionalMethod(readonly = true, trackReads = true)
     public int awaitLargerOrEqualThan(int than) {
         if (!(value >= than)) {
             retry();
@@ -138,7 +138,7 @@ public final class TransactionalInteger {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+    @TransactionalMethod(readonly = true, trackReads = true)
     public int awaitSmallerThan(int than) {
         if (!(value < than)) {
             retry();
@@ -147,7 +147,7 @@ public final class TransactionalInteger {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+    @TransactionalMethod(readonly = true, trackReads = true)
     public int awaitSmallerOrEqualThan(int than) {
         if (!(value <= than)) {
             retry();
@@ -156,7 +156,7 @@ public final class TransactionalInteger {
         return value;
     }
 
-    @TransactionalMethod(readonly = true, automaticReadTrackingEnabled = true)
+    @TransactionalMethod(readonly = true, trackReads = true)
     public int awaitNotEqualTo(int than) {
         if (!(value != than)) {
             retry();
