@@ -3,6 +3,8 @@ package org.multiverse.performancetool;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -30,11 +32,17 @@ public class PerformanceTool {
         double transactionsPerSecondPerThread = (1.0d * cli.transactionCount * TimeUnit.SECONDS.toNanos(1)) / durationNs;
         double transactionsPerSecond = transactionsPerSecondPerThread * cli.threadCount;
 
+        NumberFormat nf = createNumberFormat();
+
         System.out.println("[finished]----------------------------------------------------------");
         System.out.printf("Duration: %s seconds\n", TimeUnit.NANOSECONDS.toSeconds(durationNs));
-        System.out.printf("Duration: %s nanoseconds\n", durationNs);
-        System.out.printf("Transactions/second: %s \n", transactionsPerSecond);
-        System.out.printf("Transactions/second: %s per core\n", transactionsPerSecondPerThread);
+        System.out.printf("Duration: %s nanoseconds\n", nf.format(durationNs));
+        System.out.printf("Update transactions/second: %s \n", nf.format(transactionsPerSecond));
+        System.out.printf("Update transactions/second: %s per core\n", nf.format(transactionsPerSecondPerThread));
+    }
+
+    private NumberFormat createNumberFormat() {
+        return NumberFormat.getInstance(Locale.ENGLISH);
     }
 
     private long executeBenchmark(PerformanceToolArguments arguments) throws InterruptedException {
@@ -62,9 +70,10 @@ public class PerformanceTool {
     }
 
     private void printSettings(PerformanceToolArguments cli) {
-        System.out.println("Transaction count per thread = " + cli.transactionCount);
-        System.out.println("Threadcount = " + cli.threadCount);
-        System.out.println("Strict = " + cli.strict);
+        NumberFormat nf = createNumberFormat();
+        System.out.println("Update transaction count per thread: " + nf.format(cli.transactionCount));
+        System.out.println("Threadcount:" + nf.format(cli.threadCount));
+        System.out.println("Strict: " + cli.strict);
     }
 
     private void printWarning() {
@@ -111,6 +120,8 @@ public class PerformanceTool {
         }
 
         public void run() {
+            NumberFormat nf = createNumberFormat();
+
             barrier.awaitOpen();
 
             for (long k = 0; k < transactionCount; k++) {
@@ -122,7 +133,8 @@ public class PerformanceTool {
                 }
 
                 if (k > 0 && k % 10000000 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
+
+                    System.out.printf("%s is at %s\n", getName(), nf.format(k));
                 }
             }
         }
