@@ -71,7 +71,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewStressTest {
     }
 
     @Test
-    public void testConcurrentWithoutWriteSkewDetection() {
+    public void testConcurrentWithWriteSkewAllowed() {
         ManualRef accountA1 = new ManualRef(stm);
         ManualRef accountA2 = new ManualRef(stm);
 
@@ -81,8 +81,8 @@ public class ArrayUpdateAlphaTransaction_writeSkewStressTest {
         accountA1.set(stm, 1000);
         accountB1.set(stm, 1000);
 
-        TransferThread thread1 = new TransferThread(0, accountA1, accountA2, accountB1, accountB1, false);//todo:
-        TransferThread thread2 = new TransferThread(0, accountB1, accountB2, accountA1, accountA1, false);//todo:
+        TransferThread thread1 = new TransferThread(0, accountA1, accountA2, accountB1, accountB1, true);//todo:
+        TransferThread thread2 = new TransferThread(0, accountB1, accountB2, accountA1, accountA1, true);//todo:
 
         startAll(thread1, thread2);
         joinAll(thread1, thread2);
@@ -109,17 +109,17 @@ public class ArrayUpdateAlphaTransaction_writeSkewStressTest {
         final ManualRef accountFrom2;
         final ManualRef accountTo1;
         final ManualRef accountTo2;
-        final boolean allowWriteSkew;
+        final boolean writeSkewAllowed;
 
         public TransferThread(int id, ManualRef accountFrom1, ManualRef accountFrom2, ManualRef accountTo1,
-                              ManualRef accountTo2, boolean allowWriteSkew) {
+                              ManualRef accountTo2, boolean writeSkewAllowed) {
             super("TransferThread-" + id);
 
             this.accountFrom1 = accountFrom1;
             this.accountFrom2 = accountFrom2;
             this.accountTo1 = accountTo1;
             this.accountTo2 = accountTo2;
-            this.allowWriteSkew = allowWriteSkew;
+            this.writeSkewAllowed = writeSkewAllowed;
         }
 
         @Override
@@ -127,7 +127,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewStressTest {
             TransactionFactory txFactory = new TransactionFactory() {
                 @Override
                 public Transaction start() {
-                    return startSutTransaction(10, allowWriteSkew);
+                    return startSutTransaction(10, writeSkewAllowed);
                 }
             };
 

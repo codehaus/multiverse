@@ -16,8 +16,8 @@ import static java.lang.String.format;
 import static org.multiverse.stms.alpha.AlphaStmUtils.toTxObjectString;
 
 /**
- * An abstract {@link org.multiverse.stms.alpha.transactions.AlphaTransaction} that provides all the pluming logic for
- * update transactions.
+ * An abstract {@link org.multiverse.stms.alpha.transactions.AlphaTransaction} that provides all the pluming
+ * logic for update transactions.
  *
  * @author Peter Veentjer.
  */

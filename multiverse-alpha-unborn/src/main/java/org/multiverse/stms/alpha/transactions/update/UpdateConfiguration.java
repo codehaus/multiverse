@@ -22,7 +22,7 @@ public final class UpdateConfiguration extends AbstractAlphaTransactionConfigura
 
     public UpdateConfiguration(PrimitiveClock clock) {
         this(clock,
-                ExponentialBackoffPolicy.INSTANCE_10_MS_MAX,
+                ExponentialBackoffPolicy.INSTANCE_100_MS_MAX,
                 GenericCommitLockPolicy.FAIL_FAST_BUT_RETRY, null, new SpeculativeConfiguration(40),
                 1000, true, true, true, true, true, true, true, Long.MAX_VALUE);
     }

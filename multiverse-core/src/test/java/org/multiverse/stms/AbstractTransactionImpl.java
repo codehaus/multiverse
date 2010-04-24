@@ -12,7 +12,7 @@ public class AbstractTransactionImpl extends AbstractTransaction {
     public AbstractTransactionImpl() {
         super(new AbstractTransactionConfiguration(
                 new StrictPrimitiveClock(1),
-                ExponentialBackoffPolicy.INSTANCE_10_MS_MAX,
+                ExponentialBackoffPolicy.INSTANCE_100_MS_MAX,
                 null,
                 true,
                 1000,
@@ -23,7 +23,7 @@ public class AbstractTransactionImpl extends AbstractTransaction {
     public AbstractTransactionImpl(PrimitiveClock clock) {
         super(new AbstractTransactionConfiguration(
                 clock,
-                ExponentialBackoffPolicy.INSTANCE_10_MS_MAX,
+                ExponentialBackoffPolicy.INSTANCE_100_MS_MAX,
                 null,
                 true,
                 10000,
@@ -34,7 +34,7 @@ public class AbstractTransactionImpl extends AbstractTransaction {
     public AbstractTransactionImpl(String familyName, PrimitiveClock clock) {
         super(new AbstractTransactionConfiguration(
                 clock,
-                ExponentialBackoffPolicy.INSTANCE_10_MS_MAX,
+                ExponentialBackoffPolicy.INSTANCE_100_MS_MAX,
                 familyName,
                 true,
                 1000,

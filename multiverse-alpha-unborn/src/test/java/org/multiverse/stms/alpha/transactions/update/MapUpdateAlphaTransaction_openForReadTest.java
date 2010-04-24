@@ -147,7 +147,7 @@ public class MapUpdateAlphaTransaction_openForReadTest {
 
 
     @Test
-    public void whenLockedAndVersionTooOld_thenOldVersionNotFoundReadConflict() {
+    public void whenLockedAndVersionTooNew_thenOldVersionNotFoundReadConflict() {
         ManualRef ref = new ManualRef(stm, 1);
 
         //start the transaction to sets its readversion
@@ -175,6 +175,37 @@ public class MapUpdateAlphaTransaction_openForReadTest {
         assertEquals(version, stm.getVersion());
         assertEquals(expectedTranlocal, ref.___load());
     }
+
+    @Test
+    public void whenLockedAndVersionTooOld_thenLockNotFreeReadConflict() {
+        ManualRef ref = new ManualRef(stm, 1);
+
+        //lock it
+        Transaction owner = mock(Transaction.class);
+        ref.___tryLock(owner);
+
+
+        stm.getClock().tick();
+
+        //start the transaction to sets its readversion
+        AlphaTransaction tx = startSutTransaction();
+
+        ManualRefTranlocal expectedTranlocal = (ManualRefTranlocal) ref.___load();
+
+        //try to load it, it should fail because the version stored is newer than the
+        //readversion is the transaction allows.
+        long version = stm.getVersion();
+        try {
+            tx.openForRead(ref);
+            fail();
+        } catch (LockNotFreeReadConflict ex) {
+        }
+
+        assertIsActive(tx);
+        assertEquals(version, stm.getVersion());
+        assertEquals(expectedTranlocal, ref.___load());
+    }
+
 
     @Test
     public void whenVersionIsTooNew_thenOldVersionNotFoundReadConflict() {

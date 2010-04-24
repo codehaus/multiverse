@@ -48,7 +48,7 @@ public final class AlphaStmConfig {
             GenericCommitLockPolicy.FAIL_FAST_BUT_RETRY;
 
     public BackoffPolicy backoffPolicy =
-            ExponentialBackoffPolicy.INSTANCE_10_MS_MAX;
+            ExponentialBackoffPolicy.INSTANCE_100_MS_MAX;
 
     public boolean quickReleaseWriteLocksEnabled = true;
 

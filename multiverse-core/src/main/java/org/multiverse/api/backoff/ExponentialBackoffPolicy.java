@@ -18,18 +18,18 @@ import static java.util.concurrent.locks.LockSupport.parkNanos;
  */
 public final class ExponentialBackoffPolicy implements BackoffPolicy {
 
-    public final static ExponentialBackoffPolicy INSTANCE_10_MS_MAX = new ExponentialBackoffPolicy();
+    public final static ExponentialBackoffPolicy INSTANCE_100_MS_MAX = new ExponentialBackoffPolicy();
 
     private final long maxDelayNs;
     private final long minDelayNs;
     private final long[] slotTimes;
 
     /**
-     * Creates an ExponentialBackoffPolicy with 100 nanoseconds as minimal delay and 10 milliseconds as maximum
+     * Creates an ExponentialBackoffPolicy with 100 nanoseconds as minimal delay and 100 milliseconds as maximum
      * delay.
      */
     public ExponentialBackoffPolicy() {
-        this(10, MILLISECONDS.toNanos(10), TimeUnit.NANOSECONDS);
+        this(100, MILLISECONDS.toNanos(100), TimeUnit.NANOSECONDS);
 
     }
 
@@ -82,15 +82,28 @@ public final class ExponentialBackoffPolicy implements BackoffPolicy {
     public void delayedUninterruptible(Transaction t) {
         long delayNs = calcDelayNs(t);
 
-        if (delayNs > 1000) {
+        long remainingTimeoutNs = t.getRemainingTimeoutNs();
+
+        if (remainingTimeoutNs == Long.MAX_VALUE) {
+            if (delayNs > 1000) {
+                parkNanos(delayNs);
+            }
+        } else {
+            if (delayNs > remainingTimeoutNs) {
+                delayNs = remainingTimeoutNs;
+            }
+
+            long startNs = System.nanoTime();
             parkNanos(delayNs);
+            long durationNs = System.nanoTime() - startNs;
+            t.setRemainingTimeoutNs(Math.min(0, remainingTimeoutNs - durationNs));
         }
     }
 
     protected long calcDelayNs(Transaction tx) {
-        if (tx.getAttempt() > 100) {
-            System.out.println("tx.attempt: " + tx.getAttempt());
-        }
+        //if (tx.getAttempt() > 100) {
+        System.out.println("tx.attempt: " + tx.getAttempt());
+        //}
 
         int maxSlot;
         int attempt = tx.getAttempt();

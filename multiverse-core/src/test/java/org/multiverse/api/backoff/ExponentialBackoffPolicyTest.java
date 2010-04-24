@@ -11,7 +11,7 @@ public class ExponentialBackoffPolicyTest {
 
     @Test
     public void construction_INSTANCE() {
-        ExponentialBackoffPolicy policy = ExponentialBackoffPolicy.INSTANCE_10_MS_MAX;
+        ExponentialBackoffPolicy policy = ExponentialBackoffPolicy.INSTANCE_100_MS_MAX;
         assertEquals(10, policy.getMinDelayNs());
         assertEquals(TimeUnit.MILLISECONDS.toNanos(10), policy.getMaxDelayNs());
     }

@@ -33,7 +33,7 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
      * This method should be removed, only used for testing purposes.
      */
     public AbstractTransactionConfiguration() {
-        this(new StrictPrimitiveClock(), ExponentialBackoffPolicy.INSTANCE_10_MS_MAX,
+        this(new StrictPrimitiveClock(), ExponentialBackoffPolicy.INSTANCE_100_MS_MAX,
                 null, true, 1000, true, true, true, true, Long.MIN_VALUE);
     }
 

@@ -12,7 +12,7 @@ import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 public final class ReadonlyConfiguration extends AbstractAlphaTransactionConfiguration {
 
     public ReadonlyConfiguration(PrimitiveClock clock, boolean readTrackingEnabled) {
-        this(clock, ExponentialBackoffPolicy.INSTANCE_10_MS_MAX, null, new SpeculativeConfiguration(100), 1000,
+        this(clock, ExponentialBackoffPolicy.INSTANCE_100_MS_MAX, null, new SpeculativeConfiguration(100), 1000,
                 true, readTrackingEnabled, true, Long.MAX_VALUE);
     }
 
