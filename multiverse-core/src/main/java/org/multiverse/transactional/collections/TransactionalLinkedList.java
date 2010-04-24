@@ -241,7 +241,7 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
     @Override
     @TransactionalMethod(readonly = true)
     public int remainingCapacity() {
-        return Math.max(0, maxCapacity - (int) size.atomicGet());
+        return Math.max(0, maxCapacity - (int) size.get());
     }
 
     @Override

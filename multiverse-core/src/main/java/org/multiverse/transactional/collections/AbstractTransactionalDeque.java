@@ -297,13 +297,17 @@ public abstract class AbstractTransactionalDeque<E>
     public boolean contains(Object o) {
         Iterator<E> e = iterator();
         if (o == null) {
-            while (e.hasNext())
-                if (e.next() == null)
+            while (e.hasNext()) {
+                if (e.next() == null) {
                     return true;
+                }
+            }
         } else {
-            while (e.hasNext())
-                if (o.equals(e.next()))
+            while (e.hasNext()) {
+                if (o.equals(e.next())) {
                     return true;
+                }
+            }
         }
         return false;
     }
@@ -313,8 +317,9 @@ public abstract class AbstractTransactionalDeque<E>
         Object[] r = new Object[size()];
         Iterator<E> it = iterator();
         for (int i = 0; i < r.length; i++) {
-            if (!it.hasNext())    // fewer elements than expected
+            if (!it.hasNext()) {   // fewer elements than expected
                 return Arrays.copyOf(r, i);
+            }
             r[i] = it.next();
         }
         return it.hasNext() ? finishToArray(r, it) : r;
@@ -384,9 +389,11 @@ public abstract class AbstractTransactionalDeque<E>
 
     public boolean containsAll(Collection<?> c) {
         Iterator<?> e = c.iterator();
-        while (e.hasNext())
-            if (!contains(e.next()))
+        while (e.hasNext()) {
+            if (!contains(e.next())) {
                 return false;
+            }
+        }
         return true;
     }
 
@@ -416,16 +423,18 @@ public abstract class AbstractTransactionalDeque<E>
 
     public String toString() {
         Iterator<E> i = iterator();
-        if (!i.hasNext())
+        if (!i.hasNext()) {
             return "[]";
+        }
 
         StringBuilder sb = new StringBuilder();
         sb.append('[');
         for (; ;) {
             E e = i.next();
             sb.append(e == this ? "(this Collection)" : e);
-            if (!i.hasNext())
+            if (!i.hasNext()) {
                 return sb.append(']').toString();
+            }
             sb.append(", ");
         }
     }
