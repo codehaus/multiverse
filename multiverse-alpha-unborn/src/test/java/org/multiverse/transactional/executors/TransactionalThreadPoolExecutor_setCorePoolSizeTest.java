@@ -135,6 +135,7 @@ public class TransactionalThreadPoolExecutor_setCorePoolSizeTest {
     }
 
     @Test
+    @Ignore
     public void whenShutdown_thenIllegalStateException() {
         executor = new TransactionalThreadPoolExecutor();
         executor.execute(new Runnable() {

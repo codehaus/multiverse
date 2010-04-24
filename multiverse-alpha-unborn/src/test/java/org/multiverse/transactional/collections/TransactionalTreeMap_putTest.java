@@ -1,12 +1,13 @@
 package org.multiverse.transactional.collections;
 
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.transactional.collections.CollectionTestUtils.createTreeMapExcluding;
 import static org.multiverse.transactional.collections.CollectionTestUtils.createTreeMapIncluding;
+
+import java.util.Random;
 
 /**
  * @author Peter Veentjer
@@ -60,5 +61,81 @@ public class TransactionalTreeMap_putTest {
         assertEquals("newone", map.get("1"));
     }
 
+    @Test
+    public void shouldBalanceARightHeavyTree() {
+        TransactionalTreeMap<Integer, String> map = new TransactionalTreeMap<Integer, String>();
+        map.put(1, "one");
+        map.put(2, "two");
+        map.put(3, "three");
+        map.put(4, "four");
+        map.put(5, "five");
+        map.put(6, "six");
+        map.put(7, "seven");
+        map.put(8, "eight");
+        map.put(9, "nine");
+
+        assertEquals(9, map.size());
+        assertEquals(4, map.height());
+        assertTrue("not balanced", map.balanced());
+    }
+
+    @Test
+    public void shouldBalanceARightHeavyTreeWithLeftHeavyRightSubtree() {
+        TransactionalTreeMap<Integer, String> map = new TransactionalTreeMap<Integer, String>();
+        map.put(1, "one");
+        map.put(3, "three");
+        map.put(2, "two");
+
+        assertEquals(3, map.size());
+        assertEquals(2, map.height());
+        assertTrue("not balanced", map.balanced());
+    }
+
+    @Test
+    public void shouldBalanceALeftHeavyTree() {
+        TransactionalTreeMap<Integer, String> map = new TransactionalTreeMap<Integer, String>();
+        map.put(9, "nine");
+        map.put(8, "eight");
+        map.put(7, "seven");
+        map.put(6, "six");
+        map.put(5, "five");
+        map.put(4, "four");
+        map.put(3, "three");
+        map.put(2, "two");
+        map.put(1, "one");
+
+        assertEquals(9, map.size());
+        assertEquals(4, map.height());
+        assertTrue("not balanced", map.balanced());
+    }
+
+    @Test
+    public void shouldBalanceLeftHeavyTreeWithRightHeavyLeftSubtree() {
+        TransactionalTreeMap<Integer, String> map = new TransactionalTreeMap<Integer, String>();
+        map.put(3, "three");
+        map.put(1, "one");
+        map.put(2, "two");
+
+        assertEquals(3, map.size());
+        assertTrue(map.height() == 2);
+    }
+
+    @Test
+    public void shouldBalanceThousandRandomNumberInsertions() {
+        TransactionalTreeMap<Integer, String> map = new TransactionalTreeMap<Integer, String>();
+        int uniqueInsertionCount = 0;
+
+        Random random = new Random();
+        for (int i = 0; i < 1000; i++) {
+            Integer randomNumber = new Integer(random.nextInt(10000));
+            String oldValue = map.put(randomNumber, randomNumber.toString());
+            if (oldValue == null) {
+                uniqueInsertionCount++;
+            }
+        }
+
+        assertEquals(uniqueInsertionCount, map.size());
+        assertTrue("not balanced", map.balanced());
+    }
 
 }
