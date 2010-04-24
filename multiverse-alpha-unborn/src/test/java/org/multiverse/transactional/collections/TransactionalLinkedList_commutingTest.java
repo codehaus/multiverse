@@ -2,6 +2,7 @@ package org.multiverse.transactional.collections;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
@@ -38,6 +39,7 @@ public class TransactionalLinkedList_commutingTest {
     }
 
     @Test
+    @Ignore
     public void test() {
         TransactionalLinkedList<String> list = new TransactionalLinkedList<String>("2", "3", "4");
 

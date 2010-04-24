@@ -10,6 +10,8 @@ allprojects {
   apply plugin: 'maven'
   apply plugin: 'project-reports'
 
+  defaultTasks 'clean', 'install'
+
   repositories {
     mavenCentral()
     mavenRepo(urls: [
@@ -37,6 +39,20 @@ allprojects {
   dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.8.1'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.8.2'
+  }
+}
+
+//task integrationTest(type: org.junit.Test) {
+//    include("**/*Abstract*")
+//    include("**/*StressTest*")
+//    include("**/*LongTest*")
+//    include("**/*PerformanceTest*")
+//  }
+
+
+task hello {
+  doFirst {
+    println 'Hello world!'
   }
 }
 
@@ -125,13 +141,6 @@ project(':multiverse-alpha-unborn') {
   artifacts {
     testFixtures testJar
   }
-
-  //todo: remove? (it already is described in the manifest).
-  //jar {
-  //  manifest {
-  //    attributes 'Premain-Class': 'org.multiverse.javaagent.MultiverseJavaAgent'
-  //  }
-  //}
 
   classes.doLast() {
     println "------------------------------------------------------------------"

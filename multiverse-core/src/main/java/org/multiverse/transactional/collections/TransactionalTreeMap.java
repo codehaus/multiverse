@@ -3,17 +3,18 @@ package org.multiverse.transactional.collections;
 import org.multiverse.annotations.Exclude;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
-import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import org.multiverse.api.programmatic.ProgrammaticLong;
 import org.multiverse.api.programmatic.ProgrammaticReferenceFactory;
 import org.multiverse.utils.TodoException;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.max;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
+
+import static java.lang.Math.abs;
+import static java.lang.Math.max;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 
 /**
  * A Tree based TransactionalMap implementation. Essentially is the transactional version of the
@@ -448,11 +449,9 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
         public boolean isLeftHeavy() {
             if (left == null) {
                 return false;
-            }
-            else if (height(left) == 1) {
+            } else if (height(left) == 1) {
                 return right == null;
-            }
-            else {
+            } else {
                 return height(left) - height(right) > 1;
             }
         }
@@ -460,11 +459,9 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
         public boolean isRightHeavy() {
             if (right == null) {
                 return false;
-            }
-            else if (height(right) == 1) {
+            } else if (height(right) == 1) {
                 return left == null;
-            }
-            else {
+            } else {
                 return height(right) - height(left) > 1;
             }
         }
@@ -499,6 +496,46 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
         private void reassignParent(Node pivot) {
             pivot.parent = this.parent;
             this.parent = pivot;
+        }
+
+        public int getHeight() {
+            return height;
+        }
+
+        public void setHeight(int height) {
+            this.height = height;
+        }
+
+        public Node<K, V> getLeft() {
+            return left;
+        }
+
+        public void setLeft(Node<K, V> left) {
+            this.left = left;
+        }
+
+        public Node<K, V> getParent() {
+            return parent;
+        }
+
+        public void setParent(Node<K, V> parent) {
+            this.parent = parent;
+        }
+
+        public Node<K, V> getRight() {
+            return right;
+        }
+
+        public void setRight(Node<K, V> right) {
+            this.right = right;
+        }
+
+        public V getValue() {
+            return value;
+        }
+
+        public void setValue(V value) {
+            this.value = value;
         }
     }
 }

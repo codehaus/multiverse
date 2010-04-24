@@ -1,7 +1,8 @@
 package org.multiverse.transactional.collections;
 
-import static org.junit.Assert.*;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class TransactionTreeMap_NodeTests {
 
@@ -14,7 +15,7 @@ public class TransactionTreeMap_NodeTests {
     @Test
     public void nodeWithNullLeftAndNonNullRightWithHeightOneShouldBeRightHeavy() {
         TransactionalTreeMap.Node node = new TransactionalTreeMap.Node(1, "one");
-        node.right = new TransactionalTreeMap.Node(2, "two");
+        node.setRight(new TransactionalTreeMap.Node(2, "two"));
         assertTrue(node.isRightHeavy());
     }
 
@@ -26,10 +27,10 @@ public class TransactionTreeMap_NodeTests {
         TransactionalTreeMap.Node anotherNode = new TransactionalTreeMap.Node(4, "four");
         TransactionalTreeMap.Node oneMoreNode = new TransactionalTreeMap.Node(4, "four");
 
-        anotherNode.right = oneMoreNode;
-        right.right = anotherNode;
-        node.right = right;
-        node.left = left;
+        anotherNode.setRight(oneMoreNode);
+        right.setRight(anotherNode);
+        node.setRight(right);
+        node.setLeft(left);
 
         assertTrue(node.isRightHeavy());
     }
@@ -43,7 +44,7 @@ public class TransactionTreeMap_NodeTests {
     @Test
     public void nodeWithNullRightAndNonNullLeftWithHeightOneShouldBeLeftHeavy() {
         TransactionalTreeMap.Node node = new TransactionalTreeMap.Node(1, "one");
-        node.left = new TransactionalTreeMap.Node(2, "two");
+        node.setLeft(new TransactionalTreeMap.Node(2, "two"));
         assertTrue(node.isLeftHeavy());
     }
 
@@ -55,10 +56,10 @@ public class TransactionTreeMap_NodeTests {
         TransactionalTreeMap.Node anotherNode = new TransactionalTreeMap.Node(4, "four");
         TransactionalTreeMap.Node oneMoreNode = new TransactionalTreeMap.Node(4, "four");
 
-        anotherNode.left = oneMoreNode;
-        left.left = anotherNode;
-        node.right = right;
-        node.left = left;
+        anotherNode.setLeft(oneMoreNode);
+        left.setLeft(anotherNode);
+        node.setRight(right);
+        node.setLeft(left);
 
         assertTrue(node.isLeftHeavy());
     }
@@ -69,11 +70,11 @@ public class TransactionTreeMap_NodeTests {
         TransactionalTreeMap.Node right = new TransactionalTreeMap.Node(2, "two");
         TransactionalTreeMap.Node anotherNode = new TransactionalTreeMap.Node(3, "three");
 
-        node.right = right;
+        node.setRight(right);
 
         assertEquals(1, node.balanceFactor());
 
-        right.right = anotherNode;
+        right.setRight(anotherNode);
 
         assertEquals(2, node.balanceFactor());
     }
