@@ -15,9 +15,10 @@ public class PerformanceToolArguments {
 
     @Argument(required = false, index = 0, metaVar = "TRANSACTION_COUNT",
             usage = "The number of transactions per thread")
-    public long transactionCount = 1000 * 1000 * 1000;
+    public long transactionCount = 200 * 1000 * 1000;
 
     @Option(name = "-s", usage = "If the tick should be strict (multiverse can deal with relaxed ticks)", required = false)
     public boolean strict = false;
+
 
 }

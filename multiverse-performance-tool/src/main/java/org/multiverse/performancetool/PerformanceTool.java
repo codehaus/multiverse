@@ -20,7 +20,8 @@ public class PerformanceTool {
     }
 
     private void run(PerformanceToolArguments arguments) throws InterruptedException {
-        System.out.println("Multiverse: Starting Performance Tool");
+        System.out.println("Multiverse Threoretical STM Performance Benchmark");
+
 
         printSettings(arguments);
         printWarning();
@@ -46,6 +47,7 @@ public class PerformanceTool {
     }
 
     private long executeBenchmark(PerformanceToolArguments arguments) throws InterruptedException {
+        //AtomicLong clock = new AtomicLong();
         AtomicLong clock = new AtomicLong();
 
         Barrier startBarrier = new Barrier();
@@ -70,14 +72,15 @@ public class PerformanceTool {
 
     private void printSettings(PerformanceToolArguments cli) {
         NumberFormat nf = createNumberFormat();
+        System.out.println("Number of available processors: " + Runtime.getRuntime().availableProcessors());
+        System.out.println("Number of threads: " + nf.format(cli.threadCount));
         System.out.println("Update transaction count per thread: " + nf.format(cli.transactionCount));
         System.out.println("Update transaction count in total: " + nf.format(cli.transactionCount * cli.threadCount));
-        System.out.println("Threadcount:" + nf.format(cli.threadCount));
-        System.out.println("Strict: " + cli.strict);
+        System.out.println("Strict tick: " + cli.strict);
     }
 
     private void printWarning() {
-        System.out.println("[info]---------------------------------------------------------");
+        System.out.println("[info]--------------------------------------------------------------");
         System.out.println("Watch out with hyperthreading since the number of virtual cores");
         System.out.println("increase but the actual number of cores remains the same. In");
         System.out.println("this benchmark hyperthreading could cause a performance");
