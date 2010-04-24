@@ -257,12 +257,13 @@ public final class AlphaProgrammaticLong
     private void lock(Transaction lockOwner) {
         //if we couldn't acquire the lock, we are done.
         for (int attempt = 0; attempt <= stm.getMaxRetries(); attempt++) {
+            lockOwner.setAttempt(attempt);
             if (attempt == stm.getMaxRetries()) {
                 throw new TooManyRetriesException();
             } else if (___tryLock(lockOwner)) {
                 return;
             } else {
-                stm.getBackoffPolicy().delayedUninterruptible(lockOwner, attempt);
+                stm.getBackoffPolicy().delayedUninterruptible(lockOwner);
             }
         }
     }

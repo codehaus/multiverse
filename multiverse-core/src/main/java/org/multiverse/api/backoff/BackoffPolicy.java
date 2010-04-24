@@ -8,7 +8,7 @@ import org.multiverse.api.Transaction;
  * reduce contention by delaying certain transactions, so that the chance increases for some of them to make progress
  * and eventually make the way free for the others.
  * <p/>
- * The {@link #delayedUninterruptible(org.multiverse.api.Transaction , int)} needs the transaction, so that different
+ * The {@link #delayedUninterruptible(org.multiverse.api.Transaction)} needs the transaction, so that different
  * dalays can be done based on the transaction. For example a transaction that has a higher priority could get a smaller
  * delay than a transaction with a lower priority.
  * <p/>
@@ -21,25 +21,21 @@ public interface BackoffPolicy {
     /**
      * Executes the delay. This call is interruptible.
      *
-     * @param tx      the transaction that is going to be restarted. The transaction should never be null, but it
-     *                depends on the implementation if this is checked.
-     * @param attempt indicates the number of times the transaction is tried. Attempt should always be equal or larger
-     *                than 1. It depends on the implementation if this is checked.
+     * @param tx the transaction that is going to be restarted. The transaction should never be null, but it
+     *           depends on the implementation if this is checked.
      * @throws NullPointerException     if t is null. It depends on the implementation if this is checked.
      * @throws IllegalArgumentException if attempt smaller than 1. It depends on the implementation if this is checked.
      * @throws InterruptedException     if the delay is interrupted.
      */
-    void delay(Transaction tx, int attempt) throws InterruptedException;
+    void delay(Transaction tx) throws InterruptedException;
 
     /**
      * Executes the delay without the possibility of being interrupted.
      *
-     * @param tx      the transaction that is going to be restarted. The transaction should never be null, but it
-     *                depends on the implementation if this is checked.
-     * @param attempt indicates the number of times the transaction is tried. Attempt should always be equal or larger
-     *                than 1. It depends on the implementation if this is checked.
+     * @param tx the transaction that is going to be restarted. The transaction should never be null, but it
+     *           depends on the implementation if this is checked.
      * @throws NullPointerException     if t is null. It depends on the implementation if this is checked.
      * @throws IllegalArgumentException if attempt smaller than 1. It depends on the implementation if this is checked.
      */
-    void delayedUninterruptible(Transaction tx, int attempt);
+    void delayedUninterruptible(Transaction tx);
 }

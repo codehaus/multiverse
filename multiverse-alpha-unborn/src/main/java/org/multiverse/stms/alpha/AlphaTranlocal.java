@@ -33,14 +33,7 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
     public final static long OPENED_FOR_COMMUTE = -2;
     public final static long OPENED_FOR_COMMUTE_AND_DIRTY = -3;
 
-    /**
-     * Contains the write version
-     * <p/>
-     * -2: indicates commute
-     * -1: indicates opened for write and marked as dirty,
-     * 0: opened for write and not marked as dirty
-     * larger than 0 indicates committed (so readonly).
-     */
+    //larger than 0 means committed.
     public long ___writeVersion = 0;
 
     public AlphaTranlocal ___origin;

@@ -68,11 +68,9 @@ public abstract class AbstractUpdateAlphaTransaction
     protected final AlphaTranlocal doOpenForRead(AlphaTransactionalObject txObject) {
         AlphaTranlocal opened = findAttached(txObject);
 
-        //System.out.println("opening for read");
-
         if (opened != null) {
             if (opened.isCommuting()) {
-                AlphaTranlocal origin = txObject.___load(getReadVersion());
+                AlphaTranlocal origin = load(txObject);
                 if (origin == null) {
                     throw new UncommittedReadConflict();
                 }
@@ -83,7 +81,7 @@ public abstract class AbstractUpdateAlphaTransaction
             return opened;
         }
 
-        opened = txObject.___load(getReadVersion());
+        opened = load(txObject);
         if (opened == null) {
             throw new UncommittedReadConflict();
         } else if (config.readTrackingEnabled) {
@@ -111,7 +109,7 @@ public abstract class AbstractUpdateAlphaTransaction
             attach(attached);
             updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
         } else if (attached.isCommuting()) {
-            AlphaTranlocal origin = txObject.___load(getReadVersion());
+            AlphaTranlocal origin = load(txObject);
             if (origin == null) {
                 throw new UncommittedReadConflict();
             }

@@ -1,9 +1,6 @@
 package org.multiverse.stms.alpha.transactions;
 
-import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.NoRetryPossibleException;
-import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
+import org.multiverse.api.exceptions.*;
 import org.multiverse.api.latches.Latch;
 import org.multiverse.stms.AbstractTransaction;
 import org.multiverse.stms.AbstractTransactionSnapshot;
@@ -26,6 +23,20 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
 
     public AbstractAlphaTransaction(C config) {
         super(config);
+    }
+
+    protected final AlphaTranlocal load(AlphaTransactionalObject txObject) {
+        do {
+            try {
+                return txObject.___load(getReadVersion());
+            } catch (LockNotFreeReadConflict lockNotFreeReadConflict) {
+                config.backoffPolicy.delayedUninterruptible(this);
+                setAttempt(getAttempt() + 1);
+                if (getAttempt() >= config.maxRetries) {
+                    throw lockNotFreeReadConflict;
+                }
+            }
+        } while (true);
     }
 
     @Override

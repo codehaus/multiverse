@@ -284,7 +284,6 @@ public abstract class TransactionTemplate<E> {
             setThreadLocalTransaction(tx);
         }
 
-        int attempt = 0;
         Throwable lastFailureCause = null;
 
         if (lifecycleListenersEnabled) {
@@ -293,7 +292,7 @@ public abstract class TransactionTemplate<E> {
 
         try {
             do {
-                attempt++;
+                tx.setAttempt(tx.getAttempt() + 1);
                 try {
                     try {
                         if (listener != null) {
@@ -304,7 +303,7 @@ public abstract class TransactionTemplate<E> {
                         tx.commit();
                         return result;
                     } catch (Retry e) {
-                        if (attempt - 1 < tx.getConfiguration().getMaxRetries()) {
+                        if (tx.getAttempt() - 1 < tx.getConfiguration().getMaxRetries()) {
 
                             Latch latch;
                             if (tx.getRemainingTimeoutNs() == Long.MAX_VALUE) {
@@ -349,6 +348,7 @@ public abstract class TransactionTemplate<E> {
                 } catch (SpeculativeConfigurationFailure ex) {
                     Transaction oldTransaction = tx;
                     tx = txFactory.start();
+                    tx.setAttempt(oldTransaction.getAttempt());
                     tx.setRemainingTimeoutNs(oldTransaction.getRemainingTimeoutNs());
 
                     if (threadLocalAware) {
@@ -356,10 +356,10 @@ public abstract class TransactionTemplate<E> {
                     }
                 } catch (StmControlFlowError er) {
                     BackoffPolicy backoffPolicy = tx.getConfiguration().getBackoffPolicy();
-                    backoffPolicy.delayedUninterruptible(tx, attempt);
+                    backoffPolicy.delayedUninterruptible(tx);
                     tx.restart();
                 }
-            } while (attempt - 1 < tx.getConfiguration().getMaxRetries());
+            } while (tx.getAttempt() - 1 < tx.getConfiguration().getMaxRetries());
 
             String msg = format("Too many retries on transaction '%s', maxRetries = %s",
                     tx.getConfiguration().getFamilyName(),

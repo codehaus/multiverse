@@ -82,7 +82,7 @@ public class MultipleConditionVariablesStressTest {
             }
         }
 
-        @TransactionalMethod
+        @TransactionalMethod(maxRetries = 10000)
         public void doit() {
             for (TransactionalInteger value : values) {
                 if (value.get() == 1) {

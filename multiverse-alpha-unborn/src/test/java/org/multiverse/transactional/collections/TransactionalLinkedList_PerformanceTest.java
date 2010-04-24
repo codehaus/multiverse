@@ -1,5 +1,6 @@
 package org.multiverse.transactional.collections;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Stm;
@@ -24,6 +25,11 @@ public class TransactionalLinkedList_PerformanceTest {
         clearThreadLocalTransaction();
     }
 
+    @After
+    public void tearDown() {
+        clearThreadLocalTransaction();
+    }
+
     @Test
     public void testRelaxedTransactionalLinkedList() {
         TransactionalLinkedList<Integer> list = new TransactionalLinkedList<Integer>(10 * 1000 * 1000, true);
@@ -35,7 +41,7 @@ public class TransactionalLinkedList_PerformanceTest {
                 list.add(k);
             }
             list.clear();
-            System.out.println("completed run " + l);
+            System.out.println("completed iteration " + l);
         }
 
         long durationNs = System.nanoTime() - startNs;
@@ -54,7 +60,7 @@ public class TransactionalLinkedList_PerformanceTest {
                 list.add(k);
             }
             list.clear();
-            System.out.println("completed run " + l);
+            System.out.println("completed iteration " + l);
         }
 
         long durationNs = System.nanoTime() - startNs;
@@ -73,7 +79,7 @@ public class TransactionalLinkedList_PerformanceTest {
                 list.add(k);
             }
             list.clear();
-            System.out.println("completed run " + l);
+            System.out.println("completed iteration " + l);
         }
 
         long durationNs = System.nanoTime() - startNs;

@@ -85,9 +85,39 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
      * {@link #TransactionalLinkedList(int, boolean)} as alternative.
      *
      * @param items the items to store in this TransactionalLinkedList.
+     * @throws NullPointerException if items is null.
      */
     public TransactionalLinkedList(E... items) {
         this(Integer.MAX_VALUE);
+
+        if (items == null) {
+            throw new NullPointerException();
+        }
+
+        for (E item : items) {
+            add(item);
+        }
+    }
+
+    /**
+     * Creates a new TransactionalLinkedList with unbound capacity and the provided items.
+     * <p/>
+     * It is strict on the maximum capacity, so it could cause contention problems. See the
+     * {@link #TransactionalLinkedList(int, boolean)} as alternative.
+     *
+     * @param items the items to store in this TransactionalLinkedList.
+     * @throws NullPointerException if items is null.
+     */
+    public TransactionalLinkedList(Collection<E> items) {
+        this(Integer.MAX_VALUE);
+
+        if (items == null) {
+            throw new NullPointerException();
+        }
+
+        if (items.isEmpty()) {
+            return;
+        }
 
         for (E item : items) {
             add(item);
@@ -126,8 +156,14 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
         this.size = sizeFactory.atomicCreateLong(0);
     }
 
+    /**
+     * Checks if this TransactionalLinkedList uses a relaxed maximum capacity. Meaning that the number
+     * of items in the TransactionLinkedList could exceed the maximum capacity.
+     *
+     * @return true if a relaxed maximum capacity is used.
+     */
     @Exclude
-    public boolean hasStrictMaxCapacity() {
+    public boolean hasRelaxedMaxCapacity() {
         return relaxedMaximumCapacity;
     }
 
@@ -358,9 +394,8 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
         }
 
         boolean modified = false;
-        Iterator<? extends E> e = c.iterator();
-        while (e.hasNext()) {
-            if (add(e.next())) {
+        for (E item : c) {
+            if (add(item)) {
                 modified = true;
             }
         }

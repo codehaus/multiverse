@@ -16,12 +16,13 @@ import static java.util.concurrent.locks.LockSupport.parkNanos;
  *
  * @author Peter Veentjer.
  */
-public class ExponentialBackoffPolicy implements BackoffPolicy {
+public final class ExponentialBackoffPolicy implements BackoffPolicy {
 
     public final static ExponentialBackoffPolicy INSTANCE_10_MS_MAX = new ExponentialBackoffPolicy();
 
     private final long maxDelayNs;
     private final long minDelayNs;
+    private final long[] slotTimes;
 
     /**
      * Creates an ExponentialBackoffPolicy with 100 nanoseconds as minimal delay and 10 milliseconds as maximum
@@ -29,6 +30,7 @@ public class ExponentialBackoffPolicy implements BackoffPolicy {
      */
     public ExponentialBackoffPolicy() {
         this(10, MILLISECONDS.toNanos(10), TimeUnit.NANOSECONDS);
+
     }
 
     /**
@@ -45,6 +47,11 @@ public class ExponentialBackoffPolicy implements BackoffPolicy {
         this.minDelayNs = minDelayNs;
         if (minDelayNs > maxDelayNs) {
             throw new IllegalArgumentException("minimum delay can't be larger than maximum delay");
+        }
+
+        slotTimes = new long[1000];
+        for (int k = 0; k < slotTimes.length; k++) {
+            slotTimes[k] = Math.round((1.0d * k) / slotTimes.length * maxDelayNs);
         }
     }
 
@@ -67,48 +74,39 @@ public class ExponentialBackoffPolicy implements BackoffPolicy {
     }
 
     @Override
-    public void delay(Transaction t, int attempt) throws InterruptedException {
-        delayedUninterruptible(t, attempt);
+    public void delay(Transaction t) throws InterruptedException {
+        delayedUninterruptible(t);
     }
 
-
-//    public final AtomicLong smallest = new AtomicLong(Long.MAX_VALUE);
-
     @Override
-    public void delayedUninterruptible(Transaction t, int attempt) {
-        long delayNs = calcDelayNs(attempt);
-
-        long delay = System.nanoTime();
+    public void delayedUninterruptible(Transaction t) {
+        long delayNs = calcDelayNs(t);
 
         if (delayNs > 1000) {
             parkNanos(delayNs);
         }
-
-//        long found = System.nanoTime() - delay;
-//        if (found < smallest.get()) {
-//            smallest.set(found);
-        //           System.out.println("smallest delay: " + found + "desired delay: " + delayNs);
-//        }
     }
 
-    //public final AtomicLong maxAttempt = new AtomicLong();
-    //public final AtomicLong maxDelay = new AtomicLong();
-
-    protected long calcDelayNs(int attempt) {
-
-        //    if(attempt>maxAttempt.get()){
-        //        maxAttempt.set(attempt);
-        //        System.out.println("maxAttempt: " + attempt);
-        //    }
-
-        long delayNs;
-        if (attempt <= 0) {
-            delayNs = 0;
-        } else if (attempt >= 63) {
-            delayNs = Long.MAX_VALUE;
-        } else {
-            delayNs = 1L << attempt;
+    protected long calcDelayNs(Transaction tx) {
+        if (tx.getAttempt() > 100) {
+            System.out.println("tx.attempt: " + tx.getAttempt());
         }
+
+        int maxSlot;
+        int attempt = tx.getAttempt();
+        if (attempt >= slotTimes.length) {
+            maxSlot = slotTimes.length - 1;
+        } else {
+            maxSlot = attempt;
+        }
+
+        if (maxSlot <= 0) {
+            maxSlot = 1;
+        }
+
+        int slotIndex = (int) Math.abs(System.identityHashCode(Thread.currentThread()) % maxSlot);
+        //System.out.println("slotIndex: "+slotIndex);
+        long delayNs = slotTimes[slotIndex];
 
         if (minDelayNs > 0 && delayNs < minDelayNs) {
             delayNs = minDelayNs;
@@ -117,12 +115,6 @@ public class ExponentialBackoffPolicy implements BackoffPolicy {
         if (maxDelayNs > 0 && delayNs > maxDelayNs) {
             delayNs = maxDelayNs;
         }
-
-        //    if (maxDelay.get() < delayNs) {
-        //        maxDelay.set(delayNs);
-        //        System.out.println("delayNs: " + delayNs);
-        //    }
-
         return delayNs;
     }
 }

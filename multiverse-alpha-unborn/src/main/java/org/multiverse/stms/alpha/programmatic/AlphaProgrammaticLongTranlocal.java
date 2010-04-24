@@ -154,4 +154,16 @@ public final class AlphaProgrammaticLongTranlocal extends AlphaTranlocal impleme
     public void setRemainingTimeoutNs(long timeoutNs) {
         //ignore
     }
+
+    private int attempt;
+
+    @Override
+    public int getAttempt() {
+        return attempt;
+    }
+
+    @Override
+    public void setAttempt(int attempt) {
+        this.attempt = attempt;
+    }
 }

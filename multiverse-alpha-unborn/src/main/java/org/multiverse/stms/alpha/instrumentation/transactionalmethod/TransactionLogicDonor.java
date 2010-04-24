@@ -45,6 +45,7 @@ public class TransactionLogicDonor {
         }
 
         tx = (AlphaTransaction) transactionFactory.start();
+        tx.setAttempt(1);
         setThreadLocalTransaction(tx);
         try {
             execute___ro();
@@ -114,11 +115,10 @@ public class TransactionLogicDonor {
         tx = (AlphaTransaction) transactionFactory.start();
         setThreadLocalTransaction(tx);
         try {
-            int attempt = 0;
             do {
                 try {
                     try {
-                        attempt++;
+                        tx.setAttempt(tx.getAttempt() + 1);
                         if (tx.getConfiguration().isReadonly()) {
                             execute___ro();
                         } else {
@@ -128,7 +128,7 @@ public class TransactionLogicDonor {
                         tx.commit();
                         return;
                     } catch (Retry er) {
-                        if (attempt - 1 < tx.getConfiguration().getMaxRetries()) {
+                        if (tx.getAttempt() - 1 < tx.getConfiguration().getMaxRetries()) {
                             Latch latch;
                             if (tx.getRemainingTimeoutNs() == Long.MAX_VALUE) {
                                 latch = new CheapLatch();
@@ -173,16 +173,17 @@ public class TransactionLogicDonor {
                     AlphaTransaction oldTx = tx;
                     tx = (AlphaTransaction) transactionFactory.start();
                     tx.setRemainingTimeoutNs(oldTx.getRemainingTimeoutNs());
+                    tx.setAttempt(oldTx.getAttempt());
                     setThreadLocalTransaction(tx);
                 } catch (StmControlFlowError throwable) {
                     BackoffPolicy backoffPolicy = tx.getConfiguration().getBackoffPolicy();
-                    backoffPolicy.delayedUninterruptible(tx, attempt);
+                    backoffPolicy.delayedUninterruptible(tx);
                 } finally {
-                    if (tx.getStatus() != TransactionStatus.committed && attempt - 1 < tx.getConfiguration().getMaxRetries()) {
+                    if (tx.getStatus() != TransactionStatus.committed && tx.getAttempt() - 1 < tx.getConfiguration().getMaxRetries()) {
                         tx.restart();
                     }
                 }
-            } while (attempt - 1 < tx.getConfiguration().getMaxRetries());
+            } while (tx.getAttempt() - 1 < tx.getConfiguration().getMaxRetries());
 
             String msg = format("Could not complete transaction '%s' within %s retries",
                     tx.getConfiguration().getFamilyName(), tx.getConfiguration().getMaxRetries());

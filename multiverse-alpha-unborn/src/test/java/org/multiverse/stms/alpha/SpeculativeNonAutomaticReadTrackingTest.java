@@ -37,7 +37,7 @@ public class SpeculativeNonAutomaticReadTrackingTest {
 
     @Test
     public void whenReadonlyAndAutomaticReadtrackingNeeded() {
-        SpeculativeNonAutomaticReadTracking o = new SpeculativeNonAutomaticReadTracking();
+        SpeculativeReadTrackingDisabled o = new SpeculativeReadTrackingDisabled();
         o.set(1);
         new DelayedSetThread(o).start();
         o.getZeroOrWait();
@@ -50,7 +50,7 @@ public class SpeculativeNonAutomaticReadTrackingTest {
         assertInstanceOf(o.transactions.get(2), MonoReadonlyAlphaTransaction.class);
 
         //make sure that the system learned.
-        SpeculativeNonAutomaticReadTracking o2 = new SpeculativeNonAutomaticReadTracking();
+        SpeculativeReadTrackingDisabled o2 = new SpeculativeReadTrackingDisabled();
         o2.set(1);
         TestThread t = new DelayedSetThread(o2);
         t.start();
@@ -64,14 +64,14 @@ public class SpeculativeNonAutomaticReadTrackingTest {
 
     @Test
     public void whenReadonlyAndNoAutomaticReadtrackingNeeded() {
-        SpeculativeNonAutomaticReadTracking o = new SpeculativeNonAutomaticReadTracking();
+        SpeculativeReadTrackingDisabled o = new SpeculativeReadTrackingDisabled();
         o.getZeroOrFail();
 
         assertEquals(1, o.transactions.size());
         assertInstanceOf(o.transactions.get(0), NonTrackingReadonlyAlphaTransaction.class);
 
         //and make sure that nothing has changed
-        SpeculativeNonAutomaticReadTracking o2 = new SpeculativeNonAutomaticReadTracking();
+        SpeculativeReadTrackingDisabled o2 = new SpeculativeReadTrackingDisabled();
         o2.getZeroOrFail();
         assertEquals(1, o2.transactions.size());
         assertInstanceOf(o2.transactions.get(0), NonTrackingReadonlyAlphaTransaction.class);
@@ -79,7 +79,7 @@ public class SpeculativeNonAutomaticReadTrackingTest {
 
     @Test
     public void whenUpdateAndAutomaticReadtrackingNeeded() {
-        SpeculativeNonAutomaticReadTracking o = new SpeculativeNonAutomaticReadTracking();
+        SpeculativeReadTrackingDisabled o = new SpeculativeReadTrackingDisabled();
         o.set(1);
         new DelayedSetThread(o).start();
         o.setOneIfZeroOrWait();
@@ -92,7 +92,7 @@ public class SpeculativeNonAutomaticReadTrackingTest {
         assertInstanceOf(o.transactions.get(3), MonoUpdateAlphaTransaction.class);
 
         //make sure that the system learned.
-        SpeculativeNonAutomaticReadTracking o2 = new SpeculativeNonAutomaticReadTracking();
+        SpeculativeReadTrackingDisabled o2 = new SpeculativeReadTrackingDisabled();
         o2.set(1);
         TestThread t = new DelayedSetThread(o2);
         t.start();
@@ -107,7 +107,7 @@ public class SpeculativeNonAutomaticReadTrackingTest {
 
     @Test
     public void whenUpdateAndNoAutomaticReadTrackingNeeded() throws InterruptedException {
-        SpeculativeNonAutomaticReadTracking o = new SpeculativeNonAutomaticReadTracking();
+        SpeculativeReadTrackingDisabled o = new SpeculativeReadTrackingDisabled();
         o.setOneIfZeroOrFail();
 
         assertEquals(2, o.transactions.size());
@@ -115,7 +115,7 @@ public class SpeculativeNonAutomaticReadTrackingTest {
         assertInstanceOf(o.transactions.get(1), MonoUpdateAlphaTransaction.class);
 
         //make sure that the system learned.
-        SpeculativeNonAutomaticReadTracking o2 = new SpeculativeNonAutomaticReadTracking();
+        SpeculativeReadTrackingDisabled o2 = new SpeculativeReadTrackingDisabled();
         Thread t = new DelayedSetThread(o2);
         t.start();
 
@@ -127,7 +127,7 @@ public class SpeculativeNonAutomaticReadTrackingTest {
     }
 
     @TransactionalObject
-    class SpeculativeNonAutomaticReadTracking {
+    class SpeculativeReadTrackingDisabled {
         private int value;
 
         @Exclude
@@ -173,9 +173,9 @@ public class SpeculativeNonAutomaticReadTrackingTest {
     }
 
     public class DelayedSetThread extends TestThread {
-        private final SpeculativeNonAutomaticReadTracking o;
+        private final SpeculativeReadTrackingDisabled o;
 
-        public DelayedSetThread(SpeculativeNonAutomaticReadTracking o) {
+        public DelayedSetThread(SpeculativeReadTrackingDisabled o) {
             this.o = o;
         }
 

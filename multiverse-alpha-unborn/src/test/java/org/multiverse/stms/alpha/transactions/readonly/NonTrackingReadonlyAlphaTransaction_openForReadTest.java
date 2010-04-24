@@ -3,10 +3,7 @@ package org.multiverse.stms.alpha.transactions.readonly;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
-import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.UncommittedReadConflict;
+import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -113,7 +110,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenLockedAndVersionTooOld_thenOldVersionNotFoundReadConflict() {
+    public void whenLockedAndVersionTooNew_thenOldVersionNotFoundReadConflict() {
         ManualRef ref = new ManualRef(stm, 1);
 
         //start the transaction to sets its readversion
@@ -135,6 +132,36 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
             tx.openForRead(ref);
             fail();
         } catch (OldVersionNotFoundReadConflict ex) {
+        }
+
+        assertIsActive(tx);
+        assertEquals(version, stm.getVersion());
+        assertEquals(expectedTranlocal, ref.___load());
+    }
+
+    @Test
+    public void whenLockedAndVersionTooOld_thenLockNotFreeReadConflict() {
+        ManualRef ref = new ManualRef(stm, 1);
+
+        //lock it
+        Transaction owner = mock(Transaction.class);
+        ref.___tryLock(owner);
+
+
+        stm.getClock().tick();
+
+        //start the transaction to sets its readversion
+        AlphaTransaction tx = startSutTransaction();
+
+        ManualRefTranlocal expectedTranlocal = (ManualRefTranlocal) ref.___load();
+
+        //try to load it, it should fail because the version stored is newer than the
+        //readversion is the transaction allows.
+        long version = stm.getVersion();
+        try {
+            tx.openForRead(ref);
+            fail();
+        } catch (LockNotFreeReadConflict ex) {
         }
 
         assertIsActive(tx);

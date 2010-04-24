@@ -1,5 +1,6 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
+import org.multiverse.api.exceptions.LockNotFreeReadConflict;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.api.exceptions.UncommittedReadConflict;
@@ -27,7 +28,7 @@ public abstract class AbstractReadonlyAlphaTransaction
     protected final AlphaTranlocal doOpenForRead(AlphaTransactionalObject txObject) {
         AlphaTranlocal tranlocal = findAttached(txObject);
         if (tranlocal == null) {
-            tranlocal = txObject.___load(getReadVersion());
+            tranlocal = load(txObject);
 
             if (tranlocal == null) {
                 throw createLoadUncommittedException(txObject);

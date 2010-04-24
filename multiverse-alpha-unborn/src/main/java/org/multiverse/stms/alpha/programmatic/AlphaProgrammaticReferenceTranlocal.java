@@ -118,4 +118,16 @@ public final class AlphaProgrammaticReferenceTranlocal<E> extends AlphaTranlocal
     public void setRemainingTimeoutNs(long timeoutNs) {
         throw new UnsupportedOperationException();
     }
+
+    private int attempt;
+
+    @Override
+    public int getAttempt() {
+        return attempt;
+    }
+
+    @Override
+    public void setAttempt(int attempt) {
+        this.attempt = attempt;
+    }
 }

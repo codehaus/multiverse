@@ -189,4 +189,8 @@ public interface Transaction {
     long getRemainingTimeoutNs();
 
     void setRemainingTimeoutNs(long timeoutNs);
+
+    int getAttempt();
+
+    void setAttempt(int attempt);
 }

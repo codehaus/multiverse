@@ -42,6 +42,8 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     private long timeoutNs;
 
+    private int attempt;
+
     public AbstractTransaction(C config) {
         assert config != null;
         this.config = config;
@@ -49,12 +51,22 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
     }
 
     @Override
-    public long getRemainingTimeoutNs() {
+    public final int getAttempt() {
+        return attempt;
+    }
+
+    @Override
+    public final void setAttempt(int attempt) {
+        this.attempt = attempt;
+    }
+
+    @Override
+    public final long getRemainingTimeoutNs() {
         return timeoutNs;
     }
 
     @Override
-    public void setRemainingTimeoutNs(long newTimeoutNs) {
+    public final void setRemainingTimeoutNs(long newTimeoutNs) {
         if (newTimeoutNs > newTimeoutNs) {
             throw new IllegalArgumentException();
         }
@@ -62,7 +74,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
     }
 
     @Override
-    public long getReadVersion() {
+    public final long getReadVersion() {
         return version;
     }
 
