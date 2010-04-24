@@ -3,21 +3,20 @@ package org.multiverse.transactional.collections;
 import org.multiverse.annotations.Exclude;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import org.multiverse.api.programmatic.ProgrammaticLong;
 import org.multiverse.api.programmatic.ProgrammaticReferenceFactory;
 import org.multiverse.utils.TodoException;
 
+import static java.lang.Math.abs;
+import static java.lang.Math.max;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 
-import static java.lang.Math.max;
-import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-
 /**
- * A Tree based TransactionalMap implementation. Essentially is the
- * transactional version of the
+ * A Tree based TransactionalMap implementation. Essentially is the transactional version of the
  * {@link java.util.TreeMap}.
  *
  * @author Peter Veentjer
@@ -25,13 +24,11 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
  * @see java.util.concurrent.ConcurrentMap
  * @see java.util.Map
  */
-public final class TransactionalTreeMap<K, V> implements
-        TransactionalMap<K, V> {
+public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> {
 
-    private final static ProgrammaticReferenceFactory sizeFactory =
-            getGlobalStmInstance()
-                    .getProgrammaticReferenceFactoryBuilder()
-                    .build();
+    private final static ProgrammaticReferenceFactory sizeFactory = getGlobalStmInstance()
+            .getProgrammaticReferenceFactoryBuilder()
+            .build();
 
 
     private final Comparator<? super K> comparator;
@@ -66,8 +63,7 @@ public final class TransactionalTreeMap<K, V> implements
     }
 
     /**
-     * Returns the Comparator uses by this TransactionalTreeMap to do
-     * comparisons between keys.
+     * Returns the Comparator uses by this TransactionalTreeMap to do comparisons between keys.
      * If the keys
      *
      * @return the Comparator used.
@@ -77,25 +73,15 @@ public final class TransactionalTreeMap<K, V> implements
     }
 
     /**
-     * Returns the height of this TransactionalTreeMap. The height is
-     * the maximum number of nodes from
+     * Returns the height of this TransactionalTreeMap. The height is the maximum number of nodes from
      * the rootnode to a leaf node. An empty tree will return 0.
      *
      * @return the height of this TransactionalTreeMap.
      */
     @TransactionalMethod(readonly = true)
     public int height() {
-        return height(root);
-    }
-
-    private int height(Node<K, V> node) {
-        if (node == null) {
-            return 0;
-        }
-
-        int left = height(node.left);
-        int right = height(node.right);
-        return 1 + max(left, right);
+        //todo: at the moment this method is recursive, but should be converted to iterative.
+        return root.height();
     }
 
     @Override
@@ -147,11 +133,9 @@ public final class TransactionalTreeMap<K, V> implements
     @Override
     public V put(K key, V value) {
         V oldValue = insert(key, value);
-
         if (!balanced()) {
             root = balance(root);
         }
-
         return oldValue;
     }
 
@@ -165,6 +149,8 @@ public final class TransactionalTreeMap<K, V> implements
             root = new Node<K, V>(key, value);
             return null;
         }
+
+        //todo: no balancing is done yet.
 
         Node<K, V> node = root;
         while (true) {
@@ -195,49 +181,39 @@ public final class TransactionalTreeMap<K, V> implements
                 return oldValue;
             }
         }
+
     }
 
     private Node balance(Node<K, V> node) {
-        if (isRightHeavy(node)) {
-            if (height(node.right) > 2) {
-                node.right = balance(node.right);
+        if (node.isRightHeavy()) {
+            if (node.right.isLeftHeavy()) {
+                node = node.doubleRotateLeft();
             } else {
-                if (isLeftHeavy(node.right)) {
-                    node = node.doubleRotateLeft();
-                } else {
-                    node = node.rotateLeft();
-                }
-            }
-        } else if (isLeftHeavy(node)) {
-            if (height(node.left) > 2) {
-                node.left = balance(node.left);
-            } else {
-                if (isRightHeavy(node.left)) {
-                    node = node.doubleRotateRight();
-                } else {
-                    node = node.rotateRight();
-                }
+                node = node.rotateLeft();
             }
         }
+        if (node.isLeftHeavy()) {
+            if (node.left.isRightHeavy()) {
+                node = node.doubleRotateRight();
+            } else {
+                node = node.rotateRight();
+            }
+        }
+        balanceChildrenIfNecessary(node);
         return node;
     }
 
-    private boolean isLeftHeavy(Node<K, V> node) {
-        if (node.left == null)
-            return false;
-        else if (node.left.right == null && node.left.left == null)
-            return node.right == null;
-        else
-            return height(node.left) - height(node.right) > 1;
+    private void balanceChildrenIfNecessary(Node<K, V> node) {
+        if (!balanced(node.right)) {
+            node.right = balance(node.right);
+        }
+        if (!balanced(node.left)) {
+            node.left = balance(node.left);
+        }
     }
 
-    private boolean isRightHeavy(Node<K, V> node) {
-        if (node.right == null)
-            return false;
-        else if (node.right.right == null && node.right.left == null)
-            return node.left == null;
-        else
-            return height(node.right) - height(node.left) > 1;
+    private boolean balanced(Node<K, V> node) {
+        return node.balanceFactor() < 2;
     }
 
     private int compareTo(K key1, K key2) {
@@ -425,13 +401,11 @@ public final class TransactionalTreeMap<K, V> implements
     }
 
     public boolean balanced() {
-        //some comments so I can commit
-        int rightMinusLeft = height(root.right) - height(root.left);
-        return rightMinusLeft == 1 || rightMinusLeft == 0;
+        return balanced(root);
     }
 
     @TransactionalObject
-    static final class Node<K, V> {
+    public static class Node<K, V> {
         final K key;
 
         V value;
@@ -446,37 +420,85 @@ public final class TransactionalTreeMap<K, V> implements
         }
 
         Node rotateLeft() {
-            Node newRoot = this.right;
-            newRoot.left = this;
-            newRoot.parent = this.parent;
-            this.parent = newRoot;
-            this.right = null;
-            return newRoot;
+            Node pivot = this.right;
+            this.right = pivot.left;
+            pivot.left = this;
+            reassignParent(pivot);
+            return pivot;
         }
 
         Node rotateRight() {
-            Node newRoot = this.left;
-            newRoot.right = this;
-            newRoot.parent = this.parent;
-            this.parent = newRoot;
-            this.left = null;
-            return newRoot;
+            Node pivot = this.left;
+            this.left = pivot.right;
+            pivot.right = this;
+            reassignParent(pivot);
+            return pivot;
         }
 
         Node doubleRotateLeft() {
-            right = right.rotateRight();
+            rightRotateRightNode();
             return rotateLeft();
         }
 
         Node doubleRotateRight() {
-            left = left.rotateLeft();
+            leftRotateLeftNode();
             return rotateRight();
         }
 
-        public Node getParent() {
-            return parent;
+        public boolean isLeftHeavy() {
+            if (left == null) {
+                return false;
+            }
+            else if (height(left) == 1) {
+                return right == null;
+            }
+            else {
+                return height(left) - height(right) > 1;
+            }
+        }
+
+        public boolean isRightHeavy() {
+            if (right == null) {
+                return false;
+            }
+            else if (height(right) == 1) {
+                return left == null;
+            }
+            else {
+                return height(right) - height(left) > 1;
+            }
+        }
+
+        public int height() {
+            return height(this);
+        }
+
+        public int balanceFactor() {
+            int balanceFactor = abs(height(right) - height(left));
+            return balanceFactor;
+        }
+
+        private int height(Node<K, V> node) {
+            if (node == null) {
+                return 0;
+            }
+
+            int left = height(node.left);
+            int right = height(node.right);
+            return 1 + max(left, right);
+        }
+
+        private void rightRotateRightNode() {
+            this.right = this.right.rotateRight();
+        }
+
+        private void leftRotateLeftNode() {
+            this.left = this.left.rotateLeft();
+        }
+
+        private void reassignParent(Node pivot) {
+            pivot.parent = this.parent;
+            this.parent = pivot;
         }
     }
-
-    //more nonsense doc..
 }
