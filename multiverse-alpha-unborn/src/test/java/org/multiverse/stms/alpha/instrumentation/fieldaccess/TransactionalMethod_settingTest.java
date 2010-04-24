@@ -66,13 +66,13 @@ public class TransactionalMethod_settingTest {
     }
 
     @Test
-    public void testAllowWriteSkewProblem() {
+    public void testAllowWriteSkew() {
         ObjectWithPreventWriteSkew object = new ObjectWithPreventWriteSkew();
 
-        assertFalse(object.updateWithDisallowedWriteSkewProblem());
+        assertFalse(object.updateWithDisallowedWriteSkew());
         assertTrue(object.updateDefaultMethod());
-        assertTrue(object.updateWithAllowedWriteSkewProblem());
-        assertFalse(object.updateWithDisallowedWriteSkewProblemAndDefaultAutomaticReadTracking());
+        assertTrue(object.updateWithAllowedWriteSkew());
+        assertFalse(object.updateWithDisallowedWriteSkewAndDefaultAutomaticReadTracking());
     }
 
 
@@ -85,32 +85,32 @@ public class TransactionalMethod_settingTest {
             x = 0;
         }
 
-        @TransactionalMethod(readonly = false, writeSkewProblemAllowed = true)
-        public boolean updateWithAllowedWriteSkewProblem() {
+        @TransactionalMethod(readonly = false, writeSkew = true)
+        public boolean updateWithAllowedWriteSkew() {
             //force the loadForRead so that the retry doesn't find an empty transaction
             int b = x;
 
-            return getThreadLocalTransaction().getConfiguration().isWriteSkewProblemAllowed();
+            return getThreadLocalTransaction().getConfiguration().isWriteSkewAllowed();
         }
 
-        @TransactionalMethod(readonly = false, writeSkewProblemAllowed = false, trackReads = true)
-        public boolean updateWithDisallowedWriteSkewProblem() {
+        @TransactionalMethod(readonly = false, writeSkew = false, trackReads = true)
+        public boolean updateWithDisallowedWriteSkew() {
             //Configuration = getThreadLocalTransaction().getConfiguration(); 
 
             //force the loadForRead so that the retry doesn't find an empty transaction
             int b = x;
 
-            return getThreadLocalTransaction().getConfiguration().isWriteSkewProblemAllowed();
+            return getThreadLocalTransaction().getConfiguration().isWriteSkewAllowed();
         }
 
-        @TransactionalMethod(readonly = false, writeSkewProblemAllowed = false)
-        public boolean updateWithDisallowedWriteSkewProblemAndDefaultAutomaticReadTracking() {
+        @TransactionalMethod(readonly = false, writeSkew = false)
+        public boolean updateWithDisallowedWriteSkewAndDefaultAutomaticReadTracking() {
             assertTrue(getThreadLocalTransaction().getConfiguration().isReadTrackingEnabled());
 
             //force the loadForRead so that the retry doesn't find an empty transaction
             int b = x;
 
-            return getThreadLocalTransaction().getConfiguration().isWriteSkewProblemAllowed();
+            return getThreadLocalTransaction().getConfiguration().isWriteSkewAllowed();
         }
 
         @TransactionalMethod(readonly = false)
@@ -120,7 +120,7 @@ public class TransactionalMethod_settingTest {
 
             Transaction tx = getThreadLocalTransaction();
 
-            return getThreadLocalTransaction().getConfiguration().isWriteSkewProblemAllowed();
+            return getThreadLocalTransaction().getConfiguration().isWriteSkewAllowed();
         }
     }
 

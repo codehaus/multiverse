@@ -49,7 +49,7 @@ public class AlphaStm_NonSpeculativeTransactionSettingsTest {
 
         assertFalse(t.getConfiguration().isReadonly());
         assertFalse(t.getConfiguration().isReadTrackingEnabled());
-        assertTrue(t.getConfiguration().isWriteSkewProblemAllowed());
+        assertTrue(t.getConfiguration().isWriteSkewAllowed());
         assertEquals(1000, t.getConfiguration().getMaxRetries());
         assertFalse(t.getConfiguration().isInterruptible());
     }
@@ -66,7 +66,7 @@ public class AlphaStm_NonSpeculativeTransactionSettingsTest {
 
         assertFalse(t.getConfiguration().isReadonly());
         assertTrue(t.getConfiguration().isReadTrackingEnabled());
-        assertTrue(t.getConfiguration().isWriteSkewProblemAllowed());
+        assertTrue(t.getConfiguration().isWriteSkewAllowed());
         assertEquals(1000, t.getConfiguration().getMaxRetries());
         assertFalse(t.getConfiguration().isInterruptible());
     }
@@ -89,7 +89,7 @@ public class AlphaStm_NonSpeculativeTransactionSettingsTest {
                 .setSpeculativeConfigurationEnabled(false)
                 .setReadonly(false)
                 .setReadTrackingEnabled(false)
-                .setWriteSkewProblemAllowed(false)
+                .setWriteSkewAllowed(false)
                 .build();
     }
 
@@ -99,7 +99,7 @@ public class AlphaStm_NonSpeculativeTransactionSettingsTest {
                 .setSpeculativeConfigurationEnabled(false)
                 .setReadonly(true)
                 .setReadTrackingEnabled(false)
-                .setWriteSkewProblemAllowed(true)
+                .setWriteSkewAllowed(true)
                 .build();
     }
 }

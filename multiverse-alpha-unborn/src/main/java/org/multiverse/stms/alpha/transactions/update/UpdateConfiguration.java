@@ -30,12 +30,12 @@ public final class UpdateConfiguration extends AbstractAlphaTransactionConfigura
     public UpdateConfiguration(
             PrimitiveClock clock, BackoffPolicy backoffPolicy, CommitLockPolicy commitLockPolicy,
             String familyName, SpeculativeConfiguration speculativeConfiguration, int maxRetries,
-            boolean interruptible, boolean automaticReadTracking, boolean allowWriteSkewProblem,
+            boolean interruptible, boolean automaticReadTracking, boolean writeSkewAllowed,
             boolean optimizedConflictDetectionEnabled, boolean dirtyCheckEnabled, boolean quickReleaseLocks,
             boolean explicitRetryAllowed, long timeoutNs) {
 
         super(clock, backoffPolicy, familyName, false, maxRetries, interruptible,
-                allowWriteSkewProblem, automaticReadTracking, explicitRetryAllowed,
+                writeSkewAllowed, automaticReadTracking, explicitRetryAllowed,
                 speculativeConfiguration, timeoutNs);
 
         this.commitLockPolicy = commitLockPolicy;
@@ -47,15 +47,15 @@ public final class UpdateConfiguration extends AbstractAlphaTransactionConfigura
     public UpdateConfiguration withSpeculativeConfiguration(SpeculativeConfiguration speculativeConfigurationEnabled) {
         return new UpdateConfiguration(
                 clock, backoffPolicy, commitLockPolicy, null, speculativeConfigurationEnabled,
-                maxRetries, interruptible, readTrackingEnabled, writeSkewProblemAllowed,
+                maxRetries, interruptible, readTrackingEnabled, writeSkewAllowed,
                 optimizedConflictDetectionEnabled, dirtyCheckEnabled, quickReleaseLocksEnabled,
                 explicitRetryAllowed, timeoutNs);
     }
 
-    public UpdateConfiguration withWriteSkewProblemAllowed(boolean allowWriteSkewProblem) {
+    public UpdateConfiguration withWriteSkewAllowed(boolean writeSkewAllowed) {
         return new UpdateConfiguration(
                 clock, backoffPolicy, commitLockPolicy, null, speculativeConfiguration,
-                maxRetries, interruptible, readTrackingEnabled, allowWriteSkewProblem,
+                maxRetries, interruptible, readTrackingEnabled, writeSkewAllowed,
                 optimizedConflictDetectionEnabled, dirtyCheckEnabled, quickReleaseLocksEnabled,
                 explicitRetryAllowed, timeoutNs);
     }
@@ -63,7 +63,7 @@ public final class UpdateConfiguration extends AbstractAlphaTransactionConfigura
     public UpdateConfiguration withReadTrackingEnabled(boolean readTrackingEnabled) {
         return new UpdateConfiguration(
                 clock, backoffPolicy, commitLockPolicy, null, speculativeConfiguration,
-                maxRetries, interruptible, readTrackingEnabled, writeSkewProblemAllowed,
+                maxRetries, interruptible, readTrackingEnabled, writeSkewAllowed,
                 optimizedConflictDetectionEnabled, dirtyCheckEnabled, quickReleaseLocksEnabled,
                 explicitRetryAllowed, timeoutNs);
     }
@@ -71,7 +71,7 @@ public final class UpdateConfiguration extends AbstractAlphaTransactionConfigura
     public UpdateConfiguration withExplictRetryAllowed(boolean explicitRetryAllowed) {
         return new UpdateConfiguration(
                 clock, backoffPolicy, commitLockPolicy, null, speculativeConfiguration,
-                maxRetries, interruptible, readTrackingEnabled, writeSkewProblemAllowed,
+                maxRetries, interruptible, readTrackingEnabled, writeSkewAllowed,
                 optimizedConflictDetectionEnabled, dirtyCheckEnabled, quickReleaseLocksEnabled,
                 explicitRetryAllowed, timeoutNs);
     }

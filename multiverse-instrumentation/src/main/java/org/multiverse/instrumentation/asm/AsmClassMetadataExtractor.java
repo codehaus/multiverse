@@ -2,11 +2,11 @@ package org.multiverse.instrumentation.asm;
 
 import org.multiverse.annotations.*;
 import org.multiverse.instrumentation.metadata.*;
+import org.multiverse.utils.IOUtils;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
@@ -91,11 +91,7 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
         if (is == null) {
             return false;
         } else {
-            try {
-                is.close();
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to close the inputstream", e);
-            }
+            IOUtils.closeQuietly(is);
             return true;
         }
     }
@@ -352,7 +348,7 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
 
         transactionMetadata.readOnly = null;
         transactionMetadata.trackReads = null;
-        transactionMetadata.writeSkewProblemAllowed = true;
+        transactionMetadata.writeSkew = true;
         transactionMetadata.interruptible = throwsInterruptedException;
         transactionMetadata.familyName = createFamilyName(classMetadata.getName(), methodNode.name, methodNode.desc);
         transactionMetadata.timeoutNs = Long.MAX_VALUE;
@@ -374,9 +370,9 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
         txMetadata.readOnly = (Boolean) getValue(annotationNode, "readonly", null);
         txMetadata.familyName = createFamilyName(classMetadata.getName(), methodNode.name, methodNode.desc);
         txMetadata.interruptible = (Boolean) getValue(annotationNode, "interruptible", throwsInterruptedException);
-        txMetadata.writeSkewProblemAllowed = (Boolean) getValue(annotationNode, "writeSkewProblemAllowed", true);
+        txMetadata.writeSkew = (Boolean) getValue(annotationNode, "writeSkew", true);
 
-        if (txMetadata.writeSkewProblemAllowed) {
+        if (txMetadata.writeSkew) {
             txMetadata.trackReads = (Boolean) getValue(annotationNode, "trackReads", null);
         } else {
             Boolean tracking = (Boolean) getValue(annotationNode, "trackReads", null);

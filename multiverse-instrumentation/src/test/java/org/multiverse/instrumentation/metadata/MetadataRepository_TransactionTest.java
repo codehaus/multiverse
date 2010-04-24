@@ -31,7 +31,7 @@ public class MetadataRepository_TransactionTest {
         assertNull(transactionMetadata.trackReads);
         assertNull(transactionMetadata.readOnly);
         assertFalse(transactionMetadata.interruptible);
-        assertTrue(transactionMetadata.writeSkewProblemAllowed);
+        assertTrue(transactionMetadata.writeSkew);
         assertEquals(1000, transactionMetadata.maxRetries);
         assertEquals("org.multiverse.instrumentation.metadata.MetadataRepository_TransactionTest$DefaultSettings.method()", transactionMetadata.familyName);
     }
@@ -52,7 +52,7 @@ public class MetadataRepository_TransactionTest {
         assertTrue(transactionMetadata.readOnly);
         assertNull(transactionMetadata.trackReads);
         assertFalse(transactionMetadata.interruptible);
-        assertTrue(transactionMetadata.writeSkewProblemAllowed);
+        assertTrue(transactionMetadata.writeSkew);
         assertEquals(1000, transactionMetadata.maxRetries);
         assertEquals("org.multiverse.instrumentation.metadata.MetadataRepository_TransactionTest$ReadonlyMethod.method()", transactionMetadata.familyName);
     }
@@ -73,7 +73,7 @@ public class MetadataRepository_TransactionTest {
         assertFalse(transactionMetadata.readOnly);
         assertNull(transactionMetadata.trackReads);
         assertFalse(transactionMetadata.interruptible);
-        assertTrue(transactionMetadata.writeSkewProblemAllowed);
+        assertTrue(transactionMetadata.writeSkew);
         assertEquals(1000, transactionMetadata.maxRetries);
         assertEquals("org.multiverse.instrumentation.metadata.MetadataRepository_TransactionTest$DefaultUpdateMethod.method()", transactionMetadata.familyName);
     }
@@ -140,49 +140,49 @@ public class MetadataRepository_TransactionTest {
 
 
     @Test
-    public void whenAllowWriteSkewProblem() {
-        ClassMetadata classMetadata = repository.loadClassMetadata(AllowWriteSkewProblem.class);
+    public void whenWriteSkewAllowed() {
+        ClassMetadata classMetadata = repository.loadClassMetadata(WriteSkewAllowed.class);
 
         MethodMetadata enabledMethodMetadata = classMetadata.getMethodMetadata("enabled", "()V");
         TransactionMetadata enabledTransactionMetadata = enabledMethodMetadata.getTransactionalMetadata();
         assertNotNull(enabledTransactionMetadata);
-        assertTrue(enabledTransactionMetadata.writeSkewProblemAllowed);
+        assertTrue(enabledTransactionMetadata.writeSkew);
 
         MethodMetadata disabledMethodMetadata = classMetadata.getMethodMetadata("disabled", "()V");
         TransactionMetadata disabledTransactionMetadata = disabledMethodMetadata.getTransactionalMetadata();
         assertNotNull(disabledTransactionMetadata);
-        assertFalse(disabledTransactionMetadata.writeSkewProblemAllowed);
+        assertFalse(disabledTransactionMetadata.writeSkew);
 
         MethodMetadata nowAllowedAndDefaultNonAutomaticReadTracking = classMetadata.getMethodMetadata("nowAllowedAndDefaultNonAutomaticReadTracking", "()V");
         TransactionMetadata nowAllowedAndDefaultNonAutomaticReadTrackingMetadata = disabledMethodMetadata.getTransactionalMetadata();
         assertNotNull(nowAllowedAndDefaultNonAutomaticReadTracking);
-        assertFalse(nowAllowedAndDefaultNonAutomaticReadTrackingMetadata.writeSkewProblemAllowed);
+        assertFalse(nowAllowedAndDefaultNonAutomaticReadTrackingMetadata.writeSkew);
         assertTrue(nowAllowedAndDefaultNonAutomaticReadTrackingMetadata.trackReads);
 
         MethodMetadata nowAllowedAndAutomaticReadTracking = classMetadata.getMethodMetadata("nowAllowedAndAutomaticReadTracking", "()V");
         TransactionMetadata nowAllowedAndAutomaticReadTrackingMetadata = disabledMethodMetadata.getTransactionalMetadata();
         assertNotNull(nowAllowedAndAutomaticReadTracking);
-        assertFalse(nowAllowedAndAutomaticReadTrackingMetadata.writeSkewProblemAllowed);
+        assertFalse(nowAllowedAndAutomaticReadTrackingMetadata.writeSkew);
         assertTrue(nowAllowedAndAutomaticReadTrackingMetadata.trackReads);
 
     }
 
-    class AllowWriteSkewProblem {
+    class WriteSkewAllowed {
 
-        @TransactionalMethod(writeSkewProblemAllowed = false)
+        @TransactionalMethod(writeSkew = false)
         void nowAllowedAndDefaultNonAutomaticReadTracking() {
         }
 
-        @TransactionalMethod(writeSkewProblemAllowed = false, trackReads = false)
+        @TransactionalMethod(writeSkew = false, trackReads = false)
         void nowAllowedAndAutomaticReadTracking() {
         }
 
 
-        @TransactionalMethod(trackReads = true, writeSkewProblemAllowed = true)
+        @TransactionalMethod(trackReads = true, writeSkew = true)
         void enabled() {
         }
 
-        @TransactionalMethod(trackReads = true, writeSkewProblemAllowed = false)
+        @TransactionalMethod(trackReads = true, writeSkew = false)
         void disabled() {
         }
     }

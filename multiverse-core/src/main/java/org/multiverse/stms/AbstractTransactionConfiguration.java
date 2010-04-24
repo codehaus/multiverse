@@ -24,7 +24,7 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
     public final boolean readOnly;
     public final int maxRetries;
     public final boolean interruptible;
-    public final boolean writeSkewProblemAllowed;
+    public final boolean writeSkewAllowed;
     public final boolean readTrackingEnabled;
     public final long timeoutNs;
     public final boolean explicitRetryAllowed;
@@ -40,7 +40,7 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
     public AbstractTransactionConfiguration(
             PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName,
             boolean readOnly, int maxRetries, boolean interruptible,
-            boolean writeSkewProblemAllowed, boolean readTrackingEnabled,
+            boolean writeSkewAllowed, boolean readTrackingEnabled,
             boolean explicitRetryAllowed, long timeoutNs) {
 
         if (clock == null) {
@@ -58,13 +58,13 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
         this.maxRetries = maxRetries;
         this.interruptible = interruptible;
         this.readTrackingEnabled = readTrackingEnabled;
-        this.writeSkewProblemAllowed = writeSkewProblemAllowed;
+        this.writeSkewAllowed = writeSkewAllowed;
         this.explicitRetryAllowed = explicitRetryAllowed;
         this.timeoutNs = timeoutNs;
 
-        if (!readOnly && !readTrackingEnabled && !writeSkewProblemAllowed) {
+        if (!readOnly && !readTrackingEnabled && !writeSkewAllowed) {
             String msg = format("Update transaction '%s' isn't  " +
-                    "allowed with writeSkewProblemAllowed " +
+                    "allowed with writeSkew " +
                     "disabled and trackReads disabled. " +
                     "The last is needed to do the first.",
                     familyName);
@@ -98,8 +98,8 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
     }
 
     @Override
-    public final boolean isWriteSkewProblemAllowed() {
-        return writeSkewProblemAllowed;
+    public final boolean isWriteSkewAllowed() {
+        return writeSkewAllowed;
     }
 
     @Override

@@ -40,21 +40,28 @@ A better manual will be provided in the future because this 'getting up and runn
 wastes my precious time.
 
 <h2>Building the project</h2>
-If you have installed Maven 2, the only thing you need to do is the execute 'mvn clean install' in the root
-Multiverse directory. Make sure that you have Java 1.6 or higher installed.
+You need to install <a href="http://www.gradle.org">Gradle</a> 0.9 Preview 1
+(<a href="http://dist.codehaus.org/gradle/gradle-0.9-preview-1-all.zip">download</a>). If you go to the root directory
+and type 'gradle -i' the project will automatically be compiled and the artifacts will also be stored
+in your local maven repository. More important commands:
+<pre>
+    //builds the jar from scratch (unit tests are not executed)
+    gradle -i clean install
 
-<h2>Running the stress tests</h2>
-There are a bunch of stress tests (they are named *StressTest) that run for quite some time (15/20 minutes
-on my laptop). They are not executed under a standard phase cause of Clover (the additional instrumentation caused
-by clover takes a lot of extra time). At the moment the stress tests are completely disabled, so you need to run
-them from your ide.
+    //runs the tests
+    gradle -i test
 
-<h2>Setting up Clover</h2>
-Multiverse uses Clover as test coverage tool and out of the box a evaluation license is provided. This license
-eventually will expire, so you will need a real license. Luckily Atlassian was kind enough to provide a free
-license for the Multiverse project. Please send me (alarmnummer at gmail dot com) and email if you are a committer,
-and I'll send you the key.
-<p/>
-Once you reived the key, you need to change your maven settings. Check the following <a
-        href="settings.xml">settings.xml</a>
-for more detailed information. Linux users can find this file in the '~/.m2' directory.
+    //runs the integration tests (this can some time).
+    gradle -i integrationtest
+</pre>
+The integrationtests take a serious amount of time (more than an hour). In the 0.6 release it is going to be possible
+to configure from the buildscript/commandline how long the tests should run. Also make sure that you have
+Java 1.6 or higher installed; Sun/IBM/Open(6,7)-JDK should work without a problem since they are tested.
+
+<h2>Setting up IDEA</h2>
+Currently the Maven POMS are still available and kept in sync with the Gradle script, so you can use
+that as a bases when creating a Idea project.
+
+<h2>Setting up Eclipse</h2>
+Currently the Maven POMS are still available and kept in sync with the Gradle script, so you can use
+mvn eclipse:eclipse to generate the required Eclipse project files.

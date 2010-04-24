@@ -83,7 +83,7 @@ public final class TransactionalArrayList<E> implements TransactionalList<E> {
 
     @Override
     @Exclude
-    public int currentSize() {
+    public int atomicSize() {
         return (int) size.atomicGet();
     }
 

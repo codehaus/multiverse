@@ -12,20 +12,21 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.utils.TodoException;
 
 /**
- * The AlphaProgrammaticLongTranlocal also implement the transaction interface. This is an
- * optimization to prevent creating a transaction object. It will only be used for
- * atomic operations on the AlphaProgrammaticLong.
+ * The {@link AlphaTranlocal} for the {@link AlphaProgrammaticLong}.
+ * <p/>
+ * It also implement the transaction interface. This is an optimization needed for the atomic methods,
+ * to prevent creating an expensive transaction object.
  *
  * @author Peter Veentjer
  */
 public final class AlphaProgrammaticLongTranlocal extends AlphaTranlocal implements Transaction {
 
     public long value;
-    public long pendingIncrements;
+    public long commutingIncrements;
 
     public AlphaProgrammaticLongTranlocal(AlphaProgrammaticLong transactionalObject, boolean commuting) {
         this.___transactionalObject = transactionalObject;
-        this.___writeVersion = commuting ? -2 : 0;
+        this.___writeVersion = commuting ? OPENED_FOR_COMMUTE : OPENED_FOR_WRITE;
     }
 
     public AlphaProgrammaticLongTranlocal(AlphaProgrammaticLongTranlocal origin) {
@@ -35,7 +36,7 @@ public final class AlphaProgrammaticLongTranlocal extends AlphaTranlocal impleme
     }
 
     @Override
-    public void fixatePremature(AlphaTransaction tx, AlphaTranlocal origin) {
+    public void prematureFixation(AlphaTransaction tx, AlphaTranlocal origin) {
         if (!isCommuting()) {
             return;
         }
@@ -43,32 +44,28 @@ public final class AlphaProgrammaticLongTranlocal extends AlphaTranlocal impleme
         //System.out.println("premature fixation");
 
         this.___origin = origin;
+        this.___writeVersion = OPENED_FOR_WRITE;
         this.value = ((AlphaProgrammaticLongTranlocal) origin).value;
-        this.value += pendingIncrements;
-        this.pendingIncrements = 0;
-        //-1 indicates that it is a normaly dirty that needs writing.
-        this.___writeVersion = -1;
+        this.value += commutingIncrements;
+        this.commutingIncrements = 0;
     }
 
     @Override
-    public void ifCommutingThenFixate(AlphaTransaction tx) {
+    public void lateFixation(AlphaTransaction tx) {
         if (!isCommuting()) {
             return;
         }
 
-        AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) ___transactionalObject.___load();
-        if (tranlocal == null) {
+        AlphaProgrammaticLongTranlocal origin = (AlphaProgrammaticLongTranlocal) ___transactionalObject.___load();
+        if (origin == null) {
             throw new UncommittedReadConflict();
         }
 
-        //System.out.println("late fixation");
-
-        this.value = tranlocal.value;
-        this.value += pendingIncrements;
-        this.pendingIncrements = 0;
-
-        //-1 indicates that it is a normaly dirty that needs writing.
-        this.___writeVersion = -1;
+        this.___origin = origin;
+        this.___writeVersion = OPENED_FOR_WRITE_AND_DIRTY;
+        this.value = origin.value;
+        this.value += commutingIncrements;
+        this.commutingIncrements = 0;
     }
 
     @Override
@@ -92,7 +89,7 @@ public final class AlphaProgrammaticLongTranlocal extends AlphaTranlocal impleme
         }
 
         if (isCommuting()) {
-            return pendingIncrements != 0;
+            return commutingIncrements != 0;
         }
 
         AlphaProgrammaticLongTranlocal org = (AlphaProgrammaticLongTranlocal) ___origin;

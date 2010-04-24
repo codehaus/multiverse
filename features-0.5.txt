@@ -4,11 +4,11 @@
 
     + transactional reference array
 
-    + transactional linked list
+    - transactional linked list
 
     - transactional treemap
 
-    + transactional treeset
+    - transactional treeset
 
 - improved bytecode instrumentation
 
@@ -51,3 +51,5 @@
 + initial support for commuting operations
 
 + interruptible property is automatically inferred based on the exception thrown.
+
++ performance tool that calculates theoretical maximum number of update transactions/second

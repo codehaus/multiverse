@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
@@ -24,13 +24,13 @@ public class ConcurrentUpdateStressTest {
 
     @Before
     public void setUp() {
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
         ref = new TransactionalInteger(0);
     }
 
     @After
     public void tearDown() {
-        //    stm.getProfiler().print();
+        clearThreadLocalTransaction();
     }
 
     @Test
@@ -63,7 +63,7 @@ public class ConcurrentUpdateStressTest {
             super("UpdateThread-" + id);
         }
 
-        @Test
+        @Override
         public void doRun() {
             for (int k = 0; k < incCount; k++) {
                 ref.inc();

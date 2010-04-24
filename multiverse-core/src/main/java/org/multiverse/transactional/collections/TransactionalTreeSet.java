@@ -82,7 +82,7 @@ public final class TransactionalTreeSet<E> implements TransactionalSet<E> {
 
     @Override
     @Exclude
-    public int currentSize() {
+    public int atomicSize() {
         return map.getCurrentSize();
     }
 

@@ -197,12 +197,12 @@ public final class ClassTransactionalMethodTransformer implements Opcodes {
                 "setInterruptible",
                 "(Z)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
 
-        //isWriteSkewProblemAllowed
-        insnList.add(new InsnNode(transactionMetadata.writeSkewProblemAllowed ? ICONST_1 : ICONST_0));
+        //isWriteSkewAllowed
+        insnList.add(new InsnNode(transactionMetadata.writeSkew ? ICONST_1 : ICONST_0));
         insnList.add(new MethodInsnNode(
                 INVOKEINTERFACE,
                 Type.getInternalName(TransactionFactoryBuilder.class),
-                "setWriteSkewProblemAllowed",
+                "setWriteSkewAllowed",
                 "(Z)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
 
         //maxRetries

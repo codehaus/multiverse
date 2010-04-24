@@ -28,6 +28,11 @@ import static java.lang.String.format;
  */
 public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants {
 
+    public final static long OPENED_FOR_WRITE = 0;
+    public final static long OPENED_FOR_WRITE_AND_DIRTY = -1;
+    public final static long OPENED_FOR_COMMUTE = -2;
+    public final static long OPENED_FOR_COMMUTE_AND_DIRTY = -3;
+
     /**
      * Contains the write version
      * <p/>
@@ -111,32 +116,36 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
      *
      * @return
      */
-    public final boolean isDirtyAndCacheValue() {
+    public final boolean executeDirtyCheck() {
         if (isCommitted()) {
             return false;
         }
 
         if (isCommuting()) {
+            //todo: you now always 
+            ___writeVersion = OPENED_FOR_COMMUTE_AND_DIRTY;
             return true;
         }
 
         if (isDirty()) {
-            ___writeVersion = -1;
+            ___writeVersion = OPENED_FOR_WRITE_AND_DIRTY;
             return true;
         } else {
-            ___writeVersion = 0;
+            ___writeVersion = OPENED_FOR_WRITE;
             return false;
         }
     }
 
     /**
-     * Checks if the tranlocal is dirty by making use of a ___writeVersion that is changed by the isDirtyAndCacheValue method.
+     * Checks if the tranlocal is dirty by making use of a ___writeVersion that is changed by the executeDirtyCheck method.
      * If the tranlocal is committed, false will be returned.
      *
      * @return true if dirty, false otherwise.
      */
     public final boolean getPrecalculatedIsDirty() {
-        return ___writeVersion < 0;
+        return ___writeVersion == OPENED_FOR_COMMUTE_AND_DIRTY
+                || ___writeVersion == OPENED_FOR_WRITE_AND_DIRTY
+                || ___writeVersion == OPENED_FOR_COMMUTE;
     }
 
     public final boolean isCommitted() {
@@ -148,16 +157,17 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
     }
 
     public final boolean isCommuting() {
-        return ___writeVersion == -2;
+        return ___writeVersion == OPENED_FOR_COMMUTE
+                || ___writeVersion == OPENED_FOR_COMMUTE_AND_DIRTY;
     }
 
-    public void fixatePremature(AlphaTransaction tx, AlphaTranlocal origin) {
+    public void prematureFixation(AlphaTransaction tx, AlphaTranlocal origin) {
         throw new TodoException();
     }
 
     //todo: inline
 
-    public void ifCommutingThenFixate(AlphaTransaction tx) {
+    public void lateFixation(AlphaTransaction tx) {
         if (isCommuting()) {
             throw new TodoException();
         }

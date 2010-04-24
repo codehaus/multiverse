@@ -37,7 +37,7 @@ public @interface TransactionalMethod {
 
     boolean trackReads() default false;
 
-    boolean writeSkewProblemAllowed() default true;
+    boolean writeSkew() default true;
 
     boolean interruptible() default false;
 

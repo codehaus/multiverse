@@ -19,7 +19,7 @@ public class AnotherWriteSkewStressTest {
     private User user1;
     private User user2;
     private AtomicBoolean writeSkewEncountered = new AtomicBoolean();
-    private boolean allowWriteSkewProblem;
+    private boolean allowWriteSkew;
     private TransferThread[] threads;
 
     @Before
@@ -37,8 +37,8 @@ public class AnotherWriteSkewStressTest {
     }
 
     @Test
-    public void allowWriteSkewProblem() {
-        allowWriteSkewProblem = true;
+    public void allowWriteSkew() {
+        allowWriteSkew = true;
         startAll(threads);
         joinAll(threads);
 
@@ -49,8 +49,8 @@ public class AnotherWriteSkewStressTest {
     }
 
     @Test
-    public void disallowedWriteSkewProblem() {
-        allowWriteSkewProblem = false;
+    public void disallowedWriteSkew() {
+        allowWriteSkew = false;
         startAll(threads);
         joinAll(threads);
 
@@ -74,21 +74,21 @@ public class AnotherWriteSkewStressTest {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
 
-                if (allowWriteSkewProblem) {
-                    runWithAllowWriteSkewProblem();
+                if (allowWriteSkew) {
+                    runWithWriteSkewAllowed();
                 } else {
-                    runWithDisallowedWriteSkewProblem();
+                    runWithWriteSkewDisallowed();
                 }
             }
         }
 
-        @TransactionalMethod(writeSkewProblemAllowed = false)
-        private void runWithDisallowedWriteSkewProblem() {
+        @TransactionalMethod(writeSkew = false)
+        private void runWithWriteSkewDisallowed() {
             doIt();
         }
 
-        @TransactionalMethod(writeSkewProblemAllowed = true)
-        private void runWithAllowWriteSkewProblem() {
+        @TransactionalMethod(writeSkew = true)
+        private void runWithWriteSkewAllowed() {
             doIt();
         }
 

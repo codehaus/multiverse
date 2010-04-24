@@ -46,11 +46,11 @@ public class WriteSkewDetectionTest {
     }
 
     @Test
-    public void whenDisabledWriteSkewProblem_thenWriteSkewConflict() {
+    public void whenDisallowedWriteSkew_thenWriteSkewConflict() {
         TransactionFactory<AlphaTransaction> factory = stm.getTransactionFactoryBuilder()
                 .setReadTrackingEnabled(true)
                 .setSpeculativeConfigurationEnabled(false)
-                .setWriteSkewProblemAllowed(false)
+                .setWriteSkewAllowed(false)
                 .build();
 
         AlphaTransaction t1 = factory.start();
@@ -73,10 +73,10 @@ public class WriteSkewDetectionTest {
     }
 
     @Test
-    public void whenEnabledWriteSkewProblem_thenWriteSkewHappens() {
+    public void whenWriteSkewAllowed_thenWriteSkewHappens() {
         TransactionFactory<AlphaTransaction> txFactory = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
-                .setWriteSkewProblemAllowed(true)
+                .setWriteSkewAllowed(true)
                 .build();
 
         AlphaTransaction tx1 = txFactory.start();

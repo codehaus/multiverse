@@ -1,6 +1,7 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.multiverse.api.Listeners;
+import org.multiverse.api.commitlock.CommitLockFilter;
 import org.multiverse.api.exceptions.LockNotFreeWriteConflict;
 import org.multiverse.api.exceptions.OptimisticLockFailedWriteConflict;
 import org.multiverse.api.exceptions.UncommittedReadConflict;
@@ -8,6 +9,7 @@ import org.multiverse.api.exceptions.WriteSkewConflict;
 import org.multiverse.stms.AbstractTransactionSnapshot;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
+import org.multiverse.stms.alpha.UncommittedFilter;
 import org.multiverse.stms.alpha.transactions.AbstractAlphaTransaction;
 
 import static java.lang.String.format;
@@ -75,7 +77,7 @@ public abstract class AbstractUpdateAlphaTransaction
                     throw new UncommittedReadConflict();
                 }
 
-                opened.fixatePremature(this, origin);
+                opened.prematureFixation(this, origin);
             }
 
             return opened;
@@ -114,7 +116,7 @@ public abstract class AbstractUpdateAlphaTransaction
                 throw new UncommittedReadConflict();
             }
 
-            attached.fixatePremature(this, origin);
+            attached.prematureFixation(this, origin);
             updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
         }
 
@@ -213,13 +215,15 @@ public abstract class AbstractUpdateAlphaTransaction
                     return;
                 }
 
-                if (!tryWriteLocks()) {
+                CommitLockFilter commitLockFilter = config.dirtyCheckEnabled ? UncommittedFilter.DIRTY_CHECK : UncommittedFilter.NO_DIRTY_CHECK;
+
+                if (!tryWriteLocks(commitLockFilter)) {
                     throw createFailedToObtainCommitLocksException();
                 }
 
                 boolean failure = false;
                 try {
-                    if (config.writeSkewProblemAllowed) {
+                    if (config.writeSkewAllowed) {
                         boolean skipConflictDetection = config.optimizedConflictDetectionEnabled
                                 && getReadVersion() == config.clock.getVersion();
 
@@ -279,11 +283,16 @@ public abstract class AbstractUpdateAlphaTransaction
             return false;
         }
 
+        //todo: now eager
+        if (attached.isCommuting()) {
+            return true;
+        }
+
         if (!config.dirtyCheckEnabled) {
             return true;
         }
 
-        return attached.isDirtyAndCacheValue();
+        return attached.executeDirtyCheck();
     }
 
     /**
@@ -327,7 +336,7 @@ public abstract class AbstractUpdateAlphaTransaction
      *
      * @return true if the writeset was locked successfully, false otherwise.
      */
-    protected abstract boolean tryWriteLocks();
+    protected abstract boolean tryWriteLocks(CommitLockFilter commitLockFilter);
 
     /**
      * Releases all the locks on the transactional objects of the attached tranlocals that have been acquired. This call
@@ -372,6 +381,8 @@ public abstract class AbstractUpdateAlphaTransaction
         boolean release = true;
 
         if (tranlocal.isCommitted()) {
+            //todo: could it be that you are release locks of transactional objects owned by other
+            //transactions?
             if (tranlocal.___writeVersion != writeVersion) {
                 release = false;
             }
@@ -403,7 +414,7 @@ public abstract class AbstractUpdateAlphaTransaction
             return null;
         }
 
-        tranlocal.ifCommutingThenFixate(this);
+        tranlocal.lateFixation(this);
 
         AlphaTransactionalObject txObject = tranlocal.getTransactionalObject();
 
@@ -413,7 +424,6 @@ public abstract class AbstractUpdateAlphaTransaction
         if (!config.dirtyCheckEnabled) {
             store = true;
         } else {
-
             if (origin == null) {
                 store = true;
             } else if (tranlocal.getPrecalculatedIsDirty()) {

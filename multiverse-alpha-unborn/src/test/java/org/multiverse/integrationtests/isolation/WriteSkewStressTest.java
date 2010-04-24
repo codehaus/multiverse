@@ -33,11 +33,11 @@ public class WriteSkewStressTest {
     @Test
     public void simpleTestWithWriteSkewDetectionDisabledRepeated() {
         for (int k = 0; k < 100; k++) {
-            simpleTestWithEnabledWriteSkewProblem();
+            simpleTestWithWriteSkewAllowed();
         }
     }
 
-    public void simpleTestWithEnabledWriteSkewProblem() {
+    public void simpleTestWithWriteSkewAllowed() {
         TransactionalInteger from1 = new TransactionalInteger(100);
         TransactionalInteger from2 = new TransactionalInteger(0);
 
@@ -88,30 +88,30 @@ public class WriteSkewStressTest {
         final TransactionalInteger from1;
         final TransactionalInteger from2;
         final TransactionalInteger to;
-        final boolean writeSkewProblemAllowed;
+        final boolean writeSkewAllowed;
 
-        private AnotherTransferThread(TransactionalInteger from1, TransactionalInteger from2, TransactionalInteger to, boolean writeSkewProblemAllowed) {
+        private AnotherTransferThread(TransactionalInteger from1, TransactionalInteger from2, TransactionalInteger to, boolean writeSkewAllowed) {
             this.from1 = from1;
             this.from2 = from2;
             this.to = to;
-            this.writeSkewProblemAllowed = writeSkewProblemAllowed;
+            this.writeSkewAllowed = writeSkewAllowed;
         }
 
         public void doRun() throws Exception {
-            if (writeSkewProblemAllowed) {
-                doRunWriteSkewProblemAllowed();
+            if (writeSkewAllowed) {
+                doRunWriteSkewAllowed();
             } else {
-                doRunWriteSkewProblemDisallowed();
+                doRunWriteSkewDisallowed();
             }
         }
 
-        @TransactionalMethod(trackReads = true, writeSkewProblemAllowed = false)
-        public void doRunWriteSkewProblemDisallowed() throws Exception {
+        @TransactionalMethod(trackReads = true, writeSkew = false)
+        public void doRunWriteSkewDisallowed() throws Exception {
             doIt();
         }
 
-        @TransactionalMethod(trackReads = true, writeSkewProblemAllowed = true)
-        public void doRunWriteSkewProblemAllowed() throws Exception {
+        @TransactionalMethod(trackReads = true, writeSkew = true)
+        public void doRunWriteSkewAllowed() throws Exception {
             doIt();
         }
 

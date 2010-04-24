@@ -201,17 +201,17 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      *
      * @param allowWriteSkew indicates if writeSkew problem is allowed.
      * @return the updated TransactionFactoryBuilder
-     * @see #isWriteSkewProblemAllowed()
+     * @see #isWriteSkewAllowed()
      */
-    B setWriteSkewProblemAllowed(boolean allowWriteSkew);
+    B setWriteSkewAllowed(boolean allowWriteSkew);
 
     /**
      * Checks if the writeskew problem is allowed to happen.
      *
      * @return true if allowed, false otherwise.
-     * @see #setWriteSkewProblemAllowed(boolean)
+     * @see #setWriteSkewAllowed(boolean)
      */
-    boolean isWriteSkewProblemAllowed();
+    boolean isWriteSkewAllowed();
 
     /**
      * Checks if the quick release on locks is enabled. When a transaction commits, it

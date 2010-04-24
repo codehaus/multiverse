@@ -37,9 +37,9 @@ public class MapUpdateAlphaTransaction_commitTest {
         return new MapUpdateAlphaTransaction(config);
     }
 
-    public MapUpdateAlphaTransaction startSutTransactionWithAllowingWriteSkewProblem(boolean allowWriteSkewProblem) {
+    public MapUpdateAlphaTransaction startSutTransactionWithWriteSkew(boolean allowed) {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
-                .withWriteSkewProblemAllowed(allowWriteSkewProblem);
+                .withWriteSkewAllowed(allowed);
 
         return new MapUpdateAlphaTransaction(config);
     }
@@ -389,15 +389,15 @@ public class MapUpdateAlphaTransaction_commitTest {
     }
 
     @Test
-    public void whenAllowedWriteSkewProblem_thenCommit() {
+    public void whenWriteSkewAllowed_thenCommit() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx1 = startSutTransactionWithAllowingWriteSkewProblem(true);
+        AlphaTransaction tx1 = startSutTransactionWithWriteSkew(true);
         tx1.openForRead(ref1);
         ref2.inc(tx1);
 
-        AlphaTransaction tx2 = startSutTransactionWithAllowingWriteSkewProblem(true);
+        AlphaTransaction tx2 = startSutTransactionWithWriteSkew(true);
         tx2.openForRead(ref2);
         ref1.inc(tx2);
 
@@ -409,15 +409,15 @@ public class MapUpdateAlphaTransaction_commitTest {
     }
 
     @Test
-    public void whenDisallowedWriteSkewProblem_theWriteSkewConflict() {
+    public void whenWriteSkewDisallowed_theWriteSkewConflict() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx1 = startSutTransactionWithAllowingWriteSkewProblem(false);
+        AlphaTransaction tx1 = startSutTransactionWithWriteSkew(false);
         tx1.openForRead(ref1);
         ref2.inc(tx1);
 
-        AlphaTransaction tx2 = startSutTransactionWithAllowingWriteSkewProblem(false);
+        AlphaTransaction tx2 = startSutTransactionWithWriteSkew(false);
         tx2.openForRead(ref2);
         ref1.inc(tx2);
 

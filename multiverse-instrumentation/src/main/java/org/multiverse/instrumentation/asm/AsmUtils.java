@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import static java.lang.String.format;
+import static org.multiverse.utils.IOUtils.closeQuietly;
 import static org.objectweb.asm.Type.*;
 
 public final class AsmUtils implements Opcodes {
@@ -345,6 +346,8 @@ public final class AsmUtils implements Opcodes {
                     classInternalName));
         } catch (IOException e) {
             throw new RuntimeException("A problem ocurred while loading class: " + fileName, e);
+        } finally {
+            closeQuietly(is);
         }
     }
 
@@ -371,26 +374,18 @@ public final class AsmUtils implements Opcodes {
         }
     }
 
-    private static void closeQuietly(InputStream is) {
-        if (is == null) {
-            return;
-        }
-
-        try {
-            is.close();
-        } catch (IOException ignore) {
-        }
-    }
-
     public static byte[] loadAsBytecode(File file) {
+        InputStream is = null;
         try {
-            InputStream is = new FileInputStream(file);
+            is = new FileInputStream(file);
             ClassNode classNode = new ClassNode();
             ClassReader reader = new ClassReader(is);
             reader.accept(classNode, ClassReader.EXPAND_FRAMES);
             return toBytecode(classNode);
         } catch (IOException e) {
             throw new RuntimeException("A problem ocurred while loading class: " + file, e);
+        } finally {
+            closeQuietly(is);
         }
     }
 
@@ -551,7 +546,7 @@ public final class AsmUtils implements Opcodes {
             try {
                 writer.write(bytecode);
             } finally {
-                writer.close();
+                closeQuietly(writer);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

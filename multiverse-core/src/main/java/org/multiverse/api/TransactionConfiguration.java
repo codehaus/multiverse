@@ -3,9 +3,10 @@ package org.multiverse.api;
 import org.multiverse.api.backoff.BackoffPolicy;
 
 /**
- * Contains the transaction configuration used by a {@link Transaction}. In the beginning this was all placed in the
- * Transaction, adding a lot of 'informational' methods to the transaction and therefor complicating its usage. So
- * all the configurational properties are moved this structure.
+ * Contains the transaction configuration used by a {@link Transaction}. In the beginning this was all
+ * placed in the Transaction, adding a lot of 'informational' methods to the transaction and therefor
+ * complicating its usage. So all the configurational properties of the transaction are contained in
+ * this structure.
  *
  * @author Peter Veentjer.
  */
@@ -40,8 +41,8 @@ public interface TransactionConfiguration {
     int getMaxRetries();
 
     /**
-     * Returns the total timeout in nanoseconds. Long.MAX_VALUE indicates
-     * that an indefinite wait should be done.
+     * Returns the total timeout in nanoseconds. Long.MAX_VALUE indicates that there is no
+     * timeout.
      *
      * @return the total remaining timeout.
      * @see TransactionFactoryBuilder#setTimeoutNs(long)
@@ -93,7 +94,7 @@ public interface TransactionConfiguration {
      * writeskew problem.
      *
      * @return true if the writeskew problem is allowed, false otherwise.
-     * @see TransactionFactoryBuilder#setWriteSkewProblemAllowed(boolean)
+     * @see TransactionFactoryBuilder#setWriteSkewAllowed(boolean)
      */
-    boolean isWriteSkewProblemAllowed();
+    boolean isWriteSkewAllowed();
 }

@@ -183,7 +183,7 @@ public class ArrayUpdateAlphaTransaction_commitTest {
     }
 
     @Test
-    public void whenAllowWriteSkewProblem_thenCommit() {
+    public void whenWriteSkewAllowed_thenCommit() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
@@ -205,12 +205,12 @@ public class ArrayUpdateAlphaTransaction_commitTest {
     }
 
     @Test
-    public void whenDisallowWriteSkewProblem_thenWriteSkewConflict() {
+    public void whenWriteSkewDisallowed_thenWriteSkewConflict() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
-                .withWriteSkewProblemAllowed(false);
+                .withWriteSkewAllowed(false);
 
         AlphaTransaction tx1 = new ArrayUpdateAlphaTransaction(config, 10);
         tx1.openForRead(ref1);

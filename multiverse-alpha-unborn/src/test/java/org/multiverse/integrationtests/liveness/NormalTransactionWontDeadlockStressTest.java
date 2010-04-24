@@ -60,7 +60,7 @@ public class NormalTransactionWontDeadlockStressTest {
             super("ModifyThread-" + id);
         }
 
-        @Test
+        @Override
         public void doRun() {
             for (int k = 0; k < transactionCount; k++) {
                 doit();

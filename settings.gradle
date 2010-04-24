@@ -5,4 +5,6 @@ include 'multiverse-benchy',
         'multiverse-alpha-unborn',
         'multiverse-alpha',
         'multiverse-scala',
-        'multiverse-performance-tool'
+        'multiverse-performance-tool',
+        'multiverse-site',
+        'multiverse-manual'

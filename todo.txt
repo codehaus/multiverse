@@ -2,12 +2,24 @@
 todo engine
 ---------------------------------------------------------------
 
-- performance test swing tool that has configurable number of threads and puts load on an atomic clock long
-(relaxed and non relaxed) and calculates the maximum number of threads/second that are possible. Also use
-an transactional ref with the alphastm to do some real tests?
+- als een transactie geen dirty checks nodig heeft, dan automatisch ieder object dat gelezen is,
+kan met een dirty tag
 
+- transactional linked list is causing problems.. could it be that it isn't locked?
+
+- VetoCommitBarrier_vetoCommitWithTransactionTest fails sometimes.
+
+- is it possible to see the test output, especially for the integration test this is important to provide
+feedback what is happening.
+
+- make it possible that stresstests can be configured on the outside to execute for a different amount of time.
 
 - debug information is lost in transactional method (no visible in stacktrace)
+
+- have some kind of report that indicates which test failed instead of looking at the html
+generated test report.
+
+- find nice docbook stylesheet
 
 - convert manual from html to docbook
 
@@ -23,7 +35,9 @@ an transactional ref with the alphastm to do some real tests?
 
 - upload reports from gradle to codehaus
 
-- multiverse-scala compile project 
+- multiverse-scala compile project
+
+- group javadoc: question on gradle site pending
 
 CountDownCommitBarrier_incPartiesWithTransactionTest.whenPendingTransactions
 
@@ -434,4 +448,11 @@ TransactionalReferenceArray_atomicGetTest.whenLocked
 TransactionalReferenceArray_setTest.whenTransactionAvailable_thenThatTransactionIsUsed
 
 TransactionalReferenceArray_setTest.whenListenersAvailable_thenTheyAreNotified
+
+- integrationt tests are added to gradle
+
+- performance test swing tool that has configurable number of threads and puts load on an atomic clock long
+(relaxed and non relaxed) and calculates the maximum number of threads/second that are possible. Also use
+an transactional ref with the alphastm to do some real tests?
+
 

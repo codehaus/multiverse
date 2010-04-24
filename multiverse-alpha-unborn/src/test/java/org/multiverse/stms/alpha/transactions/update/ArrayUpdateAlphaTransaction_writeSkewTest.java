@@ -35,10 +35,10 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
         clearThreadLocalTransaction();
     }
 
-    public AlphaTransaction startSutTransaction(int size, boolean allowWriteSkewProblem) {
+    public AlphaTransaction startSutTransaction(int size, boolean writeSkewAllowed) {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
                 .withReadTrackingEnabled(true)
-                .withWriteSkewProblemAllowed(allowWriteSkewProblem);
+                .withWriteSkewAllowed(writeSkewAllowed);
 
         return new ArrayUpdateAlphaTransaction(config, size);
     }
@@ -46,16 +46,16 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
     @Test
     public void testSettings() {
         AlphaTransaction tx1 = startSutTransaction(10, true);
-        assertTrue(tx1.getConfiguration().isWriteSkewProblemAllowed());
+        assertTrue(tx1.getConfiguration().isWriteSkewAllowed());
         assertTrue(tx1.getConfiguration().isReadTrackingEnabled());
 
         AlphaTransaction tx2 = startSutTransaction(10, false);
-        assertFalse(tx2.getConfiguration().isWriteSkewProblemAllowed());
+        assertFalse(tx2.getConfiguration().isWriteSkewAllowed());
         assertTrue(tx2.getConfiguration().isReadTrackingEnabled());
     }
 
     @Test
-    public void whenDisallowedWriteSkewProblem_thenWriteSkewConflict() {
+    public void whenWriteSkewDisallowed_thenWriteSkewConflict() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRefTranlocal committedRef1 = (ManualRefTranlocal) ref1.___load();
         ManualRef ref2 = new ManualRef(stm);
@@ -87,7 +87,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
     }
 
     @Test
-    public void whenEnabledWriteSkewProblem_writeSkewProblemHappens() {
+    public void whenWriteSkewAllowed_writeSkewHappens() {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
@@ -113,7 +113,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
     }
 
     @Test
-    public void withFourAccountsAndAllowWriteSkewProblem() {
+    public void withFourAccountsAndWriteSkewAllowed() {
         ManualRef accountA1 = new ManualRef(stm);
         ManualRef accountA2 = new ManualRef(stm);
 
@@ -141,7 +141,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
 
 
     @Test
-    public void withFourAccountsAndDisallowedWriteSkewProblem_thenWriteSkewConflict() {
+    public void withFourAccountsAndWriteSkewDisallowed_thenWriteSkewConflict() {
         ManualRef accountA1 = new ManualRef(stm);
         ManualRef accountA2 = new ManualRef(stm);
 

@@ -8,7 +8,7 @@ import org.multiverse.api.commitlock.CommitLockFilter;
  *
  * @author Peter Veentjer.
  */
-public class UncommittedFilter implements CommitLockFilter {
+public final class UncommittedFilter implements CommitLockFilter {
 
     public final static UncommittedFilter NO_DIRTY_CHECK = new UncommittedFilter(false);
 
@@ -26,6 +26,10 @@ public class UncommittedFilter implements CommitLockFilter {
 
         if (tranlocal.isCommitted()) {
             return false;
+        }
+
+        if (tranlocal.isCommuting()) {
+            return true;
         }
 
         if (tranlocal.getOrigin() == null) {

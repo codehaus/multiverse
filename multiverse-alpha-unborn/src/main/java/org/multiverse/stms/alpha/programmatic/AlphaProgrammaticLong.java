@@ -152,7 +152,6 @@ public final class AlphaProgrammaticLong
         AlphaProgrammaticLongTranlocal newTranlocal = new AlphaProgrammaticLongTranlocal(
                 this, false);
         Transaction lockOwner = newTranlocal;
-
         //if we couldn't acquire the lock, we are done.
         lock(lockOwner);
 
@@ -161,6 +160,7 @@ public final class AlphaProgrammaticLong
 
         long writeVersion = stm.getClock().tick();
         newTranlocal.value = newValue;
+
         newTranlocal.prepareForCommit(writeVersion);
         Listeners listeners = ___storeUpdate(newTranlocal, writeVersion, true);
 
@@ -220,7 +220,7 @@ public final class AlphaProgrammaticLong
         AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) alphaTx.openForCommutingWrite(this);
 
         if (tranlocal.isCommuting()) {
-            tranlocal.pendingIncrements += amount;
+            tranlocal.commutingIncrements += amount;
         } else {
             tranlocal.value += amount;
         }

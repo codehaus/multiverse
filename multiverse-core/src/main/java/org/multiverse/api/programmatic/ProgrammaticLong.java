@@ -104,6 +104,7 @@ public interface ProgrammaticLong {
 
     /**
      * Sets the new value and completely ignores the Transaction stored in the ThreadLocalTransaction.
+     * If the value is not changed, it is free for the implementation to ignore this call.
      * <p/>
      * It is very likely that this call is very cheap since it doesn't need a full blown
      * transaction, but it could be that multiple retries are attempted and the transaction is

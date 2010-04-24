@@ -66,7 +66,7 @@ public final class AlphaStmConfig {
 
     public boolean readTrackingEnabled = false;
 
-    public boolean allowWriteSkewProblem = true;
+    public boolean allowWriteSkew = true;
 
     public boolean interruptible = false;
 

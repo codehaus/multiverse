@@ -3,10 +3,10 @@ package org.multiverse.stms.alpha.transactions.update;
 import org.multiverse.api.Listeners;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.commitlock.CommitLock;
+import org.multiverse.api.commitlock.CommitLockFilter;
 import org.multiverse.api.latches.Latch;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
-import org.multiverse.stms.alpha.UncommittedFilter;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import java.util.Collection;
@@ -64,10 +64,10 @@ public final class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransact
     }
 
     @Override
-    protected boolean tryWriteLocks() {
+    protected boolean tryWriteLocks(CommitLockFilter commitLockFilter) {
         return config.commitLockPolicy.tryAcquireAll(
                 (Collection<CommitLock>) ((Object) attachedMap.values()),
-                config.dirtyCheckEnabled ? UncommittedFilter.DIRTY_CHECK : UncommittedFilter.NO_DIRTY_CHECK,
+                commitLockFilter,
                 this);
     }
 

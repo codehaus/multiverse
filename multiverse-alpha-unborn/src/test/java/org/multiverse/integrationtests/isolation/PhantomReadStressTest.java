@@ -45,8 +45,13 @@ public class PhantomReadStressTest {
     //todo: test with set
 
     @Test
-    public void testTransactionalLinkedList() {
-        test(new TransactionalLinkedList());
+    public void testStrictTransactionalLinkedList() {
+        test(new TransactionalLinkedList(1000000, true));
+    }
+
+    @Test
+    public void testRelaxedTransactionalLinkedList() {
+        test(new TransactionalLinkedList(1000000, false));
     }
 
     @Test
@@ -90,7 +95,8 @@ public class PhantomReadStressTest {
             }
         }
 
-        @TransactionalMethod(readonly = false)
+        //@TransactionalMethod(readonly = false)
+
         private void doLogic() {
             table.add("foo");
             sleepRandomMs(10);

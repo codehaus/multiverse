@@ -1,12 +1,12 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.multiverse.api.Listeners;
+import org.multiverse.api.commitlock.CommitLockFilter;
 import org.multiverse.api.commitlock.CommitLockPolicy;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.api.latches.Latch;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
-import org.multiverse.stms.alpha.UncommittedFilter;
 
 /**
  * A AbstractUpdateAlphaTransaction that can deal with a single transactional object.
@@ -28,14 +28,8 @@ public final class MonoUpdateAlphaTransaction extends AbstractUpdateAlphaTransac
     }
 
     @Override
-    protected boolean tryWriteLocks() {
+    protected boolean tryWriteLocks(CommitLockFilter commitLockFilter) {
         CommitLockPolicy lockPolicy = config.commitLockPolicy;
-        UncommittedFilter commitLockFilter;
-        if (config.dirtyCheckEnabled) {
-            commitLockFilter = UncommittedFilter.DIRTY_CHECK;
-        } else {
-            commitLockFilter = UncommittedFilter.NO_DIRTY_CHECK;
-        }
         return lockPolicy.tryAcquire(attached, commitLockFilter, this);
     }
 

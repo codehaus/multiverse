@@ -48,7 +48,7 @@ public class TransactionalConstructor_settingsTest {
             assertFalse(tx.getConfiguration().isReadonly());
             assertEquals(0, tx.getConfiguration().getMaxRetries());
             assertFalse(tx.getConfiguration().isReadTrackingEnabled());
-            assertTrue(tx.getConfiguration().isWriteSkewProblemAllowed());
+            assertTrue(tx.getConfiguration().isWriteSkewAllowed());
         }
     }
 
@@ -81,26 +81,26 @@ public class TransactionalConstructor_settingsTest {
     // ============================
 
     @Test
-    public void allowWriteSkewProblem() {
-        new disallowedWriteSkewProblem();
-        new allowedWriteSkewProblem();
+    public void allowWriteSkew() {
+        new disallowedWriteSkew();
+        new allowedWriteSkew();
     }
 
-    public class disallowedWriteSkewProblem {
+    public class disallowedWriteSkew {
 
-        @TransactionalConstructor(trackReads = true, writeSkewProblemAllowed = false)
-        public disallowedWriteSkewProblem() {
+        @TransactionalConstructor(trackReads = true, writeSkew = false)
+        public disallowedWriteSkew() {
             Transaction tx = getThreadLocalTransaction();
-            assertFalse(tx.getConfiguration().isWriteSkewProblemAllowed());
+            assertFalse(tx.getConfiguration().isWriteSkewAllowed());
         }
     }
 
-    public class allowedWriteSkewProblem {
+    public class allowedWriteSkew {
 
-        @TransactionalConstructor(writeSkewProblemAllowed = true)
-        public allowedWriteSkewProblem() {
+        @TransactionalConstructor(writeSkew = true)
+        public allowedWriteSkew() {
             Transaction tx = getThreadLocalTransaction();
-            assertTrue(tx.getConfiguration().isWriteSkewProblemAllowed());
+            assertTrue(tx.getConfiguration().isWriteSkewAllowed());
         }
     }
 

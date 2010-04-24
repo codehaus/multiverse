@@ -11,17 +11,23 @@ import java.util.concurrent.TimeUnit;
 
 import static org.multiverse.api.StmUtils.retry;
 
+/**
+ * An abtract {@link TransactionalDeque} implementation.
+ *
+ * @author Peter Veentjer.
+ * @param <E>
+ */
 public abstract class AbstractTransactionalDeque<E>
         implements TransactionalDeque<E> {
 
-    @Override
-    public boolean offerFirst(E e, long timeout, TimeUnit unit) throws InterruptedException {
-        throw new TodoException();
+    protected boolean hasNoStorageCapacity() {
+        return remainingCapacity() == 0;
     }
 
     @Override
-    public boolean offerLast(E e, long timeout, TimeUnit unit) throws InterruptedException {
-        throw new TodoException();
+    public boolean add(E e) {
+        addLast(e);
+        return true;
     }
 
     @Override
@@ -63,6 +69,17 @@ public abstract class AbstractTransactionalDeque<E>
         doAddLast(e);
         return true;
     }
+
+    @Override
+    public boolean offerFirst(E e, long timeout, TimeUnit unit) throws InterruptedException {
+        throw new TodoException();
+    }
+
+    @Override
+    public boolean offerLast(E e, long timeout, TimeUnit unit) throws InterruptedException {
+        throw new TodoException();
+    }
+
 
     abstract protected void doAddLast(E e);
 
@@ -138,15 +155,6 @@ public abstract class AbstractTransactionalDeque<E>
         throw new TodoException();
     }
 
-    @Override
-    public boolean add(E e) {
-        addLast(e);
-        return true;
-    }
-
-    protected boolean hasNoStorageCapacity() {
-        return remainingCapacity() == 0;
-    }
 
     @Override
     public boolean offer(E e) {

@@ -1,5 +1,6 @@
 package org.multiverse.transactional.collections;
 
+import org.multiverse.annotations.Exclude;
 import org.multiverse.annotations.FieldGranularity;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
@@ -57,6 +58,8 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
 
     private final int maxCapacity;
 
+    private final boolean strictMaxCapacity;
+
     private final ProgrammaticLong size;
 
     @FieldGranularity
@@ -65,15 +68,19 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
     @FieldGranularity
     private Node<E> tail;
 
+    /**
+     *
+     */
     public TransactionalLinkedList() {
         this(Integer.MAX_VALUE);
     }
 
-    @TransactionalMethod(readonly = true)
-    public boolean isEmpty() {
-        return head == null;
-    }
-
+    /**
+     * Creates a new TransactionalLinkedList that is unbound (so has maximum capacity == Integer.MAX_VALUE)
+     * and that is filled with the provided items.
+     *
+     * @param items
+     */
     public TransactionalLinkedList(E... items) {
         this(Integer.MAX_VALUE);
 
@@ -82,17 +89,63 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
         }
     }
 
+    /**
+     * Creates a new TransactionalLinkedList with the provided max capacity and that is strict
+     * on the maximum capacity.
+     *
+     * @param maxCapacity
+     * @throws IllegalArgumentException if maxCapacity smaller than 0.
+     */
     public TransactionalLinkedList(int maxCapacity) {
+        this(maxCapacity, true);
+    }
+
+    /**
+     * @param maxCapacity       the maximum number of items stores in this TransactionalLinkedList.
+     * @param strictMaxCapacity if the TransactionalLinkedList should be strict with it maxCapacity. If
+     *                          it is strict, it leads to reduced concurrency. If it is relaxed, then the number of items stored
+     *                          could exceed the maxCapacity. In most cases this is not an issue.
+     * @throws IllegalArgumentException if maxCapacity is smaller than 0.
+     */
+    public TransactionalLinkedList(int maxCapacity, boolean strictMaxCapacity) {
         if (maxCapacity < 0) {
             throw new IllegalArgumentException("maxCapacity can't be smaller than 0");
         }
+        this.strictMaxCapacity = strictMaxCapacity;
         this.maxCapacity = maxCapacity;
         this.size = sizeFactory.atomicCreateLong(0);
     }
 
+    @Exclude
+    public boolean hasStrictMaxCapacity() {
+        return strictMaxCapacity;
+    }
+
+    @TransactionalMethod(readonly = true)
+    public boolean isEmpty() {
+        return head == null;
+    }
+
+    @Exclude
+    public int atomicSize() {
+        return (int) size.atomicGet();
+    }
+
     @Override
-    public int currentSize() {
+    @TransactionalMethod(readonly = true, trackReads = false)
+    public int size() {
         return (int) size.get();
+    }
+
+
+    @Override
+    @TransactionalMethod(readonly = true)
+    public int remainingCapacity() {
+        if (strictMaxCapacity) {
+            return Math.max(0, maxCapacity - (int) size.get());
+        } else {
+            return Math.max(0, maxCapacity - (int) size.atomicGet());
+        }
     }
 
     @Override
@@ -227,22 +280,11 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
     }
 
     @Override
-    @TransactionalMethod(readonly = true, trackReads = false)
-    public int size() {
-        return (int) size.get();
-    }
-
-    @Override
     //@TransactionalMethod(readonly = true)
     public Iterator<E> iterator() {
         return new IteratorImpl(head);
     }
 
-    @Override
-    @TransactionalMethod(readonly = true)
-    public int remainingCapacity() {
-        return Math.max(0, maxCapacity - (int) size.get());
-    }
 
     @Override
     @TransactionalMethod(readonly = true)

@@ -30,7 +30,7 @@ public interface TransactionalCollection<E> extends Collection<E> {
      * @return the current size of the TransactionalMap.
      */
     @Exclude
-    int currentSize();
+    int atomicSize();
 
     @Override
     @TransactionalMethod(readonly = true)

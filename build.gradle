@@ -40,19 +40,10 @@ allprojects {
     testCompile group: 'junit', name: 'junit', version: '4.8.1'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.8.2'
   }
-}
 
-//task integrationTest(type: org.junit.Test) {
-//    include("**/*Abstract*")
-//    include("**/*StressTest*")
-//    include("**/*LongTest*")
-//    include("**/*PerformanceTest*")
-//  }
-
-
-task hello {
-  doFirst {
-    println 'Hello world!'
+  task integrationtest(type: Test) {
+    include("**/*StressTest*")
+    include("**/*LongTest*")
   }
 }
 
@@ -321,4 +312,8 @@ project(':multiverse-performance-tool') {
   dependencies {
     compile group: 'args4j', name: 'args4j', version: "2.0.16"
   }
+}
+
+project(':multiverse-manual') {
+//   usePlugin 'monkeymachine.gradle:gradle-docbook:0.1-SNAPSHOT' 
 }

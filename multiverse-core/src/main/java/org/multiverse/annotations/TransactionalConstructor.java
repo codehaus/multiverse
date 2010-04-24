@@ -36,5 +36,5 @@ public @interface TransactionalConstructor {
      *
      * @return true if the writeSkew problem is allowed.
      */
-    boolean writeSkewProblemAllowed() default true;
+    boolean writeSkew() default true;
 }
