@@ -5,8 +5,6 @@ todo engine
 - als een transactie geen dirty checks nodig heeft, dan automatisch ieder object dat gelezen is,
 kan met een dirty tag
 
-- transactional linked list is causing problems.. could it be that it isn't locked?
-
 - VetoCommitBarrier_vetoCommitWithTransactionTest fails sometimes.
 
 - is it possible to see the test output, especially for the integration test this is important to provide
@@ -211,9 +209,6 @@ it will not be fixated.
     - public String toString()
 
 - TransactionalLinkedList
-
-    - relaxed/strict maximum capacity.
-        (relaxed does commit and max does check).
 
     - ListIteratorImpl
 
@@ -455,4 +450,8 @@ TransactionalReferenceArray_setTest.whenListenersAvailable_thenTheyAreNotified
 (relaxed and non relaxed) and calculates the maximum number of threads/second that are possible. Also use
 an transactional ref with the alphastm to do some real tests?
 
+- transactional linked list is causing problems.. could it be that it isn't locked?
+
+- TransactionalLinkedList relaxed/strict maximum capacity.
+        (relaxed does commit and max does check).
 

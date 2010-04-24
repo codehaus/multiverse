@@ -58,7 +58,7 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
 
     private final int maxCapacity;
 
-    private final boolean strictMaxCapacity;
+    private final boolean relaxedMaximumCapacity;
 
     private final ProgrammaticLong size;
 
@@ -69,17 +69,22 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
     private Node<E> tail;
 
     /**
-     *
+     * Creates a new TransactionalLinkedList with unbound capacity.
+     * <p/>
+     * It is strict on the maximum capacity, so it could cause contention problems. See the
+     * {@link #TransactionalLinkedList(int, boolean)} as alternative.
      */
     public TransactionalLinkedList() {
         this(Integer.MAX_VALUE);
     }
 
     /**
-     * Creates a new TransactionalLinkedList that is unbound (so has maximum capacity == Integer.MAX_VALUE)
-     * and that is filled with the provided items.
+     * Creates a new TransactionalLinkedList with unbound capacity and the provided items.
+     * <p/>
+     * It is strict on the maximum capacity, so it could cause contention problems. See the
+     * {@link #TransactionalLinkedList(int, boolean)} as alternative.
      *
-     * @param items
+     * @param items the items to store in this TransactionalLinkedList.
      */
     public TransactionalLinkedList(E... items) {
         this(Integer.MAX_VALUE);
@@ -90,35 +95,40 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
     }
 
     /**
-     * Creates a new TransactionalLinkedList with the provided max capacity and that is strict
-     * on the maximum capacity.
+     * Creates a new TransactionalLinkedList with the provided max capacity.
+     * <p/>
+     * It is strict on the maximum capacity, so it could cause contention problems. See the
+     * {@link #TransactionalLinkedList(int, boolean)} as alternative.
      *
-     * @param maxCapacity
+     * @param maxCapacity the maximum capacity of the queue.
      * @throws IllegalArgumentException if maxCapacity smaller than 0.
      */
     public TransactionalLinkedList(int maxCapacity) {
-        this(maxCapacity, true);
+        this(maxCapacity, false);
     }
 
     /**
-     * @param maxCapacity       the maximum number of items stores in this TransactionalLinkedList.
-     * @param strictMaxCapacity if the TransactionalLinkedList should be strict with it maxCapacity. If
-     *                          it is strict, it leads to reduced concurrency. If it is relaxed, then the number of items stored
-     *                          could exceed the maxCapacity. In most cases this is not an issue.
+     * Creates a new TransactionalLinkedList.
+     *
+     * @param maxCapacity            the maximum number of items stores in this TransactionalLinkedList.
+     * @param relaxedMaximumCapacity if the TransactionalLinkedList should be relaxed with it maxCapacity. If
+     *                               it is strict, it leads to reduced concurrency. If it is relaxed, then
+     *                               the number of items stored could exceed the maxCapacity. In most cases
+     *                               this is not an issue.
      * @throws IllegalArgumentException if maxCapacity is smaller than 0.
      */
-    public TransactionalLinkedList(int maxCapacity, boolean strictMaxCapacity) {
+    public TransactionalLinkedList(int maxCapacity, boolean relaxedMaximumCapacity) {
         if (maxCapacity < 0) {
             throw new IllegalArgumentException("maxCapacity can't be smaller than 0");
         }
-        this.strictMaxCapacity = strictMaxCapacity;
+        this.relaxedMaximumCapacity = relaxedMaximumCapacity;
         this.maxCapacity = maxCapacity;
         this.size = sizeFactory.atomicCreateLong(0);
     }
 
     @Exclude
     public boolean hasStrictMaxCapacity() {
-        return strictMaxCapacity;
+        return relaxedMaximumCapacity;
     }
 
     @TransactionalMethod(readonly = true)
@@ -137,14 +147,13 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
         return (int) size.get();
     }
 
-
     @Override
     @TransactionalMethod(readonly = true)
     public int remainingCapacity() {
-        if (strictMaxCapacity) {
-            return Math.max(0, maxCapacity - (int) size.get());
-        } else {
+        if (relaxedMaximumCapacity) {
             return Math.max(0, maxCapacity - (int) size.atomicGet());
+        } else {
+            return Math.max(0, maxCapacity - (int) size.get());
         }
     }
 

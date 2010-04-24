@@ -58,27 +58,34 @@ public final class TransactionalThreadPoolExecutor extends AbstractExecutorServi
 
 
     /**
-     * Creates a new TransactionalThreadPoolExecutor with a unbound workqueue and 1 as corePoolSize and maxPoolSize.
+     * Creates a new single threaded TransactionalThreadPoolExecutor with bounded workqueue
+     * with 1000.000 items and relaxed maximum capacity (so the actual size could exceed the
+     * maximum capacity for increased concurrency; takes and puts on the queue can happen
+     * concurrently without conflicting)
      * <p/>
      * If no limit is placed on the workQueue is could lead to a system not degrading gracefull because it runs out of
      * memory instead of rejecting tasks.
      */
     public TransactionalThreadPoolExecutor() {
-        this(new TransactionalLinkedList<Runnable>(), 1);
+        this(new TransactionalLinkedList<Runnable>(1000 * 1000, true), 1);
     }
 
     /**
-     * Creates a new TransactionalThreadPool with an unbound workqueue and the provided poolSize.
+     * Creates a new TransactionalThreadPoolExecutor with bounded workqueue
+     * with 1000.000 items and relaxed maximum capacity (so the actual size could exceed the
+     * maximum capacity for increased concurrency; takes and puts on the queue can happen
+     * concurrently without conflicting)
      *
      * @param poolSize the maximum and core poolsize.
      * @throws IllegalArgumentException if poolSize smaller than 0.
      */
     public TransactionalThreadPoolExecutor(int poolSize) {
-        this(new TransactionalLinkedList<Runnable>(), poolSize);
+        this(new TransactionalLinkedList<Runnable>(1000 * 1000, true), poolSize);
     }
 
     /**
-     * Creates a new TransactionalThreadPoolExecutor with the given workQueue and 1 as corePoolSize and maxPoolSize.
+     * Creates a new TransactionalThreadPoolExecutor with the given workQueue and 1 as corePoolSize
+     * and maxPoolSize.
      *
      * @param workQueue the BlockingQueue to store unprocessed work.
      * @throws NullPointerException if workQueue is null.

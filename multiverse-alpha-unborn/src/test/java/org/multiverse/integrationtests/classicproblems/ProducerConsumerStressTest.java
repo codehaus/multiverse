@@ -1,7 +1,6 @@
 package org.multiverse.integrationtests.classicproblems;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
@@ -31,7 +30,6 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
  *
  * @author Peter Veentjer.
  */
-@Ignore
 public class ProducerConsumerStressTest {
 
     private TransactionalLinkedList[] queues;
@@ -41,6 +39,7 @@ public class ProducerConsumerStressTest {
     private boolean runWithAborts;
     private int queueCapacity = 50;
     private int concurrentHandoverCount;
+    private boolean relaxedMaximumCapacity;
 
     @Before
     public void setUp() {
@@ -48,28 +47,50 @@ public class ProducerConsumerStressTest {
     }
 
     @Test
-    public void testWithAborts() {
-        runTest(true, 1);
+    public void testWithAbortsAndRelaxedCapacity() {
+        runTest(true, true, 1);
     }
 
     @Test
-    public void testWithoutAborts() {
-        runTest(false, 1);
+    public void testWithoutAbortsAndRelaxedCapacity() {
+        runTest(true, false, 1);
     }
 
     @Test
-    public void testConcurrentHandoverWithAborts() {
-        runTest(true, 5);
+    public void testConcurrentHandoverWithAbortsAndRelaxedCapacity() {
+        runTest(true, true, 5);
     }
 
     @Test
-    public void testConcurrentHandoverWithoutAborts() {
-        runTest(false, 5);
+    public void testConcurrentHandoverWithoutAbortsAndRelaxedCapacity() {
+        runTest(true, false, 5);
     }
 
-    public void runTest(boolean runWithAborts, int concurrentHandoverCount) {
+    @Test
+    public void testWithAbortsWithStrictCapacity() {
+        runTest(false, true, 1);
+    }
+
+    @Test
+    public void testWithoutAbortsWithStrictCapacity() {
+        runTest(false, false, 1);
+    }
+
+    @Test
+    public void testConcurrentHandoverWithAbortsAndStrictCapacity() {
+        runTest(false, true, 5);
+    }
+
+    @Test
+    public void testConcurrentHandoverWithoutAbortsAndWithStrictCapacity() {
+        runTest(false, false, 5);
+    }
+
+
+    public void runTest(boolean relaxedMaximumCapacity, boolean runWithAborts, int concurrentHandoverCount) {
         this.runWithAborts = runWithAborts;
         this.concurrentHandoverCount = concurrentHandoverCount;
+        this.relaxedMaximumCapacity = relaxedMaximumCapacity;
         queues = createQueues();
 
         ProducerThread producerThread = new ProducerThread();
@@ -126,7 +147,7 @@ public class ProducerConsumerStressTest {
     private TransactionalLinkedList<Integer>[] createQueues() {
         TransactionalLinkedList<Integer>[] result = new TransactionalLinkedList[queueCount];
         for (int k = 0; k < queueCount; k++) {
-            result[k] = new TransactionalLinkedList(queueCapacity);
+            result[k] = new TransactionalLinkedList(queueCapacity, relaxedMaximumCapacity);
         }
         return result;
     }

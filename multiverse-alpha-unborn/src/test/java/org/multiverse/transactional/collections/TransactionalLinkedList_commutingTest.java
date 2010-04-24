@@ -2,7 +2,6 @@ package org.multiverse.transactional.collections;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
@@ -39,9 +38,11 @@ public class TransactionalLinkedList_commutingTest {
     }
 
     @Test
-    @Ignore
     public void test() {
-        TransactionalLinkedList<String> list = new TransactionalLinkedList<String>("2", "3", "4");
+        TransactionalLinkedList<String> list = new TransactionalLinkedList<String>(10000, true);
+        list.add("2");
+        list.add("3");
+        list.add("4");
 
         Transaction tx1 = txFactory.start();
         setThreadLocalTransaction(tx1);

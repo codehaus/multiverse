@@ -25,8 +25,27 @@ public class TransactionalLinkedList_PerformanceTest {
     }
 
     @Test
-    public void testTransactionalLinkedList() {
-        TransactionalLinkedList<Integer> list = new TransactionalLinkedList<Integer>();
+    public void testRelaxedTransactionalLinkedList() {
+        TransactionalLinkedList<Integer> list = new TransactionalLinkedList<Integer>(10 * 1000 * 1000, true);
+
+        long startNs = System.nanoTime();
+
+        for (int l = 0; l < iterations; l++) {
+            for (int k = 0; k < count; k++) {
+                list.add(k);
+            }
+            list.clear();
+            System.out.println("completed run " + l);
+        }
+
+        long durationNs = System.nanoTime() - startNs;
+        double transactionsPerSecond = (1.0d * count * iterations * TimeUnit.SECONDS.toNanos(1)) / durationNs;
+        System.out.printf("Performance %s transactions/second\n", transactionsPerSecond);
+    }
+
+    @Test
+    public void testStrictTransactionalLinkedList() {
+        TransactionalLinkedList<Integer> list = new TransactionalLinkedList<Integer>(10 * 1000 * 1000, false);
 
         long startNs = System.nanoTime();
 
