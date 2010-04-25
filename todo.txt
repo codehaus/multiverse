@@ -4,8 +4,6 @@ todo engine
 
 - when the transaction has a timeout, the timeout should be updated when the transaction blocks.
 
-- update tests tests that the backoff policy is used when a openForRead is done.
-
 - update tests tests that the backoff policy is used when a openForUpdate is done.
 
 - als een transactie geen dirty checks nodig heeft, dan automatisch ieder object dat gelezen is,
@@ -460,4 +458,6 @@ an transactional ref with the alphastm to do some real tests?
 - back off policy
 
     - back off policy needs to be used when a load is done and the value is locked
+
+- update tests tests that the backoff policy is used when a openForRead is done.
 

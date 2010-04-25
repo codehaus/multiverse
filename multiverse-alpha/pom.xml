@@ -246,6 +246,7 @@
             <groupId>com.tonicsystems.jarjar</groupId>
             <artifactId>jarjar</artifactId>
             <version>1.0-rc8</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

@@ -102,7 +102,7 @@ public final class ExponentialBackoffPolicy implements BackoffPolicy {
 
     protected long calcDelayNs(Transaction tx) {
         //if (tx.getAttempt() > 100) {
-        System.out.println("tx.attempt: " + tx.getAttempt());
+        //System.out.println("tx.attempt: " + tx.getAttempt());
         //}
 
         int maxSlot;

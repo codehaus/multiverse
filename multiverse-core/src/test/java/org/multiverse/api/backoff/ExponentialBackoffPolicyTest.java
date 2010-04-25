@@ -12,8 +12,8 @@ public class ExponentialBackoffPolicyTest {
     @Test
     public void construction_INSTANCE() {
         ExponentialBackoffPolicy policy = ExponentialBackoffPolicy.INSTANCE_100_MS_MAX;
-        assertEquals(10, policy.getMinDelayNs());
-        assertEquals(TimeUnit.MILLISECONDS.toNanos(10), policy.getMaxDelayNs());
+        assertEquals(100, policy.getMinDelayNs());
+        assertEquals(TimeUnit.MILLISECONDS.toNanos(100), policy.getMaxDelayNs());
     }
 
     @Test(expected = IllegalArgumentException.class)

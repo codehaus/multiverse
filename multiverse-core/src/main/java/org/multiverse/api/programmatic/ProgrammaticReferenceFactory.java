@@ -110,4 +110,14 @@ public interface ProgrammaticReferenceFactory {
      * @return the created ProgrammaticReference.
      */
     <E> ProgrammaticReference<E> atomicCreateReference(E value);
+
+    /**
+     * Creates a new ProgrammaticReference with a null value atomically. So this call
+     * doesn't look at the {@link org.multiverse.api.ThreadLocalTransaction}.
+     * This is the cheapest call for making a ProgrammaticReference, so in most cases
+     * this is the one you want to use.
+     *
+     * @return the created ProgrammaticReference.
+     */
+    ProgrammaticReference atomicCreateReference();
 }

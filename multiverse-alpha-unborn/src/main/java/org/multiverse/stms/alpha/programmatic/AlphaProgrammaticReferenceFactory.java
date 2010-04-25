@@ -64,4 +64,10 @@ public final class AlphaProgrammaticReferenceFactory
     public <E> ProgrammaticReference<E> atomicCreateReference(E value) {
         return new AlphaProgrammaticReference<E>((AlphaTransaction) null, value);
     }
+
+    @Override
+    public ProgrammaticReference atomicCreateReference() {
+        return atomicCreateReference(null);
+    }
+
 }
