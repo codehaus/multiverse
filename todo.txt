@@ -461,3 +461,5 @@ an transactional ref with the alphastm to do some real tests?
 
 - update tests tests that the backoff policy is used when a openForRead is done.
 
+- hudson; ibm/open/sun/stress test
+

@@ -146,8 +146,7 @@ public final class AlphaProgrammaticLongTranlocal extends AlphaTranlocal impleme
 
     @Override
     public long getRemainingTimeoutNs() {
-        //ignore
-        return 0;
+        return Long.MAX_VALUE;
     }
 
     @Override

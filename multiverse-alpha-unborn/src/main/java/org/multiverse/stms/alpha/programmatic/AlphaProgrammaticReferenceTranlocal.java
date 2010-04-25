@@ -111,7 +111,7 @@ public final class AlphaProgrammaticReferenceTranlocal<E> extends AlphaTranlocal
 
     @Override
     public long getRemainingTimeoutNs() {
-        throw new UnsupportedOperationException();
+        return Long.MAX_VALUE;
     }
 
     @Override
