@@ -25,11 +25,13 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
+        stmConfig.maxRetries = 10;
         stm = new AlphaStm(stmConfig);
     }
 
     public MonoUpdateAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfig) {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withMaxRetries(10)
                 .withSpeculativeConfiguration(speculativeConfig);
         return new MonoUpdateAlphaTransaction(config);
     }
@@ -40,6 +42,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
 
     public MonoUpdateAlphaTransaction startSutTransactionWithoutAutomaticReadTracking() {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withMaxRetries(10)
                 .withExplictRetryAllowed(false)
                 .withReadTrackingEnabled(false);
 

@@ -27,12 +27,13 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
+        stmConfig.maxRetries = 10;
         stm = new AlphaStm(stmConfig);
     }
 
     public NonTrackingReadonlyAlphaTransaction startSutTransaction() {
-        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, false);
-
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, false)
+                .withMaxRetries(10);
         return new NonTrackingReadonlyAlphaTransaction(config);
     }
 

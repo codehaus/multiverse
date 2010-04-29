@@ -1,18 +1,33 @@
 allprojects {
+  apply plugin: 'base'
+  apply plugin: 'java'
+  apply plugin: 'scala'
+  apply plugin: 'maven'
+  apply plugin: 'project-reports'
+
+  install.dependsOn ':build'
+  defaultTasks 'clean', 'install'
+
   sourceCompatibility = 1.6
   version = '0.5-SNAPSHOT'
   group = 'org.multiverse'
   //scalaVersion = '2.8.0.Beta1'
   scalaVersion = '2.7.7'
 
-  apply plugin: 'java'
-  apply plugin: 'scala'
-  apply plugin: 'maven'
-  apply plugin: 'project-reports'
+  //repository(url: 'dav:https://dav.codehaus.org/repository/multiverse/') 
+  //{
+  //	authentication(userName: "${username}", password: "${password}")
+  //}
 
-  defaultTasks 'clean', 'install'
+  //snapshotRepository(url:'dav:https://dav.codehaus.org/snapshots.repository/multiverse/') 
+  //{
+  //	authentication(userName: "${username}", password: "${password}")
+  //} 
+
+  def localMavenRepo = 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
 
   repositories {
+    mavenRepo urls: localMavenRepo
     mavenCentral()
     mavenRepo(urls: [
             'http://snapshots.repository.codehaus.org',
@@ -20,13 +35,10 @@ allprojects {
             'https://maven.atlassian.com/content/groups/public'])
   }
 
-  def localMavenRepo = 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
-
-  repositories {
-    mavenRepo urls: localMavenRepo
+  configurations {
+    deployerJars
   }
 
-// only run tests that don't start with 'Abstract' as their class name
   test {
     exclude("**/*Abstract*")
     exclude("**/*StressTest*")
@@ -34,17 +46,47 @@ allprojects {
     exclude("**/*PerformanceTest*")
   }
 
-  install.dependsOn ':build'
-
-  dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.8.1'
-    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.8.2'
-  }
 
   task integrationtest(type: Test) {
     include("**/*StressTest*")
     include("**/*LongTest*")
   }
+
+  dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.8.1'
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.8.2'
+
+    deployerJars "org.apache.maven.wagon:wagon-ssh:1.0-beta-2"//, "org.apache.maven.wagon:wagon-webdav:1.0-beta-2"
+  }
+
+//  task uploadLibs {
+//    uploadResolvers.addMavenDeployer('maven-deployer') {
+//      uniqueVersion = false
+//      addProtocolProviderJars(dependencies.resolve('deployerJars'))
+//      repository(url: "dav:https://dav.codehaus.org/repository/multiverse/") {
+//        authentication(userName: "bla", password: "bla")
+//        releases()
+//        snapshots()
+//        proxy()
+//      }
+//      snapshotRepository(url: "dav:https://dav.codehaus.org/snapshots.repository/multiverse/") {
+//        authentication(userName: "bla", password: "bla")
+//        releases()
+//        snapshots()
+//        proxy()
+//      }
+//    }
+//  }
+
+//  task libs {
+//    zip().fileSet(dir: 'build') {
+//      include('**/*.dll')
+//    }
+//
+//    zip(classifier: 'debug').fileSet(dir: 'build') {
+//      include('**/*.dll')
+//    }
+//  }
 }
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -151,7 +193,7 @@ project(':multiverse-alpha-unborn') {
     ant.delete(dir: "${buildDir}/classes/main/META-INF/")
     ant.mkdir(dir: "${buildDir}/classes/main/META-INF/")
     ant.copy(
-            file: "${projectDir}/MANIFEST.MF",
+            file: "${projectDir}/src/main/resources/MANIFEST.MF",
             todir: "${buildDir}/classes/main/META-INF")
     ant.zip(
             basedir: "${buildDir}/classes/main",

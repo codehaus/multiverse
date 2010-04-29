@@ -33,6 +33,7 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
 
     public ArrayReadonlyAlphaTransaction startTransactionUnderTest(SpeculativeConfiguration speculativeConfig) {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true)
+                .withMaxRetries(10)
                 .withSpeculativeConfig(speculativeConfig);
         return new ArrayReadonlyAlphaTransaction(config, speculativeConfig.getMaximumArraySize());
     }
@@ -168,6 +169,7 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
         //try to load it, it should fail because the version stored is newer than the
         //readversion is the transaction allows.
         long version = stm.getVersion();
+        System.out.println("tx.maxRetryCount: " + tx.getConfiguration().getMaxRetries());
         try {
             tx.openForRead(ref);
             fail();

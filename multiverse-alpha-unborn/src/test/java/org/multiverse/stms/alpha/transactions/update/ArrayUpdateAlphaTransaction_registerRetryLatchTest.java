@@ -25,6 +25,7 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
+        stmConfig.maxRetries = 10;
         stm = new AlphaStm(stmConfig);
     }
 
@@ -97,7 +98,7 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
         }
 
         assertFalse(latch.isOpen());
-        assertTrue(speculativeConfig.isAutomaticReadTracking());
+        assertTrue(speculativeConfig.isReadTrackingEnabled());
     }
 
     @Test

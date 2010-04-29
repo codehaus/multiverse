@@ -22,6 +22,7 @@ public class MonoUpdateAlphaTransaction_abortTest {
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
+        stmConfig.maxRetries = 10;
         stm = new AlphaStm(stmConfig);
     }
 

@@ -34,6 +34,7 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
+        stmConfig.maxRetries = 10;
         stm = new AlphaStm(stmConfig);
     }
 
@@ -101,7 +102,7 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
         }
 
         assertIsActive(tx);
-        assertFalse(speculativeConfig.isAutomaticReadTracking());
+        assertFalse(speculativeConfig.isReadTrackingEnabled());
         assertFalse(latch.isOpen());
     }
 
@@ -121,7 +122,7 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
         }
 
         assertIsActive(tx);
-        assertTrue(speculativeConfig.isAutomaticReadTracking());
+        assertTrue(speculativeConfig.isReadTrackingEnabled());
         assertFalse(latch.isOpen());
     }
 

@@ -30,7 +30,8 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
     }
 
     public MapReadonlyAlphaTransaction startTransactionUnderTest() {
-        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
+        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true)
+                .withMaxRetries(10);
         return new MapReadonlyAlphaTransaction(config);
     }
 

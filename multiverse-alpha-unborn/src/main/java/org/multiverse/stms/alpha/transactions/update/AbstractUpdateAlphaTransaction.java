@@ -219,38 +219,53 @@ public abstract class AbstractUpdateAlphaTransaction
                     throw createFailedToObtainCommitLocksException();
                 }
 
-                boolean failure = false;
+                boolean failure = true;
                 try {
                     if (config.writeSkewAllowed) {
                         boolean skipConflictDetection = config.optimizedConflictDetectionEnabled
                                 && getReadVersion() == config.clock.getVersion();
 
-                        if (skipConflictDetection) {
+                        if (!skipConflictDetection) {
+
                             //we don't need to check for conflicts because:
                             //- writeskew is allowed (so we don't need to check reads for conflicts)
                             //- and the dirty tranlocals are locked
                             //- and no other transaction committed after this transaction started,
                             //Based on these 3 arguments we can conclude that 
-                            writeVersion = config.clock.tick();
-                        } else {
-                            failure = hasWriteConflict();
-                            if (!failure) {
-                                writeVersion = config.clock.tick();
+                            if (hasWriteConflict()) {
+                                throw createOptimisticLockFailedWriteConflict();
                             }
                         }
 
-                        if (failure) {
-                            throw createOptimisticLockFailedWriteConflict();
-                        }
+                        writeVersion = config.clock.tick();
                     } else {
-                        //todo: could here be a potential race problem because the reads are not locked, only the writes.
-                        writeVersion = config.clock.strictTick();
-                        failure = hasReadConflict();
+                        boolean possiblySkipConflictDetection = config.optimizedConflictDetectionEnabled
+                                && getReadVersion() == config.clock.getVersion();
 
-                        if (failure) {
-                            throw createWriteSkewConflict();
+                        if (possiblySkipConflictDetection) {
+                            //if the clock hasn't changed yet, there is a chance we can skip
+                            //conflict detection
+
+                            writeVersion = config.clock.strictTick();
+
+                            if (writeVersion != getReadVersion() + 1) {
+                                //we were not lucky, another transaction committed between the start and
+                                //prepare of this transaction, so we need to do a conflict test,
+
+                                if (hasReadConflict()) {
+                                    throw createWriteSkewConflict();
+                                }
+                            }
+                        } else {
+                            //another transaction has committed, so we need to do a full readconflict test
+                            if (hasReadConflict()) {
+                                throw createWriteSkewConflict();
+                            }
+
+                            writeVersion = config.clock.strictTick();
                         }
                     }
+                    failure = false;
                 } finally {
                     if (failure) {
                         doReleaseWriteLocksForFailure();
@@ -270,6 +285,7 @@ public abstract class AbstractUpdateAlphaTransaction
      *
      * @return the AttachedState.
      */
+
     protected abstract boolean isDirty();
 
     protected final boolean isDirty(AlphaTranlocal attached) {

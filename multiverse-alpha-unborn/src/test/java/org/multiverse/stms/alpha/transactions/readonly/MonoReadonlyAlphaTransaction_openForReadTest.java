@@ -24,6 +24,7 @@ public class MonoReadonlyAlphaTransaction_openForReadTest {
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createFastConfig();
+        stmConfig.maxRetries = 10;
         stm = new AlphaStm(stmConfig);
     }
 
@@ -33,7 +34,8 @@ public class MonoReadonlyAlphaTransaction_openForReadTest {
 
     public MonoReadonlyAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfig) {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true)
-                .withSpeculativeConfig(speculativeConfig);
+                .withSpeculativeConfig(speculativeConfig)
+                .withMaxRetries(10);
         return new MonoReadonlyAlphaTransaction(config);
     }
 

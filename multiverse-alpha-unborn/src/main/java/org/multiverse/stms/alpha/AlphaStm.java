@@ -479,8 +479,8 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     }
 
                     boolean finalAutomaticReadTracking;
-                    if (speculativeConfig.isSpeculativeNonAutomaticReadTrackingEnabled()) {
-                        finalAutomaticReadTracking = speculativeConfig.isAutomaticReadTracking();
+                    if (speculativeConfig.isSpeculativeNoReadTrackingEnabled()) {
+                        finalAutomaticReadTracking = speculativeConfig.isReadTrackingEnabled();
                     } else {
                         finalAutomaticReadTracking = readTrackingEnabled;
                     }

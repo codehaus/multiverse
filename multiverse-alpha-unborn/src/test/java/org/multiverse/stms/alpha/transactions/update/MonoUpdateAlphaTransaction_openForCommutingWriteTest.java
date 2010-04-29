@@ -28,6 +28,7 @@ public class MonoUpdateAlphaTransaction_openForCommutingWriteTest {
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
+        stmConfig.maxRetries = 10;
         stm = new AlphaStm(stmConfig);
     }
 

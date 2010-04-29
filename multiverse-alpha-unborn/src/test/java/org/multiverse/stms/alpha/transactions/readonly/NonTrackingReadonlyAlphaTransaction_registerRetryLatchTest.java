@@ -26,6 +26,7 @@ public class NonTrackingReadonlyAlphaTransaction_registerRetryLatchTest {
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
+        stmConfig.maxRetries = 10;
         stm = new AlphaStm(stmConfig);
     }
 
@@ -60,7 +61,7 @@ public class NonTrackingReadonlyAlphaTransaction_registerRetryLatchTest {
         assertFalse(latch.isOpen());
         assertIsActive(tx);
         assertNull(ref.___getListeners());
-        assertTrue(speculativeConfig.isAutomaticReadTracking());
+        assertTrue(speculativeConfig.isReadTrackingEnabled());
     }
 
     @Test
@@ -81,7 +82,7 @@ public class NonTrackingReadonlyAlphaTransaction_registerRetryLatchTest {
         assertFalse(latch.isOpen());
         assertIsActive(tx);
         assertNull(ref.___getListeners());
-        assertTrue(speculativeConfig.isAutomaticReadTracking());
+        assertTrue(speculativeConfig.isReadTrackingEnabled());
     }
 
     @Test
@@ -99,7 +100,7 @@ public class NonTrackingReadonlyAlphaTransaction_registerRetryLatchTest {
 
         assertFalse(latch.isOpen());
         assertIsActive(tx);
-        assertFalse(speculativeConfig.isAutomaticReadTracking());
+        assertFalse(speculativeConfig.isReadTrackingEnabled());
     }
 
     @Test
@@ -121,6 +122,6 @@ public class NonTrackingReadonlyAlphaTransaction_registerRetryLatchTest {
         assertFalse(latch.isOpen());
         assertIsActive(tx);
         assertNull(ref.___getListeners());
-        assertFalse(speculativeConfig.isAutomaticReadTracking());
+        assertFalse(speculativeConfig.isReadTrackingEnabled());
     }
 }

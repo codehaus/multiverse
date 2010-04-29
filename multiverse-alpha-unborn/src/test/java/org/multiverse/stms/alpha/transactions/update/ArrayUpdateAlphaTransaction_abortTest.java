@@ -23,8 +23,8 @@ public class ArrayUpdateAlphaTransaction_abortTest {
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
+        stmConfig.maxRetries = 10;
         stm = new AlphaStm(stmConfig);
-
     }
 
     public AlphaTransaction startSutTransaction(int size) {

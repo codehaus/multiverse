@@ -24,6 +24,7 @@ public class MonoReadonlyAlphaTransaction_registerRetryLatchTest {
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createFastConfig();
+        stmConfig.maxRetries = 10;
         stm = new AlphaStm(stmConfig);
     }
 

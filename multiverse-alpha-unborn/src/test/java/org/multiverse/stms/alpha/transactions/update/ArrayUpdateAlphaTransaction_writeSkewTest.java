@@ -26,6 +26,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
+        stmConfig.maxRetries = 10;
         stm = new AlphaStm(stmConfig);
         clearThreadLocalTransaction();
     }
@@ -81,7 +82,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
         }
 
         assertIsAborted(tx2);
-        assertEquals(version + 1, stm.getVersion());
+        assertEquals(version, stm.getVersion());
         assertSame(committedRef1, ref1.___load());
         assertSame(tranlocalRef2, ref2.___load());
     }
@@ -171,6 +172,4 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
         } catch (WriteSkewConflict expected) {
         }
     }
-
-
 }

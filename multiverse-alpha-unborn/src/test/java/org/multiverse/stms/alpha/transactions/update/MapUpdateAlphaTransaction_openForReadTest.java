@@ -30,17 +30,19 @@ public class MapUpdateAlphaTransaction_openForReadTest {
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
+        stmConfig.maxRetries = 10;
         stm = new AlphaStm(stmConfig);
     }
 
     public MapUpdateAlphaTransaction startSutTransaction() {
-        UpdateConfiguration config =
-                new UpdateConfiguration(stmConfig.clock);
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withMaxRetries(10);
         return new MapUpdateAlphaTransaction(config);
     }
 
     public MapUpdateAlphaTransaction startSutTransactionWithoutAutomaticReadTracking() {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withMaxRetries(10)
                 .withExplictRetryAllowed(false)
                 .withReadTrackingEnabled(false);
 

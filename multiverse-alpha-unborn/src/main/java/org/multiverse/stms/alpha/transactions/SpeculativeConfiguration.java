@@ -17,11 +17,11 @@ public final class SpeculativeConfiguration {
 
     private final AtomicInteger size = new AtomicInteger();
     private final AtomicBoolean readonly = new AtomicBoolean(true);
-    private final AtomicBoolean automaticReadTracking = new AtomicBoolean(false);
+    private final AtomicBoolean isReadTrackingEnabled = new AtomicBoolean(false);
 
     private final int maximumArraySize;
     private final boolean isSpeculativeReadonlyEnabled;
-    private final boolean isSpeculativeNonAutomaticReadTrackingEnabled;
+    private final boolean isSpeculativeNoReadTrackingEnabled;
     private final boolean isSpeculativeSizeEnabled;
 
     public SpeculativeConfiguration(
@@ -31,7 +31,7 @@ public final class SpeculativeConfiguration {
             int maximumArraySize) {
 
         this.isSpeculativeReadonlyEnabled = isSpeculativeOnReadonly;
-        this.isSpeculativeNonAutomaticReadTrackingEnabled = isSpeculativeNonAutomaticReadTrackingEnabled;
+        this.isSpeculativeNoReadTrackingEnabled = isSpeculativeNonAutomaticReadTrackingEnabled;
         this.isSpeculativeSizeEnabled = isSpeculativeSizeEnabled;
         this.size.set(1);
         this.maximumArraySize = maximumArraySize;
@@ -42,9 +42,9 @@ public final class SpeculativeConfiguration {
     }
 
     public boolean isEnabled() {
-        return isSpeculativeNonAutomaticReadTrackingEnabled ||
-                isSpeculativeReadonlyEnabled ||
-                isSpeculativeSizeEnabled;
+        return isSpeculativeNoReadTrackingEnabled
+                || isSpeculativeReadonlyEnabled
+                || isSpeculativeSizeEnabled;
     }
 
     // ================ size ===========================
@@ -73,14 +73,14 @@ public final class SpeculativeConfiguration {
             newOptimalSize = 2;
         } else if (failedSize == 2) {
             newOptimalSize = 3;
-        }else {
+        } else {
             newOptimalSize = failedSize + 2;
         }
 
         while (true) {
             int currentSize = this.size.get();
             if (currentSize >= newOptimalSize) {
-                return ;
+                return;
             }
 
             if (size.compareAndSet(currentSize, newOptimalSize)) {
@@ -113,36 +113,30 @@ public final class SpeculativeConfiguration {
 
     public SpeculativeConfiguration withSpeculativeReadonlyDisabled() {
         return new SpeculativeConfiguration(
-                false,
-                isSpeculativeNonAutomaticReadTrackingEnabled,
-                isSpeculativeSizeEnabled,
-                maximumArraySize);
+                false, isSpeculativeNoReadTrackingEnabled, isSpeculativeSizeEnabled, maximumArraySize);
     }
 
     // ================ automatic readtracking ===========================
 
-    public boolean isSpeculativeNonAutomaticReadTrackingEnabled() {
-        return isSpeculativeNonAutomaticReadTrackingEnabled;
+    public boolean isSpeculativeNoReadTrackingEnabled() {
+        return isSpeculativeNoReadTrackingEnabled;
     }
 
-    public void signalSpeculativeNonAutomaticReadtrackingFailure() {
-        if (!isSpeculativeNonAutomaticReadTrackingEnabled) {
+    public void signalSpeculativeReadTrackingDisabledFailure() {
+        if (!isSpeculativeNoReadTrackingEnabled) {
             throw new IllegalStateException();
         }
 
-        automaticReadTracking.set(true);
+        isReadTrackingEnabled.set(true);
     }
 
-    public boolean isAutomaticReadTracking() {
-        return automaticReadTracking.get();
+    public boolean isReadTrackingEnabled() {
+        return isReadTrackingEnabled.get();
     }
 
     public SpeculativeConfiguration withSpeculativeNonAutomaticReadTrackingDisabled() {
         return new SpeculativeConfiguration(
-                isSpeculativeReadonlyEnabled,
-                false,
-                isSpeculativeSizeEnabled,
-                maximumArraySize);
+                isSpeculativeReadonlyEnabled, false, isSpeculativeSizeEnabled, maximumArraySize);
     }
 
     // ============= misc ===========================
@@ -156,7 +150,7 @@ public final class SpeculativeConfiguration {
                 ")",
                 size.get(),
                 isSpeculativeReadonlyEnabled,
-                isSpeculativeNonAutomaticReadTrackingEnabled,
+                isSpeculativeNoReadTrackingEnabled,
                 isSpeculativeSizeEnabled);
     }
 }

@@ -219,8 +219,8 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
         SpeculativeConfiguration speculativeConfig = config.speculativeConfiguration;
 
         if (!config.readTrackingEnabled) {
-            if (speculativeConfig.isSpeculativeNonAutomaticReadTrackingEnabled()) {
-                speculativeConfig.signalSpeculativeNonAutomaticReadtrackingFailure();
+            if (speculativeConfig.isSpeculativeNoReadTrackingEnabled()) {
+                speculativeConfig.signalSpeculativeReadTrackingDisabledFailure();
                 throw SpeculativeConfigurationFailure.create();
             }
 

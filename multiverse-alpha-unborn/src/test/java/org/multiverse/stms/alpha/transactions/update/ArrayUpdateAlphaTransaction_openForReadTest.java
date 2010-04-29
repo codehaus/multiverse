@@ -25,11 +25,13 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
     @Before
     public void setUp() {
         stmConfig = AlphaStmConfig.createDebugConfig();
+        stmConfig.maxRetries = 10;
         stm = new AlphaStm(stmConfig);
     }
 
     public AlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfig) {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withMaxRetries(10)
                 .withSpeculativeConfiguration(speculativeConfig);
 
         return new ArrayUpdateAlphaTransaction(config, speculativeConfig.getMaximumArraySize());
@@ -37,14 +39,15 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
 
     public AlphaTransaction startSutTransactionWithoutAutomaticReadTracking() {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withMaxRetries(10)
                 .withReadTrackingEnabled(false);
 
         return new ArrayUpdateAlphaTransaction(config, 100);
     }
 
     public AlphaTransaction startSutTransaction() {
-        UpdateConfiguration config =
-                new UpdateConfiguration(stmConfig.clock);
+        UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
+                .withMaxRetries(10);
 
         return new ArrayUpdateAlphaTransaction(config, 100);
     }
