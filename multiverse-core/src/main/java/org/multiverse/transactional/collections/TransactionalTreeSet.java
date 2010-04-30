@@ -1,6 +1,6 @@
 package org.multiverse.transactional.collections;
 
-import org.multiverse.annotations.Exclude;
+import org.multiverse.annotations.NonTransactional;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -81,7 +81,7 @@ public final class TransactionalTreeSet<E> implements TransactionalSet<E> {
     }
 
     @Override
-    @Exclude
+    @NonTransactional
     public int atomicSize() {
         return map.getCurrentSize();
     }

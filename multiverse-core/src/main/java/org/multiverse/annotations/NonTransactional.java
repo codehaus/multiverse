@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The Exclude annotation can be used for the following purposes:
+ * The NonTransactional annotation can be used for the following purposes:
  * <ol>
  * <li>Can be placed on a field of an {@link TransactionalObject} to exclude it from being managed by
  * the STM. So this field is for the STM completely invisible; as if it doesn't exist.</li>
@@ -19,5 +19,5 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
-public @interface Exclude {
+public @interface NonTransactional {
 }

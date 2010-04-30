@@ -1,6 +1,5 @@
 package org.multiverse.integrationtests.notification;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
@@ -41,11 +40,6 @@ public class MultipleConditionVariablesStressTest {
         for (int k = 0; k < objectCount; k++) {
             values[k] = new TransactionalInteger(0);
         }
-    }
-
-    @After
-    public void tearDown() {
-        //stm.getProfiler().print();
     }
 
     @Test

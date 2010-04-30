@@ -5,26 +5,29 @@ import org.junit.Test;
 
 import java.util.Set;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
  */
-public class TransactionalTreeMap_entrySetTest {
+public class TransactionalTreeMap_entrySet_clearTest {
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
     }
 
-
     @Test
     public void whenEmpty() {
         TransactionalTreeMap map = new TransactionalTreeMap();
         Set entrySet = map.entrySet();
-        assertNotNull(entrySet);
+        entrySet.clear();
+
+        assertTrue(map.isEmpty());
+        assertTrue(entrySet.isEmpty());
     }
+
 
     @Test
     public void whenNotEmpty() {
@@ -34,6 +37,8 @@ public class TransactionalTreeMap_entrySetTest {
         map.put("3", "c");
 
         Set entrySet = map.entrySet();
-        assertNotNull(entrySet);
+        entrySet.clear();
+        assertTrue(map.isEmpty());
+        assertTrue(entrySet.isEmpty());
     }
 }

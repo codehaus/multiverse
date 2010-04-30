@@ -4,7 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
-import org.multiverse.annotations.Exclude;
+import org.multiverse.annotations.NonTransactional;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Transaction;
 import org.multiverse.stms.alpha.transactions.readonly.MonoReadonlyAlphaTransaction;
@@ -130,7 +130,7 @@ public class SpeculativeNonAutomaticReadTrackingTest {
     class SpeculativeReadTrackingDisabled {
         private int value;
 
-        @Exclude
+        @NonTransactional
         private List<Transaction> transactions = new LinkedList<Transaction>();
 
         public void set(int value) {

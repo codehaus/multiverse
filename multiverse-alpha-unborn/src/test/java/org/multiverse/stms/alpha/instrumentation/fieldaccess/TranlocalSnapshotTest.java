@@ -2,7 +2,7 @@ package org.multiverse.stms.alpha.instrumentation.fieldaccess;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.annotations.Exclude;
+import org.multiverse.annotations.NonTransactional;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Transaction;
 import org.multiverse.stms.alpha.AlphaStm;
@@ -801,7 +801,7 @@ public class TranlocalSnapshotTest {
 
         int included;
 
-        @Exclude
+        @NonTransactional
         int excluded;
     }
 

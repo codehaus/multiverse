@@ -2,7 +2,6 @@ package org.multiverse.instrumentation.metadata;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.annotations.Exclude;
 import org.multiverse.annotations.FieldGranularity;
 import org.multiverse.annotations.TransactionalObject;
 
@@ -67,7 +66,7 @@ public class MetadataRepository_FieldTest {
 
     @TransactionalObject
     class TransactionalObjectWithExcludedField {
-        @Exclude
+        @org.multiverse.annotations.NonTransactional
         int field;
     }
 

@@ -3,7 +3,7 @@ package org.multiverse.stms.alpha.instrumentation.fieldaccess;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.annotations.Exclude;
+import org.multiverse.annotations.NonTransactional;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
@@ -50,7 +50,7 @@ public class TransactionalObject_ExcludeFieldTest {
 
         int included;
 
-        @Exclude
+        @NonTransactional
         int excluded;
 
         ExcludeOneOfTheFields(int excluded, int included) {
@@ -83,7 +83,7 @@ public class TransactionalObject_ExcludeFieldTest {
     @TransactionalObject
     static class ExcludeOnlyField {
 
-        @Exclude
+        @NonTransactional
         int field;
 
         ExcludeOnlyField(int field) {
@@ -107,7 +107,7 @@ public class TransactionalObject_ExcludeFieldTest {
 
     static class ExcludeOnNonTransactionalObject {
 
-        @Exclude
+        @NonTransactional
         private int field;
     }
 
@@ -132,7 +132,7 @@ public class TransactionalObject_ExcludeFieldTest {
     @TransactionalObject
     static class ExcludeStaticField {
 
-        @Exclude
+        @NonTransactional
         private static int staticField;
 
         private int instanceField;

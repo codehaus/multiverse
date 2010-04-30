@@ -3,7 +3,7 @@ package org.multiverse.stms.alpha;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.annotations.Exclude;
+import org.multiverse.annotations.NonTransactional;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Transaction;
@@ -98,7 +98,7 @@ public class SpeculativeSizeTest {
         private TransactionalReferenceArray<String> array =
                 new TransactionalReferenceArray<String>(1000);
 
-        @Exclude
+        @NonTransactional
         private List<Transaction> transactions = new LinkedList<Transaction>();
 
         public void read() {

@@ -2,7 +2,7 @@ package org.multiverse.instrumentation.metadata;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.annotations.Exclude;
+import org.multiverse.annotations.NonTransactional;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 
@@ -84,7 +84,7 @@ public class MetadataRepository_MethodTest {
 
     @TransactionalObject
     class TransactionalObjectWithExcludedMethod {
-        @Exclude
+        @NonTransactional
         public void foo() {
         }
     }

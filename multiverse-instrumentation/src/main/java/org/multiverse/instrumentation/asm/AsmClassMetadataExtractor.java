@@ -438,11 +438,11 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
     }
 
     public static boolean isExcluded(FieldNode field) {
-        return AsmUtils.hasVisibleAnnotation(field, Exclude.class);
+        return AsmUtils.hasVisibleAnnotation(field, NonTransactional.class);
     }
 
     public static boolean isExcluded(MethodNode methodNode) {
-        return AsmUtils.hasVisibleAnnotation(methodNode, Exclude.class);
+        return AsmUtils.hasVisibleAnnotation(methodNode, NonTransactional.class);
     }
 
     public static boolean hasFieldGranularity(FieldNode field) {

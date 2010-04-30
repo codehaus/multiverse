@@ -3,7 +3,7 @@ package org.multiverse.stms.alpha;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.annotations.Exclude;
+import org.multiverse.annotations.NonTransactional;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Transaction;
 import org.multiverse.stms.alpha.transactions.readonly.NonTrackingReadonlyAlphaTransaction;
@@ -73,7 +73,7 @@ public class SpeculativeReadonlyTest {
 
         private int foo;
 
-        @Exclude
+        @NonTransactional
         private List<Transaction> transactions = new LinkedList<Transaction>();
 
         public void read() {

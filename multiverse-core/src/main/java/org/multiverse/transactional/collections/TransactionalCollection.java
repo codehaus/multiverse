@@ -1,6 +1,6 @@
 package org.multiverse.transactional.collections;
 
-import org.multiverse.annotations.Exclude;
+import org.multiverse.annotations.NonTransactional;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 
@@ -29,7 +29,7 @@ public interface TransactionalCollection<E> extends Collection<E> {
      *
      * @return the current size of the TransactionalMap.
      */
-    @Exclude
+    @NonTransactional
     int atomicSize();
 
     @Override

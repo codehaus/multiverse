@@ -3,7 +3,7 @@ package org.multiverse.stms.alpha.instrumentation.fieldaccess;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.annotations.Exclude;
+import org.multiverse.annotations.NonTransactional;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.exceptions.NoTransactionFoundException;
 import org.multiverse.javaagent.JavaAgentProblemMonitor;
@@ -63,7 +63,7 @@ public class TransactionalObject_ExcludeMethodTest {
             return value;
         }
 
-        @Exclude
+        @NonTransactional
         //@TransactionalMethod
         public void excludedIncTwice() {
             inc();
@@ -93,7 +93,7 @@ public class TransactionalObject_ExcludeMethodTest {
 
         private int value;
 
-        @Exclude
+        @NonTransactional
         public void inc() {
             value++;
         }
@@ -131,7 +131,7 @@ public class TransactionalObject_ExcludeMethodTest {
     public static class NonTransactionalObject {
         private int value;
 
-        @Exclude
+        @NonTransactional
         public void someMethod() {
             value++;
         }
@@ -161,7 +161,7 @@ public class TransactionalObject_ExcludeMethodTest {
             return value;
         }
 
-        @Exclude
+        @NonTransactional
         public void excludedIncTwice() {
             inc();
             inc();

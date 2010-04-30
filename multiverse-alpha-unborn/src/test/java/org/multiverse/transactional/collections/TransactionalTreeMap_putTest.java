@@ -1,13 +1,14 @@
 package org.multiverse.transactional.collections;
 
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Random;
+
+import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.transactional.collections.CollectionTestUtils.createTreeMapExcluding;
 import static org.multiverse.transactional.collections.CollectionTestUtils.createTreeMapIncluding;
-
-import java.util.Random;
 
 /**
  * @author Peter Veentjer
@@ -76,7 +77,7 @@ public class TransactionalTreeMap_putTest {
 
         assertEquals(9, map.size());
         assertEquals(4, map.height());
-        assertTrue("not balanced", map.balanced());
+        assertTrue("not balanced", map.isBalanced());
     }
 
     @Test
@@ -88,7 +89,7 @@ public class TransactionalTreeMap_putTest {
 
         assertEquals(3, map.size());
         assertEquals(2, map.height());
-        assertTrue("not balanced", map.balanced());
+        assertTrue("not balanced", map.isBalanced());
     }
 
     @Test
@@ -106,7 +107,7 @@ public class TransactionalTreeMap_putTest {
 
         assertEquals(9, map.size());
         assertEquals(4, map.height());
-        assertTrue("not balanced", map.balanced());
+        assertTrue("not balanced", map.isBalanced());
     }
 
     @Test
@@ -135,7 +136,7 @@ public class TransactionalTreeMap_putTest {
         }
 
         assertEquals(uniqueInsertionCount, map.size());
-        assertTrue("not balanced", map.balanced());
+        assertTrue("not balanced", map.isBalanced());
     }
 
 }

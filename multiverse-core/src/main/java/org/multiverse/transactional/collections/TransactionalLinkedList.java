@@ -1,7 +1,7 @@
 package org.multiverse.transactional.collections;
 
-import org.multiverse.annotations.Exclude;
 import org.multiverse.annotations.FieldGranularity;
+import org.multiverse.annotations.NonTransactional;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.programmatic.ProgrammaticLong;
@@ -162,7 +162,7 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
      *
      * @return true if a relaxed maximum capacity is used.
      */
-    @Exclude
+    @NonTransactional
     public boolean hasRelaxedMaxCapacity() {
         return relaxedMaximumCapacity;
     }
@@ -172,7 +172,7 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
         return head == null;
     }
 
-    @Exclude
+    @NonTransactional
     public int atomicSize() {
         return (int) size.atomicGet();
     }

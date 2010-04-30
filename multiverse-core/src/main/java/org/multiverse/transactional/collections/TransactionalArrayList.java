@@ -1,6 +1,6 @@
 package org.multiverse.transactional.collections;
 
-import org.multiverse.annotations.Exclude;
+import org.multiverse.annotations.NonTransactional;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.programmatic.ProgrammaticLong;
@@ -82,7 +82,7 @@ public final class TransactionalArrayList<E> implements TransactionalList<E> {
     }
 
     @Override
-    @Exclude
+    @NonTransactional
     public int atomicSize() {
         return (int) size.atomicGet();
     }

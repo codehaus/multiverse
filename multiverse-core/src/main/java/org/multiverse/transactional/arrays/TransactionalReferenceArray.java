@@ -1,6 +1,6 @@
 package org.multiverse.transactional.arrays;
 
-import org.multiverse.annotations.Exclude;
+import org.multiverse.annotations.NonTransactional;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.programmatic.ProgrammaticReference;
@@ -75,7 +75,7 @@ public final class TransactionalReferenceArray<E> {
      * @return the value of the item
      * @throws IndexOutOfBoundsException if index is out of bounds.
      */
-    @Exclude
+    @NonTransactional
     public E atomicGet(int index) {
         return array[index].atomicGet();
     }
@@ -105,7 +105,7 @@ public final class TransactionalReferenceArray<E> {
      * @return the previous stored value.
      * @throws IndexOutOfBoundsException if the index is out of bounds
      */
-    @Exclude
+    @NonTransactional
     public E atomicSet(int index, E update) {
         //it doesn't need a transaction, so it is excluded.
         return array[index].atomicSet(update);
@@ -121,7 +121,7 @@ public final class TransactionalReferenceArray<E> {
      * @return true if it was a success, false otherwise.
      * @throws IndexOutOfBoundsException if index is smaller than 0, or larger than array.size.
      */
-    @Exclude
+    @NonTransactional
     public boolean atomicCompareAndSet(int index, E expected, E update) {
         //it doesn't need a transaction, so it is excluded.
         return array[index].atomicCompareAndSet(expected, update);
@@ -132,7 +132,7 @@ public final class TransactionalReferenceArray<E> {
      *
      * @return the length of this TransactionalReferenceArray .
      */
-    @Exclude
+    @NonTransactional
     public int length() {
         //it doesn't need a transaction, so it is excluded.
         return array.length;

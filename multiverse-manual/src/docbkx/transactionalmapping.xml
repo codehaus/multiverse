@@ -436,7 +436,7 @@
                 @Exclude annotation:
 
         <pre>
-        import org.multiverse.annotations.Exclude;
+        import org.multiverse.annotations.NonTransactional;
         import org.multiverse.annotations.TransactionalObject;
 
         @TransactionalObject
@@ -463,7 +463,7 @@
                 with adding an Exclude annotation on a method.
 
         <pre>
-        import org.multiverse.annotations.Exclude;
+        import org.multiverse.annotations.NonTransactional;
         import org.multiverse.annotations.TransactionalObject;
 
         @TransactionalObject

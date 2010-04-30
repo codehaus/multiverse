@@ -6,7 +6,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class TransactionalLinkedList_hashTest {
+public class TransactionalLinkedList_hashCodeTest {
 
     @Before
     public void setUp() {

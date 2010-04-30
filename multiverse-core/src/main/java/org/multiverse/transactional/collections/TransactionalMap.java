@@ -1,6 +1,6 @@
 package org.multiverse.transactional.collections;
 
-import org.multiverse.annotations.Exclude;
+import org.multiverse.annotations.NonTransactional;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 
@@ -33,7 +33,7 @@ public interface TransactionalMap<K, V> extends ConcurrentMap<K, V> {
      *
      * @return the current size of the TransactionalMap.
      */
-    @Exclude
+    @NonTransactional
     int getCurrentSize();
 
     @Override
