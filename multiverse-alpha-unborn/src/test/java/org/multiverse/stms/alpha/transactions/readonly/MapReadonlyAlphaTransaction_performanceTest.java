@@ -13,6 +13,10 @@ import static org.multiverse.TestUtils.format;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
+ * todo:
+ * variable number of threads
+ * variable readset size
+ *
  * @author Peter Veentjer
  */
 public class MapReadonlyAlphaTransaction_performanceTest {
@@ -20,7 +24,6 @@ public class MapReadonlyAlphaTransaction_performanceTest {
     private AlphaStmConfig stmConfig;
     private int transactionCount = 200 * 1000 * 1000;
     private ReadonlyConfiguration config;
-    private int size = 1;
 
     @Before
     public void setUp() {
