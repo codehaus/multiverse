@@ -9,26 +9,33 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import java.util.concurrent.TimeUnit;
 
-public class MonoReadonlyAlphaTransaction_performanceStressTest {
+import static org.multiverse.TestUtils.format;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
+/**
+ * @author Peter Veentjer
+ */
+public class MapReadonlyAlphaTransaction_performanceTest {
     private AlphaStm stm;
     private AlphaStmConfig stmConfig;
     private int transactionCount = 200 * 1000 * 1000;
+    private ReadonlyConfiguration config;
+    private int size = 1;
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         stmConfig = AlphaStmConfig.createFastConfig();
-        stmConfig.maxRetries = 10;
         stm = new AlphaStm(stmConfig);
+        config = new ReadonlyConfiguration(stmConfig.clock, true);
     }
 
-    public MonoReadonlyAlphaTransaction startSutTransaction() {
-        ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
-        return new MonoReadonlyAlphaTransaction(config);
+    public MapReadonlyAlphaTransaction startSutTransaction() {
+        return new MapReadonlyAlphaTransaction(config);
     }
 
     @Test
-    public void testNoTxManagement() {
+    public void whenTransactionsNotReused() {
         ManualRef ref = new ManualRef(stm, 10);
 
         long startNs = System.nanoTime();
@@ -45,13 +52,11 @@ public class MonoReadonlyAlphaTransaction_performanceStressTest {
 
         long periodNs = System.nanoTime() - startNs;
         double transactionPerSecond = (transactionCount * TimeUnit.SECONDS.toNanos(1)) / periodNs;
-        System.out.println("---- no tx management -----------------------");
-        System.out.printf("%s reads/second\n", transactionPerSecond);
-        System.out.println("---------------------------------------------");
+        System.out.printf("%s read-transactions/second\n", format(transactionPerSecond));
     }
 
     @Test
-    public void testNoTxManagementAndTxReuse() {
+    public void whenTransactionReused() {
         ManualRef ref = new ManualRef(stm, 10);
 
         long startNs = System.nanoTime();
@@ -70,8 +75,6 @@ public class MonoReadonlyAlphaTransaction_performanceStressTest {
 
         long periodNs = System.nanoTime() - startNs;
         double transactionPerSecond = (transactionCount * TimeUnit.SECONDS.toNanos(1)) / periodNs;
-        System.out.println("---- no tx management + tx reuse ------------");
-        System.out.printf("%s reads/second\n", transactionPerSecond);
-        System.out.println("---------------------------------------------");
+        System.out.printf("%s reads-transactions/second\n", format(transactionPerSecond));
     }
 }

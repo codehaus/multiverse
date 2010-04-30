@@ -8,16 +8,18 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.text.NumberFormat;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
 import static org.junit.Assert.*;
 
 public class TestUtils {
+
+    public static String format(double value) {
+        return NumberFormat.getInstance(Locale.ENGLISH).format(value);
+    }
 
     public static void clearCurrentThreadInterruptedStatus() {
         Thread.interrupted();

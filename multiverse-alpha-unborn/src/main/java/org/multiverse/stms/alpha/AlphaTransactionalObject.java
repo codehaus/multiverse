@@ -15,6 +15,14 @@ import org.multiverse.api.latches.Latch;
 public interface AlphaTransactionalObject extends CommitLock {
 
     /**
+     * Loads the most recently committed AlphaTranlocal. Call never fails. Value could be stale as
+     * soon as it is retrieved. If no commits have been made, null is returned.
+     *
+     * @return the most recently written AlphaTranlocal.
+     */
+    AlphaTranlocal ___load();
+
+    /**
      * Loads a readonly {@link AlphaTranlocal} with a version equal or smaller than readVersion. It is very important
      * for the implementation to not to return a too old version. If this happens, the system could start to suffer from
      * lost updates (not seeing changes you should have seen).
@@ -26,29 +34,6 @@ public interface AlphaTransactionalObject extends CommitLock {
      *          if the system wasn't able to load the Tranlocal.
      */
     AlphaTranlocal ___load(long readVersion);
-
-    /**
-     * Loads the most recently committed AlphaTranlocal. Call never fails. Value could be stale as soon as it is
-     * retrieved. If no commits have been made, null is returned.
-     *
-     * @return the most recently written AlphaTranlocal.
-     */
-    AlphaTranlocal ___load();
-
-    /**
-     * Creates a fresh AlphaTranlocal. This can be used when a write on a tranlocal needs to be done, but no tranlocal
-     * has been created yet (so should be created in the constructor).
-     *
-     * @return the created AlphaTranlocal.
-     */
-    AlphaTranlocal ___openUnconstructed();
-
-    /**
-     * Opens this AlphaTransactionalObject for a commuting operation.
-     *
-     * @return the AlphaTranlocal opened
-     */
-    AlphaTranlocal ___openForCommutingOperation();
 
     /**
      * Stores the the content and releases the lock.
@@ -73,6 +58,21 @@ public interface AlphaTransactionalObject extends CommitLock {
      * @param writeVersion the version of the write.
      */
     void ___storeInitial(AlphaTranlocal tranlocal, long writeVersion);
+
+    /**
+     * Creates a fresh AlphaTranlocal. This can be used when a write on a tranlocal needs to be done, but no tranlocal
+     * has been created yet (so should be created in the constructor).
+     *
+     * @return the created AlphaTranlocal.
+     */
+    AlphaTranlocal ___openUnconstructed();
+
+    /**
+     * Opens this AlphaTransactionalObject for a commuting operation.
+     *
+     * @return the AlphaTranlocal opened
+     */
+    AlphaTranlocal ___openForCommutingOperation();
 
     /**
      * Registers a listener for retrying (the condition variable version for STM's). The Latch is a concurrency
