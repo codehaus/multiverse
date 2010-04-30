@@ -1,6 +1,5 @@
 package org.multiverse.commitbarriers;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
@@ -147,9 +146,22 @@ public class CountDownCommitBarrier_incPartiesWithTransactionTest {
     }
 
     @Test
-    @Ignore
     public void whenPendingTransactions() {
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(3);
 
+        JoinCommitThread t1 = new JoinCommitThread(barrier);
+        JoinCommitThread t2 = new JoinCommitThread(barrier);
+
+        startAll(t1, t2);
+        sleepMs(300);
+
+        barrier.incParties(2);
+        sleepMs(300);
+
+        assertAlive(t1, t2);
+
+        assertEquals(2, barrier.getNumberWaiting());
+        assertEquals(5, barrier.getParties());
     }
 
     @Test

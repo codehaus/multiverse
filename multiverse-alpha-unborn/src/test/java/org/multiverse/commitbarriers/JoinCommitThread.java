@@ -4,6 +4,7 @@ import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Transaction;
 
+import static org.junit.Assert.assertNotNull;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 /**
@@ -20,6 +21,7 @@ public class JoinCommitThread extends TestThread {
     @TransactionalMethod
     public void doRun() throws Exception {
         Transaction tx = getThreadLocalTransaction();
+        assertNotNull(tx);
         barrier.joinCommit(tx);
     }
 }

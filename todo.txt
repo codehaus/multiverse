@@ -2,8 +2,6 @@
 todo engine
 ---------------------------------------------------------------
 
-- when the transaction has a timeout, the timeout should be updated when the transaction blocks.
-
 - update tests tests that the backoff policy is used when a openForUpdate is done.
 
 - als een transactie geen dirty checks nodig heeft, dan automatisch ieder object dat gelezen is,
@@ -40,8 +38,6 @@ generated test report.
 - multiverse-scala compile project
 
 - group javadoc: question on gradle site pending
-
-CountDownCommitBarrier_incPartiesWithTransactionTest.whenPendingTransactions
 
 CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest.whenTransactionFailsToPrepare
 
@@ -92,8 +88,6 @@ TransactionalArrayList_addAll2Test.whenAddedInFront
 TransactionalArrayList_addAll2Test.whenAddedToEnd
 
 TransactionalArrayList_addAll2Test.whenAddedInBetween
-
-TransactionalArrayList_hashCodeTest
 
 TransactionalArrayList_listIterator1Test
 
@@ -158,9 +152,6 @@ TransactionalTreeSet_toStringTest
     - integration test for the alphaprogrammaticreference and atomic methods
 
 - instrumentation
-
-    - verbose output in the transactional method transformer needs to output to the Logger
-    and not to the System.out
 
     - upgrade get-field access to use frames instead of copying/swapping etc
 
@@ -463,3 +454,11 @@ an transactional ref with the alphastm to do some real tests?
 
 - hudson; ibm/open/sun/stress test
 
+- CountDownCommitBarrier_incPartiesWithTransactionTest.whenPendingTransactions
+
+- when the transaction has a timeout, the timeout should be updated when the transaction blocks.
+
+  - verbose output in the transactional method transformer needs to output to the Logger
+    and not to the System.out
+
+TransactionalArrayList_hashCodeTest
