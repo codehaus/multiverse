@@ -13,33 +13,33 @@ public final class ReadonlyConfiguration extends AbstractAlphaTransactionConfigu
 
     public ReadonlyConfiguration(PrimitiveClock clock, boolean readTrackingEnabled) {
         this(clock, ExponentialBackoffPolicy.INSTANCE_100_MS_MAX, null, new SpeculativeConfiguration(100), 1000,
-                true, readTrackingEnabled, true, Long.MAX_VALUE);
+                true, readTrackingEnabled, true, Long.MAX_VALUE, 10);
     }
 
     public ReadonlyConfiguration(
-            PrimitiveClock clock, BackoffPolicy backoffPolicy,
-            String familyName, SpeculativeConfiguration speculativeConfig, int maxRetries,
-            boolean interruptible, boolean readTrackingEnabled, boolean explicitRetryAllowed, long timeoutNs) {
+            PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName,
+            SpeculativeConfiguration speculativeConfig, int maxRetries, boolean interruptible,
+            boolean readTrackingEnabled, boolean explicitRetryAllowed, long timeoutNs, int maxReadSpinCount) {
 
         super(clock, backoffPolicy, familyName, true, maxRetries, interruptible,
-                true, readTrackingEnabled, explicitRetryAllowed, speculativeConfig, timeoutNs);
+                true, readTrackingEnabled, explicitRetryAllowed, speculativeConfig, timeoutNs, maxReadSpinCount);
     }
 
     public ReadonlyConfiguration withMaxRetries(int maxRetries) {
         return new ReadonlyConfiguration(clock, backoffPolicy, familyName,
                 speculativeConfiguration, maxRetries, interruptible, readTrackingEnabled,
-                explicitRetryAllowed, timeoutNs);
+                explicitRetryAllowed, timeoutNs, maxReadSpinCount);
     }
 
     public ReadonlyConfiguration withSpeculativeConfig(SpeculativeConfiguration speculativeConfig) {
         return new ReadonlyConfiguration(clock, backoffPolicy, familyName,
                 speculativeConfig, maxRetries, interruptible, readTrackingEnabled,
-                explicitRetryAllowed, timeoutNs);
+                explicitRetryAllowed, timeoutNs, maxReadSpinCount);
     }
 
     public ReadonlyConfiguration withExplicitRetryAllowed(boolean explicitRetryAllowed) {
         return new ReadonlyConfiguration(clock, backoffPolicy, familyName,
                 speculativeConfiguration, maxRetries, interruptible, readTrackingEnabled,
-                explicitRetryAllowed, timeoutNs);
+                explicitRetryAllowed, timeoutNs, maxReadSpinCount);
     }
 }

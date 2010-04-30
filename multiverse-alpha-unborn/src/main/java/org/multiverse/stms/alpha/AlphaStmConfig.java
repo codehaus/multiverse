@@ -42,6 +42,8 @@ public final class AlphaStmConfig {
         return config;
     }
 
+    public int maxReadSpinCount = 50;
+
     public PrimitiveClock clock = new StrictPrimitiveClock();
 
     public CommitLockPolicy commitLockPolicy =
@@ -69,6 +71,8 @@ public final class AlphaStmConfig {
     public boolean allowWriteSkew = true;
 
     public boolean interruptible = false;
+
+    public boolean loggingOfControlFlowErrorsEnabled = false;
 
     /**
      * Check if the AlphaStmConfig has been configured correctly.
@@ -98,6 +102,10 @@ public final class AlphaStmConfig {
 
         if (maxRetries < 0) {
             throw new IllegalStateException("Invalid configuration, defaultMaxRetryCount can't be smaller than 0");
+        }
+
+        if (maxReadSpinCount < 0) {
+            throw new IllegalStateException("Invalid configuration, maxReadSprinCount can't be smaller than 0");
         }
     }
 }

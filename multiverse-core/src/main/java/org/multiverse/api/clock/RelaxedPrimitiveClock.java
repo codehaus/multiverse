@@ -47,8 +47,7 @@ public final class RelaxedPrimitiveClock implements PrimitiveClock {
         //so just try to set it the oldTime is still set.
         clock.compareAndSet(oldTime, oldTime + 1);
 
-        //todo: could it be that time on the clock hasn't increased yet?
-        return oldTime + 1;
+        return clock.get();
     }
 
     @Override

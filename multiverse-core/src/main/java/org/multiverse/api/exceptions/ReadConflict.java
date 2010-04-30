@@ -8,7 +8,7 @@ package org.multiverse.api.exceptions;
  *
  * @author Peter Veentjer.
  */
-public abstract class ReadConflict extends StmControlFlowError {
+public abstract class ReadConflict extends ControlFlowError {
 
     private static final long serialVersionUID = 0;
 

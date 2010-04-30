@@ -49,7 +49,7 @@ public interface ProgrammaticReference<E> {
      * @return the current value stored in this reference.
      * @throws IllegalThreadStateException if the current transaction isn't in the right state
      *                                     for this operation.
-     * @throws org.multiverse.api.exceptions.StmControlFlowError
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      *
      */
     E get();
@@ -63,7 +63,7 @@ public interface ProgrammaticReference<E> {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not
      *                              in the correct state for this operation.
-     * @throws org.multiverse.api.exceptions.StmControlFlowError
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      *
      */
     E get(Transaction tx);

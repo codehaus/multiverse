@@ -12,13 +12,12 @@ public class AbstractAlphaTransactionConfiguration extends AbstractTransactionCo
     public final SpeculativeConfiguration speculativeConfiguration;
 
     public AbstractAlphaTransactionConfiguration(
-            PrimitiveClock clock, BackoffPolicy backoffPolicy,
-            String familyName, boolean readOnly, int maxRetries,
-            boolean interruptible, boolean writeSkewAllowed,
-            boolean readTrackingEnabled, boolean explicitRetryAllowed,
-            SpeculativeConfiguration speculativeConfiguration, long timeoutNs) {
+            PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName,
+            boolean readOnly, int maxRetries, boolean interruptible, boolean writeSkewAllowed,
+            boolean readTrackingEnabled, boolean explicitRetryAllowed, SpeculativeConfiguration speculativeConfiguration,
+            long timeoutNs, int maxReadSpinCount) {
         super(clock, backoffPolicy, familyName, readOnly, maxRetries, interruptible,
-                writeSkewAllowed, readTrackingEnabled, explicitRetryAllowed, timeoutNs);
+                writeSkewAllowed, readTrackingEnabled, explicitRetryAllowed, timeoutNs, maxReadSpinCount);
 
         this.speculativeConfiguration = speculativeConfiguration;
     }

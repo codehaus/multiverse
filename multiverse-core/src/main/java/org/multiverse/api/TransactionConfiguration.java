@@ -97,4 +97,12 @@ public interface TransactionConfiguration {
      * @see TransactionFactoryBuilder#setWriteSkewAllowed(boolean)
      */
     boolean isWriteSkewAllowed();
+
+    /**
+     * Returns the maximum number of times the transaction is allowed to spin on a read to become
+     * readable (perhaps it is locked).
+     *
+     * @return the maximum number of spins
+     */
+    int maxReadSpinCount();
 }

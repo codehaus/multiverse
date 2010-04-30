@@ -54,7 +54,7 @@ public class TransactionLogicDonor {
         } catch (Throwable throwable) {
             tx.abort();
 
-            if (throwable instanceof StmControlFlowError) {
+            if (throwable instanceof ControlFlowError) {
                 throw new ConstructorCantRetryException();
             } else if (throwable instanceof Error) {
                 throw (Error) throwable;
@@ -175,7 +175,7 @@ public class TransactionLogicDonor {
                     tx.setRemainingTimeoutNs(oldTx.getRemainingTimeoutNs());
                     tx.setAttempt(oldTx.getAttempt());
                     setThreadLocalTransaction(tx);
-                } catch (StmControlFlowError throwable) {
+                } catch (ControlFlowError throwable) {
                     BackoffPolicy backoffPolicy = tx.getConfiguration().getBackoffPolicy();
                     backoffPolicy.delayedUninterruptible(tx);
                 } finally {

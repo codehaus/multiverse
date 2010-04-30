@@ -66,6 +66,10 @@ public class FieldGranularityStressTest {
         public void doRun() throws Exception {
             for (int k = 0; k < transactionCount; k++) {
                 updateLeft();
+
+                if (k % 5000000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), k);
+                }
             }
         }
 
@@ -96,6 +100,10 @@ public class FieldGranularityStressTest {
         public void doRun() throws Exception {
             for (int k = 0; k < transactionCount; k++) {
                 updateRight();
+
+                if (k % 5000000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), k);
+                }
             }
         }
 

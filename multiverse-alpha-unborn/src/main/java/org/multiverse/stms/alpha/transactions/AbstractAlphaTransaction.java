@@ -26,17 +26,18 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
     }
 
     protected final AlphaTranlocal load(AlphaTransactionalObject txObject) {
-        do {
+        int spin = 0;
+        while (true) {
             try {
                 return txObject.___load(getReadVersion());
             } catch (LockNotFreeReadConflict lockNotFreeReadConflict) {
-                config.backoffPolicy.delayedUninterruptible(this);
-                setAttempt(getAttempt() + 1);
-                if (getAttempt() >= config.maxRetries) {
+                if (spin >= config.maxReadSpinCount) {
                     throw lockNotFreeReadConflict;
                 }
+
             }
-        } while (true);
+            spin++;
+        }
     }
 
     @Override

@@ -97,7 +97,7 @@ public interface ProgrammaticLong {
      * @return the old value
      * @throws IllegalThreadStateException
      * @throws NullPointerException        if tx is null
-     * @throws org.multiverse.api.exceptions.StmControlFlowError
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      *
      */
     long set(Transaction tx, long newValue);

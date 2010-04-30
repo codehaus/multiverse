@@ -31,7 +31,7 @@ public interface ProgrammaticReferenceFactory {
      *
      * @param value the initial value of the ProgrammaticLong.
      * @return the created ProgrammaticLong.
-     * @throws org.multiverse.api.exceptions.StmControlFlowError
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      *
      */
     ProgrammaticLong createLong(long value);
@@ -93,7 +93,7 @@ public interface ProgrammaticReferenceFactory {
      * @throws NullPointerException if t is null.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if t is not active.
-     * @throws org.multiverse.api.exceptions.StmControlFlowError
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      *
      */
     <E> ProgrammaticReference<E> createReference(Transaction tx, E value);
@@ -119,5 +119,5 @@ public interface ProgrammaticReferenceFactory {
      *
      * @return the created ProgrammaticReference.
      */
-    ProgrammaticReference atomicCreateReference();
+    <E> ProgrammaticReference<E> atomicCreateReference();
 }

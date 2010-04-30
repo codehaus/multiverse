@@ -66,7 +66,7 @@ public final class AlphaProgrammaticReferenceFactory
     }
 
     @Override
-    public ProgrammaticReference atomicCreateReference() {
+    public <E> ProgrammaticReference<E> atomicCreateReference() {
         return atomicCreateReference(null);
     }
 

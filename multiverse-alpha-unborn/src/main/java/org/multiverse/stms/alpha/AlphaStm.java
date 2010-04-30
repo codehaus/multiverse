@@ -14,6 +14,7 @@ import org.multiverse.stms.alpha.transactions.update.ArrayUpdateAlphaTransaction
 import org.multiverse.stms.alpha.transactions.update.MapUpdateAlphaTransaction;
 import org.multiverse.stms.alpha.transactions.update.MonoUpdateAlphaTransaction;
 import org.multiverse.stms.alpha.transactions.update.UpdateConfiguration;
+import org.multiverse.utils.TodoException;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
@@ -66,6 +67,10 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
     private final AlphaProgrammaticReferenceFactoryBuilder referenceFactoryBuilder;
 
+    private final int maxReadSpinCount;
+
+    private final boolean loggingOfControlFlowErrorsEnabled;
+
     public static AlphaStm createFast() {
         return new AlphaStm(AlphaStmConfig.createFastConfig());
     }
@@ -109,6 +114,8 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         this.readTrackingEnabled = config.readTrackingEnabled;
         this.allowWriteSkew = config.allowWriteSkew;
         this.interruptible = config.interruptible;
+        this.maxReadSpinCount = config.maxReadSpinCount;
+        this.loggingOfControlFlowErrorsEnabled = config.loggingOfControlFlowErrorsEnabled;
 
         if (clock.getVersion() == 0) {
             clock.tick();
@@ -120,6 +127,10 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
     @Override
     public AlphaTransactionFactoryBuilder getTransactionFactoryBuilder() {
         return new AlphaTransactionFactoryBuilder();
+    }
+
+    public int getMaxReadSpinCount() {
+        return maxReadSpinCount;
     }
 
     /**
@@ -199,6 +210,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         private final boolean quickReleaseEnabled;
         private final boolean explicitRetryAllowed;
         private final long timeoutNs;
+        private final int maxReadSpinCount;
 
         public AlphaTransactionFactoryBuilder() {
             this(false, //readonly
@@ -213,7 +225,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     AlphaStm.this.dirtyCheckEnabled,
                     AlphaStm.this.quickReleaseWriteLocksEnabled,
                     AlphaStm.this.explicitRetryAllowed,
-                    Long.MAX_VALUE);
+                    Long.MAX_VALUE, AlphaStm.this.maxReadSpinCount);
         }
 
         public AlphaTransactionFactoryBuilder(
@@ -222,7 +234,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                 CommitLockPolicy commitLockPolicy, BackoffPolicy backoffPolicy,
                 SpeculativeConfiguration speculativeConfig, boolean interruptible,
                 boolean dirtyCheck, boolean quickReleaseEnabled,
-                boolean explicitRetryAllowed, long timeoutNs) {
+                boolean explicitRetryAllowed, long timeoutNs, int maxReadSpinCount) {
             this.readonly = readonly;
             this.familyName = familyName;
             this.maxRetries = maxRetries;
@@ -236,6 +248,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             this.quickReleaseEnabled = quickReleaseEnabled;
             this.explicitRetryAllowed = explicitRetryAllowed;
             this.timeoutNs = timeoutNs;
+            this.maxReadSpinCount = maxReadSpinCount;
         }
 
         @Override
@@ -304,12 +317,40 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         }
 
         @Override
+        public int getMaxReadSpinCount() {
+            return maxReadSpinCount;
+        }
+
+        @Override
+        public boolean isLoggingOfControlFlowErrorsEnabled() {
+            throw new TodoException();
+        }
+
+        @Override
+        public void setLoggingOfControlFlowErrorsEnabled(boolean enabled) {
+            throw new TodoException();
+        }
+
+        @Override
+        public AlphaTransactionFactoryBuilder setMaxReadSpinCount(int maxReadSpinCount) {
+            if (maxReadSpinCount < 0) {
+                throw new IllegalArgumentException();
+            }
+
+            return new AlphaTransactionFactoryBuilder(
+                    readonly, readTrackingEnabled, familyName, maxRetries,
+                    writeSkewAllowed, commitLockPolicy, backoffPolicy,
+                    speculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
+                    explicitRetryAllowed, timeoutNs, maxReadSpinCount);
+        }
+
+        @Override
         public AlphaTransactionFactoryBuilder setTimeoutNs(long timeoutNs) {
             return new AlphaTransactionFactoryBuilder(
                     readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewAllowed, commitLockPolicy, backoffPolicy,
                     speculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
-                    explicitRetryAllowed, timeoutNs);
+                    explicitRetryAllowed, timeoutNs, maxReadSpinCount);
         }
 
         @Override
@@ -318,7 +359,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewAllowed, commitLockPolicy, backoffPolicy,
                     speculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
-                    explicitRetryAllowed, timeoutNs);
+                    explicitRetryAllowed, timeoutNs, maxReadSpinCount);
         }
 
         @Override
@@ -327,7 +368,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewAllowed, commitLockPolicy, backoffPolicy,
                     speculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
-                    explicitRetryAllowed, timeoutNs);
+                    explicitRetryAllowed, timeoutNs, maxReadSpinCount);
         }
 
         @Override
@@ -340,7 +381,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewAllowed, commitLockPolicy, backoffPolicy,
                     speculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
-                    explicitRetryAllowed, timeoutNs);
+                    explicitRetryAllowed, timeoutNs, maxReadSpinCount);
         }
 
         @Override
@@ -351,7 +392,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewAllowed, commitLockPolicy, backoffPolicy,
                     newSpeculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
-                    explicitRetryAllowed, timeoutNs);
+                    explicitRetryAllowed, timeoutNs, maxReadSpinCount);
         }
 
         public AlphaTransactionFactoryBuilder setReadTrackingEnabled(boolean readTrackingEnabled) {
@@ -361,7 +402,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewAllowed, commitLockPolicy, backoffPolicy,
                     newSpeculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
-                    explicitRetryAllowed, timeoutNs);
+                    explicitRetryAllowed, timeoutNs, maxReadSpinCount);
         }
 
         @Override
@@ -370,7 +411,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewAllowed, commitLockPolicy, backoffPolicy,
                     speculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
-                    explicitRetryAllowed, timeoutNs);
+                    explicitRetryAllowed, timeoutNs, maxReadSpinCount);
         }
 
         @Override
@@ -383,7 +424,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewAllowed, commitLockPolicy, backoffPolicy,
                     speculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
-                    explicitRetryAllowed, timeoutNs);
+                    explicitRetryAllowed, timeoutNs, maxReadSpinCount);
         }
 
         @Override
@@ -393,7 +434,8 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             return new AlphaTransactionFactoryBuilder(
                     readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewAllowed, commitLockPolicy, backoffPolicy, newSpeculativeConfig,
-                    interruptible, dirtyCheck, quickReleaseEnabled, explicitRetryAllowed, timeoutNs);
+                    interruptible, dirtyCheck, quickReleaseEnabled, explicitRetryAllowed,
+                    timeoutNs, maxReadSpinCount);
         }
 
         @Override
@@ -401,7 +443,8 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             return new AlphaTransactionFactoryBuilder(
                     readonly, readTrackingEnabled, familyName, maxRetries,
                     allowWriteSkew, commitLockPolicy, backoffPolicy, speculativeConfig,
-                    interruptible, dirtyCheck, quickReleaseEnabled, explicitRetryAllowed, timeoutNs);
+                    interruptible, dirtyCheck, quickReleaseEnabled, explicitRetryAllowed,
+                    timeoutNs, maxReadSpinCount);
         }
 
         @Override
@@ -414,7 +457,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewAllowed, commitLockPolicy, backoffPolicy,
                     speculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
-                    explicitRetryAllowed, timeoutNs);
+                    explicitRetryAllowed, timeoutNs, maxReadSpinCount);
         }
 
         @Override
@@ -423,7 +466,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewAllowed, commitLockPolicy, backoffPolicy,
                     speculativeConfig, interruptible, dirtyCheckEnabled, quickReleaseEnabled,
-                    explicitRetryAllowed, timeoutNs);
+                    explicitRetryAllowed, timeoutNs, maxReadSpinCount);
         }
 
         @Override
@@ -432,7 +475,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewAllowed, commitLockPolicy, backoffPolicy,
                     speculativeConfig, interruptible, dirtyCheck, quickReleaseEnabled,
-                    explicitRetryAllowed, timeoutNs);
+                    explicitRetryAllowed, timeoutNs, maxReadSpinCount);
         }
 
         @Override
@@ -450,23 +493,23 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
             final ReadonlyConfiguration ro_nort =
                     new ReadonlyConfiguration(
                             clock, backoffPolicy, familyName, speculativeConfig, maxRetries,
-                            interruptible, false, explicitRetryAllowed, timeoutNs);
+                            interruptible, false, explicitRetryAllowed, timeoutNs, maxReadSpinCount);
             final ReadonlyConfiguration ro_rt =
                     new ReadonlyConfiguration(
                             clock, backoffPolicy, familyName, speculativeConfig, maxRetries,
-                            interruptible, true, explicitRetryAllowed, timeoutNs);
+                            interruptible, true, explicitRetryAllowed, timeoutNs, maxReadSpinCount);
             final UpdateConfiguration up_rt =
                     new UpdateConfiguration(
                             clock, backoffPolicy, commitLockPolicy, familyName, speculativeConfig,
                             maxRetries, interruptible, true, writeSkewAllowed,
                             optimizeConflictDetectionEnabled, true, quickReleaseEnabled,
-                            explicitRetryAllowed, timeoutNs);
+                            explicitRetryAllowed, timeoutNs, maxReadSpinCount);
             final UpdateConfiguration up_nort =
                     new UpdateConfiguration(
                             clock, backoffPolicy, commitLockPolicy, familyName,
                             speculativeConfig, maxRetries, interruptible, false, true,
                             optimizeConflictDetectionEnabled, true, quickReleaseEnabled,
-                            explicitRetryAllowed, timeoutNs);
+                            explicitRetryAllowed, timeoutNs, maxReadSpinCount);
 
             return new TransactionFactory<AlphaTransaction>() {
                 @Override
@@ -537,7 +580,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     new ReadonlyConfiguration(
                             clock, backoffPolicy, familyName, speculativeConfig,
                             maxRetries, interruptible, readTrackingEnabled,
-                            explicitRetryAllowed, timeoutNs);
+                            explicitRetryAllowed, timeoutNs, maxReadSpinCount);
 
             if (readTrackingEnabled) {
                 return new MapReadonlyAlphaTransaction.Factory(config);
@@ -561,7 +604,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                             clock, backoffPolicy, commitLockPolicy, familyName, speculativeConfig,
                             maxRetries, interruptible, readTrackingEnabled, writeSkewAllowed,
                             optimizeConflictDetectionEnabled, true, quickReleaseEnabled,
-                            explicitRetryAllowed, timeoutNs);
+                            explicitRetryAllowed, timeoutNs, maxReadSpinCount);
 
             return new MapUpdateAlphaTransaction.Factory(config);
         }

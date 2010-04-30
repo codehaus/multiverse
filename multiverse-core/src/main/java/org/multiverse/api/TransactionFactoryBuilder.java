@@ -297,6 +297,23 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     int getMaxRetries();
 
     /**
+     * Sets the maximum number of spins that should be executed when a
+     * transactional object can't be read because it is locked. Watch out with setting
+     * this value too high, because a system could start livelocking.
+     *
+     * @param maxReadSpinCount the maximum number of spins.
+     * @return the updated TransactionFactoryBuilder.
+     * @throws IllegalArgumentException if smaller than 0.
+     */
+    B setMaxReadSpinCount(int maxReadSpinCount);
+
+    int getMaxReadSpinCount();
+
+    void setLoggingOfControlFlowErrorsEnabled(boolean enabled);
+
+    boolean isLoggingOfControlFlowErrorsEnabled();
+
+    /**
      * Builds a {@link TransactionFactory} with the provided configuration.
      *
      * @return the started Transaction.

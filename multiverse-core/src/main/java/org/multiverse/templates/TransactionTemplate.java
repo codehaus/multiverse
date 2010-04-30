@@ -354,7 +354,7 @@ public abstract class TransactionTemplate<E> {
                     if (threadLocalAware) {
                         setThreadLocalTransaction(tx);
                     }
-                } catch (StmControlFlowError er) {
+                } catch (ControlFlowError er) {
                     BackoffPolicy backoffPolicy = tx.getConfiguration().getBackoffPolicy();
                     backoffPolicy.delayedUninterruptible(tx);
                     tx.restart();

@@ -5,6 +5,8 @@ import org.multiverse.api.clock.PrimitiveClock;
 import org.multiverse.api.clock.StrictPrimitiveClock;
 
 /**
+ * Implementation for testing purposes.
+ *
  * @author Peter Veentjer
  */
 public class AbstractTransactionImpl extends AbstractTransaction {
@@ -16,7 +18,7 @@ public class AbstractTransactionImpl extends AbstractTransaction {
                 null,
                 true,
                 1000,
-                true, true, true, true, Long.MAX_VALUE));
+                true, true, true, true, Long.MAX_VALUE, 10));
         init();
     }
 
@@ -27,7 +29,7 @@ public class AbstractTransactionImpl extends AbstractTransaction {
                 null,
                 true,
                 10000,
-                true, true, true, true, Long.MAX_VALUE));
+                true, true, true, true, Long.MAX_VALUE, 10));
         init();
     }
 
@@ -38,7 +40,7 @@ public class AbstractTransactionImpl extends AbstractTransaction {
                 familyName,
                 true,
                 1000,
-                true, true, true, true, Long.MAX_VALUE));
+                true, true, true, true, Long.MAX_VALUE, 10));
 
         init();
     }
