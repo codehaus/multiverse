@@ -47,7 +47,6 @@ public class MultipleConditionVariablesStressTest {
         WorkerThread[] threads = createThreads();
         values[0].inc();
 
-
         startAll(threads);
         joinAll(threads);
     }

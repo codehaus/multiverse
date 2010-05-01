@@ -69,7 +69,6 @@ public class LargeNonParallelWriteonlyTransactionsStressTest {
         test(10000000);
     }
 
-
     public void test(final int x) {
         final List<TransactionalInteger> list = new ArrayList<TransactionalInteger>(x);
 
@@ -89,11 +88,6 @@ public class LargeNonParallelWriteonlyTransactionsStressTest {
                 return null;
             }
         }.execute();
-
-        //assertEquals(0, stm.getProfiler().sumKey1("updatetransaction.failedtoacquirelocks.count"));
-        //assertEquals(0, stm.getProfiler().sumKey1("updatetransaction.writeconflict.count"));
-        //assertEquals(1, stm.getProfiler().sumKey1("updatetransaction.committed.count"));
-        //assertEquals(0, stm.getProfiler().sumKey1("updatetransaction.retried.count"));
     }
 
 }

@@ -2,6 +2,7 @@ package org.multiverse.integrationtests.classicproblems;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
@@ -42,6 +43,7 @@ public class CigaretteSmokersProblemSimplifiedTest {
     }
 
     @Test
+    @Ignore
     public void test() {
         SmokerThread tobaccoDude = new SmokerThread("tobaccoDude", tobacco);
         SmokerThread paperDude = new SmokerThread("paperDude", paper);

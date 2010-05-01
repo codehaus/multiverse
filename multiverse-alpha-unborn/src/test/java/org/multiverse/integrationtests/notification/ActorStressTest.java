@@ -50,7 +50,6 @@ public class ActorStressTest {
 
     @Test
     public void test2() {
-
         SumActor sumActor = new SumActor();
         threadActor(sumActor);
 

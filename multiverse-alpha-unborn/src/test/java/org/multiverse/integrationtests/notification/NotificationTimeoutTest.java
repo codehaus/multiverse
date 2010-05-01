@@ -8,6 +8,7 @@ import org.multiverse.api.exceptions.RetryTimeoutException;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.junit.Assert.fail;
+import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
@@ -39,6 +40,8 @@ public class NotificationTimeoutTest {
         t.start();
 
         await(1);
+
+        joinAll(t);
     }
 
     @Test
@@ -51,6 +54,8 @@ public class NotificationTimeoutTest {
             fail();
         } catch (RetryTimeoutException expected) {
         }
+
+        joinAll(t);
     }
 
     @Test
@@ -62,6 +67,8 @@ public class NotificationTimeoutTest {
         t2.start();
 
         await(1);
+
+        joinAll(t1, t2);
     }
 
     @Test

@@ -100,8 +100,7 @@ public class ProducerConsumerStressTest {
         startAll(producerThread, consumerThread);
         startAll(handoverThreads);
 
-        joinAll(producerThread);
-        joinAll(consumerThread);
+        joinAll(producerThread, consumerThread);
         joinAll(handoverThreads);
 
         assertQueuesAreEmpty();

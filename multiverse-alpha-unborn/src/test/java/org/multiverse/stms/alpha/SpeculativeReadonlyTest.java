@@ -78,7 +78,7 @@ public class SpeculativeReadonlyTest {
 
         public void read() {
             transactions.add(getThreadLocalTransaction());
-            System.out.println(foo);
+            System.out.println("Reading:" + foo);
         }
 
         public void update() {
