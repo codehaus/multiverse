@@ -4,8 +4,8 @@ import org.multiverse.api.backoff.BackoffPolicy;
 import org.multiverse.api.commitlock.CommitLockPolicy;
 
 /**
- * An implementation of the builder design pattern to createReference a {@link TransactionFactory}. This is the place to be
- * for transaction configuration. This approach also gives the freedom to access implementation specific
+ * An implementation of the builder design pattern to createReference a {@link TransactionFactory}. This is the place
+ * to be for transaction configuration. This approach also gives the freedom to access implementation specific
  * setters by implementing and extending the {@link TransactionFactoryBuilder} interface.
  * <p/>
  * <h2>Usage</h2>
@@ -17,16 +17,8 @@ import org.multiverse.api.commitlock.CommitLockPolicy;
  * are immutable. If you don't do this, your transactions don't get the properties you want them to have.
  * <p/>
  * <h2>Transaction familyName</h2>
- * This is purely used for debugging purposes. In the instrumentation the familyname is determined by the
+ * This is purely used for debugging/profiling purposes. In the instrumentation the familyname is determined by the
  * full method signature including the owning class.
- * <p/>
- * <h2>Default configuration</h2>
- * Default a TransactionFactoryBuilder will be configured with:
- * <ol>
- * <li><b>readonly</b>false</li>
- * <li><b>automatic read tracking</b>false</li>
- * <li><b>maxRetries</b> 1000</li>
- * </ol>
  * <p/>
  * The big advantage to a builder compared to just adding a big load of parameters or storing these parameters in a
  * datastructure (so object without logic) is that the Stm implementation has a lot more room for adding custom
@@ -47,10 +39,9 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     boolean isDirtyCheckEnabled();
 
     /**
-     * If the Transaction should do a dirty check on the transactional objects it has
-     * loaded that need to commit. Default is true. If this is disabled, the transaction
-     * is protected against the aba problem, at the cost of reduced concurrency (increased
-     * number of conflicts).
+     * Sets id the dirty check is enabled. Dirty check is that something only needs to be written, if there really
+     * is a change. If it is disabled, it will always write, and this could prevent the aba isolation anomaly, but
+     * causes more conflicts so more contention. In most cases enabling it is the best option.
      *
      * @param dirtyCheckEnabled true if dirty check should be executed, false otherwise.
      * @return the updated TransactionFactoryBuilder.
@@ -59,7 +50,9 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     B setDirtyCheckEnabled(boolean dirtyCheckEnabled);
 
     /**
-     * If the Transaction should be able to do an explicit retry (for a blocking operation).
+     * Sets if the Transaction is allowed to do an explicit retry (needed for a blocking operation). One use case
+     * for disallowing it, it when the transaction is used inside an agent, and you don't want that inside the logic
+     * executed by the agent a blocking operations is done (e.g. taking an item of a blocking queue).
      *
      * @param explicitRetryEnabled true if explicit retry is enabled, false otherwise.
      * @return the updated TransactionFactoryBuilder
@@ -76,8 +69,7 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     boolean isExplicitRetryAllowed();
 
     /**
-     * Creates a new {@link TransactionFactoryBuilder} based on the this TransactionFactoryBuilder but now
-     * configured with the provided familyName.
+     * Sets the transaction familyname.
      * <p/>
      * The transaction familyName is useful debugging purposes. With Multiverse 0.4 it was
      * also needed for speculative configuration, but that requirement is dropped.
@@ -97,9 +89,7 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     String getFamilyName();
 
     /**
-     * Creates a new {@link TransactionFactoryBuilder} based on the this TransactionFactoryBuilder but now
-     * configured with the readonly setting. A readonly transaction normally is a lot faster than an update
-     * transaction and it also provides protection against unwanted changes.
+     * Sets the readonly property on a transaction. Readonly transactions are always cheaper than update transactions.
      * <p/>
      * If this property is set, the stm will not speculate on this property anymore.
      *
@@ -118,7 +108,7 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     boolean isReadonly();
 
     /**
-     * If the transaction should automatically track all reads that have been done. This is needed for blocking
+     * Sets if the transaction should automatically track all reads that have been done. This is needed for blocking
      * operations, but also for other features like writeskew detection.
      * <p/>
      * If this property is set, the stm will not speculate on this property anymore.
@@ -155,9 +145,8 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     boolean isInterruptible();
 
     /**
-     * Sets the CommitLockPolicy. The CommitLockPolicy is only used by update
-     * transactions that commit: when the stm commits, locks need to be
-     * acquired on dirty objects.
+     * Sets the CommitLockPolicy. The CommitLockPolicy is only used by update transactions that commit: when the stm
+     * commits, locks need to be acquired on dirty objects.
      *
      * @param commitLockPolicy the new CommitLockPolicy
      * @return the updated TransactionFactoryBuilder.
@@ -174,12 +163,10 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     CommitLockPolicy getCommitLockPolicy();
 
     /**
-     * With the speculative configuration enabled, the stm is allowed to determine optimal settings
-     * for transactions. Some behavior like readonly or the need for tracking reads can be determined
-     * runtime. The system can start with a readonly non readtracking transaction and upgrade to an
-     * update or a read tracking once a write or retry happens.
-     * <p/>
-     * The value defaults to true and in most cases is the best setting.
+     * With the speculative configuration enabled, the stm is allowed to determine optimal settings for transactions.
+     * Some behavior like readonly or the need for tracking reads can be determined runtime. The system can start with
+     * a readonly non readtracking transaction and upgrade to an update or a read tracking once a write or retry
+     * happens.
      *
      * @param newValue indicates if speculative configuration should be enabled.
      * @return the updated TransactionFactoryBuilder
@@ -197,7 +184,7 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
 
     /**
      * If writeskew problem is allowed to happen. Defaults to true and can have a big impact on performance (the
-     * complete read set needs to be validated and not just the writes). So disable it wisely.
+     * complete read set needs to be validated and not just the writes). So disallow it wisely.
      *
      * @param allowWriteSkew indicates if writeSkew problem is allowed.
      * @return the updated TransactionFactoryBuilder
@@ -214,15 +201,14 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     boolean isWriteSkewAllowed();
 
     /**
-     * Checks if the quick release on locks is enabled. When a transaction commits, it
-     * needs to acquire the writelocks. If quick release is disabled, first all writes are
-     * executed before any lock is released. With quick release enabled, the lock on the
-     * transactional object is released as soon as the write is done.
+     * Sets enabling quick release on locks is enabled. When a transaction commits, it needs to acquire the writelocks.
+     * If quick release is disabled, first all writes are executed before any lock is released. With quick release
+     * enabled, the lock on the transactional object is released as soon as the write is done.
      * <p/>
-     * The 'disadvantage' of having this enabled is that it could happen that some objects modified in a
-     * transaction are releases and some are not. If another transaction picks up these objects, it could
-     * be that it is able to read some and fails on other. Normally this isn't an issue because the transaction
-     * is retried in combination with a back off policy.
+     * The 'disadvantage' of having this enabled is that it could happen that some objects modified in a transaction
+     * are releases and some are not. If another transaction picks up these objects, it could be that it is able to
+     * read some and fails on other. Normally this isn't an issue because the transaction is retried in combination
+     * with a back off policy.
      *
      * @param enabled true if the lock of a transaction object should be releases as soon as possible instead
      *                of waiting for the whole transaction to commit.
@@ -259,8 +245,8 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     BackoffPolicy getBackoffPolicy();
 
     /**
-     * Sets the timeout (the maximum time a transaction is allowed to block.
-     * Long.MAX_VALUE indicates that no timeout should be used.
+     * Sets the timeout (the maximum time a transaction is allowed to block. Long.MAX_VALUE indicates that no timeout
+     * should be used.
      *
      * @param timeoutNs the timeout specified in nano seconds
      * @return the updated TransactionFactoryBuilder
@@ -269,7 +255,7 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     B setTimeoutNs(long timeoutNs);
 
     /**
-     * Returns the timeout.
+     * Returns the timeout. Value will always be equal or larger than zero.
      *
      * @return the timeout.
      * @see #setTimeoutNs(long)
@@ -277,8 +263,8 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     long getTimeoutNs();
 
     /**
-     * Sets the the maximum count a transaction can be retried. The default is 1000.
-     * Setting it to a very low value could mean that a transaction can't complete.
+     * Sets the the maximum count a transaction can be retried. The default is 1000. Setting it to a very low value
+     * could mean that a transaction can't complete.
      *
      * @param maxRetries the maximum number of times a transaction can be tried.
      * @return the updated TransactionFactoryBuilder
@@ -287,9 +273,8 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     B setMaxRetries(int maxRetries);
 
     /**
-     * Returns the maximum number of times a transaction can be retried. It doesn't
-     * matter if a retry is caused by explicit retries, or by more accidental retries
-     * (read/write conflicts).
+     * Returns the maximum number of times a transaction can be retried. It doesn't matter if a retry is caused by
+     * explicit retries, or by more accidental retries(read/write conflicts).
      *
      * @return the maximum number of times a transaction can be retried. The returned
      *         value will always be equal or larger than 0.
@@ -297,21 +282,28 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     int getMaxRetries();
 
     /**
-     * Sets the maximum number of spins that should be executed when a
-     * transactional object can't be read because it is locked. Watch out with setting
-     * this value too high, because a system could start livelocking.
+     * Sets the maximum number of spins that should be executed when a transactional object can't be read because it
+     * is locked. Watch out with setting this value too high, because a system could start livelocking.
      *
      * @param maxReadSpinCount the maximum number of spins.
      * @return the updated TransactionFactoryBuilder.
      * @throws IllegalArgumentException if smaller than 0.
+     * @see #getMaxReadSpinCount()
      */
     B setMaxReadSpinCount(int maxReadSpinCount);
 
+    /**
+     * Returns the maximum number of spins that should be executed when a transactional object can't be read because
+     * it is locked. Value will always be equal or larger than 0.
+     *
+     * @return the maximum number of spins
+     * @see #setMaxReadSpinCount(int)
+     */
     int getMaxReadSpinCount();
 
-    void setLoggingOfControlFlowErrorsEnabled(boolean enabled);
+    // void setLoggingOfControlFlowErrorsEnabled(boolean enabled);
 
-    boolean isLoggingOfControlFlowErrorsEnabled();
+    // boolean isLoggingOfControlFlowErrorsEnabled();
 
     /**
      * Builds a {@link TransactionFactory} with the provided configuration.

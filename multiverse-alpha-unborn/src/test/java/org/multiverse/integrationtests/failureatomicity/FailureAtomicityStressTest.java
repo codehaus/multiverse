@@ -1,4 +1,4 @@
-package org.multiverse.integrationtests;
+package org.multiverse.integrationtests.failureatomicity;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * The FailureAtomicityStressTest tests if failure atomicity works. So it should be impossible that the eventual
@@ -30,6 +31,7 @@ public class FailureAtomicityStressTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         ref = new TransactionalInteger();
     }
 

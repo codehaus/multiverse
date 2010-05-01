@@ -41,8 +41,6 @@ public final class AlphaProgrammaticLongTranlocal extends AlphaTranlocal impleme
             return;
         }
 
-        //System.out.println("premature fixation");
-
         this.___origin = origin;
         this.___writeVersion = OPENED_FOR_WRITE;
         this.value = ((AlphaProgrammaticLongTranlocal) origin).value;

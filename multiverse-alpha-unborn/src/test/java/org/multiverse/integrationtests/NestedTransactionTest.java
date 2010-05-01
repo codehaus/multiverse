@@ -12,6 +12,7 @@ import org.multiverse.transactional.primitives.TransactionalInteger;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 /**
@@ -28,6 +29,7 @@ public class NestedTransactionTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         stm = getGlobalStmInstance();
         ref = new TransactionalInteger();
     }

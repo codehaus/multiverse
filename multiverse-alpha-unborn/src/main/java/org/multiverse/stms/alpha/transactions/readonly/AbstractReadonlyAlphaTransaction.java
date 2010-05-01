@@ -1,6 +1,5 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
-import org.multiverse.api.exceptions.LockNotFreeReadConflict;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.api.exceptions.UncommittedReadConflict;

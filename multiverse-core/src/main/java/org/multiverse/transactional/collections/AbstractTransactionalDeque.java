@@ -343,8 +343,9 @@ public abstract class AbstractTransactionalDeque<E>
 
         for (int i = 0; i < r.length; i++) {
             if (!it.hasNext()) { // fewer elements than expected
-                if (a != r)
+                if (a != r) {
                     return Arrays.copyOf(r, i);
+                }
                 r[i] = null; // null-terminate
                 return r;
             }
@@ -360,9 +361,9 @@ public abstract class AbstractTransactionalDeque<E>
             if (i == cap) {
                 int newCap = ((cap / 2) + 1) * 3;
                 if (newCap <= cap) { // integer overflow
-                    if (cap == Integer.MAX_VALUE)
-                        throw new OutOfMemoryError
-                                ("Required array size too large");
+                    if (cap == Integer.MAX_VALUE) {
+                        throw new OutOfMemoryError("Required array size too large");
+                    }
                     newCap = Integer.MAX_VALUE;
                 }
                 r = Arrays.copyOf(r, newCap);

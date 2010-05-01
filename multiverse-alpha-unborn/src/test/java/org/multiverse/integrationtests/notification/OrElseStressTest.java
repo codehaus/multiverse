@@ -12,6 +12,7 @@ import org.multiverse.transactional.primitives.TransactionalInteger;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.api.StmUtils.retry;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class OrElseStressTest {
 
@@ -25,6 +26,8 @@ public class OrElseStressTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
+
         refs = new TransactionalInteger[refCount];
         for (int k = 0; k < refCount; k++) {
             refs[k] = new TransactionalInteger();

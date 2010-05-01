@@ -9,7 +9,7 @@ import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.multiverse.TestUtils.testIncomplete;
 import static org.multiverse.api.StmUtils.retry;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * This implementation is a lot easier than the solution provided on the wiki page. Don't see the
@@ -30,7 +30,7 @@ public class CigaretteSmokersProblemSimplifiedTest {
 
     @Before
     public void setUp() {
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
         tobacco = new TransactionalInteger(0);
         paper = new TransactionalInteger(0);
         match = new TransactionalInteger(0);
@@ -38,7 +38,7 @@ public class CigaretteSmokersProblemSimplifiedTest {
 
     @After
     public void tearDown() {
-        //    stm.getProfiler().print();
+        clearThreadLocalTransaction();
     }
 
     @Test

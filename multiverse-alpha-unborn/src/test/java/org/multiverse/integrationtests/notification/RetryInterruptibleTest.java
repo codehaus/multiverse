@@ -7,6 +7,7 @@ import org.multiverse.transactional.primitives.TransactionalInteger;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.TestUtils.assertAlive;
 import static org.multiverse.TestUtils.sleepMs;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * A Test that checks if the retry can be interrupted if the transaction is configured as interruptible.
@@ -16,6 +17,11 @@ import static org.multiverse.TestUtils.sleepMs;
 public class RetryInterruptibleTest {
 
     private TransactionalInteger ref;
+
+    @Test
+    public void setUp() {
+        clearThreadLocalTransaction();
+    }
 
     @Test
     public void test() throws InterruptedException {

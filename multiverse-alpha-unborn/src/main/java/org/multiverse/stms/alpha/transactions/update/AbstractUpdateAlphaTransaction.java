@@ -95,8 +95,6 @@ public abstract class AbstractUpdateAlphaTransaction
 
     @Override
     protected AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {
-        //System.out.println("opening for write");
-
         AlphaTranlocal attached = findAttached(txObject);
         if (attached == null) {
             attached = doOpenForWritePreviousCommittedAndAttach(txObject);

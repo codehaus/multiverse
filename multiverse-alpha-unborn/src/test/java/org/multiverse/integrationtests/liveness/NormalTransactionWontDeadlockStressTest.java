@@ -8,7 +8,7 @@ import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * A Tests that makes sure that normaly Transactions are not the subject to deadlocks. Normally resources are locked and
@@ -26,7 +26,7 @@ public class NormalTransactionWontDeadlockStressTest {
 
     @Before
     public void setUp() {
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
 
         refs = new TransactionalInteger[resourceCount];
         for (int k = 0; k < refs.length; k++) {
@@ -36,7 +36,7 @@ public class NormalTransactionWontDeadlockStressTest {
 
     @After
     public void tearDown() {
-        //    stm.getProfiler().print();
+        clearThreadLocalTransaction();
     }
 
     @Test

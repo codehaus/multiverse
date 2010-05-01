@@ -97,7 +97,9 @@ public final class StandardThreadFactory implements ThreadFactory {
      * @throws NullPointerException     if threadGroup is null.
      */
     public StandardThreadFactory(int priority, ThreadGroup threadGroup, boolean daemon) {
-        if (threadGroup == null) throw new NullPointerException();
+        if (threadGroup == null) {
+            throw new NullPointerException();
+        }
 
         this.threadGroup = threadGroup;
         ensureValidPriority(priority);

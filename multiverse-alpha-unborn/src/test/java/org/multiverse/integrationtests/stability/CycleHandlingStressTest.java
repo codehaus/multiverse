@@ -16,6 +16,7 @@ import java.util.Random;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 /**
@@ -31,7 +32,7 @@ public class CycleHandlingStressTest {
 
     @Before
     public void setUp() {
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
         stm = getGlobalStmInstance();
     }
 
@@ -46,7 +47,7 @@ public class CycleHandlingStressTest {
 
     @After
     public void tearDown() {
-        //    stm.getProfiler().print();
+        clearThreadLocalTransaction();
     }
 
     @TransactionalObject

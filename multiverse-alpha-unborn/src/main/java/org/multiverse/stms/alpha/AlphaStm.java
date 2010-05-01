@@ -14,7 +14,6 @@ import org.multiverse.stms.alpha.transactions.update.ArrayUpdateAlphaTransaction
 import org.multiverse.stms.alpha.transactions.update.MapUpdateAlphaTransaction;
 import org.multiverse.stms.alpha.transactions.update.MonoUpdateAlphaTransaction;
 import org.multiverse.stms.alpha.transactions.update.UpdateConfiguration;
-import org.multiverse.utils.TodoException;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
@@ -322,16 +321,6 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         }
 
         @Override
-        public boolean isLoggingOfControlFlowErrorsEnabled() {
-            throw new TodoException();
-        }
-
-        @Override
-        public void setLoggingOfControlFlowErrorsEnabled(boolean enabled) {
-            throw new TodoException();
-        }
-
-        @Override
         public AlphaTransactionFactoryBuilder setMaxReadSpinCount(int maxReadSpinCount) {
             if (maxReadSpinCount < 0) {
                 throw new IllegalArgumentException();
@@ -346,6 +335,10 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
         @Override
         public AlphaTransactionFactoryBuilder setTimeoutNs(long timeoutNs) {
+            if (timeoutNs < 0) {
+                throw new IllegalArgumentException();
+            }
+
             return new AlphaTransactionFactoryBuilder(
                     readonly, readTrackingEnabled, familyName, maxRetries,
                     writeSkewAllowed, commitLockPolicy, backoffPolicy,

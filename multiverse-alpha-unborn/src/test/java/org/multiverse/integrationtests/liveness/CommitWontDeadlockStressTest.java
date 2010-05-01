@@ -7,6 +7,7 @@ import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 
 /**
@@ -20,14 +21,16 @@ public class CommitWontDeadlockStressTest {
     private int threadCount = 10;
     private int transactionCountPerThread = 1000 * 1000;
 
-    private TransactionalInteger[] txObjects;
+    private TransactionalInteger[] refs;
     private ChangeThread[] threads;
 
     @Before
     public void setUp() {
-        txObjects = new TransactionalInteger[txObjectCount];
+        clearThreadLocalTransaction();
+
+        refs = new TransactionalInteger[txObjectCount];
         for (int k = 0; k < txObjectCount; k++) {
-            txObjects[k] = new TransactionalInteger();
+            refs[k] = new TransactionalInteger();
         }
 
         threads = new ChangeThread[threadCount];
@@ -60,9 +63,9 @@ public class CommitWontDeadlockStressTest {
 
         @TransactionalMethod
         public void transaction() {
-            for (int k = 0; k < txObjects.length; k++) {
+            for (int k = 0; k < refs.length; k++) {
                 if (randomInt(10) == 5) {
-                    txObjects[k].inc();
+                    refs[k].inc();
                 }
             }
         }

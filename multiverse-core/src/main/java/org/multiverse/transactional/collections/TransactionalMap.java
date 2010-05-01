@@ -34,7 +34,7 @@ public interface TransactionalMap<K, V> extends ConcurrentMap<K, V> {
      * @return the current size of the TransactionalMap.
      */
     @NonTransactional
-    int getCurrentSize();
+    int atomicSize();
 
     @Override
     @TransactionalMethod(readonly = true)

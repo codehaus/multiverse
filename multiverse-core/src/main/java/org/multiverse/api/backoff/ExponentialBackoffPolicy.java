@@ -101,10 +101,6 @@ public final class ExponentialBackoffPolicy implements BackoffPolicy {
     }
 
     protected long calcDelayNs(Transaction tx) {
-        //if (tx.getAttempt() > 100) {
-        //System.out.println("tx.attempt: " + tx.getAttempt());
-        //}
-
         int maxSlot;
         int attempt = tx.getAttempt();
         if (attempt >= slotTimes.length) {
@@ -118,7 +114,6 @@ public final class ExponentialBackoffPolicy implements BackoffPolicy {
         }
 
         int slotIndex = (int) Math.abs(System.identityHashCode(Thread.currentThread()) % maxSlot);
-        //System.out.println("slotIndex: "+slotIndex);
         long delayNs = slotTimes[slotIndex];
 
         if (minDelayNs > 0 && delayNs < minDelayNs) {

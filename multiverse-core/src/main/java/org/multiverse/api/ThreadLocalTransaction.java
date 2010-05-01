@@ -22,18 +22,7 @@ public final class ThreadLocalTransaction {
      * @return the threadlocal transaction.
      */
     public static Transaction getThreadLocalTransaction() {
-        printInfo();
-
         return threadlocal.get();
-    }
-
-    private static void printInfo() {
-        //System.out.println("called");
-        //try{
-        //    throw new Exception();
-        //}catch(Exception e){
-        //    e.printStackTrace();
-        //}
     }
 
     /**
@@ -46,8 +35,6 @@ public final class ThreadLocalTransaction {
      * @throws NoTransactionFoundException if no thread local transaction is found.
      */
     public static Transaction getRequiredThreadLocalTransaction() {
-        printInfo();
-
         Transaction tx = threadlocal.get();
 
         if (tx == null) {
@@ -59,7 +46,7 @@ public final class ThreadLocalTransaction {
 
     /**
      * Clears the threadlocal transaction.
-     *
+     * <p/>
      * If a transaction is available, it isn't aborted or committed.
      */
     public static void clearThreadLocalTransaction() {

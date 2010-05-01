@@ -1,7 +1,6 @@
-package org.multiverse.transactional.collections;
+package org.multiverse.integrationtests;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
@@ -9,7 +8,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 /**
  * @author Peter Veentjer
  */
-public class TransactionalTreeSet_hashCodeTest {
+public class TransactionRetriedOnFailureTest {
 
     @Before
     public void setUp() {
@@ -17,13 +16,6 @@ public class TransactionalTreeSet_hashCodeTest {
     }
 
     @Test
-    @Ignore
-    public void whenEmpty() {
-
-    }
-
-    @Test
-    @Ignore
-    public void whenNonEmpty() {
+    public void test() {
     }
 }

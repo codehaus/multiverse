@@ -18,6 +18,7 @@ import java.util.ListIterator;
 
 import static java.lang.String.format;
 import static org.multiverse.utils.IOUtils.closeQuietly;
+import static org.multiverse.utils.SystemOut.println;
 import static org.objectweb.asm.Type.*;
 
 public final class AsmUtils implements Opcodes {
@@ -84,8 +85,6 @@ public final class AsmUtils implements Opcodes {
 
 
     public static void printClassOfTopItem(InsnList instructions) {
-        System.out.println("invoke printClassOfTopItem");
-
         instructions.add(new MethodInsnNode(
                 INVOKEVIRTUAL,
                 Type.getInternalName(Object.class),
@@ -102,7 +101,7 @@ public final class AsmUtils implements Opcodes {
     }
 
     public static void printClass(Class clazz) {
-        System.out.println("  class on top: " + clazz.getName());
+        println("  class on top: " + clazz.getName());
     }
 
     public static DebugInfo findDebugInfo(MethodNode method) {

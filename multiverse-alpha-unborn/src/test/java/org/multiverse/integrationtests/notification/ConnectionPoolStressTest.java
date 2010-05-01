@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * A test that tests if a connection pool can be made using stm.
@@ -27,6 +28,7 @@ public class ConnectionPoolStressTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         pool = new ConnectionPool(poolsize);
     }
 

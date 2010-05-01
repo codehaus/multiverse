@@ -14,6 +14,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import static java.lang.String.format;
+import static org.multiverse.utils.SystemOut.println;
 
 /**
  * The MultiverseCompiler is responsible for transforming class files. It is a general purpose
@@ -37,24 +38,24 @@ public final class MultiverseCompiler {
     private ClassLoader compilerClassLoader;
 
     private void run(MultiverseCompilerArguments cli) {
-        System.out.println("Multiverse: initializing compiler");
+        println("Multiverse: initializing compiler");
 
         Instrumentor instrumentor = createInstrumentor(cli.instrumentorName);
         File targetDirectory = new File(cli.targetDirectory);
         compilerClassLoader = new MyClassLoader(targetDirectory, MultiverseCompiler.class.getClassLoader());
 
         if (!targetDirectory.isDirectory()) {
-            System.out.printf("Multiverse: target directory '%s' to instrument is not found, skipping instrumentation\n", targetDirectory);
+            println("Multiverse: target directory '%s' to instrument is not found, skipping instrumentation", targetDirectory);
             return;
         }
 
         if (cli.optimize) {
-            System.out.println("Multiverse: bytecode is optimized");
+            println("Multiverse: bytecode is optimized");
             instrumentor.setOptimize(true);
         }
 
         if (cli.dumpBytecode) {
-            System.out.printf("Multiverse: bytecode is to dumped %s for debugging purposes\n", instrumentor.getDumpDirectory());
+            println("Multiverse: bytecode is to dumped %s for debugging purposes", instrumentor.getDumpDirectory());
             instrumentor.setDumpBytecode(true);
         }
 
@@ -62,13 +63,13 @@ public final class MultiverseCompiler {
             instrumentor.setLog(new SystemOutImportantInstrumenterLogger());
         }
 
-        System.out.printf("Multiverse: using org.multiverse.instrumentation.Instrumentor %s version %s\n",
+        println("Multiverse: using org.multiverse.instrumentation.Instrumentor %s version %s",
                 instrumentor.getInstrumentorName(),
                 instrumentor.getInstrumentorVersion());
 
         instrumentor.setFiler(new FileSystemFiler(targetDirectory));
 
-        System.out.printf("Multiverse: instrumenting targetDirectory %s\n", targetDirectory);
+        println("Multiverse: instrumenting targetDirectory %s", targetDirectory);
 
         applyRecursive(targetDirectory, instrumentor);
     }
@@ -172,7 +173,7 @@ public final class MultiverseCompiler {
     }
 
     private static Instrumentor createInstrumentor(String compilerClassName) {
-        System.out.println(format("Multiverse: using Instrumentor '%s'", compilerClassName));
+        println(format("Multiverse: using Instrumentor '%s'", compilerClassName));
 
         Constructor constructor = getMethod(compilerClassName);
         try {
@@ -186,13 +187,13 @@ public final class MultiverseCompiler {
             String msg = format("Failed to initialize Instrumentor '%s'." +
                     "The constructor threw an exception.",
                     compilerClassName);
-            System.out.println(msg);
+            println(msg);
             throw new IllegalArgumentException(msg, e);
         } catch (InstantiationException e) {
             String msg = format("Failed to initialize Instrumentor '%s'." +
                     "The class could not be instantiated.",
                     compilerClassName);
-            System.out.println(msg);
+            println(msg);
             throw new IllegalArgumentException(msg, e);
         }
     }
@@ -208,7 +209,7 @@ public final class MultiverseCompiler {
             String msg = format("Failed to initialize Instrumentor '%s'." +
                     "Is not an existing class (it can't be found using the Thread.currentThread.getContextClassLoader).",
                     className);
-            System.out.println(msg);
+            println(msg);
             throw new IllegalArgumentException(msg, e);
         }
 
@@ -216,7 +217,7 @@ public final class MultiverseCompiler {
             String msg = format("Failed to initialize Instrumentor '%s'." +
                     "Is not an subclass of org.multiverse.compiler.Instrumentor).",
                     className);
-            System.out.println(msg);
+            println(msg);
             throw new IllegalArgumentException(msg);
         }
 
@@ -227,7 +228,7 @@ public final class MultiverseCompiler {
             String msg = format("Failed to initialize Instrumentor '%s'." +
                     "A no arg constructor is not found.",
                     compilerClazz);
-            System.out.println(msg);
+            println(msg);
             throw new IllegalArgumentException(msg, e);
         }
 

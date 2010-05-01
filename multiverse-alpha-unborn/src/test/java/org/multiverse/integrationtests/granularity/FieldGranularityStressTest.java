@@ -1,4 +1,4 @@
-package org.multiverse.integrationtests;
+package org.multiverse.integrationtests.granularity;
 
 import org.junit.After;
 import org.junit.Before;
@@ -30,7 +30,6 @@ public class FieldGranularityStressTest {
     public void setUp() {
         clearThreadLocalTransaction();
         conflictCounter = new AtomicInteger();
-
     }
 
     @After

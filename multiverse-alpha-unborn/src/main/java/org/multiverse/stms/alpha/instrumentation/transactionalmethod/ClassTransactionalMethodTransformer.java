@@ -832,14 +832,6 @@ public final class ClassTransactionalMethodTransformer implements Opcodes {
                                     aload0 = true;
                                 }
                             }
-
-                            //if (node.getOpcode() == INVOKEVIRTUAL || node.getOpcode() == INVOKEINTERFACE) {
-                            //    MethodInsnNode m = (MethodInsnNode) node;
-                            //    //    System.out.println("  startinsn methodinsn:" + m.owner + "." + m.name + "" + m.desc);
-                            //} else if (node.getOpcode() == GETFIELD || node.getOpcode() == PUTFIELD) {
-                            //    FieldInsnNode m = (FieldInsnNode) node;
-                            //    //    System.out.println("  startinsn fieldinsn:" + m.owner + "." + m.name + "" + m.desc);
-                            //}
                         }
 
                         boolean fullMonty = classMetadata.isTransactionalObjectWithObjectGranularFields()
@@ -885,33 +877,6 @@ public final class ClassTransactionalMethodTransformer implements Opcodes {
 
         newInstructions.add(endLabelNode);
         return newInstructions;
-    }
-
-    private boolean startsWithALOAD0(Frame[] frames, AbstractInsnNode node) {
-        while (node != null) {
-            if (node.getPrevious() == null) {
-                return false;
-            }
-
-            AbstractInsnNode prev = node.getPrevious();
-
-            if (prev.getOpcode() == -1) {
-                node = prev.getPrevious();
-            } else if (prev.getOpcode() != ALOAD) {
-                return false;
-            } else {
-                VarInsnNode varInsnNode = (VarInsnNode) prev;
-                boolean result = varInsnNode.var == 0;
-                if (result) {
-                    //    System.out.println("--------------------------------");
-                    //    System.out.println("ALOAD 0 found");
-                    //    System.out.println("--------------------------------");
-                }
-                return result;
-            }
-        }
-
-        return false;
     }
 
     private List createNewVariableTableForMethodWithLogic(MethodNode methodNode, CloneMap cloneMap, LabelNode startLabelNode, LabelNode endLabelNode) {

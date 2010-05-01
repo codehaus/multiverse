@@ -9,7 +9,7 @@ import org.multiverse.transactional.primitives.TransactionalInteger;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * A integration test that tests the wait notify mechanism.
@@ -29,13 +29,13 @@ public class PingPongStressTest {
 
     @Before
     public void setUp() {
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
         intValue = new TransactionalInteger(0);
     }
 
     @After
     public void tearDown() {
-        //    stm.getStatistics().print();
+        clearThreadLocalTransaction();
     }
 
     @Test

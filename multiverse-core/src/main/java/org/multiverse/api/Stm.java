@@ -35,7 +35,6 @@ public interface Stm<B extends TransactionFactoryBuilder, P extends Programmatic
      */
     B getTransactionFactoryBuilder();
 
-
     /**
      * Returns the programmatic reference factory this Stm exposes. See the
      * {@link org.multiverse.api.programmatic.ProgrammaticReference} for more information when to use it.

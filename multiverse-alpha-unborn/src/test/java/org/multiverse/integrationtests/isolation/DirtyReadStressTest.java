@@ -10,7 +10,7 @@ import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 
 /**
@@ -36,7 +36,7 @@ public class DirtyReadStressTest {
 
     @Before
     public void setUp() {
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
         ref = new TransactionalInteger(0);
     }
 

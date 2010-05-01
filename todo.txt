@@ -4,40 +4,13 @@ todo engine
 
 - update tests tests that the backoff policy is used when a openForUpdate is done.
 
-- als een transactie geen dirty checks nodig heeft, dan automatisch ieder object dat gelezen is,
-kan met een dirty tag
-
 - VetoCommitBarrier_vetoCommitWithTransactionTest fails sometimes.
-
-- is it possible to see the test output, especially for the integration test this is important to provide
-feedback what is happening.
-
-- make it possible that stresstests can be configured on the outside to execute for a different amount of time.
-
-- debug information is lost in transactional method (no visible in stacktrace)
-
-- have some kind of report that indicates which test failed instead of looking at the html
-generated test report.
 
 - find nice docbook stylesheet
 
 - convert manual from html to docbook
 
 - generate manual from gradle
-
-- site needs to be generated from gradle
-
-- publish snapshot artifacts from gradle to codehaus
-
-- publish real artifacts from gradle to codehaus
-
-- upload site from gradle to codehaus
-
-- upload reports from gradle to codehaus
-
-- multiverse-scala compile project
-
-- group javadoc: question on gradle site pending
 
 CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest.whenTransactionFailsToPrepare
 
@@ -149,31 +122,6 @@ TransactionalTreeSet_toArray1Test
 
 TransactionalTreeSet_toStringTest
 
-    - integration test for the alphaprogrammaticreference and atomic methods
-
-- instrumentation
-
-    - upgrade get-field access to use frames instead of copying/swapping etc
-
-    - upgrade put-field access to use frames instead of copying/swapping etc
-
-    - static compilation
-
-        - integration test of the compiler in combination with
-        the java agent.
-
-        - instrumented jar test
-
-    - inlining
-
-        - setter should be able to deal with returning old value
-
-        - inlining transaction in transactional getter
-
-        - inlining transaction in transactional setter
-
-- interface parameter inheritance.
-
 - commuting write and open for read; if non automatic read tracking then
 it will not be fixated.
 
@@ -208,8 +156,10 @@ it will not be fixated.
     - boolean removeLastOccurrence(Object o)
 
 ---------------------------------------------------------------
-todo unclear
+todo next release
 ---------------------------------------------------------------
+
+- 'mod' support for iterators.
 
 - tests that use different transaction size to cause all transaction implementations to be used
 
@@ -235,12 +185,6 @@ org.multiverse.api.exceptions.ReadonlyException
 	at org.multiverse.TestThread.run(TestThread.java:44)
 Thread PingPongThread-1 has thrown an exception
 
-- logging
-
-    - logging should be re-enabled but not with a subclass
-
-    - logging configurable through annotations?
-
 - support subclassing in instrumentation
 
     - tranlocal snapshot needs to be fixed for subclassing.
@@ -255,9 +199,35 @@ Thread PingPongThread-1 has thrown an exception
 
 - primitive refs should also have their waiting methods checked.
 
----------------------------------------------------------------
-todo features
----------------------------------------------------------------
+- is it possible to see the test output, especially for the integration test this is important to provide
+feedback what is happening.
+
+- have some kind of report that indicates which test failed instead of looking at the html
+generated test report.
+
+- instrumentation
+
+    - upgrade get-field access to use frames instead of copying/swapping etc
+
+    - upgrade put-field access to use frames instead of copying/swapping etc
+
+    - static compilation
+
+        - integration test of the compiler in combination with
+        the java agent.
+
+        - instrumented jar test
+
+    - inlining
+
+        - setter should be able to deal with returning old value
+
+        - inlining transaction in transactional getter
+
+        - inlining transaction in transactional setter
+
+- interface parameter inheritance.
+
 
 - JRuby integration
 
@@ -346,9 +316,35 @@ they are moved to the alpha package, so they have an stm to be tested against.
 
 - stress test for strictlinkedblockingdeque
 
+- site needs to be generated from gradle
+
+- publish snapshot artifacts from gradle to codehaus
+
+- publish real artifacts from gradle to codehaus
+
+- upload site from gradle to codehaus
+
+- upload reports from gradle to codehaus
+
+- multiverse-scala compile project
+
+- group javadoc: question on gradle site pending
+
+- make it possible that stresstests can be configured on the outside to execute for a different amount of time.
+
+- debug information is lost in transactional method (no visible in stacktrace)
+
+- log the controlflowexceptions; configurable from annotations and transactionfactorybuilder.
+
+- als een transactie geen dirty checks nodig heeft, dan automatisch ieder object dat gelezen is,
+kan met een dirty tag
+
+
 ---------------------------------------------------------------
 idea:
 ---------------------------------------------------------------
+
+- continuation when a backoff needs to be done or when a transaction needs to block?
 
 - tx reuse? So if an aborted or committed transaction is found and a new tx needs to start,
 could this old tx be reused?
@@ -399,66 +395,10 @@ Dit scheelt nog een object creatie.
 done
 ---------------------------------------------------------------
 
-- getter/setter optimization
+- TransactionalTreeMap_entrySet_addTest
 
-    - getters/setter inliner should do verbose output
+- TransactionalTreeMap_entrySet_addAllTest
 
-SpeculativeNonAutomaticReadTrackingTest
+- TransactionalTreeMap_entrySet_containsTest
 
-- multiverse scala integration needs to be added to gradle
-
-TransactionalReferenceArray_atomicCompareAndSetTest.whenLocked
-
-TransactionalReferenceArray_atomicSetTest.whenLocked
-
-TransactionalReferenceArray_atomicSetTest.whenNotCommittedBefore
-
-TransactionalReferenceArray_atomicSetTest.whenNoValueChange
-
-TransactionalReferenceArray_atomicSetTest.whenValueChanged
-
-TransactionalReferenceArray_atomicSetTest.whenTransactionActiveThenIgnored
-
-TransactionalReferenceArray_getTest.whenNoTransactionAvailableAndLocked
-
-TransactionalReferenceArray_getTest.whenNoTransactionAvailableNotCommittedBefore
-
-TransactionalReferenceArray_getTest.whenTransactionAvailableAndNotCommittedBefore
-
-TransactionalReferenceArray_getTest.whenTransactionActiveAndLocked
-
-TransactionalReferenceArray_atomicGetTest.whenNotCommittedBefore
-
-TransactionalReferenceArray_atomicGetTest.whenLocked
-
-TransactionalReferenceArray_setTest.whenTransactionAvailable_thenThatTransactionIsUsed
-
-TransactionalReferenceArray_setTest.whenListenersAvailable_thenTheyAreNotified
-
-- integrationt tests are added to gradle
-
-- performance test swing tool that has configurable number of threads and puts load on an atomic clock long
-(relaxed and non relaxed) and calculates the maximum number of threads/second that are possible. Also use
-an transactional ref with the alphastm to do some real tests?
-
-- transactional linked list is causing problems.. could it be that it isn't locked?
-
-- TransactionalLinkedList relaxed/strict maximum capacity.
-        (relaxed does commit and max does check).
-
-- back off policy
-
-    - back off policy needs to be used when a load is done and the value is locked
-
-- update tests tests that the backoff policy is used when a openForRead is done.
-
-- hudson; ibm/open/sun/stress test
-
-- CountDownCommitBarrier_incPartiesWithTransactionTest.whenPendingTransactions
-
-- when the transaction has a timeout, the timeout should be updated when the transaction blocks.
-
-  - verbose output in the transactional method transformer needs to output to the Logger
-    and not to the System.out
-
-TransactionalArrayList_hashCodeTest
+- TransactionalTreeMap_entrySet_containsAllTest

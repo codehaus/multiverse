@@ -32,7 +32,39 @@ public final class TransactionalTreeSet<E> implements TransactionalSet<E> {
      * {@code ClassCastException}.
      */
     public TransactionalTreeSet() {
-        map = new TransactionalTreeMap<E, Object>();
+        this((Comparator) null);
+    }
+
+    /**
+     * Constructs a new TransactionalTreeSet containing the elements in the specified
+     * collection, sorted according to the <i>natural ordering</i> of its
+     * elements.  All elements inserted into the set must implement the
+     * {@link Comparable} interface.  Furthermore, all such elements must be
+     * <i>mutually comparable</i>: {@code e1.compareTo(e2)} must not throw a
+     * {@code ClassCastException} for any elements {@code e1} and
+     * {@code e2} in the set.
+     *
+     * @param c collection whose elements will comprise the new set
+     * @throws ClassCastException   if the elements in {@code c} are
+     *                              not {@link Comparable}, or are not mutually comparable
+     * @throws NullPointerException if the specified collection is null
+     */
+    public TransactionalTreeSet(Collection<? extends E> c) {
+        this((Comparator) null);
+        addAll(c);
+    }
+
+    /**
+     * Creates a new TransactionalTreeSet with the provided values.
+     *
+     * @param values the initial values
+     */
+    public TransactionalTreeSet(E... values) {
+        this((Comparator) null);
+
+        for (E value : values) {
+            add(value);
+        }
     }
 
     /**
@@ -52,28 +84,6 @@ public final class TransactionalTreeSet<E> implements TransactionalSet<E> {
         map = new TransactionalTreeMap<E, Object>(comparator);
     }
 
-    /**
-     * Constructs a new TransactionalTreeSet containing the elements in the specified
-     * collection, sorted according to the <i>natural ordering</i> of its
-     * elements.  All elements inserted into the set must implement the
-     * {@link Comparable} interface.  Furthermore, all such elements must be
-     * <i>mutually comparable</i>: {@code e1.compareTo(e2)} must not throw a
-     * {@code ClassCastException} for any elements {@code e1} and
-     * {@code e2} in the set.
-     *
-     * @param c collection whose elements will comprise the new set
-     * @throws ClassCastException   if the elements in {@code c} are
-     *                              not {@link Comparable}, or are not mutually comparable
-     * @throws NullPointerException if the specified collection is null
-     */
-    public TransactionalTreeSet(Collection<? extends E> c) {
-        if (c == null) {
-            throw new NullPointerException();
-        }
-
-        map = new TransactionalTreeMap<E, Object>();
-        addAll(c);
-    }
 
     @Override
     public boolean add(E e) {
@@ -83,7 +93,7 @@ public final class TransactionalTreeSet<E> implements TransactionalSet<E> {
     @Override
     @NonTransactional
     public int atomicSize() {
-        return map.getCurrentSize();
+        return map.atomicSize();
     }
 
     @Override

@@ -7,6 +7,7 @@ import org.multiverse.api.Stm;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
+import static org.multiverse.TestUtils.format;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
@@ -56,6 +57,6 @@ public class TransactionalArrayList_getPerformanceTest {
 
         long durationNs = System.nanoTime() - startNs;
         double transactionsPerSecond = (1.0d * transactionCount * TimeUnit.SECONDS.toNanos(1)) / durationNs;
-        System.out.printf("Performance %s transactions/second\n", transactionsPerSecond);
+        System.out.printf("Performance %s transactions/second\n", format(transactionsPerSecond));
     }
 }

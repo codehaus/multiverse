@@ -93,9 +93,7 @@ public class SleepingBarberStressTest {
 
     @After
     public void tearDown() {
-//        ProfileRepository profiler = 
-//            ((AlphaStm) GlobalStmInstance.getGlobalStmInstance()).getProfiler();
-//        new ProfilePublisher(profiler.getCollator()).writeStatisticsToStream(System.out);
+        clearThreadLocalTransaction();
     }
 
     @Test

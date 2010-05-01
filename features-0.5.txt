@@ -36,7 +36,8 @@
     was locked, the transaction fails, in this version it only fails when it is locked and the
     version of the tranlocal doesn't match. So improved concurrency
 
-    + new transactional datastructures don't need to be locked
+    + new transactional datastructures don't need to be locked or increase the clock. So they
+    are a lot cheaper to create.
 
     + quick releae of locks; instead of waiting for all writes to be done,
      the lock is released after each write has complete.

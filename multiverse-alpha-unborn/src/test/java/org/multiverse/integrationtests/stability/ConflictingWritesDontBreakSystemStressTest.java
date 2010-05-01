@@ -9,7 +9,7 @@ import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class ConflictingWritesDontBreakSystemStressTest {
     private TransactionalInteger[] refs;
@@ -20,13 +20,12 @@ public class ConflictingWritesDontBreakSystemStressTest {
 
     @Before
     public void setUp() {
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
     }
 
     @After
     public void tearDown() {
-        //stm.getProfiler().print();
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
     }
 
     @Test

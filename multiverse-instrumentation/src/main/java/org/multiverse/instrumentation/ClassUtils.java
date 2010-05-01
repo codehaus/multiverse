@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import static java.lang.String.format;
+import static org.multiverse.utils.SystemOut.println;
 
 /**
  * A utility class for {@link Class}
@@ -35,7 +36,6 @@ public class ClassUtils {
     }
 
     public static Class defineClass(ClassLoader classLoader, String className, byte[] bytecode) {
-        //System.out.println("definingClass: "+className);
         try {
             return (Class) defineClassMethod.invoke(
                     classLoader,
@@ -51,7 +51,7 @@ public class ClassUtils {
     }
 
     public static void printClassLoaderInfo(Class clazz) {
-        System.out.println(getClassLoaderInfo(clazz));
+        println(getClassLoaderInfo(clazz));
     }
 
     public static String getClassLoaderInfo(Class clazz) {
@@ -72,7 +72,7 @@ public class ClassUtils {
     }
 
     public static void printClassLoaderInfo(ClassLoader classLoader) {
-        System.out.println(getClassLoaderInfo(classLoader));
+        println(getClassLoaderInfo(classLoader));
     }
 
     public static String getClassLoaderInfo(ClassLoader classLoader) {
@@ -91,7 +91,7 @@ public class ClassUtils {
     }
 
     public static void printClassInfo(Class clazz) {
-        System.out.println(getClassInfo(clazz));
+        println(getClassInfo(clazz));
     }
 
     public static String getClassInfo(Class clazz) {

@@ -8,6 +8,7 @@ import org.multiverse.api.Stm;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import static org.multiverse.TestUtils.format;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
@@ -46,7 +47,7 @@ public class TransactionalLinkedList_PerformanceTest {
 
         long durationNs = System.nanoTime() - startNs;
         double transactionsPerSecond = (1.0d * count * iterations * TimeUnit.SECONDS.toNanos(1)) / durationNs;
-        System.out.printf("Performance %s transactions/second\n", transactionsPerSecond);
+        System.out.printf("Performance %s transactions/second\n", format(transactionsPerSecond));
     }
 
     @Test
@@ -65,7 +66,7 @@ public class TransactionalLinkedList_PerformanceTest {
 
         long durationNs = System.nanoTime() - startNs;
         double transactionsPerSecond = (1.0d * count * iterations * TimeUnit.SECONDS.toNanos(1)) / durationNs;
-        System.out.printf("Performance %s transactions/second\n", transactionsPerSecond);
+        System.out.printf("Performance %s transactions/second\n", format(transactionsPerSecond));
     }
 
     @Test
@@ -84,7 +85,7 @@ public class TransactionalLinkedList_PerformanceTest {
 
         long durationNs = System.nanoTime() - startNs;
         double transactionsPerSecond = (1.0d * count * iterations * TimeUnit.SECONDS.toNanos(1)) / durationNs;
-        System.out.printf("Performance %s transactions/second\n", transactionsPerSecond);
+        System.out.printf("Performance %s transactions/second\n", format(transactionsPerSecond));
     }
 }
 

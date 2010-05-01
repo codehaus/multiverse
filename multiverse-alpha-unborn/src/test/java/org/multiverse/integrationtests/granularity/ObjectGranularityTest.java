@@ -1,4 +1,4 @@
-package org.multiverse.integrationtests;
+package org.multiverse.integrationtests.granularity;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -10,13 +10,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class ObjectGranularityThread {
+public class ObjectGranularityTest {
 
     public AtomicInteger executedCounter;
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         executedCounter = new AtomicInteger();
     }
 

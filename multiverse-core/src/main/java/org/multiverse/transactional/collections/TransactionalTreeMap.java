@@ -114,7 +114,7 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
             throw new NullPointerException();
         }
 
-        return findNode(key) != null;
+        return getEntry(key) != null;
     }
 
     @Override
@@ -124,7 +124,7 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
 
     @Override
     @NonTransactional
-    public int getCurrentSize() {
+    public int atomicSize() {
         return (int) size.atomicGet();
     }
 
@@ -139,7 +139,7 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
             throw new NullPointerException();
         }
 
-        EntryImpl<K, V> node = findNode(key);
+        EntryImpl<K, V> node = getEntry(key);
         return node == null ? null : node.value;
     }
 
@@ -257,7 +257,7 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
             throw new NullPointerException();
         }
 
-        EntryImpl<K, V> node = findNode(key);
+        EntryImpl<K, V> node = getEntry(key);
         if (node == null) {
             return null;
         }
@@ -356,7 +356,7 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
             throw new NullPointerException();
         }
 
-        EntryImpl<K, V> p = findNode(key);
+        EntryImpl<K, V> p = getEntry(key);
         if (p == null) {
             return null;
         }
@@ -376,7 +376,7 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
             throw new NullPointerException();
         }
 
-        EntryImpl<K, V> node = findNode(key);
+        EntryImpl<K, V> node = getEntry(key);
         if (node == null) {
 
         }
@@ -403,142 +403,6 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
         return new EntrySet();
     }
 
-    @TransactionalObject
-    final class EntrySet implements Set<Map.Entry<K, V>> {
-
-        @Override
-        public void clear() {
-            TransactionalTreeMap.this.clear();
-        }
-
-        @Override
-        public int size() {
-            return TransactionalTreeMap.this.size();
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return TransactionalTreeMap.this.isEmpty();
-        }
-
-        @Override
-        public boolean contains(Object o) {
-            throw new TodoException();
-        }
-
-        @Override
-        public boolean add(Entry<K, V> entry) {
-            throw new TodoException();
-        }
-
-        @Override
-        public boolean addAll(Collection<? extends Entry<K, V>> c) {
-            throw new TodoException();
-        }
-
-        @Override
-        public boolean containsAll(Collection<?> c) {
-            throw new TodoException();
-        }
-
-        @Override
-        public boolean removeAll(Collection<?> c) {
-            throw new TodoException();
-        }
-
-        @Override
-        public boolean retainAll(Collection<?> c) {
-            throw new TodoException();
-        }
-
-        @Override
-        public Object[] toArray() {
-            throw new TodoException();
-        }
-
-        @Override
-        public <T> T[] toArray(T[] a) {
-            throw new TodoException();
-        }
-
-        @Override
-        public Iterator<Entry<K, V>> iterator() {
-            return new EntryImplIterator();
-        }
-
-        @Override
-        public boolean remove(Object o) {
-            throw new TodoException();
-        }
-
-        @Override
-        public String toString() {
-            throw new TodoException();
-        }
-
-        @Override
-        public int hashCode() {
-            return TransactionalTreeMap.this.hashCode();
-        }
-
-        public boolean equals(Object thatObj) {
-            if (thatObj == this) {
-                return true;
-            }
-
-            if (!(thatObj instanceof Set)) {
-                return false;
-            }
-
-            Set that = (Set) thatObj;
-            if (that.size() != this.size()) {
-                return false;
-            }
-
-            throw new TodoException();
-        }
-    }
-
-    @TransactionalObject
-    class EntryImplIterator implements Iterator<Entry<K, V>> {
-        private EntryImpl<K, V> node;
-
-        EntryImplIterator() {
-            this.node = findMostLeft(root);
-        }
-
-        @Override
-        public boolean hasNext() {
-            return node != null;
-        }
-
-        @Override
-        public Entry<K, V> next() {
-            if (node == null) {
-                throw new NoSuchElementException();
-            }
-
-            EntryImpl<K, V> result = node;
-
-            if (node.right != null) {
-                EntryImpl<K, V> mostLeft = findMostLeft(node.right);
-                if (mostLeft != null) {
-                    node = mostLeft;
-                } else {
-                    node = node.right;
-                }
-            } else {
-                node = node.parent;
-            }
-
-            return result;
-        }
-
-        @Override
-        public void remove() {
-            throw new TodoException();
-        }
-    }
 
     @Override
     public String toString() {
@@ -595,7 +459,7 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
         for (Map.Entry<K, V> entry : entrySet()) {
             V thisValue = entry.getValue();
             V thatValue = that.get(entry.getKey());
-            if (!equalValues(thisValue, thatValue)) {
+            if (!valEquals(thisValue, thatValue)) {
                 return false;
             }
         }
@@ -604,7 +468,7 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
     }
 
     @NonTransactional
-    private boolean equalValues(V value1, V value2) {
+    private boolean valEquals(V value1, V value2) {
         return value1 == null ? value2 == null : value1.equals(value2);
     }
 
@@ -621,7 +485,7 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
      *                              and this map uses natural ordering, or its comparator
      *                              does not permit null keys
      */
-    final EntryImpl<K, V> findNode(Object key) {
+    final EntryImpl<K, V> getEntry(Object key) {
         // Offload comparator-based version for sake of performance
         if (comparator != null) {
             return findNodeUsingComparator(key);
@@ -834,6 +698,211 @@ public final class TransactionalTreeMap<K, V> implements TransactionalMap<K, V> 
         @Override
         public K getKey() {
             return key;
+        }
+    }
+
+    @TransactionalObject
+    class EntryImplIterator implements Iterator<Entry<K, V>> {
+        private EntryImpl<K, V> node;
+        private Direction direction = Direction.self;
+
+        EntryImplIterator() {
+            this.node = root;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return node != null;
+        }
+
+        @Override
+        public Entry<K, V> next() {
+            if (node == null) {
+                throw new NoSuchElementException();
+            }
+
+            EntryImpl<K, V> result = node;
+
+            switch (direction) {
+                case self:
+                    if (node.left != null) {
+                        node = node.left;
+                    } else if (node.right != null) {
+                        node = node.right;
+                    } else if (node.parent != null) {
+                        //todo:
+                    } else {
+                        node = null;
+                    }
+                    break;
+                case left:
+                    if (node.right != null) {
+                        node = node.right;
+                        direction = Direction.self;
+                    } else {
+                        //todo
+                    }
+                    break;
+                case right:
+
+                    break;
+                default:
+                    throw new IllegalStateException();
+            }
+
+
+            if (node.right != null) {
+                EntryImpl<K, V> mostLeft = findMostLeft(node.right);
+                if (mostLeft != null) {
+                    node = mostLeft;
+                } else {
+                    node = node.right;
+                }
+            } else {
+                node = node.parent;
+            }
+
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new TodoException();
+        }
+    }
+
+    enum Direction {
+        left, right, self
+    }
+
+    @TransactionalObject
+    final class EntrySet implements Set<Map.Entry<K, V>> {
+
+        @Override
+        public void clear() {
+            TransactionalTreeMap.this.clear();
+        }
+
+        @Override
+        public int size() {
+            return TransactionalTreeMap.this.size();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return TransactionalTreeMap.this.isEmpty();
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            if (!(o instanceof Map.Entry)) {
+                return false;
+            }
+
+            Map.Entry<K, V> entry = (Map.Entry<K, V>) o;
+            V value = entry.getValue();
+            Entry<K, V> p = getEntry(entry.getKey());
+            return p != null && valEquals(p.getValue(), value);
+        }
+
+        @Override
+        public boolean add(Entry<K, V> entry) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean addAll(Collection<? extends Entry<K, V>> c) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean containsAll(Collection<?> c) {
+            if (c == null) {
+                throw new NullPointerException();
+            }
+
+            if (c.isEmpty()) {
+                return true;
+            }
+
+            for (Object item : c) {
+                if (!contains(item)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        @Override
+        public boolean removeAll(Collection<?> c) {
+            boolean modified = false;
+
+            if (size() > c.size()) {
+                for (Object item : c) {
+                    modified |= remove(item);
+                }
+            } else {
+                for (Iterator<?> i = iterator(); i.hasNext();) {
+                    if (c.contains(i.next())) {
+                        i.remove();
+                        modified = true;
+                    }
+                }
+            }
+            return modified;
+        }
+
+        @Override
+        public boolean retainAll(Collection<?> c) {
+            throw new TodoException();
+        }
+
+        @Override
+        public Object[] toArray() {
+            throw new TodoException();
+        }
+
+        @Override
+        public <T> T[] toArray(T[] a) {
+            throw new TodoException();
+        }
+
+        @Override
+        public Iterator<Entry<K, V>> iterator() {
+            return new EntryImplIterator();
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            throw new TodoException();
+        }
+
+        @Override
+        public String toString() {
+            throw new TodoException();
+        }
+
+        @Override
+        public int hashCode() {
+            return TransactionalTreeMap.this.hashCode();
+        }
+
+        public boolean equals(Object thatObj) {
+            if (thatObj == this) {
+                return true;
+            }
+
+            if (!(thatObj instanceof Set)) {
+                return false;
+            }
+
+            Set that = (Set) thatObj;
+            if (that.size() != this.size()) {
+                return false;
+            }
+
+            throw new TodoException();
         }
     }
 }

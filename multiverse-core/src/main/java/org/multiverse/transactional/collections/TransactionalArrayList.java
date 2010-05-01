@@ -216,7 +216,6 @@ public final class TransactionalArrayList<E> implements TransactionalList<E> {
 
     @Override
     public <T> T[] toArray(T[] a) {
-
         int localSize = (int) this.size.get();
 
         T[] r = a.length >= localSize ? a : (T[]) Array.newInstance(a.getClass().getComponentType(), localSize);

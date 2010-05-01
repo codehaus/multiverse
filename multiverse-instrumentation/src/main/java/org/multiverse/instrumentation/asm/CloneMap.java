@@ -13,20 +13,7 @@ import java.util.HashMap;
  *
  * @author Peter Veentjer
  */
-public class CloneMap extends HashMap<LabelNode, LabelNode> {
-
-//    private Map<LabelNode, List<StackTraceElement[]>> traceMap =
-//            new HashMap<LabelNode, List<StackTraceElement[]>>();
-
-//    public void printTraces(LabelNode labelNode) {
-//        List<StackTraceElement[]> list = traceMap.getClassMetadata(labelNode);
-//        for(StackTraceElement[] elements : list){
-//            for(StackTraceElement element: elements){
-//                System.out.println(element);
-//            }
-//            System.out.println("-------------------------------");
-//        }
-//    }
+public final class CloneMap extends HashMap<LabelNode, LabelNode> {
 
     @Override
     public LabelNode get(Object key) {
@@ -34,14 +21,6 @@ public class CloneMap extends HashMap<LabelNode, LabelNode> {
     }
 
     public LabelNode get(LabelNode old) {
-//        List<StackTraceElement[]> list = traceMap.getClassMetadata(old);
-//        if (list == null) {
-//            list = new LinkedList();
-//            traceMap.put(old, list);
-//        }
-//
-//        list.add(new Exception().getStackTrace());
-
         LabelNode found = super.get(old);
         if (found == null) {
             found = new LabelNode();

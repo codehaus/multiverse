@@ -40,16 +40,19 @@ allprojects {
   }
 
   test {
-    exclude("**/*Abstract*")
+    exclude("**/*AbstractTest*")
     exclude("**/*StressTest*")
     exclude("**/*LongTest*")
     exclude("**/*PerformanceTest*")
+    exclude("**/*performanceTest*")
   }
 
 
   task integrationtest(type: Test) {
     include("**/*StressTest*")
+    include("**/*stressTest*")
     include("**/*LongTest*")
+    include("**/*longTest*")
   }
 
   dependencies {

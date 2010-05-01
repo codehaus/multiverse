@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class LargeNonParallelWriteonlyTransactionsStressTest {
     private Stm stm;
@@ -21,12 +21,12 @@ public class LargeNonParallelWriteonlyTransactionsStressTest {
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
     }
 
     @After
     public void tearDown() {
-        //  stm.getProfiler().print();
+        clearThreadLocalTransaction();
     }
 
     @Test

@@ -12,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class ReadersWritersProblemStressTest {
 
@@ -26,6 +27,7 @@ public class ReadersWritersProblemStressTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         readWriteLock = new UnfairReadWriteLock();
     }
 

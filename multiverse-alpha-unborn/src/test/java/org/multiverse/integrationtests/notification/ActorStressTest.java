@@ -1,5 +1,6 @@
 package org.multiverse.integrationtests.notification;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.transactional.collections.TransactionalLinkedList;
@@ -9,8 +10,14 @@ import java.lang.reflect.Method;
 
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.sleepMs;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class ActorStressTest {
+
+    @Before
+    public void setUp() {
+        clearThreadLocalTransaction();
+    }
 
     @Test
     public void test() {

@@ -8,6 +8,7 @@ import org.multiverse.annotations.TransactionalObject;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * The MoneyTransferStressTest is a test where money is transferred from one account to another. At random transfers are
@@ -29,6 +30,8 @@ public class MoneyTransferStressTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
+
         bankAccounts = new BankAccount[accountCount];
 
         for (int k = 0; k < accountCount; k++) {
