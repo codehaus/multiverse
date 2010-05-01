@@ -4,7 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.integrationtests.Ref;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
@@ -25,12 +25,12 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 public class PingPongStressTest {
     private int pingPongCount = 1 * 1000 * 1000;
     private int threadCount = 2;
-    private TransactionalInteger intValue;
+    private Ref intValue;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        intValue = new TransactionalInteger(0);
+        intValue = new Ref(0);
     }
 
     @After

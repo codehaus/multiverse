@@ -1,6 +1,7 @@
-package org.multiverse.integrationtests;
+package org.multiverse.integrationtests.readonly;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
@@ -8,7 +9,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 /**
  * @author Peter Veentjer
  */
-public class TransactionRetriedOnFailureTest {
+public class ReadonlyScopeTest {
 
     @Before
     public void setUp() {
@@ -16,6 +17,7 @@ public class TransactionRetriedOnFailureTest {
     }
 
     @Test
+    @Ignore
     public void test() {
     }
 }

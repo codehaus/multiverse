@@ -15,7 +15,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  * <p/>
  * Tests for direct deadlocks and deadlock chains.
  */
-public class CommitWontDeadlockStressTest {
+public class DeadlockStressTest {
 
     private int txObjectCount = 100;
     private int threadCount = 10;

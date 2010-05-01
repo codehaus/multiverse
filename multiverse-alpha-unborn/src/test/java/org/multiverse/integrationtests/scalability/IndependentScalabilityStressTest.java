@@ -1,4 +1,4 @@
-package org.multiverse.integrationtests;
+package org.multiverse.integrationtests.scalability;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +15,7 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
  * todo:
  * Test doesn't provide any value atm.
  */
-public class IndependantScalabilityStressTest {
+public class IndependentScalabilityStressTest {
     private Stm stm;
     private long updateCount = 1000000;
 

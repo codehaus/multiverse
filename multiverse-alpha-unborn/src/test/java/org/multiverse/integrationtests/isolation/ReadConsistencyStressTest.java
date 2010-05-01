@@ -14,6 +14,8 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
+ * Checks if the reads are all consistent to the beginning of the transaction.
+ *
  * @author Peter Veentjer
  */
 public class ReadConsistencyStressTest {

@@ -1,4 +1,4 @@
-package org.multiverse.integrationtests;
+package org.multiverse.integrationtests.scalability;
 
 import org.junit.After;
 import org.junit.Before;

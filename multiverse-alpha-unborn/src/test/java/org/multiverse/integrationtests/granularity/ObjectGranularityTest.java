@@ -1,6 +1,7 @@
 package org.multiverse.integrationtests.granularity;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
@@ -23,6 +24,7 @@ public class ObjectGranularityTest {
     }
 
     @Test
+    @Ignore
     public void testFieldGranularityCausesNoWriteConflicts() {
         Pair pair = new Pair(0, 0);
         SetLeftThread leftThread = new SetLeftThread(pair);
@@ -47,10 +49,11 @@ public class ObjectGranularityTest {
         }
 
         @Override
-        @TransactionalMethod
+        @TransactionalMethod(readonly = false)
         public void doRun() throws Exception {
+            sleepMs(500);
             pair.setLeft(10);
-            sleepMs(1000);
+            sleepMs(500);
 
             executedCounter.incrementAndGet();
         }
@@ -66,10 +69,11 @@ public class ObjectGranularityTest {
         }
 
         @Override
-        @TransactionalMethod
+        @TransactionalMethod(readonly = false)
         public void doRun() throws Exception {
+            sleepMs(500);
             pair.setRight(10);
-            sleepMs(1000);
+            sleepMs(500);
 
             executedCounter.incrementAndGet();
         }
