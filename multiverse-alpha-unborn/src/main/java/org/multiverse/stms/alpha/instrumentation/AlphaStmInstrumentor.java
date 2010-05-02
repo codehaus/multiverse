@@ -19,7 +19,7 @@ import org.multiverse.stms.alpha.instrumentation.transactionalobject.Transaction
 public final class AlphaStmInstrumentor extends StandardInstrumentor {
 
     public AlphaStmInstrumentor() {
-        super("AlphaStmInstrumentor", "0.5-SNAPSHOT", "AlphaStm");
+        super("AlphaStmInstrumentor", "0.5", "AlphaStm");
 
         add(new PreventReinstrumentationInstrumentationPhase(this));
         add(new JSRInlineInstrumentationPhase());

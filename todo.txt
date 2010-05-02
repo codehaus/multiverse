@@ -2,6 +2,10 @@
 todo engine
 ---------------------------------------------------------------
 
+---------------------------------------------------------------
+todo next release
+---------------------------------------------------------------
+
 - update tests tests that the backoff policy is used when a openForUpdate is done.
 
 - VetoCommitBarrier_vetoCommitWithTransactionTest fails sometimes.
@@ -70,57 +74,6 @@ TransactionalArrayList_sublistTest
 
 TransactionalLinkedList_ClassStructureTest
 
-TransactionalTreeMap_StressTest
-
-TransactionalTreeMap_containsValueTest
-
-TransactionalTreeMap_entrySetTest
-
-TransactionalTreeMap_equalsTest
-
-TransactionalTreeMap_getTest.whenKeyIsRoot
-
-TransactionalTreeMap_hashCodeTest
-
-TransactionalTreeMap_keySetTest
-
-TransactionalTreeMap.whenOneOfTheKeysContainsNull
-
-TransactionalTreeMap_putIfAbsentTest.test
-
-TransactionalTreeMap_remove1Test
-
-TransactionalTreeMap_remove2Test
-
-TransactionalTreeMap_replace3Test
-
-TransactionalTreeMap_toStringTest
-
-TransactionalTreeMap_valuesTest
-
-TransactionalTreeSet_StressTest
-
-TransactionalTreeSet_equalsTest
-
-TransactionalTreeSet_hashCodeTest
-
-TransactionalTreeSet_iteratorTest
-
-TransactionalTreeSet_removeAllTest
-
-TransactionalTreeSet_removeTest.whenSetEmpty_thenReturnFalse
-
-TransactionalTreeSet_removeTest.whenItemNotFound_thenNoChange
-
-TransactionalTreeSet_removeTest.whenItemFound_thenRemoved
-
-TransactionalTreeSet_retainAllTest.
-
-TransactionalTreeSet_toArray0Test
-
-TransactionalTreeSet_toArray1Test
-
-TransactionalTreeSet_toStringTest
 
 - commuting write and open for read; if non automatic read tracking then
 it will not be fixated.
@@ -132,6 +85,15 @@ it will not be fixated.
     - public ListIterator<E> listIterator(int index)
 
     - List<E> subList(int fromIndex, int toIndex)
+
+
+- TransactionalLinkedList
+
+    - ListIteratorImpl
+
+    - boolean removeFirstOccurrence(Object o)
+
+    - boolean removeLastOccurrence(Object o)
 
 - TransactionalTreeMap
 
@@ -147,17 +109,6 @@ it will not be fixated.
 
     - public String toString()
 
-- TransactionalLinkedList
-
-    - ListIteratorImpl
-
-    - boolean removeFirstOccurrence(Object o)
-
-    - boolean removeLastOccurrence(Object o)
-
----------------------------------------------------------------
-todo next release
----------------------------------------------------------------
 
 - 'mod' support for iterators.
 
@@ -339,7 +290,58 @@ they are moved to the alpha package, so they have an stm to be tested against.
 - als een transactie geen dirty checks nodig heeft, dan automatisch ieder object dat gelezen is,
 kan met een dirty tag
 
+       TransactionalTreeMap_StressTest
 
+       TransactionalTreeMap_containsValueTest
+
+       TransactionalTreeMap_entrySetTest
+
+       TransactionalTreeMap_equalsTest
+
+       TransactionalTreeMap_getTest.whenKeyIsRoot
+
+       TransactionalTreeMap_hashCodeTest
+
+       TransactionalTreeMap_keySetTest
+
+       TransactionalTreeMap.whenOneOfTheKeysContainsNull
+
+       TransactionalTreeMap_putIfAbsentTest.test
+
+       TransactionalTreeMap_remove1Test
+
+       TransactionalTreeMap_remove2Test
+
+       TransactionalTreeMap_replace3Test
+
+       TransactionalTreeMap_toStringTest
+
+       TransactionalTreeMap_valuesTest
+
+       TransactionalTreeSet_StressTest
+
+       TransactionalTreeSet_equalsTest
+
+       TransactionalTreeSet_hashCodeTest
+
+       TransactionalTreeSet_iteratorTest
+
+       TransactionalTreeSet_removeAllTest
+
+       TransactionalTreeSet_removeTest.whenSetEmpty_thenReturnFalse
+
+       TransactionalTreeSet_removeTest.whenItemNotFound_thenNoChange
+
+       TransactionalTreeSet_removeTest.whenItemFound_thenRemoved
+
+       TransactionalTreeSet_retainAllTest.
+
+       TransactionalTreeSet_toArray0Test
+
+       TransactionalTreeSet_toArray1Test
+
+       TransactionalTreeSet_toStringTest
+       
 ---------------------------------------------------------------
 idea:
 ---------------------------------------------------------------
@@ -394,11 +396,3 @@ Dit scheelt nog een object creatie.
 ---------------------------------------------------------------
 done
 ---------------------------------------------------------------
-
-- TransactionalTreeMap_entrySet_addTest
-
-- TransactionalTreeMap_entrySet_addAllTest
-
-- TransactionalTreeMap_entrySet_containsTest
-
-- TransactionalTreeMap_entrySet_containsAllTest
