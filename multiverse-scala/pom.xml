@@ -1,8 +1,16 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <name>Multiverse Scala Integration</name>
-    <description>Scala classes to allow more elegant use of Multiverse from Scala</description>
+    <description>Scala classes to allow more elegant use of Multiverse from Scala. Atm the functionality
+        is quite limited since not a lot of effort was put in the Scala integration. For the 0.6 release
+        Multiverse should be able to work with in Scala written transactional objects configured with
+        the Multiverse annotations. So that would reduce the need for this library, although in Scala
+        they want to have special Scala 'interfaces' that provide some syntactic sugar to use java collections
+        in Scala. So this module would be the good location for that. If anyone would like to help
+        improving the Multiverse/Scala integration, please don't hesitate to join.
+    </description>
     <artifactId>multiverse-scala</artifactId>
 
     <parent>
