@@ -5,13 +5,13 @@
     <artifactId>multiverse-core</artifactId>
     <name>The Multiverse core package</name>
     <description>Contains the core interfaces/classes of the Multiverse project. So no STM implementations</description>
-    <version>0.5</version>
+    <version>0.6-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>org.multiverse</groupId>
         <artifactId>multiverse</artifactId>
-        <version>0.5</version>
+        <version>0.6-SNAPSHOT</version>
     </parent>
 
     <build>

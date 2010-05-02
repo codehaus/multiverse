@@ -8,12 +8,12 @@
         Benchy the Benchmark framework is an application that can be used to execute benchmarks.
         It doesn't contain any Benchmarks itself (it isn't related to multiverse in principle).
     </description>
-    <version>0.5</version>
+    <version>0.6-SNAPSHOT</version>
 
     <parent>
         <groupId>org.multiverse</groupId>
         <artifactId>multiverse</artifactId>
-        <version>0.5</version>
+        <version>0.6-SNAPSHOT</version>
     </parent>
 
     <repositories>
