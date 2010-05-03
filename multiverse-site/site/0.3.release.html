@@ -11,10 +11,6 @@ every bit of spare time I had). This is a list of the most important features of
         fields of transactional objects.
     </li>
     <li>
-          Tracking update transactions: is able to do updates and to participate in
-          blocking operations.
-    </li>
-    <li>
         Non tracking readonly transaction: causes less stress on the transaction, so
         much cheaper than an update transaction. But it isn't allowed to participate
         in blocking operations and it also is more subject to read conflicts.
@@ -63,8 +59,8 @@ every bit of spare time I had). This is a list of the most important features of
         components as needed with having the option to build eveything yourself.
     </li>
     <li>
-        Transaction lifecycle  tasks: to make it possible to execute logic just before or after
-        aborts and commits. This is useful to start or clean up non transactional resources. 
+        Transaction lifecycle tasks: to make it possible to execute logic just before or after
+        aborts and commits. This is useful to start or clean up non transactional resources.
     </li>
     <li>
         Basic Scala integration.

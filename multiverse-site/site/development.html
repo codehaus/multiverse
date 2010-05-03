@@ -42,8 +42,8 @@ wastes my precious time.
 <h2>Building the project</h2>
 You need to install <a href="http://www.gradle.org">Gradle</a> 0.9 Preview 1
 (<a href="http://dist.codehaus.org/gradle/gradle-0.9-preview-1-all.zip">download</a>). If you go to the root directory
-and type 'gradle -i' the project will automatically be compiled and the artifacts will also be stored
-in your local maven repository. More important commands:
+and type 'gradle -i' (the -i adds progress information) the project will automatically be compiled and the
+artifacts will also be stored in your local maven repository. Other important commands:
 <pre>
     //builds the jar from scratch (unit tests are not executed)
     gradle -i clean install
@@ -54,8 +54,8 @@ in your local maven repository. More important commands:
     //runs the integration tests (this can some time).
     gradle -i integrationtest
 </pre>
-The integrationtests take a serious amount of time (more than an hour). In the 0.6 release it is going to be possible
-to configure from the buildscript/commandline how long the tests should run. Also make sure that you have
+The integrationtests take a serious amount of time (more than an hour). In the 0.6 release it is going to be
+possible to configure from the buildscript/commandline how long the tests should run. Also make sure that you have
 Java 1.6 or higher installed; Sun/IBM/Open(6,7)-JDK should work without a problem since they are tested.
 
 <h2>Setting up IDEA</h2>

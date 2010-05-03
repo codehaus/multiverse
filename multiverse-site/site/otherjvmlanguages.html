@@ -64,7 +64,7 @@ E.g.
 <pre>
   class Account {
         final static ProgrammaticReferenceFactory refFactory = GlobalStmInstance.getGlobalStmInstance().
-            getProgrammaticReferenceFactory();
+            getProgrammaticReferenceFactoryBuilder().build();
 
         private final ProgrammaticReference&lt;Integer&gt; balance = refFactory.createAtomic();
 

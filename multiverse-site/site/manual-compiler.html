@@ -1,0 +1,43 @@
+<h2>11 Multiverse Compiler</h2>
+
+<ul>
+    <li><a href="#introduction">11.1 Introduction</a></li>
+    <li><a href="#version.check">11.2 Version check</a></li>
+    <li><a href="#optimizations">11.3 Optimizations</a></li>
+    <li><a href="#usage">11.4 Usage</a></li>
+    <li><a href="#maven">11.5 Maven</a></li>
+    <li><a href="#gradle">11.6 Gradle</a></li>
+</ul>
+
+<h2 id="introduction">11.1 Introduction</h2>
+Multiverse relies heavily on instrumentation to integrate seamlessly in Java. It can be done at runtime using the
+Multiverse Javaagent or it can be done compiletime using the Multiverse Compiler. The advantage of compile
+time instrumentation, is that it is a lot easier to create a self contained artifact that doesn't rely
+on a Javaagent (in most cases you don't want to have a javaagent in your production environment.
+<p/>
+The instrumentation architecture in Multiverse is set up in such a way that the same Instrumentor
+can be used for the Multiverse Javaagent and the Multiverse Compiler.
+
+<h2 id="version.check">11.2 Version check</h2>
+The Multiverse Compiler will detect if code already is instrumented with a different Instrumentor or
+with a different version. After the class is transformed Multiverse will tag the file so that it can
+recognize if it already is instrumented. This means that you don't need to be worried about repeated
+instrumentation or when the Multiverse Javaagent is used.
+<p/>
+The Multiverse Compiler doesn't provide any backwards compatibility guarantees. This means that once you are going
+to upgrade to a new version of Multiverse, you need to recompile fresh classes and recompile them using
+the newest Multivsere Compiler. For SNAPSHOT releases no backward guarantees provided at all (so one
+SNAPSHOT doesn't need to be compatible with another SNAPSHOT for the same version).
+
+<h2 id="usage">11.4 Usage</h2>
+todo
+
+<h2 id="maven">11.5 Maven</h2>
+todo
+
+<h2 id="gradle">11.6 Gradle</h2>
+todo
+
+        
+
+

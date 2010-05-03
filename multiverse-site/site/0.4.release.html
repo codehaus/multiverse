@@ -1,10 +1,9 @@
 <h2>Multiverse 0.4</h2>
 
-Multiverse 0.4 is not released yet and is planned for 1 Februari 2010 and will contain the following
-feature set:
+Multiverse 0.4 was released at 24 Februari 2010. The following features have been added:
 <ol>
     <li>
-        <b>Read-tracking readonly transaction:</b> unlike a non tracking readonly transaction,
+        Read-tracking readonly transaction: unlike a non tracking readonly transaction,
         a tracking readonly transaction is able to participate in blocking operations because it knows
         which transactional objects have been read and therefor which objects to listen to. A tracking
         readonly transaction also is less subject to read-conflicts. This disadvantage of this transaction
@@ -12,59 +11,34 @@ feature set:
         this functionality is exposed, is through the automaticReadTracking property of the TransactionalMethod
         annotation.
     </li>
-    <!-- link to TransactionalMethod annotation -->
     <li>
-        <b>Non read-tracking update transaction:</b> unlike a tracking update transaction, a non tracking
+        Non read-tracking update transaction: unlike a tracking update transaction, a non tracking
         update transaction doesn't consume more resources for reads. The disadvantage is that it can't
         participate in blocking operations because it isn't known which reads have been executed. One of the ways
         this functionality is exposed, is through the automaticReadTracking property of the TransactionalMethod
         annotation.
     </li>
-    <!-- link to TransactionalMethod annotation -->
     <li>
-        <b>Optional interruptible transactional methods:</b> makes it possible to wakeup a Transaction when it
+        Interruptible transactional methods: makes it possible to wakeup a Transaction when it
         does a blocking operation like waiting an a blocking queue for an item to appear. One of the ways to
         activate this behavior is through the interruptible property of the @TransactionalMethod annotation.
     </li>
-    <!-- link to TransactionalMethod annotation -->
     <li>
-        <b>Transaction level logging:</b> using java.util.Logging. This makes it possible to see
-        what is going on inside a single transaction. One of the ways to activate this behaviour is through
-        the @TransactionalMethod annotation.
-    </li>
-    <!-- link to TransactionalMethod annotation -->
-    <li>
-        <b>Optional writeskew detection:</b> in readtracking update transactions. If writeskew detection is enabled,
+        Optional writeskew detection: in readtracking update transactions. If writeskew detection is enabled,
         concurrent executing transaction will appear to be executing serially. If writeskew detection is not
         enabled, the system could be subject to certain isolation problems. For more information see the
         following <a href="http://en.wikipedia.org/wiki/Snapshot_isolation">link</a>.
     </li>
     <li>
-        <b>TransactionalThreadPoolExecutor:</b> a Transactional clone of the java.util.concurrent.ThreadPoolExecutor
+        TransactionalThreadPoolExecutor: a Transactional clone of the java.util.concurrent.ThreadPoolExecutor
         where the execute methods can participate in transactions. This makes it possible that tasks are executed
         atomically (so all of them are executed or none of them).
     </li>
-    <!-- li>
-        <b>TransactionalNonBlockingThreadPoolExecutor:</b> an executor that can be used for non blocking transactions.
-        It can be used for example to handle thousands of transactions concurrently using only a few transactions.
-        With traditional concurrency control it is hard to move away from a thread per operation if blocking
-        operations are executed, but with transactional memory this is possible.        
-    </li -->
     <li>
-        <b>TransactionalTreeMap and TransactionalTreeSet: </b> that provide transactional versions of a
-        tree and tree based set. They support the following interfaces:
-        <ol>
-            <li>java.util.Map</li>
-            <li>java.util.concurrent.ConcurrentMap</li>
-            <li>java.util.Set</li>
-            <li>java.util.Collection</li>
-        </ol>
-    </li>
-    <li>
-        <b>Transactional primitives</b> like the TransactionalInteger and TransactionalBoolean. Useful for having
+        Transactional primitives like the TransactionalInteger and TransactionalBoolean. Useful for having
         transactional primitive fields that reduce creation of short lived wrappers (like the Integer or Long)
         that cause gc stress. The following primitives have been added:
-        <ol>
+        <ul>
             <li>TransactionalBoolean</li>
             <li>TransactionalByte</li>
             <li>TransactionalCharacter</li>
@@ -73,53 +47,37 @@ feature set:
             <li>TransactionalInteger</li>
             <li>TransactionalLong</li>
             <li>TransactionalShort</li>
-        </ol>
+        </ul>
+    </li>
     <li>
-    <li>
-        <b>Self learning transactional implementation selector:</b> based on runtime observation the system is
+        Self learning transactional implementation selector: based on runtime observation the system is
         able to select the transaction implementation that is optimal for a certain number of reads and or writes.
         The system begins with an implementation transaction (all transactions belonging to a transaction
         family to be precise) that is small and once these implementation complain that they are not big enough
         a 'bigger' implementation is selected. The following transaction 'tastes' are created.
-        <ol>
+        <ul>
             <li><b>Tiny:</b> optimized for a single tracked read or update</li>
             <li><b>Fixed: </b> optimized for transactions with a very small number of tracked reads or
                 updates.
             </li>
             <li><b>Growing:</b> optimized for a larger number of tracked reads or updates</li>
-        </ol>
-        This optimization is activated by default.
-        <p/>
-        Todo: a performance comparison.
+        </ul>
     </li>
-    <!-- li>
-        <b>2 phase commit:</b> this makes it possible to let Multiverse transactions participate in
-        distributed transactions/multiple transactional resources.
-        <p/>
-        Link to source
-    </li -->
-    <!-- li>
-        <b>Instrumentation support for TransactionalObject subclassing</b>. With the 0.3 release it is not
-        allowed for an TransactionalObject (with managed fields) to subclass from another
-        TransactionalObject (with managed fields). This limitation will be removed in the 0.4 release.
-    </li -->
     <li>
-        <b>Easier to embed: </b> that want to embed Multiverse without relying
+        2 phase commit: this makes it possible to create barrier like synchronization structures
+        where all transactions commit or none commit. The performance of the 2phase commit can't be compared
+        to a distributed 2 phase commit (which is orders of magnitude slower).
+    </li>
+    <li>
+        Easier to embed: that want to embed Multiverse without relying
         on the instrumentation.
     </li>
     <li>
-        <b>And a lot of performance improvements!</b> An overview of some benchmarks will be added in the near future.
-        But
-        a single threaded performance test using a tiny transaction (with only one transactional object) is able to do
-        roughly 5M update transactions/second on a single core of 2.3 Ghz Dual Core Intel Laptop. In the following
-        releases more performance improvements can be expected, but also scalability improvements (for example using
-        some form of commuting operations).
+        Transaction access: instead of going to the ThreadLocalTransaction to retrieve the Transaction
+        every time it is used in the instrumented code, every transactional method is 'widened' so that the
+        transaction reference is passed as additional argument.
     </li>
 </ol>
-
-<h3>Maven information for the 0.4 release</h3>
-If you want to use the 0.4 .. do the following to your pom..
-
 
 
 

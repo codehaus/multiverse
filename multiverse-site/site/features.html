@@ -1,13 +1,28 @@
-<h1>Features</h1>
+<h2>Features per version</h2>
+<ul>
+    <li><a href="0.3.release.html">Multiverse 0.3</a></li>
+    <li><a href="0.4.release.html">Multiverse 0.4</a></li>
+    <li><a href="0.5.release.html">Multiverse 0.5</a></li>
+    <li><a href="0.6.release.html">Multiverse 0.6</a></li>
+</ul>
 
+<h2>Features</h2>
 <ol>
     <li><b>Seamless integration in Java:</b> using annotations in combination with instrumentation (so you are
         not forced to extend classes or implement interfaces). Most transaction features can be configured through
-        the annotations.
+        the annotations. The instrumentation process can be:
+        <ol>
+            <li>runtime: using the Multiverse Javaagent</li>
+            <li>compiletime: using the Multiverse Compiler</li>
+            <li>any mix of runtime and compiletime instrumentation: useful when you are developing</li>
+        </ol>
     </li>
     <li><b>Independent of Java language:</b> so it can be used in other languages running on the JVM like
-        Scala or Groovy.
+        Scala or Groovy. Specially for environments that don't want to rely on instrumentation, a direct api to the
+        stm, the transaction and reference factories are provided. This api doesn't depend on a specific Multiverse
+        STM implementation.
     </li>
+
     <li>
         <b>Object and field level granularity:</b> the main STM implementation, called the AlphaStm is able to
         deal with object and field level granularity.
@@ -51,14 +66,15 @@
     <li>
         <b>Transactional collections:</b>
         <ul>
-            <li><b>TransactionalLinkedList:</b> general purpose linked list that can be used as BlockingQueue and
+            <li><b>TransactionalLinkedList:</b> general purpose linked list that also can be used as BlockingQueue and
                 BlockingDeque implementation.
             </li>
-            <li><b>TransactionalHashMap:</b> hash based transactional ConcurrentMap implementation.</li>
-            <li><b>TransactionalHashSet:</b> hash based transactional Set implementation.</li>
-            <li><b>TransactionalTreeMap:</b> tree based transactional ConcurrentMap implementation.</li>
-            <li><b>TransactionTreeSet:</b> tree based transactional Set implementation.</li>
+            <li><b>TransactionalArrayList:</b> transactional version of the java.util.ArrayList</li>
+            <li><b>TransactionalReferenceArray:</b> transactional version of the
+                java.util.concurrent.atomic.AtomicReferenceArray
+            </li>
         </ul>
+        In the near future other implementations will be added (TreeMap/HashMap,TreeSet/HashSet etc).
     </li>
     <li>
         <b>Transactional references and primitives</b>
@@ -82,7 +98,7 @@
         </ul>
     </li>
     <li>
-        <b>TransactionalThreadPoolExecutor:</b> a Transaction implementation of the
+        <b>TransactionalExecutor:</b> a Transaction implementation of the
         ThreadPoolExecutor from Java that is able to participate in transactions.
     </li>
     <li>
@@ -92,20 +108,33 @@
     </li>
     <li>
         <b>Learning Stm:</b> that learns by runtime transaction analysis and chooses better performing
-        or behaving transactions.
+        or behaving transactions. Atm it learns about when a transaction should be an update, when it needs
+        read tracking and which type of transaction is the best fit for a certain situation (cheap transaction
+        implementations for small transactions, and more expensive implementations for bigger transactions).
+    </li>
+    <li>
+        <b>No special JVM needed:</b> Multiverse runs on a standard Java 6+ JVM. Every night all the tests are
+        executed in the newest JVM's of Sun(Oracle), IBM and the OpenJDK.
+    </li>
+    <li>
+        <b>Not messing other classes:</b> Multiverse will only instrument the classes that are explicitly defined
+        as needing instrumentation. So Multiverse will not mess with your other classes (like those of the JDK).
     </li>
 </ol>
 
 <h2>Planned features</h2>
 Of course there are also a lot of features in the pipeline. The most important ones are:
 <ol>
-    <li><b>Persistence:</b> for making committed transactions durable.</li>
+    <li><b>Persistence:</b> for making committed transactions durable. This should be mostly transparent
+        to the developer.
+    </li>
     <li><b>Distributed STM:</b> so load can be spread out over a cluster of machines and it also is useful for
         realizing failover.
     </li>
-    <li><b>Profiler:</b> to pinpoint performance or contention problems.</li>
     <li><b>Contention management:</b> to have more control on liveness issues like livelocking and starvation.</li>
-    <li><b>More collections:</b> like ArrayLists, HashMap, TreeMap, SkipList, Tries etc</li>
-    <li><b>Improved performance:</b> there is a lot of room for performance improvements by optimizing the bytecode.
+    <li><b>More collections:</b> like HashMap, TreeMap, SkipList, Tries etc</li>
+    <li><b>Improved performance:</b> there is a lot of room for performance improvements by optimizing the
+        bytecode.
     </li>
 </ol>
+

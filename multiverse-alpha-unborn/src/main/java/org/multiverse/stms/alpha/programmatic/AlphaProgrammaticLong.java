@@ -21,7 +21,8 @@ import static org.multiverse.api.exceptions.UncommittedReadConflict.createUncomm
  * @author Peter Veentjer
  */
 public final class AlphaProgrammaticLong
-        extends DefaultTxObjectMixin implements ProgrammaticLong {
+        extends DefaultTxObjectMixin
+        implements ProgrammaticLong {
 
     private final AlphaStm stm;
 
