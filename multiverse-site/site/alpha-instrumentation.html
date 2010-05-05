@@ -1,61 +1,89 @@
 <h1>Instrumentation for the Alpha STM</h1>
 In Multiverse every STM is allowed to have it own instrumentation, because this provides a lot of flexibility.
-The main STM implementation of Multiverse is the Alpha STM: it contains a lot of features and is stable.
+The main STM implementation of Multiverse is the AlphaStm: it contains a lot of features and is stable.
 This page describes which optimizations have been added.
 
 <h2>Tranlocal</h2>
+All managed fields of a transactional object are moved to a new structure called the Tranlocal (Transaction Local).
+So what essentially happens is this:
+<pre>
+    class Person{
+        String name;
+        int age;
+    }
+</pre>
+This is transformed to:
+<pre>
+    class Person{
+        PersonTranlocal current;
+    }
+
+    class PersonTranlocal{
+        String name;
+        int age;
+    }
+</pre>
+When a read or write is done on a managed field of a transactional object, the transaction is asked to open
+the transactional object for reading or writing. All tranlocals that are opened for write are attached to the
+transaction, and if readtracking is enabled, the tranlocal that is opened for reading is attached to the
+transaction as well. One of the main goals of the instrumentation is to prevent unwanted access to the transaction
+for opening the tranlocal once it has been opened.
 
 <h2>Optimizations</h2>
 
 <h2>Final fields</h2>
-There is no overhead on accessing final (and other non managed fields like volatile or static). So if you get the
-chance, make it final! The more you make final, the easier it will be on the STM because less fields need to be
-copied, less transaction access needs to be done, less fields needs to be checked for dirtyness etc etc.
+There is no overhead on accessing final (and other non managed fields like volatile or static). The more you make final,
+the easier it will be on the STM because:
+<ol>
+    <li>less fields need to be copied</li>
+    <li>less transaction access needs to be done</li>
+    <li>less fields needs to be checked for dirtyness etc etc.</li>
+</ol>
+So if you get the chance, make it final (is a good practice anyway).
 
 <h2>Transactional object without fields</h2>
 If a transactional object doesn't have any managed fields (for example because they are all final), no tranlocal
 needs to be created and therefor it causes no overhead.
 
 <h3>Transaction access</h3>
-Instead of going to the ThreadLocalTransaction to retrieve the current Transactions, widened clones are
-created that accept additional parameters. One of the parameters that is passed in every transactional
-method, is the transaction. So accessing the Transaction for instrumented code, is just as cheap
-as a variable access.
+Instead of going to the ThreadLocalTransaction to retrieve the current Transactions, a clone of the transactional
+method is made (multiple clones to be correct) which has an extra argument: the transaction. So the instrumented
+code can access the transaction by loading a local variable (so a simple ALOAD).
 
 <h3>Getter/setter</h3>
 Normally simple getters/setters are inlined by the JIT (so no overhead of a method call). In Multiverse
 additional logic is added to methods, so the JIT has less chance to do its work. In the 0.5 release inlining
-of transactional getters/setters (getters and setters of managed fields) are now automatically inlined
-and don't need the getter/setter method call anymore. It also makes future optimizations in Multiverse
-easier because there is a larger set of instructions to optimize and this increases the chance of recognizing
-certain patterns.
-<p/>
-Getter setter inlining only works for final methods (all methods of a final class are also final) and
-it works of the javac compiler is able to determine that a private getter/setter is done.
+of transactional getters/setters (getters and setters of managed fields) is not automatically done.
+It also makes future optimizations in Multiverse easier because there is a larger set of instructions
+to optimize and this increases the chance of recognizing certain patterns.
+<p>
+    Getter/setter inlining only works for final methods (all methods of a final class are also final) and
+    it works if the Java compiler is able to determine that a private getter/setter is called (so INVOKE_SPECIAL).
+    A getter/setter is not determined based on the name, but by analyzing the instructions of the method.
 
 <h3>Transactional management skip</h3>
-For every transactional method, a whole bunch of new synthetic methods are added optimized for readonly or update
-transactions. The original logic is removed from the transactional method and copied to the synthetic
-versions and transactionmanagement logic relaced the original logic. So the original method does the transaction
-management:
+For every transactional method, a whole bunch of new synthetic methods are added which are optimized for
+readonly or update transactions. The original logic is removed from the transactional method and copied
+to the synthetic versions (these also contain an extra argument: the Transaction). The transactionmanagement
+logic relaces the original logic, so the original method does the transaction management:
 <ol>
     <li>looks up the current transaction on the ThreadLocalTransaction</li>
     <li>if one is available it forwards to one of the synthetic methods</li>
     <li>if one is not available, it starts a transaction, forwards it to one of the synthetic methods,
-        and commits/aborts/retries if needed
+        and commits/aborts/retries if needed.
     </li>
 </ol>
 But once you are inside a synthethic method that contains the original logic, the instrumented code will directly
 call the synthetic version of a transactional method directly, completely bypassing any unneeded transaction
 management logic.
-<p/>
-Transactional management skip is not possible if the instrumentation process is not able to
-determine if a call is a transactional method or not. In this case the 'original' method needs to
-be called and the useless transaction check needs to be done again.
-<p/>
-That is a performance reason why using a transactional interface/object instead of a normal interface/object
-(e.g. TransactionalList vs List) should be used if possible. If a normal interface/object is used, the
-instrumentation is not able to detect if a method is transactional, and is not able to apply this optimization.
+<p>
+    Transactional management skip is not possible if the instrumentation process is not able to
+    determine if a call is a transactional method or not. In this case the 'original' method needs to
+    be called and the useless transaction check needs to be done again.
+<p>
+    That is a performance reason why using a transactional interface/object instead of a normal interface/object
+    (e.g. TransactionalList vs List) should be used if possible. If a normal interface/object is used, the
+    instrumentation is not able to detect if a method is transactional, and is not able to apply this optimization.
 
 <h3>New transactional data-structures</h3>
 Instead of calling an Transaction.openForWrite(transactionalObject), the Transaction.openForConstruction is called.
@@ -70,7 +98,32 @@ reading them.
 
 <h3>This access</h3>
 
+Before the optimization:
+<pre>
+    class IntRef{
+        void inc(Transaction tx){
+            ((IntRefTranlocal)tx.openForWrite(this)).value =
+                ((IntRefTranlocal)tx.openForRead(this)).value+1;
+        }
+    }
+</pre>
+
+After the optimization:
+<pre>
+    class IntRef{
+        void inc(Transaction tx, IntRefTranlocal tranlocal){
+            if(tranlocal.isCommitted()){
+                tranlocal = ((IntRefTranlocal)tx.openForWrite(this));
+            }
+
+            tranlocal.value=tranlocal.value+1;
+        }
+    }
+</pre>
+As you can see, reading the tranlocal has become a lot cheaper. And writing the tranlocal is very cheap once it
+has
+
 <h3>Local variable access</h3>
 
-
 <h3>Multiverse Javaagent vs Multiverse Compiler</h3>
+All optimizations are enabled by default in the Multiverse Compiler.

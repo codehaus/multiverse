@@ -3,7 +3,7 @@
 function runbenchmark(){
 java -javaagent:~/.m2/repository/org/multiverse/multiverse-alpha/0.4-SNAPSHOT/multiverse-alpha-0.4-SNAPSHOT-jar-with-dependencies.jar \
  -classpath ~/.m2/repository/org/multiverse/multiverse-benchy/0.4-SNAPSHOT/multiverse-benchy-0.4-SNAPSHOT.jar \
- org.benchy.executor.BenchmarkMain ~/benchmarks <<< $1 EOF
+ org.benchy.executor.BenchmarkExecutorMain ~/benchmarks <<< $1 EOF
 }
 
 #function createDiagram(){

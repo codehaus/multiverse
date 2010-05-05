@@ -17,9 +17,8 @@
         <ul>
             <li><a href="#transactionalmethod.readonly">1.3.1 @TransactionalMethod.readonly</a></li>
             <li><a href="#transactionalmethod.maxRetries">1.3.2 @TransactionalMethod.maxRetries</a></li>
-            <li><a href="#transactionalmethod.automaticreadtracking">1.3.3
-                @TransactionalMethod.automaticReadTracking</a></li>
-            <li><a href="">1.3.3 @TransactionalMethod.writeSkew</a></li>
+            <li><a href="#transactionalmethod.trackReads">1.3.3 @TransactionalMethod.trackReads</a></li>
+            <li><a href="#transactionalmethod.writeSkew">1.3.3 @TransactionalMethod.writeSkew</a></li>
             <li><a href="#transactionalmethod.interruptible">1.3.3 @TransactionalMethod.interruptible</a></li>
             <li><a href="#transactionalmethod.and.nesting">1.3.3 @TransactionalMethod and nesting.</a></li>
             <li><a href="#transactionalmethod.and.interfaces">1.3.3 @TransactionalMethod and interfaces.</a></li>
@@ -33,10 +32,10 @@
             <li><a href="#transactionalconstructor.and.blocking">1.4.1 @TransactionalConstructor and blocking</a></li>
         </ul>
     </li>
-    <li><a href="#exclude">1.5 @Exclude</a>
+    <li><a href="#nontransactional">1.5 @NonTransactional</a>
         <ul>
-            <li><a href="#exclude">1.5.1 @Exclude field</a></li>
-            <li><a href="#exclude">1.5.2 @Exclude method</a></li>
+            <li><a href="#nontransactional.field">1.5.1 @NonTransactional field</a></li>
+            <li><a href="#nontransactional.method">1.5.2 @NonTransactional method</a></li>
         </ul>
     </li>
     <li><a href="#fieldgranularity">1.6 @FieldGranularity</a></li>
@@ -154,6 +153,10 @@ of the TransactionalMethod annotation, e.g.:
     }
 </pre>
 
+If no explicit readonly value is set, the system will speculative execute transactions as readonly and once there
+is a violation because an update is done, all new transactions will automatically be executed as update
+transactions.
+
 <h3 id="transactionalmethod.maxRetries">1.3.2 @TransactionalMethod.maxRetries</h3>
 Transactions run in Multiverse can fail for all kinds of reasons:
 <ol>
@@ -209,7 +212,7 @@ On a lower level the maxRetries is combined with a customizable restartBackoffPo
 backoff policy as the default implementation) to eliviate pressure on contention. In the future this backoff
 policy will be exposed through annotations.
 
-<h3 id="transactionalmethod.automaticreadtracking">@TransactionalMethod.automaticReadTracking</h3>
+<h3 id="transactionalmethod.trackReads">@TransactionalMethod.trackReads</h3>
 When a transaction reads from transactional objects, it can decide to track that read. Readtracking is useful
 for multiple purposes:
 <ol>
@@ -221,17 +224,45 @@ for multiple purposes:
         objects to listen when a transaction is blocked. For more information see
         <a href="manual-blocking.html">chapter 2 Blocking transactions</a>.
     </li>
-    <li><b>writeSkewPrevention:</b> an isolation problem. For more information see
-        <a href="#transactionalmethod.writeskewprevention">@TransactionalMethod.writeSkewPrevention</a>
+    <li><b>writeskew:</b> an isolation problem. For more information see
+        <a href="#transactionalmethod.writeskew">@TransactionalMethod.writeSkew</a>
     </li>
 </ol>
 Ofcourse readtracking has its price; for each read that is tracked, some kind of registration needs to be done
 and this increases the memory and cpu usage of a transaction.
-<p/>
-By default all readonly transactional methods will not do automaticReadTracking and all update transactions will,
-unless explicitly specified otherwise ofcourse.
+<p>
+    By default all readonly transactional methods will not track reads and all update transactions will,
+    unless explicitly specified otherwise ofcourse.
+<p>
+    If the value is not specified, Multiverse is speculative about this property. It first starts with non
+    read tracking, but as soon as a retry is done, it knows that the property is needed so all new transactions
+    will automatically have readtracking enabled.
 
-<h3 id="transactionalmethod.writeskewprevention">@TransansactionalMethod.writeSkewPrevention</h3>
+<h3 id="transactionalmethod.writeSkew">@TransansactionalMethod.writeSkew</h3>
+Configures is the transaction is allowed to suffer from the writeskew problem (defaults to true). This property
+only has meaning for an update transaction and is ignored for readonly transactions. If writeSkew is false, the
+trackReads needs to be set to true (will automatically be set to true if not done explicitly and throws an error
+when it is false). Writeskew is quite expensive since the whole readset needs to be validated.
+
+<h3 id="transactionalmethod.interruptible">@TransansactionalMethod.interruptible</h3>
+Configures if the method is interruptible if it blocks. This property will automatically be inferred based on if
+the InterruptedException is thrown, e.g:
+
+<pre>
+    @TransactionalMethod(interruptible = true)
+    void somemethod()throws InterruptedException{
+        ...
+    }
+</pre>
+is exactly the same as:
+<pre>
+    @TransactionalMethod
+    void somemethod()throws InterruptedException{
+        ...
+    }
+</pre>
+This will only work for InterruptedException, and not for any subclass or when the method throws a
+java.lang.Exception. For these cases you need to configure the interruptible property explictly.
 
 <h3 id="transactionalmethod.and.exceptions">@TransactionalMethod and exceptions</h3>
 When a TransactionalMethod encounters an exception (no matter if it is checked, unchecked or an error),
@@ -378,7 +409,7 @@ you can use the following approach:
 
         @TransactionalMethod
         public static IntValue create(TransactionalInteger integer){
-            return new IntValue(integer);     
+            return new IntValue(integer);
         }
     }
 </pre>
@@ -386,27 +417,27 @@ The example is quite useless, but it shows how to add the blocking behavior. It 
 because the 'create' function can be executed more than once (because of the await in the constructor), that
 multiple IntValue's are created.
 
-<h2 id="exclude">1.5 @Exclude</h2>
-The @Exclude annotation can be used for 2 reaons:
+<h2 id="nontransactional">1.5 @NonTransactional</h2>
+The @NonTransactional annotation can be used for 2 reasons:
 <ol>
-    <li><a href="#exclude.field">excluding a field</a></li>
-    <li><a href="#exclude.method">excluding a method</a></li>
+    <li><a href="#nontransactional.field">mark a field as being non transactional</a></li>
+    <li><a href="#nontransactional.method">mark a method as being non transactional</a></li>
 </ol>
 
-<h3 id="exclude.field">1.5.1 @Exclude field</h3>
+<h3 id="nontransactional.field">1.5.1 @NonTransactional field</h3>
 When a TransactionalObject annotation is placed on an object, all non final instance fields of that object will
 automatically be managed by the STM. But in some you want to exclude certain fields. This can be done with the
-@Exclude annotation:
+@NonTransactional annotation:
 
 <pre>
-    import org.multiverse.annotations.Exclude;
+    import org.multiverse.annotations.NonTransactional;
     import org.multiverse.annotations.TransactionalObject;
 
     @TransactionalObject
     public class Foo{
         private int a;
 
-        @Exclude
+        @NonTransactional
         private int b;
 
         ...
@@ -417,29 +448,29 @@ In this example field 'a' is managed and field 'b' is not managed.
 It is important to realize that the field is not protected by transactions, so it could be subject to all the problems
 transactions are trying to prevent. So it should be used wisely.
 <p/>
-If a @Exclude annotation is placed on a field of a non transactional object, or if the field automatically is excluded
+If a @Transactional annotation is placed on a field of a non transactional object, or if the field automatically is excluded
 (final, static, volatile) it has no effect and is completely ignored.
 
-<h3 id="exclude.method">1.5.1 @Exclude method</h3>
+<h3 id="nontransactional.method">1.5.1 @NonTransactional method</h3>
 When a TransactionalObject annotation is placed on an object, all instance methods of that object automatically
 become transactional update methods. But in some cases you want to exclude that method. This can be done
-with adding an Exclude annotation on a method.
+with adding a @NonTransactional annotation on a method.
 
 <pre>
-    import org.multiverse.annotations.Exclude;
+    import org.multiverse.annotations.NonTransactional;
     import org.multiverse.annotations.TransactionalObject;
 
     @TransactionalObject
     public class Foo{
         private int a;
 
-        @Exclude
+        @NonTransactional
         public void sayHello(){
             System.out.println("hello");
         }
     }
 </pre>
-The Exclude has a very high priority, so it can be used to override @TransactionalMethod or @TransactionalObject
+The @NonTransactional has a very high priority, so it can be used to override @TransactionalMethod or @TransactionalObject
 configuration.
 <p/>
 If an excluded method access managed fields, you need to watch out. If there is no transaction active in the
@@ -449,7 +480,7 @@ this transaction will be used to access the field.
 If an excluded method calls multiple other transactional methods, it could be that multiple transactions are used.
 So you won't get your isolation or atomicity guarantees.
 <p/>
-If an exclude annotation is placed on a non transactional method, it is ignored.
+If a @NonTransactional annotation is placed on a non transactional method, it is ignored.
 
 <h2 id="fieldgranularity">1.6 @FieldGranularity</h2>
 If a transactional object has more than 1 fields, it could be that you get a writeconflict on 2 transactions
@@ -524,7 +555,7 @@ instrumentation, the code looks like this:
     @TransactionalObject
     public class Foo{
 
-        private final TransactionalInteger a = new TransactionalInteger();        
+        private final TransactionalInteger a = new TransactionalInteger();
         private final TransactionalInteger b = new TransactionalInteger();
 
         ...

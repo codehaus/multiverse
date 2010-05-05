@@ -24,10 +24,10 @@ not be on adding new features, but on improving scalability, performance and sta
     </li>
     <li>
         New transactional collections:
-        <ol>
+        <ul>
             <li>TransactionalTreeMap</li>
             <li>TransactionalTreeSet</li>
-        </ol>
+        </ul>
     </li>
     <li>
         Groovy integration.
@@ -36,7 +36,7 @@ not be on adding new features, but on improving scalability, performance and sta
         Compatible with Scala/Akka. In principle nothing special needs to be done for a class generated
         by Scala compiler or by the Java compiler to be instrumented; from a bytecode perspective they should
         be the same. But there always are small exceptions that cause problems. The goal is to make
-        Multiverse Scala/Akka compatible.
+        MultiverseCompiler and MultiverseJavaagent Scala and Akka compatible.
     </li>
     <li>
         Continuous performance integration environment. It should become easy to create benchmark, store results
@@ -57,7 +57,7 @@ not be on adding new features, but on improving scalability, performance and sta
         <ol>
             <li>
                 speculative inlining of transactions: Removing the creation of the transaction object and inlining
-                it completely in simple methods, should give a big performance boost.
+                it completely in simple methods, should give a big performance boost on simple methods.
             </li>
             <li>
                 transactional objects as arguments: Once the tranlocal is retrieved it can be stored for later use
