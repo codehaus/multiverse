@@ -3,9 +3,10 @@
 Multiverse 0.5 was released at 2 May 2010 and contains the following features:
 <ol>
     <li>Multiverse Compiler: responsible for compile-time instrumentation. The instrumentation architecture
-        is now set up in such a way the the same mechanism can be used for the compile-time and runtime instrumentation
+        is now set up in such a way the the same mechanism can be used for the compiletime and runtime
+        instrumentation
     </li>
-    <li>Transactional collections
+    <li>New Transactional collections:
         <ul>
             <li>TransactionalReferenceArray</li>
             <li>TransactionalArrayList</li>
@@ -21,21 +22,27 @@ Multiverse 0.5 was released at 2 May 2010 and contains the following features:
         <ul>
             <li>Inlining getters/setters: because additional code is generated, simple inlining of getters/setters
                 could be obstructed in the JIT. That is why an explicit getter/setter inliner for managed fields
-                is added to the Multiverse Compiler before all other transformations are applied.
+                is added to the Multiverse Compiler, that is applied before all other transformations.
             </li>
             <li>Staying inside transactional methods: the instrumentation generates additional methods
                 for every transactional method. The original method is stripped from all logic which is replaced
-                by transaction management logic. The actual logic is moved to new synthetic methods. But because you
+                by transaction management logic. The original logic is moved to new synthetic methods. But because you
                 know that once you enter such a method, the transaction management already is done, you can safely call
                 other 'synthetic' methods that already have transaction management done.
             <li>Transactional this: transactional methods in Multiverse are modified, and in this case they
-                are modified in such a way that the tranlocal of the this object, is added to all instance methods of
-                that class. The advantage is that instead of going through a transaction to retrieve the tranlocal,
-                it always will be available in a local variable. So a read/write on managed field of will be almost
-                as fast as in uninstrumented code. And if a instance method calls another instance methods of itself,
-                it can pass the tranlocal (doesn't need to be retrieved again from the transaction).
+                are modified in such a way that the tranlocal of the 'this', is added to all transactional instance
+                methods of that class. The advantage is that instead of going through a transaction to
+                retrieve the tranlocal, it always will be available in a local variable. So a read/write
+                on managed field of will be almost as fast as in uninstrumented code. And if a instance
+                method calls another instance methods of itself, it can pass the tranlocal
+                (doesn't need to be retrieved again from the transaction).
             </li>
         </ul>
+    </li>
+    <li>
+        Spinning: in the 0.4 release when a transaction wants to to open a transactional object for reading
+        or writing, and the object is locked (for committing), it fails immediately and is retried. With the
+        0.5 release spinning is added to prevent failing immediately.
     </li>
     <li>
         Scalability improvements in the AlphaSTM by reducing lock time and removing unwanted cas
@@ -72,7 +79,7 @@ Multiverse 0.5 was released at 2 May 2010 and contains the following features:
         should be enabled. This means that these properties don't need to be specified explicitly by the developer.
     </li>
     <li>
-        Guaranteed to work with the Sun 1.6 /IBM 1.6 /OpenJDK 1.7 (all tests are executed on the newest
+        Guaranteed to work with the Sun 1.6 / IBM 1.6 / OpenJDK 1.7 (all tests are executed on the newest
         versions every night).
     </li>
 </ol>

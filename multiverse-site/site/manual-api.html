@@ -66,11 +66,12 @@ why it was moved to a Config object that only contains configuration properties.
 <h2 id="transactionfactory">6.3 TransactionFactory</h2>
 It isn't possible to create transactions directly, they should always be created with a TransactionFactory.
 A TransactionFactory should create Transactions optimal configured for certain scenario's. For more information
-check <a href="#transactionFactoryBuilder">TransactionFactoryBuilder</a>
+check <a href="#transactionfactorybuilder">TransactionFactoryBuilder</a>
 
 <p/>
 TransactionFactories are threadsafe to use and can be expensive to create. So it is best to create them
-in the beginning and store them for later use.
+in the beginning and store them for later use. In the instrumentation I create them when the class is loaded,
+and they are stored in a new final static synthetic field.
 
 
 <h2 id="transactionfactorybuilder">6.4 TransactionFactoryBuilder</h2>
