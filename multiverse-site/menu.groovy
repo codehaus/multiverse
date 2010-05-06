@@ -66,7 +66,6 @@ def pages = [
         new Page(pageid: 'contact'),
         new Page(pageid: 'missionstatement'),
         new Page(pageid: 'download'),
-        new Page(pageid: 'guide-misc'),
         new Page(pageid: 'license'),
         new Page(pageid: 'features'),
         new Page(pageid: '0.3.release'),
