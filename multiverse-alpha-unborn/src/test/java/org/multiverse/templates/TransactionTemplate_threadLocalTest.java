@@ -27,7 +27,7 @@ public class TransactionTemplate_threadLocalTest {
     }
 
     @Test
-    public void test() {
+    public void TransactionalTemplate_ShouldBe_ThreadLocalAware() {
         TransactionTemplate t = new TransactionTemplate(stm) {
             @Override
             public Object execute(Transaction tx) throws Exception {

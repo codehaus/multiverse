@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+  <testsuite errors="0" failures="0" hostname="guhui-laptop" id="0" name="StmUtilsSpec" package="org.multiverse.integration.scala" tests="5" time="0.234" timestamp="2010-05-07T15:38:47">
+      <properties />
+
+      <testcase classname="org.multiverse.integration.scala.StmUtilsSpec" name="retry throws Retry" time="0.129" />
+
+      <testcase classname="org.multiverse.integration.scala.StmUtilsSpec" name="atomic will execute a simple block when invoked" time="0.025" />
+
+      <testcase classname="org.multiverse.integration.scala.StmUtilsSpec" name="atomic will execute only the either block if successful" time="0.0030" />
+
+      <testcase classname="org.multiverse.integration.scala.StmUtilsSpec" name="atomic will execute the orelse block if the either block fails" time="0.0010" />
+
+      <testcase classname="org.multiverse.integration.scala.StmUtilsSpec" name="StmEither.orelse cannot be evaluated outside the scope of a transaction" time="0.0030" />
+
+      <system-out><![CDATA[]]></system-out>
+
+      <system-err><![CDATA[]]></system-err>
+
+  </testsuite>
+</testsuites>
