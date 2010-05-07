@@ -9,3 +9,4 @@
 /multiverse.ipr
 /multiverse.iws
 *.iml
+**/build
