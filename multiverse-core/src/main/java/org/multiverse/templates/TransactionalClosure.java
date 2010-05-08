@@ -9,7 +9,7 @@ import java.util.concurrent.Callable;
  * <p/>
  * example:
  * <pre>
- * new TransactionalCallable().execute(new Callable<Integer> {
+ * new TransactionalClosure().execute(new Callable<Integer> {
  *         Integer call(){
  *            return queue.pop();
  *         }
@@ -20,7 +20,7 @@ import java.util.concurrent.Callable;
  * @author Sai Venkat
  */
 
-public class TransactionalCallable<E> extends TransactionTemplate<E> {
+public class TransactionalClosure<E> extends TransactionTemplate<E> {
     private Callable<E> callable;
 
     @Override

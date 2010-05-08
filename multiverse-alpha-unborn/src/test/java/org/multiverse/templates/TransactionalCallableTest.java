@@ -4,7 +4,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Stm;
-import org.multiverse.api.Transaction;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import java.util.concurrent.Callable;
@@ -38,7 +37,7 @@ public class TransactionalCallableTest {
 
         long version = stm.getVersion();
 
-        new TransactionalCallable().execute(
+        new TransactionalClosure().execute(
                 new Callable() {
                     @Override
                     public Object call(){
