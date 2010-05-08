@@ -40,7 +40,8 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
  * <p/>
  * <h2>Exceptions</h2> All uncaught throwable's lead to a rollback of the transaction.
  * <p/>
- * <h2>Threadsafe</h2> AtomicTemplates are thread-safe to use and can be reused.
+ * <h2>Threadsafe</h2> TransactionTemplate is thread-safe to use and can be reused. So in case of an actor, you could
+ * create one instance in the beginning, and reuse the instance.
  *
  * @author Peter Veentjer
  */
@@ -90,7 +91,7 @@ public abstract class TransactionTemplate<E> {
      * @throws NullPointerException if txFactory is null.
      */
     public TransactionTemplate(TransactionFactory txFactory) {
-        this(txFactory, true, true, true);
+        this(txFactory, true, true);
     }
 
     /**
@@ -103,7 +104,7 @@ public abstract class TransactionTemplate<E> {
      *                                  extra object creation, so if you want to squeeze out more performance, set this to false at the price of
      *                                  not having the lifecycle methods working.
      */
-    public TransactionTemplate(TransactionFactory txFactory, boolean threadLocalAware, boolean lifecycleListenersEnabled, boolean retryEnabled) {
+    public TransactionTemplate(TransactionFactory txFactory, boolean threadLocalAware, boolean lifecycleListenersEnabled) {
         if (txFactory == null) {
             throw new NullPointerException();
         }

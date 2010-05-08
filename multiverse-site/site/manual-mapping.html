@@ -17,8 +17,8 @@
         <ul>
             <li><a href="#transactionalmethod.readonly">1.3.1 @TransactionalMethod.readonly</a></li>
             <li><a href="#transactionalmethod.maxRetries">1.3.2 @TransactionalMethod.maxRetries</a></li>
-            <li><a href="#transactionalmethod.automaticreadtracking">1.3.3
-                @TransactionalMethod.automaticReadTracking</a></li>
+            <li><a href="#transactionalmethod.trackReads">1.3.3
+                @TransactionalMethod.trackReads</a></li>
             <li><a href="">1.3.3 @TransactionalMethod.writeSkew</a></li>
             <li><a href="#transactionalmethod.interruptible">1.3.3 @TransactionalMethod.interruptible</a></li>
             <li><a href="#transactionalmethod.and.nesting">1.3.3 @TransactionalMethod and nesting.</a></li>
@@ -209,7 +209,7 @@ On a lower level the maxRetries is combined with a customizable restartBackoffPo
 backoff policy as the default implementation) to eliviate pressure on contention. In the future this backoff
 policy will be exposed through annotations.
 
-<h3 id="transactionalmethod.automaticreadtracking">@TransactionalMethod.automaticReadTracking</h3>
+<h3 id="transactionalmethod.trackReads">@TransactionalMethod.trackReads</h3>
 When a transaction reads from transactional objects, it can decide to track that read. Readtracking is useful
 for multiple purposes:
 <ol>
@@ -221,17 +221,17 @@ for multiple purposes:
         objects to listen when a transaction is blocked. For more information see
         <a href="manual-blocking.html">chapter 2 Blocking transactions</a>.
     </li>
-    <li><b>writeSkewPrevention:</b> an isolation problem. For more information see
-        <a href="#transactionalmethod.writeskewprevention">@TransactionalMethod.writeSkewPrevention</a>
+    <li><b>writeSkew:</b> an isolation problem. For more information see
+        <a href="#transactionalmethod.writeSkew">@TransactionalMethod.writeSkew</a>
     </li>
 </ol>
 Ofcourse readtracking has its price; for each read that is tracked, some kind of registration needs to be done
 and this increases the memory and cpu usage of a transaction.
 <p/>
-By default all readonly transactional methods will not do automaticReadTracking and all update transactions will,
+By default all readonly transactional methods will not do trackReads and all update transactions will,
 unless explicitly specified otherwise ofcourse.
 
-<h3 id="transactionalmethod.writeskewprevention">@TransansactionalMethod.writeSkewPrevention</h3>
+<h3 id="transactionalmethod.writeSkew">@TransansactionalMethod.writeSkew</h3>
 
 <h3 id="transactionalmethod.and.exceptions">@TransactionalMethod and exceptions</h3>
 When a TransactionalMethod encounters an exception (no matter if it is checked, unchecked or an error),
@@ -323,13 +323,13 @@ A TransactionalConstructor can be added to a constructor of a TransactionalObjec
 
         private int balance;
 
-        @TransactionalConstructor(automaticReadTracking = false)
+        @TransactionalConstructor(trackReads = false)
         public Account(int balance){
             this.balance = balance;
         }
     }
 </pre>
-In this case the default value true for automaticReadTracking is changed to false.
+In this case the default value true for trackReads is changed to false.
 <p/>
 It can also be placed on a constructor of a non transactional object to make use of other transactional objects
 within a single transaction, e.g.:
@@ -352,8 +352,8 @@ All properties of the TransactionalConstructor, can also be found in the Transac
 the same meaning:
 <ol>
     <li><a href="#transactionalmethod.readonly">readonly</a></li>
-    <li><a href="#transactionalmethod.automaticreadtracking">automaticReadTracking</a></li>
-    <li><a href="#transactionalmethod.preventWriteSkew">preventWriteSkew</a></li>
+    <li><a href="#transactionalmethod.trackReads">trackReads</a></li>
+    <li><a href="#transactionalmethod.writeSkew">writeSkew</a></li>
 </ol>
 So for more information about these properties, just check the documentation on the TransactionalMethod.
 

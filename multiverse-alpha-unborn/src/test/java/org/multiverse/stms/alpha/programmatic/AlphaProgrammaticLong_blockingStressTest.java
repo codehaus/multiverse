@@ -20,7 +20,7 @@ public class AlphaProgrammaticLong_blockingStressTest {
     private ProgrammaticReferenceFactory refFactory;
     private AlphaProgrammaticLong ref;
     private int consumerCount = 10;
-    private int transactionCount = 1000 * 1000 * 10;
+    private int transactionCount = 1000 * 1000 * 5;
     private int unprocessedCapacity = 1000;
 
     @Before

@@ -1,8 +1,6 @@
 package org.multiverse.stms.alpha.programmatic;
 
-import org.multiverse.api.Transaction;
-import org.multiverse.api.TransactionConfiguration;
-import org.multiverse.api.TransactionStatus;
+import org.multiverse.api.*;
 import org.multiverse.api.latches.Latch;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -43,6 +41,16 @@ public final class AlphaProgrammaticReferenceTranlocal<E> extends AlphaTranlocal
 
     @Override
     public AlphaTranlocalSnapshot takeSnapshot() {
+        throw new TodoException();
+    }
+
+    @Override
+    public Stm getStm() {
+        throw new TodoException();
+    }
+
+    @Override
+    public TransactionFactory getTransactionFactory() {
         throw new TodoException();
     }
 

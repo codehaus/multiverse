@@ -1,9 +1,7 @@
 package org.multiverse.stms;
 
 import org.multiverse.MultiverseConstants;
-import org.multiverse.api.Transaction;
-import org.multiverse.api.TransactionConfiguration;
-import org.multiverse.api.TransactionStatus;
+import org.multiverse.api.*;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.NoRetryPossibleException;
 import org.multiverse.api.latches.Latch;
@@ -43,6 +41,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
     private long timeoutNs;
 
     private int attempt;
+
 
     public AbstractTransaction(C config) {
         assert config != null;
@@ -84,8 +83,18 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
     }
 
     @Override
-    public TransactionConfiguration getConfiguration() {
+    public final TransactionConfiguration getConfiguration() {
         return config;
+    }
+
+    @Override
+    public final Stm getStm() {
+        return config.transactionFactory.getStm();
+    }
+
+    @Override
+    public final TransactionFactory getTransactionFactory() {
+        return config.transactionFactory;
     }
 
     protected final void init() {

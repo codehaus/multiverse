@@ -40,7 +40,7 @@ def menus = [
         new Menu(name: 'Documentation', items: [
                 new MenuItem(title: 'Overview', pageid: 'documentationoverview'),
                 new MenuItem(title: 'Reference Manual', pageid: 'manual'),
-                new MenuItem(title: 'Javadoc', url: 'http://multiverse.codehaus.org/maven-site/apidocs/')
+                new MenuItem(title: 'Javadoc', url: 'http://multiverse.codehaus.org/apidocs/')
         ])
 ]
 
@@ -63,6 +63,8 @@ def pages = [
         new Page(pageid: 'manual-templates'),
         new Page(pageid: 'manual-javaagent'),
         new Page(pageid: 'manual-compiler'),
+        new Page(pageid: 'manual-runtime'),
+        new Page(pageid: 'manual-programmaticapi'),
         new Page(pageid: 'contact'),
         new Page(pageid: 'missionstatement'),
         new Page(pageid: 'download'),

@@ -1,8 +1,6 @@
 package org.multiverse.stms.alpha.programmatic;
 
-import org.multiverse.api.Transaction;
-import org.multiverse.api.TransactionConfiguration;
-import org.multiverse.api.TransactionStatus;
+import org.multiverse.api.*;
 import org.multiverse.api.exceptions.UncommittedReadConflict;
 import org.multiverse.api.latches.Latch;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
@@ -150,6 +148,16 @@ public final class AlphaProgrammaticLongTranlocal extends AlphaTranlocal impleme
     @Override
     public void setRemainingTimeoutNs(long timeoutNs) {
         //ignore
+    }
+
+    @Override
+    public Stm getStm() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public TransactionFactory getTransactionFactory() {
+        throw new UnsupportedOperationException();
     }
 
     private int attempt;

@@ -1,3 +1,5 @@
+import org.junit.Test
+
 allprojects {
   apply plugin: 'base'
   apply plugin: 'java'
@@ -249,7 +251,6 @@ project(':multiverse-alpha') {
       arg value: '-o'
 //      arg value: '-v'
       arg value: '-d'
-      arg value: 'org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor'
       arg value: "${buildDir}/classes/main"
 
       classpath {
@@ -285,7 +286,6 @@ project(':multiverse-alpha') {
       arg value: '-o'
 //      arg value: '-v'
       arg value: '-d'
-      arg value: 'org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor'
       arg value: "${buildDir}/classes/test"
 
       classpath {

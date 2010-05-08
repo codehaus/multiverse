@@ -43,8 +43,8 @@ All <b>instance</b> methods of this Account class will now be transactional and 
         setBalance method where the lastUpdate is set even though the call could fail.
     </li>
     <li><b>isolation: </b> all reads and writes are thread-safe and are isolated from
-        other transactions. A transaction automatically gets a Oracle version of the SERIALIZABLE isolation level.
-        You don't need to deal with lower isolation levels like READ_UNCOMMITTED, READ_COMMITTED or
+        other transactions. A transaction automatically gets a Oracle version of the SERIALIZABLE isolation level and
+        you don't need to deal with lower isolation levels like READ_UNCOMMITTED, READ_COMMITTED or
         REPEATABLE_READ.
     </li>
     <li><b>no deadlocks</b> between transactions because deadlocks are prevented by Multiverse.

@@ -4,9 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.api.exceptions.UncommittedReadConflict;
-import org.multiverse.stms.AbstractTransactionImpl;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 
@@ -62,27 +60,6 @@ public class AlphaProgrammaticLong_atomicIncTest {
         assertTrue(committed.isCommitted());
         assertNull(ref.___getLockOwner());
         assertEquals(version, committed.getWriteVersion());
-    }
-
-    @Test
-    public void whenLocked_thenTooManyRetriesException() {
-        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 1);
-        AlphaProgrammaticLongTranlocal committed = (AlphaProgrammaticLongTranlocal) ref.___load();
-
-        Transaction lockOwner = new AbstractTransactionImpl();
-        ref.___tryLock(lockOwner);
-
-
-        long version = stm.getVersion();
-        try {
-            ref.atomicInc(10);
-            fail();
-        } catch (TooManyRetriesException expected) {
-        }
-
-        assertEquals(version, stm.getVersion());
-        assertSame(lockOwner, ref.___getLockOwner());
-        assertSame(committed, ref.___load());
     }
 
     @Test

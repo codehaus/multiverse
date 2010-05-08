@@ -17,12 +17,11 @@ public class MultiverseCompilerArguments {
     @Option(name = "-o", usage = "optimize the classes (should not be combined with agent)", required = false)
     public boolean optimize = true;
 
-    @Argument(required = true, index = 0, metaVar = "COMPILER",
-            usage = "the org.multiverse.instrumentation.Instrumentor to use " +
-                    "(most likely org.multiverse.stms.alpha.instrumentation.AlphaInstrumentor).")
-    public String instrumentorName;
+    @Option(name = "-i", usage = "the org.multiverse.instrumentation.Instrumentor to use. Defaults to" +
+            "org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor", required = false)
+    public String instrumentorName = "org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor";
 
-    @Argument(required = true, index = 1, metaVar = "TARGET_DIRECTORY",
+    @Argument(required = true, index = 0, metaVar = "TARGET_DIRECTORY",
             usage = "target directory with the classes to transform")
     public String targetDirectory;
 }

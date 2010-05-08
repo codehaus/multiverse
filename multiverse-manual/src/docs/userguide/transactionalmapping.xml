@@ -13,6 +13,7 @@
 
     <sect1>
         <title>Transactional object</title>
+
         <para>
             The easies way in Multiverse to make an object transactional, is to add the
             @TransactionalObject annotation, e.g.:

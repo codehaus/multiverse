@@ -118,7 +118,7 @@ public class TransactionTemplateTest {
         final Transaction outerTx = txFactory.start();
         setThreadLocalTransaction(outerTx);
 
-        new TransactionTemplate(txFactory, false, true, true) {
+        new TransactionTemplate(txFactory, false, true) {
             @Override
             public Object execute(Transaction innerTx) throws Exception {
                 assertNotSame(innerTx, outerTx);

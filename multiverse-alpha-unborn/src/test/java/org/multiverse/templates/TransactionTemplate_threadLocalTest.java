@@ -45,7 +45,7 @@ public class TransactionTemplate_threadLocalTest {
 
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder().build();
 
-        Transaction found = new TransactionTemplate<Transaction>(txFactory, false, false, true) {
+        Transaction found = new TransactionTemplate<Transaction>(txFactory, false, false) {
             @Override
             public Transaction execute(Transaction tx) throws Exception {
                 return tx;

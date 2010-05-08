@@ -16,7 +16,6 @@ public class StandardInstrumentor implements Instrumentor {
     private final List<InstrumentationPhase> phases = new LinkedList<InstrumentationPhase>();
     private final String compilerName;
     private final String compilerVersion;
-    private Resolver resolver;
     private Filer filer;
     private boolean dumpBytecode;
     private File dumpDir = new File(System.getProperty("java.io.tmpdir"));
@@ -101,14 +100,6 @@ public class StandardInstrumentor implements Instrumentor {
             throw new NullPointerException();
         }
         this.filer = filer;
-    }
-
-    @Override
-    public void setResolver(Resolver resolver) {
-        if (resolver == null) {
-            throw new NullPointerException();
-        }
-        this.resolver = resolver;
     }
 
     @Override

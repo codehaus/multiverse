@@ -12,6 +12,7 @@ import org.multiverse.api.backoff.BackoffPolicy;
  */
 public interface TransactionConfiguration {
 
+
     /**
      * Returns the BackoffPolicy used by the Stm when a transaction conflicts with another transaction.
      *
