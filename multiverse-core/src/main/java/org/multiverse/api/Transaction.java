@@ -141,8 +141,8 @@ public interface Transaction {
     void abort();
 
     /**
-     * Restarts this Transaction. It doesn't matter what the transaction state of the transaction is. This is the
-     * preferred way to restart a transaction once a recoverable exception or retry occurred.
+     * Restarts this Transaction. It doesn't matter what the transaction state of the transaction is.
+     * This is the preferred way to restart a transaction once a recoverable exception or retry occurred.
      * <p/>
      * If the Transaction is prepared or committed, it will be aborted before it is restarted. If there are
      * TransactionLifecycleListeners that cause problems while executing the pre/post abort notification, the

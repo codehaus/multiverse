@@ -1,38 +1,46 @@
-package org.multiverse.benchmarks;
+package org.multiverse.benchmarks.programmatic;
 
 import org.benchy.AbstractBenchmarkDriver;
 import org.benchy.TestCase;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.api.Stm;
+import org.multiverse.api.programmatic.ProgrammaticLong;
 
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
  */
-public class NonConcurrentUpdateDriver extends AbstractBenchmarkDriver {
+public class ConcurrentUpdateDriver extends AbstractBenchmarkDriver {
 
     private long incCountPerThread;
     private int threadCount;
     private IncThread[] threads;
-    private TransactionalInteger[] refs;
+    private ProgrammaticLong ref;
+    private Stm stm;
 
     @Override
     public void preRun(TestCase testCase) {
-        incCountPerThread = testCase.getLongProperty("incCountPerThread");
+        clearThreadLocalTransaction();
+
+        stm = getGlobalStmInstance();
+
+        incCountPerThread = testCase.getIntProperty("incCountPerThread");
         threadCount = testCase.getIntProperty("threadCount");
 
-        refs = new TransactionalInteger[threadCount];
         threads = new IncThread[threadCount];
         for (int k = 0; k < threads.length; k++) {
-            refs[k] = new TransactionalInteger();
-            threads[k] = new IncThread(k, refs[k]);
+            threads[k] = new IncThread(k);
         }
+
+        ref = stm.getProgrammaticReferenceFactoryBuilder().build().atomicCreateLong(0);
     }
 
     @Override
@@ -40,7 +48,7 @@ public class NonConcurrentUpdateDriver extends AbstractBenchmarkDriver {
         startAll(threads);
         joinAll(threads);
 
-        assertEquals(incCountPerThread * threadCount, sum());
+        assertEquals(incCountPerThread * threadCount, ref.get());
     }
 
     @Override
@@ -56,21 +64,10 @@ public class NonConcurrentUpdateDriver extends AbstractBenchmarkDriver {
         caseResult.put("transactions/s/thread", transactionsPerSecondPerThread);
     }
 
-    private int sum() {
-        int result = 0;
-        for (TransactionalInteger ref : refs) {
-            result += ref.get();
-        }
-        return result;
-    }
-
     public class IncThread extends TestThread {
-        private TransactionalInteger intRef;
 
-
-        public IncThread(int id, TransactionalInteger intRef) {
+        public IncThread(int id) {
             super("IncThread-" + id);
-            this.intRef = intRef;
         }
 
         @Override
@@ -79,9 +76,8 @@ public class NonConcurrentUpdateDriver extends AbstractBenchmarkDriver {
                 if (k % 1000000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
-                intRef.inc();
+                ref.inc(1);
             }
         }
     }
 }
-

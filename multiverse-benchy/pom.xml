@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>multiverse-benchy</artifactId>
@@ -15,6 +16,46 @@
         <artifactId>multiverse</artifactId>
         <version>0.6-SNAPSHOT</version>
     </parent>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <unzip src="${settings.localRepository}/junit/junit/${junit.version}/junit-${junit.version}.jar"
+                                       dest="${project.build.outputDirectory}"/>
+                                <unzip src="${settings.localRepository}/com/google/code/gson/gson/1.4/gson-1.4.jar"
+                                       dest="${project.build.outputDirectory}"/>
+
+
+                                <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"/>
+                                <jarjar destfile="${project.build.directory}/${artifactId}-${project.version}.jar"
+                                        update="true">
+                                    <rule pattern="com.google.**" result="org.benchy.repackaged.@0"/>
+                                    <fileset dir="${project.build.outputDirectory}"/>
+                                </jarjar>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.tonicsystems.jarjar</groupId>
+                        <artifactId>jarjar</artifactId>
+                        <version>1.0-rc8</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+
 
     <repositories>
         <repository>

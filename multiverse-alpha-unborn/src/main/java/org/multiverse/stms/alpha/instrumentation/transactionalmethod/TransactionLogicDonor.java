@@ -44,7 +44,7 @@ public class TransactionLogicDonor {
             return;
         }
 
-        tx = (AlphaTransaction) transactionFactory.start();
+        tx = createTransaction(tx, transactionFactory);
         tx.setAttempt(1);
         setThreadLocalTransaction(tx);
         try {
@@ -112,7 +112,8 @@ public class TransactionLogicDonor {
             return;
         }
 
-        tx = (AlphaTransaction) transactionFactory.start();
+        tx = createTransaction(tx,transactionFactory);
+
         setThreadLocalTransaction(tx);
         try {
             do {
@@ -189,12 +190,21 @@ public class TransactionLogicDonor {
                     tx.getConfiguration().getFamilyName(), tx.getConfiguration().getMaxRetries());
             throw new TooManyRetriesException(msg);
         } finally {
-            clearThreadLocalTransaction();
-
             if (tx.getStatus() != TransactionStatus.committed) {
                 tx.abort();
             }
         }
+    }
+
+    public static AlphaTransaction createTransaction(AlphaTransaction tx, TransactionFactory transactionFactory) {
+        if (tx != null && tx.getTransactionFactory() == transactionFactory) {
+            tx.restart();
+            tx.setAttempt(0);
+            tx.setRemainingTimeoutNs(tx.getConfiguration().getTimeoutNs());
+        } else {
+            tx = (AlphaTransaction) transactionFactory.start();
+        }
+        return tx;
     }
 
     // ===================== support methods ===========================

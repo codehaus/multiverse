@@ -9,10 +9,8 @@ import org.multiverse.transactional.primitives.TransactionalInteger;
 import java.util.concurrent.Callable;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 /**
  * @author Sai Venkat
@@ -48,8 +46,6 @@ public class TransactionalCallableTest {
         );
 
         assertEquals(version + 1, stm.getVersion());
-        assertNull(getThreadLocalTransaction());
         assertEquals(1, value.get());
-    }
-    
+    }    
 }

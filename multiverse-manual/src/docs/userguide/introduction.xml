@@ -1,0 +1,16 @@
+<chapter id="introduction">
+    <title>Introduction</title>
+    <para>Multiverse is a Software Transactional Memory implementation that wants to realize the following goals:
+    </para>
+    <itemizedlist>
+        <listitem>
+            <para>Seamless integration in the Java language</para>
+            <para>Easy integration in other JVM based languages</para>
+        </listitem>
+    </itemizedlist>
+    <section>
+        <title>About this manual</title>
+        <para>
+        </para>
+    </section>
+</chapter>

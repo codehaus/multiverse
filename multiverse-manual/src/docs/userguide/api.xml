@@ -1,0 +1,193 @@
+<chapter id="Api">
+    <title>Api</title>
+    <para>
+    </para>
+    <section>
+        <title>Introduction</title>
+        <para>
+            If you are using instrumentation, chances are high that you don't need to deal with the core api's of
+            Multiverse
+            directly. But if you want to implement custom STM's using Multiverse, want to integrate it in a different
+            language, or just want to have a better understanding; the Multiverse API is the best place to begin.
+        </para>
+    </section>
+
+    <section>
+        <title>Transaction</title>
+        <para>
+            One of the most central parts of Multiverse is the Transaction. It exposes functionality for:
+        </para>
+        <variablelist>
+            <varlistentry>
+                <term>commit</term>
+                <listitem>
+                    <para>
+                        to commit the pending changes or abort the transaction it the commit failed (
+                        for example caused by a writeconflict)
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>abort</term>
+                <listitem>
+                    <para>
+                        to abort a transaction and prevent the changes from being committed. If a transaction
+                        already is committed, it can't be aborted (you'll get a DeadTransactionException).
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>resetting</term>
+                <listitem>
+                    <para>
+                        to make it possible that the same transaction instance can be reused. This is very
+                        useful if there read/write conflicts and you want to reuse the instance. By resetting it, it can
+                        be
+                        reused for another try.
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>transactionlifecyclelisteners</term>
+                <listitem>
+                    <para>
+                        to make it possible to listen to certain transaction lifecycle events
+                        like postcommit or postabort. For more information check
+                        <a href="manual-lifecycleevents.html">chapter 3 Transaction lifecycle events</a>
+                    </para>
+                </listitem>
+            </varlistentry>
+
+        </variablelist>
+
+        <!--subsection>
+            <title>No support for opening for read or write</title>
+            <para>
+                The transaction is responsible for tracking all writes that have been done (and in
+                some cases also the reads) and also providing the transactional properties like
+                isolation and failure atomicity. But it doesn't expose methods for opening
+                transactional objects. After a lot of experiments and a few complete rewrites of AlphaStm
+                (the main Stm implementation) I decided that these methods are so implementation specific that
+                placing them in the Transaction interface only is going to limit reusability.
+            </para>
+        </subsection -->
+    </section>
+
+    <section>
+        <title>TransactionFactory</title>
+        <para>
+            It isn't possible to create transactions directly, they should always be created with a TransactionFactory.
+            A TransactionFactory should create Transactions optimal configured for certain scenario's. For more
+            information check<a href="#transactionfactorybuilder">TransactionFactoryBuilder</a>.
+        </para>
+        <para>
+            ransactionFactories are threadsafe to use and can be expensive to create. So it is best to create them
+            in the beginning and store them for later use. In the instrumentation I create them when the class is
+            loaded,
+            and they are stored in a new final static synthetic field. It also is better to create a TransactionFactory
+            for each transactional method, transaction template or perhaps the receive method of an actor.
+            This makes it possible to use different transaction settings, but also to give the self
+            learning stm the ability to learn from certain usage patterns. If only one transactionfactory
+            is used for all transactions, the stm loses the ability to learn from certain patterns.
+        </para>
+    </section>
+
+    <section>
+        <title>TransactionFactoryBuilder</title>
+        <para>The transaction factory always returns transactions with the same configuration. But what is the use
+            of such a strange beast; what about configuration? This can be done through the transaction factory builder.
+            This builder implementation provides ... The TransactionFactoryBuilder is threadsafe and can be reused. But
+            in most cases you only want to have TransactionFactories and discard the TransactionFactoryBuilders after
+            theTransactionFactories are created.
+        </para>
+
+        <para>Make sure that you use the return value of the set methods, because that is going to returned the updated
+            builder since the TransactionFactoryBuilder is immutable. If you forget this, you won't get the
+            transaction configured in the way you would expect.
+        </para>
+
+        <para>
+            Till Multiverse 0.5 it was needed to set a transactionfamilyname if you want the stm to learn based
+            on transaction usage patterns. With the 0.5 release a transactionfamilyname is automatically generated
+            if you don't provide one. But it still is important to provide some form of identification mechanism
+            for logging or profiling. In the instrumented code the full description of the method is used as
+            transaction familyname. So for an agent you probably want to have something like 'FooAgent.receive()'.
+            For an atomic closure it is more difficult because you would like to have access to the surrounding
+            method.
+        </para>
+    </section>
+
+    <section>
+        <title>Stm</title>
+        <para>
+            This also brings us to the last missing peace of the puzzel; the Stm. The main task of the Stm
+            implementation is to provide TransactionFactoryBuilders and other builders. For the AlphaStm not
+            much state is maintained in the Stm itself. All managed state on transactional objects, is stored
+            in the transactional objects themselves.
+        </para>
+    </section>
+
+    <section>
+        <title>ThreadLocalTransaction</title>
+        <para>
+            The ThreadLocalTransaction is a ThreadLocal responsible for storing a Transaction. This
+            functionality is needed making transactional datastructures easier to work with because you
+            don't need to drag along the transaction all the time.
+        </para>
+    </section>
+
+    <section>
+        <title>GlobalStmInstance</title>
+        <para>
+            The GlobalStmInstance is responsible for storing the global STM instance. This functionality is needed for
+            the
+            instrumented classes, but if you are using the api's directly, you don't need to care about the
+            GlobalStmInstance.
+            So if you want you can create more than 1 STM instance, as long as the objects managed by these STM's are
+            not
+            shared between them. One of the reasons this could fails is that versions of written data don't make sense
+            and
+            no isolation guarantees can be provided anymore.
+        </para>
+
+        <para>
+            In the future some form of ThreadLocalStm may be added to make using different STM instances in the same
+             JVM easier.
+        </para>
+    </section>  
+</chapter>
+
+
+        <!--
+<h3 id="transactionconfiguration">TransactionConfiguration</h3>
+        It also exposes functionality for the configuration of transaction through the TransactionConfiguration. In the beginning
+        all these properties were placed on the Transaction interface directly but it make a messy interface. That is
+        why it was moved to a Config object that only contains configuration properties.
+
+<h2 id="transactionfactory">6.3 TransactionFactory</h2>
+
+<p/>
+        T
+
+<h2 id="transactionfactorybuilder">6.4 TransactionFactoryBuilder</h2>
+
+<p>
+<p>
+
+    <h2 id="stm">6.5 Stm</h2>
+
+    <h2 id="threadlocaltransaction">6.6 </h2>
+
+    <h2 id="globalstminstance">6.7 GlobalStmInstance</h2>
+   <p/>
+
+    <h2 id="multiverse.util.package">6.8 Multiverse util package</h2>
+    The org.multiverse.util package contains a lot of support systems that are not tied to a specific
+    Stm implementation. So if you want to build your own implementation or want to tweak the AlphaStm,
+    this is the place to get started.
+
+    <h3 id="clock">Clock</h3>
+
+    <h3 id="commitlock">CommitLock</h3>
+
+    <h3 id="restart.backoff.policy">Restart backoff policy</h3> -->

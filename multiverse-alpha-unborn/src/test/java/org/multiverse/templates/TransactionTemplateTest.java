@@ -43,7 +43,8 @@ public class TransactionTemplateTest {
         Transaction t = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setReadonly(false)
-                .build().start();
+                .build()
+                .start();
         setThreadLocalTransaction(t);
         return t;
     }
@@ -60,7 +61,7 @@ public class TransactionTemplateTest {
         }.execute();
 
         assertEquals(version, stm.getVersion());
-        assertNull(getThreadLocalTransaction());
+        assertNotNull(getThreadLocalTransaction());
     }
 
     @Test
@@ -78,7 +79,7 @@ public class TransactionTemplateTest {
         }.execute();
 
         assertEquals(version + 1, stm.getVersion());
-        assertNull(getThreadLocalTransaction());
+        assertNotNull(getThreadLocalTransaction());
         assertEquals(1, value.get());
     }
 
@@ -151,7 +152,7 @@ public class TransactionTemplateTest {
         } catch (DeadTransactionException ignore) {
         }
 
-        assertNull(getThreadLocalTransaction());
+        assertNotNull(getThreadLocalTransaction());
         assertEquals(version, stm.getVersion());
         assertEquals(0, value.get());
     }
@@ -172,7 +173,7 @@ public class TransactionTemplateTest {
         }.execute();
 
         assertEquals(version + 1, stm.getVersion());
-        assertNull(getThreadLocalTransaction());
+        assertNotNull(getThreadLocalTransaction());
         assertEquals(1, value.get());
     }
 

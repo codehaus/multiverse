@@ -51,7 +51,7 @@ public abstract class TransactionTemplate<E> {
 
     private final boolean lifecycleListenersEnabled;
 
-    private final TransactionFactory txFactory;
+    private final TransactionFactory transactionFactory;
 
     /**
      * Creates a new TransactionTemplate that uses the STM stored in the GlobalStmInstance and works the the {@link
@@ -87,30 +87,30 @@ public abstract class TransactionTemplate<E> {
      * Creates a new TransactionTemplate with the provided TransactionFactory and that is aware of the
      * ThreadLocalTransaction.
      *
-     * @param txFactory the TransactionFactory used to createReference Transactions.
+     * @param transactionFactory the TransactionFactory used to createReference Transactions.
      * @throws NullPointerException if txFactory is null.
      */
-    public TransactionTemplate(TransactionFactory txFactory) {
-        this(txFactory, true, true);
+    public TransactionTemplate(TransactionFactory transactionFactory) {
+        this(transactionFactory, true, true);
     }
 
     /**
      * Creates a new TransactionTemplate with the provided TransactionFactory.
      *
-     * @param txFactory                 the TransactionFactory used to createReference Transactions.
+     * @param transactionFactory        the TransactionFactory used to createReference Transactions.
      * @param threadLocalAware          true if this TransactionTemplate should look at the ThreadLocalTransaction and publish
      *                                  the running transaction there.
      * @param lifecycleListenersEnabled true if the lifecycle callback methods should be enabled. Enabling them causes
      *                                  extra object creation, so if you want to squeeze out more performance, set this to false at the price of
      *                                  not having the lifecycle methods working.
      */
-    public TransactionTemplate(TransactionFactory txFactory, boolean threadLocalAware, boolean lifecycleListenersEnabled) {
-        if (txFactory == null) {
+    public TransactionTemplate(TransactionFactory transactionFactory, boolean threadLocalAware, boolean lifecycleListenersEnabled) {
+        if (transactionFactory == null) {
             throw new NullPointerException();
         }
 
         this.lifecycleListenersEnabled = lifecycleListenersEnabled;
-        this.txFactory = txFactory;
+        this.transactionFactory = transactionFactory;
         this.threadLocalAware = threadLocalAware;
     }
 
@@ -139,7 +139,7 @@ public abstract class TransactionTemplate<E> {
      * @return the TransactionFactory this TransactionTemplate uses to createReference Transactions.
      */
     public final TransactionFactory getTransactionFactory() {
-        return txFactory;
+        return transactionFactory;
     }
 
     /**
@@ -270,20 +270,27 @@ public abstract class TransactionTemplate<E> {
      */
     public final E executeChecked() throws Exception {
         Transaction tx = threadLocalAware ? getThreadLocalTransaction() : null;
-        if (noActiveTransaction(tx)) {
-            return executeWithTransaction();
+        if (isDead(tx)) {
+            if (tx != null && tx.getTransactionFactory() == transactionFactory) {
+                tx.restart();
+                tx.setAttempt(0);
+                tx.setRemainingTimeoutNs(tx.getConfiguration().getTimeoutNs());
+            } else {
+                tx = transactionFactory.start();
+            }
+
+            if(threadLocalAware){
+                setThreadLocalTransaction(tx);
+            }
+
+            return executeWithTransaction(tx);
         } else {
             return execute(tx);
         }
     }
 
-    private E executeWithTransaction() throws Exception {
+    private E executeWithTransaction(Transaction tx) throws Exception {
         CallbackListener listener = lifecycleListenersEnabled ? new CallbackListener() : null;
-
-        Transaction tx = txFactory.start();
-        if (threadLocalAware) {
-            setThreadLocalTransaction(tx);
-        }
 
         Throwable lastFailureCause = null;
 
@@ -348,7 +355,7 @@ public abstract class TransactionTemplate<E> {
                     }
                 } catch (SpeculativeConfigurationFailure ex) {
                     Transaction oldTransaction = tx;
-                    tx = txFactory.start();
+                    tx = transactionFactory.start();
                     tx.setAttempt(oldTransaction.getAttempt());
                     tx.setRemainingTimeoutNs(oldTransaction.getRemainingTimeoutNs());
 
@@ -370,14 +377,10 @@ public abstract class TransactionTemplate<E> {
             if (tx != null && tx.getStatus() != TransactionStatus.committed) {
                 tx.abort();
             }
-
-            if (threadLocalAware) {
-                setThreadLocalTransaction(null);
-            }
         }
     }
 
-    private boolean noActiveTransaction(Transaction t) {
+    private boolean isDead(Transaction t) {
         return t == null || t.getStatus() != TransactionStatus.active;
     }
 

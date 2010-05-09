@@ -1,9 +1,10 @@
-<chapter>
-    <beginpage/>
-    <title>Transactions and the 2phase commit</title>
-    <para>...</para>
-    <sect1>
+<chapter id="2phasecommit">
+    <title>Two phase commit</title>
+    <para>
+    </para>
+    <section>
         <title>Introduction</title>
-        <para>...</para>
-    </sect1>
+        <para>
+        </para>
+    </section>
 </chapter>
