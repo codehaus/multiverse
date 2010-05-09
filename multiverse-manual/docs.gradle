@@ -65,6 +65,7 @@ task samples(type: ExtractSnippetsTask) {
     exclude '**/readme.xml'
     destDir = samplesDir
     snippetsDir = new File(buildDir, 'snippets')
+    snippetsDir.mkdirs()
     doLast {
         copy {
             from samplesSrcDir
