@@ -17,7 +17,7 @@ import static org.multiverse.TestUtils.startAll;
  */
 public class ConcurrentUpdateDriver extends AbstractBenchmarkDriver {
 
-    private int incCountPerThread;
+    private long incCountPerThread;
     private int threadCount;
     private IncThread[] threads;
     private TransactionalInteger ref;
@@ -45,12 +45,12 @@ public class ConcurrentUpdateDriver extends AbstractBenchmarkDriver {
 
     @Override
     public void postRun(TestCaseResult caseResult) {
-        int transactionCount = incCountPerThread * threadCount;
+        long transactionCount = incCountPerThread * threadCount;
         caseResult.put("transactionCount", transactionCount);
 
         double transactionsPerSecond = (1.0d * transactionCount * TimeUnit.SECONDS.toNanos(1))
                 / caseResult.getLongProperty("duration(ns)");
-        caseResult.put("transactions/s", transactionsPerSecond);
+        caseResult.put("transactions/second", transactionsPerSecond);
 
         double transactionsPerSecondPerThread = transactionsPerSecond / threadCount;
         caseResult.put("transactions/s/thread", transactionsPerSecondPerThread);

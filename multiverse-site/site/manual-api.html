@@ -66,11 +66,16 @@ why it was moved to a Config object that only contains configuration properties.
 <h2 id="transactionfactory">6.3 TransactionFactory</h2>
 It isn't possible to create transactions directly, they should always be created with a TransactionFactory.
 A TransactionFactory should create Transactions optimal configured for certain scenario's. For more information
-check <a href="#transactionFactoryBuilder">TransactionFactoryBuilder</a>
+check <a href="#transactionfactorybuilder">TransactionFactoryBuilder</a>,
 
 <p/>
 TransactionFactories are threadsafe to use and can be expensive to create. So it is best to create them
-in the beginning and store them for later use.
+in the beginning and store them for later use. In the instrumentation I create them when the class is loaded,
+and they are stored in a new final static synthetic field. It also is better to create a TransactionFactory
+for each transactional method, transaction template or perhaps the receive method of an actor.
+This makes it possible to use different transaction settings, but also to give the self
+learning stm the ability to learn from certain usage patterns. If only one transactionfactory
+is used for all transactions, the stm loses the ability to learn from certain patterns.
 
 
 <h2 id="transactionfactorybuilder">6.4 TransactionFactoryBuilder</h2>
@@ -79,14 +84,24 @@ of such a strange beast; what about configuration? This can be done through the 
 This builder implementation provides ... The TransactionFactoryBuilder is threadsafe and can be reused. But
 in most cases you only want to have TransactionFactories and discard the TransactionFactoryBuilders after the
 TransactionFactories are created.
-<p/>
-Make sure that use the return value of the set methods, because that is going to returned the updated
-builder since the TransactionFactoryBuilder is immutable. If this is forgotten, you won't get the
-transaction configured in the way you would expect.
+<p>
+    Make sure that you use the return value of the set methods, because that is going to returned the updated
+    builder since the TransactionFactoryBuilder is immutable. If you forget this, you won't get the
+    transaction configured in the way you would expect.
+<p>
+    Till Multiverse 0.5 it was needed to set a transactionfamilyname if you want the stm to learn based
+    on transaction usage patterns. With the 0.5 release a transactionfamilyname is automatically generated
+    if you don't provide one. But it still is important to provide some form of identification mechanism
+    for logging or profiling. In the instrumented code the full description of the method is used as
+    transaction familyname. So for an agent you probably want to have something like 'FooAgent.receive()'.
+    For an atomic closure it is more difficult because you would like to have access to the surrounding
+    method.
 
 <h2 id="stm">6.5 Stm</h2>
-This also brings us to the last missing peace of the puzzel; the STM. The only thing that the STM implementation
-needs to do, is to provide TransactionFactoryBuilders.
+This also brings us to the last missing peace of the puzzel; the Stm. The main task of the Stm implementation
+is to provide TransactionFactoryBuilders and other builders. For the AlphaStm not much state is maintained
+in the Stm itself. All managed state on transactional objects, is stored in the transactional objects
+themselves.
 
 <h2 id="threadlocaltransaction">6.6 ThreadLocalTransaction</h2>
 The ThreadLocalTransaction is a ThreadLocal responsible for storing a Transaction. This functionality is needed for

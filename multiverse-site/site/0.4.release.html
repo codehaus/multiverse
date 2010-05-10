@@ -8,14 +8,14 @@ Multiverse 0.4 was released at 24 Februari 2010. The following features have bee
         which transactional objects have been read and therefor which objects to listen to. A tracking
         readonly transaction also is less subject to read-conflicts. This disadvantage of this transaction
         is that it requires more resources than a non tracking readonly transaction. One of the ways
-        this functionality is exposed, is through the automaticReadTracking property of the TransactionalMethod
+        this functionality is exposed, is through the trackReads property of the TransactionalMethod
         annotation.
     </li>
     <li>
         Non read-tracking update transaction: unlike a tracking update transaction, a non tracking
         update transaction doesn't consume more resources for reads. The disadvantage is that it can't
         participate in blocking operations because it isn't known which reads have been executed. One of the ways
-        this functionality is exposed, is through the automaticReadTracking property of the TransactionalMethod
+        this functionality is exposed, is through the trackReads property of the TransactionalMethod
         annotation.
     </li>
     <li>

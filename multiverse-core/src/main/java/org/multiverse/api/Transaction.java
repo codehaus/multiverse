@@ -24,7 +24,7 @@ import org.multiverse.api.lifecycle.TransactionLifecycleListener;
  * could depend on threadlocals.
  * </dd>
  * <p/>
- * <dt>Listen to lifecycles</dt>
+ * <dt>TransactionLifecycle</dt>
  * <dd>
  * It is possible to listen to a Transaction when it aborts, or commits. This can be done with the
  * {@link #registerLifecycleListener(TransactionLifecycleListener)}.
@@ -48,6 +48,20 @@ import org.multiverse.api.lifecycle.TransactionLifecycleListener;
  * @author Peter Veentjer.
  */
 public interface Transaction {
+
+    /**
+     * Returns the TransactionFactory that started this Transaction.
+     *
+     * @return the TransactionFactory that started this Transaction.
+     */
+    TransactionFactory getTransactionFactory();
+
+    /**
+     * Returns the Stm that started this Transaction.
+     *
+     * @return the Stm that started this Transaction.
+     */
+    Stm getStm();
 
     /**
      * Gets the {@link TransactionConfiguration} that is used by this Transaction.
@@ -127,8 +141,8 @@ public interface Transaction {
     void abort();
 
     /**
-     * Restarts this Transaction. It doesn't matter what the transaction state of the transaction is. This is the
-     * preferred way to restart a transaction once a recoverable exception or retry occurred.
+     * Restarts this Transaction. It doesn't matter what the transaction state of the transaction is.
+     * This is the preferred way to restart a transaction once a recoverable exception or retry occurred.
      * <p/>
      * If the Transaction is prepared or committed, it will be aborted before it is restarted. If there are
      * TransactionLifecycleListeners that cause problems while executing the pre/post abort notification, the
@@ -186,11 +200,40 @@ public interface Transaction {
      */
     void registerLifecycleListener(TransactionLifecycleListener listener);
 
+    /**
+     * Gets the remaining timeout in nanoseconds. Long.MAX_VALUE indicates that no timeout should be used.
+     *
+     * @return the remaining timeout.
+     */
     long getRemainingTimeoutNs();
 
+    /**
+     * Sets the remaining timeout in nanoseconds. Long.MAX_VALUE indicates that no timeout should be used.
+     * <p/>
+     * This normally isn't called from the user code, it is task of the stm internals and the
+     * transaction management to use the timeout.
+     *
+     * @param timeoutNs the timeout.
+     * @throws IllegalArgumentException if timeout smaller than 0.
+     */
     void setRemainingTimeoutNs(long timeoutNs);
 
+    /**
+     * Gets the current attempt (so the number of tries this transaction already had). Value will
+     * always be equal or larger than 0.
+     *
+     * @return the current attempt.
+     */
     int getAttempt();
 
+    /**
+     * Sets the current attempt.
+     * <p/>
+     * This normally isn't called from the user code, it is the task of the stm internals and
+     * the transaction management to use the attempt.
+     *
+     * @param attempt the current attempt
+     * @throws IllegalArgumentException if attempt smaller than zero.
+     */
     void setAttempt(int attempt);
 }

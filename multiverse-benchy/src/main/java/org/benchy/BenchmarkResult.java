@@ -1,11 +1,10 @@
 package org.benchy;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Contains the results of a Benchmark.
+ * Contains the results of a Benchmark; a list of testcase results.
  *
  * @author Peter Veentjer
  */
@@ -13,10 +12,6 @@ public class BenchmarkResult {
 
     private final String benchmarkName;
     private final List<TestCaseResult> testCaseResultList;
-
-    public BenchmarkResult(String benchmarkName) {
-        this(benchmarkName, new LinkedList<TestCaseResult>());
-    }
 
     public BenchmarkResult(String benchmarkName, List<TestCaseResult> testCaseResultList) {
         if (benchmarkName == null) {

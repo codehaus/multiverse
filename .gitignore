@@ -8,4 +8,6 @@
 /multiverse.iml
 /multiverse.ipr
 /multiverse.iws
-/multiverse-core-tests/multiverse-core-tests.iml
+*.iml
+**/build
+*.class

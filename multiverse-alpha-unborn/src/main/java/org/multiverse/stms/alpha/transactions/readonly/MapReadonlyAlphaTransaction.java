@@ -1,7 +1,10 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
+import org.multiverse.api.Stm;
 import org.multiverse.api.TransactionFactory;
+import org.multiverse.api.TransactionFactoryBuilder;
 import org.multiverse.api.latches.Latch;
+import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
@@ -21,10 +24,23 @@ public final class MapReadonlyAlphaTransaction extends AbstractReadonlyAlphaTran
 
     public static class Factory implements TransactionFactory<AlphaTransaction> {
 
+        private final AlphaStm.AlphaTransactionFactoryBuilder transactionFactoryBuilder;
+
+        public Factory(ReadonlyConfiguration config, AlphaStm.AlphaTransactionFactoryBuilder transactionFactoryBuilder) {
+            this.config = config;
+            this.transactionFactoryBuilder = transactionFactoryBuilder;
+        }
+
         public final ReadonlyConfiguration config;
 
-        public Factory(ReadonlyConfiguration config) {
-            this.config = config;
+        @Override
+        public Stm getStm() {
+            return transactionFactoryBuilder.getStm();
+        }
+
+        @Override
+        public TransactionFactoryBuilder getTransactionFactoryBuilder() {
+            return transactionFactoryBuilder;
         }
 
         @Override

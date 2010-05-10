@@ -1,0 +1,65 @@
+<chapter id="multiversejavaagent">
+    <title>Multiverse Javaagent</title>
+    <para>
+        Multiverse relies heavily on instrumentation to integrate seamlessly in Java. It can
+        be done dynamic using the Multiverse Javaagent or it can be done compiletime using the
+        Multiverse Compiler. The advantage of runtime instrumentation is that it is a lot
+        easier to use in a development environment, because often it is very hard to add some
+        bytecode postprocessing step in the IDE.
+    </para>
+
+    <para>
+        The Multiverse Javaagent is designed to be used from IDE's and can be used on uninstrumented,
+        instrumented and any mix. So from your IDE you don't need to be worried if classes have received
+        the correct transformation, as long as you have the Multiverse Javaagent installed. The Multiverse
+        Javaagent and Multiverse Compiler share the same Instrumentor; Multiverse specific component
+        responsible for instrumenting classes.
+    </para>
+
+    <para>
+        The Multiverse Javaagent will detect if code already is instrumented by the Multiverse Compiler
+        and there is a mismatch in the used Instrumentor or version of the Instrumentor. So you don't
+        need to be worried about mixing them.
+    </para>
+
+    <section>
+        <title>Optimizations</title>
+        <para>
+            The Multiverse Javaagent is not able to optimize as much as the Multiverse Compiler
+            (caused by limitations in the javaagent technology). So if you want to get the most out of
+            performance, make sure that you are using the Multiverse Compiler.
+        </para>
+
+        <para>
+            You also need to watch out, when you are using a profiler, that
+            preinstrumented classes are used. It is no problem to add the Multiverse Javaagent to a profiler (I
+            use it in combination with JProfiler extensively), but since the performance of the instrumented code
+            instrumented by the Multiverse Javaagent is suboptimal, it could be that you are hunting ghosts.
+        </para>
+    </section>
+
+    <section>
+        <title>Commandline interface</title>
+        <para>
+        </para>
+    </section>
+
+    <!-- section>
+        <title>IntelliJ IDEA 9</title>
+        <para>
+        </para>
+    </section>
+
+    <section>
+        <title> Eclipse</title>
+        <para>
+        </para>
+    </section>
+
+    <section>
+        <title> Eclipse</title>
+        <para>
+        </para>
+    </section -->
+
+</chapter>

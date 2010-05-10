@@ -172,7 +172,7 @@ public class CountDownCommitBarrier_incPartiesWithTransactionTest {
         Transaction tx = new AbstractTransactionImpl();
         try {
             barrier.incParties(tx, 10);
-            fail();
+            fail("Should have got CommitBarrierOpenException");
         } catch (CommitBarrierOpenException expected) {
         }
 
@@ -188,7 +188,7 @@ public class CountDownCommitBarrier_incPartiesWithTransactionTest {
 
         try {
             barrier.incParties(tx, 1);
-            fail();
+            fail("Should have got CommitBarrierOpenException");
         } catch (CommitBarrierOpenException expected) {
         }
 

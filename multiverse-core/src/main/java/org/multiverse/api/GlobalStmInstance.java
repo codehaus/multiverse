@@ -8,12 +8,12 @@ import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isStatic;
 
 /**
- * A singleton that can be used for easy access to the {@link org.multiverse.api.Stm} that is used globally. Once it has
+ * A singleton that can be used for easy access to the {@link Stm} that is used globally. Once it has
  * been set, it should not be changed while running the system.
  * <p/>
- * Using the GlobalStm imposes some limitations (like 1 global stm instance that is used by everything) but makes the
- * system a lot easier to use. But if the GlobalStm should not be used, but a 'private' stm, you need to carry around
- * the stm reference yourself and just ignore this GlobalStm.
+ * Using the GlobalStmInstance imposes some limitations (like 1 global stm instance that is used by everything) but makes the
+ * system a lot easier to use. But if the GlobalStmInstance should not be used, but a 'private' stm, you need to carry around
+ * the stm reference yourself and just ignore this GlobalStmInstance.
  * <p/>
  * The default implementation is the AlphaStm for now. It can be configured through setting the System property:
  * org.multiverse api GlobalStmInstance.factorymethod. This method should be a no arg static method that returns a

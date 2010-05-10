@@ -103,10 +103,10 @@ and the transaction aborted and retried.
     all reads done by a transaction. This is not only useful for blocking operations and write skew detection,
     but it also serves as a local cache; meaning that it doesn't matter if another transaction has done an updae
     after the field has been read for the first time. A default readonly transaction does not track reads (since
-    it consumes resources) but it can be activated by setting the automaticReadTracking property on the
+    it consumes resources) but it can be activated by setting the trackReads property on the
     TransactionalMethod annotation. For more information see
-    <a href="manual-mapping.html#transactionalmethod.automaticreadtracking">1
-        TransactionalMethod.automaticReadTracking</a>.
+    <a href="manual-mapping.html#transactionalmethod.trackReads">1
+        TransactionalMethod.trackReads</a>.
 
 <p>
     In Oracle this would be the snapshot too old exception. In the future a mechanism will be added to persist
@@ -140,9 +140,9 @@ level). It isn't perfect however because there is one anomaly that can happen;
 TODO: explain writeskew.
 
 <p>
-    In Multiverse the writeSkew problem can be prevented by setting the preventWriteSkew parameter (defaults to false).
+    In Multiverse the writeSkew problem can be prevented by setting the writeSkew parameter (defaults to true).
 <pre>
-    @TransactionalMethod(preventWriteSkew = true, automaticReadTracking = true)
+    @TransactionalMethod(writeSkew = true, trackReads = true)
     void transfer(Account from1, Account from2, Account to, int amount){
         if(from1.get()+from2.get()&lt;amount){
             throw new NotEnoughMoneyException();
@@ -154,7 +154,7 @@ TODO: explain writeskew.
 </pre>
 Write skew detection relies on automatic readtracking since all read transactional objects, need to be re-checked.
 <p>
-    In MVCC databases like Oracle it isn't possible to get prevention against writeskewing as direct feature, so one of
+    In MVCC databases like Oracle it isn't possible to get prevention against writeskew as direct feature, so one of
     the things you can do is use a select for update so that the record automatically is locked, or
 <p>
     So this

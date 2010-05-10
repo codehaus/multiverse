@@ -363,14 +363,14 @@ and cpu cycles. In most cases, when you block, you also are going to do updates,
 tracking is enabled by default on update transactions and is disabled by default on readonly transactions.
 <p/>
 But it is possible to create a blocking readonly transaction using the
-automaticReadTracking property. The following fragment shows a new method on the TransactionalStack
+trackReads property. The following fragment shows a new method on the TransactionalStack
 where a wait can be done until the stack becomes empty.
 <pre>
         import org.multiverse.annotations.TransactionalMethod;
 
         ...
 
-        @TransactionalMethod(readonly = true, automaticReadTracking = true)
+        @TransactionalMethod(readonly = true, trackReads = true)
         public void awaitEmpty(){
             if(head == null){
                 retry();
@@ -387,7 +387,6 @@ these are some form of management threads) and abort their operation.
 In Multiverse this behavior can be configured using the interruptible property in the TransactionalMethod annotation.
 Default all transactions are non interruptible, but this behavior can be customized by setting the
 interruptible property on the TransactionalMethod annotation, e.g.:
-
 <pre>
     @TransactionalMethod(interruptible = true)
     public E popInterruptible()implements InterruptedException{
@@ -401,7 +400,10 @@ interruptible property on the TransactionalMethod annotation, e.g.:
     }
 </pre>
 The popInterruptible will be interruptible when it blocks (so when the Stack is empty). So unlike traditional lock
-based approaches, interruptibility is not configured on the blocking resources but on the transaction.
+based approaches, interruptibility is not configured on the blocking resources but on the transaction. Another
+advantage is that you don't need to propagate the InterruptedException on the methods that are called
+by the interruptible method. So you can use the same methods for a interruptible and non interruptible
+transactions.
 <p/>
 It is important that the popInterruptible method does define an Exception or InterruptedException. If this is missing,
 the Multiverse Javaagent will complain. It also is important to realize that it isn't sufficient to add
@@ -440,32 +442,33 @@ can also be used on the transactional references and transactional primitives.
 
 
 <h2 id="timeouts">2.11 Timeouts</h2>
-At the moment it isn't possible to work with timeouts if a transaction blocks, this functionality
-will be implemented in the near future. This topic contains information about the expected
-look and feel of the implementation.
-<p/>
-Timeouts are very useful
-to prevent waiting indeterminetly and will be added in the near future. From a technical point of view it
-is quite simple te realize, there already exists a more sophisticated Latch called the StandardLatch
-(based on java.util.concurrent.locks.Condition) that provides access to timed waiting. But the problem is more
-on a conceptual level because transactions can be retried. I think it is best to create some kind of timeout
-'savings-account' that is used to determine
-how long a transaction can wait. Once a blocking transaction continues, it calculates to total time spend
-waiting and substracts this from the savings-account.
-<p/>
-Eventually the following approaches are going to be added:
+Timeouts are very useful to prevent waiting indeterminetly. Traditionally timeouts would be placed on the
+lock level and you need to carry the remaining timeout of you want to have control on the total
+timeout. With Multiverse the timeout is configured on the transaction level and every time
+some form of waiting is done, the remaining timeout of the transaction decreased until the operation
+completes or when or no timeout remains.
+<p>
+    It can be configured like this:
 <pre>
-    @TransactionalMethod(timeout = 10, unit = TimeUnit.MILLISECONDS)
-    void doit(){
+    @TransactionalMethod(timeout = 10, timeoutTimeUnit = TimeUnit.MILLISECONDS)
+    void doit1(){
         ...
     }
 
-    @TransactionalMethod(timeoutSignatureScan=true)
-    void doit(long timeout, TimeUnit unit){
+    @TransactionalMethod(timeout = 10)
+    void doit2(){
         ...
     }
 </pre>
-The syntax is still subject to change.
+The timeoutTimeUnit defaults to TimeUnit.SECOND.
+<p>
+    Atm it is not possible to configure timeout on method level like:
+<pre>
+    @TransactionalMethod
+    void doit3(long timeout, TimeUnit timeoutUnit){
+    }
+</pre>
+This will be added in the near future (especially to integrate with more traditional interfaces).
 
 <h2 id="fairness">2.12 Fairness</h2>
 Atm the moment it isn't possible to provide any fairness guarantees on

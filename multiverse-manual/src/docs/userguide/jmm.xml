@@ -1,0 +1,71 @@
+<chapter id="jmm">
+    <title>Multiverse and the Java Memory Model</title>
+    <para>
+    </para>
+    <section>
+        <title>Introduction</title>
+        <para>
+            Before Java 5, the Java Memory Model (JMM) was broken. It was possible to get all kinds
+            of strange results like unpredictable merged writes made by concurrent executing threads,
+            unexpected reorderings of instructions, and even final fields were not guaranteed to be
+            final. With Java 5 and JSR-133, the Java Memory Model is clearly specified. This
+            specification makes it possible to write code that performs, but doesn't cause concurrency problems.
+        </para>
+    </section>
+
+    <section>
+        <title>Happens before rules</title>
+        <para>
+            The Java Memory Model is specified in happens before rules, e.g.:
+        </para>
+        <para>
+            The happens before rules clearly specify which visibility guarantees are provided on memory content and
+            which
+            reorderings are allowed. Without these rules it would not be possible to write concurrent code in Java.
+        </para>
+        <para>
+            For a more detailed explanation, please check ... or
+            <a href="http://www.javaconcurrencyinpractice.com/">Java Concurrency in Practice</a>
+            by Brian Goetz.
+        </para>
+    </section>
+
+    <section>
+        <title>Transaction rule</title>
+        <para>
+            Multiverse also provides a happens before rule called the<b>transaction rule</b>. It guarantees that a
+            write on a transactional object is visible after the transaction commits and before another transaction
+            reads the same transactional object. On a lower level this is realized by lifting on the volatile variable
+            or lock rule.
+        </para>
+        <para>
+            For developers this means that
+            <b>you don't need to worry about the JMM when transactions are used</b>
+            and
+            you don't need to define variable as volatile or synchronized blocks to introduce the needed memory
+            fences; this is all done for you.
+
+        </para>
+    </section>
+</chapter>
+
+<!--
+<h2 id="happens.before.rules">5.2 Happens before rules</h2>
+
+<ol>
+<li>
+    <b>lock rule:</b>
+    all writes executed before some lock is released, are visible when the same lock is acquired.
+</li>
+<li>
+    <b>volatile variable rule:</b>
+    all writes executed before some volatile variable is written, are
+    visible when the same volatile variable is read.
+</li>
+</ol>
+<p/>
+
+<h2 id="transaction.rule">5.3 Transaction rule</h2>
+
+<p/ -->
+

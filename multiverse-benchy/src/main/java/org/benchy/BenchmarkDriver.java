@@ -19,6 +19,9 @@ public interface BenchmarkDriver {
      */
     void preRun(TestCase testCase);
 
+    /**
+     * Runs the driver for one iteration.
+     */
     void run();
 
     /**

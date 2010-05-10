@@ -16,7 +16,7 @@ todo next release
 
 - generate manual from gradle
 
-CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest.whenTransactionFailsToPrepare
+CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest.whenTransactionFailsToPrepare - Done
 
 CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest.whenStartingInterrupted
 
@@ -180,7 +180,7 @@ generated test report.
 - interface parameter inheritance.
 
 
-- JRuby integration
+- JRuby integration - In Progress
 
 - Groovy Integration
 

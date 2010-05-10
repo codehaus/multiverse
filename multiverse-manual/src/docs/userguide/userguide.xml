@@ -1,0 +1,34 @@
+<book xmlns:xi="http://www.w3.org/2001/XInclude">
+    <bookinfo>
+        <title>Multiverse</title>
+        <subtitle>Software Transactional Memory for Java</subtitle>
+        <copyright>
+            <year>2010</year>
+            <holder>Peter Veentjer</holder>
+        </copyright>
+        <legalnotice>
+            <para>
+                Copies of this document may be made for your own use and for distribution
+                to others, provided that you do not charge any fee for such copies and further
+                provided that each copy contains this Copyright Notice, whether distributed in
+                print or electronically.
+            </para>
+        </legalnotice>
+        <author>
+            <firstname>Peter</firstname>
+            <surname>Veentjer</surname>
+        </author>
+    </bookinfo>
+    <xi:include href='introduction.xml'/>
+    <xi:include href='transactionalmapping.xml'/>
+    <xi:include href='blockingtransactions.xml'/>
+    <xi:include href='lifecycleevents.xml'/>
+    <xi:include href='templates.xml'/>
+    <xi:include href='jmm.xml'/>
+    <xi:include href='api.xml'/>
+    <xi:include href='programmaticapi.xml'/>
+    <xi:include href='2phasecommit.xml'/>
+    <xi:include href='runtime.xml'/>
+    <xi:include href='multiversecompiler.xml'/>
+    <xi:include href='multiversejavaagent.xml'/>
+</book>

@@ -27,7 +27,7 @@ public class TransactionTemplate_threadLocalTest {
     }
 
     @Test
-    public void test() {
+    public void TransactionalTemplate_ShouldBe_ThreadLocalAware() {
         TransactionTemplate t = new TransactionTemplate(stm) {
             @Override
             public Object execute(Transaction tx) throws Exception {
@@ -45,7 +45,7 @@ public class TransactionTemplate_threadLocalTest {
 
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder().build();
 
-        Transaction found = new TransactionTemplate<Transaction>(txFactory, false, false, true) {
+        Transaction found = new TransactionTemplate<Transaction>(txFactory, false, false) {
             @Override
             public Transaction execute(Transaction tx) throws Exception {
                 return tx;

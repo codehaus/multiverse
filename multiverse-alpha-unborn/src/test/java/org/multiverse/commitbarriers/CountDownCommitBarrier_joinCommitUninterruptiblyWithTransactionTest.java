@@ -7,11 +7,15 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.stms.AbstractTransactionImpl;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
@@ -45,11 +49,21 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
     }
 
     @Test
-    @Ignore
     public void whenTransactionFailsToPrepare() {
         barrier = new CountDownCommitBarrier(1);
-
-
+        Transaction tx = mock(Transaction.class);
+        TransactionStatus status = mock(TransactionStatus.class);
+        when(status.isDead()).thenReturn(false);
+        when(tx.getStatus()).thenReturn(status);
+        doThrow(new RuntimeException()).when(tx).prepare();
+        try{
+            barrier.joinCommitUninterruptibly(tx);
+            fail("Expecting Runtime Exception thrown on Transaction preparation");
+        } catch (RuntimeException ex){
+            
+        }
+        assertTrue(barrier.isClosed());
+        assertEquals(0, barrier.getNumberWaiting());
     }
 
     @Test
@@ -60,7 +74,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
         tx.abort();
         try {
             barrier.joinCommitUninterruptibly(tx);
-            fail();
+            fail("Should have thrown DeadTransactionException");
         } catch (DeadTransactionException expected) {
         }
 
@@ -77,7 +91,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
         tx.commit();
         try {
             barrier.joinCommitUninterruptibly(tx);
-            fail();
+            fail("Should have thrown DeadTransactionException");
         } catch (DeadTransactionException expected) {
         }
 

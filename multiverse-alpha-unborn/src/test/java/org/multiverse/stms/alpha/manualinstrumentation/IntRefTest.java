@@ -83,7 +83,7 @@ public class IntRefTest {
         IntRef intValue = new IntRef(10);
 
         assertEquals(startVersion, stm.getVersion());
-        assertNull(getThreadLocalTransaction());
+        assertNotNull(getThreadLocalTransaction());
         assertEquals(10, intValue.get());
     }
 
@@ -94,7 +94,7 @@ public class IntRefTest {
         long startVersion = stm.getVersion();
         int result = intValue.get();
         assertEquals(10, result);
-        assertNull(getThreadLocalTransaction());
+        assertNotNull(getThreadLocalTransaction());
         assertEquals(startVersion, stm.getVersion());
     }
 
@@ -106,7 +106,7 @@ public class IntRefTest {
 
         intValue.set(100);
 
-        assertNull(getThreadLocalTransaction());
+        assertNotNull(getThreadLocalTransaction());
         assertEquals(startVersion + 1, stm.getVersion());
         assertEquals(100, intValue.get());
     }
@@ -119,7 +119,7 @@ public class IntRefTest {
 
         intValue.inc();
 
-        assertNull(getThreadLocalTransaction());
+        assertNotNull(getThreadLocalTransaction());
         assertEquals(startVersion + 1, stm.getVersion());
         assertEquals(11, intValue.get());
     }
