@@ -180,7 +180,7 @@ generated test report.
 - interface parameter inheritance.
 
 
-- JRuby integration
+- JRuby integration - In Progress
 
 - Groovy Integration
 
