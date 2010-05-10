@@ -1,0 +1,46 @@
+<h2>12 Multiverse Runtime</h2>
+
+<ul>
+    <li><a href="#introduction">12.1 Introduction</a></li>
+    <li><a href="#configuration">12.2 Configuration</a></li>
+    <li><a href="#warning">12.3 Warning</a></li>
+    <li><a href="#design.rationale">12.4 Design rationale</a></li>
+</ul>
+
+<h2 id="introduction">12.1 Introduction</h2>
+The Multiverse Runtime contains the global stm instance. It is possible to have multiple stm instances in the
+same java process (even in the same classloader), but if you are using the instrumented functionality
+or not explicitly using an STM instance, the transaction will make use of the GlobalStmInstance (so one
+unique instance for every classloader). Default the AlphaStm (the main Stm implementation of Multiverse) is
+loaded and configured for performance. In most cases you can completely ignore this chapter.
+
+<h2 id="configuration">12.2 Configuration</h2>
+<p>
+    The GlobalStmInstance can be configured using the org.multiverse.api.GlobalStmInstance.factoryMethod key
+    in the System properties. The value should point to a static no argument method that returns an Stm
+    instance. This property can be set from the commandline like this:
+<pre>
+    java ..... -Dorg.multiverse.api.GlobalStmInstance.factoryMethod=YourStm.createMethod ...
+</pre>
+If you want to reconfigure the Multiverse AlphaStm:
+<ol>
+    <li>create a static factory method where the AlphaStm instance if build</li>
+    <li>set the org.multiverse.api.GlobalStmInstance.factoryMethod property</li>
+</ol>
+<p>
+
+<h2 id="warning">12.3 Warning</h2>
+If you have created a different Stm implementation, you need to make sure that you are using the right
+Instrumentor in the Multiverse Javaagent or Multiverse Compiler because the instrumentation process is
+stm specific (this provides a lot of design and optimization freedom).
+<p>
+    You also need to watch out for classes that are instrumented with the Multiverse Compiler
+    with a different Instrumentor. If this happens the Multiverse Compiler and Javaagent
+    will detect this an throw a org.multiverse.instrumentation.CompileException.
+
+<h2 id="design.rationale">12.4 Design rationale</h2>
+In most cases I would have been against fiddling with System.properties; an IOC container like Spring
+or Guice normally takes care of initializing dependencies. But because instrumented classes could depend
+on a initialized GlobalStmInstance once they are loaded (for the AlphaStm the transactionfactory
+is initialized by accessing the GlobalStmInstance and stored in a generated static variable),
+we can't rely on some container because that possibly is loaded later.

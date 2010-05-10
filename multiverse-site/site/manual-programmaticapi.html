@@ -1,0 +1,154 @@
+<h2>13 Programmatic API</h2>
+
+<ul>
+    <li><a href="#introduction">13.1 Introduction</a></li>
+    <li><a href="#transaction">13.2 Configuring the Transaction</a></li>
+    <li><a href="#transactionTemplate">13.3 TransactionTemplate</a></li>
+    <li><a href="#api">13.4 API</a></li>
+    <li><a href="#programmaticReference">13.5 ProgrammaticReference</a></li>
+    <li><a href="#programmaticLong">13.6 ProgrammaticLong</a></li>
+    <li><a href="#multiple.stm.instances">13.7 Multiple Stm instances</a></li>
+</ul>
+
+<h2 id="introduction">13.1 Introduction</h2>
+One of the main <a href="missionstatement.html">mission statements</a> is the seamless integration in the
+Java language. This is based done on annotations in combination with instrumentation
+(<a href="manual-javaagent.html">runtime</a> or <a href="manual-compiler.html">compiletime</a>). But Multiverse
+isn't limited for being used in the Java language only. One of the other mission statements is that the
+heart of Multiverse, should be used just as easily in other JVM based languages like Groovy/Scala/JRuby etc.
+
+<h2 id="transaction">13.2 Configuring the Transaction</h2>
+The Transaction can be configured by retrieving the
+<a href="http://multiverse.codehaus.org/apidocs/org/multiverse/api/TransactionFactoryBuilder.html">TransactionFactoryBuilder</a>
+from the STM. For more information see the <a href="manual-api.html">Chapter 6: API</a>
+
+<h2 id="transactionTemplate">13.3 TransactionTemplate</h2>
+Transaction management is done through the <a href="manual-templates.html">TransactionTemplate</a>. It contains
+all the logic you don't want to implement yourself. The transaction template is threadsafe and can be reused so
+you could create it in the beginning and store it for later use. If you really need to get the most out of performance
+and can't make use of the transactiontemplate, you need to inline the logic in the transactiontemplate
+yourself. The big disadvantage is that changes made in the TransactionTemplate (and chances are high that
+there will be) will not be done in your code. So you need to make sure that you track changes on the
+TransactionTemplate.
+
+<h2 id="api">13.4 Programmatic API</h2>
+The Multiverse internals only case object objects implementing certain interfaces, so it doesn't matter if code
+is instrumented or written manually; they all look the same to the Stm. For the important interfaces in
+you need to look at the org.multiverse.api package. It contains the transaction, stm, clock etc interfaces
+you would expect to be there which can be configured manually. The instrumentation uses exactly the same
+interfaces, so the programmatic api is not a second class citizen.
+
+<h2 id="programmaticReference">13.5 ProgrammaticReference</h2>
+The <a href="http://multiverse.codehaus.org/apidocs/org/multiverse/api/programmatic/ProgrammaticReference.html">ProgrammaticReference</a>
+provides a transactional reference without being dependant on instrumentation. The ProgrammaticReference can
+be compared with the refs in:
+<ol>
+    <li><a href="http://doc.akkasource.org/stm">Akka</a> (uses Multiverse in combination with the
+        Programmatic API)
+    </li>
+    <li><a href="http://ppl.stanford.edu/ccstm/site/intro.html">CCStm</a></li>
+    <li><a href="http://clojure.org/refs">Clojure</a></li>
+</ol>
+All changes on references don't suffer from failure atomicity or isolation problems if they are done inside
+the context fo a running transaction. The Multiverse STM itself only knows about transactional objects
+(so an object with a managed field). The managed references itself is a transactional object with a
+single managed field: the value.
+<p>
+    Managed references are not the holy grail for STM based programming. If you use a managed reference
+    for every field that needs to be managed in an object, the overhead is higher than with an object
+    granularity. Although the object granularity has a chance of unfair conflicts (2 transaction updating
+    different fields on the same transactional object) will fail with object granularity and succeed
+    with field granularity. With the @FieldGranularity annotation the instrumentation knows that field
+    granularity should be used and rewrites the normal field to a Ref:
+
+<pre>
+    //before
+    @TransactionalObject
+    class LinkedBlockingQueue{
+
+        @FieldGranularity
+        Node head;
+
+        @FieldGranularity
+        Node tail;
+
+        ...
+    }
+
+    //after
+    @TransactionalObject
+    class LinkedBlockingQueue{
+
+        final Ref&lt;Node&gt; head = new Ref();
+
+        final &lt;Node&gt; tail = new Ref();
+
+        ...
+    }
+</pre>
+All reads and writes are transformed to get/set operations on the Ref.
+
+<p>
+    One of the disadvantages is that the total overhead on field granularity is higher if a transactional
+    object has more than 1 managed field. In the AlphaStm there even is a special transaction that is amazing
+    fast when only one transactional objects is used inside a transaction. So if there is a transactional
+    object with 3 managed fields using object granularity, the STM is able to make use of this transaction.
+    If each field needs to be managed with field granularity, a more expensive one is used used.
+<p>
+    Another disadvantage of field granularity is that the total number of synchronization actions
+    increases:
+<ol>
+    <li>more locks to release/acquire</li>
+    <li>locks are hold for a longer period</li>
+    <li>more conflict detecting needed</li>
+    <li>more writes needed</li>
+    <li>more reads needed</li>
+    <li>etc</li>
+</ol>
+<p>
+    The instrumentation for the AlphaStm is even able to prevent loading the tranlocal content of an object
+    once it has been retrieved. All transactional instance method of a transactional object which really has state,
+    or modified so that the tranlocal is passed as argument. So if you need to do a lot of 'this' calls on a
+    transactional object, chances are high that instead of doing an ALOAD 0 -> GET_FIELD or ALOAD 0, value->PUT_FIELD
+    is that an ALOAD N -> GET_FIELD or ALOAD N value-> PUTFIELD can be done. Making reads and writes almost as expensive
+    as non transactional field read/writes.
+</p>
+That is why Multiverse instrumentation for the AlphaStm uses object granularity by default. And for Stm
+implementation it doesn't managed of object or field granularity is used, since each managed reference
+itself is a transactional object with a single managed field.
+
+<h2 id="programmaticLong">13.6 ProgrammaticLong</h2>
+The <a href="http://multiverse.codehaus.org/apidocs/org/multiverse/api/programmatic/ProgrammaticLong.html">ProgrammaticLong</a>
+is not much different than the ProgrammaticReference, except that is optimized for storing
+a long (or int, short, byte, char). It can be compared to the AtomicLong except that is can be used
+inside transactions. The advantage of using a ProgrammaticLong is that you have access to the commutingInc
+(needed for creating a well behaving size field in transactions for example) and that no unnecessary boxing
+and autoboxing happens.
+
+<h2 id="multiple.stm.instances">13.7 Multiple Stm instances</h2>
+In some cases you might want to have multiple stm instances. Perhaps different configurations or you want to
+prevent unwanted contention. E.g. stm's can suffer from contention caused by a shared structures like the
+clock needed to prevent isolation issues. Having multiple instances are possible, but you need to be careful that
+certain components don't look at the GlobalStmInstance if they need an Stm instance.
+The TransactionTemplate should use an explicit TransactionFactory created by your stm. If this is forgotten,
+the TransactionTemplate will make use of the
+<a href="http://multiverse.codehaus.org/apidocs/org/multiverse/api/GlobalStmInstance.html">GlobalStmInstance</a>.
+<p>
+    It it also very important to realize that transactional objects created by different stm's
+    can't be exchanged because you can get problems like from ClassCastExceptions to subtile isolation anomalies.
+    The same Stm instance needs to be used that created the TransactionFactoryBuilder and the
+    ProgrammaticReferenceFactoryBuilder. There is no detection or protection of transactional objects
+    being exchanged between stm's. If this becomes an issue, it will be easy to add a 'stm' owner to
+    each transactional object, but it will increase memory usage.
+<p>
+    If there really is a need for multiple stm instances, a ThreadLocalStm could be created for easy access
+    instead of carrying it around all the time. The TransactionTemplate also needs to be enhanced to make use
+    of this ThreadLocalStm.
+<p>
+    Using pre-instrumented code could be an issue since it relies on a GlobalStm (the instrumented code in the
+    AlphaStm does since the ThreadFactories are expensive objects and created when the class is initialized and
+    stored in a generated final static variable).
+
+
+
+

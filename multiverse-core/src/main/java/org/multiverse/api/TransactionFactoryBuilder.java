@@ -31,6 +31,13 @@ import org.multiverse.api.commitlock.CommitLockPolicy;
 public interface TransactionFactoryBuilder<T extends Transaction, B extends TransactionFactoryBuilder> {
 
     /**
+     * Returns the Stm that created this TransactionFactoryBuilder.
+     *
+     * @return returns the Stm that created this TransactionFactoryBuilder.
+     */
+    Stm getStm();
+
+    /**
      * Checks if dirty check is enabled.
      *
      * @return true if enabled, false otherwise.

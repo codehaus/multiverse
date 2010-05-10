@@ -211,6 +211,11 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         private final long timeoutNs;
         private final int maxReadSpinCount;
 
+        @Override
+        public AlphaStm getStm() {
+            return AlphaStm.this;
+        }
+
         public AlphaTransactionFactoryBuilder() {
             this(false, //readonly
                     AlphaStm.this.readTrackingEnabled,
@@ -483,28 +488,39 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         }
 
         private TransactionFactory<AlphaTransaction> createSpeculativeTxFactory() {
-            final ReadonlyConfiguration ro_nort =
-                    new ReadonlyConfiguration(
-                            clock, backoffPolicy, familyName, speculativeConfig, maxRetries,
-                            interruptible, false, explicitRetryAllowed, timeoutNs, maxReadSpinCount);
-            final ReadonlyConfiguration ro_rt =
-                    new ReadonlyConfiguration(
-                            clock, backoffPolicy, familyName, speculativeConfig, maxRetries,
-                            interruptible, true, explicitRetryAllowed, timeoutNs, maxReadSpinCount);
-            final UpdateConfiguration up_rt =
-                    new UpdateConfiguration(
-                            clock, backoffPolicy, commitLockPolicy, familyName, speculativeConfig,
-                            maxRetries, interruptible, true, writeSkewAllowed,
-                            optimizeConflictDetectionEnabled, true, quickReleaseEnabled,
-                            explicitRetryAllowed, timeoutNs, maxReadSpinCount);
-            final UpdateConfiguration up_nort =
-                    new UpdateConfiguration(
-                            clock, backoffPolicy, commitLockPolicy, familyName,
-                            speculativeConfig, maxRetries, interruptible, false, true,
-                            optimizeConflictDetectionEnabled, true, quickReleaseEnabled,
-                            explicitRetryAllowed, timeoutNs, maxReadSpinCount);
-
             return new TransactionFactory<AlphaTransaction>() {
+
+                final ReadonlyConfiguration ro_nort =
+                        new ReadonlyConfiguration(
+                                clock, backoffPolicy, familyName, speculativeConfig, maxRetries,
+                                interruptible, false, explicitRetryAllowed, timeoutNs, maxReadSpinCount, this);
+                final ReadonlyConfiguration ro_rt =
+                        new ReadonlyConfiguration(
+                                clock, backoffPolicy, familyName, speculativeConfig, maxRetries,
+                                interruptible, true, explicitRetryAllowed, timeoutNs, maxReadSpinCount, this);
+                final UpdateConfiguration up_rt =
+                        new UpdateConfiguration(
+                                clock, backoffPolicy, commitLockPolicy, familyName, speculativeConfig,
+                                maxRetries, interruptible, true, writeSkewAllowed,
+                                optimizeConflictDetectionEnabled, true, quickReleaseEnabled,
+                                explicitRetryAllowed, timeoutNs, maxReadSpinCount, this);
+                final UpdateConfiguration up_nort =
+                        new UpdateConfiguration(
+                                clock, backoffPolicy, commitLockPolicy, familyName,
+                                speculativeConfig, maxRetries, interruptible, false, true,
+                                optimizeConflictDetectionEnabled, true, quickReleaseEnabled,
+                                explicitRetryAllowed, timeoutNs, maxReadSpinCount, this);
+
+                @Override
+                public Stm getStm() {
+                    return AlphaStm.this;
+                }
+
+                @Override
+                public TransactionFactoryBuilder getTransactionFactoryBuilder() {
+                    return AlphaTransactionFactoryBuilder.this;
+                }
+
                 @Override
                 public AlphaTransaction start() {
                     boolean finalReadonly;
@@ -569,37 +585,68 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         }
 
         private TransactionFactory<AlphaTransaction> createNonSpeculativeReadonlyTxFactory() {
-            ReadonlyConfiguration config =
-                    new ReadonlyConfiguration(
-                            clock, backoffPolicy, familyName, speculativeConfig,
-                            maxRetries, interruptible, readTrackingEnabled,
-                            explicitRetryAllowed, timeoutNs, maxReadSpinCount);
+            return new TransactionFactory<AlphaTransaction>() {
+                ReadonlyConfiguration config =
+                        new ReadonlyConfiguration(
+                                clock, backoffPolicy, familyName, speculativeConfig,
+                                maxRetries, interruptible, readTrackingEnabled,
+                                explicitRetryAllowed, timeoutNs, maxReadSpinCount, this);
 
-            if (readTrackingEnabled) {
-                return new MapReadonlyAlphaTransaction.Factory(config);
-            } else {
-                return new NonTrackingReadonlyAlphaTransaction.Factory(config);
-            }
+                @Override
+                public Stm getStm() {
+                    return AlphaStm.this;
+                }
+
+                @Override
+                public TransactionFactoryBuilder getTransactionFactoryBuilder() {
+                    return AlphaTransactionFactoryBuilder.this;
+                }
+
+                @Override
+                public AlphaTransaction start() {
+                    if (readTrackingEnabled) {
+                        return new MapReadonlyAlphaTransaction(config);
+                    } else {
+                        return new NonTrackingReadonlyAlphaTransaction(config);
+                    }
+                }
+            };
         }
 
         private TransactionFactory<AlphaTransaction> createNonSpeculativeUpdateTxFactory() {
             if (!readTrackingEnabled && !writeSkewAllowed) {
                 String msg = format("Can't createReference transactionfactory for transaction family '%s' because an update "
-                        + "transaction without automaticReadTracking and without isWriteSkewAllowed is "
+                        + "transaction without automaticReadTracking and with writeSkew disallowed is "
                         + "not possible", familyName
                 );
 
                 throw new IllegalStateException(msg);
             }
 
-            UpdateConfiguration config =
-                    new UpdateConfiguration(
-                            clock, backoffPolicy, commitLockPolicy, familyName, speculativeConfig,
-                            maxRetries, interruptible, readTrackingEnabled, writeSkewAllowed,
-                            optimizeConflictDetectionEnabled, true, quickReleaseEnabled,
-                            explicitRetryAllowed, timeoutNs, maxReadSpinCount);
+            return new TransactionFactory<AlphaTransaction>() {
+                UpdateConfiguration config =
+                        new UpdateConfiguration(
+                                clock, backoffPolicy, commitLockPolicy, familyName, speculativeConfig,
+                                maxRetries, interruptible, readTrackingEnabled, writeSkewAllowed,
+                                optimizeConflictDetectionEnabled, true, quickReleaseEnabled,
+                                explicitRetryAllowed, timeoutNs, maxReadSpinCount, this);
 
-            return new MapUpdateAlphaTransaction.Factory(config);
+
+                @Override
+                public Stm getStm() {
+                    return AlphaStm.this;
+                }
+
+                @Override
+                public TransactionFactoryBuilder getTransactionFactoryBuilder() {
+                    return AlphaTransactionFactoryBuilder.this;
+                }
+
+                @Override
+                public AlphaTransaction start() {
+                    return new MapUpdateAlphaTransaction(config);
+                }
+            };
         }
     }
 }

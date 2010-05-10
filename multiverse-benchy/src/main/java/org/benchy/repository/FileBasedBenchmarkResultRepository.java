@@ -18,22 +18,6 @@ import static java.lang.String.format;
  */
 public class FileBasedBenchmarkResultRepository implements BenchmarkResultRepository {
 
-    private static void ensureExistingDirectory(File dir) {
-        if (dir == null) {
-            throw new NullPointerException();
-        }
-
-        if (!dir.exists()) {
-            if (!dir.mkdirs()) {
-                String msg = format("Unable to create directory %s", dir);
-                throw new IllegalArgumentException(msg);
-            }
-        } else if (!dir.isDirectory()) {
-            String msg = format("file %s is not a directory", dir);
-            throw new IllegalArgumentException(msg);
-        }
-    }
-
     private final File rootDir;
 
     /**
@@ -196,4 +180,22 @@ public class FileBasedBenchmarkResultRepository implements BenchmarkResultReposi
             return pathname.getName().endsWith(".txt");
         }
     }
+
+    private static void ensureExistingDirectory(File dir) {
+        if (dir == null) {
+            throw new NullPointerException();
+        }
+
+        if (!dir.exists()) {
+            if (!dir.mkdirs()) {
+                String msg = format("Unable to create directory %s", dir);
+                throw new IllegalArgumentException(msg);
+            }
+        } else if (!dir.isDirectory()) {
+            String msg = format("file %s is not a directory", dir);
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+
 }

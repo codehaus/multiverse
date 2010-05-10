@@ -80,7 +80,7 @@ public final class MultiverseJavaAgent {
                 "instrumentor",
                 "org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor");
 
-        println(format("Multiverse: Initializing org.multiverse.instrumentation.Instrumentor '%s'",
+        println(format("Multiverse: Initializing instrumentor '%s'",
                 instrumentorClassName));
 
         Constructor constructor = getMethod(instrumentorClassName);

@@ -1,0 +1,527 @@
+<chapter id="transactionalmapping">
+    <title>Transactional Mapping</title>
+    <para>
+    </para>
+    <section>
+        <title>Introduction</title>
+        <para>
+            One of the main goals of Multiverse, is to create a STM implementation that seamlessly
+            integrates in Java. This is done based on placing special annotations on POJO's combined
+            with bytecode instrumentation, to add the logic. This chapter contains all the information
+            about how to map POJO's to transactions.
+        </para>
+    </section>
+
+    <section>
+        <title>@TransactionalObject</title>
+        <para>
+            The easies way in Multiverse to make an object transactional, is to add the
+            @TransactionalObject annotation, e.g.:
+        </para>
+    </section>
+</chapter>
+
+<!--
+<pre>
+    import org.multiverse.annotations.TransactionalObject;
+
+    @TransactionalObject
+    public class Account{
+        private int balance;
+
+        public Account(int initialBalance){
+            this.balance = initialBalance;
+        }
+
+        public int getBalance(){
+            return balance;
+        }
+
+        public setBalance(int newBalance){
+            this.balance = newBalance;
+        }
+    }
+</pre>
+By adding the annotation, this object has become transactional:
+<ol>
+    <li><b>failure atomicity:</b> all changes are written or non of them are written</li>
+    <li><b>isolated:</b> transaction will not observe changes made by concurrent executing transactions. So
+        no worries about race problems.
+    </li>
+    <li><b>deadlock free:</b> no worries about the order in which resources are used because the transactions will not
+        deadlock.
+    </li>
+    <li><b>composable:</b> transactional methods can be composed to create new transactional methods.
+    </li>
+</ol>
+So all reads/writes on instance fields (static field and final fields are completely ignored) will
+be done through a transaction.
+
+<h3 id="transactionalobject.finalfields">1.2.1 @TransactionalObject and final fields</h3>
+When the @TransactionalObject annotation is placed on a POJO, automatically all non final fields will be managed
+by Multiverse (there is no need to). All final fields are competely ignored by the STM.
+<p/>
+So Multiverse promotes the use of final fields where possible because this not only gives better performance,
+immutable structures are reduce complexity in a lot of cases because you don't need to worry about if the object
+still is in a consistent state.
+
+<h3 id="transactionalobject.and.volatile.fields">1.2.2 @TransactionalObject and volatile fields</h3>
+If a @TransactionalObject contains a volatile field, the system completely ignores this field. This is exactly the
+same as adding an <a href="#exclude">@Exclude</a> annotation. So volatile fields can be used if transactional
+memory also is combined with more traditional concurrency approaches.
+
+<h3 id="transactionalobject.without.managed.fields">1.2.3 @TransactionalObject without managed fields</h3>
+If transactional object doesn't contain any fields to manage (so volatile, final, static) the transactional
+object will be completely invisible to the stm. So there will not be any stress on the transaction.
+Of course the instance methods of these objects still are transactional.
+
+<h3 id="transactionalobject.limitations">1.2.4 @TransactionalObject and limitations</h3>
+Currently there are some limitations:
+<ol>
+    <li><b>No support for subclassing:</b> it is currently not possible (limitation in the instrumentation)
+        to subclass from another transactional object (with managed fields). When the Javaagent encounters this
+        situation, it will complain and output some log statements. You can extend from any non transactional object,
+        but the transactional properties will not be provided to the super class. So be careful with that.
+    </li>
+    <li>
+        <b>No support for arrays:</b> it is currently no possible to get transactional arrays. At the moment the
+        reference to the array only is transactional, but the content not.
+    </li>
+    <li>
+        <b>Not able to manage static fields:</b> although it isn't a problem to use transactional static
+        methods, it is not possible to have managed static fields. If a TransactionalObject annotation is placed
+        on a POJO with static fields, the static fields will be totally ignored by the stm.
+    </li>
+</ol>
+Some of these limitations will be removed in future releases of Multivere (hopefully in the 0.5 release).
+
+<h2 id="transactionalmethod">1.3 @TransactionalMethod</h2>
+The easies way to create transactional methods it place a TransactionalObject annotation on an object. The
+instrumentation knows that all <b>instance</b> methods automically receive an update transaction. But in a lot of
+cases you want to finetune this behavior or you want to add transactions on methods that are not an
+instance method of a transactional object (for example in a different class or static methods). In these
+cases the TransactionalMethod annotation can be used.
+
+<h3 id="transactionalmethod.readonly">1.3.1 @TransactionalMethod.readonly</h3>
+All instance method of a transactional object automatically become update methods. But in some cases it is better
+to use a readonly transaction because they often consume less resources than an update or you want to indicate
+that no changes can be made through that transaction. If a change is tried in a readonly transaction, a
+ReadonlyException will be thrown. A transactional method can be made readonly by setting the readonly property
+of the TransactionalMethod annotation, e.g.:
+
+<pre>
+     import org.multiverse.annotations.TransactionalObject;
+
+    @TransactionalObject
+    public class Account{
+
+        private int balance;
+
+        ...
+
+        @Transactional(readonly = true)
+        public int setBalance(){
+            return balance;
+        }
+    }
+</pre>
+
+<h3 id="transactionalmethod.maxRetries">1.3.2 @TransactionalMethod.maxRetries</h3>
+Transactions run in Multiverse can fail for all kinds of reasons:
+<ol>
+    <li><b>read conflicts:</b> when a transaction tries to load a transactional object for reading or writing,
+        but the version it needs, doesn't exist anymore. If the transaction would have been able to see this change,
+        you could run into race problems.
+    </li>
+    <li><b>write conflicts:</b> when a transaction tries to make a write (atm writes in multiverse are deferred to
+        the commit and sees that a different transaction made a conflicting write, the transaction is aborted and
+        in most cases will succeed the next time.
+        If the transaction would have
+        have been able to make this write, you could
+    </li>
+    <li>
+        <b>blocking transactions:</b> when a transaction 'blocks', on a lower level the transaction is aborted and
+        restarted when a commit is done on one or more of the objects it was listening to.
+    </li>
+    <li>
+        <b>speculative transaction implementation selection:</b> the stm could decide to start transactions with
+    </li>
+</ol>
+The transaction management logic added to transactional method automatically retries in these situations, because
+the next time the transaction executed, it could succeed. But in some cases a transaction is not able to
+complete; perhaps the transaction is continuously runs into read or write conflicts caused by contention.
+To prevent uncontrolled retrying (this could lead to livelocking), the number of retries default is bound to
+1000. With the maxRetries this property can be influenced:
+
+<pre>
+    import org.multiverse.annotations.TransactionalMethod;
+    import org.multiverse.annotations.TransactionalObject;
+
+    @TransactionalObject
+    public class Account{
+
+        private int balance;
+
+        ...
+
+        @TransactionalMethod(readonly = true, maxRetries = 10)
+        public int getBalance(){
+            return balance;
+        }
+    }
+</pre>
+The maxRetries can be used in combination with all the other TransactionalMethod properties.
+<p/>
+But be careful:
+<ol>
+    <li>if you give it a too high value, the system could start to suffer from livelocking</li>
+    <li>if you give it a too low value, some transactions will never commit</li>
+</ol>
+On a lower level the maxRetries is combined with a customizable restartBackoffPolicy (with an exponential
+backoff policy as the default implementation) to eliviate pressure on contention. In the future this backoff
+policy will be exposed through annotations.
+
+<h3 id="transactionalmethod.trackReads">@TransactionalMethod.trackReads</h3>
+When a transaction reads from transactional objects, it can decide to track that read. Readtracking is useful
+for multiple purposes:
+<ol>
+    <li><b>reduce number of read conflicts:</b> if a read is tracked in a transaction, the next time the same
+        read is done, the 'cached' value can be returned. If the read is not tracked, it could happen that a
+        different transaction does an update between reads and a LoadTooOldVersionException is thrown.
+    </li>
+    <li><b>blocking transactions:</b> based on the reads done, a transaction is able to figure out on which
+        objects to listen when a transaction is blocked. For more information see
+        <a href="manual-blocking.html">chapter 2 Blocking transactions</a>.
+    </li>
+    <li><b>writeSkew:</b> an isolation problem. For more information see
+        <a href="#transactionalmethod.writeSkew">@TransactionalMethod.writeSkew</a>
+    </li>
+</ol>
+Ofcourse readtracking has its price; for each read that is tracked, some kind of registration needs to be done
+and this increases the memory and cpu usage of a transaction.
+<p/>
+By default all readonly transactional methods will not do trackReads and all update transactions will,
+unless explicitly specified otherwise ofcourse.
+
+<h3 id="transactionalmethod.writeSkew">@TransansactionalMethod.writeSkew</h3>
+
+<h3 id="transactionalmethod.and.exceptions">@TransactionalMethod and exceptions</h3>
+When a TransactionalMethod encounters an exception (no matter if it is checked, unchecked or an error),
+it will automatically abort the transaction. In the future this behavior is going to be customizable.
+
+<h3 id="transactionalmethod.and.nesting">@TransactionalMethod and nesting</h3>
+TransactionalMethods can be nested so they are able to be composed, for example:
+
+<pre>
+    import org.multiverse.annotations.TransactionalObject;
+    import org.multiverse.annotations.TransactionalMethod;
+
+    @TransactionalObject
+    public class Account{
+
+        private int balance;
+
+        public Account(int initialBalance){
+            this.balance = balance;
+        }
+
+
+        @TransactionalMethod(readonly = true)
+        public int getBalance(){
+            return balance;
+        }
+
+        @TransactionalMethod
+        public void setBalance(int newBalance){
+            this.balance = newBalance;
+        }
+
+        @TransactionalMethod
+        public static void transfer(Account from, Account to, int amount){
+            from.setBalance(from.getBalance()-amount);
+            to.setBalance(to.getBalance()+amount);
+        }
+    }
+</pre>
+In this example the transfer method is a composition of 4 other transactional methods (2x getBalance and
+2x setBalance). So nesting of transactions is no problem. If you want to know more about nesting behavior,
+check <a href="">Chapter XXX: Transaction Nesting</a>.
+
+<h3 id="transactionalmethod.and.interfaces">@TransactionalMethod and interfaces</h3>
+It is important to realize that @TransactionalMethod don't inherit, so the following example
+is not going to give the result you want to have.
+
+<pre>
+    import org.multiverse.annotations.TransactionalMethod;
+
+    public interface TransferService{
+
+        @TransactionalMethod
+        void transfer(Account from, Account to, int amount);
+    }
+
+    public class TransferServerImpl implements TransferService{
+
+        public void transfer(Account from, Account to, int amount){
+            from.setBalance(from.getBalance()-amount);
+            to.setBalance(to.getBalance()+amount);
+        }
+    }
+</pre>
+Although the methods on the transactional object Account are transactional, the transfer method itself isn't.
+So this transfer is subject to race problems; imagine what happens when a different transaction modifies
+the balance of the from account just after the from.get() has been called and just before the setBalance method
+on from is called. And it also is subject to lack of atomicity.
+<p/>
+The lack of inheritance of method annotation in Java is something that has annoyed me from day one, but we have
+to live with it.
+
+<h3 id="transactionalmethod.and.the.transactiontemplate">@TransactionalMethod and the TransactionTemplate</h3>
+TransactionalMethod can perfectly be combined with TransactionTemplates. For more information about
+the TransactionTemplate see <a href="manual-templates.html">chapter 3 Templates</a>.
+
+<h2 id="transactionalconstructor">1.4 @TransactionalConstructor</h2>
+The TransactionalConstructor annotation looks a lot like the functionality the TransactionalMethod annotation
+provides because it also can make constructors (also a method) transactional. The big difference is that
+a constructor can't be retried, so you won't find any retry related properties.
+<p/>
+A TransactionalConstructor can be added to a constructor of a TransactionalObject to finetune behavior:
+<pre>
+    import org.multiverse.annotations.TransactionalMethod;
+    import org.multiverse.annotations.TransactionalObject;
+
+    @TransactionalObject
+    public class Account{
+
+        private int balance;
+
+        @TransactionalConstructor(trackReads = false)
+        public Account(int balance){
+            this.balance = balance;
+        }
+    }
+</pre>
+In this case the default value true for trackReads is changed to false.
+<p/>
+It can also be placed on a constructor of a non transactional object to make use of other transactional objects
+within a single transaction, e.g.:
+<pre>
+    import org.multiverse.annotations.TransactionalConstructor;
+    import org.multiverse.transactional.primitives.TransactionalInteger;
+
+    public final class Sum{
+
+        private int sum;
+
+        @TransactionalConstructor(readonly = true)
+        public Sum(TransactionalInteger ref1, TransactionalInteger ref2){
+            this.sum = ref1.get()+ref2.get();
+        }
+    }
+</pre>
+
+All properties of the TransactionalConstructor, can also be found in the TransactionalMethod and have exactly
+the same meaning:
+<ol>
+    <li><a href="#transactionalmethod.readonly">readonly</a></li>
+    <li><a href="#transactionalmethod.trackReads">trackReads</a></li>
+    <li><a href="#transactionalmethod.writeSkew">writeSkew</a></li>
+</ol>
+So for more information about these properties, just check the documentation on the TransactionalMethod.
+
+<h3 id="transactionalconstructor.and.blocking">1.4.1 @TransactionalConstructor and blocking</h3>
+Because the TransactionalConstructor doesn't support retries, blocking behavior also isn't possible because
+this also relies on the ability of transactions to be retried. If you need blocking behavior in the constructor,
+you can use the following approach:
+
+<pre>
+    import org.multiverse.annotations.TransactionalMethod;
+    import org.multiverse.annotations.TransactionalObject;
+    import org.multiverse.transactional.primitives.TransactionalInteger;
+
+    @TransactionalObject
+    public class IntValue{
+        private int value;
+
+        private IntValue(TransactionalInteger integer){
+            integer.await(10);
+            value = integer.get();
+        }
+
+        @TransactionalMethod
+        public static IntValue create(TransactionalInteger integer){
+            return new IntValue(integer);
+        }
+    }
+</pre>
+The example is quite useless, but it shows how to add the blocking behavior. It is important to realize that
+because the 'create' function can be executed more than once (because of the await in the constructor), that
+multiple IntValue's are created.
+
+<h2 id="exclude">1.5 @Exclude</h2>
+The @Exclude annotation can be used for 2 reaons:
+<ol>
+    <li><a href="#exclude.field">excluding a field</a></li>
+    <li><a href="#exclude.method">excluding a method</a></li>
+</ol>
+
+<h3 id="exclude.field">1.5.1 @Exclude field</h3>
+When a TransactionalObject annotation is placed on an object, all non final instance fields of that object will
+automatically be managed by the STM. But in some you want to exclude certain fields. This can be done with the
+@Exclude annotation:
+
+<pre>
+    import org.multiverse.annotations.Exclude;
+    import org.multiverse.annotations.TransactionalObject;
+
+    @TransactionalObject
+    public class Foo{
+        private int a;
+
+        @Exclude
+        private int b;
+
+        ...
+    }
+</pre>
+In this example field 'a' is managed and field 'b' is not managed.
+<p/>
+It is important to realize that the field is not protected by transactions, so it could be subject to all the problems
+transactions are trying to prevent. So it should be used wisely.
+<p/>
+If a @Exclude annotation is placed on a field of a non transactional object, or if the field automatically is excluded
+(final, static, volatile) it has no effect and is completely ignored.
+
+<h3 id="exclude.method">1.5.1 @Exclude method</h3>
+When a TransactionalObject annotation is placed on an object, all instance methods of that object automatically
+become transactional update methods. But in some cases you want to exclude that method. This can be done
+with adding an Exclude annotation on a method.
+
+<pre>
+    import org.multiverse.annotations.Exclude;
+    import org.multiverse.annotations.TransactionalObject;
+
+    @TransactionalObject
+    public class Foo{
+        private int a;
+
+        @Exclude
+        public void sayHello(){
+            System.out.println("hello");
+        }
+    }
+</pre>
+The Exclude has a very high priority, so it can be used to override @TransactionalMethod or @TransactionalObject
+configuration.
+<p/>
+If an excluded method access managed fields, you need to watch out. If there is no transaction active in the
+ThreadLocalTransaction, you will get an NoTransactionFoundException. If there is a transaction active,
+this transaction will be used to access the field.
+<p/>
+If an excluded method calls multiple other transactional methods, it could be that multiple transactions are used.
+So you won't get your isolation or atomicity guarantees.
+<p/>
+If an exclude annotation is placed on a non transactional method, it is ignored.
+
+<h2 id="fieldgranularity">1.6 @FieldGranularity</h2>
+If a transactional object has more than 1 fields, it could be that you get a writeconflict on 2 transactions
+writing to different fields, e.g:
+
+<pre>
+    import org.multiverse.annotations.TransactionalObject;
+
+    @TransactionalObject
+    public class Foo{
+
+        private int a;
+        private int b;
+
+        ...
+
+        public void incA(){
+            a++;
+        }
+
+        public void incB(){
+            b++;
+        }
+    }
+</pre>
+This is caused by that the Multiverse javaagent adds object granularity by default;
+meaning that you only get reads/writes on the object level (so all fields are read/written). In some cases you
+get unwanted contention on these fields (for example with a linked blocking queue with an independant head
+and tail). By placing the @FieldGranularity annotation above a field, you can configure field granularity,
+e.g:
+<p/>
+If one transaction modifies a and another modifies b, one of the transactions is going to fail when it does a commit,
+even though from a logical point of view there is no reason to conflict. This is because the conflict occurrs
+on the instance level (object granularity) and not on the field level (field granularity). By placing the
+@FieldGranualarity annotation above a field, this unwanted cause of contention can be removed:
+
+<pre>
+    import org.multiverse.annotations.FieldGranularity;
+    import org.multiverse.annotations.TransactionalObject;
+
+    @TransactionalObject
+    public class Foo{
+
+        @FieldGranularity
+        private int a;
+
+        @FieldGranularity
+        private int b;
+
+        ...
+
+        public void incA(){
+            a++;
+        }
+
+        public void incB(){
+            b++;
+        }
+    }
+</pre>
+Placing the @FieldGranularity on fields of non transactional objects, has no effect (they are completely ignored).
+Placing the @FieldGranularity annotation on 'excluded' fields like volatile, final, static of fields with the
+@Exclude annotation, has no effect either.
+<p/>
+What happens under the hood is that the fields are transformed to a TransactionalReference or transactional primitive,
+check <a href="manual-referencesandprimitives.html">4 Transactional references and primitives</a> So after the
+instrumentation, the code looks like this:
+<pre>
+    import org.multiverse.annotations.TransactionalObject;
+    import org.multiverse.transactional.primitives.TransactionalInteger;
+
+    @TransactionalObject
+    public class Foo{
+
+        private final TransactionalInteger a = new TransactionalInteger();
+        private final TransactionalInteger b = new TransactionalInteger();
+
+        ...
+
+        public void incA(){
+            a.set(a.get()+1);
+        }
+
+        public void incB(){
+            b.set(b.get()+1);
+        }
+    }
+</pre>
+Because the content of a and b have been moved to different transactional objects (the systems sees a transactional
+primitive or transactional reference as just another transactional object), there won't be a conflict when
+one transaction updates a and another b. Unless writeskew prevention is anabled and both transaction also read
+a and b. For more information see <a href="manual-isolation.html">8 Transaction Isolation</a>. Because each
+instance method of a transactional object automatically is a transactional method, incA is executed under
+a single transaction, so the operation is atomic no matter if @FieldGranularity is used. The same goes
+for incB ofcourse.
+<p/>
+You might wonder why not declare all fields with the @FieldGranularity annotation by default. Although field level
+granularity reduce the chance of writeconflicts, it increases the stress on the transaction; so operations like
+commit take more time (increasing the chance on read/write conflicts) It also causes increased memory usage
+because extra transactional objects and tranlocal objects need to be created.
+
+
+    -->    

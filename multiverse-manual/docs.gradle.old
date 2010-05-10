@@ -1,0 +1,300 @@
+/*
+ * Copyright 2010 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: 'base'
+
+configurations {
+    userGuideStyleSheets
+    userGuideTask
+}
+
+dependencies {
+    userGuideTask 'xalan:xalan:2.7.1', 'xerces:xercesImpl:2.9.1'
+    userGuideTask module('xhtmlrenderer:xhtmlrenderer:R8rc1') {
+        dependency 'itext:itext:2.0.8@jar'
+    }
+    userGuideTask 'xslthl:xslthl:2.0.1@jar'
+
+    userGuideStyleSheets 'docbook:docbook-xsl:1.75.2@zip'
+}
+
+srcDocsDir = file('src/docs')
+userguideSrcDir = new File(srcDocsDir, 'userguide')
+cssSrcDir = new File(srcDocsDir, 'css')
+
+docsDir = file("$buildDir/docs")
+userguideDir = new File(docsDir, 'userguide')
+distDocsDir = new File(buildDir, 'distDocs')
+docbookSrc = new File(project.buildDir, 'src/docbook')
+
+tasks.withType(Docbook2Xhtml).allObjects { task->
+    task.dependsOn userguideStyleSheets
+    task.classpath = configurations.userGuideTask
+    task.stylesheetsDir = userguideStyleSheets.destinationDir
+}
+
+task userguideStyleSheets(type: Copy) {
+    File stylesheetsDir = new File(srcDocsDir, 'stylesheets')
+    into new File(buildDir, 'stylesheets')
+    from(stylesheetsDir) {
+        include '*.xsl'
+    }
+    from(cssSrcDir) {
+        include '*.css'
+    }
+    from(zipTree(configurations.userGuideStyleSheets.singleFile)) {
+        // Remove the prefix
+        eachFile { fcd -> fcd.path = fcd.path.replaceFirst('^docbook-xsl-[0-9\\.]+/', '') }
+    }
+}
+
+task userguideDocbook(type: UserGuideTransformTask) {
+    inputs.files fileTree(dir: userguideSrcDir, includes: ['*.xml'])
+    sourceFile = new File(userguideSrcDir, 'userguide.xml')
+    destFile = new File(docbookSrc, 'userguide.xml')
+    websiteUrl = 'http://multiverse.codehaus.org'
+}
+
+task remoteUserguideDocbook(type: UserGuideTransformTask) {
+    sourceFile = new File(userguideSrcDir, 'userguide.xml')
+    destFile = new File(docbookSrc, 'remoteUserguide.xml')
+    doFirst {
+        javadocUrl = remoteLocations.javadocUrl
+        groovydocUrl = remoteLocations.groovydocUrl
+        websiteUrl = 'http://multiverse.codehaus.org'
+    }
+}
+
+task userguideHtml(type: Docbook2Xhtml, dependsOn: userguideDocbook) {
+    source userguideDocbook.destFile
+    destDir = userguideDir
+    stylesheetName = 'userGuideHtml.xsl'
+    resources = fileTree {
+        from userguideSrcDir
+        include 'img/*.png'
+    }
+    resources += fileTree {
+        from cssSrcDir
+        include '*.css'
+    }
+}
+
+task userguideSingleHtml(type: Docbook2Xhtml, dependsOn: userguideDocbook) {
+    source userguideDocbook.destFile
+    destFile = new File(userguideDir, 'userguide_single.html')
+    stylesheetName = 'userGuideSingleHtml.xsl'
+    resources = fileTree {
+        from userguideSrcDir
+        include 'img/*.png'
+    }
+    resources += fileTree {
+        from cssSrcDir
+        include '*.css'
+    }
+}
+
+task userguideXhtml(type: Docbook2Xhtml, dependsOn: remoteUserguideDocbook) {
+    source remoteUserguideDocbook.destFile
+    destFile = new File(buildDir, 'tmp/userguidePdf/userguidePdf.html')
+    stylesheetName = 'userGuidePdf.xsl'
+    resources = fileTree {
+        from userguideSrcDir
+        include 'img/*.png'
+    }
+    resources += fileTree {
+        from cssSrcDir
+        include '*.css'
+    }
+}
+
+task userguidePdf(type: Xhtml2Pdf, dependsOn: userguideXhtml) {
+    sourceFile = userguideXhtml.destFile
+    destFile = new File(userguideDir, 'userguide.pdf')
+    classpath = configurations.userGuideTask
+}
+
+task javadoc(type: Javadoc) {
+    source groovyProjects().collect {project -> project.sourceSets.main.allJava }
+    destinationDir = new File(docsDir, 'javadoc')
+    classpath = files(groovyProjects().collect {project -> [project.sourceSets.main.compileClasspath, project.sourceSets.main.classes] })
+    include 'org/gradle/api/**'
+    include 'org/gradle/*'
+    include 'org/gradle/external/javadoc/**'
+    exclude '**/internal/**'
+    optionsFile = file("$buildDir/tmp/javadoc.options")
+    options.links("http://java.sun.com/j2se/1.5.0/docs/api", "http://groovy.codehaus.org/gapi/", "http://maven.apache.org/ref/2.2.1/maven-core/apidocs",
+        "http://maven.apache.org/ref/2.2.1/maven-model/apidocs")
+    doFirst {
+        title = "Multiverse $version"
+    }
+}
+
+task groovydoc(type: Groovydoc) {
+    source groovyProjects().collect {project -> project.sourceSets.main.groovy }
+    destinationDir = new File(docsDir, 'groovydoc')
+    includes = javadoc.includes
+    excludes = javadoc.excludes
+    doFirst {
+        title = "Multiverse $version"
+    }
+    groovyClasspath = project(':core').configurations.groovy
+}
+
+task userguideFragmentSrc(type: UserGuideTransformTask, dependsOn: [userguideStyleSheets]) {
+    tags << 'standalone'
+    sourceFile = new File(userguideSrcDir, 'installation.xml')
+    destFile = new File(docbookSrc, 'installation.xml')
+    doFirst {
+        javadocUrl = remoteLocations.javadocUrl
+        groovydocUrl = remoteLocations.groovydocUrl
+        websiteUrl = 'http://www.gradle.org'
+    }
+}
+
+task distDocs(type: Docbook2Xhtml, dependsOn: userguideFragmentSrc) {
+    source userguideFragmentSrc.destFile
+    destFile = new File(distDocsDir, 'getting-started.html')
+    stylesheetName = 'standaloneHtml.xsl'
+}
+
+task websiteDocsSrc(type: UserGuideTransformTask, dependsOn: [userguideStyleSheets]) {
+    inputs.files fileTree(dir: userguideSrcDir, includes: ['*.xml'])
+    sourceFile = new File(userguideSrcDir, 'userguide.xml')
+    destFile = new File(docbookSrc, 'website.xml')
+    tags << 'website'
+    doFirst {
+        javadocUrl = remoteLocations.javadocUrl
+        groovydocUrl = remoteLocations.groovydocUrl
+        websiteUrl = ''
+    }
+}
+
+task websiteDocs(type: Docbook2Xhtml, dependsOn: websiteDocsSrc) {
+    File websiteDocs = new File(buildDir, 'websiteDocs')
+    source websiteDocsSrc.destFile
+    destFile = new File(websiteDocs, 'website.html')
+    stylesheetName = 'websiteHtml.xsl'
+    resources = fileTree {
+        from userguideSrcDir
+        include 'img/*.png'
+    }
+    resources += fileTree {
+        from cssSrcDir
+        include '*.css'
+    }
+}
+
+task userguide(
+        dependsOn: [userguideHtml, userguideSingleHtml, userguidePdf],
+        description: 'Generates the userguide')
+
+task docs(dependsOn: [javadoc, groovydoc, userguide, distDocs])
+
+class Docbook2Xhtml extends SourceTask {
+    @InputFiles
+    FileCollection classpath
+
+    @OutputFile @Optional
+    File destFile
+
+    @OutputDirectory @Optional
+    File destDir
+
+    @InputDirectory
+    File stylesheetsDir
+
+    String stylesheetName
+
+    @InputFiles @Optional
+    FileCollection resources
+
+    @TaskAction
+    def transform() {
+        if (!((destFile != null) ^ (destDir != null))) {
+            throw new InvalidUserDataException("Must specify exactly 1 of output file or dir.")
+        }
+
+        source.visit { FileVisitDetails fvd ->
+            if (fvd.isDirectory()) {
+                return
+            }
+
+            ant.java(classname: 'org.apache.xalan.xslt.Process', failonerror: true, fork: true) {
+                jvmarg(value: '-Xmx256m')
+                arg(value: '-in')
+                arg(value: fvd.file)
+                if (destFile) {
+                    arg(value: '-out')
+                    arg(value: destFile)
+                } else {
+                    arg(value: '-out')
+                    File outFile = fvd.relativePath.replaceLastName(fvd.file.name.replaceAll('.xml$', '.html')).getFile(destDir)
+                    outFile.parentFile.mkdirs()
+                    arg(value: outFile)
+                }
+                arg(value: '-xsl')
+                arg(value: new File(stylesheetsDir, stylesheetName))
+                if (destDir) {
+                    arg(line: "-param base.dir ${destDir}/")
+                }
+                sysproperty(
+                        key: 'xslthl.config',
+                        value: new File("$stylesheetsDir/highlighting/xslthl-config.xml").toURI())
+                sysproperty(
+                        key: 'org.apache.xerces.xni.parser.XMLParserConfiguration',
+                        value: 'org.apache.xerces.parsers.XIncludeParserConfiguration')
+                classpath {
+                    path(path: classpath.asPath)
+                    path(location: new File(stylesheetsDir, 'extensions/xalan27.jar'))
+                }
+            }
+        }
+
+        if (resources) {
+            project.copy {
+                into this.destDir ?: destFile.parentFile
+                from resources
+            }
+        }
+    }
+}
+
+class Xhtml2Pdf extends DefaultTask {
+    @InputFile
+    File sourceFile
+
+    @OutputFile
+    File destFile
+
+    @InputFiles
+    FileCollection classpath
+
+    def Xhtml2Pdf() {
+        onlyIf { !System.getProperty("os.name").toLowerCase().contains('windows') }
+    }
+
+    @TaskAction
+    def transform() {
+        def uris = classpath.files.collect {it.toURI().toURL()}
+        def classloader = new URLClassLoader(uris as URL[], getClass().classLoader)
+        def renderer = classloader.loadClass('org.xhtmlrenderer.pdf.ITextRenderer').newInstance()
+        renderer.setDocument(sourceFile)
+        renderer.layout()
+        destFile.withOutputStream {
+            renderer.createPDF(it)
+        }
+    }
+}

@@ -9,7 +9,7 @@ allprojects {
   defaultTasks 'clean', 'install'
 
   sourceCompatibility = 1.6
-  version = '0.5-SNAPSHOT'
+  version = '0.6-SNAPSHOT'
   group = 'org.multiverse'
   //scalaVersion = '2.8.0.Beta1'
   scalaVersion = '2.7.7'
@@ -249,7 +249,6 @@ project(':multiverse-alpha') {
       arg value: '-o'
 //      arg value: '-v'
       arg value: '-d'
-      arg value: 'org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor'
       arg value: "${buildDir}/classes/main"
 
       classpath {
@@ -285,7 +284,6 @@ project(':multiverse-alpha') {
       arg value: '-o'
 //      arg value: '-v'
       arg value: '-d'
-      arg value: 'org.multiverse.stms.alpha.instrumentation.AlphaStmInstrumentor'
       arg value: "${buildDir}/classes/test"
 
       classpath {
@@ -334,23 +332,23 @@ project(':multiverse-alpha') {
 
 // ------------------------------------------------------------------------------------------------------------------
 
-project(':multiverse-scala') {
-  repositories {
-    mavenRepo urls: 'http://scala-tools.org/repo-releases/'
-  }
-
-  dependencies {
-    // Libraries needed to run the scala tools
-    scalaTools "org.scala-lang:scala-compiler:${scalaVersion}"
-    scalaTools "org.scala-lang:scala-library:${scalaVersion}"
-    // Libraries needed for scala api
-    compile "org.scala-lang:scala-library:${scalaVersion}"
-    compile project(':multiverse-core')
-    compile project(':multiverse-instrumentation')
-    compile project(':multiverse-alpha-unborn')
-    testCompile group: 'org.scalatest', name: 'scalatest', version: '1.0'
-  }
-}
+//project(':multiverse-scala') {
+//  repositories {.
+//    mavenRepo urls: 'http://scala-tools.org/repo-releases/'
+//  }
+//
+//  dependencies {
+//    // Libraries needed to run the scala tools
+//    scalaTools "org.scala-lang:scala-compiler:${scalaVersion}"
+//    scalaTools "org.scala-lang:scala-library:${scalaVersion}"
+//    // Libraries needed for scala api
+//    compile "org.scala-lang:scala-library:${scalaVersion}"
+//    compile project(':multiverse-core')
+//    compile project(':multiverse-instrumentation')
+//    compile project(':multiverse-alpha-unborn')
+//    testCompile group: 'org.scalatest', name: 'scalatest', version: '1.0'
+//  }
+//}
 
 project(':multiverse-performance-tool') {
 

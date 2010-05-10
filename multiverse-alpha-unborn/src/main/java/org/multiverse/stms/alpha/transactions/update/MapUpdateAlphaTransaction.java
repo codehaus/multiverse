@@ -1,7 +1,9 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.multiverse.api.Listeners;
+import org.multiverse.api.Stm;
 import org.multiverse.api.TransactionFactory;
+import org.multiverse.api.TransactionFactoryBuilder;
 import org.multiverse.api.commitlock.CommitLock;
 import org.multiverse.api.commitlock.CommitLockFilter;
 import org.multiverse.api.latches.Latch;
@@ -28,9 +30,21 @@ public final class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransact
     public static class Factory implements TransactionFactory<AlphaTransaction> {
 
         public final UpdateConfiguration config;
+        private final TransactionFactoryBuilder transactionFactoryBuilder;
 
-        public Factory(UpdateConfiguration config) {
+        public Factory(UpdateConfiguration config, TransactionFactoryBuilder transactionFactoryBuilder) {
             this.config = config;
+            this.transactionFactoryBuilder = transactionFactoryBuilder;
+        }
+
+        @Override
+        public Stm getStm() {
+            return transactionFactoryBuilder.getStm();
+        }
+
+        @Override
+        public TransactionFactoryBuilder getTransactionFactoryBuilder() {
+            return transactionFactoryBuilder;
         }
 
         @Override

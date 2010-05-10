@@ -1,19 +1,15 @@
 package org.multiverse.api;
 
 
-import static org.hamcrest.CoreMatchers.*;
 import org.junit.Test;
-import org.multiverse.api.programmatic.ProgrammaticReferenceFactoryBuilder;
 
-import static org.junit.Assert.*;
-import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 /**
  * @author Sai Venkat
  */
 public class GlobalStmInstanceTest {
     @Test
-    public void Test(){
-        
+    public void Test() {
+
     }
 //    private Stm stm;
 //    private Stm stm1;

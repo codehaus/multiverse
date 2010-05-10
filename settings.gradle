@@ -4,7 +4,6 @@ include 'multiverse-benchy',
         'multiverse-core-tests',
         'multiverse-alpha-unborn',
         'multiverse-alpha',
-        'multiverse-scala',
         'multiverse-performance-tool',
         'multiverse-site',
         'multiverse-manual'

@@ -1,6 +1,7 @@
 package org.multiverse.stms;
 
 import org.multiverse.api.TransactionConfiguration;
+import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.backoff.BackoffPolicy;
 import org.multiverse.api.backoff.ExponentialBackoffPolicy;
 import org.multiverse.api.clock.PrimitiveClock;
@@ -29,20 +30,22 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
     public final long timeoutNs;
     public final boolean explicitRetryAllowed;
     public final int maxReadSpinCount;
+    public final TransactionFactory transactionFactory;
 
     /**
      * This method should be removed, only used for testing purposes.
      */
     public AbstractTransactionConfiguration() {
         this(new StrictPrimitiveClock(), ExponentialBackoffPolicy.INSTANCE_100_MS_MAX,
-                null, true, 1000, true, true, true, true, Long.MIN_VALUE, 10);
+                null, true, 1000, true, true, true, true, Long.MIN_VALUE, 10, null);
     }
 
     public AbstractTransactionConfiguration(
             PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName,
             boolean readOnly, int maxRetries, boolean interruptible,
             boolean writeSkewAllowed, boolean readTrackingEnabled,
-            boolean explicitRetryAllowed, long timeoutNs, int maxReadSpinCount) {
+            boolean explicitRetryAllowed, long timeoutNs, int maxReadSpinCount,
+            TransactionFactory transactionFactory) {
 
         if (clock == null) {
             throw new NullPointerException();
@@ -63,6 +66,7 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
         this.explicitRetryAllowed = explicitRetryAllowed;
         this.timeoutNs = timeoutNs;
         this.maxReadSpinCount = maxReadSpinCount;
+        this.transactionFactory = transactionFactory;
 
         if (!readOnly && !readTrackingEnabled && !writeSkewAllowed) {
             String msg = format("Update transaction '%s' isn't  " +
