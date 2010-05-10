@@ -6,6 +6,7 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.utils.StandardThreadFactory;
 import org.multiverse.utils.TodoException;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
@@ -26,8 +27,10 @@ import static java.lang.String.format;
  */
 public abstract class CommitBarrier {
 
+    private static int corePoolSize = 5;
+    private static boolean runAsDaemon = true;
     private final static ScheduledThreadPoolExecutor EXECUTOR = new ScheduledThreadPoolExecutor(
-            5, new StandardThreadFactory(Thread.NORM_PRIORITY, true));
+            corePoolSize, new StandardThreadFactory(Thread.NORM_PRIORITY, runAsDaemon));
 
     private volatile ScheduledExecutorService executorService = EXECUTOR;
     protected final Lock lock;
@@ -37,8 +40,8 @@ public abstract class CommitBarrier {
     private volatile int numberWaiting = 0;
 
     //for all non final non volatile variables; they only should be accessed while the lock is acquired.
-    private List<Runnable> onAbortTasks;
-    private List<Runnable> onCommitTasks;
+    private List<Runnable> onAbortTasks = new ArrayList<Runnable>();
+    private List<Runnable> onCommitTasks = new ArrayList<Runnable>();
 
     /**
      * Creates a new CommitBarrier.
@@ -108,7 +111,7 @@ public abstract class CommitBarrier {
         statusCondition.signalAll();
         onAbortTasks = null;
         List<Runnable> result = onCommitTasks;
-        onCommitTasks = null;
+        onCommitTasks = new ArrayList<Runnable>();
         return result;
     }
 
@@ -121,9 +124,9 @@ public abstract class CommitBarrier {
         numberWaiting = 0;
         status = Status.aborted;
         statusCondition.signalAll();
-        onCommitTasks = null;
+        onCommitTasks = new ArrayList<Runnable>();
         List<Runnable> result = onAbortTasks;
-        onAbortTasks = null;
+        onAbortTasks = new ArrayList<Runnable>();
         return result;
     }
 
@@ -136,7 +139,7 @@ public abstract class CommitBarrier {
      * @throws CommitBarrierOpenException if this CommitBarrier already is committed.
      */
     public final void abort() {
-        List<Runnable> postAbortTasks = null;
+        List<Runnable> postAbortTasks = new ArrayList<Runnable>();
 
         lock.lock();
         try {
@@ -165,10 +168,6 @@ public abstract class CommitBarrier {
      * @param tasks the tasks to execute.
      */
     protected static void executeTasks(List<Runnable> tasks) {
-        if (tasks == null) {
-            return;
-        }
-
         for (Runnable task : tasks) {
             task.run();
         }
@@ -514,7 +513,7 @@ public abstract class CommitBarrier {
     public void joinCommit(Transaction tx) throws InterruptedException {
         ensureNotDead(tx);
 
-        List<Runnable> tasks = null;
+        List<Runnable> tasks = new ArrayList<Runnable>();
 
         lock.lock();
         try {
@@ -571,7 +570,7 @@ public abstract class CommitBarrier {
     public void joinCommitUninterruptibly(Transaction tx) {
         ensureNotDead(tx);
 
-        List<Runnable> postCommitTasks = null;
+        List<Runnable> postCommitTasks = new ArrayList<Runnable>();
         lock.lock();
         try {
             switch (getStatus()) {
@@ -624,7 +623,7 @@ public abstract class CommitBarrier {
     public boolean tryJoinCommit(Transaction tx) {
         ensureNotDead(tx);
 
-        List<Runnable> postCommitTasks = null;
+        List<Runnable> postCommitTasks = new ArrayList<Runnable>();
         boolean abort = true;
         lock.lock();
         try {

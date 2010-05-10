@@ -16,7 +16,7 @@ todo next release
 
 - generate manual from gradle
 
-CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest.whenTransactionFailsToPrepare
+CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest.whenTransactionFailsToPrepare - Done
 
 CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest.whenStartingInterrupted
 
