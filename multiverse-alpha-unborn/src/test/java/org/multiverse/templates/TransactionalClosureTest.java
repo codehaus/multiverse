@@ -18,7 +18,7 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
  * @author Sai Venkat
  */
 
-public class TransactionalCallableTest {
+public class TransactionalClosureTest {
     private Stm stm;
 
     @Before
