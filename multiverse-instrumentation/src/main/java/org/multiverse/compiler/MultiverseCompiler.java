@@ -30,15 +30,15 @@ import static org.multiverse.utils.SystemOut.println;
 public final class MultiverseCompiler {
 
     public static void main(String[] args) {
-        MultiverseCompilerArguments cli = createCli(args);
-        MultiverseCompiler multiverseCompiler = new MultiverseCompiler();
-        multiverseCompiler.run(cli);
+        new MultiverseCompiler().run(args);
     }
 
     private ClassLoader compilerClassLoader;
 
-    private void run(MultiverseCompilerArguments cli) {
+    private void run(String[] args) {
         println("Multiverse: initializing compiler");
+
+        MultiverseCompilerArguments cli = createCli(args);
 
         Instrumentor instrumentor = createInstrumentor(cli.instrumentorName);
         File targetDirectory = new File(cli.targetDirectory);
@@ -75,19 +75,14 @@ public final class MultiverseCompiler {
     }
 
     private static MultiverseCompilerArguments createCli(String[] args) {
-        CmdLineParser parser = null;
+        MultiverseCompilerArguments cli = new MultiverseCompilerArguments();
+        CmdLineParser parser = new CmdLineParser(cli);
         try {
-            MultiverseCompilerArguments cli = new MultiverseCompilerArguments();
-            parser = new CmdLineParser(cli);
             parser.parseArgument(args);
             return cli;
         } catch (CmdLineException e) {
-            e.printStackTrace();
             System.err.println(e.getMessage());
-            System.err.println("java -jar myprogram.jar [options...] compilername target");
-            if (parser != null) {
-                parser.printUsage(System.out);
-            }
+            parser.printUsage(System.out);
             System.exit(-1);
             return null;
         }
@@ -235,3 +230,4 @@ public final class MultiverseCompiler {
         return method;
     }
 }
+

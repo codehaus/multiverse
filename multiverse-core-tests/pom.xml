@@ -7,13 +7,12 @@
     <description>Contains the tests of core interfaces/classes of the Multiverse project.
         So no STM implementations. These tests are seperated from the
     </description>
-    <version>0.5</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>org.multiverse</groupId>
         <artifactId>multiverse</artifactId>
-        <version>0.5</version>
+        <version>0.5.1-SNAPSHOT</version>
     </parent>
 
     <build>
