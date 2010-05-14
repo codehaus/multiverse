@@ -5,9 +5,14 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionConfiguration;
+import org.multiverse.api.TransactionStatus;
 import org.multiverse.stms.AbstractTransactionImpl;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.clearCurrentThreadInterruptedStatus;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
@@ -31,7 +36,7 @@ public class CountDownCommitBarrier_tryJoinCommitTest {
 
         try {
             barrier.tryJoinCommit(null);
-            fail();
+            fail("Expecting NullPointerException");
         } catch (NullPointerException expected) {
         }
 
@@ -40,15 +45,31 @@ public class CountDownCommitBarrier_tryJoinCommitTest {
     }
 
     @Test
-    @Ignore
     public void whenOpenAndTransactionCommitted_thenIllegalStateException() {
-
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
+        Transaction tx = new AbstractTransactionImpl();
+        tx.commit();
+        try{
+          barrier.tryJoinCommit(tx);
+          fail("Expected Illegal state exception");
+        } catch (IllegalStateException ex) {
+        }
+        assertTrue(barrier.isClosed());
+        assertEquals(0, barrier.getNumberWaiting());
     }
 
     @Test
-    @Ignore
     public void whenOpenAndTransactionAborted_thenIllegalStateException() {
-
+        CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
+        Transaction tx = new AbstractTransactionImpl();
+        tx.abort();
+        try{
+          barrier.tryJoinCommit(tx);
+          fail("Expected Illegal state exception");
+        } catch (IllegalStateException ex) {
+        }
+        assertTrue(barrier.isClosed());
+        assertEquals(0, barrier.getNumberWaiting());
     }
 
     @Test
@@ -59,7 +80,7 @@ public class CountDownCommitBarrier_tryJoinCommitTest {
         Transaction tx = new AbstractTransactionImpl();
         try {
             barrier.tryJoinCommit(tx);
-            fail();
+            fail("Expecting CommitBarrierOpenException");
         } catch (CommitBarrierOpenException expected) {
         }
 
@@ -75,7 +96,7 @@ public class CountDownCommitBarrier_tryJoinCommitTest {
         Transaction tx = new AbstractTransactionImpl();
         try {
             barrier.tryJoinCommit(tx);
-            fail();
+            fail("Expected CommitBarrierOpenException");
         } catch (CommitBarrierOpenException expected) {
         }
 

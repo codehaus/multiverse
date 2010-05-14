@@ -35,7 +35,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
     }
 
     @Test
-    public void whenTransactionNull() {
+    public void whenTransactionNull_thenFailWithNullPointerException() {
         barrier = new CountDownCommitBarrier(1);
 
         try {
@@ -102,8 +102,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
 
     @Test
     @Ignore
-    public void whenStartingInterrupted() {
-
+    public void whenStartingInterrupted() throws InterruptedException {
     }
 
     @Test
@@ -125,7 +124,6 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
         t.setPrintStackTrace(false);
         t.start();
         sleepMs(500);
-
         t.interrupt();
         sleepMs(500);
 
@@ -204,7 +202,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
         Transaction tx = new AbstractTransactionImpl();
         try {
             barrier.joinCommitUninterruptibly(tx);
-            fail();
+            fail("Expecting CommitBarrierOpenException");
         } catch (CommitBarrierOpenException expected) {
         }
 
@@ -220,7 +218,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
         Transaction tx = new AbstractTransactionImpl();
         try {
             barrier.joinCommitUninterruptibly(tx);
-            fail();
+            fail("Expecting CommitBarrierOpenException");
         } catch (CommitBarrierOpenException expected) {
         }
 

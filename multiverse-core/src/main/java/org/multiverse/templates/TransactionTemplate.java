@@ -69,7 +69,7 @@ public abstract class TransactionTemplate<E> {
      * Creates a new TransactionTemplate using the provided STM. The transaction used is stores/retrieved from the
      * {@link org.multiverse.api.ThreadLocalTransaction}.
      * <p/>
-     * It automatically creats read tracking update transactions.
+     * It automatically creates read tracking update transactions.
      * <p/>
      * This constructor should only be used for experimentation purposes. If you want something fast, you need to pass
      * in a TransactionFactory.
