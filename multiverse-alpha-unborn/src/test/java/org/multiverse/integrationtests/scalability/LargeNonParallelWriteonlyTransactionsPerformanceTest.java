@@ -15,7 +15,7 @@ import java.util.List;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class LargeNonParallelWriteonlyTransactionsStressTest {
+public class LargeNonParallelWriteonlyTransactionsPerformanceTest {
     private Stm stm;
 
     @Before
