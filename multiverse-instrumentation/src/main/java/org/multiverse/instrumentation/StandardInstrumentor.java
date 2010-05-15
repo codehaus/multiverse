@@ -167,17 +167,17 @@ public class StandardInstrumentor implements Instrumentor {
     @Override
     public Clazz process(Clazz originalClazz) {
         if (originalClazz.getClassLoader() == null) {
-            log.important("Multiverse: Ignoring class '%s' because it is a system class", originalClazz.getName());
+            log.important("Multiverse: Ignoring %s because it is a System class", originalClazz.getName());
             return originalClazz;
         }
 
         if (included.length() > 0 && !contains(included, originalClazz.getInternalName())) {
-            log.lessImportant("Multiverse: Class '%s' is not included in instrumentation", originalClazz.getName());
+            log.lessImportant("Multiverse: Ignoring %s, because it is not included", originalClazz.getName());
             return originalClazz;
         }
 
         if (contains(excluded, originalClazz.getInternalName())) {
-            log.important("Multiverse: Class '%s' is excluded from instrumentation", originalClazz.getName());
+            log.important("Multiverse: Ignoring %s, because it is excluded", originalClazz.getName());
             return originalClazz;
         }
 
@@ -195,9 +195,9 @@ public class StandardInstrumentor implements Instrumentor {
         }
 
         if (originalClazz == beforeClazz) {
-            log.lessImportant("Multiverse: Finished compilation of class '%s' (class was not modified)", originalClazz.getName());
+            log.lessImportant("Multiverse: Finished instrumenting %s (class was not modified)", originalClazz.getName());
         } else {
-            log.lessImportant("Multiverse: Finished compilation of class '%s'", originalClazz.getName());
+            log.lessImportant("Multiverse: Finished instrumenting of class %s", originalClazz.getName());
         }
 
         return beforeClazz;
@@ -216,12 +216,12 @@ public class StandardInstrumentor implements Instrumentor {
         AsmUtils.writeToFile(end, afterClazz.getBytecode());
     }
 
-    private boolean contains(String all, String pattern) {
+    private boolean contains(String all, String name) {
         StringTokenizer tokenizer = new StringTokenizer(all, ";");
 
         while (tokenizer.hasMoreElements()) {
             String token = tokenizer.nextToken();
-            if (pattern.startsWith(token)) {
+            if (name.startsWith(token)) {
                 return true;
             }
         }

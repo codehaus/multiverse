@@ -61,7 +61,7 @@ public class Clazz {
     }
 
     public String getInternalName() {
-        return getName().replace(".", "/");
+        return getName().replace("/", ".");
     }
 
     public byte[] getBytecode() {
