@@ -1,7 +1,6 @@
 package org.multiverse.stms;
 
 import org.multiverse.MultiverseConstants;
-import org.multiverse.annotations.LogLevel;
 import org.multiverse.api.*;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.NoRetryPossibleException;

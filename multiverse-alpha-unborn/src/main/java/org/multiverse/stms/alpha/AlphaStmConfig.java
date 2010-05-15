@@ -1,6 +1,6 @@
 package org.multiverse.stms.alpha;
 
-import org.multiverse.annotations.LogLevel;
+import org.multiverse.api.LogLevel;
 import org.multiverse.api.backoff.BackoffPolicy;
 import org.multiverse.api.backoff.ExponentialBackoffPolicy;
 import org.multiverse.api.clock.PrimitiveClock;

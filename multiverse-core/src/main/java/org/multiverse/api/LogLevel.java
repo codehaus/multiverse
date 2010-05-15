@@ -1,4 +1,4 @@
-package org.multiverse.annotations;
+package org.multiverse.api;
 
 /**
  * @author Peter Veentjer

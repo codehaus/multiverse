@@ -1,13 +1,10 @@
 <chapter id="introduction">
     <title>Introduction</title>
-    <para>Multiverse is a Software Transactional Memory implementation that wants to realize the following goals:
+    <para>
+        Multiverse is a Software Transactional Memory implementation for Java. It can be seamlessly
+        integrated in the Java language, but also is designed to be used in other JVM based
+        languages.
     </para>
-    <itemizedlist>
-        <listitem>
-            <para>Seamless integration in the Java language</para>
-            <para>Easy integration in other JVM based languages</para>
-        </listitem>
-    </itemizedlist>
     <section>
         <title>About this manual</title>
         <para>

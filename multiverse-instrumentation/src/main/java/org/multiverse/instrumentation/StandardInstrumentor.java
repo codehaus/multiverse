@@ -40,6 +40,7 @@ public class StandardInstrumentor implements Instrumentor {
         exclude("com.jprofiler.");
         exclude("com.ibm.");
         exclude("com.intellij.");
+        exclude("com.sun.");
         exclude("java.");
         exclude("org.apache.");
         exclude("org.eclipse.");

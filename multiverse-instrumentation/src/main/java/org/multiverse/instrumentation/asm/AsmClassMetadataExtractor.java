@@ -1,6 +1,7 @@
 package org.multiverse.instrumentation.asm;
 
 import org.multiverse.annotations.*;
+import org.multiverse.api.LogLevel;
 import org.multiverse.instrumentation.metadata.*;
 import org.multiverse.utils.IOUtils;
 import org.objectweb.asm.Opcodes;

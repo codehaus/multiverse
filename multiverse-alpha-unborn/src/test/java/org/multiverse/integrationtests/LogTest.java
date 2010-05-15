@@ -2,8 +2,8 @@ package org.multiverse.integrationtests;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.annotations.LogLevel;
 import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.api.LogLevel;
 import org.multiverse.api.TransactionConfiguration;
 
 import static org.junit.Assert.assertEquals;

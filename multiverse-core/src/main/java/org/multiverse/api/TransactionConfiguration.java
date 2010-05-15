@@ -1,6 +1,5 @@
 package org.multiverse.api;
 
-import org.multiverse.annotations.LogLevel;
 import org.multiverse.api.backoff.BackoffPolicy;
 
 /**

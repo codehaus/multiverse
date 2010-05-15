@@ -1,6 +1,6 @@
 package org.multiverse.instrumentation.metadata;
 
-import org.multiverse.annotations.LogLevel;
+import org.multiverse.api.LogLevel;
 
 /**
  * A container for all parameters passed to an transactional method.

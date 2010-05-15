@@ -1,6 +1,6 @@
 package org.multiverse.stms.alpha;
 
-import org.multiverse.annotations.LogLevel;
+import org.multiverse.api.LogLevel;
 import org.multiverse.api.Stm;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.TransactionFactoryBuilder;

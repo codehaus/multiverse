@@ -22,7 +22,6 @@ todo engine
 
     - List<E> subList(int fromIndex, int toIndex)
 
-
 - TransactionalLinkedList
 
     - ListIteratorImpl
@@ -268,23 +267,15 @@ than threads. Just like non blocking io.
 
 - propagation support
 
-
 - when class definition is loaded, display it in the output.
 
-
-
  - maven plugin for the compiler
-
-
 
 - support subclassing in instrumentation
 
     - tranlocal snapshot needs to be fixed for subclassing.
 
 - continuation when a backoff needs to be done or when a transaction needs to block?
-
-- tx reuse? So if an aborted or committed transaction is found and a new tx needs to start,
-could this old tx be reused?
 
 - a tranlocal that can't be used for listening to; causes less space, but also reduces
 stress on the memory bus because of no reads need to be done on the listeners (no

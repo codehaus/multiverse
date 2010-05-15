@@ -20,7 +20,6 @@
     <!-- Use custom <head> content, to include stylesheets and bookmarks -->
 
     <xsl:template name="output.html.stylesheets">
-        <link href="base.css" rel="stylesheet" type="text/css"/>
         <link href="style.css" rel="stylesheet" type="text/css"/>
         <link href="print.css" rel="stylesheet" type="text/css" media="print"/>
     </xsl:template>
@@ -36,7 +35,9 @@
             <xsl:attribute name="name">
                 <xsl:apply-templates select="." mode="object.title.markup"/>
             </xsl:attribute>
-            <xsl:attribute name="href">#<xsl:call-template name="object.id"/></xsl:attribute>
+            <xsl:attribute name="href">#
+                <xsl:call-template name="object.id"/>
+            </xsl:attribute>
             <xsl:apply-templates select="section[parent::chapter|parent::appendix]" mode="bookmarks"/>
         </bookmark>
     </xsl:template>

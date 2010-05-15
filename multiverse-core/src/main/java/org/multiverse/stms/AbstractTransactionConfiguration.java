@@ -1,6 +1,6 @@
 package org.multiverse.stms;
 
-import org.multiverse.annotations.LogLevel;
+import org.multiverse.api.LogLevel;
 import org.multiverse.api.TransactionConfiguration;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.backoff.BackoffPolicy;

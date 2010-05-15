@@ -1,10 +1,6 @@
 package org.multiverse.stms.alpha.instrumentation.transactionalmethod;
 
-import org.multiverse.annotations.LogLevel;
-import org.multiverse.api.GlobalStmInstance;
-import org.multiverse.api.Stm;
-import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.TransactionFactoryBuilder;
+import org.multiverse.api.*;
 import org.multiverse.instrumentation.CompileException;
 import org.multiverse.instrumentation.DebugInfo;
 import org.multiverse.instrumentation.InstrumenterLogger;

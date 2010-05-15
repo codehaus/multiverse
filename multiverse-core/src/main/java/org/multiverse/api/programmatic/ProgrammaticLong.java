@@ -188,4 +188,10 @@ public interface ProgrammaticLong {
      * @throws IllegalThreadStateException if not in the correct state for this operation.
      */
     void commutingInc(Transaction tx, long amount);
+
+    void changeMod();
+
+    void changeMod(Transaction tx);
+
+    void atomicChangeMod();
 }
