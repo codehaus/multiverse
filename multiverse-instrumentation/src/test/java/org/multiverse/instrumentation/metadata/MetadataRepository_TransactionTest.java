@@ -2,6 +2,7 @@ package org.multiverse.instrumentation.metadata;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.annotations.LogLevel;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Transaction;
 
@@ -248,6 +249,37 @@ public class MetadataRepository_TransactionTest {
             assertEquals(TimeUnit.SECONDS.toNanos(10), tx.getConfiguration().getTimeoutNs());
         }
 
+
+        @TransactionalMethod
+        void defaultValue() {
+            Transaction tx = getThreadLocalTransaction();
+            assertEquals(Long.MAX_VALUE, tx.getConfiguration().getTimeoutNs());
+        }
+    }
+
+
+    @Test
+    public void whenLogLevel() {
+        ClassMetadata classMetadata = repository.loadClassMetadata(LogLevelObject.class);
+        MethodMetadata explicitValueMethodMetadata = classMetadata.getMethodMetadata("explicitValue", "()V");
+        TransactionMetadata explicitValueTransactionMetadata = explicitValueMethodMetadata.getTransactionalMetadata();
+
+        assertNotNull(explicitValueTransactionMetadata);
+        assertEquals(LogLevel.course, explicitValueTransactionMetadata.logLevel);
+
+        MethodMetadata defaultValueMethodMetadata = classMetadata.getMethodMetadata("defaultValue", "()V");
+
+        TransactionMetadata defaultValueTransactionMetadata = defaultValueMethodMetadata.getTransactionalMetadata();
+        assertNotNull(defaultValueTransactionMetadata);
+        assertEquals(LogLevel.none, defaultValueTransactionMetadata.logLevel);
+    }
+
+    class LogLevelObject {
+        @TransactionalMethod(logLevel = LogLevel.course)
+        void explicitValue() {
+            Transaction tx = getThreadLocalTransaction();
+            assertEquals(TimeUnit.HOURS.toNanos(10), tx.getConfiguration().getTimeoutNs());
+        }
 
         @TransactionalMethod
         void defaultValue() {

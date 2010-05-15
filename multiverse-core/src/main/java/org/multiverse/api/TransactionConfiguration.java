@@ -1,5 +1,6 @@
 package org.multiverse.api;
 
+import org.multiverse.annotations.LogLevel;
 import org.multiverse.api.backoff.BackoffPolicy;
 
 /**
@@ -12,6 +13,7 @@ import org.multiverse.api.backoff.BackoffPolicy;
  */
 public interface TransactionConfiguration {
 
+    LogLevel getLogLevel();
 
     /**
      * Returns the BackoffPolicy used by the Stm when a transaction conflicts with another transaction.

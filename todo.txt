@@ -4,8 +4,6 @@ todo engine
 
 - integration tests should be fixed
 
-- includes/exclude functionality on the javaagent
-
 - fix style guide css
 
 - convert manual from html to docbook
@@ -389,4 +387,6 @@ done
 ---------------------------------------------------------------
 
 - if a good transaction is available, it should be reused.
+
+- includes/exclude functionality on the javaagent
 

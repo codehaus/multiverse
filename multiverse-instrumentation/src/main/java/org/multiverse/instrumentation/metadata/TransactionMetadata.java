@@ -1,5 +1,7 @@
 package org.multiverse.instrumentation.metadata;
 
+import org.multiverse.annotations.LogLevel;
+
 /**
  * A container for all parameters passed to an transactional method.
  *
@@ -30,4 +32,6 @@ public class TransactionMetadata {
     public boolean speculativeConfigurationEnabled;
 
     public long timeoutNs;
+
+    public LogLevel logLevel;
 }

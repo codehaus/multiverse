@@ -1,5 +1,6 @@
 package org.multiverse.api;
 
+import org.multiverse.annotations.LogLevel;
 import org.multiverse.api.backoff.BackoffPolicy;
 import org.multiverse.api.commitlock.CommitLockPolicy;
 
@@ -36,6 +37,10 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      * @return returns the Stm that created this TransactionFactoryBuilder.
      */
     Stm getStm();
+
+    B setLogLevel(LogLevel logLevel);
+
+    LogLevel getLogLevel();
 
     /**
      * Checks if dirty check is enabled.

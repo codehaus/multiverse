@@ -48,4 +48,6 @@ public @interface TransactionalMethod {
     long timeout() default Long.MAX_VALUE;
 
     TimeUnit timeoutTimeUnit() default TimeUnit.SECONDS;
+
+    LogLevel logLevel() default LogLevel.none;
 }

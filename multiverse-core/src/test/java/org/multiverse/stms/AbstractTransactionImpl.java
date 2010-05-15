@@ -1,5 +1,6 @@
 package org.multiverse.stms;
 
+import org.multiverse.annotations.LogLevel;
 import org.multiverse.api.backoff.ExponentialBackoffPolicy;
 import org.multiverse.api.clock.PrimitiveClock;
 import org.multiverse.api.clock.StrictPrimitiveClock;
@@ -18,7 +19,7 @@ public class AbstractTransactionImpl extends AbstractTransaction {
                 null,
                 true,
                 1000,
-                true, true, true, true, Long.MAX_VALUE, 10, null));
+                true, true, true, true, Long.MAX_VALUE, 10, null, LogLevel.none));
         init();
     }
 
@@ -29,7 +30,7 @@ public class AbstractTransactionImpl extends AbstractTransaction {
                 null,
                 true,
                 10000,
-                true, true, true, true, Long.MAX_VALUE, 10, null));
+                true, true, true, true, Long.MAX_VALUE, 10, null, LogLevel.none));
         init();
     }
 
@@ -40,7 +41,7 @@ public class AbstractTransactionImpl extends AbstractTransaction {
                 familyName,
                 true,
                 1000,
-                true, true, true, true, Long.MAX_VALUE, 10, null));
+                true, true, true, true, Long.MAX_VALUE, 10, null, LogLevel.none));
 
         init();
     }
