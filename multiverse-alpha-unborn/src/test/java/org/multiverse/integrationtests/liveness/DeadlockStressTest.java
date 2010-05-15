@@ -19,7 +19,7 @@ public class DeadlockStressTest {
 
     private int txObjectCount = 100;
     private int threadCount = 10;
-    private int transactionCountPerThread = 1000 * 1000;
+    private int transactionCountPerThread = 500 * 1000;
 
     private TransactionalInteger[] refs;
     private ChangeThread[] threads;

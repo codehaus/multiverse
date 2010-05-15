@@ -2,19 +2,56 @@
 todo engine
 ---------------------------------------------------------------
 
----------------------------------------------------------------
-todo next release
----------------------------------------------------------------
+- integration tests should be fixed
 
-- update tests tests that the backoff policy is used when a openForUpdate is done.
+- includes/exclude functionality on the javaagent
 
-- VetoCommitBarrier_vetoCommitWithTransactionTest fails sometimes.
-
-- find nice docbook stylesheet
+- fix style guide css
 
 - convert manual from html to docbook
 
 - generate manual from gradle
+
+- logging on transactions should be configurable
+
+- improved clock
+
+- ArrayList:
+
+    - public ListIterator<E> listIterator()
+
+    - public ListIterator<E> listIterator(int index)
+
+    - List<E> subList(int fromIndex, int toIndex)
+
+
+- TransactionalLinkedList
+
+    - ListIteratorImpl
+
+    - boolean removeFirstOccurrence(Object o)
+
+    - boolean removeLastOccurrence(Object o)
+
+- TransactionalTreeMap
+
+    - balancing of the treemap
+
+        - big performance problem
+
+        - deletion of nodes
+
+    - public boolean replace(K key, V oldValue, V newValue)
+
+    - public Set<Entry<K, V>> entrySet()
+
+    - public String toString()
+
+- 'mod' support for iterators.
+
+- update tests tests that the backoff policy is used when a openForUpdate is done.
+
+- VetoCommitBarrier_vetoCommitWithTransactionTest fails sometimes.
 
 CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest.whenTransactionFailsToPrepare - Done
 
@@ -74,58 +111,10 @@ TransactionalArrayList_sublistTest
 
 TransactionalLinkedList_ClassStructureTest
 
-
 - commuting write and open for read; if non automatic read tracking then
 it will not be fixated.
 
-- ArrayList:
-
-    - public ListIterator<E> listIterator()
-
-    - public ListIterator<E> listIterator(int index)
-
-    - List<E> subList(int fromIndex, int toIndex)
-
-
-- TransactionalLinkedList
-
-    - ListIteratorImpl
-
-    - boolean removeFirstOccurrence(Object o)
-
-    - boolean removeLastOccurrence(Object o)
-
-- TransactionalTreeMap
-
-    - balancing of the treemap
-
-        - big performance problem
-
-        - deletion of nodes
-
-    - public boolean replace(K key, V oldValue, V newValue)
-
-    - public Set<Entry<K, V>> entrySet()
-
-    - public String toString()
-
-
-- 'mod' support for iterators.
-
 - tests that use different transaction size to cause all transaction implementations to be used
-
-- rethink about the or-else. There is no need to create a snapshot, but it can be used for nested transactions.
-
-    - FixedTrackingUpdateAlphaTransaction and support for 'orelse'
-
-     - TinyTrackingUpdateTransaction and support for orelse
-
-     - TinyTrackingReadonlyTransaction and support for orelse
-
-     - GrowingTrackingReadonlyTransaction and support for orelse
-
-- make sure (using bug shaker) that the registration of the listener contains no
-concurrency problem. I think it is possible that there are pending
 
 - debug information for the atomic object is lost somehow:
 org.multiverse.api.exceptions.ReadonlyException
@@ -136,24 +125,16 @@ org.multiverse.api.exceptions.ReadonlyException
 	at org.multiverse.TestThread.run(TestThread.java:44)
 Thread PingPongThread-1 has thrown an exception
 
-- support subclassing in instrumentation
-
-    - tranlocal snapshot needs to be fixed for subclassing.
-
-- logging on transactions should be configurable
-
 - Test 'assertAllMethodsAreCopied' incomplete in file 'AtomicMethod_FastAtomicObjectMixinTest.java' at line 60
 
 - Test 'test' incomplete in file 'CigaretteSmokersProblemSimplifiedTest.java' at line 51
-
-- CigaretteSmokersProblemSimplifiedTest
 
 - primitive refs should also have their waiting methods checked.
 
 - is it possible to see the test output, especially for the integration test this is important to provide
 feedback what is happening.
 
-- have some kind of report that indicates which test failed instead of looking at the html
+- gradle: have some kind of report that indicates which test failed instead of looking at the html
 generated test report.
 
 - instrumentation
@@ -179,15 +160,6 @@ generated test report.
 
 - interface parameter inheritance.
 
-
-- JRuby integration - In Progress
-
-- Groovy Integration
-
-- when class definition is loaded, display it in the output.
-
-- the version in the AlphaInstrumentor needs to be modified by maven instead of manually
-
 - ProgrammaticLong is not seen as transactional
 
 - ProgrammaticReference is not seen as transactional
@@ -195,73 +167,14 @@ generated test report.
 - speculative atomic methods; at the moment only get/set can be made atomic but more complex methods can't.
 So enhance the speculative mechanism and the instrumentation so that methods start with the atomic mode.
 
- - maven plugin for the compiler
-
-- if a good transaction is available, it should be reused.
-
 - version should start with 0 again; so all other status should shift one down.
 
 - AlphaProgrammaticLong.getOrAwait
 
-- support for a history in the ProgrammaticReference
-
-- support for a history in the ProgrammaticLong
-
-- profiler
-
-    - profiler should be added to the abstract transaction config
-
-    - profiler statements of the abstract transaction should be added.
-
-- retry policy should be configurable through annotation
-
-- blocking executor.
-
-- inlining of transactions
-
-- when instrumentation fails, instead of continuing with the process, reinstrument the classes so that
- they always throw an error. Remove all fields/methods?
-
-- GlobalStmInstance test
-
-- performance test with readonly and update transaction that only do reads.
-
--   measure avarage locking time with and without this (late wakening).
-
-- work with a debug flag the enables exception reuse generally?
-
-- history for stale objects
-
-- dynamic history length for history; start with a zero history and once there is a loadtoooldversion,
-start maintaining history. Increase the history as long as you get loadtoooldversions.
-
-- customizable contention managers
-
-- pessimistic online locking
-
-- nested transactions
-
-- SkipList
-
-- via een system property aangeven welke mixin gebruikt moet worden
-
-- het inlezen van de mixin hoeft niet iedere keer te gebeuren, maar
-  kan eenmalig gedaan worden.
-
-    - problem: the classnode of the mixin is modified atm, so can't be reused. This modification
-    should be removed, or it is not possible to reuse the classnode and it needs to be read again and again
-
 - more complex cycle test with collections that have references to each other.
-
-- a selector for transactions to make non blocking transaction processing possible, using more transactions
-than threads. Just like non blocking io.
-
-- propagation support
 
 - a better way to run the tests of the stm dependant packages in the core package. Atm
 they are moved to the alpha package, so they have an stm to be tested against.
-
-- when a field access is done without a transaction, throw an error that contains the class/field
 
 - exceptions thrown in the fastmixin doen't show transaction
 
@@ -346,6 +259,30 @@ kan met een dirty tag
 idea:
 ---------------------------------------------------------------
 
+- the version in the AlphaInstrumentor needs to be modified by maven instead of manually
+
+- customizable contention managers
+
+- pessimistic online locking
+
+- a selector for transactions to make non blocking transaction processing possible, using more transactions
+than threads. Just like non blocking io.
+
+- propagation support
+
+
+- when class definition is loaded, display it in the output.
+
+
+
+ - maven plugin for the compiler
+
+
+
+- support subclassing in instrumentation
+
+    - tranlocal snapshot needs to be fixed for subclassing.
+
 - continuation when a backoff needs to be done or when a transaction needs to block?
 
 - tx reuse? So if an aborted or committed transaction is found and a new tx needs to start,
@@ -392,7 +329,64 @@ Dit scheelt nog een object creatie.
 
     - rerun tests with the bug shakers on
 
+- performance test with readonly and update transaction that only do reads.
+
+-   measure avarage locking time with and without this (late wakening).
+
+- profiler
+
+    - profiler should be added to the abstract transaction config
+
+    - profiler statements of the abstract transaction should be added.
+
+- retry policy should be configurable through annotation
+
+- blocking executor.
+
+- inlining of transactions
+
+- support for a history in the ProgrammaticReference
+
+- support for a history in the ProgrammaticLong
+
+- SkipList
+
+- via een system property aangeven welke mixin gebruikt moet worden
+
+- het inlezen van de mixin hoeft niet iedere keer te gebeuren, maar
+  kan eenmalig gedaan worden.
+
+    - problem: the classnode of the mixin is modified atm, so can't be reused. This modification
+    should be removed, or it is not possible to reuse the classnode and it needs to be read again and again
+
+- rethink about the or-else. There is no need to create a snapshot, but it can be used for nested transactions.
+
+    - FixedTrackingUpdateAlphaTransaction and support for 'orelse'
+
+     - TinyTrackingUpdateTransaction and support for orelse
+
+     - TinyTrackingReadonlyTransaction and support for orelse
+
+     - GrowingTrackingReadonlyTransaction and support for orelse
+
+- make sure (using bug shaker) that the registration of the listener contains no
+concurrency problem. I think it is possible that there are pending
+
+- when a field access is done without a transaction, throw an error that contains the class/field
+
+- work with a debug flag the enables exception reuse generally?
+
+- history for stale objects
+
+- dynamic history length for history; start with a zero history and once there is a loadtoooldversion,
+start maintaining history. Increase the history as long as you get loadtoooldversions.
+
+- when instrumentation fails, instead of continuing with the process, reinstrument the classes so that
+ they always throw an error. Remove all fields/methods?
 
 ---------------------------------------------------------------
 done
 ---------------------------------------------------------------
+
+- if a good transaction is available, it should be reused.
+

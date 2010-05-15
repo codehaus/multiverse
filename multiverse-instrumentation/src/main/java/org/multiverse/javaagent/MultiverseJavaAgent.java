@@ -40,35 +40,41 @@ public final class MultiverseJavaAgent {
 
         Instrumentor compiler = loadClazzCompiler();
         inst.addTransformer(new MultiverseClassFileTransformer(compiler));
+
+        println("Multiverse: Multiverse Javaagent started successfully");
     }
 
     private static Instrumentor loadClazzCompiler() {
-        Instrumentor compiler = createInstrumentor();
+        Instrumentor instrumentor = createInstrumentor();
 
         boolean verbose = getSystemBooleanProperty("verbose", false);
         if (verbose) {
-            compiler.setLog(new SystemOutImportantInstrumenterLogger());
+            instrumentor.setLog(new SystemOutImportantInstrumenterLogger());
         }
 
-        compiler.setFiler(new JavaAgentFiler());
+        instrumentor.setFiler(new JavaAgentFiler());
         boolean dumpBytecode = getSystemBooleanProperty("dumpBytecode", false);
-        compiler.setDumpBytecode(dumpBytecode);
+        instrumentor.setDumpBytecode(dumpBytecode);
         if (dumpBytecode) {
             String tmpDir = System.getProperty("java.io.tmpdir");
             File dumpDirectory = new File(getSystemProperty("dumpDirectory", tmpDir));
 
             println(format("Multiverse: Bytecode from Javaagent will be dumped to '%s'", dumpDirectory.getAbsolutePath()));
 
-            compiler.setDumpDirectory(dumpDirectory);
+            instrumentor.setDumpDirectory(dumpDirectory);
         }
 
-        println("Multiverse: Javaaagent won't apply code optimizations (see compiletime instrumentation)");
+        String include = getSystemProperty("include", "");
 
-        return compiler;
+        println("Multiverse: Optimizations disabled in Javaaagent (see compiletime instrumentation)");
+
+        println("Multiverse: The following packages are excluded from instrumentation " + instrumentor.getExcluded());
+
+        return instrumentor;
     }
 
     private static void printMultiverseJavaAgentInfo() {
-        println("Multiverse: Using JavaAgent");
+        println("Multiverse: Starting Multiverse JavaAgent");
 
         if (MultiverseConstants.___SANITY_CHECKS_ENABLED) {
             println("Sanity checks are enabled.");

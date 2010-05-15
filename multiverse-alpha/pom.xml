@@ -90,7 +90,6 @@
                                 <jarjar destfile="${project.build.directory}/${artifactId}-${project.version}.jar"
                                         update="true">
                                     <rule pattern="org.objectweb.asm.**" result="${groupId}.repackaged.@0"/>
-                                    <rule pattern="org.kohsuke.args4j.**" result="${groupId}.repackaged.@0"/>
                                     <fileset dir="${project.build.outputDirectory}"/>
 
                                     <manifest>
