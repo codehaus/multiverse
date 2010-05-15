@@ -74,12 +74,19 @@ public class StandardInstrumentor implements Instrumentor {
         return compilerVersion;
     }
 
+    @Override
     public String getStmName() {
         return stmName;
     }
 
+    @Override
     public String getExcluded() {
         return excluded;
+    }
+
+    @Override
+    public String getIncluded() {
+        return included;
     }
 
     @Override
@@ -88,7 +95,9 @@ public class StandardInstrumentor implements Instrumentor {
             throw new NullPointerException();
         }
 
-        pattern = pattern.replace(".", "/");
+        if (pattern.length() == 0) {
+            return;
+        }
 
         if (excluded.length() == 0) {
             excluded = pattern;
@@ -103,7 +112,9 @@ public class StandardInstrumentor implements Instrumentor {
             throw new NullPointerException();
         }
 
-        pattern = pattern.replace(".", "/");
+        if (pattern.length() == 0) {
+            return;
+        }
 
         if (included.length() == 0) {
             included = pattern;
@@ -160,18 +171,17 @@ public class StandardInstrumentor implements Instrumentor {
             return originalClazz;
         }
 
-        if (included.length() > 0 && !contains(included, originalClazz.getName())) {
-            log.lessImportant("Multiverse: class '%s' is not included", originalClazz.getName());
+        if (included.length() > 0 && !contains(included, originalClazz.getInternalName())) {
+            log.lessImportant("Multiverse: Class '%s' is not included in instrumentation", originalClazz.getName());
             return originalClazz;
         }
 
-        if (contains(excluded, originalClazz.getName())) {
-            log.important("Multiverse: class '%s' is excluded", originalClazz.getName());
+        if (contains(excluded, originalClazz.getInternalName())) {
+            log.important("Multiverse: Class '%s' is excluded from instrumentation", originalClazz.getName());
             return originalClazz;
         }
 
-
-        log.important("Multiverse: instrumenting %s", originalClazz.getName());
+        log.important("Multiverse: Instrumenting %s", originalClazz.getName());
 
         Environment env = new EnvironmentImpl();
         Clazz beforeClazz = originalClazz;
@@ -214,8 +224,6 @@ public class StandardInstrumentor implements Instrumentor {
             if (pattern.startsWith(token)) {
                 return true;
             }
-
-
         }
 
         return false;

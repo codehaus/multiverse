@@ -64,17 +64,24 @@ public final class MultiverseJavaAgent {
             instrumentor.setDumpDirectory(dumpDirectory);
         }
 
-        String include = getSystemProperty("include", "");
+        instrumentor.include(getSystemProperty("include", ""));
+        instrumentor.exclude(getSystemProperty("exclude", ""));
 
-        println("Multiverse: Optimizations disabled in Javaaagent (see compiletime instrumentation)");
+        if (instrumentor.getIncluded().equals("")) {
+            println("Multiverse: All classes are included since nothing explicitly has been configured.");
+            println("Multiverse: \tIn most cases you want to set it explicitly using the org.multiverse.javaagent.include System propery.");
+        } else {
+            println("Multiverse: The following classes are included the instrumentation '%s'" + instrumentor.getIncluded());
+        }
 
-        println("Multiverse: The following packages are excluded from instrumentation " + instrumentor.getExcluded());
+        println("Multiverse: The following classes are excluded from instrumentation " + instrumentor.getExcluded());
 
         return instrumentor;
     }
 
     private static void printMultiverseJavaAgentInfo() {
         println("Multiverse: Starting Multiverse JavaAgent");
+        println("Multiverse: Optimizations disabled in Javaaagent (see compiletime instrumentation)");
 
         if (MultiverseConstants.___SANITY_CHECKS_ENABLED) {
             println("Sanity checks are enabled.");

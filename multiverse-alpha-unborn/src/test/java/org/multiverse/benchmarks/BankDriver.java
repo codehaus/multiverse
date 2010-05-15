@@ -1,7 +1,5 @@
 package org.multiverse.benchmarks;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 
@@ -24,7 +22,8 @@ public class BankDriver {
     Account[] m_accounts;
     int init = 100;
 
-    @Before
+    //@Before
+
     public void before() {
         m_accounts = new Account[nb];
         for (int i = 0; i < m_accounts.length; i++) {
@@ -43,7 +42,8 @@ public class BankDriver {
         System.out.println();
     }
 
-    @Test
+    //@Test
+
     public void test() {
 
         BenchmarkThread[] bt = new BenchmarkThread[nb_threads];

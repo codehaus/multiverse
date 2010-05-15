@@ -92,6 +92,8 @@ public interface Instrumentor {
      */
     String getExcluded();
 
+    String getIncluded();
+
     /**
      * Processes a clazz. If nothing needs to be processed, the provided clazz can be returned. The return
      * value should never be null.
