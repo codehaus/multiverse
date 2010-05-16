@@ -2,6 +2,7 @@ package org.multiverse.templates;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.Stm;
@@ -23,6 +24,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 /**
  * @author Peter Veentjer
  */
+@Ignore
 public class TransactionTemplate_TimeoutTest {
     private Stm stm;
 
