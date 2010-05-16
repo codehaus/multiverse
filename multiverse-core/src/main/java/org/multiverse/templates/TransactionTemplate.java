@@ -350,7 +350,7 @@ public abstract class TransactionTemplate<E> {
                                     timeout = !latch.tryAwaitNs(tx.getRemainingTimeoutNs());
                                 }
 
-                                long durationNs = beginNs - System.nanoTime();
+                                long durationNs = System.nanoTime() - beginNs;
                                 tx.setRemainingTimeoutNs(tx.getRemainingTimeoutNs() - durationNs);
 
                                 if (timeout) {

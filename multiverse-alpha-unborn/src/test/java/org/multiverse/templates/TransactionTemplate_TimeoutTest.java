@@ -8,9 +8,8 @@ import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.RetryTimeoutException;
-import org.multiverse.transactional.DefaultTransactionalReference;
-import org.multiverse.transactional.TransactionalReference;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.api.programmatic.ProgrammaticLong;
+import org.multiverse.api.programmatic.ProgrammaticReference;
 
 import java.util.concurrent.TimeUnit;
 
@@ -24,7 +23,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 /**
  * @author Peter Veentjer
  */
-public class TransactionTemplate_TimeoutLongTest {
+public class TransactionTemplate_TimeoutTest {
     private Stm stm;
 
     @Before
@@ -40,16 +39,20 @@ public class TransactionTemplate_TimeoutLongTest {
 
     @Test
     public void whenTimeout() {
-        final TransactionalReference ref = new DefaultTransactionalReference();
+        System.out.println("----------------whenTimeout------------------");
+        final ProgrammaticReference ref = stm.getProgrammaticReferenceFactoryBuilder()
+                .build().atomicCreateReference();
 
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
-                .setTimeoutNs(TimeUnit.SECONDS.toNanos(1))
+                .setTimeoutNs(TimeUnit.SECONDS.toNanos(5))
                 .build();
 
-        TransactionTemplate t = new TransactionTemplate(txFactory) {
+        TransactionTemplate template = new TransactionTemplate(txFactory) {
             @Override
             public Object execute(Transaction tx) throws Exception {
-                System.out.println(ref.get());
+                System.out.println("timeout: " + tx.getConfiguration().getTimeoutNs());
+                System.out.println("remaining timeout: " + tx.getRemainingTimeoutNs());
+                System.out.println("found value=" + ref.get());
                 if (ref.isNull()) {
                     retry();
                 }
@@ -59,28 +62,40 @@ public class TransactionTemplate_TimeoutLongTest {
         };
 
         try {
-            t.execute();
+            template.execute();
             fail();
         } catch (RetryTimeoutException expected) {
         }
+
+        System.out.println("---------------------finished whenTimeout------------------");
     }
 
     @Test
     public void whenSomeWaitingNeeded() {
-        final TransactionalInteger ref = new TransactionalInteger();
+        System.out.println("whenSomeWaitingNeeded");
+
+        final ProgrammaticLong ref = stm.getProgrammaticReferenceFactoryBuilder()
+                .build()
+                .atomicCreateLong(0);
 
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
-                .setTimeoutNs(TimeUnit.SECONDS.toNanos(10))
+                .setSpeculativeConfigurationEnabled(false)
+                .setReadTrackingEnabled(true)
+                .setTimeoutNs(TimeUnit.SECONDS.toNanos(60))
                 .build();
 
-        TransactionTemplate t = new TransactionTemplate(txFactory) {
+        TransactionTemplate template = new TransactionTemplate(txFactory) {
             @Override
             public Object execute(Transaction tx) throws Exception {
-                System.out.println("ref.value=" + ref.get());
+                System.out.println("timeout: " + tx.getConfiguration().getTimeoutNs());
+                System.out.println("remaining timeout: " + tx.getRemainingTimeoutNs());
+                System.out.println("found value=" + ref.get());
                 if (ref.get() < 50) {
+                    System.out.println("sleeping");
                     retry();
                 }
 
+                System.out.println("expected value found");
                 return null;
             }
         };
@@ -89,34 +104,46 @@ public class TransactionTemplate_TimeoutLongTest {
             @Override
             public void doRun() throws Exception {
                 for (int k = 0; k < 100; k++) {
-                    ref.inc();
+                    System.out.println("incrementing to: " + k);
+                    ref.atomicInc(1);
+                    System.out.println("finished incrementing to: " + k);
                     sleepMs(100);
                 }
             }
         };
         notifyThread.start();
 
-        t.execute();
+        template.execute();
 
         joinAll(notifyThread);
     }
 
     @Test
-    public void multipleWakeupsButNotEnough() {
-        final TransactionalInteger ref = new TransactionalInteger();
+    public void whenMultipleWakeupsButStillTimeout() {
+        System.out.println("multipleWakeupsButNotEnough");
+
+        final ProgrammaticLong ref = stm.getProgrammaticReferenceFactoryBuilder()
+                .build()
+                .atomicCreateLong(0);
 
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+                .setReadTrackingEnabled(true)
+                .setSpeculativeConfigurationEnabled(false)
                 .setTimeoutNs(TimeUnit.SECONDS.toNanos(5))
                 .build();
 
-        TransactionTemplate t = new TransactionTemplate(txFactory) {
+        TransactionTemplate template = new TransactionTemplate(txFactory) {
             @Override
             public Object execute(Transaction tx) throws Exception {
                 System.out.println("ref.value=" + ref.get());
+                System.out.println("timeout: " + tx.getConfiguration().getTimeoutNs());
+                System.out.println("remaining timeout: " + tx.getRemainingTimeoutNs());
+
                 if (ref.get() < 10000) {
                     retry();
                 }
 
+                System.out.println("expected value found");
                 return null;
             }
         };
@@ -125,7 +152,7 @@ public class TransactionTemplate_TimeoutLongTest {
             @Override
             public void doRun() throws Exception {
                 for (int k = 0; k < 100; k++) {
-                    ref.inc();
+                    ref.inc(1);
                     sleepMs(100);
                 }
             }
@@ -133,7 +160,7 @@ public class TransactionTemplate_TimeoutLongTest {
         notifyThread.start();
 
         try {
-            t.execute();
+            template.execute();
             fail();
         } catch (RetryTimeoutException expected) {
         }

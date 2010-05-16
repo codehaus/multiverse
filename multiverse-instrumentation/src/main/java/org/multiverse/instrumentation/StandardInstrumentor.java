@@ -100,6 +100,8 @@ public class StandardInstrumentor implements Instrumentor {
             return;
         }
 
+        pattern = removeTrailingAndPrecedingSemicolons(pattern);
+
         if (excluded.length() == 0) {
             excluded = pattern;
         } else {
@@ -107,11 +109,33 @@ public class StandardInstrumentor implements Instrumentor {
         }
     }
 
+    public String removeTrailingAndPrecedingSemicolons(String s) {
+        return removePreceding(removeTrailing(s));
+    }
+
+    private String removeTrailing(String s) {
+        if (s.endsWith(";")) {
+            return removeTrailing(s.substring(0, s.length() - 1));
+        }
+
+        return s;
+    }
+
+    private String removePreceding(String s) {
+        if (s.startsWith(";")) {
+            return removeTrailing(s.substring(1, s.length()));
+        }
+
+        return s;
+    }
+
     @Override
     public void include(String pattern) {
         if (pattern == null) {
             throw new NullPointerException();
         }
+
+        pattern = removeTrailingAndPrecedingSemicolons(pattern);
 
         if (pattern.length() == 0) {
             return;
