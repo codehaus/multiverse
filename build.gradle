@@ -41,7 +41,9 @@ allprojects {
 
   test {
     exclude("**/*AbstractTest*")
+    exclude("**/*stressTest*")
     exclude("**/*StressTest*")
+    exclude("**/*longTest*")
     exclude("**/*LongTest*")
     exclude("**/*PerformanceTest*")
     exclude("**/*performanceTest*")
