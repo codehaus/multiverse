@@ -253,7 +253,6 @@ public final class FieldGranularityTransformer implements Opcodes {
                             extraInstructions.add(
                                     new MethodInsnNode(INVOKESPECIAL, referenceName, "<init>", "()V"));
 
-
                             extraInstructions.add(new FieldInsnNode(
                                     PUTFIELD,
                                     classNode.name,
