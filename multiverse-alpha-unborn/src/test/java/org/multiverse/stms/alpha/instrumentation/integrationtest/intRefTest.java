@@ -5,7 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.javaagent.JavaAgentProblemMonitor;
-import org.multiverse.transactional.primitives.TransactionalInteger;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -30,7 +29,7 @@ public class intRefTest {
 
     @Test
     public void testStructuralContent() {
-        TransactionalInteger.class.toString();
+        org.multiverse.transactional.refs.IntRef.class.toString();
 
         assertFalse(existsField(IntRef.class, "value"));
         assertTrue(existsTranlocalField(IntRef.class, "value"));

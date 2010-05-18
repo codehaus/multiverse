@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -121,10 +121,10 @@ public class AnotherWriteSkewStressTest {
 
     public class User {
 
-        private TransactionalInteger account1 = new TransactionalInteger();
-        private TransactionalInteger account2 = new TransactionalInteger();
+        private IntRef account1 = new IntRef();
+        private IntRef account2 = new IntRef();
 
-        public TransactionalInteger getRandomAccount() {
+        public IntRef getRandomAccount() {
             return randomBoolean() ? account1 : account2;
         }
 

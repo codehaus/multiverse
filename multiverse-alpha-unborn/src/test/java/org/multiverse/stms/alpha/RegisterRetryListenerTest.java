@@ -6,7 +6,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.NoRetryPossibleException;
 import org.multiverse.api.latches.CheapLatch;
 import org.multiverse.api.latches.Latch;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsActive;
@@ -47,7 +47,7 @@ public class RegisterRetryListenerTest {
     @Test
     public void testOnlyNewOnesAttached() {
         Transaction tx = startUpdateTransaction();
-        TransactionalInteger ref = new TransactionalInteger(0);
+        IntRef ref = new IntRef(0);
         Latch latch = new CheapLatch();
 
         try {
@@ -63,7 +63,7 @@ public class RegisterRetryListenerTest {
     @Test
     public void test() {
         Transaction tx1 = startUpdateTransaction();
-        TransactionalInteger ref = new TransactionalInteger(10);
+        IntRef ref = new IntRef(10);
         tx1.commit();
 
         Transaction tx2 = startUpdateTransaction();

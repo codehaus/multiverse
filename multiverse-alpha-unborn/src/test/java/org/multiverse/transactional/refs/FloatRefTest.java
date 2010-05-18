@@ -1,4 +1,4 @@
-package org.multiverse.transactional.primitives;
+package org.multiverse.transactional.refs;
 
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
@@ -9,11 +9,11 @@ import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 
-public class TransactionalFloatTest {
+public class FloatRefTest {
 
     @Test
     public void constructorWithNoArg() {
-        TransactionalFloat ref = new TransactionalFloat();
+        FloatRef ref = new FloatRef();
         assertFloatEquals(0, ref.get());
     }
 
@@ -23,13 +23,13 @@ public class TransactionalFloatTest {
 
     @Test
     public void constructorWithSingleArg() {
-        TransactionalFloat ref = new TransactionalFloat(10);
+        FloatRef ref = new FloatRef(10);
         assertFloatEquals(10, ref.get());
     }
 
     @Test
     public void set() {
-        TransactionalFloat ref = new TransactionalFloat();
+        FloatRef ref = new FloatRef();
         Float old = ref.set(100);
         assertFloatEquals(0, old);
         assertFloatEquals(100, ref.get());
@@ -37,7 +37,7 @@ public class TransactionalFloatTest {
 
     @Test
     public void testInc() {
-        TransactionalFloat ref = new TransactionalFloat(100);
+        FloatRef ref = new FloatRef(100);
 
         assertFloatEquals(101, ref.inc());
         assertFloatEquals(101, ref.get());
@@ -51,7 +51,7 @@ public class TransactionalFloatTest {
 
     @Test
     public void testDec() {
-        TransactionalFloat ref = new TransactionalFloat(100);
+        FloatRef ref = new FloatRef(100);
 
         assertFloatEquals(99, ref.dec());
         assertFloatEquals(99, ref.get());
@@ -66,9 +66,9 @@ public class TransactionalFloatTest {
 
     @Test
     public void testEquals() {
-        TransactionalFloat ref1 = new TransactionalFloat(10);
-        TransactionalFloat ref2 = new TransactionalFloat(10);
-        TransactionalFloat ref3 = new TransactionalFloat(20);
+        FloatRef ref1 = new FloatRef(10);
+        FloatRef ref2 = new FloatRef(10);
+        FloatRef ref3 = new FloatRef(20);
 
         assertFalse(ref1.equals(null));
         assertFalse(ref1.equals(""));
@@ -81,19 +81,19 @@ public class TransactionalFloatTest {
 
     @Test
     public void testHashCode() {
-        assertEquals(new Float(100).hashCode(), new TransactionalFloat(100).hashCode());
-        assertEquals(new Float(10).hashCode(), new TransactionalFloat(10).hashCode());
+        assertEquals(new Float(100).hashCode(), new FloatRef(100).hashCode());
+        assertEquals(new Float(10).hashCode(), new FloatRef(10).hashCode());
     }
 
     @Test
     public void testToString() {
-        assertEquals("TransactionalFloat(value=10.0)", new TransactionalFloat(10).toString());
+        assertEquals("FloatRef(value=10.0)", new FloatRef(10).toString());
     }
 
     @Test
     public void testAtomic() {
-        TransactionalFloat ref1 = new TransactionalFloat(10);
-        TransactionalFloat ref2 = new TransactionalFloat(20);
+        FloatRef ref1 = new FloatRef(10);
+        FloatRef ref2 = new FloatRef(20);
 
         try {
             incButAbort(ref1, ref2);
@@ -106,8 +106,8 @@ public class TransactionalFloatTest {
     }
 
     @TransactionalMethod
-    public void incButAbort(TransactionalFloat... refs) {
-        for (TransactionalFloat ref : refs) {
+    public void incButAbort(FloatRef... refs) {
+        for (FloatRef ref : refs) {
             ref.inc();
         }
 

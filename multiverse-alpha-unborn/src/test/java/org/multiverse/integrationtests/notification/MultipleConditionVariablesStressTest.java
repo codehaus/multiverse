@@ -6,7 +6,7 @@ import org.multiverse.TestThread;
 import org.multiverse.TestUtils;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Stm;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
@@ -28,7 +28,7 @@ public class MultipleConditionVariablesStressTest {
     public int objectCount = 100;
     public int threadCount = 10;
     private Stm stm;
-    private TransactionalInteger[] values;
+    private IntRef[] values;
     private int wakeUpCount = 100000;
 
     @Before
@@ -36,9 +36,9 @@ public class MultipleConditionVariablesStressTest {
         stm = getGlobalStmInstance();
         clearThreadLocalTransaction();
 
-        values = new TransactionalInteger[objectCount];
+        values = new IntRef[objectCount];
         for (int k = 0; k < objectCount; k++) {
-            values[k] = new TransactionalInteger(0);
+            values[k] = new IntRef(0);
         }
     }
 
@@ -77,7 +77,7 @@ public class MultipleConditionVariablesStressTest {
 
         @TransactionalMethod(maxRetries = 10000)
         public void doit() {
-            for (TransactionalInteger value : values) {
+            for (IntRef value : values) {
                 if (value.get() == 1) {
                     value.dec();
                     int random = TestUtils.randomInt(values.length - 1);

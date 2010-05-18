@@ -13,7 +13,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  * A performance comparison of the get operation between the
  * {@link TransactionalReferenceArray} and the {@link java.util.concurrent.atomic.AtomicReferenceArray}.
  * <p/>
- * On my machine I get around 80M transaction/second for the TransactionalReference and
+ * On my machine I get around 80M transaction/second for the Ref and
  * 180M transactions/second for the AtomicReferenceArray.
  *
  * @author Peter Veentjer

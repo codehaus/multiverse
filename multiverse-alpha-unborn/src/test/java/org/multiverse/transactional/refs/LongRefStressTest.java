@@ -1,4 +1,4 @@
-package org.multiverse.transactional.primitives;
+package org.multiverse.transactional.refs;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -10,12 +10,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 
-public class TransactionalLongStressTest {
+public class LongRefStressTest {
 
     private int threadCount = 5;
     private int transactionCount = 2 * 1000 * 1000;
     private int refCount = 20;
-    private TransactionalInteger[] refs;
+    private IntRef[] refs;
     private AtomicInteger total = new AtomicInteger();
     private StressThread[] threads;
 
@@ -26,9 +26,9 @@ public class TransactionalLongStressTest {
         for (int k = 0; k < threads.length; k++) {
             threads[k] = new StressThread(k);
         }
-        refs = new TransactionalInteger[refCount];
+        refs = new IntRef[refCount];
         for (int k = 0; k < refs.length; k++) {
-            refs[k] = new TransactionalInteger(0);
+            refs[k] = new IntRef(0);
         }
     }
 
@@ -42,7 +42,7 @@ public class TransactionalLongStressTest {
 
     public int sum() {
         int result = 0;
-        for (TransactionalInteger ref : refs) {
+        for (IntRef ref : refs) {
             result += ref.get();
         }
         return result;
@@ -69,7 +69,7 @@ public class TransactionalLongStressTest {
         @TransactionalMethod
         private int doIt() {
             int count = 0;
-            for (TransactionalInteger ref : refs) {
+            for (IntRef ref : refs) {
                 if (randomInt(10) % 5 == 2) {
                     count++;
                     ref.inc();

@@ -8,7 +8,7 @@ import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.Retry;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
@@ -43,7 +43,7 @@ public class OrElseTemplateTest {
 
     @Test
     public void changesInLeftBranchAreNotUnsetWhenTheRightBranchIsEntered() {
-        final TransactionalInteger leftRef = new TransactionalInteger();
+        final IntRef leftRef = new IntRef();
 
         Transaction tx = startUpdateTransaction();
         new OrElseTemplate(tx) {
@@ -66,8 +66,8 @@ public class OrElseTemplateTest {
 
     @Test
     public void testWaitOnLeftBranch() {
-        TransactionalInteger orRef = new TransactionalInteger();
-        TransactionalInteger elseRef = new TransactionalInteger();
+        IntRef orRef = new IntRef();
+        IntRef elseRef = new IntRef();
 
         WThread thread = new WThread(orRef, elseRef);
         thread.start();
@@ -84,8 +84,8 @@ public class OrElseTemplateTest {
 
     @Test
     public void testWaitOnRightBranch() {
-        TransactionalInteger orRef = new TransactionalInteger();
-        TransactionalInteger elseRef = new TransactionalInteger();
+        IntRef orRef = new IntRef();
+        IntRef elseRef = new IntRef();
 
         WThread thread = new WThread(orRef, elseRef);
         thread.start();
@@ -102,11 +102,11 @@ public class OrElseTemplateTest {
 
 
     class WThread extends TestThread {
-        private final TransactionalInteger orRef;
-        private final TransactionalInteger elseRef;
+        private final IntRef orRef;
+        private final IntRef elseRef;
         private String result;
 
-        WThread(TransactionalInteger orRef, TransactionalInteger elseRef) {
+        WThread(IntRef orRef, IntRef elseRef) {
             super("WaitThread");
             this.orRef = orRef;
             this.elseRef = elseRef;
@@ -170,7 +170,7 @@ public class OrElseTemplateTest {
 
     @Test
     public void testRunWasSuccess() {
-        final TransactionalInteger v = new TransactionalInteger(0);
+        final IntRef v = new IntRef(0);
 
         Transaction t = startUpdateTransaction();
 
@@ -195,7 +195,7 @@ public class OrElseTemplateTest {
 
     @Test
     public void testRunWasFailureTryOrElseRun() {
-        final TransactionalInteger v = new TransactionalInteger(0);
+        final IntRef v = new IntRef(0);
 
         Transaction t = startUpdateTransaction();
 
@@ -221,7 +221,7 @@ public class OrElseTemplateTest {
 
     @Test
     public void testRunWasFailureTryOrElseRunWasAlsoFailure() {
-        final TransactionalInteger v = new TransactionalInteger(0);
+        final IntRef v = new IntRef(0);
 
         Transaction t = startUpdateTransaction();
 

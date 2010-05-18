@@ -1,4 +1,4 @@
-package org.multiverse.transactional.primitives;
+package org.multiverse.transactional.refs;
 
 import org.junit.Test;
 import org.multiverse.TestThread;
@@ -9,23 +9,23 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public class TransactionalByteTest {
+public class ByteRefTest {
 
     @Test
     public void constructorWithNoArg() {
-        TransactionalByte ref = new TransactionalByte();
+        ByteRef ref = new ByteRef();
         assertEquals(0, ref.get());
     }
 
     @Test
     public void constructorWithSingleArg() {
-        TransactionalByte ref = new TransactionalByte((byte) 10);
+        ByteRef ref = new ByteRef((byte) 10);
         assertEquals((byte) 10, ref.get());
     }
 
     @Test
     public void set() {
-        TransactionalByte ref = new TransactionalByte();
+        ByteRef ref = new ByteRef();
         byte old = ref.set((byte) 100);
         assertEquals((byte) 0, old);
         assertEquals((byte) 100, ref.get());
@@ -33,7 +33,7 @@ public class TransactionalByteTest {
 
     @Test
     public void testInc() {
-        TransactionalByte ref = new TransactionalByte((byte) 100);
+        ByteRef ref = new ByteRef((byte) 100);
 
         assertEquals((byte) 101, ref.inc());
         assertEquals((byte) 101, ref.get());
@@ -47,7 +47,7 @@ public class TransactionalByteTest {
 
     @Test
     public void testDec() {
-        TransactionalByte ref = new TransactionalByte((byte) 100);
+        ByteRef ref = new ByteRef((byte) 100);
 
         assertEquals((byte) 99, ref.dec());
         assertEquals((byte) 99, ref.get());
@@ -61,9 +61,9 @@ public class TransactionalByteTest {
 
     @Test
     public void testEquals() {
-        TransactionalByte ref1 = new TransactionalByte((byte) 10);
-        TransactionalByte ref2 = new TransactionalByte((byte) 10);
-        TransactionalByte ref3 = new TransactionalByte((byte) 20);
+        ByteRef ref1 = new ByteRef((byte) 10);
+        ByteRef ref2 = new ByteRef((byte) 10);
+        ByteRef ref3 = new ByteRef((byte) 20);
 
         assertFalse(ref1.equals(null));
         assertFalse(ref1.equals(""));
@@ -76,7 +76,7 @@ public class TransactionalByteTest {
 
     @Test
     public void testHashCode() {
-        TransactionalByte ref = new TransactionalByte((byte) 10);
+        ByteRef ref = new ByteRef((byte) 10);
         assertEquals(10, ref.hashCode());
 
         ref.set((byte) 50);
@@ -85,13 +85,13 @@ public class TransactionalByteTest {
 
     @Test
     public void testToString() {
-        assertEquals("TransactionalByte(value=10)", new TransactionalByte((byte) 10).toString());
+        assertEquals("ByteRef(value=10)", new ByteRef((byte) 10).toString());
     }
 
     @Test
     public void testAtomic() {
-        TransactionalByte ref1 = new TransactionalByte((byte) 10);
-        TransactionalByte ref2 = new TransactionalByte((byte) 20);
+        ByteRef ref1 = new ByteRef((byte) 10);
+        ByteRef ref2 = new ByteRef((byte) 20);
 
         try {
             incButAbort(ref1, ref2);
@@ -105,8 +105,8 @@ public class TransactionalByteTest {
     }
 
     @TransactionalMethod
-    public void incButAbort(TransactionalByte... refs) {
-        for (TransactionalByte ref : refs) {
+    public void incButAbort(ByteRef... refs) {
+        for (ByteRef ref : refs) {
             ref.inc();
         }
 
@@ -115,7 +115,7 @@ public class TransactionalByteTest {
 
     @Test
     public void awaitTest() {
-        final TransactionalByte ref = new TransactionalByte();
+        final ByteRef ref = new ByteRef();
 
         TestThread t = new TestThread() {
             @Override

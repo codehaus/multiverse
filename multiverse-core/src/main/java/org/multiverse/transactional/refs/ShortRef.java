@@ -1,4 +1,4 @@
-package org.multiverse.transactional.primitives;
+package org.multiverse.transactional.refs;
 
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
@@ -7,37 +7,37 @@ import static java.lang.String.format;
 import static org.multiverse.api.StmUtils.retry;
 
 /**
- * A reference for a primitive byte.
+ * A reference for a primitive short.
  *
  * @author Peter Veentjer
  */
 @TransactionalObject
-public final class TransactionalByte {
+public final class ShortRef {
 
-    private byte value;
+    private short value;
 
-    public TransactionalByte() {
-        this((byte) 0);
+    public ShortRef() {
+        this((short) 0);
     }
 
-    public TransactionalByte(byte value) {
+    public ShortRef(short value) {
         this.value = value;
     }
 
     @TransactionalMethod(readonly = true)
-    public byte get() {
+    public short get() {
         return value;
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public void await(byte desired) {
+    public void await(short desired) {
         if (desired != value) {
             retry();
         }
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public byte awaitLargerThan(byte than) {
+    public short awaitLargerThan(short than) {
         if (!(value > than)) {
             retry();
         }
@@ -46,7 +46,7 @@ public final class TransactionalByte {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public byte awaitLargerOrEqualThan(byte than) {
+    public short awaitLargerOrEqualThan(short than) {
         if (!(value >= than)) {
             retry();
         }
@@ -55,7 +55,7 @@ public final class TransactionalByte {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public byte awaitSmallerThan(byte than) {
+    public short awaitSmallerThan(short than) {
         if (!(value < than)) {
             retry();
         }
@@ -64,7 +64,7 @@ public final class TransactionalByte {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public byte awaitSmallerOrEqualThan(byte than) {
+    public short awaitSmallerOrEqualThan(short than) {
         if (!(value <= than)) {
             retry();
         }
@@ -73,7 +73,7 @@ public final class TransactionalByte {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public byte awaitNotEqualTo(byte than) {
+    public short awaitNotEqualTo(short than) {
         if (!(value != than)) {
             retry();
         }
@@ -87,35 +87,35 @@ public final class TransactionalByte {
      * @param newValue the new value.
      * @return the previous value.
      */
-    public byte set(byte newValue) {
-        byte oldValue = this.value;
+    public short set(short newValue) {
+        short oldValue = this.value;
         this.value = newValue;
         return oldValue;
     }
 
-    public byte inc() {
+    public short inc() {
         value++;
         return value;
     }
 
-    public byte inc(byte amount) {
+    public short inc(short amount) {
         value += amount;
         return value;
     }
 
-    public byte dec() {
+    public short dec() {
         value--;
         return value;
     }
 
-    public byte dec(byte amount) {
-        value -= amount;
+    public short dec(short amount) {
+        this.value -= amount;
         return value;
     }
 
     @TransactionalMethod(readonly = true)
     public String toString() {
-        return format("TransactionalByte(value=%s)", value);
+        return format("ShortRef(value=%s)", value);
     }
 
     @TransactionalMethod(readonly = true)
@@ -129,11 +129,11 @@ public final class TransactionalByte {
             return true;
         }
 
-        if (!(thatObj instanceof TransactionalByte)) {
+        if (!(thatObj instanceof ShortRef)) {
             return false;
         }
 
-        TransactionalByte that = (TransactionalByte) thatObj;
+        ShortRef that = (ShortRef) thatObj;
         return that.value == this.value;
     }
 }

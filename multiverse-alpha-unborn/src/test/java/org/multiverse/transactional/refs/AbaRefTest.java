@@ -1,4 +1,4 @@
-package org.multiverse.transactional;
+package org.multiverse.transactional.refs;
 
 import org.junit.After;
 import org.junit.Before;
@@ -15,7 +15,7 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
 /**
  * @author Peter Veentjer
  */
-public class TransactionalAbaRefTest {
+public class AbaRefTest {
 
     private Stm stm;
     private TransactionFactory updateTxFactory;

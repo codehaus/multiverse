@@ -1,59 +1,38 @@
-package org.multiverse.transactional.primitives;
+package org.multiverse.transactional.refs;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.api.Stm;
 import org.multiverse.api.exceptions.DeadTransactionException;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public class TransactionalIntegerTest {
-    private Stm stm;
+public class LongRefTest {
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = getGlobalStmInstance();
-    }
-
-    @After
-    public void tearDown(){
-        clearThreadLocalTransaction();
-    }
-
-    @Test
-    public void test() {
-        TransactionalInteger ref = new TransactionalInteger(1);
-
-        long version = stm.getVersion();
-        ref.inc();
-
-        assertEquals(version+1, stm.getVersion());
-        assertEquals(2, ref.get());
     }
 
     @Test
     public void constructorWithNoArg() {
-        TransactionalInteger ref = new TransactionalInteger();
+        LongRef ref = new LongRef();
         assertEquals(0, ref.get());
     }
 
     @Test
     public void constructorWithSingleArg() {
-        TransactionalInteger ref = new TransactionalInteger(10);
+        LongRef ref = new LongRef(10);
         assertEquals(10, ref.get());
     }
 
     @Test
     public void set() {
-        TransactionalInteger ref = new TransactionalInteger(10);
+        LongRef ref = new LongRef(10);
         long old = ref.set(100);
         assertEquals(10, old);
         assertEquals(100, ref.get());
@@ -61,7 +40,7 @@ public class TransactionalIntegerTest {
 
     @Test
     public void testInc() {
-        TransactionalInteger ref = new TransactionalInteger(100);
+        LongRef ref = new LongRef(100);
 
         assertEquals(101, ref.inc());
         assertEquals(101, ref.get());
@@ -75,7 +54,7 @@ public class TransactionalIntegerTest {
 
     @Test
     public void testDec() {
-        TransactionalInteger ref = new TransactionalInteger(100);
+        LongRef ref = new LongRef(100);
 
         assertEquals(99, ref.dec());
         assertEquals(99, ref.get());
@@ -89,9 +68,9 @@ public class TransactionalIntegerTest {
 
     @Test
     public void testEquals() {
-        TransactionalInteger ref1 = new TransactionalInteger(10);
-        TransactionalInteger ref2 = new TransactionalInteger(10);
-        TransactionalInteger ref3 = new TransactionalInteger(20);
+        LongRef ref1 = new LongRef(10);
+        LongRef ref2 = new LongRef(10);
+        LongRef ref3 = new LongRef(20);
 
         assertFalse(ref1.equals(null));
         assertFalse(ref1.equals(""));
@@ -104,7 +83,7 @@ public class TransactionalIntegerTest {
 
     @Test
     public void testHashCode() {
-        TransactionalInteger ref = new TransactionalInteger(10);
+        LongRef ref = new LongRef(10);
         assertEquals(10, ref.hashCode());
 
         ref.set(200);
@@ -113,8 +92,8 @@ public class TransactionalIntegerTest {
 
     @Test
     public void testAtomic() {
-        TransactionalInteger ref1 = new TransactionalInteger(10);
-        TransactionalInteger ref2 = new TransactionalInteger(20);
+        LongRef ref1 = new LongRef(10);
+        LongRef ref2 = new LongRef(20);
 
         try {
             incButAbort(ref1, ref2);
@@ -127,8 +106,8 @@ public class TransactionalIntegerTest {
     }
 
     @TransactionalMethod
-    public void incButAbort(TransactionalInteger... refs) {
-        for (TransactionalInteger ref : refs) {
+    public void incButAbort(LongRef... refs) {
+        for (LongRef ref : refs) {
             ref.inc();
         }
 
@@ -137,7 +116,7 @@ public class TransactionalIntegerTest {
 
     @Test
     public void await() {
-        TransactionalInteger txInt = new TransactionalInteger();
+        LongRef txInt = new LongRef();
 
         SetThread t = new SetThread(txInt, 3);
         t.start();
@@ -146,10 +125,10 @@ public class TransactionalIntegerTest {
     }
 
     public class SetThread extends TestThread {
-        private final TransactionalInteger txInt;
+        private final LongRef txInt;
         private final int value;
 
-        public SetThread(TransactionalInteger txInt, int value) {
+        public SetThread(LongRef txInt, int value) {
             super("SetThread");
             this.txInt = txInt;
             this.value = value;
@@ -164,7 +143,7 @@ public class TransactionalIntegerTest {
 
     @Test
     public void awaitTest() {
-        final TransactionalInteger ref = new TransactionalInteger();
+        final LongRef ref = new LongRef();
 
         TestThread t = new TestThread() {
             @Override

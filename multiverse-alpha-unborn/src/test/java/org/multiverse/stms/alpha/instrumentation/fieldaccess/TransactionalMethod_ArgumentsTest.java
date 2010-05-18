@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.stms.alpha.AlphaStm;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -416,7 +416,7 @@ public class TransactionalMethod_ArgumentsTest {
 
     @Test
     public void testStatic() {
-        TransactionalInteger ref = new TransactionalInteger();
+        IntRef ref = new IntRef();
         long version = stm.getVersion();
         inc(ref);
 
@@ -425,7 +425,7 @@ public class TransactionalMethod_ArgumentsTest {
     }
 
     @TransactionalMethod
-    public static void inc(TransactionalInteger intRef) {
+    public static void inc(IntRef intRef) {
         intRef.inc();
     }
 

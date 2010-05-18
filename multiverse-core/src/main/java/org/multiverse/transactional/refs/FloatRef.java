@@ -1,4 +1,4 @@
-package org.multiverse.transactional.primitives;
+package org.multiverse.transactional.refs;
 
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
@@ -13,15 +13,15 @@ import static org.multiverse.api.StmUtils.retry;
  * @author Peter Veentjer.
  */
 @TransactionalObject
-public final class TransactionalFloat {
+public final class FloatRef {
 
     private float value;
 
-    public TransactionalFloat() {
+    public FloatRef() {
         this(0f);
     }
 
-    public TransactionalFloat(float value) {
+    public FloatRef(float value) {
         this.value = value;
     }
 
@@ -71,7 +71,7 @@ public final class TransactionalFloat {
 
     @TransactionalMethod(readonly = true)
     public String toString() {
-        return format("TransactionalFloat(value=%s)", value);
+        return format("FloatRef(value=%s)", value);
     }
 
     @TransactionalMethod(readonly = true)
@@ -85,11 +85,11 @@ public final class TransactionalFloat {
             return true;
         }
 
-        if (!(thatobj instanceof TransactionalFloat)) {
+        if (!(thatobj instanceof FloatRef)) {
             return false;
         }
 
-        TransactionalFloat that = (TransactionalFloat) thatobj;
+        FloatRef that = (FloatRef) thatobj;
         return floatToIntBits(this.value) == floatToIntBits(that.value);
     }
 }

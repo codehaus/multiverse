@@ -1,4 +1,4 @@
-package org.multiverse.transactional.primitives;
+package org.multiverse.transactional.refs;
 
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
@@ -7,37 +7,37 @@ import static java.lang.String.format;
 import static org.multiverse.api.StmUtils.retry;
 
 /**
- * A reference for a primitive char.
+ * A reference for a primitive byte.
  *
  * @author Peter Veentjer
  */
 @TransactionalObject
-public final class TransactionalCharacter {
+public final class ByteRef {
 
-    private char value;
+    private byte value;
 
-    public TransactionalCharacter() {
-        this((char) 0);
+    public ByteRef() {
+        this((byte) 0);
     }
 
-    public TransactionalCharacter(char value) {
+    public ByteRef(byte value) {
         this.value = value;
     }
 
     @TransactionalMethod(readonly = true)
-    public char get() {
+    public byte get() {
         return value;
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public void await(char desired) {
+    public void await(byte desired) {
         if (desired != value) {
             retry();
         }
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public char awaitLargerThan(char than) {
+    public byte awaitLargerThan(byte than) {
         if (!(value > than)) {
             retry();
         }
@@ -46,7 +46,7 @@ public final class TransactionalCharacter {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public char awaitLargerOrEqualThan(char than) {
+    public byte awaitLargerOrEqualThan(byte than) {
         if (!(value >= than)) {
             retry();
         }
@@ -55,7 +55,7 @@ public final class TransactionalCharacter {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public char awaitSmallerThan(char than) {
+    public byte awaitSmallerThan(byte than) {
         if (!(value < than)) {
             retry();
         }
@@ -64,7 +64,7 @@ public final class TransactionalCharacter {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public char awaitSmallerOrEqualThan(char than) {
+    public byte awaitSmallerOrEqualThan(byte than) {
         if (!(value <= than)) {
             retry();
         }
@@ -73,7 +73,7 @@ public final class TransactionalCharacter {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public char awaitNotEqualTo(char than) {
+    public byte awaitNotEqualTo(byte than) {
         if (!(value != than)) {
             retry();
         }
@@ -87,35 +87,35 @@ public final class TransactionalCharacter {
      * @param newValue the new value.
      * @return the previous value.
      */
-    public char set(char newValue) {
-        char oldValue = this.value;
+    public byte set(byte newValue) {
+        byte oldValue = this.value;
         this.value = newValue;
         return oldValue;
     }
 
-    public char inc() {
+    public byte inc() {
         value++;
         return value;
     }
 
-    public char inc(char amount) {
+    public byte inc(byte amount) {
         value += amount;
         return value;
     }
 
-    public char dec() {
+    public byte dec() {
         value--;
         return value;
     }
 
-    public char dec(char amount) {
+    public byte dec(byte amount) {
         value -= amount;
-        return this.value;
+        return value;
     }
 
     @TransactionalMethod(readonly = true)
     public String toString() {
-        return format("TransactionalCharacter(value=%s)", value);
+        return format("ByteRef(value=%s)", value);
     }
 
     @TransactionalMethod(readonly = true)
@@ -129,11 +129,11 @@ public final class TransactionalCharacter {
             return true;
         }
 
-        if (!(thatObj instanceof TransactionalCharacter)) {
+        if (!(thatObj instanceof ByteRef)) {
             return false;
         }
 
-        TransactionalCharacter that = (TransactionalCharacter) thatObj;
+        ByteRef that = (ByteRef) thatObj;
         return that.value == this.value;
     }
 }

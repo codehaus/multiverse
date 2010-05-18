@@ -2,7 +2,7 @@ package org.multiverse.integrationtests;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.transactional.Ref;
+import org.multiverse.transactional.refs.SimpleRef;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class AsIsTest {
         l.add("1");
         l.add("2");
 
-        Ref<List<String>> ref = new org.multiverse.transactional.Ref<List<String>>();
+        SimpleRef<List<String>> ref = new SimpleRef<List<String>>();
         ref.set(l);
 
         List<String> found = ref.get();

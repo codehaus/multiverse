@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Transaction;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import java.util.Vector;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -31,7 +31,7 @@ public class CountDownCommitBarrier_StressTest {
     private int spawnCountPerThread = 2 * 1000;
     private int spawnCount = 5;
 
-    private TransactionalInteger[] refs;
+    private IntRef[] refs;
     private ThreadPoolExecutor executor =
             new ThreadPoolExecutor(50, 50, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
     private ThreadPoolExecutor spawnExecutor =
@@ -41,9 +41,9 @@ public class CountDownCommitBarrier_StressTest {
     public void setUp() {
         commitInc = new AtomicLong();
         totalInc = new AtomicLong();
-        refs = new TransactionalInteger[refCount];
+        refs = new IntRef[refCount];
         for (int k = 0; k < refCount; k++) {
-            refs[k] = new TransactionalInteger();
+            refs[k] = new IntRef();
         }
     }
 

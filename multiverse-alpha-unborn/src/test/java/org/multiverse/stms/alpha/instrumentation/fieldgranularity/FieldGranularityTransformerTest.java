@@ -6,8 +6,7 @@ import org.multiverse.annotations.FieldGranularity;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
-import org.multiverse.transactional.Ref;
-import org.multiverse.transactional.primitives.*;
+import org.multiverse.transactional.refs.*;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
@@ -43,7 +42,7 @@ public class FieldGranularityTransformerTest {
         Class clazz = PrivateField.class;
         PrivateField field = new PrivateField(10);
 
-        assertHasField(field.getClass(), "value", TransactionalInteger.class);
+        assertHasField(field.getClass(), "value", IntRef.class);
 
         assertFalse(field instanceof AlphaTransactionalObject);
         long version = stm.getVersion();
@@ -76,7 +75,7 @@ public class FieldGranularityTransformerTest {
     public void protectedField() {
         ProtectedField field = new ProtectedField(10);
         assertFalse(field instanceof AlphaTransactionalObject);
-        assertHasField(field.getClass(), "value", TransactionalInteger.class);
+        assertHasField(field.getClass(), "value", IntRef.class);
 
         long version = stm.getVersion();
         field.setValue(field.getValue() + 1);
@@ -107,7 +106,7 @@ public class FieldGranularityTransformerTest {
     @Test
     public void publicField() {
         PublicField field = new PublicField(10);
-        assertHasField(field.getClass(), "value", TransactionalInteger.class);
+        assertHasField(field.getClass(), "value", IntRef.class);
         assertFalse(field instanceof AlphaTransactionalObject);
         long version = stm.getVersion();
 
@@ -139,7 +138,7 @@ public class FieldGranularityTransformerTest {
     public void packageFriendlyField() {
         PackageFriendlyField field = new PackageFriendlyField(10);
         assertFalse(field instanceof AlphaTransactionalObject);
-        assertHasField(field.getClass(), "value", TransactionalInteger.class);
+        assertHasField(field.getClass(), "value", IntRef.class);
 
         long version = stm.getVersion();
         field.setValue(field.getValue() + 1);
@@ -172,7 +171,7 @@ public class FieldGranularityTransformerTest {
     public void intField_structure() {
         IntField field = new IntField();
         assertFalse(field instanceof AlphaTransactionalObject);
-        assertHasField(field.getClass(), "value", TransactionalInteger.class);
+        assertHasField(field.getClass(), "value", IntRef.class);
     }
 
     @Test
@@ -212,7 +211,7 @@ public class FieldGranularityTransformerTest {
     public void floatField_structure() {
         FloatField field = new FloatField();
         assertFalse(field instanceof AlphaTransactionalObject);
-        assertHasField(field.getClass(), "value", TransactionalFloat.class);
+        assertHasField(field.getClass(), "value", FloatRef.class);
     }
 
     @Test
@@ -252,7 +251,7 @@ public class FieldGranularityTransformerTest {
     public void booleanField_structure() {
         BooleanField field = new BooleanField();
         assertFalse(field instanceof AlphaTransactionalObject);
-        assertHasField(field.getClass(), "value", TransactionalBoolean.class);
+        assertHasField(field.getClass(), "value", BooleanRef.class);
 
     }
 
@@ -293,7 +292,7 @@ public class FieldGranularityTransformerTest {
     public void byteField_structure() {
         ByteField field = new ByteField();
         assertFalse(field instanceof AlphaTransactionalObject);
-        assertHasField(field.getClass(), "value", TransactionalByte.class);
+        assertHasField(field.getClass(), "value", ByteRef.class);
     }
 
     @Test
@@ -334,7 +333,7 @@ public class FieldGranularityTransformerTest {
     public void charField_structure() {
         CharField field = new CharField();
         assertFalse(field instanceof AlphaTransactionalObject);
-        assertHasField(field.getClass(), "value", TransactionalCharacter.class);
+        assertHasField(field.getClass(), "value", CharRef.class);
     }
 
     @Test
@@ -374,7 +373,7 @@ public class FieldGranularityTransformerTest {
     public void longField_structure() {
         LongField field = new LongField();
         assertFalse(field instanceof AlphaTransactionalObject);
-        assertHasField(field.getClass(), "value", TransactionalLong.class);
+        assertHasField(field.getClass(), "value", LongRef.class);
     }
 
     @Test
@@ -414,7 +413,7 @@ public class FieldGranularityTransformerTest {
     public void doubleField_structure() {
         DoubleField field = new DoubleField();
         assertFalse(field instanceof AlphaTransactionalObject);
-        assertHasField(field.getClass(), "value", TransactionalDouble.class);
+        assertHasField(field.getClass(), "value", DoubleRef.class);
     }
 
     @Test
@@ -455,7 +454,7 @@ public class FieldGranularityTransformerTest {
     public void shortField_structure() {
         ShortField field = new ShortField();
         assertFalse(field instanceof AlphaTransactionalObject);
-        assertHasField(field.getClass(), "value", TransactionalShort.class);
+        assertHasField(field.getClass(), "value", ShortRef.class);
     }
 
     @Test
@@ -496,7 +495,7 @@ public class FieldGranularityTransformerTest {
     public void objectField_structure() {
         ObjectField field = new ObjectField();
         assertFalse(field instanceof AlphaTransactionalObject);
-        assertHasField(field.getClass(), "value", Ref.class);
+        assertHasField(field.getClass(), "value", SimpleRef.class);
     }
 
     @Test
@@ -536,7 +535,7 @@ public class FieldGranularityTransformerTest {
     public void typedField_structure() {
         TypedField field = new TypedField();
         assertFalse(field instanceof AlphaTransactionalObject);
-        assertHasField(field.getClass(), "value", Ref.class);
+        assertHasField(field.getClass(), "value", SimpleRef.class);
     }
 
     @Test
@@ -576,7 +575,7 @@ public class FieldGranularityTransformerTest {
     public void arrayField_structure() {
         ArrayField field = new ArrayField();
         assertFalse(field instanceof AlphaTransactionalObject);
-        assertHasField(field.getClass(), "value", Ref.class);
+        assertHasField(field.getClass(), "value", SimpleRef.class);
     }
 
     @Test

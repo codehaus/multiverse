@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
@@ -27,7 +27,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class NonRepeatableReadStressTest {
 
-    private TransactionalInteger ref;
+    private IntRef ref;
     private int readCount = 10000;
     private int readThreadCount = 5;
     private int modifyThreadCount = 2;
@@ -36,7 +36,7 @@ public class NonRepeatableReadStressTest {
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        ref = new TransactionalInteger(0);
+        ref = new IntRef(0);
         readersFinished = false;
     }
 

@@ -13,7 +13,7 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 
 /**
  * This implementation suffers from the ABA problem (well.. the stm suffers from it because the isDirty method suffers
- * from it). This can be fixed very easily, just add a counter. So although the primitives may not have changed in the
+ * from it). This can be fixed very easily, just add a counter. So although the refs may not have changed in the
  * end but the counter has. And this will cause the writeconfict we are after for the ABA problem.  See the TransactionalAbaReference.
  *
  * @author Peter Veentjer

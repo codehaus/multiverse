@@ -4,7 +4,7 @@ import org.benchy.AbstractBenchmarkDriver;
 import org.benchy.TestCase;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import java.util.concurrent.TimeUnit;
 
@@ -20,17 +20,17 @@ public class NonConcurrentUpdateDriver extends AbstractBenchmarkDriver {
     private long incCountPerThread;
     private int threadCount;
     private IncThread[] threads;
-    private TransactionalInteger[] refs;
+    private IntRef[] refs;
 
     @Override
     public void preRun(TestCase testCase) {
         incCountPerThread = testCase.getLongProperty("incCountPerThread");
         threadCount = testCase.getIntProperty("threadCount");
 
-        refs = new TransactionalInteger[threadCount];
+        refs = new IntRef[threadCount];
         threads = new IncThread[threadCount];
         for (int k = 0; k < threads.length; k++) {
-            refs[k] = new TransactionalInteger();
+            refs[k] = new IntRef();
             threads[k] = new IncThread(k, refs[k]);
         }
     }
@@ -58,17 +58,17 @@ public class NonConcurrentUpdateDriver extends AbstractBenchmarkDriver {
 
     private int sum() {
         int result = 0;
-        for (TransactionalInteger ref : refs) {
+        for (IntRef ref : refs) {
             result += ref.get();
         }
         return result;
     }
 
     public class IncThread extends TestThread {
-        private TransactionalInteger intRef;
+        private IntRef intRef;
 
 
-        public IncThread(int id, TransactionalInteger intRef) {
+        public IncThread(int id, IntRef intRef) {
             super("IncThread-" + id);
             this.intRef = intRef;
         }

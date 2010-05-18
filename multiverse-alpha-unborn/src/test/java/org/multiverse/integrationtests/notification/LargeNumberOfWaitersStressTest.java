@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,8 +29,8 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class LargeNumberOfWaitersStressTest {
 
-    private TransactionalInteger waiterLatch;
-    private TransactionalInteger notifyLatch;
+    private IntRef waiterLatch;
+    private IntRef notifyLatch;
 
     private int totalWakeupCount = 1000000;
     private int wakeupCount = 1000;
@@ -53,8 +53,8 @@ public class LargeNumberOfWaitersStressTest {
     public void test() {
         wakeupCountDown.set(totalWakeupCount);
         notifyCountDown.set(totalWakeupCount);
-        waiterLatch = new TransactionalInteger(0);
-        notifyLatch = new TransactionalInteger(1);
+        waiterLatch = new IntRef(0);
+        notifyLatch = new IntRef(1);
 
         //System.out.println(stm.getStatistics());
 

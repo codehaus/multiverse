@@ -1,4 +1,4 @@
-package org.multiverse.transactional.primitives;
+package org.multiverse.transactional.refs;
 
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
@@ -7,37 +7,37 @@ import static java.lang.String.format;
 import static org.multiverse.api.StmUtils.retry;
 
 /**
- * A reference for a primitive short.
+ * A reference for a primitive char.
  *
  * @author Peter Veentjer
  */
 @TransactionalObject
-public final class TransactionalShort {
+public final class CharRef {
 
-    private short value;
+    private char value;
 
-    public TransactionalShort() {
-        this((short) 0);
+    public CharRef() {
+        this((char) 0);
     }
 
-    public TransactionalShort(short value) {
+    public CharRef(char value) {
         this.value = value;
     }
 
     @TransactionalMethod(readonly = true)
-    public short get() {
+    public char get() {
         return value;
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public void await(short desired) {
+    public void await(char desired) {
         if (desired != value) {
             retry();
         }
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public short awaitLargerThan(short than) {
+    public char awaitLargerThan(char than) {
         if (!(value > than)) {
             retry();
         }
@@ -46,7 +46,7 @@ public final class TransactionalShort {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public short awaitLargerOrEqualThan(short than) {
+    public char awaitLargerOrEqualThan(char than) {
         if (!(value >= than)) {
             retry();
         }
@@ -55,7 +55,7 @@ public final class TransactionalShort {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public short awaitSmallerThan(short than) {
+    public char awaitSmallerThan(char than) {
         if (!(value < than)) {
             retry();
         }
@@ -64,7 +64,7 @@ public final class TransactionalShort {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public short awaitSmallerOrEqualThan(short than) {
+    public char awaitSmallerOrEqualThan(char than) {
         if (!(value <= than)) {
             retry();
         }
@@ -73,7 +73,7 @@ public final class TransactionalShort {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public short awaitNotEqualTo(short than) {
+    public char awaitNotEqualTo(char than) {
         if (!(value != than)) {
             retry();
         }
@@ -87,35 +87,35 @@ public final class TransactionalShort {
      * @param newValue the new value.
      * @return the previous value.
      */
-    public short set(short newValue) {
-        short oldValue = this.value;
+    public char set(char newValue) {
+        char oldValue = this.value;
         this.value = newValue;
         return oldValue;
     }
 
-    public short inc() {
+    public char inc() {
         value++;
         return value;
     }
 
-    public short inc(short amount) {
+    public char inc(char amount) {
         value += amount;
         return value;
     }
 
-    public short dec() {
+    public char dec() {
         value--;
         return value;
     }
 
-    public short dec(short amount) {
-        this.value -= amount;
-        return value;
+    public char dec(char amount) {
+        value -= amount;
+        return this.value;
     }
 
     @TransactionalMethod(readonly = true)
     public String toString() {
-        return format("TransactionalShort(value=%s)", value);
+        return format("CharRef(value=%s)", value);
     }
 
     @TransactionalMethod(readonly = true)
@@ -129,11 +129,11 @@ public final class TransactionalShort {
             return true;
         }
 
-        if (!(thatObj instanceof TransactionalShort)) {
+        if (!(thatObj instanceof CharRef)) {
             return false;
         }
 
-        TransactionalShort that = (TransactionalShort) thatObj;
+        CharRef that = (CharRef) thatObj;
         return that.value == this.value;
     }
 }

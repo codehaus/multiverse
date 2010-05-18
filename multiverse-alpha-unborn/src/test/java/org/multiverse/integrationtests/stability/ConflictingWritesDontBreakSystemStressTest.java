@@ -5,14 +5,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class ConflictingWritesDontBreakSystemStressTest {
-    private TransactionalInteger[] refs;
+    private IntRef[] refs;
 
     private int structureCount = 100;
     private int writerThreadCount = 10;
@@ -43,15 +43,15 @@ public class ConflictingWritesDontBreakSystemStressTest {
     }
 
     private void assertValues(int value) {
-        for (TransactionalInteger ref : refs) {
+        for (IntRef ref : refs) {
             assertEquals(value, ref.get());
         }
     }
 
     private void setUpStructures() {
-        refs = new TransactionalInteger[structureCount];
+        refs = new IntRef[structureCount];
         for (int k = 0; k < refs.length; k++) {
-            refs[k] = new TransactionalInteger(0);
+            refs[k] = new IntRef(0);
         }
     }
 
@@ -81,7 +81,7 @@ public class ConflictingWritesDontBreakSystemStressTest {
         @TransactionalMethod
         public void doTransaction() {
             for (int k = 0; k < refs.length; k++) {
-                TransactionalInteger ref = refs[k];
+                IntRef ref = refs[k];
                 sleepRandomMs(1);
                 ref.inc();
             }

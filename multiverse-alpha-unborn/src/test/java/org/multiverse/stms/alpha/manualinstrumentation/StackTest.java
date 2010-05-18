@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.stms.alpha.AlphaStm;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -64,8 +64,8 @@ public class StackTest {
     @Test
     public void testNonEmpty() {
         Transaction t1 = startUpdateTransaction();
-        TransactionalInteger v1 = new TransactionalInteger(10);
-        TransactionalInteger v2 = new TransactionalInteger(10);
+        IntRef v1 = new IntRef(10);
+        IntRef v2 = new IntRef(10);
         Stack stack = new Stack();
         stack.push(v1);
         stack.push(v2);
@@ -74,8 +74,8 @@ public class StackTest {
 
     @Test
     public void test() {
-        TransactionalInteger v1 = new TransactionalInteger(10);
-        TransactionalInteger v2 = new TransactionalInteger(10);
+        IntRef v1 = new IntRef(10);
+        IntRef v2 = new IntRef(10);
 
         Transaction t2 = startUpdateTransaction();
         Stack stack = new Stack();
@@ -87,8 +87,8 @@ public class StackTest {
     @Test
     public void testAnotherScenario() {
         Transaction t1 = startUpdateTransaction();
-        TransactionalInteger v1 = new TransactionalInteger(10);
-        TransactionalInteger v2 = new TransactionalInteger(10);
+        IntRef v1 = new IntRef(10);
+        org.multiverse.transactional.refs.IntRef v2 = new IntRef(10);
         t1.commit();
 
         Transaction t2 = startUpdateTransaction();

@@ -5,9 +5,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.transactional.Ref;
 import org.multiverse.transactional.collections.TransactionalLinkedList;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
+import org.multiverse.transactional.refs.SimpleRef;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -123,10 +123,10 @@ public class SleepingBarberStressTest {
 
     public class BarberThread extends TestThread {
 
-        private Ref<Boolean> closingTime = new Ref<Boolean>();
+        private SimpleRef<Boolean> closingTime = new SimpleRef<Boolean>();
 
         // 0 == asleep, 1 == awake
-        private TransactionalInteger state = new TransactionalInteger();
+        private IntRef state = new IntRef();
 
         BarberThread() {
             super("BarberThread");
@@ -226,7 +226,7 @@ public class SleepingBarberStressTest {
     public class CustomerThread extends TestThread {
 
         // 0 == sat down, 1 == beckoned by barber, 2 == got up for haircut, 3 == left shop
-        private final TransactionalInteger state = new TransactionalInteger();
+        private final IntRef state = new IntRef();
 
         CustomerThread(int id) {
             super("CustomerThread-" + id);

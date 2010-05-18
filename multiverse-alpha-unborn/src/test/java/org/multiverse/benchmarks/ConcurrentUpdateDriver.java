@@ -4,7 +4,7 @@ import org.benchy.AbstractBenchmarkDriver;
 import org.benchy.TestCase;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import java.util.concurrent.TimeUnit;
 
@@ -20,7 +20,7 @@ public class ConcurrentUpdateDriver extends AbstractBenchmarkDriver {
     private long incCountPerThread;
     private int threadCount;
     private IncThread[] threads;
-    private TransactionalInteger ref;
+    private IntRef ref;
 
     @Override
     public void preRun(TestCase testCase) {
@@ -32,7 +32,7 @@ public class ConcurrentUpdateDriver extends AbstractBenchmarkDriver {
             threads[k] = new IncThread(k);
         }
 
-        ref = new TransactionalInteger();
+        ref = new IntRef();
     }
 
     @Override

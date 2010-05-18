@@ -1,10 +1,10 @@
-package org.multiverse.transactional;
+package org.multiverse.transactional.refs;
 
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
 
 /**
- * The TransactionalReference is responsible for storing an object reference transactional (so that it can be
+ * The Ref is responsible for storing an object reference transactional (so that it can be
  * used in a {@link org.multiverse.api.Transaction}.
  * <p/>
  * <p/>
@@ -13,7 +13,7 @@ import org.multiverse.annotations.TransactionalObject;
  * @author Peter Veentjer
  */
 @TransactionalObject
-public interface TransactionalReference<E> {
+public interface Ref<E> {
 
     /**
      * Gets the current stored ref, or null if no ref is stored.

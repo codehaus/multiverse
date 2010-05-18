@@ -1,7 +1,7 @@
 package org.multiverse.integration.scala.examples
 
 import org.multiverse.integration.scala.StmUtils._;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 /**
  * A &quot;port&quot; of the Java {@link DiningPhilosophersStressTest DiningPhilosophers}

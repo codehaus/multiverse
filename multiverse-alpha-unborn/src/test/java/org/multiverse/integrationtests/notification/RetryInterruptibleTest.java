@@ -2,7 +2,7 @@ package org.multiverse.integrationtests.notification;
 
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.TestUtils.assertAlive;
@@ -16,7 +16,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class RetryInterruptibleTest {
 
-    private TransactionalInteger ref;
+    private IntRef ref;
 
     @Test
     public void setUp() {
@@ -25,7 +25,7 @@ public class RetryInterruptibleTest {
 
     @Test
     public void test() throws InterruptedException {
-        ref = new TransactionalInteger(0);
+        ref = new IntRef(0);
 
         AwaitThread t = new AwaitThread();
         t.start();

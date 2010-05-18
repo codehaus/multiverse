@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -21,7 +21,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 public class TransactionTemplate_growingTransactionsTest {
     private Stm stm;
     private int refCount = 100 * 1000;
-    private TransactionalInteger[] refs;
+    private IntRef[] refs;
     private TransactionFactory txFactory;
 
     @Before
@@ -35,10 +35,10 @@ public class TransactionTemplate_growingTransactionsTest {
                 .setSpeculativeConfigurationEnabled(true)
                 .build();
 
-        refs = new TransactionalInteger[refCount];
+        refs = new IntRef[refCount];
 
         for (int k = 0; k < refs.length; k++) {
-            refs[k] = new TransactionalInteger();
+            refs[k] = new IntRef();
         }
     }
 

@@ -5,7 +5,7 @@ import org.benchy.TestCase;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import java.util.concurrent.TimeUnit;
 
@@ -27,7 +27,7 @@ public class ReadPerformanceDriver extends AbstractBenchmarkDriver {
     private boolean readonly;
 
     private ReadThread[] threads;
-    private TransactionalInteger ref;
+    private IntRef ref;
 
     @Override
     public void preRun(TestCase testCase) {
@@ -42,7 +42,7 @@ public class ReadPerformanceDriver extends AbstractBenchmarkDriver {
             threads[k] = new ReadThread(k);
         }
 
-        ref = new TransactionalInteger();
+        ref = new IntRef();
     }
 
     @Override

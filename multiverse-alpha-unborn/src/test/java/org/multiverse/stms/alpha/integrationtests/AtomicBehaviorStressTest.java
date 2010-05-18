@@ -6,7 +6,7 @@ import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Stm;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -30,7 +30,7 @@ public class AtomicBehaviorStressTest {
 
     private Stm stm;
 
-    private TransactionalInteger ref;
+    private IntRef ref;
     private int modifyCount = 500;
     private AtomicInteger modifyCountDown = new AtomicInteger();
 
@@ -38,7 +38,7 @@ public class AtomicBehaviorStressTest {
     public void setUp() {
         stm = getGlobalStmInstance();
         setThreadLocalTransaction(null);
-        ref = new TransactionalInteger(0);
+        ref = new IntRef(0);
     }
 
     @Test

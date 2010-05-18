@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Transaction;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
@@ -28,7 +28,7 @@ public class DiningPhilosophersStressTest {
     private int philosopherCount = 10;
     private int eatCount = 1000;
 
-    private TransactionalInteger[] forks;
+    private IntRef[] forks;
 
     @Before
     public void setUp() {
@@ -52,7 +52,7 @@ public class DiningPhilosophersStressTest {
     }
 
     public void assertAllForksHaveReturned() {
-        for (TransactionalInteger fork : forks) {
+        for (IntRef fork : forks) {
             assertEquals(0, fork.get());
         }
     }
@@ -60,25 +60,25 @@ public class DiningPhilosophersStressTest {
     public PhilosopherThread[] createPhilosopherThreads() {
         PhilosopherThread[] threads = new PhilosopherThread[philosopherCount];
         for (int k = 0; k < philosopherCount; k++) {
-            TransactionalInteger leftFork = forks[k];
-            TransactionalInteger rightFork = k == philosopherCount - 1 ? forks[0] : forks[k + 1];
+            IntRef leftFork = forks[k];
+            IntRef rightFork = k == philosopherCount - 1 ? forks[0] : forks[k + 1];
             threads[k] = new PhilosopherThread(k, leftFork, rightFork);
         }
         return threads;
     }
 
     public void createForks() {
-        forks = new TransactionalInteger[philosopherCount];
+        forks = new IntRef[philosopherCount];
         for (int k = 0; k < forks.length; k++) {
-            forks[k] = new TransactionalInteger(0);
+            forks[k] = new IntRef(0);
         }
     }
 
     class PhilosopherThread extends TestThread {
-        private final TransactionalInteger leftFork;
-        private final TransactionalInteger rightFork;
+        private final IntRef leftFork;
+        private final IntRef rightFork;
 
-        PhilosopherThread(int id, TransactionalInteger leftFork, TransactionalInteger rightFork) {
+        PhilosopherThread(int id, IntRef leftFork, IntRef rightFork) {
             super("PhilosopherThread-" + id);
             this.leftFork = leftFork;
             this.rightFork = rightFork;

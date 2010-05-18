@@ -7,7 +7,7 @@ import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.templates.TransactionTemplate;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +70,7 @@ public class LargeNonParallelWriteonlyTransactionsPerformanceTest {
     }
 
     public void test(final int x) {
-        final List<TransactionalInteger> list = new ArrayList<TransactionalInteger>(x);
+        final List<IntRef> list = new ArrayList<IntRef>(x);
 
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
@@ -82,7 +82,7 @@ public class LargeNonParallelWriteonlyTransactionsPerformanceTest {
             @Override
             public Object execute(Transaction tx) {
                 for (int k = 0; k < x; k++) {
-                    TransactionalInteger value = new TransactionalInteger(k);
+                    IntRef value = new IntRef(k);
                     list.add(value);
                 }
                 return null;

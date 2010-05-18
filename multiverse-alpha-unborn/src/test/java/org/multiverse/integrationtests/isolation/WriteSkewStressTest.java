@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.TestUtils.joinAll;
@@ -38,11 +38,11 @@ public class WriteSkewStressTest {
     }
 
     public void simpleTestWithWriteSkewAllowed() {
-        TransactionalInteger from1 = new TransactionalInteger(100);
-        TransactionalInteger from2 = new TransactionalInteger(0);
+        IntRef from1 = new IntRef(100);
+        IntRef from2 = new IntRef(0);
 
-        TransactionalInteger to1 = new TransactionalInteger();
-        TransactionalInteger to2 = new TransactionalInteger();
+        IntRef to1 = new IntRef();
+        IntRef to2 = new IntRef();
 
         AnotherTransferThread t1 = new AnotherTransferThread(from1, from2, to1, true);
         AnotherTransferThread t2 = new AnotherTransferThread(from2, from1, to2, true);
@@ -64,11 +64,11 @@ public class WriteSkewStressTest {
     }
 
     public void simpleTestWithoutWriteSkew() {
-        TransactionalInteger from1 = new TransactionalInteger(100);
-        TransactionalInteger from2 = new TransactionalInteger(0);
+        IntRef from1 = new IntRef(100);
+        IntRef from2 = new IntRef(0);
 
-        TransactionalInteger to1 = new TransactionalInteger(0);
-        TransactionalInteger to2 = new TransactionalInteger(0);
+        IntRef to1 = new IntRef(0);
+        IntRef to2 = new IntRef(0);
 
         AnotherTransferThread t1 = new AnotherTransferThread(from1, from2, to1, false);
         AnotherTransferThread t2 = new AnotherTransferThread(from2, from1, to2, false);
@@ -85,12 +85,12 @@ public class WriteSkewStressTest {
 
     private class AnotherTransferThread extends TestThread {
 
-        final TransactionalInteger from1;
-        final TransactionalInteger from2;
-        final TransactionalInteger to;
+        final IntRef from1;
+        final IntRef from2;
+        final IntRef to;
         final boolean writeSkewAllowed;
 
-        private AnotherTransferThread(TransactionalInteger from1, TransactionalInteger from2, TransactionalInteger to, boolean writeSkewAllowed) {
+        private AnotherTransferThread(IntRef from1, IntRef from2, IntRef to, boolean writeSkewAllowed) {
             this.from1 = from1;
             this.from2 = from2;
             this.to = to;

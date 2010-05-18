@@ -278,25 +278,25 @@ public final class FieldGranularityTransformer implements Opcodes {
 
         switch (type.getSort()) {
             case Type.ARRAY:
-                return "Lorg/multiverse/transactional/Ref;";
+                return "Lorg/multiverse/transactional/refs/SimpleRef;";
             case Type.BOOLEAN:
-                return "Lorg/multiverse/transactional/primitives/TransactionalBoolean;";
+                return "Lorg/multiverse/transactional/refs/BooleanRef;";
             case Type.BYTE:
-                return "Lorg/multiverse/transactional/primitives/TransactionalByte;";
+                return "Lorg/multiverse/transactional/refs/ByteRef;";
             case Type.CHAR:
-                return "Lorg/multiverse/transactional/primitives/TransactionalCharacter;";
+                return "Lorg/multiverse/transactional/refs/CharRef;";
             case Type.DOUBLE:
-                return "Lorg/multiverse/transactional/primitives/TransactionalDouble;";
+                return "Lorg/multiverse/transactional/refs/DoubleRef;";
             case Type.FLOAT:
-                return "Lorg/multiverse/transactional/primitives/TransactionalFloat;";
+                return "Lorg/multiverse/transactional/refs/FloatRef;";
             case Type.INT:
-                return "Lorg/multiverse/transactional/primitives/TransactionalInteger;";
+                return "Lorg/multiverse/transactional/refs/IntRef;";
             case Type.LONG:
-                return "Lorg/multiverse/transactional/primitives/TransactionalLong;";
+                return "Lorg/multiverse/transactional/refs/LongRef;";
             case Type.SHORT:
-                return "Lorg/multiverse/transactional/primitives/TransactionalShort;";
+                return "Lorg/multiverse/transactional/refs/ShortRef;";
             case Type.OBJECT:
-                return "Lorg/multiverse/transactional/Ref;";
+                return "Lorg/multiverse/transactional/refs/SimpleRef;";
             default:
                 throw new IllegalStateException("Unhandeled sort: " + type.getSort());
         }

@@ -7,7 +7,7 @@ import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.templates.TransactionTemplate;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -23,7 +23,7 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
  */
 public class NestedTransactionTest {
 
-    private TransactionalInteger ref;
+    private IntRef ref;
     private int maximumDepth = 50;
     private Stm stm;
 
@@ -31,7 +31,7 @@ public class NestedTransactionTest {
     public void setUp() {
         clearThreadLocalTransaction();
         stm = getGlobalStmInstance();
-        ref = new TransactionalInteger();
+        ref = new IntRef();
     }
 
     @Test

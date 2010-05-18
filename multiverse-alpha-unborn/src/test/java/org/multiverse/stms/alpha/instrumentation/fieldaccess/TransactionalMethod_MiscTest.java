@@ -8,7 +8,7 @@ import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.Transaction;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.templates.TransactionTemplate;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.assertIsActive;
@@ -94,14 +94,14 @@ public class TransactionalMethod_MiscTest {
 
     public static class AtomicObjectCreated {
 
-        private TransactionalInteger ref;
+        private IntRef ref;
 
         @TransactionalMethod
         public void doit(int v) {
-            ref = new TransactionalInteger(v);
+            ref = new IntRef(v);
         }
 
-        public TransactionalInteger getRef() {
+        public IntRef getRef() {
             return ref;
         }
     }

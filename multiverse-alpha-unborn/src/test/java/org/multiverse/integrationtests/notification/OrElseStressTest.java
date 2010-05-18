@@ -7,7 +7,7 @@ import org.multiverse.TestUtils;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Transaction;
 import org.multiverse.templates.OrElseTemplate;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
@@ -20,7 +20,7 @@ public class OrElseStressTest {
     private int waitingThreadCount = 20;
     private int refCount = 100;
 
-    private TransactionalInteger[] refs;
+    private IntRef[] refs;
     private WaitingThread[] waitingThreads;
     private NotifyThread notifyThread;
 
@@ -28,9 +28,9 @@ public class OrElseStressTest {
     public void setUp() {
         clearThreadLocalTransaction();
 
-        refs = new TransactionalInteger[refCount];
+        refs = new IntRef[refCount];
         for (int k = 0; k < refCount; k++) {
-            refs[k] = new TransactionalInteger();
+            refs[k] = new IntRef();
         }
 
         waitingThreads = new WaitingThread[waitingThreadCount];

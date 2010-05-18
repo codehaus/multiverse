@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  * transactions could conflict even if they are writing to a different one. This reduce this 'unneeded'
  * failure, this annotation can be placed on fields.
  * <p/>
- * Under water these fields are transformed to transactional references or transactional primitives.
+ * Under water these fields are transformed to transactional references or transactional refs.
  * <p/>
  * <pre>
  *  &at;TransactionalObject
@@ -28,8 +28,8 @@ import java.lang.annotation.Target;
  * <pre>
  * &at;TransactionalObject
  * class Person{
- *     private final TransactionalReference&lt;String&gt; name = new ...
- *     private final TransactionalInteger age = new ...
+ *     private final Ref&lt;String&gt; name = new ...
+ *     private final IntRef age = new ...
  * }
  * </pre>
  *

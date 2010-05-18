@@ -7,7 +7,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -38,7 +38,7 @@ public class NonBlockingAccessTest {
 
     @Test
     public void writerDoesNotBlockReader() {
-        TransactionalInteger ref = new TransactionalInteger(0);
+        IntRef ref = new IntRef(0);
 
         //begin the first transaction
         Transaction t1 = updateTxFactory.start();
@@ -57,7 +57,7 @@ public class NonBlockingAccessTest {
 
     @Test
     public void writerDoesNotBlockWriter() {
-        TransactionalInteger ref = new TransactionalInteger(0);
+        IntRef ref = new IntRef(0);
 
         //begin the first transaction
         Transaction t1 = updateTxFactory.start();
@@ -76,7 +76,7 @@ public class NonBlockingAccessTest {
 
     @Test
     public void readerDoesNotBlockWriter() {
-        TransactionalInteger ref = new TransactionalInteger(0);
+        IntRef ref = new IntRef(0);
 
         //do the read in the first transaction but don't commit.
         Transaction t1 = updateTxFactory.start();

@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Transaction;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -72,7 +72,7 @@ public class CountDownCommitBarrier_IntegrationTest {
         @TransactionalMethod
         public void doRun() throws Exception {
             //make the transaction dirty.
-            TransactionalInteger dummy = new TransactionalInteger();
+            IntRef dummy = new IntRef();
 
             tx = getThreadLocalTransaction();
             barrier.joinCommitUninterruptibly(tx);

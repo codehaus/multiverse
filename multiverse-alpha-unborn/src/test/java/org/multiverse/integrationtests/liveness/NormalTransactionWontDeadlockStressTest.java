@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
@@ -22,15 +22,15 @@ public class NormalTransactionWontDeadlockStressTest {
     private int threadCount = 20;
     private int resourceCount = 10;
     private int transactionCount = 200;
-    private TransactionalInteger[] refs;
+    private IntRef[] refs;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
 
-        refs = new TransactionalInteger[resourceCount];
+        refs = new IntRef[resourceCount];
         for (int k = 0; k < refs.length; k++) {
-            refs[k] = new TransactionalInteger();
+            refs[k] = new IntRef();
         }
     }
 
@@ -72,10 +72,10 @@ public class NormalTransactionWontDeadlockStressTest {
 
         @TransactionalMethod
         private void doit() {
-            TransactionalInteger value1 = refs[randomInt(refs.length - 1)];
+            IntRef value1 = refs[randomInt(refs.length - 1)];
             value1.inc();
             sleepMs(25);
-            TransactionalInteger value2 = refs[randomInt(refs.length - 1)];
+            IntRef value2 = refs[randomInt(refs.length - 1)];
             value2.inc();
         }
     }

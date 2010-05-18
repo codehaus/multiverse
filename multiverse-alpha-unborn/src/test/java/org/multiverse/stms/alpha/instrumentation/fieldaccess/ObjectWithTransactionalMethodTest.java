@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.stms.alpha.AlphaStm;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -37,7 +37,7 @@ public class ObjectWithTransactionalMethodTest {
     }
 
     public class ObjectWithTransactionalMethod {
-        private final TransactionalInteger ref = new TransactionalInteger(0);
+        private final IntRef ref = new IntRef(0);
 
         @TransactionalMethod
         public void theMethod() {

@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -14,13 +14,13 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 
 public class TransactionTemplate_blockingTransactionTest {
     private Stm stm;
-    private TransactionalInteger ref;
+    private IntRef ref;
 
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
         clearThreadLocalTransaction();
-        ref = new TransactionalInteger(0);
+        ref = new IntRef(0);
     }
 
     @After

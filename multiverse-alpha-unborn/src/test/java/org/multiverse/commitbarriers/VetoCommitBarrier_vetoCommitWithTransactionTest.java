@@ -11,7 +11,7 @@ import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.OptimisticLockFailedWriteConflict;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -66,7 +66,7 @@ public class VetoCommitBarrier_vetoCommitWithTransactionTest {
     public void whenPendingTransaction() throws InterruptedException {
         final VetoCommitBarrier barrier = new VetoCommitBarrier();
 
-        final TransactionalInteger ref = new TransactionalInteger();
+        final IntRef ref = new IntRef();
 
         TestThread t = new TestThread() {
             @Override

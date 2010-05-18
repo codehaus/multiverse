@@ -6,7 +6,7 @@ import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.ThreadLocalTransaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -18,8 +18,8 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  * The FailureAtomicityStressTest tests if failure atomicity works. So it should be impossible that the eventual
  * state is based on transactions that are eventually rolled back.
  * <p/>
- * There is a shared TransactionalInteger that is concurrently increased. Half of the transactions is going to be aborted
- * so with a writecount of x and a modifyThreadCount of y, the TransactionalInteger.getClassMetadata() will be x*y/2.
+ * There is a shared IntRef that is concurrently increased. Half of the transactions is going to be aborted
+ * so with a writecount of x and a modifyThreadCount of y, the IntRef.getClassMetadata() will be x*y/2.
  *
  * @author Peter Veentjer.
  */
@@ -27,12 +27,12 @@ public class FailureAtomicityStressTest {
 
     private int modifyThreadCount = 10;
     private int writeCount = 1000 * 1000;
-    private TransactionalInteger ref;
+    private IntRef ref;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        ref = new TransactionalInteger();
+        ref = new IntRef();
     }
 
     @Test
