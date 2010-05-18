@@ -1,50 +1,71 @@
-/*
- * Copyright 2010 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/*
- * Basic layout
- */
-
-html {
-    margin: 0;
-    height: 100%;
-    min-height: 100%
-}
-
-body {
-    margin: 0;
-    padding: 0;
-    line-height: 125%;
-    color: #333;
-    min-width: 610px;
-    background: #efefef;
-}
-
-body, td, div {
+body, td, th, input {
+/* redundant rules for bad browsers  */
     font-family: verdana, sans-serif;
-    font-size: 11pt;
-    color: #333;
+    font-size: x-small;
+    voice-family: "\"}\"";
+    voice-family: inherit;
+    font-size: small;
 }
 
-div {
-    margin: 0;
-    padding: 0;
+h1, h2, h3, h4, h5, h6 {
+    margin: 1em 0 0.2em 0;
+}
+
+h1, h2, h3 {
+    border-bottom: 1px solid #ccc;
+}
+
+li h1, li h2, li h3, li h4, li h5, li h6 {
+    border: none;
+}
+
+li {
+    padding: 2px 3px;
+}
+
+h1 {
+    font-size: 160%;
+    font-weight: normal;
+}
+
+h2 {
+    font-size: 150%;
+    font-weight: normal;
+}
+
+h3 {
+    font-size: 130%;
+    width: 70%;
+    min-width: 250px;
+}
+
+h4 {
+    font-size: 120%;
+}
+
+h5 {
+    font-size: 110%;
+}
+
+h6 {
+    font-size: 90%;
+    border: 0;
+}
+
+pre {
+    font-size: 110%;
+    padding: 5px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #CCCCCC;
+    background-color: #f3f5e9;
 }
 
 :link {
+    color: #039;
+}
+
+:visited {
     color: #039;
 }
 
@@ -56,206 +77,347 @@ div {
     color: #000;
 }
 
-h1, h2, h3, h4, h5 {
-    color: #444444;
-    line-height: 125%;
-    font-weight: bold;
-    font-family: arial, verdana, sans-serif;
+body {
+    margin: 0 0 1em 0;
+    padding: 0; /* need for Opera */
+    color: #333;
+    min-width: 610px;
+    background: #efefef;
 }
 
-.heading {
-    font-family: arial, verdana, sans-serif;
-}
-
-code, pre {
-    font-size: 110%;
-    padding: 5px;
-    border-style: solid;
-    border-width: 1px;
-    border-color: #CCCCCC;
-    background-color: #f3f5e9;
-}
-
-/*
- * Docbook content
- */
-
-/*
- * Lists
- */
-
-.variablelist dt {
-    font-weight: bold;
-}
-
-.variablelist dt a {
-    font-weight: normal;
-}
-
-/*
- * Examples, Figures
- */
-
-pre {
-    background-color: #f5f5f5;
-    padding-top: 1em;
-    padding-bottom: 1em;
-    padding-left: 1.2em;
-    padding-right: 1.2em;
-    margin-top: 0.6em;
-    margin-bottom: 0.6em;
-    line-height: 120%;
-}
-
-.programlisting {
-    border-left: solid #d0d0d0 0.5em; /*overflow-x: auto;*/
-}
-
-.screen {
-    border-left: solid #d0d0d0 0.5em; /*overflow-x: auto;*/
-}
-
-.example, .figure, .table {
-    margin-top: 0;
-    margin-bottom: 1.8em;
-}
-
-.example .title, .figure .title, .table .title {
-    white-space: nowrap; /*overflow-x: hidden;*/
-    margin-top: 0;
-    margin-bottom: 0.6em;
-}
-
-.example pre, .figure pre {
+form {
     margin: 0;
-    margin-bottom: 0.6em;
 }
 
-.example-contents > p {
-    display: block;
-    margin: 0;
-    margin-bottom: 0.2em;
+img {
+    border: 0;
 }
 
-.example-break, .figure-break {
-    display: none
-}
-
-.exampleLocation {
-    margin-top: 0.5em;
-    padding-left: 1.7em;
-    background: #FEFEDD;
-    color: #777744;
-}
-
-.exampleLocation p {
-    padding-top: 0.4em;
-    padding-bottom: 0.4em;
-}
-
-.exampleLocation .emphasis em {
-    font-style: normal;
-    font-weight: bold;
-}
-
-.cmdsynopsis {
-    font-family: Courier, monospace;
-    margin-left: 2em;
-}
-
-/*
- * Tables
- */
-
-.table table {
-    border-collapse: collapse;
-    font-size: 100%;
-    min-width: 50%;
-    border: solid #d0d0d0 1px;
-}
-
-.table table td {
-    text-align: left;
-    vertical-align: text-top;
-    padding-left: 0.8em;
-    padding-right: 0.8em;
-    padding-top: 0.3em;
-    padding-bottom: 0.3em;
-}
-
-.table table thead td {
-    font-weight: bold;
-    border-bottom: solid #d0d0d0 1px;
-    background-color: #f2f2f2;
-}
-
-/*
- * Footnotes, notes, tips
- */
-
-.footnote sup {
-    vertical-align: baseline;
-    font-size: 100%;
-}
-
-.note, .tip {
-    padding-top: 1em;
-    padding-bottom: 0;
-    padding-left: 1.2em;
-    padding-right: 1.2em;
+#side {
+    float: left;
+    width: 23%;
     margin-bottom: 1em;
-}
-
-.note {
-    background: #ebf4f7;
-    border: solid #c3d9e6 1px;
-}
-
-.note .title {
-    color: #5283a1;
-}
-
-.tip {
-    background: #FAF7F5;
-    border: solid #e2d2c9 1px;
-    float: right;
-    clear: right;
-    margin-left: 2em;
     margin-top: 1em;
-    margin-bottom: 1em;
-    max-width: 30%;
-    width: 30%;
+
 }
 
-.tip .title {
-    color: #80614D;
+#mainContent {
+    float: right;
+    width: 74%;
+    margin-bottom: 3em;
 }
 
-/* Remove top margins on headings inside notes and tips */
-.tip h1, .note h1
-.tip h2, .note h2,
-.tip h3, .note h3,
-.tip h4, .note h4,
-.tip h5, .note h5,
-.tip h6, .note h6 {
-    margin-top: 0;
+#footer {
 }
 
-/*
- * Code highlighting
- */
-.hl-string, .hl-number, .hl-value {
-    color: #51913f;
+.hide {
+    display: none;
 }
 
-.hl-keyword {
+#header, #content, #main-header {
+    padding: 0 50px;
+}
+
+#header, #main-header {
+    max-width: 900px;
+}
+
+#footer {
+    padding: 0 20px;
+    margin: 0 50px;
+}
+
+#main-header, #header, #content, #footer {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+#content {
+    border: none;
+    /*margin: 0px 0px 0px 7px;
+padding: 4px 0px 0 0;*/
+}
+
+h1.main-header-left {
+    float: left;
+}
+
+h1.main-header-right {
+    float: right;
+}
+
+/* =========================================
+				header
+=========================================*/
+
+#header {
+    background: #4070A0;
+    color: #fff;
+    padding-top: 5px;
+    padding-bottom: 5px; /*border-bottom: 1px solid #A1A6B1;*/
+    border-left: 1px solid #333333;
+    border-right: 1px solid #333333;
+    z-index: 1;
+}
+
+#header-title {
+/*background:url("unity-codehaus-logo-only.png") no-repeat right;*/
+}
+
+#header-logo {
+    float: right;
+    background-color: red;
+    color: chartreuse;
+}
+
+#header h1 {
+    border: 0;
+    font-size: 250%;
+    padding: 0;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+#header a:link, #header a:visited {
+    color: #FFFFFF;
+}
+
+/* =========================================
+        main-header
+=========================================*/
+
+#main-header {
+    background: #ccc;
+    padding-top: 5px;
+    padding-bottom: 8px;
+    border-left: 1px solid #333333;
+    border-right: 1px solid #333333;
+    height: 30px;
+}
+
+#main-header h1 {
+    border: 0;
+}
+
+#main-header h1 {
+    padding: 0;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+#content {
+    background-color: #ffffff;
+    border-left: 1px solid #333333;
+    border-right: 1px solid #333333;
+    border-bottom: 1px solid #333333;
+}
+
+/* ========================================
+		 		Sidebar
+=========================================*/
+
+.nav-title {
+    /*
+  background: #ccc;
+  border: 1px solid #AAA;
+  padding: 3px 0px 3px 0px;
+  width: auto !important;*/
+    background: #ccc;
+    border: 1px solid #AAA;
+    padding: 3px 0px 3px 0px;
+    width: auto !important;
+}
+
+.nav-title div {
+    width: 100%;
+}
+
+.nav-title div div {
+    background: none;
+    padding: 0;
+}
+
+.nav-title div h3 {
+    font-size: 100%;
+    font-weight: bold; /*color: #eef;*/
+    text-decoration: none;
+    border: none;
+    margin: 0 0 0 7px;
+    padding: 4px 0px 0 0;
+}
+
+.nav-footer {
+    border-top: 1px solid #fff;
+    height: 10px;
+    margin-bottom: 3em;
+}
+
+.nav-footer div {
+
+    width: 100%;
+    height: 10px;
+}
+
+.nav-footer div div {
+    background: none;
+    padding: 0;
+    height: 10px;
+}
+
+.nav {
+    border-right: 1px solid #ddd;
+}
+
+.nav, .nav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.nav li {
+    display: inline;
+    padding: 0;
+    margin: 0;
+    font-size: 95%;
+}
+
+.nav li span {
+/* used for un-linked menu items */
+    display: block;
+    padding: 6px 10px;
     font-weight: bold;
+    color: #666;
 }
 
-.hl-comment, .hl-doccomment {
-    color: #929292;
+.nav li span#configParent,
+#nav li span #configuration {
+    display: inline;
+    font-weight: normal;
+    padding: 0;
 }
 
-.hl-annotation {
-    color: #777744;
+.nav li a {
+    display: block;
+    text-decoration: none;
+    background: #F0F0F0;
+    border-bottom: 1px solid #ddd;
+    border-top: 1px solid #fff;
+    color: #225;
+    padding: 5px 7px;
+}
+
+/* =========================================
+				News
+=========================================*/
+
+.news {
+    border-right: 1px solid #AAA;
+    border-left: 1px solid #AAA;
+    padding: 0;
+    margin: 0;
+    background: #f0f0f0;
+    font-size: 100%;
+}
+
+.news-title {
+    background: #ccc;
+    border: 1px solid #AAA;
+    padding: 3px 0px 3px 0px;
+    width: auto !important;
+}
+
+.news-title h3 {
+    padding: 0 0 0 7px;
+    border: 0;
+    margin: 0;
+}
+
+.news-footer {
+    border-top: 1px solid #AAA;
+}
+
+.news dt {
+    padding: 3px 7px 0px 7px;
+    font-weight: bold;
+    border-top: 1px solid #fff;
+}
+
+.news dd {
+    padding: 0px 7px 10px 7px;
+    margin: 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.nav li a.selected {
+    background: #FFE8A0;
+}
+
+.nav li a:hover {
+    background: #E4E4E4; /*#FFF0C0;*/
+}
+
+.nav li a.selected:hover {
+    background: #F4DE99; /*#FFF0C0;*/
+}
+
+.nav li li span {
+/* used for un-linked menu items */
+    padding: 4px 8px 4px 20px;
+}
+
+.nav li li a {
+    padding: 6px 8px 6px 20px;
+}
+
+#oN {
+    background-color: #E0E9E9;
+}
+
+#oN:hover {
+    background-color: #C6DCDC;
+}
+
+/* =========================================
+        Footer
+=========================================*/
+
+#footer {
+    clear: both;
+    margin-top: 3em;
+    margin-bottom: 1em;
+    color: #888;
+    padding: 25px 50px;
+    text-align: center;
+}
+
+#footer-contents {
+    padding: 0;
+    border-top: 1px solid #C9D0E0;
+}
+
+#footer ul#footer-menu {
+    position: relative;
+    top: -0.8em;
+    margin: 0 1em 0 1em;
+    padding: 0;
+    list-style-type: none;
+}
+
+#footer ul#footer-menu li {
+    display: inline;
+    background: #fff;
+    margin: 0 1em;
+}
+
+#footer ul#footer-menu li a {
+    margin: 0 1em;
+    white-space: nowrap;
+}
+
+#footer p {
+    margin: 0.3em;
+}
+
+#footer .site-tools {
+    display: none;
 }

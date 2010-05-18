@@ -220,6 +220,10 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     @Override
     public final void abort() {
+        if (config.logLevel == LogLevel.course) {
+            System.out.println("aborting " + config.familyName);
+        }
+
         switch (status) {
             case active:
                 //fall through
@@ -262,6 +266,11 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     @Override
     public final void commit() {
+        if (config.logLevel == LogLevel.course) {
+            System.out.println("committing " + config.familyName);
+        }
+
+
         switch (status) {
             case active:
                 prepare();
@@ -278,6 +287,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
                 }
                 break;
             case committed:
+
                 //ignore the call
                 return;
             case aborted:

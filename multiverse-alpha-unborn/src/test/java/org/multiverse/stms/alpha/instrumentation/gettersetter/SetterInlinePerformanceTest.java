@@ -20,11 +20,14 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  * The performance of 1 and 2 should be almost the same. The 3 should be a lot slower.
  * In my machine number 1 and 2 do 50M inc/second and no 3  20M inc/second. So the getter
  * setter inlining works.
+ * <p/>
+ * Performance optimizations are disabled when using the Javaagent. So don't expect a
+ * big performance improvement here.
  *
  * @author Peter Veentjer
  */
 public class SetterInlinePerformanceTest {
-    private static final int incCount = 1000 * 1000 * 1000 * 2;
+    private static final int incCount = 1000 * 1000 * 200;
 
     private AlphaStm stm;
 

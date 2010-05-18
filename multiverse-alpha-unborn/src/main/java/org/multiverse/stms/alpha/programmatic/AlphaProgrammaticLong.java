@@ -61,12 +61,11 @@ public final class AlphaProgrammaticLong
     }
 
     public AlphaProgrammaticLong(AlphaTransaction tx, long value) {
-        //todo: this is not correct.
-        this.stm = ((AlphaStm) getGlobalStmInstance());
-
         if (tx == null) {
             throw new NullPointerException();
         }
+
+        this.stm = (AlphaStm) tx.getTransactionFactory().getStm();
 
         AlphaProgrammaticLongTranlocal tranlocal = (AlphaProgrammaticLongTranlocal) tx.openForConstruction(this);
         tranlocal.value = value;
@@ -313,6 +312,30 @@ public final class AlphaProgrammaticLong
             listeners.openAll();
         }
         return true;
+    }
+
+    // ======================== mod ============================================
+
+    @Override
+    public void changeMod() {
+        Transaction tx = getThreadLocalTransaction();
+
+        if (tx == null || tx.getStatus().isDead()) {
+            atomicChangeMod();
+            return;
+        }
+
+        //return changeMod(tx);
+    }
+
+    @Override
+    public void changeMod(Transaction tx) {
+
+    }
+
+    @Override
+    public void atomicChangeMod() {
+
     }
 
     @Override

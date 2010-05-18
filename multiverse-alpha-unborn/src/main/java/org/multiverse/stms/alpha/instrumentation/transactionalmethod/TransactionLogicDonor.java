@@ -112,7 +112,7 @@ public class TransactionLogicDonor {
             return;
         }
 
-        tx = createTransaction(tx,transactionFactory);
+        tx = createTransaction(tx, transactionFactory);
 
         setThreadLocalTransaction(tx);
         try {
@@ -156,11 +156,11 @@ public class TransactionLogicDonor {
                                     timeout = !latch.tryAwaitNs(tx.getRemainingTimeoutNs());
                                 }
 
-                                long durationNs = beginNs - System.nanoTime();
+                                long durationNs = System.nanoTime() - beginNs;
                                 tx.setRemainingTimeoutNs(tx.getRemainingTimeoutNs() - durationNs);
 
                                 if (timeout) {
-                                    String msg = format("Transaction %s has timed with a total timeout of %s ns",
+                                    String msg = format("Transaction %s has timed out with a total timeout of %s ns",
                                             tx.getConfiguration().getFamilyName(),
                                             tx.getConfiguration().getTimeoutNs());
                                     throw new RetryTimeoutException(msg);

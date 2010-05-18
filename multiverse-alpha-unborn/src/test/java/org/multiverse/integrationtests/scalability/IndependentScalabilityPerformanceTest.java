@@ -17,7 +17,7 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
  * todo:
  * Test doesn't provide any value atm.
  */
-public class IndependentScalabilityStressTest {
+public class IndependentScalabilityPerformanceTest {
     private Stm stm;
     private long updateCount = 5 * 1000 * 1000;
 

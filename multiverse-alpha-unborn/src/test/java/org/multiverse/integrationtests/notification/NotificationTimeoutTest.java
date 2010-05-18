@@ -36,7 +36,7 @@ public class NotificationTimeoutTest {
 
     @Test
     public void whenSomeWaitingNeeded() {
-        SetThread t = new SetThread(1, 1);
+        SetThread t = new SetThread(1, 1000);
         t.start();
 
         await(1);
@@ -46,7 +46,7 @@ public class NotificationTimeoutTest {
 
     @Test
     public void whenSpuriousWakeupsAndTimeout() {
-        SetThread t = new SetThread(2, 1);
+        SetThread t = new SetThread(2, 1000);
         t.start();
 
         try {
@@ -60,10 +60,10 @@ public class NotificationTimeoutTest {
 
     @Test
     public void whenSpuriousWakeups() {
-        SetThread t1 = new SetThread(2, 1);
+        SetThread t1 = new SetThread(2, 1000);
         t1.start();
 
-        SetThread t2 = new SetThread(1, 2);
+        SetThread t2 = new SetThread(1, 2000);
         t2.start();
 
         await(1);

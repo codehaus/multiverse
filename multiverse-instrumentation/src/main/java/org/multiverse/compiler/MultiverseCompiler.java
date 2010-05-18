@@ -38,24 +38,22 @@ public final class MultiverseCompiler {
     private ClassLoader compilerClassLoader;
 
     private void run(MultiverseCompilerArguments cli) {
-        println("Multiverse: initializing compiler");
+        println("Multiverse: Starting compiler");
 
         Instrumentor instrumentor = createInstrumentor(cli.instrumentorName);
         File targetDirectory = new File(cli.targetDirectory);
         compilerClassLoader = new MyClassLoader(targetDirectory, MultiverseCompiler.class.getClassLoader());
 
         if (!targetDirectory.isDirectory()) {
-            println("Multiverse: target directory '%s' to instrument is not found, skipping instrumentation", targetDirectory);
+            println("Multiverse: Target directory '%s' is not found, skipping instrumentation", targetDirectory);
             return;
         }
 
-        if (cli.optimize) {
-            println("Multiverse: bytecode is optimized");
-            instrumentor.setOptimize(true);
-        }
+        println("Multiverse: Bytecode optimization enabled = %s", cli.optimize);
+        instrumentor.setOptimize(cli.optimize);
 
         if (cli.dumpBytecode) {
-            println("Multiverse: bytecode is to dumped %s for debugging purposes", instrumentor.getDumpDirectory());
+            println("Multiverse: Bytecode is to dumped %s for debugging purposes", instrumentor.getDumpDirectory());
             instrumentor.setDumpBytecode(true);
         }
 
@@ -63,31 +61,27 @@ public final class MultiverseCompiler {
             instrumentor.setLog(new SystemOutImportantInstrumenterLogger());
         }
 
-        println("Multiverse: using org.multiverse.instrumentation.Instrumentor %s version %s",
+        println("Multiverse: Using org.multiverse.instrumentation.Instrumentor %s version %s",
                 instrumentor.getInstrumentorName(),
                 instrumentor.getInstrumentorVersion());
 
         instrumentor.setFiler(new FileSystemFiler(targetDirectory));
 
-        println("Multiverse: instrumenting targetDirectory %s", targetDirectory);
+        println("Multiverse: Multiverse Compiler started successfully");
+        println("Multiverse: Instrumenting targetDirectory %s", targetDirectory);
 
         applyRecursive(targetDirectory, instrumentor);
     }
 
     private static MultiverseCompilerArguments createCli(String[] args) {
-        CmdLineParser parser = null;
+        MultiverseCompilerArguments cli = new MultiverseCompilerArguments();
+        CmdLineParser parser = new CmdLineParser(cli);
         try {
-            MultiverseCompilerArguments cli = new MultiverseCompilerArguments();
-            parser = new CmdLineParser(cli);
             parser.parseArgument(args);
             return cli;
         } catch (CmdLineException e) {
-            e.printStackTrace();
             System.err.println(e.getMessage());
-            System.err.println("java -jar myprogram.jar [options...] compilername target");
-            if (parser != null) {
-                parser.printUsage(System.out);
-            }
+            parser.printUsage(System.out);
             System.exit(-1);
             return null;
         }

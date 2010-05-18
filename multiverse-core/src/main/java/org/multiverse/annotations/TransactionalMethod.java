@@ -1,5 +1,7 @@
 package org.multiverse.annotations;
 
+import org.multiverse.api.LogLevel;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -48,4 +50,6 @@ public @interface TransactionalMethod {
     long timeout() default Long.MAX_VALUE;
 
     TimeUnit timeoutTimeUnit() default TimeUnit.SECONDS;
+
+    LogLevel logLevel() default LogLevel.none;
 }

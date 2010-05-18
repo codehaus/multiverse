@@ -31,7 +31,7 @@ public class PreventReinstrumentationInstrumentationPhase extends AbstractInstru
     private final static String INSTRUMENTOR_NAME = "instrumentorName";
     private final static String INSTRUMENTOR_VERSION = "instrumentorVersion";
 
-    private final Instrumentor compiler;
+    private final Instrumentor instrumentor;
 
     /**
      * Creates a new PreventReinstrumentationInstrumentationPhase.
@@ -45,7 +45,7 @@ public class PreventReinstrumentationInstrumentationPhase extends AbstractInstru
         if (instrumentor == null) {
             throw new NullPointerException();
         }
-        this.compiler = instrumentor;
+        this.instrumentor = instrumentor;
     }
 
     @Override
@@ -77,29 +77,29 @@ public class PreventReinstrumentationInstrumentationPhase extends AbstractInstru
     private void ensureCorrectClazzCompiler(AnnotationNode instrumentedAnnotationNode, ClassNode original) {
         String foundCompilerName = (String) getAnnotationValue(instrumentedAnnotationNode, INSTRUMENTOR_NAME);
 
-        if (!compiler.getInstrumentorName().equals(foundCompilerName)) {
+        if (!instrumentor.getInstrumentorName().equals(foundCompilerName)) {
             String msg = format("Failed to instrument already instrumented class '%s'. " +
-                    "The current compiler '%s' does not match the previous used compiler '%s' " +
+                    "The current instrumentor '%s' does not match the previous used instrumentor '%s' " +
                     "and therefor can't be used in combination with the Stm '%s'. " +
                     "To solve this problem you need to make sure that you using the correct " +
-                    "compiler or you need to delete the classes and reinstrument them " +
-                    "with this compiler.",
-                    original.name, compiler.getInstrumentorName(), foundCompilerName, compiler.getStmName());
+                    "instrumentor or you need to delete the classes and reinstrument them " +
+                    "with this instrumentor.",
+                    original.name, instrumentor.getInstrumentorName(), foundCompilerName, instrumentor.getStmName());
             throw new CompileException(msg);
         }
 
         String foundCompilerVersion = (String) getAnnotationValue(instrumentedAnnotationNode, INSTRUMENTOR_VERSION);
-        if (!compiler.getInstrumentorVersion().equals(foundCompilerVersion)) {
+        if (!instrumentor.getInstrumentorVersion().equals(foundCompilerVersion)) {
             String msg = format("Failed to instrument already instrumented class '%s'. " +
-                    "The new compiler version '%s' does not match the previous compiler version. '%s'." +
+                    "The new instrumentor version '%s' does not match the previous instrumentor version. '%s'." +
                     "And because the instrumentation process is not backwards compatible, this" +
                     "class can't be used with the current Stm. " +
                     "The Multiverse instrumentation process is not backwards compatible. " +
                     "To solve the problem you need to delete the classes and reinstrument " +
-                    "them with this compiler %s.%s to solve the problem.",
-                    original.name, compiler.getInstrumentorVersion(),
-                    foundCompilerVersion, compiler.getInstrumentorName(),
-                    compiler.getInstrumentorVersion());
+                    "them with this instrumentor %s.%s to solve the problem.",
+                    original.name, instrumentor.getInstrumentorVersion(),
+                    foundCompilerVersion, instrumentor.getInstrumentorName(),
+                    instrumentor.getInstrumentorVersion());
             throw new CompileException(msg);
         }
     }
@@ -109,9 +109,9 @@ public class PreventReinstrumentationInstrumentationPhase extends AbstractInstru
         AnnotationNode annotationNode = new AnnotationNode(desc);
         annotationNode.values = new LinkedList();
         annotationNode.values.add(INSTRUMENTOR_NAME);
-        annotationNode.values.add(compiler.getInstrumentorName());
+        annotationNode.values.add(instrumentor.getInstrumentorName());
         annotationNode.values.add(INSTRUMENTOR_VERSION);
-        annotationNode.values.add(compiler.getInstrumentorVersion());
+        annotationNode.values.add(instrumentor.getInstrumentorVersion());
         return annotationNode;
     }
 }

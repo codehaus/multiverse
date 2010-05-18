@@ -81,9 +81,18 @@ public interface Instrumentor {
      *
      * @param included
      */
-    void addIncluded(String included);
+    void include(String included);
 
-    void addExcluded(String ignored);
+    void exclude(String ignored);
+
+    /**
+     * Returns a string containing all
+     *
+     * @return
+     */
+    String getExcluded();
+
+    String getIncluded();
 
     /**
      * Processes a clazz. If nothing needs to be processed, the provided clazz can be returned. The return

@@ -25,9 +25,8 @@ import static org.multiverse.utils.SystemOut.println;
  * org.multiverse.javaagent.dumpBytecode=true/false
  * org.multiverse.javaagent.verbose=true/false
  * org.multiverse.javaagent.dumpDirectory=directory for dumping classfiles (defaults to the tmp dir)
- * org.multiverse.javaagent.included=
- * org.multiverse.javaagent.excluded=
- * <p/>
+ * org.multiverse.javaagent.include=pattern of classes to include, seperated by ';', defaults to everything being included
+ * org.multiverse.javaagent.exclude=pattern of classes to exclude, seperated by ';'
  *
  * @author Peter Veentjer
  */
@@ -40,35 +39,48 @@ public final class MultiverseJavaAgent {
 
         Instrumentor compiler = loadClazzCompiler();
         inst.addTransformer(new MultiverseClassFileTransformer(compiler));
+
+        println("Multiverse: Multiverse Javaagent started successfully");
     }
 
     private static Instrumentor loadClazzCompiler() {
-        Instrumentor compiler = createInstrumentor();
+        Instrumentor instrumentor = createInstrumentor();
 
         boolean verbose = getSystemBooleanProperty("verbose", false);
         if (verbose) {
-            compiler.setLog(new SystemOutImportantInstrumenterLogger());
+            instrumentor.setLog(new SystemOutImportantInstrumenterLogger());
         }
 
-        compiler.setFiler(new JavaAgentFiler());
+        instrumentor.setFiler(new JavaAgentFiler());
         boolean dumpBytecode = getSystemBooleanProperty("dumpBytecode", false);
-        compiler.setDumpBytecode(dumpBytecode);
+        instrumentor.setDumpBytecode(dumpBytecode);
         if (dumpBytecode) {
             String tmpDir = System.getProperty("java.io.tmpdir");
             File dumpDirectory = new File(getSystemProperty("dumpDirectory", tmpDir));
 
             println(format("Multiverse: Bytecode from Javaagent will be dumped to '%s'", dumpDirectory.getAbsolutePath()));
 
-            compiler.setDumpDirectory(dumpDirectory);
+            instrumentor.setDumpDirectory(dumpDirectory);
         }
 
-        println("Multiverse: Javaaagent won't apply code optimizations (see compiletime instrumentation)");
+        instrumentor.include(getSystemProperty("include", ""));
+        instrumentor.exclude(getSystemProperty("exclude", ""));
 
-        return compiler;
+        if (instrumentor.getIncluded().equals("")) {
+            println("Multiverse: All classes are included since nothing explicitly is configured.");
+            println("Multiverse: \tIn most cases you want to set it explicitly using the org.multiverse.javaagent.include System propery.");
+        } else {
+            println("Multiverse: The following classes are included the instrumentation '%s'" + instrumentor.getIncluded());
+        }
+
+        println("Multiverse: The following classes are excluded from instrumentation (exclude overrides includes) " + instrumentor.getExcluded());
+
+        return instrumentor;
     }
 
     private static void printMultiverseJavaAgentInfo() {
-        println("Multiverse: Using JavaAgent");
+        println("Multiverse: Starting Multiverse JavaAgent");
+        println("Multiverse: Optimizations disabled in Javaaagent (see compiletime instrumentation)");
 
         if (MultiverseConstants.___SANITY_CHECKS_ENABLED) {
             println("Sanity checks are enabled.");
@@ -133,7 +145,7 @@ public final class MultiverseJavaAgent {
             compilerClazz = ClassLoader.getSystemClassLoader().loadClass(className);
         } catch (ClassNotFoundException e) {
             String msg = format("Failed to initialize Instrumentor through System property '%s' with value '%s'." +
-                    "Is not an existing class (it can't be found using the Thread.currentThread.getContextClassLoader).",
+                    "is not an existing class (it can't be found using the Thread.currentThread.getContextClassLoader).",
                     KEY, className);
             println(msg);
             throw new IllegalArgumentException(msg, e);
@@ -141,7 +153,7 @@ public final class MultiverseJavaAgent {
 
         if (!Instrumentor.class.isAssignableFrom(compilerClazz)) {
             String msg = format("Failed to initialize Instrumentor through System property '%s' with value '%s'." +
-                    "Is not an subclass of org.multiverse.compiler.Instrumentor).",
+                    "is not an subclass of org.multiverse.compiler.Instrumentor).",
                     KEY, className);
             println(msg);
             throw new IllegalArgumentException(msg);
@@ -152,7 +164,7 @@ public final class MultiverseJavaAgent {
             method = compilerClazz.getConstructor();
         } catch (NoSuchMethodException e) {
             String msg = format("Failed to initialize Instrumentor through System property '%s' with value '%s'." +
-                    "A no arg constructor is not found.",
+                    "Because a no arg constructor is not found.",
                     KEY, compilerClazz);
             println(msg);
             throw new IllegalArgumentException(msg, e);

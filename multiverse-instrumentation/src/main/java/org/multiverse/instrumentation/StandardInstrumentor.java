@@ -6,6 +6,7 @@ import org.multiverse.instrumentation.metadata.MetadataRepository;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * @author Peter Veentjer
@@ -23,7 +24,8 @@ public class StandardInstrumentor implements Instrumentor {
     private InstrumenterLogger log = new NullInstrumenterLogger();
     private final String stmName;
     private boolean optimize = false;
-
+    private String excluded = "";
+    private String included = "";
 
     public StandardInstrumentor(String compilerName, String compilerVersion, String stmName) {
         if (compilerName == null || compilerVersion == null || stmName == null) {
@@ -32,6 +34,27 @@ public class StandardInstrumentor implements Instrumentor {
         this.compilerName = compilerName;
         this.compilerVersion = compilerVersion;
         this.stmName = stmName;
+
+
+        exclude("ch.qos.");
+        exclude("com.jprofiler.");
+        exclude("com.ibm.");
+        exclude("com.intellij.");
+        exclude("com.sun.");
+        exclude("java.");
+        exclude("org.apache.");
+        exclude("org.eclipse.");
+        exclude("org.gradle.");
+        exclude("org.hamcrest.");
+        exclude("org.jruby.");
+        exclude("org.junit.");
+        exclude("org.kohsuke.");
+        exclude("org.junit.");
+        exclude("org.mockito.");
+        exclude("org.multiverse.repackaged.");
+        exclude("org.objectweb.asm.");
+        exclude("org.slf4j.");
+        exclude("sun.");
     }
 
     protected final void add(InstrumentationPhase phase) {
@@ -52,18 +75,77 @@ public class StandardInstrumentor implements Instrumentor {
         return compilerVersion;
     }
 
+    @Override
     public String getStmName() {
         return stmName;
     }
 
     @Override
-    public void addExcluded(String ignored) {
-        //todo
+    public String getExcluded() {
+        return excluded;
     }
 
     @Override
-    public void addIncluded(String included) {
-        //todo
+    public String getIncluded() {
+        return included;
+    }
+
+    @Override
+    public void exclude(String pattern) {
+        if (pattern == null) {
+            throw new NullPointerException();
+        }
+
+        if (pattern.length() == 0) {
+            return;
+        }
+
+        pattern = removeTrailingAndPrecedingSemicolons(pattern);
+
+        if (excluded.length() == 0) {
+            excluded = pattern;
+        } else {
+            excluded = excluded + ";" + pattern;
+        }
+    }
+
+    public String removeTrailingAndPrecedingSemicolons(String s) {
+        return removePreceding(removeTrailing(s));
+    }
+
+    private String removeTrailing(String s) {
+        if (s.endsWith(";")) {
+            return removeTrailing(s.substring(0, s.length() - 1));
+        }
+
+        return s;
+    }
+
+    private String removePreceding(String s) {
+        if (s.startsWith(";")) {
+            return removeTrailing(s.substring(1, s.length()));
+        }
+
+        return s;
+    }
+
+    @Override
+    public void include(String pattern) {
+        if (pattern == null) {
+            throw new NullPointerException();
+        }
+
+        pattern = removeTrailingAndPrecedingSemicolons(pattern);
+
+        if (pattern.length() == 0) {
+            return;
+        }
+
+        if (included.length() == 0) {
+            included = pattern;
+        } else {
+            included = included + ";" + pattern;
+        }
     }
 
     @Override
@@ -110,16 +192,21 @@ public class StandardInstrumentor implements Instrumentor {
     @Override
     public Clazz process(Clazz originalClazz) {
         if (originalClazz.getClassLoader() == null) {
-            log.important("Multiverse: Ignoring class '%s' because it is a system class", originalClazz.getName());
+            log.important("Multiverse: Ignoring %s because it is a System class", originalClazz.getName());
             return originalClazz;
         }
 
-        if (isExcluded(originalClazz.getName())) {
-            log.important("Multiverse: Ignoring class '%s' because it is excluded", originalClazz.getName());
+        if (included.length() > 0 && !contains(included, originalClazz.getInternalName())) {
+            log.lessImportant("Multiverse: Ignoring %s, because it is not included", originalClazz.getName());
             return originalClazz;
         }
 
-        log.important("Multiverse: instrumenting %s", originalClazz.getName());
+        if (contains(excluded, originalClazz.getInternalName())) {
+            log.important("Multiverse: Ignoring %s, because it is excluded", originalClazz.getName());
+            return originalClazz;
+        }
+
+        log.important("Multiverse: Instrumenting %s", originalClazz.getName());
 
         Environment env = new EnvironmentImpl();
         Clazz beforeClazz = originalClazz;
@@ -133,9 +220,9 @@ public class StandardInstrumentor implements Instrumentor {
         }
 
         if (originalClazz == beforeClazz) {
-            log.lessImportant("Multiverse: Finished compilation of class '%s' (class was not modified)", originalClazz.getName());
+            log.lessImportant("Multiverse: Finished instrumenting %s (class was not modified)", originalClazz.getName());
         } else {
-            log.lessImportant("Multiverse: Finished compilation of class '%s'", originalClazz.getName());
+            log.lessImportant("Multiverse: Finished instrumenting of class %s", originalClazz.getName());
         }
 
         return beforeClazz;
@@ -154,29 +241,18 @@ public class StandardInstrumentor implements Instrumentor {
         AsmUtils.writeToFile(end, afterClazz.getBytecode());
     }
 
-    //todo: ugly hack.
+    private boolean contains(String all, String name) {
+        StringTokenizer tokenizer = new StringTokenizer(all, ";");
 
-    private static boolean isExcluded(String className) {
-        return className.startsWith("java/")
-                || className.startsWith("javax/")
-                || className.startsWith("com/ibm/")
-                || className.startsWith("org/mockito")
-                || className.startsWith("org/gradle")
-                || className.startsWith("ch/qos")
-                || className.startsWith("com/jprofiler/")
-                || className.startsWith("org/junit")
-                || className.startsWith("sun/")
-                || className.startsWith("com/sun")
-                || className.startsWith("org/apache/")
-                || className.startsWith("org/jruby/")
-                || className.startsWith("org/slf4j/")
-                || className.startsWith("org/hamcrest/")
-                || className.startsWith("com/intellij")
-                || className.startsWith("org/eclipse")
-                || className.startsWith("org/kohsuke/args4j")
-                || className.startsWith("org/objectweb/asm")
-                || className.startsWith("org/multiverse/repackaged")
-                || className.startsWith("junit/");
+        while (tokenizer.hasMoreElements()) {
+            String token = tokenizer.nextToken();
+            if (name.startsWith(token)) {
+                return true;
+            }
+        }
+
+        return false;
+
     }
 
     class EnvironmentImpl implements Environment {

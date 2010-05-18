@@ -36,7 +36,52 @@ are using the Multiverse Compiler.
     instrumented by the Multiverse Javaagent is suboptimal, it could be that you are hunting ghosts.
 
 <h2 id="commandlineinterface">10.3 Command Line Interface</h2>
-todo
+The Multiverse javaagent needs to set up using the javaagent argument on the java command.
+<pre>
+    java -javaagent:/path/to/multiverse-alpha-0.6.jar ....
+</pre>
+The multiverse jar is completely self contained, so you don't need to worry about
+dependent jars.
+
+<p>
+    The Multiverse Javaagent can be configured by setting System properties
+    from the cli. A complete listing of the properties:
+<table>
+    <tr>
+        <td>-Dorg.multiverse.javaagent.verbose</td>
+        <td>verbose output. Value is a boolean and defaults to false.
+        </td>
+    </tr>
+    <tr>
+        <td>-Dorg.multiverse.javaagent.dumpBytecode</td>
+        <td>if the bytecode should be dumped for
+            debugging purposes. Value is boolean and defaults to false.
+        </td>
+    </tr>
+    <tr>
+        <td>-Dorg.multiverse.javaagent.include</td>
+        <td>semicolon separated list of packages to
+            exclude. E.g. com.sun.;com.yourcompany.; If this is not specified, all packages will be included
+            and this can cause ClassCircularityErrors. <b>So make sure that you have this one configured</b>.
+        </td>
+    </tr>
+    <tr>
+        <td>-Dorg.multiverse.javaagent.exclude</td>
+        <td>semicolon separated list of packages to
+            include. E.g. com.yourcompany.;. Default a lot of packages are excluded
+            to prevent problems. See the output of the Multiverse Javaagent for a listing. Excludes
+            outrank includes.
+        </td>
+    </tr>
+    <tr>
+        <td>-Dorg.multiverse.javaagent.instrumentor</td>
+        <td>
+            The org.multiverse.instrumentation.Instrumentor to use. The same Multiverse Javaagent
+            can be used for different types of instrumentation. Using this property, the exact instrumentor
+            is selected. Defaults to org.multiverse.stm.alpha.instrumentation.AlphaStmInstrumentor.
+        </td>
+    </tr>
+</table>
 
 <h2 id="intellij">10.4 IntelliJ IDEA 9</h2>
 todo

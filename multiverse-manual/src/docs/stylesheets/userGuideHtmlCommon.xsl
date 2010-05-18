@@ -29,7 +29,6 @@
     <!-- Use custom style sheet content -->
     <xsl:param name="html.stylesheet">DUMMY</xsl:param>
     <xsl:template name="output.html.stylesheets">
-        <link href="base.css" rel="stylesheet" type="text/css"/>
         <link href="style.css" rel="stylesheet" type="text/css"/>
     </xsl:template>
 
@@ -77,10 +76,12 @@
     <xsl:param name="admon.style">
     </xsl:param>
 
-    <xsl:template match="tip[@role='exampleLocation']" mode="class.value"><xsl:value-of select="@role"/></xsl:template>
-    
+    <xsl:template match="tip[@role='exampleLocation']" mode="class.value">
+        <xsl:value-of select="@role"/>
+    </xsl:template>
+
     <xsl:param name="admon.textlabel">0</xsl:param>
-    
+
     <!-- BOOK TITLEPAGE -->
 
     <!-- Customise the contents of the book titlepage -->
@@ -98,7 +99,9 @@
     </xsl:template>
 
     <xsl:template match="releaseinfo" mode="titlepage.mode">
-        <h3 class='releaseinfo'>Version <xsl:value-of select="."/></h3>
+        <h3 class='releaseinfo'>Version
+            <xsl:value-of select="."/>
+        </h3>
     </xsl:template>
 
     <!-- CHAPTER/APPENDIX TITLES -->
@@ -107,13 +110,13 @@
     <xsl:template name="component.title">
         <h1>
             <xsl:call-template name="anchor">
-	            <xsl:with-param name="node" select=".."/>
-	            <xsl:with-param name="conditional" select="0"/>
+                <xsl:with-param name="node" select=".."/>
+                <xsl:with-param name="conditional" select="0"/>
             </xsl:call-template>
             <xsl:apply-templates select=".." mode="object.title.markup"/>
         </h1>
     </xsl:template>
-    
+
     <!-- TABLES -->
 
     <!-- Duplicated from docbook stylesheets, to fix problem where html table does not get a title -->
@@ -141,39 +144,57 @@
     <!-- CODE HIGHLIGHTING -->
 
     <xsl:template match='xslthl:keyword' mode="xslthl">
-        <span class="hl-keyword"><xsl:apply-templates mode="xslthl"/></span>
+        <span class="hl-keyword">
+            <xsl:apply-templates mode="xslthl"/>
+        </span>
     </xsl:template>
 
     <xsl:template match='xslthl:string' mode="xslthl">
-        <span class="hl-string"><xsl:apply-templates mode="xslthl"/></span>
+        <span class="hl-string">
+            <xsl:apply-templates mode="xslthl"/>
+        </span>
     </xsl:template>
 
     <xsl:template match='xslthl:comment' mode="xslthl">
-        <span class="hl-comment"><xsl:apply-templates mode="xslthl"/></span>
+        <span class="hl-comment">
+            <xsl:apply-templates mode="xslthl"/>
+        </span>
     </xsl:template>
 
     <xsl:template match='xslthl:number' mode="xslthl">
-        <span class="hl-number"><xsl:apply-templates mode="xslthl"/></span>
+        <span class="hl-number">
+            <xsl:apply-templates mode="xslthl"/>
+        </span>
     </xsl:template>
 
     <xsl:template match='xslthl:annotation' mode="xslthl">
-        <span class="hl-annotation"><xsl:apply-templates mode="xslthl"/></span>
+        <span class="hl-annotation">
+            <xsl:apply-templates mode="xslthl"/>
+        </span>
     </xsl:template>
 
     <xsl:template match='xslthl:doccomment' mode="xslthl">
-        <span class="hl-doccomment"><xsl:apply-templates mode="xslthl"/></span>
+        <span class="hl-doccomment">
+            <xsl:apply-templates mode="xslthl"/>
+        </span>
     </xsl:template>
 
     <xsl:template match='xslthl:tag' mode="xslthl">
-        <span class="hl-tag"><xsl:apply-templates mode="xslthl"/></span>
+        <span class="hl-tag">
+            <xsl:apply-templates mode="xslthl"/>
+        </span>
     </xsl:template>
 
     <xsl:template match='xslthl:attribute' mode="xslthl">
-        <span class="hl-attribute"><xsl:apply-templates mode="xslthl"/></span>
+        <span class="hl-attribute">
+            <xsl:apply-templates mode="xslthl"/>
+        </span>
     </xsl:template>
 
     <xsl:template match='xslthl:value' mode="xslthl">
-        <span class="hl-value"><xsl:apply-templates mode="xslthl"/></span>
+        <span class="hl-value">
+            <xsl:apply-templates mode="xslthl"/>
+        </span>
     </xsl:template>
 
 </xsl:stylesheet>

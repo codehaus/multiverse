@@ -37,6 +37,10 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      */
     Stm getStm();
 
+    B setLogLevel(LogLevel logLevel);
+
+    LogLevel getLogLevel();
+
     /**
      * Checks if dirty check is enabled.
      *

@@ -1,6 +1,7 @@
 package org.multiverse.instrumentation.asm;
 
 import org.multiverse.annotations.*;
+import org.multiverse.api.LogLevel;
 import org.multiverse.instrumentation.metadata.*;
 import org.multiverse.utils.IOUtils;
 import org.objectweb.asm.Opcodes;
@@ -346,6 +347,7 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
             transactionMetadata.speculativeConfigurationEnabled = true;
         }
 
+        transactionMetadata.logLevel = LogLevel.none;
         transactionMetadata.readOnly = null;
         transactionMetadata.trackReads = null;
         transactionMetadata.writeSkew = true;
@@ -392,6 +394,9 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
         } else {
             txMetadata.timeoutNs = timeoutTimeUnit.toNanos(timeout);
         }
+
+        String[] logLevels = (String[]) getValue(annotationNode, "logLevel", new String[]{null, LogLevel.none.name()});
+        txMetadata.logLevel = LogLevel.valueOf(logLevels[1]);
 
         if (methodNode.name.equals("<init>")) {
             txMetadata.maxRetries = (Integer) getValue(annotationNode, "maxRetries", 0);

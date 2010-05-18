@@ -38,6 +38,7 @@
     <li><a href="#question.34">Does Multiverse touch java.util classes?</a></li>
     <li><a href="#question.35">Does Multiverse work with the IBM JDK?</a></li>
     <li><a href="#question.36">Does Multiverse work with the Open JDK?</a></li>
+    <li><a href="#question.37">I get a ClassCircularityError?</a></li>
 </ol>
 
 <h2 id="question.1">Does Multiverse rely on instrumentation</h2>
@@ -248,7 +249,7 @@ areas of research for transactional memory to lower the amount of contention (fo
 
 <h2 id="question.34">Does Multiverse touch java.util classes?</h2>
 No, Multiverse doesn't instrument any classes in the java.util library. Only the classes you want to be instrumented,
-are instrumented.
+are instrumented and if it doesn't contain anything interesting, it is ignored.
 
 <h2 id="question.35">Does Multiverse work with the IBM JDK?</h2>
 Yes. All unit and integration tests are executed using the IBM J9 1.6 JDK.  This is the exact version
@@ -267,4 +268,18 @@ Yes. All unit and integration tests are executed using Open JDK. This is the exa
     Java(TM) SE Runtime Environment (build 1.7.0-ea-b89)
     Java HotSpot(TM) Server VM (build 18.0-b02, mixed mode)
 </pre>
-I don't have performance numbers (yet).        
+I don't have performance numbers (yet).
+
+<h2 id="question.37">I get a ClassCircularityError</h2>
+If you get a ClassCicularityError while using the Multiverse Javaagent, changes
+are big that you haven't configured the include property. If this isn't set explicitly
+the javaagent will try to analyze all classes it encounters and this causes ASM to cause
+problems. With the -Dorg.multiverse.javaagent.include
+property on the command line. It expects a ';' seperated list of Classes to ignore. Example:
+<pre>
+    -Dorg.multiverse.javaagent.include=org.youproject.;org.anotherproject.
+</pre>
+Asterix can't be used (perhaps it will be added in the future). When the Multiverse Javaagent
+starts, it lists the packages that are included/excluded so inspect that for more
+information. If you also enable the verbose logging for the Javaagent using
+-Dorg.multiverse.javaagent.verbose=true, you can see better what is happing.

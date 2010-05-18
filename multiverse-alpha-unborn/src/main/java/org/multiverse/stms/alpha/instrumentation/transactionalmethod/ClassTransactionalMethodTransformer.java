@@ -1,9 +1,6 @@
 package org.multiverse.stms.alpha.instrumentation.transactionalmethod;
 
-import org.multiverse.api.GlobalStmInstance;
-import org.multiverse.api.Stm;
-import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.TransactionFactoryBuilder;
+import org.multiverse.api.*;
 import org.multiverse.instrumentation.CompileException;
 import org.multiverse.instrumentation.DebugInfo;
 import org.multiverse.instrumentation.InstrumenterLogger;
@@ -188,6 +185,19 @@ public final class ClassTransactionalMethodTransformer implements Opcodes {
                 Type.getInternalName(TransactionFactoryBuilder.class),
                 "setFamilyName",
                 "(Ljava/lang/String;)" + Type.getDescriptor(TransactionFactoryBuilder.class)));
+
+        //logLevel
+        insnList.add(new LdcInsnNode(transactionMetadata.logLevel.name()));
+        insnList.add(new MethodInsnNode(
+                INVOKESTATIC,
+                Type.getInternalName(LogLevel.class),
+                "valueOf",
+                format("(Ljava/lang/String;)%s", Type.getDescriptor(LogLevel.class))));
+        insnList.add(new MethodInsnNode(
+                INVOKEINTERFACE,
+                Type.getInternalName(TransactionFactoryBuilder.class),
+                "setLogLevel",
+                format("(%s)%s", Type.getDescriptor(LogLevel.class), Type.getDescriptor(TransactionFactoryBuilder.class))));
 
         //interruptible.
         insnList.add(new InsnNode(transactionMetadata.interruptible ? ICONST_1 : ICONST_0));

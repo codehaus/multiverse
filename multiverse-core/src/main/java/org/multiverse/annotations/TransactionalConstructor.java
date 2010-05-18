@@ -1,5 +1,7 @@
 package org.multiverse.annotations;
 
+import org.multiverse.api.LogLevel;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -20,6 +22,11 @@ import java.lang.annotation.Target;
 @Target({ElementType.CONSTRUCTOR})
 public @interface TransactionalConstructor {
 
+    /**
+     * If the TransactionalConstructor should be readonly or an update.
+     *
+     * @return
+     */
     boolean readonly() default false;
 
     /**
@@ -37,4 +44,6 @@ public @interface TransactionalConstructor {
      * @return true if the writeSkew problem is allowed.
      */
     boolean writeSkew() default true;
+
+    LogLevel logLevel() default LogLevel.none;
 }

@@ -29,19 +29,25 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
  * </pre>
  * <p/>
  * <h2>TransactionFactories</h2> Some of the methods of the TransactionTemplate don't need a {@link TransactionFactory}
- * and createReference read tracking update transaction by default. But if you want a better performance, you need to pass your
- * own TransactionFactory. One of the biggest reasons is that the system else is not able to do runtime optimizations
- * like selecting better transaction implementation.
+ * and createReference read tracking update transaction by default. But if you want a better performance, you need
+ * to pass your own TransactionFactory. One of the biggest reasons is that the system else is not able to do runtime
+ * optimizations like selecting better transaction implementation.
  * <p/>
  * <h2>Ignoring ThreadLocalTransaction</h2> Out of the box the TransactionTemplate checks the {@link
- * ThreadLocalTransaction} for a running transaction, and if one is available, it doesn't createReference its own. But in some
- * cases you don't want to rely on a threadlocal, for example when you are not using instrumentation, it is possible to
- * totally ignore the ThreadLocalTransaction.
+ * ThreadLocalTransaction} for a running transaction, and if one is available, it doesn't createReference its own.
+ * But in some cases you don't want to rely on a threadlocal, for example when you are not using instrumentation,
+ * it is possible to totally ignore the ThreadLocalTransaction.
  * <p/>
  * <h2>Exceptions</h2> All uncaught throwable's lead to a rollback of the transaction.
  * <p/>
  * <h2>Threadsafe</h2> TransactionTemplate is thread-safe to use and can be reused. So in case of an actor, you could
  * create one instance in the beginning, and reuse the instance.
+ * <p/>
+ * <h2>Transaction reuse</h2>
+ * The TransactionTemplate is able to reuse transactions stored in the TransactionThreadLocal that were created by the
+ * same transaction family. For agents this is very useful, since each agent will repeatedly execute the same
+ * transaction. This is good for performance since less objects need to be created. Nothing special needs to be
+ * done to activate this behavior.
  *
  * @author Peter Veentjer
  */
@@ -98,13 +104,14 @@ public abstract class TransactionTemplate<E> {
      * Creates a new TransactionTemplate with the provided TransactionFactory.
      *
      * @param transactionFactory        the TransactionFactory used to createReference Transactions.
-     * @param threadLocalAware          true if this TransactionTemplate should look at the ThreadLocalTransaction and publish
-     *                                  the running transaction there.
+     * @param threadLocalAware          true if this TransactionTemplate should look at the ThreadLocalTransaction
+     *                                  and publish the running transaction there.
      * @param lifecycleListenersEnabled true if the lifecycle callback methods should be enabled. Enabling them causes
-     *                                  extra object creation, so if you want to squeeze out more performance, set this to false at the price of
-     *                                  not having the lifecycle methods working.
+     *                                  extra object creation, so if you want to squeeze out more performance, set
+     *                                  this to false at the price of not having the lifecycle methods working.
      */
-    public TransactionTemplate(TransactionFactory transactionFactory, boolean threadLocalAware, boolean lifecycleListenersEnabled) {
+    public TransactionTemplate(TransactionFactory transactionFactory, boolean threadLocalAware,
+                               boolean lifecycleListenersEnabled) {
         if (transactionFactory == null) {
             throw new NullPointerException();
         }
@@ -271,7 +278,7 @@ public abstract class TransactionTemplate<E> {
     public final E executeChecked() throws Exception {
         Transaction tx = threadLocalAware ? getThreadLocalTransaction() : null;
         if (isDead(tx)) {
-            if (tx != null && tx.getTransactionFactory() == transactionFactory) {
+            if (sameTransactionFamily(tx)) {
                 tx.restart();
                 tx.setAttempt(0);
                 tx.setRemainingTimeoutNs(tx.getConfiguration().getTimeoutNs());
@@ -279,7 +286,7 @@ public abstract class TransactionTemplate<E> {
                 tx = transactionFactory.start();
             }
 
-            if(threadLocalAware){
+            if (threadLocalAware) {
                 setThreadLocalTransaction(tx);
             }
 
@@ -287,6 +294,10 @@ public abstract class TransactionTemplate<E> {
         } else {
             return execute(tx);
         }
+    }
+
+    private boolean sameTransactionFamily(Transaction tx) {
+        return tx != null && tx.getTransactionFactory() == transactionFactory;
     }
 
     private E executeWithTransaction(Transaction tx) throws Exception {
@@ -339,7 +350,7 @@ public abstract class TransactionTemplate<E> {
                                     timeout = !latch.tryAwaitNs(tx.getRemainingTimeoutNs());
                                 }
 
-                                long durationNs = beginNs - System.nanoTime();
+                                long durationNs = System.nanoTime() - beginNs;
                                 tx.setRemainingTimeoutNs(tx.getRemainingTimeoutNs() - durationNs);
 
                                 if (timeout) {

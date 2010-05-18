@@ -41,7 +41,9 @@ allprojects {
 
   test {
     exclude("**/*AbstractTest*")
+    exclude("**/*stressTest*")
     exclude("**/*StressTest*")
+    exclude("**/*longTest*")
     exclude("**/*LongTest*")
     exclude("**/*PerformanceTest*")
     exclude("**/*performanceTest*")
@@ -247,7 +249,7 @@ project(':multiverse-alpha') {
 
     ant.java(classname: "org.multiverse.compiler.MultiverseCompiler") {
       arg value: '-o'
-//      arg value: '-v'
+      arg value: '-v'
       arg value: '-d'
       arg value: "${buildDir}/classes/main"
 
@@ -282,7 +284,7 @@ project(':multiverse-alpha') {
 
     ant.java(classname: "org.multiverse.compiler.MultiverseCompiler") {
       arg value: '-o'
-//      arg value: '-v'
+      arg value: '-v'
       arg value: '-d'
       arg value: "${buildDir}/classes/test"
 
@@ -312,7 +314,7 @@ project(':multiverse-alpha') {
 
     ant.jarjar(jarfile: "${projectRootDir}/multiverse-alpha/build/libs/multiverse-alpha-${project.version}.jar", update: true) {
       rule pattern: 'org.objectweb.asm.**', result: 'org.multiverse.repackaged.@0'
-      rule pattern: 'org.kohsuke.args4j.**', result: 'org.multiverse.repackaged.@0'
+//      rule pattern: 'org.kohsuke.args4j.**', result: 'org.multiverse.repackaged.@0'
     }
   }
 

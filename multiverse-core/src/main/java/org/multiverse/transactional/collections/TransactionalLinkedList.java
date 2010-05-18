@@ -56,11 +56,17 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
             .getProgrammaticReferenceFactoryBuilder()
             .build();
 
+    private final static ProgrammaticReferenceFactory modFactory = getGlobalStmInstance()
+            .getProgrammaticReferenceFactoryBuilder()
+            .build();
+
     private final int maxCapacity;
 
     private final boolean relaxedMaximumCapacity;
 
     private final ProgrammaticLong size;
+
+    private final ProgrammaticLong mod;
 
     @FieldGranularity
     private Node<E> head;
@@ -154,6 +160,7 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
         this.relaxedMaximumCapacity = relaxedMaximumCapacity;
         this.maxCapacity = maxCapacity;
         this.size = sizeFactory.atomicCreateLong(0);
+        this.mod = sizeFactory.atomicCreateLong(0);
     }
 
     /**
@@ -226,6 +233,7 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
             tail = newNode;
         }
         size.commutingInc(1);
+        mod.changeMod();
     }
 
     @Override
@@ -245,6 +253,7 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
         }
 
         size.commutingInc(1);
+        mod.changeMod();
     }
 
     public Node<E> getHead() {
@@ -268,6 +277,7 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
         }
 
         size.commutingInc(-1);
+        size.changeMod();
         return value;
     }
 
@@ -283,6 +293,7 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
             head = head.next;
         }
 
+        mod.changeMod();
         size.commutingInc(-1);
         return value;
     }
@@ -320,6 +331,7 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
             tail = tail.prev;
         }
 
+        mod.changeMod();
         size.commutingInc(-1);
         return value;
     }
@@ -375,6 +387,7 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
             throw new NullPointerException();
         }
 
+        mod.changeMod();
         Node<E> node = getNode(index);
         E old = node.value;
         node.value = element;
@@ -501,6 +514,7 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
 
     private void removeNode(Node<E> node) {
         size.commutingInc(-1);
+        mod.changeMod();
 
         if (node == head) {
             head = node.next;
@@ -646,15 +660,18 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
 
         private Node<E> next;
         private Node<E> current;
+        private long expectedModCount;
 
         private IteratorImpl(Node<E> head) {
             this.current = null;
             this.next = head;
+            this.expectedModCount = TransactionalLinkedList.this.mod.get();
         }
 
         @Override
         @TransactionalMethod(readonly = true)
         public boolean hasNext() {
+            checkForComodification();
             return next != null;
         }
 
@@ -671,11 +688,20 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
 
         @Override
         public void remove() {
+            checkForComodification();
+
             if (current == null) {
                 throw new NoSuchElementException();
             }
 
             TransactionalLinkedList.this.removeNode(current);
+            expectedModCount++;
+        }
+
+        public void checkForComodification() {
+            if (TransactionalLinkedList.this.mod.get() != expectedModCount) {
+                throw new ConcurrentModificationException();
+            }
         }
     }
 
@@ -728,6 +754,4 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
             this.value = value;
         }
     }
-
-
 }
