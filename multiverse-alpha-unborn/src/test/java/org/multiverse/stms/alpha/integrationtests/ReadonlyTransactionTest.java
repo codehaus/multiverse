@@ -8,7 +8,7 @@ import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
-import org.multiverse.transactional.DefaultTransactionalReference;
+import org.multiverse.transactional.Ref;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -27,13 +27,13 @@ public class ReadonlyTransactionTest {
 
     @Test
     public void refIsTransformed() {
-        DefaultTransactionalReference ref = new DefaultTransactionalReference();
+        Ref ref = new Ref();
         assertTrue(((Object) ref) instanceof AlphaTransactionalObject);
     }
 
     @Test
     public void whenNonTrackingRead_thenReadonlyOperationSucceeds() {
-        DefaultTransactionalReference<Integer> ref = new DefaultTransactionalReference<Integer>(10);
+        Ref<Integer> ref = new Ref<Integer>(10);
 
         long version = stm.getVersion();
 
@@ -43,13 +43,13 @@ public class ReadonlyTransactionTest {
     }
 
     @TransactionalMethod(readonly = true)
-    public static void executeNonTrackingReadonlyMethod(DefaultTransactionalReference<Integer> ref, int expectedValue) {
+    public static void executeNonTrackingReadonlyMethod(Ref<Integer> ref, int expectedValue) {
         assertEquals(expectedValue, (int) ref.get());
     }
 
     @Test
     public void whenTrackingRead_thenReadonlyOperationSucceeds() {
-        DefaultTransactionalReference<Integer> ref = new DefaultTransactionalReference<Integer>(10);
+        Ref<Integer> ref = new Ref<Integer>(10);
 
         long version = stm.getVersion();
 
@@ -59,14 +59,14 @@ public class ReadonlyTransactionTest {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public static void executeTrackingReadonlyMethod(DefaultTransactionalReference<Integer> ref, int expectedValue) {
+    public static void executeTrackingReadonlyMethod(Ref<Integer> ref, int expectedValue) {
         int found = ref.get();
         assertEquals(expectedValue, found);
     }
 
     @Test
     public void whenNonTrackingReadonly_thenModificationInReadonlyTransactionIsDetected() {
-        DefaultTransactionalReference<Integer> ref = new DefaultTransactionalReference<Integer>(0);
+        Ref<Integer> ref = new Ref<Integer>(0);
 
         long version = stm.getVersion();
 
@@ -81,13 +81,13 @@ public class ReadonlyTransactionTest {
     }
 
     @TransactionalMethod(readonly = true, trackReads = false)
-    public static void nonTrackingReadonlyMethodThatUpdates(DefaultTransactionalReference<Integer> ref) {
+    public static void nonTrackingReadonlyMethodThatUpdates(Ref<Integer> ref) {
         ref.set(1);
     }
 
     @Test
     public void whenTrackingReadonly_thenModificationInReadonlyTransactionIsDetected() {
-        DefaultTransactionalReference<Integer> ref = new DefaultTransactionalReference<Integer>(0);
+        Ref<Integer> ref = new Ref<Integer>(0);
 
         long version = stm.getVersion();
 
@@ -102,7 +102,7 @@ public class ReadonlyTransactionTest {
     }
 
     @TransactionalMethod(readonly = true, trackReads = false)
-    public static void trackingReadonlyMethodThatUpdates(DefaultTransactionalReference<Integer> ref) {
+    public static void trackingReadonlyMethodThatUpdates(Ref<Integer> ref) {
         ref.set(1);
     }
 

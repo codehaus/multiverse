@@ -278,7 +278,7 @@ public final class FieldGranularityTransformer implements Opcodes {
 
         switch (type.getSort()) {
             case Type.ARRAY:
-                return "Lorg/multiverse/transactional/DefaultTransactionalReference;";
+                return "Lorg/multiverse/transactional/Ref;";
             case Type.BOOLEAN:
                 return "Lorg/multiverse/transactional/primitives/TransactionalBoolean;";
             case Type.BYTE:
@@ -296,7 +296,7 @@ public final class FieldGranularityTransformer implements Opcodes {
             case Type.SHORT:
                 return "Lorg/multiverse/transactional/primitives/TransactionalShort;";
             case Type.OBJECT:
-                return "Lorg/multiverse/transactional/DefaultTransactionalReference;";
+                return "Lorg/multiverse/transactional/Ref;";
             default:
                 throw new IllegalStateException("Unhandeled sort: " + type.getSort());
         }

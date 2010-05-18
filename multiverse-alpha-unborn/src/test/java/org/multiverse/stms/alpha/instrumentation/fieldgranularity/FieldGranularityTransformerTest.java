@@ -6,7 +6,7 @@ import org.multiverse.annotations.FieldGranularity;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
-import org.multiverse.transactional.DefaultTransactionalReference;
+import org.multiverse.transactional.Ref;
 import org.multiverse.transactional.primitives.*;
 
 import static java.util.Arrays.asList;
@@ -20,7 +20,7 @@ public class FieldGranularityTransformerTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
-       }
+    }
 
 
     //test with different forms of references.
@@ -496,7 +496,7 @@ public class FieldGranularityTransformerTest {
     public void objectField_structure() {
         ObjectField field = new ObjectField();
         assertFalse(field instanceof AlphaTransactionalObject);
-        assertHasField(field.getClass(), "value", DefaultTransactionalReference.class);
+        assertHasField(field.getClass(), "value", Ref.class);
     }
 
     @Test
@@ -536,7 +536,7 @@ public class FieldGranularityTransformerTest {
     public void typedField_structure() {
         TypedField field = new TypedField();
         assertFalse(field instanceof AlphaTransactionalObject);
-        assertHasField(field.getClass(), "value", DefaultTransactionalReference.class);
+        assertHasField(field.getClass(), "value", Ref.class);
     }
 
     @Test
@@ -576,7 +576,7 @@ public class FieldGranularityTransformerTest {
     public void arrayField_structure() {
         ArrayField field = new ArrayField();
         assertFalse(field instanceof AlphaTransactionalObject);
-        assertHasField(field.getClass(), "value", DefaultTransactionalReference.class);
+        assertHasField(field.getClass(), "value", Ref.class);
     }
 
     @Test

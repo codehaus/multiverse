@@ -5,5 +5,9 @@ package org.multiverse.api;
  */
 public enum LogLevel {
 
-    none, course, fine
+    none, course, fine;
+
+    public boolean isLogableFrom(LogLevel level) {
+        return compareTo(level) >= 0;
+    }
 }

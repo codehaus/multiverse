@@ -8,12 +8,12 @@ import static org.multiverse.api.StmUtils.retry;
 
 /**
  * A {@link TransactionalReference} that doesn't suffer from the ABA problem. See
- * the {@link DefaultTransactionalReference} for more information.
+ * the {@link Ref} for more information.
  *
  * @author Peter Veentjer
  */
 @TransactionalObject
-public final class TransactionalAbaReference<E> implements TransactionalReference<E> {
+public final class AbaRef<E> implements TransactionalReference<E> {
 
     private E reference;
 
@@ -25,7 +25,7 @@ public final class TransactionalAbaReference<E> implements TransactionalReferenc
     /**
      * Creates a new TransactionalAbaReference with a null reference.
      */
-    public TransactionalAbaReference() {
+    public AbaRef() {
         this.reference = null;
         this.writeVersion = Long.MIN_VALUE;
     }
@@ -36,7 +36,7 @@ public final class TransactionalAbaReference<E> implements TransactionalReferenc
      *
      * @param reference the reference to store.
      */
-    public TransactionalAbaReference(E reference) {
+    public AbaRef(E reference) {
         this.reference = reference;
         this.writeVersion = Long.MIN_VALUE;
     }

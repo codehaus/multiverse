@@ -16,7 +16,7 @@ package org.multiverse.api.exceptions;
  *
  * @author Peter Veentjer
  */
-public class ControlFlowError extends Error {
+public abstract class ControlFlowError extends Error {
 
     public ControlFlowError() {
     }
@@ -32,4 +32,6 @@ public class ControlFlowError extends Error {
     public ControlFlowError(String message, Throwable cause) {
         super(message, cause);
     }
+
+    public abstract String getDescription();
 }

@@ -7,7 +7,7 @@ import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Stm;
 import org.multiverse.api.exceptions.RetryTimeoutException;
-import org.multiverse.transactional.DefaultTransactionalReference;
+import org.multiverse.transactional.Ref;
 import org.multiverse.transactional.TransactionalReference;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
@@ -38,7 +38,7 @@ public class TransactionalMethod_TimeoutLongTest {
 
     @Test
     public void whenTimeout() {
-        TransactionalReference ref = new DefaultTransactionalReference();
+        TransactionalReference ref = new Ref();
 
         try {
             tryAwaitNonNull(ref);

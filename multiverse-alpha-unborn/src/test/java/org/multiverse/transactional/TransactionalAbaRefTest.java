@@ -46,7 +46,7 @@ public class TransactionalAbaRefTest {
     }
 
     public void rollback(String initialValue, String newValue) {
-        TransactionalAbaReference<String> ref = new TransactionalAbaReference<String>(initialValue);
+        AbaRef<String> ref = new AbaRef<String>(initialValue);
 
         long version = stm.getVersion();
 
@@ -67,7 +67,7 @@ public class TransactionalAbaRefTest {
     public void noArgConstruction() {
         long version = stm.getVersion();
 
-        TransactionalAbaReference<String> ref = new TransactionalAbaReference<String>();
+        AbaRef<String> ref = new AbaRef<String>();
 
         assertEquals(version, stm.getVersion());
         assertNull(ref.get());
@@ -77,7 +77,7 @@ public class TransactionalAbaRefTest {
     public void nullConstruction() {
         long version = stm.getVersion();
 
-        TransactionalAbaReference<String> ref = new TransactionalAbaReference<String>();
+        AbaRef<String> ref = new AbaRef<String>();
 
         assertEquals(version, stm.getVersion());
         assertEquals(null, ref.get());
@@ -87,7 +87,7 @@ public class TransactionalAbaRefTest {
     public void nonNullConstruction() {
         long version = stm.getVersion();
         String s = "foo";
-        TransactionalAbaReference<String> ref = new TransactionalAbaReference<String>(s);
+        AbaRef<String> ref = new AbaRef<String>(s);
 
         assertEquals(version, stm.getVersion());
         assertEquals(s, ref.get());
@@ -95,7 +95,7 @@ public class TransactionalAbaRefTest {
 
     @Test
     public void testIsNull() {
-        TransactionalAbaReference<String> ref = new TransactionalAbaReference<String>();
+        AbaRef<String> ref = new AbaRef<String>();
 
         long version = stm.getVersion();
         assertTrue(ref.isNull());
@@ -110,7 +110,7 @@ public class TransactionalAbaRefTest {
 
     @Test
     public void testSetFromNullToNull() {
-        TransactionalAbaReference<String> ref = new TransactionalAbaReference<String>();
+        AbaRef<String> ref = new AbaRef<String>();
 
         long version = stm.getVersion();
         String result = ref.set(null);
@@ -121,7 +121,7 @@ public class TransactionalAbaRefTest {
 
     @Test
     public void testSetFromNullToNonNull() {
-        TransactionalAbaReference<String> ref = new TransactionalAbaReference<String>();
+        AbaRef<String> ref = new AbaRef<String>();
 
         long version = stm.getVersion();
         String newRef = "foo";
@@ -134,7 +134,7 @@ public class TransactionalAbaRefTest {
     @Test
     public void testSetFromNonNullToNull() {
         String oldRef = "foo";
-        TransactionalAbaReference<String> ref = new TransactionalAbaReference<String>(oldRef);
+        AbaRef<String> ref = new AbaRef<String>(oldRef);
 
         long version = stm.getVersion();
 
@@ -148,7 +148,7 @@ public class TransactionalAbaRefTest {
     public void testSetChangedReferenced() {
         String oldRef = "foo";
 
-        TransactionalAbaReference<String> ref = new TransactionalAbaReference<String>(oldRef);
+        AbaRef<String> ref = new AbaRef<String>(oldRef);
 
         long version = stm.getVersion();
 
@@ -163,7 +163,7 @@ public class TransactionalAbaRefTest {
     public void testSetUnchangedReferences() {
         String oldRef = "foo";
 
-        TransactionalAbaReference<String> ref = new TransactionalAbaReference<String>(oldRef);
+        AbaRef<String> ref = new AbaRef<String>(oldRef);
 
         long version = stm.getVersion();
 
@@ -177,7 +177,7 @@ public class TransactionalAbaRefTest {
     public void testSetEqualIsNotUsedButReferenceEquality() {
         String oldRef = new String("foo");
 
-        TransactionalAbaReference<String> ref = new TransactionalAbaReference<String>(oldRef);
+        AbaRef<String> ref = new AbaRef<String>(oldRef);
 
         long version = stm.getVersion();
 
@@ -191,7 +191,7 @@ public class TransactionalAbaRefTest {
     @Test
     public void testSetAndUnsetIsSeenAsChange() {
         String oldRef = "foo";
-        TransactionalAbaReference<String> ref = new TransactionalAbaReference<String>(oldRef);
+        AbaRef<String> ref = new AbaRef<String>(oldRef);
 
         long version = stm.getVersion();
         Transaction tx = updateTxFactory.start();
@@ -210,7 +210,7 @@ public class TransactionalAbaRefTest {
     public void getOrAwaitComletesIfRefNotNull() {
         String oldRef = "foo";
 
-        TransactionalAbaReference<String> ref = new TransactionalAbaReference<String>(oldRef);
+        AbaRef<String> ref = new AbaRef<String>(oldRef);
 
         long version = stm.getVersion();
 
@@ -221,7 +221,7 @@ public class TransactionalAbaRefTest {
 
     @Test
     public void getOrAwaitRetriesIfNull() {
-        TransactionalAbaReference<String> ref = new TransactionalAbaReference<String>();
+        AbaRef<String> ref = new AbaRef<String>();
 
         long version = stm.getVersion();
 

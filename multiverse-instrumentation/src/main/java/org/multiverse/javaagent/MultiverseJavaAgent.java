@@ -99,7 +99,7 @@ public final class MultiverseJavaAgent {
         try {
             Instrumentor instrumentor = (Instrumentor) constructor.newInstance();
             println("Multiverse: Initialized '%s-%s'",
-                    instrumentor.getInstrumentorName(), instrumentor.getInstrumentorVersion());
+                    instrumentor.getName(), instrumentor.getVersion());
             return instrumentor;
         } catch (IllegalAccessException e) {
             String msg = format("Failed to initialize Instrumentor through System property '%s' with value '%s'." +

@@ -9,7 +9,7 @@ import static org.multiverse.api.StmUtils.retry;
 /**
  * Default {@link TransactionalReference}. Changes on primitives are atomic and consistent,
  * but not completely because a transaction could suffer from the ABA problem between transactions.
- * See the {@link TransactionalAbaReference} to solve this problem.
+ * See the {@link AbaRef} to solve this problem.
  * <p/>
  * It depends on the STM implementation if the ABA problem can occur btw. If the readset also
  * is included in the conflict detection, then the ABA problem can't occur.
@@ -17,25 +17,25 @@ import static org.multiverse.api.StmUtils.retry;
  * @author Peter Veentjer
  */
 @TransactionalObject
-public final class DefaultTransactionalReference<E> implements TransactionalReference<E> {
+public final class Ref<E> implements TransactionalReference<E> {
 
     private E value;
 
     /**
-     * Creates a DefaultTransactionalReference with a null reference.
+     * Creates a Ref with a null reference.
      */
-    public DefaultTransactionalReference() {
+    public Ref() {
         this(null);
     }
 
 
     /**
-     * Creates a new DefaultTransactionalReference with the provided reference. This reference is allowed to
+     * Creates a new Ref with the provided reference. This reference is allowed to
      * be null.
      *
-     * @param value the reference to store in this DefaultTransactionalReference.
+     * @param value the reference to store in this Ref.
      */
-    public DefaultTransactionalReference(E value) {
+    public Ref(E value) {
         this.value = value;
     }
 
@@ -95,9 +95,9 @@ public final class DefaultTransactionalReference<E> implements TransactionalRefe
     @TransactionalMethod(readonly = true)
     public String toString() {
         if (value == null) {
-            return "DefaultTransactionalReference(ref=null)";
+            return "Ref(ref=null)";
         } else {
-            return format("DefaultTransactionalReference(ref=%s)", value);
+            return format("Ref(ref=%s)", value);
         }
     }
 }

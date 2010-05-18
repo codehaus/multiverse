@@ -40,4 +40,9 @@ public class LockNotFreeWriteConflict extends WriteConflict {
     public LockNotFreeWriteConflict(Throwable cause) {
         super(cause);
     }
+
+    @Override
+    public String getDescription() {
+        return "writeconflict caused by a resources that already is locked for writing";
+    }
 }

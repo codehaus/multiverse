@@ -37,4 +37,9 @@ public class SpeculativeConfigurationFailure extends ControlFlowError {
     public SpeculativeConfigurationFailure(Throwable cause) {
         super(cause);
     }
+
+    @Override
+    public String getDescription() {
+        return "speculative configuration failure";
+    }
 }

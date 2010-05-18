@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.transactional.DefaultTransactionalReference;
+import org.multiverse.transactional.Ref;
 import org.multiverse.transactional.collections.TransactionalLinkedList;
 import org.multiverse.transactional.primitives.TransactionalInteger;
 
@@ -123,7 +123,7 @@ public class SleepingBarberStressTest {
 
     public class BarberThread extends TestThread {
 
-        private DefaultTransactionalReference<Boolean> closingTime = new DefaultTransactionalReference<Boolean>();
+        private Ref<Boolean> closingTime = new Ref<Boolean>();
 
         // 0 == asleep, 1 == awake
         private TransactionalInteger state = new TransactionalInteger();

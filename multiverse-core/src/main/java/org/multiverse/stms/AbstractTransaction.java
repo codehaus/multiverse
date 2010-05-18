@@ -143,6 +143,12 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     @Override
     public final void prepare() {
+        if (___LOGGING_ENABLED_ENABLED) {
+            if (config.logLevel.isLogableFrom(LogLevel.course)) {
+                System.out.println("preparing active" + config.familyName);
+            }
+        }
+
         switch (status) {
             case active:
                 try {
@@ -178,6 +184,12 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     @Override
     public final void restart() {
+        if (___LOGGING_ENABLED_ENABLED) {
+            if (config.logLevel.isLogableFrom(LogLevel.course)) {
+                System.out.println("restarting " + config.familyName);
+            }
+        }
+
         switch (status) {
             case active:
                 //fall through
@@ -220,8 +232,10 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     @Override
     public final void abort() {
-        if (config.logLevel == LogLevel.course) {
-            System.out.println("aborting " + config.familyName);
+        if (___LOGGING_ENABLED_ENABLED) {
+            if (config.logLevel.isLogableFrom(LogLevel.course)) {
+                System.out.println("committing " + config.familyName);
+            }
         }
 
         switch (status) {
@@ -266,10 +280,11 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     @Override
     public final void commit() {
-        if (config.logLevel == LogLevel.course) {
-            System.out.println("committing " + config.familyName);
+        if (___LOGGING_ENABLED_ENABLED) {
+            if (config.logLevel.isLogableFrom(LogLevel.course)) {
+                System.out.println("committing " + config.familyName);
+            }
         }
-
 
         switch (status) {
             case active:

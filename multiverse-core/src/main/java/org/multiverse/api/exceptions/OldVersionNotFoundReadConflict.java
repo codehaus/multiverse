@@ -35,4 +35,9 @@ public class OldVersionNotFoundReadConflict extends ReadConflict {
     public OldVersionNotFoundReadConflict(Throwable cause) {
         super(cause);
     }
+
+    @Override
+    public String getDescription() {
+        return "readconflict caused another transaction overwriting a value this transaction reads";
+    }
 }

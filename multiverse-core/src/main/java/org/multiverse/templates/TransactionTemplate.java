@@ -1,5 +1,6 @@
 package org.multiverse.templates;
 
+import org.multiverse.MultiverseConstants;
 import org.multiverse.api.*;
 import org.multiverse.api.backoff.BackoffPolicy;
 import org.multiverse.api.exceptions.*;
@@ -51,7 +52,7 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
  *
  * @author Peter Veentjer
  */
-public abstract class TransactionTemplate<E> {
+public abstract class TransactionTemplate<E> implements MultiverseConstants {
 
     private final boolean threadLocalAware;
 
@@ -86,7 +87,8 @@ public abstract class TransactionTemplate<E> {
     public TransactionTemplate(Stm stm) {
         this(stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
-                .setReadTrackingEnabled(true).build());
+                .setReadTrackingEnabled(true)
+                .build());
     }
 
     /**
@@ -314,6 +316,12 @@ public abstract class TransactionTemplate<E> {
                 tx.setAttempt(tx.getAttempt() + 1);
                 try {
                     try {
+                        if (___LOGGING_ENABLED_ENABLED) {
+                            if (tx.getConfiguration().getLogLevel().isLogableFrom(LogLevel.course)) {
+                                System.out.println("starting " + tx.getConfiguration().getFamilyName());
+                            }
+                        }
+
                         if (listener != null) {
                             tx.registerLifecycleListener(listener);
                         }
@@ -322,6 +330,12 @@ public abstract class TransactionTemplate<E> {
                         tx.commit();
                         return result;
                     } catch (Retry e) {
+                        if (___LOGGING_ENABLED_ENABLED) {
+                            if (tx.getConfiguration().getLogLevel().isLogableFrom(LogLevel.course)) {
+                                System.out.println("retrying " + tx.getConfiguration().getFamilyName());
+                            }
+                        }
+
                         if (tx.getAttempt() - 1 < tx.getConfiguration().getMaxRetries()) {
 
                             Latch latch;
@@ -365,6 +379,12 @@ public abstract class TransactionTemplate<E> {
                         }
                     }
                 } catch (SpeculativeConfigurationFailure ex) {
+                    if (___LOGGING_ENABLED_ENABLED) {
+                        if (tx.getConfiguration().getLogLevel().isLogableFrom(LogLevel.course)) {
+                            System.out.println("speculative configuration failure " + tx.getConfiguration().getFamilyName());
+                        }
+                    }
+
                     Transaction oldTransaction = tx;
                     tx = transactionFactory.start();
                     tx.setAttempt(oldTransaction.getAttempt());
@@ -374,6 +394,12 @@ public abstract class TransactionTemplate<E> {
                         setThreadLocalTransaction(tx);
                     }
                 } catch (ControlFlowError er) {
+                    if (___LOGGING_ENABLED_ENABLED) {
+                        if (tx.getConfiguration().getLogLevel().isLogableFrom(LogLevel.course)) {
+                            System.out.println(er.getDescription() + " for" + tx.getConfiguration().getFamilyName());
+                        }
+                    }
+
                     BackoffPolicy backoffPolicy = tx.getConfiguration().getBackoffPolicy();
                     backoffPolicy.delayedUninterruptible(tx);
                     tx.restart();

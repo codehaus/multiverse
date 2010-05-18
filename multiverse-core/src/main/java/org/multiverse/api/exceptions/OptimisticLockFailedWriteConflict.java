@@ -32,4 +32,9 @@ public class OptimisticLockFailedWriteConflict extends WriteConflict {
     public OptimisticLockFailedWriteConflict(Throwable cause) {
         super(cause);
     }
+
+    @Override
+    public String getDescription() {
+        return "writeconflict caused by other transaction overwriting a value, this transaction should overwrite";
+    }
 }

@@ -12,9 +12,9 @@ import org.multiverse.templates.TransactionTemplate;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 
 /**
- * DefaultTransactionalReference that fixes the Aba problem.
+ * Ref that fixes the Aba problem.
  * <p/>
- * See the DefaultTransactionalReference for more documentation about the Aba problem.
+ * See the Ref for more documentation about the Aba problem.
  *
  * @author Peter Veentjer
  */

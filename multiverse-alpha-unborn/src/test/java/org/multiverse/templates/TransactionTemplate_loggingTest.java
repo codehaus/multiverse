@@ -1,0 +1,75 @@
+package org.multiverse.templates;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.multiverse.api.LogLevel;
+import org.multiverse.api.Stm;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionFactory;
+import org.multiverse.api.programmatic.ProgrammaticReference;
+
+import static org.multiverse.TestUtils.sleepMs;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+
+/**
+ * @author Peter Veentjer
+ */
+public class TransactionTemplate_loggingTest {
+    private Stm stm;
+
+    @Before
+    public void setUp() {
+        stm = getGlobalStmInstance();
+        clearThreadLocalTransaction();
+    }
+
+    @Test
+    public void whenCourseLogging() {
+        TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+                .setLogLevel(LogLevel.course)
+                .setSpeculativeConfigurationEnabled(false)
+                .setFamilyName("loggingtransaction")
+                .build();
+
+        final ProgrammaticReference ref = stm.getProgrammaticReferenceFactoryBuilder()
+                .build()
+                .atomicCreateReference();
+
+        new TransactionTemplate(txFactory) {
+            @Override
+            public Object execute(Transaction tx) throws Exception {
+                sleepMs(1000);
+                ref.set("foo");
+                return null;
+            }
+        }.execute();
+        sleepMs(100);
+        ref.set("banana");
+    }
+
+    @Test
+    public void whenNoLogging() {
+        TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+                .setLogLevel(LogLevel.none)
+                .setFamilyName("loggingtransaction")
+                .setSpeculativeConfigurationEnabled(false)
+                .build();
+
+        final ProgrammaticReference ref = stm.getProgrammaticReferenceFactoryBuilder()
+                .build()
+                .atomicCreateReference();
+
+        new TransactionTemplate(txFactory) {
+            @Override
+            public Object execute(Transaction tx) throws Exception {
+                sleepMs(1000);
+                ref.set("foo");
+                return null;
+            }
+        }.execute();
+
+        sleepMs(100);
+        ref.set("banana");
+    }
+}
