@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Transaction;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
@@ -38,9 +38,9 @@ public class VetoCommitBarrier_vetoCommitTest {
     public void whenPendingTransactions() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
 
-        TransactionalInteger ref1 = new TransactionalInteger();
-        TransactionalInteger ref2 = new TransactionalInteger();
-        TransactionalInteger ref3 = new TransactionalInteger();
+        IntRef ref1 = new IntRef();
+        IntRef ref2 = new IntRef();
+        IntRef ref3 = new IntRef();
 
         IncThread thread1 = new IncThread(ref1, barrier);
         IncThread thread2 = new IncThread(ref2, barrier);
@@ -84,11 +84,11 @@ public class VetoCommitBarrier_vetoCommitTest {
     }
 
     public class IncThread extends TestThread {
-        private final TransactionalInteger ref;
+        private final IntRef ref;
         private final VetoCommitBarrier barrier;
         private Transaction tx;
 
-        public IncThread(TransactionalInteger ref, VetoCommitBarrier barrier) {
+        public IncThread(IntRef ref, VetoCommitBarrier barrier) {
             super("IncThread");
             this.barrier = barrier;
             this.ref = ref;

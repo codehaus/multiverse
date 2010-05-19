@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
@@ -31,8 +31,8 @@ public class VetoCommitBarrier_integrationTest {
     public void test() throws InterruptedException {
         barrier = new VetoCommitBarrier();
 
-        TransactionalInteger ref1 = new TransactionalInteger();
-        TransactionalInteger ref2 = new TransactionalInteger();
+        IntRef ref1 = new IntRef();
+        IntRef ref2 = new IntRef();
 
         CommitThread t1 = new CommitThread(1, ref1);
         CommitThread t2 = new CommitThread(2, ref2);
@@ -52,8 +52,8 @@ public class VetoCommitBarrier_integrationTest {
     public void testAbort() throws InterruptedException {
         barrier = new VetoCommitBarrier();
 
-        TransactionalInteger ref1 = new TransactionalInteger();
-        TransactionalInteger ref2 = new TransactionalInteger();
+        IntRef ref1 = new IntRef();
+        IntRef ref2 = new IntRef();
 
         CommitThread t1 = new CommitThread(1, ref1);
         t1.setPrintStackTrace(false);
@@ -73,9 +73,9 @@ public class VetoCommitBarrier_integrationTest {
     }
 
     public class CommitThread extends TestThread {
-        private TransactionalInteger ref;
+        private IntRef ref;
 
-        public CommitThread(int id, TransactionalInteger ref) {
+        public CommitThread(int id, IntRef ref) {
             super("CommitThread-" + id);
             this.ref = ref;
         }

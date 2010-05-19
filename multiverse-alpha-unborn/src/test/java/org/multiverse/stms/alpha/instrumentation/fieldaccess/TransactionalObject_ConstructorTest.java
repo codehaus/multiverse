@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -263,7 +263,7 @@ public class TransactionalObject_ConstructorTest {
 
     @Test
     public void testTransactionalObjectConstructor() {
-        TransactionalInteger intValue = new TransactionalInteger(10);
+        IntRef intValue = new IntRef(10);
 
         long version = stm.getVersion();
 
@@ -276,13 +276,13 @@ public class TransactionalObject_ConstructorTest {
     @TransactionalObject
     static class TransactionalObjectConstructor {
 
-        TransactionalInteger intValue;
+        IntRef intValue;
 
-        TransactionalObjectConstructor(TransactionalInteger intValue) {
+        TransactionalObjectConstructor(IntRef intValue) {
             this.intValue = intValue;
         }
 
-        public TransactionalInteger getIntValue() {
+        public IntRef getIntValue() {
             return intValue;
         }
     }
@@ -326,13 +326,13 @@ public class TransactionalObject_ConstructorTest {
     @TransactionalObject
     static class CreateTxObjectInConstructor {
 
-        private TransactionalInteger value;
+        private IntRef value;
 
         CreateTxObjectInConstructor(int i) {
-            this.value = new TransactionalInteger(i);
+            this.value = new IntRef(i);
         }
 
-        public TransactionalInteger getValue() {
+        public IntRef getValue() {
             return value;
         }
     }
@@ -462,7 +462,7 @@ public class TransactionalObject_ConstructorTest {
 
     @Test
     public void finalFieldIsAtomicObject() {
-        TransactionalInteger value = new TransactionalInteger(100);
+        IntRef value = new IntRef(100);
 
         long version = stm.getVersion();
 
@@ -475,9 +475,9 @@ public class TransactionalObject_ConstructorTest {
     @TransactionalObject
     static class TxObjectWithOtherTxObjectAsFinalField {
 
-        final TransactionalInteger value;
+        final IntRef value;
 
-        TxObjectWithOtherTxObjectAsFinalField(TransactionalInteger value) {
+        TxObjectWithOtherTxObjectAsFinalField(IntRef value) {
             this.value = value;
         }
     }
@@ -495,10 +495,10 @@ public class TransactionalObject_ConstructorTest {
     @TransactionalObject
     static class TxObjectWithFinalRefThatIsCreatedInsideConstructor {
 
-        final TransactionalInteger value;
+        final IntRef value;
 
         public TxObjectWithFinalRefThatIsCreatedInsideConstructor() {
-            value = new TransactionalInteger(10);
+            value = new IntRef(10);
         }
     }
 

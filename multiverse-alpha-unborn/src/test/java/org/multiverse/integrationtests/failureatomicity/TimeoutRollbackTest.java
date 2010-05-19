@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.exceptions.RetryTimeoutException;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -15,15 +15,15 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class TimeoutRollbackTest {
 
-    private TransactionalInteger modifyRef;
-    private TransactionalInteger awaitRef;
+    private IntRef modifyRef;
+    private IntRef awaitRef;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
 
-        modifyRef = new TransactionalInteger();
-        awaitRef = new TransactionalInteger();
+        modifyRef = new IntRef();
+        awaitRef = new IntRef();
     }
 
     @Test

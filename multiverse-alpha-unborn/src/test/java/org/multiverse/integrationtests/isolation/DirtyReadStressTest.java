@@ -6,7 +6,7 @@ import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.ThreadLocalTransaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
@@ -26,7 +26,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class DirtyReadStressTest {
 
-    private TransactionalInteger ref;
+    private IntRef ref;
 
     private int readCount = 5000;
     private int readThreadCount = 10;
@@ -37,7 +37,7 @@ public class DirtyReadStressTest {
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        ref = new TransactionalInteger(0);
+        ref = new IntRef(0);
     }
 
     @Test

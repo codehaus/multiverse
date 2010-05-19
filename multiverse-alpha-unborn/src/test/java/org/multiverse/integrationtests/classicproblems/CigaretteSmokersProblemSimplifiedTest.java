@@ -6,7 +6,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.multiverse.TestUtils.testIncomplete;
 import static org.multiverse.api.StmUtils.retry;
@@ -24,17 +24,17 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  * @author Peter Veentjer.
  */
 public class CigaretteSmokersProblemSimplifiedTest {
-    private TransactionalInteger tobacco;
-    private TransactionalInteger paper;
-    private TransactionalInteger match;
+    private IntRef tobacco;
+    private IntRef paper;
+    private IntRef match;
     private int cigarettesToSmoke = 10 * 1000 * 1000;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        tobacco = new TransactionalInteger(0);
-        paper = new TransactionalInteger(0);
-        match = new TransactionalInteger(0);
+        tobacco = new IntRef(0);
+        paper = new IntRef(0);
+        match = new IntRef(0);
     }
 
     @After
@@ -55,9 +55,9 @@ public class CigaretteSmokersProblemSimplifiedTest {
     }
 
     class SmokerThread extends TestThread {
-        private TransactionalInteger resource;
+        private IntRef resource;
 
-        public SmokerThread(String name, TransactionalInteger resource) {
+        public SmokerThread(String name, IntRef resource) {
             super(name);
 
             this.resource = resource;

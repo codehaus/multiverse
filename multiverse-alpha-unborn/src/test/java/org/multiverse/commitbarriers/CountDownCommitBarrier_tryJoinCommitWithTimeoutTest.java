@@ -8,7 +8,7 @@ import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Transaction;
 import org.multiverse.stms.AbstractTransactionImpl;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import java.util.concurrent.TimeUnit;
 
@@ -89,7 +89,7 @@ public class CountDownCommitBarrier_tryJoinCommitWithTimeoutTest {
     public void whenCommittedWhileWaiting() throws InterruptedException {
         barrier = new CountDownCommitBarrier(2);
 
-        final TransactionalInteger ref = new TransactionalInteger();
+        final IntRef ref = new IntRef();
 
         TestThread t = new TestThread() {
             @TransactionalMethod

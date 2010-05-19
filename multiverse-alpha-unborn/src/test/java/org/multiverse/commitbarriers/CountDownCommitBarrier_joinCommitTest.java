@@ -9,7 +9,7 @@ import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.stms.AbstractTransactionImpl;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
@@ -67,7 +67,7 @@ public class CountDownCommitBarrier_joinCommitTest {
     public void whenAbortedWhileWaiting() throws InterruptedException {
         barrier = new CountDownCommitBarrier(2);
 
-        final TransactionalInteger ref = new TransactionalInteger();
+        final IntRef ref = new IntRef();
 
         TestThread t = new TestThread() {
             @Override
@@ -113,7 +113,7 @@ public class CountDownCommitBarrier_joinCommitTest {
     public void whenInterruptedWhileWaiting() throws InterruptedException {
         barrier = new CountDownCommitBarrier(2);
 
-        final TransactionalInteger ref = new TransactionalInteger();
+        final IntRef ref = new IntRef();
 
         TestThread t = new TestThread() {
             @Override

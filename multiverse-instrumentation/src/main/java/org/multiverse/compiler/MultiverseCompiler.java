@@ -42,7 +42,7 @@ public final class MultiverseCompiler {
 
         Instrumentor instrumentor = createInstrumentor(cli.instrumentorName);
         File targetDirectory = new File(cli.targetDirectory);
-        compilerClassLoader = new MyClassLoader(targetDirectory, MultiverseCompiler.class.getClassLoader());
+        compilerClassLoader = new DummyClassLoader(targetDirectory, MultiverseCompiler.class.getClassLoader());
 
         if (!targetDirectory.isDirectory()) {
             println("Multiverse: Target directory '%s' is not found, skipping instrumentation", targetDirectory);
@@ -53,7 +53,7 @@ public final class MultiverseCompiler {
         instrumentor.setOptimize(cli.optimize);
 
         if (cli.dumpBytecode) {
-            println("Multiverse: Bytecode is to dumped %s for debugging purposes", instrumentor.getDumpDirectory());
+            println("Multiverse: Bytecode is dumped to %s", instrumentor.getDumpDirectory());
             instrumentor.setDumpBytecode(true);
         }
 
@@ -61,13 +61,13 @@ public final class MultiverseCompiler {
             instrumentor.setLog(new SystemOutImportantInstrumenterLogger());
         }
 
-        println("Multiverse: Using org.multiverse.instrumentation.Instrumentor %s version %s",
-                instrumentor.getInstrumentorName(),
-                instrumentor.getInstrumentorVersion());
+        println("Multiverse: Using org.multiverse.instrumentation.Instrumentor %s-%s",
+                instrumentor.getName(),
+                instrumentor.getVersion());
 
         instrumentor.setFiler(new FileSystemFiler(targetDirectory));
 
-        println("Multiverse: Multiverse Compiler started successfully");
+        println("Multiverse: Compiler started successfully");
         println("Multiverse: Instrumenting targetDirectory %s", targetDirectory);
 
         applyRecursive(targetDirectory, instrumentor);
@@ -111,10 +111,10 @@ public final class MultiverseCompiler {
         return clazz;
     }
 
-    class MyClassLoader extends ClassLoader {
+    class DummyClassLoader extends ClassLoader {
         private final File rootDirectory;
 
-        protected MyClassLoader(File rootDirectory, ClassLoader parent) {
+        protected DummyClassLoader(File rootDirectory, ClassLoader parent) {
             super(parent);
             this.rootDirectory = rootDirectory;
         }
@@ -167,8 +167,6 @@ public final class MultiverseCompiler {
     }
 
     private static Instrumentor createInstrumentor(String compilerClassName) {
-        println(format("Multiverse: using Instrumentor '%s'", compilerClassName));
-
         Constructor constructor = getMethod(compilerClassName);
         try {
             return (Instrumentor) constructor.newInstance();

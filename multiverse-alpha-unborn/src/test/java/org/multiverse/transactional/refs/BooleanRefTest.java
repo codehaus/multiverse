@@ -1,4 +1,4 @@
-package org.multiverse.transactional.primitives;
+package org.multiverse.transactional.refs;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public class TransactionalBooleanTest {
+public class BooleanRefTest {
     private Stm stm;
 
     @Before
@@ -20,19 +20,19 @@ public class TransactionalBooleanTest {
 
     @Test
     public void constructorWithNoArg() {
-        TransactionalBoolean ref = new TransactionalBoolean();
+        BooleanRef ref = new BooleanRef();
         assertFalse(ref.get());
     }
 
     @Test
     public void constructorWithSingleArg() {
-        assertTrue(new TransactionalBoolean(true).get());
-        assertFalse(new TransactionalBoolean(false).get());
+        assertTrue(new BooleanRef(true).get());
+        assertFalse(new BooleanRef(false).get());
     }
 
     @Test
     public void set() {
-        TransactionalCharacter ref = new TransactionalCharacter((char) 10);
+        CharRef ref = new CharRef((char) 10);
         long old = ref.set((char) 100);
         assertEquals((char) 10, old);
         assertEquals((char) 100, ref.get());
@@ -40,9 +40,9 @@ public class TransactionalBooleanTest {
 
     @Test
     public void testEquals() {
-        TransactionalBoolean ref1 = new TransactionalBoolean(true);
-        TransactionalBoolean ref2 = new TransactionalBoolean(true);
-        TransactionalBoolean ref3 = new TransactionalBoolean(false);
+        BooleanRef ref1 = new BooleanRef(true);
+        BooleanRef ref2 = new BooleanRef(true);
+        BooleanRef ref3 = new BooleanRef(false);
 
         assertFalse(ref1.equals(null));
         assertFalse(ref1.equals(""));
@@ -55,20 +55,20 @@ public class TransactionalBooleanTest {
 
     @Test
     public void testHashCode() {
-        assertEquals(1, new TransactionalBoolean(true).hashCode());
-        assertEquals(0, new TransactionalBoolean(false).hashCode());
+        assertEquals(1, new BooleanRef(true).hashCode());
+        assertEquals(0, new BooleanRef(false).hashCode());
     }
 
     @Test
     public void testToString() {
-        assertEquals("TransactionalBoolean(value=true)", new TransactionalBoolean(true).toString());
-        assertEquals("TransactionalBoolean(value=false)", new TransactionalBoolean(false).toString());
+        assertEquals("BooleanRef(value=true)", new BooleanRef(true).toString());
+        assertEquals("BooleanRef(value=false)", new BooleanRef(false).toString());
     }
 
     @Test
     public void testAtomic() {
-        TransactionalBoolean ref1 = new TransactionalBoolean(true);
-        TransactionalBoolean ref2 = new TransactionalBoolean(false);
+        BooleanRef ref1 = new BooleanRef(true);
+        BooleanRef ref2 = new BooleanRef(false);
 
         try {
             flipButAbort(ref1, ref2);
@@ -81,8 +81,8 @@ public class TransactionalBooleanTest {
     }
 
     @TransactionalMethod
-    public void flipButAbort(TransactionalBoolean... refs) {
-        for (TransactionalBoolean ref : refs) {
+    public void flipButAbort(BooleanRef... refs) {
+        for (BooleanRef ref : refs) {
             ref.set(!ref.get());
         }
 

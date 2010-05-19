@@ -44,4 +44,9 @@ public class LockNotFreeReadConflict extends ReadConflict {
     public LockNotFreeReadConflict(Throwable cause) {
         super(cause);
     }
+
+    @Override
+    public String getDescription() {
+        return "readconflict caused by a lock that was not free";
+    }
 }

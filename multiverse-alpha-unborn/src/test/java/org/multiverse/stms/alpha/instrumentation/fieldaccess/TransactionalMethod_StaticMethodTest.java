@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.stms.alpha.AlphaStm;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -81,8 +81,8 @@ public class TransactionalMethod_StaticMethodTest {
 
     @Test
     public void atomicObjectsArePassedToStaticMethod() {
-        TransactionalInteger a = new TransactionalInteger(10);
-        TransactionalInteger b = new TransactionalInteger(20);
+        IntRef a = new IntRef(10);
+        IntRef b = new IntRef(20);
 
         long version = stm.getVersion();
         swap(a, b);
@@ -92,7 +92,7 @@ public class TransactionalMethod_StaticMethodTest {
     }
 
     @TransactionalMethod
-    public static void swap(TransactionalInteger a, TransactionalInteger b) {
+    public static void swap(IntRef a, IntRef b) {
         int oldA = a.get();
         a.set(b.get());
         b.set(oldA);

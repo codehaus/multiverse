@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.transactional.primitives.TransactionalLong;
+import org.multiverse.transactional.refs.LongRef;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -20,7 +20,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class ReadConsistencyStressTest {
     private int refCount = 1000;
-    private TransactionalLong[] refs;
+    private LongRef[] refs;
     private final AtomicBoolean shutdown = new AtomicBoolean();
     private int readerCount = 10;
     private int writerCount = 2;
@@ -30,9 +30,9 @@ public class ReadConsistencyStressTest {
     public void setUp() {
         clearThreadLocalTransaction();
 
-        refs = new TransactionalLong[refCount];
+        refs = new LongRef[refCount];
         for (int k = 0; k < refs.length; k++) {
-            refs[k] = new TransactionalLong();
+            refs[k] = new LongRef();
         }
 
         shutdown.set(false);
@@ -77,7 +77,7 @@ public class ReadConsistencyStressTest {
 
         @TransactionalMethod(readonly = false)
         private void write() {
-            for (TransactionalLong ref : refs) {
+            for (LongRef ref : refs) {
                 ref.inc();
             }
         }

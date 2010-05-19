@@ -10,7 +10,7 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 
 /**
  * An Transactional array. The elements in the array are of type
- * {@link org.multiverse.transactional.TransactionalReference}. The elements are created eagerly. In the future some
+ * {@link org.multiverse.transactional.refs.Ref}. The elements are created eagerly. In the future some
  * kind of lazy creation mechanism will be added as well, but for the time being this is the simplest solution.
  * <p/>
  * Just as with normal arrays, the length of the TransactionalReferenceArray can't change after

@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.exceptions.TooManyRetriesException;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -17,16 +17,16 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  * @author Peter Veentjer
  */
 public class TooManyRetriesRollbackTest {
-    private TransactionalInteger modifyRef;
-    private TransactionalInteger retryRef;
+    private IntRef modifyRef;
+    private IntRef retryRef;
     private volatile boolean finished;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
 
-        modifyRef = new TransactionalInteger();
-        retryRef = new TransactionalInteger();
+        modifyRef = new IntRef();
+        retryRef = new IntRef();
         finished = false;
     }
 

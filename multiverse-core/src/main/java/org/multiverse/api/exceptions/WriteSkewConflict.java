@@ -31,4 +31,9 @@ public class WriteSkewConflict extends WriteConflict {
     public WriteSkewConflict(String message, Throwable cause) {
         super(message, cause);
     }
+
+    @Override
+    public String getDescription() {
+        return "writeconflict caused by the writeskew problem";
+    }
 }

@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.exceptions.RetryTimeoutException;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.joinAll;
@@ -17,12 +17,12 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class NotificationTimeoutTest {
 
-    private TransactionalInteger ref;
+    private IntRef ref;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        ref = new TransactionalInteger();
+        ref = new IntRef();
     }
 
     @Test

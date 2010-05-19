@@ -17,18 +17,18 @@ public interface Instrumentor {
      * purpuses.
      *
      * @return the name of this Instrumentor.
-     * @see #getInstrumentorVersion()
+     * @see #getVersion()
      */
-    String getInstrumentorName();
+    String getName();
 
     /**
      * Returns the version of this Instrumentor. Needed for identification and
      * logging purposes.
      *
      * @return the version of this Instrumentor.
-     * @see #getInstrumentorName()
+     * @see #getName()
      */
-    String getInstrumentorVersion();
+    String getVersion();
 
     /**
      * Returns the name of the Stm this Instrumentor is going to do the instrumentation

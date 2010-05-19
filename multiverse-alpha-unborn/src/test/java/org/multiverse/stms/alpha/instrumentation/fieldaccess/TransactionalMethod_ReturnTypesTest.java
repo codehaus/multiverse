@@ -87,7 +87,7 @@ public class TransactionalMethod_ReturnTypesTest {
         }
     }
 
-    // =================== primitives =========================
+    // =================== refs =========================
 
     @Test
     public void booleanReturningMethod() {

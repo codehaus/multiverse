@@ -54,7 +54,8 @@ public class UncommittedReadConflict extends ReadConflict {
         super(cause);
     }
 
-    public static Exception create() {
-        return null;  //To change body of created methods use File | Settings | File Templates.
+    @Override
+    public String getDescription() {
+        return "readconflict caused by reading an uncommitted value";
     }
 }

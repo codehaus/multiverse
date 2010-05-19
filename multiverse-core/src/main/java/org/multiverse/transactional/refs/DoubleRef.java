@@ -1,4 +1,4 @@
-package org.multiverse.transactional.primitives;
+package org.multiverse.transactional.refs;
 
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
@@ -13,15 +13,15 @@ import static org.multiverse.api.StmUtils.retry;
  * @author Peter Veentjer.
  */
 @TransactionalObject
-public final class TransactionalDouble {
+public final class DoubleRef {
 
     private double value;
 
-    public TransactionalDouble() {
+    public DoubleRef() {
         this((double) 0);
     }
 
-    public TransactionalDouble(double value) {
+    public DoubleRef(double value) {
         this.value = value;
     }
 
@@ -71,7 +71,7 @@ public final class TransactionalDouble {
 
     @TransactionalMethod(readonly = true)
     public String toString() {
-        return format("TransactionalDouble(value=%s)", value);
+        return format("DoubleRef(value=%s)", value);
     }
 
     @TransactionalMethod(readonly = true)
@@ -86,11 +86,11 @@ public final class TransactionalDouble {
             return true;
         }
 
-        if (!(thatobj instanceof TransactionalDouble)) {
+        if (!(thatobj instanceof DoubleRef)) {
             return false;
         }
 
-        TransactionalDouble that = (TransactionalDouble) thatobj;
+        DoubleRef that = (DoubleRef) thatobj;
         return doubleToLongBits(this.value) == doubleToLongBits(that.value);
     }
 }

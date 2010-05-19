@@ -24,4 +24,9 @@ public class Retry extends ControlFlowError {
             return new Retry();
         }
     }
+
+    @Override
+    public String getDescription() {
+        return "retry";
+    }
 }

@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.stms.alpha.AlphaStm;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import java.io.FileNotFoundException;
 
@@ -44,7 +44,7 @@ public class TransactionalMethod_ExceptionsTest {
     public static class CheckedExceptionIsPropagated {
 
         Exception exception;
-        TransactionalInteger ref = new TransactionalInteger(0);
+        IntRef ref = new IntRef(0);
 
         @TransactionalMethod
         public void doIt() throws Exception {
@@ -76,7 +76,7 @@ public class TransactionalMethod_ExceptionsTest {
     public static class RuntimeExceptionIsPropagated {
 
         RuntimeException exception;
-        TransactionalInteger ref = new TransactionalInteger(0);
+        IntRef ref = new IntRef(0);
 
         @TransactionalMethod
         public void doIt() {

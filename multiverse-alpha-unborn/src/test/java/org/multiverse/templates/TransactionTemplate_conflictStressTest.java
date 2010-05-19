@@ -7,7 +7,7 @@ import org.multiverse.TestThread;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
@@ -31,7 +31,7 @@ public class TransactionTemplate_conflictStressTest {
     private int transactionsPerThread = 500 * 1000;
     private int refCount = 40;
 
-    private TransactionalInteger[] refs;
+    private IntRef[] refs;
     private Stm stm;
     private IncThread[] threads;
 
@@ -40,9 +40,9 @@ public class TransactionTemplate_conflictStressTest {
         stm = getGlobalStmInstance();
         clearThreadLocalTransaction();
 
-        refs = new TransactionalInteger[refCount];
+        refs = new IntRef[refCount];
         for (int k = 0; k < refCount; k++) {
-            refs[k] = new TransactionalInteger();
+            refs[k] = new IntRef();
         }
 
         threads = new IncThread[threadCount];
@@ -58,7 +58,7 @@ public class TransactionTemplate_conflictStressTest {
 
     private int sum() {
         int sum = 0;
-        for (TransactionalInteger ref : refs) {
+        for (IntRef ref : refs) {
             sum += ref.get();
         }
         return sum;

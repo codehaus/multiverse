@@ -1,4 +1,4 @@
-package org.multiverse.transactional;
+package org.multiverse.transactional.refs;
 
 import org.junit.After;
 import org.junit.Before;
@@ -15,7 +15,7 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
 /**
  * @author Peter Veentjer
  */
-public final class DefaultTransactionalReferenceTest {
+public final class SimpleRefTest {
 
     private Stm stm;
     private TransactionFactory txFactory;
@@ -42,7 +42,7 @@ public final class DefaultTransactionalReferenceTest {
         Transaction tx = txFactory.start();
         setThreadLocalTransaction(tx);
 
-        DefaultTransactionalReference ref = new DefaultTransactionalReference();
+        SimpleRef ref = new SimpleRef();
 
         tx.commit();
         assertEquals(version, stm.getVersion());
@@ -59,7 +59,7 @@ public final class DefaultTransactionalReferenceTest {
     }
 
     public void rollback(String initialValue, String newValue) {
-        DefaultTransactionalReference<String> ref = new DefaultTransactionalReference<String>(initialValue);
+        SimpleRef<String> ref = new SimpleRef<String>(initialValue);
 
         long version = stm.getVersion();
 
@@ -81,7 +81,7 @@ public final class DefaultTransactionalReferenceTest {
     public void noArgConstruction() {
         long version = stm.getVersion();
 
-        DefaultTransactionalReference<String> ref = new DefaultTransactionalReference<String>();
+        SimpleRef<String> ref = new SimpleRef<String>();
 
         assertEquals(version, stm.getVersion());
         assertNull(ref.get());
@@ -91,7 +91,7 @@ public final class DefaultTransactionalReferenceTest {
     public void nullConstruction() {
         long version = stm.getVersion();
 
-        DefaultTransactionalReference<String> ref = new DefaultTransactionalReference<String>();
+        SimpleRef<String> ref = new SimpleRef<String>();
 
         assertEquals(version, stm.getVersion());
         assertNull(ref.get());
@@ -101,7 +101,7 @@ public final class DefaultTransactionalReferenceTest {
     public void nonNullConstruction() {
         long version = stm.getVersion();
         String s = "foo";
-        DefaultTransactionalReference<String> ref = new DefaultTransactionalReference<String>(s);
+        SimpleRef<String> ref = new SimpleRef<String>(s);
 
         assertEquals(version, stm.getVersion());
         assertEquals(s, ref.get());
@@ -109,7 +109,7 @@ public final class DefaultTransactionalReferenceTest {
 
     @Test
     public void testIsNull() {
-        DefaultTransactionalReference<String> ref = new DefaultTransactionalReference<String>();
+        SimpleRef<String> ref = new SimpleRef<String>();
 
         long version = stm.getVersion();
         assertTrue(ref.isNull());
@@ -124,7 +124,7 @@ public final class DefaultTransactionalReferenceTest {
 
     @Test
     public void testSetFromNullToNull() {
-        DefaultTransactionalReference<String> ref = new DefaultTransactionalReference<String>();
+        SimpleRef<String> ref = new SimpleRef<String>();
 
         long version = stm.getVersion();
         String result = ref.set(null);
@@ -135,7 +135,7 @@ public final class DefaultTransactionalReferenceTest {
 
     @Test
     public void testSetFromNullToNonNull() {
-        DefaultTransactionalReference<String> ref = new DefaultTransactionalReference<String>();
+        SimpleRef<String> ref = new SimpleRef<String>();
 
         long version = stm.getVersion();
         String newRef = "foo";
@@ -148,7 +148,7 @@ public final class DefaultTransactionalReferenceTest {
     @Test
     public void testSetFromNonNullToNull() {
         String oldRef = "foo";
-        DefaultTransactionalReference<String> ref = new DefaultTransactionalReference<String>(oldRef);
+        SimpleRef<String> ref = new SimpleRef<String>(oldRef);
 
         long version = stm.getVersion();
 
@@ -162,7 +162,7 @@ public final class DefaultTransactionalReferenceTest {
     public void testSetChangedReferenced() {
         String oldRef = "foo";
 
-        DefaultTransactionalReference<String> ref = new DefaultTransactionalReference<String>(oldRef);
+        SimpleRef<String> ref = new SimpleRef<String>(oldRef);
 
         long version = stm.getVersion();
 
@@ -177,7 +177,7 @@ public final class DefaultTransactionalReferenceTest {
     public void testSetUnchangedReferences() {
         String oldRef = "foo";
 
-        DefaultTransactionalReference<String> ref = new DefaultTransactionalReference<String>(oldRef);
+        SimpleRef<String> ref = new SimpleRef<String>(oldRef);
 
         long version = stm.getVersion();
 
@@ -191,7 +191,7 @@ public final class DefaultTransactionalReferenceTest {
     public void testSetEqualIsNotUsedButReferenceEquality() {
         String oldRef = new String("foo");
 
-        DefaultTransactionalReference<String> ref = new DefaultTransactionalReference<String>(oldRef);
+        SimpleRef<String> ref = new SimpleRef<String>(oldRef);
 
         long version = stm.getVersion();
 
@@ -205,7 +205,7 @@ public final class DefaultTransactionalReferenceTest {
     @Test
     public void testSetAndUnsetIsNotSeenAsChange() {
         String oldRef = "foo";
-        DefaultTransactionalReference<String> ref = new DefaultTransactionalReference<String>(oldRef);
+        SimpleRef<String> ref = new SimpleRef<String>(oldRef);
 
         long version = stm.getVersion();
         Transaction tx = stm.getTransactionFactoryBuilder()
@@ -227,7 +227,7 @@ public final class DefaultTransactionalReferenceTest {
     public void getOrAwaitCompletesIfRefNotNull() {
         String oldRef = "foo";
 
-        DefaultTransactionalReference<String> ref = new DefaultTransactionalReference<String>(oldRef);
+        SimpleRef<String> ref = new SimpleRef<String>(oldRef);
 
         long version = stm.getVersion();
 
@@ -238,7 +238,7 @@ public final class DefaultTransactionalReferenceTest {
 
     @Test
     public void getOrAwaitRetriesIfNull() {
-        DefaultTransactionalReference<String> ref = new DefaultTransactionalReference<String>();
+        SimpleRef<String> ref = new SimpleRef<String>();
 
         long version = stm.getVersion();
 

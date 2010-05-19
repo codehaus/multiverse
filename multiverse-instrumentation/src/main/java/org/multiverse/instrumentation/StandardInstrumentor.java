@@ -66,12 +66,12 @@ public class StandardInstrumentor implements Instrumentor {
     }
 
     @Override
-    public String getInstrumentorName() {
+    public String getName() {
         return compilerName;
     }
 
     @Override
-    public String getInstrumentorVersion() {
+    public String getVersion() {
         return compilerVersion;
     }
 

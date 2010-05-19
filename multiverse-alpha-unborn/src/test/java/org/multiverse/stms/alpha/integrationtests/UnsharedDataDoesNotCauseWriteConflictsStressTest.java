@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.stms.alpha.AlphaStm;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import java.util.concurrent.TimeUnit;
 
@@ -18,7 +18,7 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
 public class UnsharedDataDoesNotCauseWriteConflictsStressTest {
 
     private AlphaStm stm;
-    private TransactionalInteger[] refs;
+    private IntRef[] refs;
     private int threadCount = Runtime.getRuntime().availableProcessors() * 4;
     private int updateCountPerThread = 2 * 1000 * 1000;
 
@@ -50,9 +50,9 @@ public class UnsharedDataDoesNotCauseWriteConflictsStressTest {
     }
 
     private void createValues() {
-        refs = new TransactionalInteger[threadCount];
+        refs = new IntRef[threadCount];
         for (int k = 0; k < threadCount; k++) {
-            refs[k] = new TransactionalInteger(0);
+            refs[k] = new IntRef(0);
         }
     }
 
@@ -84,7 +84,7 @@ public class UnsharedDataDoesNotCauseWriteConflictsStressTest {
 
         @TransactionalMethod
         private void doIt() {
-            TransactionalInteger ref = refs[id];
+            IntRef ref = refs[id];
             ref.inc();
         }
     }

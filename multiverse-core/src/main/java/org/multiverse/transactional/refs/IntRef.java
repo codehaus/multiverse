@@ -1,4 +1,4 @@
-package org.multiverse.transactional.primitives;
+package org.multiverse.transactional.refs;
 
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
@@ -12,23 +12,23 @@ import static org.multiverse.api.StmUtils.retry;
  * @author Peter Veentjer
  */
 @TransactionalObject
-public final class TransactionalInteger {
+public final class IntRef {
 
     private int value;
 
     /**
-     * Creates a new TransactionalInteger with the 0 as value.
+     * Creates a new IntRef with the 0 as value.
      */
-    public TransactionalInteger() {
+    public IntRef() {
         this(0);
     }
 
     /**
-     * Creates a new TransactionalInteger with the given value.
+     * Creates a new IntRef with the given value.
      *
-     * @param value the initial value of this TransactionalInteger.
+     * @param value the initial value of this IntRef.
      */
-    public TransactionalInteger(int value) {
+    public IntRef(int value) {
         this.value = value;
     }
 
@@ -55,7 +55,7 @@ public final class TransactionalInteger {
     }
 
     /**
-     * Decreases the value in this TransactionalInteger by one.
+     * Decreases the value in this IntRef by one.
      *
      * @return the decreased value.
      */
@@ -65,7 +65,7 @@ public final class TransactionalInteger {
     }
 
     /**
-     * Increases the value in this TransactionalInteger by one.
+     * Increases the value in this IntRef by one.
      *
      * @return the increased value.
      */
@@ -75,7 +75,7 @@ public final class TransactionalInteger {
     }
 
     /**
-     * Increase the value of this TransactionalInteger by the given amount.
+     * Increase the value of this IntRef by the given amount.
      *
      * @param amount the amount the value needs to be increased with. Value is allowed to be 0 or negative.
      * @return the increased value.
@@ -86,7 +86,7 @@ public final class TransactionalInteger {
     }
 
     /**
-     * Decreases the value of this TransactionalInteger by the given amount.
+     * Decreases the value of this IntRef by the given amount.
      *
      * @param amount the amount the value needs to be decreased with. Value is allowed to be 0 or negative.
      * @return the decreased value.
@@ -167,7 +167,7 @@ public final class TransactionalInteger {
 
     @TransactionalMethod(readonly = true)
     public String toString() {
-        return format("TransactionalInteger(value=%s)", value);
+        return format("IntRef(value=%s)", value);
     }
 
     @TransactionalMethod(readonly = true)
@@ -181,11 +181,11 @@ public final class TransactionalInteger {
             return true;
         }
 
-        if (!(thatObj instanceof TransactionalInteger)) {
+        if (!(thatObj instanceof IntRef)) {
             return false;
         }
 
-        TransactionalInteger that = (TransactionalInteger) thatObj;
+        IntRef that = (IntRef) thatObj;
         return that.value == this.value;
     }
 }

@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -124,7 +124,7 @@ public class TransactionalObject_ChainOfFieldTest {
 
     @Test
     public void fieldOfTypeTxObjectIsNotNull() {
-        TransactionalInteger ref = new TransactionalInteger(1);
+        IntRef ref = new IntRef(1);
         FieldWithOtherTypeTxObject o = new FieldWithOtherTypeTxObject(null);
 
         assertNull(o.getRef());
@@ -133,7 +133,7 @@ public class TransactionalObject_ChainOfFieldTest {
     @Test
     public void fieldOfTypeAtomicObjectThatIsNull() {
         //force the load of the intref, will be fixed in the future.
-        TransactionalInteger ref = new TransactionalInteger(0);
+        IntRef ref = new IntRef(0);
 
         FieldWithOtherTypeTxObject o = new FieldWithOtherTypeTxObject(ref);
 
@@ -144,17 +144,17 @@ public class TransactionalObject_ChainOfFieldTest {
 
     @TransactionalObject
     private static class FieldWithOtherTypeTxObject {
-        private TransactionalInteger ref;
+        private IntRef ref;
 
-        private FieldWithOtherTypeTxObject(TransactionalInteger ref) {
+        private FieldWithOtherTypeTxObject(IntRef ref) {
             this.ref = ref;
         }
 
-        public TransactionalInteger getRef() {
+        public IntRef getRef() {
             return ref;
         }
 
-        public void setRef(TransactionalInteger ref) {
+        public void setRef(IntRef ref) {
             this.ref = ref;
         }
 

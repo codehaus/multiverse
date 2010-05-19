@@ -1,4 +1,4 @@
-package org.multiverse.transactional.primitives;
+package org.multiverse.transactional.refs;
 
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
@@ -8,11 +8,11 @@ import static java.lang.Double.doubleToLongBits;
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public class TransactionalDoubleTest {
+public class DoubleRefTest {
 
     @Test
     public void constructorWithNoArg() {
-        TransactionalDouble ref = new TransactionalDouble();
+        DoubleRef ref = new DoubleRef();
         assertDoubleEquals(0, ref.get());
     }
 
@@ -22,13 +22,13 @@ public class TransactionalDoubleTest {
 
     @Test
     public void constructorWithSingleArg() {
-        TransactionalDouble ref = new TransactionalDouble(10);
+        DoubleRef ref = new DoubleRef(10);
         assertDoubleEquals(10, ref.get());
     }
 
     @Test
     public void set() {
-        TransactionalDouble ref = new TransactionalDouble();
+        DoubleRef ref = new DoubleRef();
         double old = ref.set(100);
         assertDoubleEquals(0, old);
         assertDoubleEquals(100, ref.get());
@@ -36,7 +36,7 @@ public class TransactionalDoubleTest {
 
     @Test
     public void testInc() {
-        TransactionalDouble ref = new TransactionalDouble(100);
+        DoubleRef ref = new DoubleRef(100);
 
         assertDoubleEquals(101, ref.inc());
         assertDoubleEquals(101, ref.get());
@@ -50,7 +50,7 @@ public class TransactionalDoubleTest {
 
     @Test
     public void testDec() {
-        TransactionalDouble ref = new TransactionalDouble(100);
+        DoubleRef ref = new DoubleRef(100);
 
         assertDoubleEquals(99, ref.dec());
         assertDoubleEquals(99, ref.get());
@@ -65,9 +65,9 @@ public class TransactionalDoubleTest {
 
     @Test
     public void testEquals() {
-        TransactionalDouble ref1 = new TransactionalDouble(10);
-        TransactionalDouble ref2 = new TransactionalDouble(10);
-        TransactionalDouble ref3 = new TransactionalDouble(20);
+        DoubleRef ref1 = new DoubleRef(10);
+        DoubleRef ref2 = new DoubleRef(10);
+        DoubleRef ref3 = new DoubleRef(20);
 
         assertFalse(ref1.equals(null));
         assertFalse(ref1.equals(""));
@@ -80,19 +80,19 @@ public class TransactionalDoubleTest {
 
     @Test
     public void testHashCode() {
-        assertEquals(new Double(100).hashCode(), new TransactionalDouble(100).hashCode());
-        assertEquals(new Double(10).hashCode(), new TransactionalDouble(10).hashCode());
+        assertEquals(new Double(100).hashCode(), new DoubleRef(100).hashCode());
+        assertEquals(new Double(10).hashCode(), new DoubleRef(10).hashCode());
     }
 
     @Test
     public void testToString() {
-        assertEquals("TransactionalDouble(value=10.0)", new TransactionalDouble(10).toString());
+        assertEquals("DoubleRef(value=10.0)", new DoubleRef(10).toString());
     }
 
     @Test
     public void testAtomic() {
-        TransactionalDouble ref1 = new TransactionalDouble(10);
-        TransactionalDouble ref2 = new TransactionalDouble(20);
+        DoubleRef ref1 = new DoubleRef(10);
+        DoubleRef ref2 = new DoubleRef(20);
 
         try {
             incButAbort(ref1, ref2);
@@ -106,8 +106,8 @@ public class TransactionalDoubleTest {
     }
 
     @TransactionalMethod
-    public void incButAbort(TransactionalDouble... refs) {
-        for (TransactionalDouble ref : refs) {
+    public void incButAbort(DoubleRef... refs) {
+        for (DoubleRef ref : refs) {
             ref.inc();
         }
 

@@ -1,4 +1,4 @@
-package org.multiverse.transactional;
+package org.multiverse.transactional.refs;
 
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
@@ -7,35 +7,31 @@ import static java.lang.String.format;
 import static org.multiverse.api.StmUtils.retry;
 
 /**
- * Default {@link TransactionalReference}. Changes on primitives are atomic and consistent,
- * but not completely because a transaction could suffer from the ABA problem between transactions.
- * See the {@link TransactionalAbaReference} to solve this problem.
- * <p/>
- * It depends on the STM implementation if the ABA problem can occur btw. If the readset also
- * is included in the conflict detection, then the ABA problem can't occur.
+ * Default {@link org.multiverse.transactional.refs.Ref}. Changes on refs are atomic and consistent. In most cases this is the
+ * Ref implementation you want to use.
  *
  * @author Peter Veentjer
  */
 @TransactionalObject
-public final class DefaultTransactionalReference<E> implements TransactionalReference<E> {
+public final class SimpleRef<E> implements Ref<E> {
 
     private E value;
 
     /**
-     * Creates a DefaultTransactionalReference with a null reference.
+     * Creates a SimpleRef with a null reference.
      */
-    public DefaultTransactionalReference() {
+    public SimpleRef() {
         this(null);
     }
 
 
     /**
-     * Creates a new DefaultTransactionalReference with the provided reference. This reference is allowed to
+     * Creates a new SimpleRef with the provided reference. This reference is allowed to
      * be null.
      *
-     * @param value the reference to store in this DefaultTransactionalReference.
+     * @param value the reference to store in this SimpleRef.
      */
-    public DefaultTransactionalReference(E value) {
+    public SimpleRef(E value) {
         this.value = value;
     }
 
@@ -74,16 +70,15 @@ public final class DefaultTransactionalReference<E> implements TransactionalRefe
     @Override
     @TransactionalMethod(trackReads = true)
     public E set(E newValue) {
-        E currentValue = value;
+        E initialValue = value;
 
         //optimization to prevent loading the object if not needed.
-        if (currentValue == newValue) {
+        if (initialValue == newValue) {
             return newValue;
         }
 
-        E oldRef = currentValue;
         value = newValue;
-        return oldRef;
+        return initialValue;
     }
 
     @Override
@@ -95,9 +90,9 @@ public final class DefaultTransactionalReference<E> implements TransactionalRefe
     @TransactionalMethod(readonly = true)
     public String toString() {
         if (value == null) {
-            return "DefaultTransactionalReference(ref=null)";
+            return "SimpleRef(ref=null)";
         } else {
-            return format("DefaultTransactionalReference(ref=%s)", value);
+            return format("SimpleRef(ref=%s)", value);
         }
     }
 }

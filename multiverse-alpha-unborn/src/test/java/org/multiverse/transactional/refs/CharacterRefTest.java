@@ -1,4 +1,4 @@
-package org.multiverse.transactional.primitives;
+package org.multiverse.transactional.refs;
 
 import org.junit.Test;
 import org.multiverse.TestThread;
@@ -9,23 +9,23 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public class TransactionalCharacterTest {
+public class CharacterRefTest {
 
     @Test
     public void constructorWithNoArg() {
-        TransactionalCharacter ref = new TransactionalCharacter();
+        CharRef ref = new CharRef();
         assertEquals(0, ref.get());
     }
 
     @Test
     public void constructorWithSingleArg() {
-        TransactionalCharacter ref = new TransactionalCharacter((char) 10);
+        CharRef ref = new CharRef((char) 10);
         assertEquals((char) 10, ref.get());
     }
 
     @Test
     public void set() {
-        TransactionalCharacter ref = new TransactionalCharacter((char) 10);
+        CharRef ref = new CharRef((char) 10);
         long old = ref.set((char) 100);
         assertEquals((char) 10, old);
         assertEquals((char) 100, ref.get());
@@ -33,7 +33,7 @@ public class TransactionalCharacterTest {
 
     @Test
     public void testInc() {
-        TransactionalCharacter ref = new TransactionalCharacter((char) 100);
+        CharRef ref = new CharRef((char) 100);
 
         assertEquals((char) 101, ref.inc());
         assertEquals((char) 101, ref.get());
@@ -47,7 +47,7 @@ public class TransactionalCharacterTest {
 
     @Test
     public void testDec() {
-        TransactionalCharacter ref = new TransactionalCharacter((char) 100);
+        CharRef ref = new CharRef((char) 100);
 
         assertEquals((char) 99, ref.dec());
         assertEquals((char) 99, ref.get());
@@ -61,9 +61,9 @@ public class TransactionalCharacterTest {
 
     @Test
     public void testEquals() {
-        TransactionalCharacter ref1 = new TransactionalCharacter((char) 10);
-        TransactionalCharacter ref2 = new TransactionalCharacter((char) 10);
-        TransactionalCharacter ref3 = new TransactionalCharacter((char) 20);
+        CharRef ref1 = new CharRef((char) 10);
+        CharRef ref2 = new CharRef((char) 10);
+        CharRef ref3 = new CharRef((char) 20);
 
         assertFalse(ref1.equals(null));
         assertFalse(ref1.equals(""));
@@ -76,7 +76,7 @@ public class TransactionalCharacterTest {
 
     @Test
     public void testHashCode() {
-        TransactionalCharacter ref = new TransactionalCharacter((char) 10);
+        CharRef ref = new CharRef((char) 10);
         assertEquals(10, ref.hashCode());
 
         ref.set((char) 200);
@@ -85,13 +85,13 @@ public class TransactionalCharacterTest {
 
     @Test
     public void testToString() {
-        assertEquals("TransactionalCharacter(value=a)", new TransactionalCharacter('a').toString());
+        assertEquals("CharRef(value=a)", new CharRef('a').toString());
     }
 
     @Test
     public void testAtomic() {
-        TransactionalCharacter ref1 = new TransactionalCharacter('a');
-        TransactionalCharacter ref2 = new TransactionalCharacter('b');
+        CharRef ref1 = new CharRef('a');
+        CharRef ref2 = new CharRef('b');
 
         try {
             incButAbort(ref1, ref2);
@@ -104,8 +104,8 @@ public class TransactionalCharacterTest {
     }
 
     @TransactionalMethod
-    public void incButAbort(TransactionalCharacter... refs) {
-        for (TransactionalCharacter ref : refs) {
+    public void incButAbort(CharRef... refs) {
+        for (CharRef ref : refs) {
             ref.inc();
         }
 
@@ -114,7 +114,7 @@ public class TransactionalCharacterTest {
 
     @Test
     public void awaitTest() {
-        final TransactionalCharacter ref = new TransactionalCharacter('a');
+        final CharRef ref = new CharRef('a');
 
         TestThread t = new TestThread() {
             @Override

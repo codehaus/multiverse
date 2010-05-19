@@ -7,9 +7,9 @@ import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Stm;
 import org.multiverse.api.exceptions.RetryTimeoutException;
-import org.multiverse.transactional.DefaultTransactionalReference;
-import org.multiverse.transactional.TransactionalReference;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
+import org.multiverse.transactional.refs.Ref;
+import org.multiverse.transactional.refs.SimpleRef;
 
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.joinAll;
@@ -38,7 +38,7 @@ public class TransactionalMethod_TimeoutLongTest {
 
     @Test
     public void whenTimeout() {
-        TransactionalReference ref = new DefaultTransactionalReference();
+        Ref ref = new SimpleRef();
 
         try {
             tryAwaitNonNull(ref);
@@ -48,7 +48,7 @@ public class TransactionalMethod_TimeoutLongTest {
     }
 
     @TransactionalMethod(timeout = 1)
-    public void tryAwaitNonNull(TransactionalReference ref) {
+    public void tryAwaitNonNull(Ref ref) {
         if (ref.isNull()) {
             retry();
         }
@@ -56,7 +56,7 @@ public class TransactionalMethod_TimeoutLongTest {
 
     @Test
     public void whenSomeWaitingNeeded() {
-        final TransactionalInteger ref = new TransactionalInteger();
+        final IntRef ref = new IntRef();
 
         TestThread incThread = new TestThread() {
             @Override
@@ -78,7 +78,7 @@ public class TransactionalMethod_TimeoutLongTest {
     //we need a high retry count because the reference could be getting a useless value very often
 
     @TransactionalMethod(timeout = 5, maxRetries = 100000)
-    public void tryAwaitFiveSeconds(TransactionalInteger ref, int minvalue) {
+    public void tryAwaitFiveSeconds(IntRef ref, int minvalue) {
         if (ref.get() < minvalue) {
             System.out.println("ref.get: " + ref.get() + " and waiting for: " + minvalue);
             retry();
@@ -88,7 +88,7 @@ public class TransactionalMethod_TimeoutLongTest {
 
     @Test
     public void multipleWakeupsButNotEnough() {
-        final TransactionalInteger ref = new TransactionalInteger();
+        final IntRef ref = new IntRef();
 
         TestThread incThread = new TestThread() {
             @Override

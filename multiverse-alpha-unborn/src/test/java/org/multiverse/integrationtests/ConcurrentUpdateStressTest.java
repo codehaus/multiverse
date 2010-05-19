@@ -4,7 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import java.util.concurrent.TimeUnit;
 
@@ -18,14 +18,14 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class ConcurrentUpdateStressTest {
 
-    public TransactionalInteger ref;
+    public IntRef ref;
     public int incCount = 10 * 1000 * 1000;
     public int threadCount = 3;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        ref = new TransactionalInteger(0);
+        ref = new IntRef(0);
     }
 
     @After

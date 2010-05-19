@@ -1,4 +1,4 @@
-package org.multiverse.transactional.primitives;
+package org.multiverse.transactional.refs;
 
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
@@ -12,15 +12,15 @@ import static org.multiverse.api.StmUtils.retry;
  * @author Peter Veentjer
  */
 @TransactionalObject
-public final class TransactionalLong {
+public final class LongRef {
 
     private long value;
 
-    public TransactionalLong() {
+    public LongRef() {
         this(0L);
     }
 
-    public TransactionalLong(long value) {
+    public LongRef(long value) {
         this.value = value;
     }
 
@@ -115,7 +115,7 @@ public final class TransactionalLong {
 
     @TransactionalMethod(readonly = true)
     public String toString() {
-        return format("TransactionalLong(value=%s)", value);
+        return format("LongRef(value=%s)", value);
     }
 
     @TransactionalMethod(readonly = true)
@@ -129,11 +129,11 @@ public final class TransactionalLong {
             return true;
         }
 
-        if (!(thatObj instanceof TransactionalLong)) {
+        if (!(thatObj instanceof LongRef)) {
             return false;
         }
 
-        TransactionalLong that = (TransactionalLong) thatObj;
+        LongRef that = (LongRef) thatObj;
         return that.value == this.value;
     }
 }

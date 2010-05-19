@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Stm;
-import org.multiverse.transactional.primitives.TransactionalLong;
+import org.multiverse.transactional.refs.LongRef;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
@@ -17,7 +17,7 @@ public class ContendingStressTest {
     private Stm stm;
 
     private int refCount = 100;
-    private TransactionalLong[] refs;
+    private LongRef[] refs;
     private int threadCount;
 
     @Before
@@ -26,7 +26,7 @@ public class ContendingStressTest {
         clearThreadLocalTransaction();
 
         for (int k = 0; k < refCount; k++) {
-            //    refs[k] = new TransactionalLong();
+            //    refs[k] = new LongRef();
         }
     }
 

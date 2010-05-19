@@ -4,7 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Stm;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import java.util.concurrent.Callable;
 
@@ -29,16 +29,17 @@ public class TransactionalClosureTest {
     public void tearDown() {
         clearThreadLocalTransaction();
     }
+
     @Test
     public void testSelfCreatedTransaction() {
-        final TransactionalInteger value = new TransactionalInteger(0);
+        final IntRef value = new IntRef(0);
 
         long version = stm.getVersion();
 
         new TransactionalClosure().execute(
                 new Callable() {
                     @Override
-                    public Object call(){
+                    public Object call() {
                         value.inc();
                         return null;
                     }
@@ -47,5 +48,5 @@ public class TransactionalClosureTest {
 
         assertEquals(version + 1, stm.getVersion());
         assertEquals(1, value.get());
-    }    
+    }
 }

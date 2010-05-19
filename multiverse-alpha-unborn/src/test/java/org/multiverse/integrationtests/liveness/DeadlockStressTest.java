@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
@@ -21,16 +21,16 @@ public class DeadlockStressTest {
     private int threadCount = 10;
     private int transactionCountPerThread = 500 * 1000;
 
-    private TransactionalInteger[] refs;
+    private IntRef[] refs;
     private ChangeThread[] threads;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
 
-        refs = new TransactionalInteger[txObjectCount];
+        refs = new IntRef[txObjectCount];
         for (int k = 0; k < txObjectCount; k++) {
-            refs[k] = new TransactionalInteger();
+            refs[k] = new IntRef();
         }
 
         threads = new ChangeThread[threadCount];

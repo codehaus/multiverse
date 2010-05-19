@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -77,7 +77,7 @@ public class TransactionalObject_MethodTest {
 
     @Test
     public void testRuntimeKnownReturnTypeWithTxObject() {
-        Object item = new TransactionalInteger();
+        Object item = new IntRef();
         ObjectReturn objectReturn = new ObjectReturn(item);
         assertSame(item, objectReturn.doIt());
     }
@@ -588,21 +588,21 @@ public class TransactionalObject_MethodTest {
     @TransactionalObject
     static class TxObjectArg {
 
-        private TransactionalInteger ref;
+        private IntRef ref;
 
         public TxObjectArg() {
-            this.ref = new TransactionalInteger(0);
+            this.ref = new IntRef(0);
         }
 
         public void inc() {
             doIt(ref);
         }
 
-        public void doIt(TransactionalInteger intRef) {
+        public void doIt(IntRef intRef) {
             intRef.inc();
         }
 
-        public TransactionalInteger getRef() {
+        public IntRef getRef() {
             return ref;
         }
     }
@@ -683,13 +683,13 @@ public class TransactionalObject_MethodTest {
     @TransactionalObject
     static class TxObjectIsCreatedInMethod {
 
-        private TransactionalInteger ref;
+        private IntRef ref;
 
         public void doIt() {
-            ref = new TransactionalInteger(20);
+            ref = new IntRef(20);
         }
 
-        public TransactionalInteger getRef() {
+        public IntRef getRef() {
             return ref;
         }
     }

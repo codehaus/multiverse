@@ -10,12 +10,10 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.stms.AbstractTransactionImpl;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
@@ -56,11 +54,11 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
         when(status.isDead()).thenReturn(false);
         when(tx.getStatus()).thenReturn(status);
         doThrow(new RuntimeException()).when(tx).prepare();
-        try{
+        try {
             barrier.joinCommitUninterruptibly(tx);
             fail("Expecting Runtime Exception thrown on Transaction preparation");
-        } catch (RuntimeException ex){
-            
+        } catch (RuntimeException ex) {
+
         }
         assertTrue(barrier.isClosed());
         assertEquals(0, barrier.getNumberWaiting());
@@ -109,7 +107,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
     public void whenInterruptedWhileWaiting_thenNoInterruption() throws InterruptedException {
         barrier = new CountDownCommitBarrier(2);
 
-        final TransactionalInteger ref = new TransactionalInteger();
+        final IntRef ref = new IntRef();
 
         TestThread t = new TestThread() {
             @TransactionalMethod
@@ -138,7 +136,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
     public void whenCommittedWhileWaiting() throws InterruptedException {
         barrier = new CountDownCommitBarrier(2);
 
-        final TransactionalInteger ref = new TransactionalInteger();
+        final IntRef ref = new IntRef();
 
         TestThread t = new TestThread() {
             @TransactionalMethod
@@ -168,7 +166,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
     public void whenAbortedWhileWaiting_() throws InterruptedException {
         barrier = new CountDownCommitBarrier(2);
 
-        final TransactionalInteger ref = new TransactionalInteger();
+        final IntRef ref = new IntRef();
 
         TestThread t = new TestThread() {
             @TransactionalMethod

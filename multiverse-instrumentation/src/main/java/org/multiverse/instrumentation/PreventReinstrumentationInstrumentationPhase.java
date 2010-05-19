@@ -77,19 +77,19 @@ public class PreventReinstrumentationInstrumentationPhase extends AbstractInstru
     private void ensureCorrectClazzCompiler(AnnotationNode instrumentedAnnotationNode, ClassNode original) {
         String foundCompilerName = (String) getAnnotationValue(instrumentedAnnotationNode, INSTRUMENTOR_NAME);
 
-        if (!instrumentor.getInstrumentorName().equals(foundCompilerName)) {
+        if (!instrumentor.getName().equals(foundCompilerName)) {
             String msg = format("Failed to instrument already instrumented class '%s'. " +
                     "The current instrumentor '%s' does not match the previous used instrumentor '%s' " +
                     "and therefor can't be used in combination with the Stm '%s'. " +
                     "To solve this problem you need to make sure that you using the correct " +
                     "instrumentor or you need to delete the classes and reinstrument them " +
                     "with this instrumentor.",
-                    original.name, instrumentor.getInstrumentorName(), foundCompilerName, instrumentor.getStmName());
+                    original.name, instrumentor.getName(), foundCompilerName, instrumentor.getStmName());
             throw new CompileException(msg);
         }
 
         String foundCompilerVersion = (String) getAnnotationValue(instrumentedAnnotationNode, INSTRUMENTOR_VERSION);
-        if (!instrumentor.getInstrumentorVersion().equals(foundCompilerVersion)) {
+        if (!instrumentor.getVersion().equals(foundCompilerVersion)) {
             String msg = format("Failed to instrument already instrumented class '%s'. " +
                     "The new instrumentor version '%s' does not match the previous instrumentor version. '%s'." +
                     "And because the instrumentation process is not backwards compatible, this" +
@@ -97,9 +97,9 @@ public class PreventReinstrumentationInstrumentationPhase extends AbstractInstru
                     "The Multiverse instrumentation process is not backwards compatible. " +
                     "To solve the problem you need to delete the classes and reinstrument " +
                     "them with this instrumentor %s.%s to solve the problem.",
-                    original.name, instrumentor.getInstrumentorVersion(),
-                    foundCompilerVersion, instrumentor.getInstrumentorName(),
-                    instrumentor.getInstrumentorVersion());
+                    original.name, instrumentor.getVersion(),
+                    foundCompilerVersion, instrumentor.getName(),
+                    instrumentor.getVersion());
             throw new CompileException(msg);
         }
     }
@@ -109,9 +109,9 @@ public class PreventReinstrumentationInstrumentationPhase extends AbstractInstru
         AnnotationNode annotationNode = new AnnotationNode(desc);
         annotationNode.values = new LinkedList();
         annotationNode.values.add(INSTRUMENTOR_NAME);
-        annotationNode.values.add(instrumentor.getInstrumentorName());
+        annotationNode.values.add(instrumentor.getName());
         annotationNode.values.add(INSTRUMENTOR_VERSION);
-        annotationNode.values.add(instrumentor.getInstrumentorVersion());
+        annotationNode.values.add(instrumentor.getVersion());
         return annotationNode;
     }
 }

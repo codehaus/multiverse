@@ -117,7 +117,7 @@ it will not be fixated.
 org.multiverse.api.exceptions.ReadonlyException
 	at org.multiverse.stms.alpha.transactions.readonly.NonTrackingReadonlyAlphaTransaction.doAbortAndRegisterRetryLatch(NonTrackingReadonlyAlphaTransaction.java:166)
 	at org.multiverse.stms.AbstractTransaction.abortAndRegisterRetryLatch(AbstractTransaction.java:214)
-	at org.multiverse.transactional.primitives.TransactionalInteger.await(IntegerRef.java)
+	at org.multiverse.transactional.refs.IntRef.await(IntegerRef.java)
 	at org.multiverse.integrationtests.notification.PingPongLongTest$PingPongThread.doRun(PingPongLongTest.java:75)
 	at org.multiverse.TestThread.run(TestThread.java:44)
 Thread PingPongThread-1 has thrown an exception

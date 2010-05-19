@@ -1,4 +1,4 @@
-package org.multiverse.transactional.primitives;
+package org.multiverse.transactional.refs;
 
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
@@ -9,18 +9,18 @@ import static org.multiverse.api.StmUtils.retry;
  * @author Peter Veentjer
  */
 @TransactionalObject
-public final class TransactionalBoolean {
+public final class BooleanRef {
 
     private boolean value;
 
     /**
-     * Creates a new TransactionalBoolean with false as va
+     * Creates a new BooleanRef with false as va
      */
-    public TransactionalBoolean() {
+    public BooleanRef() {
         this(false);
     }
 
-    public TransactionalBoolean(boolean value) {
+    public BooleanRef(boolean value) {
         this.value = value;
     }
 
@@ -51,9 +51,9 @@ public final class TransactionalBoolean {
     @TransactionalMethod(readonly = true)
     public String toString() {
         if (value) {
-            return "TransactionalBoolean(value=true)";
+            return "BooleanRef(value=true)";
         } else {
-            return "TransactionalBoolean(value=false)";
+            return "BooleanRef(value=false)";
         }
     }
 
@@ -68,11 +68,11 @@ public final class TransactionalBoolean {
             return true;
         }
 
-        if (!(thatObj instanceof TransactionalBoolean)) {
+        if (!(thatObj instanceof BooleanRef)) {
             return false;
         }
 
-        TransactionalBoolean that = (TransactionalBoolean) thatObj;
+        BooleanRef that = (BooleanRef) thatObj;
         return that.value == this.value;
     }
 }

@@ -1,4 +1,4 @@
-package org.multiverse.transactional.primitives;
+package org.multiverse.transactional.refs;
 
 import org.junit.After;
 import org.junit.Before;
@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
-public class TransactionalIntegerPerformanceStressTest {
+public class IntRefPerformanceStressTest {
 
     private int count = 50 * 1000 * 1000;
 
@@ -25,7 +25,7 @@ public class TransactionalIntegerPerformanceStressTest {
 
     @Test
     public void test() {
-        TransactionalInteger ref = new TransactionalInteger();
+        IntRef ref = new IntRef();
 
         long startNs = System.nanoTime();
 

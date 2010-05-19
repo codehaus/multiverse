@@ -10,7 +10,7 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.api.exceptions.TooManyRetriesException;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import java.io.IOException;
 
@@ -66,7 +66,7 @@ public class TransactionTemplateTest {
 
     @Test
     public void testSelfCreatedTransaction() {
-        final TransactionalInteger value = new TransactionalInteger(0);
+        final IntRef value = new IntRef(0);
 
         long version = stm.getVersion();
 
@@ -85,7 +85,7 @@ public class TransactionTemplateTest {
 
     @Test
     public void testLiftingOnExistingTransaction() {
-        final TransactionalInteger value = new TransactionalInteger(0);
+        final IntRef value = new IntRef(0);
 
         Transaction t = startThreadLocalUpdateTransaction();
 
@@ -134,7 +134,7 @@ public class TransactionTemplateTest {
 
     @Test
     public void testExplicitAbort() {
-        final TransactionalInteger value = new TransactionalInteger(0);
+        final IntRef value = new IntRef(0);
 
         long version = stm.getVersion();
 
@@ -159,7 +159,7 @@ public class TransactionTemplateTest {
 
     @Test
     public void testExplicitCommit() {
-        final TransactionalInteger value = new TransactionalInteger(0);
+        final IntRef value = new IntRef(0);
 
         long version = stm.getVersion();
 
@@ -179,7 +179,7 @@ public class TransactionTemplateTest {
 
     @Test
     public void testRuntimeExceptionDoesNotCommitChanges() {
-        final TransactionalInteger value = new TransactionalInteger(0);
+        final IntRef value = new IntRef(0);
 
         final Exception ex = new RuntimeException();
 
@@ -200,7 +200,7 @@ public class TransactionTemplateTest {
 
     @Test
     public void testCheckedException() {
-        final TransactionalInteger value = new TransactionalInteger(0);
+        final IntRef value = new IntRef(0);
 
         final Exception ex = new IOException();
 
@@ -222,7 +222,7 @@ public class TransactionTemplateTest {
     @Test
     public void testRecursionDoesntCallProblems() {
 
-        TransactionalInteger ref = new TransactionalInteger();
+        IntRef ref = new IntRef();
 
         long version = stm.getVersion();
         recursiveCall(100, ref, 10);
@@ -232,7 +232,7 @@ public class TransactionTemplateTest {
     }
 
 
-    public void recursiveCall(final int depth, final TransactionalInteger ref, final int value) {
+    public void recursiveCall(final int depth, final IntRef ref, final int value) {
         if (depth == 0) {
             ref.set(value);
         } else {
@@ -257,7 +257,7 @@ public class TransactionTemplateTest {
                 .setMaxRetries(retryCount).build();
 
 
-        final TransactionalInteger ref = new TransactionalInteger();
+        final IntRef ref = new IntRef();
         final IntHolder executeCounter = new IntHolder();
 
         long version = stm.getVersion();
@@ -293,7 +293,7 @@ public class TransactionTemplateTest {
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
                 .setReadonly(true).build();
 
-        final TransactionalInteger ref = new TransactionalInteger(0);
+        final IntRef ref = new IntRef(0);
 
         long version = stm.getVersion();
 

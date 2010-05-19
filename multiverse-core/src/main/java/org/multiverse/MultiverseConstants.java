@@ -28,5 +28,8 @@ public interface MultiverseConstants {
      * If the sanity checks are disabled, the JIT is completely removing
      */
     boolean ___SANITY_CHECKS_ENABLED =
-            parseBoolean(getProperty(MultiverseConstants.class.getName() + ".sanityChecks", "false"));
+            parseBoolean(getProperty("org.multiverse.sanityChecks", "false"));
+
+    boolean ___LOGGING_ENABLED_ENABLED =
+            parseBoolean(getProperty("org.multiverse.loggingEnabled", "true"));
 }

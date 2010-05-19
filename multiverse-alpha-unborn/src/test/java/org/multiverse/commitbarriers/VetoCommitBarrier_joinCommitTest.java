@@ -10,7 +10,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.TooManyRetriesException;
-import org.multiverse.transactional.primitives.TransactionalInteger;
+import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
@@ -54,7 +54,7 @@ public class VetoCommitBarrier_joinCommitTest {
     @Test
     public void whenTransactionPreparable_thenAdded() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
-        TransactionalInteger ref = new TransactionalInteger();
+        IntRef ref = new IntRef();
         IncThread thread = new IncThread(ref, barrier);
         thread.start();
 
@@ -68,7 +68,7 @@ public class VetoCommitBarrier_joinCommitTest {
     public void whenTransactionPrepared_thenAdded() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
 
-        TransactionalInteger ref = new TransactionalInteger();
+        IntRef ref = new IntRef();
         IncThread thread = new IncThread(ref, barrier, true);
         thread.start();
 
@@ -82,7 +82,7 @@ public class VetoCommitBarrier_joinCommitTest {
     @Test
     public void whenPrepareFails() throws InterruptedException {
         final VetoCommitBarrier group = new VetoCommitBarrier();
-        final TransactionalInteger ref = new TransactionalInteger();
+        final IntRef ref = new IntRef();
 
         FailToPrepareThread thread = new FailToPrepareThread(group, ref);
         thread.start();
@@ -97,9 +97,9 @@ public class VetoCommitBarrier_joinCommitTest {
 
     class FailToPrepareThread extends TestThread {
         final VetoCommitBarrier group;
-        final TransactionalInteger ref;
+        final IntRef ref;
 
-        FailToPrepareThread(VetoCommitBarrier group, TransactionalInteger ref) {
+        FailToPrepareThread(VetoCommitBarrier group, IntRef ref) {
             this.group = group;
             this.ref = ref;
             setPrintStackTrace(false);
@@ -183,16 +183,16 @@ public class VetoCommitBarrier_joinCommitTest {
     }
 
     public class IncThread extends TestThread {
-        private final TransactionalInteger ref;
+        private final IntRef ref;
         private final VetoCommitBarrier barrier;
         private Transaction tx;
         private boolean prepare;
 
-        public IncThread(TransactionalInteger ref, VetoCommitBarrier barrier) {
+        public IncThread(IntRef ref, VetoCommitBarrier barrier) {
             this(ref, barrier, false);
         }
 
-        public IncThread(TransactionalInteger ref, VetoCommitBarrier barrier, boolean prepare) {
+        public IncThread(IntRef ref, VetoCommitBarrier barrier, boolean prepare) {
             super("IncThread");
             this.barrier = barrier;
             this.ref = ref;

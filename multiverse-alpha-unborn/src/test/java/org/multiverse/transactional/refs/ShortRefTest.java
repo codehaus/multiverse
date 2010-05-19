@@ -1,4 +1,4 @@
-package org.multiverse.transactional.primitives;
+package org.multiverse.transactional.refs;
 
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
@@ -7,23 +7,23 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public class TransactionalShortTest {
+public class ShortRefTest {
 
     @Test
     public void constructorWithNoArg() {
-        TransactionalShort ref = new TransactionalShort();
+        ShortRef ref = new ShortRef();
         assertEquals(0, ref.get());
     }
 
     @Test
     public void constructorWithSingleArg() {
-        TransactionalShort ref = new TransactionalShort((short) 10);
+        ShortRef ref = new ShortRef((short) 10);
         assertEquals((char) 10, ref.get());
     }
 
     @Test
     public void set() {
-        TransactionalShort ref = new TransactionalShort((short) 10);
+        ShortRef ref = new ShortRef((short) 10);
         long old = ref.set((short) 100);
         assertEquals((short) 10, old);
         assertEquals((short) 100, ref.get());
@@ -31,7 +31,7 @@ public class TransactionalShortTest {
 
     @Test
     public void testInc() {
-        TransactionalShort ref = new TransactionalShort((short) 100);
+        ShortRef ref = new ShortRef((short) 100);
 
         assertEquals((short) 101, ref.inc());
         assertEquals((short) 101, ref.get());
@@ -45,7 +45,7 @@ public class TransactionalShortTest {
 
     @Test
     public void testDec() {
-        TransactionalShort ref = new TransactionalShort((short) 100);
+        ShortRef ref = new ShortRef((short) 100);
 
         assertEquals((short) 99, ref.dec());
         assertEquals((short) 99, ref.get());
@@ -60,9 +60,9 @@ public class TransactionalShortTest {
 
     @Test
     public void testEquals() {
-        TransactionalShort ref1 = new TransactionalShort((short) 10);
-        TransactionalShort ref2 = new TransactionalShort((short) 10);
-        TransactionalShort ref3 = new TransactionalShort((short) 20);
+        ShortRef ref1 = new ShortRef((short) 10);
+        ShortRef ref2 = new ShortRef((short) 10);
+        ShortRef ref3 = new ShortRef((short) 20);
 
         assertFalse(ref1.equals(null));
         assertFalse(ref1.equals(""));
@@ -75,7 +75,7 @@ public class TransactionalShortTest {
 
     @Test
     public void testHashCode() {
-        TransactionalShort ref = new TransactionalShort((short) 10);
+        ShortRef ref = new ShortRef((short) 10);
         assertEquals(10, ref.hashCode());
 
         ref.set((short) 200);
@@ -84,13 +84,13 @@ public class TransactionalShortTest {
 
     @Test
     public void testToString() {
-        assertEquals("TransactionalShort(value=10)", new TransactionalShort((short) 10).toString());
+        assertEquals("ShortRef(value=10)", new ShortRef((short) 10).toString());
     }
 
     @Test
     public void testAtomic() {
-        TransactionalShort ref1 = new TransactionalShort((short) 10);
-        TransactionalShort ref2 = new TransactionalShort((short) 20);
+        ShortRef ref1 = new ShortRef((short) 10);
+        ShortRef ref2 = new ShortRef((short) 20);
 
         try {
             incButAbort(ref1, ref2);
@@ -103,8 +103,8 @@ public class TransactionalShortTest {
     }
 
     @TransactionalMethod
-    public void incButAbort(TransactionalShort... refs) {
-        for (TransactionalShort ref : refs) {
+    public void incButAbort(ShortRef... refs) {
+        for (ShortRef ref : refs) {
             ref.inc();
         }
 

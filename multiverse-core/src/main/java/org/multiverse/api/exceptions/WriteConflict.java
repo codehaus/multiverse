@@ -25,4 +25,9 @@ public class WriteConflict extends ControlFlowError {
     public WriteConflict(Throwable cause) {
         super(cause);
     }
+
+    @Override
+    public String getDescription() {
+        return "writeconflict";
+    }
 }
