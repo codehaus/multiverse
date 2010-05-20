@@ -7,12 +7,12 @@ import static java.lang.String.format;
 import static org.multiverse.api.StmUtils.retry;
 
 /**
- * A reference for a primitive byte.
+ * A Ref for storing a byte.
  *
  * @author Peter Veentjer
  */
 @TransactionalObject
-public final class ByteRef {
+public class ByteRef {
 
     private byte value;
 
@@ -25,19 +25,19 @@ public final class ByteRef {
     }
 
     @TransactionalMethod(readonly = true)
-    public byte get() {
+    public final byte get() {
         return value;
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public void await(byte desired) {
+    public final void await(byte desired) {
         if (desired != value) {
             retry();
         }
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public byte awaitLargerThan(byte than) {
+    public final byte awaitLargerThan(byte than) {
         if (!(value > than)) {
             retry();
         }
@@ -46,7 +46,7 @@ public final class ByteRef {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public byte awaitLargerOrEqualThan(byte than) {
+    public final byte awaitLargerOrEqualThan(byte than) {
         if (!(value >= than)) {
             retry();
         }
@@ -55,7 +55,7 @@ public final class ByteRef {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public byte awaitSmallerThan(byte than) {
+    public final byte awaitSmallerThan(byte than) {
         if (!(value < than)) {
             retry();
         }
@@ -64,7 +64,7 @@ public final class ByteRef {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public byte awaitSmallerOrEqualThan(byte than) {
+    public final byte awaitSmallerOrEqualThan(byte than) {
         if (!(value <= than)) {
             retry();
         }
@@ -73,7 +73,7 @@ public final class ByteRef {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public byte awaitNotEqualTo(byte than) {
+    public final byte awaitNotEqualTo(byte than) {
         if (!(value != than)) {
             retry();
         }
@@ -87,44 +87,86 @@ public final class ByteRef {
      * @param newValue the new value.
      * @return the previous value.
      */
-    public byte set(byte newValue) {
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final byte set(byte newValue) {
+        if (newValue == value) {
+            return newValue;
+        }
+
         byte oldValue = this.value;
         this.value = newValue;
         return oldValue;
     }
 
-    public byte inc() {
+    /**
+     * Increases the value by one.
+     *
+     * @return the new value
+     */
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final byte inc() {
         value++;
         return value;
     }
 
-    public byte inc(byte amount) {
+    /**
+     * Increases the value with the given amount.
+     *
+     * @param amount the amount to increae the value with.
+     * @return the new value.
+     */
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final byte inc(byte amount) {
+        if (amount == 0) {
+            return value;
+        }
+
         value += amount;
         return value;
     }
 
-    public byte dec() {
+    /**
+     * Decreases the value by one.
+     *
+     * @return the new value.
+     */
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final byte dec() {
         value--;
         return value;
     }
 
-    public byte dec(byte amount) {
+    /**
+     * Decreases the value with the given amount.
+     *
+     * @param amount the amount to decrease the value with.
+     * @return the new value
+     */
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final byte dec(byte amount) {
+        if (amount == 0) {
+            return value;
+        }
+
         value -= amount;
         return value;
     }
 
+    @Override
     @TransactionalMethod(readonly = true)
-    public String toString() {
+    public final String toString() {
         return format("ByteRef(value=%s)", value);
     }
 
+    @Override
     @TransactionalMethod(readonly = true)
-    public int hashCode() {
+    public final int hashCode() {
         return (int) value;
     }
 
+    @Override
     @TransactionalMethod(readonly = true)
-    public boolean equals(Object thatObj) {
+    public final boolean equals(Object thatObj) {
         if (thatObj == this) {
             return true;
         }

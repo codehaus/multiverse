@@ -7,37 +7,37 @@ import static java.lang.String.format;
 import static org.multiverse.api.StmUtils.retry;
 
 /**
- * Default {@link org.multiverse.transactional.refs.Ref}. Changes on refs are atomic and consistent. In most cases this is the
+ * Basic {@link org.multiverse.transactional.refs.Ref} implementation. In most cases this is the
  * Ref implementation you want to use.
  *
  * @author Peter Veentjer
  */
 @TransactionalObject
-public final class SimpleRef<E> implements Ref<E> {
+public class BasicRef<E> implements Ref<E> {
 
     private E value;
 
     /**
-     * Creates a SimpleRef with a null reference.
+     * Creates a BasicRef with a null reference.
      */
-    public SimpleRef() {
+    public BasicRef() {
         this(null);
     }
 
 
     /**
-     * Creates a new SimpleRef with the provided reference. This reference is allowed to
+     * Creates a new BasicRef with the provided reference. This reference is allowed to
      * be null.
      *
-     * @param value the reference to store in this SimpleRef.
+     * @param value the reference to store in this BasicRef.
      */
-    public SimpleRef(E value) {
+    public BasicRef(E value) {
         this.value = value;
     }
 
     @Override
     @TransactionalMethod(readonly = true, trackReads = true)
-    public E getOrAwait() {
+    public final E getOrAwait() {
         if (value == null) {
             retry();
         }
@@ -47,7 +47,7 @@ public final class SimpleRef<E> implements Ref<E> {
 
     @Override
     @TransactionalMethod(readonly = true, trackReads = true, interruptible = true)
-    public E getOrAwaitInterruptibly() throws InterruptedException {
+    public final E getOrAwaitInterruptibly() throws InterruptedException {
         if (value == null) {
             retry();
         }
@@ -57,42 +57,41 @@ public final class SimpleRef<E> implements Ref<E> {
 
     @Override
     @TransactionalMethod(readonly = true)
-    public boolean isNull() {
+    public final boolean isNull() {
         return value == null;
     }
 
     @Override
     @TransactionalMethod(readonly = true)
-    public E get() {
+    public final E get() {
         return value;
     }
 
     @Override
     @TransactionalMethod(trackReads = true)
-    public E set(E newValue) {
-        E initialValue = value;
-
-        //optimization to prevent loading the object if not needed.
-        if (initialValue == newValue) {
+    public final E set(E newValue) {
+        if (value == newValue) {
             return newValue;
         }
 
+        E oldValue = value;
         value = newValue;
-        return initialValue;
+        return oldValue;
     }
 
     @Override
-    public E clear() {
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final E clear() {
         return set(null);
     }
 
     @Override
     @TransactionalMethod(readonly = true)
-    public String toString() {
+    public final String toString() {
         if (value == null) {
-            return "SimpleRef(ref=null)";
+            return "BasicRef(ref=null)";
         } else {
-            return format("SimpleRef(ref=%s)", value);
+            return format("BasicRef(ref=%s)", value);
         }
     }
 }

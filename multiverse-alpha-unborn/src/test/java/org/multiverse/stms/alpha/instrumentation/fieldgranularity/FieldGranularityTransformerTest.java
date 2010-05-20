@@ -495,7 +495,7 @@ public class FieldGranularityTransformerTest {
     public void objectField_structure() {
         ObjectField field = new ObjectField();
         assertFalse(field instanceof AlphaTransactionalObject);
-        assertHasField(field.getClass(), "value", SimpleRef.class);
+        assertHasField(field.getClass(), "value", BasicRef.class);
     }
 
     @Test
@@ -535,7 +535,7 @@ public class FieldGranularityTransformerTest {
     public void typedField_structure() {
         TypedField field = new TypedField();
         assertFalse(field instanceof AlphaTransactionalObject);
-        assertHasField(field.getClass(), "value", SimpleRef.class);
+        assertHasField(field.getClass(), "value", BasicRef.class);
     }
 
     @Test
@@ -575,7 +575,7 @@ public class FieldGranularityTransformerTest {
     public void arrayField_structure() {
         ArrayField field = new ArrayField();
         assertFalse(field instanceof AlphaTransactionalObject);
-        assertHasField(field.getClass(), "value", SimpleRef.class);
+        assertHasField(field.getClass(), "value", BasicRef.class);
     }
 
     @Test

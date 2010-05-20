@@ -6,8 +6,8 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.transactional.collections.TransactionalLinkedList;
+import org.multiverse.transactional.refs.BasicRef;
 import org.multiverse.transactional.refs.IntRef;
-import org.multiverse.transactional.refs.SimpleRef;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -123,7 +123,7 @@ public class SleepingBarberStressTest {
 
     public class BarberThread extends TestThread {
 
-        private SimpleRef<Boolean> closingTime = new SimpleRef<Boolean>();
+        private BasicRef<Boolean> closingTime = new BasicRef<Boolean>();
 
         // 0 == asleep, 1 == awake
         private IntRef state = new IntRef();

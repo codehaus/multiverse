@@ -7,12 +7,12 @@ import static java.lang.String.format;
 import static org.multiverse.api.StmUtils.retry;
 
 /**
- * A reference for a long.
+ * A Ref for storing a long.
  *
  * @author Peter Veentjer
  */
 @TransactionalObject
-public final class LongRef {
+public class LongRef {
 
     private long value;
 
@@ -25,19 +25,19 @@ public final class LongRef {
     }
 
     @TransactionalMethod(readonly = true)
-    public long get() {
+    public final long get() {
         return value;
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public void await(long desired) {
+    public final void await(long desired) {
         if (desired != value) {
             retry();
         }
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public long awaitLargerThan(long than) {
+    public final long awaitLargerThan(long than) {
         if (!(value > than)) {
             retry();
         }
@@ -46,7 +46,7 @@ public final class LongRef {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public long awaitLargerOrEqualThan(long than) {
+    public final long awaitLargerOrEqualThan(long than) {
         if (!(value >= than)) {
             retry();
         }
@@ -55,7 +55,7 @@ public final class LongRef {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public long awaitSmallerThan(long than) {
+    public final long awaitSmallerThan(long than) {
         if (!(value < than)) {
             retry();
         }
@@ -64,7 +64,7 @@ public final class LongRef {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public long awaitSmallerOrEqualThan(long than) {
+    public final long awaitSmallerOrEqualThan(long than) {
         if (!(value <= than)) {
             retry();
         }
@@ -73,7 +73,7 @@ public final class LongRef {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public long awaitNotEqualThan(long than) {
+    public final long awaitNotEqualThan(long than) {
         if (!(value != than)) {
             retry();
         }
@@ -87,44 +87,52 @@ public final class LongRef {
      * @param newValue the new value.
      * @return the previous value.
      */
-    public long set(long newValue) {
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final long set(long newValue) {
         long oldValue = this.value;
         this.value = newValue;
         return oldValue;
     }
 
-    public long inc() {
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final long inc() {
         value++;
         return value;
     }
 
-    public long inc(long amount) {
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final long inc(long amount) {
         value += amount;
         return value;
     }
 
-    public long dec() {
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final long dec() {
         value--;
         return value;
     }
 
-    public long dec(long amount) {
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final long dec(long amount) {
         value -= amount;
         return value;
     }
 
+    @Override
     @TransactionalMethod(readonly = true)
-    public String toString() {
+    public final String toString() {
         return format("LongRef(value=%s)", value);
     }
 
+    @Override
     @TransactionalMethod(readonly = true)
-    public int hashCode() {
+    public final int hashCode() {
         return (int) (value ^ (value >>> 32));
     }
 
+    @Override
     @TransactionalMethod(readonly = true)
-    public boolean equals(Object thatObj) {
+    public final boolean equals(Object thatObj) {
         if (thatObj == this) {
             return true;
         }

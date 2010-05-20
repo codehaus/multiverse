@@ -10,6 +10,7 @@ import org.multiverse.api.exceptions.Retry;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 /**
@@ -27,12 +28,12 @@ public class AbaRefTest {
                 .setSpeculativeConfigurationEnabled(false)
                 .setReadonly(false)
                 .build();
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
     }
 
     @After
     public void tearDown() {
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
     }
 
     // ================ rollback =============
@@ -115,7 +116,7 @@ public class AbaRefTest {
         long version = stm.getVersion();
         String result = ref.set(null);
         assertNull(result);
-        assertEquals(version, stm.getVersion());
+        assertEquals(version + 1, stm.getVersion());
         assertNull(ref.get());
     }
 
@@ -169,7 +170,7 @@ public class AbaRefTest {
 
         String result = ref.set(oldRef);
         assertSame(oldRef, result);
-        assertEquals(version, stm.getVersion());
+        assertEquals(version + 1, stm.getVersion());
         assertSame(oldRef, ref.get());
     }
 

@@ -7,12 +7,12 @@ import static java.lang.String.format;
 import static org.multiverse.api.StmUtils.retry;
 
 /**
- * A reference for a primitive short.
+ * A Ref for storing a short.
  *
  * @author Peter Veentjer
  */
 @TransactionalObject
-public final class ShortRef {
+public class ShortRef {
 
     private short value;
 
@@ -24,20 +24,25 @@ public final class ShortRef {
         this.value = value;
     }
 
+    /**
+     * Gets the current value.
+     *
+     * @return the current value.
+     */
     @TransactionalMethod(readonly = true)
-    public short get() {
+    public final short get() {
         return value;
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public void await(short desired) {
+    public final void await(short desired) {
         if (desired != value) {
             retry();
         }
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public short awaitLargerThan(short than) {
+    public final short awaitLargerThan(short than) {
         if (!(value > than)) {
             retry();
         }
@@ -46,7 +51,7 @@ public final class ShortRef {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public short awaitLargerOrEqualThan(short than) {
+    public final short awaitLargerOrEqualThan(short than) {
         if (!(value >= than)) {
             retry();
         }
@@ -55,7 +60,7 @@ public final class ShortRef {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public short awaitSmallerThan(short than) {
+    public final short awaitSmallerThan(short than) {
         if (!(value < than)) {
             retry();
         }
@@ -64,7 +69,7 @@ public final class ShortRef {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public short awaitSmallerOrEqualThan(short than) {
+    public final short awaitSmallerOrEqualThan(short than) {
         if (!(value <= than)) {
             retry();
         }
@@ -73,7 +78,7 @@ public final class ShortRef {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public short awaitNotEqualTo(short than) {
+    public final short awaitNotEqualTo(short than) {
         if (!(value != than)) {
             retry();
         }
@@ -87,44 +92,86 @@ public final class ShortRef {
      * @param newValue the new value.
      * @return the previous value.
      */
+    @TransactionalMethod(readonly = false, trackReads = true)
     public short set(short newValue) {
-        short oldValue = this.value;
-        this.value = newValue;
+        if (newValue == value) {
+            return newValue;
+        }
+
+        short oldValue = value;
+        value = newValue;
         return oldValue;
     }
 
-    public short inc() {
+    /**
+     * Increases the value by one.
+     *
+     * @return the new value.
+     */
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final short inc() {
         value++;
         return value;
     }
 
-    public short inc(short amount) {
+    /**
+     * Increases the value with the given amount.
+     *
+     * @param amount the amount to increase with.
+     * @return the new value.
+     */
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final short inc(short amount) {
+        if (amount == 0) {
+            return value;
+        }
+
         value += amount;
         return value;
     }
 
-    public short dec() {
+    /**
+     * Decreases the value by one.
+     *
+     * @return the new value.
+     */
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final short dec() {
         value--;
         return value;
     }
 
-    public short dec(short amount) {
-        this.value -= amount;
+    /**
+     * Increases the value with the given amount.
+     *
+     * @param amount the amount to increase with
+     * @return the new value
+     */
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final short dec(short amount) {
+        if (amount == 0) {
+            return value;
+        }
+
+        value -= amount;
         return value;
     }
 
+    @Override
     @TransactionalMethod(readonly = true)
-    public String toString() {
+    public final String toString() {
         return format("ShortRef(value=%s)", value);
     }
 
+    @Override
     @TransactionalMethod(readonly = true)
-    public int hashCode() {
+    public final int hashCode() {
         return (int) value;
     }
 
+    @Override
     @TransactionalMethod(readonly = true)
-    public boolean equals(Object thatObj) {
+    public final boolean equals(Object thatObj) {
         if (thatObj == this) {
             return true;
         }

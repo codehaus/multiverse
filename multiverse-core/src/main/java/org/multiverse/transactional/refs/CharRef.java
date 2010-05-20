@@ -7,12 +7,12 @@ import static java.lang.String.format;
 import static org.multiverse.api.StmUtils.retry;
 
 /**
- * A reference for a primitive char.
+ * A Ref for storing a char.
  *
  * @author Peter Veentjer
  */
 @TransactionalObject
-public final class CharRef {
+public class CharRef {
 
     private char value;
 
@@ -25,19 +25,19 @@ public final class CharRef {
     }
 
     @TransactionalMethod(readonly = true)
-    public char get() {
+    public final char get() {
         return value;
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public void await(char desired) {
+    public final void await(char desired) {
         if (desired != value) {
             retry();
         }
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public char awaitLargerThan(char than) {
+    public final char awaitLargerThan(char than) {
         if (!(value > than)) {
             retry();
         }
@@ -46,7 +46,7 @@ public final class CharRef {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public char awaitLargerOrEqualThan(char than) {
+    public final char awaitLargerOrEqualThan(char than) {
         if (!(value >= than)) {
             retry();
         }
@@ -55,7 +55,7 @@ public final class CharRef {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public char awaitSmallerThan(char than) {
+    public final char awaitSmallerThan(char than) {
         if (!(value < than)) {
             retry();
         }
@@ -64,7 +64,7 @@ public final class CharRef {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public char awaitSmallerOrEqualThan(char than) {
+    public final char awaitSmallerOrEqualThan(char than) {
         if (!(value <= than)) {
             retry();
         }
@@ -73,7 +73,7 @@ public final class CharRef {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public char awaitNotEqualTo(char than) {
+    public final char awaitNotEqualTo(char than) {
         if (!(value != than)) {
             retry();
         }
@@ -87,44 +87,86 @@ public final class CharRef {
      * @param newValue the new value.
      * @return the previous value.
      */
-    public char set(char newValue) {
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final char set(char newValue) {
+        if (newValue == value) {
+            return newValue;
+        }
+
         char oldValue = this.value;
         this.value = newValue;
         return oldValue;
     }
 
-    public char inc() {
+    /**
+     * Increases the value by one.
+     *
+     * @return the new value.
+     */
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final char inc() {
         value++;
         return value;
     }
 
-    public char inc(char amount) {
+    /**
+     * Increases the value with the given amount.
+     *
+     * @param amount the amount to increase with.
+     * @return the new value.
+     */
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final char inc(char amount) {
+        if (amount == 0) {
+            return value;
+        }
+
         value += amount;
         return value;
     }
 
-    public char dec() {
+    /**
+     * Decreases the value by one.
+     *
+     * @return the new value
+     */
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final char dec() {
         value--;
         return value;
     }
 
-    public char dec(char amount) {
+    /**
+     * Decreases the value with the given amount.
+     *
+     * @param amount the amount to decrease the value with.
+     * @return the new value.
+     */
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final char dec(char amount) {
+        if (amount == 0) {
+            return value;
+        }
+
         value -= amount;
         return this.value;
     }
 
+    @Override
     @TransactionalMethod(readonly = true)
-    public String toString() {
+    public final String toString() {
         return format("CharRef(value=%s)", value);
     }
 
+    @Override
     @TransactionalMethod(readonly = true)
-    public int hashCode() {
+    public final int hashCode() {
         return (int) value;
     }
 
+    @Override
     @TransactionalMethod(readonly = true)
-    public boolean equals(Object thatObj) {
+    public final boolean equals(Object thatObj) {
         if (thatObj == this) {
             return true;
         }
