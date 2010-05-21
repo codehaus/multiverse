@@ -56,11 +56,11 @@ public class MultiverseLibrary implements Library{
         	if(cause instanceof SpeculativeConfigurationFailure){
         		throw SpeculativeConfigurationFailure.create();
         	}
-        	if(cause instanceof ControlFlowError){
-        		throw new ControlFlowError(ex);
-        	}
         	if(cause instanceof OldVersionNotFoundReadConflict){
         		throw new OldVersionNotFoundReadConflict();
+        	}            
+        	if(cause instanceof ControlFlowError){
+        		throw new ControlFlowError(ex);
         	}
 
         	throw ruby.newRuntimeError(ex.getLocalizedMessage());
