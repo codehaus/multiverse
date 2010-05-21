@@ -7,12 +7,12 @@ import static java.lang.String.format;
 import static org.multiverse.api.StmUtils.retry;
 
 /**
- * A transactional primitive for a int.
+ * A Ref for storing an int.
  *
  * @author Peter Veentjer
  */
 @TransactionalObject
-public final class IntRef {
+public class IntRef {
 
     private int value;
 
@@ -38,7 +38,7 @@ public final class IntRef {
      * @return gets the current value.
      */
     @TransactionalMethod(readonly = true)
-    public int get() {
+    public final int get() {
         return value;
     }
 
@@ -48,7 +48,8 @@ public final class IntRef {
      * @param newValue the new value.
      * @return the previous value.
      */
-    public int set(int newValue) {
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final int set(int newValue) {
         int oldValue = this.value;
         this.value = newValue;
         return oldValue;
@@ -59,7 +60,8 @@ public final class IntRef {
      *
      * @return the decreased value.
      */
-    public int dec() {
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final int dec() {
         value--;
         return value;
     }
@@ -69,7 +71,8 @@ public final class IntRef {
      *
      * @return the increased value.
      */
-    public int inc() {
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final int inc() {
         value++;
         return value;
     }
@@ -80,7 +83,11 @@ public final class IntRef {
      * @param amount the amount the value needs to be increased with. Value is allowed to be 0 or negative.
      * @return the increased value.
      */
-    public int inc(int amount) {
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final int inc(int amount) {
+        if (amount == 0) {
+            return value;
+        }
         value += amount;
         return value;
     }
@@ -91,9 +98,9 @@ public final class IntRef {
      * @param amount the amount the value needs to be decreased with. Value is allowed to be 0 or negative.
      * @return the decreased value.
      */
-    public int dec(int amount) {
-        value -= amount;
-        return value;
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final int dec(int amount) {
+        return inc(-amount);
     }
 
     /**
@@ -102,7 +109,7 @@ public final class IntRef {
      * @param desired the value to wait for.
      */
     @TransactionalMethod(readonly = true, trackReads = true)
-    public void await(int desired) {
+    public final void await(int desired) {
         if (desired != value) {
             retry();
         }
@@ -115,7 +122,7 @@ public final class IntRef {
      * @return the value that currently is active.
      */
     @TransactionalMethod(readonly = true, trackReads = true)
-    public int awaitLargerThan(int than) {
+    public final int awaitLargerThan(int than) {
         if (!(value > than)) {
             retry();
         }
@@ -130,7 +137,7 @@ public final class IntRef {
      * @return
      */
     @TransactionalMethod(readonly = true, trackReads = true)
-    public int awaitLargerOrEqualThan(int than) {
+    public final int awaitLargerOrEqualThan(int than) {
         if (!(value >= than)) {
             retry();
         }
@@ -139,7 +146,7 @@ public final class IntRef {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public int awaitSmallerThan(int than) {
+    public final int awaitSmallerThan(int than) {
         if (!(value < than)) {
             retry();
         }
@@ -148,7 +155,7 @@ public final class IntRef {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public int awaitSmallerOrEqualThan(int than) {
+    public final int awaitSmallerOrEqualThan(int than) {
         if (!(value <= than)) {
             retry();
         }
@@ -157,7 +164,7 @@ public final class IntRef {
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public int awaitNotEqualTo(int than) {
+    public final int awaitNotEqualTo(int than) {
         if (!(value != than)) {
             retry();
         }
@@ -165,18 +172,21 @@ public final class IntRef {
         return value;
     }
 
+    @Override
     @TransactionalMethod(readonly = true)
-    public String toString() {
+    public final String toString() {
         return format("IntRef(value=%s)", value);
     }
 
+    @Override
     @TransactionalMethod(readonly = true)
-    public int hashCode() {
+    public final int hashCode() {
         return value;
     }
 
+    @Override
     @TransactionalMethod(readonly = true)
-    public boolean equals(Object thatObj) {
+    public final boolean equals(Object thatObj) {
         if (thatObj == this) {
             return true;
         }

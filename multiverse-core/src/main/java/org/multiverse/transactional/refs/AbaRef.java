@@ -8,12 +8,12 @@ import static org.multiverse.api.StmUtils.retry;
 
 /**
  * A {@link Ref} that doesn't suffer from the ABA problem. See
- * the {@link SimpleRef} for more information.
+ * the {@link BasicRef} for more information.
  *
  * @author Peter Veentjer
  */
 @TransactionalObject
-public final class AbaRef<E> implements Ref<E> {
+public class AbaRef<E> implements Ref<E> {
 
     private E value;
 
@@ -43,7 +43,7 @@ public final class AbaRef<E> implements Ref<E> {
 
     @Override
     @TransactionalMethod(readonly = true, trackReads = true)
-    public E getOrAwait() {
+    public final E getOrAwait() {
         if (value == null) {
             retry();
         }
@@ -53,7 +53,7 @@ public final class AbaRef<E> implements Ref<E> {
 
     @Override
     @TransactionalMethod(readonly = true, trackReads = true, interruptible = true)
-    public E getOrAwaitInterruptibly() throws InterruptedException {
+    public final E getOrAwaitInterruptibly() throws InterruptedException {
         if (value == null) {
             retry();
         }
@@ -63,40 +63,38 @@ public final class AbaRef<E> implements Ref<E> {
 
     @Override
     @TransactionalMethod(readonly = true)
-    public E get() {
+    public final E get() {
         return value;
     }
 
     @Override
     @TransactionalMethod(readonly = true)
-    public boolean isNull() {
+    public final boolean isNull() {
         return value == null;
     }
 
     @Override
-    public E set(E newRef) {
-        if (newRef != value) {
-            E initialValue = value;
-            value = newRef;
-            writeVersion++;
-            return initialValue;
-        } else {
-            return newRef;
-        }
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final E set(E newValue) {
+        E initialValue = value;
+        value = newValue;
+        writeVersion++;
+        return initialValue;
     }
 
     @Override
-    public E clear() {
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final E clear() {
         return set(null);
     }
 
     @Override
     @TransactionalMethod(readonly = true)
-    public String toString() {
+    public final String toString() {
         if (value == null) {
-            return "TransactionalAbaReference(ref=null)";
+            return "AbaRef(ref=null)";
         } else {
-            return format("TransactionalAbaReference(ref=%s)", value);
+            return format("AbaRef(ref=%s)", value);
         }
     }
 }

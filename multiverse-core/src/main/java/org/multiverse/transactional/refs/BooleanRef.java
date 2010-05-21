@@ -6,10 +6,12 @@ import org.multiverse.annotations.TransactionalObject;
 import static org.multiverse.api.StmUtils.retry;
 
 /**
+ * A Ref for storing a boolean.
+ *
  * @author Peter Veentjer
  */
 @TransactionalObject
-public final class BooleanRef {
+public class BooleanRef {
 
     private boolean value;
 
@@ -25,12 +27,12 @@ public final class BooleanRef {
     }
 
     @TransactionalMethod(readonly = true)
-    public boolean get() {
+    public final boolean get() {
         return value;
     }
 
     @TransactionalMethod(readonly = true, trackReads = true)
-    public void await(boolean desired) {
+    public final void await(boolean desired) {
         if (desired != value) {
             retry();
         }
@@ -42,14 +44,20 @@ public final class BooleanRef {
      * @param newValue the new value.
      * @return the previous value.
      */
-    public boolean set(boolean newValue) {
+    @TransactionalMethod(readonly = false, trackReads = true)
+    public final boolean set(boolean newValue) {
+        if (newValue == value) {
+            return newValue;
+        }
+
         boolean oldValue = this.value;
         this.value = newValue;
         return oldValue;
     }
 
+    @Override
     @TransactionalMethod(readonly = true)
-    public String toString() {
+    public final String toString() {
         if (value) {
             return "BooleanRef(value=true)";
         } else {
@@ -57,13 +65,15 @@ public final class BooleanRef {
         }
     }
 
+    @Override
     @TransactionalMethod(readonly = true)
-    public int hashCode() {
+    public final int hashCode() {
         return value ? 1 : 0;
     }
 
+    @Override
     @TransactionalMethod(readonly = true)
-    public boolean equals(Object thatObj) {
+    public final boolean equals(Object thatObj) {
         if (thatObj == this) {
             return true;
         }

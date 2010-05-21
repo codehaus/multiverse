@@ -7,9 +7,9 @@ import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Stm;
 import org.multiverse.api.exceptions.RetryTimeoutException;
+import org.multiverse.transactional.refs.BasicRef;
 import org.multiverse.transactional.refs.IntRef;
 import org.multiverse.transactional.refs.Ref;
-import org.multiverse.transactional.refs.SimpleRef;
 
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.joinAll;
@@ -38,7 +38,7 @@ public class TransactionalMethod_TimeoutLongTest {
 
     @Test
     public void whenTimeout() {
-        Ref ref = new SimpleRef();
+        Ref ref = new BasicRef();
 
         try {
             tryAwaitNonNull(ref);

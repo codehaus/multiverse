@@ -7,7 +7,8 @@ import org.junit.Test;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
+import static org.multiverse.TestUtils.format;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class IntRefPerformanceStressTest {
 
@@ -15,12 +16,12 @@ public class IntRefPerformanceStressTest {
 
     @Before
     public void setUp() {
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
     }
 
     @After
     public void tearDown() {
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
     }
 
     @Test
@@ -40,6 +41,6 @@ public class IntRefPerformanceStressTest {
         assertEquals(count, ref.get());
         long periodNs = System.nanoTime() - startNs;
         double transactionPerSecond = (count * 1.0d * TimeUnit.SECONDS.toNanos(1)) / periodNs;
-        System.out.printf("%s Transaction/second\n", transactionPerSecond);
+        System.out.printf("%s Transaction/second\n", format(transactionPerSecond));
     }
 }

@@ -38,7 +38,7 @@ import static org.multiverse.api.exceptions.UncommittedReadConflict.createUncomm
  * Transactions or TransactionTemplates. If you really need more performance you should talk to me
  * about adding instrumentation.
  * <h3>Relying on GlobalStmInstance</h3>
- * This SimpleRef implementation can be used without depending on the GlobalStmInstance (so you could createReference a local
+ * This BasicRef implementation can be used without depending on the GlobalStmInstance (so you could createReference a local
  * one stm instance). If this is done, only the methods that rely on a Transaction or TransactionFactory
  * should be used.
  * <h3>___ methods</h3>
@@ -75,7 +75,7 @@ public final class AlphaProgrammaticReference<E>
     private final AlphaStm stm;
 
     /**
-     * Creates a new SimpleRef with null as value. It has exactly the same {@link #AlphaProgrammaticReference(Object)}
+     * Creates a new BasicRef with null as value. It has exactly the same {@link #AlphaProgrammaticReference(Object)}
      * with null as value.
      * <p/>
      * This method relies on the ThreadLocalTransaction and GlobalStmInstance.
@@ -89,7 +89,7 @@ public final class AlphaProgrammaticReference<E>
     }
 
     /**
-     * Creates a new SimpleRef with the provided value.
+     * Creates a new BasicRef with the provided value.
      * <p/>
      * If there is no transaction active, the writeversion of the committed reference will
      * be the same as the current version of the stm. Normally it increases after a commit to
@@ -99,14 +99,14 @@ public final class AlphaProgrammaticReference<E>
      * This method relies on the ThreadLocalTransaction.
      * If no transaction is found, it also relies on the GlobalStmInstance.
      *
-     * @param value the value this SimpleRef should have.
+     * @param value the value this BasicRef should have.
      */
     public AlphaProgrammaticReference(E value) {
         this(getThreadLocalTransaction(), value);
     }
 
     /**
-     * Creates a new SimpleRef using the provided transaction.
+     * Creates a new BasicRef using the provided transaction.
      * <p/>
      * This method does not rely on a ThreadLocalTransaction and GlobalStmInstance.
      *

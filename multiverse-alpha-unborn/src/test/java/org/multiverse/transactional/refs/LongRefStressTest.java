@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class LongRefStressTest {
 
@@ -21,6 +22,7 @@ public class LongRefStressTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         total.set(0);
         threads = new StressThread[threadCount];
         for (int k = 0; k < threads.length; k++) {
@@ -38,6 +40,8 @@ public class LongRefStressTest {
         joinAll(threads);
 
         assertEquals(total.get(), sum());
+
+
     }
 
     public int sum() {
@@ -60,7 +64,7 @@ public class LongRefStressTest {
                 int count = doIt();
                 total.addAndGet(count);
 
-                if (k % 100000 == 0) {
+                if (k % 500000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
             }

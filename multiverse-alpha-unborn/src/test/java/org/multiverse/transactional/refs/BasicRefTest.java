@@ -10,12 +10,13 @@ import org.multiverse.api.exceptions.Retry;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
  */
-public final class SimpleRefTest {
+public final class BasicRefTest {
 
     private Stm stm;
     private TransactionFactory txFactory;
@@ -27,12 +28,12 @@ public final class SimpleRefTest {
                 .setSpeculativeConfigurationEnabled(false)
                 .setReadonly(false)
                 .build();
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
     }
 
     @After
     public void tearDown() {
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
     }
 
     @Test
@@ -42,7 +43,7 @@ public final class SimpleRefTest {
         Transaction tx = txFactory.start();
         setThreadLocalTransaction(tx);
 
-        SimpleRef ref = new SimpleRef();
+        BasicRef ref = new BasicRef();
 
         tx.commit();
         assertEquals(version, stm.getVersion());
@@ -59,7 +60,7 @@ public final class SimpleRefTest {
     }
 
     public void rollback(String initialValue, String newValue) {
-        SimpleRef<String> ref = new SimpleRef<String>(initialValue);
+        BasicRef<String> ref = new BasicRef<String>(initialValue);
 
         long version = stm.getVersion();
 
@@ -81,7 +82,7 @@ public final class SimpleRefTest {
     public void noArgConstruction() {
         long version = stm.getVersion();
 
-        SimpleRef<String> ref = new SimpleRef<String>();
+        BasicRef<String> ref = new BasicRef<String>();
 
         assertEquals(version, stm.getVersion());
         assertNull(ref.get());
@@ -91,7 +92,7 @@ public final class SimpleRefTest {
     public void nullConstruction() {
         long version = stm.getVersion();
 
-        SimpleRef<String> ref = new SimpleRef<String>();
+        BasicRef<String> ref = new BasicRef<String>();
 
         assertEquals(version, stm.getVersion());
         assertNull(ref.get());
@@ -101,7 +102,7 @@ public final class SimpleRefTest {
     public void nonNullConstruction() {
         long version = stm.getVersion();
         String s = "foo";
-        SimpleRef<String> ref = new SimpleRef<String>(s);
+        BasicRef<String> ref = new BasicRef<String>(s);
 
         assertEquals(version, stm.getVersion());
         assertEquals(s, ref.get());
@@ -109,7 +110,7 @@ public final class SimpleRefTest {
 
     @Test
     public void testIsNull() {
-        SimpleRef<String> ref = new SimpleRef<String>();
+        BasicRef<String> ref = new BasicRef<String>();
 
         long version = stm.getVersion();
         assertTrue(ref.isNull());
@@ -124,7 +125,7 @@ public final class SimpleRefTest {
 
     @Test
     public void testSetFromNullToNull() {
-        SimpleRef<String> ref = new SimpleRef<String>();
+        BasicRef<String> ref = new BasicRef<String>();
 
         long version = stm.getVersion();
         String result = ref.set(null);
@@ -135,7 +136,7 @@ public final class SimpleRefTest {
 
     @Test
     public void testSetFromNullToNonNull() {
-        SimpleRef<String> ref = new SimpleRef<String>();
+        BasicRef<String> ref = new BasicRef<String>();
 
         long version = stm.getVersion();
         String newRef = "foo";
@@ -148,7 +149,7 @@ public final class SimpleRefTest {
     @Test
     public void testSetFromNonNullToNull() {
         String oldRef = "foo";
-        SimpleRef<String> ref = new SimpleRef<String>(oldRef);
+        BasicRef<String> ref = new BasicRef<String>(oldRef);
 
         long version = stm.getVersion();
 
@@ -162,7 +163,7 @@ public final class SimpleRefTest {
     public void testSetChangedReferenced() {
         String oldRef = "foo";
 
-        SimpleRef<String> ref = new SimpleRef<String>(oldRef);
+        BasicRef<String> ref = new BasicRef<String>(oldRef);
 
         long version = stm.getVersion();
 
@@ -177,7 +178,7 @@ public final class SimpleRefTest {
     public void testSetUnchangedReferences() {
         String oldRef = "foo";
 
-        SimpleRef<String> ref = new SimpleRef<String>(oldRef);
+        BasicRef<String> ref = new BasicRef<String>(oldRef);
 
         long version = stm.getVersion();
 
@@ -191,7 +192,7 @@ public final class SimpleRefTest {
     public void testSetEqualIsNotUsedButReferenceEquality() {
         String oldRef = new String("foo");
 
-        SimpleRef<String> ref = new SimpleRef<String>(oldRef);
+        BasicRef<String> ref = new BasicRef<String>(oldRef);
 
         long version = stm.getVersion();
 
@@ -205,7 +206,7 @@ public final class SimpleRefTest {
     @Test
     public void testSetAndUnsetIsNotSeenAsChange() {
         String oldRef = "foo";
-        SimpleRef<String> ref = new SimpleRef<String>(oldRef);
+        BasicRef<String> ref = new BasicRef<String>(oldRef);
 
         long version = stm.getVersion();
         Transaction tx = stm.getTransactionFactoryBuilder()
@@ -227,7 +228,7 @@ public final class SimpleRefTest {
     public void getOrAwaitCompletesIfRefNotNull() {
         String oldRef = "foo";
 
-        SimpleRef<String> ref = new SimpleRef<String>(oldRef);
+        BasicRef<String> ref = new BasicRef<String>(oldRef);
 
         long version = stm.getVersion();
 
@@ -238,7 +239,7 @@ public final class SimpleRefTest {
 
     @Test
     public void getOrAwaitRetriesIfNull() {
-        SimpleRef<String> ref = new SimpleRef<String>();
+        BasicRef<String> ref = new BasicRef<String>();
 
         long version = stm.getVersion();
 

@@ -1,13 +1,20 @@
 package org.multiverse.transactional.refs;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.exceptions.DeadTransactionException;
 
 import static org.junit.Assert.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 public class ShortRefTest {
+
+    @Before
+    public void setUp() {
+        clearThreadLocalTransaction();
+    }
 
     @Test
     public void constructorWithNoArg() {
