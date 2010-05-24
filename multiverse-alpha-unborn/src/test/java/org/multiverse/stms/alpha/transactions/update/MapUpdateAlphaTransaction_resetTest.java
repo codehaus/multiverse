@@ -10,14 +10,15 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import java.util.Map;
 
-import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.assertIsActive;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.multiverse.TestUtils.assertIsNew;
 import static org.multiverse.TestUtils.getField;
 
 /**
  * @author Peter Veentjer
  */
-public class MapUpdateAlphaTransaction_restartTest {
+public class MapUpdateAlphaTransaction_resetTest {
 
     private AlphaStm stm;
     private AlphaStmConfig stmConfig;
@@ -29,7 +30,7 @@ public class MapUpdateAlphaTransaction_restartTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MapUpdateAlphaTransaction startSutTransaction() {
+    public MapUpdateAlphaTransaction createSutTransaction() {
         UpdateConfiguration config =
                 new UpdateConfiguration(stmConfig.clock);
         return new MapUpdateAlphaTransaction(config);
@@ -37,69 +38,73 @@ public class MapUpdateAlphaTransaction_restartTest {
 
     @Test
     public void whenUnused() {
-        AlphaTransaction tx = startSutTransaction();
-        tx.restart();
+        AlphaTransaction tx = createSutTransaction();
+        tx.start();
+        tx.reset();
 
-        assertEquals(stm.getVersion(), tx.getReadVersion());
-        assertIsActive(tx);
+        assertIsNew(tx);
+        assertEquals(0, tx.getReadVersion());
     }
 
     @Test
     public void whenUsed() {
         ManualRef ref = new ManualRef(stm, 1);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForWrite(ref);
         tranlocal.value++;
 
-        tx.restart();
-        assertIsActive(tx);
-        assertEquals(stm.getVersion(), tx.getReadVersion());
+        tx.reset();
+        assertIsNew(tx);
+        assertEquals(0, tx.getReadVersion());
     }
 
     @Test
     public void whenAborted() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.abort();
 
-        tx.restart();
-        assertIsActive(tx);
-        assertEquals(stm.getVersion(), tx.getReadVersion());
+        tx.reset();
+
+        assertIsNew(tx);
+        assertEquals(0, tx.getReadVersion());
     }
 
     @Test
     public void whenPreparedWithLockedResources_thenResourcesFreed() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref.inc(tx);
         tx.prepare();
 
-        tx.restart();
-        assertIsActive(tx);
-        assertNull(ref.___getLockOwner());
+        tx.reset();
+
+        assertIsNew(tx);
+        assertEquals(0, tx.getReadVersion());
     }
 
     @Test
     public void whenCommitted() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.commit();
 
-        tx.restart();
-        assertIsActive(tx);
-        assertEquals(stm.getVersion(), tx.getReadVersion());
+        tx.reset();
+
+        assertIsNew(tx);
+        assertEquals(0, tx.getReadVersion());
     }
 
     @Test
     public void whenVersionUpdatedByOtherTx_thenTxUpdatesReadVersion() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         stmConfig.clock.tick();
 
-        tx.restart();
+        tx.reset();
 
-        assertIsActive(tx);
-        assertEquals(stm.getVersion(), tx.getReadVersion());
+        assertIsNew(tx);
+        assertEquals(0, tx.getReadVersion());
     }
 
     @Test
@@ -107,10 +112,10 @@ public class MapUpdateAlphaTransaction_restartTest {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref1);
         tx.openForWrite(ref2);
-        tx.restart();
+        tx.reset();
 
         Map readWriteMap = (Map) getField(tx, "attachedMap");
         assertTrue(readWriteMap.isEmpty());

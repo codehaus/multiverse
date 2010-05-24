@@ -215,7 +215,7 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
                 throw new PanicError("tryLockAndDetectConflicts can't be called with null as lockOwner");
             }
 
-            if (lockOwner.getStatus() != TransactionStatus.active) {
+            if (lockOwner.getStatus() != TransactionStatus.Active) {
                 String msg = format(
                         "Can't tryLockAndDetectConflicts with non active transaction '%s'",
                         lockOwner.getConfiguration().getFamilyName());
@@ -233,7 +233,7 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
                 throw new PanicError("releaseLock can't be called with null as expectedLockOwner");
             }
 
-            if (expectedLockOwner.getStatus() != TransactionStatus.active) {
+            if (expectedLockOwner.getStatus() != TransactionStatus.Active) {
                 String msg = format(
                         "Can't tryLockAndDetectConflicts with non active transaction '%s'",
                         expectedLockOwner.getConfiguration().getFamilyName());

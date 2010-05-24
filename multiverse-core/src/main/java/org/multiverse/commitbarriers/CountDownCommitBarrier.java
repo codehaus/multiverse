@@ -57,7 +57,7 @@ public final class CountDownCommitBarrier extends CommitBarrier {
      * @throws IllegalArgumentException if parties smaller than 0.
      */
     public CountDownCommitBarrier(int parties, boolean fair) {
-        super(parties == 0 ? Status.committed : Status.closed, fair);
+        super(parties == 0 ? Status.Committed : Status.Closed, fair);
 
         if (parties < 0) {
             throw new IllegalArgumentException();
@@ -92,16 +92,16 @@ public final class CountDownCommitBarrier extends CommitBarrier {
         lock.lock();
         try {
             switch (getStatus()) {
-                case closed:
+                case Closed:
                     addJoiner();
 
                     if (isLastParty()) {
                         onCommitTasks = signalCommit();
                     }
                     break;
-                case aborted:
+                case Aborted:
                     break;
-                case committed:
+                case Committed:
                     break;
                 default:
                     throw new IllegalStateException();
@@ -117,7 +117,6 @@ public final class CountDownCommitBarrier extends CommitBarrier {
      * Adds 1 additional party to this CountDownCommitBarrier.
      *
      * @throws CommitBarrierOpenException if this CountDownCommitBarrier already is committed or aborted.
-     * @throws CommitBarrierOpenException if this CountDownCommitBarrier already is open.
      * @see #incParties(int)
      */
     public void incParties() {
@@ -145,17 +144,17 @@ public final class CountDownCommitBarrier extends CommitBarrier {
         lock.lock();
         try {
             switch (getStatus()) {
-                case closed:
+                case Closed:
                     if (extra == 0) {
                         return;
                     }
 
                     parties += extra;
                     break;
-                case aborted:
+                case Aborted:
                     String abortMsg = "Can't call countDown on already aborted CountDownCommitBarrier";
                     throw new CommitBarrierOpenException(abortMsg);
-                case committed:
+                case Committed:
                     String commitMsg = "Can't call countDown on already committed CountDownCommitBarrier";
                     throw new CommitBarrierOpenException(commitMsg);
                 default:
@@ -168,10 +167,11 @@ public final class CountDownCommitBarrier extends CommitBarrier {
 
     /**
      * Increases the number of parties that need to return before this CommitBarrier can open.
+     * The parties are only increased after the transaction has committed.
      * <p/>
      * If extra is 0, this call is ignored.
      *
-     * @param tx
+     * @param tx    the transaction where this operation lifts on.
      * @param extra the number of extra parties
      * @throws NullPointerException     if tx is null.
      * @throws IllegalArgumentException is extra smaller than zero.
@@ -196,7 +196,7 @@ public final class CountDownCommitBarrier extends CommitBarrier {
         lock.lock();
         try {
             switch (getStatus()) {
-                case closed:
+                case Closed:
                     if (extra == 0) {
                         return;
                     }
@@ -204,10 +204,10 @@ public final class CountDownCommitBarrier extends CommitBarrier {
                     parties += extra;
                     tx.registerLifecycleListener(new RestorePartiesCompensatingTask(extra));
                     break;
-                case aborted:
+                case Aborted:
                     String abortMsg = "Can't call countDown on already aborted CountDownCommitBarrier";
                     throw new CommitBarrierOpenException(abortMsg);
-                case committed:
+                case Committed:
                     String commitMsg = "Can't call countDown on already committed CountDownCommitBarrier";
                     throw new CommitBarrierOpenException(commitMsg);
                 default:
@@ -231,14 +231,14 @@ public final class CountDownCommitBarrier extends CommitBarrier {
 
         @Override
         public void notify(Transaction tx, TransactionLifecycleEvent event) {
-            if (event != TransactionLifecycleEvent.preAbort) {
+            if (event != TransactionLifecycleEvent.PreAbort) {
                 return;
             }
 
             List<Runnable> onCommitTasks = new ArrayList<Runnable>();
             lock.lock();
             try {
-                if (getStatus() == Status.closed) {
+                if (getStatus() == Status.Closed) {
                     parties -= extra;
                     if (isLastParty()) {
                         onCommitTasks = signalCommit();

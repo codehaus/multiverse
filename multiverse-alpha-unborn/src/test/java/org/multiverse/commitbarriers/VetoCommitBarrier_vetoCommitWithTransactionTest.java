@@ -94,7 +94,7 @@ public class VetoCommitBarrier_vetoCommitWithTransactionTest {
     @Test
     public void whenTransactionFailedToPrepare_thenBarrierNotAbortedOrCommitted() {
         Transaction tx = mock(Transaction.class);
-        doReturn(TransactionStatus.active).when(tx).getStatus();
+        doReturn(TransactionStatus.Active).when(tx).getStatus();
         doThrow(new OptimisticLockFailedWriteConflict()).when(tx).prepare();
 
         VetoCommitBarrier barrier = new VetoCommitBarrier();

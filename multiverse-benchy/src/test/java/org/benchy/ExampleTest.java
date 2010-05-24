@@ -1,18 +1,21 @@
 package org.benchy;
 
-import org.benchy.executor.BenchmarkExecutor;
-import org.benchy.executor.DefaultBenchmarkExecutor;
-import org.benchy.repository.FileBasedBenchmarkResultRepository;
+import com.google.gdata.util.AuthenticationException;
+import org.benchy.repository.GoogleSpreadsheetRepository;
+import org.benchy.runner.BenchmarkRunner;
+import org.benchy.runner.DefaultBenchmarkRunner;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
+@Ignore
 public class ExampleTest {
-    private BenchmarkExecutor executor;
+    private BenchmarkRunner runner;
 
     @Before
-    public void setUp() {
-        executor = new DefaultBenchmarkExecutor(new FileBasedBenchmarkResultRepository());
+    public void setUp() throws AuthenticationException {
+        runner = new DefaultBenchmarkRunner(new GoogleSpreadsheetRepository("alarmnummer@gmail.com", "turdsandwitch"));
     }
 
     @Test
@@ -24,7 +27,7 @@ public class ExampleTest {
         benchmark.setBenchmarkName("foo");
         benchmark.getTestCases().add(testCase);
 
-        executor.execute(benchmark);
+        runner.execute(benchmark);
     }
 
     static class TestDriver extends AbstractBenchmarkDriver {

@@ -12,6 +12,7 @@ import org.multiverse.stms.alpha.AlphaTransactionalObject;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.instrumentation.InstrumentationTestUtils.resetInstrumentationProblemMonitor;
 import static org.multiverse.stms.alpha.instrumentation.AlphaReflectionUtils.*;
 
@@ -26,6 +27,7 @@ public class QueueTest {
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
         resetInstrumentationProblemMonitor();
+        clearThreadLocalTransaction();
     }
 
     @After

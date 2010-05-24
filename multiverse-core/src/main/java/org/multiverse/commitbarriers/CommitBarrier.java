@@ -79,7 +79,7 @@ public abstract class CommitBarrier {
      * @return true if closed, false otherwise.
      */
     public final boolean isClosed() {
-        return status == Status.closed;
+        return status == Status.Closed;
     }
 
     /**
@@ -88,7 +88,7 @@ public abstract class CommitBarrier {
      * @return true if committed, false otherwise.
      */
     public final boolean isCommitted() {
-        return status == Status.committed;
+        return status == Status.Committed;
     }
 
     /**
@@ -97,7 +97,7 @@ public abstract class CommitBarrier {
      * @return true if aborted, false otherwise.
      */
     public final boolean isAborted() {
-        return status == Status.aborted;
+        return status == Status.Aborted;
     }
 
     /**
@@ -107,7 +107,7 @@ public abstract class CommitBarrier {
      */
     protected final List<Runnable> signalCommit() {
         numberWaiting = 0;
-        status = Status.committed;
+        status = Status.Committed;
         statusCondition.signalAll();
         onAbortTasks = null;
         List<Runnable> result = onCommitTasks;
@@ -122,7 +122,7 @@ public abstract class CommitBarrier {
      */
     protected final List<Runnable> signalAborted() {
         numberWaiting = 0;
-        status = Status.aborted;
+        status = Status.Aborted;
         statusCondition.signalAll();
         onCommitTasks = new ArrayList<Runnable>();
         List<Runnable> result = onAbortTasks;
@@ -144,12 +144,12 @@ public abstract class CommitBarrier {
         lock.lock();
         try {
             switch (status) {
-                case closed:
+                case Closed:
                     postAbortTasks = signalAborted();
                     break;
-                case aborted:
+                case Aborted:
                     return;
-                case committed:
+                case Committed:
                     String commitMsg = "Can't abort already committed CommitBarrier";
                     throw new CommitBarrierOpenException(commitMsg);
                 default:
@@ -180,13 +180,13 @@ public abstract class CommitBarrier {
      * @throws InterruptedException if the calling thread is interrupted while waiting.
      */
     public final void awaitOpen() throws InterruptedException {
-        if (status != Status.closed) {
+        if (status != Status.Closed) {
             return;
         }
 
         lock.lockInterruptibly();
         try {
-            while (status == Status.closed) {
+            while (status == Status.Closed) {
                 statusCondition.await();
             }
         } finally {
@@ -202,10 +202,10 @@ public abstract class CommitBarrier {
      * This call is not responsive to interrupts.
      */
     public final void awaitOpenUninterruptibly() {
-        if (status == Status.closed) {
+        if (status == Status.Closed) {
             lock.lock();
             try {
-                while (status == Status.closed) {
+                while (status == Status.Closed) {
                     statusCondition.awaitUninterruptibly();
                 }
             } finally {
@@ -229,12 +229,12 @@ public abstract class CommitBarrier {
             throw new NullPointerException();
         }
 
-        if (status == Status.closed) {
+        if (status == Status.Closed) {
             long timeoutNs = unit.toNanos(timeout);
 
             lock.lockInterruptibly();
             try {
-                while (status == Status.closed) {
+                while (status == Status.Closed) {
                     timeoutNs = statusCondition.awaitNanos(timeoutNs);
                     if (timeoutNs <= 0) {
                         return false;
@@ -263,11 +263,11 @@ public abstract class CommitBarrier {
             throw new NullPointerException();
         }
 
-        if (status == Status.closed) {
+        if (status == Status.Closed) {
             long timeoutNs = unit.toNanos(timeout);
             lock.lock();
             try {
-                while (status == Status.closed) {
+                while (status == Status.Closed) {
                     timeoutNs = awaitNanosUninterruptible(timeoutNs);
                     if (timeoutNs <= 0) {
                         return false;
@@ -331,7 +331,7 @@ public abstract class CommitBarrier {
         lock.lock();
         try {
             switch (status) {
-                case closed:
+                case Closed:
                     Runnable command = new Runnable() {
                         @Override
                         public void run() {
@@ -343,10 +343,10 @@ public abstract class CommitBarrier {
                     };
                     executorService.schedule(command, timeout, unit);
                     break;
-                case committed:
+                case Committed:
                     String commitMsg = "Can't set a timeout on an already commit CommitBarrier.";
                     throw new CommitBarrierOpenException(commitMsg);
-                case aborted:
+                case Aborted:
                     String abortMsg = "Can't set a timeout on an already aborted CommitBarrier.";
                     throw new CommitBarrierOpenException(abortMsg);
                 default:
@@ -373,7 +373,7 @@ public abstract class CommitBarrier {
         lock.lock();
         try {
             switch (status) {
-                case closed:
+                case Closed:
                     if (task == null) {
                         throw new NullPointerException();
                     }
@@ -384,10 +384,10 @@ public abstract class CommitBarrier {
 
                     onAbortTasks.add(task);
                     break;
-                case committed:
+                case Committed:
                     String commitMsg = "Can't register on abort task on already committed CommitBarrier";
                     throw new CommitBarrierOpenException(commitMsg);
-                case aborted:
+                case Aborted:
                     String abortMsg = "Can't register on abort task on already aborted CommitBarrier";
                     throw new CommitBarrierOpenException(abortMsg);
                 default:
@@ -414,7 +414,7 @@ public abstract class CommitBarrier {
         lock.lock();
         try {
             switch (status) {
-                case closed:
+                case Closed:
                     if (task == null) {
                         throw new NullPointerException();
                     }
@@ -425,10 +425,10 @@ public abstract class CommitBarrier {
 
                     onCommitTasks.add(task);
                     break;
-                case committed:
+                case Committed:
                     String commitMsg = "Can't register on commit task on already committed CommitBarrier";
                     throw new CommitBarrierOpenException(commitMsg);
-                case aborted:
+                case Aborted:
                     String abortMsg = "Can't register on commit task on already aborted CommitBarrier";
                     throw new CommitBarrierOpenException(abortMsg);
                 default:
@@ -447,7 +447,7 @@ public abstract class CommitBarrier {
      * @throws IllegalStateException if the transaction isn't closed.
      */
     protected final void addJoiner() {
-        if (status != Status.closed) {
+        if (status != Status.Closed) {
             throw new IllegalStateException();
         }
 
@@ -518,13 +518,13 @@ public abstract class CommitBarrier {
         lock.lock();
         try {
             switch (getStatus()) {
-                case closed:
+                case Closed:
                     tx.prepare();
                     addJoiner();
                     if (isLastParty()) {
                         tasks = signalCommit();
                     } else {
-                        while (getStatus() == Status.closed) {
+                        while (getStatus() == Status.Closed) {
                             try {
                                 statusCondition.await();
                             } catch (InterruptedException ex) {
@@ -535,11 +535,11 @@ public abstract class CommitBarrier {
                         }
                     }
                     break;
-                case committed:
+                case Committed:
                     String committedMsg = format("Can't await commit on already committed VetoCommitBarrier " +
                             "with transaction %s", tx.getConfiguration().getFamilyName());
                     throw new CommitBarrierOpenException(committedMsg);
-                case aborted:
+                case Aborted:
                     String abortMsg = format("Can't await commit on already aborted VetoCommitBarrier " +
                             "with transaction %s", tx.getConfiguration().getFamilyName());
                     throw new CommitBarrierOpenException(abortMsg);
@@ -574,25 +574,25 @@ public abstract class CommitBarrier {
         lock.lock();
         try {
             switch (getStatus()) {
-                case closed:
+                case Closed:
                     tx.prepare();
                     addJoiner();
 
                     if (isLastParty()) {
                         postCommitTasks = signalCommit();
                     } else {
-                        while (getStatus() == Status.closed) {
+                        while (getStatus() == Status.Closed) {
                             statusCondition.awaitUninterruptibly();
                         }
                     }
                     break;
-                case aborted:
+                case Aborted:
                     tx.abort();
 
                     String abortedMsg = format("Can't call joinCommitUninterruptible on already aborted " +
                             "CountDownCommitBarrier with transaction %s ", tx.getConfiguration().getFamilyName());
                     throw new CommitBarrierOpenException(abortedMsg);
-                case committed:
+                case Committed:
                     tx.abort();
 
                     String commitMsg = format("Can't call joinCommitUninterruptible on already committed " +
@@ -629,7 +629,7 @@ public abstract class CommitBarrier {
         try {
             try {
                 switch (getStatus()) {
-                    case closed:
+                    case Closed:
                         tx.prepare();
                         addJoiner();
 
@@ -640,11 +640,11 @@ public abstract class CommitBarrier {
                             postCommitTasks = signalAborted();
                         }
                         break;
-                    case aborted:
+                    case Aborted:
                         String abortMsg = format("Can't call tryJoinCommit on already aborted " +
                                 "CountDownCommitBarrier with transaction %s ", tx.getConfiguration().getFamilyName());
                         throw new CommitBarrierOpenException(abortMsg);
-                    case committed:
+                    case Committed:
                         String commitMsg = format("Can't call tryJoinCommit on already committed " +
                                 "CountDownCommitBarrier with transaction %s ", tx.getConfiguration().getFamilyName());
                         throw new CommitBarrierOpenException(commitMsg);
@@ -696,10 +696,10 @@ public abstract class CommitBarrier {
         lock.lock();
         try {
             switch (getStatus()) {
-                case closed:
+                case Closed:
                     tx.prepare();
                     addJoiner();
-                    while (getStatus() == Status.closed) {
+                    while (getStatus() == Status.Closed) {
                         try {
                             timeoutNs = statusCondition.awaitNanos(timeoutNs);
                             if (timeoutNs <= 0) {
@@ -715,10 +715,10 @@ public abstract class CommitBarrier {
                         }
                     }
                     break;
-                case committed:
+                case Committed:
                     String commitMsg = "Can't await commit on an already committed VetoCommitBarrier";
                     throw new CommitBarrierOpenException(commitMsg);
-                case aborted:
+                case Aborted:
                     String abortMsg = "Can't await commit on an already aborted VetoCommitBarrier";
                     throw new CommitBarrierOpenException(abortMsg);
                 default:
@@ -759,10 +759,10 @@ public abstract class CommitBarrier {
         lock.lock();
         try {
             switch (getStatus()) {
-                case closed:
+                case Closed:
                     tx.prepare();
                     addJoiner();
-                    while (getStatus() == Status.closed) {
+                    while (getStatus() == Status.Closed) {
                         try {
                             timeoutNs = statusCondition.awaitNanos(timeoutNs);
                             if (timeoutNs <= 0) {
@@ -778,10 +778,10 @@ public abstract class CommitBarrier {
                         }
                     }
                     break;
-                case committed:
+                case Committed:
                     String commitMsg = "Can't await commit on an already committed VetoCommitBarrier";
                     throw new CommitBarrierOpenException(commitMsg);
-                case aborted:
+                case Aborted:
                     String abortMsg = "Can't await commit on an already aborted VetoCommitBarrier";
                     throw new CommitBarrierOpenException(abortMsg);
                 default:
@@ -799,6 +799,6 @@ public abstract class CommitBarrier {
     protected abstract boolean isLastParty();
 
     enum Status {
-        closed, committed, aborted
+        Closed, Committed, Aborted
     }
 }

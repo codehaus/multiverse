@@ -28,6 +28,7 @@ public class AbstractTransaction_commitTest {
     @Test
     public void whenPrepareThrowsException_thenAbort() {
         AbstractTransaction tx = spy(new AbstractTransactionImpl());
+        tx.start();
 
         RuntimeException expected = new RuntimeException();
         doThrow(expected).when(tx).doPrepare();
@@ -44,26 +45,28 @@ public class AbstractTransaction_commitTest {
     @Test
     public void whenActive_listenersAreNotified() {
         Transaction tx = new AbstractTransactionImpl(clock);
+        tx.start();
 
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         tx.registerLifecycleListener(listener);
         tx.commit();
 
         assertIsCommitted(tx);
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.preCommit);
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.postCommit);
-        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.preAbort);
-        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.postAbort);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PreCommit);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PostCommit);
+        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.PreAbort);
+        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.PostAbort);
     }
 
     @Test
     public void whenPreCommitTaskFails_thenAbort() {
         Transaction tx = new AbstractTransactionImpl();
+        tx.start();
 
         RuntimeException exception = new RuntimeException();
 
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        doThrow(exception).when(listener).notify(tx, TransactionLifecycleEvent.preCommit);
+        doThrow(exception).when(listener).notify(tx, TransactionLifecycleEvent.PreCommit);
 
         tx.registerLifecycleListener(listener);
 
@@ -75,20 +78,21 @@ public class AbstractTransaction_commitTest {
         }
 
         assertIsAborted(tx);
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.preCommit);
-        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.postCommit);
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.preAbort);
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.postAbort);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PreCommit);
+        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.PostCommit);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PreAbort);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PostAbort);
     }
 
     @Test
     public void whenPostCommitTaskFails_exceptionThrown() {
         Transaction tx = new AbstractTransactionImpl();
+        tx.start();
 
         RuntimeException exception = new RuntimeException();
 
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        doThrow(exception).when(listener).notify(tx, TransactionLifecycleEvent.postCommit);
+        doThrow(exception).when(listener).notify(tx, TransactionLifecycleEvent.PostCommit);
 
         tx.registerLifecycleListener(listener);
 
@@ -100,10 +104,10 @@ public class AbstractTransaction_commitTest {
         }
 
         assertIsCommitted(tx);
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.preCommit);
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.postCommit);
-        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.preAbort);
-        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.postAbort);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PreCommit);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PostCommit);
+        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.PreAbort);
+        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.PostAbort);
     }
 
     @Test

@@ -13,7 +13,7 @@ import java.lang.reflect.Field;
 import static java.lang.reflect.Modifier.isTransient;
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.alpha.instrumentation.AlphaReflectionUtils.*;
 
 /**
@@ -27,7 +27,7 @@ public class TransactionalObject_FieldTypesTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
     }
 
     @After

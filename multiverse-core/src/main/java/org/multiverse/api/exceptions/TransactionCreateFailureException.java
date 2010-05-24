@@ -8,20 +8,20 @@ package org.multiverse.api.exceptions;
  *
  * @author Peter Veentjer
  */
-public class StartFailureException extends IllegalStateException {
+public class TransactionCreateFailureException extends IllegalStateException {
 
-    public StartFailureException() {
+    public TransactionCreateFailureException() {
     }
 
-    public StartFailureException(String message) {
+    public TransactionCreateFailureException(String message) {
         super(message);
     }
 
-    public StartFailureException(String message, Throwable cause) {
+    public TransactionCreateFailureException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public StartFailureException(Throwable cause) {
+    public TransactionCreateFailureException(Throwable cause) {
         super(cause);
     }
 }

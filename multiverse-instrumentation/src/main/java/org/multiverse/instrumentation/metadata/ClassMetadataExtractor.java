@@ -15,6 +15,7 @@ public interface ClassMetadataExtractor {
      * metadata itself.
      *
      * @param metadataRepository the repository for retrieving metadata.
+     * @throws NullPointerException if metadataRepository is null.
      */
     void init(MetadataRepository metadataRepository);
 

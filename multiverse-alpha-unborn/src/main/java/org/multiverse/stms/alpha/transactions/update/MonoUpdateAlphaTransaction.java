@@ -19,11 +19,10 @@ public final class MonoUpdateAlphaTransaction extends AbstractUpdateAlphaTransac
 
     public MonoUpdateAlphaTransaction(UpdateConfiguration config) {
         super(config);
-        init();
     }
 
     @Override
-    protected void dodoClear() {
+    protected void doDoReset() {
         attached = null;
     }
 

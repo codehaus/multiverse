@@ -32,19 +32,20 @@ public class MonoUpdateAlphaTransaction_openForConstructionTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MonoUpdateAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfig) {
+    public MonoUpdateAlphaTransaction createSutTransaction(SpeculativeConfiguration speculativeConfig) {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
                 .withSpeculativeConfiguration(speculativeConfig);
         return new MonoUpdateAlphaTransaction(config);
     }
 
     public MonoUpdateAlphaTransaction startSutTransaction() {
-        return startSutTransaction(new SpeculativeConfiguration(100));
+        return createSutTransaction(new SpeculativeConfiguration(100));
     }
 
     @Test
     public void whenNullTxObject_thenNullPointerException() {
         AlphaTransaction tx = startSutTransaction();
+        tx.start();
 
         long version = stm.getVersion();
         try {
@@ -177,7 +178,7 @@ public class MonoUpdateAlphaTransaction_openForConstructionTest {
         ManualRef ref2 = ManualRef.createUncommitted();
 
         SpeculativeConfiguration config = new SpeculativeConfiguration(100);
-        AlphaTransaction tx = startSutTransaction(config);
+        AlphaTransaction tx = createSutTransaction(config);
         tx.openForConstruction(ref1);
 
         long version = stm.getVersion();

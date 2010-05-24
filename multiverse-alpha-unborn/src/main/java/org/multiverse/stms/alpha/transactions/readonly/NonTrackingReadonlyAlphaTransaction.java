@@ -48,12 +48,19 @@ public class NonTrackingReadonlyAlphaTransaction extends AbstractReadonlyAlphaTr
 
         @Override
         public AlphaTransaction start() {
-            return new NonTrackingReadonlyAlphaTransaction(config);
+            AlphaTransaction tx = create();
+            tx.start();
+            return tx;
         }
 
         @Override
         public Stm getStm() {
             return transactionFactoryBuilder.getStm();
+        }
+
+        @Override
+        public AlphaTransaction create() {
+            return new NonTrackingReadonlyAlphaTransaction(config);
         }
 
         @Override
@@ -64,7 +71,6 @@ public class NonTrackingReadonlyAlphaTransaction extends AbstractReadonlyAlphaTr
 
     public NonTrackingReadonlyAlphaTransaction(ReadonlyConfiguration config) {
         super(config);
-        init();
     }
 
     @Override

@@ -30,6 +30,7 @@ public class AbstractTransaction_registerRetryLatchTest {
     @Test
     public void whenActiveAndDoRegisterRetryLatchReturnsTrue_thenSuccess() {
         AbstractTransaction tx = spy(new AbstractTransactionImpl());
+        tx.start();
 
         Latch latch = new CheapLatch();
 

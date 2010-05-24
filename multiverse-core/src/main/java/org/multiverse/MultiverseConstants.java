@@ -30,6 +30,6 @@ public interface MultiverseConstants {
     boolean ___SANITY_CHECKS_ENABLED =
             parseBoolean(getProperty("org.multiverse.sanityChecks", "false"));
 
-    boolean ___LOGGING_ENABLED_ENABLED =
+    boolean ___LOGGING_ENABLED =
             parseBoolean(getProperty("org.multiverse.loggingEnabled", "true"));
 }

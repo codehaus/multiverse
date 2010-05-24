@@ -56,7 +56,7 @@ public class CountDownCommitBarrier_tryJoinCommitWithTimeoutTest {
         } catch (NullPointerException expected) {
         }
 
-        assertIsActive(tx);
+        assertIsNew(tx);
         assertTrue(barrier.isClosed());
         assertEquals(0, barrier.getNumberWaiting());
     }
@@ -126,7 +126,7 @@ public class CountDownCommitBarrier_tryJoinCommitWithTimeoutTest {
         } catch (CommitBarrierOpenException expected) {
         }
 
-        assertIsActive(tx);
+        assertIsNew(tx);
         assertTrue(barrier.isAborted());
         assertEquals(0, barrier.getNumberWaiting());
     }
@@ -143,7 +143,7 @@ public class CountDownCommitBarrier_tryJoinCommitWithTimeoutTest {
         } catch (CommitBarrierOpenException expected) {
         }
 
-        assertIsActive(tx);
+        assertIsNew(tx);
         assertTrue(barrier.isCommitted());
         assertEquals(0, barrier.getNumberWaiting());
     }

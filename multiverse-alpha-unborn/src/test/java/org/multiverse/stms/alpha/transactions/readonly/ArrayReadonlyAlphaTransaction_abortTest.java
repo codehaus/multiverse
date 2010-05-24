@@ -22,7 +22,7 @@ public class ArrayReadonlyAlphaTransaction_abortTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public ArrayReadonlyAlphaTransaction startTransactionUnderTest() {
+    public ArrayReadonlyAlphaTransaction createTransactionUnderTest() {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new ArrayReadonlyAlphaTransaction(config, 1);
     }
@@ -33,7 +33,7 @@ public class ArrayReadonlyAlphaTransaction_abortTest {
         ManualRefTranlocal expectedTranlocal = (ManualRefTranlocal) ref.___load();
 
         long expectedVersion = stm.getVersion();
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createTransactionUnderTest();
         tx.openForRead(ref);
         tx.abort();
 
@@ -45,7 +45,7 @@ public class ArrayReadonlyAlphaTransaction_abortTest {
     @Test
     public void whenUnused() {
         long expectedVersion = stm.getVersion();
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createTransactionUnderTest();
         tx.abort();
 
         assertEquals(expectedVersion, stm.getVersion());

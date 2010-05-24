@@ -1,6 +1,7 @@
 package org.multiverse.benchmarks;
 
 import org.benchy.AbstractBenchmarkDriver;
+import org.benchy.DriverParameter;
 import org.benchy.TestCase;
 import org.benchy.TestCaseResult;
 import org.multiverse.annotations.TransactionalMethod;
@@ -23,14 +24,16 @@ import static org.junit.Assert.assertEquals;
  * @author Peter Veentjer
  */
 public class PropertyAccessorDriver extends AbstractBenchmarkDriver {
+    @DriverParameter
     private long loopSize;
-    private LongRef ref;
+
+    @DriverParameter
     private String writeType;
 
+    private LongRef ref;
+
     public void preRun(TestCase testCase) {
-        loopSize = testCase.getLongProperty("loopSize");
         ref = new LongRef();
-        writeType = testCase.getProperty("writeType");
     }
 
     @Override

@@ -28,7 +28,7 @@ public class MonoReadonlyAlphaTransaction_registerRetryLatchTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MonoReadonlyAlphaTransaction startSutTransaction() {
+    public MonoReadonlyAlphaTransaction createSutTransaction() {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new MonoReadonlyAlphaTransaction(config);
     }
@@ -56,7 +56,7 @@ public class MonoReadonlyAlphaTransaction_registerRetryLatchTest {
 
     @Test
     public void whenUnused_thenNoRetryPossibleException() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         Latch latch = new CheapLatch();
 
         try {
@@ -71,7 +71,7 @@ public class MonoReadonlyAlphaTransaction_registerRetryLatchTest {
 
     @Test
     public void whenNullLatch_thenNullPointerException() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         try {
             tx.registerRetryLatch(null);
@@ -86,7 +86,7 @@ public class MonoReadonlyAlphaTransaction_registerRetryLatchTest {
     public void whenLoadedForRead_thenListenerAdded() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
 
         Latch latch = new CheapLatch();
@@ -103,11 +103,11 @@ public class MonoReadonlyAlphaTransaction_registerRetryLatchTest {
         Latch latch1 = new CheapLatch();
         Latch latch2 = new CheapLatch();
 
-        AlphaTransaction tx1 = startSutTransaction();
+        AlphaTransaction tx1 = createSutTransaction();
         tx1.openForRead(ref);
         tx1.registerRetryLatch(latch1);
 
-        AlphaTransaction tx2 = startSutTransaction();
+        AlphaTransaction tx2 = createSutTransaction();
         tx2.openForRead(ref);
         tx2.registerRetryLatch(latch2);
 
@@ -121,7 +121,7 @@ public class MonoReadonlyAlphaTransaction_registerRetryLatchTest {
     public void whenVersionAlreadyThere_thenLatchOpenedAndNotRegistered() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
         //do the update that will prevent adding the listener
         ref.inc(stm);
@@ -139,7 +139,7 @@ public class MonoReadonlyAlphaTransaction_registerRetryLatchTest {
         ManualRef ref = new ManualRef(stm);
 
         Latch latch = new CheapLatch();
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
         tx.registerRetryLatch(latch);
 

@@ -4,13 +4,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.api.LogLevel;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-import static org.multiverse.TestUtils.assertIsActive;
+import static org.multiverse.TestUtils.assertIsAlive;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 public class TransactionalMethod_StaticMethodTest {
@@ -20,6 +22,7 @@ public class TransactionalMethod_StaticMethodTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
+        clearThreadLocalTransaction();
     }
 
     @After
@@ -28,7 +31,7 @@ public class TransactionalMethod_StaticMethodTest {
     }
 
     public static void assertTransactionWorking() {
-        assertIsActive(getThreadLocalTransaction());
+        assertIsAlive(getThreadLocalTransaction());
     }
 
     @Test
@@ -86,12 +89,13 @@ public class TransactionalMethod_StaticMethodTest {
 
         long version = stm.getVersion();
         swap(a, b);
+
         assertEquals(version + 1, stm.getVersion());
         assertEquals(20, a.get());
         assertEquals(10, b.get());
     }
 
-    @TransactionalMethod
+    @TransactionalMethod(logLevel = LogLevel.course)
     public static void swap(IntRef a, IntRef b) {
         int oldA = a.get();
         a.set(b.get());

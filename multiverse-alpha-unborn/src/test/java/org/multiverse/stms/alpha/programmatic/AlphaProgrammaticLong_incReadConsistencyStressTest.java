@@ -130,12 +130,12 @@ public class AlphaProgrammaticLong_incReadConsistencyStressTest {
         }
 
         public void inc() {
-            for (int k = 0; k < refs.length; k++) {
+            for (ProgrammaticLong ref : refs) {
                 if (randomOneOf(5)) {
                     if (commute) {
-                        refs[k].commutingInc(1);
+                        ref.commutingInc(1);
                     } else {
-                        refs[k].atomicInc(1);
+                        ref.atomicInc(1);
                     }
                 }
             }

@@ -13,38 +13,28 @@ package org.multiverse.api;
  */
 public enum TransactionStatus {
 
-    active {
-        @Override
-        public boolean isDead() {
-            return false;
-        }
-    },
+    New(false),
 
-    prepared {
-        @Override
-        public boolean isDead() {
-            return false;
-        }
-    },
+    Active(false),
 
-    committed {
-        @Override
-        public boolean isDead() {
-            return true;
-        }
-    },
+    Prepared(false),
 
-    aborted {
-        @Override
-        public boolean isDead() {
-            return true;
-        }
-    };
+    Committed(true),
+
+    Aborted(true);
+
+    private final boolean isDead;
+
+    private TransactionStatus(boolean isDead) {
+        this.isDead = isDead;
+    }
 
     /**
      * Checks if the TransactionStatus belongs to a dead (committed or aborted) transaction.
      *
      * @return true if dead, false otherwise.
      */
-    public abstract boolean isDead();
+    public final boolean isDead() {
+        return isDead;
+    }
 }

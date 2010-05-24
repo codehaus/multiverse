@@ -10,7 +10,7 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.multiverse.TestUtils.assertIsActive;
+import static org.multiverse.TestUtils.assertIsNew;
 import static org.multiverse.TestUtils.getField;
 
 public class ArrayReadonlyAlphaTransaction_resetTest {
@@ -24,28 +24,30 @@ public class ArrayReadonlyAlphaTransaction_resetTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public ArrayReadonlyAlphaTransaction startTransactionUnderTest() {
+    public ArrayReadonlyAlphaTransaction createSutTransaction() {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new ArrayReadonlyAlphaTransaction(config, 100);
     }
 
     @Test
     public void whenUnused() {
-        AlphaTransaction tx = startTransactionUnderTest();
-        tx.restart();
+        AlphaTransaction tx = createSutTransaction();
+        tx.reset();
 
         assertEquals(0, getField(tx, "firstFreeIndex"));
-        assertIsActive(tx);
+        assertIsNew(tx);
     }
 
     @Test
     public void whenOtherTxCommitted_thenReadVersionUpdated() {
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
 
         stmConfig.clock.tick();
 
-        tx.restart();
-        assertEquals(stm.getVersion(), tx.getReadVersion());
+        tx.reset();
+
+        assertIsNew(tx);
+        assertEquals(0, tx.getReadVersion());
     }
 
     @Test
@@ -54,11 +56,11 @@ public class ArrayReadonlyAlphaTransaction_resetTest {
         ManualRef ref2 = new ManualRef(stm);
         ManualRef ref3 = new ManualRef(stm);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref1);
         tx.openForRead(ref2);
         tx.openForRead(ref3);
-        tx.restart();
+        tx.reset();
 
         assertEquals(0, getField(tx, "firstFreeIndex"));
         AlphaTranlocal[] attached = (AlphaTranlocal[]) getField(tx, "attachedArray");

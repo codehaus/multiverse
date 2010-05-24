@@ -29,11 +29,11 @@ public class MapReadonlyAlphaTransaction_openForConstructionTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MapReadonlyAlphaTransaction startTransactionUnderTest() {
-        return startTransactionUnderTest(new SpeculativeConfiguration(100));
+    public MapReadonlyAlphaTransaction createSutTransaction() {
+        return createSutTransaction(new SpeculativeConfiguration(100));
     }
 
-    public MapReadonlyAlphaTransaction startTransactionUnderTest(SpeculativeConfiguration speculativeConfig) {
+    public MapReadonlyAlphaTransaction createSutTransaction(SpeculativeConfiguration speculativeConfig) {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true)
                 .withSpeculativeConfig(speculativeConfig);
         return new MapReadonlyAlphaTransaction(config);
@@ -41,7 +41,7 @@ public class MapReadonlyAlphaTransaction_openForConstructionTest {
 
     @Test
     public void whenActiveAndNullTxObject_thenNullPointerException() {
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
 
         try {
             tx.openForConstruction(null);
@@ -49,7 +49,7 @@ public class MapReadonlyAlphaTransaction_openForConstructionTest {
         } catch (NullPointerException expected) {
         }
 
-        assertIsActive(tx);
+        assertIsNew(tx);
     }
 
     @Test
@@ -57,7 +57,7 @@ public class MapReadonlyAlphaTransaction_openForConstructionTest {
         ManualRef ref = new ManualRef(stm, 0);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, true, 100);
-        AlphaTransaction tx = startTransactionUnderTest(speculativeConfig);
+        AlphaTransaction tx = createSutTransaction(speculativeConfig);
 
         long version = stm.getVersion();
         try {
@@ -75,7 +75,7 @@ public class MapReadonlyAlphaTransaction_openForConstructionTest {
         ManualRef ref = new ManualRef(stm, 0);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(true, false, false, 100);
-        AlphaTransaction tx = startTransactionUnderTest(speculativeConfig);
+        AlphaTransaction tx = createSutTransaction(speculativeConfig);
 
         long version = stm.getVersion();
         try {
@@ -93,7 +93,7 @@ public class MapReadonlyAlphaTransaction_openForConstructionTest {
     public void whenPrepared_thenPreparedTransactionException() {
         ManualRef value = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
         tx.prepare();
 
         long version = stm.getVersion();
@@ -111,7 +111,7 @@ public class MapReadonlyAlphaTransaction_openForConstructionTest {
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef value = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
         tx.commit();
 
         long version = stm.getVersion();
@@ -129,7 +129,7 @@ public class MapReadonlyAlphaTransaction_openForConstructionTest {
     public void whenAborted_thenDeadTransactionException() {
         ManualRef value = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
         tx.abort();
 
         long version = stm.getVersion();

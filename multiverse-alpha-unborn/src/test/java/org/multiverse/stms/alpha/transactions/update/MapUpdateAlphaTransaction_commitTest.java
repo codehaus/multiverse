@@ -32,13 +32,13 @@ public class MapUpdateAlphaTransaction_commitTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MapUpdateAlphaTransaction startSutTransaction() {
+    public MapUpdateAlphaTransaction createSutTransaction() {
         UpdateConfiguration config =
                 new UpdateConfiguration(stmConfig.clock);
         return new MapUpdateAlphaTransaction(config);
     }
 
-    public MapUpdateAlphaTransaction startSutTransactionWithWriteSkew(boolean allowed) {
+    public MapUpdateAlphaTransaction createSutTransactionWithWriteSkew(boolean allowed) {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
                 .withWriteSkewAllowed(allowed);
 
@@ -53,7 +53,7 @@ public class MapUpdateAlphaTransaction_commitTest {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref1.inc(tx);
         AlphaTranlocal tranlocal2 = tx.openForConstruction(ref2);
 
@@ -76,7 +76,7 @@ public class MapUpdateAlphaTransaction_commitTest {
     public void lockIsNotAcquiredOnReadonlyTransaction() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
         ref.resetLockInfo();
         tx.commit();
@@ -90,7 +90,7 @@ public class MapUpdateAlphaTransaction_commitTest {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForWrite(ref1);
         tx.openForRead(ref2);
         ref2.resetLockInfo();
@@ -104,7 +104,7 @@ public class MapUpdateAlphaTransaction_commitTest {
     public void lockIsAcquiredOnNonDirtyObjectInAnUpdateTransaction() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForWrite(ref);
         ref.resetLockInfo();
         tx.commit();
@@ -117,7 +117,7 @@ public class MapUpdateAlphaTransaction_commitTest {
     public void lockIsAcquiredOnDirtyObject() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForWrite(ref);
         tranlocal.value++;
         ref.resetLockInfo();
@@ -129,7 +129,7 @@ public class MapUpdateAlphaTransaction_commitTest {
 
     @Test
     public void lockIsNotAcquiredOnFreshObject() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRef ref = new ManualRef(tx, 0);
         tx.openForWrite(ref);
         ref.resetLockInfo();
@@ -145,7 +145,7 @@ public class MapUpdateAlphaTransaction_commitTest {
     public void whenUnused() {
         long startVersion = stm.getVersion();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.commit();
 
         assertEquals(startVersion, stm.getVersion());
@@ -158,7 +158,7 @@ public class MapUpdateAlphaTransaction_commitTest {
         AlphaTranlocal expectedTranlocal = ref.___load();
         long version = stm.getVersion();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
         tx.commit();
 
@@ -173,7 +173,7 @@ public class MapUpdateAlphaTransaction_commitTest {
         ManualRef ref = new ManualRef(stm, 10);
 
         long startVersion = stm.getVersion();
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref.inc(tx);
         tx.commit();
 
@@ -190,7 +190,7 @@ public class MapUpdateAlphaTransaction_commitTest {
     public void whenCommutingWrites() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(1);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref.commutingInc(tx, 1);
         AlphaTranlocal tranlocal = tx.openForCommutingWrite(ref);
         assertTrue(tranlocal.isCommuting());
@@ -210,7 +210,7 @@ public class MapUpdateAlphaTransaction_commitTest {
 
     @Test
     public void whenOnlyOpenedForConstruction_thenVersionNotIncreased() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         long startVersion = stm.getVersion();
         ManualRef ref = new ManualRef(tx, 10);
@@ -231,7 +231,7 @@ public class MapUpdateAlphaTransaction_commitTest {
         AlphaTranlocal tranlocal = ref.___load();
 
         long startVersion = stm.getVersion();
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForWrite(ref);
         tx.commit();
 
@@ -245,7 +245,7 @@ public class MapUpdateAlphaTransaction_commitTest {
     public void whenWriteConflict_thenVersionTooOldWriteConflict() {
         ManualRef ref = new ManualRef(stm, 0);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForWrite(ref);
 
         ref.inc(stm);
@@ -271,7 +271,7 @@ public class MapUpdateAlphaTransaction_commitTest {
 
         long version = stm.getVersion();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref.inc(tx);
 
         Transaction otherOwner = mock(Transaction.class);
@@ -294,7 +294,7 @@ public class MapUpdateAlphaTransaction_commitTest {
     public void whenCommitted_thenIgnore() {
         ManualRef ref = new ManualRef(stm, 1);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref.inc(tx);
         tx.commit();
 
@@ -313,7 +313,7 @@ public class MapUpdateAlphaTransaction_commitTest {
     public void whenAborted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm, 1);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref.inc(tx);
         tx.abort();
 
@@ -338,7 +338,7 @@ public class MapUpdateAlphaTransaction_commitTest {
 
         long version = stm.getVersion();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref1.inc(tx);
         ref2.get(tx);
         ManualRef ref3 = new ManualRef(tx, 30);
@@ -362,7 +362,7 @@ public class MapUpdateAlphaTransaction_commitTest {
 
         long startVersion = stm.getVersion();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref1.inc(tx);
         ref2.inc(tx);
         ref3.get(tx);
@@ -394,11 +394,11 @@ public class MapUpdateAlphaTransaction_commitTest {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx1 = startSutTransactionWithWriteSkew(true);
+        AlphaTransaction tx1 = createSutTransactionWithWriteSkew(true);
         tx1.openForRead(ref1);
         ref2.inc(tx1);
 
-        AlphaTransaction tx2 = startSutTransactionWithWriteSkew(true);
+        AlphaTransaction tx2 = createSutTransactionWithWriteSkew(true);
         tx2.openForRead(ref2);
         ref1.inc(tx2);
 
@@ -414,11 +414,11 @@ public class MapUpdateAlphaTransaction_commitTest {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx1 = startSutTransactionWithWriteSkew(false);
+        AlphaTransaction tx1 = createSutTransactionWithWriteSkew(false);
         tx1.openForRead(ref1);
         ref2.inc(tx1);
 
-        AlphaTransaction tx2 = startSutTransactionWithWriteSkew(false);
+        AlphaTransaction tx2 = createSutTransactionWithWriteSkew(false);
         tx2.openForRead(ref2);
         ref1.inc(tx2);
 

@@ -26,14 +26,14 @@ public class MonoUpdateAlphaTransaction_abortTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MonoUpdateAlphaTransaction startSutTransaction() {
+    public MonoUpdateAlphaTransaction createSutTransaction() {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock);
         return new MonoUpdateAlphaTransaction(config);
     }
 
     @Test
     public void whenUnused() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         long version = stm.getVersion();
         tx.abort();
 
@@ -45,7 +45,7 @@ public class MonoUpdateAlphaTransaction_abortTest {
     public void whenReadonly() {
         ManualRef ref = new ManualRef(stm);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
 
         long version = stm.getVersion();
@@ -60,7 +60,7 @@ public class MonoUpdateAlphaTransaction_abortTest {
         ManualRef ref = new ManualRef(stm);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForWrite(ref);
 
         long version = stm.getVersion();
@@ -75,7 +75,7 @@ public class MonoUpdateAlphaTransaction_abortTest {
         ManualRef ref = new ManualRef(stm);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForWrite(ref);
         tranlocal.value++;
 
@@ -90,7 +90,7 @@ public class MonoUpdateAlphaTransaction_abortTest {
     public void whenFresh_changesAreDiscarded() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForConstruction(ref);
 
         long version = stm.getVersion();
@@ -116,7 +116,7 @@ public class MonoUpdateAlphaTransaction_abortTest {
         listenTx.openForRead(ref);
         listenTx.registerRetryLatch(latch);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForWrite(ref);
         tranlocal.value++;
         tx.abort();
@@ -130,7 +130,7 @@ public class MonoUpdateAlphaTransaction_abortTest {
     public void whenPreparedWithLockedResources_thenResourcesFreed() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref.inc(tx);
         tx.prepare();
 

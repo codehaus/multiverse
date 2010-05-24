@@ -29,7 +29,7 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public AlphaTransaction startSutTransaction() {
+    public AlphaTransaction createSutTransaction() {
         UpdateConfiguration config =
                 new UpdateConfiguration(stmConfig.clock);
         return new ArrayUpdateAlphaTransaction(config, 100);
@@ -103,7 +103,7 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
 
     @Test
     public void whenUnused_thenNoRetryPossibleException() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         Latch latch = new CheapLatch();
 
@@ -121,7 +121,7 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
     public void whenOnlyFresh_thenNoRetryPossibleException() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForConstruction(ref);
 
         Latch latch = new CheapLatch();
@@ -140,7 +140,7 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
     public void whenOpenedForWrite_thenListenerAppended() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForWrite(ref);
 
         Latch latch = new CheapLatch();
@@ -155,7 +155,7 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
     public void whenOpenedForRead_thenListenerAppended() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
 
         Latch latch = new CheapLatch();
@@ -173,11 +173,11 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
         Latch latch1 = new CheapLatch();
         Latch latch2 = new CheapLatch();
 
-        AlphaTransaction tx1 = startSutTransaction();
+        AlphaTransaction tx1 = createSutTransaction();
         tx1.openForRead(ref);
         tx1.registerRetryLatch(latch1);
 
-        AlphaTransaction tx2 = startSutTransaction();
+        AlphaTransaction tx2 = createSutTransaction();
         tx2.openForRead(ref);
         tx2.registerRetryLatch(latch2);
 
@@ -193,7 +193,7 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
         ManualRef ref2 = new ManualRef(stm);
         ManualRef ref3 = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref1);
         tx.openForRead(ref2);
         tx.openForRead(ref3);
@@ -212,7 +212,7 @@ public class ArrayUpdateAlphaTransaction_registerRetryLatchTest {
     public void whenListenVersionAlreadyIsThere_thenLatchIsOpenedAndNothingIsRegistered() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
 
         //do the desired update

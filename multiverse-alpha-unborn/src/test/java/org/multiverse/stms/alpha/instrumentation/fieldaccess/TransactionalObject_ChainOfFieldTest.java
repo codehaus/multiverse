@@ -9,6 +9,7 @@ import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
@@ -19,6 +20,7 @@ public class TransactionalObject_ChainOfFieldTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
+        clearThreadLocalTransaction();
     }
 
     @After

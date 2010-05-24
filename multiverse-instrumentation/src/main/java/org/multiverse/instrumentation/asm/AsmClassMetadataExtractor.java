@@ -24,6 +24,18 @@ import static org.multiverse.instrumentation.asm.AsmUtils.isStatic;
 public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, Opcodes {
 
     private MetadataRepository metadataRepository;
+    private FamilyNameStrategy familyNameStrategy;
+
+    public AsmClassMetadataExtractor() {
+        this(new CompactFamilyNameStrategy());
+    }
+
+    public AsmClassMetadataExtractor(FamilyNameStrategy familyNameStrategy) {
+        if (familyNameStrategy == null) {
+            throw new NullPointerException();
+        }
+        this.familyNameStrategy = familyNameStrategy;
+    }
 
     @Override
     public void init(MetadataRepository metadataRepository) {
@@ -352,7 +364,7 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
         transactionMetadata.trackReads = null;
         transactionMetadata.writeSkew = true;
         transactionMetadata.interruptible = throwsInterruptedException;
-        transactionMetadata.familyName = createFamilyName(classMetadata.getName(), methodNode.name, methodNode.desc);
+        transactionMetadata.familyName = familyNameStrategy.create(classMetadata.getName(), methodNode.name, methodNode.desc);
         transactionMetadata.timeoutNs = Long.MAX_VALUE;
         return transactionMetadata;
     }
@@ -370,7 +382,7 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
         MethodMetadata methodMetadata = classMetadata.getMethodMetadata(methodNode.name, methodNode.desc);
         boolean throwsInterruptedException = methodMetadata.checkIfSpecificTransactionIsThrown(InterruptedException.class);
         txMetadata.readOnly = (Boolean) getValue(annotationNode, "readonly", null);
-        txMetadata.familyName = createFamilyName(classMetadata.getName(), methodNode.name, methodNode.desc);
+        txMetadata.familyName = familyNameStrategy.create(classMetadata.getName(), methodNode.name, methodNode.desc);
         txMetadata.interruptible = (Boolean) getValue(annotationNode, "interruptible", throwsInterruptedException);
         txMetadata.writeSkew = (Boolean) getValue(annotationNode, "writeSkew", true);
 
@@ -407,24 +419,6 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
         }
 
         return txMetadata;
-    }
-
-    private String createFamilyName(String className, String methodName, String desc) {
-        StringBuffer sb = new StringBuffer();
-        sb.append(className.replace("/", "."));
-        sb.append('.');
-        sb.append(methodName);
-        sb.append('(');
-        Type[] argTypes = Type.getArgumentTypes(desc);
-        for (int k = 0; k < argTypes.length; k++) {
-            sb.append(argTypes[k].getClassName());
-            if (k < argTypes.length - 1) {
-                sb.append(',');
-            }
-        }
-        sb.append(')');
-
-        return sb.toString();
     }
 
     private static Object getValue(AnnotationNode node, String name, Object defaultValue) {

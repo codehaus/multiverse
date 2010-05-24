@@ -109,7 +109,7 @@ public class CountDownCommitBarrier_incPartiesWithTransactionTest {
         Transaction tx = new AbstractTransactionImpl();
         barrier.incParties(tx, 5);
 
-        assertIsActive(tx);
+        assertIsNew(tx);
         assertEquals(0, barrier.getNumberWaiting());
         assertEquals(15, barrier.getParties());
         assertTrue(barrier.isClosed());
@@ -192,7 +192,7 @@ public class CountDownCommitBarrier_incPartiesWithTransactionTest {
         } catch (CommitBarrierOpenException expected) {
         }
 
-        assertIsActive(tx);
+        assertIsNew(tx);
         assertEquals(0, barrier.getParties());
         assertEquals(0, barrier.getNumberWaiting());
         assertTrue(barrier.isCommitted());

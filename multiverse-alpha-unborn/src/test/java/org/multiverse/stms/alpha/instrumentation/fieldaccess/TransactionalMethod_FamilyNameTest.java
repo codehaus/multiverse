@@ -25,7 +25,7 @@ public class TransactionalMethod_FamilyNameTest {
         DefaultFamilyName method = new DefaultFamilyName();
         method.execute();
 
-        assertEquals("org.multiverse.stms.alpha.instrumentation.fieldaccess.TransactionalMethod_FamilyNameTest$DefaultFamilyName.execute()", method.found);
+        assertEquals("o.m.s.a.i.f.TransactionalMethod_FamilyNameTest$DefaultFamilyName.execute()", method.found);
     }
 
     @Test
@@ -33,7 +33,7 @@ public class TransactionalMethod_FamilyNameTest {
         DefaultFamilyName method = new DefaultFamilyName();
         method.execute(1, true, "foo");
 
-        assertEquals("org.multiverse.stms.alpha.instrumentation.fieldaccess.TransactionalMethod_FamilyNameTest$DefaultFamilyName.execute(int,boolean,java.lang.String)", method.found);
+        assertEquals("o.m.s.a.i.f.TransactionalMethod_FamilyNameTest$DefaultFamilyName.execute(int,boolean,String)", method.found);
     }
 
 

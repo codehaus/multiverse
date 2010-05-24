@@ -27,11 +27,10 @@ public final class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransa
     public ArrayUpdateAlphaTransaction(UpdateConfiguration config, int size) {
         super(config);
         attachedArray = new AlphaTranlocal[size];
-        init();
     }
 
     @Override
-    protected void dodoClear() {
+    protected void doDoReset() {
         firstFreeIndex = 0;
         for (int k = 0; k < attachedArray.length; k++) {
             attachedArray[k] = null;

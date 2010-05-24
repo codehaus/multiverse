@@ -36,12 +36,12 @@ public abstract class AbstractUpdateAlphaTransaction
     // ======================= clear =============================
 
     @Override
-    protected final void doClear() {
+    protected final void doReset() {
         updateTransactionStatus = UpdateTransactionStatus.nowrites;
-        dodoClear();
+        doDoReset();
     }
 
-    protected abstract void dodoClear();
+    protected abstract void doDoReset();
 
     // ======================= attach operations =========================
 

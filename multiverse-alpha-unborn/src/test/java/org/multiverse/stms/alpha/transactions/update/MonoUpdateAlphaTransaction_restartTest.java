@@ -9,7 +9,7 @@ import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.assertIsActive;
+import static org.multiverse.TestUtils.assertIsNew;
 import static org.multiverse.TestUtils.getField;
 
 public class MonoUpdateAlphaTransaction_restartTest {
@@ -22,10 +22,9 @@ public class MonoUpdateAlphaTransaction_restartTest {
         stmConfig = AlphaStmConfig.createDebugConfig();
         stmConfig.maxRetries = 10;
         stm = new AlphaStm(stmConfig);
-
     }
 
-    public MonoUpdateAlphaTransaction startSutTransaction() {
+    public MonoUpdateAlphaTransaction createSutTransaction() {
         UpdateConfiguration config =
                 new UpdateConfiguration(stmConfig.clock);
         return new MonoUpdateAlphaTransaction(config);
@@ -33,8 +32,8 @@ public class MonoUpdateAlphaTransaction_restartTest {
 
     @Test
     public void whenUnused() {
-        AlphaTransaction tx = startSutTransaction();
-        tx.restart();
+        AlphaTransaction tx = createSutTransaction();
+        tx.reset();
 
         assertRestartedCorrectly(tx);
     }
@@ -43,9 +42,9 @@ public class MonoUpdateAlphaTransaction_restartTest {
     public void whenOpenForRead_thenAttachedIsCleared() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
-        tx.restart();
+        tx.reset();
 
         assertRestartedCorrectly(tx);
     }
@@ -54,20 +53,20 @@ public class MonoUpdateAlphaTransaction_restartTest {
     public void whenOpenForWrite_thenAttachedIsCleared() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForWrite(ref);
-        tx.restart();
+        tx.reset();
 
         assertRestartedCorrectly(tx);
     }
 
     @Test
     public void whenOtherTxCommitted_thenTxReadVersionIncreased() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         stmConfig.clock.tick();
 
-        tx.restart();
+        tx.reset();
         assertRestartedCorrectly(tx);
     }
 
@@ -76,18 +75,18 @@ public class MonoUpdateAlphaTransaction_restartTest {
         ManualRef ref = new ManualRef(stm);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRefTranlocal dirty = (ManualRefTranlocal) tx.openForWrite(ref);
         dirty.value++;
-        tx.restart();
+        tx.reset();
 
         assertRestartedCorrectly(tx);
         assertSame(committed, ref.___load());
     }
 
     private void assertRestartedCorrectly(AlphaTransaction tx) {
-        assertIsActive(tx);
-        assertEquals(stm.getVersion(), tx.getReadVersion());
+        assertIsNew(tx);
+        assertEquals(0, tx.getReadVersion());
         assertNull(getField(tx, "attached"));
     }
 
@@ -95,12 +94,12 @@ public class MonoUpdateAlphaTransaction_restartTest {
     public void whenPreparedWithLockedResources_thenResourcesFreed() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref.inc(tx);
         tx.prepare();
 
-        tx.restart();
-        assertIsActive(tx);
+        tx.reset();
+        assertIsNew(tx);
         assertNull(ref.___getLockOwner());
     }
 }

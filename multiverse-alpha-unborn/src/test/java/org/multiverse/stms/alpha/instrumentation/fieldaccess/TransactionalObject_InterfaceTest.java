@@ -4,21 +4,19 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalObject;
-import org.multiverse.instrumentation.metadata.MetadataRepository;
 import org.multiverse.javaagent.JavaAgentProblemMonitor;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 
 import static org.junit.Assert.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.instrumentation.InstrumentationTestUtils.resetInstrumentationProblemMonitor;
 
 public class TransactionalObject_InterfaceTest {
 
-    private MetadataRepository repository;
-
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         resetInstrumentationProblemMonitor();
-        repository = null;//MetadataRepository.INSTANCE;
     }
 
     @After

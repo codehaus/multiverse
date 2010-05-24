@@ -6,6 +6,7 @@ import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * There was an instrumentation problem with an atomic method containing 'assert' statement. The symptom of the problem
@@ -29,6 +30,7 @@ public class TransactionalMethod_assertTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
+        clearThreadLocalTransaction();
     }
 
     @Test

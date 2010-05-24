@@ -30,7 +30,7 @@ public class MonoUpdateAlphaTransaction_commitTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MonoUpdateAlphaTransaction startSutTransaction() {
+    public MonoUpdateAlphaTransaction createSutTransaction() {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
                 .withReadTrackingEnabled(true)
                 .withExplictRetryAllowed(true);
@@ -42,7 +42,7 @@ public class MonoUpdateAlphaTransaction_commitTest {
     public void freshObjectIsNotLocked() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForConstruction(ref);
 
         long version = stm.getVersion();
@@ -60,7 +60,7 @@ public class MonoUpdateAlphaTransaction_commitTest {
     public void whenUnused_thenCommitSucceedsWithoutChange() {
         long startTime = stm.getVersion();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.commit();
 
         assertIsCommitted(tx);
@@ -73,7 +73,7 @@ public class MonoUpdateAlphaTransaction_commitTest {
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
 
         long version = stm.getVersion();
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
         tx.commit();
 
@@ -91,7 +91,7 @@ public class MonoUpdateAlphaTransaction_commitTest {
 
         long version = stm.getVersion();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForWrite(ref);
         tx.commit();
 
@@ -108,7 +108,7 @@ public class MonoUpdateAlphaTransaction_commitTest {
 
         long version = stm.getVersion();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForWrite(ref);
         tranlocal.value++;
 
@@ -126,7 +126,7 @@ public class MonoUpdateAlphaTransaction_commitTest {
     public void whenCommutingWrites() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(1);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref.commutingInc(tx, 1);
         AlphaTranlocal tranlocal = tx.openForCommutingWrite(ref);
         assertTrue(tranlocal.isCommuting());
@@ -146,7 +146,7 @@ public class MonoUpdateAlphaTransaction_commitTest {
     public void whenFresh_commitSucceeds() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForConstruction(ref);
         long version = stm.getVersion();
         tx.commit();
@@ -164,7 +164,7 @@ public class MonoUpdateAlphaTransaction_commitTest {
     public void whenWriteConflict_thenVersionTooOldWriteConflict() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForWrite(ref);
         tranlocal.value++;
 
@@ -195,7 +195,7 @@ public class MonoUpdateAlphaTransaction_commitTest {
         stmConfig.clock.tick();
         registerRetryListener(ref, latch2);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForWrite(ref);
         tranlocal.value++;
         tx.commit();
@@ -222,7 +222,7 @@ public class MonoUpdateAlphaTransaction_commitTest {
         ManualRef ref = new ManualRef(stm, 25);
 
         for (int k = 0; k < 100; k++) {
-            AlphaTransaction tx = startSutTransaction();
+            AlphaTransaction tx = createSutTransaction();
             ref.inc(tx);
             tx.commit();
         }

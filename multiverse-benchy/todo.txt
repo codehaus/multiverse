@@ -1,0 +1,20 @@
+TODO
+
+- Graphmain should make use of args4j
+
+- BenchmarkExecutormain should make use of args4j
+
+- Graphmain should be able to output information over time
+
+- Graphmain doesn't need to create a matrix. But is able to output multiple 'sections'. This should
+simplify the GraphMain
+
+- Graphmain should be called data extractor/repository.
+
+- Graphmain should be able to select on a specific date and not just the last entries.
+
+- the 
+
+DONE
+
+- benchmarkexecutor should be renamed to benchmark runner

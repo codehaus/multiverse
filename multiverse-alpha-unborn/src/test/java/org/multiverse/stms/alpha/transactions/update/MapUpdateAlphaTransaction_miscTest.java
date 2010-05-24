@@ -7,7 +7,7 @@ import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.TestUtils.assertIsActive;
+import static org.multiverse.TestUtils.assertIsNew;
 
 public class MapUpdateAlphaTransaction_miscTest {
 
@@ -21,7 +21,7 @@ public class MapUpdateAlphaTransaction_miscTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MapUpdateAlphaTransaction startSutTransaction() {
+    public MapUpdateAlphaTransaction createSutTransaction() {
         UpdateConfiguration config =
                 new UpdateConfiguration(stmConfig.clock);
         return new MapUpdateAlphaTransaction(config);
@@ -31,8 +31,8 @@ public class MapUpdateAlphaTransaction_miscTest {
     public void testConstruction() {
         long expectedReadVersion = stm.getVersion();
 
-        AlphaTransaction tx = startSutTransaction();
-        assertEquals(expectedReadVersion, tx.getReadVersion());
-        assertIsActive(tx);
+        AlphaTransaction tx = createSutTransaction();
+        assertEquals(0, tx.getReadVersion());
+        assertIsNew(tx);
     }
 }

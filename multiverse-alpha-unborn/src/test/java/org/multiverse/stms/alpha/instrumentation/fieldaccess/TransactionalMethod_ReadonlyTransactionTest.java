@@ -10,6 +10,7 @@ import org.multiverse.stms.alpha.AlphaStm;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
@@ -21,6 +22,7 @@ public class TransactionalMethod_ReadonlyTransactionTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
+        clearThreadLocalTransaction();
     }
 
     @Test

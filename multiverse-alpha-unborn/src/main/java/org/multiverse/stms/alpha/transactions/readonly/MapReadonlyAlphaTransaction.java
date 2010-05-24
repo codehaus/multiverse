@@ -45,6 +45,13 @@ public final class MapReadonlyAlphaTransaction extends AbstractReadonlyAlphaTran
 
         @Override
         public AlphaTransaction start() {
+            AlphaTransaction tx = create();
+            tx.start();
+            return tx;
+        }
+
+        @Override
+        public AlphaTransaction create() {
             return new MapReadonlyAlphaTransaction(config);
         }
     }
@@ -54,12 +61,10 @@ public final class MapReadonlyAlphaTransaction extends AbstractReadonlyAlphaTran
 
     public MapReadonlyAlphaTransaction(ReadonlyConfiguration config) {
         super(config);
-
-        init();
     }
 
     @Override
-    protected void doClear() {
+    protected void doReset() {
         attachedMap.clear();
     }
 

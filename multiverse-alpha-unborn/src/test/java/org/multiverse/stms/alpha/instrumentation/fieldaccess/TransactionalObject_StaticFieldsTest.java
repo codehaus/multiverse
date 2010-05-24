@@ -21,6 +21,7 @@ public class TransactionalObject_StaticFieldsTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
+        clearThreadLocalTransaction();
     }
 
     @After

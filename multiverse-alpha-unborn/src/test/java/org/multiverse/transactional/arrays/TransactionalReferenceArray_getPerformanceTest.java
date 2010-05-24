@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
+import static org.multiverse.TestUtils.format;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
@@ -20,7 +21,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class TransactionalReferenceArray_getPerformanceTest {
 
-    public final long transactionCount = 1000 * 1000 * 1000;
+    public final long transactionCount = 2000 * 1000 * 1000;
     public final int itemCount = 1000;
 
     @Before
@@ -49,7 +50,7 @@ public class TransactionalReferenceArray_getPerformanceTest {
 
         long durationNs = System.nanoTime() - startNs;
         double transactionsPerSecond = (1.0d * transactionCount * TimeUnit.SECONDS.toNanos(1)) / durationNs;
-        System.out.printf("Performance %s transactions/second\n", transactionsPerSecond);
+        System.out.printf("Performance %s transactions/second\n", format(transactionsPerSecond));
     }
 
     @Test
@@ -68,7 +69,7 @@ public class TransactionalReferenceArray_getPerformanceTest {
 
         long durationNs = System.nanoTime() - startNs;
         double transactionsPerSecond = (1.0d * transactionCount * TimeUnit.SECONDS.toNanos(1)) / durationNs;
-        System.out.printf("Performance %s transactions/second\n", transactionsPerSecond);
+        System.out.printf("Performance %s transactions/second\n", format(transactionsPerSecond));
     }
 
     @Test
@@ -87,6 +88,6 @@ public class TransactionalReferenceArray_getPerformanceTest {
 
         long durationNs = System.nanoTime() - startNs;
         double transactionsPerSecond = (1.0d * transactionCount * TimeUnit.SECONDS.toNanos(1)) / durationNs;
-        System.out.printf("Performance %s transactions/second\n", transactionsPerSecond);
+        System.out.printf("Performance %s transactions/second\n", format(transactionsPerSecond));
     }
 }

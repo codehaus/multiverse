@@ -49,6 +49,13 @@ public final class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransact
 
         @Override
         public AlphaTransaction start() {
+            AlphaTransaction tx = create();
+            tx.start();
+            return tx;
+        }
+
+        @Override
+        public AlphaTransaction create() {
             return new MapUpdateAlphaTransaction(config);
         }
     }
@@ -58,12 +65,11 @@ public final class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransact
 
     public MapUpdateAlphaTransaction(UpdateConfiguration config) {
         super(config);
-        init();
         //todo: the size of the attachedMap could be chosen a littlebit better
     }
 
     @Override
-    protected void dodoClear() {
+    protected void doDoReset() {
         attachedMap.clear();
     }
 

@@ -25,7 +25,7 @@ public class ArrayReadonlyAlphaTransaction_registerRetryLatchTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public ArrayReadonlyAlphaTransaction startTransactionUnderTest(int size) {
+    public ArrayReadonlyAlphaTransaction createSutTransaction(int size) {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new ArrayReadonlyAlphaTransaction(config, size);
     }
@@ -53,7 +53,7 @@ public class ArrayReadonlyAlphaTransaction_registerRetryLatchTest {
 
     @Test
     public void whenNoReads_thenNoRetryPossibleException() {
-        AlphaTransaction tx = startTransactionUnderTest(10);
+        AlphaTransaction tx = createSutTransaction(10);
         Latch latch = new CheapLatch();
 
         try {
@@ -70,7 +70,7 @@ public class ArrayReadonlyAlphaTransaction_registerRetryLatchTest {
         ManualRef ref = new ManualRef(stm);
         Latch latch = new CheapLatch();
 
-        AlphaTransaction tx = startTransactionUnderTest(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.openForRead(ref);
         tx.registerRetryLatch(latch);
 
@@ -85,7 +85,7 @@ public class ArrayReadonlyAlphaTransaction_registerRetryLatchTest {
         ManualRef ref3 = new ManualRef(stm);
 
         Latch latch = new CheapLatch();
-        AlphaTransaction tx = startTransactionUnderTest(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.openForRead(ref1);
         tx.openForRead(ref2);
         tx.openForRead(ref3);
@@ -104,7 +104,7 @@ public class ArrayReadonlyAlphaTransaction_registerRetryLatchTest {
         ManualRef ref3 = new ManualRef(stm);
 
         Latch latch = new CheapLatch();
-        AlphaTransaction tx = startTransactionUnderTest(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.openForRead(ref1);
         tx.openForRead(ref2);
         tx.openForRead(ref3);
@@ -125,11 +125,11 @@ public class ArrayReadonlyAlphaTransaction_registerRetryLatchTest {
         Latch latch1 = new CheapLatch();
         Latch latch2 = new CheapLatch();
 
-        AlphaTransaction tx1 = startTransactionUnderTest(10);
+        AlphaTransaction tx1 = createSutTransaction(10);
         tx1.openForRead(ref);
         tx1.registerRetryLatch(latch1);
 
-        AlphaTransaction tx2 = startTransactionUnderTest(10);
+        AlphaTransaction tx2 = createSutTransaction(10);
         tx2.openForRead(ref);
         tx2.registerRetryLatch(latch2);
 

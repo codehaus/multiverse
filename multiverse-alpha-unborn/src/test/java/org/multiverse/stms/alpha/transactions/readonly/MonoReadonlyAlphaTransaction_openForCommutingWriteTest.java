@@ -29,11 +29,11 @@ public class MonoReadonlyAlphaTransaction_openForCommutingWriteTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MonoReadonlyAlphaTransaction startSutTransaction() {
-        return startSutTransaction(new SpeculativeConfiguration(100));
+    public MonoReadonlyAlphaTransaction createSutTransaction() {
+        return createSutTransaction(new SpeculativeConfiguration(100));
     }
 
-    public MonoReadonlyAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfiguration) {
+    public MonoReadonlyAlphaTransaction createSutTransaction(SpeculativeConfiguration speculativeConfiguration) {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true)
                 .withSpeculativeConfig(speculativeConfiguration);
         return new MonoReadonlyAlphaTransaction(config);
@@ -44,7 +44,7 @@ public class MonoReadonlyAlphaTransaction_openForCommutingWriteTest {
         ManualRef ref = new ManualRef(stm);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, false, false, 100);
-        AlphaTransaction tx = startSutTransaction(speculativeConfig);
+        AlphaTransaction tx = createSutTransaction(speculativeConfig);
 
         long version = stm.getVersion();
         try {
@@ -64,7 +64,7 @@ public class MonoReadonlyAlphaTransaction_openForCommutingWriteTest {
         ManualRef ref = new ManualRef(stm);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
-        AlphaTransaction tx = startSutTransaction(speculativeConfig);
+        AlphaTransaction tx = createSutTransaction(speculativeConfig);
 
         long version = stm.getVersion();
         try {
@@ -83,7 +83,7 @@ public class MonoReadonlyAlphaTransaction_openForCommutingWriteTest {
     public void whenPrepared_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.prepare();
         long version = stm.getVersion();
 
@@ -101,7 +101,7 @@ public class MonoReadonlyAlphaTransaction_openForCommutingWriteTest {
     public void whenAborted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.abort();
         long version = stm.getVersion();
 
@@ -119,7 +119,7 @@ public class MonoReadonlyAlphaTransaction_openForCommutingWriteTest {
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.commit();
 
         long version = stm.getVersion();

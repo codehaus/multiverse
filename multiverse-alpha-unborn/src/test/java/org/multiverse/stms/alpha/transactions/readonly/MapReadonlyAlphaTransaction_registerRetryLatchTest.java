@@ -37,7 +37,7 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
         clearThreadLocalTransaction();
     }
 
-    public MapReadonlyAlphaTransaction startSutTransaction() {
+    public MapReadonlyAlphaTransaction createSutTransaction() {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new MapReadonlyAlphaTransaction(config);
     }
@@ -65,7 +65,7 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
 
     @Test
     public void whenNullLatch_thenNullPointerException() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         try {
             tx.registerRetryLatch(null);
@@ -80,7 +80,7 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
     public void whenEmptyReadSet_thenNoRetryPossibleException() {
         Latch latch = new CheapLatch();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         try {
             tx.registerRetryLatch(latch);
             fail();
@@ -96,7 +96,7 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
         ManualRef ref = new ManualRef(stm);
         Latch latch = new CheapLatch();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
 
         ref.inc(stm);
@@ -112,7 +112,7 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
         Latch latch = new CheapLatch();
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
         tx.registerRetryLatch(latch);
 
@@ -131,7 +131,7 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref1);
         tx.openForRead(ref2);
         tx.registerRetryLatch(latch);
@@ -156,11 +156,11 @@ public class MapReadonlyAlphaTransaction_registerRetryLatchTest {
         Latch newLatch = new CheapLatch();
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx1 = startSutTransaction();
+        AlphaTransaction tx1 = createSutTransaction();
         tx1.openForRead(ref);
         tx1.registerRetryLatch(oldLatch);
 
-        AlphaTransaction tx2 = startSutTransaction();
+        AlphaTransaction tx2 = createSutTransaction();
         tx2.openForRead(ref);
         tx2.registerRetryLatch(newLatch);
 

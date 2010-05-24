@@ -19,9 +19,6 @@ import static java.text.MessageFormat.format;
  * <p/>
  * The do-methods can be overridden.
  * <p/>
- * The subclass needs to call the {@link #init()} when it has completed its constructor. Can't be done inside the
- * constructor of the AbstractTransaction because fields in the subclass perhaps are not set.
- * <p/>
  * AbstractTransaction requires the clock.time to be at least 1. It used the version field to encode the transaction
  * state. See the version field for more information.
  *
@@ -36,12 +33,11 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     private long version;
 
-    private TransactionStatus status;
+    private TransactionStatus status = TransactionStatus.New;
 
     private long timeoutNs;
 
     private int attempt;
-
 
     public AbstractTransaction(C config) {
         assert config != null;
@@ -97,27 +93,72 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
         return config.transactionFactory;
     }
 
-    protected final void init() {
-        status = TransactionStatus.active;
-        version = config.clock.getVersion();
-        doInit();
-    }
-
     /**
      * Method is designed to be overridden to add custom behavior on the init of the transaction.
      */
-    protected void doInit() {
+    protected void doStart() {
     }
 
-    protected void doClear() {
+    protected void doReset() {
+    }
+
+    @Override
+    public void start() {
+        if (___LOGGING_ENABLED) {
+            if (config.logLevel.isLogableFrom(LogLevel.course)) {
+                System.out.println(config.familyName + " starting");
+            }
+        }
+
+        switch (status) {
+            case New:
+                boolean success = false;
+                try {
+                    notifyAll(TransactionLifecycleEvent.PreStart);
+                    status = TransactionStatus.Active;
+                    version = config.clock.getVersion();
+                    doStart();
+                    success = true;
+                } finally {
+                    if (!success) {
+                        abort();
+                    }
+                }
+                break;
+            case Active:
+                //ignore
+                break;
+            case Prepared:
+                String preparedMsg = format("Can't start already prepared transaction '%s'",
+                        config.getFamilyName());
+                throw new DeadTransactionException(preparedMsg);
+            case Committed:
+                String committedMsg = format("Can't start already committed transaction '%s'",
+                        config.getFamilyName());
+                throw new DeadTransactionException(committedMsg);
+            case Aborted:
+                String abortMsg = format("Can't start already aborted transaction '%s'",
+                        config.getFamilyName());
+                throw new DeadTransactionException(abortMsg);
+            default:
+                throw new IllegalStateException("unhandled transactionStatus: " + status);
+        }
     }
 
     @Override
     public final void registerLifecycleListener(TransactionLifecycleListener listener) {
+        if (___LOGGING_ENABLED) {
+            if (config.logLevel.isLogableFrom(LogLevel.course)) {
+                System.out.println(config.familyName + " registerLifecycleListener");
+            }
+        }
+
         switch (status) {
-            case active:
+            case New:
                 //fall through
-            case prepared:
+            case Active:
+                //fall through
+            case Prepared:
                 if (listener == null) {
                     throw new NullPointerException();
                 }
@@ -127,55 +168,58 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
                 }
                 listeners.add(listener);
                 break;
-            case committed:
+            case Committed:
                 String committedMsg = format("Can't register TransactionLifecycleListener on already committed " +
                         "transaction '%s'",
                         config.getFamilyName());
                 throw new DeadTransactionException(committedMsg);
-            case aborted:
+            case Aborted:
                 String abortMsg = format("Can't register TransactionLifecycleListener on already aborted transaction '%s'",
                         config.getFamilyName());
                 throw new DeadTransactionException(abortMsg);
             default:
-                throw new RuntimeException();
+                throw new IllegalStateException("unhandled transactionStatus: " + status);
         }
     }
 
     @Override
     public final void prepare() {
-        if (___LOGGING_ENABLED_ENABLED) {
+        if (___LOGGING_ENABLED) {
             if (config.logLevel.isLogableFrom(LogLevel.course)) {
-                System.out.println("preparing active" + config.familyName);
+                System.out.println(config.familyName + " preparing");
             }
         }
 
         switch (status) {
-            case active:
+            case New:
+                start();
+                //fall through
+            case Active:
                 try {
-                    notifyAll(TransactionLifecycleEvent.preCommit);
+                    notifyAll(TransactionLifecycleEvent.PreCommit);
 
                     //todo: the pre-commit tasks need to be executed
                     doPrepare();
-                    status = TransactionStatus.prepared;
+                    status = TransactionStatus.Prepared;
                 } finally {
-                    if (status != TransactionStatus.prepared) {
+                    if (status != TransactionStatus.Prepared) {
                         abort();
                     }
                 }
                 break;
-            case prepared:
+            case Prepared:
                 //ignore
                 break;
-            case committed:
+            case Committed:
                 String committedMsg = format("Can't prepare already committed transaction '%s'",
                         config.getFamilyName());
                 throw new DeadTransactionException(committedMsg);
-            case aborted:
+            case Aborted:
                 String abortedMsg = format("Can't prepare already aborted transaction '%s'",
                         config.getFamilyName());
                 throw new DeadTransactionException(abortedMsg);
             default:
-                throw new RuntimeException();
+                throw new IllegalStateException("unhandled transactionStatus: " + status);
         }
     }
 
@@ -183,28 +227,31 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
     }
 
     @Override
-    public final void restart() {
-        if (___LOGGING_ENABLED_ENABLED) {
+    public final void reset() {
+        if (___LOGGING_ENABLED) {
             if (config.logLevel.isLogableFrom(LogLevel.course)) {
-                System.out.println("restarting " + config.familyName);
+                System.out.println(config.familyName + " reset");
             }
         }
 
         switch (status) {
-            case active:
+            case New:
                 //fall through
-            case prepared:
+            case Active:
+                //fall through
+            case Prepared:
                 abort();
                 //fall through
-            case committed:
+            case Committed:
                 //fall through
-            case aborted:
+            case Aborted:
                 clearListeners();
-                doClear();
-                init();
+                doReset();
+                version = 0;
+                status = TransactionStatus.New;
                 break;
             default:
-                throw new RuntimeException();
+                throw new IllegalStateException("unhandled transactionStatus: " + status);
         }
     }
 
@@ -232,40 +279,42 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     @Override
     public final void abort() {
-        if (___LOGGING_ENABLED_ENABLED) {
+        if (___LOGGING_ENABLED) {
             if (config.logLevel.isLogableFrom(LogLevel.course)) {
-                System.out.println("committing " + config.familyName);
+                System.out.println(config.familyName + " aborting");
             }
         }
 
         switch (status) {
-            case active:
+            case New:
                 //fall through
-            case prepared:
+            case Active:
+                //fall through
+            case Prepared:
                 try {
                     try {
-                        notifyAll(TransactionLifecycleEvent.preAbort);
+                        notifyAll(TransactionLifecycleEvent.PreAbort);
                     } finally {
-                        status = TransactionStatus.aborted;
-                        if (status == TransactionStatus.active) {
+                        status = TransactionStatus.Aborted;
+                        if (status == TransactionStatus.Active) {
                             doAbortActive();
                         } else {
                             doAbortPrepared();
                         }
                     }
-                    notifyAll(TransactionLifecycleEvent.postAbort);
+                    notifyAll(TransactionLifecycleEvent.PostAbort);
                 } finally {
                     clearListeners();
                 }
                 break;
-            case committed:
+            case Committed:
                 String committedMsg = format("Can't abort already committed transaction '%s'", config.getFamilyName());
                 throw new DeadTransactionException(committedMsg);
-            case aborted:
+            case Aborted:
                 //ignore
                 break;
             default:
-                throw new RuntimeException();
+                throw new IllegalStateException("unhandled transactionStatus: " + status);
         }
     }
 
@@ -280,36 +329,39 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     @Override
     public final void commit() {
-        if (___LOGGING_ENABLED_ENABLED) {
+        if (___LOGGING_ENABLED) {
             if (config.logLevel.isLogableFrom(LogLevel.course)) {
-                System.out.println("committing " + config.familyName);
+                System.out.println(config.familyName + " committing");
             }
         }
 
         switch (status) {
-            case active:
+            case New:
+                status = TransactionStatus.Committed;
+                break;
+            case Active:
                 prepare();
                 //fall through
-            case prepared:
+            case Prepared:
                 try {
                     makeChangesPermanent();
-                    status = TransactionStatus.committed;
-                    notifyAll(TransactionLifecycleEvent.postCommit);
+                    status = TransactionStatus.Committed;
+                    notifyAll(TransactionLifecycleEvent.PostCommit);
                 } finally {
-                    if (status != TransactionStatus.committed) {
+                    if (status != TransactionStatus.Committed) {
                         abort();
                     }
                 }
                 break;
-            case committed:
+            case Committed:
 
                 //ignore the call
                 return;
-            case aborted:
+            case Aborted:
                 String abortedMsg = format("Can't commit already aborted transaction '%s'", config.getFamilyName());
                 throw new DeadTransactionException(abortedMsg);
             default:
-                throw new IllegalStateException();
+                throw new IllegalStateException("unhandled transactionStatus: " + status);
         }
     }
 
@@ -318,10 +370,19 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     @Override
     public final void registerRetryLatch(Latch latch) {
+        if (___LOGGING_ENABLED) {
+            if (config.logLevel.isLogableFrom(LogLevel.course)) {
+                System.out.println(config.familyName + " registerRetryLatch");
+            }
+        }
+
         switch (status) {
-            case active:
+            case New:
+                start();
                 //fall through
-            case prepared:
+            case Active:
+                //fall through
+            case Prepared:
                 if (latch == null) {
                     throw new NullPointerException();
                 }
@@ -335,17 +396,17 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
                     throw new NoRetryPossibleException(msg);
                 }
                 break;
-            case committed:
+            case Committed:
                 String commitMsg = format("No retry is possible on already committed transaction '%s'",
                         config.getFamilyName());
                 throw new DeadTransactionException(commitMsg);
-            case aborted: {
+            case Aborted: {
                 String abortedMsg = format("No retry is possible on already aborted transaction '%s'",
                         config.getFamilyName());
                 throw new DeadTransactionException(abortedMsg);
             }
             default:
-                throw new IllegalStateException();
+                throw new IllegalStateException("unhandled transactionStatus: " + status);
         }
     }
 
@@ -365,28 +426,28 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     public final void startOr() {
         switch (status) {
-            case active:
+            case Active:
                 S snapshot = takeSnapshot();
                 snapshot.parent = getSnapshot();
                 snapshot.tasks = null;//listeners;
                 storeSnapshot(snapshot);
                 break;
-            case committed:
+            case Committed:
                 String commitMsg = format("Can't call startOr on already committed transaction '%s'",
                         config.getFamilyName());
                 throw new DeadTransactionException(commitMsg);
-            case aborted:
+            case Aborted:
                 String abortMsg = format("Can't call startOr on already aborted transaction '%s'",
                         config.getFamilyName());
                 throw new DeadTransactionException(abortMsg);
             default:
-                throw new RuntimeException();
+                throw new IllegalStateException("unhandled transactionStatus: " + status);
         }
     }
 
     public final void endOr() {
         switch (status) {
-            case active:
+            case Active:
                 S snapshot = getSnapshot();
                 if (snapshot == null) {
                     throw new IllegalStateException();//improve exception
@@ -394,22 +455,22 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
                 storeSnapshot((S) snapshot.parent);
                 break;
-            case committed:
+            case Committed:
                 String committedMsg = format("Can't call endOr on already committed transaction '%s'",
                         config.getFamilyName());
                 throw new DeadTransactionException(committedMsg);
-            case aborted:
+            case Aborted:
                 String abortedMsg = format("Can't call endOr on already aborted transaction '%s'",
                         config.getFamilyName());
                 throw new DeadTransactionException(abortedMsg);
             default:
-                throw new RuntimeException();
+                throw new IllegalStateException("unhandled transactionStatus: " + status);
         }
     }
 
     public final void endOrAndStartElse() {
         switch (status) {
-            case active:
+            case Active:
                 S snapshot = getSnapshot();
                 if (snapshot == null) {
                     throw new IllegalStateException();
@@ -419,16 +480,16 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
                 snapshot.restore();
                 storeSnapshot((S) snapshot.parent);
                 break;
-            case committed:
+            case Committed:
                 String commitMsg = format("Can't call endOrAndStartElse on already committed transaction '%s'",
                         config.getFamilyName());
                 throw new DeadTransactionException(commitMsg);
-            case aborted:
+            case Aborted:
                 String abortMsg = format("Can't call endOrAndStartElse on already aborted transaction '%s'",
                         config.getFamilyName());
                 throw new DeadTransactionException(abortMsg);
             default:
-                throw new RuntimeException();
+                throw new IllegalStateException("unhandled transactionStatus: " + status);
         }
     }
 

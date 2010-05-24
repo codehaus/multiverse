@@ -1,6 +1,7 @@
 package org.multiverse.benchmarks;
 
 import org.benchy.AbstractBenchmarkDriver;
+import org.benchy.DriverParameter;
 import org.benchy.TestCase;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
@@ -16,16 +17,16 @@ import static org.multiverse.TestUtils.startAll;
  */
 public class ConcurrentUpdateWithIntrinsicLockDriver extends AbstractBenchmarkDriver {
 
+    @DriverParameter
     private int incCountPerThread;
+    @DriverParameter
     private int threadCount;
+
     private IncThread[] threads;
     private intRef intRef;
 
     @Override
     public void preRun(TestCase testCase) {
-        incCountPerThread = testCase.getIntProperty("incCountPerThread");
-        threadCount = testCase.getIntProperty("threadCount");
-
         threads = new IncThread[threadCount];
         for (int k = 0; k < threads.length; k++) {
             threads[k] = new IncThread(k);

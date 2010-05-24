@@ -126,7 +126,7 @@ public final class AlphaProgrammaticLongTranlocal extends AlphaTranlocal impleme
     }
 
     @Override
-    public void restart() {
+    public void reset() {
         //ignore
     }
 
@@ -148,6 +148,11 @@ public final class AlphaProgrammaticLongTranlocal extends AlphaTranlocal impleme
     @Override
     public void setRemainingTimeoutNs(long timeoutNs) {
         //ignore
+    }
+
+    @Override
+    public void start() {
+        throw new UnsupportedOperationException();
     }
 
     @Override

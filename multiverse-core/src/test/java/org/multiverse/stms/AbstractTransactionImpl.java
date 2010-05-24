@@ -20,7 +20,6 @@ public class AbstractTransactionImpl extends AbstractTransaction {
                 true,
                 1000,
                 true, true, true, true, Long.MAX_VALUE, 10, null, LogLevel.none));
-        init();
     }
 
     public AbstractTransactionImpl(PrimitiveClock clock) {
@@ -31,7 +30,6 @@ public class AbstractTransactionImpl extends AbstractTransaction {
                 true,
                 10000,
                 true, true, true, true, Long.MAX_VALUE, 10, null, LogLevel.none));
-        init();
     }
 
     public AbstractTransactionImpl(String familyName, PrimitiveClock clock) {
@@ -42,7 +40,5 @@ public class AbstractTransactionImpl extends AbstractTransaction {
                 true,
                 1000,
                 true, true, true, true, Long.MAX_VALUE, 10, null, LogLevel.none));
-
-        init();
     }
 }

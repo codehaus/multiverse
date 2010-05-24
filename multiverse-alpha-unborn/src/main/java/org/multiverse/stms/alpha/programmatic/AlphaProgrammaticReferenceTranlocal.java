@@ -88,6 +88,11 @@ public final class AlphaProgrammaticReferenceTranlocal<E> extends AlphaTranlocal
     }
 
     @Override
+    public void start() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public TransactionStatus getStatus() {
         throw new UnsupportedOperationException();
     }
@@ -103,7 +108,7 @@ public final class AlphaProgrammaticReferenceTranlocal<E> extends AlphaTranlocal
     }
 
     @Override
-    public void restart() {
+    public void reset() {
         throw new UnsupportedOperationException();
     }
 

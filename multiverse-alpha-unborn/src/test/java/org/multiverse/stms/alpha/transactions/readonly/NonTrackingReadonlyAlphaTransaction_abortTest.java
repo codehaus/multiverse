@@ -25,16 +25,15 @@ public class NonTrackingReadonlyAlphaTransaction_abortTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public NonTrackingReadonlyAlphaTransaction startSutTransaction() {
+    public NonTrackingReadonlyAlphaTransaction createSutTransaction() {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, false);
-
         return new NonTrackingReadonlyAlphaTransaction(config);
     }
 
     @Test
     public void whenUnused() {
         long startVersion = stm.getVersion();
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.abort();
 
         assertEquals(startVersion, stm.getVersion());
@@ -46,7 +45,7 @@ public class NonTrackingReadonlyAlphaTransaction_abortTest {
         ManualRef ref = new ManualRef(stm);
         long startVersion = stm.getVersion();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
         tx.abort();
 

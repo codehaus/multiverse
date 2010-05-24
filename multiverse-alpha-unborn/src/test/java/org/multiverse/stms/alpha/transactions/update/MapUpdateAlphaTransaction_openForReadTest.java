@@ -34,13 +34,13 @@ public class MapUpdateAlphaTransaction_openForReadTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MapUpdateAlphaTransaction startSutTransaction() {
+    public MapUpdateAlphaTransaction createSutTransaction() {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
                 .withMaxRetries(10);
         return new MapUpdateAlphaTransaction(config);
     }
 
-    public MapUpdateAlphaTransaction startSutTransactionWithoutAutomaticReadTracking() {
+    public MapUpdateAlphaTransaction createSutTransactionWithoutAutomaticReadTracking() {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
                 .withMaxRetries(10)
                 .withExplictRetryAllowed(false)
@@ -53,7 +53,7 @@ public class MapUpdateAlphaTransaction_openForReadTest {
     public void whenAutomaticReadTrackingDisabled_openForReadIsNotTracked() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransactionWithoutAutomaticReadTracking();
+        AlphaTransaction tx = createSutTransactionWithoutAutomaticReadTracking();
         tx.openForRead(ref);
 
         Map attachedMap = (Map) getField(tx, "attachedMap");
@@ -64,7 +64,7 @@ public class MapUpdateAlphaTransaction_openForReadTest {
     public void whenNotCommittedBefore_thenUncommitted() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         long version = stm.getVersion();
         try {
@@ -82,7 +82,7 @@ public class MapUpdateAlphaTransaction_openForReadTest {
     public void whenOpenedForRead_noLockingIsDone() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref.resetLockInfo();
         tx.openForRead(ref);
 
@@ -94,7 +94,8 @@ public class MapUpdateAlphaTransaction_openForReadTest {
     public void whenTxObjectIsNull_thenNullReturned() {
         long expectedVersion = stm.getVersion();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
+        tx.start();
 
         AlphaTranlocal result = tx.openForRead(null);
 
@@ -108,7 +109,7 @@ public class MapUpdateAlphaTransaction_openForReadTest {
         ManualRef ref = new ManualRef(stm, 10);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForRead(ref);
 
         assertSame(committed, tranlocal);
@@ -121,7 +122,7 @@ public class MapUpdateAlphaTransaction_openForReadTest {
 
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load(stm.getVersion());
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRefTranlocal opened = (ManualRefTranlocal) tx.openForWrite(ref);
         assertNotSame(committed, opened);
         assertEquals(ref, opened.getTransactionalObject());
@@ -139,7 +140,7 @@ public class MapUpdateAlphaTransaction_openForReadTest {
         AlphaTransaction owner = mock(AlphaTransaction.class);
         ref.___tryLock(owner);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         AlphaTranlocal tranlocal = tx.openForRead(ref);
 
@@ -153,7 +154,8 @@ public class MapUpdateAlphaTransaction_openForReadTest {
         ManualRef ref = new ManualRef(stm, 1);
 
         //start the transaction to sets its readversion
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
+        tx.start();
 
         //do an atomic and conflicting update
         ref.set(stm, 10);
@@ -190,7 +192,7 @@ public class MapUpdateAlphaTransaction_openForReadTest {
         stm.getClock().tick();
 
         //start the transaction to sets its readversion
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         ManualRefTranlocal expectedTranlocal = (ManualRefTranlocal) ref.___load();
 
@@ -213,17 +215,18 @@ public class MapUpdateAlphaTransaction_openForReadTest {
     public void whenVersionIsTooNew_thenOldVersionNotFoundReadConflict() {
         ManualRef ref = new ManualRef(stm, 0);
 
-        AlphaTransaction tx1 = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
+        tx.start();
 
         ref.inc(stm);
 
         try {
-            tx1.openForWrite(ref);
+            tx.openForWrite(ref);
             fail();
         } catch (OldVersionNotFoundReadConflict ex) {
         }
 
-        assertIsActive(tx1);
+        assertIsActive(tx);
     }
 
     @Test
@@ -249,7 +252,7 @@ public class MapUpdateAlphaTransaction_openForReadTest {
     public void openForReadDoesNotLockAtomicObjects() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref.resetLockInfo();
         tx.openForRead(ref);
 
@@ -274,7 +277,7 @@ public class MapUpdateAlphaTransaction_openForReadTest {
     public void whenAlreadyOpenedForRead_thenSameTranlocalReturned() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         ManualRefTranlocal expected = (ManualRefTranlocal) tx.openForRead(ref);
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForRead(ref);
@@ -300,7 +303,7 @@ public class MapUpdateAlphaTransaction_openForReadTest {
     public void whenAlreadyOpenedForCommutingWrite_thenItIsFixated() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal openedForCommutingWrite = tx.openForCommutingWrite(ref);
         AlphaTranlocal found = tx.openForRead(ref);
 
@@ -313,7 +316,7 @@ public class MapUpdateAlphaTransaction_openForReadTest {
     public void whenAlreadyOpenedForCommutingWriteAndLockedButVersionMatches() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal openedForCommutingWrite = tx.openForCommutingWrite(ref);
 
         Transaction lockOwner = mock(Transaction.class);
@@ -330,7 +333,7 @@ public class MapUpdateAlphaTransaction_openForReadTest {
     public void whenAlreadyOpenedForCommutingWriteAndLockedAndVersionTooOld_thenOldVersionNotFoundReadConflict() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal openedForCommutingWrite = tx.openForCommutingWrite(ref);
 
         ref.atomicInc(10);
@@ -356,7 +359,7 @@ public class MapUpdateAlphaTransaction_openForReadTest {
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
         long expectedVersion = stm.getVersion();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.commit();
 
         try {
@@ -376,7 +379,7 @@ public class MapUpdateAlphaTransaction_openForReadTest {
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
         long expectedVersion = stm.getVersion();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.abort();
 
         try {
@@ -394,7 +397,7 @@ public class MapUpdateAlphaTransaction_openForReadTest {
     public void whenPrepared_thenPreparedTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.prepare();
 
         try {

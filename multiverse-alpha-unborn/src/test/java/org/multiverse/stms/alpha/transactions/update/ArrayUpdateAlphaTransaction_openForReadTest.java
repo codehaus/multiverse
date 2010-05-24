@@ -29,7 +29,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public AlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfig) {
+    public AlphaTransaction createSutTransaction(SpeculativeConfiguration speculativeConfig) {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
                 .withMaxRetries(10)
                 .withSpeculativeConfiguration(speculativeConfig);
@@ -37,7 +37,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
         return new ArrayUpdateAlphaTransaction(config, speculativeConfig.getMaximumArraySize());
     }
 
-    public AlphaTransaction startSutTransactionWithoutAutomaticReadTracking() {
+    public AlphaTransaction createSutTransactionWithoutAutomaticReadTracking() {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
                 .withMaxRetries(10)
                 .withReadTrackingEnabled(false);
@@ -56,7 +56,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
     public void whenAutomaticReadTrackingDisabled_openForReadIsNotTracked() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransactionWithoutAutomaticReadTracking();
+        AlphaTransaction tx = createSutTransactionWithoutAutomaticReadTracking();
         tx.openForRead(ref);
 
         assertEquals(0, getField(tx, "firstFreeIndex"));
@@ -124,6 +124,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
 
         //start the transaction to sets its readversion
         AlphaTransaction tx = startSutTransaction();
+        tx.start();
 
         //do an atomic and conflicting update
         ref.set(stm, 10);
@@ -183,6 +184,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = startSutTransaction();
+        tx.start();
         ref.inc(stm);
 
         try {
@@ -298,7 +300,7 @@ public class ArrayUpdateAlphaTransaction_openForReadTest {
         ManualRef ref4 = new ManualRef(stm);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(true, false, false, 3);
-        AlphaTransaction tx = startSutTransaction(speculativeConfig);
+        AlphaTransaction tx = createSutTransaction(speculativeConfig);
         tx.openForWrite(ref1);
         tx.openForWrite(ref2);
         tx.openForWrite(ref3);

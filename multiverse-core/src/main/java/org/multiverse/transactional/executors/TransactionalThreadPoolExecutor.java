@@ -492,7 +492,7 @@ public final class TransactionalThreadPoolExecutor extends AbstractExecutorServi
 
         @Override
         public void notify(Transaction t, TransactionLifecycleEvent event) {
-            if (event == TransactionLifecycleEvent.postCommit) {
+            if (event == TransactionLifecycleEvent.PostCommit) {
                 for (int k = 0; k < threads.length; k++) {
                     threads[k].start();
                 }
@@ -505,7 +505,7 @@ public final class TransactionalThreadPoolExecutor extends AbstractExecutorServi
         @Override
         @TransactionalMethod
         public void notify(Transaction tx, TransactionLifecycleEvent event) {
-            if (event == TransactionLifecycleEvent.postCommit) {
+            if (event == TransactionLifecycleEvent.PostCommit) {
                 for (Thread thread : threads) {
                     thread.interrupt();
                 }

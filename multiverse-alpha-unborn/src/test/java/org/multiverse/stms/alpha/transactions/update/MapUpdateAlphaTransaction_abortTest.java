@@ -27,7 +27,7 @@ public class MapUpdateAlphaTransaction_abortTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MapUpdateAlphaTransaction startSutTransaction() {
+    public MapUpdateAlphaTransaction createSutTransaction() {
         UpdateConfiguration config =
                 new UpdateConfiguration(stmConfig.clock);
         return new MapUpdateAlphaTransaction(config);
@@ -37,7 +37,7 @@ public class MapUpdateAlphaTransaction_abortTest {
     public void abortDoesNotLockDirtyObject() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForWrite(ref);
         tranlocal.value++;
         ref.resetLockInfo();
@@ -51,7 +51,7 @@ public class MapUpdateAlphaTransaction_abortTest {
     public void abortDoesNotLockReadonlyObject() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
         ref.resetLockInfo();
         tx.abort();
@@ -62,7 +62,7 @@ public class MapUpdateAlphaTransaction_abortTest {
 
     @Test
     public void abortDoesNotLockFreshObject() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRef ref = new ManualRef(tx, 0);
         tx.openForWrite(ref);
         ref.resetLockInfo();
@@ -74,7 +74,7 @@ public class MapUpdateAlphaTransaction_abortTest {
 
     @Test
     public void whenUnused() {
-        Transaction tx = startSutTransaction();
+        Transaction tx = createSutTransaction();
         long startTime = stm.getVersion();
         tx.abort();
         assertEquals(startTime, stm.getVersion());
@@ -87,7 +87,7 @@ public class MapUpdateAlphaTransaction_abortTest {
         ManualRefTranlocal original = (ManualRefTranlocal) ref.___load();
 
         long version = stm.getVersion();
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
         tx.abort();
 
@@ -102,7 +102,7 @@ public class MapUpdateAlphaTransaction_abortTest {
         ManualRefTranlocal original = (ManualRefTranlocal) ref.___load();
 
         long version = stm.getVersion();
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForWrite(ref);
         tx.abort();
 
@@ -117,7 +117,7 @@ public class MapUpdateAlphaTransaction_abortTest {
         ManualRefTranlocal original = (ManualRefTranlocal) ref.___load();
 
         long version = stm.getVersion();
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForWrite(ref);
         tranlocal.value++;
         tx.abort();
@@ -131,7 +131,7 @@ public class MapUpdateAlphaTransaction_abortTest {
     public void whenTransactionContainsFreshObject_thenFreshObjectGetsNoTranlocal() {
         long startVersion = stm.getVersion();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRef ref = new ManualRef(tx, 10);
         tx.abort();
 
@@ -144,7 +144,7 @@ public class MapUpdateAlphaTransaction_abortTest {
 
     @Test
     public void whenPreparedAndUnused_thenNothingHappens() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.prepare();
 
         long version = stm.getVersion();
@@ -160,7 +160,7 @@ public class MapUpdateAlphaTransaction_abortTest {
     public void whenPreparedAndDirty_thenResourcesReleased() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref.inc(tx);
         tx.prepare();
         tx.abort();
@@ -173,7 +173,7 @@ public class MapUpdateAlphaTransaction_abortTest {
         ManualRef ref = new ManualRef(stm);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref.inc(tx);
         tx.prepare();
 
@@ -190,7 +190,7 @@ public class MapUpdateAlphaTransaction_abortTest {
 
         long startTime = stm.getVersion();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref1.inc(tx);
         ref2.inc(tx);
         ref3.inc(tx);

@@ -11,8 +11,9 @@ import org.multiverse.templates.TransactionTemplate;
 import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.TestUtils.assertIsActive;
+import static org.multiverse.TestUtils.assertIsAlive;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 public class TransactionalMethod_MiscTest {
@@ -22,6 +23,7 @@ public class TransactionalMethod_MiscTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
+        clearThreadLocalTransaction();
     }
 
     @After
@@ -30,7 +32,7 @@ public class TransactionalMethod_MiscTest {
     }
 
     public static void assertTransactionWorking() {
-        assertIsActive(getThreadLocalTransaction());
+        assertIsAlive(getThreadLocalTransaction());
     }
 
     /**

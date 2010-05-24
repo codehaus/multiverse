@@ -27,11 +27,11 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public ArrayReadonlyAlphaTransaction startTransactionUnderTest() {
-        return startTransactionUnderTest(new SpeculativeConfiguration(100));
+    public ArrayReadonlyAlphaTransaction createTransactionUnderTest() {
+        return createTransactionUnderTest(new SpeculativeConfiguration(100));
     }
 
-    public ArrayReadonlyAlphaTransaction startTransactionUnderTest(SpeculativeConfiguration speculativeConfig) {
+    public ArrayReadonlyAlphaTransaction createTransactionUnderTest(SpeculativeConfiguration speculativeConfig) {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true)
                 .withMaxRetries(10)
                 .withSpeculativeConfig(speculativeConfig);
@@ -40,7 +40,7 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
 
     @Test
     public void whenTxObjectNull_thenNullReturned() {
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createTransactionUnderTest();
         AlphaTranlocal tranlocal = tx.openForRead(null);
         assertNull(tranlocal);
     }
@@ -49,7 +49,7 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
     public void whenNotCommittedBefore_thenUncommittedReadConflict() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createTransactionUnderTest();
         try {
             tx.openForRead(ref);
             fail();
@@ -64,7 +64,7 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
         ManualRef ref = new ManualRef(stm);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createTransactionUnderTest();
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForRead(ref);
 
         assertTrue(found.isCommitted());
@@ -77,7 +77,7 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
     public void whenSecondTimeOpenedForRead_thenNotAddedToAttachedSet() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createTransactionUnderTest();
         ManualRefTranlocal expected = (ManualRefTranlocal) tx.openForRead(ref);
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForRead(ref);
 
@@ -93,7 +93,7 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
         ManualRef ref2 = new ManualRef(stm);
         ManualRef ref3 = new ManualRef(stm);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createTransactionUnderTest();
         tx.openForRead(ref1);
         assertEquals(1, getField(tx, "firstFreeIndex"));
 
@@ -112,7 +112,7 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
         AlphaTransaction owner = mock(AlphaTransaction.class);
         ref.___tryLock(owner);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createTransactionUnderTest();
 
         AlphaTranlocal tranlocal = tx.openForRead(ref);
 
@@ -126,7 +126,8 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
         ManualRef ref = new ManualRef(stm, 1);
 
         //start the transaction to sets its readversion
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createTransactionUnderTest();
+        tx.start();
 
         //do an atomic and conflicting update
         ref.set(stm, 10);
@@ -162,7 +163,7 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
         stm.getClock().tick();
 
         //start the transaction to sets its readversion
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createTransactionUnderTest();
 
         ManualRefTranlocal expectedTranlocal = (ManualRefTranlocal) ref.___load();
 
@@ -185,7 +186,8 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
     public void whenVersionTooNew_thenOldVersionNotFoundReadConflict() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createTransactionUnderTest();
+        tx.start();
 
         //conflicting write
         ref.inc(stm);
@@ -208,7 +210,7 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
         ManualRef ref4 = new ManualRef(stm);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(3);
-        AbstractReadonlyAlphaTransaction tx = startTransactionUnderTest(speculativeConfig);
+        AbstractReadonlyAlphaTransaction tx = createTransactionUnderTest(speculativeConfig);
         tx.openForRead(ref1);
         tx.openForRead(ref2);
         tx.openForRead(ref3);
@@ -226,7 +228,7 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
     public void whenPrepared_thenPreparedTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createTransactionUnderTest();
         tx.prepare();
 
         long version = stm.getVersion();
@@ -244,7 +246,7 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createTransactionUnderTest();
         tx.commit();
 
         long version = stm.getVersion();
@@ -262,7 +264,7 @@ public class ArrayReadonlyAlphaTransaction_openForReadTest {
     public void whenAborted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createTransactionUnderTest();
         tx.abort();
 
         long version = stm.getVersion();

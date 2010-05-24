@@ -28,7 +28,7 @@ public class MapReadonlyAlphaTransaction_commitTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MapReadonlyAlphaTransaction startTransactionUnderTest() {
+    public MapReadonlyAlphaTransaction createSutTransaction() {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new MapReadonlyAlphaTransaction(config);
     }
@@ -37,7 +37,7 @@ public class MapReadonlyAlphaTransaction_commitTest {
     public void commitDoesNotLockTxObjects() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
         ref.resetLockInfo();
         tx.commit();
@@ -52,7 +52,7 @@ public class MapReadonlyAlphaTransaction_commitTest {
         ManualRefTranlocal expectedTranlocal = (ManualRefTranlocal) ref.___load();
 
         long startVersion = stm.getVersion();
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
         tx.abort();
 
@@ -64,7 +64,7 @@ public class MapReadonlyAlphaTransaction_commitTest {
     @Test
     public void whenUnused() {
         long startVersion = stm.getVersion();
-        Transaction tx = startTransactionUnderTest();
+        Transaction tx = createSutTransaction();
         tx.abort();
 
         assertEquals(startVersion, stm.getVersion());
@@ -75,7 +75,7 @@ public class MapReadonlyAlphaTransaction_commitTest {
     public void whenWriteConflictTransaction_thenInsensitiveForConflict() {
         ManualRef ref = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
 
         //conflicting write

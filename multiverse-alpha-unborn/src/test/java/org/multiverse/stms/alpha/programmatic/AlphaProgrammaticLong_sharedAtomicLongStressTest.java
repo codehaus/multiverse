@@ -8,8 +8,7 @@ import org.multiverse.TestThread;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static org.multiverse.TestUtils.joinAll;
-import static org.multiverse.TestUtils.startAll;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
@@ -46,7 +45,7 @@ public class AlphaProgrammaticLong_sharedAtomicLongStressTest {
 
         long durationNs = System.nanoTime() - startNs;
         double transactionsPerSecond = (1.0d * totalIncCount * TimeUnit.SECONDS.toNanos(1)) / durationNs;
-        System.out.printf("Performance %s transactions/second\n", transactionsPerSecond);
+        System.out.printf("Performance %s transactions/second\n", format(transactionsPerSecond));
 
     }
 

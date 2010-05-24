@@ -9,6 +9,7 @@ import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.alpha.instrumentation.AlphaReflectionUtils.existsField;
 
 /**
@@ -27,6 +28,7 @@ public class TransactionalMethod_DefaultTxObjectMixinTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
+        clearThreadLocalTransaction();
     }
 
     @Test

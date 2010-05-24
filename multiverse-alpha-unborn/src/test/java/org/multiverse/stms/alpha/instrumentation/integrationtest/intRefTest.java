@@ -8,6 +8,7 @@ import org.multiverse.javaagent.JavaAgentProblemMonitor;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.instrumentation.InstrumentationTestUtils.resetInstrumentationProblemMonitor;
 import static org.multiverse.stms.alpha.instrumentation.AlphaReflectionUtils.existsField;
 import static org.multiverse.stms.alpha.instrumentation.AlphaReflectionUtils.existsTranlocalField;
@@ -20,6 +21,7 @@ public class intRefTest {
     @Before
     public void setUp() {
         resetInstrumentationProblemMonitor();
+        clearThreadLocalTransaction();
     }
 
     @After

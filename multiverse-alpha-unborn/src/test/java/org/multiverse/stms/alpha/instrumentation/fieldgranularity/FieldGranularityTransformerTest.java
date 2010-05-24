@@ -11,6 +11,7 @@ import org.multiverse.transactional.refs.*;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.alpha.instrumentation.AlphaReflectionUtils.assertHasField;
 
 public class FieldGranularityTransformerTest {
@@ -19,6 +20,7 @@ public class FieldGranularityTransformerTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
+        clearThreadLocalTransaction();
     }
 
 

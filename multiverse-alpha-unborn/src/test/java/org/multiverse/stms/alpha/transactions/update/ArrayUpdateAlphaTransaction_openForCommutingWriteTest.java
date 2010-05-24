@@ -32,12 +32,12 @@ public class ArrayUpdateAlphaTransaction_openForCommutingWriteTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public AlphaTransaction startSutTransaction(int size) {
+    public AlphaTransaction createSutTransaction(int size) {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock);
         return new ArrayUpdateAlphaTransaction(config, size);
     }
 
-    public AlphaTransaction startSutTransaction(int size, int maximumSize) {
+    public AlphaTransaction createSutTransaction(int size, int maximumSize) {
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(maximumSize);
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
                 .withSpeculativeConfiguration(speculativeConfig);
@@ -49,7 +49,7 @@ public class ArrayUpdateAlphaTransaction_openForCommutingWriteTest {
     public void whenTransactionalObjectLocked() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 10);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
 
         Transaction lockOwner = mock(Transaction.class);
         ref.___tryLock(lockOwner);
@@ -62,7 +62,7 @@ public class ArrayUpdateAlphaTransaction_openForCommutingWriteTest {
     public void whenTransactionalObjectAlreadyOpenedForConstruction() {
         AlphaProgrammaticLong ref = AlphaProgrammaticLong.createUncommitted(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         AlphaTranlocal openedForConstruction = tx.openForConstruction(ref);
         AlphaTranlocal found = tx.openForCommutingWrite(ref);
 
@@ -75,7 +75,7 @@ public class ArrayUpdateAlphaTransaction_openForCommutingWriteTest {
     public void whenTransactionalObjectAlreadyOpenedForWrite() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 1);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         AlphaTranlocal openedForWrite = tx.openForWrite(ref);
         AlphaTranlocal found = tx.openForCommutingWrite(ref);
 
@@ -90,7 +90,7 @@ public class ArrayUpdateAlphaTransaction_openForCommutingWriteTest {
     public void whenTransactionalObjectAlreadyOpenedForRead() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 1);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         AlphaTranlocal openedForRead = tx.openForRead(ref);
         AlphaTranlocal found = tx.openForCommutingWrite(ref);
 
@@ -107,7 +107,7 @@ public class ArrayUpdateAlphaTransaction_openForCommutingWriteTest {
     public void whenTransactionalObjectAlreadyOpenedForCommutingWrite() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 1);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         AlphaTranlocal firstOpen = tx.openForCommutingWrite(ref);
         AlphaTranlocal found = tx.openForCommutingWrite(ref);
 
@@ -122,7 +122,7 @@ public class ArrayUpdateAlphaTransaction_openForCommutingWriteTest {
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.commit();
 
         try {
@@ -138,7 +138,7 @@ public class ArrayUpdateAlphaTransaction_openForCommutingWriteTest {
     public void whenAborted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.abort();
 
         try {
@@ -154,7 +154,7 @@ public class ArrayUpdateAlphaTransaction_openForCommutingWriteTest {
     public void whenPrepared_thenPreparedTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.prepare();
 
         try {

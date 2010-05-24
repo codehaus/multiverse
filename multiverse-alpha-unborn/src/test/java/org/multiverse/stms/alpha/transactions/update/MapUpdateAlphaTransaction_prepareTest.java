@@ -22,7 +22,7 @@ public class MapUpdateAlphaTransaction_prepareTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MapUpdateAlphaTransaction startSutTransaction() {
+    public MapUpdateAlphaTransaction createSutTransaction() {
         UpdateConfiguration config =
                 new UpdateConfiguration(stmConfig.clock);
         return new MapUpdateAlphaTransaction(config);
@@ -32,7 +32,7 @@ public class MapUpdateAlphaTransaction_prepareTest {
     public void whenDirty_thenResourcesLocked() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref.inc(tx);
         tx.prepare();
 
@@ -43,7 +43,7 @@ public class MapUpdateAlphaTransaction_prepareTest {
     public void whenNonDirty_thenNoResourcesLocked() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForWrite(ref);
         tx.prepare();
 
@@ -54,7 +54,7 @@ public class MapUpdateAlphaTransaction_prepareTest {
     public void whenPrepared_thenCommitSuccess() {
         ManualRef ref = new ManualRef(stm, 1);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref.inc(tx);
         tx.prepare();
         tx.commit();

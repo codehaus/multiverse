@@ -14,6 +14,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.TestUtils.hasMethod;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.instrumentation.InstrumentationTestUtils.resetInstrumentationProblemMonitor;
 
 /**
@@ -26,6 +27,7 @@ public class TransactionalMethod_InterfaceTest {
     @Before
     public void setUp() {
         resetInstrumentationProblemMonitor();
+        clearThreadLocalTransaction();
         stm = (AlphaStm) getGlobalStmInstance();
     }
 

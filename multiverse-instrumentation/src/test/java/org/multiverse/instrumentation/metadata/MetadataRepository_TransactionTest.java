@@ -34,7 +34,7 @@ public class MetadataRepository_TransactionTest {
         assertFalse(transactionMetadata.interruptible);
         assertTrue(transactionMetadata.writeSkew);
         assertEquals(1000, transactionMetadata.maxRetries);
-        assertEquals("org.multiverse.instrumentation.metadata.MetadataRepository_TransactionTest$DefaultSettings.method()", transactionMetadata.familyName);
+        assertEquals("o.m.i.m.MetadataRepository_TransactionTest$DefaultSettings.method()", transactionMetadata.familyName);
     }
 
     class DefaultSettings {
@@ -55,7 +55,7 @@ public class MetadataRepository_TransactionTest {
         assertFalse(transactionMetadata.interruptible);
         assertTrue(transactionMetadata.writeSkew);
         assertEquals(1000, transactionMetadata.maxRetries);
-        assertEquals("org.multiverse.instrumentation.metadata.MetadataRepository_TransactionTest$ReadonlyMethod.method()", transactionMetadata.familyName);
+        assertEquals("o.m.i.m.MetadataRepository_TransactionTest$ReadonlyMethod.method()", transactionMetadata.familyName);
     }
 
     class ReadonlyMethod {
@@ -76,7 +76,7 @@ public class MetadataRepository_TransactionTest {
         assertFalse(transactionMetadata.interruptible);
         assertTrue(transactionMetadata.writeSkew);
         assertEquals(1000, transactionMetadata.maxRetries);
-        assertEquals("org.multiverse.instrumentation.metadata.MetadataRepository_TransactionTest$DefaultUpdateMethod.method()", transactionMetadata.familyName);
+        assertEquals("o.m.i.m.MetadataRepository_TransactionTest$DefaultUpdateMethod.method()", transactionMetadata.familyName);
     }
 
 
@@ -257,15 +257,19 @@ public class MetadataRepository_TransactionTest {
         }
     }
 
-
     @Test
     public void whenLogLevel() {
         ClassMetadata classMetadata = repository.loadClassMetadata(LogLevelObject.class);
+
         MethodMetadata explicitValueMethodMetadata = classMetadata.getMethodMetadata("explicitValue", "()V");
         TransactionMetadata explicitValueTransactionMetadata = explicitValueMethodMetadata.getTransactionalMetadata();
-
         assertNotNull(explicitValueTransactionMetadata);
         assertEquals(LogLevel.course, explicitValueTransactionMetadata.logLevel);
+
+        explicitValueMethodMetadata = classMetadata.getMethodMetadata("explicitValueFine", "()V");
+        explicitValueTransactionMetadata = explicitValueMethodMetadata.getTransactionalMetadata();
+        assertNotNull(explicitValueTransactionMetadata);
+        assertEquals(LogLevel.fine, explicitValueTransactionMetadata.logLevel);
 
         MethodMetadata defaultValueMethodMetadata = classMetadata.getMethodMetadata("defaultValue", "()V");
 
@@ -278,13 +282,19 @@ public class MetadataRepository_TransactionTest {
         @TransactionalMethod(logLevel = LogLevel.course)
         void explicitValue() {
             Transaction tx = getThreadLocalTransaction();
-            assertEquals(TimeUnit.HOURS.toNanos(10), tx.getConfiguration().getTimeoutNs());
+            assertEquals(LogLevel.course, tx.getConfiguration().getLogLevel());
+        }
+
+        @TransactionalMethod(logLevel = LogLevel.fine)
+        void explicitValueFine() {
+            Transaction tx = getThreadLocalTransaction();
+            assertEquals(LogLevel.fine, tx.getConfiguration().getLogLevel());
         }
 
         @TransactionalMethod
         void defaultValue() {
             Transaction tx = getThreadLocalTransaction();
-            assertEquals(Long.MAX_VALUE, tx.getConfiguration().getTimeoutNs());
+            assertEquals(LogLevel.none, tx.getConfiguration().getLogLevel());
         }
     }
 }

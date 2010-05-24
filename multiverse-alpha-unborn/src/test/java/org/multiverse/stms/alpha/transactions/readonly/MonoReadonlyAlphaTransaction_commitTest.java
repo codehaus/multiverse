@@ -23,14 +23,14 @@ public class MonoReadonlyAlphaTransaction_commitTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MonoReadonlyAlphaTransaction startSutTransaction() {
+    public MonoReadonlyAlphaTransaction createSutTransaction() {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new MonoReadonlyAlphaTransaction(config);
     }
 
     @Test
     public void whenUnused() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         long version = stm.getVersion();
         tx.commit();
@@ -44,7 +44,7 @@ public class MonoReadonlyAlphaTransaction_commitTest {
         ManualRef ref = new ManualRef(stm);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
         long version = stm.getVersion();
         tx.commit();
@@ -58,7 +58,7 @@ public class MonoReadonlyAlphaTransaction_commitTest {
     public void whenPrepared_thenSuccess() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
         tx.prepare();
 
@@ -73,7 +73,7 @@ public class MonoReadonlyAlphaTransaction_commitTest {
     public void whenConflict_thenCommitSucceeds() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
         ref.inc(stm);
 

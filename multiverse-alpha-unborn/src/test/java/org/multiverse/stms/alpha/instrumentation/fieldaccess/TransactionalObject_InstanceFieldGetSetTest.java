@@ -1,14 +1,21 @@
 package org.multiverse.stms.alpha.instrumentation.fieldaccess;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalObject;
 
 import static org.junit.Assert.assertEquals;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
  */
 public class TransactionalObject_InstanceFieldGetSetTest {
+
+    @Before
+    public void setUp() {
+        clearThreadLocalTransaction();
+    }
 
     @Test
     public void simplePutAndGet() {

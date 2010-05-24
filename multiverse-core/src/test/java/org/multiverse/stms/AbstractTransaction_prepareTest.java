@@ -14,28 +14,40 @@ import static org.multiverse.TestUtils.*;
 public class AbstractTransaction_prepareTest {
 
     @Test
+    public void whenNew_thenPrepared() {
+        AbstractTransaction tx = new AbstractTransactionImpl();
+
+        tx.prepare();
+        assertIsPrepared(tx);
+    }
+
+    @Test
     public void whenLifecycleListenerRegistered_thenPreCommitIsCalled() {
         AbstractTransaction tx = new AbstractTransactionImpl();
+        tx.start();
+
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         tx.registerLifecycleListener(listener);
 
         tx.prepare();
 
         assertIsPrepared(tx);
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.preCommit);
-        verify(listener, never()).notify(tx, TransactionLifecycleEvent.postCommit);
-        verify(listener, never()).notify(tx, TransactionLifecycleEvent.preAbort);
-        verify(listener, never()).notify(tx, TransactionLifecycleEvent.preAbort);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PreCommit);
+        verify(listener, never()).notify(tx, TransactionLifecycleEvent.PostCommit);
+        verify(listener, never()).notify(tx, TransactionLifecycleEvent.PreAbort);
+        verify(listener, never()).notify(tx, TransactionLifecycleEvent.PreAbort);
     }
 
     @Test
     public void whenPreCommitTaskFails_thenAborted() {
         AbstractTransaction tx = spy(new AbstractTransactionImpl());
+        tx.start();
+
         RuntimeException expected = new RuntimeException();
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         tx.registerLifecycleListener(listener);
 
-        doThrow(expected).when(listener).notify(tx, TransactionLifecycleEvent.preCommit);
+        doThrow(expected).when(listener).notify(tx, TransactionLifecycleEvent.PreCommit);
 
         try {
             tx.prepare();
@@ -45,15 +57,17 @@ public class AbstractTransaction_prepareTest {
 
         assertIsAborted(tx);
         verify(tx, times(1)).doAbortPrepared();
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.preCommit);
-        verify(listener, never()).notify(tx, TransactionLifecycleEvent.postCommit);
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.preAbort);
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.preAbort);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PreCommit);
+        verify(listener, never()).notify(tx, TransactionLifecycleEvent.PostCommit);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PreAbort);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PreAbort);
     }
 
     @Test
     public void whenExceptionThrown_thenAbort() {
         AbstractTransaction tx = spy(new AbstractTransactionImpl());
+        tx.start();
+
         RuntimeException expected = new RuntimeException();
         doThrow(expected).when(tx).doPrepare();
 

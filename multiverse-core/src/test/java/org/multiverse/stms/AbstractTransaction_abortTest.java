@@ -29,6 +29,7 @@ public class AbstractTransaction_abortTest {
     @Test
     public void whenActive_thenAbort() {
         Transaction tx = new AbstractTransactionImpl();
+        tx.start();
         long startVersion = clock.getVersion();
         tx.abort();
         assertEquals(startVersion, clock.getVersion());
@@ -69,7 +70,7 @@ public class AbstractTransaction_abortTest {
         tx.prepare();
 
         RuntimeException expected = new RuntimeException();
-        doThrow(expected).when(listener).notify(tx, TransactionLifecycleEvent.preAbort);
+        doThrow(expected).when(listener).notify(tx, TransactionLifecycleEvent.PreAbort);
 
         try {
             tx.abort();
@@ -118,10 +119,10 @@ public class AbstractTransaction_abortTest {
 
         tx.abort();
 
-        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.preCommit);
-        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.postCommit);
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.preAbort);
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.postAbort);
+        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.PreCommit);
+        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.PostCommit);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PreAbort);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PostAbort);
     }
 
     @Test
@@ -131,7 +132,7 @@ public class AbstractTransaction_abortTest {
         RuntimeException exception = new RuntimeException();
 
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        doThrow(exception).when(listener).notify(tx, TransactionLifecycleEvent.preAbort);
+        doThrow(exception).when(listener).notify(tx, TransactionLifecycleEvent.PreAbort);
 
         tx.registerLifecycleListener(listener);
 
@@ -143,10 +144,10 @@ public class AbstractTransaction_abortTest {
         }
 
         assertIsAborted(tx);
-        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.preCommit);
-        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.postCommit);
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.preAbort);
-        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.postAbort);
+        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.PreCommit);
+        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.PostCommit);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PreAbort);
+        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.PostAbort);
     }
 
     @Test
@@ -156,7 +157,7 @@ public class AbstractTransaction_abortTest {
         RuntimeException exception = new RuntimeException();
 
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        doThrow(exception).when(listener).notify(tx, TransactionLifecycleEvent.postAbort);
+        doThrow(exception).when(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
 
         tx.registerLifecycleListener(listener);
 
@@ -168,9 +169,9 @@ public class AbstractTransaction_abortTest {
         }
 
         assertIsAborted(tx);
-        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.preCommit);
-        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.postCommit);
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.preAbort);
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.postAbort);
+        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.PreCommit);
+        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.PostCommit);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PreAbort);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PostAbort);
     }
 }

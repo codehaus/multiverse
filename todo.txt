@@ -330,7 +330,7 @@ Dit scheelt nog een object creatie.
 
 - retry policy should be configurable through annotation
 
-- blocking executor.
+- blocking runner.
 
 - inlining of transactions
 

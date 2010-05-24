@@ -30,11 +30,7 @@ public class NonTrackingReadonlyAlphaTransaction_registerRetryLatchTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public NonTrackingReadonlyAlphaTransaction startSutTransaction() {
-        return startSutTransaction(new SpeculativeConfiguration(100));
-    }
-
-    public NonTrackingReadonlyAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfiguration) {
+    public NonTrackingReadonlyAlphaTransaction createSutTransaction(SpeculativeConfiguration speculativeConfiguration) {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, false)
                 .withExplicitRetryAllowed(true)
                 .withSpeculativeConfig(speculativeConfiguration);
@@ -47,7 +43,7 @@ public class NonTrackingReadonlyAlphaTransaction_registerRetryLatchTest {
         ManualRef ref = new ManualRef(stm);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(true, true, false, 100);
-        AlphaTransaction tx = startSutTransaction(speculativeConfig);
+        AlphaTransaction tx = createSutTransaction(speculativeConfig);
         tx.openForRead(ref);
 
         Latch latch = new CheapLatch();
@@ -69,7 +65,7 @@ public class NonTrackingReadonlyAlphaTransaction_registerRetryLatchTest {
         ManualRef ref = new ManualRef(stm);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, false, 100);
-        AlphaTransaction tx = startSutTransaction(speculativeConfig);
+        AlphaTransaction tx = createSutTransaction(speculativeConfig);
 
         Latch latch = new CheapLatch();
 
@@ -88,7 +84,7 @@ public class NonTrackingReadonlyAlphaTransaction_registerRetryLatchTest {
     @Test
     public void whenExplicitNonAutomaticReadTrackingAndUnused_thenNoRetryPossibleException() {
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, false, false, 100);
-        AlphaTransaction tx = startSutTransaction(speculativeConfig);
+        AlphaTransaction tx = createSutTransaction(speculativeConfig);
 
         Latch latch = new CheapLatch();
 
@@ -108,7 +104,7 @@ public class NonTrackingReadonlyAlphaTransaction_registerRetryLatchTest {
         ManualRef ref = new ManualRef(stm);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(true, false, true, 100);
-        AlphaTransaction tx = startSutTransaction(speculativeConfig);
+        AlphaTransaction tx = createSutTransaction(speculativeConfig);
         tx.openForRead(ref);
 
         Latch latch = new CheapLatch();

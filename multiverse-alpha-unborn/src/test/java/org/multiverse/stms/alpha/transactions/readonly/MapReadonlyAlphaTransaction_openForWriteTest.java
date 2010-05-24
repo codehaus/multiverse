@@ -29,11 +29,11 @@ public class MapReadonlyAlphaTransaction_openForWriteTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MapReadonlyAlphaTransaction startTransactionUnderTest() {
-        return startTransactionUnderTest(new SpeculativeConfiguration(100));
+    public MapReadonlyAlphaTransaction createSutTransaction() {
+        return createSutTransaction(new SpeculativeConfiguration(100));
     }
 
-    public MapReadonlyAlphaTransaction startTransactionUnderTest(SpeculativeConfiguration speculativeConfig) {
+    public MapReadonlyAlphaTransaction createSutTransaction(SpeculativeConfiguration speculativeConfig) {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true)
                 .withSpeculativeConfig(speculativeConfig);
         return new MapReadonlyAlphaTransaction(config);
@@ -41,7 +41,9 @@ public class MapReadonlyAlphaTransaction_openForWriteTest {
 
     @Test
     public void withNullTxObject_thenNullPointerException() {
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
+        tx.start();
+
         long expectedVersion = stm.getVersion();
 
         try {
@@ -60,7 +62,7 @@ public class MapReadonlyAlphaTransaction_openForWriteTest {
         long expectedVersion = stm.getVersion();
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, true, 100);
-        AlphaTransaction tx = startTransactionUnderTest(speculativeConfig);
+        AlphaTransaction tx = createSutTransaction(speculativeConfig);
         try {
             tx.openForWrite(ref);
             fail();
@@ -78,7 +80,7 @@ public class MapReadonlyAlphaTransaction_openForWriteTest {
         long expectedVersion = stm.getVersion();
 
         SpeculativeConfiguration speculativeConfiguration = new SpeculativeConfiguration(100);
-        AlphaTransaction tx = startTransactionUnderTest(speculativeConfiguration);
+        AlphaTransaction tx = createSutTransaction(speculativeConfiguration);
         try {
             tx.openForWrite(ref);
             fail();
@@ -94,7 +96,7 @@ public class MapReadonlyAlphaTransaction_openForWriteTest {
     public void whenPrepared() {
         ManualRef ref = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
         tx.prepare();
 
         long expectedVersion = stm.getVersion();
@@ -112,7 +114,7 @@ public class MapReadonlyAlphaTransaction_openForWriteTest {
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
         tx.commit();
 
         long expectedVersion = stm.getVersion();
@@ -132,7 +134,7 @@ public class MapReadonlyAlphaTransaction_openForWriteTest {
         ManualRef ref = new ManualRef(stm, 10);
         long expectedVersion = stm.getVersion();
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
         tx.abort();
 
         try {

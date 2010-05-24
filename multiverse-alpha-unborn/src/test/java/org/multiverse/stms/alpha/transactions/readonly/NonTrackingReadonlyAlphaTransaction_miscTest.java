@@ -7,7 +7,7 @@ import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.TestUtils.assertIsActive;
+import static org.multiverse.TestUtils.assertIsNew;
 
 public class NonTrackingReadonlyAlphaTransaction_miscTest {
 
@@ -21,7 +21,7 @@ public class NonTrackingReadonlyAlphaTransaction_miscTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public NonTrackingReadonlyAlphaTransaction startSutTransaction() {
+    public NonTrackingReadonlyAlphaTransaction createSutTransaction() {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, false);
 
         return new NonTrackingReadonlyAlphaTransaction(config);
@@ -29,9 +29,9 @@ public class NonTrackingReadonlyAlphaTransaction_miscTest {
 
     @Test
     public void start() {
-        long version = stm.getVersion();
-        AlphaTransaction tx = startSutTransaction();
-        assertIsActive(tx);
-        assertEquals(version, stm.getVersion());
+        AlphaTransaction tx = createSutTransaction();
+
+        assertIsNew(tx);
+        assertEquals(0, tx.getReadVersion());
     }
 }

@@ -6,6 +6,7 @@ import org.multiverse.stms.alpha.AlphaStm;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * Tests if an atomic object is correctly transformed when a static initializer is used.
@@ -25,6 +26,7 @@ public class TransactionalObject_StaticInitializerTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
+        clearThreadLocalTransaction();
     }
 
     @Test

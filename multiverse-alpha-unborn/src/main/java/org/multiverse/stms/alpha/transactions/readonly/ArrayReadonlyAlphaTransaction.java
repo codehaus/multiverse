@@ -16,11 +16,10 @@ public final class ArrayReadonlyAlphaTransaction extends AbstractReadonlyAlphaTr
     public ArrayReadonlyAlphaTransaction(ReadonlyConfiguration config, int size) {
         super(config);
         attachedArray = new AlphaTranlocal[size];
-        init();
     }
 
     @Override
-    protected void doClear() {
+    protected void doReset() {
         firstFreeIndex = 0;
         for (int k = 0; k < attachedArray.length; k++) {
             attachedArray[k] = null;

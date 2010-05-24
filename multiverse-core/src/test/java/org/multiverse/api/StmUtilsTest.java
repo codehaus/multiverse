@@ -105,6 +105,7 @@ public class StmUtilsTest {
         Runnable task = mock(Runnable.class);
 
         Transaction tx = new AbstractTransactionImpl();
+        tx.start();
         setThreadLocalTransaction(tx);
 
         scheduleDeferredTask(task);

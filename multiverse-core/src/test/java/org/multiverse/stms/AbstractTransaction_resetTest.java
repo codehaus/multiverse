@@ -11,12 +11,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.assertIsAborted;
-import static org.multiverse.TestUtils.assertIsActive;
+import static org.multiverse.TestUtils.assertIsNew;
 
 /**
  * @author Peter Veentjer
  */
-public class AbstractTransaction_restartTest {
+public class AbstractTransaction_resetTest {
 
     private StrictPrimitiveClock clock;
 
@@ -26,14 +26,25 @@ public class AbstractTransaction_restartTest {
     }
 
     @Test
-    public void whenActive_thenTransactionRestarted() {
+    public void whenNew() {
         Transaction tx = new AbstractTransactionImpl(clock);
-        long version = clock.getVersion();
+        clock.tick();
 
-        tx.restart();
+        tx.reset();
 
-        assertIsActive(tx);
-        assertEquals(version, clock.getVersion());
+        assertIsNew(tx);
+        assertEquals(0, tx.getReadVersion());
+    }
+
+    @Test
+    public void whenActive() {
+        Transaction tx = new AbstractTransactionImpl(clock);
+        tx.start();
+
+        tx.reset();
+
+        assertIsNew(tx);
+        assertEquals(0, tx.getReadVersion());
     }
 
     @Test
@@ -45,12 +56,12 @@ public class AbstractTransaction_restartTest {
 
         reset(listener);
 
-        tx.restart();
+        tx.reset();
 
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.preAbort);
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.postAbort);
-        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.preCommit);
-        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.postCommit);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PreAbort);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PostAbort);
+        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.PreCommit);
+        verify(listener, times(0)).notify(tx, TransactionLifecycleEvent.PostCommit);
     }
 
     @Test
@@ -60,10 +71,10 @@ public class AbstractTransaction_restartTest {
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         tx.registerLifecycleListener(listener);
 
-        doThrow(new RuntimeException()).when(listener).notify(tx, TransactionLifecycleEvent.preAbort);
+        doThrow(new RuntimeException()).when(listener).notify(tx, TransactionLifecycleEvent.PreAbort);
 
         try {
-            tx.restart();
+            tx.reset();
             fail();
         } catch (RuntimeException ex) {
         }
@@ -78,10 +89,10 @@ public class AbstractTransaction_restartTest {
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         tx.registerLifecycleListener(listener);
 
-        doThrow(new RuntimeException()).when(listener).notify(tx, TransactionLifecycleEvent.postAbort);
+        doThrow(new RuntimeException()).when(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
 
         try {
-            tx.restart();
+            tx.reset();
             fail();
         } catch (RuntimeException ex) {
         }
@@ -96,11 +107,11 @@ public class AbstractTransaction_restartTest {
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         tx.registerLifecycleListener(listener);
 
-        doThrow(new RuntimeException()).when(listener).notify(tx, TransactionLifecycleEvent.preAbort);
+        doThrow(new RuntimeException()).when(listener).notify(tx, TransactionLifecycleEvent.PreAbort);
 
         tx.prepare();
         try {
-            tx.restart();
+            tx.reset();
             fail();
         } catch (RuntimeException ex) {
         }
@@ -115,11 +126,11 @@ public class AbstractTransaction_restartTest {
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         tx.registerLifecycleListener(listener);
 
-        doThrow(new RuntimeException()).when(listener).notify(tx, TransactionLifecycleEvent.postAbort);
+        doThrow(new RuntimeException()).when(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
 
         tx.prepare();
         try {
-            tx.restart();
+            tx.reset();
             fail();
         } catch (RuntimeException ex) {
         }
@@ -132,11 +143,9 @@ public class AbstractTransaction_restartTest {
         Transaction tx = new AbstractTransactionImpl(clock);
         tx.prepare();
 
-        long version = clock.getVersion();
-
-        tx.restart();
-        assertIsActive(tx);
-        assertEquals(version, clock.getVersion());
+        tx.reset();
+        assertIsNew(tx);
+        assertEquals(0, tx.getReadVersion());
     }
 
     @Test
@@ -144,12 +153,10 @@ public class AbstractTransaction_restartTest {
         Transaction tx = new AbstractTransactionImpl(clock);
         tx.commit();
 
-        long version = clock.getVersion();
+        tx.reset();
 
-        tx.restart();
-
-        assertIsActive(tx);
-        assertEquals(version, clock.getVersion());
+        assertIsNew(tx);
+        assertEquals(0, tx.getReadVersion());
     }
 
     @Test
@@ -162,7 +169,7 @@ public class AbstractTransaction_restartTest {
 
         reset(listener);
 
-        tx.restart();
+        tx.reset();
         verify(listener, never()).notify((Transaction) any(), (TransactionLifecycleEvent) any());
     }
 
@@ -171,12 +178,10 @@ public class AbstractTransaction_restartTest {
         Transaction tx = new AbstractTransactionImpl(clock);
         tx.abort();
 
-        long version = clock.getVersion();
+        tx.reset();
 
-        tx.restart();
-
-        assertIsActive(tx);
-        assertEquals(version, clock.getVersion());
+        assertIsNew(tx);
+        assertEquals(0, tx.getReadVersion());
     }
 
     @Test
@@ -189,7 +194,7 @@ public class AbstractTransaction_restartTest {
 
         reset(listener);
 
-        tx.restart();
+        tx.reset();
         verify(listener, never()).notify((Transaction) any(), (TransactionLifecycleEvent) any());
     }
 }

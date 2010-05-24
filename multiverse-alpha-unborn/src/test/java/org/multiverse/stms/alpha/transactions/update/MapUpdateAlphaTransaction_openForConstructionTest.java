@@ -30,7 +30,7 @@ public class MapUpdateAlphaTransaction_openForConstructionTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MapUpdateAlphaTransaction startSutTransaction() {
+    public MapUpdateAlphaTransaction createSutTransaction() {
         UpdateConfiguration config =
                 new UpdateConfiguration(stmConfig.clock);
         return new MapUpdateAlphaTransaction(config);
@@ -38,7 +38,8 @@ public class MapUpdateAlphaTransaction_openForConstructionTest {
 
     @Test
     public void whenNullTxObject_thenNullPointerException() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
+        tx.start();
 
         long version = stm.getVersion();
         try {
@@ -56,7 +57,7 @@ public class MapUpdateAlphaTransaction_openForConstructionTest {
     public void whenCalledForTheFirstTime() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         long version = stm.getVersion();
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForConstruction(ref);
@@ -73,7 +74,7 @@ public class MapUpdateAlphaTransaction_openForConstructionTest {
     public void whenAlreadyOpenedForConstruction_sameInstanceReturned() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         long version = stm.getVersion();
         ManualRefTranlocal firstTime = (ManualRefTranlocal) tx.openForConstruction(ref);
@@ -92,7 +93,7 @@ public class MapUpdateAlphaTransaction_openForConstructionTest {
         ManualRef ref = new ManualRef(stm);
         ref.___load();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         long version = stm.getVersion();
         AlphaTranlocal opened = tx.openForConstruction(ref);
@@ -109,7 +110,7 @@ public class MapUpdateAlphaTransaction_openForConstructionTest {
         ManualRef ref = new ManualRef(stm);
         AlphaTranlocal committed = ref.___load();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
 
         long version = stm.getVersion();
@@ -129,7 +130,7 @@ public class MapUpdateAlphaTransaction_openForConstructionTest {
         ManualRef ref = new ManualRef(stm);
         AlphaTranlocal committed = ref.___load();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForWrite(ref);
 
         long version = stm.getVersion();
@@ -149,7 +150,7 @@ public class MapUpdateAlphaTransaction_openForConstructionTest {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 10);
         AlphaTranlocal committed = ref.___load();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForCommutingWrite(ref);
 
         long version = stm.getVersion();
@@ -168,7 +169,7 @@ public class MapUpdateAlphaTransaction_openForConstructionTest {
     public void whenAborted_thenDeadTransactionException() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.abort();
 
         long version = stm.getVersion();
@@ -186,7 +187,7 @@ public class MapUpdateAlphaTransaction_openForConstructionTest {
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.commit();
 
         long version = stm.getVersion();
@@ -204,7 +205,7 @@ public class MapUpdateAlphaTransaction_openForConstructionTest {
     public void whenPrepared_thenPreparedTransactionException() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.prepare();
 
         long version = stm.getVersion();

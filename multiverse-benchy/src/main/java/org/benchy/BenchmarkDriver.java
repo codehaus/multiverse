@@ -15,7 +15,7 @@ public interface BenchmarkDriver {
     /**
      * Is executed before the run.
      *
-     * @param testCase
+     * @param testCase the testCase that is going to be run.
      */
     void preRun(TestCase testCase);
 
@@ -27,7 +27,7 @@ public interface BenchmarkDriver {
     /**
      * Is executed after the run.
      *
-     * @param caseResult
+     * @param caseResult the testCase that just has run.
      */
     void postRun(TestCaseResult caseResult);
 }

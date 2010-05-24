@@ -29,7 +29,7 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MapReadonlyAlphaTransaction startTransactionUnderTest() {
+    public MapReadonlyAlphaTransaction createSutTransaction() {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true)
                 .withMaxRetries(10);
         return new MapReadonlyAlphaTransaction(config);
@@ -39,7 +39,7 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
     public void whenOpenForRead_thenNotLockTxObjects() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
         ref.resetLockInfo();
         tx.openForRead(ref);
 
@@ -51,7 +51,7 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
     public void whenNotCommittedBefore_thenUncommittedReadConflict() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
         try {
             tx.openForRead(ref);
             fail();
@@ -67,7 +67,7 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
         ManualRef ref = new ManualRef(stm);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal found = tx.openForRead(ref);
 
         assertTrue(found.isCommitted());
@@ -79,7 +79,7 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
     @Test
     public void whenSecondTimeLoadForRead_sameTranlocalIsReturned() {
         ManualRef ref = new ManualRef(stm);
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal expected = tx.openForRead(ref);
 
         AlphaTranlocal found = tx.openForRead(ref);
@@ -95,7 +95,8 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
     public void whenVersionTooOld_thenOldVersionNotFoundReadConflict() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
+        tx.start();
 
         //conflicting write
         ref.inc(stm);
@@ -119,7 +120,7 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
         AlphaTransaction owner = mock(AlphaTransaction.class);
         ref.___tryLock(owner);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
 
         AlphaTranlocal tranlocal = tx.openForRead(ref);
 
@@ -132,7 +133,8 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
         ManualRef ref = new ManualRef(stm, 1);
 
         //start the transaction to sets its readversion
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
+        tx.start();
 
         //do an atomic and conflicting update
         ref.set(stm, 10);
@@ -169,7 +171,7 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
         stm.getClock().tick();
 
         //start the transaction to sets its readversion
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
 
         ManualRefTranlocal expectedTranlocal = (ManualRefTranlocal) ref.___load();
 
@@ -191,7 +193,7 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
     public void whenAlreadyOpenedForRead_thenReadWillNotObserveChangesByOthers() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal expected = tx.openForRead(ref);
 
         //update in other transaction
@@ -205,7 +207,7 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
     public void whenPrepared_thenPreparedTransactionException() {
         ManualRef ref = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
         tx.prepare();
 
         long version = stm.getVersion();
@@ -223,7 +225,7 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
         tx.commit();
 
         long expectedVersion = stm.getVersion();
@@ -241,7 +243,7 @@ public class MapReadonlyAlphaTransaction_openForReadTest {
     public void whenAborted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
         tx.abort();
 
         long expectedVersion = stm.getVersion();

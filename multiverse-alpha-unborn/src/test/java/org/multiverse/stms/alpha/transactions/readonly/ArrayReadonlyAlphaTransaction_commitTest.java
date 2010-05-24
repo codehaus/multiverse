@@ -21,14 +21,14 @@ public class ArrayReadonlyAlphaTransaction_commitTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public ArrayReadonlyAlphaTransaction startTransactionUnderTest(int maximumSize) {
+    public ArrayReadonlyAlphaTransaction createSutTransaction(int maximumSize) {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new ArrayReadonlyAlphaTransaction(config, maximumSize);
     }
 
     @Test
     public void whenEmpty() {
-        AlphaTransaction tx = startTransactionUnderTest(10);
+        AlphaTransaction tx = createSutTransaction(10);
 
         long version = stm.getVersion();
 
@@ -42,7 +42,7 @@ public class ArrayReadonlyAlphaTransaction_commitTest {
     public void whenNoConflictingReads_thenCommitSuccess() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startTransactionUnderTest(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.openForRead(ref);
 
         long version = stm.getVersion();
@@ -56,7 +56,7 @@ public class ArrayReadonlyAlphaTransaction_commitTest {
     public void whenConflictingWritesAreFoundAfterOpenForRead_thenCommitSuccess() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startTransactionUnderTest(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.openForRead(ref);
 
         //conflicting write

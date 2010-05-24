@@ -31,7 +31,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public NonTrackingReadonlyAlphaTransaction startSutTransaction() {
+    public NonTrackingReadonlyAlphaTransaction createSutTransaction() {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, false)
                 .withMaxRetries(10);
         return new NonTrackingReadonlyAlphaTransaction(config);
@@ -41,7 +41,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
     public void whenOpenedForRead_thenNotLockTxObjects() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref.resetLockInfo();
         tx.openForRead(ref);
 
@@ -51,7 +51,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
 
     @Test
     public void openedForReadWithNull_thenNullReturned() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal result = tx.openForRead(null);
         assertNull(result);
     }
@@ -60,7 +60,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
     public void whenNotCommittedBefore_thenUncommittedReadConflict() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         try {
             tx.openForRead(ref);
             fail();
@@ -76,7 +76,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
 
         ManualRefTranlocal expected = (ManualRefTranlocal) ref.___load(stm.getVersion());
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForRead(ref);
         assertTrue(found.isCommitted());
         assertSame(expected, found);
@@ -89,7 +89,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
 
         stmConfig.clock.tick();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal tranlocal = tx.openForRead(ref);
         assertSame(committed, tranlocal);
     }
@@ -102,7 +102,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
         AlphaTransaction owner = mock(AlphaTransaction.class);
         ref.___tryLock(owner);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         AlphaTranlocal tranlocal = tx.openForRead(ref);
 
@@ -115,7 +115,8 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
         ManualRef ref = new ManualRef(stm, 1);
 
         //start the transaction to sets its readversion
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
+        tx.start();
 
         //do an atomic and conflicting update
         ref.set(stm, 10);
@@ -152,7 +153,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
         stm.getClock().tick();
 
         //start the transaction to sets its readversion
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         ManualRefTranlocal expectedTranlocal = (ManualRefTranlocal) ref.___load();
 
@@ -174,7 +175,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
     public void whenOtherTransactionHasPendingWrite_noChangesAreSeen() {
         ManualRef ref = new ManualRef(stm, 0);
 
-        AlphaTransaction readonlyTx = startSutTransaction();
+        AlphaTransaction readonlyTx = createSutTransaction();
         AlphaTransaction updateTx = startTrackingUpdateTransaction(stm);
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) updateTx.openForWrite(ref);
         tranlocal.value++;
@@ -194,7 +195,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
     public void whenVersionTooOld_thenLoadTooOldVersionException() {
         ManualRef ref = new ManualRef(stm, 0);
 
-        AlphaTransaction readonlyTx = startSutTransaction();
+        AlphaTransaction readonlyTx = createSutTransaction();
         AlphaTransaction updateTx = startTrackingUpdateTransaction(stm);
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) updateTx.openForWrite(ref);
         tranlocal.value++;
@@ -216,7 +217,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
     public void whenPrepared_thenPreparedTransactionException() {
         ManualRef value = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.prepare();
 
         long version = stm.getVersion();
@@ -234,7 +235,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef value = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.commit();
 
         long version = stm.getVersion();
@@ -252,7 +253,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForReadTest {
     public void whenAborted_thenDeadTransactionException() {
         ManualRef value = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.abort();
 
         long version = stm.getVersion();

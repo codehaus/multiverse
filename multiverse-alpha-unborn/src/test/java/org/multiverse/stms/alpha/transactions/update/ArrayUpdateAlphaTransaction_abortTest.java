@@ -27,14 +27,14 @@ public class ArrayUpdateAlphaTransaction_abortTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public AlphaTransaction startSutTransaction(int size) {
+    public AlphaTransaction createSutTransaction(int size) {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock);
         return new ArrayUpdateAlphaTransaction(config, size);
     }
 
     @Test
     public void whenUnused() {
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.abort();
 
         assertIsAborted(tx);
@@ -45,7 +45,7 @@ public class ArrayUpdateAlphaTransaction_abortTest {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.openForRead(ref1);
         tx.openForRead(ref2);
         tx.abort();
@@ -58,7 +58,7 @@ public class ArrayUpdateAlphaTransaction_abortTest {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.openForWrite(ref1);
         tx.openForWrite(ref2);
         tx.abort();
@@ -71,7 +71,7 @@ public class ArrayUpdateAlphaTransaction_abortTest {
         ManualRef ref = new ManualRef(stm);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForWrite(ref);
         tranlocal.value++;
         tx.abort();
@@ -93,7 +93,7 @@ public class ArrayUpdateAlphaTransaction_abortTest {
         listenTx.openForRead(ref);
         listenTx.registerRetryLatch(latch);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForWrite(ref);
         tranlocal.value++;
         tx.abort();
@@ -105,7 +105,7 @@ public class ArrayUpdateAlphaTransaction_abortTest {
     public void whenPreparedWithLockedResources_thenResourcesFreed() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         ref.inc(tx);
         tx.prepare();
 

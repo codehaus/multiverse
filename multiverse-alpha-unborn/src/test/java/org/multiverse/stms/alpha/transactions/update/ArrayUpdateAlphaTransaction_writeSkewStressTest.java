@@ -39,7 +39,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewStressTest {
         clearThreadLocalTransaction();
     }
 
-    public AlphaTransaction startSutTransaction(int size, boolean writeSkewAllowed) {
+    public AlphaTransaction createSutTransaction(int size, boolean writeSkewAllowed) {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
                 .withReadTrackingEnabled(true)
                 .withWriteSkewAllowed(writeSkewAllowed);
@@ -141,7 +141,14 @@ public class ArrayUpdateAlphaTransaction_writeSkewStressTest {
 
                 @Override
                 public Transaction start() {
-                    return startSutTransaction(10, writeSkewAllowed);
+                    AlphaTransaction tx = create();
+                    tx.start();
+                    return tx;
+                }
+
+                @Override
+                public AlphaTransaction create() {
+                    return createSutTransaction(10, writeSkewAllowed);
                 }
             };
 

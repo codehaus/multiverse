@@ -91,8 +91,60 @@ public interface Transaction {
     TransactionStatus getStatus();
 
     /**
+     * Gets the current attempt (so the number of tries this transaction already had). Value will
+     * always be equal or larger than 0.
+     *
+     * @return the current attempt.
+     */
+    int getAttempt();
+
+    /**
+     * Sets the current attempt.
+     * <p/>
+     * This normally isn't called from the user code, it is the task of the stm internals and
+     * the transaction management to use the attempt.
+     *
+     * @param attempt the current attempt
+     * @throws IllegalArgumentException if attempt smaller than zero.
+     */
+    void setAttempt(int attempt);
+
+    /**
+     * Gets the remaining timeout in nanoseconds. Long.MAX_VALUE indicates that no timeout should be used.
+     *
+     * @return the remaining timeout.
+     */
+    long getRemainingTimeoutNs();
+
+    /**
+     * Sets the remaining timeout in nanoseconds. Long.MAX_VALUE indicates that no timeout should be used.
+     * <p/>
+     * This normally isn't called from the user code, it is task of the stm internals and the
+     * transaction management to use the timeout.
+     *
+     * @param timeoutNs the timeout.
+     * @throws IllegalArgumentException if timeout smaller than 0.
+     */
+    void setRemainingTimeoutNs(long timeoutNs);
+
+    /**
+     * Starts the Transaction. Transaction normally started as New.
+     * <p/>
+     * If a clock based stm is used (like the AlphaStm), when the transaction is New, the readversion
+     * is not set. When it is started, it is set. Based on this readversion the transaction is able to
+     * construct a read consistent view. But the sooner the read version is set, the higher the chance
+     * that a transaction runs out of history to read from.
+     *
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if the Transaction is not in the correct state for this operation.
+     */
+    void start();
+
+    /**
      * Commits this Transaction. If the Transaction is:
      * <ol>
+     * <li>new: is is started and following the same flow as an active transaction. This is done so that
+     * the lifecyclelisteners work.</li>
      * <li>active: it is prepared for commit and then committed</li>
      * <li>prepared: it is committed (so changes persisted)</li>
      * <li>aborted: a DeadTransactionException is thrown</li>
@@ -133,7 +185,6 @@ public interface Transaction {
      * such a situation is a pre-abort task that fails. So the transaction always is aborted (unless it is committed).
      * <p/>
      * If the Transaction already is aborted, the call is ignored.
-     * <p/>
      *
      * @throws org.multiverse.api.exceptions.DeadTransactionException
      *          if this transaction already is committed
@@ -141,14 +192,18 @@ public interface Transaction {
     void abort();
 
     /**
-     * Restarts this Transaction. It doesn't matter what the transaction state of the transaction is.
-     * This is the preferred way to restart a transaction once a recoverable exception or retry occurred.
+     * Resets this Transaction so it can be reused. After the reset is executed the Transaction is back
+     * to the TransactionStatus.New state.
      * <p/>
-     * If the Transaction is prepared or committed, it will be aborted before it is restarted. If there are
+     * It doesn't matter what the transaction state of the transaction is. This is the preferred way to
+     * reuse a transaction (e.g. when a {@link org.multiverse.api.exceptions.ControlFlowError} or when
+     * an old transaction on the {@link ThreadLocalTransaction} is found that can be reused.
+     * <p/>
+     * If the Transaction is prepared or committed, it will be aborted before it is reset. If there are
      * TransactionLifecycleListeners that cause problems while executing the pre/post abort notification, the
      * transaction will be aborted and the exception will be propagated.
      */
-    void restart();
+    void reset();
 
     /**
      * Registers the retry Latch on this Transaction. This functionality is required for the retry mechanism
@@ -192,6 +247,10 @@ public interface Transaction {
      * <p/>
      * A good use case of this feature is starting up threads. If you need to start threads, you don't want to start
      * them immediately because eventually the transaction could be aborted.
+     * <p/>
+     * The registration is 'transactional', so when the transaction is restarted, the listeners need
+     * to be registered again. In most cases this is the behavior wanted because listeners are added
+     * inside the atomic 'block' and this block is re-executed when a failure occurs.
      *
      * @param listener the TransactionLifecycleListener to registerLifecycleListener
      * @throws NullPointerException if listener is null.
@@ -200,40 +259,5 @@ public interface Transaction {
      */
     void registerLifecycleListener(TransactionLifecycleListener listener);
 
-    /**
-     * Gets the remaining timeout in nanoseconds. Long.MAX_VALUE indicates that no timeout should be used.
-     *
-     * @return the remaining timeout.
-     */
-    long getRemainingTimeoutNs();
 
-    /**
-     * Sets the remaining timeout in nanoseconds. Long.MAX_VALUE indicates that no timeout should be used.
-     * <p/>
-     * This normally isn't called from the user code, it is task of the stm internals and the
-     * transaction management to use the timeout.
-     *
-     * @param timeoutNs the timeout.
-     * @throws IllegalArgumentException if timeout smaller than 0.
-     */
-    void setRemainingTimeoutNs(long timeoutNs);
-
-    /**
-     * Gets the current attempt (so the number of tries this transaction already had). Value will
-     * always be equal or larger than 0.
-     *
-     * @return the current attempt.
-     */
-    int getAttempt();
-
-    /**
-     * Sets the current attempt.
-     * <p/>
-     * This normally isn't called from the user code, it is the task of the stm internals and
-     * the transaction management to use the attempt.
-     *
-     * @param attempt the current attempt
-     * @throws IllegalArgumentException if attempt smaller than zero.
-     */
-    void setAttempt(int attempt);
 }

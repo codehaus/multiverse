@@ -30,11 +30,11 @@ public class NonTrackingReadonlyAlphaTransaction_openForConstructionTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public NonTrackingReadonlyAlphaTransaction startSutTransaction() {
-        return startSutTransaction(new SpeculativeConfiguration(100));
+    public NonTrackingReadonlyAlphaTransaction createSutTransaction() {
+        return createSutTransaction(new SpeculativeConfiguration(100));
     }
 
-    public NonTrackingReadonlyAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfiguration) {
+    public NonTrackingReadonlyAlphaTransaction createSutTransaction(SpeculativeConfiguration speculativeConfiguration) {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, false)
                 .withSpeculativeConfig(speculativeConfiguration);
 
@@ -43,7 +43,8 @@ public class NonTrackingReadonlyAlphaTransaction_openForConstructionTest {
 
     @Test
     public void whenActiveAndNullTxObject_thenNullPointerException() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
+        tx.start();
 
         try {
             tx.openForConstruction(null);
@@ -59,7 +60,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForConstructionTest {
         ManualRef ref = new ManualRef(stm, 0);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, true, 100);
-        AlphaTransaction tx = startSutTransaction(speculativeConfig);
+        AlphaTransaction tx = createSutTransaction(speculativeConfig);
 
         long version = stm.getVersion();
         try {
@@ -77,7 +78,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForConstructionTest {
         ManualRef ref = new ManualRef(stm, 0);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(true, false, false, 100);
-        AlphaTransaction tx = startSutTransaction(speculativeConfig);
+        AlphaTransaction tx = createSutTransaction(speculativeConfig);
 
         long version = stm.getVersion();
         try {
@@ -95,7 +96,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForConstructionTest {
     public void whenPrepared_thenPreparedTransactionException() {
         ManualRef value = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.prepare();
 
         long version = stm.getVersion();
@@ -113,7 +114,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForConstructionTest {
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef value = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.commit();
 
         long version = stm.getVersion();
@@ -131,7 +132,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForConstructionTest {
     public void whenAborted_thenDeadTransactionException() {
         ManualRef value = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.abort();
 
         long version = stm.getVersion();

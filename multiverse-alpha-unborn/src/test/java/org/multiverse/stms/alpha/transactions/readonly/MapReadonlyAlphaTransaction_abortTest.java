@@ -26,7 +26,7 @@ public class MapReadonlyAlphaTransaction_abortTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MapReadonlyAlphaTransaction startTransactionUnderTest() {
+    public MapReadonlyAlphaTransaction createSutTransaction() {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new MapReadonlyAlphaTransaction(config);
     }
@@ -37,7 +37,7 @@ public class MapReadonlyAlphaTransaction_abortTest {
         ManualRefTranlocal expectedTranlocal = (ManualRefTranlocal) ref.___load();
 
         long expectedVersion = stm.getVersion();
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
         tx.abort();
 
@@ -49,7 +49,7 @@ public class MapReadonlyAlphaTransaction_abortTest {
     @Test
     public void whenUnused() {
         long expectedVersion = stm.getVersion();
-        AlphaTransaction tx = startTransactionUnderTest();
+        AlphaTransaction tx = createSutTransaction();
         tx.abort();
 
         assertEquals(expectedVersion, stm.getVersion());

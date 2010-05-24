@@ -1,0 +1,32 @@
+FEATURES
+
+- activating/deactivating sensor points runtime (so zoom in, and zoom out).
+
+- transactions/second on txFactoryLevel
+
+- transactions/second in total
+
+- readconflicts
+    -also the individual causes
+
+- writeconflicts
+
+- Developer edition: can be done from the code.
+
+- Enterprise edition: can be done from the outside (while the application is running in
+production).
+
+- Transaction length information
+    - when a transaction commits, it should store the length. This makes it possible to see
+    average size, maximum size etc.
+
+- retrieve transaction length
+
+- an STM should maintain a list of transactionfactories? Problem is with throw away transactionfactories
+ since they could cause memory leaks.
+
+TODO
+
+
+
+DONE

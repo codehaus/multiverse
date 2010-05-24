@@ -1,6 +1,7 @@
 package org.multiverse.benchmarks;
 
 import org.benchy.AbstractBenchmarkDriver;
+import org.benchy.DriverParameter;
 import org.benchy.TestCase;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
@@ -22,8 +23,11 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class ReadPerformanceDriver extends AbstractBenchmarkDriver {
 
-    private long incCountPerThread;
+    @DriverParameter
+    private long readCountPerThread;
+    @DriverParameter
     private int threadCount;
+    @DriverParameter
     private boolean readonly;
 
     private ReadThread[] threads;
@@ -32,10 +36,6 @@ public class ReadPerformanceDriver extends AbstractBenchmarkDriver {
     @Override
     public void preRun(TestCase testCase) {
         clearThreadLocalTransaction();
-
-        incCountPerThread = testCase.getLongProperty("readCountPerThread");
-        threadCount = testCase.getIntProperty("threadCount");
-        readonly = testCase.getBooleanProperty("readonly");
 
         threads = new ReadThread[threadCount];
         for (int k = 0; k < threads.length; k++) {
@@ -47,7 +47,7 @@ public class ReadPerformanceDriver extends AbstractBenchmarkDriver {
 
     @Override
     public void postRun(TestCaseResult caseResult) {
-        long transactionCount = incCountPerThread * threadCount;
+        long transactionCount = readCountPerThread * threadCount;
         caseResult.put("transactionCount", transactionCount);
 
         double transactionsPerSecond = (1.0d * transactionCount * TimeUnit.SECONDS.toNanos(1))
@@ -73,7 +73,7 @@ public class ReadPerformanceDriver extends AbstractBenchmarkDriver {
 
         @Override
         public void doRun() throws Exception {
-            for (int k = 0; k < incCountPerThread; k++) {
+            for (int k = 0; k < readCountPerThread; k++) {
                 if ((k % 10000000) == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }

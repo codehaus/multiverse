@@ -551,6 +551,13 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
                 @Override
                 public AlphaTransaction start() {
+                    AlphaTransaction tx = create();
+                    tx.start();
+                    return tx;
+                }
+
+                @Override
+                public AlphaTransaction create() {
                     boolean finalReadonly;
                     if (speculativeConfig.isSpeculativeReadonlyEnabled()) {
                         finalReadonly = speculativeConfig.isReadonly();
@@ -610,16 +617,17 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     }
                 }
             };
+
+
         }
 
         private TransactionFactory<AlphaTransaction> createNonSpeculativeReadonlyTxFactory() {
             return new TransactionFactory<AlphaTransaction>() {
                 ReadonlyConfiguration config =
                         new ReadonlyConfiguration(
-                                clock, backoffPolicy, familyName, speculativeConfig,
-                                maxRetries, interruptible, readTrackingEnabled,
-                                explicitRetryAllowed, timeoutNs, maxReadSpinCount,
-                                this, logLevel);
+                                clock, backoffPolicy, familyName, speculativeConfig, maxRetries,
+                                interruptible, readTrackingEnabled, explicitRetryAllowed, timeoutNs,
+                                maxReadSpinCount, this, logLevel);
 
                 @Override
                 public Stm getStm() {
@@ -632,12 +640,19 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                 }
 
                 @Override
-                public AlphaTransaction start() {
+                public AlphaTransaction create() {
                     if (readTrackingEnabled) {
                         return new MapReadonlyAlphaTransaction(config);
                     } else {
                         return new NonTrackingReadonlyAlphaTransaction(config);
                     }
+                }
+
+                @Override
+                public AlphaTransaction start() {
+                    AlphaTransaction tx = create();
+                    tx.start();
+                    return tx;
                 }
             };
         }
@@ -673,6 +688,13 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
                 @Override
                 public AlphaTransaction start() {
+                    AlphaTransaction tx = create();
+                    tx.start();
+                    return tx;
+                }
+
+                @Override
+                public AlphaTransaction create() {
                     return new MapUpdateAlphaTransaction(config);
                 }
             };

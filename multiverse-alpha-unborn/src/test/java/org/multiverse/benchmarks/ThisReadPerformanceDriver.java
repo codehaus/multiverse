@@ -1,20 +1,20 @@
 package org.multiverse.benchmarks;
 
 import org.benchy.AbstractBenchmarkDriver;
+import org.benchy.DriverParameter;
 import org.benchy.TestCase;
 import org.multiverse.annotations.TransactionalObject;
 
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class ThisReadPerformanceDriver extends AbstractBenchmarkDriver {
+    @DriverParameter
     private long readCount;
     private Ref ref;
 
     @Override
     public void preRun(TestCase testCase) {
         clearThreadLocalTransaction();
-
-        readCount = testCase.getLongProperty("readCount");
         ref = new Ref(readCount);
     }
 

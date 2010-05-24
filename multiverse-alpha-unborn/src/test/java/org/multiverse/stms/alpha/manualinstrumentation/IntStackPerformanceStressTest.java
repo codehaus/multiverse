@@ -67,11 +67,11 @@ public class IntStackPerformanceStressTest {
         AlphaTransaction popTx = startTransaction();
 
         for (int k = 0; k < count; k++) {
-            pushTx.restart();
+            pushTx.reset();
             stack.push(pushTx, 10);
             pushTx.commit();
 
-            popTx.restart();
+            popTx.reset();
             stack.pop(popTx);
             popTx.commit();
 

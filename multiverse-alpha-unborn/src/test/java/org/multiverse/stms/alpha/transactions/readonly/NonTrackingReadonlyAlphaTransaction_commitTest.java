@@ -28,7 +28,7 @@ public class NonTrackingReadonlyAlphaTransaction_commitTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public NonTrackingReadonlyAlphaTransaction startSutTransaction() {
+    public NonTrackingReadonlyAlphaTransaction createSutTransaction() {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, false);
 
         return new NonTrackingReadonlyAlphaTransaction(config);
@@ -38,7 +38,7 @@ public class NonTrackingReadonlyAlphaTransaction_commitTest {
     public void commitDoesNotLockTransactionalObjects() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
         ref.resetLockInfo();
         tx.commit();
@@ -50,7 +50,7 @@ public class NonTrackingReadonlyAlphaTransaction_commitTest {
     @Test
     public void whenUnused() {
         long startVersion = stm.getVersion();
-        Transaction tx = startSutTransaction();
+        Transaction tx = createSutTransaction();
         tx.commit();
 
         assertEquals(startVersion, stm.getVersion());
@@ -64,7 +64,7 @@ public class NonTrackingReadonlyAlphaTransaction_commitTest {
 
         long startVersion = stm.getVersion();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
         tx.commit();
 
@@ -77,7 +77,7 @@ public class NonTrackingReadonlyAlphaTransaction_commitTest {
     public void whenConflictingChangesAreMade_thenCommitSuccess() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
 
         //conflicting update

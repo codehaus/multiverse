@@ -30,7 +30,7 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MapUpdateAlphaTransaction startSutTransaction() {
+    public MapUpdateAlphaTransaction createSutTransaction() {
         UpdateConfiguration config =
                 new UpdateConfiguration(stmConfig.clock);
         return new MapUpdateAlphaTransaction(config);
@@ -40,7 +40,7 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
     public void whenTransactionalObjectLocked() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 10);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         Transaction lockOwner = mock(Transaction.class);
         ref.___tryLock(lockOwner);
@@ -53,7 +53,7 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
     public void whenTransactionalObjectAlreadyOpenedForConstruction() {
         AlphaProgrammaticLong ref = AlphaProgrammaticLong.createUncommitted(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal openedForConstruction = tx.openForConstruction(ref);
         AlphaTranlocal found = tx.openForCommutingWrite(ref);
 
@@ -66,7 +66,7 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
     public void whenTransactionalObjectAlreadyOpenedForWrite() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 1);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal openedForWrite = tx.openForWrite(ref);
         AlphaTranlocal found = tx.openForCommutingWrite(ref);
 
@@ -81,7 +81,7 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
     public void whenTransactionalObjectAlreadyOpenedForRead() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 1);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal openedForRead = tx.openForRead(ref);
         AlphaTranlocal found = tx.openForCommutingWrite(ref);
 
@@ -98,7 +98,7 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
     public void whenTransactionalObjectAlreadyOpenedForCommutingWrite() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 1);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal firstOpen = tx.openForCommutingWrite(ref);
         AlphaTranlocal found = tx.openForCommutingWrite(ref);
 
@@ -113,7 +113,7 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.commit();
 
         try {
@@ -129,7 +129,7 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
     public void whenAborted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.abort();
 
         try {
@@ -145,7 +145,7 @@ public class MapUpdateAlphaTransaction_openForCommutingWriteTest {
     public void whenPrepared_thenPreparedTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.prepare();
 
         try {

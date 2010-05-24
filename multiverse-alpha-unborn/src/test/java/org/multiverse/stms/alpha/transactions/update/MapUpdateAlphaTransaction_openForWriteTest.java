@@ -32,7 +32,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MapUpdateAlphaTransaction startSutTransaction() {
+    public MapUpdateAlphaTransaction createSutTransaction() {
         UpdateConfiguration config =
                 new UpdateConfiguration(stmConfig.clock);
         return new MapUpdateAlphaTransaction(config);
@@ -43,7 +43,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
         ManualRef ref = new ManualRef(stm, 0);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForWrite(ref);
 
         assertNotSame(committed, found);
@@ -56,7 +56,8 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
 
     @Test
     public void whenNullTxObject_thenNullPointerException() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
+        tx.start();
 
         try {
             tx.openForWrite(null);
@@ -71,7 +72,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
     public void openForWriteDoesNotLockAtomicObjects() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ref.resetLockInfo();
         tx.openForWrite(ref);
 
@@ -84,7 +85,8 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
         ManualRef ref = new ManualRef(stm, 1);
 
         //start the transaction to sets its readversion
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
+        tx.start();
 
         //do an atomic and conflicting update
         ref.set(stm, 10);
@@ -113,7 +115,9 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
     public void whenReadConflict_thenOldVersionNotFoundReadConflict() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
+        tx.start();
+
         //conflicting write
         ref.inc(stm);
         try {
@@ -129,18 +133,19 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
     public void whenVersionTooNew_thenOldVersionNotFoundReadConflict() {
         ManualRef ref = new ManualRef(stm, 0);
 
-        AlphaTransaction tx1 = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
+        tx.start();
 
         //conflicting update
         ref.inc(stm);
 
         try {
-            tx1.openForWrite(ref);
+            tx.openForWrite(ref);
             fail();
         } catch (OldVersionNotFoundReadConflict expected) {
         }
 
-        assertIsActive(tx1);
+        assertIsActive(tx);
     }
 
     @Test
@@ -152,7 +157,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
         Transaction owner = mock(Transaction.class);
         ref.___tryLock(owner);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         try {
             tx.openForWrite(ref);
             fail();
@@ -166,7 +171,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
     public void whenAlreadyOpenedForWrite_thenSameTranlocalReturned() {
         ManualRef ref = new ManualRef(stm, 0);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRefTranlocal exected = (ManualRefTranlocal) tx.openForWrite(ref);
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForWrite(ref);
 
@@ -178,7 +183,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
     public void whenAlreadyOpenedForRead_thenItIsUpgradedToOpenForWrite() {
         ManualRef ref = new ManualRef(stm, 20);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         ManualRefTranlocal read1 = (ManualRefTranlocal) tx.openForRead(ref);
         ManualRefTranlocal read2 = (ManualRefTranlocal) tx.openForWrite(ref);
 
@@ -193,7 +198,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
     public void whenAlreadyOpenedForCommutingWrite_thenFixated() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal openedForCommutingWrite = tx.openForCommutingWrite(ref);
         AlphaTranlocal found = tx.openForWrite(ref);
 
@@ -206,7 +211,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
     public void whenAlreadyOpenedForCommutingWriteAndLockedButVersionMatches() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal openedForCommutingWrite = tx.openForCommutingWrite(ref);
 
         Transaction lockOwner = mock(Transaction.class);
@@ -223,7 +228,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
     public void whenAlreadyOpenedForCommutingWriteAndLockedAndVersionTooOld_thenOldVersionNotFoundReadConflict() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal openedForCommutingWrite = tx.openForCommutingWrite(ref);
 
         ref.atomicInc(10);
@@ -277,7 +282,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm, 0);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.commit();
 
         long expectedVersion = stm.getVersion();
@@ -295,7 +300,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
     public void whenAborted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm, 0);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.abort();
 
         long expectedVersion = stm.getVersion();
@@ -313,7 +318,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
     public void whenPrepared_thenPreparedTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.prepare();
 
         try {

@@ -38,13 +38,13 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MapUpdateAlphaTransaction startSutTransaction() {
+    public MapUpdateAlphaTransaction createSutTransaction() {
         UpdateConfiguration config =
                 new UpdateConfiguration(stmConfig.clock);
         return new MapUpdateAlphaTransaction(config);
     }
 
-    public MapUpdateAlphaTransaction startSutTransactionWithoutReadTracking(SpeculativeConfiguration speculativeConfig) {
+    public MapUpdateAlphaTransaction createSutTransactionWithoutReadTracking(SpeculativeConfiguration speculativeConfig) {
         UpdateConfiguration config = new UpdateConfiguration(stm.getClock())
                 .withSpeculativeConfiguration(speculativeConfig)
                 .withExplictRetryAllowed(true)
@@ -91,7 +91,7 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
         ManualRef ref = new ManualRef(stm);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, false, false, 100);
-        AlphaTransaction tx = startSutTransactionWithoutReadTracking(speculativeConfig);
+        AlphaTransaction tx = createSutTransactionWithoutReadTracking(speculativeConfig);
         tx.openForWrite(ref);
 
         Latch latch = new CheapLatch();
@@ -111,7 +111,7 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
         ManualRef ref = new ManualRef(stm);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, false, 100);
-        AlphaTransaction tx = startSutTransactionWithoutReadTracking(speculativeConfig);
+        AlphaTransaction tx = createSutTransactionWithoutReadTracking(speculativeConfig);
         tx.openForWrite(ref);
 
         Latch latch = new CheapLatch();
@@ -135,7 +135,7 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
 
         Latch latch = new CheapLatch();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForWrite(ref);
         tx.registerRetryLatch(latch);
 
@@ -150,7 +150,7 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
 
         Latch latch = new CheapLatch();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForWrite(ref);
 
         //update the prevents registration
@@ -168,7 +168,7 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
 
         Latch latch = new CheapLatch();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForWrite(ref1);
         tx.openForWrite(ref2);
         tx.registerRetryLatch(latch);
@@ -188,12 +188,12 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
 
         Latch latch1 = new CheapLatch();
 
-        AlphaTransaction tx1 = startSutTransaction();
+        AlphaTransaction tx1 = createSutTransaction();
         tx1.openForWrite(ref);
         tx1.registerRetryLatch(latch1);
 
         Latch latch2 = new CheapLatch();
-        AlphaTransaction tx2 = startSutTransaction();
+        AlphaTransaction tx2 = createSutTransaction();
         tx2.openForWrite(ref);
         tx2.registerRetryLatch(latch2);
 
@@ -205,7 +205,7 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
 
     @Test
     public void whenLatchNull_thenNullPointerException() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         try {
             tx.registerRetryLatch(null);
@@ -218,7 +218,7 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
 
     @Test
     public void whenUnused_thenNoRetryPossibleException() {
-        Transaction tx = startSutTransaction();
+        Transaction tx = createSutTransaction();
 
         Latch latch = new CheapLatch();
         try {
@@ -233,7 +233,7 @@ public class MapUpdateAlphaTransaction_registerRetryLatchTest {
 
     @Test
     public void whenOnlyFreshObjects_thenNoRetryPossibleException() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         ManualRef ref = new ManualRef(tx, 0);
 

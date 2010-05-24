@@ -87,7 +87,7 @@ public final class StmUtils {
         tx.registerLifecycleListener(new TransactionLifecycleListener() {
             @Override
             public void notify(Transaction tx, TransactionLifecycleEvent event) {
-                if (event == TransactionLifecycleEvent.postCommit) {
+                if (event == TransactionLifecycleEvent.PostCommit) {
                     task.run();
                 }
             }
@@ -112,7 +112,7 @@ public final class StmUtils {
         tx.registerLifecycleListener(new TransactionLifecycleListener() {
             @Override
             public void notify(Transaction tx, TransactionLifecycleEvent event) {
-                if (event == TransactionLifecycleEvent.postAbort) {
+                if (event == TransactionLifecycleEvent.PostAbort) {
                     task.run();
                 }
             }

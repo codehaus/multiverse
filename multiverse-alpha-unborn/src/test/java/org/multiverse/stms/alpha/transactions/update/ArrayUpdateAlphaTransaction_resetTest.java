@@ -11,7 +11,7 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 
-public class ArrayUpdateAlphaTransaction_restartTest {
+public class ArrayUpdateAlphaTransaction_resetTest {
 
     private AlphaStmConfig stmConfig;
     private AlphaStm stm;
@@ -23,7 +23,7 @@ public class ArrayUpdateAlphaTransaction_restartTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public AlphaTransaction startSutTransaction(int size) {
+    public AlphaTransaction createSutTransaction(int size) {
         UpdateConfiguration config =
                 new UpdateConfiguration(stmConfig.clock);
         return new ArrayUpdateAlphaTransaction(config, size);
@@ -31,10 +31,10 @@ public class ArrayUpdateAlphaTransaction_restartTest {
 
     @Test
     public void whenUnused() {
-        AlphaTransaction tx = startSutTransaction(10);
-        tx.restart();
+        AlphaTransaction tx = createSutTransaction(10);
+        tx.reset();
 
-        assertIsActive(tx);
+        assertIsNew(tx);
         assertEquals(0, getField(tx, "firstFreeIndex"));
     }
 
@@ -45,12 +45,12 @@ public class ArrayUpdateAlphaTransaction_restartTest {
         ManualRef ref2 = new ManualRef(stm);
         ManualRefTranlocal committed2 = (ManualRefTranlocal) ref2.___load();
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.openForWrite(ref1);
         tx.openForRead(ref2);
 
-        tx.restart();
-        assertIsActive(tx);
+        tx.reset();
+        assertIsNew(tx);
         assertEquals(0, getField(tx, "firstFreeIndex"));
         assertSame(committed1, ref1.___load());
         assertSame(committed2, ref2.___load());
@@ -60,7 +60,7 @@ public class ArrayUpdateAlphaTransaction_restartTest {
     public void whenPreparedWithLockedResources_thenResourcesFreed() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         ref.inc(tx);
         tx.prepare();
 

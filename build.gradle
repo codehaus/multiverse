@@ -32,6 +32,7 @@ allprojects {
     mavenRepo(urls: [
             'http://snapshots.repository.codehaus.org',
             'http://download.java.net/maven/2/',
+            'http://mandubian-mvn.googlecode.com/svn/trunk/mandubian-mvn/repository',
             'https://maven.atlassian.com/content/groups/public'])
   }
 
@@ -99,6 +100,11 @@ allprojects {
 project(':multiverse-benchy') {
   dependencies {
     compile group: 'com.google.code.gson', name: 'gson', version: "1.4"
+    compile group: 'args4j', name: 'args4j', version: "2.0.16"
+    compile group: 'com.google.gdata', name: 'gdata-client-meta-1.0', version: "1.41.1"
+    compile group: 'com.google.gdata', name: 'gdata-spreadsheet-3.0', version: "1.41.1"
+    compile group: 'com.google.gdata', name: 'gdata-core-1.0', version: "1.41.1"
+    compile group: 'com.google.collections', name: 'google-collections', version: "1.0"
   }
 }
 

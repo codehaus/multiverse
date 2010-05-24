@@ -8,8 +8,9 @@ import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.stms.alpha.AlphaStm;
 
 import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.assertIsActive;
+import static org.multiverse.TestUtils.assertIsAlive;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 public class TransactionalMethod_ReturnTypesTest {
@@ -19,6 +20,7 @@ public class TransactionalMethod_ReturnTypesTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
+        clearThreadLocalTransaction();
     }
 
     @After
@@ -40,7 +42,7 @@ public class TransactionalMethod_ReturnTypesTest {
     }
 
     public static void assertTransactionWorking() {
-        assertIsActive(getThreadLocalTransaction());
+        assertIsAlive(getThreadLocalTransaction());
     }
 
     @Test

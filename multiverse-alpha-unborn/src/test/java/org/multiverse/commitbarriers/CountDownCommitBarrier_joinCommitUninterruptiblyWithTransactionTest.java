@@ -50,9 +50,8 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
     public void whenTransactionFailsToPrepare() {
         barrier = new CountDownCommitBarrier(1);
         Transaction tx = mock(Transaction.class);
-        TransactionStatus status = mock(TransactionStatus.class);
-        when(status.isDead()).thenReturn(false);
-        when(tx.getStatus()).thenReturn(status);
+
+        when(tx.getStatus()).thenReturn(TransactionStatus.Active);
         doThrow(new RuntimeException()).when(tx).prepare();
         try {
             barrier.joinCommitUninterruptibly(tx);

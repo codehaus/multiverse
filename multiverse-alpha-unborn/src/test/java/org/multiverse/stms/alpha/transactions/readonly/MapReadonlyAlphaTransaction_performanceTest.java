@@ -67,7 +67,7 @@ public class MapReadonlyAlphaTransaction_performanceTest {
         AlphaTransaction tx = startSutTransaction();
 
         for (int k = 0; k < transactionCount; k++) {
-            tx.restart();
+            tx.reset();
             tx.openForRead(ref);
             tx.commit();
 

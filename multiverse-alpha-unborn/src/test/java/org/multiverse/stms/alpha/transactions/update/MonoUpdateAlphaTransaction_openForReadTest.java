@@ -29,18 +29,18 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MonoUpdateAlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfig) {
+    public MonoUpdateAlphaTransaction createSutTransaction(SpeculativeConfiguration speculativeConfig) {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
                 .withMaxRetries(10)
                 .withSpeculativeConfiguration(speculativeConfig);
         return new MonoUpdateAlphaTransaction(config);
     }
 
-    public MonoUpdateAlphaTransaction startSutTransaction() {
-        return startSutTransaction(new SpeculativeConfiguration(100));
+    public MonoUpdateAlphaTransaction createSutTransaction() {
+        return createSutTransaction(new SpeculativeConfiguration(100));
     }
 
-    public MonoUpdateAlphaTransaction startSutTransactionWithoutAutomaticReadTracking() {
+    public MonoUpdateAlphaTransaction createSutTransactionWithoutAutomaticReadTracking() {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
                 .withMaxRetries(10)
                 .withExplictRetryAllowed(false)
@@ -51,10 +51,10 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
 
     @Test
     public void testAutomaticReadTrackingProperty() {
-        AlphaTransaction tx = startSutTransactionWithoutAutomaticReadTracking();
+        AlphaTransaction tx = createSutTransactionWithoutAutomaticReadTracking();
         assertFalse(tx.getConfiguration().isReadTrackingEnabled());
 
-        tx = startSutTransaction();
+        tx = createSutTransaction();
         assertTrue(tx.getConfiguration().isReadTrackingEnabled());
     }
 
@@ -62,7 +62,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     public void whenAutomaticReadTrackingDisabled_openForReadIsNotTracked() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransactionWithoutAutomaticReadTracking();
+        AlphaTransaction tx = createSutTransactionWithoutAutomaticReadTracking();
         tx.openForRead(ref);
 
         AlphaTranlocal tranlocal = (AlphaTranlocal) getField(tx, "attached");
@@ -71,7 +71,8 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
 
     @Test
     public void whenTxObjectNull_thenNullReturned() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
+        tx.start();
 
         AlphaTranlocal tranlocal = tx.openForRead(null);
 
@@ -83,7 +84,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     public void whenNotCommittedBefore_thenLoadUncommittedReadConflict() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         long version = stm.getVersion();
         try {
@@ -107,7 +108,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
         AlphaTransaction owner = mock(AlphaTransaction.class);
         ref.___tryLock(owner);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         AlphaTranlocal tranlocal = tx.openForRead(ref);
 
@@ -121,7 +122,8 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
         ManualRef ref = new ManualRef(stm, 1);
 
         //start the transaction to sets its readversion
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
+        tx.start();
 
         //do an atomic and conflicting update
         ref.set(stm, 10);
@@ -158,7 +160,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
         stm.getClock().tick();
 
         //start the transaction to sets its readversion
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         ManualRefTranlocal expectedTranlocal = (ManualRefTranlocal) ref.___load();
 
@@ -181,7 +183,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
         ManualRef ref = new ManualRef(stm);
         AlphaTranlocal committed = ref.___load();
         stmConfig.clock.tick();
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForRead(ref);
         assertSame(committed, found);
@@ -193,7 +195,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
         ManualRef ref = new ManualRef(stm);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
         long version = stm.getVersion();
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForRead(ref);
 
@@ -206,7 +208,8 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     @Test
     public void whenVersionTooNew_thenOldVersionNotFoundReadConflict() {
         ManualRef ref = new ManualRef(stm);
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
+        tx.start();
         //the 'conflicting' update
         ref.inc(stm);
 
@@ -224,7 +227,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     public void whenAlreadyOpenedForWrite_thenSameTranlocalReturned() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal tranlocal = tx.openForWrite(ref);
         AlphaTranlocal found = tx.openForRead(ref);
 
@@ -235,7 +238,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     public void whenAlreadyOpenedForCommutingWrite_thenPrematureFixation() {
         AlphaProgrammaticLong ref1 = new AlphaProgrammaticLong(stm, 0);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal tranlocal = tx.openForCommutingWrite(ref1);
         AlphaTranlocal found = tx.openForRead(ref1);
 
@@ -248,7 +251,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     public void whenAlreadyOpenedForCommutingWriteAndLockedButVersionMatches() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal openedForCommutingWrite = tx.openForCommutingWrite(ref);
 
         Transaction lockOwner = mock(Transaction.class);
@@ -265,7 +268,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     public void whenAlreadyOpenedForCommutingWriteAndLockedAndVersionTooOld_thenOldVersionNotFoundReadConflict() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal openedForCommutingWrite = tx.openForCommutingWrite(ref);
 
         ref.atomicInc(10);
@@ -289,7 +292,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     public void whenAlreadyOpenedForConstruction_thenSameTranlocalReturned() {
         ManualRef ref1 = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal tranlocal = tx.openForConstruction(ref1);
         AlphaTranlocal found = tx.openForCommutingWrite(ref1);
 
@@ -303,7 +306,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
         ManualRef ref2 = new ManualRef(stm);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
-        AlphaTransaction tx = startSutTransaction(speculativeConfig);
+        AlphaTransaction tx = createSutTransaction(speculativeConfig);
         tx.openForRead(ref1);
 
         long version = stm.getVersion();
@@ -322,7 +325,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.commit();
 
         try {
@@ -338,7 +341,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     public void whenAborted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.abort();
 
         try {
@@ -354,7 +357,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
     public void whenPrepared_thenPreparedTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.prepare();
 
         try {

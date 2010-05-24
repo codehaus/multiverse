@@ -62,7 +62,7 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
 
     /**
      * Sets if the Transaction is allowed to do an explicit retry (needed for a blocking operation). One use case
-     * for disallowing it, it when the transaction is used inside an agent, and you don't want that inside the logic
+     * for disallowing it, it when the transaction is used inside an actor, and you don't want that inside the logic
      * executed by the agent a blocking operations is done (e.g. taking an item of a blocking queue).
      *
      * @param explicitRetryEnabled true if explicit retry is enabled, false otherwise.
@@ -311,10 +311,6 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      * @see #setMaxReadSpinCount(int)
      */
     int getMaxReadSpinCount();
-
-    // void setLoggingOfControlFlowErrorsEnabled(boolean enabled);
-
-    // boolean isLoggingOfControlFlowErrorsEnabled();
 
     /**
      * Builds a {@link TransactionFactory} with the provided configuration.

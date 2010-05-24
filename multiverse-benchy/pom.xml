@@ -31,6 +31,8 @@
                             <tasks>
                                 <unzip src="${settings.localRepository}/junit/junit/${junit.version}/junit-${junit.version}.jar"
                                        dest="${project.build.outputDirectory}"/>
+                                <unzip src="${settings.localRepository}/args4j/args4j/${args4j.version}/args4j-${args4j.version}.jar"
+                                       dest="${project.build.outputDirectory}"/>
                                 <unzip src="${settings.localRepository}/com/google/code/gson/gson/1.4/gson-1.4.jar"
                                        dest="${project.build.outputDirectory}"/>
 
@@ -71,6 +73,38 @@
             <artifactId>gson</artifactId>
             <version>1.4</version>
         </dependency>
+
+        <dependency>
+            <groupId>args4j</groupId>
+            <artifactId>args4j</artifactId>
+            <version>${args4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.gdata</groupId>
+            <artifactId>gdata-client-meta-1.0</artifactId>
+            <version>1.41.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.gdata</groupId>
+            <artifactId>gdata-spreadsheet-3.0</artifactId>
+            <version>1.41.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.gdata</groupId>
+            <artifactId>gdata-core-1.0</artifactId>
+            <version>1.41.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.collections</groupId>
+            <artifactId>google-collections</artifactId>
+            <version>1.0</version>
+        </dependency>
+
     </dependencies>
 
 </project>

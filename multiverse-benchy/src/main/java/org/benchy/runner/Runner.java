@@ -1,4 +1,4 @@
-package org.benchy.executor;
+package org.benchy.runner;
 
 import com.google.gson.*;
 import org.benchy.Benchmark;
@@ -16,19 +16,41 @@ import java.util.Map;
 /**
  * @author Peter Veentjer
  */
-public class BenchmarkExecutorMain {
+public class Runner {
 
     public static void main(String[] args) throws Exception {
-        System.out.println("Benchy: Starting Benchy the Benchmark Executor");
+        System.out.println("Benchy: Starting the benchmark runner");
 
-        BenchmarkResultRepository repository = loadRepository(args[0]);
+        RunnerArguments arguments = createArguments(args);
+
+        BenchmarkResultRepository repository = loadRepository(arguments.repository);
 
         Benchmark benchmark = loadBenchmark(readbenchmarkJson());
 
-        BenchmarkExecutor executor = new DefaultBenchmarkExecutor(repository);
-        executor.execute(benchmark);
+        BenchmarkRunner runner = new DefaultBenchmarkRunner(repository);
+        runner.execute(benchmark);
 
         System.out.println("Benchy: Finished");
+    }
+
+    private static RunnerArguments createArguments(String[] args) {
+        //System.out.println("---------------------------------");
+        //for(String s: args){
+        //    System.out.println("arg: "+s);
+        //}
+        //System.out.println("---------------------------------");
+
+        RunnerArguments cli = new RunnerArguments();
+        //CmdLineParser parser = new CmdLineParser(cli);
+        //try {
+        //parser.parseArgument(args);
+        return cli;
+        //} catch (CmdLineException e) {
+        //    System.err.println(e.getMessage());
+        //    parser.printUsage(System.out);
+        //    System.exit(-1);
+        //    return null;
+        //}
     }
 
     private static String readbenchmarkJson() throws IOException {

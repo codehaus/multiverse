@@ -36,7 +36,7 @@ public class TransactionalMethod_ReadonlyUpdateTransactionTest {
         assertTrue(transaction instanceof NonTrackingReadonlyAlphaTransaction);
         assertEquals(version, stm.getVersion());
         assertNotNull(transaction);
-        assertEquals(version, method.version);
+        assertEquals(0, method.version);
     }
 
     static class InstanceReadonlyMethod {
@@ -61,7 +61,7 @@ public class TransactionalMethod_ReadonlyUpdateTransactionTest {
 
         assertEquals(version, stm.getVersion());
         assertNotNull(transaction);
-        assertEquals(version, StaticReadonlyMethod.version);
+        assertEquals(0, StaticReadonlyMethod.version);
         assertTrue(transaction instanceof NonTrackingReadonlyAlphaTransaction);
     }
 

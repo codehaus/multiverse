@@ -36,7 +36,7 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
         clearThreadLocalTransaction();
     }
 
-    public AlphaTransaction startSutTransaction(int size, boolean writeSkewAllowed) {
+    public AlphaTransaction createSutTransaction(int size, boolean writeSkewAllowed) {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
                 .withReadTrackingEnabled(true)
                 .withWriteSkewAllowed(writeSkewAllowed);
@@ -46,11 +46,11 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
 
     @Test
     public void testSettings() {
-        AlphaTransaction tx1 = startSutTransaction(10, true);
+        AlphaTransaction tx1 = createSutTransaction(10, true);
         assertTrue(tx1.getConfiguration().isWriteSkewAllowed());
         assertTrue(tx1.getConfiguration().isReadTrackingEnabled());
 
-        AlphaTransaction tx2 = startSutTransaction(10, false);
+        AlphaTransaction tx2 = createSutTransaction(10, false);
         assertFalse(tx2.getConfiguration().isWriteSkewAllowed());
         assertTrue(tx2.getConfiguration().isReadTrackingEnabled());
     }
@@ -62,12 +62,12 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
         ManualRef ref2 = new ManualRef(stm);
         ManualRefTranlocal committedRef2 = (ManualRefTranlocal) ref2.___load();
 
-        AlphaTransaction tx1 = startSutTransaction(10, false);
+        AlphaTransaction tx1 = createSutTransaction(10, false);
         tx1.openForRead(ref1);
         ManualRefTranlocal tranlocalRef2 = (ManualRefTranlocal) tx1.openForWrite(ref2);
         tranlocalRef2.value++;
 
-        AlphaTransaction tx2 = startSutTransaction(10, false);
+        AlphaTransaction tx2 = createSutTransaction(10, false);
         tx2.openForRead(ref2);
         ManualRefTranlocal tranlocalRef1 = (ManualRefTranlocal) tx2.openForWrite(ref1);
         tranlocalRef1.value++;
@@ -92,12 +92,12 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx1 = startSutTransaction(10, true);
+        AlphaTransaction tx1 = createSutTransaction(10, true);
         tx1.openForRead(ref1);
         ManualRefTranlocal tranlocalRef2 = (ManualRefTranlocal) tx1.openForWrite(ref2);
         tranlocalRef2.value++;
 
-        AlphaTransaction tx2 = startSutTransaction(10, true);
+        AlphaTransaction tx2 = createSutTransaction(10, true);
         tx2.openForRead(ref2);
         ManualRefTranlocal tranlocalRef1 = (ManualRefTranlocal) tx2.openForWrite(ref1);
         tranlocalRef1.value++;
@@ -124,13 +124,13 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
         accountA1.set(stm, 50);
         accountB1.set(stm, 50);
 
-        AlphaTransaction tx1 = startSutTransaction(10, true);
+        AlphaTransaction tx1 = createSutTransaction(10, true);
         if (accountA1.get(tx1) + accountA2.get(tx1) > 25) {
             accountA1.inc(tx1, -25);
             accountB1.inc(tx1, 25);
         }
 
-        AlphaTransaction tx2 = startSutTransaction(10, true);
+        AlphaTransaction tx2 = createSutTransaction(10, true);
         if (accountB1.get(tx2) + accountB2.get(tx2) > 25) {
             accountB2.inc(tx2, -25);
             accountA2.inc(tx2, 25);
@@ -152,13 +152,13 @@ public class ArrayUpdateAlphaTransaction_writeSkewTest {
         accountA1.set(stm, 50);
         accountB1.set(stm, 50);
 
-        AlphaTransaction tx1 = startSutTransaction(10, false);
+        AlphaTransaction tx1 = createSutTransaction(10, false);
         if (accountA1.get(tx1) + accountA2.get(tx1) > 25) {
             accountA1.inc(tx1, -25);
             accountB1.inc(tx1, 25);
         }
 
-        AlphaTransaction tx2 = startSutTransaction(10, false);
+        AlphaTransaction tx2 = createSutTransaction(10, false);
         if (accountB1.get(tx2) + accountB2.get(tx2) > 25) {
             accountB2.inc(tx2, -25);
             accountA2.inc(tx2, 25);

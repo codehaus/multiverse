@@ -25,10 +25,10 @@ public class AbstractTransaction_registerLifecycleListenerTest {
 
         tx.commit();
 
-        verify(listener, never()).notify(tx, TransactionLifecycleEvent.preCommit);
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.postCommit);
-        verify(listener, never()).notify(tx, TransactionLifecycleEvent.preAbort);
-        verify(listener, never()).notify(tx, TransactionLifecycleEvent.postAbort);
+        verify(listener, never()).notify(tx, TransactionLifecycleEvent.PreCommit);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PostCommit);
+        verify(listener, never()).notify(tx, TransactionLifecycleEvent.PreAbort);
+        verify(listener, never()).notify(tx, TransactionLifecycleEvent.PostAbort);
     }
 
     @Test
@@ -67,6 +67,7 @@ public class AbstractTransaction_registerLifecycleListenerTest {
     @Test
     public void scheduleFailsWithNullTask() {
         Transaction tx = new AbstractTransactionImpl();
+        tx.start();
 
         try {
             tx.registerLifecycleListener(null);
@@ -80,15 +81,16 @@ public class AbstractTransaction_registerLifecycleListenerTest {
     @Test
     public void whenCommit_thenPreAndPostCommitTasksAreCalled() {
         Transaction tx = new AbstractTransactionImpl();
+        tx.start();
 
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         tx.registerLifecycleListener(listener);
 
         tx.commit();
 
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.preCommit);
-        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.postCommit);
-        verify(listener, never()).notify(tx, TransactionLifecycleEvent.preAbort);
-        verify(listener, never()).notify(tx, TransactionLifecycleEvent.postAbort);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PreCommit);
+        verify(listener, times(1)).notify(tx, TransactionLifecycleEvent.PostCommit);
+        verify(listener, never()).notify(tx, TransactionLifecycleEvent.PreAbort);
+        verify(listener, never()).notify(tx, TransactionLifecycleEvent.PostAbort);
     }
 }

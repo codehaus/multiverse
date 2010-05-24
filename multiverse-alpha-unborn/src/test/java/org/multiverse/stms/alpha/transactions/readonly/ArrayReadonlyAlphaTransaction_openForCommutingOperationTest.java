@@ -1,6 +1,7 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
@@ -8,6 +9,7 @@ import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
+import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
@@ -29,13 +31,13 @@ public class ArrayReadonlyAlphaTransaction_openForCommutingOperationTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public ArrayReadonlyAlphaTransaction startTransactionUnderTest(int size) {
+    public ArrayReadonlyAlphaTransaction createSutTransaction(int size) {
         SpeculativeConfiguration speculativeConfiguration = new SpeculativeConfiguration(100);
         speculativeConfiguration.setOptimalSize(size);
-        return startTransactionUnderTest(speculativeConfiguration);
+        return createSutTransaction(speculativeConfiguration);
     }
 
-    public ArrayReadonlyAlphaTransaction startTransactionUnderTest(SpeculativeConfiguration speculativeConfiguration) {
+    public ArrayReadonlyAlphaTransaction createSutTransaction(SpeculativeConfiguration speculativeConfiguration) {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true)
                 .withSpeculativeConfig(speculativeConfiguration);
 
@@ -43,8 +45,35 @@ public class ArrayReadonlyAlphaTransaction_openForCommutingOperationTest {
     }
 
     @Test
+    public void whenNewAndNullTxObject_thenNullPointerExceptionAndRemainNew() {
+        AlphaTransaction tx = createSutTransaction(10);
+
+        try {
+            tx.openForCommutingWrite(null);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        assertIsNew(tx);
+    }
+
+    @Ignore
+    @Test
+    public void whenNew_thenStarted() {
+        ManualRef ref = new ManualRef(stm);
+
+        AlphaTransaction tx = createSutTransaction(10);
+
+        AlphaTranlocal tranlocal = tx.openForCommutingWrite(ref);
+
+        assertIsActive(tx);
+        assertEquals(stm.getClock().getVersion(), tx.getReadVersion());
+    }
+
+    @Test
     public void whenActiveAndNullTxObject_thenNullPointerException() {
-        AlphaTransaction tx = startTransactionUnderTest(10);
+        AlphaTransaction tx = createSutTransaction(10);
+        tx.start();
 
         try {
             tx.openForCommutingWrite(null);
@@ -56,11 +85,11 @@ public class ArrayReadonlyAlphaTransaction_openForCommutingOperationTest {
     }
 
     @Test
-    public void withExplicitReadlonly_thenReadonlyException() {
+    public void withExplicitReadonly_thenReadonlyException() {
         ManualRef ref = new ManualRef(stm, 0);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, true, 100);
-        AlphaTransaction tx = startTransactionUnderTest(speculativeConfig);
+        AlphaTransaction tx = createSutTransaction(speculativeConfig);
 
         long version = stm.getVersion();
         try {
@@ -78,7 +107,7 @@ public class ArrayReadonlyAlphaTransaction_openForCommutingOperationTest {
         ManualRef ref = new ManualRef(stm, 0);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(true, false, false, 100);
-        AlphaTransaction tx = startTransactionUnderTest(speculativeConfig);
+        AlphaTransaction tx = createSutTransaction(speculativeConfig);
 
         long version = stm.getVersion();
         try {
@@ -96,7 +125,7 @@ public class ArrayReadonlyAlphaTransaction_openForCommutingOperationTest {
     public void whenPrepared() {
         ManualRef value = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startTransactionUnderTest(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.prepare();
 
         long version = stm.getVersion();
@@ -114,7 +143,7 @@ public class ArrayReadonlyAlphaTransaction_openForCommutingOperationTest {
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef value = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startTransactionUnderTest(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.commit();
 
         long version = stm.getVersion();
@@ -132,7 +161,7 @@ public class ArrayReadonlyAlphaTransaction_openForCommutingOperationTest {
     public void whenAborted_thenDeadTransactionException() {
         ManualRef value = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startTransactionUnderTest(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.abort();
 
         long version = stm.getVersion();

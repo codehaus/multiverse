@@ -129,59 +129,16 @@ public class TransactionLogicDonor {
                         tx.commit();
                         return;
                     } catch (Retry er) {
-                        if (tx.getAttempt() - 1 < tx.getConfiguration().getMaxRetries()) {
-                            Latch latch;
-                            if (tx.getRemainingTimeoutNs() == Long.MAX_VALUE) {
-                                latch = new CheapLatch();
-                            } else {
-                                latch = new StandardLatch();
-                            }
-
-                            tx.registerRetryLatch(latch);
-                            tx.abort();
-
-                            if (tx.getRemainingTimeoutNs() == Long.MAX_VALUE) {
-                                if (tx.getConfiguration().isInterruptible()) {
-                                    latch.await();
-                                } else {
-                                    latch.awaitUninterruptible();
-                                }
-                            } else {
-                                long beginNs = System.nanoTime();
-
-                                boolean timeout;
-                                if (tx.getConfiguration().isInterruptible()) {
-                                    timeout = !latch.tryAwaitNs(tx.getRemainingTimeoutNs());
-                                } else {
-                                    timeout = !latch.tryAwaitNs(tx.getRemainingTimeoutNs());
-                                }
-
-                                long durationNs = System.nanoTime() - beginNs;
-                                tx.setRemainingTimeoutNs(tx.getRemainingTimeoutNs() - durationNs);
-
-                                if (timeout) {
-                                    String msg = format("Transaction %s has timed out with a total timeout of %s ns",
-                                            tx.getConfiguration().getFamilyName(),
-                                            tx.getConfiguration().getTimeoutNs());
-                                    throw new RetryTimeoutException(msg);
-                                }
-                            }
-
-                            tx.restart();
-                        }
+                        handleRetry(tx);
                     }
-                } catch (SpeculativeConfigurationFailure tooSmallException) {
-                    AlphaTransaction oldTx = tx;
-                    tx = (AlphaTransaction) transactionFactory.start();
-                    tx.setRemainingTimeoutNs(oldTx.getRemainingTimeoutNs());
-                    tx.setAttempt(oldTx.getAttempt());
-                    setThreadLocalTransaction(tx);
+                } catch (SpeculativeConfigurationFailure speculativeConfigurationFailure) {
+                    tx = handleSpeculativeFailure(transactionFactory, tx);
                 } catch (ControlFlowError throwable) {
                     BackoffPolicy backoffPolicy = tx.getConfiguration().getBackoffPolicy();
                     backoffPolicy.delayedUninterruptible(tx);
                 } finally {
-                    if (tx.getStatus() != TransactionStatus.committed && tx.getAttempt() - 1 < tx.getConfiguration().getMaxRetries()) {
-                        tx.restart();
+                    if (tx.getStatus() != TransactionStatus.Committed && tx.getAttempt() - 1 < tx.getConfiguration().getMaxRetries()) {
+                        tx.reset();
                     }
                 }
             } while (tx.getAttempt() - 1 < tx.getConfiguration().getMaxRetries());
@@ -190,19 +147,71 @@ public class TransactionLogicDonor {
                     tx.getConfiguration().getFamilyName(), tx.getConfiguration().getMaxRetries());
             throw new TooManyRetriesException(msg);
         } finally {
-            if (tx.getStatus() != TransactionStatus.committed) {
+            if (tx.getStatus() != TransactionStatus.Committed) {
                 tx.abort();
             }
         }
     }
 
+    public static AlphaTransaction handleSpeculativeFailure(TransactionFactory transactionFactory, AlphaTransaction tx) {
+        AlphaTransaction oldTx = tx;
+        tx = (AlphaTransaction) transactionFactory.start();
+        tx.setRemainingTimeoutNs(oldTx.getRemainingTimeoutNs());
+        tx.setAttempt(oldTx.getAttempt());
+        setThreadLocalTransaction(tx);
+        return tx;
+    }
+
+    public static void handleRetry(AlphaTransaction tx) throws InterruptedException {
+        if (tx.getAttempt() - 1 < tx.getConfiguration().getMaxRetries()) {
+            Latch latch;
+            if (tx.getRemainingTimeoutNs() == Long.MAX_VALUE) {
+                latch = new CheapLatch();
+            } else {
+                latch = new StandardLatch();
+            }
+
+            tx.registerRetryLatch(latch);
+            tx.abort();
+
+            if (tx.getRemainingTimeoutNs() == Long.MAX_VALUE) {
+                if (tx.getConfiguration().isInterruptible()) {
+                    latch.await();
+                } else {
+                    latch.awaitUninterruptible();
+                }
+            } else {
+                long beginNs = System.nanoTime();
+
+                boolean timeout;
+                if (tx.getConfiguration().isInterruptible()) {
+                    timeout = !latch.tryAwaitNs(tx.getRemainingTimeoutNs());
+                } else {
+                    timeout = !latch.tryAwaitNs(tx.getRemainingTimeoutNs());
+                }
+
+                long durationNs = System.nanoTime() - beginNs;
+                tx.setRemainingTimeoutNs(tx.getRemainingTimeoutNs() - durationNs);
+
+                if (timeout) {
+                    String msg = format("Transaction %s has timed out with a total timeout of %s ns",
+                            tx.getConfiguration().getFamilyName(),
+                            tx.getConfiguration().getTimeoutNs());
+                    throw new RetryTimeoutException(msg);
+                }
+            }
+
+            tx.reset();
+        }
+    }
+
     public static AlphaTransaction createTransaction(AlphaTransaction tx, TransactionFactory transactionFactory) {
         if (tx != null && tx.getTransactionFactory() == transactionFactory) {
-            tx.restart();
+            tx.reset();
             tx.setAttempt(0);
             tx.setRemainingTimeoutNs(tx.getConfiguration().getTimeoutNs());
         } else {
-            tx = (AlphaTransaction) transactionFactory.start();
+            tx = (AlphaTransaction) transactionFactory.create();
         }
         return tx;
     }
@@ -210,6 +219,6 @@ public class TransactionLogicDonor {
     // ===================== support methods ===========================
 
     public static boolean isActiveTransaction(AlphaTransaction t) {
-        return t != null && t.getStatus() == TransactionStatus.active;
+        return t != null && !t.getStatus().isDead();
     }
 }

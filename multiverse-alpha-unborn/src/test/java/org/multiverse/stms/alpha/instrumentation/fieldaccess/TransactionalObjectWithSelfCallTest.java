@@ -8,6 +8,7 @@ import org.multiverse.stms.alpha.AlphaStm;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
@@ -19,6 +20,7 @@ public class TransactionalObjectWithSelfCallTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
+        clearThreadLocalTransaction();
     }
 
 

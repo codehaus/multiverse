@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
+import org.multiverse.api.LogLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
 import org.multiverse.api.exceptions.TooManyRetriesException;
@@ -16,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertInstanceOf;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 /**
@@ -31,6 +33,7 @@ public class TransactionalMethod_settingTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
+        clearThreadLocalTransaction();
     }
 
     @Test
@@ -210,13 +213,13 @@ public class TransactionalMethod_settingTest {
     @Test
     public void automaticReadTracking() {
         AutomaticReadTracking m = new AutomaticReadTracking();
-        //m.defaultMethod();
-        //m.readonlyMethod();
-        //m.readonlyMethodWithReadTrackingDisabled();
-        //m.readonlyMethodWithReadTrackingEnabled();
+        m.defaultMethod();
+        m.readonlyMethod();
+        m.readonlyMethodWithReadTrackingDisabled();
+        m.readonlyMethodWithReadTrackingEnabled();
         m.defaultUpdateMethod();
-        //m.updateMethodWithReadTrackingDisabled();
-        //m.updateMethodWithReadTrackingEnabled();
+        m.updateMethodWithReadTrackingDisabled();
+        m.updateMethodWithReadTrackingEnabled();
     }
 
     @TransactionalObject
@@ -268,6 +271,45 @@ public class TransactionalMethod_settingTest {
         public void updateMethodWithReadTrackingEnabled() {
             Transaction tx = getThreadLocalTransaction();
             assertTrue(tx.getConfiguration().isReadTrackingEnabled());
+        }
+    }
+
+    @Test
+    public void whenLogLevel() {
+        LogLevelObject o = new LogLevelObject();
+        o.explicitValueCourse();
+
+        o.explicitValueFine();
+
+        o.explicitValueNone();
+
+        o.defaultValue();
+    }
+
+    class LogLevelObject {
+
+        @TransactionalMethod(logLevel = LogLevel.course)
+        void explicitValueCourse() {
+            Transaction tx = getThreadLocalTransaction();
+            assertEquals(LogLevel.course, tx.getConfiguration().getLogLevel());
+        }
+
+        @TransactionalMethod(logLevel = LogLevel.fine)
+        void explicitValueFine() {
+            Transaction tx = getThreadLocalTransaction();
+            assertEquals(LogLevel.fine, tx.getConfiguration().getLogLevel());
+        }
+
+        @TransactionalMethod(logLevel = LogLevel.none)
+        void explicitValueNone() {
+            Transaction tx = getThreadLocalTransaction();
+            assertEquals(LogLevel.none, tx.getConfiguration().getLogLevel());
+        }
+
+        @TransactionalMethod
+        void defaultValue() {
+            Transaction tx = getThreadLocalTransaction();
+            assertEquals(LogLevel.none, tx.getConfiguration().getLogLevel());
         }
     }
 }

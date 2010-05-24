@@ -15,7 +15,6 @@ public class LogLevelTest {
         assertTrue(LogLevel.fine.isLogableFrom(LogLevel.fine));
         assertTrue(LogLevel.fine.isLogableFrom(LogLevel.course));
         assertFalse(LogLevel.course.isLogableFrom(LogLevel.fine));
-
         assertFalse(LogLevel.none.isLogableFrom(LogLevel.course));
     }
 }

@@ -9,11 +9,12 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import java.util.Map;
 
-import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.assertIsActive;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.multiverse.TestUtils.assertIsNew;
 import static org.multiverse.TestUtils.getField;
 
-public class MapReadonlyAlphaTransaction_restartTest {
+public class MapReadonlyAlphaTransaction_resetTest {
 
     private AlphaStm stm;
     private AlphaStmConfig stmConfig;
@@ -24,7 +25,7 @@ public class MapReadonlyAlphaTransaction_restartTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MapReadonlyAlphaTransaction startSutTransaction() {
+    public MapReadonlyAlphaTransaction createSutTransaction() {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new MapReadonlyAlphaTransaction(config);
     }
@@ -32,11 +33,11 @@ public class MapReadonlyAlphaTransaction_restartTest {
     @Test
     public void whenUnused() {
         long version = stm.getVersion();
-        AlphaTransaction tx = startSutTransaction();
-        tx.restart();
+        AlphaTransaction tx = createSutTransaction();
+        tx.reset();
 
-        assertIsActive(tx);
-        assertSame(version, tx.getReadVersion());
+        assertIsNew(tx);
+        assertEquals(0, tx.getReadVersion());
         assertEquals(version, stm.getVersion());
         Map readMap = (Map) getField(tx, "attachedMap");
         assertTrue(readMap.isEmpty());
@@ -47,40 +48,30 @@ public class MapReadonlyAlphaTransaction_restartTest {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref1);
         tx.openForRead(ref2);
-        tx.restart();
+        tx.reset();
 
         Map readMap = (Map) getField(tx, "attachedMap");
         assertTrue(readMap.isEmpty());
     }
 
     @Test
-    public void whenOtherTxCommittedAfterThisTxStarted_thenReadVersionIncreased() {
-        AlphaTransaction tx = startSutTransaction();
-
-        stmConfig.clock.tick();
-        tx.restart();
-
-        assertEquals(stm.getVersion(), tx.getReadVersion());
-    }
-
-    @Test
     public void whenAborted_thenTxActivated() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.abort();
 
-        tx.restart();
-        assertIsActive(tx);
+        tx.reset();
+        assertIsNew(tx);
     }
 
     @Test
     public void whenCommitted_thenTxActivated() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.commit();
 
-        tx.restart();
-        assertIsActive(tx);
+        tx.reset();
+        assertIsNew(tx);
     }
 }

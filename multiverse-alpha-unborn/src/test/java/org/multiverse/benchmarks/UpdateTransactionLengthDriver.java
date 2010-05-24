@@ -1,6 +1,7 @@
 package org.multiverse.benchmarks;
 
 import org.benchy.AbstractBenchmarkDriver;
+import org.benchy.DriverParameter;
 import org.benchy.TestCase;
 import org.benchy.TestCaseResult;
 import org.multiverse.annotations.TransactionalMethod;
@@ -16,16 +17,15 @@ import java.util.concurrent.TimeUnit;
  */
 public class UpdateTransactionLengthDriver extends AbstractBenchmarkDriver {
 
+    @DriverParameter
     private int transactionCount;
+    @DriverParameter
     private int transactionLength;
 
     private IntRef[] refs;
 
     @Override
     public void preRun(TestCase testCase) {
-        transactionCount = testCase.getIntProperty("transactionCount");
-        transactionLength = testCase.getIntProperty("transactionLength");
-
         refs = new IntRef[transactionLength];
         for (int k = 0; k < transactionLength; k++) {
             refs[k] = new IntRef();

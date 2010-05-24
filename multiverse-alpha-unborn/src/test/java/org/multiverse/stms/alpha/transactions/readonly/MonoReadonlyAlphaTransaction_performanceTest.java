@@ -32,7 +32,7 @@ public class MonoReadonlyAlphaTransaction_performanceTest {
         config = new ReadonlyConfiguration(stmConfig.clock, true);
     }
 
-    public MonoReadonlyAlphaTransaction startSutTransaction() {
+    public MonoReadonlyAlphaTransaction createSutTransaction() {
         return new MonoReadonlyAlphaTransaction(config);
     }
 
@@ -43,7 +43,7 @@ public class MonoReadonlyAlphaTransaction_performanceTest {
         long startNs = System.nanoTime();
 
         for (int k = 0; k < transactionCount; k++) {
-            AlphaTransaction tx = startSutTransaction();
+            AlphaTransaction tx = createSutTransaction();
             tx.openForRead(ref);
             tx.commit();
 
@@ -63,10 +63,10 @@ public class MonoReadonlyAlphaTransaction_performanceTest {
 
         long startNs = System.nanoTime();
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
 
         for (int k = 0; k < transactionCount; k++) {
-            tx.restart();
+            tx.reset();
             tx.openForRead(ref);
             tx.commit();
 

@@ -1,19 +1,15 @@
 package org.multiverse.templates;
 
 import org.multiverse.MultiverseConstants;
-import org.multiverse.api.*;
-import org.multiverse.api.backoff.BackoffPolicy;
-import org.multiverse.api.exceptions.*;
-import org.multiverse.api.latches.CheapLatch;
-import org.multiverse.api.latches.Latch;
-import org.multiverse.api.latches.StandardLatch;
+import org.multiverse.api.Stm;
+import org.multiverse.api.ThreadLocalTransaction;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionFactory;
+import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 
-import static java.lang.String.format;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 /**
  * A Template that handles the boilerplate code for transactions. A transaction will be started if none is available
@@ -54,11 +50,9 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
  */
 public abstract class TransactionTemplate<E> implements MultiverseConstants {
 
-    private final boolean threadLocalAware;
+    private final TransactionBoilerplate boilerplate;
 
-    private final boolean lifecycleListenersEnabled;
-
-    private final TransactionFactory transactionFactory;
+    private final TransactionalCallable<E> callable = new TransactionalCallableImpl();
 
     /**
      * Creates a new TransactionTemplate that uses the STM stored in the GlobalStmInstance and works the the {@link
@@ -102,6 +96,7 @@ public abstract class TransactionTemplate<E> implements MultiverseConstants {
         this(transactionFactory, true, true);
     }
 
+
     /**
      * Creates a new TransactionTemplate with the provided TransactionFactory.
      *
@@ -114,41 +109,10 @@ public abstract class TransactionTemplate<E> implements MultiverseConstants {
      */
     public TransactionTemplate(TransactionFactory transactionFactory, boolean threadLocalAware,
                                boolean lifecycleListenersEnabled) {
-        if (transactionFactory == null) {
-            throw new NullPointerException();
-        }
 
-        this.lifecycleListenersEnabled = lifecycleListenersEnabled;
-        this.transactionFactory = transactionFactory;
-        this.threadLocalAware = threadLocalAware;
-    }
 
-    /**
-     * Checks if the TransactionTemplate should work together with the ThreadLocalTransaction.
-     *
-     * @return true if the TransactionTemplate should work together with the ThreadLocalTransaction.
-     */
-    public final boolean isThreadLocalAware() {
-        return threadLocalAware;
-    }
-
-    /**
-     * Checks if the lifecycle listeners on this TransactionTemplate have been enabled. Disabling it reduces
-     * object creation.
-     *
-     * @return true if the lifecycle listener has been enabled, false otherwise.
-     */
-    public final boolean isLifecycleListenersEnabled() {
-        return lifecycleListenersEnabled;
-    }
-
-    /**
-     * Returns the TransactionFactory this TransactionTemplate uses to createReference Transactions.
-     *
-     * @return the TransactionFactory this TransactionTemplate uses to createReference Transactions.
-     */
-    public final TransactionFactory getTransactionFactory() {
-        return transactionFactory;
+        CallbackListener listener = lifecycleListenersEnabled ? new CallbackListener() : null;
+        boilerplate = new TransactionBoilerplate(transactionFactory, listener, threadLocalAware);
     }
 
     /**
@@ -159,6 +123,34 @@ public abstract class TransactionTemplate<E> implements MultiverseConstants {
      * @throws Exception the Exception thrown
      */
     public abstract E execute(Transaction tx) throws Exception;
+
+    /**
+     * Checks if the TransactionTemplate should work together with the ThreadLocalTransaction.
+     *
+     * @return true if the TransactionTemplate should work together with the ThreadLocalTransaction.
+     */
+    public final boolean isThreadLocalAware() {
+        return boilerplate.isThreadLocalAware();
+    }
+
+    /**
+     * Checks if the lifecycle listeners on this TransactionTemplate have been enabled. Disabling it reduces
+     * object creation.
+     *
+     * @return true if the lifecycle listener has been enabled, false otherwise.
+     */
+    public final boolean isLifecycleListenersEnabled() {
+        return boilerplate.getTransactionLifecycleListener() != null;
+    }
+
+    /**
+     * Returns the TransactionFactory this TransactionTemplate uses to createReference Transactions.
+     *
+     * @return the TransactionFactory this TransactionTemplate uses to createReference Transactions.
+     */
+    public final TransactionFactory getTransactionFactory() {
+        return boilerplate.getTransactionFactory();
+    }
 
     /**
      * Lifecycle method that is called when this TransactionTemplate is about to begin. It will be called once.
@@ -180,7 +172,7 @@ public abstract class TransactionTemplate<E> implements MultiverseConstants {
      *
      * @param tx the Transaction that is started.
      */
-    protected void onStart(Transaction tx) {
+    protected void onPostStart(Transaction tx) {
     }
 
     /**
@@ -254,15 +246,7 @@ public abstract class TransactionTemplate<E> implements MultiverseConstants {
      *                                   to look for problems
      */
     public final E execute() {
-        try {
-            return executeChecked();
-        } catch (Exception ex) {
-            if (ex instanceof RuntimeException) {
-                throw (RuntimeException) ex;
-            } else {
-                throw new TransactionTemplate.InvisibleCheckedException(ex);
-            }
-        }
+        return boilerplate.execute(callable);
     }
 
     /**
@@ -278,161 +262,7 @@ public abstract class TransactionTemplate<E> implements MultiverseConstants {
      *                                 look for problems
      */
     public final E executeChecked() throws Exception {
-        Transaction tx = threadLocalAware ? getThreadLocalTransaction() : null;
-        if (isDead(tx)) {
-            if (sameTransactionFamily(tx)) {
-                tx.restart();
-                tx.setAttempt(0);
-                tx.setRemainingTimeoutNs(tx.getConfiguration().getTimeoutNs());
-            } else {
-                tx = transactionFactory.start();
-            }
-
-            if (threadLocalAware) {
-                setThreadLocalTransaction(tx);
-            }
-
-            return executeWithTransaction(tx);
-        } else {
-            return execute(tx);
-        }
-    }
-
-    private boolean sameTransactionFamily(Transaction tx) {
-        return tx != null && tx.getTransactionFactory() == transactionFactory;
-    }
-
-    private E executeWithTransaction(Transaction tx) throws Exception {
-        CallbackListener listener = lifecycleListenersEnabled ? new CallbackListener() : null;
-
-        Throwable lastFailureCause = null;
-
-        if (lifecycleListenersEnabled) {
-            onInit();
-        }
-
-        try {
-            do {
-                tx.setAttempt(tx.getAttempt() + 1);
-                try {
-                    try {
-                        if (___LOGGING_ENABLED_ENABLED) {
-                            if (tx.getConfiguration().getLogLevel().isLogableFrom(LogLevel.course)) {
-                                System.out.println("starting " + tx.getConfiguration().getFamilyName());
-                            }
-                        }
-
-                        if (listener != null) {
-                            tx.registerLifecycleListener(listener);
-                        }
-                        onStart(tx);
-                        E result = execute(tx);
-                        tx.commit();
-                        return result;
-                    } catch (Retry e) {
-                        if (___LOGGING_ENABLED_ENABLED) {
-                            if (tx.getConfiguration().getLogLevel().isLogableFrom(LogLevel.course)) {
-                                System.out.println("retrying " + tx.getConfiguration().getFamilyName());
-                            }
-                        }
-
-                        if (tx.getAttempt() - 1 < tx.getConfiguration().getMaxRetries()) {
-
-                            Latch latch;
-                            if (tx.getRemainingTimeoutNs() == Long.MAX_VALUE) {
-                                latch = new CheapLatch();
-                            } else {
-                                latch = new StandardLatch();
-                            }
-
-                            tx.registerRetryLatch(latch);
-                            tx.abort();
-
-                            if (tx.getRemainingTimeoutNs() == Long.MAX_VALUE) {
-                                if (tx.getConfiguration().isInterruptible()) {
-                                    latch.await();
-                                } else {
-                                    latch.awaitUninterruptible();
-                                }
-                            } else {
-                                long beginNs = System.nanoTime();
-
-                                boolean timeout;
-                                if (tx.getConfiguration().isInterruptible()) {
-                                    timeout = !latch.tryAwaitNs(tx.getRemainingTimeoutNs());
-                                } else {
-                                    timeout = !latch.tryAwaitNs(tx.getRemainingTimeoutNs());
-                                }
-
-                                long durationNs = System.nanoTime() - beginNs;
-                                tx.setRemainingTimeoutNs(tx.getRemainingTimeoutNs() - durationNs);
-
-                                if (timeout) {
-                                    String msg = format("Transaction %s has timed with a total timeout of %s ns",
-                                            tx.getConfiguration().getFamilyName(),
-                                            tx.getConfiguration().getTimeoutNs());
-                                    throw new RetryTimeoutException(msg);
-                                }
-                            }
-
-                            tx.restart();
-                        }
-                    }
-                } catch (SpeculativeConfigurationFailure ex) {
-                    if (___LOGGING_ENABLED_ENABLED) {
-                        if (tx.getConfiguration().getLogLevel().isLogableFrom(LogLevel.course)) {
-                            System.out.println("speculative configuration failure " + tx.getConfiguration().getFamilyName());
-                        }
-                    }
-
-                    Transaction oldTransaction = tx;
-                    tx = transactionFactory.start();
-                    tx.setAttempt(oldTransaction.getAttempt());
-                    tx.setRemainingTimeoutNs(oldTransaction.getRemainingTimeoutNs());
-
-                    if (threadLocalAware) {
-                        setThreadLocalTransaction(tx);
-                    }
-                } catch (ControlFlowError er) {
-                    if (___LOGGING_ENABLED_ENABLED) {
-                        if (tx.getConfiguration().getLogLevel().isLogableFrom(LogLevel.course)) {
-                            System.out.println(er.getDescription() + " for" + tx.getConfiguration().getFamilyName());
-                        }
-                    }
-
-                    BackoffPolicy backoffPolicy = tx.getConfiguration().getBackoffPolicy();
-                    backoffPolicy.delayedUninterruptible(tx);
-                    tx.restart();
-                }
-            } while (tx.getAttempt() - 1 < tx.getConfiguration().getMaxRetries());
-
-            String msg = format("Too many retries on transaction '%s', maxRetries = %s",
-                    tx.getConfiguration().getFamilyName(),
-                    tx.getConfiguration().getMaxRetries());
-            throw new TooManyRetriesException(msg, lastFailureCause);
-        } finally {
-            if (tx != null && tx.getStatus() != TransactionStatus.committed) {
-                tx.abort();
-            }
-        }
-    }
-
-    private boolean isDead(Transaction t) {
-        return t == null || t.getStatus() != TransactionStatus.active;
-    }
-
-    public static class InvisibleCheckedException extends RuntimeException {
-
-        static final long serialVersionUID = 0;
-
-        public InvisibleCheckedException(Exception cause) {
-            super(cause);
-        }
-
-        @Override
-        public Exception getCause() {
-            return (Exception) super.getCause();
-        }
+        return boilerplate.executeChecked(callable);
     }
 
     private class CallbackListener implements TransactionLifecycleListener {
@@ -440,21 +270,41 @@ public abstract class TransactionTemplate<E> implements MultiverseConstants {
         @Override
         public void notify(Transaction tx, TransactionLifecycleEvent event) {
             switch (event) {
-                case preAbort:
+                case PreStart:
+                    //ignore
+                    break;
+                case PostStart:
+                    onPostStart(tx);
+                    break;
+                case PrePrepare:
+                    //ignore
+                    break;
+                case PostPrepare:
+                    //ignore
+                    break;
+                case PreAbort:
                     onPreAbort(tx);
                     break;
-                case postAbort:
+                case PostAbort:
                     onPostAbort();
                     break;
-                case preCommit:
+                case PreCommit:
                     onPreCommit(tx);
                     break;
-                case postCommit:
+                case PostCommit:
                     onPostCommit();
                     break;
                 default:
-                    throw new IllegalStateException();
+                    throw new IllegalStateException("unhandled event: " + event);
             }
+        }
+    }
+
+    class TransactionalCallableImpl implements TransactionalCallable<E> {
+
+        @Override
+        public E call(Transaction tx) throws Exception {
+            return execute(tx);
         }
     }
 }

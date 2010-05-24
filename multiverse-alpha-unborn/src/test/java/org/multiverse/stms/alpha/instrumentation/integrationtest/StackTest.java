@@ -14,6 +14,7 @@ import org.multiverse.templates.TransactionTemplate;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.instrumentation.InstrumentationTestUtils.assertNoInstrumentationProblems;
 import static org.multiverse.instrumentation.InstrumentationTestUtils.resetInstrumentationProblemMonitor;
 import static org.multiverse.stms.alpha.instrumentation.AlphaReflectionUtils.*;
@@ -33,6 +34,7 @@ public class StackTest {
                 .setSpeculativeConfigurationEnabled(false)
                 .build();
         resetInstrumentationProblemMonitor();
+        clearThreadLocalTransaction();
     }
 
     @After

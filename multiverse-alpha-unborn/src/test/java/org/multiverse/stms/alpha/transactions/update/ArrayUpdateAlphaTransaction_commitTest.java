@@ -29,7 +29,7 @@ public class ArrayUpdateAlphaTransaction_commitTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public AlphaTransaction startSutTransaction(int size) {
+    public AlphaTransaction createSutTransaction(int size) {
         UpdateConfiguration config =
                 new UpdateConfiguration(stmConfig.clock);
         return new ArrayUpdateAlphaTransaction(config, size);
@@ -37,7 +37,7 @@ public class ArrayUpdateAlphaTransaction_commitTest {
 
     @Test
     public void whenUnused_thenCommitSuccess() {
-        AlphaTransaction tx = startSutTransaction(2);
+        AlphaTransaction tx = createSutTransaction(2);
         tx.commit();
 
         long version = stm.getVersion();
@@ -50,7 +50,7 @@ public class ArrayUpdateAlphaTransaction_commitTest {
     public void whenOnlyFreshObjects_thenVersionNotIncreased() {
         ManualRef txObject = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction(2);
+        AlphaTransaction tx = createSutTransaction(2);
         AlphaTranlocal tranlocal = tx.openForConstruction(txObject);
 
         long version = stm.getVersion();
@@ -69,7 +69,7 @@ public class ArrayUpdateAlphaTransaction_commitTest {
         ManualRef ref1 = new ManualRef(stm);
         ManualRef ref2 = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction(2);
+        AlphaTransaction tx = createSutTransaction(2);
         ref1.inc(tx);
         AlphaTranlocal tranlocal2 = tx.openForConstruction(ref2);
 
@@ -92,7 +92,7 @@ public class ArrayUpdateAlphaTransaction_commitTest {
     public void whenDirty() {
         ManualRef txObject = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(2);
+        AlphaTransaction tx = createSutTransaction(2);
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForWrite(txObject);
         tranlocal.value++;
 
@@ -111,7 +111,7 @@ public class ArrayUpdateAlphaTransaction_commitTest {
     public void whenCommutingWrites() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(1);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         ref.commutingInc(tx, 1);
         AlphaTranlocal tranlocal = tx.openForCommutingWrite(ref);
         assertTrue(tranlocal.isCommuting());
@@ -138,7 +138,7 @@ public class ArrayUpdateAlphaTransaction_commitTest {
         stmConfig.clock.tick();
         registerRetryListener(ref, latch2);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForWrite(ref);
         tranlocal.value++;
         tx.commit();
@@ -166,7 +166,7 @@ public class ArrayUpdateAlphaTransaction_commitTest {
         ManualRef readonlyRef = new ManualRef(stm, 0);
         ManualRef freshRef = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction(3);
+        AlphaTransaction tx = createSutTransaction(3);
         ManualRefTranlocal updateTranlocal = (ManualRefTranlocal) tx.openForWrite(updateRef);
         updateTranlocal.value++;
         tx.openForRead(readonlyRef);

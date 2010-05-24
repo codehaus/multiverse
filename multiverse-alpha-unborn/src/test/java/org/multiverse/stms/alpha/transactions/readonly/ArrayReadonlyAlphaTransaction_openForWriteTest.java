@@ -26,13 +26,13 @@ public class ArrayReadonlyAlphaTransaction_openForWriteTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public ArrayReadonlyAlphaTransaction startTransactionUnderTest(int size) {
+    public ArrayReadonlyAlphaTransaction createSutTransaction(int size) {
         SpeculativeConfiguration speculativeConfiguration = new SpeculativeConfiguration(100);
         speculativeConfiguration.setOptimalSize(size);
-        return startTransactionUnderTest(speculativeConfiguration);
+        return createSutTransaction(speculativeConfiguration);
     }
 
-    public ArrayReadonlyAlphaTransaction startTransactionUnderTest(SpeculativeConfiguration speculativeConfiguration) {
+    public ArrayReadonlyAlphaTransaction createSutTransaction(SpeculativeConfiguration speculativeConfiguration) {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true)
                 .withSpeculativeConfig(speculativeConfiguration);
         return new ArrayReadonlyAlphaTransaction(config, speculativeConfiguration.getOptimalSize());
@@ -40,7 +40,8 @@ public class ArrayReadonlyAlphaTransaction_openForWriteTest {
 
     @Test
     public void whenActiveAndNullTxObject_thenNullPointerException() {
-        AlphaTransaction tx = startTransactionUnderTest(10);
+        AlphaTransaction tx = createSutTransaction(10);
+        tx.start();
 
         try {
             tx.openForWrite(null);
@@ -56,7 +57,7 @@ public class ArrayReadonlyAlphaTransaction_openForWriteTest {
         ManualRef ref = new ManualRef(stm, 0);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, true, 100);
-        AlphaTransaction tx = startTransactionUnderTest(speculativeConfig);
+        AlphaTransaction tx = createSutTransaction(speculativeConfig);
 
         long version = stm.getVersion();
         try {
@@ -74,7 +75,7 @@ public class ArrayReadonlyAlphaTransaction_openForWriteTest {
         ManualRef ref = new ManualRef(stm, 0);
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(true, false, false, 100);
-        AlphaTransaction tx = startTransactionUnderTest(speculativeConfig);
+        AlphaTransaction tx = createSutTransaction(speculativeConfig);
 
         long version = stm.getVersion();
         try {
@@ -92,7 +93,7 @@ public class ArrayReadonlyAlphaTransaction_openForWriteTest {
     public void whenPrepared() {
         ManualRef value = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startTransactionUnderTest(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.prepare();
 
         long version = stm.getVersion();
@@ -110,7 +111,7 @@ public class ArrayReadonlyAlphaTransaction_openForWriteTest {
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef value = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startTransactionUnderTest(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.commit();
 
         long version = stm.getVersion();
@@ -128,7 +129,7 @@ public class ArrayReadonlyAlphaTransaction_openForWriteTest {
     public void whenAborted_thenDeadTransactionException() {
         ManualRef value = new ManualRef(stm, 10);
 
-        AlphaTransaction tx = startTransactionUnderTest(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.abort();
 
         long version = stm.getVersion();

@@ -16,11 +16,10 @@ public final class MonoReadonlyAlphaTransaction extends AbstractReadonlyAlphaTra
 
     public MonoReadonlyAlphaTransaction(ReadonlyConfiguration config) {
         super(config);
-        init();
     }
 
     @Override
-    protected void doClear() {
+    protected void doReset() {
         attached = null;
     }
 

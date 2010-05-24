@@ -30,7 +30,7 @@ public final class VetoCommitBarrier extends CommitBarrier {
      * @param fair if the lock should be fair.
      */
     public VetoCommitBarrier(boolean fair) {
-        super(Status.closed, fair);
+        super(Status.Closed, fair);
     }
 
     @Override
@@ -57,13 +57,13 @@ public final class VetoCommitBarrier extends CommitBarrier {
         lock.lock();
         try {
             switch (getStatus()) {
-                case closed:
+                case Closed:
                     postCommitTasks = signalCommit();
                     break;
-                case committed:
+                case Committed:
                     //ignore it.
                     return;
-                case aborted:
+                case Aborted:
                     String abortMsg = "Can't veto a commit on already aborted VetoCommitBarrier";
                     throw new CommitBarrierOpenException(abortMsg);
                 default:
@@ -101,14 +101,14 @@ public final class VetoCommitBarrier extends CommitBarrier {
         lock.lock();
         try {
             switch (getStatus()) {
-                case closed:
+                case Closed:
                     tx.prepare();
                     postCommitTasks = signalCommit();
                     break;
-                case aborted:
+                case Aborted:
                     String abortMsg = "Can't veto commit on already aborted VetoCommitBarrier";
                     throw new CommitBarrierOpenException(abortMsg);
-                case committed:
+                case Committed:
                     String commitMsg = "Can't veto commit on already committed VetoCommitBarrier";
                     throw new CommitBarrierOpenException(commitMsg);
                 default:

@@ -32,13 +32,13 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public AlphaTransaction startSutTransaction(int size) {
+    public AlphaTransaction createSutTransaction(int size) {
         UpdateConfiguration config =
                 new UpdateConfiguration(stmConfig.clock);
         return new ArrayUpdateAlphaTransaction(config, size);
     }
 
-    public AlphaTransaction startSutTransaction(SpeculativeConfiguration speculativeConfig) {
+    public AlphaTransaction createSutTransaction(SpeculativeConfiguration speculativeConfig) {
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
                 .withSpeculativeConfiguration(speculativeConfig);
 
@@ -48,7 +48,8 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
 
     @Test
     public void whenNullTxObject_thenNullPointerException() {
-        AlphaTransaction tx = startSutTransaction(1);
+        AlphaTransaction tx = createSutTransaction(1);
+        tx.start();
 
         long version = stm.getVersion();
         try {
@@ -66,7 +67,7 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
     public void whenCalledForTheFirstTime() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction(1);
+        AlphaTransaction tx = createSutTransaction(1);
 
         long version = stm.getVersion();
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForConstruction(ref);
@@ -83,7 +84,7 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
     public void whenAlreadyOpenedForConstruction_sameInstanceReturned() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction(1);
+        AlphaTransaction tx = createSutTransaction(1);
 
         long version = stm.getVersion();
         ManualRefTranlocal firstTime = (ManualRefTranlocal) tx.openForConstruction(ref);
@@ -102,7 +103,7 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
         ManualRef ref = new ManualRef(stm);
         ref.___load();
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
 
         long version = stm.getVersion();
         AlphaTranlocal opened = tx.openForConstruction(ref);
@@ -119,7 +120,7 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
         ManualRef ref = new ManualRef(stm);
         AlphaTranlocal committed = ref.___load();
 
-        AlphaTransaction tx = startSutTransaction(1);
+        AlphaTransaction tx = createSutTransaction(1);
         tx.openForRead(ref);
 
         long version = stm.getVersion();
@@ -139,7 +140,7 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
         ManualRef ref = new ManualRef(stm);
         AlphaTranlocal committed = ref.___load();
 
-        AlphaTransaction tx = startSutTransaction(1);
+        AlphaTransaction tx = createSutTransaction(1);
         tx.openForWrite(ref);
 
         long version = stm.getVersion();
@@ -159,7 +160,7 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 10);
         AlphaTranlocal committed = ref.___load();
 
-        AlphaTransaction tx = startSutTransaction(1);
+        AlphaTransaction tx = createSutTransaction(1);
         tx.openForCommutingWrite(ref);
 
         long version = stm.getVersion();
@@ -182,7 +183,7 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
         ManualRef ref4 = ManualRef.createUncommitted();
 
         SpeculativeConfiguration config = new SpeculativeConfiguration(3);
-        AlphaTransaction tx = startSutTransaction(config);
+        AlphaTransaction tx = createSutTransaction(config);
         tx.openForConstruction(ref1);
         tx.openForConstruction(ref2);
         System.out.println("config.optimalsize: " + config.getOptimalSize());
@@ -204,7 +205,7 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
     public void whenAborted_thenDeadTransactionException() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction(1);
+        AlphaTransaction tx = createSutTransaction(1);
         tx.abort();
 
         long version = stm.getVersion();
@@ -222,7 +223,7 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction(1);
+        AlphaTransaction tx = createSutTransaction(1);
         tx.commit();
 
         long version = stm.getVersion();
@@ -240,7 +241,7 @@ public class ArrayUpdateAlphaTransaction_openForConstructionTest {
     public void whenPrepared_thenPreparedTransactionException() {
         ManualRef ref = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction(1);
+        AlphaTransaction tx = createSutTransaction(1);
         tx.prepare();
 
         long version = stm.getVersion();

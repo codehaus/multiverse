@@ -13,7 +13,7 @@ import java.lang.reflect.Modifier;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
@@ -24,7 +24,7 @@ public class TransactionalObject_MethodAccessModifiersTest {
 
     @Before
     public void setUp() {
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
         stm = (AlphaStm) getGlobalStmInstance();
     }
 

@@ -7,12 +7,11 @@ import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.multiverse.TestUtils.assertIsActive;
+import static org.multiverse.TestUtils.assertIsNew;
 import static org.multiverse.TestUtils.getField;
 
-public class MonoReadonlyAlphaTransaction_restartTest {
+public class MonoReadonlyAlphaTransaction_resetTest {
 
     private AlphaStm stm;
     private AlphaStmConfig stmConfig;
@@ -24,37 +23,28 @@ public class MonoReadonlyAlphaTransaction_restartTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MonoReadonlyAlphaTransaction startSutTransaction() {
+    public MonoReadonlyAlphaTransaction createSutTransaction() {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new MonoReadonlyAlphaTransaction(config);
     }
 
     @Test
     public void whenUnused() {
-        AlphaTransaction tx = startSutTransaction();
-        tx.restart();
+        AlphaTransaction tx = createSutTransaction();
+        tx.reset();
 
-        assertIsActive(tx);
-    }
-
-    @Test
-    public void whenOtherCommitsOccurred_thenReadVersionOfTxUpdated() {
-        AlphaTransaction tx = startSutTransaction();
-        stmConfig.clock.tick();
-
-        tx.restart();
-        assertEquals(stm.getVersion(), tx.getReadVersion());
+        assertIsNew(tx);
     }
 
     @Test
     public void whenUsed_thenAttachedIsUnset() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
 
-        tx.restart();
+        tx.reset();
         assertNull(getField(tx, "attached"));
-        assertIsActive(tx);
+        assertIsNew(tx);
     }
 }

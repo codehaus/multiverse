@@ -8,6 +8,7 @@ import org.multiverse.stms.alpha.AlphaStm;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.alpha.instrumentation.AlphaReflectionUtils.*;
 
 /**
@@ -20,6 +21,7 @@ public class TransactionalObject_NonStaticInnerClassTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
+        clearThreadLocalTransaction();
     }
 
     @Test

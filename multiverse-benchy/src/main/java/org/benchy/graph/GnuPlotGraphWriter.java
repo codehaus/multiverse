@@ -28,8 +28,7 @@ public class GnuPlotGraphWriter implements GraphWriter {
     }
 
     @Override
-    public void write(org.benchy.graph.GraphModel graphModel) {
-
+    public void write(GraphModel graphModel) {
         TreeMap<Integer, List<Pair>> treeMap = new TreeMap<Integer, List<Pair>>();
 
         for (String lineId : graphModel.getLineIds()) {

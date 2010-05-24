@@ -26,6 +26,12 @@ public class GraphMain {
         resultRepository = new FileBasedBenchmarkResultRepository(benchmarkDir);
     }
 
+    /**
+     * @param outputFile
+     * @param names      the names of the benchmarks to collect.
+     * @param x
+     * @param y
+     */
     public void doIt(File outputFile, List<String> names, String x, String y) {
         Date now = new Date();
 

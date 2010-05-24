@@ -201,7 +201,7 @@ public class AbstractTrackingUpdateAlphaTransaction_performanceComparison {
                 refs[l].inc(tx);
             }
             tx.commit();
-            tx.restart();
+            tx.reset();
         }
 
         long periodFixedNs = System.nanoTime() - startFixedNs;
@@ -216,7 +216,7 @@ public class AbstractTrackingUpdateAlphaTransaction_performanceComparison {
                 refs[l].inc(tx);
             }
             tx.commit();
-            tx.restart();
+            tx.reset();
         }
 
         long periodGrowingNs = System.nanoTime() - startGrowingNs;

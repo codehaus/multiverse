@@ -30,13 +30,13 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public AlphaTransaction startSutTransaction(int size) {
+    public AlphaTransaction createSutTransaction(int size) {
         UpdateConfiguration config =
                 new UpdateConfiguration(stmConfig.clock);
         return new ArrayUpdateAlphaTransaction(config, size);
     }
 
-    public AlphaTransaction startSutTransaction(int size, int maximumSize) {
+    public AlphaTransaction createSutTransaction(int size, int maximumSize) {
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(maximumSize);
 
         UpdateConfiguration config = new UpdateConfiguration(stmConfig.clock)
@@ -49,7 +49,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
     public void whenOpeningUncommittedObject_thenUncommittedReadConflict() {
         ManualRef txObject = ManualRef.createUncommitted();
 
-        AlphaTransaction tx = startSutTransaction(2);
+        AlphaTransaction tx = createSutTransaction(2);
 
         long version = stm.getVersion();
         try {
@@ -70,7 +70,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
         ManualRef txObject1 = new ManualRef(stm, 1);
         ManualRef txObject2 = new ManualRef(stm, 1);
 
-        AlphaTransaction tx = startSutTransaction(1, 1);
+        AlphaTransaction tx = createSutTransaction(1, 1);
         tx.openForWrite(txObject1);
 
         try {
@@ -89,7 +89,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
         ManualRef txObject = new ManualRef(stm, 10);
         ManualRefTranlocal original = (ManualRefTranlocal) txObject.___load();
 
-        AlphaTransaction tx = startSutTransaction(1);
+        AlphaTransaction tx = createSutTransaction(1);
 
         long version = stm.getVersion();
         ManualRefTranlocal tranlocal = (ManualRefTranlocal) tx.openForWrite(txObject);
@@ -104,7 +104,8 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
 
     @Test
     public void whenNullTxObject_thenNullPointerException() {
-        AlphaTransaction tx = startSutTransaction(1);
+        AlphaTransaction tx = createSutTransaction(1);
+        tx.start();
 
         try {
             tx.openForWrite(null);
@@ -120,7 +121,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
         ManualRef ref = new ManualRef(stm);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForWrite(ref);
 
         assertIsActive(tx);
@@ -132,7 +133,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
         ManualRef ref = new ManualRef(stm);
         ManualRefTranlocal committed = (ManualRefTranlocal) ref.___load();
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.openForRead(ref);
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForWrite(ref);
 
@@ -145,7 +146,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
     public void whenAlreadyOpenedForWrite_sameVersionReturned() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         ManualRefTranlocal expected = (ManualRefTranlocal) tx.openForWrite(ref);
         ManualRefTranlocal found = (ManualRefTranlocal) tx.openForWrite(ref);
 
@@ -158,7 +159,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
     public void whenAlreadyOpenedForCommutingWrite_thenFixated() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         AlphaTranlocal openedForCommutingWrite = tx.openForCommutingWrite(ref);
         AlphaTranlocal found = tx.openForWrite(ref);
 
@@ -171,7 +172,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
     public void whenAlreadyOpenedForCommutingWriteAndLockedButVersionMatches() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         AlphaTranlocal openedForCommutingWrite = tx.openForCommutingWrite(ref);
 
         Transaction lockOwner = mock(Transaction.class);
@@ -188,7 +189,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
     public void whenAlreadyOpenedForCommutingWriteAndLockedAndVersionTooOld_thenOldVersionNotFoundReadConflict() {
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         AlphaTranlocal openedForCommutingWrite = tx.openForCommutingWrite(ref);
 
         ref.atomicInc(10);
@@ -215,7 +216,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
         ManualRef ref3 = new ManualRef(stm);
         ManualRef ref4 = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(3, 3);
+        AlphaTransaction tx = createSutTransaction(3, 3);
         tx.openForWrite(ref1);
         tx.openForWrite(ref2);
         tx.openForWrite(ref3);
@@ -239,7 +240,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
         AlphaTransaction owner = mock(AlphaTransaction.class);
         ref.___tryLock(owner);
 
-        AlphaTransaction tx = startSutTransaction(100);
+        AlphaTransaction tx = createSutTransaction(100);
 
         AlphaTranlocal tranlocal = tx.openForWrite(ref);
 
@@ -253,7 +254,8 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
         ManualRef ref = new ManualRef(stm, 1);
 
         //start the transaction to sets its readversion
-        AlphaTransaction tx = startSutTransaction(100);
+        AlphaTransaction tx = createSutTransaction(100);
+        tx.start();
 
         //do an atomic and conflicting update
         ref.set(stm, 10);
@@ -282,7 +284,8 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
     public void whenReadConflict_thenOldVersionNotFoundReadConflict() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
+        tx.start();
         //conflicting write
         ref.inc(stm);
         try {
@@ -298,7 +301,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
     public void whenAlreadyOpenedForRead_thenNotSubjectToReadConflict() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.openForRead(ref);
         //conflicting write
         ref.inc(stm);
@@ -311,7 +314,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
     public void whenAlreadyOpenedForWrite_thenNotSubjectToReadConflict() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(10);
+        AlphaTransaction tx = createSutTransaction(10);
         tx.openForWrite(ref);
         //conflicting write
         ref.inc(stm);
@@ -324,7 +327,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
     public void whenAborted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(1);
+        AlphaTransaction tx = createSutTransaction(1);
         tx.abort();
 
         try {
@@ -340,7 +343,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
     public void whenCommitted_thenDeadTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(1);
+        AlphaTransaction tx = createSutTransaction(1);
         tx.commit();
 
         try {
@@ -356,7 +359,7 @@ public class ArrayUpdateAlphaTransaction_openForWriteTest {
     public void whenPrepared_thenPreparedTransactionException() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction(1);
+        AlphaTransaction tx = createSutTransaction(1);
         tx.prepare();
 
         try {

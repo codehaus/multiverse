@@ -75,7 +75,7 @@ public class AlphaProgrammaticLongAndReference_integrationStressTest {
             }
         }
 
-        @TransactionalMethod
+        @TransactionalMethod(trackReads = true)
         private void produce() {
             queue.push("foo");
         }
@@ -97,7 +97,7 @@ public class AlphaProgrammaticLongAndReference_integrationStressTest {
             }
         }
 
-        @TransactionalMethod
+        @TransactionalMethod(trackReads = true)
         private void produce() {
             queue.pop();
         }
@@ -119,7 +119,7 @@ public class AlphaProgrammaticLongAndReference_integrationStressTest {
         }
 
         public E pop() {
-            if (queuedStack.head.isNull() && popableStack.head.isNull()){
+            if (queuedStack.head.isNull() && popableStack.head.isNull()) {
                 retry();
             }
 
@@ -136,7 +136,7 @@ public class AlphaProgrammaticLongAndReference_integrationStressTest {
         }
 
         public int size() {
-            return (int)size.get();
+            return (int) size.get();
         }
     }
 

@@ -8,22 +8,44 @@ package org.multiverse.api.lifecycle;
 public enum TransactionLifecycleEvent {
 
     /**
-     * Just before aborting.
+     * Just before starting.
      */
-    preAbort,
+    PreStart,
 
     /**
-     * Just before committing.
+     * Just after starting.
      */
-    preCommit,
+    PostStart,
+
+    /**
+     * Just before preparing
+     */
+    PrePrepare,
+
+    /**
+     * Just after preparing
+     */
+    PostPrepare,
+
+    /**
+     * Just before aborting.
+     */
+    PreAbort,
 
     /**
      * Just after aborting.
      */
-    postAbort,
+    PostAbort,
+
+
+    /**
+     * Just before committing.
+     */
+    PreCommit,
+
 
     /**
      * Just after committing.
      */
-    postCommit
+    PostCommit
 }

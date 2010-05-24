@@ -1,4 +1,4 @@
-package org.benchy.executor;
+package org.benchy.runner;
 
 import org.benchy.Benchmark;
 
@@ -7,7 +7,7 @@ import org.benchy.Benchmark;
  *
  * @author Peter Veentjer.
  */
-public interface BenchmarkExecutor {
+public interface BenchmarkRunner {
 
     void execute(Benchmark... benchmarks);
 }

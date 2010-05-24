@@ -20,14 +20,14 @@ public class MonoReadonlyAlphaTransaction_abortTest {
         stm = new AlphaStm(stmConfig);
     }
 
-    public MonoReadonlyAlphaTransaction startSutTransaction() {
+    public MonoReadonlyAlphaTransaction createSutTransaction() {
         ReadonlyConfiguration config = new ReadonlyConfiguration(stmConfig.clock, true);
         return new MonoReadonlyAlphaTransaction(config);
     }
 
     @Test
     public void whenUnused() {
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.abort();
 
         assertIsAborted(tx);
@@ -37,7 +37,7 @@ public class MonoReadonlyAlphaTransaction_abortTest {
     public void whenUsed_thenTxAborted() {
         ManualRef ref = new ManualRef(stm);
 
-        AlphaTransaction tx = startSutTransaction();
+        AlphaTransaction tx = createSutTransaction();
         tx.openForRead(ref);
         tx.abort();
 

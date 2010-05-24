@@ -4,10 +4,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.TestUtils;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.stms.alpha.AlphaStm;
 
-import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
@@ -33,7 +33,7 @@ public class TransactionalMethod_AccessModifierTest {
     }
 
     public static void assertTransactionWorking() {
-        assertIsActive(getThreadLocalTransaction());
+        TestUtils.assertIsAlive(getThreadLocalTransaction());
     }
 
     @Test

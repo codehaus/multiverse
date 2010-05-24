@@ -4,9 +4,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Stm;
+import org.multiverse.api.Transaction;
 import org.multiverse.transactional.refs.IntRef;
-
-import java.util.concurrent.Callable;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -15,8 +14,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 /**
  * @author Sai Venkat
  */
-
-public class TransactionalClosureTest {
+public class TransactionBoilerplateTest {
     private Stm stm;
 
     @Before
@@ -36,10 +34,10 @@ public class TransactionalClosureTest {
 
         long version = stm.getVersion();
 
-        new TransactionalClosure().execute(
-                new Callable() {
+        new TransactionBoilerplate().execute(
+                new TransactionalCallable() {
                     @Override
-                    public Object call() {
+                    public Object call(Transaction tx) {
                         value.inc();
                         return null;
                     }

@@ -2,10 +2,10 @@ package org.multiverse.benchmarks;
 
 import org.benchy.Benchmark;
 import org.benchy.TestCase;
-import org.benchy.executor.BenchmarkExecutor;
-import org.benchy.executor.DefaultBenchmarkExecutor;
 import org.benchy.graph.GraphMain;
 import org.benchy.repository.FileBasedBenchmarkResultRepository;
+import org.benchy.runner.BenchmarkRunner;
+import org.benchy.runner.DefaultBenchmarkRunner;
 
 /**
  * @author Peter Veentjer
@@ -14,14 +14,14 @@ public class BenchmarkMain {
 
     public static void main(String[] args) {
         FileBasedBenchmarkResultRepository repository = new FileBasedBenchmarkResultRepository();
-        BenchmarkExecutor executor = new DefaultBenchmarkExecutor(repository);
+        BenchmarkRunner runner = new DefaultBenchmarkRunner(repository);
 
-        executor.execute(createThisReadPerformanceBenchmark());
-        //executor.execute(createReadPerformanceBenchmark());
+        runner.execute(createConcurrentUpdateBenchmark());
+        //runner.execute(createReadPerformanceBenchmark());
         //executors.execute(createNonConcurrentUpdateBenchmark());
         // executors.execute(createConcurrentUpdateClassicLockBenchmark());
         // executors.execute(createConcurrentUpdateBenchmark());
-        //executor.execute(createSetterInLoopDriver());
+        //runner.execute(createSetterInLoopDriver());
 
         GraphMain.main(new String[]{"/tmp",});
     }

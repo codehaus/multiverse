@@ -17,6 +17,14 @@ import static org.junit.Assert.*;
 
 public class TestUtils {
 
+    public static void assertNotEquals(Object o1, Object o2) {
+        if (o1 == null) {
+            assertNotNull(o2);
+        } else {
+            assertFalse(o1.equals(o2));
+        }
+    }
+
     public static String format(double value) {
         return NumberFormat.getInstance(Locale.ENGLISH).format(value);
     }
@@ -98,31 +106,39 @@ public class TestUtils {
         System.out.println("============================================================================");
     }
 
-    public static void assertIsActive(Transaction... transactions) {
-        assertNotNull("No transaction found", transactions);
+    public static void assertIsNew(Transaction... transactions) {
         for (Transaction tx : transactions) {
-            assertEquals(TransactionStatus.active, tx.getStatus());
+            assertEquals(TransactionStatus.New, tx.getStatus());
+        }
+    }
+
+    public static void assertIsActive(Transaction... transactions) {
+        for (Transaction tx : transactions) {
+            assertEquals(TransactionStatus.Active, tx.getStatus());
+        }
+    }
+
+    public static void assertIsAlive(Transaction... transactions) {
+        for (Transaction tx : transactions) {
+            assertFalse(tx.getStatus().isDead());
         }
     }
 
     public static void assertIsPrepared(Transaction... transactions) {
-        assertNotNull("No transaction found", transactions);
         for (Transaction tx : transactions) {
-            assertEquals(TransactionStatus.prepared, tx.getStatus());
+            assertEquals(TransactionStatus.Prepared, tx.getStatus());
         }
     }
 
     public static void assertIsCommitted(Transaction... transactions) {
-        assertNotNull("No transaction found", transactions);
         for (Transaction tx : transactions) {
-            assertEquals(TransactionStatus.committed, tx.getStatus());
+            assertEquals(TransactionStatus.Committed, tx.getStatus());
         }
     }
 
     public static void assertIsAborted(Transaction... transactions) {
-        assertNotNull("No transaction found", transactions);
         for (Transaction tx : transactions) {
-            assertEquals(TransactionStatus.aborted, tx.getStatus());
+            assertEquals(TransactionStatus.Aborted, tx.getStatus());
         }
     }
 
