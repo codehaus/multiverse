@@ -1,6 +1,7 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.multiverse.api.Listeners;
+import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.commitlock.CommitLockFilter;
 import org.multiverse.api.exceptions.LockNotFreeWriteConflict;
 import org.multiverse.api.exceptions.OptimisticLockFailedWriteConflict;
@@ -138,6 +139,10 @@ public abstract class AbstractUpdateAlphaTransaction
 
     @Override
     protected AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject txObject) {
+        if(getStatus()== TransactionStatus.New){
+            start();
+        }
+
         updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
 
         AlphaTranlocal attached = findAttached(txObject);

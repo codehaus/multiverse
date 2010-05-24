@@ -62,6 +62,8 @@ public class MapReadonlyAlphaTransaction_openForCommutingWriteTest {
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, true, 100);
         AlphaTransaction tx = createSutTransaction(speculativeConfig);
+        tx.start();
+
         try {
             tx.openForCommutingWrite(ref);
             fail();
@@ -80,6 +82,8 @@ public class MapReadonlyAlphaTransaction_openForCommutingWriteTest {
 
         SpeculativeConfiguration speculativeConfiguration = new SpeculativeConfiguration(100);
         AlphaTransaction tx = createSutTransaction(speculativeConfiguration);
+        tx.start();
+        
         try {
             tx.openForCommutingWrite(ref);
             fail();

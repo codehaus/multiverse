@@ -36,7 +36,6 @@ public class TransactionalMethod_FamilyNameTest {
         assertEquals("o.m.s.a.i.f.TransactionalMethod_FamilyNameTest$DefaultFamilyName.execute(int,boolean,String)", method.found);
     }
 
-
     private class DefaultFamilyName {
         private String found;
 

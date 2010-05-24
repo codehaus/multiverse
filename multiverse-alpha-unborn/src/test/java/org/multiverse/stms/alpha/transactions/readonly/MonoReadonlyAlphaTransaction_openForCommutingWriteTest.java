@@ -45,6 +45,7 @@ public class MonoReadonlyAlphaTransaction_openForCommutingWriteTest {
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, false, false, 100);
         AlphaTransaction tx = createSutTransaction(speculativeConfig);
+        tx.start();
 
         long version = stm.getVersion();
         try {
@@ -65,6 +66,7 @@ public class MonoReadonlyAlphaTransaction_openForCommutingWriteTest {
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
         AlphaTransaction tx = createSutTransaction(speculativeConfig);
+        tx.start();
 
         long version = stm.getVersion();
         try {

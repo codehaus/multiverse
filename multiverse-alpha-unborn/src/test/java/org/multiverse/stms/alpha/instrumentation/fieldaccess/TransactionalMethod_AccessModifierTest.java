@@ -2,7 +2,6 @@ package org.multiverse.stms.alpha.instrumentation.fieldaccess;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestUtils;
 import org.multiverse.annotations.TransactionalMethod;
@@ -90,12 +89,6 @@ public class TransactionalMethod_AccessModifierTest {
         void doIt() {
             assertTransactionWorking();
         }
-    }
-
-    @Test
-    @Ignore
-    public void abstractMethodFails() {
-
     }
 
     @Test
