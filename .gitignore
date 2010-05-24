@@ -10,4 +10,5 @@
 /multiverse.iws
 *.iml
 **/build
+**/target
 *.class
