@@ -34,7 +34,6 @@ public class TransactionalObject_ConstructorTest {
     }
 
     @Test
-    @Ignore
     public void testConstructorWithReadFirst() {
         ConstructorWithReadFirst object = new ConstructorWithReadFirst();
         assertEquals(0, object.getField());

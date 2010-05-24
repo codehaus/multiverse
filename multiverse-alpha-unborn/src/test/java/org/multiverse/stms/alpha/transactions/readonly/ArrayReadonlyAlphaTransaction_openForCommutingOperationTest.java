@@ -1,7 +1,6 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
@@ -9,7 +8,6 @@ import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
-import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
@@ -57,17 +55,21 @@ public class ArrayReadonlyAlphaTransaction_openForCommutingOperationTest {
         assertIsNew(tx);
     }
 
-    @Ignore
     @Test
-    public void whenNew_thenStarted() {
+    public void whenNew_thenNotStarted() {
         ManualRef ref = new ManualRef(stm);
 
         AlphaTransaction tx = createSutTransaction(10);
 
-        AlphaTranlocal tranlocal = tx.openForCommutingWrite(ref);
+        try {
+            tx.openForCommutingWrite(ref);
+            fail();
+        } catch (SpeculativeConfigurationFailure expected) {
 
-        assertIsActive(tx);
-        assertEquals(stm.getClock().getVersion(), tx.getReadVersion());
+        }
+
+        assertIsNew(tx);
+        assertEquals(0, tx.getReadVersion());
     }
 
     @Test
@@ -90,6 +92,7 @@ public class ArrayReadonlyAlphaTransaction_openForCommutingOperationTest {
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, true, 100);
         AlphaTransaction tx = createSutTransaction(speculativeConfig);
+        tx.start();
 
         long version = stm.getVersion();
         try {
@@ -108,6 +111,7 @@ public class ArrayReadonlyAlphaTransaction_openForCommutingOperationTest {
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(true, false, false, 100);
         AlphaTransaction tx = createSutTransaction(speculativeConfig);
+        tx.start();
 
         long version = stm.getVersion();
         try {

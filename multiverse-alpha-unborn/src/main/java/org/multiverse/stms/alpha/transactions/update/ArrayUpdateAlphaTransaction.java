@@ -1,6 +1,7 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.multiverse.api.Listeners;
+import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.commitlock.CommitLockFilter;
 import org.multiverse.api.exceptions.PanicError;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
@@ -53,8 +54,11 @@ public final class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransa
 
     @Override
     public AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject txObject) {
-        updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
+        if (getStatus() == TransactionStatus.New) {
+            start();
+        }
 
+        updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
 
         int indexOf = indexOf(txObject);
 

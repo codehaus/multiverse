@@ -222,15 +222,7 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
 
         switch (getStatus()) {
             case New:
-                if (transactionalObject == null) {
-                    String msg = format(
-                            "Can't open for write a null transactional object on transaction '%s' ",
-                            config.getFamilyName());
-                    throw new NullPointerException(msg);
-                }
-
-                start();
-                //fall through                
+               //fall through
             case Active:
                 if (transactionalObject == null) {
                     String msg = format(

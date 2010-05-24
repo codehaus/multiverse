@@ -16,7 +16,6 @@ import static org.multiverse.instrumentation.InstrumentationTestUtils.resetInstr
 
 public class TransactionalMethod_InterruptibleTest {
 
-
     private AlphaStm stm;
 
     @Before

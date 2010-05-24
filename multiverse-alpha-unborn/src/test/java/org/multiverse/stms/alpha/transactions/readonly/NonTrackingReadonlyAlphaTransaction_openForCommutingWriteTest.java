@@ -61,6 +61,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForCommutingWriteTest {
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(false, true, true, 100);
         AlphaTransaction tx = createSutTransaction(speculativeConfig);
+        tx.start();
 
         long version = stm.getVersion();
         try {
@@ -80,6 +81,7 @@ public class NonTrackingReadonlyAlphaTransaction_openForCommutingWriteTest {
 
         SpeculativeConfiguration speculativeConfig = new SpeculativeConfiguration(100);
         AlphaTransaction tx = createSutTransaction(speculativeConfig);
+        tx.start();
 
         long version = stm.getVersion();
         try {

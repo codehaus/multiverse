@@ -1,10 +1,17 @@
 package org.multiverse.stms.alpha.instrumentation.fieldaccess;
 
-import org.junit.Ignore;
+import org.junit.Before;
+import org.junit.Test;
+import org.multiverse.annotations.TransactionalObject;
+import org.multiverse.api.Stm;
+import org.multiverse.stms.alpha.AlphaStm;
 
-@Ignore
+import static org.junit.Assert.assertEquals;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.instrumentation.InstrumentationTestUtils.resetInstrumentationProblemMonitor;
+
 public class TransactionalObject_ClashingFieldAndMethodTest {
-    /*
     private Stm stm;
 
     @Before
@@ -18,37 +25,39 @@ public class TransactionalObject_ClashingFieldAndMethodTest {
         resetInstrumentationProblemMonitor();
     }
 
+    /**
+     * All the fiels are private, so no worries about conflicts.
+     */
     @Test
-    public void test() throws NoSuchFieldException {
-        System.out.println("The following exception is expected");
-        //force loading of the class
-        System.out.println("ObjectWithClashingField.name: " + ObjectWithClashingField.class);
+    public void whenConflictingFieldNothingBadHappens(){
+        ObjectWithClashingField o = new ObjectWithClashingField();
 
         long version = stm.getVersion();
 
-        //try {
-        new ObjectWithClashingField(10);
-        //    fail();
-        //} catch (IncompatibleClassChangeError expected) {
-        //}
+        o.set(10);
+
+        assertEquals(version+1, stm.getVersion());
+        assertEquals(10, o.get());
     }
 
-    //@TransactionalObject
+    @TransactionalObject
     static class ObjectWithClashingField {
 
         int ___lockOwner;
 
-        public ObjectWithClashingField(int lockOwner) {
+        public void set(int lockOwner) {
             this.___lockOwner = lockOwner;
+        }
+
+        public int get() {
+            return ___lockOwner;
         }
     }
 
     @Test
-    public void testConflictingMethod() throws NoSuchFieldException {
+    public void whenConflictingMethod() throws NoSuchFieldException {
         //force loading of the class
         System.out.println("ObjectWithClashingMethod.name: " + ObjectWithClashingMethod.class);
-
-        long version = stm.getVersion();
 
         try {
             ObjectWithClashingMethod o = new ObjectWithClashingMethod();
@@ -57,7 +66,7 @@ public class TransactionalObject_ClashingFieldAndMethodTest {
         }
     }
 
-    //@TransactionalObject
+    @TransactionalObject
     static class ObjectWithClashingMethod {
 
         int x;
@@ -65,5 +74,5 @@ public class TransactionalObject_ClashingFieldAndMethodTest {
         public String ___getLockOwner() {
             return null;
         }
-    }*/
+    }
 }

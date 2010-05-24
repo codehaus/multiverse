@@ -75,19 +75,9 @@ public final class TransactionalObjectTransformer implements Opcodes {
         //if (metadataRepository.isRealAtomicObject(atomicObject.superName)) {
         //    String message = format(
         //            "Subclassing an atomicobject is not allowed. Subclass is %s and the superclass is %s",
-        //            atomicObject.name, atomicObject.superName);
-        //    throw new IllegalStateException(message);
-        //}
-
-        //check for conflicting fields 
-        for (FieldNode fieldNode : (List<FieldNode>) classNode.fields) {
-            if (fieldNode.name.startsWith("___")) {
-                String msg = format("Field '%s.%s' begins with illegal pattern '___'",
-                        classNode.name,
-                        fieldNode.name);
-                throw new IllegalStateException(msg);
-            }
-        }
+       //             classMetadata.getName(), atomicObject.superName);
+       //     throw new IllegalStateException(message);
+       // }
 
         //check for conflicting method names
         for (MethodNode methodNode : (List<MethodNode>) classNode.methods) {

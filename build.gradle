@@ -287,6 +287,11 @@ project(':multiverse-alpha') {
             dest: "${buildDir}/classes/test",
             src: new File("${rootProject.projectDir}").absolutePath + "/multiverse-alpha-unborn/build/libs/multiverse-alpha-unborn-${project.version}-test.jar")
 
+    ant.delete file:("${buildDir}"+'/classes/test/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalMethod_InterruptibleTest.class')
+    ant.delete file:("${buildDir}"+'/classes/test/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalMethod_InterruptibleTest$MethodWithoutException.class')
+    ant.delete file:("${buildDir}"+'/classes/test/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalMethod_InterruptibleTest$MethodWithIncorrectException.class')
+    ant.delete file:("${buildDir}"+'/classes/test/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalObject_ClashingFieldAndMethodTest.class')
+    ant.delete file:("${buildDir}"+'/classes/test/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalObject_ClashingFieldAndMethodTest$ObjectWithClashingMethod.class')
 
     ant.java(classname: "org.multiverse.compiler.MultiverseCompiler") {
       arg value: '-o'

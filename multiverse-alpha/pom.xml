@@ -139,6 +139,15 @@
                                 <unzip src="${settings.localRepository}/org/multiverse/multiverse-core/${project.version}/multiverse-core-${project.version}-tests.jar"
                                        dest="${project.build.testOutputDirectory}"/>
 
+                                <!-- remove tests that can't be executed with the multiverse compiler.
+                                     The Multiverse compiler aborts when an instrumentation error occurs
+                                     and these errors cause instrumentation errors (their purpose) -->
+                                <delete file="${project.build.testOutputDirectory}/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalMethod_InterruptibleTest.class"/>
+                                <delete file="${project.build.testOutputDirectory}/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalMethod_InterruptibleTest$MethodWithoutException.class"/>
+                                <delete file="${project.build.testOutputDirectory}/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalMethod_InterruptibleTest$MethodWithIncorrectException.class"/>
+                                <delete file="${project.build.testOutputDirectory}/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalObject_ClashingFieldAndMethodTest.class"/>
+                                <delete file="${project.build.testOutputDirectory}/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalObject_ClashingFieldAndMethodTest$ObjectWithClashingMethod.class"/>
+
                                 <java classname="org.multiverse.compiler.MultiverseCompiler">
                                     <arg value="-o"/>
                                     <arg value="-v"/>
@@ -200,8 +209,7 @@
                         <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                     </archive>
                 </configuration>
-            </plugin>
-
+            </plugin>  
         </plugins>
     </build>
 
