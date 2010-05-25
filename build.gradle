@@ -153,7 +153,7 @@ project(':multiverse-instrumentation') {
     compile group: 'asm', name: 'asm-all', version: "3.2"
     testCompile project(path: ':multiverse-core', configuration: 'testFixtures')
   }
-}
+}       
 
 // ------------------------------------------------------------------------------------------------------------------
 
