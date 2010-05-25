@@ -8,7 +8,7 @@
         Multiverse is a Software Transactional Memory implementation that can be used in Java
         but also in other languages running on the JVM like Scala or Groovy. Essentially it is a framework that allows
         different STM implementation (with different featuresets or performance characteristics) to be used
-        under the hood. The main STM implementation is multiverse-alpha.
+        under the hood. The main STM implementation is multiverse-alpha..
     </description>
     <groupId>org.multiverse</groupId>
     <artifactId>multiverse</artifactId>
