@@ -32,6 +32,7 @@ public class RefTest {
     public Transaction startTransaction() {
         Transaction t = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
                 .build()
                 .start();
         setThreadLocalTransaction(t);

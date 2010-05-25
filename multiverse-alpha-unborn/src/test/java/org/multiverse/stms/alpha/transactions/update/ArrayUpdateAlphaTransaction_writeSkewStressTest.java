@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
+import org.multiverse.api.TransactionFactoryBuilder;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
@@ -125,10 +126,16 @@ public class ArrayUpdateAlphaTransaction_writeSkewStressTest {
 
         @Override
         public void doRun() throws Exception {
+
             TransactionFactory txFactory = new TransactionFactory() {
                 @Override
                 public Transaction start() {
                     return startSutTransaction(10, writeSkewAllowed);
+                }
+
+                @Override
+                public TransactionFactoryBuilder getBuilder() {
+                    return null;
                 }
             };
 

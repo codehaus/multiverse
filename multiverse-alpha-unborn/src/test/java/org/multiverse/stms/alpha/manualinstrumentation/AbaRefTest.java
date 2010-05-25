@@ -7,6 +7,7 @@ import org.multiverse.stms.alpha.AlphaStm;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
 /**
@@ -19,12 +20,13 @@ public class AbaRefTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
-        setThreadLocalTransaction(null);
+        clearThreadLocalTransaction();
     }
 
     public Transaction startTransaction() {
         Transaction t = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
                 .build()
                 .start();
         setThreadLocalTransaction(t);

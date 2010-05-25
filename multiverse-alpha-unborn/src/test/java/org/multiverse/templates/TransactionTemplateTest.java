@@ -43,7 +43,8 @@ public class TransactionTemplateTest {
         Transaction t = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setReadonly(false)
-                .build().start();
+                .build()
+                .start();
         setThreadLocalTransaction(t);
         return t;
     }

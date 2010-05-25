@@ -1,6 +1,7 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
 import org.multiverse.api.TransactionFactory;
+import org.multiverse.api.TransactionFactoryBuilder;
 import org.multiverse.api.latches.Latch;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
@@ -36,14 +37,21 @@ public class NonTrackingReadonlyAlphaTransaction extends AbstractReadonlyAlphaTr
     public static class Factory implements TransactionFactory<AlphaTransaction> {
 
         private final ReadonlyConfiguration config;
+        private final TransactionFactoryBuilder builder;
 
-        public Factory(ReadonlyConfiguration config) {
+        public Factory(ReadonlyConfiguration config, TransactionFactoryBuilder builder) {
             this.config = config;
+            this.builder = builder;
         }
 
         @Override
         public AlphaTransaction start() {
             return new NonTrackingReadonlyAlphaTransaction(config);
+        }
+
+        @Override
+        public TransactionFactoryBuilder getBuilder() {
+            return builder;
         }
     }
 

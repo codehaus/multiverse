@@ -78,7 +78,7 @@ public class AlphaProgrammaticLong_Test {
     @TransactionalObject
     class Foo {
         final ProgrammaticLong size = getGlobalStmInstance()
-                .getProgrammaticReferenceFactoryBuilder()
+                .getProgrammaticReferenceFactoryBuilder()                
                 .build()
                 .createLong(0);
 

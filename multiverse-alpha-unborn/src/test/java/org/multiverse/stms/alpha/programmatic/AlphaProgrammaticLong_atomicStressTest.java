@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 import static java.lang.Math.abs;
 import static org.junit.Assert.assertEquals;
+import static org.multiverse.TestUtils.format;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -58,7 +59,7 @@ public class AlphaProgrammaticLong_atomicStressTest {
 
         long durationNs = System.nanoTime() - startNs;
         double transactionsPerSecond = (1.0d * totalIncCount * TimeUnit.SECONDS.toNanos(1)) / durationNs;
-        System.out.printf("Performance %s transactions/second\n", transactionsPerSecond);
+        System.out.printf("Performance %s transactions/second\n", format(transactionsPerSecond));
 
     }
 
@@ -107,7 +108,7 @@ public class AlphaProgrammaticLong_atomicStressTest {
 
                 refs[refIndex].atomicInc(1);
 
-                if (k % (1000 * 1000) == 0) {
+                if (k % (5000 * 1000) == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
             }

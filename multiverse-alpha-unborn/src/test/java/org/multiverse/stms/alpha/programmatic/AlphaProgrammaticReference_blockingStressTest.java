@@ -49,7 +49,6 @@ public class AlphaProgrammaticReference_blockingStressTest {
         joinAll(consumers);
     }
 
-
     class ProducerThread extends TestThread {
         public ProducerThread(int id) {
             super("ProducerThread-" + id);

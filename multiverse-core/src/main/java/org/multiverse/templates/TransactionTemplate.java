@@ -78,8 +78,7 @@ public abstract class TransactionTemplate<E> {
      */
     public TransactionTemplate(Stm stm) {
         this(stm.getTransactionFactoryBuilder()
-                .setReadonly(false)
-                .setReadTrackingEnabled(true).build());
+                .build());
     }
 
     /**
@@ -303,61 +302,12 @@ public abstract class TransactionTemplate<E> {
                         tx.commit();
                         return result;
                     } catch (Retry e) {
-                        if (tx.getAttempt() - 1 < tx.getConfiguration().getMaxRetries()) {
-
-                            Latch latch;
-                            if (tx.getRemainingTimeoutNs() == Long.MAX_VALUE) {
-                                latch = new CheapLatch();
-                            } else {
-                                latch = new StandardLatch();
-                            }
-
-                            tx.registerRetryLatch(latch);
-                            tx.abort();
-
-                            if (tx.getRemainingTimeoutNs() == Long.MAX_VALUE) {
-                                if (tx.getConfiguration().isInterruptible()) {
-                                    latch.await();
-                                } else {
-                                    latch.awaitUninterruptible();
-                                }
-                            } else {
-                                long beginNs = System.nanoTime();
-
-                                boolean timeout;
-                                if (tx.getConfiguration().isInterruptible()) {
-                                    timeout = !latch.tryAwaitNs(tx.getRemainingTimeoutNs());
-                                } else {
-                                    timeout = !latch.tryAwaitNs(tx.getRemainingTimeoutNs());
-                                }
-
-                                long durationNs = beginNs - System.nanoTime();
-                                tx.setRemainingTimeoutNs(tx.getRemainingTimeoutNs() - durationNs);
-
-                                if (timeout) {
-                                    String msg = format("Transaction %s has timed with a total timeout of %s ns",
-                                            tx.getConfiguration().getFamilyName(),
-                                            tx.getConfiguration().getTimeoutNs());
-                                    throw new RetryTimeoutException(msg);
-                                }
-                            }
-
-                            tx.restart();
-                        }
+                        handleRetry(tx);
                     }
                 } catch (SpeculativeConfigurationFailure ex) {
-                    Transaction oldTransaction = tx;
-                    tx = txFactory.start();
-                    tx.setAttempt(oldTransaction.getAttempt());
-                    tx.setRemainingTimeoutNs(oldTransaction.getRemainingTimeoutNs());
-
-                    if (threadLocalAware) {
-                        setThreadLocalTransaction(tx);
-                    }
+                    tx = handleSpeculativeConfigurationFailure(tx);
                 } catch (ControlFlowError er) {
-                    BackoffPolicy backoffPolicy = tx.getConfiguration().getBackoffPolicy();
-                    backoffPolicy.delayedUninterruptible(tx);
-                    tx.restart();
+                    handleControlFlowError(tx);
                 }
             } while (tx.getAttempt() - 1 < tx.getConfiguration().getMaxRetries());
 
@@ -374,6 +324,70 @@ public abstract class TransactionTemplate<E> {
                 setThreadLocalTransaction(null);
             }
         }
+    }
+
+    private void handleControlFlowError(Transaction tx) {
+        BackoffPolicy backoffPolicy = tx.getConfiguration().getBackoffPolicy();
+        backoffPolicy.delayedUninterruptible(tx);
+        tx.restart();
+    }
+
+    private void handleRetry(Transaction tx) throws InterruptedException {
+        if (tx.getAttempt() - 1 < tx.getConfiguration().getMaxRetries()) {
+
+            Latch latch;
+            if (tx.getRemainingTimeoutNs() == Long.MAX_VALUE) {
+                latch = new CheapLatch();
+            } else {
+                latch = new StandardLatch();
+            }
+
+            tx.registerRetryLatch(latch);
+            tx.abort();
+
+            if (tx.getRemainingTimeoutNs() == Long.MAX_VALUE) {
+                if (tx.getConfiguration().isInterruptible()) {
+                    latch.await();
+                } else {
+                    latch.awaitUninterruptible();
+                }
+            } else {
+                long beginNs = System.nanoTime();
+
+                boolean timeout;
+                if (tx.getConfiguration().isInterruptible()) {
+                    timeout = !latch.tryAwaitNs(tx.getRemainingTimeoutNs());
+                } else {
+                    timeout = !latch.tryAwaitNs(tx.getRemainingTimeoutNs());
+                }
+
+                long durationNs = beginNs - System.nanoTime();
+                tx.setRemainingTimeoutNs(tx.getRemainingTimeoutNs() - durationNs);
+
+                if (timeout) {
+                    String msg = format("Transaction %s has timed with a total timeout of %s ns",
+                            tx.getConfiguration().getFamilyName(),
+                            tx.getConfiguration().getTimeoutNs());
+                    throw new RetryTimeoutException(msg);
+                }
+            }
+
+            tx.restart();
+        }
+    }
+
+    private Transaction handleSpeculativeConfigurationFailure(Transaction oldTx) {
+        oldTx.abort();
+        
+        Transaction newTx = txFactory.start();
+        newTx.setAttempt(oldTx.getAttempt());
+        newTx.setRemainingTimeoutNs(oldTx.getRemainingTimeoutNs());
+
+        if (threadLocalAware) {
+            setThreadLocalTransaction(newTx);
+        }
+
+        return newTx;
     }
 
     private boolean noActiveTransaction(Transaction t) {

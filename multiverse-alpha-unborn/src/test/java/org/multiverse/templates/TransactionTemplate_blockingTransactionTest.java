@@ -28,6 +28,8 @@ public class TransactionTemplate_blockingTransactionTest {
         clearThreadLocalTransaction();
     }
 
+    
+
     @Test
     public void test() {
         WaiterThread thread1 = new WaiterThread(0);
@@ -61,6 +63,7 @@ public class TransactionTemplate_blockingTransactionTest {
             new TransactionTemplate() {
                 @Override
                 public Object execute(Transaction tx) throws Exception {
+                    System.out.println("tx: "+tx);
                     ref.await(number);
                     return null;
                 }

@@ -25,12 +25,12 @@ public final class SpeculativeConfiguration {
     private final boolean isSpeculativeSizeEnabled;
 
     public SpeculativeConfiguration(
-            boolean isSpeculativeOnReadonly,
+            boolean isSpeculativeOnReadonlyEnabled,
             boolean isSpeculativeNonAutomaticReadTrackingEnabled,
             boolean isSpeculativeSizeEnabled,
             int maximumArraySize) {
 
-        this.isSpeculativeReadonlyEnabled = isSpeculativeOnReadonly;
+        this.isSpeculativeReadonlyEnabled = isSpeculativeOnReadonlyEnabled;
         this.isSpeculativeNoReadTrackingEnabled = isSpeculativeNonAutomaticReadTrackingEnabled;
         this.isSpeculativeSizeEnabled = isSpeculativeSizeEnabled;
         this.size.set(1);

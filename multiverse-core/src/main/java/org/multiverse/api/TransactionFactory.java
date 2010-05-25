@@ -11,6 +11,8 @@ package org.multiverse.api;
  */
 public interface TransactionFactory<T extends Transaction> {
 
+    TransactionFactoryBuilder getBuilder();
+
     /**
      * Creates a new and started Transaction.
      * <p/>

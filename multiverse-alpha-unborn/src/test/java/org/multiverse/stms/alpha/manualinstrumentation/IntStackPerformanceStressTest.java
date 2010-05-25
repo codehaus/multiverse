@@ -8,6 +8,7 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import java.util.concurrent.TimeUnit;
 
+import static org.multiverse.TestUtils.format;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
@@ -45,14 +46,14 @@ public class IntStackPerformanceStressTest {
             stack.push(10);
             stack.pop();
 
-            if (k % (500 * 1000) == 0) {
+            if (k % (200 * 1000) == 0) {
                 System.out.printf("at %s\n", k);
             }
         }
 
         long periodNs = System.nanoTime() - startNs;
         double transactionPerSecond = (count * 2.0d * TimeUnit.SECONDS.toNanos(1)) / periodNs;
-        System.out.printf("%s Transaction/second\n", transactionPerSecond);
+        System.out.printf("%s Transaction/second\n", format(transactionPerSecond));
     }
 
     @Test
@@ -76,13 +77,13 @@ public class IntStackPerformanceStressTest {
             popTx.commit();
 
 
-            if (k % 500000 == 0) {
+            if (k % 200000 == 0) {
                 System.out.printf("at %s\n", k);
             }
         }
 
         long periodNs = System.nanoTime() - startNs;
         double transactionPerSecond = (count * 2.0d * TimeUnit.SECONDS.toNanos(1)) / periodNs;
-        System.out.printf("%s Transaction/second\n", transactionPerSecond);
+        System.out.printf("%s Transaction/second\n", format(transactionPerSecond));
     }
 }

@@ -224,7 +224,8 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     AlphaStm.this.dirtyCheckEnabled,
                     AlphaStm.this.quickReleaseWriteLocksEnabled,
                     AlphaStm.this.explicitRetryAllowed,
-                    Long.MAX_VALUE, AlphaStm.this.maxReadSpinCount);
+                    Long.MAX_VALUE,
+                    AlphaStm.this.maxReadSpinCount);
         }
 
         public AlphaTransactionFactoryBuilder(
@@ -506,6 +507,11 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
             return new TransactionFactory<AlphaTransaction>() {
                 @Override
+                public TransactionFactoryBuilder getBuilder() {
+                    return AlphaTransactionFactoryBuilder.this;
+                }
+
+                @Override
                 public AlphaTransaction start() {
                     boolean finalReadonly;
                     if (speculativeConfig.isSpeculativeReadonlyEnabled()) {
@@ -576,9 +582,9 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                             explicitRetryAllowed, timeoutNs, maxReadSpinCount);
 
             if (readTrackingEnabled) {
-                return new MapReadonlyAlphaTransaction.Factory(config);
+                return new MapReadonlyAlphaTransaction.Factory(config, this);
             } else {
-                return new NonTrackingReadonlyAlphaTransaction.Factory(config);
+                return new NonTrackingReadonlyAlphaTransaction.Factory(config,this);
             }
         }
 
@@ -599,7 +605,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                             optimizeConflictDetectionEnabled, true, quickReleaseEnabled,
                             explicitRetryAllowed, timeoutNs, maxReadSpinCount);
 
-            return new MapUpdateAlphaTransaction.Factory(config);
+            return new MapUpdateAlphaTransaction.Factory(config, this);
         }
     }
 }

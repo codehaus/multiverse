@@ -90,7 +90,7 @@ public class AlphaProgrammaticLong_atomicNothingSharedStressTest {
             for (int k = 0; k < incCountPerThread; k++) {
                 ref.atomicInc(1);
 
-                if (k % (1000 * 1000) == 0) {
+                if (k % (5000 * 1000) == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
             }

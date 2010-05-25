@@ -35,7 +35,8 @@ public class AlphaProgrammaticLong_atomicBehaviorStressTest {
     public void setUp() {
         clearThreadLocalTransaction();
         stm = (AlphaStm) getGlobalStmInstance();
-        refFactory = stm.getProgrammaticReferenceFactoryBuilder().build();
+        refFactory = stm.getProgrammaticReferenceFactoryBuilder()
+                .build();
 
         refs = new ProgrammaticLong[refCount];
         for (int k = 0; k < refs.length; k++) {
