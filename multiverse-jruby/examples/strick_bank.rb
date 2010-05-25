@@ -1,7 +1,4 @@
-require "java"
-require "multiverse"
-require "test/unit/assertions"
-include Test::Unit::Assertions
+require "test_helper"
 
 class NotEnoughFundException < RuntimeError
   def initialize(message)

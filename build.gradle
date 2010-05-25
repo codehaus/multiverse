@@ -13,6 +13,7 @@ allprojects {
   group = 'org.multiverse'
   //scalaVersion = '2.8.0.Beta1'
   scalaVersion = '2.7.7'
+  jrubyVersion = '1.5.0'
 
   //repository(url: 'dav:https://dav.codehaus.org/repository/multiverse/') 
   //{
@@ -369,6 +370,19 @@ project(':multiverse-performance-tool') {
     compile group: 'args4j', name: 'args4j', version: "2.0.16"
   }
 }
+
+
+//project(':multiverse-jruby') {
+//
+//  dependencies {
+//    // Libraries needed to run the jruby multiverse
+//    compile group: 'org.jruby', name: 'jruby-complete', version: "${jrubyVersion}"
+//    // Libraries needed for jruby api
+//    compile project(':multiverse-core')
+//    compile project(':multiverse-instrumentation')
+//    compile project(':multiverse-alpha-unborn')
+//  }
+//}
 
 project(':multiverse-manual') {
 //   usePlugin 'monkeymachine.gradle:gradle-docbook:0.1-SNAPSHOT' 

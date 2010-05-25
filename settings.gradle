@@ -7,3 +7,5 @@ include 'multiverse-benchy',
         'multiverse-performance-tool',
         'multiverse-site',
         'multiverse-manual'
+        //'multiverse-jruby'
+
