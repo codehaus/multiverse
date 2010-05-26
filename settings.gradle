@@ -6,6 +6,6 @@ include 'multiverse-benchy',
         'multiverse-alpha',
         'multiverse-performance-tool',
         'multiverse-site',
-        'multiverse-manual'
-        //'multiverse-jruby'
+        'multiverse-manual',
+        'multiverse-jruby'
 

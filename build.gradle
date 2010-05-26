@@ -372,17 +372,17 @@ project(':multiverse-performance-tool') {
 }
 
 
-//project(':multiverse-jruby') {
-//
-//  dependencies {
-//    // Libraries needed to run the jruby multiverse
-//    compile group: 'org.jruby', name: 'jruby-complete', version: "${jrubyVersion}"
-//    // Libraries needed for jruby api
-//    compile project(':multiverse-core')
-//    compile project(':multiverse-instrumentation')
-//    compile project(':multiverse-alpha-unborn')
-//  }
-//}
+project(':multiverse-jruby') {
+
+  dependencies {
+    // Libraries needed to run the jruby multiverse
+    compile group: 'org.jruby', name: 'jruby-complete', version: "${jrubyVersion}"
+    // Libraries needed for jruby api
+    compile project(':multiverse-core')
+    compile project(':multiverse-instrumentation')
+    compile project(':multiverse-alpha-unborn')
+  }
+}
 
 project(':multiverse-manual') {
 //   usePlugin 'monkeymachine.gradle:gradle-docbook:0.1-SNAPSHOT' 
