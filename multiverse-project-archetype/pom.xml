@@ -6,11 +6,12 @@
     <name>Multiverse project archetype</name>
     <description>Skeleton for a project using Multiverse</description>
     <packaging>maven-archetype</packaging>
-    
+       <version>0.5.2</version>
+  
     <parent>
         <groupId>org.multiverse</groupId>
         <artifactId>multiverse</artifactId>        
-        <version>0.5.2-SNAPSHOT</version>
+        <version>0.5.2</version>
     </parent>
 
     <build>

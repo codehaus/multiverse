@@ -15,8 +15,10 @@
     <parent>
         <groupId>org.multiverse</groupId>
         <artifactId>multiverse</artifactId>
-        <version>0.5.2-SNAPSHOT</version>
+        <version>0.5.2</version>
     </parent>
+   <version>0.5.2</version>
+  
 
     <repositories>
         <repository>
