@@ -15,9 +15,9 @@
     <parent>
         <groupId>org.multiverse</groupId>
         <artifactId>multiverse</artifactId>
-        <version>0.5.2-SNAPSHOT</version>
+        <version>0.5.2</version>
     </parent>
-   <version>0.5.2-SNAPSHOT</version>
+   <version>0.5.2</version>
   
 
     <repositories>
@@ -72,20 +72,7 @@
                     <forkMode>once</forkMode>
                 </configuration>
             </plugin>
-            <!-- Clover fails when trying to recompile already compiled tests in
-              its forked lifecycle -->
-            <plugin>
-                <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-clover2-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>verify</id>
-                        <!-- Phase "none" looks like a hack but there are others using it.
-                          See e.g. http://jira.codehaus.org/browse/MSOURCES-51. -->
-                        <phase>none</phase>
-                    </execution>
-                </executions>
-            </plugin>
+         
         </plugins>
     </build>
 
