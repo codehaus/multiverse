@@ -3,10 +3,10 @@
     <parent>
         <artifactId>multiverse</artifactId>
         <groupId>org.multiverse</groupId>
-        <version>0.5.3-SNAPSHOT</version>
+        <version>0.5.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-   <version>0.5.3-SNAPSHOT</version>  
+   <version>0.5.2-SNAPSHOT</version>  
     <artifactId>multiverse-performance-tool</artifactId>
     <name>Multiverse Performace Tool</name>
 
