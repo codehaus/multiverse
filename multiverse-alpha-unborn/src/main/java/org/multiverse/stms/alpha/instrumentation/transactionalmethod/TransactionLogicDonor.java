@@ -154,7 +154,7 @@ public class TransactionLogicDonor {
         }
     }
 
-    private static AlphaTransaction handleSpeculativeConfigurationFailure(AlphaTransaction tx) {
+    public static AlphaTransaction handleSpeculativeConfigurationFailure(AlphaTransaction tx) {
         AlphaTransaction oldTx = tx;
         tx = (AlphaTransaction) transactionFactory.start();
         tx.setRemainingTimeoutNs(oldTx.getRemainingTimeoutNs());
@@ -163,7 +163,7 @@ public class TransactionLogicDonor {
         return tx;
     }
 
-    private static void handleRetry(AlphaTransaction tx) throws InterruptedException {
+    public static void handleRetry(AlphaTransaction tx) throws InterruptedException {
         if (tx.getAttempt() - 1 < tx.getConfiguration().getMaxRetries()) {
             Latch latch;
             if (tx.getRemainingTimeoutNs() == Long.MAX_VALUE) {
