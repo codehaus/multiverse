@@ -73,9 +73,9 @@ aristotle = Philosopher.new("aristotle", c34, c45, 0.1, 0.2)
 plato = Philosopher.new("plato", c45, c51, 0.2, 0.1) 
 
 threads = []
-[godel, hume, aristotle, plato].each do |p|
+[godel, nietzsche, hume, aristotle, plato].each do |p|
    threads << Thread.new { p.live }
 end
 
-puts "Philosophers disperse"
 threads.each {|t| t.join }
+puts "Philosophers disperse"
