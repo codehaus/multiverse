@@ -27,6 +27,7 @@ public class NonBlockingAccessTest {
         stm = (AlphaStm) getGlobalStmInstance();
         updateTxFactory = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
                 .build();
         clearThreadLocalTransaction();
     }

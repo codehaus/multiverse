@@ -80,6 +80,7 @@ public class AlphaProgrammaticLong_getTest {
 
         Transaction tx = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
                 .build()
                 .start();
         setThreadLocalTransaction(tx);

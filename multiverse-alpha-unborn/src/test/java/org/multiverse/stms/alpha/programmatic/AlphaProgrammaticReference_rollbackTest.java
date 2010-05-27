@@ -23,6 +23,7 @@ public class AlphaProgrammaticReference_rollbackTest {
         stm = getGlobalStmInstance();
         updateTxFactory = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
                 .build();
         clearThreadLocalTransaction();
     }

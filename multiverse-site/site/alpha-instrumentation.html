@@ -121,9 +121,16 @@ After the optimization:
     }
 </pre>
 As you can see, reading the tranlocal has become a lot cheaper. And writing the tranlocal is very cheap once it
-has
+has been opened for write. And if an instance method of a transactional object, calls another instance method on the
+        same object, the tranlocal can be send to that call as well. So once calls stay inside a single transactional
+        object, the tranlocal doesn't need to be retrieved very often (if you are lucky it only needs to be
+        retrieved once).
 
 <h3>Local variable access</h3>
+If a local variable is a transactional object, extra local variable will be generated containing the tranlocal. This
+        also reduces the number of times a tranlocal needs to be retrieved.
+
+        
 
 <h3>Multiverse Javaagent vs Multiverse Compiler</h3>
 All optimizations are enabled by default in the Multiverse Compiler.

@@ -222,7 +222,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         }
 
         public AlphaTransactionFactoryBuilder() {
-            this(false, //readonly
+            this(true, //readonly
                     AlphaStm.this.readTrackingEnabled,
                     createAnonymousFamilyName(),
                     AlphaStm.this.maxRetries,

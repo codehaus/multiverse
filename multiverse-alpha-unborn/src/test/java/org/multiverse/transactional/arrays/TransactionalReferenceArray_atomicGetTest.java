@@ -63,6 +63,7 @@ public class TransactionalReferenceArray_atomicGetTest {
 
         Transaction tx = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
                 .build()
                 .start();
 

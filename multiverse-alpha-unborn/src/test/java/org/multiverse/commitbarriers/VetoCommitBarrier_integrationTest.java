@@ -38,7 +38,7 @@ public class VetoCommitBarrier_integrationTest {
         CommitThread t2 = new CommitThread(2, ref2);
 
         startAll(t1, t2);
-        sleepMs(500);
+        sleepMs(1000);
 
         barrier.vetoCommit();
 

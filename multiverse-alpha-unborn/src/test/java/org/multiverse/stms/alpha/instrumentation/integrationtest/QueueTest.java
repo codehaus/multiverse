@@ -83,6 +83,7 @@ public class QueueTest {
 
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
                 .build();
 
         Transaction tx = txFactory.start();

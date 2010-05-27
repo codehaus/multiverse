@@ -116,6 +116,7 @@ public class AlphaProgrammaticLong_constructionTest {
     public void whenTransactionUsed() {
         AlphaTransaction tx = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
                 .build()
                 .start();
 
@@ -136,6 +137,7 @@ public class AlphaProgrammaticLong_constructionTest {
     public void whenTransactionAborts() {
         AlphaTransaction tx = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
                 .build()
                 .start();
 

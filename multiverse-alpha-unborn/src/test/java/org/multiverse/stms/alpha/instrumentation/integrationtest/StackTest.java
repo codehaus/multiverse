@@ -32,6 +32,7 @@ public class StackTest {
         stm = (AlphaStm) getGlobalStmInstance();
         updateTxFactory = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
                 .build();
         resetInstrumentationProblemMonitor();
         clearThreadLocalTransaction();

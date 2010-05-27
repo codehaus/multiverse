@@ -29,9 +29,10 @@ public class RefTest {
         clearThreadLocalTransaction();
     }
 
-    public Transaction startTransaction() {
+    public Transaction startUpdateTransaction() {
         Transaction t = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
                 .build()
                 .start();
         setThreadLocalTransaction(t);
@@ -101,7 +102,7 @@ public class RefTest {
         final Ref<String> ref = new Ref<String>(a);
 
         long startVersion = stm.getVersion();
-        Transaction t = startTransaction();
+        Transaction t = startUpdateTransaction();
         ref.set(b);
         ref.set(a);
         t.commit();

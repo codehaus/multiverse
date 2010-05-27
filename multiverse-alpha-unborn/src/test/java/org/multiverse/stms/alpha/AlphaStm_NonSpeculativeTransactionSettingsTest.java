@@ -4,13 +4,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.stms.alpha.transactions.update.AbstractUpdateAlphaTransaction;
+import org.multiverse.stms.alpha.transactions.readonly.NonTrackingReadonlyAlphaTransaction;
 import org.multiverse.stms.alpha.transactions.update.MapUpdateAlphaTransaction;
 
 import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.testIncomplete;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
@@ -22,20 +21,7 @@ public class AlphaStm_NonSpeculativeTransactionSettingsTest {
     @Before
     public void setUp() {
         stm = (AlphaStm) getGlobalStmInstance();
-        setThreadLocalTransaction(null);
-    }
-
-    @Test
-    public void testDefaultTransaction() {
-        Transaction t = stm.getTransactionFactoryBuilder()
-                .setSpeculativeConfigurationEnabled(false)
-                .build()
-                .start();
-
-        assertTrue(t instanceof AbstractUpdateAlphaTransaction);
-
-        //parameters should be checked
-        testIncomplete();
+        clearThreadLocalTransaction();
     }
 
     @Test
@@ -55,18 +41,15 @@ public class AlphaStm_NonSpeculativeTransactionSettingsTest {
     }
 
     @Test
-    public void test() {
+    public void testDefault() {
         Transaction t = stm.getTransactionFactoryBuilder()
-                .setSpeculativeConfigurationEnabled(false)
-                .setReadTrackingEnabled(true)
                 .build()
                 .start();
 
-        assertTrue(t instanceof AbstractUpdateAlphaTransaction);
+        assertTrue(t instanceof NonTrackingReadonlyAlphaTransaction);
 
-        assertFalse(t.getConfiguration().isReadonly());
-        assertTrue(t.getConfiguration().isReadTrackingEnabled());
-        assertTrue(t.getConfiguration().isWriteSkewAllowed());
+        assertTrue(t.getConfiguration().isReadonly());
+        assertFalse(t.getConfiguration().isReadTrackingEnabled());
         assertEquals(1000, t.getConfiguration().getMaxRetries());
         assertFalse(t.getConfiguration().isInterruptible());
     }

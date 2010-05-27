@@ -32,6 +32,7 @@ public class CycleHandlingStressTest {
     public Transaction startUpdateTransaction() {
         Transaction t = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
                 .build()
                 .start();
         setThreadLocalTransaction(t);
@@ -55,7 +56,7 @@ public class CycleHandlingStressTest {
             return next;
         }
 
-        public void setNext(CycleHandlingStressTest.SingleLinkedNode next) {
+        public void setNext(SingleLinkedNode next) {
             this.next = next;
         }
     }

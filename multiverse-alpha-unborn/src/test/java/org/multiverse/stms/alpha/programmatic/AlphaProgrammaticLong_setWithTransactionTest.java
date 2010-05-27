@@ -52,6 +52,7 @@ public class AlphaProgrammaticLong_setWithTransactionTest {
 
         AlphaTransaction tx = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
                 .build()
                 .start();
 
@@ -72,6 +73,7 @@ public class AlphaProgrammaticLong_setWithTransactionTest {
 
         AlphaTransaction tx = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
                 .build()
                 .start();
 
@@ -93,6 +95,7 @@ public class AlphaProgrammaticLong_setWithTransactionTest {
 
         AlphaTransaction tx = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
                 .build()
                 .start();
 

@@ -48,6 +48,7 @@ public class AlphaProgrammaticLong_commutingIncWithTransactionTest {
     public void commuting() {
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
                 .build();
 
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 10);
@@ -70,6 +71,7 @@ public class AlphaProgrammaticLong_commutingIncWithTransactionTest {
     public void multipleCommutingIncs() {
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
                 .build();
 
         AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 10);

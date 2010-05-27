@@ -354,13 +354,14 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
         if (methodNode.name.equals("<init>")) {
             transactionMetadata.maxRetries = 0;
             transactionMetadata.speculativeConfigurationEnabled = false;
+            transactionMetadata.readOnly = false;
         } else {
             transactionMetadata.maxRetries = 1000;
             transactionMetadata.speculativeConfigurationEnabled = true;
+            transactionMetadata.readOnly = null;
         }
 
         transactionMetadata.logLevel = LogLevel.none;
-        transactionMetadata.readOnly = null;
         transactionMetadata.trackReads = null;
         transactionMetadata.writeSkew = true;
         transactionMetadata.interruptible = throwsInterruptedException;
@@ -381,7 +382,6 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
 
         MethodMetadata methodMetadata = classMetadata.getMethodMetadata(methodNode.name, methodNode.desc);
         boolean throwsInterruptedException = methodMetadata.checkIfSpecificTransactionIsThrown(InterruptedException.class);
-        txMetadata.readOnly = (Boolean) getValue(annotationNode, "readonly", null);
         txMetadata.familyName = familyNameStrategy.create(classMetadata.getName(), methodNode.name, methodNode.desc);
         txMetadata.interruptible = (Boolean) getValue(annotationNode, "interruptible", throwsInterruptedException);
         txMetadata.writeSkew = (Boolean) getValue(annotationNode, "writeSkew", true);
@@ -413,9 +413,11 @@ public final class AsmClassMetadataExtractor implements ClassMetadataExtractor, 
         if (methodNode.name.equals("<init>")) {
             txMetadata.maxRetries = (Integer) getValue(annotationNode, "maxRetries", 0);
             txMetadata.speculativeConfigurationEnabled = false;
+            txMetadata.readOnly = (Boolean) getValue(annotationNode, "readonly", false);
         } else {
             txMetadata.maxRetries = (Integer) getValue(annotationNode, "maxRetries", 1000);
             txMetadata.speculativeConfigurationEnabled = true;
+            txMetadata.readOnly = (Boolean) getValue(annotationNode, "readonly", null);                    
         }
 
         return txMetadata;

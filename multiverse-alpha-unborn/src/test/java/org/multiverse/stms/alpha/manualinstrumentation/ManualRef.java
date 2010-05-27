@@ -29,7 +29,7 @@ public class ManualRef extends DefaultTxObjectMixin {
     }
 
     public ManualRef(AlphaStm stm, final int value) {
-        new TransactionTemplate(stm.getTransactionFactoryBuilder().build(), false, false) {
+        new TransactionTemplate(stm.getTransactionFactoryBuilder().setReadonly(false).build(), false, false) {
             @Override
             public Object execute(Transaction t) {
                 ManualRefTranlocal tranlocal = (ManualRefTranlocal) ((AlphaTransaction) t).openForConstruction(ManualRef.this);

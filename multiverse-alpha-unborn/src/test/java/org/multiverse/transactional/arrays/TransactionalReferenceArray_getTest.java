@@ -64,6 +64,7 @@ public class TransactionalReferenceArray_getTest {
 
         Transaction tx = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
                 .build()
                 .start();
         setThreadLocalTransaction(tx);

@@ -79,10 +79,7 @@ public abstract class TransactionTemplate<E> implements MultiverseConstants {
      * @throws NullPointerException if stm is null.
      */
     public TransactionTemplate(Stm stm) {
-        this(stm.getTransactionFactoryBuilder()
-                .setReadonly(false)
-                .setReadTrackingEnabled(true)
-                .build());
+        this(stm.getTransactionFactoryBuilder().build());
     }
 
     /**
@@ -109,7 +106,6 @@ public abstract class TransactionTemplate<E> implements MultiverseConstants {
      */
     public TransactionTemplate(TransactionFactory transactionFactory, boolean threadLocalAware,
                                boolean lifecycleListenersEnabled) {
-
 
         CallbackListener listener = lifecycleListenersEnabled ? new CallbackListener() : null;
         boilerplate = new TransactionBoilerplate(transactionFactory, listener, threadLocalAware);

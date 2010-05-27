@@ -285,22 +285,23 @@ public final class TransactionBoilerplate implements MultiverseConstants {
         tx.reset();
     }
 
-    private Transaction handleSpeculativeConfigurationFailure(Transaction tx) {
+    private Transaction handleSpeculativeConfigurationFailure(Transaction oldTx) {
         if (___LOGGING_ENABLED) {
-            if (tx.getConfiguration().getLogLevel().isLogableFrom(LogLevel.course)) {
-                System.out.println(tx.getConfiguration().getFamilyName() + " speculative configuration failure");
+            if (oldTx.getConfiguration().getLogLevel().isLogableFrom(LogLevel.course)) {
+                System.out.println(oldTx.getConfiguration().getFamilyName() + " speculative configuration failure");
             }
         }
 
-        Transaction oldTransaction = tx;
-        tx = transactionFactory.create();
-        tx.setAttempt(oldTransaction.getAttempt());
-        tx.setRemainingTimeoutNs(oldTransaction.getRemainingTimeoutNs());
+
+        oldTx.abort();
+        Transaction newTx = transactionFactory.create();
+        newTx.setAttempt(oldTx.getAttempt());
+        newTx.setRemainingTimeoutNs(oldTx.getRemainingTimeoutNs());
 
         if (threadLocalAware) {
-            setThreadLocalTransaction(tx);
+            setThreadLocalTransaction(newTx);
         }
-        return tx;
+        return newTx;
     }
 
     private static void handleRetry(Transaction tx) throws InterruptedException {

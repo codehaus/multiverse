@@ -11,6 +11,7 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.multiverse.TestUtils.assertIsAborted;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class ArrayReadonlyAlphaTransaction_abortTest {
     private AlphaStm stm;
@@ -18,6 +19,7 @@ public class ArrayReadonlyAlphaTransaction_abortTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         stmConfig = AlphaStmConfig.createDebugConfig();
         stm = new AlphaStm(stmConfig);
     }

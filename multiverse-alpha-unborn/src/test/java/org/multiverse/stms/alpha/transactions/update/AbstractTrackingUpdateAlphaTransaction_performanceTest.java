@@ -10,21 +10,22 @@ import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
 import java.util.concurrent.TimeUnit;
 
+import static org.multiverse.TestUtils.format;
+
 /**
  * A performance comparison between the fixed and growing trackingupdatealpha transactions. Gives an indication
  * when one of the two is preferred.
  *
  * @author Peter Veentjer.
  */
-public class AbstractTrackingUpdateAlphaTransaction_performanceComparison {
+public class AbstractTrackingUpdateAlphaTransaction_performanceTest {
 
     private AlphaStmConfig stmConfig;
     private AlphaStm stm;
     private SpeculativeConfiguration speculativeConfig;
     private UpdateConfiguration config;
     private ManualRef[] refs;
-    //todo: very small size. 
-    private int txCount = 1000;
+    private int txCount = 1000 * 1000;
 
     @Before
     public void setUp() {
@@ -182,8 +183,8 @@ public class AbstractTrackingUpdateAlphaTransaction_performanceComparison {
 
         System.out.println("transactionsize: " + transactionSize);
         System.out.printf("growing %s tx/sec\n", growingTransactionPerSecond);
-        System.out.printf("fixed %s tx/sec\n", fixedTransactionPerSecond);
-        System.out.printf("fixed is %s faster than growing\n", fixedTransactionPerSecond / growingTransactionPerSecond);
+        System.out.printf("fixed %s tx/sec\n", format(fixedTransactionPerSecond));
+        System.out.printf("fixed is %s faster than growing\n", format(fixedTransactionPerSecond / growingTransactionPerSecond));
     }
 
     public void testWithReuse(int transactionSize) {
@@ -224,10 +225,8 @@ public class AbstractTrackingUpdateAlphaTransaction_performanceComparison {
         double growingTransactionPerSecond = (txCount * TimeUnit.SECONDS.toNanos(1)) / periodGrowingNs;
 
         System.out.println("transactionsize: " + transactionSize);
-        System.out.printf("growing %s tx/sec\n", growingTransactionPerSecond);
-        System.out.printf("fixed %s tx/sec\n", fixedTransactionPerSecond);
+        System.out.printf("growing %s tx/sec\n", format(growingTransactionPerSecond));
+        System.out.printf("fixed %s tx/sec\n", format(fixedTransactionPerSecond));
         System.out.printf("fixed is %s faster than growing\n", fixedTransactionPerSecond / growingTransactionPerSecond);
     }
-
-
 }

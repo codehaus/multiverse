@@ -7,6 +7,8 @@ import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.multiverse.TestUtils.assertNotEquals;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -58,6 +60,22 @@ public class TransactionTemplate_threadLocalTest {
         }.execute();
 
         assertSame(outerTx, getThreadLocalTransaction());
+    }
+
+    @Test
+    public void whenThreadLocalIgnoreThenNothingWrittenToThreadLocal() {
+        TransactionFactory txFactory = stm.getTransactionFactoryBuilder().build();
+
+        new TransactionTemplate<Transaction>(txFactory, false, false) {
+            @Override
+            public Transaction execute(Transaction tx) throws Exception {
+                assertNotNull(tx);
+                assertNull(getThreadLocalTransaction());
+                return tx;
+            }
+        }.execute();
+
+        assertNull(getThreadLocalTransaction());
     }
 
     @Test

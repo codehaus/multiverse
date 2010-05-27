@@ -44,6 +44,7 @@ public class TransactionTemplate_loggingTest {
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
                 .setLogLevel(level)
                 .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
                 .setFamilyName("loggingtransaction")
                 .build();
 

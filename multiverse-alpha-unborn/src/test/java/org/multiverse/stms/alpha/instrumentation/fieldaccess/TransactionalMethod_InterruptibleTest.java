@@ -32,6 +32,8 @@ public class TransactionalMethod_InterruptibleTest {
 
     @Test
     public void whenNoException_thenError() {
+        System.out.println("---------------- following error is expected ----------------------");
+
         MethodWithoutException o = new MethodWithoutException();
 
         assertTrue(JavaAgentProblemMonitor.INSTANCE.isProblemFound());
@@ -50,10 +52,9 @@ public class TransactionalMethod_InterruptibleTest {
 
     @Test
     public void whenNoMatchingException() {
-        resetInstrumentationProblemMonitor();
+        System.out.println("---------------- following error is expected ----------------------");
 
         MethodWithIncorrectException o = new MethodWithIncorrectException();
-
         assertTrue(JavaAgentProblemMonitor.INSTANCE.isProblemFound());
     }
 
@@ -70,8 +71,6 @@ public class TransactionalMethod_InterruptibleTest {
 
     @Test
     public void whenInterruptedExceptionPresent() {
-        resetInstrumentationProblemMonitor();
-
         MethodWithInterruptedException o = new MethodWithInterruptedException();
 
         assertFalse(JavaAgentProblemMonitor.INSTANCE.isProblemFound());
@@ -91,8 +90,6 @@ public class TransactionalMethod_InterruptibleTest {
 
     @Test
     public void whenExceptionPresent() {
-        resetInstrumentationProblemMonitor();
-
         MethodWithException o = new MethodWithException();
 
         assertFalse(JavaAgentProblemMonitor.INSTANCE.isProblemFound());
@@ -111,8 +108,6 @@ public class TransactionalMethod_InterruptibleTest {
 
     @Test
     public void whenThrowablePresent() {
-        resetInstrumentationProblemMonitor();
-
         MethodWithThrowable o = new MethodWithThrowable();
 
         assertFalse(JavaAgentProblemMonitor.INSTANCE.isProblemFound());

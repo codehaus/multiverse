@@ -133,7 +133,7 @@ public class TransactionLogicDonor {
                     }
                 } catch (SpeculativeConfigurationFailure speculativeConfigurationFailure) {
                     tx = handleSpeculativeFailure(transactionFactory, tx);
-                } catch (ControlFlowError throwable) {
+                } catch (ControlFlowError controlFlowError) {
                     BackoffPolicy backoffPolicy = tx.getConfiguration().getBackoffPolicy();
                     backoffPolicy.delayedUninterruptible(tx);
                 } finally {
@@ -153,13 +153,13 @@ public class TransactionLogicDonor {
         }
     }
 
-    public static AlphaTransaction handleSpeculativeFailure(TransactionFactory transactionFactory, AlphaTransaction tx) {
-        AlphaTransaction oldTx = tx;
-        tx = (AlphaTransaction) transactionFactory.start();
-        tx.setRemainingTimeoutNs(oldTx.getRemainingTimeoutNs());
-        tx.setAttempt(oldTx.getAttempt());
-        setThreadLocalTransaction(tx);
-        return tx;
+    public static AlphaTransaction handleSpeculativeFailure(TransactionFactory transactionFactory, AlphaTransaction oldTx) {
+        oldTx.abort();
+        AlphaTransaction newTx = (AlphaTransaction) transactionFactory.create();
+        newTx.setRemainingTimeoutNs(oldTx.getRemainingTimeoutNs());
+        newTx.setAttempt(oldTx.getAttempt());
+        setThreadLocalTransaction(newTx);
+        return newTx;
     }
 
     public static void handleRetry(AlphaTransaction tx) throws InterruptedException {

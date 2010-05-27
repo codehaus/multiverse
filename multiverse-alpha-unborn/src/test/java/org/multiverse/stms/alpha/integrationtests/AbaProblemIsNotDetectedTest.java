@@ -55,6 +55,7 @@ public class AbaProblemIsNotDetectedTest {
     public AlphaTransaction startUpdateTransaction() {
         AlphaTransaction t = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
+                .setReadonly(false)
                 .build()
                 .start();
         setThreadLocalTransaction(t);

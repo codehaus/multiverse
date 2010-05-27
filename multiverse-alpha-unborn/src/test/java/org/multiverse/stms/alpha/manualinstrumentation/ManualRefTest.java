@@ -5,6 +5,9 @@ import org.junit.Test;
 import org.multiverse.stms.alpha.AlphaStm;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 public class ManualRefTest {
 
@@ -13,6 +16,7 @@ public class ManualRefTest {
     @Before
     public void setUp() {
         stm = AlphaStm.createFast();
+        clearThreadLocalTransaction();
     }
 
     @Test
@@ -22,6 +26,7 @@ public class ManualRefTest {
         ManualRef ref = new ManualRef(stm, 10);
         assertEquals(10, ref.get(stm));
         assertEquals(version, stm.getVersion());
+        assertNull(getThreadLocalTransaction());
     }
 
     @Test
@@ -32,5 +37,6 @@ public class ManualRefTest {
         ref.inc(stm);
         assertEquals(version + 1, stm.getVersion());
         assertEquals(11, ref.get(stm));
+        assertNull(getThreadLocalTransaction());
     }
 }

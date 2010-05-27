@@ -7,7 +7,11 @@ import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.stms.AbstractTransactionImpl;
+import org.multiverse.stms.alpha.manualinstrumentation.IntRef;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
@@ -84,4 +88,91 @@ public class TransactionTemplate_lifecycleCallbacksTest {
             return null;
         }
     }
+
+    @Test
+     public void testSpeculative(){
+         final IntRef ref = new IntRef();
+
+         final AtomicInteger committedCount = new AtomicInteger();
+         final AtomicInteger abortedCount = new AtomicInteger();
+
+         TransactionTemplate template = new TransactionTemplate() {
+             @Override
+             public Object execute(Transaction tx) throws Exception {
+                 ref.inc();
+                 return null;
+             }
+
+             @Override
+             protected void onPostCommit() {
+                 committedCount.incrementAndGet();
+             }
+
+             @Override
+             public void onPostAbort(){
+                 abortedCount.incrementAndGet();
+             }
+         };
+
+         //first time execute. 2 aborts (from readonly to monoupdate, from mono update to array update).
+         template.execute();
+         assertEquals(1, ref.get());
+         assertEquals(1, committedCount.get());
+         assertEquals(1, abortedCount.get());
+
+         committedCount.set(0);
+         abortedCount.set(0);
+
+         //execute again: the transactiontemplate has learned, so no unwanted aborts anymore.
+         template.execute();
+         assertEquals(2, ref.get());
+         assertEquals(1, committedCount.get());
+         assertEquals(0, abortedCount.get());
+     }
+
+     @Test
+     public void test() {
+         final IntRef ref1 = new IntRef();
+         final IntRef ref2 = new IntRef();
+
+         final AtomicInteger committedCount = new AtomicInteger();
+         final AtomicInteger abortedCount = new AtomicInteger();
+
+         TransactionTemplate template = new TransactionTemplate() {
+             @Override
+             public Object execute(Transaction tx) throws Exception {
+                 ref1.inc();
+                 ref2.inc();
+                 return null;
+             }
+
+             @Override
+             protected void onPostCommit() {
+                 committedCount.incrementAndGet();
+             }
+
+             @Override
+             public void onPostAbort(){
+                 abortedCount.incrementAndGet();
+             }
+         };
+
+         //first time execute. 2 aborts (from readonly to monoupdate, from mono update to array update).
+         template.execute();
+         assertEquals(1, ref1.get());
+         assertEquals(1, ref2.get());
+         assertEquals(1, committedCount.get());
+         assertEquals(2, abortedCount.get());
+
+         committedCount.set(0);
+         abortedCount.set(0);
+
+         //execute again: the transactiontemplate has learned, so no unwanted aborts anymore.
+         template.execute();
+         assertEquals(2, ref1.get());
+         assertEquals(2, ref2.get());
+         assertEquals(1, committedCount.get());
+         assertEquals(0, abortedCount.get());
+     }
+    
 }

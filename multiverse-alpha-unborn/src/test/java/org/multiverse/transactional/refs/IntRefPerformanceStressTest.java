@@ -12,7 +12,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 
 public class IntRefPerformanceStressTest {
 
-    private int count = 50 * 1000 * 1000;
+    private int count = 50;// * 1000 * 1000;
 
     @Before
     public void setUp() {

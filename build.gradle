@@ -182,7 +182,7 @@ project(':multiverse-alpha-unborn') {
     from sourceSets.test.classes
     classifier = 'test'
   }
-             
+              
   artifacts {
     testFixtures testJar
   }
