@@ -2,6 +2,7 @@ package org.multiverse.commitbarriers;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
@@ -13,6 +14,7 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
+@Ignore
 public class CountDownCommitBarrier_joinCommitUninterruptiblyTest {
     private CountDownCommitBarrier barrier;
 
