@@ -373,6 +373,8 @@ start maintaining history. Increase the history as long as you get loadtoooldver
 - when instrumentation fails, instead of continuing with the process, reinstrument the classes so that
  they always throw an error. Remove all fields/methods?
 
+- use gradle in Bamboo
+
 ---------------------------------------------------------------
 done
 ---------------------------------------------------------------
