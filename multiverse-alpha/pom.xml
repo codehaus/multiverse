@@ -12,7 +12,8 @@
         at all.
     </description>
     <packaging>jar</packaging>
-
+    <version>0.6-SNAPSHOT</version>
+      
     <parent>
         <groupId>org.multiverse</groupId>
         <artifactId>multiverse</artifactId>
