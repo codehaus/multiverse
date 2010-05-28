@@ -198,10 +198,15 @@ project(':multiverse-alpha-unborn') {
             src: "${localRepo}/asm/asm-all/jars/asm-all-3.2.jar")
     ant.unzip(dest: "${buildDir}/classes/main",
             src: localRepo + 'args4j/args4j/jars/args4j-2.0.16.jar')
-    ant.unzip(dest: "${buildDir}/classes/main",
-            src: new File("${rootProject.projectDir}").absolutePath + "/multiverse-core/build/libs/multiverse-core-${project.version}.jar")
-    ant.unzip(dest: "${buildDir}/classes/main",
-            src: new File("${rootProject.projectDir}").absolutePath + "/multiverse-instrumentation/build/libs/multiverse-instrumentation-${project.version}.jar")
+    
+    ant.copy(todir: "${buildDir}/classes/main"){
+            fileset(dir: "${projectRootDir}/multiverse-core/build/classes/main") 
+    }
+    
+    ant.copy(todir: "${buildDir}/classes/main"){
+            fileset(dir: "${projectRootDir}/multiverse-instrumentation/build/classes/main")
+    }
+ 
     ant.delete(dir: "${buildDir}/classes/main/META-INF/")
     ant.mkdir(dir: "${buildDir}/classes/main/META-INF/")
     ant.copy(
@@ -212,7 +217,7 @@ project(':multiverse-alpha-unborn') {
             destfile: "${buildDir}/libs/javaagent.jar") {
     }
 
-    println "Finished creating tmp jar"
+    println "Finished creating tmp agent"
   }
 
   dependencies {
