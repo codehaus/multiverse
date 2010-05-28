@@ -350,23 +350,23 @@ project(':multiverse-alpha') {
 
 // ------------------------------------------------------------------------------------------------------------------
 
-project(':multiverse-scala') {
-  repositories {
-    mavenRepo urls: 'http://scala-tools.org/repo-releases/'
-  }
-
-  dependencies {
-    // Libraries needed to run the scala tools
-    scalaTools "org.scala-lang:scala-compiler:${scalaVersion}"
-    scalaTools "org.scala-lang:scala-library:${scalaVersion}"
-    // Libraries needed for scala api
-    compile "org.scala-lang:scala-library:${scalaVersion}"
-    compile project(':multiverse-core')
-    compile project(':multiverse-instrumentation')
-    compile project(':multiverse-alpha-unborn')
-    testCompile group: 'org.scalatest', name: 'scalatest', version: '1.0'
-  }
-}
+//project(':multiverse-scala') {
+//  repositories {
+//    mavenRepo urls: 'http://scala-tools.org/repo-releases/'
+//  }
+//
+//  dependencies {
+//    // Libraries needed to run the scala tools
+//    scalaTools "org.scala-lang:scala-compiler:${scalaVersion}"
+//    scalaTools "org.scala-lang:scala-library:${scalaVersion}"
+//    // Libraries needed for scala api
+//    compile "org.scala-lang:scala-library:${scalaVersion}"
+//    compile project(':multiverse-core')
+//    compile project(':multiverse-instrumentation')
+//    compile project(':multiverse-alpha-unborn')
+//    testCompile group: 'org.scalatest', name: 'scalatest', version: '1.0'
+//  }
+//}
 
 project(':multiverse-performance-tool') {
 
