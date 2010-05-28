@@ -61,35 +61,6 @@ allprojects {
 
     deployerJars "org.apache.maven.wagon:wagon-ssh:1.0-beta-2"//, "org.apache.maven.wagon:wagon-webdav:1.0-beta-2"
   }
-
-//  task uploadLibs {
-//    uploadResolvers.addMavenDeployer('maven-deployer') {
-//      uniqueVersion = false
-//      addProtocolProviderJars(dependencies.resolve('deployerJars'))
-//      repository(url: "dav:https://dav.codehaus.org/repository/multiverse/") {
-//        authentication(userName: "bla", password: "bla")
-//        releases()
-//        snapshots()
-//        proxy()
-//      }
-//      snapshotRepository(url: "dav:https://dav.codehaus.org/snapshots.repository/multiverse/") {
-//        authentication(userName: "bla", password: "bla")
-//        releases()
-//        snapshots()
-//        proxy()
-//      }
-//    }
-//  }
-
-//  task libs {
-//    zip().fileSet(dir: 'build') {
-//      include('**/*.dll')
-//    }
-//
-//    zip(classifier: 'debug').fileSet(dir: 'build') {
-//      include('**/*.dll')
-//    }
-//  }
 }
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -225,6 +196,10 @@ project(':multiverse-alpha-unborn') {
   }
 
   test {
+    jvmArgs = ["-javaagent:${buildDir}/libs/javaagent.jar"]
+  }
+
+  integrationtest {
     jvmArgs = ["-javaagent:${buildDir}/libs/javaagent.jar"]
   }
 }
