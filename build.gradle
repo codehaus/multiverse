@@ -9,12 +9,10 @@ allprojects {
   defaultTasks 'clean', 'install'
 
   sourceCompatibility = 1.6
-  version = '0.6-SNAPSHOT'
+  version = '0.5.3-SNAPSHOT'
   group = 'org.multiverse'
   //scalaVersion = '2.8.0.Beta1'
   scalaVersion = '2.7.7'
-  jrubyVersion = '1.5.0'
-
 
   //repository(url: 'dav:https://dav.codehaus.org/repository/multiverse/') 
   //{
@@ -34,7 +32,6 @@ allprojects {
     mavenRepo(urls: [
             'http://snapshots.repository.codehaus.org',
             'http://download.java.net/maven/2/',
-            'http://mandubian-mvn.googlecode.com/svn/trunk/mandubian-mvn/repository',
             'https://maven.atlassian.com/content/groups/public'])
   }
 
@@ -44,9 +41,7 @@ allprojects {
 
   test {
     exclude("**/*AbstractTest*")
-    exclude("**/*stressTest*")
     exclude("**/*StressTest*")
-    exclude("**/*longTest*")
     exclude("**/*LongTest*")
     exclude("**/*PerformanceTest*")
     exclude("**/*performanceTest*")
@@ -102,11 +97,6 @@ allprojects {
 project(':multiverse-benchy') {
   dependencies {
     compile group: 'com.google.code.gson', name: 'gson', version: "1.4"
-    compile group: 'args4j', name: 'args4j', version: "2.0.16"
-    compile group: 'com.google.gdata', name: 'gdata-client-meta-1.0', version: "1.41.1"
-    compile group: 'com.google.gdata', name: 'gdata-spreadsheet-3.0', version: "1.41.1"
-    compile group: 'com.google.gdata', name: 'gdata-core-1.0', version: "1.41.1"
-    compile group: 'com.google.collections', name: 'google-collections', version: "1.0"
   }
 }
 
@@ -129,8 +119,8 @@ project(':multiverse-core') {
     testFixtures testJar
   }
 
-}        
-              
+}
+
 // ------------------------------------------------------------------------------------------------------------------
 
 project(':multiverse-instrumentation') {
@@ -155,7 +145,7 @@ project(':multiverse-instrumentation') {
     compile group: 'asm', name: 'asm-all', version: "3.2"
     testCompile project(path: ':multiverse-core', configuration: 'testFixtures')
   }
-}        
+}
 
 // ------------------------------------------------------------------------------------------------------------------
 
@@ -360,41 +350,28 @@ project(':multiverse-alpha') {
 
 // ------------------------------------------------------------------------------------------------------------------
 
-//project(':multiverse-scala') {
-//  repositories {.
-//    mavenRepo urls: 'http://scala-tools.org/repo-releases/'
-//  }
-//
-//  dependencies {
-//    // Libraries needed to run the scala tools
-//    scalaTools "org.scala-lang:scala-compiler:${scalaVersion}"
-//    scalaTools "org.scala-lang:scala-library:${scalaVersion}"
-//    // Libraries needed for scala api
-//    compile "org.scala-lang:scala-library:${scalaVersion}"
-//    compile project(':multiverse-core')
-//    compile project(':multiverse-instrumentation')
-//    compile project(':multiverse-alpha-unborn')
-//    testCompile group: 'org.scalatest', name: 'scalatest', version: '1.0'
-//  }
-//}
+project(':multiverse-scala') {
+  repositories {
+    mavenRepo urls: 'http://scala-tools.org/repo-releases/'
+  }
+
+  dependencies {
+    // Libraries needed to run the scala tools
+    scalaTools "org.scala-lang:scala-compiler:${scalaVersion}"
+    scalaTools "org.scala-lang:scala-library:${scalaVersion}"
+    // Libraries needed for scala api
+    compile "org.scala-lang:scala-library:${scalaVersion}"
+    compile project(':multiverse-core')
+    compile project(':multiverse-instrumentation')
+    compile project(':multiverse-alpha-unborn')
+    testCompile group: 'org.scalatest', name: 'scalatest', version: '1.0'
+  }
+}
 
 project(':multiverse-performance-tool') {
 
   dependencies {
     compile group: 'args4j', name: 'args4j', version: "2.0.16"
-  }
-}
-
-
-project(':multiverse-jruby') {
-
-  dependencies {
-    // Libraries needed to run the jruby multiverse
-    compile group: 'org.jruby', name: 'jruby-complete', version: "${jrubyVersion}"
-    // Libraries needed for jruby api
-    compile project(':multiverse-core')
-    compile project(':multiverse-instrumentation')
-    compile project(':multiverse-alpha-unborn')
   }
 }
 
