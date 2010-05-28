@@ -1,23 +1,10 @@
 package org.benchy.repository;
 
-import com.google.gdata.client.spreadsheet.SpreadsheetService;
-import com.google.gdata.data.PlainTextConstruct;
-import com.google.gdata.data.spreadsheet.*;
-import com.google.gdata.util.AuthenticationException;
-import com.google.gdata.util.ServiceException;
-import org.benchy.BenchmarkResult;
-import org.benchy.TestCaseResult;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Date;
-import java.util.List;
-
 /**
  * @author Peter Veentjer
  */
-public class GoogleSpreadsheetRepository implements BenchmarkResultRepository {
+public class GoogleSpreadsheetRepository{
+    /*
     private SpreadsheetService spreadsheetService;
     private SpreadsheetEntry benchmarkSheetEntry;
 
@@ -144,5 +131,5 @@ public class GoogleSpreadsheetRepository implements BenchmarkResultRepository {
 
     private WorksheetEntry getOrCreateWorkSheet(String x) {
         return null;
-    }
+    }  */
 }

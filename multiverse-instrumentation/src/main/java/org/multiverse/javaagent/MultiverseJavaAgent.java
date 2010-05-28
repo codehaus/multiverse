@@ -63,9 +63,10 @@ public final class MultiverseJavaAgent {
             instrumentor.setDumpDirectory(dumpDirectory);
         }
 
-        instrumentor.include(getSystemProperty("include", ""));
-        instrumentor.exclude(getSystemProperty("exclude", ""));
+        String include = include();
 
+        instrumentor.include(include);
+        println("Multiverse: include = '%s'",include);
         if (instrumentor.getIncluded().equals("")) {
             println("Multiverse: All classes are included since nothing explicitly is configured.");
             println("Multiverse: \tIn most cases you want to set it explicitly using the org.multiverse.javaagent.include System propery.");
@@ -73,9 +74,20 @@ public final class MultiverseJavaAgent {
             println("Multiverse: The following classes are included the instrumentation '%s'" + instrumentor.getIncluded());
         }
 
-        println("Multiverse: The following classes are excluded from instrumentation (exclude overrides includes) " + instrumentor.getExcluded());
 
+        String exclude = exclude();
+        instrumentor.exclude(exclude);
+        println("Multiverse; exclude = '%s'", exclude);
+        println("Multiverse: The following classes are excluded from instrumentation (exclude overrides includes) " + instrumentor.getExcluded());
         return instrumentor;
+    }
+
+    private static String exclude() {
+        return getSystemProperty("exclude", "");
+    }
+
+    private static String include() {
+        return getSystemProperty("include", "");
     }
 
     private static void printMultiverseJavaAgentInfo() {

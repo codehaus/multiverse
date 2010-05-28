@@ -1,16 +1,11 @@
 package org.benchy;
 
-import com.google.gdata.util.AuthenticationException;
-import org.benchy.repository.GoogleSpreadsheetRepository;
-import org.benchy.runner.BenchmarkRunner;
-import org.benchy.runner.DefaultBenchmarkRunner;
-import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Test;
 
 
 @Ignore
 public class ExampleTest {
+   /*
     private BenchmarkRunner runner;
 
     @Before
@@ -36,5 +31,5 @@ public class ExampleTest {
         public void run() {
             System.out.println("run");
         }
-    }
+    }*/
 }
