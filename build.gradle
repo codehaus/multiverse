@@ -247,11 +247,11 @@ project(':multiverse-alpha') {
     ant.unzip(dest: "${buildDir}/classes/main",
             src: localRepo + 'args4j/args4j/jars/args4j-2.0.16.jar')
 
-    ant.copy(dest: "${buildDir}/classes/main",
+    ant.copy(todir: "${buildDir}/classes/main",
             file: "${projectRootDir}/multiverse-core/build/classes/main")
-    ant.copy(dest: "${buildDir}/classes/main",
+    ant.copy(todir: "${buildDir}/classes/main",
             file: "${projectRootDir}/multiverse-instrumentation/build/classes/main")
-    ant.copy(dest: "${buildDir}/classes/main",
+    ant.copy(todir: "${buildDir}/classes/main",
             file: "${projectRootDir}/multiverse-unborn/build/classes/main")
 
     ant.delete(file: "${buildDir}/classes/main/GiveMavenSomethingToCompile.class")
@@ -284,9 +284,9 @@ project(':multiverse-alpha') {
 
     ant.mkdir dir: "${buildDir}/classes/test"
 
-    ant.copy(dest: "${buildDir}/classes/test",
+    ant.copy(todir: "${buildDir}/classes/test",
             file: "${projectRootDir}/multiverse-core/build/classes/test")
-    ant.copy(dest: "${buildDir}/classes/test",
+    ant.copy(todir: "${buildDir}/classes/test",
             file: "${projectRootDir}/multiverse-unborn/build/classes/test")
     
     ant.delete file:("${buildDir}"+'/classes/test/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalMethod_InterruptibleTest.class')
