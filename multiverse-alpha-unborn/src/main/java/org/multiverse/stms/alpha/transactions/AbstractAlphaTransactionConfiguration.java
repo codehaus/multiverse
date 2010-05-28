@@ -1,6 +1,6 @@
 package org.multiverse.stms.alpha.transactions;
 
-import org.multiverse.api.LogLevel;
+import org.multiverse.api.TraceLevel;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.backoff.BackoffPolicy;
 import org.multiverse.api.clock.PrimitiveClock;
@@ -17,10 +17,10 @@ public class AbstractAlphaTransactionConfiguration extends AbstractTransactionCo
             PrimitiveClock clock, BackoffPolicy backoffPolicy, String familyName,
             boolean readOnly, int maxRetries, boolean interruptible, boolean writeSkewAllowed,
             boolean readTrackingEnabled, boolean explicitRetryAllowed, SpeculativeConfiguration speculativeConfiguration,
-            long timeoutNs, int maxReadSpinCount, TransactionFactory transactionFactory, LogLevel logLevel) {
+            long timeoutNs, int maxReadSpinCount, TransactionFactory transactionFactory, TraceLevel traceLevel) {
         super(clock, backoffPolicy, familyName, readOnly, maxRetries, interruptible,
                 writeSkewAllowed, readTrackingEnabled, explicitRetryAllowed, timeoutNs,
-                maxReadSpinCount, transactionFactory, logLevel);
+                maxReadSpinCount, transactionFactory, traceLevel);
 
         this.speculativeConfiguration = speculativeConfiguration;
     }

@@ -3,7 +3,7 @@ package org.multiverse.stms.alpha.instrumentation.fieldaccess;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.api.LogLevel;
+import org.multiverse.api.TraceLevel;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.transactional.refs.IntRef;
 
@@ -47,7 +47,7 @@ public class TransactionalMethod_ExceptionsTest {
         Exception exception;
         IntRef ref = new IntRef(0);
 
-        @TransactionalMethod(logLevel = LogLevel.course)
+        @TransactionalMethod(traceLevel = TraceLevel.course)
         public void doIt() throws Exception {
             ref.inc();
             throw exception;

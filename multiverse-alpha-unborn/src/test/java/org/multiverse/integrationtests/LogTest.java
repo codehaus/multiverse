@@ -3,7 +3,7 @@ package org.multiverse.integrationtests;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.api.LogLevel;
+import org.multiverse.api.TraceLevel;
 import org.multiverse.api.TransactionConfiguration;
 
 import static org.junit.Assert.assertEquals;
@@ -25,9 +25,9 @@ public class LogTest {
         loggingMethod();
     }
 
-    @TransactionalMethod(logLevel = LogLevel.course)
+    @TransactionalMethod(traceLevel = TraceLevel.course)
     public void loggingMethod() {
         TransactionConfiguration config = getThreadLocalTransaction().getConfiguration();
-        assertEquals(LogLevel.course, config.getLogLevel());
+        assertEquals(TraceLevel.course, config.getTraceLevel());
     }
 }

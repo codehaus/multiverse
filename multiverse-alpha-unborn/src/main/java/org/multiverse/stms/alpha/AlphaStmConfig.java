@@ -1,6 +1,6 @@
 package org.multiverse.stms.alpha;
 
-import org.multiverse.api.LogLevel;
+import org.multiverse.api.TraceLevel;
 import org.multiverse.api.backoff.BackoffPolicy;
 import org.multiverse.api.backoff.ExponentialBackoffPolicy;
 import org.multiverse.api.clock.PrimitiveClock;
@@ -75,7 +75,7 @@ public final class AlphaStmConfig {
 
     public boolean loggingOfControlFlowErrorsEnabled = false;
 
-    public LogLevel logLevel = LogLevel.none;
+    public TraceLevel traceLevel = TraceLevel.none;
 
     /**
      * Check if the AlphaStmConfig has been configured correctly.
@@ -111,8 +111,8 @@ public final class AlphaStmConfig {
             throw new IllegalStateException("Invalid configuration, maxReadSprinCount can't be smaller than 0");
         }
 
-        if (logLevel == null) {
-            throw new IllegalStateException("Invalid configuration, logLevel can't be null");
+        if (traceLevel == null) {
+            throw new IllegalStateException("Invalid configuration, traceLevel can't be null");
         }
     }
 }

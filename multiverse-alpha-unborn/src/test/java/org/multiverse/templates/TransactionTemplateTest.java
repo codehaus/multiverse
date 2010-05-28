@@ -3,7 +3,7 @@ package org.multiverse.templates;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.LogLevel;
+import org.multiverse.api.TraceLevel;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
@@ -142,14 +142,14 @@ public class TransactionTemplateTest {
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setReadonly(false)
-                .setLogLevel(LogLevel.fine)
+                .setTraceLevel(TraceLevel.fine)
                 .build();
 
         try {
             new TransactionTemplate(txFactory) {
                 @Override
                 public Object execute(Transaction tx) throws Exception {
-                    System.out.println("loglevel: " + tx.getConfiguration().getLogLevel());
+                    System.out.println("loglevel: " + tx.getConfiguration().getTraceLevel());
 
                     System.out.println("tx.status: " + tx.getStatus());
                     value.inc();

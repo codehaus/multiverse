@@ -3,11 +3,11 @@ package org.multiverse.api;
 /**
  * @author Peter Veentjer
  */
-public enum LogLevel {
+public enum TraceLevel {
 
     none, course, fine;
 
-    public boolean isLogableFrom(LogLevel level) {
+    public boolean isLogableFrom(TraceLevel level) {
         return compareTo(level) >= 0;
     }
 }

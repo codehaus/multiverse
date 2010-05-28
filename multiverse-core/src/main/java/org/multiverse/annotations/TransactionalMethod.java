@@ -1,6 +1,6 @@
 package org.multiverse.annotations;
 
-import org.multiverse.api.LogLevel;
+import org.multiverse.api.TraceLevel;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -51,5 +51,5 @@ public @interface TransactionalMethod {
 
     TimeUnit timeoutTimeUnit() default TimeUnit.SECONDS;
 
-    LogLevel logLevel() default LogLevel.none;
+    TraceLevel traceLevel() default TraceLevel.none;
 }

@@ -1,6 +1,6 @@
 package org.multiverse.stms.alpha.transactions.update;
 
-import org.multiverse.api.LogLevel;
+import org.multiverse.api.TraceLevel;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.backoff.BackoffPolicy;
 import org.multiverse.api.backoff.ExponentialBackoffPolicy;
@@ -26,7 +26,7 @@ public final class UpdateConfiguration extends AbstractAlphaTransactionConfigura
         this(clock,
                 ExponentialBackoffPolicy.INSTANCE_100_MS_MAX,
                 GenericCommitLockPolicy.FAIL_FAST_BUT_RETRY, null, new SpeculativeConfiguration(40),
-                1000, true, true, true, true, true, true, true, Long.MAX_VALUE, 10, null, LogLevel.none);
+                1000, true, true, true, true, true, true, true, Long.MAX_VALUE, 10, null, TraceLevel.none);
     }
 
     public UpdateConfiguration(
@@ -35,11 +35,11 @@ public final class UpdateConfiguration extends AbstractAlphaTransactionConfigura
             boolean interruptible, boolean automaticReadTracking, boolean writeSkewAllowed,
             boolean optimizedConflictDetectionEnabled, boolean dirtyCheckEnabled, boolean quickReleaseLocks,
             boolean explicitRetryAllowed, long timeoutNs, int maxReadSpinCount,
-            TransactionFactory transactionFactory, LogLevel logLevel) {
+            TransactionFactory transactionFactory, TraceLevel traceLevel) {
 
         super(clock, backoffPolicy, familyName, false, maxRetries, interruptible,
                 writeSkewAllowed, automaticReadTracking, explicitRetryAllowed,
-                speculativeConfiguration, timeoutNs, maxReadSpinCount, transactionFactory, logLevel);
+                speculativeConfiguration, timeoutNs, maxReadSpinCount, transactionFactory, traceLevel);
 
         this.commitLockPolicy = commitLockPolicy;
         this.optimizedConflictDetectionEnabled = optimizedConflictDetectionEnabled;
@@ -52,7 +52,7 @@ public final class UpdateConfiguration extends AbstractAlphaTransactionConfigura
                 clock, backoffPolicy, commitLockPolicy, familyName, speculativeConfigurationEnabled,
                 maxRetries, interruptible, readTrackingEnabled, writeSkewAllowed,
                 optimizedConflictDetectionEnabled, dirtyCheckEnabled, quickReleaseLocksEnabled,
-                explicitRetryAllowed, timeoutNs, maxReadSpinCount, transactionFactory, logLevel);
+                explicitRetryAllowed, timeoutNs, maxReadSpinCount, transactionFactory, traceLevel);
     }
 
     public UpdateConfiguration withWriteSkewAllowed(boolean writeSkewAllowed) {
@@ -60,7 +60,7 @@ public final class UpdateConfiguration extends AbstractAlphaTransactionConfigura
                 clock, backoffPolicy, commitLockPolicy, familyName, speculativeConfiguration,
                 maxRetries, interruptible, readTrackingEnabled, writeSkewAllowed,
                 optimizedConflictDetectionEnabled, dirtyCheckEnabled, quickReleaseLocksEnabled,
-                explicitRetryAllowed, timeoutNs, maxReadSpinCount, transactionFactory, logLevel);
+                explicitRetryAllowed, timeoutNs, maxReadSpinCount, transactionFactory, traceLevel);
     }
 
     public UpdateConfiguration withReadTrackingEnabled(boolean readTrackingEnabled) {
@@ -68,7 +68,7 @@ public final class UpdateConfiguration extends AbstractAlphaTransactionConfigura
                 clock, backoffPolicy, commitLockPolicy, familyName, speculativeConfiguration,
                 maxRetries, interruptible, readTrackingEnabled, writeSkewAllowed,
                 optimizedConflictDetectionEnabled, dirtyCheckEnabled, quickReleaseLocksEnabled,
-                explicitRetryAllowed, timeoutNs, maxReadSpinCount, transactionFactory, logLevel);
+                explicitRetryAllowed, timeoutNs, maxReadSpinCount, transactionFactory, traceLevel);
     }
 
     public UpdateConfiguration withExplictRetryAllowed(boolean explicitRetryAllowed) {
@@ -76,7 +76,7 @@ public final class UpdateConfiguration extends AbstractAlphaTransactionConfigura
                 clock, backoffPolicy, commitLockPolicy, familyName, speculativeConfiguration,
                 maxRetries, interruptible, readTrackingEnabled, writeSkewAllowed,
                 optimizedConflictDetectionEnabled, dirtyCheckEnabled, quickReleaseLocksEnabled,
-                explicitRetryAllowed, timeoutNs, maxReadSpinCount, transactionFactory, logLevel);
+                explicitRetryAllowed, timeoutNs, maxReadSpinCount, transactionFactory, traceLevel);
     }
 
     public UpdateConfiguration withMaxRetries(int maxRetries) {
@@ -84,6 +84,6 @@ public final class UpdateConfiguration extends AbstractAlphaTransactionConfigura
                 clock, backoffPolicy, commitLockPolicy, familyName, speculativeConfiguration,
                 maxRetries, interruptible, readTrackingEnabled, writeSkewAllowed,
                 optimizedConflictDetectionEnabled, dirtyCheckEnabled, quickReleaseLocksEnabled,
-                explicitRetryAllowed, timeoutNs, maxReadSpinCount, transactionFactory, logLevel);
+                explicitRetryAllowed, timeoutNs, maxReadSpinCount, transactionFactory, traceLevel);
     }
 }

@@ -105,7 +105,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
     @Override
     public void start() {
         if (___LOGGING_ENABLED) {
-            if (config.logLevel.isLogableFrom(LogLevel.course)) {
+            if (config.traceLevel.isLogableFrom(TraceLevel.course)) {
                 System.out.println(config.familyName + " starting");
             }
         }
@@ -148,7 +148,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
     @Override
     public final void registerLifecycleListener(TransactionLifecycleListener listener) {
         if (___LOGGING_ENABLED) {
-            if (config.logLevel.isLogableFrom(LogLevel.course)) {
+            if (config.traceLevel.isLogableFrom(TraceLevel.course)) {
                 System.out.println(config.familyName + " registerLifecycleListener");
             }
         }
@@ -185,7 +185,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
     @Override
     public final void prepare() {
         if (___LOGGING_ENABLED) {
-            if (config.logLevel.isLogableFrom(LogLevel.course)) {
+            if (config.traceLevel.isLogableFrom(TraceLevel.course)) {
                 System.out.println(config.familyName + " preparing");
             }
         }
@@ -229,7 +229,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
     @Override
     public final void reset() {
         if (___LOGGING_ENABLED) {
-            if (config.logLevel.isLogableFrom(LogLevel.course)) {
+            if (config.traceLevel.isLogableFrom(TraceLevel.course)) {
                 System.out.println(config.familyName + " reset");
             }
         }
@@ -280,7 +280,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
     @Override
     public final void abort() {
         if (___LOGGING_ENABLED) {
-            if (config.logLevel.isLogableFrom(LogLevel.course)) {
+            if (config.traceLevel.isLogableFrom(TraceLevel.course)) {
                 System.out.println(config.familyName + " aborting");
             }
         }
@@ -330,7 +330,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
     @Override
     public final void commit() {
         if (___LOGGING_ENABLED) {
-            if (config.logLevel.isLogableFrom(LogLevel.course)) {
+            if (config.traceLevel.isLogableFrom(TraceLevel.course)) {
                 System.out.println(config.familyName + " committing");
             }
         }
@@ -371,7 +371,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
     @Override
     public final void registerRetryLatch(Latch latch) {
         if (___LOGGING_ENABLED) {
-            if (config.logLevel.isLogableFrom(LogLevel.course)) {
+            if (config.traceLevel.isLogableFrom(TraceLevel.course)) {
                 System.out.println(config.familyName + " registerRetryLatch");
             }
         }

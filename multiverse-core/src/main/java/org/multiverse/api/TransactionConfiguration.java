@@ -12,7 +12,12 @@ import org.multiverse.api.backoff.BackoffPolicy;
  */
 public interface TransactionConfiguration {
 
-    LogLevel getLogLevel();
+    /**
+     * Returns the TraceLevel
+     *
+     * @return the TraceLevel.
+     */
+    TraceLevel getTraceLevel();
 
     /**
      * Returns the BackoffPolicy used by the Stm when a transaction conflicts with another transaction.

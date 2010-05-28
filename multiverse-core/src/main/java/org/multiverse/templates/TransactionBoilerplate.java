@@ -267,7 +267,7 @@ public final class TransactionBoilerplate implements MultiverseConstants {
 
     private static void logStart(Transaction tx) {
         if (___LOGGING_ENABLED) {
-            if (tx.getConfiguration().getLogLevel().isLogableFrom(LogLevel.course)) {
+            if (tx.getConfiguration().getTraceLevel().isLogableFrom(TraceLevel.course)) {
                 System.out.println(tx.getConfiguration().getFamilyName() + " starting");
             }
         }
@@ -275,7 +275,7 @@ public final class TransactionBoilerplate implements MultiverseConstants {
 
     private static void handleControlFlowError(Transaction tx, ControlFlowError er) {
         if (___LOGGING_ENABLED) {
-            if (tx.getConfiguration().getLogLevel().isLogableFrom(LogLevel.course)) {
+            if (tx.getConfiguration().getTraceLevel().isLogableFrom(TraceLevel.course)) {
                 System.out.println(tx.getConfiguration().getFamilyName() + " " + er.getDescription());
             }
         }
@@ -287,7 +287,7 @@ public final class TransactionBoilerplate implements MultiverseConstants {
 
     private Transaction handleSpeculativeConfigurationFailure(Transaction oldTx) {
         if (___LOGGING_ENABLED) {
-            if (oldTx.getConfiguration().getLogLevel().isLogableFrom(LogLevel.course)) {
+            if (oldTx.getConfiguration().getTraceLevel().isLogableFrom(TraceLevel.course)) {
                 System.out.println(oldTx.getConfiguration().getFamilyName() + " speculative configuration failure");
             }
         }
@@ -306,7 +306,7 @@ public final class TransactionBoilerplate implements MultiverseConstants {
 
     private static void handleRetry(Transaction tx) throws InterruptedException {
         if (___LOGGING_ENABLED) {
-            if (tx.getConfiguration().getLogLevel().isLogableFrom(LogLevel.course)) {
+            if (tx.getConfiguration().getTraceLevel().isLogableFrom(TraceLevel.course)) {
                 System.out.println(tx.getConfiguration().getFamilyName() + " retry (blocking)");
             }
         }

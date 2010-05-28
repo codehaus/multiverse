@@ -1,6 +1,6 @@
 package org.multiverse.instrumentation.metadata;
 
-import org.multiverse.api.LogLevel;
+import org.multiverse.api.TraceLevel;
 
 /**
  * A container for all parameters passed to an transactional method.
@@ -33,5 +33,5 @@ public class TransactionMetadata {
 
     public long timeoutNs;
 
-    public LogLevel logLevel;
+    public TraceLevel traceLevel;
 }

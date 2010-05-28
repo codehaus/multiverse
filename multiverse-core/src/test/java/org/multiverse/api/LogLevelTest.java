@@ -12,9 +12,9 @@ public class LogLevelTest {
 
     @Test
     public void test() {
-        assertTrue(LogLevel.fine.isLogableFrom(LogLevel.fine));
-        assertTrue(LogLevel.fine.isLogableFrom(LogLevel.course));
-        assertFalse(LogLevel.course.isLogableFrom(LogLevel.fine));
-        assertFalse(LogLevel.none.isLogableFrom(LogLevel.course));
+        assertTrue(TraceLevel.fine.isLogableFrom(TraceLevel.fine));
+        assertTrue(TraceLevel.fine.isLogableFrom(TraceLevel.course));
+        assertFalse(TraceLevel.course.isLogableFrom(TraceLevel.fine));
+        assertFalse(TraceLevel.none.isLogableFrom(TraceLevel.course));
     }
 }

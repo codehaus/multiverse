@@ -1,6 +1,6 @@
 package org.multiverse.stms.alpha.transactions;
 
-import org.multiverse.api.LogLevel;
+import org.multiverse.api.TraceLevel;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.latches.Latch;
 import org.multiverse.stms.AbstractTransaction;
@@ -44,7 +44,7 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
     @Override
     public final AlphaTranlocal openForRead(AlphaTransactionalObject transactionalObject) {
         if (___LOGGING_ENABLED) {
-            if (config.logLevel.isLogableFrom(LogLevel.fine)) {
+            if (config.traceLevel.isLogableFrom(TraceLevel.fine)) {
                 System.out.println(config.familyName + " openForRead " + toTxObjectString(transactionalObject));
             }
         }
@@ -97,7 +97,7 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
     @Override
     public final AlphaTranlocal openForWrite(AlphaTransactionalObject transactionalObject) {
         if (___LOGGING_ENABLED) {
-            if (config.logLevel.isLogableFrom(LogLevel.fine)) {
+            if (config.traceLevel.isLogableFrom(TraceLevel.fine)) {
                 System.out.println(config.familyName + " openForWrite " + toTxObjectString(transactionalObject));
             }
         }
@@ -156,7 +156,7 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
     @Override
     public final AlphaTranlocal openForConstruction(AlphaTransactionalObject transactionalObject) {
         if (___LOGGING_ENABLED) {
-            if (config.logLevel.isLogableFrom(LogLevel.fine)) {
+            if (config.traceLevel.isLogableFrom(TraceLevel.fine)) {
                 System.out.println(config.familyName + " openForConstruction " + toTxObjectString(transactionalObject));
             }
         }
@@ -215,7 +215,7 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
     @Override
     public final AlphaTranlocal openForCommutingWrite(AlphaTransactionalObject transactionalObject) {
         if (___LOGGING_ENABLED) {
-            if (config.logLevel.isLogableFrom(LogLevel.fine)) {
+            if (config.traceLevel.isLogableFrom(TraceLevel.fine)) {
                 System.out.println(config.familyName + " openForCommutingWrite " + toTxObjectString(transactionalObject));
             }
         }

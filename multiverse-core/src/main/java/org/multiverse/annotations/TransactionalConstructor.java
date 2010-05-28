@@ -1,6 +1,6 @@
 package org.multiverse.annotations;
 
-import org.multiverse.api.LogLevel;
+import org.multiverse.api.TraceLevel;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -25,7 +25,7 @@ public @interface TransactionalConstructor {
     /**
      * If the TransactionalConstructor should be readonly or an update.
      *
-     * @return
+     * @return true if readonly.
      */
     boolean readonly() default false;
 
@@ -45,5 +45,10 @@ public @interface TransactionalConstructor {
      */
     boolean writeSkew() default true;
 
-    LogLevel logLevel() default LogLevel.none;
+    /**
+     * With the TraceLevel you can see what is happening inside a transaction.
+     *
+     * @return the TraceLevel.
+     */
+    TraceLevel traceLevel() default TraceLevel.none;
 }

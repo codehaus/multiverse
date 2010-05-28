@@ -2,7 +2,7 @@ package org.multiverse.templates;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.LogLevel;
+import org.multiverse.api.TraceLevel;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
@@ -25,24 +25,24 @@ public class TransactionTemplate_loggingTest {
 
     @Test
     public void whenCourseLogging() {
-        whenLogging(LogLevel.course);
+        whenLogging(TraceLevel.course);
     }
 
     @Test
     public void whenFineLogging() {
-        whenLogging(LogLevel.fine);
+        whenLogging(TraceLevel.fine);
     }
 
 
     @Test
     public void whenNoLogging() {
-        whenLogging(LogLevel.none);
+        whenLogging(TraceLevel.none);
     }
 
 
-    public void whenLogging(LogLevel level) {
+    public void whenLogging(TraceLevel level) {
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
-                .setLogLevel(level)
+                .setTraceLevel(level)
                 .setSpeculativeConfigurationEnabled(false)
                 .setReadonly(false)
                 .setFamilyName("loggingtransaction")

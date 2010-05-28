@@ -58,7 +58,6 @@ public class ToStringEqualsAndHashNotUsedTest {
     //todo: somehow this test is extremely slow using the ibm jdk.
     //needs further investigation
     //@Test
-
     public void test_1000000() {
         test(1000000);
     }

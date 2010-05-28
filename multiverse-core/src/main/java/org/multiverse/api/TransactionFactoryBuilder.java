@@ -37,9 +37,23 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      */
     Stm getStm();
 
-    B setLogLevel(LogLevel logLevel);
+    /**
+     * Sets the TraceLevel. With tracing it is possible to see what is happening inside a transaction.
+     *
+     * @param traceLevel the new traceLevel.
+     * @return the updated TransactionFactoryBuilder.
+     * @throws NullPointerException if traceLevel is null.
+     * @see #getTraceLevel()
+     */
+    B setTraceLevel(TraceLevel traceLevel);
 
-    LogLevel getLogLevel();
+    /**
+     * Gets the TraceLevel. With tracing it is possible to see what is happening inside a transaction.
+     *
+     * @return the TraceLevel.
+     * @see #setTraceLevel(TraceLevel) 
+     */
+    TraceLevel getTraceLevel();
 
     /**
      * Checks if dirty check is enabled.

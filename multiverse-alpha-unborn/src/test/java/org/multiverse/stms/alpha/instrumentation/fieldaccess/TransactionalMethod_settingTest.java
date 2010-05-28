@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
-import org.multiverse.api.LogLevel;
+import org.multiverse.api.TraceLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
 import org.multiverse.api.exceptions.TooManyRetriesException;
@@ -288,28 +288,28 @@ public class TransactionalMethod_settingTest {
 
     class LogLevelObject {
 
-        @TransactionalMethod(logLevel = LogLevel.course)
+        @TransactionalMethod(traceLevel = TraceLevel.course)
         void explicitValueCourse() {
             Transaction tx = getThreadLocalTransaction();
-            assertEquals(LogLevel.course, tx.getConfiguration().getLogLevel());
+            assertEquals(TraceLevel.course, tx.getConfiguration().getTraceLevel());
         }
 
-        @TransactionalMethod(logLevel = LogLevel.fine)
+        @TransactionalMethod(traceLevel = TraceLevel.fine)
         void explicitValueFine() {
             Transaction tx = getThreadLocalTransaction();
-            assertEquals(LogLevel.fine, tx.getConfiguration().getLogLevel());
+            assertEquals(TraceLevel.fine, tx.getConfiguration().getTraceLevel());
         }
 
-        @TransactionalMethod(logLevel = LogLevel.none)
+        @TransactionalMethod(traceLevel = TraceLevel.none)
         void explicitValueNone() {
             Transaction tx = getThreadLocalTransaction();
-            assertEquals(LogLevel.none, tx.getConfiguration().getLogLevel());
+            assertEquals(TraceLevel.none, tx.getConfiguration().getTraceLevel());
         }
 
         @TransactionalMethod
         void defaultValue() {
             Transaction tx = getThreadLocalTransaction();
-            assertEquals(LogLevel.none, tx.getConfiguration().getLogLevel());
+            assertEquals(TraceLevel.none, tx.getConfiguration().getTraceLevel());
         }
     }
 }

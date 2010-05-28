@@ -3,7 +3,7 @@ package org.multiverse.instrumentation.metadata;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.api.LogLevel;
+import org.multiverse.api.TraceLevel;
 import org.multiverse.api.Transaction;
 
 import java.util.concurrent.TimeUnit;
@@ -264,37 +264,37 @@ public class MetadataRepository_TransactionTest {
         MethodMetadata explicitValueMethodMetadata = classMetadata.getMethodMetadata("explicitValue", "()V");
         TransactionMetadata explicitValueTransactionMetadata = explicitValueMethodMetadata.getTransactionalMetadata();
         assertNotNull(explicitValueTransactionMetadata);
-        assertEquals(LogLevel.course, explicitValueTransactionMetadata.logLevel);
+        assertEquals(TraceLevel.course, explicitValueTransactionMetadata.traceLevel);
 
         explicitValueMethodMetadata = classMetadata.getMethodMetadata("explicitValueFine", "()V");
         explicitValueTransactionMetadata = explicitValueMethodMetadata.getTransactionalMetadata();
         assertNotNull(explicitValueTransactionMetadata);
-        assertEquals(LogLevel.fine, explicitValueTransactionMetadata.logLevel);
+        assertEquals(TraceLevel.fine, explicitValueTransactionMetadata.traceLevel);
 
         MethodMetadata defaultValueMethodMetadata = classMetadata.getMethodMetadata("defaultValue", "()V");
 
         TransactionMetadata defaultValueTransactionMetadata = defaultValueMethodMetadata.getTransactionalMetadata();
         assertNotNull(defaultValueTransactionMetadata);
-        assertEquals(LogLevel.none, defaultValueTransactionMetadata.logLevel);
+        assertEquals(TraceLevel.none, defaultValueTransactionMetadata.traceLevel);
     }
 
     class LogLevelObject {
-        @TransactionalMethod(logLevel = LogLevel.course)
+        @TransactionalMethod(traceLevel = TraceLevel.course)
         void explicitValue() {
             Transaction tx = getThreadLocalTransaction();
-            assertEquals(LogLevel.course, tx.getConfiguration().getLogLevel());
+            assertEquals(TraceLevel.course, tx.getConfiguration().getTraceLevel());
         }
 
-        @TransactionalMethod(logLevel = LogLevel.fine)
+        @TransactionalMethod(traceLevel = TraceLevel.fine)
         void explicitValueFine() {
             Transaction tx = getThreadLocalTransaction();
-            assertEquals(LogLevel.fine, tx.getConfiguration().getLogLevel());
+            assertEquals(TraceLevel.fine, tx.getConfiguration().getTraceLevel());
         }
 
         @TransactionalMethod
         void defaultValue() {
             Transaction tx = getThreadLocalTransaction();
-            assertEquals(LogLevel.none, tx.getConfiguration().getLogLevel());
+            assertEquals(TraceLevel.none, tx.getConfiguration().getTraceLevel());
         }
     }
 }

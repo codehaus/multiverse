@@ -4,7 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.api.LogLevel;
+import org.multiverse.api.TraceLevel;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.transactional.refs.IntRef;
 
@@ -95,7 +95,7 @@ public class TransactionalMethod_StaticMethodTest {
         assertEquals(10, b.get());
     }
 
-    @TransactionalMethod(logLevel = LogLevel.course)
+    @TransactionalMethod(traceLevel = TraceLevel.course)
     public static void swap(IntRef a, IntRef b) {
         int oldA = a.get();
         a.set(b.get());
