@@ -228,12 +228,81 @@ project(':multiverse-alpha-unborn') {
 
 // ------------------------------------------------------------------------------------------------------------------
 
-project(':multiverse-alpha') {
+project(':multiverse-alpha-unborn') {
 
-  def localRepo = "${gradle.gradleUserHomeDir}/cache/"
   def projectRootDir = new File("${rootProject.projectDir}").absolutePath
 
- classes.doLast() {
+  configurations {
+    testFixtures {
+      extendsFrom testRuntime
+    }
+  }
+
+  task testJar(type: Jar) {
+    from sourceSets.test.classes
+    classifier = 'test'
+  }
+              
+  artifacts {
+    testFixtures testJar
+  }
+
+  classes.doLast() {
+    println "------------------------------------------------------------------"
+    println "Creating temporary agent"
+    println "------------------------------------------------------------------"
+
+    def localRepo = "${gradle.gradleUserHomeDir}/cache/"
+
+    ant.unzip(dest: "${buildDir}/classes/main",
+            src: "${localRepo}/asm/asm-all/jars/asm-all-3.2.jar")
+    ant.unzip(dest: "${buildDir}/classes/main",
+            src: localRepo + 'args4j/args4j/jars/args4j-2.0.16.jar')
+    
+    ant.copy(todir: "${buildDir}/classes/main"){
+            fileset(dir: "${projectRootDir}/multiverse-core/build/classes/main") 
+    }
+    
+    ant.copy(todir: "${buildDir}/classes/main"){
+            fileset(dir: "${projectRootDir}/multiverse-instrumentation/build/classes/main")
+    }
+ 
+    ant.delete(dir: "${buildDir}/classes/main/META-INF/")
+    ant.mkdir(dir: "${buildDir}/classes/main/META-INF/")
+    ant.copy(
+            file: "${projectDir}/src/main/resources/MANIFEST.MF",
+            todir: "${buildDir}/classes/main/META-INF")
+    ant.zip(
+            basedir: "${buildDir}/classes/main",
+            destfile: "${buildDir}/libs/javaagent.jar") {
+    }
+
+    println "Finished creating tmp agent"
+  }
+
+  dependencies {
+    compile project(':multiverse-core')
+    compile project(':multiverse-instrumentation')
+    compile group: 'args4j', name: 'args4j', version: "2.0.16"
+    compile group: 'asm', name: 'asm-all', version: "3.2"
+    testCompile project(path: ':multiverse-core', configuration: 'testFixtures')
+    testCompile project(path: ':multiverse-instrumentation', configuration: 'testFixtures')
+    testCompile project(':multiverse-benchy')
+  }
+
+  test {
+    jvmArgs = ["-javaagent:${buildDir}/libs/javaagent.jar"]
+  }
+}
+
+// ------------------------------------------------------------------------------------------------------------------
+
+project(':multiverse-alpha') {
+
+  def projectRootDir = new File("${rootProject.projectDir}").absolutePath
+  def localRepo = "${gradle.gradleUserHomeDir}/cache/"
+
+  classes.doLast() {
     println "------------------------------------------------------------------"
     println "Extracting dependant jars and doing preinstrumentation"
     println "------------------------------------------------------------------"
@@ -328,7 +397,7 @@ project(':multiverse-alpha') {
 
     ant.jarjar(jarfile: "${projectRootDir}/multiverse-alpha/build/libs/multiverse-alpha-${project.version}.jar", update: true) {
       rule pattern: 'org.objectweb.asm.**', result: 'org.multiverse.repackaged.@0'
-      rule pattern: 'org.kohsuke.args4j.**', result: 'org.multiverse.repackaged.@0'
+//      rule pattern: 'org.kohsuke.args4j.**', result: 'org.multiverse.repackaged.@0'
     }
   }
 
