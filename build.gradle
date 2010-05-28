@@ -9,7 +9,7 @@ allprojects {
   defaultTasks 'clean', 'install'
 
   sourceCompatibility = 1.6
-  version = '0.5.2-SNAPSHOT'
+  version = '0.5.3-SNAPSHOT'
   group = 'org.multiverse'
   //scalaVersion = '2.8.0.Beta1'
   scalaVersion = '2.7.7'
