@@ -97,6 +97,7 @@ allprojects {
 project(':multiverse-benchy') {
   dependencies {
     compile group: 'com.google.code.gson', name: 'gson', version: "1.4"
+    compile group: 'args4j', name: 'args4j', version: "2.0.16"
   }
 }
 
@@ -350,21 +351,11 @@ project(':multiverse-alpha') {
 
 // ------------------------------------------------------------------------------------------------------------------
 
-//project(':multiverse-scala') {
-//  repositories {
-//    mavenRepo urls: 'http://scala-tools.org/repo-releases/'
-//  }
-//
+//project(':multiverse-jruby') {
 //  dependencies {
-//    // Libraries needed to run the scala tools
-//    scalaTools "org.scala-lang:scala-compiler:${scalaVersion}"
-//    scalaTools "org.scala-lang:scala-library:${scalaVersion}"
-//    // Libraries needed for scala api
-//    compile "org.scala-lang:scala-library:${scalaVersion}"
 //    compile project(':multiverse-core')
 //    compile project(':multiverse-instrumentation')
 //    compile project(':multiverse-alpha-unborn')
-//    testCompile group: 'org.scalatest', name: 'scalatest', version: '1.0'
 //  }
 //}
 
