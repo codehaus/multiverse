@@ -246,12 +246,14 @@ project(':multiverse-alpha') {
             src: localRepo + 'asm/asm-all/jars/asm-all-3.2.jar')
     ant.unzip(dest: "${buildDir}/classes/main",
             src: localRepo + 'args4j/args4j/jars/args4j-2.0.16.jar')
-    ant.unzip(dest: "${buildDir}/classes/main",
-            src: "${projectRootDir}/multiverse-core/build/libs/multiverse-core-${project.version}.jar")
-    ant.unzip(dest: "${buildDir}/classes/main",
-            src: "${projectRootDir}/multiverse-instrumentation/build/libs/multiverse-instrumentation-${project.version}.jar")
-    ant.unzip(dest: "${buildDir}/classes/main",
-            src: "${projectRootDir}/multiverse-alpha-unborn/build/libs/multiverse-alpha-unborn-${project.version}.jar")
+
+    ant.copy(dest: "${buildDir}/classes/main",
+            file: "${projectRootDir}/multiverse-core/build/classes/main")
+    ant.copy(dest: "${buildDir}/classes/main",
+            file: "${projectRootDir}/multiverse-instrumentation/build/classes/main")
+    ant.copy(dest: "${buildDir}/classes/main",
+            file: "${projectRootDir}/multiverse-unborn/build/classes/main")
+
     ant.delete(file: "${buildDir}/classes/main/GiveMavenSomethingToCompile.class")
 
     ant.java(classname: "org.multiverse.compiler.MultiverseCompiler") {
@@ -281,13 +283,12 @@ project(':multiverse-alpha') {
     println "------------------------------------------------------------------"
 
     ant.mkdir dir: "${buildDir}/classes/test"
-    ant.unzip(
-            dest: "${buildDir}/classes/test",
-            src: new File("${rootProject.projectDir}").absolutePath + "/multiverse-core/build/libs/multiverse-core-${project.version}-test.jar")
-    ant.unzip(
-            dest: "${buildDir}/classes/test",
-            src: new File("${rootProject.projectDir}").absolutePath + "/multiverse-alpha-unborn/build/libs/multiverse-alpha-unborn-${project.version}-test.jar")
 
+    ant.copy(dest: "${buildDir}/classes/test",
+            file: "${projectRootDir}/multiverse-core/build/classes/test")
+    ant.copy(dest: "${buildDir}/classes/test",
+            file: "${projectRootDir}/multiverse-unborn/build/classes/test")
+    
     ant.delete file:("${buildDir}"+'/classes/test/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalMethod_InterruptibleTest.class')
     ant.delete file:("${buildDir}"+'/classes/test/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalMethod_InterruptibleTest$MethodWithoutException.class')
     ant.delete file:("${buildDir}"+'/classes/test/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalMethod_InterruptibleTest$MethodWithIncorrectException.class')
