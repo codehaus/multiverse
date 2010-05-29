@@ -25,8 +25,9 @@ import static org.multiverse.utils.SystemOut.println;
  * org.multiverse.javaagent.dumpBytecode=true/false
  * org.multiverse.javaagent.verbose=true/false
  * org.multiverse.javaagent.dumpDirectory=directory for dumping classfiles (defaults to the tmp dir)
- * org.multiverse.javaagent.include=pattern of classes to include, seperated by ';', defaults to everything being included
- * org.multiverse.javaagent.exclude=pattern of classes to exclude, seperated by ';'
+ * org.multiverse.javaagent.include=pattern of classes to include, seperated by ; or , or : , defaults to
+ * everything being included
+ * org.multiverse.javaagent.exclude=pattern of classes to exclude, seperated by ; or , or :
  *
  * @author Peter Veentjer
  */
@@ -67,7 +68,6 @@ public final class MultiverseJavaAgent {
         String include = include();
 
         instrumentor.include(include);
-        println("Multiverse: include = '%s'", include);
         if (instrumentor.getIncluded().equals("")) {
             println("Multiverse: All classes are included since nothing explicitly is configured.");
             println("Multiverse: \tIn most cases you want to set it explicitly using the org.multiverse.javaagent.include System propery.");
@@ -78,7 +78,6 @@ public final class MultiverseJavaAgent {
 
         String exclude = exclude();
         instrumentor.exclude(exclude);
-        println("Multiverse; exclude = '%s'", exclude);
         println("Multiverse: The following classes are excluded from instrumentation (exclude overrides includes) " + instrumentor.getExcluded());
         return instrumentor;
     }
