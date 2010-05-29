@@ -14,7 +14,6 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-@Ignore
 public class CountDownCommitBarrier_joinCommitUninterruptiblyTest {
     private CountDownCommitBarrier barrier;
 
