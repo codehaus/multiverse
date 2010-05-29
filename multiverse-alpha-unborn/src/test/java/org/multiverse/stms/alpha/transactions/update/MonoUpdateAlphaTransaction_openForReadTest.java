@@ -9,7 +9,7 @@ import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
-import org.multiverse.stms.alpha.programmatic.AlphaProgrammaticLong;
+import org.multiverse.stms.alpha.programmatic.AlphaProgrammaticLongRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
@@ -236,7 +236,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
 
     @Test
     public void whenAlreadyOpenedForCommutingWrite_thenPrematureFixation() {
-        AlphaProgrammaticLong ref1 = new AlphaProgrammaticLong(stm, 0);
+        AlphaProgrammaticLongRef ref1 = new AlphaProgrammaticLongRef(stm, 0);
 
         AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal tranlocal = tx.openForCommutingWrite(ref1);
@@ -249,7 +249,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
 
     @Test
     public void whenAlreadyOpenedForCommutingWriteAndLockedButVersionMatches() {
-        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
+        AlphaProgrammaticLongRef ref = new AlphaProgrammaticLongRef(stm, 0);
 
         AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal openedForCommutingWrite = tx.openForCommutingWrite(ref);
@@ -266,7 +266,7 @@ public class MonoUpdateAlphaTransaction_openForReadTest {
 
     @Test
     public void whenAlreadyOpenedForCommutingWriteAndLockedAndVersionTooOld_thenOldVersionNotFoundReadConflict() {
-        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
+        AlphaProgrammaticLongRef ref = new AlphaProgrammaticLongRef(stm, 0);
 
         AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal openedForCommutingWrite = tx.openForCommutingWrite(ref);

@@ -83,12 +83,12 @@ public class TransactionLogicDonor {
             throw new NullPointerException();
         }
 
-        AlphaProgrammaticReferenceTranlocal<E> tranlocal = openForRead(tx);
+        AlphaProgrammaticRefTranlocal<E> tranlocal = openForRead(tx);
         return tranlocal.value;
     }
 
     public <E> E atomicGet() {
-        AlphaProgrammaticReferenceTranlocal<E> tranlocal = (AlphaProgrammaticReferenceTranlocal) ___load();
+        AlphaProgrammaticRefTranlocal<E> tranlocal = (AlphaProgrammaticRefTranlocal) ___load();
 
         if (tranlocal == null) {
             throw new UncommittedReadConflict();

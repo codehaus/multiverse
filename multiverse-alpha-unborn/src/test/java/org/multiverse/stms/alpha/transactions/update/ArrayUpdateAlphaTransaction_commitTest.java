@@ -10,7 +10,7 @@ import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
-import org.multiverse.stms.alpha.programmatic.AlphaProgrammaticLong;
+import org.multiverse.stms.alpha.programmatic.AlphaProgrammaticLongRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import static org.junit.Assert.*;
@@ -109,7 +109,7 @@ public class ArrayUpdateAlphaTransaction_commitTest {
 
     @Test
     public void whenCommutingWrites() {
-        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(1);
+        AlphaProgrammaticLongRef ref = new AlphaProgrammaticLongRef(1);
 
         AlphaTransaction tx = createSutTransaction(10);
         ref.commutingInc(tx, 1);

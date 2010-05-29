@@ -171,6 +171,11 @@ public final class CountDownCommitBarrier extends CommitBarrier {
      * <p/>
      * If extra is 0, this call is ignored.
      *
+     * This is the call you want to use when you are doing an incParties inside a transaction.
+     * A transaction can be retried multiple times, and if number of parties is incremented more than
+     * once, you run into problems. That is why a transaction can be passed where a compensating
+     * tasks is registered on, that removes the added parties when the transaction is aborted.
+     *
      * @param tx    the transaction where this operation lifts on.
      * @param extra the number of extra parties
      * @throws NullPointerException     if tx is null.

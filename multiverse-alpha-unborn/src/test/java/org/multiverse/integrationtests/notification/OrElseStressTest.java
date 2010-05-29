@@ -102,7 +102,7 @@ public class OrElseStressTest {
         public void decreaseRefContainingOne(final int refIndex) {
             new OrElseTemplate() {
                 @Override
-                public Object run(Transaction tx) {
+                public Object either(Transaction tx) {
                     //System.out.println("++++++++++++++++++++++++++");
                     //System.out.println(tx.getClass()+" "+System.identityHashCode(tx));
                     refs[refIndex].await(1);
@@ -112,7 +112,7 @@ public class OrElseStressTest {
                 }
 
                 @Override
-                public Object orelserun(Transaction t) {
+                public Object orelse(Transaction t) {
                     if (refIndex == refs.length - 1) {
                         retry();
                     } else {

@@ -26,13 +26,14 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
  */
 public class DiningPhilosophersStressTest {
     private int philosopherCount = 10;
-    private int eatCount = 1000;
+    private volatile boolean stop;
 
     private IntRef[] forks;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
+        stop = false;
     }
 
     @After
@@ -46,6 +47,10 @@ public class DiningPhilosophersStressTest {
 
         PhilosopherThread[] philosopherThreads = createPhilosopherThreads();
         startAll(philosopherThreads);
+
+        sleepMs(getDurationMsFromSystemProperties(60*1000));
+        
+        stop = true;
         joinAll(philosopherThreads);
 
         assertAllForksHaveReturned();
@@ -86,11 +91,13 @@ public class DiningPhilosophersStressTest {
 
         @Override
         public void doRun() {
-            for (int k = 0; k < eatCount; k++) {
+            int k = 0;
+            while (!stop) {
                 if (k % 100 == 0) {
                     System.out.printf("%s at %s\n", getName(), k);
                 }
                 eat();
+                k++;
             }
         }
 

@@ -22,6 +22,7 @@ public class ReadConsistencyStressTest {
     private int refCount = 1000;
     private LongRef[] refs;
     private final AtomicBoolean shutdown = new AtomicBoolean();
+
     private int readerCount = 10;
     private int writerCount = 2;
     private int readTransactionCount = 1000 * 1000;

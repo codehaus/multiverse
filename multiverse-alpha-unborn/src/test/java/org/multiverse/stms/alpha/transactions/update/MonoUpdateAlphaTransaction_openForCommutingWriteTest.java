@@ -10,7 +10,7 @@ import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
-import org.multiverse.stms.alpha.programmatic.AlphaProgrammaticLong;
+import org.multiverse.stms.alpha.programmatic.AlphaProgrammaticLongRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 
@@ -45,7 +45,7 @@ public class MonoUpdateAlphaTransaction_openForCommutingWriteTest {
 
     @Test
     public void whenFirstTime() {
-        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 1);
+        AlphaProgrammaticLongRef ref = new AlphaProgrammaticLongRef(stm, 1);
 
         AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal found = tx.openForCommutingWrite(ref);
@@ -58,7 +58,7 @@ public class MonoUpdateAlphaTransaction_openForCommutingWriteTest {
 
     @Test
     public void whenLocked() {
-        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 1);
+        AlphaProgrammaticLongRef ref = new AlphaProgrammaticLongRef(stm, 1);
         Transaction lockOwner = new AbstractTransactionImpl();
         ref.___tryLock(lockOwner);
 
@@ -75,7 +75,7 @@ public class MonoUpdateAlphaTransaction_openForCommutingWriteTest {
 
     @Test
     public void whenTransactionalObjectAlreadyOpenedForWrite() {
-        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 1);
+        AlphaProgrammaticLongRef ref = new AlphaProgrammaticLongRef(stm, 1);
 
         AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal openedForWrite = tx.openForWrite(ref);
@@ -90,7 +90,7 @@ public class MonoUpdateAlphaTransaction_openForCommutingWriteTest {
 
     @Test
     public void whenTransactionalObjectAlreadyOpenedForRead() {
-        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 1);
+        AlphaProgrammaticLongRef ref = new AlphaProgrammaticLongRef(stm, 1);
 
         AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal openedForRead = tx.openForRead(ref);
@@ -107,7 +107,7 @@ public class MonoUpdateAlphaTransaction_openForCommutingWriteTest {
 
     @Test
     public void whenTransactionalObjectAlreadyOpenedForCommutingWrite() {
-        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 1);
+        AlphaProgrammaticLongRef ref = new AlphaProgrammaticLongRef(stm, 1);
 
         AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal firstOpen = tx.openForCommutingWrite(ref);

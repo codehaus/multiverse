@@ -28,5 +28,5 @@ set ylabel "transactions/second"
 set grid
 set terminal png
 set output "../target/diagrams/ProgrammaticConcurrentUpdate.png"
-plot "../target/out.dat" using 1:2 title "ProgrammaticLong ConcurrentUpdate" with linespoint'
+plot "../target/out.dat" using 1:2 title "ProgrammaticLongRef ConcurrentUpdate" with linespoint'
 

@@ -1,7 +1,6 @@
 package org.multiverse.integrationtests.granularity;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
@@ -24,9 +23,9 @@ public class ObjectGranularityTest {
     }
 
     @Test
-    @Ignore
     public void testFieldGranularityCausesNoWriteConflicts() {
         Pair pair = new Pair(0, 0);
+
         SetLeftThread leftThread = new SetLeftThread(pair);
         SetRightThread rightThread = new SetRightThread(pair);
 

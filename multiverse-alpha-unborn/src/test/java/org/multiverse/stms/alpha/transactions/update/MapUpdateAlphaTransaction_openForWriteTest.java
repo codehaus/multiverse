@@ -9,7 +9,7 @@ import org.multiverse.stms.alpha.AlphaStmConfig;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRef;
 import org.multiverse.stms.alpha.manualinstrumentation.ManualRefTranlocal;
-import org.multiverse.stms.alpha.programmatic.AlphaProgrammaticLong;
+import org.multiverse.stms.alpha.programmatic.AlphaProgrammaticLongRef;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import static org.junit.Assert.*;
@@ -196,7 +196,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
 
     @Test
     public void whenAlreadyOpenedForCommutingWrite_thenFixated() {
-        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
+        AlphaProgrammaticLongRef ref = new AlphaProgrammaticLongRef(stm, 0);
 
         AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal openedForCommutingWrite = tx.openForCommutingWrite(ref);
@@ -209,7 +209,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
 
     @Test
     public void whenAlreadyOpenedForCommutingWriteAndLockedButVersionMatches() {
-        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
+        AlphaProgrammaticLongRef ref = new AlphaProgrammaticLongRef(stm, 0);
 
         AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal openedForCommutingWrite = tx.openForCommutingWrite(ref);
@@ -226,7 +226,7 @@ public class MapUpdateAlphaTransaction_openForWriteTest {
 
     @Test
     public void whenAlreadyOpenedForCommutingWriteAndLockedAndVersionTooOld_thenOldVersionNotFoundReadConflict() {
-        AlphaProgrammaticLong ref = new AlphaProgrammaticLong(stm, 0);
+        AlphaProgrammaticLongRef ref = new AlphaProgrammaticLongRef(stm, 0);
 
         AlphaTransaction tx = createSutTransaction();
         AlphaTranlocal openedForCommutingWrite = tx.openForCommutingWrite(ref);

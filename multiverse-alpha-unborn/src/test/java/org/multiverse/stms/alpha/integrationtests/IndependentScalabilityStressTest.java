@@ -5,8 +5,8 @@ import org.multiverse.TestThread;
 import org.multiverse.api.Stm;
 import org.multiverse.api.latches.CheapLatch;
 import org.multiverse.api.latches.Latch;
-import org.multiverse.api.programmatic.ProgrammaticLong;
-import org.multiverse.api.programmatic.ProgrammaticReferenceFactory;
+import org.multiverse.api.programmatic.ProgrammaticLongRef;
+import org.multiverse.api.programmatic.ProgrammaticRefFactory;
 import org.multiverse.stms.alpha.AlphaStm;
 
 import java.util.concurrent.TimeUnit;
@@ -79,20 +79,20 @@ public class IndependentScalabilityStressTest {
     public MyThread[] createThreads(Stm stm, Latch startLatch, int threadCount) {
         MyThread[] threads = new MyThread[threadCount];
 
-        ProgrammaticReferenceFactory factory = stm.getProgrammaticReferenceFactoryBuilder()
+        ProgrammaticRefFactory factory = stm.getProgrammaticRefFactoryBuilder()
                 .build();
 
         for (int k = 0; k < threads.length; k++) {
-            threads[k] = new MyThread(k, factory.atomicCreateLong(0), startLatch);
+            threads[k] = new MyThread(k, factory.atomicCreateLongRef(0), startLatch);
         }
         return threads;
     }
 
     class MyThread extends TestThread {
-        private final ProgrammaticLong ref;
+        private final ProgrammaticLongRef ref;
         private final Latch startLatch;
 
-        public MyThread(int id, ProgrammaticLong ref, Latch startLatch) {
+        public MyThread(int id, ProgrammaticLongRef ref, Latch startLatch) {
             super("Thread-" + id);
             this.startLatch = startLatch;
             this.ref = ref;

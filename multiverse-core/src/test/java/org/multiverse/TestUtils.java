@@ -17,6 +17,11 @@ import static org.junit.Assert.*;
 
 public class TestUtils {
 
+    public static long getDurationMsFromSystemProperties(long defaultDuration){
+        String value = System.getProperty("org.multiverse.integrationtest.duration", ""+defaultDuration);
+        return Long.parseLong(value);
+    }
+
     public static void assertNotEquals(Object o1, Object o2) {
         if (o1 == null) {
             assertNotNull(o2);

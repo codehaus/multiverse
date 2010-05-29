@@ -40,13 +40,13 @@ public class TranlocalSnapshotTest {
             public Object execute(Transaction t) throws Exception {
                 new OrElseTemplate() {
                     @Override
-                    public Object orelserun(Transaction t) {
+                    public Object orelse(Transaction t) {
                         i.setValue(newValue);
                         return null;
                     }
 
                     @Override
-                    public Object run(Transaction t) {
+                    public Object either(Transaction t) {
                         assertEquals(oldValue, i.getValue());
                         return null;
                     }
@@ -86,13 +86,13 @@ public class TranlocalSnapshotTest {
             public Object execute(Transaction t) throws Exception {
                 new OrElseTemplate() {
                     @Override
-                    public Object orelserun(Transaction t) {
+                    public Object orelse(Transaction t) {
                         i.setValue(newValue);
                         return null;
                     }
 
                     @Override
-                    public Object run(Transaction t) {
+                    public Object either(Transaction t) {
                         assertEquals(oldValue, i.getValue());
                         return null;
                     }
@@ -131,13 +131,13 @@ public class TranlocalSnapshotTest {
             public Object execute(Transaction t) throws Exception {
                 new OrElseTemplate() {
                     @Override
-                    public Object orelserun(Transaction t) {
+                    public Object orelse(Transaction t) {
                         i.setValue(newValue);
                         return null;
                     }
 
                     @Override
-                    public Object run(Transaction t) {
+                    public Object either(Transaction t) {
                         assertEquals(oldValue, i.getValue());
                         return null;
                     }
@@ -176,13 +176,13 @@ public class TranlocalSnapshotTest {
             public Object execute(Transaction t) throws Exception {
                 new OrElseTemplate() {
                     @Override
-                    public Object orelserun(Transaction t) {
+                    public Object orelse(Transaction t) {
                         i.setValue(newValue);
                         return null;
                     }
 
                     @Override
-                    public Object run(Transaction t) {
+                    public Object either(Transaction t) {
                         assertEquals(oldValue, i.getValue());
                         return null;
                     }
@@ -221,13 +221,13 @@ public class TranlocalSnapshotTest {
             public Object execute(Transaction t) throws Exception {
                 new OrElseTemplate() {
                     @Override
-                    public Object orelserun(Transaction t) {
+                    public Object orelse(Transaction t) {
                         i.setValue(newValue);
                         return null;
                     }
 
                     @Override
-                    public Object run(Transaction t) {
+                    public Object either(Transaction t) {
                         assertEquals(oldValue, i.getValue());
                         return null;
                     }
@@ -266,13 +266,13 @@ public class TranlocalSnapshotTest {
             public Object execute(Transaction t) throws Exception {
                 new OrElseTemplate() {
                     @Override
-                    public Object orelserun(Transaction t) {
+                    public Object orelse(Transaction t) {
                         i.setValue(newValue);
                         return null;
                     }
 
                     @Override
-                    public Object run(Transaction t) {
+                    public Object either(Transaction t) {
                         assertEquals(oldValue, i.getValue(), 0.0001);
                         return null;
                     }
@@ -312,13 +312,13 @@ public class TranlocalSnapshotTest {
             public Object execute(Transaction t) throws Exception {
                 new OrElseTemplate() {
                     @Override
-                    public Object orelserun(Transaction t) {
+                    public Object orelse(Transaction t) {
                         i.setValue(newValue);
                         return null;
                     }
 
                     @Override
-                    public Object run(Transaction t) {
+                    public Object either(Transaction t) {
                         assertEquals(oldValue, i.getValue(), 0.000001);
                         return null;
                     }
@@ -357,13 +357,13 @@ public class TranlocalSnapshotTest {
             public Object execute(Transaction t) throws Exception {
                 new OrElseTemplate() {
                     @Override
-                    public Object orelserun(Transaction t) {
+                    public Object orelse(Transaction t) {
                         i.setValue(newValue);
                         return null;
                     }
 
                     @Override
-                    public Object run(Transaction t) {
+                    public Object either(Transaction t) {
                         assertSame(oldValue, i.getValue());
                         return null;
                     }
@@ -402,13 +402,13 @@ public class TranlocalSnapshotTest {
             public Object execute(Transaction t) throws Exception {
                 new OrElseTemplate() {
                     @Override
-                    public Object orelserun(Transaction t) {
+                    public Object orelse(Transaction t) {
                         i.setValue(newValue);
                         return null;
                     }
 
                     @Override
-                    public Object run(Transaction t) {
+                    public Object either(Transaction t) {
                         assertSame(oldValue, i.getValue());
                         return null;
                     }
@@ -447,13 +447,13 @@ public class TranlocalSnapshotTest {
             public Object execute(Transaction t) throws Exception {
                 new OrElseTemplate() {
                     @Override
-                    public Object orelserun(Transaction t) {
+                    public Object orelse(Transaction t) {
                         i.setValue(newValue);
                         return null;
                     }
 
                     @Override
-                    public Object run(Transaction t) {
+                    public Object either(Transaction t) {
                         assertSame(oldValue, i.getValue());
                         return null;
                     }
@@ -490,7 +490,7 @@ public class TranlocalSnapshotTest {
             public Object execute(Transaction t) throws Exception {
                 new OrElseTemplate() {
                     @Override
-                    public Object orelserun(Transaction t) {
+                    public Object orelse(Transaction t) {
                         m.setValue1(100);
                         m.setValue2(200);
                         m.setValue3(300);
@@ -498,7 +498,7 @@ public class TranlocalSnapshotTest {
                     }
 
                     @Override
-                    public Object run(Transaction t) {
+                    public Object either(Transaction t) {
                         assertEquals(1, m.getValue1());
                         assertEquals(2, m.getValue2());
                         assertEquals(3, m.getValue3());
@@ -561,13 +561,13 @@ public class TranlocalSnapshotTest {
             public Object execute(Transaction t) throws Exception {
                 new OrElseTemplate() {
                     @Override
-                    public Object orelserun(Transaction t) {
+                    public Object orelse(Transaction t) {
                         i.setValue(newValue);
                         return null;
                     }
 
                     @Override
-                    public Object run(Transaction t) {
+                    public Object either(Transaction t) {
                         assertSame(oldValue, i.getValue());
                         return null;
                     }
@@ -606,13 +606,13 @@ public class TranlocalSnapshotTest {
             public Object execute(Transaction t) throws Exception {
                 new OrElseTemplate() {
                     @Override
-                    public Object orelserun(Transaction t) {
+                    public Object orelse(Transaction t) {
                         i.setValue(newValue);
                         return null;
                     }
 
                     @Override
-                    public Object run(Transaction t) {
+                    public Object either(Transaction t) {
                         assertSame(oldValue, i.getValue());
                         return null;
                     }
@@ -650,13 +650,13 @@ public class TranlocalSnapshotTest {
             public Object execute(Transaction t) throws Exception {
                 new OrElseTemplate() {
                     @Override
-                    public Object orelserun(Transaction t) {
+                    public Object orelse(Transaction t) {
                         i.setValue(newValue);
                         return null;
                     }
 
                     @Override
-                    public Object run(Transaction t) {
+                    public Object either(Transaction t) {
                         assertSame(oldValue, i.getValue());
                         return null;
                     }
@@ -694,13 +694,13 @@ public class TranlocalSnapshotTest {
             public Object execute(Transaction t) throws Exception {
                 new OrElseTemplate() {
                     @Override
-                    public Object orelserun(Transaction t) {
+                    public Object orelse(Transaction t) {
                         i.setValue(newValue);
                         return null;
                     }
 
                     @Override
-                    public Object run(Transaction t) {
+                    public Object either(Transaction t) {
                         assertSame(oldValue, i.getValue());
                         return null;
                     }
@@ -740,13 +740,13 @@ public class TranlocalSnapshotTest {
             public Object execute(Transaction t) throws Exception {
                 new OrElseTemplate() {
                     @Override
-                    public Object orelserun(Transaction t) {
+                    public Object orelse(Transaction t) {
                         i.setValue(newValue);
                         return null;
                     }
 
                     @Override
-                    public Object run(Transaction t) {
+                    public Object either(Transaction t) {
                         assertSame(oldValue, i.getValue());
                         return null;
                     }

@@ -10,8 +10,7 @@ import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.multiverse.TestUtils.joinAll;
-import static org.multiverse.TestUtils.startAll;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
@@ -26,13 +25,14 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 public class FailureAtomicityStressTest {
 
     private int modifyThreadCount = 10;
-    private int writeCount = 1000 * 1000;
+    private boolean stop;
     private IntRef ref;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
         ref = new IntRef();
+        stop = false;
     }
 
     @Test
@@ -43,25 +43,42 @@ public class FailureAtomicityStressTest {
         }
 
         startAll(modifyThreads);
+
+        sleepMs(getDurationMsFromSystemProperties(30 * 1000));
+        stop = true;
+
         joinAll(modifyThreads);
         //since half of the transactions are going to be aborted we need to divide it by 2
-        int expected = (modifyThreadCount * writeCount) / 2;
+
+        long expected = sum(modifyThreads) / 2;
+
         assertEquals(expected, ref.get());
     }
 
+    public long sum(ModifyThread[] threads){
+        long result = 0;
+        for(ModifyThread thread: threads){
+            result+=thread.writeCount;
+        }
+        return result;
+    }
+
     public class ModifyThread extends TestThread {
+
+        long writeCount;
+
         public ModifyThread(int id) {
             super("ModifyThread-" + id);
         }
 
         @Override
         public void doRun() throws Exception {
-            for (int k = 0; k < writeCount; k++) {
-                if (k % 50000 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
+            while(!stop){
+                if (writeCount % 500000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), writeCount);
                 }
 
-                boolean abort = k % 2 == 0;
+                boolean abort = randomOneOf(10);
                 if (abort) {
                     try {
                         modifyButAbort();
@@ -69,7 +86,8 @@ public class FailureAtomicityStressTest {
                     } catch (DeadTransactionException ignore) {
                     }
                 } else {
-                    modify();
+                   writeCount++;
+                   modify();
                 }
             }
         }

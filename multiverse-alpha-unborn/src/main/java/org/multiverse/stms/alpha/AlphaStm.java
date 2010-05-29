@@ -1,13 +1,13 @@
 package org.multiverse.stms.alpha;
 
-import org.multiverse.api.TraceLevel;
 import org.multiverse.api.Stm;
+import org.multiverse.api.TraceLevel;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.TransactionFactoryBuilder;
 import org.multiverse.api.backoff.BackoffPolicy;
 import org.multiverse.api.clock.PrimitiveClock;
 import org.multiverse.api.commitlock.CommitLockPolicy;
-import org.multiverse.stms.alpha.programmatic.AlphaProgrammaticReferenceFactoryBuilder;
+import org.multiverse.stms.alpha.programmatic.AlphaProgrammaticRefFactoryBuilder;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.stms.alpha.transactions.SpeculativeConfiguration;
 import org.multiverse.stms.alpha.transactions.readonly.*;
@@ -29,7 +29,7 @@ import static org.multiverse.stms.alpha.transactions.SpeculativeConfiguration.cr
  *
  * @author Peter Veentjer.
  */
-public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuilder, AlphaProgrammaticReferenceFactoryBuilder> {
+public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuilder, AlphaProgrammaticRefFactoryBuilder> {
 
     private final static Logger logger = Logger.getLogger(AlphaStm.class.getName());
 
@@ -67,7 +67,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
     private final boolean interruptible;
 
-    private final AlphaProgrammaticReferenceFactoryBuilder referenceFactoryBuilder;
+    private final AlphaProgrammaticRefFactoryBuilder refFactoryBuilder;
 
     private final int maxReadSpinCount;
 
@@ -111,7 +111,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         this.maxRetries = config.maxRetries;
         this.clock = config.clock;
         this.quickReleaseWriteLocksEnabled = config.quickReleaseWriteLocksEnabled;
-        this.referenceFactoryBuilder = new AlphaProgrammaticReferenceFactoryBuilder(this);
+        this.refFactoryBuilder = new AlphaProgrammaticRefFactoryBuilder(this);
         this.explicitRetryAllowed = config.explicitRetryAllowed;
         this.readTrackingEnabled = config.readTrackingEnabled;
         this.allowWriteSkew = config.allowWriteSkew;
@@ -130,6 +130,11 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
     @Override
     public AlphaTransactionFactoryBuilder getTransactionFactoryBuilder() {
         return new AlphaTransactionFactoryBuilder();
+    }
+
+    @Override
+    public AlphaProgrammaticRefFactoryBuilder getProgrammaticRefFactoryBuilder() {
+        return refFactoryBuilder;
     }
 
     public int getMaxReadSpinCount() {
@@ -192,10 +197,6 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         return clock;
     }
 
-    @Override
-    public AlphaProgrammaticReferenceFactoryBuilder getProgrammaticReferenceFactoryBuilder() {
-        return referenceFactoryBuilder;
-    }
 
     public class AlphaTransactionFactoryBuilder
             implements TransactionFactoryBuilder<AlphaTransaction, AlphaTransactionFactoryBuilder> {

@@ -42,7 +42,6 @@ public class TransactionalThreadPoolExecutor_exceptionsStressTest {
             executor.execute(new Task());
         }
 
-
         executor.awaitTermination();
     }
 

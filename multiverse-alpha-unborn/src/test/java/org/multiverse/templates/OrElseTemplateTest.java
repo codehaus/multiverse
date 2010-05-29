@@ -48,14 +48,14 @@ public class OrElseTemplateTest {
         Transaction tx = startUpdateTransaction();
         new OrElseTemplate(tx) {
             @Override
-            public Object run(Transaction tx) {
+            public Object either(Transaction tx) {
                 leftRef.set(1);
                 retry();
                 return null;
             }
 
             @Override
-            public Object orelserun(Transaction tx) {
+            public Object orelse(Transaction tx) {
                 assertEquals(1, leftRef.get());
                 return null;
             }
@@ -123,7 +123,7 @@ public class OrElseTemplateTest {
                 public String execute(Transaction t) throws Exception {
                     return new OrElseTemplate<String>() {
                         @Override
-                        public String run(Transaction tx) {
+                        public String either(Transaction tx) {
                             if (orRef.get() == 0) {
                                 retry();
                             }
@@ -132,7 +132,7 @@ public class OrElseTemplateTest {
                         }
 
                         @Override
-                        public String orelserun(Transaction tx) {
+                        public String orelse(Transaction tx) {
                             if (elseRef.get() == 0) {
                                 retry();
                             }
@@ -151,14 +151,14 @@ public class OrElseTemplateTest {
 
         new OrElseTemplate() {
             @Override
-            public Object run(Transaction tx) {
+            public Object either(Transaction tx) {
                 assertSame(startedTx, tx);
                 retry();
                 return null;
             }
 
             @Override
-            public Object orelserun(Transaction tx) {
+            public Object orelse(Transaction tx) {
                 assertSame(startedTx, tx);
                 return null;
             }
@@ -176,13 +176,13 @@ public class OrElseTemplateTest {
 
         new OrElseTemplate() {
             @Override
-            public Object run(Transaction t) {
+            public Object either(Transaction t) {
                 v.set(10);
                 return null;
             }
 
             @Override
-            public Object orelserun(Transaction t) {
+            public Object orelse(Transaction t) {
                 fail();
                 return null;
             }
@@ -201,14 +201,14 @@ public class OrElseTemplateTest {
 
         new OrElseTemplate() {
             @Override
-            public Object run(Transaction t) {
+            public Object either(Transaction t) {
                 v.set(10);
                 retry();
                 return null;
             }
 
             @Override
-            public Object orelserun(Transaction t) {
+            public Object orelse(Transaction t) {
                 v.set(20);
                 return null;
             }
@@ -228,14 +228,14 @@ public class OrElseTemplateTest {
         try {
             new OrElseTemplate() {
                 @Override
-                public Object run(Transaction t) {
+                public Object either(Transaction t) {
                     v.set(10);
                     retry();
                     return null;
                 }
 
                 @Override
-                public Object orelserun(Transaction t) {
+                public Object orelse(Transaction t) {
                     v.set(20);
                     retry();
                     return null;

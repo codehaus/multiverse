@@ -4,8 +4,8 @@ import org.multiverse.annotations.FieldGranularity;
 import org.multiverse.annotations.NonTransactional;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
-import org.multiverse.api.programmatic.ProgrammaticLong;
-import org.multiverse.api.programmatic.ProgrammaticReferenceFactory;
+import org.multiverse.api.programmatic.ProgrammaticLongRef;
+import org.multiverse.api.programmatic.ProgrammaticRefFactory;
 import org.multiverse.utils.TodoException;
 
 import java.util.*;
@@ -52,21 +52,21 @@ import static org.multiverse.api.StmUtils.retry;
 public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque<E>
         implements TransactionalList<E> {
 
-    private final static ProgrammaticReferenceFactory sizeFactory = getGlobalStmInstance()
-            .getProgrammaticReferenceFactoryBuilder()
+    private final static ProgrammaticRefFactory sizeFactory = getGlobalStmInstance()
+            .getProgrammaticRefFactoryBuilder()
             .build();
 
-    private final static ProgrammaticReferenceFactory modFactory = getGlobalStmInstance()
-            .getProgrammaticReferenceFactoryBuilder()
+    private final static ProgrammaticRefFactory modFactory = getGlobalStmInstance()
+            .getProgrammaticRefFactoryBuilder()
             .build();
 
     private final int maxCapacity;
 
     private final boolean relaxedMaximumCapacity;
 
-    private final ProgrammaticLong size;
+    private final ProgrammaticLongRef size;
 
-    private final ProgrammaticLong mod;
+    private final ProgrammaticLongRef mod;
 
     @FieldGranularity
     private Node<E> head;
@@ -159,8 +159,8 @@ public final class TransactionalLinkedList<E> extends AbstractTransactionalDeque
         }
         this.relaxedMaximumCapacity = relaxedMaximumCapacity;
         this.maxCapacity = maxCapacity;
-        this.size = sizeFactory.atomicCreateLong(0);
-        this.mod = sizeFactory.atomicCreateLong(0);
+        this.size = sizeFactory.atomicCreateLongRef(0);
+        this.mod = sizeFactory.atomicCreateLongRef(0);
     }
 
     /**

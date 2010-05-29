@@ -1,6 +1,6 @@
 package org.multiverse.api;
 
-import org.multiverse.api.programmatic.ProgrammaticReferenceFactoryBuilder;
+import org.multiverse.api.programmatic.ProgrammaticRefFactoryBuilder;
 
 /**
  * The main interface for software transactional memory. Updates/reads in the stm should only be done through the
@@ -14,7 +14,7 @@ import org.multiverse.api.programmatic.ProgrammaticReferenceFactoryBuilder;
  *
  * @author Peter Veentjer.
  */
-public interface Stm<B extends TransactionFactoryBuilder, P extends ProgrammaticReferenceFactoryBuilder> {
+public interface Stm<B extends TransactionFactoryBuilder, P extends ProgrammaticRefFactoryBuilder> {
 
     /**
      * Returns the current clock version (this is logical time). The returned value will always be equal or larger than
@@ -36,10 +36,10 @@ public interface Stm<B extends TransactionFactoryBuilder, P extends Programmatic
     B getTransactionFactoryBuilder();
 
     /**
-     * Returns the programmatic reference factory this Stm exposes. See the
-     * {@link org.multiverse.api.programmatic.ProgrammaticReference} for more information when to use it.
+     * Returns the programmatic ref factory this Stm exposes. See the
+     * {@link org.multiverse.api.programmatic.ProgrammaticRef} for more information when to use it.
      *
-     * @return the used ProgrammaticReferenceFactory.
+     * @return the used ProgrammaticRefFactory.
      */
-    P getProgrammaticReferenceFactoryBuilder();
+    P getProgrammaticRefFactoryBuilder();
 }

@@ -43,7 +43,6 @@ public class MoneyTransferStressTest {
         threads = createThreads();
     }
 
-
     @Test
     public void test() {
         startAll(threads);

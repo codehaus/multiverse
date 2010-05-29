@@ -6,7 +6,7 @@ import org.multiverse.api.TraceLevel;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.programmatic.ProgrammaticReference;
+import org.multiverse.api.programmatic.ProgrammaticRef;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
@@ -48,9 +48,9 @@ public class TransactionTemplate_loggingTest {
                 .setFamilyName("loggingtransaction")
                 .build();
 
-        final ProgrammaticReference ref = stm.getProgrammaticReferenceFactoryBuilder()
+        final ProgrammaticRef ref = stm.getProgrammaticRefFactoryBuilder()
                 .build()
-                .atomicCreateReference();
+                .atomicCreateRef();
 
         new TransactionTemplate(txFactory) {
             @Override

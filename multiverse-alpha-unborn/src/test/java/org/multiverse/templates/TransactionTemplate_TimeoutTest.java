@@ -9,8 +9,8 @@ import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.RetryTimeoutException;
-import org.multiverse.api.programmatic.ProgrammaticLong;
-import org.multiverse.api.programmatic.ProgrammaticReference;
+import org.multiverse.api.programmatic.ProgrammaticLongRef;
+import org.multiverse.api.programmatic.ProgrammaticRef;
 
 import java.util.concurrent.TimeUnit;
 
@@ -42,8 +42,8 @@ public class TransactionTemplate_TimeoutTest {
     @Test
     public void whenTimeout() {
         System.out.println("----------------whenTimeout------------------");
-        final ProgrammaticReference ref = stm.getProgrammaticReferenceFactoryBuilder()
-                .build().atomicCreateReference();
+        final ProgrammaticRef ref = stm.getProgrammaticRefFactoryBuilder()
+                .build().atomicCreateRef();
 
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
                 .setTimeoutNs(TimeUnit.SECONDS.toNanos(5))
@@ -76,9 +76,9 @@ public class TransactionTemplate_TimeoutTest {
     public void whenSomeWaitingNeeded() {
         System.out.println("whenSomeWaitingNeeded");
 
-        final ProgrammaticLong ref = stm.getProgrammaticReferenceFactoryBuilder()
+        final ProgrammaticLongRef ref = stm.getProgrammaticRefFactoryBuilder()
                 .build()
-                .atomicCreateLong(0);
+                .atomicCreateLongRef(0);
 
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
@@ -124,9 +124,9 @@ public class TransactionTemplate_TimeoutTest {
     public void whenMultipleWakeupsButStillTimeout() {
         System.out.println("multipleWakeupsButNotEnough");
 
-        final ProgrammaticLong ref = stm.getProgrammaticReferenceFactoryBuilder()
+        final ProgrammaticLongRef ref = stm.getProgrammaticRefFactoryBuilder()
                 .build()
-                .atomicCreateLong(0);
+                .atomicCreateLongRef(0);
 
         TransactionFactory txFactory = stm.getTransactionFactoryBuilder()
                 .setReadTrackingEnabled(true)

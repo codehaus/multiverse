@@ -6,7 +6,7 @@ import org.benchy.TestCase;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
 import org.multiverse.api.Stm;
-import org.multiverse.api.programmatic.ProgrammaticLong;
+import org.multiverse.api.programmatic.ProgrammaticLongRef;
 
 import java.util.concurrent.TimeUnit;
 
@@ -27,7 +27,7 @@ public class ConcurrentUpdateDriver extends AbstractBenchmarkDriver {
     private int threadCount;
 
     private IncThread[] threads;
-    private ProgrammaticLong ref;
+    private ProgrammaticLongRef ref;
     private Stm stm;
 
     @Override
@@ -41,7 +41,7 @@ public class ConcurrentUpdateDriver extends AbstractBenchmarkDriver {
             threads[k] = new IncThread(k);
         }
 
-        ref = stm.getProgrammaticReferenceFactoryBuilder().build().atomicCreateLong(0);
+        ref = stm.getProgrammaticRefFactoryBuilder().build().atomicCreateLongRef(0);
     }
 
     @Override

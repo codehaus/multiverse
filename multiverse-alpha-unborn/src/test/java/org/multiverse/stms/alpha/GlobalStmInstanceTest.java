@@ -4,7 +4,7 @@ package org.multiverse.stms.alpha;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.TransactionFactoryBuilder;
-import org.multiverse.api.programmatic.ProgrammaticReferenceFactoryBuilder;
+import org.multiverse.api.programmatic.ProgrammaticRefFactoryBuilder;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -24,7 +24,7 @@ public class GlobalStmInstanceTest {
     public void GiveMePreConfiguredSTMInstance(){
         stm = getGlobalStmInstance();
         assertThat(stm.getTransactionFactoryBuilder(), is(instanceOf(TransactionFactoryBuilder.class)));
-        assertThat(stm.getProgrammaticReferenceFactoryBuilder(), is(instanceOf(ProgrammaticReferenceFactoryBuilder.class)));
+        assertThat(stm.getProgrammaticRefFactoryBuilder(), is(instanceOf(ProgrammaticRefFactoryBuilder.class)));
     }
     @Test
     public void GiveMeSingleInstanceOfSTM() {

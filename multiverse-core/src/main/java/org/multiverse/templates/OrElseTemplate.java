@@ -75,15 +75,15 @@ public abstract class OrElseTemplate<E> {
         this.tx = tx;
     }
 
-    public abstract E run(Transaction tx);
+    public abstract E either(Transaction tx);
 
-    public abstract E orelserun(Transaction tx);
+    public abstract E orelse(Transaction tx);
 
-    public final E execute() {
+    public final E execute() {      
         try {
-            return run(tx);
+            return either(tx);
         } catch (Retry e) {
-            return orelserun(tx);
+            return orelse(tx);
         }
     }
 }

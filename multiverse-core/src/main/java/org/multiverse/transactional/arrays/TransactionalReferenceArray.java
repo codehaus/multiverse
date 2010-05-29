@@ -3,8 +3,8 @@ package org.multiverse.transactional.arrays;
 import org.multiverse.annotations.NonTransactional;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.annotations.TransactionalObject;
-import org.multiverse.api.programmatic.ProgrammaticReference;
-import org.multiverse.api.programmatic.ProgrammaticReferenceFactory;
+import org.multiverse.api.programmatic.ProgrammaticRef;
+import org.multiverse.api.programmatic.ProgrammaticRefFactory;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 
@@ -23,11 +23,11 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 @TransactionalObject
 public final class TransactionalReferenceArray<E> {
 
-    private final static ProgrammaticReferenceFactory referenceFactory = getGlobalStmInstance()
-            .getProgrammaticReferenceFactoryBuilder()
+    private final static ProgrammaticRefFactory referenceFactory = getGlobalStmInstance()
+            .getProgrammaticRefFactoryBuilder()
             .build();
 
-    private final ProgrammaticReference<E>[] array;
+    private final ProgrammaticRef<E>[] array;
 
     /**
      * Creates a new TransactionalReferenceArray with the specified length.
@@ -40,13 +40,13 @@ public final class TransactionalReferenceArray<E> {
             throw new IllegalArgumentException();
         }
 
-        array = new ProgrammaticReference[length];
+        array = new ProgrammaticRef[length];
         for (int k = 0; k < length; k++) {
-            array[k] = referenceFactory.atomicCreateReference(null);
+            array[k] = referenceFactory.atomicCreateRef(null);
         }
     }
 
-    private TransactionalReferenceArray(ProgrammaticReference<E>[] array) {
+    private TransactionalReferenceArray(ProgrammaticRef<E>[] array) {
         if (array == null) {
             throw new NullPointerException();
         }
@@ -195,11 +195,11 @@ public final class TransactionalReferenceArray<E> {
             throw new IllegalArgumentException();
         }
 
-        ProgrammaticReference[] newArray = new ProgrammaticReference[newLength];
+        ProgrammaticRef[] newArray = new ProgrammaticRef[newLength];
         System.arraycopy(array, 0, newArray, 0, array.length);
 
         for (int k = array.length; k < newLength; k++) {
-            newArray[k] = referenceFactory.atomicCreateReference(null);
+            newArray[k] = referenceFactory.atomicCreateRef(null);
         }
 
         return new TransactionalReferenceArray<E>(newArray);

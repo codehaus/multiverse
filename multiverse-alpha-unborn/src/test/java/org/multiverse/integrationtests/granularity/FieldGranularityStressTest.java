@@ -13,8 +13,7 @@ import org.multiverse.api.exceptions.WriteConflict;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.TestUtils.joinAll;
-import static org.multiverse.TestUtils.startAll;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
@@ -24,12 +23,14 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
 public class FieldGranularityStressTest {
 
     public AtomicInteger conflictCounter;
-    private int transactionCount = 50 * 1000 * 1000;
+
+    private boolean stop;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
         conflictCounter = new AtomicInteger();
+        stop = false;
     }
 
     @After
@@ -44,10 +45,13 @@ public class FieldGranularityStressTest {
         SetRightThread rightThread = new SetRightThread(pair);
 
         startAll(leftThread, rightThread);
+
+        sleepMs(getDurationMsFromSystemProperties(30 * 1000));
+        stop = true;
         joinAll(leftThread, rightThread);
 
-        assertEquals(transactionCount, pair.getLeft());
-        assertEquals(transactionCount, pair.getRight());
+        assertEquals(leftThread.count, pair.getLeft());
+        assertEquals(rightThread.count, pair.getRight());
 
         assertEquals(0, conflictCounter.get());
     }
@@ -55,6 +59,7 @@ public class FieldGranularityStressTest {
     class SetLeftThread extends TestThread {
 
         final Pair pair;
+        int count = 0;
 
         SetLeftThread(Pair pair) {
             super("SetLeftThread");
@@ -63,12 +68,14 @@ public class FieldGranularityStressTest {
 
         @Override
         public void doRun() throws Exception {
-            for (int k = 0; k < transactionCount; k++) {
+            while (!stop) {
                 updateLeft();
 
-                if (k % 5000000 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
+                if (count % 5000000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), count);
                 }
+
+                count++;
             }
         }
 
@@ -89,6 +96,7 @@ public class FieldGranularityStressTest {
     class SetRightThread extends TestThread {
 
         final Pair pair;
+        int count = 0;
 
         SetRightThread(Pair pair) {
             super("SetRightThread");
@@ -97,13 +105,15 @@ public class FieldGranularityStressTest {
 
         @Override
         public void doRun() throws Exception {
-            for (int k = 0; k < transactionCount; k++) {
+            while(!stop){
                 updateRight();
 
-                if (k % 5000000 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
+                if (count % 5000000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), count);
                 }
+                count++;
             }
+
         }
 
         @TransactionalMethod(readonly = false)
