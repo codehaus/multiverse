@@ -42,6 +42,7 @@ public class StandardInstrumentor implements Instrumentor {
         exclude("com.intellij.");
         exclude("com.sun.");
         exclude("java.");
+        exclude("javax.");
         exclude("org.apache.");
         exclude("org.eclipse.");
         exclude("org.gradle.");
@@ -54,6 +55,7 @@ public class StandardInstrumentor implements Instrumentor {
         exclude("org.multiverse.repackaged.");
         exclude("org.objectweb.asm.");
         exclude("org.slf4j.");
+        exclude("org.springframework.");
         exclude("sun.");
     }
 

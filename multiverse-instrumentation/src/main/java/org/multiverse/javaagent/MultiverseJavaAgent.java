@@ -49,6 +49,7 @@ public final class MultiverseJavaAgent {
         boolean verbose = getSystemBooleanProperty("verbose", false);
         if (verbose) {
             instrumentor.setLog(new SystemOutImportantInstrumenterLogger());
+            println("Multiverse: Verbose output enabled");            
         }
 
         instrumentor.setFiler(new JavaAgentFiler());
