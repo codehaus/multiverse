@@ -11,18 +11,6 @@ allprojects {
   sourceCompatibility = 1.6
   version = '0.5.3-SNAPSHOT'
   group = 'org.multiverse'
-  //scalaVersion = '2.8.0.Beta1'
-  scalaVersion = '2.7.7'
-
-  //repository(url: 'dav:https://dav.codehaus.org/repository/multiverse/') 
-  //{
-  //	authentication(userName: "${username}", password: "${password}")
-  //}
-
-  //snapshotRepository(url:'dav:https://dav.codehaus.org/snapshots.repository/multiverse/') 
-  //{
-  //	authentication(userName: "${username}", password: "${password}")
-  //} 
 
   def localMavenRepo = 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
 
@@ -147,7 +135,7 @@ project(':multiverse-alpha-unborn') {
     from sourceSets.test.classes
     classifier = 'test'
   }
-              
+
   artifacts {
     testFixtures testJar
   }
@@ -163,15 +151,15 @@ project(':multiverse-alpha-unborn') {
             src: "${localRepo}/asm/asm-all/jars/asm-all-3.2.jar")
     ant.unzip(dest: "${buildDir}/classes/main",
             src: localRepo + 'args4j/args4j/jars/args4j-2.0.16.jar')
-    
-    ant.copy(todir: "${buildDir}/classes/main"){
-            fileset(dir: "${projectRootDir}/multiverse-core/build/classes/main") 
+
+    ant.copy(todir: "${buildDir}/classes/main") {
+      fileset(dir: "${projectRootDir}/multiverse-core/build/classes/main")
     }
-    
-    ant.copy(todir: "${buildDir}/classes/main"){
-            fileset(dir: "${projectRootDir}/multiverse-instrumentation/build/classes/main")
+
+    ant.copy(todir: "${buildDir}/classes/main") {
+      fileset(dir: "${projectRootDir}/multiverse-instrumentation/build/classes/main")
     }
- 
+
     ant.delete(dir: "${buildDir}/classes/main/META-INF/")
     ant.mkdir(dir: "${buildDir}/classes/main/META-INF/")
     ant.copy(
@@ -221,14 +209,14 @@ project(':multiverse-alpha') {
     ant.unzip(dest: "${buildDir}/classes/main",
             src: localRepo + 'args4j/args4j/jars/args4j-2.0.16.jar')
 
-    ant.copy(todir: "${buildDir}/classes/main"){
-            fileset(dir: "${projectRootDir}/multiverse-core/build/classes/main") 
+    ant.copy(todir: "${buildDir}/classes/main") {
+      fileset(dir: "${projectRootDir}/multiverse-core/build/classes/main")
     }
-    ant.copy(todir: "${buildDir}/classes/main"){
-            fileset(dir: "${projectRootDir}/multiverse-instrumentation/build/classes/main")
+    ant.copy(todir: "${buildDir}/classes/main") {
+      fileset(dir: "${projectRootDir}/multiverse-instrumentation/build/classes/main")
     }
-    ant.copy(todir: "${buildDir}/classes/main"){
-            fileset(dir: "${projectRootDir}/multiverse-alpha-unborn/build/classes/main")
+    ant.copy(todir: "${buildDir}/classes/main") {
+      fileset(dir: "${projectRootDir}/multiverse-alpha-unborn/build/classes/main")
     }
 
     ant.delete(file: "${buildDir}/classes/main/GiveMavenSomethingToCompile.class")
@@ -261,18 +249,18 @@ project(':multiverse-alpha') {
 
     ant.mkdir dir: "${buildDir}/classes/test"
 
-    ant.copy(todir: "${buildDir}/classes/test"){
-	fileset(dir: "${projectRootDir}/multiverse-core/build/classes/test")
+    ant.copy(todir: "${buildDir}/classes/test") {
+      fileset(dir: "${projectRootDir}/multiverse-core/build/classes/test")
     }
-    ant.copy(todir: "${buildDir}/classes/test"){
-        fileset(dir: "${projectRootDir}/multiverse-alpha-unborn/build/classes/test")
+    ant.copy(todir: "${buildDir}/classes/test") {
+      fileset(dir: "${projectRootDir}/multiverse-alpha-unborn/build/classes/test")
     }
-    
-    ant.delete file:("${buildDir}"+'/classes/test/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalMethod_InterruptibleTest.class')
-    ant.delete file:("${buildDir}"+'/classes/test/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalMethod_InterruptibleTest$MethodWithoutException.class')
-    ant.delete file:("${buildDir}"+'/classes/test/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalMethod_InterruptibleTest$MethodWithIncorrectException.class')
-    ant.delete file:("${buildDir}"+'/classes/test/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalObject_ClashingFieldAndMethodTest.class')
-    ant.delete file:("${buildDir}"+'/classes/test/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalObject_ClashingFieldAndMethodTest$ObjectWithClashingMethod.class')
+
+    ant.delete file: ("${buildDir}" + '/classes/test/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalObject_ClashingFieldAndMethodTest.class')
+    ant.delete file: ("${buildDir}" + '/classes/test/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalObject_ClashingFieldAndMethodTest$ObjectWithClashingMethod.class')
+    ant.delete file: ("${buildDir}" + '/classes/test/org/multiverse/stms/alpha/instrumentation/transactionalmethod/TransactionalMethod_InterruptibleTest.class')
+    ant.delete file: ("${buildDir}" + '/classes/test/org/multiverse/stms/alpha/instrumentation/transactionalmethod/TransactionalMethod_InterruptibleTest$MethodWithoutException.class')
+    ant.delete file: ("${buildDir}" + '/classes/test/org/multiverse/stms/alpha/instrumentation/transactionalmethod/TransactionalMethod_InterruptibleTest$MethodWithIncorrectException.class')
 
     ant.java(classname: "org.multiverse.compiler.MultiverseCompiler") {
       arg value: '-o'

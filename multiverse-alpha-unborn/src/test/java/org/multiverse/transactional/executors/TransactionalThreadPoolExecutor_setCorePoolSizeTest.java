@@ -137,11 +137,11 @@ public class TransactionalThreadPoolExecutor_setCorePoolSizeTest {
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                sleepMs(2000);
+                sleepMs(3000);
             }
         });
 
-        sleepMs(1000);
+        sleepMs(1500);
         executor.shutdown();
 
         try {
