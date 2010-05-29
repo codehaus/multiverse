@@ -28,7 +28,6 @@ public class ReadonlyScopeTest {
             readonlySurroundingUpdate(ref);
             fail();
         } catch (ReadonlyException expected) {
-
         }
 
         assertEquals(0, ref.get());
@@ -59,5 +58,4 @@ public class ReadonlyScopeTest {
     private void innerReadonly(Ref ref) {
         ref.inc();
     }
-
 }
