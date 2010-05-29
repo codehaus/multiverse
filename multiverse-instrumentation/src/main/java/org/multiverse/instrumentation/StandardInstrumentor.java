@@ -35,26 +35,50 @@ public class StandardInstrumentor implements Instrumentor {
         this.compilerVersion = compilerVersion;
         this.stmName = stmName;
 
+        addDefaultExcludes();
+    }
 
+    private void addDefaultExcludes() {
         exclude("ch.qos.");
+        exclude("com.gigaspaces.");
         exclude("com.jprofiler.");
+        exclude("com.j_spaces.");
         exclude("com.ibm.");
         exclude("com.intellij.");
         exclude("com.sun.");
+        exclude("com.tc.");
+        exclude("com.tcclient.");
+        exclude("groovy.");
         exclude("java.");
+        exclude("javax.");
+        exclude("oracle.");
         exclude("org.apache.");
         exclude("org.eclipse.");
         exclude("org.gradle.");
+        exclude("org.codehaus.groovy.");
         exclude("org.hamcrest.");
+        exclude("org.hibernate.");
+        exclude("org.ietf.");
+        exclude("org.jboss.");
         exclude("org.jruby.");
         exclude("org.junit.");
-        exclude("org.kohsuke.");
         exclude("org.junit.");
+        exclude("org.kohsuke.");
         exclude("org.mockito.");
+        exclude("org.mortbay.");
         exclude("org.multiverse.repackaged.");
         exclude("org.objectweb.asm.");
+        exclude("org.omg.");
+        exclude("org.openspaces.");
+        exclude("org.osgi.");
         exclude("org.slf4j.");
+        exclude("org.springframework.");
+        exclude("org.w3c.");
+        exclude("org.xml.");
+        exclude("scala.");
+        exclude("se.scalablesolutions.");
         exclude("sun.");
+        exclude("sunw.");
     }
 
     protected final void add(InstrumentationPhase phase) {

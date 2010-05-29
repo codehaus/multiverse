@@ -41,7 +41,7 @@ public class TransactionTemplate_TimeoutTest {
 
     @Test
     public void whenTimeout() {
-        System.out.println("----------------whenTimeout------------------");
+        //System.out.println("----------------whenTimeout------------------");
         final ProgrammaticRef ref = stm.getProgrammaticRefFactoryBuilder()
                 .build().atomicCreateRef();
 
@@ -52,9 +52,9 @@ public class TransactionTemplate_TimeoutTest {
         TransactionTemplate template = new TransactionTemplate(txFactory) {
             @Override
             public Object execute(Transaction tx) throws Exception {
-                System.out.println("timeout: " + tx.getConfiguration().getTimeoutNs());
-                System.out.println("remaining timeout: " + tx.getRemainingTimeoutNs());
-                System.out.println("found value=" + ref.get());
+                //System.out.println("timeout: " + tx.getConfiguration().getTimeoutNs());
+                //System.out.println("remaining timeout: " + tx.getRemainingTimeoutNs());
+                //System.out.println("found value=" + ref.get());
                 if (ref.isNull()) {
                     retry();
                 }
@@ -69,12 +69,12 @@ public class TransactionTemplate_TimeoutTest {
         } catch (RetryTimeoutException expected) {
         }
 
-        System.out.println("---------------------finished whenTimeout------------------");
+        //System.out.println("---------------------finished whenTimeout------------------");
     }
 
     @Test
     public void whenSomeWaitingNeeded() {
-        System.out.println("whenSomeWaitingNeeded");
+        //System.out.println("whenSomeWaitingNeeded");
 
         final ProgrammaticLongRef ref = stm.getProgrammaticRefFactoryBuilder()
                 .build()
@@ -89,15 +89,15 @@ public class TransactionTemplate_TimeoutTest {
         TransactionTemplate template = new TransactionTemplate(txFactory) {
             @Override
             public Object execute(Transaction tx) throws Exception {
-                System.out.println("timeout: " + tx.getConfiguration().getTimeoutNs());
-                System.out.println("remaining timeout: " + tx.getRemainingTimeoutNs());
-                System.out.println("found value=" + ref.get());
+                //System.out.println("timeout: " + tx.getConfiguration().getTimeoutNs());
+                //System.out.println("remaining timeout: " + tx.getRemainingTimeoutNs());
+                //System.out.println("found value=" + ref.get());
                 if (ref.get() < 50) {
-                    System.out.println("sleeping");
+                //    System.out.println("sleeping");
                     retry();
                 }
 
-                System.out.println("expected value found");
+                //System.out.println("expected value found");
                 return null;
             }
         };
@@ -106,9 +106,9 @@ public class TransactionTemplate_TimeoutTest {
             @Override
             public void doRun() throws Exception {
                 for (int k = 0; k < 100; k++) {
-                    System.out.println("incrementing to: " + k);
+                //    System.out.println("incrementing to: " + k);
                     ref.atomicInc(1);
-                    System.out.println("finished incrementing to: " + k);
+                //    System.out.println("finished incrementing to: " + k);
                     sleepMs(100);
                 }
             }
@@ -122,7 +122,7 @@ public class TransactionTemplate_TimeoutTest {
 
     @Test
     public void whenMultipleWakeupsButStillTimeout() {
-        System.out.println("multipleWakeupsButNotEnough");
+        //System.out.println("multipleWakeupsButNotEnough");
 
         final ProgrammaticLongRef ref = stm.getProgrammaticRefFactoryBuilder()
                 .build()
@@ -137,15 +137,15 @@ public class TransactionTemplate_TimeoutTest {
         TransactionTemplate template = new TransactionTemplate(txFactory) {
             @Override
             public Object execute(Transaction tx) throws Exception {
-                System.out.println("ref.value=" + ref.get());
-                System.out.println("timeout: " + tx.getConfiguration().getTimeoutNs());
-                System.out.println("remaining timeout: " + tx.getRemainingTimeoutNs());
+                //System.out.println("ref.value=" + ref.get());
+                //System.out.println("timeout: " + tx.getConfiguration().getTimeoutNs());
+                //System.out.println("remaining timeout: " + tx.getRemainingTimeoutNs());
 
                 if (ref.get() < 10000) {
                     retry();
                 }
 
-                System.out.println("expected value found");
+                //System.out.println("expected value found");
                 return null;
             }
         };

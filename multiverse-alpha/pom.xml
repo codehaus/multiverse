@@ -143,9 +143,9 @@
                                 <!-- remove tests that can't be executed with the multiverse compiler.
                                      The Multiverse compiler aborts when an instrumentation error occurs
                                      and these errors cause instrumentation errors (their purpose) -->
-                                <delete file="${project.build.testOutputDirectory}/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalMethod_InterruptibleTest.class"/>
-                                <delete file="${project.build.testOutputDirectory}/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalMethod_InterruptibleTest$MethodWithoutException.class"/>
-                                <delete file="${project.build.testOutputDirectory}/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalMethod_InterruptibleTest$MethodWithIncorrectException.class"/>
+                                <delete file="${project.build.testOutputDirectory}/org/multiverse/stms/alpha/instrumentation/transactionalmethod/TransactionalMethod_InterruptibleTest.class"/>
+                                <delete file="${project.build.testOutputDirectory}/org/multiverse/stms/alpha/instrumentation/transactionalmethod/TransactionalMethod_InterruptibleTest$MethodWithoutException.class"/>
+                                <delete file="${project.build.testOutputDirectory}/org/multiverse/stms/alpha/instrumentation/transactionalmethod/TransactionalMethod_InterruptibleTest$MethodWithIncorrectException.class"/>
                                 <delete file="${project.build.testOutputDirectory}/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalObject_ClashingFieldAndMethodTest.class"/>
                                 <delete file="${project.build.testOutputDirectory}/org/multiverse/stms/alpha/instrumentation/fieldaccess/TransactionalObject_ClashingFieldAndMethodTest$ObjectWithClashingMethod.class"/>
 

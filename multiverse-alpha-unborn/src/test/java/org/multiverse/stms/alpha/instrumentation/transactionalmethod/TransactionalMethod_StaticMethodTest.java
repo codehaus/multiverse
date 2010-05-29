@@ -1,4 +1,4 @@
-package org.multiverse.stms.alpha.instrumentation.fieldaccess;
+package org.multiverse.stms.alpha.instrumentation.transactionalmethod;
 
 import org.junit.After;
 import org.junit.Before;

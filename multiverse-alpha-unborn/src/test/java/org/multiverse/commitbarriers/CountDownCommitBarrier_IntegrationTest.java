@@ -33,12 +33,11 @@ public class CountDownCommitBarrier_IntegrationTest {
         AwaitThread t1 = new AwaitThread(barrier);
         t1.start();
 
-        sleepMs(100);
+        sleepMs(1000);
         assertTrue(t1.isAlive());
 
         AwaitThread t2 = new AwaitThread(barrier);
         t2.start();
-
 
         joinAll(t1, t2);
         assertEquals(0, barrier.getNumberWaiting());
