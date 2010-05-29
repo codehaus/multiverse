@@ -17,13 +17,13 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  *
  * @author Peter Veentjer
  */
-public class MutexTest {
+public class MutexStressTest {
 
     private volatile boolean stop;
     private int accountCount = 50;
 
     private int threadCount = processorCount() * 4;
-    private Account[] accounts;
+    private IntValue[] intValues;
 
 
     @Before
@@ -35,9 +35,9 @@ public class MutexTest {
 
     @Test
     public void test() {
-        accounts = new Account[accountCount];
+        intValues = new IntValue[accountCount];
         for (int k = 0; k < accountCount; k++) {
-            accounts[k] = new Account();
+            intValues[k] = new IntValue();
         }
 
         IncThread[] threads = new IncThread[threadCount];
@@ -50,8 +50,8 @@ public class MutexTest {
         stop = true;
         joinAll(threads);
 
-        assertEquals(sum(threads), sum(accounts));
-        System.out.println("total increases: "+sum(threads));
+        assertEquals(sum(threads), sum(intValues));
+        System.out.println("total increments: "+sum(threads));
     }
 
     int sum(IncThread[] threads) {
@@ -62,10 +62,10 @@ public class MutexTest {
         return result;
     }
 
-    int sum(Account[] accounts) {
+    int sum(IntValue[] intValues) {
         int result = 0;
-        for (Account account : accounts) {
-            result += account.balance;
+        for (IntValue intValue : intValues) {
+            result += intValue.balance;
         }
         return result;
     }
@@ -80,8 +80,8 @@ public class MutexTest {
         @Override
         public void doRun() throws Exception {
             while (!stop) {
-                Account account = accounts[TestUtils.randomInt(accountCount)];
-                account.inc();
+                IntValue intValue = intValues[TestUtils.randomInt(accountCount)];
+                intValue.inc();
 
                 if (count % 100000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), count);
@@ -92,7 +92,7 @@ public class MutexTest {
         }
     }
 
-    class Account {
+    class IntValue {
         final Mutex mutex = new Mutex();
 
         int balance;
