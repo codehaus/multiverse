@@ -2,7 +2,6 @@ package org.multiverse.transactional.executors;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 
@@ -18,14 +17,13 @@ import static org.multiverse.transactional.executors.TransactionalThreadPoolExec
 
 public class TransactionalThreadPoolExecutor_setCorePoolSizeTest {
     private Stm stm;
+    private TransactionalThreadPoolExecutor executor;
 
     @Before
     public void setUp() {
         stm = getGlobalStmInstance();
         clearThreadLocalTransaction();
     }
-
-    private TransactionalThreadPoolExecutor executor;
 
     @After
     public void tearDown() {
@@ -77,26 +75,25 @@ public class TransactionalThreadPoolExecutor_setCorePoolSizeTest {
     }
 
     @Test
-    @Ignore
     public void whenPoolSizeIncreased() {
-        executor = new TransactionalThreadPoolExecutor();
+        executor = new TransactionalThreadPoolExecutor(1);
         executor.start();
 
-        Runnable command = new Runnable() {
+         Runnable command = new Runnable() {
             @Override
             public void run() {
-                sleepMs(5000);
+                sleepMs(2000);
             }
         };
 
         executor.execute(command);
         executor.execute(command);
 
-        sleepMs(500);
+        sleepMs(1000);
         assertEquals(1, executor.getWorkQueue().size());
         executor.setCorePoolSize(2);
 
-        sleepMs(500);
+        sleepMs(5000);
         assertEquals(0, executor.getWorkQueue().size());
     }
 
@@ -135,16 +132,16 @@ public class TransactionalThreadPoolExecutor_setCorePoolSizeTest {
     }
 
     @Test
-    @Ignore
     public void whenShutdown_thenIllegalStateException() {
         executor = new TransactionalThreadPoolExecutor();
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                sleepMs(1000);
+                sleepMs(2000);
             }
         });
-        sleepMs(500);
+
+        sleepMs(1000);
         executor.shutdown();
 
         try {

@@ -2,7 +2,6 @@ package org.multiverse.transactional.executors;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 
@@ -14,7 +13,7 @@ import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.transactional.executors.TransactionalThreadPoolExecutorTestUtils.assertIsTerminated;
 
-public class TransactionalThreadPoolExecutor_awaitTerminationTest {
+public class TransactionalThreadPoolExecutor_awaitTerminationLongTest {
     private TransactionalThreadPoolExecutor executor;
 
     @Before
@@ -41,7 +40,7 @@ public class TransactionalThreadPoolExecutor_awaitTerminationTest {
             }
         };
         thread.start();
-        sleepMs(500);
+        sleepMs(1000);
 
         executor.shutdownNow();
         thread.join();
@@ -62,7 +61,7 @@ public class TransactionalThreadPoolExecutor_awaitTerminationTest {
             }
         };
         thread.start();
-        sleepMs(500);
+        sleepMs(1000);
 
         executor.shutdownNow();
         thread.join();
@@ -72,7 +71,6 @@ public class TransactionalThreadPoolExecutor_awaitTerminationTest {
     }
 
     @Test
-    @Ignore
     public void whenShutdown() throws InterruptedException {
         executor = new TransactionalThreadPoolExecutor();
 
@@ -84,7 +82,7 @@ public class TransactionalThreadPoolExecutor_awaitTerminationTest {
         };
 
         executor.execute(task);
-        sleepMs(500);
+        sleepMs(1000);
         executor.shutdown();
 
         TestThread thread = new TestThread() {
@@ -94,7 +92,7 @@ public class TransactionalThreadPoolExecutor_awaitTerminationTest {
             }
         };
         thread.start();
-        sleepMs(500);
+        sleepMs(1000);
 
         assertAlive(thread);
 

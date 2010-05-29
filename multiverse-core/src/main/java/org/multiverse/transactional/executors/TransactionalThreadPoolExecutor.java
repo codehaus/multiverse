@@ -51,11 +51,11 @@ public final class TransactionalThreadPoolExecutor extends AbstractExecutorServi
 
     private final TransactionalQueue<Runnable> workQueue;
     private final TransactionalLinkedList<Thread> threads = new TransactionalLinkedList<Thread>();
+    private final AtomicLong workerIdGenerator = new AtomicLong();
 
     private State state;
     private int corePoolSize;
     private ThreadFactory threadFactory;
-
 
     /**
      * Creates a new single threaded TransactionalThreadPoolExecutor with bounded workqueue
@@ -107,6 +107,7 @@ public final class TransactionalThreadPoolExecutor extends AbstractExecutorServi
         if (workQueue == null) {
             throw new NullPointerException();
         }
+
         if (corePoolSize < 0) {
             throw new IllegalArgumentException();
         }
@@ -156,7 +157,9 @@ public final class TransactionalThreadPoolExecutor extends AbstractExecutorServi
                 break;
             case started:
                 int extra = newCorePoolSize - corePoolSize;
-                if (extra > 0) {
+                if (extra == 0) {
+                    return;
+                } else if (extra > 0) {
                     createAndRegisterWorkers(extra);
                 }
 
@@ -356,21 +359,6 @@ public final class TransactionalThreadPoolExecutor extends AbstractExecutorServi
         }
     }
 
-    public void u() {
-        v();
-    }
-
-    public void v() {
-    }
-
-
-    public void x(int a) {
-        y(a);
-    }
-
-    public void y(int b) {
-    }
-
     /**
      * Starts this TransactionalThreadPoolExecutor. If the TransactionalThreadPoolExecutor already is started, the call
      * is ignored.
@@ -395,11 +383,13 @@ public final class TransactionalThreadPoolExecutor extends AbstractExecutorServi
         }
     }
 
-    private void createAndRegisterWorkers(int size) {
-        Thread[] newThreads = new Thread[size];
-        for (int k = 0; k < corePoolSize; k++) {
+    private void createAndRegisterWorkers(int workerCount) {
+        Thread[] newThreads = new Thread[workerCount];
+
+        for (int k = 0; k < workerCount; k++) {
             Worker worker = new Worker();
             Thread thread = threadFactory.newThread(worker);
+            thread.setName("Worker-" + workerIdGenerator.incrementAndGet());
             worker.thread = thread;
 
             threads.add(thread);
