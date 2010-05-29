@@ -70,6 +70,7 @@ public class StandardInstrumentor implements Instrumentor {
         exclude("org.objectweb.asm.");
         exclude("org.omg.");
         exclude("org.openspaces.");
+        exclude("org.osgi.");
         exclude("org.slf4j.");
         exclude("org.springframework.");
         exclude("org.w3c.");
