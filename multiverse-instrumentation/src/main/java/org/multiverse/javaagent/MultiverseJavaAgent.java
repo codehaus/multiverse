@@ -49,7 +49,7 @@ public final class MultiverseJavaAgent {
         boolean verbose = getSystemBooleanProperty("verbose", false);
         if (verbose) {
             instrumentor.setLog(new SystemOutImportantInstrumenterLogger());
-            println("Multiverse: Verbose output enabled");            
+            println("Multiverse: Verbose output enabled");
         }
 
         instrumentor.setFiler(new JavaAgentFiler());
@@ -67,7 +67,7 @@ public final class MultiverseJavaAgent {
         String include = include();
 
         instrumentor.include(include);
-        println("Multiverse: include = '%s'",include);
+        println("Multiverse: include = '%s'", include);
         if (instrumentor.getIncluded().equals("")) {
             println("Multiverse: All classes are included since nothing explicitly is configured.");
             println("Multiverse: \tIn most cases you want to set it explicitly using the org.multiverse.javaagent.include System propery.");
@@ -84,11 +84,15 @@ public final class MultiverseJavaAgent {
     }
 
     private static String exclude() {
-        return getSystemProperty("exclude", "");
+        return normalize(getSystemProperty("exclude", ""));
     }
 
     private static String include() {
-        return getSystemProperty("include", "");
+        return normalize(getSystemProperty("include", ""));
+    }
+
+    private static String normalize(String s) {
+        return s.replace(",", ";").replace(":", ";");
     }
 
     private static void printMultiverseJavaAgentInfo() {
