@@ -2,6 +2,7 @@ package org.multiverse.transactional.executors;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 
@@ -75,6 +76,7 @@ public class TransactionalThreadPoolExecutor_setCorePoolSizeTest {
     }
 
     @Test
+    @Ignore
     public void whenPoolSizeIncreased() {
         executor = new TransactionalThreadPoolExecutor(1);
         executor.start();

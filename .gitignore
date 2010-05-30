@@ -8,6 +8,7 @@
 /multiverse.iml
 /multiverse.ipr
 /multiverse.iws
+/multiverse-jruby/dependencies
 *.iml
 **/build
 **/target

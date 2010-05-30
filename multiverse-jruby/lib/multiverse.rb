@@ -1,9 +1,10 @@
 dependencies_dir = File.join(File.dirname(__FILE__), "..", "dependencies")
 $LOAD_PATH.unshift(dependencies_dir) unless $LOAD_PATH.include? dependencies_dir
 
+
 require "java"
-require "multiverse-jruby-0.6-SNAPSHOT.jar"
-require "multiverse-alpha-0.6-SNAPSHOT.jar"
+require "multiverse-jruby-0.5.3-SNAPSHOT.jar"
+require "multiverse-alpha-0.5.3-SNAPSHOT.jar"
 #require "multiverse-alpha-unborn-0.6-SNAPSHOT.jar"
 
 import "org.multiverse.integration.jruby.MultiverseLibrary"

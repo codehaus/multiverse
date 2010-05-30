@@ -11,6 +11,19 @@ allprojects {
   sourceCompatibility = 1.6
   version = '0.5.3-SNAPSHOT'
   group = 'org.multiverse'
+  //scalaVersion = '2.8.0.Beta1'
+  scalaVersion = '2.7.7'
+  jrubyVersion = '1.5.0'
+
+  //repository(url: 'dav:https://dav.codehaus.org/repository/multiverse/') 
+  //{
+  //	authentication(userName: "${username}", password: "${password}")
+  //}
+
+  //snapshotRepository(url:'dav:https://dav.codehaus.org/snapshots.repository/multiverse/') 
+  //{
+  //	authentication(userName: "${username}", password: "${password}")
+  //} 
 
   def localMavenRepo = 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
 
@@ -314,13 +327,38 @@ project(':multiverse-alpha') {
 
 // ------------------------------------------------------------------------------------------------------------------
 
-//project(':multiverse-jruby') {
-//  dependencies {
-//    compile project(':multiverse-core')
-//    compile project(':multiverse-instrumentation')
-//    compile project(':multiverse-alpha-unborn')
-//  }
-//}
+project(':multiverse-jruby') {
+  def localRepo = "${gradle.gradleUserHomeDir}/cache/"
+  def projectRootDir = new File("${rootProject.projectDir}").absolutePath
+
+  dependencies {
+    // Libraries needed to run the jruby multiverse
+    compile group: 'org.jruby', name: 'jruby-complete', version: "${jrubyVersion}"
+    // Libraries needed for jruby api
+    compile project(':multiverse-core')
+    compile project(':multiverse-instrumentation')
+    compile project(':multiverse-alpha-unborn')
+  }
+  jar.doLast() {
+    println "------------------------------------------------------------------"
+    println "Setting up environment for multiverse-jruby"
+    println "------------------------------------------------------------------"
+    println "${projectDir}"
+    ant.delete(dir: "${projectDir}/dependencies/")
+    ant.mkdir(dir: "${projectDir}/dependencies/")
+
+    ant.copy(
+            file: "${buildDir}/libs/multiverse-jruby-${project.version}.jar",
+            todir: "${projectDir}/dependencies/")
+    ant.copy(
+            file: "${localRepo}/org.jruby/jruby-complete/jars/jruby-complete-${jrubyVersion}.jar",
+            todir: "${projectDir}/dependencies/")
+    ant.copy(
+            file: "${projectRootDir}/multiverse-alpha/build/libs/multiverse-alpha-${project.version}.jar",
+            todir: "${projectDir}/dependencies/")
+  }
+}
+
 
 project(':multiverse-performance-tool') {
 
