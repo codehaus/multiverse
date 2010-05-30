@@ -16,20 +16,6 @@ import static java.lang.System.getProperty;
  */
 public interface MultiverseConstants {
 
-
-    /**
-     * A flag that enables the sanity check build in the system.
-     * <p/>
-     * If sanity checks are enabled, the system can check all kinds of design by contract violations using pre/post
-     * condition checks and checking the invariants. It could be that these checks are costly so as end used you want to
-     * turn this off. For the time being it is true by default.
-     * <p/>
-     * <p/>
-     * If the sanity checks are disabled, the JIT is completely removing
-     */
-    boolean ___SANITY_CHECKS_ENABLED =
-            parseBoolean(getProperty("org.multiverse.sanityChecks", "false"));
-
     boolean ___LOGGING_ENABLED =
             parseBoolean(getProperty("org.multiverse.loggingEnabled", "true"));
 }

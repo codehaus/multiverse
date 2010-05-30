@@ -46,7 +46,7 @@ public class FieldGranularityStressTest {
 
         startAll(leftThread, rightThread);
 
-        sleepMs(getDurationMsFromSystemProperties(30 * 1000));
+        sleepMs(getStressTestDurationMs(30 * 1000));
         stop = true;
         joinAll(leftThread, rightThread);
 

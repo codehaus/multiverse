@@ -34,7 +34,7 @@ public class IsolatedChangeStressTest {
         }
 
         startAll(threads);
-        sleepMs(getDurationMsFromSystemProperties(60 * 1000));
+        sleepMs(getStressTestDurationMs(60 * 1000));
         stop = true;
         joinAll(threads);
 

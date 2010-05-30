@@ -4,7 +4,7 @@ import org.multiverse.instrumentation.AbstractInstrumentationPhase;
 import org.multiverse.instrumentation.Clazz;
 import org.multiverse.instrumentation.Environment;
 import org.multiverse.instrumentation.metadata.ClassMetadata;
-import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
+import org.multiverse.stms.alpha.mixins.BasicTransactionalObjectMixin;
 import org.objectweb.asm.tree.ClassNode;
 
 import static org.multiverse.instrumentation.asm.AsmUtils.loadAsClassNode;
@@ -30,7 +30,7 @@ public final class TransactionalObjectInstrumentationPhase extends AbstractInstr
         }
 
         environment.getLog().lessImportant("%s is a real transactional object", originalClazz.getName());
-        ClassNode mixinClassNode = loadAsClassNode(DefaultTxObjectMixin.class);
+        ClassNode mixinClassNode = loadAsClassNode(BasicTransactionalObjectMixin.class);
         ClassNode originalClassNode = loadAsClassNode(originalClazz.getBytecode());
 
         TransactionalObjectTransformer transformer = new TransactionalObjectTransformer(

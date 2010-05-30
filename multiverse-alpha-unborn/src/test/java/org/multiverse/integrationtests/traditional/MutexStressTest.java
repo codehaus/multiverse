@@ -46,7 +46,7 @@ public class MutexStressTest {
         }
 
         startAll(threads);
-        sleepMs(TestUtils.getDurationMsFromSystemProperties(60 * 1000));
+        sleepMs(TestUtils.getStressTestDurationMs(60 * 1000));
         stop = true;
         joinAll(threads);
 

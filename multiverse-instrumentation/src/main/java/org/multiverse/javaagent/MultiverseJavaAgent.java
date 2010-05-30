@@ -97,10 +97,6 @@ public final class MultiverseJavaAgent {
     private static void printMultiverseJavaAgentInfo() {
         println("Multiverse: Starting Multiverse JavaAgent");
         println("Multiverse: Optimizations disabled in Javaaagent (see compiletime instrumentation)");
-
-        if (MultiverseConstants.___SANITY_CHECKS_ENABLED) {
-            println("Sanity checks are enabled.");
-        }
     }
 
     private static Instrumentor createInstrumentor() {

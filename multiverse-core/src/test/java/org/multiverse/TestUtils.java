@@ -21,7 +21,7 @@ public class TestUtils {
                  return Runtime.getRuntime().availableProcessors();
     }
 
-    public static long getDurationMsFromSystemProperties(long defaultDuration){
+    public static long getStressTestDurationMs(long defaultDuration){
         String value = System.getProperty("org.multiverse.integrationtest.duration", ""+defaultDuration);
         return Long.parseLong(value);
     }

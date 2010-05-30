@@ -6,14 +6,14 @@ import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.manualinstrumentation.IntStackTranlocal.IntNode;
-import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
+import org.multiverse.stms.alpha.mixins.BasicTransactionalObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 
-public final class IntStack extends DefaultTxObjectMixin {
+public final class IntStack extends BasicTransactionalObjectMixin {
 
     public IntStack() {
         new TransactionTemplate() {

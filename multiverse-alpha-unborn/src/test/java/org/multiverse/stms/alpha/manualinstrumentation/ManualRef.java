@@ -5,7 +5,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTranlocal;
-import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
+import org.multiverse.stms.alpha.mixins.BasicTransactionalObjectMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
 
@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class ManualRef extends DefaultTxObjectMixin {
+public class ManualRef extends BasicTransactionalObjectMixin {
 
     private List<Transaction> lockTransactions = new LinkedList<Transaction>();
     private List<Transaction> releaseLockTransactions = new LinkedList<Transaction>();
@@ -125,11 +125,11 @@ public class ManualRef extends DefaultTxObjectMixin {
     }
 
     @Override
-    public Listeners ___storeUpdate(AlphaTranlocal tranlocal, long writeVersion, boolean releaseLock) {
+    public Listeners ___storeUpdate(AlphaTranlocal update, long writeVersion, boolean releaseLock) {
         if (releaseLock) {
             releaseLockTransactions.add(___getLockOwner());
         }
-        return super.___storeUpdate(tranlocal, writeVersion, releaseLock);
+        return super.___storeUpdate(update, writeVersion, releaseLock);
     }
 
     @Override

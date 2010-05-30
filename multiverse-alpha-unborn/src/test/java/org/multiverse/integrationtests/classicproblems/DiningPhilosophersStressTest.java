@@ -48,7 +48,7 @@ public class DiningPhilosophersStressTest {
         PhilosopherThread[] philosopherThreads = createPhilosopherThreads();
         startAll(philosopherThreads);
 
-        sleepMs(getDurationMsFromSystemProperties(60*1000));
+        sleepMs(getStressTestDurationMs(60*1000));
         
         stop = true;
         joinAll(philosopherThreads);

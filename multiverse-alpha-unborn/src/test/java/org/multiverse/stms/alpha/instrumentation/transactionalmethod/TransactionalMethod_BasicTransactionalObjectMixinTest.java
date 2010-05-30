@@ -21,7 +21,7 @@ import static org.multiverse.stms.alpha.instrumentation.AlphaReflectionUtils.exi
  *
  * @author Peter Veentjer.
  */
-public class TransactionalMethod_DefaultTxObjectMixinTest {
+public class TransactionalMethod_BasicTransactionalObjectMixinTest {
 
     private AlphaStm stm;
 
@@ -42,7 +42,6 @@ public class TransactionalMethod_DefaultTxObjectMixinTest {
 
     private void assertAllStaticFieldsAreCopied(Class clazz) {
         assertTrue(existsField(clazz, "___LOCKOWNER_UPDATER"));
-        assertTrue(existsField(clazz, "___TRANLOCAL_UPDATER"));
         assertTrue(existsField(clazz, "___LISTENERS_UPDATER"));
     }
 
