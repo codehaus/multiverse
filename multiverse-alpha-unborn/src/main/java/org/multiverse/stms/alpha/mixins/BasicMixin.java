@@ -26,13 +26,15 @@ import static java.lang.String.format;
  *
  * @author Peter Veentjer
  */
-public abstract class BasicTransactionalObjectMixin implements AlphaTransactionalObject, MultiverseConstants {
+public abstract class BasicMixin implements AlphaTransactionalObject, MultiverseConstants {
 
-    private final static AtomicReferenceFieldUpdater<BasicTransactionalObjectMixin, Transaction> ___LOCKOWNER_UPDATER =
-            AtomicReferenceFieldUpdater.newUpdater(BasicTransactionalObjectMixin.class, Transaction.class, "___lockOwner");
+    private final static AtomicReferenceFieldUpdater<BasicMixin, Transaction> ___LOCKOWNER_UPDATER =
+            AtomicReferenceFieldUpdater.newUpdater(
+                    BasicMixin.class, Transaction.class, "___lockOwner");
 
-    private final static AtomicReferenceFieldUpdater<BasicTransactionalObjectMixin, Listeners> ___LISTENERS_UPDATER =
-            AtomicReferenceFieldUpdater.newUpdater(BasicTransactionalObjectMixin.class, Listeners.class, "___listeners");
+    private final static AtomicReferenceFieldUpdater<BasicMixin, Listeners> ___LISTENERS_UPDATER =
+            AtomicReferenceFieldUpdater.newUpdater(
+                    BasicMixin.class, Listeners.class, "___listeners");
 
     private volatile Transaction ___lockOwner;
     private volatile AlphaTranlocal ___tranlocal;
@@ -63,15 +65,15 @@ public abstract class BasicTransactionalObjectMixin implements AlphaTransactiona
         } else {
             //the exact version is not there, we need to make sure that the one we
             //are going to load is valid (so not locked).
-            Transaction lockOwner = ___LOCKOWNER_UPDATER.get(this);
+            Transaction lockOwner = ___lockOwner;
 
             if (lockOwner != null) {
                 throw createLockNotFreeReadConflict();
             }
 
             AlphaTranlocal tranlocalTime2 = ___tranlocal;
-            boolean noConflictingWrites = tranlocalTime2 == tranlocalTime1;
-            if (noConflictingWrites) {
+            boolean noConflict = tranlocalTime2 == tranlocalTime1;
+            if (noConflict) {
                 //the tranlocal has not changed and it was unlocked. This means that we read
                 //an old version that we can use.
                 return tranlocalTime1;
@@ -122,8 +124,6 @@ public abstract class BasicTransactionalObjectMixin implements AlphaTransactiona
     @Override
     //todo: make final
     public Listeners ___storeUpdate(AlphaTranlocal update, long writeVersion, boolean releaseLock) {
-        assert update != null;
-
         //it is very important that the tranlocal write is is done before the lock release.
         //it also is very important that the commit and version are set, before the tranlocal write.
         //the tranlocal write also creates a happens before relation between the changes made on the
@@ -164,10 +164,13 @@ public abstract class BasicTransactionalObjectMixin implements AlphaTransactiona
     public boolean ___tryLock(Transaction lockOwner) {
         //uses a TTAS.
 
+        //if the lock already is owned, return false because we can't lock it.
         if (___lockOwner != null) {
             return false;
         }
 
+        //the lock was not owned, but it could be that in the mean while another transaction acquired it.
+        //Now we need to do an expensive compareAndSet to acquire the lock.
         return ___LOCKOWNER_UPDATER.compareAndSet(this, null, lockOwner);
     }
 

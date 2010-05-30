@@ -5,14 +5,14 @@ import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTranlocalSnapshot;
-import org.multiverse.stms.alpha.mixins.BasicTransactionalObjectMixin;
+import org.multiverse.stms.alpha.mixins.BasicMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 
-public final class Stack<E> extends BasicTransactionalObjectMixin {
+public final class Stack<E> extends BasicMixin {
 
     public Stack() {
         new TransactionTemplate() {

@@ -279,7 +279,7 @@ public class BasicTransactionalObjectMixinTest {
 
     // ==========================================
 
-    static class DummyFastTransactionalObjectMixin extends BasicTransactionalObjectMixin {
+    static class DummyFastTransactionalObjectMixin extends BasicMixin {
 
         @Override
         public AlphaTranlocal ___openUnconstructed() {

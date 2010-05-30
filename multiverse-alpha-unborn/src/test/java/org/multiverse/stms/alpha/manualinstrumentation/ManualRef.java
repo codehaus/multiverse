@@ -5,7 +5,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTranlocal;
-import org.multiverse.stms.alpha.mixins.BasicTransactionalObjectMixin;
+import org.multiverse.stms.alpha.mixins.BasicMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
 
@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class ManualRef extends BasicTransactionalObjectMixin {
+public class ManualRef extends BasicMixin {
 
     private List<Transaction> lockTransactions = new LinkedList<Transaction>();
     private List<Transaction> releaseLockTransactions = new LinkedList<Transaction>();

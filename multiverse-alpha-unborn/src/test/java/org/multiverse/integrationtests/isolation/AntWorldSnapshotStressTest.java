@@ -27,7 +27,6 @@ public class AntWorldSnapshotStressTest {
 
     private int width = 80;
     private int height = 80;
-    private int testDurationMs = 60 * 1000;
     private Cell[] cells;
 
     private volatile boolean stop;
@@ -58,24 +57,23 @@ public class AntWorldSnapshotStressTest {
 
         startAll(snapshotThread);
 
-
-        sleepMs(testDurationMs);
+        sleepMs(getStressTestDurationMs(60 * 1000));
 
         stop = true;
         joinAll(snapshotThread);
         long durationNs = System.nanoTime() - startNs;
 
-        double transactionsPerSecond = (1.0d * snapshotThread.snapshotCount * TimeUnit.SECONDS.toNanos(1)) / durationNs;
+        double transactionsPerSecond = (1.0d * snapshotThread.count * TimeUnit.SECONDS.toNanos(1)) / durationNs;
         System.out.printf("Performance %s snapshots/second\n", format(transactionsPerSecond));
 
-        double averageTimePerSnapshotNs = snapshotThread.snapshotTimeNs / snapshotThread.snapshotCount;
+        double averageTimePerSnapshotNs = snapshotThread.snapshotTimeNs / snapshotThread.count;
         System.out.printf("Average time per snapshot is %s ns\n", format(averageTimePerSnapshotNs));
         System.out.printf("Average read access time per cell is %s ns\n", format(averageTimePerSnapshotNs / cells.length));
     }
 
     class SnapshotThread extends TestThread {
 
-        private long snapshotCount = 0;
+        private long count = 0;
         private long snapshotTimeNs = 0;
 
         public SnapshotThread() {
@@ -86,18 +84,18 @@ public class AntWorldSnapshotStressTest {
         public void doRun() throws Exception {
             int[] snapshot = new int[cells.length];
 
+            long startNs = System.nanoTime();
+
             while (!stop) {
-                try {
-                    long startNs = System.nanoTime();
-                    takeSnapshot(snapshot);
-                    long durationNs = System.nanoTime() - startNs;
-                    snapshotTimeNs += durationNs;
-                    snapshotCount++;
-                } catch (RuntimeException e) {
-                    stop = true;
-                    throw e;
+                takeSnapshot(snapshot);
+                count++;
+
+                if (count % (10 * 1000) == 0) {
+                    System.out.printf("%s is at %s\n", getName(), count);
                 }
             }
+
+            snapshotTimeNs = System.nanoTime() - startNs;
         }
 
         @TransactionalMethod(readonly = true, trackReads = false)

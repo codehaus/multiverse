@@ -17,5 +17,5 @@ import static java.lang.System.getProperty;
 public interface MultiverseConstants {
 
     boolean ___LOGGING_ENABLED =
-            parseBoolean(getProperty("org.multiverse.loggingEnabled", "true"));
+            parseBoolean(getProperty("org.multiverse.loggingEnabled", "false"));
 }

@@ -6,7 +6,7 @@ import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.api.programmatic.ProgrammaticLongRef;
 import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTranlocal;
-import org.multiverse.stms.alpha.mixins.BasicTransactionalObjectMixin;
+import org.multiverse.stms.alpha.mixins.BasicMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import java.io.File;
@@ -20,7 +20,7 @@ import static org.multiverse.api.exceptions.UncommittedReadConflict.createUncomm
  *
  * @author Peter Veentjer
  */
-public final class AlphaProgrammaticLongRef extends BasicTransactionalObjectMixin implements ProgrammaticLongRef {
+public final class AlphaProgrammaticLongRef extends BasicMixin implements ProgrammaticLongRef {
 
     private final AlphaStm stm;
 

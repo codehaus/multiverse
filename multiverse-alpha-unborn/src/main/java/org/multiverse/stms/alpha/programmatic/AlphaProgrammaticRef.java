@@ -7,7 +7,7 @@ import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.api.exceptions.UncommittedReadConflict;
 import org.multiverse.api.programmatic.ProgrammaticRef;
 import org.multiverse.stms.alpha.AlphaStm;
-import org.multiverse.stms.alpha.mixins.BasicTransactionalObjectMixin;
+import org.multiverse.stms.alpha.mixins.BasicMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
 
@@ -58,7 +58,7 @@ import static org.multiverse.api.exceptions.UncommittedReadConflict.createUncomm
  * @author Peter Veentjer
  */
 public final class AlphaProgrammaticRef<E>
-        extends BasicTransactionalObjectMixin implements ProgrammaticRef<E> {
+        extends BasicMixin implements ProgrammaticRef<E> {
 
     //should only be used for testing purposes.
 
