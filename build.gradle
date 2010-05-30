@@ -328,6 +328,8 @@ project(':multiverse-alpha') {
 // ------------------------------------------------------------------------------------------------------------------
 
 project(':multiverse-jruby') {
+  def localRepo = "${gradle.gradleUserHomeDir}/cache/"
+  def projectRootDir = new File("${rootProject.projectDir}").absolutePath
 
   dependencies {
     // Libraries needed to run the jruby multiverse
@@ -336,6 +338,24 @@ project(':multiverse-jruby') {
     compile project(':multiverse-core')
     compile project(':multiverse-instrumentation')
     compile project(':multiverse-alpha-unborn')
+  }
+  jar.doLast() {
+    println "------------------------------------------------------------------"
+    println "Setting up environment for multiverse-jruby"
+    println "------------------------------------------------------------------"
+    println "${projectDir}"
+    ant.delete(dir: "${projectDir}/dependencies/")
+    ant.mkdir(dir: "${projectDir}/dependencies/")
+
+    ant.copy(
+            file: "${buildDir}/libs/multiverse-jruby-${project.version}.jar",
+            todir: "${projectDir}/dependencies/")
+    ant.copy(
+            file: "${localRepo}/org.jruby/jruby-complete/jars/jruby-complete-${jrubyVersion}.jar",
+            todir: "${projectDir}/dependencies/")
+    ant.copy(
+            file: "${projectRootDir}/multiverse-alpha/build/libs/multiverse-alpha-${project.version}.jar",
+            todir: "${projectDir}/dependencies/")
   }
 }
 
