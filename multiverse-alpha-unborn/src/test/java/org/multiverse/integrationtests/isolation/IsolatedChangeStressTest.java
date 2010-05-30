@@ -3,8 +3,7 @@ package org.multiverse.integrationtests.isolation;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
-import org.multiverse.TestUtils;
-import org.multiverse.stms.alpha.instrumentation.LongRef;
+import org.multiverse.transactional.refs.LongRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
@@ -13,7 +12,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 /**
  * @author Peter Veentjer
  */
-public class WriteConflictStressTest {
+public class IsolatedChangeStressTest {
 
     private int threadCount = 4;
     private volatile boolean stop;
@@ -35,11 +34,12 @@ public class WriteConflictStressTest {
         }
 
         startAll(threads);
-        sleepMs(TestUtils.getDurationMsFromSystemProperties(60 * 1000));
+        sleepMs(getDurationMsFromSystemProperties(60 * 1000));
         stop = true;
         joinAll(threads);
 
         assertEquals(sum(threads), ref.get());
+        System.out.println("end value is : "+ref);
     }
 
     public long sum(WriteThread[] threads) {
