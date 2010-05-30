@@ -12,7 +12,7 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
- * Test
+ * Readonly behavior of transaction.
  *
  * @author Peter Veentjer
  */
@@ -128,6 +128,19 @@ public class ReadonlyTest {
     @TransactionalMethod(readonly = false)
     public void updateInUpdateMethod(Ref ref, int newValue) {
         ref.set(newValue);
+    }
+
+    @Test
+    public void whenDefault_thenUpdateSuccess() {
+        Ref ref = new Ref();
+        defaultTransactionalMethod(ref);
+
+        assertEquals(1, ref.get());
+    }
+
+    @TransactionalMethod
+    public void defaultTransactionalMethod(Ref ref) {
+        ref.inc();
     }
 
 }

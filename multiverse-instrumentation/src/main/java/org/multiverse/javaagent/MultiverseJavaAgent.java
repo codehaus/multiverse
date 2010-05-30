@@ -25,8 +25,9 @@ import static org.multiverse.utils.SystemOut.println;
  * org.multiverse.javaagent.dumpBytecode=true/false
  * org.multiverse.javaagent.verbose=true/false
  * org.multiverse.javaagent.dumpDirectory=directory for dumping classfiles (defaults to the tmp dir)
- * org.multiverse.javaagent.include=pattern of classes to include, seperated by ';', defaults to everything being included
- * org.multiverse.javaagent.exclude=pattern of classes to exclude, seperated by ';'
+ * org.multiverse.javaagent.include=pattern of classes to include, seperated by ; or , or : , defaults to
+ * everything being included
+ * org.multiverse.javaagent.exclude=pattern of classes to exclude, seperated by ; or , or :
  *
  * @author Peter Veentjer
  */
@@ -49,7 +50,7 @@ public final class MultiverseJavaAgent {
         boolean verbose = getSystemBooleanProperty("verbose", false);
         if (verbose) {
             instrumentor.setLog(new SystemOutImportantInstrumenterLogger());
-            println("Multiverse: Verbose output enabled");            
+            println("Multiverse: Verbose output enabled");
         }
 
         instrumentor.setFiler(new JavaAgentFiler());
@@ -67,7 +68,6 @@ public final class MultiverseJavaAgent {
         String include = include();
 
         instrumentor.include(include);
-        println("Multiverse: include = '%s'",include);
         if (instrumentor.getIncluded().equals("")) {
             println("Multiverse: All classes are included since nothing explicitly is configured.");
             println("Multiverse: \tIn most cases you want to set it explicitly using the org.multiverse.javaagent.include System propery.");
@@ -78,17 +78,20 @@ public final class MultiverseJavaAgent {
 
         String exclude = exclude();
         instrumentor.exclude(exclude);
-        println("Multiverse; exclude = '%s'", exclude);
         println("Multiverse: The following classes are excluded from instrumentation (exclude overrides includes) " + instrumentor.getExcluded());
         return instrumentor;
     }
 
     private static String exclude() {
-        return getSystemProperty("exclude", "");
+        return normalize(getSystemProperty("exclude", ""));
     }
 
     private static String include() {
-        return getSystemProperty("include", "");
+        return normalize(getSystemProperty("include", ""));
+    }
+
+    private static String normalize(String s) {
+        return s.replace(",", ";").replace(":", ";");
     }
 
     private static void printMultiverseJavaAgentInfo() {

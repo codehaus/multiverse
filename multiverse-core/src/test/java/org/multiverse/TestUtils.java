@@ -17,6 +17,10 @@ import static org.junit.Assert.*;
 
 public class TestUtils {
 
+    public static int processorCount(){
+                 return Runtime.getRuntime().availableProcessors();
+    }
+
     public static long getDurationMsFromSystemProperties(long defaultDuration){
         String value = System.getProperty("org.multiverse.integrationtest.duration", ""+defaultDuration);
         return Long.parseLong(value);
@@ -165,6 +169,7 @@ public class TestUtils {
 
     /**
      * Returns random int exclusive max. 0 is allowed as max and returns 0 (so this is unlike the Random.nextInt).
+     * Max value is excluded.
      *
      * @param max
      * @return
@@ -177,7 +182,7 @@ public class TestUtils {
     }
 
     public static void sleepRandomMs(int maxMs) {
-        sleepMs((long) randomInt(maxMs));
+        sleepUs((long) randomInt((int)TimeUnit.MILLISECONDS.toMicros(maxMs)));
     }
 
     public static void sleepSome() {
