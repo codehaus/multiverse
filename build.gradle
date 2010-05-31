@@ -1,7 +1,6 @@
 allprojects {
   apply plugin: 'base'
   apply plugin: 'java'
-  apply plugin: 'scala'
   apply plugin: 'maven'
   apply plugin: 'project-reports'
 
@@ -9,7 +8,8 @@ allprojects {
   defaultTasks 'clean', 'install'
 
   sourceCompatibility = 1.6
-  version = '0.5.3-SNAPSHOT'
+  version = '0.6-SNAPSHOT'
+  asmversion = '3.2'
   group = 'org.multiverse'
   //scalaVersion = '2.8.0.Beta1'
   scalaVersion = '2.7.7'
@@ -48,7 +48,6 @@ allprojects {
     exclude("**/*performanceTest*")
   }
 
-
   task integrationtest(type: Test) {
     include("**/*StressTest*")
     include("**/*stressTest*")
@@ -59,8 +58,7 @@ allprojects {
   dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.8.1'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.8.2'
-
-    deployerJars "org.apache.maven.wagon:wagon-ssh:1.0-beta-2"//, "org.apache.maven.wagon:wagon-webdav:1.0-beta-2"
+    deployerJars "org.apache.maven.wagon:wagon-ssh:1.0-beta-2"
   }
 }
 
@@ -115,7 +113,7 @@ project(':multiverse-instrumentation') {
   dependencies {
     compile project(':multiverse-core')
     compile group: 'args4j', name: 'args4j', version: "2.0.16"
-    compile group: 'asm', name: 'asm-all', version: "3.2"
+    compile group: 'asm', name: 'asm-all', version: "${asmversion}"
     testCompile project(path: ':multiverse-core', configuration: 'testFixtures')
   }
 }
@@ -127,7 +125,7 @@ project(':multiverse-core-tests') {
     compile project(':multiverse-core')
     compile project(':multiverse-instrumentation')
     compile group: 'args4j', name: 'args4j', version: "2.0.16"
-    compile group: 'asm', name: 'asm-all', version: "3.2"
+    compile group: 'asm', name: 'asm-all', version: "${asmversion}"
     testCompile project(path: ':multiverse-core', configuration: 'testFixtures')
   }
 }
@@ -161,7 +159,7 @@ project(':multiverse-alpha-unborn') {
     def localRepo = "${gradle.gradleUserHomeDir}/cache/"
 
     ant.unzip(dest: "${buildDir}/classes/main",
-            src: "${localRepo}/asm/asm-all/jars/asm-all-3.2.jar")
+            src: "${localRepo}/asm/asm-all/jars/asm-all-${asmversion}.jar")
     ant.unzip(dest: "${buildDir}/classes/main",
             src: localRepo + 'args4j/args4j/jars/args4j-2.0.16.jar')
 
@@ -190,7 +188,7 @@ project(':multiverse-alpha-unborn') {
     compile project(':multiverse-core')
     compile project(':multiverse-instrumentation')
     compile group: 'args4j', name: 'args4j', version: "2.0.16"
-    compile group: 'asm', name: 'asm-all', version: "3.2"
+    compile group: 'asm', name: 'asm-all', version: "${asmversion}"
     testCompile project(path: ':multiverse-core', configuration: 'testFixtures')
     testCompile project(path: ':multiverse-instrumentation', configuration: 'testFixtures')
     testCompile project(':multiverse-benchy')
@@ -218,7 +216,7 @@ project(':multiverse-alpha') {
     println "------------------------------------------------------------------"
 
     ant.unzip(dest: "${buildDir}/classes/main",
-            src: localRepo + 'asm/asm-all/jars/asm-all-3.2.jar')
+            src: localRepo + "asm/asm-all/jars/asm-all-${asmversion}.jar")
     ant.unzip(dest: "${buildDir}/classes/main",
             src: localRepo + 'args4j/args4j/jars/args4j-2.0.16.jar')
 
@@ -250,7 +248,7 @@ project(':multiverse-alpha') {
         pathelement(
                 location: "${localRepo}/args4j/args4j/jars/args4j-2.0.16.jar")
         pathelement(
-                location: "${localRepo}/asm/asm-all/jars/asm-all-3.2.jar")
+                location: "${localRepo}/asm/asm-all/jars/asm-all-${asmversion}.jar")
       }
     }
   }
@@ -291,7 +289,7 @@ project(':multiverse-alpha') {
         pathelement(
                 location: localRepo + 'args4j/args4j/jars/args4j-2.0.16.jar')
         pathelement(
-                location: localRepo + 'asm/asm-all/jars/asm-all-3.2.jar')
+                location: localRepo + 'asm/asm-all/jars/asm-all-${asmversion}.jar')
       }
     }
   }
@@ -316,7 +314,7 @@ project(':multiverse-alpha') {
     compile project(':multiverse-instrumentation')
     compile project(':multiverse-alpha-unborn')
     compile group: 'args4j', name: 'args4j', version: "2.0.16"
-    compile group: 'asm', name: 'asm-all', version: "3.2"
+    compile group: 'asm', name: 'asm-all', version: "${asmversion}"
     compile group: 'com.tonicsystems.jarjar', name: 'jarjar', version: "1.0-rc8"
     testCompile project(path: ':multiverse-core', configuration: 'testFixtures')
     testCompile project(path: ':multiverse-instrumentation', configuration: 'testFixtures')

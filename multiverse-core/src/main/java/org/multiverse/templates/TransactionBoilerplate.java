@@ -66,8 +66,6 @@ public final class TransactionBoilerplate implements MultiverseConstants {
      */
     public TransactionBoilerplate(Stm stm) {
         this(stm.getTransactionFactoryBuilder()
-                .setReadonly(false)
-                .setReadTrackingEnabled(true)
                 .build());
     }
 

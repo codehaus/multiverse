@@ -5,7 +5,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTranlocalSnapshot;
-import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
+import org.multiverse.stms.alpha.mixins.BasicMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
 
@@ -15,7 +15,7 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
 /**
  * @author Peter Veentjer
  */
-public class LongRef extends DefaultTxObjectMixin {
+public class LongRef extends BasicMixin {
 
     public LongRef(final long value) {
         new TransactionTemplate() {

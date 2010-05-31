@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class DefaultTxObjectMixinTest {
+public class BasicTransactionalObjectMixinTest {
 
     private AlphaStm stm;
 
@@ -279,7 +279,7 @@ public class DefaultTxObjectMixinTest {
 
     // ==========================================
 
-    static class DummyFastTransactionalObjectMixin extends DefaultTxObjectMixin {
+    static class DummyFastTransactionalObjectMixin extends BasicMixin {
 
         @Override
         public AlphaTranlocal ___openUnconstructed() {

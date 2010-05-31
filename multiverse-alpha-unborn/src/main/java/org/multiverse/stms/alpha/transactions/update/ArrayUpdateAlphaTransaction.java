@@ -123,12 +123,6 @@ public final class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransa
 
     @Override
     protected void attach(AlphaTranlocal tranlocal) {
-        if (___SANITY_CHECKS_ENABLED) {
-            if (tranlocal.isUncommitted()) {
-                throw new PanicError();
-            }
-        }
-
         if (firstFreeIndex == attachedArray.length) {
             SpeculativeConfiguration speculativeConfig = config.speculativeConfiguration;
             speculativeConfig.signalSpeculativeSizeFailure(attachedArray.length);

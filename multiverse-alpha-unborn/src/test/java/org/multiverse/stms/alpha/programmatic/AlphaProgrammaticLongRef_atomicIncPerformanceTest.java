@@ -93,7 +93,6 @@ public class AlphaProgrammaticLongRef_atomicIncPerformanceTest {
         private AlphaStm stm;
         private ProgrammaticLongRef ref;
 
-
         public AtomicIncThread(int id) {
             super("AtomicIncThread-" + id);
 
@@ -102,7 +101,6 @@ public class AlphaProgrammaticLongRef_atomicIncPerformanceTest {
             ref = stm.getProgrammaticRefFactoryBuilder()
                     .build()
                     .atomicCreateLongRef(0);
-
         }
 
         public long get() {

@@ -5,7 +5,7 @@ import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTranlocalSnapshot;
-import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
+import org.multiverse.stms.alpha.mixins.BasicMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
 
@@ -18,7 +18,7 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
  *
  * @author Peter Veentjer
  */
-public class AbaRef<E> extends DefaultTxObjectMixin {
+public class AbaRef<E> extends BasicMixin {
 
     public AbaRef() {
         new TransactionTemplate() {

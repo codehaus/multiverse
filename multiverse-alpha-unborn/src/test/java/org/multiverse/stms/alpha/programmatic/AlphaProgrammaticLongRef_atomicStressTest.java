@@ -58,7 +58,6 @@ public class AlphaProgrammaticLongRef_atomicStressTest {
         long durationNs = System.nanoTime() - startNs;
         double transactionsPerSecond = (1.0d * totalIncCount * TimeUnit.SECONDS.toNanos(1)) / durationNs;
         System.out.printf("Performance %s transactions/second\n", format(transactionsPerSecond));
-
     }
 
     private long sum() {
@@ -106,7 +105,7 @@ public class AlphaProgrammaticLongRef_atomicStressTest {
 
                 refs[refIndex].atomicInc(1);
 
-                if (k % (1000 * 1000) == 0) {
+                if (k % (10 * 1000 * 1000) == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
             }

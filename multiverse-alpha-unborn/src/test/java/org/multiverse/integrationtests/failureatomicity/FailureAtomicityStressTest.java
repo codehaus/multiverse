@@ -4,7 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.api.ThreadLocalTransaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.transactional.refs.IntRef;
 
@@ -12,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 /**
  * The FailureAtomicityStressTest tests if failure atomicity works. So it should be impossible that the eventual
@@ -44,15 +44,13 @@ public class FailureAtomicityStressTest {
 
         startAll(modifyThreads);
 
-        sleepMs(getDurationMsFromSystemProperties(30 * 1000));
+        sleepMs(getStressTestDurationMs(30 * 1000));
         stop = true;
 
         joinAll(modifyThreads);
         //since half of the transactions are going to be aborted we need to divide it by 2
 
-        long expected = sum(modifyThreads) / 2;
-
-        assertEquals(expected, ref.get());
+        assertEquals(sum(modifyThreads), ref.get());
     }
 
     public long sum(ModifyThread[] threads){
@@ -100,7 +98,7 @@ public class FailureAtomicityStressTest {
         @TransactionalMethod
         private void modifyButAbort() {
             ref.inc();
-            ThreadLocalTransaction.getThreadLocalTransaction().abort();
+            getThreadLocalTransaction().abort();
         }
     }
 }

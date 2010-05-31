@@ -4,14 +4,14 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.stms.alpha.AlphaStm;
-import org.multiverse.stms.alpha.mixins.DefaultTxObjectMixin;
+import org.multiverse.stms.alpha.mixins.BasicMixin;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.templates.TransactionTemplate;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 
-public class IntRef extends DefaultTxObjectMixin {
+public class IntRef extends BasicMixin {
 
     public static IntRef createUncommitted() {
         return new IntRef(String.class);

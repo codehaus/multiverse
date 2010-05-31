@@ -2,9 +2,7 @@ package org.multiverse.stms.alpha;
 
 import org.multiverse.MultiverseConstants;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.commitlock.CommitLock;
-import org.multiverse.api.exceptions.PanicError;
 import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 import org.multiverse.utils.TodoException;
 
@@ -210,37 +208,11 @@ public abstract class AlphaTranlocal implements CommitLock, MultiverseConstants 
 
     @Override
     public final boolean ___tryLock(Transaction lockOwner) {
-        if (___SANITY_CHECKS_ENABLED) {
-            if (lockOwner == null) {
-                throw new PanicError("tryLockAndDetectConflicts can't be called with null as lockOwner");
-            }
-
-            if (lockOwner.getStatus() != TransactionStatus.Active) {
-                String msg = format(
-                        "Can't tryLockAndDetectConflicts with non active transaction '%s'",
-                        lockOwner.getConfiguration().getFamilyName());
-                throw new PanicError(msg);
-            }
-        }
-
         return ___transactionalObject.___tryLock(lockOwner);
     }
 
     @Override
     public final void ___releaseLock(Transaction expectedLockOwner) {
-        if (___SANITY_CHECKS_ENABLED) {
-            if (expectedLockOwner == null) {
-                throw new PanicError("releaseLock can't be called with null as expectedLockOwner");
-            }
-
-            if (expectedLockOwner.getStatus() != TransactionStatus.Active) {
-                String msg = format(
-                        "Can't tryLockAndDetectConflicts with non active transaction '%s'",
-                        expectedLockOwner.getConfiguration().getFamilyName());
-                throw new PanicError(msg);
-            }
-        }
-
         ___transactionalObject.___releaseLock(expectedLockOwner);
     }
 
