@@ -348,10 +348,10 @@ project(':multiverse-jruby') {
     ant.mkdir(dir: "${projectDir}/dependencies/")
 
     ant.copy(
-            file: "${buildDir}/libs/multiverse-jruby-${project.version}.jar",
+            file: "${localRepo}/org.jruby/jruby-complete/jars/jruby-complete-${jrubyVersion}.jar",
             todir: "${projectDir}/dependencies/")
     ant.copy(
-            file: "${localRepo}/org.jruby/jruby-complete/jars/jruby-complete-${jrubyVersion}.jar",
+            file: "${buildDir}/libs/multiverse-jruby-${project.version}.jar",
             todir: "${projectDir}/dependencies/")
     ant.copy(
             file: "${projectRootDir}/multiverse-alpha/build/libs/multiverse-alpha-${project.version}.jar",
