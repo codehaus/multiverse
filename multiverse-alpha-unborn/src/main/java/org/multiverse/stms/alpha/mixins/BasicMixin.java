@@ -6,7 +6,6 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.LockNotFreeReadConflict;
 import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
 import org.multiverse.api.latches.Latch;
-import org.multiverse.stms.alpha.AlphaStmUtils;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
 import org.multiverse.stms.alpha.RegisterRetryListenerResult;
@@ -15,6 +14,7 @@ import org.multiverse.utils.TodoException;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 import static java.lang.String.format;
+import static org.multiverse.stms.alpha.AlphaStmUtils.toTxObjectString;
 
 /**
  * AlphaTransactionalObject implementation that also can be used to transplant methods from during instrumentation. This
@@ -49,69 +49,68 @@ public abstract class BasicMixin implements AlphaTransactionalObject, Multiverse
 
     @Override
     public final AlphaTranlocal ___load(long readVersion) {
-        AlphaTranlocal tranlocalTime1 = ___tranlocal;
+        AlphaTranlocal first = ___tranlocal;
 
-        if (tranlocalTime1 == null) {
-            //a read is done, but there is no committed data.
+        if (first == null) {
+            //there is no committed state, so lets return null.
             return null;
         }
 
-        if (tranlocalTime1.getWriteVersion() == readVersion) {
+        long firstVersion = first.getWriteVersion();
+
+        if (firstVersion == readVersion) {
             //we are lucky, the tranlocal is exactly the one we are looking for.
-            return tranlocalTime1;
-        } else if (tranlocalTime1.getWriteVersion() > readVersion) {
-            //we are not lucky, the version that is stored, is too new for us.
-            throw createOldVersionNotFoundReadConflict(readVersion, tranlocalTime1);
-        } else {
-            //the exact version is not there, we need to make sure that the one we
-            //are going to load is valid (so not locked).
-            Transaction lockOwner = ___lockOwner;
-
-            if (lockOwner != null) {
-                throw createLockNotFreeReadConflict();
-            }
-
-            AlphaTranlocal tranlocalTime2 = ___tranlocal;
-            boolean noConflict = tranlocalTime2 == tranlocalTime1;
-            if (noConflict) {
-                //the tranlocal has not changed and it was unlocked. This means that we read
-                //an old version that we can use.
-                return tranlocalTime1;
-            } else {
-                //if the tranlocal has changed, lets check if the new tranlocal has exactly the
-                //version we are looking for.
-                if (tranlocalTime2.getWriteVersion() == readVersion) {
-                    //we are lucky, the newest version is exactly the one we are looking for.
-                    return tranlocalTime2;
-                }
-
-                //we ran out of luck, the version that currently is stored is not usable. 
-                throw createOldVersionNotFoundReadConflict(readVersion, tranlocalTime2);
-            }
+            return first;
         }
+
+        if (firstVersion > readVersion) {
+            //we are not lucky, the version that is stored, is too new for us.
+            throw createOldVersionNotFoundReadConflict(readVersion, first);
+        }
+
+        //the exact version is not there, we need to make sure that the one we
+        //are going to load is valid (so not locked). This is done by if the lock is free and then looking
+        //if the first read is the same as second read.
+        if (___lockOwner != null) {
+            //the lock is not free
+            throw createLockNotFreeReadConflict();
+        }
+
+        //now we read the ___tranlocal again to see if there was a change.
+        AlphaTranlocal second = ___tranlocal;
+        if (first == second) {
+            //the tranlocal has not changed and it was unlocked. This means that we read an old version that we can use.
+            return first;
+        }
+
+        //if the tranlocal has changed, lets check if the new tranlocal has exactly the
+        //version we are looking for.
+        if (second.getWriteVersion() == readVersion) {
+            //we are lucky, the newest version is exactly the one we are looking for.
+            return second;
+        }
+
+        //we ran out of luck, the version that currently is stored is not usable.
+        throw createOldVersionNotFoundReadConflict(readVersion, second);
     }
 
     private LockNotFreeReadConflict createLockNotFreeReadConflict() {
         if (LockNotFreeReadConflict.reuse) {
             return LockNotFreeReadConflict.INSTANCE;
-        } else {
-            String msg = format("Failed to load already locked transactionalobject '%s'",
-                    AlphaStmUtils.toTxObjectString(this));
-            return new LockNotFreeReadConflict(msg);
         }
+
+        String msg = format("Failed to load already locked transactionalobject '%s'", toTxObjectString(this));
+        return new LockNotFreeReadConflict(msg);
     }
 
-    private OldVersionNotFoundReadConflict createOldVersionNotFoundReadConflict(long readVersion, AlphaTranlocal tranlocalTime2) {
+    private OldVersionNotFoundReadConflict createOldVersionNotFoundReadConflict(long readVersion, AlphaTranlocal found) {
         if (OldVersionNotFoundReadConflict.reuse) {
             return OldVersionNotFoundReadConflict.INSTANCE;
-        } else {
-            String msg = format(
-                    "Can't load version '%s' transactionalobject '%s', the oldest version found is '%s'",
-                    readVersion,
-                    AlphaStmUtils.toTxObjectString(this),
-                    tranlocalTime2.getWriteVersion());
-            return new OldVersionNotFoundReadConflict(msg);
         }
+
+        String msg = format("Can't load version '%s' transactionalobject '%s', the oldest version found is '%s'",
+                readVersion, toTxObjectString(this), found.getWriteVersion());
+        return new OldVersionNotFoundReadConflict(msg);
     }
 
     @Override
@@ -133,7 +132,7 @@ public abstract class BasicMixin implements AlphaTransactionalObject, Multiverse
         ___tranlocal = update;
 
         Listeners listeners = null;
-        if (___LISTENERS_UPDATER.get(this) != null) {
+        if (___listeners != null) {
             //it could be that listeners are set af
             listeners = ___LISTENERS_UPDATER.getAndSet(this, null);
         }
@@ -179,8 +178,9 @@ public abstract class BasicMixin implements AlphaTransactionalObject, Multiverse
     public void ___releaseLock(Transaction expectedLockOwner) {
         //uses a TTAS.
 
+        //we only need to release the lock if we own it.
         if (___lockOwner == expectedLockOwner) {
-            ___LOCKOWNER_UPDATER.set(this, null);
+            ___lockOwner = null;
         }
     }
 
@@ -192,11 +192,11 @@ public abstract class BasicMixin implements AlphaTransactionalObject, Multiverse
 
     @Override
     public final RegisterRetryListenerResult ___registerRetryListener(Latch listener, long minimumWakeupVersion) {
-        AlphaTranlocal tranlocalT1 = ___tranlocal;
+        AlphaTranlocal first = ___tranlocal;
 
         //could it be that a locked value is read? (YES, can happen) A value that will be updated,
         //but isn't updated yet.. consequence: the listener tries to registerLifecycleListener a listener.
-        if (tranlocalT1 == null) {
+        if (first == null) {
             //no tranlocal has been committed yet. We don't need to registerLifecycleListener the listener,
             //because this call can only be made a transaction that has newattached items
             //and does an abort.
@@ -205,44 +205,51 @@ public abstract class BasicMixin implements AlphaTransactionalObject, Multiverse
             //if all objects within the transaction give this behavior it looks like the
             //latch was registered, but the transaction will never be woken up.
             return RegisterRetryListenerResult.noregistration;
-        } else if (tranlocalT1.getWriteVersion() >= minimumWakeupVersion) {
+        }
+
+        if (first.getWriteVersion() >= minimumWakeupVersion) {
             //if the version if the tranlocal already is equal or bigger than the version we
             //are looking for, we are done.
             listener.open();
             return RegisterRetryListenerResult.opened;
-        } else {
-            //ok, the version we are looking for has not been committed yet, so we need to
-            //registerLifecycleListener a the listener so that it will be opened
-
-            boolean placedListener;
-            Listeners newListeners;
-            Listeners oldListeners;
-            do {
-                oldListeners = ___LISTENERS_UPDATER.get(this);
-                newListeners = new Listeners(listener, oldListeners);
-                placedListener = ___LISTENERS_UPDATER.compareAndSet(this, oldListeners, newListeners);
-                if (!placedListener) {
-                    //it could be that another transaction did a registerLifecycleListener, but it also could mean
-                    //that a write occurred.
-                    AlphaTranlocal tranlocalT2 = ___tranlocal;
-                    if (tranlocalT1 != tranlocalT2) {
-                        //we are not sure when the registration took place, but a new version is available.
-                        //a write happened so we can closed this latch
-                        listener.open();
-                        return RegisterRetryListenerResult.opened;
-                    }
-                }
-            } while (!placedListener);
-
-            AlphaTranlocal tranlocalT2 = ___tranlocal;
-            if (tranlocalT1 != tranlocalT2) {
-                listener.open();
-                //lets try to restore the oldListeners.
-                ___LISTENERS_UPDATER.compareAndSet(this, newListeners, oldListeners);
-            }
-            //else: it is registered before the write took place
-
-            return RegisterRetryListenerResult.registered;
         }
+        //ok, the version we are looking for has not been committed yet, so we need to
+        //registerLifecycleListener a the listener so that it will be opened
+
+        boolean placedListener;
+        Listeners newListeners;
+        Listeners oldListeners;
+        do {
+            oldListeners = ___listeners;
+            newListeners = new Listeners(listener, oldListeners);
+
+            if (___listeners != oldListeners) {
+                placedListener = false;
+            } else {
+                placedListener = ___LISTENERS_UPDATER.compareAndSet(this, oldListeners, newListeners);
+            }
+
+            if (!placedListener) {
+                //it could be that another transaction did a registerLifecycleListener, but it also could mean
+                //that a write occurred.
+                AlphaTranlocal second = ___tranlocal;
+                if (first != second) {
+                    //we are not sure when the registration took place, but a new version is available.
+                    //a write happened so we can closed this latch
+                    listener.open();
+                    return RegisterRetryListenerResult.opened;
+                }
+            }
+        } while (!placedListener);
+
+        AlphaTranlocal second = ___tranlocal;
+        if (first != second) {
+            listener.open();
+            //lets try to restore the oldListeners.
+            ___LISTENERS_UPDATER.compareAndSet(this, newListeners, oldListeners);
+        }
+        //else: it is registered before the write took place
+
+        return RegisterRetryListenerResult.registered;
     }
 }
