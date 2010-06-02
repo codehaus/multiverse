@@ -4,7 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
-import org.multiverse.ThreadLocalRandom;
+import org.multiverse.utils.ThreadLocalRandom;
 import org.multiverse.api.programmatic.ProgrammaticRefFactory;
 import org.multiverse.stms.alpha.AlphaStm;
 

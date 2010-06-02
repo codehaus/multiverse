@@ -1,4 +1,4 @@
-package org.multiverse.stms.alpha.programmatic;
+package org.multiverse.transactional.refs;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,21 +16,20 @@ import static org.multiverse.api.StmUtils.retry;
 /**
  * @author Peter Veentjer
  */
-public class AlphaProgrammaticLongRef_blockingStressTest {
+public class BasicRefBlockingStressTest {
+
     private AlphaStm stm;
     private ProgrammaticRefFactory refFactory;
-    private AlphaProgrammaticLongRef ref;
+    private BasicRef<String> ref;
     private int consumerCount = 10;
-    private int unprocessedCapacity = 1000;
     private volatile boolean stop;
+    private String poison = "poison";
 
     @Before
     public void setUp() {
         stop = false;
         stm = (AlphaStm) getGlobalStmInstance();
-        refFactory = stm.getProgrammaticRefFactoryBuilder()
-                .build();
-        ref = (AlphaProgrammaticLongRef) refFactory.atomicCreateLongRef(0);
+        ref = new BasicRef<String>();
     }
 
     @Test
@@ -87,35 +86,27 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
                     count++;
                 }
 
-                if (count % 1000 == 0) {
+                if (count % 100000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), count);
                 }
             }
 
-            ref.set(-1);
+            ref.set(poison);
         }
 
         @TransactionalMethod(readonly = false)
         private boolean produce() {
-            long value = ref.get();
+            String value = ref.get();
 
-            if (value < -1) {
-                throw new RuntimeException();
-            }
-
-            if (value == -1) {
+            if (value == poison) {
                 return false;
             }
 
-            if (value > unprocessedCapacity) {
-                throw new RuntimeException();
-            }
-
-            if (value >= unprocessedCapacity) {
+            if (value != null) {
                 retry();
             }
 
-            ref.inc(1);
+            ref.set("token");
             return true;
         }
     }
@@ -133,7 +124,7 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
             do {
                 again = consume();
 
-                if (count % 1000 == 0) {
+                if (count % 100000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), count);
                 }
 
@@ -145,21 +136,17 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
 
         @TransactionalMethod(readonly = false)
         private boolean consume() {
-            long value = ref.get();
+            String value = ref.get();
 
-            if (value < -1) {
-                throw new RuntimeException();
-            }
-
-            if (value == -1) {
+            if (value == poison) {
                 return false;
             }
 
-            if (value == 0) {
+            if (value == null) {
                 retry();
             }
 
-            ref.inc(-1);
+            ref.set(null);
             return true;
         }
     }

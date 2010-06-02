@@ -1,11 +1,10 @@
-package org.multiverse.stms.alpha.programmatic;
+package org.multiverse.transactional.refs;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.TestUtils;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.api.programmatic.ProgrammaticRefFactory;
 import org.multiverse.stms.alpha.AlphaStm;
 
 import static org.junit.Assert.assertEquals;
@@ -16,10 +15,10 @@ import static org.multiverse.api.StmUtils.retry;
 /**
  * @author Peter Veentjer
  */
-public class AlphaProgrammaticLongRef_blockingStressTest {
+public class LongRefBlockingStressTest {
+
     private AlphaStm stm;
-    private ProgrammaticRefFactory refFactory;
-    private AlphaProgrammaticLongRef ref;
+    private LongRef ref;
     private int consumerCount = 10;
     private int unprocessedCapacity = 1000;
     private volatile boolean stop;
@@ -28,9 +27,7 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
     public void setUp() {
         stop = false;
         stm = (AlphaStm) getGlobalStmInstance();
-        refFactory = stm.getProgrammaticRefFactoryBuilder()
-                .build();
-        ref = (AlphaProgrammaticLongRef) refFactory.atomicCreateLongRef(0);
+         ref = new LongRef();
     }
 
     @Test
@@ -87,7 +84,7 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
                     count++;
                 }
 
-                if (count % 1000 == 0) {
+                if (count % 100000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), count);
                 }
             }
@@ -129,11 +126,11 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
 
         @Override
         public void doRun() throws Exception {
-            boolean again = true;
+            boolean again;
             do {
                 again = consume();
 
-                if (count % 1000 == 0) {
+                if (count % 100000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), count);
                 }
 
@@ -163,4 +160,5 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
             return true;
         }
     }
+
 }

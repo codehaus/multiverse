@@ -20,32 +20,52 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class MoneyTransferStressTest {
 
-    private final int threadCount = 20;
-    private final int accountCount = 10;
-    private final int transferCount = 1000;
+    private volatile boolean stop;
 
-    private long initialAmount;
-    private BankAccount[] bankAccounts;
-    private TransferThread[] threads;
+    private BankAccount[] accounts;
 
     @Before
     public void setUp() {
+        stop = false;
         clearThreadLocalTransaction();
-
-        bankAccounts = new BankAccount[accountCount];
-
-        for (int k = 0; k < accountCount; k++) {
-            long amount = randomInt(1000);
-            initialAmount += amount;
-            bankAccounts[k] = new BankAccount(amount);
-        }
-
-        threads = createThreads();
     }
 
     @Test
-    public void test() {
+    public void test_10_2() {
+        test(10, 2);
+    }
+
+    @Test
+    public void test_100_10() {
+        test(100, 10);
+    }
+
+    @Test
+    public void test_1000_10() {
+        test(1000, 10);
+    }
+
+    @Test
+    public void test_30_30() {
+        test(30, 30);
+    }
+
+    public void test(int accountCount, int threadCount) {
+        accounts = new BankAccount[accountCount];
+
+        long initialAmount = 0;
+        for (int k = 0; k < accountCount; k++) {
+            long amount = randomInt(1000);
+            initialAmount += amount;
+            accounts[k] = new BankAccount(amount);
+        }
+
+        TransferThread[] threads = createThreads(threadCount);
+
         startAll(threads);
+
+        sleepMs(getStressTestDurationMs(60 * 1000));
+        stop = true;
         joinAll(threads);
 
         assertEquals(initialAmount, getTotal());
@@ -53,13 +73,13 @@ public class MoneyTransferStressTest {
 
     private long getTotal() {
         long sum = 0;
-        for (BankAccount account : bankAccounts) {
+        for (BankAccount account : accounts) {
             sum += account.getBalance();
         }
         return sum;
     }
 
-    private TransferThread[] createThreads() {
+    private TransferThread[] createThreads(int threadCount) {
         TransferThread[] threads = new TransferThread[threadCount];
         for (int k = 0; k < threads.length; k++) {
             threads[k] = new TransferThread(k);
@@ -76,23 +96,23 @@ public class MoneyTransferStressTest {
         @Override
         public void doRun() throws Exception {
             int k = 0;
-            do {
+            while (!stop) {
                 try {
                     transferBetweenRandomAccounts();
-                    if ((k % 100) == 0) {
+                    if ((k % 1000) == 0) {
                         System.out.printf("Thread %s is at iteration %s\n", getName(), k);
                     }
                     k++;
                 } catch (NotEnoughMoneyException ignore) {
                 }
-            } while (k < transferCount);
+            }
         }
 
         @TransactionalMethod
         private void transferBetweenRandomAccounts() {
-            BankAccount from = bankAccounts[randomInt(bankAccounts.length - 1)];
-            BankAccount to = bankAccounts[randomInt(bankAccounts.length - 1)];
-            int amount = randomInt(1000);
+            BankAccount from = accounts[randomInt(accounts.length)];
+            BankAccount to = accounts[randomInt(accounts.length)];
+            int amount = randomInt(100);
             to.inc(amount);
             //place some delay so that the transaction is very likely to conflict 
             sleepRandomMs(20);
@@ -116,7 +136,7 @@ public class MoneyTransferStressTest {
 
         public void setBalance(long balance) {
             if (balance < 0) {
-                throw new NotEnoughMoneyException();
+                throw NotEnoughMoneyException.INSTANCE;
             }
 
             this.balance = balance;
@@ -132,6 +152,6 @@ public class MoneyTransferStressTest {
     }
 
     private static class NotEnoughMoneyException extends RuntimeException {
-
+        static NotEnoughMoneyException INSTANCE = new NotEnoughMoneyException();
     }
 }

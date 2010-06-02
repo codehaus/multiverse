@@ -2,6 +2,8 @@ package org.multiverse;
 
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionStatus;
+import org.multiverse.utils.DelayUtils;
+import org.multiverse.utils.ThreadLocalRandom;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,7 +13,6 @@ import java.lang.reflect.Field;
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.LockSupport;
 
 import static org.junit.Assert.*;
 
@@ -178,11 +179,12 @@ public class TestUtils {
         if (max <= 0) {
             return 0;
         }
+
         return ThreadLocalRandom.current().nextInt(max);
     }
 
     public static void sleepRandomMs(int maxMs) {
-        sleepUs((long) randomInt((int)TimeUnit.MILLISECONDS.toMicros(maxMs)));
+        DelayUtils.sleepUs((long) randomInt((int)TimeUnit.MILLISECONDS.toMicros(maxMs)));
     }
 
     public static void sleepSome() {
@@ -191,20 +193,11 @@ public class TestUtils {
 
     public static void sleepMs(long ms) {
         long us = TimeUnit.MILLISECONDS.toMicros(ms);
-        sleepUs(us);
+        DelayUtils.sleepUs(us);
     }
 
     public static void sleepRandomUs(int maxUs) {
-        sleepUs((long) randomInt(maxUs));
-    }
-
-    public static void sleepUs(long us) {
-        if (us <= 0) {
-            return;
-        }
-
-        long nanos = TimeUnit.MICROSECONDS.toNanos(us);
-        LockSupport.parkNanos(nanos);
+        DelayUtils.sleepUs((long) randomInt(maxUs));
     }
 
     public static void startAll(TestThread... threads) {

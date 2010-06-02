@@ -26,7 +26,7 @@ public class AntWorldSnapshotStressTest {
 
     private int width = 80;
     private int height = 80;
-    private int testDurationMs = 5 * 60 * 1000;
+    private int testDurationMs = 60 * 1000;
     private Cell[] cells;
 
     private volatile boolean stop;
@@ -118,7 +118,7 @@ public class AntWorldSnapshotStressTest {
     }
 
     @TransactionalObject
-    class Cell {
+    final class Cell {
         private int value;
 
         public int getValue() {

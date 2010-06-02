@@ -91,7 +91,7 @@ public class AlphaProgrammaticLongRefAndRef_integrationStressTest {
             for (int k = 0; k < transactionCount; k++) {
                 produce();
 
-                if (k % 100000 == 0) {
+                if (k % 500000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
             }

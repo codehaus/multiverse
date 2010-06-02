@@ -16,6 +16,9 @@ import static java.lang.System.getProperty;
  */
 public interface MultiverseConstants {
 
-    boolean ___LOGGING_ENABLED =
-            parseBoolean(getProperty("org.multiverse.loggingEnabled", "false"));
+    boolean ___BUGSHAKER_ENABLED =
+            parseBoolean(getProperty("org.multiverse.bugshaker.enabled", "false"));
+
+    boolean ___TRACING_ENABLED =
+            parseBoolean(getProperty("org.multiverse.tracing.enabled", "false"));
 }

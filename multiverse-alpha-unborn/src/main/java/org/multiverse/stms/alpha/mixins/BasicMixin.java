@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 import static java.lang.String.format;
 import static org.multiverse.stms.alpha.AlphaStmUtils.toTxObjectString;
+import static org.multiverse.utils.DelayUtils.shakeBugs;
 
 /**
  * AlphaTransactionalObject implementation that also can be used to transplant methods from during instrumentation. This
@@ -49,6 +50,8 @@ public abstract class BasicMixin implements AlphaTransactionalObject, Multiverse
 
     @Override
     public final AlphaTranlocal ___load(long readVersion) {
+        if (___BUGSHAKER_ENABLED) shakeBugs();
+
         AlphaTranlocal first = ___tranlocal;
 
         if (first == null) {
@@ -68,6 +71,8 @@ public abstract class BasicMixin implements AlphaTransactionalObject, Multiverse
             throw createOldVersionNotFoundReadConflict(readVersion, first);
         }
 
+        if (___BUGSHAKER_ENABLED) shakeBugs();
+
         //the exact version is not there, we need to make sure that the one we
         //are going to load is valid (so not locked). This is done by if the lock is free and then looking
         //if the first read is the same as second read.
@@ -75,6 +80,8 @@ public abstract class BasicMixin implements AlphaTransactionalObject, Multiverse
             //the lock is not free
             throw createLockNotFreeReadConflict();
         }
+
+        if (___BUGSHAKER_ENABLED) shakeBugs();
 
         //now we read the ___tranlocal again to see if there was a change.
         AlphaTranlocal second = ___tranlocal;
@@ -133,9 +140,15 @@ public abstract class BasicMixin implements AlphaTransactionalObject, Multiverse
 
         Listeners listeners = null;
         if (___listeners != null) {
-            //it could be that listeners are set af
+            if (___BUGSHAKER_ENABLED) shakeBugs();
+
+            //it could be that listeners are set after the check was done and none is found. It is now the
+            //responsibility of the listener to re-read the ___tranlocal to make sure that his registration
+            //is not 'lost'; So that there is a lost wakeup.
             listeners = ___LISTENERS_UPDATER.getAndSet(this, null);
         }
+
+        if (___BUGSHAKER_ENABLED) shakeBugs();
 
         if (releaseLock) {
             ___lockOwner = null;
@@ -161,12 +174,16 @@ public abstract class BasicMixin implements AlphaTransactionalObject, Multiverse
     @Override
     //todo: make final
     public boolean ___tryLock(Transaction lockOwner) {
+        if (___BUGSHAKER_ENABLED) shakeBugs();
+
         //uses a TTAS.
 
         //if the lock already is owned, return false because we can't lock it.
         if (___lockOwner != null) {
             return false;
         }
+
+        if (___BUGSHAKER_ENABLED) shakeBugs();
 
         //the lock was not owned, but it could be that in the mean while another transaction acquired it.
         //Now we need to do an expensive compareAndSet to acquire the lock.
@@ -180,6 +197,8 @@ public abstract class BasicMixin implements AlphaTransactionalObject, Multiverse
 
         //we only need to release the lock if we own it.
         if (___lockOwner == expectedLockOwner) {
+            if (___BUGSHAKER_ENABLED) shakeBugs();
+
             ___lockOwner = null;
         }
     }
@@ -192,18 +211,16 @@ public abstract class BasicMixin implements AlphaTransactionalObject, Multiverse
 
     @Override
     public final RegisterRetryListenerResult ___registerRetryListener(Latch listener, long minimumWakeupVersion) {
+        if (___BUGSHAKER_ENABLED) shakeBugs();
+
         AlphaTranlocal first = ___tranlocal;
 
         //could it be that a locked value is read? (YES, can happen) A value that will be updated,
         //but isn't updated yet.. consequence: the listener tries to registerLifecycleListener a listener.
         if (first == null) {
-            //no tranlocal has been committed yet. We don't need to registerLifecycleListener the listener,
+            //no tranlocal has been committed yet. We don't need to register the listener,
             //because this call can only be made a transaction that has newattached items
             //and does an abort.
-
-            //todo: one thing we still need to take care of is the noprogresspossible exception
-            //if all objects within the transaction give this behavior it looks like the
-            //latch was registered, but the transaction will never be woken up.
             return RegisterRetryListenerResult.noregistration;
         }
 
@@ -216,20 +233,25 @@ public abstract class BasicMixin implements AlphaTransactionalObject, Multiverse
         //ok, the version we are looking for has not been committed yet, so we need to
         //registerLifecycleListener a the listener so that it will be opened
 
-        boolean placedListener;
+        boolean registered;
         Listeners newListeners;
         Listeners oldListeners;
         do {
+            if (___BUGSHAKER_ENABLED) shakeBugs();
+
             oldListeners = ___listeners;
             newListeners = new Listeners(listener, oldListeners);
 
+            //ttas.
             if (___listeners != oldListeners) {
-                placedListener = false;
+                registered = false;
             } else {
-                placedListener = ___LISTENERS_UPDATER.compareAndSet(this, oldListeners, newListeners);
+                registered = ___LISTENERS_UPDATER.compareAndSet(this, oldListeners, newListeners);
             }
 
-            if (!placedListener) {
+            if (___BUGSHAKER_ENABLED) shakeBugs();
+
+            if (!registered) {
                 //it could be that another transaction did a registerLifecycleListener, but it also could mean
                 //that a write occurred.
                 AlphaTranlocal second = ___tranlocal;
@@ -240,16 +262,25 @@ public abstract class BasicMixin implements AlphaTransactionalObject, Multiverse
                     return RegisterRetryListenerResult.opened;
                 }
             }
-        } while (!placedListener);
+        } while (!registered);
 
+        if (___BUGSHAKER_ENABLED) shakeBugs();
+
+        //the listener is placed, but it could be that a write was done in the mean time and the writer didn't notify
+        //the listener. So we need to re-read to make sure that no new write has happened after we did the registration.  
         AlphaTranlocal second = ___tranlocal;
         if (first != second) {
+            //lets try to restore the oldListeners.. it it was a success.. we are lucky, if it isn't
+            //the 'useless' listener remains attached 
+            if (___listeners == newListeners) {
+                //we use a ttas here to prevent unwanted tas (cas).
+                ___LISTENERS_UPDATER.compareAndSet(this, newListeners, oldListeners);
+            }
             listener.open();
-            //lets try to restore the oldListeners.
-            ___LISTENERS_UPDATER.compareAndSet(this, newListeners, oldListeners);
+            return RegisterRetryListenerResult.opened;
         }
-        //else: it is registered before the write took place
 
+        //else: it is registered before the write took place
         return RegisterRetryListenerResult.registered;
     }
 }

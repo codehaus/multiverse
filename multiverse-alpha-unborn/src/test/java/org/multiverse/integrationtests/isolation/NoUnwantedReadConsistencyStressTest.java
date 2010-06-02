@@ -19,72 +19,88 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class NoUnwantedReadConsistencyStressTest {
 
-    public long readCount = 500 * 1000;
-    public int readThreadCount = 10;
-    public int refCount = 100;
+    private volatile boolean stop;
+    private int readThreadCount = 10;
+    private int refCount = 100;
 
-    public volatile boolean finished = false;
+    private final AtomicLong inconsistenciesCounter = new AtomicLong();
+    private Ref[] refs = new Ref[refCount];
 
-    public final AtomicLong inconsistenciesCounter = new AtomicLong();
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
         inconsistenciesCounter.set(0);
+        stop = false;
     }
 
     @Test
     public void test() {
-        Ref[] refs = new Ref[refCount];
         for (int k = 0; k < refs.length; k++) {
             refs[k] = new Ref();
         }
 
-        ReadThread[] threads = new ReadThread[readThreadCount];
-        for (int k = 0; k < threads.length; k++) {
-            threads[k] = new ReadThread(refs, k);
+        ReadThread[] readThreads = new ReadThread[readThreadCount];
+        for (int k = 0; k < readThreads.length; k++) {
+            readThreads[k] = new ReadThread(k);
         }
 
-        startAll(threads);
+        ModifyThread modifyThread = new ModifyThread(0);
 
-        while (!finished) {
-            for (Ref ref : refs) {
-                if (randomOneOf(10)) {
-                    sleepRandomUs(10);
-                    ref.inc();
-                }
-            }
-        }
+        startAll(readThreads);
+        startAll(modifyThread);
+        sleepMs(getStressTestDurationMs(60 * 1000));
 
-        joinAll(threads);
+        stop = true;
+        joinAll(readThreads);
+        joinAll(modifyThread);
         System.out.println("number of readinconsistencies: " + inconsistenciesCounter.get());
         assertTrue(inconsistenciesCounter.get() > 0);
     }
 
+    class ModifyThread extends TestThread {
+        public ModifyThread(int id) {
+            super("ModifyThread-" + id);
+        }
+
+        @Override
+        public void doRun() throws Exception {
+            while (!stop) {
+                for (Ref ref : refs) {
+                    if (randomOneOf(10)) {
+                        sleepRandomUs(10);
+                        ref.inc();
+                    }
+                }
+            }
+        }
+    }
+
     class ReadThread extends TestThread {
-        private Ref[] refs;
 
-
-        public ReadThread(Ref[] refs, int id) {
+        public ReadThread(int id) {
             super("ReadThread-" + id);
-            this.refs = refs;
         }
 
         @Override
         public void doRun() throws Exception {
             int readInconsistencies = 0;
 
-            for (int k = 0; k < readCount; k++) {
+            int k = 0;
+            while (!stop) {
+
                 readInconsistencies += doread();
 
                 if (k % 10000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
+                k++;
             }
 
-            finished = true;
             inconsistenciesCounter.addAndGet(readInconsistencies);
         }
+
+        //important that this method is not transactional.
 
         private int doread() {
             int[] values = new int[refs.length];

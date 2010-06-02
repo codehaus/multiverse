@@ -30,7 +30,7 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
         int spin = 0;
         while (true) {
             try {
-                return txObject.___load(getReadVersion());
+                return txObject.___load(version);
             } catch (LockNotFreeReadConflict lockNotFreeReadConflict) {
                 if (spin >= config.maxReadSpinCount) {
                     throw lockNotFreeReadConflict;
@@ -43,39 +43,39 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
 
     @Override
     public final AlphaTranlocal openForRead(AlphaTransactionalObject transactionalObject) {
-        if (___LOGGING_ENABLED) {
+        if (___TRACING_ENABLED) {
             if (config.traceLevel.isLogableFrom(TraceLevel.fine)) {
                 System.out.println(config.familyName + " openForRead " + toTxObjectString(transactionalObject));
             }
         }
 
-        switch (getStatus()) {
-            case New:
+        switch (statusInt) {
+            case NEW:
                 if (transactionalObject == null) {
                     return null;
                 }
 
                 start();
                 return doOpenForRead(transactionalObject);
-            case Active:
+            case ACTIVE:
                 if (transactionalObject == null) {
                     return null;
                 }
 
                 return doOpenForRead(transactionalObject);
-            case Prepared:
+            case PREPARED:
                 String preparedMsg = format(
                         "Can't open for read transactional object '%s' " +
                                 "because transaction '%s' is prepared to commit.",
                         toTxObjectString(transactionalObject), config.getFamilyName());
                 throw new PreparedTransactionException(preparedMsg);
-            case Committed:
+            case COMMITTED:
                 String committedMsg = format(
                         "Can't open for read transactional object '%s' " +
                                 "because transaction '%s' already is committed.",
                         toTxObjectString(transactionalObject), config.getFamilyName());
                 throw new DeadTransactionException(committedMsg);
-            case Aborted:
+            case ABORTED:
                 String abortedMsg = format(
                         "Can't open for read transactional object '%s' " +
                                 "because transaction '%s' already is aborted.",
@@ -96,7 +96,7 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
 
     @Override
     public final AlphaTranlocal openForWrite(AlphaTransactionalObject transactionalObject) {
-        if (___LOGGING_ENABLED) {
+        if (___TRACING_ENABLED) {
             if (config.traceLevel.isLogableFrom(TraceLevel.fine)) {
                 System.out.println(config.familyName + " openForWrite " + toTxObjectString(transactionalObject));
             }
@@ -155,7 +155,7 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
 
     @Override
     public final AlphaTranlocal openForConstruction(AlphaTransactionalObject transactionalObject) {
-        if (___LOGGING_ENABLED) {
+        if (___TRACING_ENABLED) {
             if (config.traceLevel.isLogableFrom(TraceLevel.fine)) {
                 System.out.println(config.familyName + " openForConstruction " + toTxObjectString(transactionalObject));
             }
@@ -214,7 +214,7 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
 
     @Override
     public final AlphaTranlocal openForCommutingWrite(AlphaTransactionalObject transactionalObject) {
-        if (___LOGGING_ENABLED) {
+        if (___TRACING_ENABLED) {
             if (config.traceLevel.isLogableFrom(TraceLevel.fine)) {
                 System.out.println(config.familyName + " openForCommutingWrite " + toTxObjectString(transactionalObject));
             }

@@ -3,6 +3,7 @@ package org.multiverse.integrationtests.isolation;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.TestUtils;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.transactional.refs.IntRef;
 
@@ -25,19 +26,18 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  *
  * @author Peter Veentjer.
  */
-public class NonRepeatableReadStressTest {
+public class ReadonlyRepeatableReadStressTest {
 
+    private volatile boolean stop;
     private IntRef ref;
-    private int readCount = 10000;
     private int readThreadCount = 5;
     private int modifyThreadCount = 2;
-    private volatile boolean readersFinished;
-
+ 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
         ref = new IntRef(0);
-        readersFinished = false;
+        stop = false;
     }
 
     @Test
@@ -54,6 +54,8 @@ public class NonRepeatableReadStressTest {
 
         startAll(modifyThreads);
         startAll(readerThread);
+        sleepMs(TestUtils.getStressTestDurationMs(60 * 1000));
+        stop = true;
         joinAll(modifyThreads);
         joinAll(readerThread);
     }
@@ -66,14 +68,8 @@ public class NonRepeatableReadStressTest {
 
         @Override
         public void doRun() {
-            int k = 0;
-            while (!readersFinished) {
-                if (k % 1000 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
-                }
-                k++;
+            while (!stop) {
                 ref.inc();
-
                 sleepRandomMs(5);
             }
         }
@@ -87,26 +83,45 @@ public class NonRepeatableReadStressTest {
 
         @Override
         public void doRun() {
-            for (int k = 0; k < readCount; k++) {
-                if (k % 1000 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
+            int k=0;
+            while(!stop){
+                switch (k % 4){
+                    case 0:
+                        readUsingUpdateTransaction();
+                        break;
+                    case 1:
+                        readUsingReadonlyTransaction();
+                        break;
+                    case 2:
+                        readUsingReadtrackingReadonlyTransaction();
+                        break;
+                    case 3:
+                        readUsingReadtrackingUpdateTransaction();
+                        break;
+                    default:
+                        throw new IllegalStateException();
                 }
-                if (k % 2 == 0) {
-                    readUsingUpdateTransaction();
-                } else {
-                    readUsingReadonlyTransaction();
-                }
+                k++;
             }
-            readersFinished = true;
         }
 
-        @TransactionalMethod(readonly = true)
+        @TransactionalMethod(readonly = true, trackReads = false)
         private void readUsingReadonlyTransaction() {
             read();
         }
 
-        @TransactionalMethod(readonly = false)
+        @TransactionalMethod(readonly = false,trackReads = false)
         private void readUsingUpdateTransaction() {
+            read();
+        }
+
+        @TransactionalMethod(readonly = true, trackReads = true)
+        private void readUsingReadtrackingReadonlyTransaction() {
+            read();
+        }
+
+        @TransactionalMethod(readonly = false, trackReads = true)
+        private void readUsingReadtrackingUpdateTransaction() {
             read();
         }
 

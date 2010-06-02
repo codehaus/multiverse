@@ -31,7 +31,7 @@ import static org.multiverse.utils.SystemOut.println;
  *
  * @author Peter Veentjer
  */
-public final class MultiverseJavaAgent {
+public final class MultiverseJavaAgent implements MultiverseConstants {
 
     public final static String KEY = "org.multiverse.javaagent.instrumentor";
 
@@ -75,7 +75,6 @@ public final class MultiverseJavaAgent {
             println("Multiverse: The following classes are included the instrumentation '%s'" + instrumentor.getIncluded());
         }
 
-
         String exclude = exclude();
         instrumentor.exclude(exclude);
         println("Multiverse: The following classes are excluded from instrumentation (exclude overrides includes) " + instrumentor.getExcluded());
@@ -97,6 +96,17 @@ public final class MultiverseJavaAgent {
     private static void printMultiverseJavaAgentInfo() {
         println("Multiverse: Starting Multiverse JavaAgent");
         println("Multiverse: Optimizations disabled in Javaaagent (see compiletime instrumentation)");
+        if (___BUGSHAKER_ENABLED) {
+            println("Multiverse: Bugshaker enabled (can cause performance problems)");
+        } else {
+            println("Multiverse: Bugshaker disabled (good performance)");
+        }
+
+        if (___TRACING_ENABLED) {
+            println("Multiverse: Tracing is enabled (useful for debugging/developing)");
+        } else {
+            println("Multiverse: Tracing is disabled (useful for production environment)");
+        }
     }
 
     private static Instrumentor createInstrumentor() {

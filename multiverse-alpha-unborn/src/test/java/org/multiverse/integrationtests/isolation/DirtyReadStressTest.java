@@ -3,6 +3,7 @@ package org.multiverse.integrationtests.isolation;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.TestUtils;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.ThreadLocalTransaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
@@ -28,16 +29,16 @@ public class DirtyReadStressTest {
 
     private IntRef ref;
 
-    private int readCount = 5000;
     private int readThreadCount = 10;
     private int modifyThreadCount = 2;
 
-    private volatile boolean readersFinished = false;
+    private volatile boolean stop;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
         ref = new IntRef(0);
+        stop = false;
     }
 
     @Test
@@ -54,6 +55,8 @@ public class DirtyReadStressTest {
 
         startAll(modifyThreads);
         startAll(readerThread);
+        sleepMs(TestUtils.getStressTestDurationMs(60 * 1000));
+        stop = true;
         joinAll(modifyThreads);
         joinAll(readerThread);
     }
@@ -66,12 +69,7 @@ public class DirtyReadStressTest {
 
         @Override
         public void doRun() {
-            int k = 0;
-            while (!readersFinished) {
-                if (k % 1000 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
-                }
-                k++;
+            while (!stop) {
                 try {
                     modify();
                     fail();
@@ -98,33 +96,49 @@ public class DirtyReadStressTest {
 
         @Override
         public void doRun() {
-            try {
-                for (int k = 0; k < readCount; k++) {
-                    if (k % 1000 == 0) {
-                        System.out.printf("%s is at %s\n", getName(), k);
-                    }
-
-                    if (k % 2 == 0) {
+            int k = 0;
+            while (!stop) {
+                switch (k% 4){
+                    case 0:
                         observeUsingReadonlyTransaction();
-                    } else {
+                        break;
+                    case 1:
+                        observeUsingReadtrackingReadonlyTransaction();
+                        break;
+                    case 2:
                         observeUsingUpdateTransaction();
-                    }
-
-                    sleepRandomMs(5);
+                        break;
+                    case 3:
+                        observeUsingReadtrackingUpdateTransaction();
+                        break;
+                    default:
+                        throw new IllegalStateException();
                 }
-            } finally {
-                readersFinished = true;
+
+                k++;
+                sleepRandomMs(5);
             }
         }
 
-        @TransactionalMethod(readonly = true)
+        @TransactionalMethod(readonly = true, trackReads = false)
         private void observeUsingReadonlyTransaction() {
             observe();
         }
 
 
-        @TransactionalMethod
+        @TransactionalMethod(readonly = false, trackReads = false)
         private void observeUsingUpdateTransaction() {
+            observe();
+        }
+
+        @TransactionalMethod(readonly = true, trackReads = true)
+        private void observeUsingReadtrackingReadonlyTransaction() {
+            observe();
+        }
+
+
+        @TransactionalMethod(readonly = false, trackReads = true)
+        private void observeUsingReadtrackingUpdateTransaction() {
             observe();
         }
 
