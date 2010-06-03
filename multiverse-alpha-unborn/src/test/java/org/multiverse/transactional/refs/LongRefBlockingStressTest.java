@@ -17,8 +17,9 @@ import static org.multiverse.api.StmUtils.retry;
  */
 public class LongRefBlockingStressTest {
 
-    private AlphaStm stm;
+     private AlphaStm stm;
     private LongRef ref;
+    private BooleanRef completedRef;
     private int consumerCount = 10;
     private int unprocessedCapacity = 1000;
     private volatile boolean stop;
@@ -27,7 +28,8 @@ public class LongRefBlockingStressTest {
     public void setUp() {
         stop = false;
         stm = (AlphaStm) getGlobalStmInstance();
-         ref = new LongRef();
+        ref = new LongRef();
+        completedRef = new BooleanRef();
     }
 
     @Test
@@ -51,7 +53,10 @@ public class LongRefBlockingStressTest {
         joinAll(producers);
         joinAll(consumers);
 
-        assertEquals(sum(producers), sum(consumers));
+        long produceCount = sum(producers);
+        long consumeCount = sum(consumers);
+        System.out.println("missing consumes: "+(produceCount-consumeCount));
+        assertEquals(produceCount, consumeCount);
     }
 
     long sum(ProducerThread[] threads) {
@@ -89,30 +94,23 @@ public class LongRefBlockingStressTest {
                 }
             }
 
-            ref.set(-1);
+            completedRef.set(true);
         }
 
         @TransactionalMethod(readonly = false)
         private boolean produce() {
-            long value = ref.get();
-
-            if (value < -1) {
-                throw new RuntimeException();
-            }
-
-            if (value == -1) {
+            if(completedRef.get()){
                 return false;
             }
 
-            if (value > unprocessedCapacity) {
-                throw new RuntimeException();
-            }
+            long value = ref.get();
 
             if (value >= unprocessedCapacity) {
                 retry();
             }
 
-            ref.inc(1);
+            ref.inc();
+
             return true;
         }
     }
@@ -142,15 +140,11 @@ public class LongRefBlockingStressTest {
 
         @TransactionalMethod(readonly = false)
         private boolean consume() {
-            long value = ref.get();
-
-            if (value < -1) {
-                throw new RuntimeException();
-            }
-
-            if (value == -1) {
+            if(completedRef.get()){
                 return false;
             }
+
+            long value = ref.get();
 
             if (value == 0) {
                 retry();
@@ -159,6 +153,7 @@ public class LongRefBlockingStressTest {
             ref.inc(-1);
             return true;
         }
+
     }
 
 }

@@ -18,6 +18,7 @@ import static org.multiverse.api.StmUtils.retry;
 public class IntRefBlockingStressTest {
     private AlphaStm stm;
     private IntRef ref;
+    private BooleanRef completedRef;
     private int consumerCount = 10;
     private int unprocessedCapacity = 1000;
     private volatile boolean stop;
@@ -27,6 +28,7 @@ public class IntRefBlockingStressTest {
         stop = false;
         stm = (AlphaStm) getGlobalStmInstance();
         ref = new IntRef();
+        completedRef = new BooleanRef();
     }
 
     @Test
@@ -44,7 +46,7 @@ public class IntRefBlockingStressTest {
         startAll(producers);
         startAll(consumers);
 
-        sleepMs(TestUtils.getStressTestDurationMs(20 * 1000));
+        sleepMs(TestUtils.getStressTestDurationMs(60 * 1000));
         stop = true;
 
         joinAll(producers);
@@ -91,30 +93,23 @@ public class IntRefBlockingStressTest {
                 }
             }
 
-            ref.set(-1);
+            completedRef.set(true);
         }
 
         @TransactionalMethod(readonly = false)
         private boolean produce() {
-            long value = ref.get();
-
-            if (value < -1) {
-                throw new RuntimeException();
-            }
-
-            if (value == -1) {
+            if(completedRef.get()){
                 return false;
             }
 
-            if (value > unprocessedCapacity) {
-                throw new RuntimeException();
-            }
+            long value = ref.get();
 
             if (value >= unprocessedCapacity) {
                 retry();
             }
 
-            ref.inc(1);
+            ref.inc();
+
             return true;
         }
     }
@@ -144,15 +139,11 @@ public class IntRefBlockingStressTest {
 
         @TransactionalMethod(readonly = false)
         private boolean consume() {
-            long value = ref.get();
-
-            if (value < -1) {
-                throw new RuntimeException();
-            }
-
-            if (value == -1) {
+            if(completedRef.get()){
                 return false;
             }
+
+            long value = ref.get();
 
             if (value == 0) {
                 retry();

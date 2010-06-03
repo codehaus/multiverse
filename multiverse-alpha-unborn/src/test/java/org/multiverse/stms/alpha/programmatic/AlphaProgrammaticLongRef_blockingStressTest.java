@@ -5,8 +5,12 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.TestUtils;
 import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.programmatic.ProgrammaticLongRef;
+import org.multiverse.api.programmatic.ProgrammaticRef;
 import org.multiverse.api.programmatic.ProgrammaticRefFactory;
 import org.multiverse.stms.alpha.AlphaStm;
+import org.multiverse.templates.TransactionTemplate;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
@@ -17,20 +21,21 @@ import static org.multiverse.api.StmUtils.retry;
  * @author Peter Veentjer
  */
 public class AlphaProgrammaticLongRef_blockingStressTest {
-    private AlphaStm stm;
-    private ProgrammaticRefFactory refFactory;
-    private AlphaProgrammaticLongRef ref;
+      private AlphaStm stm;
+    private ProgrammaticLongRef ref;
+    private ProgrammaticRef<Boolean> completedRef;
     private int consumerCount = 10;
     private int unprocessedCapacity = 1000;
     private volatile boolean stop;
+    private ProgrammaticRefFactory refFactory;
 
     @Before
     public void setUp() {
         stop = false;
         stm = (AlphaStm) getGlobalStmInstance();
-        refFactory = stm.getProgrammaticRefFactoryBuilder()
-                .build();
-        ref = (AlphaProgrammaticLongRef) refFactory.atomicCreateLongRef(0);
+        refFactory = stm.getProgrammaticRefFactoryBuilder().build();
+        ref = refFactory.atomicCreateLongRef(0);
+        completedRef = refFactory.createRef(false);
     }
 
     @Test
@@ -54,7 +59,10 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
         joinAll(producers);
         joinAll(consumers);
 
-        assertEquals(sum(producers), sum(consumers));
+        long produceCount = sum(producers);
+        long consumeCount = sum(consumers);
+        System.out.println("missing consumes: "+(produceCount-consumeCount));
+        assertEquals(produceCount, consumeCount);
     }
 
     long sum(ProducerThread[] threads) {
@@ -87,35 +95,35 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
                     count++;
                 }
 
-                if (count % 1000 == 0) {
+                if (count % 100000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), count);
                 }
             }
 
-            ref.set(-1);
+            new TransactionTemplate(){
+                @Override
+                public Object execute(Transaction tx) throws Exception {
+                    completedRef.set(true);
+                    return null;
+                }
+            }.execute();
+
         }
 
         @TransactionalMethod(readonly = false)
         private boolean produce() {
-            long value = ref.get();
-
-            if (value < -1) {
-                throw new RuntimeException();
-            }
-
-            if (value == -1) {
+            if(completedRef.get()){
                 return false;
             }
 
-            if (value > unprocessedCapacity) {
-                throw new RuntimeException();
-            }
+            long value = ref.get();
 
             if (value >= unprocessedCapacity) {
                 retry();
             }
 
             ref.inc(1);
+
             return true;
         }
     }
@@ -129,11 +137,11 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
 
         @Override
         public void doRun() throws Exception {
-            boolean again = true;
+            boolean again;
             do {
                 again = consume();
 
-                if (count % 1000 == 0) {
+                if (count % 100000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), count);
                 }
 
@@ -145,15 +153,11 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
 
         @TransactionalMethod(readonly = false)
         private boolean consume() {
-            long value = ref.get();
-
-            if (value < -1) {
-                throw new RuntimeException();
-            }
-
-            if (value == -1) {
+            if(completedRef.get()){
                 return false;
             }
+
+            long value = ref.get();
 
             if (value == 0) {
                 retry();
@@ -162,5 +166,6 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
             ref.inc(-1);
             return true;
         }
+
     }
 }
