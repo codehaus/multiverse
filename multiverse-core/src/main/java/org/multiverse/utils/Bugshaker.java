@@ -9,7 +9,7 @@ import static java.lang.Thread.yield;
  *
  * @author Peter Veentjer
  */
-public class DelayUtils {
+public class Bugshaker {
 
     /**
      * Delays a random amount of time.
@@ -40,6 +40,6 @@ public class DelayUtils {
 
     //we don't want any instances
 
-    private DelayUtils() {
+    private Bugshaker() {
     }
 }
