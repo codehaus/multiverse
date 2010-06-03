@@ -21,7 +21,7 @@ import static org.multiverse.api.StmUtils.retry;
  * @author Peter Veentjer
  */
 public class AlphaProgrammaticLongRef_blockingStressTest {
-      private AlphaStm stm;
+    private AlphaStm stm;
     private ProgrammaticLongRef ref;
     private ProgrammaticRef<Boolean> completedRef;
     private int consumerCount = 10;
@@ -61,8 +61,8 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
 
         long produceCount = sum(producers);
         long consumeCount = sum(consumers);
-        System.out.println("missing consumes: "+(produceCount-consumeCount));
-        assertEquals(produceCount, consumeCount);
+        long leftOver = ref.get();
+        assertEquals(produceCount, consumeCount + leftOver);
     }
 
     long sum(ProducerThread[] threads) {
@@ -100,7 +100,7 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
                 }
             }
 
-            new TransactionTemplate(){
+            new TransactionTemplate() {
                 @Override
                 public Object execute(Transaction tx) throws Exception {
                     completedRef.set(true);
@@ -112,7 +112,7 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
 
         @TransactionalMethod(readonly = false)
         private boolean produce() {
-            if(completedRef.get()){
+            if (completedRef.get()) {
                 return false;
             }
 
@@ -153,7 +153,7 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
 
         @TransactionalMethod(readonly = false)
         private boolean consume() {
-            if(completedRef.get()){
+            if (completedRef.get()) {
                 return false;
             }
 

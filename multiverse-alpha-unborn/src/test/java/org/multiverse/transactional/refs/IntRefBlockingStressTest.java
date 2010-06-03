@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
@@ -25,6 +26,7 @@ public class IntRefBlockingStressTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         stop = false;
         stm = (AlphaStm) getGlobalStmInstance();
         ref = new IntRef();
@@ -54,14 +56,14 @@ public class IntRefBlockingStressTest {
 
         long produceCount = sum(producers);
         long consumeCount = sum(consumers);
-        System.out.println("missing consumes: "+(produceCount-consumeCount));
-        assertEquals(produceCount, consumeCount);
+        long leftOver = ref.get();
+        assertEquals(produceCount, consumeCount+leftOver);
     }
 
     long sum(ProducerThread[] threads) {
         long result = 0;
         for (ProducerThread thread : threads) {
-            result += thread.count;
+            result += thread.produceCount;
         }
         return result;
     }
@@ -69,13 +71,13 @@ public class IntRefBlockingStressTest {
     long sum(ConsumerThread[] threads) {
         long result = 0;
         for (ConsumerThread thread : threads) {
-            result += thread.count;
+            result += thread.consumeCount;
         }
         return result;
     }
 
     class ProducerThread extends TestThread {
-        long count = 0;
+        long produceCount = 0;
 
         public ProducerThread(int id) {
             super("ProducerThread-" + id);
@@ -85,11 +87,11 @@ public class IntRefBlockingStressTest {
         public void doRun() throws Exception {
             while (!stop) {
                 if (produce()) {
-                    count++;
+                    produceCount++;
                 }
 
-                if (count % 100000 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), count);
+                if (produceCount % 100000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), produceCount);
                 }
             }
 
@@ -115,7 +117,7 @@ public class IntRefBlockingStressTest {
     }
 
     class ConsumerThread extends TestThread {
-        long count = 0;
+        long consumeCount = 0;
 
         public ConsumerThread(int id) {
             super("ConsumerThread-" + id);
@@ -127,12 +129,12 @@ public class IntRefBlockingStressTest {
             do {
                 again = consume();
 
-                if (count % 100000 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), count);
+                if (consumeCount % 100000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), consumeCount);
                 }
 
                 if (again) {
-                    count++;
+                    consumeCount++;
                 }
             } while (again);
         }
@@ -152,6 +154,5 @@ public class IntRefBlockingStressTest {
             ref.inc(-1);
             return true;
         }
-
     }
 }

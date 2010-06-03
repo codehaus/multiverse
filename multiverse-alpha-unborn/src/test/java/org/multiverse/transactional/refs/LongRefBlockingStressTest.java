@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
@@ -26,6 +27,7 @@ public class LongRefBlockingStressTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         stop = false;
         stm = (AlphaStm) getGlobalStmInstance();
         ref = new LongRef();
@@ -54,9 +56,10 @@ public class LongRefBlockingStressTest {
         joinAll(consumers);
 
         long produceCount = sum(producers);
-        long consumeCount = sum(consumers);
-        System.out.println("missing consumes: "+(produceCount-consumeCount));
-        assertEquals(produceCount, consumeCount);
+           long consumeCount = sum(consumers);
+           long leftOver = ref.get();
+           assertEquals(produceCount, consumeCount+leftOver);
+        
     }
 
     long sum(ProducerThread[] threads) {

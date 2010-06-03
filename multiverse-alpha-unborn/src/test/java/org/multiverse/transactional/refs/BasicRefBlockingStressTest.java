@@ -5,21 +5,19 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.TestUtils;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.api.programmatic.ProgrammaticRefFactory;
-import org.multiverse.stms.alpha.AlphaStm;
+import org.multiverse.api.Transaction;
+import org.multiverse.templates.TransactionTemplate;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
  */
 public class BasicRefBlockingStressTest {
 
-    private AlphaStm stm;
-    private ProgrammaticRefFactory refFactory;
     private BasicRef<String> ref;
     private int consumerCount = 10;
     private volatile boolean stop;
@@ -27,8 +25,8 @@ public class BasicRefBlockingStressTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         stop = false;
-        stm = (AlphaStm) getGlobalStmInstance();
         ref = new BasicRef<String>();
     }
 
@@ -53,7 +51,9 @@ public class BasicRefBlockingStressTest {
         joinAll(producers);
         joinAll(consumers);
 
-        assertEquals(sum(producers), sum(consumers));
+        long producedCount = sum(producers);
+        long consumedCount = sum(consumers);
+        assertEquals(producedCount, consumedCount);
     }
 
     long sum(ProducerThread[] threads) {
@@ -86,19 +86,33 @@ public class BasicRefBlockingStressTest {
                     count++;
                 }
 
-                if (count % 100000 == 0) {
+                if (count % 10000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), count);
                 }
             }
 
-            ref.set(poison);
+            new TransactionTemplate() {
+                @Override
+                public Object execute(Transaction tx) throws Exception {
+                    if (poison.equals(ref.get())) {
+                        return null;
+                    }
+
+                    if (ref.get() != null) {
+                        retry();
+                    }
+
+                    ref.set(poison);
+                    return null;
+                }
+            }.execute();
         }
 
         @TransactionalMethod(readonly = false)
         private boolean produce() {
             String value = ref.get();
 
-            if (value == poison) {
+            if (poison.equals(value)) {
                 return false;
             }
 
@@ -120,11 +134,11 @@ public class BasicRefBlockingStressTest {
 
         @Override
         public void doRun() throws Exception {
-            boolean again = true;
+            boolean again;
             do {
                 again = consume();
 
-                if (count % 100000 == 0) {
+                if (count % 10000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), count);
                 }
 
@@ -138,7 +152,7 @@ public class BasicRefBlockingStressTest {
         private boolean consume() {
             String value = ref.get();
 
-            if (value == poison) {
+            if (poison.equals(value)) {
                 return false;
             }
 

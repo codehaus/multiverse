@@ -31,22 +31,22 @@ public class MoneyTransferStressTest {
     }
 
     @Test
-    public void test_10_2() {
+    public void test_10Accounts_2Threads() {
         test(10, 2);
     }
 
     @Test
-    public void test_100_10() {
+    public void test_100Account_10Threads() {
         test(100, 10);
     }
 
     @Test
-    public void test_1000_10() {
+    public void test_1000Accounts_10Threads() {
         test(1000, 10);
     }
 
     @Test
-    public void test_30_30() {
+    public void test_30Accounts_30Threads() {
         test(30, 30);
     }
 

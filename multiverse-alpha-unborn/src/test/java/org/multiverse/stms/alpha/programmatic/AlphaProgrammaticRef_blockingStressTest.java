@@ -5,13 +5,16 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.TestUtils;
 import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.api.Transaction;
 import org.multiverse.api.programmatic.ProgrammaticRefFactory;
 import org.multiverse.stms.alpha.AlphaStm;
+import org.multiverse.templates.TransactionTemplate;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
@@ -27,6 +30,7 @@ public class AlphaProgrammaticRef_blockingStressTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         stop = false;
         stm = (AlphaStm) getGlobalStmInstance();
         refFactory = stm.getProgrammaticRefFactoryBuilder()
@@ -55,7 +59,9 @@ public class AlphaProgrammaticRef_blockingStressTest {
         joinAll(producers);
         joinAll(consumers);
 
-        assertEquals(sum(producers), sum(consumers));
+        long producedCount = sum(producers);
+        long consumedCount = sum(consumers);
+        assertEquals(producedCount, consumedCount);
     }
 
     long sum(ProducerThread[] threads) {
@@ -93,14 +99,28 @@ public class AlphaProgrammaticRef_blockingStressTest {
                 }
             }
 
-            ref.set(poison);
+            new TransactionTemplate(){
+                @Override
+                public Object execute(Transaction tx) throws Exception {
+                    if(poison.equals(ref.get())){
+                        return null;
+                    }
+
+                    if(ref.get()!=null){
+                        retry();
+                    }
+                    
+                    ref.set(poison);
+                    return null;
+                }
+            }.execute();
         }
 
         @TransactionalMethod(readonly = false)
         private boolean produce() {
             String value = ref.get();
 
-            if (value == poison) {
+            if (poison.equals(value)) {
                 return false;
             }
 
@@ -122,7 +142,7 @@ public class AlphaProgrammaticRef_blockingStressTest {
 
         @Override
         public void doRun() throws Exception {
-            boolean again = true;
+            boolean again;
             do {
                 again = consume();
 
@@ -140,7 +160,7 @@ public class AlphaProgrammaticRef_blockingStressTest {
         private boolean consume() {
             String value = ref.get();
 
-            if (value == poison) {
+            if (poison.equals(value)) {
                 return false;
             }
 

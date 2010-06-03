@@ -36,32 +36,32 @@ public class ReadConsistencyStressTest {
     }
 
     @Test
-    public void test_2(){
+    public void testRefCount_2(){
         test(2);
     }
 
     @Test
-    public void test_4(){
+    public void testRefCount_4(){
         test(4);
     }
 
     @Test
-    public void test_16(){
+    public void testRefCount_16(){
         test(16);
     }
 
     @Test
-    public void test_64(){
+    public void testRefCount_64(){
         test(64);
     }
 
     @Test
-    public void test_256(){
+    public void testRefCount_256(){
         test(256);
     }
 
     @Test
-    public void test_1024(){
+    public void testRefCount_1024(){
         test(1024);
     }
 

@@ -15,10 +15,10 @@ public class DelayUtils {
      * Delays a random amount of time.
      */
     public static void shakeBugs() {
-        int delayUs = ThreadLocalRandom.current().nextInt(100);
-        if (delayUs == 10) {
+        int random = ThreadLocalRandom.current().nextInt(100);
+        if (random == 10) {
             sleepUs(10);
-        }else if(delayUs == 20){
+        }else if(random == 20){
             yield();
         }
     }
