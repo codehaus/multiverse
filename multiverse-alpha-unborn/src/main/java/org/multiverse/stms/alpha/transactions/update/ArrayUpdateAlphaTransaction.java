@@ -3,7 +3,6 @@ package org.multiverse.stms.alpha.transactions.update;
 import org.multiverse.api.Listeners;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.commitlock.CommitLockFilter;
-import org.multiverse.api.exceptions.PanicError;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
 import org.multiverse.api.exceptions.UncommittedReadConflict;
 import org.multiverse.api.latches.Latch;
@@ -53,18 +52,18 @@ public final class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransa
     }
 
     @Override
-    public AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject txObject) {
+    public AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject transactionalObject) {
         if (getStatus() == TransactionStatus.New) {
             start();
         }
 
         updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
 
-        int indexOf = indexOf(txObject);
+        int indexOf = indexOf(transactionalObject);
 
         AlphaTranlocal opened;
         if (indexOf == -1) {
-            opened = txObject.___openForCommutingOperation();
+            opened = transactionalObject.___openForCommutingOperation();
             attach(opened);
         } else {
             opened = attachedArray[indexOf];
@@ -182,7 +181,7 @@ public final class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransa
     }
 
     @Override
-    protected boolean hasReadConflict() {
+    protected boolean hasConflict() {
         for (int k = 0; k < firstFreeIndex; k++) {
             AlphaTranlocal attached = attachedArray[k];
             if (hasReadConflict(attached)) {

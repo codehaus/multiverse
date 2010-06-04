@@ -24,13 +24,13 @@ public abstract class AbstractReadonlyAlphaTransaction
     protected abstract void attach(AlphaTranlocal tranlocal);
 
     @Override
-    protected final AlphaTranlocal doOpenForRead(AlphaTransactionalObject txObject) {
-        AlphaTranlocal tranlocal = findAttached(txObject);
+    protected final AlphaTranlocal doOpenForRead(AlphaTransactionalObject transactionalObject) {
+        AlphaTranlocal tranlocal = findAttached(transactionalObject);
         if (tranlocal == null) {
-            tranlocal = load(txObject);
+            tranlocal = load(transactionalObject);
 
             if (tranlocal == null) {
-                throw createLoadUncommittedException(txObject);
+                throw createLoadUncommittedException(transactionalObject);
             }
 
             if (config.readTrackingEnabled) {

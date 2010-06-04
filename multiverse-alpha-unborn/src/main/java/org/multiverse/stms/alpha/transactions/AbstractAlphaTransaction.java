@@ -26,11 +26,11 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
         super(config);
     }
 
-    protected final AlphaTranlocal load(AlphaTransactionalObject txObject) {
+    protected final AlphaTranlocal load(AlphaTransactionalObject transactionalObject) {
         int spin = 0;
         while (true) {
             try {
-                return txObject.___load(version);
+                return transactionalObject.___load(version);
             } catch (LockNotFreeReadConflict lockNotFreeReadConflict) {
                 if (spin >= config.maxReadSpinCount) {
                     throw lockNotFreeReadConflict;
@@ -86,13 +86,7 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
         }
     }
 
-    protected AlphaTranlocal doOpenForRead(AlphaTransactionalObject txObject) {
-        String msg = format(
-                "Can't open for read transactional object '%s' " +
-                        "because transaction '%s' and class '%s' doesn't support this operation.",
-                toTxObjectString(txObject), config.getFamilyName(), getClass());
-        throw new UnsupportedOperationException(msg);
-    }
+    protected abstract AlphaTranlocal doOpenForRead(AlphaTransactionalObject transactionalObject);
 
     @Override
     public final AlphaTranlocal openForWrite(AlphaTransactionalObject transactionalObject) {
@@ -144,14 +138,7 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
         }
     }
 
-    protected AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {
-        String msg = format(
-                "Can't can't open for write transactional object '%s' " +
-                        "because transaction '%s' and class '%s' doesn't support this operation.",
-                toTxObjectString(txObject), config.getFamilyName(), getClass());
-        throw new UnsupportedOperationException(msg);
-    }
-
+    protected abstract AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) ;
 
     @Override
     public final AlphaTranlocal openForConstruction(AlphaTransactionalObject transactionalObject) {
@@ -203,13 +190,7 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
         }
     }
 
-    protected AlphaTranlocal doOpenForConstruction(AlphaTransactionalObject txObject) {
-        String msg = format(
-                "Can't can't open for construction transactional object '%s' " +
-                        "because transaction '%s' and class '%s' doesn't support this operation.",
-                toTxObjectString(txObject), config.getFamilyName(), getClass());
-        throw new UnsupportedOperationException(msg);
-    }
+    protected abstract AlphaTranlocal doOpenForConstruction(AlphaTransactionalObject txObject) ;
 
 
     @Override
@@ -255,13 +236,7 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
         }
     }
 
-    protected AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject txObject) {
-        String msg = format(
-                "Can't can't open for write transactional object '%s' " +
-                        "because transaction '%s' and class '%s' doesn't support this operation.",
-                toTxObjectString(txObject), config.getFamilyName(), getClass());
-        throw new UnsupportedOperationException(msg);
-    }
+    protected abstract AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject txObject);
 
 
     @Override

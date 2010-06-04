@@ -129,7 +129,7 @@ public final class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransact
     }
 
     @Override
-    protected boolean hasReadConflict() {
+    protected boolean hasConflict() {
         for (AlphaTranlocal attached : attachedMap.values()) {
             if (hasReadConflict(attached)) {
                 return true;
