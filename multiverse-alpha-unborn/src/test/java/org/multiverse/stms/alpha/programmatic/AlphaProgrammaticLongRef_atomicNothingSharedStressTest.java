@@ -107,7 +107,6 @@ public class AlphaProgrammaticLongRef_atomicNothingSharedStressTest {
             ref = stm.getProgrammaticRefFactoryBuilder()
                     .build()
                     .atomicCreateLongRef(0);
-
         }
 
         @Override

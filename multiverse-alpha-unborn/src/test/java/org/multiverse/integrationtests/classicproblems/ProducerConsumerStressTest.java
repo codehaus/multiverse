@@ -34,7 +34,7 @@ public class ProducerConsumerStressTest {
 
     private TransactionalLinkedList[] queues;
     private int queueCount = 50;
-    private int itemCount = 5000;
+    private int itemCount = 2000;
     private int delayMs = 2;
     private boolean runWithAborts;
     private int queueCapacity = 50;
