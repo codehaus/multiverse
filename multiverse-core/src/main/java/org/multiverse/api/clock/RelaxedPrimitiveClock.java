@@ -36,7 +36,14 @@ public final class RelaxedPrimitiveClock implements PrimitiveClock {
      * Creates a RelaxedPrimitiveClock with 0 as begin version.
      */
     public RelaxedPrimitiveClock() {
-        this.clock = new AtomicLong(0);
+        this(0);        
+    }
+
+    public RelaxedPrimitiveClock(long version){
+        if(version<0){
+            throw new IllegalArgumentException();
+        }
+        this.clock = new AtomicLong(version);
     }
 
     @Override
@@ -53,6 +60,21 @@ public final class RelaxedPrimitiveClock implements PrimitiveClock {
     @Override
     public long strictTick() {
         return clock.incrementAndGet();
+    }
+
+    @Override
+    public long tickTo(long version) {
+        long current = clock.get();
+
+        if(version<current){
+            return current;
+        }else{
+            while(true){
+                if(clock.compareAndSet(current, version)){
+                    return version;
+                }
+            }
+        }
     }
 
     @Override

@@ -25,8 +25,15 @@ public final class StrictPrimitiveClock implements PrimitiveClock {
      * Creates a new StrictPrimitiveClock.
      */
     public StrictPrimitiveClock() {
+        this(0);
     }
 
+    /**
+     * Creates a new StrictPrimitiveClock initialized with the provided time.
+     *
+     * @param time the initial time of the clock
+     * @throws IllegalArgumentException if time smaller than 0.
+     */
     public StrictPrimitiveClock(long time) {
         if (time < 0) {
             throw new IllegalArgumentException();
@@ -42,6 +49,21 @@ public final class StrictPrimitiveClock implements PrimitiveClock {
     @Override
     public long tick() {
         return clock.incrementAndGet();
+    }
+
+    @Override
+    public long tickTo(long version) {
+        long current = clock.get();
+
+        if(version<current){
+            return current;
+        }else{
+            while(true){
+                if(clock.compareAndSet(current, version)){
+                    return version;
+                }
+            }
+        }
     }
 
     @Override
