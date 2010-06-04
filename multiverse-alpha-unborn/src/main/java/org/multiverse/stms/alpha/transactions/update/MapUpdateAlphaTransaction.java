@@ -79,8 +79,8 @@ public final class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransact
     }
 
     @Override
-    protected AlphaTranlocal findAttached(AlphaTransactionalObject txObject) {
-        return attachedMap.get(txObject);
+    protected AlphaTranlocal findAttached(AlphaTransactionalObject transactionalObject) {
+        return attachedMap.get(transactionalObject);
     }
 
     @Override

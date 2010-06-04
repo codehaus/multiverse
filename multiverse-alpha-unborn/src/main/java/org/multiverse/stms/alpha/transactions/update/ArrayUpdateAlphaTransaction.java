@@ -81,15 +81,15 @@ public final class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransa
     }
 
     @Override
-    protected AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {
+    protected AlphaTranlocal doOpenForWrite(AlphaTransactionalObject transactionalObject) {
         updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
 
 
-        int indexOf = indexOf(txObject);
+        int indexOf = indexOf(transactionalObject);
 
         if (indexOf == -1) {
             //it isnt opened before.
-            AlphaTranlocal committed = txObject.___load(getReadVersion());
+            AlphaTranlocal committed = transactionalObject.___load(getReadVersion());
 
             AlphaTranlocal opened;
             if (committed == null) {
@@ -109,7 +109,7 @@ public final class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransa
                 attached = attached.openForWrite();
                 attachedArray[indexOf] = attached;
             } else if (attached.isCommuting()) {
-                AlphaTranlocal origin = txObject.___load(getReadVersion());
+                AlphaTranlocal origin = transactionalObject.___load(getReadVersion());
                 if (origin == null) {
                     throw new UncommittedReadConflict();
                 }
@@ -141,11 +141,11 @@ public final class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransa
     }
 
     @Override
-    protected AlphaTranlocal findAttached(AlphaTransactionalObject txObject) {
+    protected AlphaTranlocal findAttached(AlphaTransactionalObject transactionalObject) {
         for (int k = 0; k < firstFreeIndex; k++) {
             AlphaTranlocal attached = attachedArray[k];
 
-            if (attached.getTransactionalObject() == txObject) {
+            if (attached.getTransactionalObject() == transactionalObject) {
                 if (k != 0) {
                     AlphaTranlocal old = attachedArray[0];
                     attachedArray[0] = attached;

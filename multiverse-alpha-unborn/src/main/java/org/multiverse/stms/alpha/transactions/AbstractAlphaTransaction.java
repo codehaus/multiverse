@@ -26,6 +26,18 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
         super(config);
     }
 
+    protected final UncommittedReadConflict createUncommittedException(AlphaTransactionalObject transactionalObject) {
+        String msg = format(
+                "Can't open for read transactional object '%s' in transaction '%s' because the " +
+                        "readonly transactional object has not been committed before. The cause of this " +
+                        "problem is very likely that a reference to this transactional object escaped " +
+                        "the creating transaction before that transaction was committed.'",
+                toTxObjectString(transactionalObject), config.getFamilyName());
+        return new UncommittedReadConflict(msg);
+    }
+
+
+
     protected final AlphaTranlocal load(AlphaTransactionalObject transactionalObject) {
         int spin = 0;
         while (true) {

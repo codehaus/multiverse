@@ -51,54 +51,55 @@ public abstract class AbstractUpdateAlphaTransaction
      * read for the transactional object of the readonly has been made. It is important that an implementation doesn't
      * ignore this call.
      *
-     * @param opened the opened AlphaTranlocal to attach.
+     * @param tranlocal the opened AlphaTranlocal to attach.
      */
-    protected abstract void attach(AlphaTranlocal opened);
+    protected abstract void attach(AlphaTranlocal tranlocal);
 
     /**
      * Finds the tranlocal for the given transactional object in the set of attached tranlocals.
      *
-     * @param txObject the transactional object to find the tranlocal for.
+     * @param transactionalObject the transactional object to find the tranlocal for.
      * @return the found tranlocal. If no tranlocal was found in the set of attached tranlocals, null is returned.
      */
-    protected abstract AlphaTranlocal findAttached(AlphaTransactionalObject txObject);
+    protected abstract AlphaTranlocal findAttached(AlphaTransactionalObject transactionalObject);
 
     // ======================= open for read =============================
 
     @Override
     protected final AlphaTranlocal doOpenForRead(AlphaTransactionalObject transactionalObject) {
-        AlphaTranlocal opened = findAttached(transactionalObject);
+        AlphaTranlocal tranlocal = findAttached(transactionalObject);
 
-        if (opened != null) {
-            if (opened.isCommuting()) {
+        if (tranlocal != null) {
+            if (tranlocal.isCommuting()) {
                 AlphaTranlocal origin = load(transactionalObject);
+
                 if (origin == null) {
-                    throw new UncommittedReadConflict();
+                    throw createUncommittedException(transactionalObject);
                 }
 
-                opened.prematureFixation(this, origin);
+                tranlocal.prematureFixation(this, origin);
             }
 
-            return opened;
+            return tranlocal;
         }
 
-        opened = load(transactionalObject);
-        if (opened == null) {
-            throw new UncommittedReadConflict();
+        tranlocal = load(transactionalObject);
+        if (tranlocal == null) {
+            throw createUncommittedException(transactionalObject);
         } else if (config.readTrackingEnabled) {
-            attach(opened);
+            attach(tranlocal);
         }
 
-        return opened;
+        return tranlocal;
     }
 
-    // ======================= open for write =============================
+   // ======================= open for write =============================
 
     @Override
-    protected AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {
-        AlphaTranlocal attached = findAttached(txObject);
+    protected AlphaTranlocal doOpenForWrite(AlphaTransactionalObject transactionalObject) {
+        AlphaTranlocal attached = findAttached(transactionalObject);
         if (attached == null) {
-            attached = doOpenForWriteAndAttach(txObject);
+            attached = doOpenForWriteAndAttach(transactionalObject);
             updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
         } else if (attached.isCommitted()) {
             //it is loaded before but it is a readonly
@@ -108,9 +109,9 @@ public abstract class AbstractUpdateAlphaTransaction
             attach(attached);
             updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
         } else if (attached.isCommuting()) {
-            AlphaTranlocal origin = load(txObject);
+            AlphaTranlocal origin = load(transactionalObject);
             if (origin == null) {
-                throw new UncommittedReadConflict();
+                throw createUncommittedException(transactionalObject);
             }
 
             attached.prematureFixation(this, origin);
