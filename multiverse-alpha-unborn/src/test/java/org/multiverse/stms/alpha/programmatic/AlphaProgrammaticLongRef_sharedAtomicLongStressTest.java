@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.TestUtils;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -20,12 +21,13 @@ public class AlphaProgrammaticLongRef_sharedAtomicLongStressTest {
     private final AtomicLong ref = new AtomicLong();
 
     private int threadCount = 4;
-    private long incCountPerThread = 1000 * 1000 * 200;
+    private volatile boolean stop;
     private boolean strict = false;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
+        stop = false;
     }
 
     @After
@@ -39,9 +41,11 @@ public class AlphaProgrammaticLongRef_sharedAtomicLongStressTest {
 
         long startNs = System.nanoTime();
         startAll(threads);
+        sleepMs(TestUtils.getStressTestDurationMs(60 * 1000));
+        stop = true;
         joinAll(threads);
 
-        long totalIncCount = threadCount * incCountPerThread;
+        long totalIncCount = sum(threads);
 
         long durationNs = System.nanoTime() - startNs;
         double transactionsPerSecond = (1.0d * totalIncCount * TimeUnit.SECONDS.toNanos(1)) / durationNs;
@@ -52,7 +56,7 @@ public class AlphaProgrammaticLongRef_sharedAtomicLongStressTest {
     private long sum(AtomicIncThread[] threads) {
         long result = 0;
         for (AtomicIncThread thread : threads) {
-            result += thread.get();
+            result += thread.count;
         }
         return result;
     }
@@ -67,6 +71,8 @@ public class AlphaProgrammaticLongRef_sharedAtomicLongStressTest {
 
     public class AtomicIncThread extends TestThread {
 
+        private long count;
+
         public AtomicIncThread(int id) {
             super("AtomicIncThread-" + id);
         }
@@ -77,7 +83,7 @@ public class AlphaProgrammaticLongRef_sharedAtomicLongStressTest {
 
         @Override
         public void doRun() throws Exception {
-            for (int k = 0; k < incCountPerThread; k++) {
+            while(!stop){
                 if (strict) {
                     ref.incrementAndGet();
                 } else {
@@ -85,9 +91,10 @@ public class AlphaProgrammaticLongRef_sharedAtomicLongStressTest {
                     ref.compareAndSet(get, get + 1);
                 }
 
-                if (k % (10 * 1000 * 1000) == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
+                if (count % (10 * 1000 * 1000) == 0) {
+                    System.out.printf("%s is at %s\n", getName(), count);
                 }
+                count++;
             }
         }
     }

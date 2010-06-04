@@ -20,7 +20,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class HandoverRingStressTest {
 
-    private int handoverCount = 500 * 1000;
+    private int handoverCount = 50 * 1000;
     private int threadCount = 10;
 
     @Before

@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 import static java.lang.String.format;
 import static org.multiverse.stms.alpha.AlphaStmUtils.toTxObjectString;
-import static org.multiverse.utils.DelayUtils.shakeBugs;
+import static org.multiverse.utils.Bugshaker.shakeBugs;
 
 /**
  * AlphaTransactionalObject implementation that also can be used to transplant methods from during instrumentation. This
@@ -231,7 +231,7 @@ public abstract class BasicMixin implements AlphaTransactionalObject, Multiverse
             return RegisterRetryListenerResult.opened;
         }
         //ok, the version we are looking for has not been committed yet, so we need to
-        //registerLifecycleListener a the listener so that it will be opened
+        //register a listener that will be opened if the interesting write is done.
 
         boolean registered;
         Listeners newListeners;

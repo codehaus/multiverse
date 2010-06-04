@@ -48,6 +48,13 @@ allprojects {
     exclude("**/*performanceTest*")
   }
 
+  task shortintegrationtest(type: Test) {
+    include("**/*StressTest*")
+    include("**/*stressTest*")
+    include("**/*LongTest*")
+    include("**/*longTest*")
+  }
+
   task integrationtest(type: Test) {
     include("**/*StressTest*")
     include("**/*stressTest*")
@@ -90,6 +97,11 @@ project(':multiverse-core') {
     testFixtures testJar
   }
 
+
+  shortintegrationtest {
+    jvmArgs = ["-Dorg.multiverse.integrationtest.durationMs=10000","-Dorg.multiverse.bugshaker.enabled=true"]
+  }
+
 }
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -116,6 +128,11 @@ project(':multiverse-instrumentation') {
     compile group: 'asm', name: 'asm-all', version: "${asmversion}"
     testCompile project(path: ':multiverse-core', configuration: 'testFixtures')
   }
+
+  shortintegrationtest {
+    jvmArgs = ["-Dorg.multiverse.integrationtest.durationMs=10000","-Dorg.multiverse.bugshaker.enabled=true"]
+  }
+
 }
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -200,6 +217,12 @@ project(':multiverse-alpha-unborn') {
 
   integrationtest {
     jvmArgs = ["-javaagent:${buildDir}/libs/javaagent.jar"]
+  }
+
+  shortintegrationtest {
+    jvmArgs = ["-javaagent:${buildDir}/libs/javaagent.jar",
+		"-Dorg.multiverse.integrationtest.durationMs=10000",
+		"-Dorg.multiverse.bugshaker.enabled=true"]
   }
 }
 
@@ -321,6 +344,11 @@ project(':multiverse-alpha') {
     testCompile project(path: ':multiverse-alpha-unborn', configuration: 'testFixtures')
     testCompile project(':multiverse-benchy')
   }
+
+  shortintegrationtest {
+    jvmArgs = ["-Dorg.multiverse.integrationtest.durationMs=10000","-Dorg.multiverse.bugshaker.enabled=true"]
+  }
+
 }
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -355,6 +383,11 @@ project(':multiverse-jruby') {
             file: "${projectRootDir}/multiverse-alpha/build/libs/multiverse-alpha-${project.version}.jar",
             todir: "${projectDir}/dependencies/")
   }
+
+  shortintegrationtest {
+    jvmArgs = ["-Dorg.multiverse.integrationtest.durationMs=10000","-Dorg.multiverse.bugshaker.enabled=true"]
+  }
+
 }
 
 

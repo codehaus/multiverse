@@ -5,7 +5,7 @@ import java.util.concurrent.locks.LockSupport;
 import static java.lang.Thread.yield;
 
 /**
- * Contains some utility functions for delaying (sleeping) a thread.
+ * Contains some utility functions for shaking out bugs.
  *
  * @author Peter Veentjer
  */

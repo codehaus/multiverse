@@ -9,8 +9,7 @@ import org.multiverse.api.programmatic.ProgrammaticLongRef;
 import org.multiverse.api.programmatic.ProgrammaticRef;
 import org.multiverse.api.programmatic.ProgrammaticRefFactory;
 
-import static org.multiverse.TestUtils.joinAll;
-import static org.multiverse.TestUtils.startAll;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
@@ -24,7 +23,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 public class AlphaProgrammaticLongRefAndRef_integrationStressTest {
 
     private int threadCount = 10;
-    private int transactionCount = 1000 * 1000;
+    private volatile boolean stop;
     private int queueCapacity = 1000;
 
     private final static ProgrammaticRefFactory refFactory = getGlobalStmInstance()
@@ -33,8 +32,11 @@ public class AlphaProgrammaticLongRefAndRef_integrationStressTest {
 
     private Queue<String> queue;
 
+    private final static String POISON = "poison";
+
     @Before
     public void setUp() {
+        stop = false;
         clearThreadLocalTransaction();
         queue = new Queue<String>();
     }
@@ -55,23 +57,30 @@ public class AlphaProgrammaticLongRefAndRef_integrationStressTest {
 
         startAll(producers);
         startAll(consumers);
+        sleepMs(getStressTestDurationMs(60 * 1000));
+        stop = true;
         joinAll(producers);
         joinAll(consumers);
     }
 
     public class ProducerThread extends TestThread {
+        private long produceCount;
+
         public ProducerThread(int id) {
             super("ProducerThread-" + id);
         }
 
         @Override
         public void doRun() throws Exception {
-            for (int k = 0; k < transactionCount; k++) {
+            while (!stop) {
                 produce();
-
-                if (k % 100000 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
+                produceCount++;
+                if (produceCount % 100000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), produceCount);
                 }
+            }
+            for (int k = 0; k < threadCount; k++) {
+                queue.push(POISON);
             }
         }
 
@@ -82,24 +91,31 @@ public class AlphaProgrammaticLongRefAndRef_integrationStressTest {
     }
 
     public class ConsumerThread extends TestThread {
+        private long consumeCount;
+
         public ConsumerThread(int id) {
             super("ConsumerThread-" + id);
         }
 
         @Override
         public void doRun() throws Exception {
-            for (int k = 0; k < transactionCount; k++) {
-                produce();
-
-                if (k % 500000 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
+            boolean again;
+            do {
+                again = consume();
+                if (again) {
+                    consumeCount++;
                 }
-            }
+
+                if (consumeCount % 500000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), consumeCount);
+                }
+            }while(again);
         }
 
         @TransactionalMethod(trackReads = true)
-        private void produce() {
-            queue.pop();
+        private boolean consume() {
+            String item = queue.pop();
+            return !POISON.equals(item);
         }
     }
 

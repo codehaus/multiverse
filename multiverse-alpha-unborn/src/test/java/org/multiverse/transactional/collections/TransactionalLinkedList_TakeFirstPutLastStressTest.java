@@ -28,7 +28,7 @@ public class TransactionalLinkedList_TakeFirstPutLastStressTest {
     private int takeFirstThreadCount = 2;
     private int putLastThreadCount = 2;
     private int dequeCapacity;
-    private int produceCount = 1000 * 1000;
+    private int produceCount = 200 * 1000;
 
     private AtomicLong itemGenerator;
     private AtomicLong takeCounter;
@@ -66,6 +66,8 @@ public class TransactionalLinkedList_TakeFirstPutLastStressTest {
 
         startAll(putLastThreads);
         startAll(takeFirstThreads);
+
+
         joinAll(putLastThreads);
         joinAll(takeFirstThreads);
     }

@@ -8,8 +8,7 @@ import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Stm;
 import org.multiverse.transactional.refs.IntRef;
 
-import static org.multiverse.TestUtils.joinAll;
-import static org.multiverse.TestUtils.startAll;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
@@ -25,14 +24,15 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class MultipleConditionVariablesStressTest {
 
-    public int objectCount = 100;
-    public int threadCount = 10;
+    private int objectCount = 100;
+    private int threadCount = 10;
     private Stm stm;
     private IntRef[] values;
-    private int wakeUpCount = 100000;
+    private volatile boolean stop;
 
     @Before
     public void setUp() {
+        stop = false;
         stm = getGlobalStmInstance();
         clearThreadLocalTransaction();
 
@@ -48,6 +48,8 @@ public class MultipleConditionVariablesStressTest {
         values[0].inc();
 
         startAll(threads);
+        sleepMs(TestUtils.getStressTestDurationMs(60 * 1000));
+        stop = true;
         joinAll(threads);
     }
 
@@ -67,11 +69,13 @@ public class MultipleConditionVariablesStressTest {
 
         @Override
         public void doRun() {
-            for (int k = 0; k < wakeUpCount; k++) {
+            int count = 0;
+            while (!stop) {
                 doit();
-                if (k % (10 * 1000) == 0) {
-                    System.out.printf("%s is at count %s\n", getName(), k);
+                if (count % (10 * 1000) == 0) {
+                    System.out.printf("%s is at count %s\n", getName(), count);
                 }
+                count++;
             }
         }
 

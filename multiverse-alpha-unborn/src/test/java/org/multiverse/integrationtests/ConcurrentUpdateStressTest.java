@@ -9,8 +9,7 @@ import org.multiverse.transactional.refs.IntRef;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.TestUtils.joinAll;
-import static org.multiverse.TestUtils.startAll;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
@@ -18,14 +17,15 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class ConcurrentUpdateStressTest {
 
-    public IntRef ref;
-    public int incCount = 10 * 1000 * 1000;
-    public int threadCount = 3;
+    private IntRef ref;
+    private volatile boolean stop;
+    private int threadCount = 3;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
         ref = new IntRef(0);
+        stop = false;
     }
 
     @After
@@ -40,13 +40,17 @@ public class ConcurrentUpdateStressTest {
         long startNs = System.nanoTime();
 
         startAll(threads);
+        sleepMs(getStressTestDurationMs(60 * 1000));
+        stop = true;
         joinAll(threads);
 
-        assertEquals(threadCount * incCount, ref.get());
+        long count = sum(threads);
+
+        assertEquals(count, ref.get());
 
         long periodNs = System.nanoTime() - startNs;
-        double transactionPerSecond = (incCount * threadCount * 1.0d * TimeUnit.SECONDS.toNanos(1)) / periodNs;
-        System.out.printf("%s Transaction/second\n", transactionPerSecond);
+        double transactionPerSecond = (count * 1.0d * TimeUnit.SECONDS.toNanos(1)) / periodNs;
+        System.out.printf("%s Transaction/second\n", format(transactionPerSecond));
     }
 
     public UpdateThread[] createThreads() {
@@ -57,7 +61,17 @@ public class ConcurrentUpdateStressTest {
         return results;
     }
 
+    private long sum(UpdateThread[] threads){
+        long result = 0;
+        for(UpdateThread t: threads){
+            result+=t.count;
+        }
+        return result;
+    }
+
     public class UpdateThread extends TestThread {
+
+        private long count;
 
         public UpdateThread(int id) {
             super("UpdateThread-" + id);
@@ -65,12 +79,14 @@ public class ConcurrentUpdateStressTest {
 
         @Override
         public void doRun() {
-            for (int k = 0; k < incCount; k++) {
+            while (!stop) {
                 ref.inc();
 
-                if (k % (1000 * 1000) == 0) {
-                    System.out.printf("%s at %s\n", getName(), k);
+                if (count % (1000 * 1000) == 0) {
+                    System.out.printf("%s at %s\n", getName(), count);
                 }
+
+                count++;
             }
         }
     }

@@ -8,8 +8,8 @@ import org.multiverse.annotations.TransactionalObject;
 import org.multiverse.api.programmatic.ProgrammaticRef;
 import org.multiverse.api.programmatic.ProgrammaticRefFactory;
 
-import static org.multiverse.TestUtils.joinAll;
-import static org.multiverse.TestUtils.startAll;
+import static org.junit.Assert.assertEquals;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
@@ -20,17 +20,19 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 public class AlphaProgrammaticRef_stackStressTest {
 
     private int threadCount = 10;
-    private int transactionCount = 1000 * 1000;
+    private volatile boolean stop;
     private int stackCapacity = 1000;
 
     private final static ProgrammaticRefFactory refFactory = getGlobalStmInstance()
             .getProgrammaticRefFactoryBuilder()
             .build();
 
-    private Stack stack;
+    private Stack<String> stack;
+    private final static String POISON = "poison";
 
     @Before
     public void setUp() {
+        stop = false;
         clearThreadLocalTransaction();
         stack = new Stack();
     }
@@ -51,24 +53,50 @@ public class AlphaProgrammaticRef_stackStressTest {
 
         startAll(producers);
         startAll(consumers);
+        sleepMs(getStressTestDurationMs(20 * 1000));
+        stop = true;
         joinAll(producers);
         joinAll(consumers);
+
+        assertEquals(sum(producers), sum(consumers));
+    }
+
+    private long sum(ProducerThread[] threads){
+        long sum = 0;
+        for(ProducerThread t: threads){
+            sum+=t.produceCount;
+        }
+        return sum;
+    }
+
+    private long sum(ConsumerThread[] threads){
+        long sum = 0;
+        for(ConsumerThread t: threads){
+            sum+=t.consumeCount;
+        }
+        return sum;
     }
 
     public class ProducerThread extends TestThread {
+        private long produceCount;
+
         public ProducerThread(int id) {
             super("ProducerThread-" + id);
         }
 
         @Override
         public void doRun() throws Exception {
-            for (int k = 0; k < transactionCount; k++) {
+            while (!stop) {
                 produce();
 
-                if (k % 100000 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
+                if (produceCount % 100000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), produceCount);
                 }
+
+                produceCount++;
             }
+
+            stack.push(POISON);
         }
 
         @TransactionalMethod
@@ -78,24 +106,31 @@ public class AlphaProgrammaticRef_stackStressTest {
     }
 
     public class ConsumerThread extends TestThread {
+        private long consumeCount;
+
         public ConsumerThread(int id) {
             super("ConsumerThread-" + id);
         }
 
         @Override
         public void doRun() throws Exception {
-            for (int k = 0; k < transactionCount; k++) {
-                produce();
-
-                if (k % 100000 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
+            boolean again;
+            do {
+                again = consume();
+                if(again){
+                    consumeCount++;
                 }
-            }
+
+                if (consumeCount % 100000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), consumeCount);
+                }
+            } while (again);
         }
 
         @TransactionalMethod
-        private void produce() {
-            stack.pop();
+        private boolean consume() {
+            String item = stack.pop();
+            return !POISON.equals(item);
         }
     }
 

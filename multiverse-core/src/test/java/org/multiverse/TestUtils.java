@@ -2,7 +2,7 @@ package org.multiverse;
 
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionStatus;
-import org.multiverse.utils.DelayUtils;
+import org.multiverse.utils.Bugshaker;
 import org.multiverse.utils.ThreadLocalRandom;
 
 import java.io.BufferedReader;
@@ -23,7 +23,7 @@ public class TestUtils {
     }
 
     public static long getStressTestDurationMs(long defaultDuration){
-        String value = System.getProperty("org.multiverse.integrationtest.duration", ""+defaultDuration);
+        String value = System.getProperty("org.multiverse.integrationtest.durationMs", ""+defaultDuration);
         return Long.parseLong(value);
     }
 
@@ -184,7 +184,7 @@ public class TestUtils {
     }
 
     public static void sleepRandomMs(int maxMs) {
-        DelayUtils.sleepUs((long) randomInt((int)TimeUnit.MILLISECONDS.toMicros(maxMs)));
+        Bugshaker.sleepUs((long) randomInt((int)TimeUnit.MILLISECONDS.toMicros(maxMs)));
     }
 
     public static void sleepSome() {
@@ -193,11 +193,11 @@ public class TestUtils {
 
     public static void sleepMs(long ms) {
         long us = TimeUnit.MILLISECONDS.toMicros(ms);
-        DelayUtils.sleepUs(us);
+        Bugshaker.sleepUs(us);
     }
 
     public static void sleepRandomUs(int maxUs) {
-        DelayUtils.sleepUs((long) randomInt(maxUs));
+        Bugshaker.sleepUs((long) randomInt(maxUs));
     }
 
     public static void startAll(TestThread... threads) {

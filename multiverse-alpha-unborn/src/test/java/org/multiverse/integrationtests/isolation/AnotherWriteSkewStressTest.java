@@ -16,7 +16,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 
 public class AnotherWriteSkewStressTest {
 
-    private boolean stop;
+    private volatile boolean stop;
     private User user1;
     private User user2;
     private boolean allowWriteSkew;

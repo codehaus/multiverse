@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.TestUtils;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
@@ -11,6 +12,7 @@ import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
+import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
@@ -28,7 +30,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 public class TransactionTemplate_conflictStressTest {
 
     private int threadCount = 4;
-    private int transactionsPerThread = 500 * 1000;
+    private volatile boolean stop;
     private int refCount = 40;
 
     private IntRef[] refs;
@@ -37,18 +39,9 @@ public class TransactionTemplate_conflictStressTest {
 
     @Before
     public void setUp() {
+        stop = false;
         stm = getGlobalStmInstance();
         clearThreadLocalTransaction();
-
-        refs = new IntRef[refCount];
-        for (int k = 0; k < refCount; k++) {
-            refs[k] = new IntRef();
-        }
-
-        threads = new IncThread[threadCount];
-        for (int k = 0; k < threads.length; k++) {
-            threads[k] = new IncThread(k);
-        }
     }
 
     @After
@@ -56,7 +49,7 @@ public class TransactionTemplate_conflictStressTest {
         clearThreadLocalTransaction();
     }
 
-    private int sum() {
+    private int sumRefs() {
         int sum = 0;
         for (IntRef ref : refs) {
             sum += ref.get();
@@ -66,14 +59,33 @@ public class TransactionTemplate_conflictStressTest {
 
     @Test
     public void test() {
+        refs = new IntRef[refCount];
+        for (int k = 0; k < refCount; k++) {
+            refs[k] = new IntRef();
+        }
+
+        threads = new IncThread[threadCount];
+        for (int k = 0; k < threads.length; k++) {
+            threads[k] = new IncThread(k);
+        }
         startAll(threads);
+        sleepMs(TestUtils.getStressTestDurationMs(20 * 1000));
+        stop = true;
         joinAll(threads);
 
-        assertEquals(refs.length * threadCount * transactionsPerThread, sum());
+        assertEquals(sum(threads)*refs.length, sumRefs());
     }
 
+    private long sum(IncThread[] threads) {
+        long result = 0;
+        for (IncThread t : threads) {
+            result += t.incCount;
+        }
+        return result;
+    }
 
     public class IncThread extends TestThread {
+        private long incCount;
 
         public IncThread(int id) {
             super("IncThread-" + id);
@@ -81,12 +93,14 @@ public class TransactionTemplate_conflictStressTest {
 
         @Override
         public void doRun() throws Exception {
-            for (int k = 0; k < transactionsPerThread; k++) {
-                if (k % 10000 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
-                }
-
+            while (!stop) {
                 action();
+
+                incCount++;
+
+                if (incCount % 10000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), incCount);
+                }
             }
         }
 
@@ -99,9 +113,7 @@ public class TransactionTemplate_conflictStressTest {
             new TransactionTemplate(txFactory) {
                 @Override
                 public Object execute(Transaction tx) throws Exception {
-                    //sleepUs(100);
-
-                    for (int k = 0; k < refCount; k++) {
+                     for (int k = 0; k < refCount; k++) {
                         refs[k].inc();
                     }
                     return null;
