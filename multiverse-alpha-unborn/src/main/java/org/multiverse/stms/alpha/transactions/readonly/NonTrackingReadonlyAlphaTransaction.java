@@ -1,13 +1,8 @@
 package org.multiverse.stms.alpha.transactions.readonly;
 
-import org.multiverse.api.Stm;
-import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.TransactionFactoryBuilder;
 import org.multiverse.api.latches.Latch;
-import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
-import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 /**
  * A readonly {@link org.multiverse.stms.alpha.transactions.AlphaTransaction} implementation that doesn't track reads.
@@ -35,39 +30,6 @@ import org.multiverse.stms.alpha.transactions.AlphaTransaction;
  * @author Peter Veentjer.
  */
 public class NonTrackingReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransaction {
-
-    public static class Factory implements TransactionFactory<AlphaTransaction> {
-
-        private final ReadonlyConfiguration config;
-        private final AlphaStm.AlphaTransactionFactoryBuilder transactionFactoryBuilder;
-
-        public Factory(ReadonlyConfiguration config, AlphaStm.AlphaTransactionFactoryBuilder transactionFactoryBuilder) {
-            this.config = config;
-            this.transactionFactoryBuilder = transactionFactoryBuilder;
-        }
-
-        @Override
-        public AlphaTransaction start() {
-            AlphaTransaction tx = create();
-            tx.start();
-            return tx;
-        }
-
-        @Override
-        public Stm getStm() {
-            return transactionFactoryBuilder.getStm();
-        }
-
-        @Override
-        public AlphaTransaction create() {
-            return new NonTrackingReadonlyAlphaTransaction(config);
-        }
-
-        @Override
-        public TransactionFactoryBuilder getTransactionFactoryBuilder() {
-            return transactionFactoryBuilder;
-        }
-    }
 
     public NonTrackingReadonlyAlphaTransaction(ReadonlyConfiguration config) {
         super(config);

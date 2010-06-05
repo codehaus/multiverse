@@ -255,13 +255,14 @@ public abstract class AbstractUpdateAlphaTransaction
                                 //we were not lucky, another transaction committed between the start and
                                 //prepare of this transaction, so we need to do a conflict test,
 
-                                if (hasConflict()) {
+                                if (hasReadWriteConflict()) {
                                     throw createWriteSkewConflict();
                                 }
                             }
                         } else {
                             //another transaction has committed, so we need to do a full readconflict test
-                            if (hasConflict()) {
+                            //todo: seperate between a write conflict and a writeskew (read conflict).
+                            if (hasReadWriteConflict()) {
                                 throw createWriteSkewConflict();
                             }
 
@@ -334,7 +335,7 @@ public abstract class AbstractUpdateAlphaTransaction
      *
      * @return true if there are conflict, false otherwise.
      */
-    protected abstract boolean hasConflict();
+    protected abstract boolean hasReadWriteConflict();
 
     protected final boolean hasReadConflict(AlphaTranlocal attached) {
         if (attached == null) {
