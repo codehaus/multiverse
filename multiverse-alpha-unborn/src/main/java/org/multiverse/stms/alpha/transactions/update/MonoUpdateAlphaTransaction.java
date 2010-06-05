@@ -53,7 +53,7 @@ public final class MonoUpdateAlphaTransaction extends AbstractUpdateAlphaTransac
     }
 
     @Override
-    protected boolean hasReadConflict() {
+    protected boolean hasConflict() {
         return hasWriteConflict(attached);
     }
 
@@ -78,8 +78,8 @@ public final class MonoUpdateAlphaTransaction extends AbstractUpdateAlphaTransac
     }
 
     @Override
-    protected AlphaTranlocal findAttached(AlphaTransactionalObject txObject) {
-        if (attached == null || attached.getTransactionalObject() != txObject) {
+    protected AlphaTranlocal findAttached(AlphaTransactionalObject transactionalObject) {
+        if (attached == null || attached.getTransactionalObject() != transactionalObject) {
             return null;
         } else {
             return attached;

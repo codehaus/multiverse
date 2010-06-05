@@ -14,13 +14,14 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 public class ConflictingWritesDontBreakSystemStressTest {
     private IntRef[] refs;
 
+    private volatile boolean stop;
     private int structureCount = 100;
     private int writerThreadCount = 10;
-    private int transactionCount = 100;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
+        stop = false;
     }
 
     @After
@@ -30,16 +31,21 @@ public class ConflictingWritesDontBreakSystemStressTest {
 
     @Test
     public void test() {
-        setUpStructures();
+        refs = new IntRef[structureCount];
+        for (int k = 0; k < refs.length; k++) {
+            refs[k] = new IntRef(0);
+        }
 
-        WriterThread[] threads = createWriterThreads();
-        startAll(threads);
+        WriterThread[] threads = new WriterThread[writerThreadCount];
+        for (int k = 0; k < threads.length; k++) {
+            threads[k] = new WriterThread(k);
+        }
+
+        sleepMs(getStressTestDurationMs(60 * 1000));
+        stop = true;
         joinAll(threads);
 
-        //the 10 is quite arbitrary.. but we should have quite a number of conflicts.
-        //stm.getProfiler().print();
-        //assertTrue(stm.getStatistics().getUpdateTransactionWriteConflictCount() > 10);
-        assertValues(transactionCount * 10);
+        assertValues(sum(threads));
     }
 
     private void assertValues(int value) {
@@ -48,33 +54,29 @@ public class ConflictingWritesDontBreakSystemStressTest {
         }
     }
 
-    private void setUpStructures() {
-        refs = new IntRef[structureCount];
-        for (int k = 0; k < refs.length; k++) {
-            refs[k] = new IntRef(0);
+    public int sum(WriterThread[] threads) {
+        int value = 0;
+        for (WriterThread t : threads) {
+            value += t.writeCount;
         }
-    }
-
-    private WriterThread[] createWriterThreads() {
-        WriterThread[] threads = new WriterThread[writerThreadCount];
-        for (int k = 0; k < threads.length; k++)
-            threads[k] = new WriterThread(k);
-
-        return threads;
+        return value;
     }
 
     private class WriterThread extends TestThread {
+        private int writeCount;
+
         private WriterThread(int id) {
             super("WriterThread-" + id);
         }
 
         @Override
         public void doRun() {
-            for (int k = 0; k < transactionCount; k++) {
-                if (k % 10 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
-                }
+            while (!stop) {
                 doTransaction();
+                if (writeCount % 10 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), writeCount);
+                }
+                writeCount++;
             }
         }
 

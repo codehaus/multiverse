@@ -14,8 +14,7 @@ import org.multiverse.stms.alpha.AlphaStm;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.multiverse.TestUtils.joinAll;
-import static org.multiverse.TestUtils.startAll;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
@@ -24,8 +23,9 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class AlphaProgrammaticLongRef_atomicBehaviorStressTest {
 
+    private volatile boolean stop;
     private int modifyThreadCount = 10;
-    private int transactionCount = 1000 * 1000;
+
     private int refCount = 100;
     private ProgrammaticLongRef[] refs;
     private AlphaStm stm;
@@ -33,6 +33,7 @@ public class AlphaProgrammaticLongRef_atomicBehaviorStressTest {
 
     @Before
     public void setUp() {
+        stop = false;
         clearThreadLocalTransaction();
         stm = (AlphaStm) getGlobalStmInstance();
         refFactory = stm.getProgrammaticRefFactoryBuilder().build();
@@ -65,6 +66,8 @@ public class AlphaProgrammaticLongRef_atomicBehaviorStressTest {
         }
 
         startAll(modifyThreads);
+        sleepMs(getStressTestDurationMs(10* 1000));
+        stop = true;
         joinAll(modifyThreads);
         assertEquals(sumThreads(modifyThreads), sumRefs());
     }
@@ -96,7 +99,9 @@ public class AlphaProgrammaticLongRef_atomicBehaviorStressTest {
 
         @Override
         public void doRun() throws Exception {
-            for (int k = 0; k < transactionCount; k++) {
+            long k =0;
+
+            while(!stop){
                 if (k % 100000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
@@ -111,6 +116,7 @@ public class AlphaProgrammaticLongRef_atomicBehaviorStressTest {
                 } else {
                     incCount += incRefs();
                 }
+                k++;
             }
         }
 

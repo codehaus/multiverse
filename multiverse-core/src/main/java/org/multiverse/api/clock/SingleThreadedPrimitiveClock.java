@@ -31,8 +31,18 @@ public final class SingleThreadedPrimitiveClock implements PrimitiveClock {
         return time;
     }
 
+
+    @Override
+    public long tickTo(long version) {
+        if (version > time) {
+            time = version;
+        }
+        return time;
+    }
+
     @Override
     public String toString() {
         return format("SingleThreadedPrimitiveClock(time=%s)", time);
     }
+
 }

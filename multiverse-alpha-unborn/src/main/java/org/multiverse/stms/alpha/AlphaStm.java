@@ -71,7 +71,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
     private final int maxReadSpinCount;
 
-    private final boolean loggingOfControlFlowErrorsEnabled;
+    private final int syncToClock;
 
     public static AlphaStm createFast() {
         return new AlphaStm(AlphaStmConfig.createFastConfig());
@@ -117,8 +117,8 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         this.allowWriteSkew = config.allowWriteSkew;
         this.interruptible = config.interruptible;
         this.maxReadSpinCount = config.maxReadSpinCount;
-        this.loggingOfControlFlowErrorsEnabled = config.loggingOfControlFlowErrorsEnabled;
         this.traceLevel = config.traceLevel;
+        this.syncToClock = config.syncToClock;
 
         if (clock.getVersion() == 0) {
             clock.tick();
@@ -521,24 +521,24 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                         new ReadonlyConfiguration(
                                 clock, backoffPolicy, familyName, speculativeConfig, maxRetries,
                                 interruptible, false, explicitRetryAllowed, timeoutNs, maxReadSpinCount,
-                                this, traceLevel);
+                                this, traceLevel, syncToClock);
                 final ReadonlyConfiguration ro_rt =
                         new ReadonlyConfiguration(
                                 clock, backoffPolicy, familyName, speculativeConfig, maxRetries,
                                 interruptible, true, explicitRetryAllowed, timeoutNs, maxReadSpinCount,
-                                this, traceLevel);
+                                this, traceLevel, syncToClock);
                 final UpdateConfiguration up_rt =
                         new UpdateConfiguration(
                                 clock, backoffPolicy, commitLockPolicy, familyName, speculativeConfig,
                                 maxRetries, interruptible, true, writeSkewAllowed,
                                 optimizeConflictDetectionEnabled, true, quickReleaseEnabled,
-                                explicitRetryAllowed, timeoutNs, maxReadSpinCount, this, traceLevel);
+                                explicitRetryAllowed, timeoutNs, maxReadSpinCount, this, traceLevel, syncToClock);
                 final UpdateConfiguration up_nort =
                         new UpdateConfiguration(
                                 clock, backoffPolicy, commitLockPolicy, familyName,
                                 speculativeConfig, maxRetries, interruptible, false, true,
                                 optimizeConflictDetectionEnabled, true, quickReleaseEnabled,
-                                explicitRetryAllowed, timeoutNs, maxReadSpinCount, this, traceLevel);
+                                explicitRetryAllowed, timeoutNs, maxReadSpinCount, this, traceLevel, syncToClock);
 
                 @Override
                 public Stm getStm() {
@@ -618,8 +618,6 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                     }
                 }
             };
-
-
         }
 
         private TransactionFactory<AlphaTransaction> createNonSpeculativeReadonlyTxFactory() {
@@ -628,7 +626,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                         new ReadonlyConfiguration(
                                 clock, backoffPolicy, familyName, speculativeConfig, maxRetries,
                                 interruptible, readTrackingEnabled, explicitRetryAllowed, timeoutNs,
-                                maxReadSpinCount, this, traceLevel);
+                                maxReadSpinCount, this, traceLevel, syncToClock);
 
                 @Override
                 public Stm getStm() {
@@ -674,8 +672,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                                 clock, backoffPolicy, commitLockPolicy, familyName, speculativeConfig,
                                 maxRetries, interruptible, readTrackingEnabled, writeSkewAllowed,
                                 optimizeConflictDetectionEnabled, true, quickReleaseEnabled,
-                                explicitRetryAllowed, timeoutNs, maxReadSpinCount, this, traceLevel);
-
+                                explicitRetryAllowed, timeoutNs, maxReadSpinCount, this, traceLevel, syncToClock);
 
                 @Override
                 public Stm getStm() {

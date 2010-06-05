@@ -1,41 +1,36 @@
-package org.multiverse.stms.alpha.programmatic;
+package org.multiverse.transactional.refs;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.TestUtils;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.api.Transaction;
-import org.multiverse.api.programmatic.ProgrammaticLongRef;
-import org.multiverse.api.programmatic.ProgrammaticRef;
-import org.multiverse.api.programmatic.ProgrammaticRefFactory;
 import org.multiverse.stms.alpha.AlphaStm;
-import org.multiverse.templates.TransactionTemplate;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
  */
-public class AlphaProgrammaticLongRef_blockingStressTest {
+public class IntRefBlockingStressTest {
     private AlphaStm stm;
-    private ProgrammaticLongRef ref;
-    private ProgrammaticRef<Boolean> completedRef;
+    private IntRef ref;
+    private BooleanRef completedRef;
     private int consumerCount = 10;
     private int unprocessedCapacity = 1000;
     private volatile boolean stop;
-    private ProgrammaticRefFactory refFactory;
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         stop = false;
         stm = (AlphaStm) getGlobalStmInstance();
-        refFactory = stm.getProgrammaticRefFactoryBuilder().build();
-        ref = refFactory.atomicCreateLongRef(0);
-        completedRef = refFactory.createRef(false);
+        ref = new IntRef();
+        completedRef = new BooleanRef();
     }
 
     @Test
@@ -62,13 +57,13 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
         long produceCount = sum(producers);
         long consumeCount = sum(consumers);
         long leftOver = ref.get();
-        assertEquals(produceCount, consumeCount + leftOver);
+        assertEquals(produceCount, consumeCount+leftOver);
     }
 
     long sum(ProducerThread[] threads) {
         long result = 0;
         for (ProducerThread thread : threads) {
-            result += thread.count;
+            result += thread.produceCount;
         }
         return result;
     }
@@ -76,13 +71,13 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
     long sum(ConsumerThread[] threads) {
         long result = 0;
         for (ConsumerThread thread : threads) {
-            result += thread.count;
+            result += thread.consumeCount;
         }
         return result;
     }
 
     class ProducerThread extends TestThread {
-        long count = 0;
+        long produceCount = 0;
 
         public ProducerThread(int id) {
             super("ProducerThread-" + id);
@@ -92,27 +87,20 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
         public void doRun() throws Exception {
             while (!stop) {
                 if (produce()) {
-                    count++;
+                    produceCount++;
                 }
 
-                if (count % 100000 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), count);
+                if (produceCount % 100000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), produceCount);
                 }
             }
 
-            new TransactionTemplate() {
-                @Override
-                public Object execute(Transaction tx) throws Exception {
-                    completedRef.set(true);
-                    return null;
-                }
-            }.execute();
-
+            completedRef.set(true);
         }
 
         @TransactionalMethod(readonly = false)
         private boolean produce() {
-            if (completedRef.get()) {
+            if(completedRef.get()){
                 return false;
             }
 
@@ -122,14 +110,14 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
                 retry();
             }
 
-            ref.inc(1);
+            ref.inc();
 
             return true;
         }
     }
 
     class ConsumerThread extends TestThread {
-        long count = 0;
+        long consumeCount = 0;
 
         public ConsumerThread(int id) {
             super("ConsumerThread-" + id);
@@ -141,19 +129,19 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
             do {
                 again = consume();
 
-                if (count % 100000 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), count);
+                if (consumeCount % 100000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), consumeCount);
                 }
 
                 if (again) {
-                    count++;
+                    consumeCount++;
                 }
             } while (again);
         }
 
         @TransactionalMethod(readonly = false)
         private boolean consume() {
-            if (completedRef.get()) {
+            if(completedRef.get()){
                 return false;
             }
 
@@ -166,6 +154,5 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
             ref.inc(-1);
             return true;
         }
-
     }
 }

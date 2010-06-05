@@ -1,0 +1,11 @@
+<h2>Multiverse 0.5.2</h2>
+
+Multiverse 0.5 was released at 25 May 2010 and contains improvements:
+<ol>
+    <li>Support for including/excluding packages from the Multiverse Javaagent.</li>
+    <li>Bug fix for transaction callback not being called when transaction is upgraded to a better
+        transaction</li>
+    <li>Transaction reuse: old transactions stored in the ThreadLocalTransaction can be reused if
+        the transactionfactory that created the old transaction, is the same as the transactionfactory
+        that wants to create the new transaction.</li>
+</ol>

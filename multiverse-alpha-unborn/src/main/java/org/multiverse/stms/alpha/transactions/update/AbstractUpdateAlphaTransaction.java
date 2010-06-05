@@ -51,54 +51,55 @@ public abstract class AbstractUpdateAlphaTransaction
      * read for the transactional object of the readonly has been made. It is important that an implementation doesn't
      * ignore this call.
      *
-     * @param opened the opened AlphaTranlocal to attach.
+     * @param tranlocal the opened AlphaTranlocal to attach.
      */
-    protected abstract void attach(AlphaTranlocal opened);
+    protected abstract void attach(AlphaTranlocal tranlocal);
 
     /**
      * Finds the tranlocal for the given transactional object in the set of attached tranlocals.
      *
-     * @param txObject the transactional object to find the tranlocal for.
+     * @param transactionalObject the transactional object to find the tranlocal for.
      * @return the found tranlocal. If no tranlocal was found in the set of attached tranlocals, null is returned.
      */
-    protected abstract AlphaTranlocal findAttached(AlphaTransactionalObject txObject);
+    protected abstract AlphaTranlocal findAttached(AlphaTransactionalObject transactionalObject);
 
     // ======================= open for read =============================
 
     @Override
-    protected final AlphaTranlocal doOpenForRead(AlphaTransactionalObject txObject) {
-        AlphaTranlocal opened = findAttached(txObject);
+    protected final AlphaTranlocal doOpenForRead(AlphaTransactionalObject transactionalObject) {
+        AlphaTranlocal tranlocal = findAttached(transactionalObject);
 
-        if (opened != null) {
-            if (opened.isCommuting()) {
-                AlphaTranlocal origin = load(txObject);
+        if (tranlocal != null) {
+            if (tranlocal.isCommuting()) {
+                AlphaTranlocal origin = load(transactionalObject);
+
                 if (origin == null) {
-                    throw new UncommittedReadConflict();
+                    throw createUncommittedException(transactionalObject);
                 }
 
-                opened.prematureFixation(this, origin);
+                tranlocal.prematureFixation(this, origin);
             }
 
-            return opened;
+            return tranlocal;
         }
 
-        opened = load(txObject);
-        if (opened == null) {
-            throw new UncommittedReadConflict();
+        tranlocal = load(transactionalObject);
+        if (tranlocal == null) {
+            throw createUncommittedException(transactionalObject);
         } else if (config.readTrackingEnabled) {
-            attach(opened);
+            attach(tranlocal);
         }
 
-        return opened;
+        return tranlocal;
     }
 
-    // ======================= open for write =============================
+   // ======================= open for write =============================
 
     @Override
-    protected AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {
-        AlphaTranlocal attached = findAttached(txObject);
+    protected AlphaTranlocal doOpenForWrite(AlphaTransactionalObject transactionalObject) {
+        AlphaTranlocal attached = findAttached(transactionalObject);
         if (attached == null) {
-            attached = doOpenForWritePreviousCommittedAndAttach(txObject);
+            attached = doOpenForWriteAndAttach(transactionalObject);
             updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
         } else if (attached.isCommitted()) {
             //it is loaded before but it is a readonly
@@ -108,9 +109,9 @@ public abstract class AbstractUpdateAlphaTransaction
             attach(attached);
             updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
         } else if (attached.isCommuting()) {
-            AlphaTranlocal origin = load(txObject);
+            AlphaTranlocal origin = load(transactionalObject);
             if (origin == null) {
-                throw new UncommittedReadConflict();
+                throw createUncommittedException(transactionalObject);
             }
 
             attached.prematureFixation(this, origin);
@@ -122,8 +123,8 @@ public abstract class AbstractUpdateAlphaTransaction
 
     //todo: this method is going to be inlined.
 
-    protected final AlphaTranlocal doOpenForWritePreviousCommittedAndAttach(AlphaTransactionalObject txObject) {
-        AlphaTranlocal committed = txObject.___load(getReadVersion());
+    protected final AlphaTranlocal doOpenForWriteAndAttach(AlphaTransactionalObject transactionalObject) {
+        AlphaTranlocal committed = transactionalObject.___load(getReadVersion());
 
         if (committed == null) {
             throw new UncommittedReadConflict();
@@ -134,20 +135,19 @@ public abstract class AbstractUpdateAlphaTransaction
         return opened;
     }
 
-
     // ======================= open for commuting write =============================
 
     @Override
-    protected AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject txObject) {
-        if(getStatus()== TransactionStatus.New){
+    protected AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject transactionalObject) {
+        if (getStatus() == TransactionStatus.New) {
             start();
         }
 
         updateTransactionStatus = updateTransactionStatus.upgradeToOpenForWrite();
 
-        AlphaTranlocal attached = findAttached(txObject);
+        AlphaTranlocal attached = findAttached(transactionalObject);
         if (attached == null) {
-            attached = txObject.___openForCommutingOperation();
+            attached = transactionalObject.___openForCommutingOperation();
             attach(attached);
         } else if (attached.isCommitted()) {
             attached = attached.openForWrite();
@@ -160,15 +160,15 @@ public abstract class AbstractUpdateAlphaTransaction
     // ======================= open for construction =============================
 
     @Override
-    public final AlphaTranlocal doOpenForConstruction(AlphaTransactionalObject txObject) {
-        AlphaTranlocal opened = findAttached(txObject);
+    public final AlphaTranlocal doOpenForConstruction(AlphaTransactionalObject transactionalObject) {
+        AlphaTranlocal opened = findAttached(transactionalObject);
 
         if (opened != null) {
             if (opened.isCommitted()) {
                 String msg = format(
                         "Can't open for construction transactional object '%s' using transaction '%s'" +
                                 "because the transactional object already has commits",
-                        toTxObjectString(txObject), config.getFamilyName());
+                        toTxObjectString(transactionalObject), config.getFamilyName());
                 throw new IllegalStateException(msg);
             }
 
@@ -176,7 +176,7 @@ public abstract class AbstractUpdateAlphaTransaction
                 String msg = format(
                         "Can't open for construction transactional object '%s' using transaction '%s'" +
                                 "because the transactional object is opened for a commuting operations",
-                        toTxObjectString(txObject), config.getFamilyName());
+                        toTxObjectString(transactionalObject), config.getFamilyName());
                 throw new IllegalStateException(msg);
             }
 
@@ -184,7 +184,7 @@ public abstract class AbstractUpdateAlphaTransaction
                 String msg = format(
                         "Can't open for construction transactional object '%s' using transaction '%s'" +
                                 "because the transactional object already has commits",
-                        toTxObjectString(txObject), config.getFamilyName());
+                        toTxObjectString(transactionalObject), config.getFamilyName());
                 throw new IllegalStateException(msg);
             }
 
@@ -193,7 +193,7 @@ public abstract class AbstractUpdateAlphaTransaction
 
         updateTransactionStatus = updateTransactionStatus.upgradeToOpenForConstruction();
 
-        AlphaTranlocal fresh = txObject.___openUnconstructed();
+        AlphaTranlocal fresh = transactionalObject.___openUnconstructed();
         attach(fresh);
         return fresh;
     }
@@ -255,13 +255,13 @@ public abstract class AbstractUpdateAlphaTransaction
                                 //we were not lucky, another transaction committed between the start and
                                 //prepare of this transaction, so we need to do a conflict test,
 
-                                if (hasReadConflict()) {
+                                if (hasConflict()) {
                                     throw createWriteSkewConflict();
                                 }
                             }
                         } else {
                             //another transaction has committed, so we need to do a full readconflict test
-                            if (hasReadConflict()) {
+                            if (hasConflict()) {
                                 throw createWriteSkewConflict();
                             }
 
@@ -288,20 +288,19 @@ public abstract class AbstractUpdateAlphaTransaction
      *
      * @return the AttachedState.
      */
-
     protected abstract boolean isDirty();
 
-    protected final boolean isDirty(AlphaTranlocal attached) {
-        if (attached == null) {
+    protected final boolean isDirty(AlphaTranlocal tranlocal) {
+        if (tranlocal == null) {
             return false;
         }
 
-        if (attached.isCommitted()) {
+        if (tranlocal.isCommitted()) {
             return false;
         }
 
         //todo: now eager
-        if (attached.isCommuting()) {
+        if (tranlocal.isCommuting()) {
             return true;
         }
 
@@ -309,7 +308,7 @@ public abstract class AbstractUpdateAlphaTransaction
             return true;
         }
 
-        return attached.executeDirtyCheck();
+        return tranlocal.executeDirtyCheck();
     }
 
     /**
@@ -335,7 +334,7 @@ public abstract class AbstractUpdateAlphaTransaction
      *
      * @return true if there are conflict, false otherwise.
      */
-    protected abstract boolean hasReadConflict();
+    protected abstract boolean hasConflict();
 
     protected final boolean hasReadConflict(AlphaTranlocal attached) {
         if (attached == null) {
@@ -397,12 +396,8 @@ public abstract class AbstractUpdateAlphaTransaction
 
         boolean release = true;
 
-        if (tranlocal.isCommitted()) {
-            //todo: could it be that you are release locks of transactional objects owned by other
-            //transactions?
-            if (tranlocal.___writeVersion != writeVersion) {
-                release = false;
-            }
+        if (tranlocal.___writeVersion != writeVersion) {
+            release = false;
         }
 
         if (release) {
@@ -468,9 +463,11 @@ public abstract class AbstractUpdateAlphaTransaction
     @Override
     protected void makeChangesPermanent() {
         Listeners[] listeners = makeChangesPermanent(writeVersion);
+
         if (!config.quickReleaseLocksEnabled) {
             doReleaseWriteLocksForSuccess(writeVersion);
         }
+
         Listeners.openAll(listeners);
     }
 

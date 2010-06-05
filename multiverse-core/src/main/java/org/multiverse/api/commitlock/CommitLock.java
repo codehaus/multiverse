@@ -26,7 +26,7 @@ public interface CommitLock {
     Transaction ___getLockOwner();
 
     /**
-     * Tries to acquire the lock.
+     * Tries to acquire the lock. Atm when the lock already is acquired, this call is going to fail.
      * <p/>
      * CommitLocks are not reentrant.
      *

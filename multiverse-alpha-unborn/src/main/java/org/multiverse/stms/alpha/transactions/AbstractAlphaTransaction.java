@@ -26,11 +26,23 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
         super(config);
     }
 
-    protected final AlphaTranlocal load(AlphaTransactionalObject txObject) {
+    protected final UncommittedReadConflict createUncommittedException(AlphaTransactionalObject transactionalObject) {
+        String msg = format(
+                "Can't open for read transactional object '%s' in transaction '%s' because the " +
+                        "readonly transactional object has not been committed before. The cause of this " +
+                        "problem is very likely that a reference to this transactional object escaped " +
+                        "the creating transaction before that transaction was committed.'",
+                toTxObjectString(transactionalObject), config.getFamilyName());
+        return new UncommittedReadConflict(msg);
+    }
+
+
+
+    protected final AlphaTranlocal load(AlphaTransactionalObject transactionalObject) {
         int spin = 0;
         while (true) {
             try {
-                return txObject.___load(getReadVersion());
+                return transactionalObject.___load(version);
             } catch (LockNotFreeReadConflict lockNotFreeReadConflict) {
                 if (spin >= config.maxReadSpinCount) {
                     throw lockNotFreeReadConflict;
@@ -43,39 +55,39 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
 
     @Override
     public final AlphaTranlocal openForRead(AlphaTransactionalObject transactionalObject) {
-        if (___LOGGING_ENABLED) {
+        if (___TRACING_ENABLED) {
             if (config.traceLevel.isLogableFrom(TraceLevel.fine)) {
                 System.out.println(config.familyName + " openForRead " + toTxObjectString(transactionalObject));
             }
         }
 
-        switch (getStatus()) {
-            case New:
+        switch (statusInt) {
+            case NEW:
                 if (transactionalObject == null) {
                     return null;
                 }
 
                 start();
                 return doOpenForRead(transactionalObject);
-            case Active:
+            case ACTIVE:
                 if (transactionalObject == null) {
                     return null;
                 }
 
                 return doOpenForRead(transactionalObject);
-            case Prepared:
+            case PREPARED:
                 String preparedMsg = format(
                         "Can't open for read transactional object '%s' " +
                                 "because transaction '%s' is prepared to commit.",
                         toTxObjectString(transactionalObject), config.getFamilyName());
                 throw new PreparedTransactionException(preparedMsg);
-            case Committed:
+            case COMMITTED:
                 String committedMsg = format(
                         "Can't open for read transactional object '%s' " +
                                 "because transaction '%s' already is committed.",
                         toTxObjectString(transactionalObject), config.getFamilyName());
                 throw new DeadTransactionException(committedMsg);
-            case Aborted:
+            case ABORTED:
                 String abortedMsg = format(
                         "Can't open for read transactional object '%s' " +
                                 "because transaction '%s' already is aborted.",
@@ -86,17 +98,11 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
         }
     }
 
-    protected AlphaTranlocal doOpenForRead(AlphaTransactionalObject txObject) {
-        String msg = format(
-                "Can't open for read transactional object '%s' " +
-                        "because transaction '%s' and class '%s' doesn't support this operation.",
-                toTxObjectString(txObject), config.getFamilyName(), getClass());
-        throw new UnsupportedOperationException(msg);
-    }
+    protected abstract AlphaTranlocal doOpenForRead(AlphaTransactionalObject transactionalObject);
 
     @Override
     public final AlphaTranlocal openForWrite(AlphaTransactionalObject transactionalObject) {
-        if (___LOGGING_ENABLED) {
+        if (___TRACING_ENABLED) {
             if (config.traceLevel.isLogableFrom(TraceLevel.fine)) {
                 System.out.println(config.familyName + " openForWrite " + toTxObjectString(transactionalObject));
             }
@@ -144,18 +150,11 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
         }
     }
 
-    protected AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {
-        String msg = format(
-                "Can't can't open for write transactional object '%s' " +
-                        "because transaction '%s' and class '%s' doesn't support this operation.",
-                toTxObjectString(txObject), config.getFamilyName(), getClass());
-        throw new UnsupportedOperationException(msg);
-    }
-
+    protected abstract AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) ;
 
     @Override
     public final AlphaTranlocal openForConstruction(AlphaTransactionalObject transactionalObject) {
-        if (___LOGGING_ENABLED) {
+        if (___TRACING_ENABLED) {
             if (config.traceLevel.isLogableFrom(TraceLevel.fine)) {
                 System.out.println(config.familyName + " openForConstruction " + toTxObjectString(transactionalObject));
             }
@@ -203,18 +202,12 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
         }
     }
 
-    protected AlphaTranlocal doOpenForConstruction(AlphaTransactionalObject txObject) {
-        String msg = format(
-                "Can't can't open for construction transactional object '%s' " +
-                        "because transaction '%s' and class '%s' doesn't support this operation.",
-                toTxObjectString(txObject), config.getFamilyName(), getClass());
-        throw new UnsupportedOperationException(msg);
-    }
+    protected abstract AlphaTranlocal doOpenForConstruction(AlphaTransactionalObject txObject) ;
 
 
     @Override
     public final AlphaTranlocal openForCommutingWrite(AlphaTransactionalObject transactionalObject) {
-        if (___LOGGING_ENABLED) {
+        if (___TRACING_ENABLED) {
             if (config.traceLevel.isLogableFrom(TraceLevel.fine)) {
                 System.out.println(config.familyName + " openForCommutingWrite " + toTxObjectString(transactionalObject));
             }
@@ -255,13 +248,7 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
         }
     }
 
-    protected AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject txObject) {
-        String msg = format(
-                "Can't can't open for write transactional object '%s' " +
-                        "because transaction '%s' and class '%s' doesn't support this operation.",
-                toTxObjectString(txObject), config.getFamilyName(), getClass());
-        throw new UnsupportedOperationException(msg);
-    }
+    protected abstract AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject txObject);
 
 
     @Override

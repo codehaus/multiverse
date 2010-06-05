@@ -7,8 +7,7 @@ import org.multiverse.TestThread;
 import org.multiverse.integrationtests.Ref;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.TestUtils.joinAll;
-import static org.multiverse.TestUtils.startAll;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
@@ -23,14 +22,15 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  * @author Peter Veentjer.
  */
 public class PingPongStressTest {
-    private int pingPongCount = 1 * 1000 * 1000;
+    private volatile boolean stop = false;
     private int threadCount = 2;
-    private Ref intValue;
+    private Ref ref;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        intValue = new Ref(0);
+        ref = new Ref(0);
+        stop = false;
     }
 
     @After
@@ -42,9 +42,10 @@ public class PingPongStressTest {
     public void test() {
         PingPongThread[] threads = createThreads();
         startAll(threads);
+        sleepMs(getStressTestDurationMs(60 * 1000));
+        stop = true;
         joinAll(threads);
-
-        assertEquals(pingPongCount * threadCount, intValue.get());
+        assertEquals(sum(threads), ref.get());
     }
 
     private PingPongThread[] createThreads() {
@@ -55,8 +56,17 @@ public class PingPongStressTest {
         return threads;
     }
 
+    private long sum(PingPongThread[] threads){
+        long result = 0;
+        for(PingPongThread t: threads){
+            result+=t.count;
+        }
+        return result;
+    }
+
     private class PingPongThread extends TestThread {
         private int id;
+        private int count;
 
         public PingPongThread(int id) {
             super("PingPongThread-" + id);
@@ -67,14 +77,15 @@ public class PingPongStressTest {
         public void doRun() {
             int expected = id;
 
-            for (int k = 0; k < pingPongCount; k++) {
-                if (k % (100 * 1000) == 0) {
-                    System.out.println(getName() + " " + k);
+            while(!stop){
+                if (count % (100 * 1000) == 0) {
+                    System.out.println(getName() + " " + count);
                 }
 
-                intValue.await(expected);
-                intValue.inc();
+                ref.await(expected);
+                ref.inc();
                 expected += threadCount;
+                count++;
             }
         }
     }

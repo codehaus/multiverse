@@ -79,8 +79,8 @@ public final class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransact
     }
 
     @Override
-    protected AlphaTranlocal findAttached(AlphaTransactionalObject txObject) {
-        return attachedMap.get(txObject);
+    protected AlphaTranlocal findAttached(AlphaTransactionalObject transactionalObject) {
+        return attachedMap.get(transactionalObject);
     }
 
     @Override
@@ -129,7 +129,7 @@ public final class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransact
     }
 
     @Override
-    protected boolean hasReadConflict() {
+    protected boolean hasConflict() {
         for (AlphaTranlocal attached : attachedMap.values()) {
             if (hasReadConflict(attached)) {
                 return true;

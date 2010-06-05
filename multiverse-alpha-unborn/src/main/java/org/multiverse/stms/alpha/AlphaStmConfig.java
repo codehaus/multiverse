@@ -25,6 +25,7 @@ import org.multiverse.api.commitlock.GenericCommitLockPolicy;
  * @author Peter Veentjer.
  */
 public final class AlphaStmConfig {
+
     public static AlphaStmConfig createDebugConfig() {
         AlphaStmConfig config = new AlphaStmConfig();
         config.speculativeConfigurationEnabled = false;
@@ -43,6 +44,8 @@ public final class AlphaStmConfig {
         return config;
     }
 
+    public int syncToClock = 0;
+            
     public int maxReadSpinCount = 50;
 
     public PrimitiveClock clock = new StrictPrimitiveClock();
@@ -72,8 +75,6 @@ public final class AlphaStmConfig {
     public boolean allowWriteSkew = true;
 
     public boolean interruptible = false;
-
-    public boolean loggingOfControlFlowErrorsEnabled = false;
 
     public TraceLevel traceLevel = TraceLevel.none;
 
@@ -113,6 +114,10 @@ public final class AlphaStmConfig {
 
         if (traceLevel == null) {
             throw new IllegalStateException("Invalid configuration, traceLevel can't be null");
+        }
+
+        if(syncToClock <0){
+            throw new IllegalStateException("Invalid configuration, syncToClock can't be smaller than zero");
         }
     }
 }

@@ -3,14 +3,18 @@ package org.multiverse.stms.alpha.programmatic;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.TestUtils;
 import org.multiverse.annotations.TransactionalMethod;
+import org.multiverse.api.Transaction;
 import org.multiverse.api.programmatic.ProgrammaticRefFactory;
 import org.multiverse.stms.alpha.AlphaStm;
+import org.multiverse.templates.TransactionTemplate;
 
-import static org.multiverse.TestUtils.joinAll;
-import static org.multiverse.TestUtils.startAll;
+import static org.junit.Assert.assertEquals;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
@@ -19,16 +23,19 @@ public class AlphaProgrammaticRef_blockingStressTest {
 
     private AlphaStm stm;
     private ProgrammaticRefFactory refFactory;
-    private AlphaProgrammaticRef ref;
+    private AlphaProgrammaticRef<String> ref;
     private int consumerCount = 10;
-    private int transactionCount = 1000 * 1000 * 2;
+    private volatile boolean stop;
+    private String poison = "poison";
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
+        stop = false;
         stm = (AlphaStm) getGlobalStmInstance();
         refFactory = stm.getProgrammaticRefFactoryBuilder()
                 .build();
-        ref = (AlphaProgrammaticRef) refFactory.atomicCreateRef(0);
+        ref = (AlphaProgrammaticRef) refFactory.atomicCreateRef(null);
     }
 
     @Test
@@ -45,60 +52,124 @@ public class AlphaProgrammaticRef_blockingStressTest {
 
         startAll(producers);
         startAll(consumers);
+
+        sleepMs(TestUtils.getStressTestDurationMs(60 * 1000));
+        stop = true;
+
         joinAll(producers);
         joinAll(consumers);
+
+        long producedCount = sum(producers);
+        long consumedCount = sum(consumers);
+        assertEquals(producedCount, consumedCount);
     }
 
+    long sum(ProducerThread[] threads) {
+        long result = 0;
+        for (ProducerThread thread : threads) {
+            result += thread.count;
+        }
+        return result;
+    }
+
+    long sum(ConsumerThread[] threads) {
+        long result = 0;
+        for (ConsumerThread thread : threads) {
+            result += thread.count;
+        }
+        return result;
+    }
 
     class ProducerThread extends TestThread {
+        long count = 0;
+
         public ProducerThread(int id) {
             super("ProducerThread-" + id);
         }
 
         @Override
         public void doRun() throws Exception {
-            for (int k = 0; k < transactionCount; k++) {
-                produce();
+            while (!stop) {
+                if (produce()) {
+                    count++;
+                }
 
-                if (k % 100000 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
+                if (count % 10000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), count);
                 }
             }
+
+            new TransactionTemplate(){
+                @Override
+                public Object execute(Transaction tx) throws Exception {
+                    if(poison.equals(ref.get())){
+                        return null;
+                    }
+
+                    if(ref.get()!=null){
+                        retry();
+                    }
+                    
+                    ref.set(poison);
+                    return null;
+                }
+            }.execute();
         }
 
         @TransactionalMethod(readonly = false)
-        private void produce() {
-            if (ref.get() != null) {
+        private boolean produce() {
+            String value = ref.get();
+
+            if (poison.equals(value)) {
+                return false;
+            }
+
+            if (value != null) {
                 retry();
             }
 
-            ref.set("foo");
+            ref.set("token");
+            return true;
         }
     }
 
     class ConsumerThread extends TestThread {
+        long count = 0;
+
         public ConsumerThread(int id) {
             super("ConsumerThread-" + id);
         }
 
         @Override
         public void doRun() throws Exception {
-            for (int k = 0; k < transactionCount; k++) {
-                consume();
+            boolean again;
+            do {
+                again = consume();
 
-                if (k % 100000 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
+                if (count % 10000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), count);
                 }
-            }
+
+                if (again) {
+                    count++;
+                }
+            } while (again);
         }
 
         @TransactionalMethod(readonly = false)
-        private void consume() {
-            if (ref.get() == null) {
+        private boolean consume() {
+            String value = ref.get();
+
+            if (poison.equals(value)) {
+                return false;
+            }
+
+            if (value == null) {
                 retry();
             }
 
             ref.set(null);
+            return true;
         }
     }
 }

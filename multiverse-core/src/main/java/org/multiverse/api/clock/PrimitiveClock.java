@@ -60,5 +60,7 @@ public interface PrimitiveClock {
      * @return the current version.
      */
     long getVersion();
+
+    long tickTo(long version);
 }
 

@@ -73,6 +73,7 @@ def pages = [
         new Page(pageid: '0.3.release'),
         new Page(pageid: '0.4.release'),
         new Page(pageid: '0.5.release'),
+        new Page(pageid: '0.5.2.release'),
         new Page(pageid: '0.6.release'),
         new Page(pageid: 'faq'),
         new Page(pageid: 'team'),

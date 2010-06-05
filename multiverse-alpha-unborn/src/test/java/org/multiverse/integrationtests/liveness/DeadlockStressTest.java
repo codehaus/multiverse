@@ -17,19 +17,22 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class DeadlockStressTest {
 
-    private int txObjectCount = 100;
+    private volatile boolean stop;
+    private int refCount = 100;
     private int threadCount = 10;
-    private int transactionCountPerThread = 500 * 1000;
-
     private IntRef[] refs;
     private ChangeThread[] threads;
 
     @Before
     public void setUp() {
+        stop = false;
         clearThreadLocalTransaction();
+    }
 
-        refs = new IntRef[txObjectCount];
-        for (int k = 0; k < txObjectCount; k++) {
+    @Test
+    public void test() {
+        refs = new IntRef[refCount];
+        for (int k = 0; k < refCount; k++) {
             refs[k] = new IntRef();
         }
 
@@ -37,11 +40,10 @@ public class DeadlockStressTest {
         for (int k = 0; k < threadCount; k++) {
             threads[k] = new ChangeThread(k);
         }
-    }
 
-    @Test
-    public void test() {
         startAll(threads);
+        sleepMs(getStressTestDurationMs(60 * 1000));
+        stop = true;
         joinAll(threads);
     }
 
@@ -53,19 +55,25 @@ public class DeadlockStressTest {
 
         @Override
         public void doRun() throws Exception {
-            for (int k = 0; k < transactionCountPerThread; k++) {
+            int k = 0;
+            while (!stop) {
                 if (k % 100000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
                 transaction();
+                k++;
             }
         }
 
         @TransactionalMethod
         public void transaction() {
             for (int k = 0; k < refs.length; k++) {
-                if (randomInt(10) == 5) {
-                    refs[k].inc();
+                if (randomInt(3) == 0) {
+                    int index = randomInt(refs.length);
+
+                    if (randomInt(5) == 0) {
+                        refs[index].inc();
+                    }
                 }
             }
         }

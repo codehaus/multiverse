@@ -36,6 +36,16 @@ public class Ref {
         this.value = value;
     }
 
+    @TransactionalMethod(readonly = false)
+    public boolean compareAndSet(int expected, int update) {
+        if (value != expected) {
+            return false;
+        }
+
+        value = update;
+        return true;
+    }
+
     @TransactionalMethod(readonly = true)
     public void await(int expected) {
         if (expected != value) {

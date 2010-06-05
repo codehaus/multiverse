@@ -24,6 +24,7 @@ public class RelaxedPrimitiveClockTest {
         assertEquals(returned, clock.getVersion());
     }
 
+ 
     @Test
     public void testToString() {
         RelaxedPrimitiveClock clock = new RelaxedPrimitiveClock();

@@ -16,18 +16,19 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 
 public class AnotherWriteSkewStressTest {
 
-    private int transactionCountPerThread = 10 * 1000 * 1000;
+    private volatile boolean stop;
     private User user1;
     private User user2;
-    private AtomicBoolean writeSkewEncountered = new AtomicBoolean();
     private boolean allowWriteSkew;
     private TransferThread[] threads;
+    private AtomicBoolean writeSkewEncountered = new AtomicBoolean();
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
         user1 = new User();
         user2 = new User();
+        stop = false;
         writeSkewEncountered.set(false);
 
         threads = new TransferThread[2];
@@ -42,6 +43,8 @@ public class AnotherWriteSkewStressTest {
     public void allowWriteSkew() {
         allowWriteSkew = true;
         startAll(threads);
+        sleepMs(getStressTestDurationMs(60 * 1000));
+        stop = true;
         joinAll(threads);
 
         System.out.println("User1: " + user1);
@@ -54,6 +57,9 @@ public class AnotherWriteSkewStressTest {
     public void disallowedWriteSkew() {
         allowWriteSkew = false;
         startAll(threads);
+        sleepMs(getStressTestDurationMs(60 * 1000));
+        stop = true;
+
         joinAll(threads);
 
         System.out.println("User1: " + user1);
@@ -71,7 +77,8 @@ public class AnotherWriteSkewStressTest {
 
         @Override
         public void doRun() throws Exception {
-            for (int k = 0; k < transactionCountPerThread; k++) {
+            int k = 0;
+            while (!stop) {
                 if (k % 1000000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
@@ -81,15 +88,16 @@ public class AnotherWriteSkewStressTest {
                 } else {
                     runWithWriteSkewDisallowed();
                 }
+                k++;
             }
         }
 
-        @TransactionalMethod(writeSkew = false)
+        @TransactionalMethod(readonly = false, writeSkew = false)
         private void runWithWriteSkewDisallowed() {
             doIt();
         }
 
-        @TransactionalMethod(writeSkew = true)
+        @TransactionalMethod(readonly = false, writeSkew = true)
         private void runWithWriteSkewAllowed() {
             doIt();
         }
@@ -103,8 +111,10 @@ public class AnotherWriteSkewStressTest {
             int sum = from.account1.get() + from.account2.get();
 
             if (sum < 0) {
-                writeSkewEncountered.set(true);
-                System.out.println("writeskew detected");
+                if (!writeSkewEncountered.get()) {
+                    writeSkewEncountered.set(true);
+                    System.out.println("writeskew detected");
+                }
             }
 
             if (sum >= amount) {

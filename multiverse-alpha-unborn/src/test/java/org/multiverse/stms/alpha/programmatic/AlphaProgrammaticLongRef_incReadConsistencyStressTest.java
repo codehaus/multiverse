@@ -22,16 +22,15 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class AlphaProgrammaticLongRef_incReadConsistencyStressTest {
 
+    private volatile boolean stop;
     private int refCount = 10;
-    private volatile boolean completed;
     private ProgrammaticLongRef[] refs;
     private Stm stm;
-    private int transactionCount = 1000 * 1000;
     private int readerCount = 10;
 
     @Before
     public void setUp() {
-        completed = false;
+        stop = false;
         clearThreadLocalTransaction();
         stm = getGlobalStmInstance();
         ProgrammaticRefFactory refFactory = stm.getProgrammaticRefFactoryBuilder()
@@ -69,26 +68,30 @@ public class AlphaProgrammaticLongRef_incReadConsistencyStressTest {
         startAll(incThread);
         startAll(readThreads);
 
+        sleepMs(getStressTestDurationMs(60*1000));
+        stop = true;
         joinAll(readThreads);
         joinAll(incThread);
     }
 
     public class ReadThread extends TestThread {
+        private long count;
+
         public ReadThread(int id) {
             super("ReadThread-" + id);
         }
 
         @Override
         public void doRun() throws Exception {
-            for (int k = 0; k < transactionCount; k++) {
+            while(!stop){
                 read();
                 sleepRandomUs(10);
 
-                if (k % 100000 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
+                if (count % 100000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), count);
                 }
+                count++;
             }
-            completed = true;
         }
 
         @TransactionalMethod(readonly = true, trackReads = false)
@@ -120,7 +123,7 @@ public class AlphaProgrammaticLongRef_incReadConsistencyStressTest {
         @Override
         public void doRun() throws Exception {
             int k = 0;
-            while (!completed) {
+            while (!stop) {
                 sleepRandomUs(10);
                 if (k % 100000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);

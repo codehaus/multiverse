@@ -1,4 +1,4 @@
-package org.multiverse;
+package org.multiverse.utils;
 
 import java.util.Random;
 

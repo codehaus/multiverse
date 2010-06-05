@@ -31,11 +31,17 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     private List<TransactionLifecycleListener> listeners;
 
-    private long version;
+    protected long version;
+
+    public static final int NEW = 0;
+    public static final int ACTIVE = 1;
+    public static final int PREPARED = 2;
+    public static final int COMMITTED = 3;
+    public static final int ABORTED = 4;
 
     private TransactionStatus status = TransactionStatus.New;
-
-    private long timeoutNs;
+    protected int statusInt = NEW;
+    protected long timeoutNs;
 
     private int attempt;
 
@@ -104,7 +110,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     @Override
     public void start() {
-        if (___LOGGING_ENABLED) {
+        if (___TRACING_ENABLED) {
             if (config.traceLevel.isLogableFrom(TraceLevel.course)) {
                 System.out.println(config.familyName + " starting");
             }
@@ -116,6 +122,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
                 try {
                     notifyAll(TransactionLifecycleEvent.PreStart);
                     status = TransactionStatus.Active;
+                    statusInt = ACTIVE;
                     version = config.clock.getVersion();
                     doStart();
                     success = true;
@@ -147,7 +154,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     @Override
     public final void registerLifecycleListener(TransactionLifecycleListener listener) {
-        if (___LOGGING_ENABLED) {
+        if (___TRACING_ENABLED) {
             if (config.traceLevel.isLogableFrom(TraceLevel.course)) {
                 System.out.println(config.familyName + " registerLifecycleListener");
             }
@@ -184,7 +191,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     @Override
     public final void prepare() {
-        if (___LOGGING_ENABLED) {
+        if (___TRACING_ENABLED) {
             if (config.traceLevel.isLogableFrom(TraceLevel.course)) {
                 System.out.println(config.familyName + " preparing");
             }
@@ -201,6 +208,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
                     //todo: the pre-commit tasks need to be executed
                     doPrepare();
                     status = TransactionStatus.Prepared;
+                    statusInt = PREPARED;
                 } finally {
                     if (status != TransactionStatus.Prepared) {
                         abort();
@@ -228,7 +236,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     @Override
     public final void reset() {
-        if (___LOGGING_ENABLED) {
+        if (___TRACING_ENABLED) {
             if (config.traceLevel.isLogableFrom(TraceLevel.course)) {
                 System.out.println(config.familyName + " reset");
             }
@@ -249,6 +257,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
                 doReset();
                 version = 0;
                 status = TransactionStatus.New;
+                statusInt = NEW;
                 break;
             default:
                 throw new IllegalStateException("unhandled transactionStatus: " + status);
@@ -279,7 +288,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     @Override
     public final void abort() {
-        if (___LOGGING_ENABLED) {
+        if (___TRACING_ENABLED) {
             if (config.traceLevel.isLogableFrom(TraceLevel.course)) {
                 System.out.println(config.familyName + " aborting");
             }
@@ -296,6 +305,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
                         notifyAll(TransactionLifecycleEvent.PreAbort);
                     } finally {
                         status = TransactionStatus.Aborted;
+                        statusInt = ABORTED;
                         if (status == TransactionStatus.Active) {
                             doAbortActive();
                         } else {
@@ -329,7 +339,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     @Override
     public final void commit() {
-        if (___LOGGING_ENABLED) {
+        if (___TRACING_ENABLED) {
             if (config.traceLevel.isLogableFrom(TraceLevel.course)) {
                 System.out.println(config.familyName + " committing");
             }
@@ -338,6 +348,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
         switch (status) {
             case New:
                 status = TransactionStatus.Committed;
+                statusInt = COMMITTED;
                 break;
             case Active:
                 prepare();
@@ -346,6 +357,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
                 try {
                     makeChangesPermanent();
                     status = TransactionStatus.Committed;
+                    statusInt = COMMITTED;
                     notifyAll(TransactionLifecycleEvent.PostCommit);
                 } finally {
                     if (status != TransactionStatus.Committed) {
@@ -370,7 +382,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     @Override
     public final void registerRetryLatch(Latch latch) {
-        if (___LOGGING_ENABLED) {
+        if (___TRACING_ENABLED) {
             if (config.traceLevel.isLogableFrom(TraceLevel.course)) {
                 System.out.println(config.familyName + " registerRetryLatch");
             }

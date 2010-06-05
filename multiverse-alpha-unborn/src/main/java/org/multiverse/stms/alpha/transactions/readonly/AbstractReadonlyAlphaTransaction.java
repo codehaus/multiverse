@@ -2,7 +2,6 @@ package org.multiverse.stms.alpha.transactions.readonly;
 
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
-import org.multiverse.api.exceptions.UncommittedReadConflict;
 import org.multiverse.stms.AbstractTransactionSnapshot;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
@@ -24,13 +23,13 @@ public abstract class AbstractReadonlyAlphaTransaction
     protected abstract void attach(AlphaTranlocal tranlocal);
 
     @Override
-    protected final AlphaTranlocal doOpenForRead(AlphaTransactionalObject txObject) {
-        AlphaTranlocal tranlocal = findAttached(txObject);
+    protected final AlphaTranlocal doOpenForRead(AlphaTransactionalObject transactionalObject) {
+        AlphaTranlocal tranlocal = findAttached(transactionalObject);
         if (tranlocal == null) {
-            tranlocal = load(txObject);
+            tranlocal = load(transactionalObject);
 
             if (tranlocal == null) {
-                throw createLoadUncommittedException(txObject);
+                throw createUncommittedException(transactionalObject);
             }
 
             if (config.readTrackingEnabled) {
@@ -41,30 +40,20 @@ public abstract class AbstractReadonlyAlphaTransaction
         return tranlocal;
     }
 
-    protected UncommittedReadConflict createLoadUncommittedException(AlphaTransactionalObject txObject) {
-        String msg = format(
-                "Can't open for read transactional object '%s' in transaction '%s' because the " +
-                        "readonly transactional object has not been committed before. The cause of this " +
-                        "problem is very likely that a reference to this transactional object escaped " +
-                        "the creating transaction before that transaction was committed.'",
-                toTxObjectString(txObject), config.getFamilyName());
-        return new UncommittedReadConflict(msg);
-    }
-
     @Override
-    public AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject txObject) {
+    public AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject transactionalObject) {
         //forward it to the write
-        return doOpenForWrite(txObject);
+        return doOpenForWrite(transactionalObject);
     }
 
     @Override
-    public AlphaTranlocal doOpenForConstruction(AlphaTransactionalObject txObject) {
+    public AlphaTranlocal doOpenForConstruction(AlphaTransactionalObject transactionalObject) {
         //forward it to the write
-        return doOpenForWrite(txObject);
+        return doOpenForWrite(transactionalObject);
     }
 
     @Override
-    protected final AlphaTranlocal doOpenForWrite(AlphaTransactionalObject txObject) {
+    protected final AlphaTranlocal doOpenForWrite(AlphaTransactionalObject transactionalObject) {
         SpeculativeConfiguration speculativeConfig = config.speculativeConfiguration;
         if (speculativeConfig.isSpeculativeReadonlyEnabled()) {
             speculativeConfig.signalSpeculativeReadonlyFailure();
@@ -73,7 +62,7 @@ public abstract class AbstractReadonlyAlphaTransaction
 
         String msg = format(
                 "Can't open for write transactional object '%s' because transaction '%s' is readonly'",
-                toTxObjectString(txObject), config.getFamilyName());
+                toTxObjectString(transactionalObject), config.getFamilyName());
         throw new ReadonlyException(msg);
     }
 }

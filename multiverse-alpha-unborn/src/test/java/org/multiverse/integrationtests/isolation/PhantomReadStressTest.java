@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.TestUtils;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.transactional.collections.TransactionalArrayList;
 import org.multiverse.transactional.collections.TransactionalLinkedList;
@@ -24,15 +25,14 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class PhantomReadStressTest {
 
-    private int readCount = 1000;
+    private volatile boolean stop;
     private int readThreadCount = 10;
     private int modifyThreadCount = 2;
     private List table;
-    private volatile boolean readersFinished;
 
     @Before
     public void setUp() {
-        readersFinished = false;
+        stop = false;
         clearThreadLocalTransaction();
     }
 
@@ -73,6 +73,8 @@ public class PhantomReadStressTest {
 
         startAll(modifyThreads);
         startAll(readerThread);
+        sleepMs(TestUtils.getStressTestDurationMs(60 * 1000));
+        stop = true;
         joinAll(modifyThreads);
         joinAll(readerThread);
     }
@@ -84,14 +86,8 @@ public class PhantomReadStressTest {
 
         @Override
         public void doRun() {
-            int k = 0;
-            while (!readersFinished) {
+            while (!stop) {
                 doLogic();
-                k++;
-
-                if (k % 500 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
-                }
             }
         }
 
@@ -111,38 +107,54 @@ public class PhantomReadStressTest {
 
         @Override
         public void doRun() throws Exception {
-            for (int k = 0; k < readCount; k++) {
-                boolean readonly = k % 2 == 0;
-                if (readonly) {
-                    readWithReadonlyTransaction();
-                } else {
-                    readWithUpdateTransaction();
+            int k = 0;
+            while (!stop) {
+                switch (k % 4) {
+                    case 0:
+                        readWithUpdateTransaction();
+                        break;
+                    case 1:
+                        readWithReadonlyTransaction();
+                        break;
+                    case 2:
+                        readWithReadtrackingReadonlyTransaction();
+                        break;
+                    case 3:
+                        readWithReadtrackingUpdateTransaction();
+                        break;
+                    default:
+                        throw new IllegalStateException();
                 }
-
-                if (k % 500 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
-                }
+                k++;
             }
-
-            readersFinished = true;
         }
 
-        @TransactionalMethod(readonly = false)
+        @TransactionalMethod(readonly = false, trackReads = false)
         public void readWithUpdateTransaction() {
             readLogic();
         }
 
-        @TransactionalMethod(readonly = true)
+        @TransactionalMethod(readonly = true, trackReads = false)
         private void readWithReadonlyTransaction() {
             readLogic();
         }
 
-        private void readLogic() {
-            int sizeT1 = table.size();
-            sleepRandomMs(10);
-            int sizeT2 = table.size();
+        @TransactionalMethod(readonly = false, trackReads = true)
+        public void readWithReadtrackingUpdateTransaction() {
+            readLogic();
+        }
 
-            assertEquals(sizeT1, sizeT2);
+        @TransactionalMethod(readonly = true, trackReads = true)
+        private void readWithReadtrackingReadonlyTransaction() {
+            readLogic();
+        }
+
+        private void readLogic() {
+            int read1 = table.size();
+            sleepRandomMs(10);
+            int read2 = table.size();
+
+            assertEquals(read1, read2);
         }
     }
 }

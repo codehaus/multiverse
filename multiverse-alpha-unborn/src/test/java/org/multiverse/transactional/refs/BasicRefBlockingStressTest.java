@@ -1,4 +1,4 @@
-package org.multiverse.stms.alpha.programmatic;
+package org.multiverse.transactional.refs;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -6,36 +6,28 @@ import org.multiverse.TestThread;
 import org.multiverse.TestUtils;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.programmatic.ProgrammaticLongRef;
-import org.multiverse.api.programmatic.ProgrammaticRef;
-import org.multiverse.api.programmatic.ProgrammaticRefFactory;
-import org.multiverse.stms.alpha.AlphaStm;
 import org.multiverse.templates.TransactionTemplate;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
  */
-public class AlphaProgrammaticLongRef_blockingStressTest {
-    private AlphaStm stm;
-    private ProgrammaticLongRef ref;
-    private ProgrammaticRef<Boolean> completedRef;
+public class BasicRefBlockingStressTest {
+
+    private BasicRef<String> ref;
     private int consumerCount = 10;
-    private int unprocessedCapacity = 1000;
     private volatile boolean stop;
-    private ProgrammaticRefFactory refFactory;
+    private String poison = "poison";
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         stop = false;
-        stm = (AlphaStm) getGlobalStmInstance();
-        refFactory = stm.getProgrammaticRefFactoryBuilder().build();
-        ref = refFactory.atomicCreateLongRef(0);
-        completedRef = refFactory.createRef(false);
+        ref = new BasicRef<String>();
     }
 
     @Test
@@ -59,10 +51,9 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
         joinAll(producers);
         joinAll(consumers);
 
-        long produceCount = sum(producers);
-        long consumeCount = sum(consumers);
-        long leftOver = ref.get();
-        assertEquals(produceCount, consumeCount + leftOver);
+        long producedCount = sum(producers);
+        long consumedCount = sum(consumers);
+        assertEquals(producedCount, consumedCount);
     }
 
     long sum(ProducerThread[] threads) {
@@ -95,7 +86,7 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
                     count++;
                 }
 
-                if (count % 100000 == 0) {
+                if (count % 10000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), count);
                 }
             }
@@ -103,27 +94,33 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
             new TransactionTemplate() {
                 @Override
                 public Object execute(Transaction tx) throws Exception {
-                    completedRef.set(true);
+                    if (poison.equals(ref.get())) {
+                        return null;
+                    }
+
+                    if (ref.get() != null) {
+                        retry();
+                    }
+
+                    ref.set(poison);
                     return null;
                 }
             }.execute();
-
         }
 
         @TransactionalMethod(readonly = false)
         private boolean produce() {
-            if (completedRef.get()) {
+            String value = ref.get();
+
+            if (poison.equals(value)) {
                 return false;
             }
 
-            long value = ref.get();
-
-            if (value >= unprocessedCapacity) {
+            if (value != null) {
                 retry();
             }
 
-            ref.inc(1);
-
+            ref.set("token");
             return true;
         }
     }
@@ -141,7 +138,7 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
             do {
                 again = consume();
 
-                if (count % 100000 == 0) {
+                if (count % 10000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), count);
                 }
 
@@ -153,19 +150,18 @@ public class AlphaProgrammaticLongRef_blockingStressTest {
 
         @TransactionalMethod(readonly = false)
         private boolean consume() {
-            if (completedRef.get()) {
+            String value = ref.get();
+
+            if (poison.equals(value)) {
                 return false;
             }
 
-            long value = ref.get();
-
-            if (value == 0) {
+            if (value == null) {
                 retry();
             }
 
-            ref.inc(-1);
+            ref.set(null);
             return true;
         }
-
     }
 }

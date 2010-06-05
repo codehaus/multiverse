@@ -16,7 +16,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 
 public class OrElseStressTest {
 
-    private int waitCountPerWaiter = 10000;
+    private int waitCountPerWaiter = 5000;
     private int waitingThreadCount = 20;
     private int refCount = 100;
 

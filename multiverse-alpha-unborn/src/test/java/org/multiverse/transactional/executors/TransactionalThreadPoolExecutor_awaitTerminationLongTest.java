@@ -77,7 +77,7 @@ public class TransactionalThreadPoolExecutor_awaitTerminationLongTest {
         Runnable task = new Runnable() {
             @Override
             public void run() {
-                sleepMs(10000);
+                sleepMs(50000);
             }
         };
 

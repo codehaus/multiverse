@@ -3,16 +3,13 @@ package org.multiverse.stms.alpha.integrationtests;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.TestUtils;
 import org.multiverse.annotations.TransactionalMethod;
-import org.multiverse.api.Stm;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.transactional.refs.IntRef;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 
@@ -28,27 +25,24 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
  */
 public class AtomicBehaviorStressTest {
 
-    private Stm stm;
-
     private IntRef ref;
-    private int modifyCount = 500;
-    private AtomicInteger modifyCountDown = new AtomicInteger();
+    private volatile boolean stop;
 
     @Before
     public void setUp() {
-        stm = getGlobalStmInstance();
         setThreadLocalTransaction(null);
         ref = new IntRef(0);
+        stop = true;
     }
 
     @Test
     public void test() {
-        modifyCountDown.set(modifyCount);
-
         ModifyThread modifyThread = new ModifyThread(0);
         ObserverThread observerThread = new ObserverThread();
 
         startAll(modifyThread, observerThread);
+        sleepMs(TestUtils.getStressTestDurationMs(20*1000));
+        stop = true;
         joinAll(modifyThread, observerThread);
     }
 
@@ -58,7 +52,7 @@ public class AtomicBehaviorStressTest {
         }
 
         public void doRun() {
-            while (modifyCountDown.getAndDecrement() > 0) {
+            while (!stop) {
                 try {
                     doit();
                 } catch (DeadTransactionException ignore) {
@@ -91,7 +85,7 @@ public class AtomicBehaviorStressTest {
 
         @Override
         public void doRun() {
-            while (modifyCountDown.get() > 0) {
+            while (!stop) {
                 doit();
                 sleepRandomMs(5);
             }

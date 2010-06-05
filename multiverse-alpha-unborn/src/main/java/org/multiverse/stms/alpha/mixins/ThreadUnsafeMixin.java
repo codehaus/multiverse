@@ -17,7 +17,7 @@ import org.multiverse.utils.TodoException;
  * <p/>
  * Can't be used in a multithreaded program.
  */
-public abstract class ThreadUnsafeTransactionalObjectMixin implements AlphaTransactionalObject, MultiverseConstants {
+public abstract class ThreadUnsafeMixin implements AlphaTransactionalObject, MultiverseConstants {
 
     private Transaction ___lockOwner;
 

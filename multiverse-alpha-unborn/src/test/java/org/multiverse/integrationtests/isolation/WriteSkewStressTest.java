@@ -44,8 +44,8 @@ public class WriteSkewStressTest {
         IntRef to1 = new IntRef();
         IntRef to2 = new IntRef();
 
-        AnotherTransferThread t1 = new AnotherTransferThread(from1, from2, to1, true);
-        AnotherTransferThread t2 = new AnotherTransferThread(from2, from1, to2, true);
+        TransferThread t1 = new TransferThread(from1, from2, to1, true);
+        TransferThread t2 = new TransferThread(from2, from1, to2, true);
 
         //there is a big fat delay before the tx completes, so would but both threads in the problem area.
         t1.start();
@@ -70,8 +70,8 @@ public class WriteSkewStressTest {
         IntRef to1 = new IntRef(0);
         IntRef to2 = new IntRef(0);
 
-        AnotherTransferThread t1 = new AnotherTransferThread(from1, from2, to1, false);
-        AnotherTransferThread t2 = new AnotherTransferThread(from2, from1, to2, false);
+        TransferThread t1 = new TransferThread(from1, from2, to1, false);
+        TransferThread t2 = new TransferThread(from2, from1, to2, false);
 
         t2.start();
         t1.start();
@@ -83,14 +83,14 @@ public class WriteSkewStressTest {
         assertTrue("sumRefs " + sum, sum >= 0);
     }
 
-    private class AnotherTransferThread extends TestThread {
+    private class TransferThread extends TestThread {
 
         final IntRef from1;
         final IntRef from2;
         final IntRef to;
         final boolean writeSkewAllowed;
 
-        private AnotherTransferThread(IntRef from1, IntRef from2, IntRef to, boolean writeSkewAllowed) {
+        private TransferThread(IntRef from1, IntRef from2, IntRef to, boolean writeSkewAllowed) {
             this.from1 = from1;
             this.from2 = from2;
             this.to = to;
