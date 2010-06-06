@@ -7,6 +7,12 @@ import org.multiverse.stms.alpha.AlphaTransactionalObject;
 
 import static java.lang.System.arraycopy;
 
+/**
+ * A readonly transaction that does readtracking, and stores all reads in an array. For short transaction
+ * and array is much faster for looking up then a map.
+ *
+ * @author Peter Veentjer.
+ */
 public final class ArrayReadonlyAlphaTransaction extends AbstractReadonlyAlphaTransaction {
 
     private AlphaTranlocal[] attachedArray;

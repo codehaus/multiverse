@@ -36,8 +36,6 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
         return new UncommittedReadConflict(msg);
     }
 
-
-
     protected final AlphaTranlocal load(AlphaTransactionalObject transactionalObject) {
         int spin = 0;
         while (true) {
@@ -204,7 +202,6 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
 
     protected abstract AlphaTranlocal doOpenForConstruction(AlphaTransactionalObject txObject) ;
 
-
     @Override
     public final AlphaTranlocal openForCommutingWrite(AlphaTransactionalObject transactionalObject) {
         if (___TRACING_ENABLED) {
@@ -248,8 +245,7 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
         }
     }
 
-    protected abstract AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject txObject);
-
+    protected abstract AlphaTranlocal doOpenForCommutingWrite(AlphaTransactionalObject transactionalObject);
 
     @Override
     protected final boolean doRegisterRetryLatch(Latch latch, long wakeupVersion) {

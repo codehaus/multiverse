@@ -1,15 +1,11 @@
 package org.multiverse.stms.alpha.transactions.update;
 
 import org.multiverse.api.Listeners;
-import org.multiverse.api.Stm;
-import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.TransactionFactoryBuilder;
 import org.multiverse.api.commitlock.CommitLock;
 import org.multiverse.api.commitlock.CommitLockFilter;
 import org.multiverse.api.latches.Latch;
 import org.multiverse.stms.alpha.AlphaTranlocal;
 import org.multiverse.stms.alpha.AlphaTransactionalObject;
-import org.multiverse.stms.alpha.transactions.AlphaTransaction;
 
 import java.util.Collection;
 import java.util.IdentityHashMap;
@@ -26,39 +22,6 @@ import java.util.Map;
  * @author Peter Veentjer.
  */
 public final class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransaction {
-
-    public static class Factory implements TransactionFactory<AlphaTransaction> {
-
-        public final UpdateConfiguration config;
-        private final TransactionFactoryBuilder transactionFactoryBuilder;
-
-        public Factory(UpdateConfiguration config, TransactionFactoryBuilder transactionFactoryBuilder) {
-            this.config = config;
-            this.transactionFactoryBuilder = transactionFactoryBuilder;
-        }
-
-        @Override
-        public Stm getStm() {
-            return transactionFactoryBuilder.getStm();
-        }
-
-        @Override
-        public TransactionFactoryBuilder getTransactionFactoryBuilder() {
-            return transactionFactoryBuilder;
-        }
-
-        @Override
-        public AlphaTransaction start() {
-            AlphaTransaction tx = create();
-            tx.start();
-            return tx;
-        }
-
-        @Override
-        public AlphaTransaction create() {
-            return new MapUpdateAlphaTransaction(config);
-        }
-    }
 
     private final Map<AlphaTransactionalObject, AlphaTranlocal> attachedMap =
             new IdentityHashMap<AlphaTransactionalObject, AlphaTranlocal>(30);
@@ -129,7 +92,7 @@ public final class MapUpdateAlphaTransaction extends AbstractUpdateAlphaTransact
     }
 
     @Override
-    protected boolean hasConflict() {
+    protected boolean hasReadWriteConflict() {
         for (AlphaTranlocal attached : attachedMap.values()) {
             if (hasReadConflict(attached)) {
                 return true;

@@ -53,7 +53,7 @@ public final class MonoUpdateAlphaTransaction extends AbstractUpdateAlphaTransac
     }
 
     @Override
-    protected boolean hasConflict() {
+    protected boolean hasReadWriteConflict() {
         return hasWriteConflict(attached);
     }
 

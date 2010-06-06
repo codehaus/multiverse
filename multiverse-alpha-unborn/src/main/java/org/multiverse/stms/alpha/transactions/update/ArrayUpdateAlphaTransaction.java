@@ -158,9 +158,9 @@ public final class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransa
         return null;
     }
 
-    private int indexOf(AlphaTransactionalObject txObject) {
+    private int indexOf(AlphaTransactionalObject transactionalObject) {
         for (int k = 0; k < firstFreeIndex; k++) {
-            if (attachedArray[k].getTransactionalObject() == txObject) {
+            if (attachedArray[k].getTransactionalObject() == transactionalObject) {
                 return k;
             }
         }
@@ -181,7 +181,7 @@ public final class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransa
     }
 
     @Override
-    protected boolean hasConflict() {
+    protected boolean hasReadWriteConflict() {
         for (int k = 0; k < firstFreeIndex; k++) {
             AlphaTranlocal attached = attachedArray[k];
             if (hasReadConflict(attached)) {
