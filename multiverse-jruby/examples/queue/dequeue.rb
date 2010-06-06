@@ -39,7 +39,7 @@ t = []
 t << Thread.new { q.push 1 }
 t << Thread.new { q.push 2 }
 t << Thread.new { q.push 3 }
-t << Thread.new { q.push 4 }
 t << Thread.new { sleep 0.2; puts q.pop }
+t << Thread.new { q.push 4 }
 
 t.each {|thread| thread.join }

@@ -14,7 +14,6 @@ import org.jruby.exceptions.RaiseException;
 import org.multiverse.api.GlobalStmInstance;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.exceptions.ControlFlowError;
 import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.SpeculativeConfigurationFailure;
@@ -48,6 +47,13 @@ public class MultiverseLibrary implements Library{
         			}
         		}.execute();
         }
+
+        @JRubyMethod
+        public static IRubyObject either(final ThreadContext context, final IRubyObject self, final Block block) {
+            final Ruby ruby = context.getRuntime();
+        	return (IRubyObject) new OrElseTransaction(ruby, block);
+        }
+
         private static void rethrowKnownExceptions(Ruby ruby, Exception ex){
         	Throwable cause = ex.getCause();
         	if(cause instanceof Retry){
@@ -64,3 +70,4 @@ public class MultiverseLibrary implements Library{
         }
     }
 }
+
