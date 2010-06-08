@@ -1,6 +1,8 @@
 package org.multiverse.stms.alpha.instrumentation.integrationtest;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.stms.alpha.manualinstrumentation.IntRef;
 
 import static org.junit.Assert.assertEquals;
@@ -8,6 +10,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 
 public class IfElseTest {
 
+    @Before
     public void setUp() {
         clearThreadLocalTransaction();
     }
@@ -18,6 +21,7 @@ public class IfElseTest {
         assertEquals(2, methodWhereUsedInCondition(new IntRef(1)));
     }
 
+    @TransactionalMethod
     public int methodWhereUsedInCondition(IntRef ref) {
         if (ref.get() == 0) {
             return 1;
@@ -40,6 +44,7 @@ public class IfElseTest {
         assertEquals(2, ref.get());
     }
 
+    @TransactionalMethod
     public void methodWhereUsedInBranch(boolean condition, IntRef ref){
         if(condition){
             ref.set(1);
@@ -47,5 +52,4 @@ public class IfElseTest {
             ref.set(2);
         }
     }
-
 }
