@@ -53,16 +53,18 @@ public final class StrictPrimitiveClock implements PrimitiveClock {
 
     @Override
     public long tickTo(long version) {
-        long current = clock.get();
+        while (true) {
+            long current = clock.get();
 
-        if(version<current){
-            return current;
-        }else{
-            while(true){
-                if(clock.compareAndSet(current, version)){
+            if (version < current) {
+                return current;
+            } else {
+
+                if (clock.compareAndSet(current, version)) {
                     return version;
                 }
             }
+
         }
     }
 

@@ -4,8 +4,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.api.clock.SingleThreadedPrimitiveClock;
 import org.multiverse.api.programmatic.ProgrammaticLongRef;
 import org.multiverse.stms.alpha.AlphaStm;
+import org.multiverse.stms.alpha.AlphaStmConfig;
 
 import java.util.concurrent.TimeUnit;
 
@@ -96,8 +98,10 @@ public class AlphaProgrammaticLongRef_atomicIncPerformanceTest {
         public AtomicIncThread(int id) {
             super("AtomicIncThread-" + id);
 
-            stm = AlphaStm.createFast();
-            System.out.println(stm.getClock().getClass());
+            AlphaStmConfig config = AlphaStmConfig.createFastConfig();
+            config.clock = new SingleThreadedPrimitiveClock();
+
+            stm = new AlphaStm(config);
             ref = stm.getProgrammaticRefFactoryBuilder()
                     .build()
                     .atomicCreateLongRef(0);

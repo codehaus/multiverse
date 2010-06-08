@@ -1,8 +1,14 @@
 package org.multiverse.stms.alpha.instrumentation.integrationtest;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
-public class SwitchCaseTest{
+/**
+ * @author Peter Veentjer
+ */
+public class LabelTest {
+
     @Test
+    @Ignore
     public void test(){}
 }
