@@ -1,4 +1,4 @@
-package org.multiverse.stms.alpha.instrumentation.integrationtest;
+package org.multiverse.stms.alpha.instrumentation.integrationtest.languageconstructs;
 
 /**
 * @author Peter Veentjer

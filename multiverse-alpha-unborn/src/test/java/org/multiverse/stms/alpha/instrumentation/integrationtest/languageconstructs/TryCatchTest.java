@@ -1,10 +1,11 @@
-package org.multiverse.stms.alpha.instrumentation.integrationtest;
+package org.multiverse.stms.alpha.instrumentation.integrationtest.languageconstructs;
 
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.annotations.TransactionalMethod;
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.stms.alpha.instrumentation.integrationtest.languageconstructs.ExpectedRuntimeException;
 import org.multiverse.stms.alpha.manualinstrumentation.IntRef;
 
 import static org.junit.Assert.assertEquals;

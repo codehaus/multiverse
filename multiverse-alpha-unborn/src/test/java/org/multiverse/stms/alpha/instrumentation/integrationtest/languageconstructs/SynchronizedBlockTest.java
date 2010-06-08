@@ -1,7 +1,8 @@
-package org.multiverse.stms.alpha.instrumentation.integrationtest;
+package org.multiverse.stms.alpha.instrumentation.integrationtest.languageconstructs;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.stms.alpha.instrumentation.integrationtest.languageconstructs.ExpectedRuntimeException;
 import org.multiverse.transactional.refs.IntRef;
 
 import static org.junit.Assert.assertEquals;
