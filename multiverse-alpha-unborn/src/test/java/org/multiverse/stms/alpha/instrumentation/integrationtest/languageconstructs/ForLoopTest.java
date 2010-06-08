@@ -52,15 +52,15 @@ public class ForLoopTest {
     @Test
     public void whenUsedInNewForLoop() {
         TransactionalList<String> list = new TransactionalArrayList<String>("a", "b", "c");
-        int result = newForLoop(list);
-        assertEquals(3, result);
+        String result = newForLoop(list);
+        assertEquals("abc", result);
     }
 
     @TransactionalMethod
-    public int newForLoop(TransactionalList<String> list) {
-        int result = 0;
+    public String newForLoop(TransactionalList<String> list) {
+        String result = "";
         for (String item : list) {
-            result++;
+            result+=item;
         }
         return result;
     }
