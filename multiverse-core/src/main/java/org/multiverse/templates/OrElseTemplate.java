@@ -52,6 +52,10 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
 public abstract class OrElseTemplate<E> {
 
     private final Transaction tx;
+    private final OrElseBoilerPlate boilerplate;
+
+    private final EitherCallable<E> eitherCallable = new EitherCallableImpl();
+    private final OrElseCallable<E> orElseCallable = new OrElseCallableImpl();
 
     /**
      * Creates a OrElseTemplate using the transaction in the getThreadLocalTransaction.
@@ -73,16 +77,31 @@ public abstract class OrElseTemplate<E> {
             throw new NullPointerException();
         }
         this.tx = tx;
+        boilerplate = new OrElseBoilerPlate(tx);
     }
 
     public abstract E either(Transaction tx);
 
     public abstract E orelse(Transaction tx);
 
-    public final E execute() {      
+    public final E execute() {
         try {
+            return boilerplate.execute(eitherCallable, orElseCallable);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    class EitherCallableImpl implements EitherCallable<E> {
+        @Override
+        public E call(Transaction tx) throws Exception{
             return either(tx);
-        } catch (Retry e) {
+        }
+    }
+
+    class OrElseCallableImpl implements OrElseCallable<E>{
+
+        @Override
+        public E call(Transaction tx) throws Exception{
             return orelse(tx);
         }
     }

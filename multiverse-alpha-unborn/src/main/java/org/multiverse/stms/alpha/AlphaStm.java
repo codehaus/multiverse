@@ -97,7 +97,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
      */
     public AlphaStm(AlphaStmConfig config) {
         if (config == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("No configuration provided for STM");
         }
 
         config.ensureValid();

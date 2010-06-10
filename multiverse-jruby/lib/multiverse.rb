@@ -27,6 +27,10 @@ def IntRef
   return IntRef.new
 end
 
+def LongRef
+  return LongRef.new
+end
+
 def Retry
   StmUtils.retry()
 end
