@@ -36,11 +36,11 @@ public final class RelaxedPrimitiveClock implements PrimitiveClock {
      * Creates a RelaxedPrimitiveClock with 0 as begin version.
      */
     public RelaxedPrimitiveClock() {
-        this(0);        
+        this(0);
     }
 
-    public RelaxedPrimitiveClock(long version){
-        if(version<0){
+    public RelaxedPrimitiveClock(long version) {
+        if (version < 0) {
             throw new IllegalArgumentException();
         }
         this.clock = new AtomicLong(version);
@@ -52,9 +52,9 @@ public final class RelaxedPrimitiveClock implements PrimitiveClock {
 
         //it doesn't matter if we increase it, or if someone else increases it.
         //so just try to set it the oldTime is still set.
-        clock.compareAndSet(oldTime, oldTime + 1);
-
-        return clock.get();
+        long newTime = oldTime + 1;
+        clock.compareAndSet(oldTime, newTime);
+        return newTime;
     }
 
     @Override
@@ -64,13 +64,14 @@ public final class RelaxedPrimitiveClock implements PrimitiveClock {
 
     @Override
     public long tickTo(long version) {
-        long current = clock.get();
+        while (true) {
+            long current = clock.get();
 
-        if(version<current){
-            return current;
-        }else{
-            while(true){
-                if(clock.compareAndSet(current, version)){
+            if (version < current) {
+                return current;
+            } else {
+
+                if (clock.compareAndSet(current, version)) {
                     return version;
                 }
             }

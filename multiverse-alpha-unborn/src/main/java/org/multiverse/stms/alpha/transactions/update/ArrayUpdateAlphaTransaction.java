@@ -89,7 +89,7 @@ public final class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransa
 
         if (indexOf == -1) {
             //it isnt opened before.
-            AlphaTranlocal committed = transactionalObject.___load(getReadVersion());
+            AlphaTranlocal committed = load(transactionalObject);
 
             AlphaTranlocal opened;
             if (committed == null) {
@@ -109,7 +109,7 @@ public final class ArrayUpdateAlphaTransaction extends AbstractUpdateAlphaTransa
                 attached = attached.openForWrite();
                 attachedArray[indexOf] = attached;
             } else if (attached.isCommuting()) {
-                AlphaTranlocal origin = transactionalObject.___load(getReadVersion());
+                AlphaTranlocal origin = load(transactionalObject);
                 if (origin == null) {
                     throw new UncommittedReadConflict();
                 }

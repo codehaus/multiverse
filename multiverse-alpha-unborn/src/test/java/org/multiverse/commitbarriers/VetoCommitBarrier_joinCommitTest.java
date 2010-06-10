@@ -58,7 +58,7 @@ public class VetoCommitBarrier_joinCommitTest {
         IncThread thread = new IncThread(ref, barrier);
         thread.start();
 
-        sleepMs(500);
+        sleepMs(1000);
         assertAlive(thread);
         assertTrue(barrier.isClosed());
         assertEquals(1, barrier.getNumberWaiting());
@@ -72,7 +72,7 @@ public class VetoCommitBarrier_joinCommitTest {
         IncThread thread = new IncThread(ref, barrier, true);
         thread.start();
 
-        sleepMs(500);
+        sleepMs(1000);
         assertAlive(thread);
         assertTrue(barrier.isClosed());
         assertEquals(1, barrier.getNumberWaiting());

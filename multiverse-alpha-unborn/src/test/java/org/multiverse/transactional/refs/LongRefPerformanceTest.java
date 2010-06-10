@@ -1,13 +1,9 @@
-package org.multiverse.stms.alpha.programmatic;
+package org.multiverse.transactional.refs;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
-import org.multiverse.api.clock.SingleThreadedPrimitiveClock;
-import org.multiverse.api.programmatic.ProgrammaticLongRef;
-import org.multiverse.stms.alpha.AlphaStm;
-import org.multiverse.stms.alpha.AlphaStmConfig;
 
 import java.util.concurrent.TimeUnit;
 
@@ -18,7 +14,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 /**
  * @author Peter Veentjer
  */
-public class AlphaProgrammaticLongRef_atomicIncPerformanceTest {
+public class LongRefPerformanceTest {
 
     private int threadCount;
     private long incCountPerThread = 1000 * 1000 * 100;
@@ -78,7 +74,7 @@ public class AlphaProgrammaticLongRef_atomicIncPerformanceTest {
     private long sum(AtomicIncThread[] threads) {
         long result = 0;
         for (AtomicIncThread thread : threads) {
-            result += thread.get();
+            result += thread.ref.get();
         }
         return result;
     }
@@ -92,29 +88,16 @@ public class AlphaProgrammaticLongRef_atomicIncPerformanceTest {
     }
 
     public class AtomicIncThread extends TestThread {
-        private AlphaStm stm;
-        private ProgrammaticLongRef ref;
+        private final LongRef ref = new LongRef();
 
         public AtomicIncThread(int id) {
             super("AtomicIncThread-" + id);
-
-            AlphaStmConfig config = AlphaStmConfig.createFastConfig();
-            config.clock = new SingleThreadedPrimitiveClock();
-
-            stm = new AlphaStm(config);
-            ref = stm.getProgrammaticRefFactoryBuilder()
-                    .build()
-                    .atomicCreateLongRef(0);
-        }
-
-        public long get() {
-            return ref.atomicGet();
         }
 
         @Override
         public void doRun() throws Exception {
             for (int k = 0; k < incCountPerThread; k++) {
-                ref.atomicInc(1);
+                ref.inc(1);
 
                 if (k % (1000 * 1000 * 10) == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);

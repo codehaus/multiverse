@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>multiverse-alpha-unborn</artifactId>
@@ -9,7 +12,8 @@
         Contains the main Multiverse STM Implementation: the Alpha Engine. The Alpha engine supports
         readonly and update transactions. It also supports the retry/or else mechanism. This not
         the jar you want to have in your final distribution because it isn't instrumented
-        (hence the name unborn). What this package does, is test the instrumentation for the
+        (hence the name unborn). The jar you eventually want to have in your distribution is the
+        multiverse-alpha jar. What this package does, is test the instrumentation for the
         Javaagent. The compiletime instrumentation is tested in the multiverse-alpha package
         (where all tests are copied and reexecuted but now with compiletime instrumentation).
     </description>
