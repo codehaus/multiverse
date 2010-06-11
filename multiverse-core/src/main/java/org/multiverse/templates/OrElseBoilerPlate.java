@@ -17,10 +17,20 @@ public final class OrElseBoilerPlate {
     }
     
     public final <E> E execute(final EitherCallable<E> either, final OrElseCallable<E> orelse) throws Exception {
+        failIfTheCallablesAreNull(either, orelse);
         try {
             return either.call(tx);
         } catch (Retry e) {
             return orelse.call(tx);
+        } 
+    }
+
+    private void failIfTheCallablesAreNull(EitherCallable either, OrElseCallable orelse) {
+        if(either == null){
+            throw new NullPointerException("Either Callable cannot be Null");
         }
-    }    
+        if(orelse == null){
+            throw new NullPointerException("OrElse Callable cannot be Null");
+        }        
+    }
 }
