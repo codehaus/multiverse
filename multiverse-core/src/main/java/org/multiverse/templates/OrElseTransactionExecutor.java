@@ -5,14 +5,14 @@ import org.multiverse.api.exceptions.Retry;
 
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public final class OrElseBoilerPlate {
+public final class OrElseTransactionExecutor {
     private final Transaction tx;
 
-    public OrElseBoilerPlate(){
+    public OrElseTransactionExecutor(){
         this(getThreadLocalTransaction());
     }
 
-    public OrElseBoilerPlate(final Transaction tx) {
+    public OrElseTransactionExecutor(final Transaction tx) {
         this.tx = tx;
     }
     
