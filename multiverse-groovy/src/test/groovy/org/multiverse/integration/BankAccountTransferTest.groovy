@@ -1,6 +1,7 @@
 package org.multiverse.integration
 
 import org.multiverse.transactional.refs.LongRef
+import static org.multiverse.integration.MultiverseGroovyLibrary.*
 
 public class BankAccountTransferTest extends GroovyTestCase {
 
@@ -37,7 +38,7 @@ public class BankAccountTransferTest extends GroovyTestCase {
   }
 
   private static def transfer(from, to, amount, delay) {
-    MultiverseGroovyLibrary.atomic(readonly: false, trackreads: true) {
+    atomic() {
       if (from.balance >= amount){
         sleep delay
         from.balance -= amount
