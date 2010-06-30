@@ -1,0 +1,4 @@
+- update documentation tracelevel setting
+- use of dynamic declaratons + performance
+- verify orElseTransaction
+- add orElseTransaction syntactic sugar

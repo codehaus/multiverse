@@ -13,8 +13,11 @@ import org.multiverse.transactional.refs.LongRef
 import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict
 
 import org.multiverse.api.exceptions.TooManyRetriesException
+import static org.multiverse.api.StmUtils.*
+import org.multiverse.api.exceptions.RetryTimeoutException
 
 public class MultiverseGroovyLibraryTest extends GroovyTestCase {
+
 
   void testThrowExceptionsThatHappenWithinTheClosure() {
     shouldFail(RuntimeException) {
@@ -47,6 +50,42 @@ public class MultiverseGroovyLibraryTest extends GroovyTestCase {
     }
 
     assertEquals(0, number.get());
+  }
+
+  void testShouldAllowManualRetryWhenExplicitRetryAndReadTrackingAreEnabled() {
+
+    def actualNumberOfRetries = 0;
+    final LongRef valueForReadTracking = new LongRef(0);
+
+    shouldFail(RetryTimeoutException) {
+      atomic(trackreads: true, explicitRetryAllowed: true, timeoutInNanoSeconds: 10) {
+        actualNumberOfRetries++;
+        valueForReadTracking.inc()
+        retry()
+      }
+    }
+
+    assertEquals(1, actualNumberOfRetries)
+    assertEquals(0, valueForReadTracking.get())
+
+  }
+
+  void testShouldExecuteElseIfOrFailed() {
+
+    def executedSection = ""
+
+    orElseTransaction(
+            {
+              executedSection = "either"
+              retry()
+            },
+            {
+              executedSection = "or"
+            }
+    )
+    
+    assertEquals("or", executedSection)
+
   }
 
 }
