@@ -17,14 +17,14 @@ public class MultiverseGroovyLibrary {
     def globalStm = GlobalStmInstance.getGlobalStmInstance()
     def transactionFactoryBuilder = globalStm.getTransactionFactoryBuilder()
 
-    transactionFactoryBuilder
+
+
+    TransactionFactory txFactory = transactionFactoryBuilder
             .setReadonly(readonly)
             .setReadTrackingEnabled(trackreads)
             .setSpeculativeConfigurationEnabled(speculativeConfigurationEnabled)
             .setExplicitRetryAllowed(explicitRetryAllowed)
-            .setMaxRetries(maxRetries)
-
-    TransactionFactory txFactory = transactionFactoryBuilder.build()
+            .setMaxRetries(maxRetries).build()
 
     new TransactionTemplate(txFactory) {
       Object execute(Transaction transaction) {
