@@ -2,3 +2,10 @@
 - use of dynamic declaratons + performance
 - verify orElseTransaction
 - add orElseTransaction syntactic sugar
+
+Questions
+- Orelse transaction does not take a transaction Factory, rather takes a Transaction
+- If I store the transaction Factory when should I clear it
+- Alpha Stm getTransactionFactoryBuilder() returns new builder every time
+- Test OrElseTransaction is config is working
+

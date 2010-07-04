@@ -1,4 +1,4 @@
-package org.multiverse.integration
+package org.multiverse.integration.org.multiverse.integration.examples
 
 import org.multiverse.transactional.refs.LongRef
 import static org.multiverse.integration.MultiverseGroovyLibrary.*

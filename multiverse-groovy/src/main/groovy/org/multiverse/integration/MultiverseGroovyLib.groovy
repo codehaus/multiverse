@@ -34,7 +34,7 @@ public class MultiverseGroovyLibrary {
 
     setThreadLocalTransaction(transaction)
 
-    new OrElseTemplate(transaction) {
+    new OrElseTemplate() {
       Object either(Transaction tx) {
         either.call()
         return null;
