@@ -5,7 +5,8 @@ import org.multiverse.api.TransactionFactory
 import org.multiverse.templates.TransactionTemplate
 import org.multiverse.api.GlobalStmInstance
 import org.multiverse.templates.OrElseTemplate
-import static org.multiverse.api.ThreadLocalTransaction.*;
+import static org.multiverse.api.ThreadLocalTransaction.*
+import static org.multiverse.api.StmUtils.*;
 
 public class MultiverseGroovyLibrary {
 
@@ -30,7 +31,7 @@ public class MultiverseGroovyLibrary {
   public static void orElseTransaction(Map configuration, Closure either, Closure or) {
     TransactionFactory txFactory = build_transaction_factory_with(configuration)
     Transaction transaction = txFactory.create()
-    
+
     setThreadLocalTransaction(transaction)
 
     new OrElseTemplate(transaction) {
@@ -44,10 +45,6 @@ public class MultiverseGroovyLibrary {
         return null;
       }
     }.execute()
-  }
-
-  public static void orElseTransaction(Closure either, Closure or) {
-    orElseTransaction([:], either, or)
   }
 
   private static TransactionFactory build_transaction_factory_with(Map configuration) {

@@ -70,23 +70,5 @@ public class MultiverseGroovyLibraryTest extends GroovyTestCase {
 
   }
 
-  void testShouldExecuteElseIfOrFailed() {
-
-    def executedSection = ""
-
-    orElseTransaction(
-            {
-              executedSection = "either"
-              retry()
-            },
-            {
-              executedSection = "or"
-            }
-    )
-    
-    assertEquals("or", executedSection)
-
-  }
-
 }
 
