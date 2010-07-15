@@ -139,7 +139,7 @@ public abstract class CommitBarrier {
      * @throws CommitBarrierOpenException if this CommitBarrier already is committed.
      */
     public final void abort() {
-        List<Runnable> postAbortTasks = new ArrayList<Runnable>();
+        List<Runnable> postAbortTasks = null;
 
         lock.lock();
         try {
@@ -168,6 +168,10 @@ public abstract class CommitBarrier {
      * @param tasks the tasks to execute.
      */
     protected static void executeTasks(List<Runnable> tasks) {
+        if(tasks == null){
+            return;
+        }
+
         for (Runnable task : tasks) {
             task.run();
         }
@@ -513,7 +517,7 @@ public abstract class CommitBarrier {
     public void joinCommit(Transaction tx) throws InterruptedException {
         ensureNotDead(tx);
 
-        List<Runnable> tasks = new ArrayList<Runnable>();
+        List<Runnable> tasks = null;
 
         lock.lock();
         try {
@@ -623,7 +627,7 @@ public abstract class CommitBarrier {
     public boolean tryJoinCommit(Transaction tx) {
         ensureNotDead(tx);
 
-        List<Runnable> postCommitTasks = new ArrayList<Runnable>();
+        List<Runnable> postCommitTasks = null;
         boolean abort = true;
         lock.lock();
         try {
@@ -670,15 +674,16 @@ public abstract class CommitBarrier {
      * Tries to joins this CommitBarrier with the provided transaction. If the CommitBarrier can't commit yet, this call
      * will block until one of the following things happens:
      * <ol>
-     * <li>the CommitBarrier is committed</li>
-     * <li>the CommitBarrier is aborted</li>
-     * <li>the thread is interrupted</li>
+     * <li>the CommitBarrier is committed before timeing out: the transaction also is committed</li>
+     * <li>the CommitBarrier is aborted before timeing out: the transaction also is aborted</li>
+     * <li>the thread is interrupted: the transaction and commit barrier also is aborted</li>
+     * <li>the thread times out: the transaction and commit barrier are aborted</li>
      * </ol>
      * <p/>
      * If the CommitBarrier already is aborted or committed, the transaction is aborted.
      * <p/>
      * This method is responsive to interrupts. If the waiting thread is interrupted, it will abort itself and
-     * this CommitGroup.
+     * this CommitBarrier.
      *
      * @param tx      the Transaction that wants to join the other parties to commit with.
      * @param timeout the maximum time to wait.
@@ -693,27 +698,34 @@ public abstract class CommitBarrier {
 
         long timeoutNs = unit.toNanos(timeout);
 
+        List<Runnable> postCommitTasks = null;
+
         lock.lock();
         try {
             switch (getStatus()) {
                 case Closed:
                     tx.prepare();
                     addJoiner();
-                    while (getStatus() == Status.Closed) {
-                        try {
-                            timeoutNs = statusCondition.awaitNanos(timeoutNs);
-                            if (timeoutNs <= 0) {
+                    if (isLastParty()) {
+                        postCommitTasks = signalCommit();
+                    } else {
+                        while (getStatus() == Status.Closed) {
+                            try {
+                                timeoutNs = statusCondition.awaitNanos(timeoutNs);
+                                if (timeoutNs <= 0) {
+                                    signalAborted();
+                                    tx.abort();
+                                    return false;
+                                }
+                            } catch (InterruptedException ex) {
                                 signalAborted();
                                 tx.abort();
-                                return false;
+                                //for the time being.. needs to be replaced with a really uninterruptible version
+                                throw ex;
                             }
-                        } catch (InterruptedException ex) {
-                            signalAborted();
-                            tx.abort();
-                            //for the time being.. needs to be replaced with a really uninterruptible version
-                            throw ex;
                         }
                     }
+
                     break;
                 case Committed:
                     String commitMsg = "Can't await commit on an already committed VetoCommitBarrier";
@@ -729,6 +741,7 @@ public abstract class CommitBarrier {
         }
 
         finish(tx);
+        executeTasks(postCommitTasks);
         return true;
     }
 

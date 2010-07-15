@@ -5,7 +5,6 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -87,7 +86,7 @@ public final class CountDownCommitBarrier extends CommitBarrier {
      * as the {@link java.util.concurrent.CountDownLatch#countDown()} method provides.
      */
     public void countDown() {
-        List<Runnable> onCommitTasks = new ArrayList<Runnable>();
+        List<Runnable> onCommitTasks = null;
 
         lock.lock();
         try {
@@ -240,7 +239,7 @@ public final class CountDownCommitBarrier extends CommitBarrier {
                 return;
             }
 
-            List<Runnable> onCommitTasks = new ArrayList<Runnable>();
+            List<Runnable> onCommitTasks = null;
             lock.lock();
             try {
                 if (getStatus() == Status.Closed) {

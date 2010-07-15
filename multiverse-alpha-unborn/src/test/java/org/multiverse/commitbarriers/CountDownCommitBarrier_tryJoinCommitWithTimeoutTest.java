@@ -62,9 +62,17 @@ public class CountDownCommitBarrier_tryJoinCommitWithTimeoutTest {
     }
 
     @Test
-    @Ignore
-    public void whenNotLastOne() {
+    public void whenLastOne() throws InterruptedException {
+        barrier = new CountDownCommitBarrier(1);
 
+        Transaction tx = new AbstractTransactionImpl();
+        tx.start();
+
+        boolean result =    barrier.tryJoinCommit(tx, 1, TimeUnit.SECONDS);
+        assertTrue(result);
+        assertIsCommitted(tx);
+        assertFalse(barrier.isClosed());
+        assertEquals(0, barrier.getNumberWaiting());
     }
 
     @Test

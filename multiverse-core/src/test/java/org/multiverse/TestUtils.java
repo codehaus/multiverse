@@ -18,12 +18,12 @@ import static org.junit.Assert.*;
 
 public class TestUtils {
 
-    public static int processorCount(){
-                 return Runtime.getRuntime().availableProcessors();
+    public static int processorCount() {
+        return Runtime.getRuntime().availableProcessors();
     }
 
-    public static long getStressTestDurationMs(long defaultDuration){
-        String value = System.getProperty("org.multiverse.integrationtest.durationMs", ""+defaultDuration);
+    public static long getStressTestDurationMs(long defaultDuration) {
+        String value = System.getProperty("org.multiverse.integrationtest.durationMs", "" + defaultDuration);
         return Long.parseLong(value);
     }
 
@@ -69,13 +69,23 @@ public class TestUtils {
 
     public static Object getField(Object o, String fieldname) {
         try {
-            Field field = o.getClass().getDeclaredField(fieldname);
+            Field field = findField(o.getClass(), fieldname);
             field.setAccessible(true);
             return field.get(o);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public static Field findField(Class clazz, String fieldname) {
+        try {
+            return clazz.getDeclaredField(fieldname);
+        } catch (NoSuchFieldException e) {
+            if (clazz.equals(Object.class)) {
+                return null;
+            }
+
+            return findField(clazz.getSuperclass(), fieldname);
         }
     }
 
@@ -184,7 +194,7 @@ public class TestUtils {
     }
 
     public static void sleepRandomMs(int maxMs) {
-        Bugshaker.sleepUs((long) randomInt((int)TimeUnit.MILLISECONDS.toMicros(maxMs)));
+        Bugshaker.sleepUs((long) randomInt((int) TimeUnit.MILLISECONDS.toMicros(maxMs)));
     }
 
     public static void sleepSome() {

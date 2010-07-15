@@ -2,7 +2,6 @@ package org.multiverse.commitbarriers;
 
 import org.multiverse.api.Transaction;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -53,7 +52,7 @@ public final class VetoCommitBarrier extends CommitBarrier {
      * @throws CommitBarrierOpenException if the VetoCommitBarrier already is aborted.
      */
     public void vetoCommit() {
-        List<Runnable> postCommitTasks = new ArrayList<Runnable>();
+        List<Runnable> postCommitTasks = null;
         lock.lock();
         try {
             switch (getStatus()) {
@@ -97,7 +96,7 @@ public final class VetoCommitBarrier extends CommitBarrier {
     public void vetoCommit(Transaction tx) {
         ensureNotDead(tx);
 
-        List<Runnable> postCommitTasks = new ArrayList<Runnable>();
+        List<Runnable> postCommitTasks = null;
         lock.lock();
         try {
             switch (getStatus()) {

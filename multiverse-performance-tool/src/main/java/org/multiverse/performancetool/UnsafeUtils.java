@@ -5,12 +5,7 @@ import sun.misc.Unsafe;
 import java.lang.reflect.Field;
 
 /**
- * Simple class to obtain access to the {@link Unsafe} object.  {@link Unsafe}
- * is required to allow efficient CAS operations on arrays.  Note that the
- * versions in {@link java.util.concurrent.atomic}, such as {@link
- * java.util.concurrent.atomic.AtomicLongArray}, require extra memory ordering
- * guarantees which are generally not needed in these algorithms and are also
- * expensive on most processors.
+ * Simple class to obtain access to the {@link Unsafe} object.  
  */
 class UtilUnsafe {
     private UtilUnsafe() {

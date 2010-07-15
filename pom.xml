@@ -124,7 +124,7 @@
         <module>multiverse-site</module>
         <!-- module>multiverse-project-archetype</module -->
         <module>multiverse-performance-tool</module>
-		<module>multiverse-groovy</module>
+		<!--module>multiverse-groovy</module -->
     </modules>
 
     <build>
