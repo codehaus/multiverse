@@ -14,13 +14,12 @@ import org.multiverse.api.exceptions.RetryTimeoutException
 public class BlockingQueueTest extends GroovyTestCase {
 
   void testShouldBlockEnqueueWhenFull() {
-    def queue = new BlockingQueue(maxSize: 2) //TODO: below size two TransactionList seems throw SpeculativeCOnfiguration Exception
+    def queue = new BlockingQueue(maxSize: 1)
 
-    queue.enqueue("Hello")
-    queue.enqueue("Hello")
+    queue.enqueue("item1")
 
     shouldFail(RetryTimeoutException) {
-      queue.enqueue("Hello")
+      queue.enqueue("item2")
     }
 
   }
@@ -31,7 +30,6 @@ public class BlockingQueueTest extends GroovyTestCase {
     shouldFail(RetryTimeoutException) {
       queue.dequeue()
     }
-
   }
 
 }

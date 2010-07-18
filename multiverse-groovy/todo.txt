@@ -1,7 +1,9 @@
 - update documentation tracelevel setting
 - use of dynamic declaratons + performance
-- verify orElseTransaction
-- add orElseTransaction syntactic sugar
+- verify orElseTransaction - Done
+- add orElseTransaction syntactic sugar - Done
+
+- api should allow timeout settings with time unit, something like (1, TIME.hour)
 
 Questions
 - Orelse transaction does not take a transaction Factory, rather takes a Transaction
