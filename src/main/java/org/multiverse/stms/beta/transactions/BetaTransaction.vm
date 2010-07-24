@@ -1,0 +1,76 @@
+package org.multiverse.stms.beta.transactions;
+
+import org.multiverse.api.Transaction;
+import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.exceptions.*;
+import org.multiverse.stms.beta.BetaTransactionalObject;
+import org.multiverse.stms.beta.ObjectPool;
+import org.multiverse.stms.beta.refs.Tranlocal;
+import org.multiverse.stms.beta.refs.*;
+
+/**
+ * @author Peter Veentjer
+ */
+public interface BetaTransaction extends Transaction {
+
+    void start(ObjectPool pool);
+
+    /**
+     * Prepares this BetaTransaction.
+     *
+     *
+     * @param the ObjectPool
+     */
+    void prepare(ObjectPool pool);
+
+    /**
+     * Commits this BetaTransaction.
+     *
+     * @param pool the ObjectPool for putting/taking poolable resources.
+     * @throws ControlFlowError e.g. on read or write conflicts.
+     * @throws DeadTransactionException if the transaction already is aborted.
+     */
+    void commit(ObjectPool pool);
+
+    /**
+     * Aborts this BetaTransaction.
+     *
+     * throws DeadTransactionException if the transaction already is committed.
+     */
+    void abort(ObjectPool pool);
+
+    /**
+     * Resets this BetaTransaction.
+     *
+     * @param pool the ObjectPool for putting/taking poolable resources.
+     */
+    void reset(ObjectPool pool);
+
+    BetaTransactionConfig getConfig();
+
+    /**
+     *
+     *
+     */
+    void init(BetaTransactionConfig transactionConfig, ObjectPool pool);
+    
+    /**
+     * Registers the changelistener and aborts the transaction (so also releasing its acquired resources
+     * like locks.
+     */
+    void registerChangeListenerAndAbort(Latch changeListener, ObjectPool pool);
+
+    void startEitherBranch(ObjectPool pool);
+
+    void endEitherBranch(ObjectPool pool);
+
+    void startOrElseBranch(ObjectPool pool);
+
+#foreach($ref in $refs)
+    ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter}  openForRead(${ref.name}${ref.typeParameter} ref, boolean lock, ObjectPool pool);
+
+    ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter}  openForWrite(${ref.name}${ref.typeParameter} ref, boolean lock, ObjectPool pool);
+
+    ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter}  openForConstruction(${ref.name}${ref.typeParameter} ref, ObjectPool pool);
+#end
+}
