@@ -5,10 +5,8 @@ build
 .classpath
 .project
 .idea
-**/*.iml
-**/*.ipr
-**/*.iws
-**/build
-**/target
+*.iml
+*.ipr
+*.iws
 *.class
 *.swp
