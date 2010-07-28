@@ -1,10 +1,10 @@
-.gradle
-.settings
-target
-build
+.gradle/
+.settings/
+target/
+build/
 .classpath
 .project
-.idea
+.idea/
 *.iml
 *.ipr
 *.iws
