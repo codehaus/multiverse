@@ -3,11 +3,13 @@ package org.multiverse.stms.beta.integrationtest.isolation;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.benchmarks.BenchmarkUtils;
+import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
-import org.multiverse.stms.beta.BetaTransactionTemplate;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.refs.LongRef;
 import org.multiverse.stms.beta.refs.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -36,12 +38,12 @@ public class IsolationStressTest {
     }
 
     @Test
-    public void withPessimisticSettingsAndDirtyCheck(){
+    public void withPessimisticSettingsAndDirtyCheck() {
         test(true, true);
     }
 
     @Test
-    public void withOptimisticSettingAndNoDirtyCheck(){
+    public void withOptimisticSettingAndNoDirtyCheck() {
         test(false, false);
     }
 
@@ -57,7 +59,7 @@ public class IsolationStressTest {
         long txCount = 100 * 1000 * 1000;
 
         for (int k = 0; k < threads.length; k++) {
-            threads[k] = new UpdateThread(k, ref, txCount, pessimistic,diryCheckEnabled);
+            threads[k] = new UpdateThread(k, ref, txCount, pessimistic, diryCheckEnabled);
         }
 
         for (UpdateThread thread : threads) {
@@ -95,22 +97,23 @@ public class IsolationStressTest {
         public void doRun() {
             final BetaObjectPool pool = new BetaObjectPool();
 
-            stm.getTransactionFactoryBuilder()
-                    .setDirtyCheckEnabled(dirtyCheckEnabled);
+            AtomicBlock block = stm.getTransactionFactoryBuilder()
+                    .setDirtyCheckEnabled(dirtyCheckEnabled)
+                    .buildAtomicBlock();
 
-            BetaTransactionTemplate template = new BetaTransactionTemplate(stm) {
+            AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
-                public Object execute(BetaTransaction tx) {
-                    LongRefTranlocal tranlocal = tx.openForWrite(ref, pessimistic, pool);
+                public void execute(Transaction tx) throws Exception {
+                    BetaTransaction btx = (BetaTransaction) tx;
+                    LongRefTranlocal tranlocal = btx.openForWrite(ref, pessimistic, pool);
                     tranlocal.value++;
-                    return null;
                 }
             };
 
             long startMs = currentTimeMillis();
 
             for (long k = 0; k < count; k++) {
-                template.execute(pool);
+                block.execute(closure);
             }
 
             durationMs = currentTimeMillis() - startMs;

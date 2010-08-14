@@ -18,7 +18,7 @@ public class BetaStm_atomicBlockTest {
 
     @Test
     public void whenCreateAtomicBlock(){
-        AtomicBlock block = stm.createAtomicBlock();
+        AtomicBlock block = stm.getDefaultAtomicBlock();
         assertTrue(block instanceof LeanBetaAtomicBlock);
     }
 

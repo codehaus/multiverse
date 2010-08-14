@@ -4,10 +4,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.TestUtils;
+import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaTransactionFactory;
-import org.multiverse.stms.beta.BetaTransactionTemplate;
 import org.multiverse.stms.beta.refs.IntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -61,15 +62,20 @@ public class ReadonlyRepeatableReadStressTest {
 
         @Override
         public void doRun() {
+            AtomicBlock block = stm.getTransactionFactoryBuilder()
+                    .buildAtomicBlock();
+            AtomicVoidClosure closure = new AtomicVoidClosure() {
+                @Override
+                public void execute(Transaction tx) throws Exception {
+                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
+                    BetaTransaction btx = (BetaTransaction) tx;
+                    ref.set(btx, pool, ref.get(btx, pool));
+                }
+            };
+
+
             while (!stop) {
-                new BetaTransactionTemplate(stm){
-                    @Override
-                    public Object execute(BetaTransaction tx) throws Exception {
-                        BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                        ref.set(tx,pool, ref.get(tx,pool));
-                        return null;
-                    }
-                }.execute();
+                block.execute(closure);
                 sleepRandomMs(5);
             }
         }
@@ -77,75 +83,49 @@ public class ReadonlyRepeatableReadStressTest {
 
     class ReadThread extends TestThread {
 
+        private final AtomicBlock readTrackingReadonlyBlock = stm.getTransactionFactoryBuilder()
+                .setReadonly(true)
+                .setReadTrackingEnabled(true)
+                .buildAtomicBlock();
+
+        private final AtomicBlock readTrackingUpdateBlock = stm.getTransactionFactoryBuilder()
+                .setReadonly(false)
+                .setReadTrackingEnabled(true)
+                .buildAtomicBlock();
+
+        private final AtomicVoidClosure closure = new AtomicVoidClosure() {
+            @Override
+            public void execute(Transaction tx) throws Exception {
+                BetaObjectPool pool = getThreadLocalBetaObjectPool();
+                BetaTransaction btx = (BetaTransaction) tx;
+
+                int firstTime = ref.get(btx, pool);
+                sleepRandomMs(2);
+                int secondTime = ref.get(btx, pool);
+                assertEquals(firstTime, secondTime);
+            }
+        };
+
         public ReadThread(int id) {
             super("ReadThread-" + id);
         }
 
         @Override
         public void doRun() {
-            int k=0;
-            while(!stop){
-                switch (k % 2){
+            int k = 0;
+            while (!stop) {
+                switch (k % 2) {
                     case 0:
-                        readUsingReadtrackingReadonlyTransaction();
+                        readTrackingReadonlyBlock.execute(closure);
                         break;
                     case 1:
-                        readUsingReadtrackingUpdateTransaction();
+                        readTrackingUpdateBlock.execute(closure);
                         break;
                     default:
                         throw new IllegalStateException();
                 }
                 k++;
             }
-        }
-
-//        @TransactionalMethod(readonly = true, trackReads = false)
-//        private void readUsingReadonlyTransaction() {
-//            read();
-//        }
-
-//        @TransactionalMethod(readonly = false,trackReads = false)
-//        private void readUsingUpdateTransaction() {
-//            read();
-//        }
-
-        private void readUsingReadtrackingReadonlyTransaction() {
-            BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
-                    .setReadonly(true)
-                    .setReadTrackingEnabled(true)
-                    .build();
-
-            new BetaTransactionTemplate(txFactory){
-                @Override
-                public Object execute(BetaTransaction tx) throws Exception {
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    read(tx,pool);
-                    return null;
-                }
-            }.execute();
-        }
-
-        private void readUsingReadtrackingUpdateTransaction() {
-             BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
-                    .setReadonly(false)
-                    .setReadTrackingEnabled(true)
-                    .build();
-
-            new BetaTransactionTemplate(txFactory){
-                @Override
-                public Object execute(BetaTransaction tx) throws Exception {
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    read(tx,pool);
-                    return null;
-                }
-            }.execute();
-        }
-
-        private void read(BetaTransaction tx,BetaObjectPool pool) {
-            int firstTime = ref.get(tx,pool);
-            sleepRandomMs(2);
-            int secondTime = ref.get(tx,pool);
-            assertEquals(firstTime, secondTime);
         }
     }
 }

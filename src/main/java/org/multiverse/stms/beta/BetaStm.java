@@ -60,7 +60,7 @@ public final class BetaStm implements Stm {
         return new FatArrayTreeBetaTransaction(config);
     }
 
-    public AtomicBlock createAtomicBlock(){
+    public AtomicBlock getDefaultAtomicBlock(){
         return atomicBlock;
     }
 
