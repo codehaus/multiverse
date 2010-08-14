@@ -3,11 +3,12 @@ package org.multiverse.stms.beta.integrationtest.failureatomicity;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaTransactionFactory;
-import org.multiverse.stms.beta.BetaTransactionTemplate;
 import org.multiverse.stms.beta.refs.IntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -52,25 +53,24 @@ public class TooManyRetriesRollbackTest {
 
 
     public void setAndAwaitUneven(final int value) {
-        BetaTransactionFactory txFactory =stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setMaxRetries(10)
-                .build();
+                .buildAtomicBlock();
 
-        new BetaTransactionTemplate(txFactory) {
+        block.execute(new AtomicVoidClosure() {
             @Override
-            public Object execute(BetaTransaction tx) throws Exception {
+            public void execute(Transaction tx) throws Exception {
+                BetaTransaction btx = (BetaTransaction) tx;
+
                 BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-                modifyRef.set(tx, pool, value);
+                modifyRef.set(btx, pool, value);
 
-                if (retryRef.get(tx, pool) % 2 == 0) {
+                if (retryRef.get(btx, pool) % 2 == 0) {
                     retry();
                 }
-
-                return null;
             }
-        }.execute();
-
+        });
     }
 
     class NotifyThread extends TestThread {
@@ -81,19 +81,22 @@ public class TooManyRetriesRollbackTest {
 
         @Override
         public void doRun() throws Exception {
-            while (!finished) {
-                new BetaTransactionTemplate(stm){
-                    @Override
-                    public Object execute(BetaTransaction tx) throws Exception {
-                        BetaObjectPool pool = getThreadLocalBetaObjectPool();
+            AtomicBlock block = stm.getTransactionFactoryBuilder()
+                    .buildAtomicBlock();
+            AtomicVoidClosure closure = new AtomicVoidClosure() {
+                @Override
+                public void execute(Transaction tx) throws Exception {
+                    BetaTransaction btx = (BetaTransaction) tx;
+                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-                        int value = retryRef.get(tx, pool);
-                        retryRef.set(tx, pool, value+2);
-                        return null;
-                    }
-                }.execute();
+                    int value = retryRef.get(btx, pool);
+                    retryRef.set(btx, pool, value + 2);
+                }
+            };
+
+            while (!finished) {
+                block.execute(closure);
             }
         }
     }
-
 }

@@ -5,7 +5,6 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaTransactionTemplate;
 import org.multiverse.stms.beta.BetaTransactionalObject;
 import org.multiverse.stms.beta.refs.LongRef;
 import org.multiverse.stms.beta.refs.LongRefTranlocal;
@@ -137,7 +136,7 @@ public class AccountBenchmark {
 
             this.startLatch = startLatch;
             this.accounts = accounts;
-}
+        }
 
         @Override
         public void run() {
@@ -147,7 +146,7 @@ public class AccountBenchmark {
             AtomicVoidClosure addInterestClosure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction)tx;
+                    BetaTransaction btx = (BetaTransaction) tx;
                     for (int k = 0; k < accounts.length; k++) {
                         LongRef account = accounts[k];
                         LongRefTranlocal tranlocal = btx.openForWrite(account, false, pool);
@@ -163,7 +162,7 @@ public class AccountBenchmark {
             AtomicVoidClosure computeTotalClosure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction)tx;
+                    BetaTransaction btx = (BetaTransaction) tx;
                     long sum = 0;
                     for (int k = 0; k < accounts.length; k++) {
                         LongRefTranlocal tranlocal = btx.openForWrite(accounts[k], false, pool);
@@ -178,7 +177,7 @@ public class AccountBenchmark {
             AtomicVoidClosure transferClosure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction)tx;
+                    BetaTransaction btx = (BetaTransaction) tx;
 
                     long amount = random.nextInt(max) + 1;
 
@@ -208,24 +207,6 @@ public class AccountBenchmark {
 
             durationMs = System.currentTimeMillis() - startMs;
             System.out.printf("Multiverse> %s finished in %s ms\n", getName(), durationMs);
-        }
-    }
-
-    class TransferTemplate extends BetaTransactionTemplate {
-        private final BetaObjectPool pool;
-        private final Random random = new Random();
-        private final LongRef[] accounts;
-
-        public TransferTemplate(BetaObjectPool pool, final LongRef[] accounts) {
-            super(stm);
-            this.pool = pool;
-            this.accounts = accounts;
-        }
-
-        @Override
-        public Object execute(BetaTransaction tx) {
-
-            return null;
         }
     }
 
