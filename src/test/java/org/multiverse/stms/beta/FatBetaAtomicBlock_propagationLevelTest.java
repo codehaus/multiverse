@@ -1,0 +1,232 @@
+package org.multiverse.stms.beta;
+
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.PropagationLevel;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.closures.AtomicIntClosure;
+import org.multiverse.api.closures.AtomicVoidClosure;
+import org.multiverse.api.exceptions.NoTransactionAllowedException;
+import org.multiverse.api.exceptions.NoTransactionFoundException;
+import org.multiverse.stms.beta.refs.LongRef;
+import org.multiverse.stms.beta.transactions.BetaTransaction;
+
+import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.multiverse.TestUtils.assertActive;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
+
+public class FatBetaAtomicBlock_propagationLevelTest {
+    private BetaStm stm;
+
+    @Before
+    public void setUp() {
+        stm = new BetaStm();
+        clearThreadLocalTransaction();
+    }
+
+    @Test
+    public void whenNeverAndTransactionAvailable_thenNoTransactionAllowedException() {
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
+                .setPropagationLevel(PropagationLevel.Never)
+                .buildAtomicBlock();
+
+        BetaTransaction otherTx = stm.start();
+        setThreadLocalTransaction(otherTx);
+
+        AtomicVoidClosure closure = mock(AtomicVoidClosure.class);
+
+        try {
+            block.execute(closure);
+            fail();
+        } catch (NoTransactionAllowedException expected) {
+        }
+
+        verifyZeroInteractions(closure);
+        assertActive(otherTx);
+        assertSame(otherTx, getThreadLocalTransaction());
+    }
+
+    @Test
+    public void whenNeverAndNoTransactionAvailable() {
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
+                .setPropagationLevel(PropagationLevel.Never)
+                .buildAtomicBlock();
+
+        AtomicIntClosure closure = new AtomicIntClosure() {
+            @Override
+            public int execute(Transaction tx) throws Exception {
+                assertNull(tx);
+                return 10;
+            }
+        };
+
+        int result = block.execute(closure);
+
+        assertEquals(10, result);
+        assertNull(getThreadLocalTransaction());
+    }
+
+    @Test
+    public void whenMandatoryAndNoTransactionAvailable_thenNoTransactionFoundException() {
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
+                .setPropagationLevel(PropagationLevel.Mandatory)
+                .buildAtomicBlock();
+
+        AtomicVoidClosure closure = mock(AtomicVoidClosure.class);
+
+        try {
+            block.execute(closure);
+            fail();
+        } catch (NoTransactionFoundException expected) {
+        }
+
+        verifyZeroInteractions(closure);
+        assertNull(getThreadLocalTransaction());
+    }
+
+    @Test
+    public void whenMandatoryAndTransactionAvailable_thenExistingTransactionUsed() {
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
+                .setPropagationLevel(PropagationLevel.Mandatory)
+                .buildAtomicBlock();
+
+        final BetaTransaction otherTx = stm.start();
+        setThreadLocalTransaction(otherTx);
+
+        AtomicIntClosure closure = new AtomicIntClosure() {
+            @Override
+            public int execute(Transaction tx) throws Exception {
+                assertSame(otherTx, tx);
+                return 10;
+            }
+        };
+
+        int result = block.execute(closure);
+
+        assertEquals(10, result);
+        assertActive(otherTx);
+        assertSame(otherTx, getThreadLocalTransaction());
+    }
+
+    @Ignore
+    @Test
+    public void whenRequiresAndNoTransactionAvailable_thenNewTransactionUsed() {
+
+    }
+
+    @Ignore
+    @Test
+    public void whenRequiresAndTransactionAvailable_thenExistingTransactionUsed() {
+
+    }
+
+    @Test
+    public void whenRequiresNewAndNoTransactionAvailable_thenNewTransactionCreated() {
+         AtomicBlock block = stm.getTransactionFactoryBuilder()
+                .setPropagationLevel(PropagationLevel.RequiresNew)
+                .buildAtomicBlock();
+
+        final LongRef ref = createLongRef(stm, 10);
+
+        AtomicIntClosure closure = new AtomicIntClosure() {
+            @Override
+            public int execute(Transaction tx) throws Exception {
+                assertNotNull(tx);
+                BetaTransaction btx = (BetaTransaction)tx;
+                BetaObjectPool pool = getThreadLocalBetaObjectPool();
+                btx.openForWrite(ref, false, pool).value++;
+                return 1;
+            }
+        };
+
+        int result = block.execute(closure);
+
+        assertEquals(1, result);
+        assertEquals(11,ref.unsafeLoad().value);
+        assertNull(getThreadLocalTransaction());
+    }
+
+    @Test
+    public void whenRequiresNewAndTransactionAvailable_thenExistingTransactionSuspended() {
+           AtomicBlock block = stm.getTransactionFactoryBuilder()
+                .setPropagationLevel(PropagationLevel.RequiresNew)
+                .buildAtomicBlock();
+
+        final BetaTransaction otherTx = stm.start();
+        setThreadLocalTransaction(otherTx);
+
+        final LongRef ref = createLongRef(stm, 10);
+
+        AtomicIntClosure closure = new AtomicIntClosure() {
+            @Override
+            public int execute(Transaction tx) throws Exception {
+                assertNotNull(tx);
+                assertNotSame(otherTx, tx);
+                BetaTransaction btx = (BetaTransaction)tx;
+                BetaObjectPool pool = getThreadLocalBetaObjectPool();
+                btx.openForWrite(ref, false, pool).value++;
+                return 1;
+            }
+        };
+
+        int result = block.execute(closure);
+
+        assertEquals(1, result);
+        assertEquals(11,ref.unsafeLoad().value);
+        assertSame(otherTx, getThreadLocalTransaction());
+        assertActive(otherTx);
+    }
+
+    @Test
+    public void whenSupportsAndTransactionAvailable() {
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
+                .setPropagationLevel(PropagationLevel.Supports)
+                .buildAtomicBlock();
+
+        final BetaTransaction otherTx = stm.start();
+        setThreadLocalTransaction(otherTx);
+
+        AtomicIntClosure closure = new AtomicIntClosure() {
+            @Override
+            public int execute(Transaction tx) throws Exception {
+                assertSame(otherTx, tx);
+                return 10;
+            }
+        };
+
+        int result = block.execute(closure);
+
+        assertEquals(10, result);
+        assertActive(otherTx);
+        assertSame(otherTx, getThreadLocalTransaction());
+    }
+
+    @Test
+    public void whenSupportsAndNoTransactionAvailable() {
+         AtomicBlock block = stm.getTransactionFactoryBuilder()
+                .setPropagationLevel(PropagationLevel.Supports)
+                .buildAtomicBlock();
+
+        AtomicIntClosure closure = new AtomicIntClosure() {
+            @Override
+            public int execute(Transaction tx) throws Exception {
+                assertNull(tx);
+                return 10;
+            }
+        };
+
+        int result = block.execute(closure);
+
+        assertEquals(10, result);
+        assertNull(getThreadLocalTransaction());
+    }
+}

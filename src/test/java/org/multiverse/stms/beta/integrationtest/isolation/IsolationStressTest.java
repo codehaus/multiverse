@@ -1,0 +1,121 @@
+package org.multiverse.stms.beta.integrationtest.isolation;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.multiverse.TestThread;
+import org.multiverse.benchmarks.BenchmarkUtils;
+import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
+import org.multiverse.stms.beta.BetaTransactionTemplate;
+import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.refs.LongRef;
+import org.multiverse.stms.beta.refs.LongRefTranlocal;
+import org.multiverse.stms.beta.transactions.BetaTransaction;
+
+import static java.lang.System.currentTimeMillis;
+import static org.junit.Assert.assertEquals;
+import static org.multiverse.TestUtils.joinAll;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+
+/**
+ * @author Peter Veentjer
+ */
+public class IsolationStressTest {
+
+    private BetaStm stm;
+
+    @Before
+    public void setUp() {
+        clearThreadLocalTransaction();
+        stm = new BetaStm();
+    }
+
+    @Test
+    public void withOptimisticSettingAndDirtyCheck() {
+        test(false, true);
+    }
+
+    @Test
+    public void withPessimisticSettingsAndDirtyCheck(){
+        test(true, true);
+    }
+
+    @Test
+    public void withOptimisticSettingAndNoDirtyCheck(){
+        test(false, false);
+    }
+
+    @Test
+    public void withPessimisticSettingsAndNoDirtyCheck() {
+        test(true, false);
+    }
+
+    public void test(boolean pessimistic, boolean diryCheckEnabled) {
+        int threadCount = 2;
+        UpdateThread[] threads = new UpdateThread[threadCount];
+        LongRef ref = BetaStmUtils.createLongRef(stm);
+        long txCount = 100 * 1000 * 1000;
+
+        for (int k = 0; k < threads.length; k++) {
+            threads[k] = new UpdateThread(k, ref, txCount, pessimistic,diryCheckEnabled);
+        }
+
+        for (UpdateThread thread : threads) {
+            thread.start();
+        }
+
+        joinAll(threads);
+        long durationMs = 0;
+        for (UpdateThread thread : threads) {
+            durationMs += thread.durationMs;
+        }
+
+        double performance = BenchmarkUtils.perSecond(txCount, durationMs, threadCount);
+        System.out.printf("Performance %s transactions/second\n", BenchmarkUtils.format(performance));
+        assertEquals(threadCount * txCount, ref.active.value);
+        System.out.println("ref.orec: " + ref.toOrecString());
+    }
+
+    class UpdateThread extends TestThread {
+        private final LongRef ref;
+        private final long count;
+        private final boolean pessimistic;
+        private long durationMs;
+        private final boolean dirtyCheckEnabled;
+
+        public UpdateThread(int id, LongRef ref, long count, boolean pessimistic, boolean dirtyCheckEnabled) {
+            super("UpdateThread-" + id);
+            this.ref = ref;
+            this.count = count;
+            this.pessimistic = pessimistic;
+            this.dirtyCheckEnabled = dirtyCheckEnabled;
+        }
+
+        @Override
+        public void doRun() {
+            final BetaObjectPool pool = new BetaObjectPool();
+
+            stm.getTransactionFactoryBuilder()
+                    .setDirtyCheckEnabled(dirtyCheckEnabled);
+
+            BetaTransactionTemplate template = new BetaTransactionTemplate(stm) {
+                @Override
+                public Object execute(BetaTransaction tx) {
+                    LongRefTranlocal tranlocal = tx.openForWrite(ref, pessimistic, pool);
+                    tranlocal.value++;
+                    return null;
+                }
+            };
+
+            long startMs = currentTimeMillis();
+
+            for (long k = 0; k < count; k++) {
+                template.execute(pool);
+            }
+
+            durationMs = currentTimeMillis() - startMs;
+
+            System.out.printf("finished %s after %s ms\n", getName(), durationMs);
+        }
+    }
+}

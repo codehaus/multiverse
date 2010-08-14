@@ -1,0 +1,153 @@
+IDEAS:
+
+- dematerialize handler
+
+- rematerialize handler
+
+
+----------------- semantics of durability-------------------------
+
+work with durable roots. Everything that can be reached from a durable root, becomes durable. The problem is
+how a relation can be determined:
+        durable(X)
+            :- root(X)
+            ; direct(X,Y), durable(Y)
+            .
+So it either is a durable root directly, or indirectly
+
+The problems are:
+    - how to determine the the 'direct' relation. For instrumented classes it is easy, since the structure
+      of these classes is well known. But what about non instrumented classes like immutables.
+    - how to efficiently keep track of these relations.
+
+
+Example:
+
+List list = (List)storage.getOrCreate("banana", new TransactionalLinkedList());
+
+atomic{
+    list.add(new Person());
+}
+
+When this block completes, automatically all changes to it and objects reachable from the root are durable.
+
+Within a transaction all changes made on transactional objects will be detected.
+
+
+when a transaction commits, and it acquires the commit lock.. it can check if one of the references is durable.
+Once the lock is acquired, no other transaction can make changes. Based on this outcome, a transaction can decide to
+talk to the storage to commit the changed or not.
+Once the transaction starts with writing, it needs to determine which objects are becoming durable.
+
+Lemma:
+A change from made on a non durable object, can itself never lead to the transaction becomming durable:
+why?
+
+So at least one durable object needs to be updated, before any interaction with storage is needed. The question
+is how this can be detected; this can be detected by checking if one of the writes after obtaining the commit lock
+has the durable flag set.
+
+
+If a transaction becomes durable, all reads need to be available. So non automatic readtracking is not allowed.
+Speculative stuff could be added to
+
+After the transaction starts with the storage, a graph needs to be created from all objects reachable from
+the durable objects in the transaction. For this graph all objects need to be locked.. can be done on the
+normal locking mechanism.
+
+
+
+
+
+
+--------------------- meta model -------------------------------------
+
+It should be easy to get the meta model, so how objects are structures & how persistence properties like lazyness
+can be set.
+
+TODO
+
+- write through & write behind
+
+- failure atomicity; atm it could happen that the files are left in an inconsistent state
+
+- connecting to transaction.
+
+- sort of 'get or create' function that either:
+    - loads an entity from storage and returns it,
+    - gets an existing entity with the same name
+    - create an entity, stores it and returns it.
+
+- mechanism to remove unused entities from the SimpleObjectIdentityMap: could be done with a weak reference.
+
+- deleting an entity from simple storage.
+
+- atm all state is persisted and not only dirty state.
+
+- the load of a durable object should be done inside a transaction, so that it automatically can be locked
+  by the transaction? This is to prevent other transactions from accessing the object before it being ready
+  to be used. Can this transaction by started by a callback to the stm to coordinate construction: some kind
+  of of openForConstruction callback.
+
+    - thread safety on loading an entity; it could happen that when the loadentity is called concurrently, multiple
+    instances of the same entity could appear and this is not the behavior we want.
+
+    - easy way to figure out if something needs to be persisted. Atm the complete object graph is loaded for every
+    commit, but there must be a better way. If an object becomes durable once, it could remain durable. Perhaps
+    this would be an easy first approach.
+
+- how does a beta transaction know when the UnitOfWork needs to be called...
+    - an extra bit could be set/unset on the orec of the transactional object. When an object becomes durable/
+    transient, the bit can be set/unset and all readers notified. Each transaction can recheck for a readconflict,
+    but can also recheck if an object has become transient or durable. If it is made durable, it should also receive
+    a persistence id.
+
+- if a transaction reads/writes a non durable object.. no worries.
+  if a transaction reads a durable object, because it only is read, no link from a durable to a currently
+  transient root can be made. So no worries.
+  if a trans updates a durable object, that is the moment that the transaction should work with a UnitOfWrite.
+
+- lazy loading; with the 'full' initialization of a durable object, one load could load the whole branch.
+
+DONE
+
+- once an DurableObject is loaded, the state is not determined. So if it is 'released' to other transactions,
+    shit could happen.
+
+- BetaTransaction.openForConstruction needs a lock parameter so that it can be locked.
+not needed, since each constructed object automatically is locked.
+
+- Storage. get or create should be moved to the UnitOfWork.
+
+- there is no protection against committing a UnitOfWork more than once
+
+- the storage should return a unit of work instead of accepting one
+
+- the unit of work should have a commit instead of the storage having it.
+
+- add root is now part of the durable transaction.
+
+- the persist for durableobject/durablestate has been removed, should now be done through the
+persist writeset.
+
+- lazy loading: because the state is seperate from the durable object, a load of a state only loads the durableobjects
+and not the state. So everything is lazy
+
+- object identity guarantees
+
+- protection against cycles
+
+- when the serializer needs to access to the storage to load dependencies.
+
+- finding the right deserializer for a class
+
+- finding the right serializer for a class
+
+- roots are not persisted, and loaded when the db starts.
+
+- separate load of durable object from the load of the state.
+
+- how to load objects by a certain id.
+
+- protection against a writeset containing different states for the same durable object.
+

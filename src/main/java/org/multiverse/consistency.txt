@@ -1,0 +1,76 @@
+With TL2 you have a central clock that makes sure that there are no read inconsistencies.
+
+With SkySTM approach the Snzi makes sure that there are no read conflicts; if a transaction wants to do
+an update, and it sees that there is a surplus (excluding his own caused surplus), then it knows that
+the conflict counter should be called.
+
+But can these 2 be combined (for cheaper readonly access). So if data mostly is read, then it goes in the
+TL2 mode, and it it changes very frequently, it goes in the SkySTM mode.
+
+Of course, a transaction needs to be able to deal with these 2 different modes. When a transaction
+begins, it reads the current clock + it reads the conflict counter. For snzi's that are in update mode,
+it can use the SkySTM approach. For snzi's that are in readonly mode, it can use the readversion for
+conflict detection.
+
+
+Tranlocal and timestamp:
+When a tranlocal is written, it automatically receives a timestamp based on the current clock + 1. But instead
+of increasing the clock (like with the normal TL2 approach) the clock isn't increased. So a tranlocal always
+has a timestamp. If a transaction encounters a snzi in readonly mode, it knows that it should use his own
+ read version to validate that the tranlocal is acceptable to be read. If it finds that the tranlocal in
+ readonly mode has a higher version then his own read version, it updates the central clock to have a value
+ at least as big as the encountered writeversion of the tranlocal, and aborts and retries.
+
+Changing behavior of Snzi:
+a snzi needs to track the number of 'readonly' operations it was used in. This can be done with the
+arrive/depart and lock. If only arrive/depart is called, you know it was for a readonly operation. If
+arrive/lock/departAndUnlock is called, then it knows that it was used an update transaction.
+
+If a transaction calls depart and the number of readonly operations have exceeded the limit and
+there is no surplus, the snzi is automatically locked to give the departing transaction to chance to
+do its work. What should it do (one of the things it should do it to mark the tranlocal as 'don't pool me'?
+So it can't happen that the behavior of the Snzi changes from normal mode, to readonly mode, while there is a
+surplus. But it can happen that a Snzi changes from readonly mode to update mode. Since the reads are not tracked
+, it can't signal anyone that there is a conflict. So how to make sure that 
+
+Using readonly mode snzi:
+If the Snzi is in readonly mode, the timestamp of the tranlocal should be used to prevent conflicts.
+If the Snzi is in update mode, the conflict counter makes sure that the transaction is protected against
+conflicts.
+
+unclear:
+What happens when a transaction has read the snzi in readonly mode and starts reading the tranlocal, but
+ another transaction just updated the tranlocal? 
+
+
+The number of 'readonly' operations can be encoded in the same long as where the surplus and locked bit
+also are stored.
+
+Switching from SkySTM to TL2:
+Switching from update mode to readonly mode, can be done atomic. And if the snzi automatically is locked
+when this upgrade happens, the stm doesn't need to worry if other transactions are going to read data that
+potentially is in an inconsistent state. Once 'lucky' transaction did his work, he can release the lock
+again.
+
+
+Switching from TL2 to SkySTM:
+It can happen that a 'readonly' item, is updated eventually. When this happens, the readonly counter
+needs to be reset.  The snzi
+
+
+IDEA:
+The readonly counter
+
+IDEA:
+Make difference between snzi-state transfer lock and update lock?
+
+IDEA:
+For very small transactions it is cheap to do repeated readset validation. For these transactions having an
+arrive/departs doesn't sound needed (although one potentially could have problems with garbage collection).
+
+
+Problem:
+If a transaction has read a tl2 entry that is ok, and then another transaction updates that entry and another one,
+and the first transaction reads the other entry, it will not see that there is a conflict since no real arrive is done
+on the first entry (tl2). So you will have a read conflict here.
+
