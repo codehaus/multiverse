@@ -1,6 +1,6 @@
 ideas:
 
-- when a commute reference is openedForRead/openedForWrite, the read should be fixated.
+- non repeatable read?
 
 - on read/ on write function
     - stuff like encryption and security could be added through this general purpose mechanism
@@ -144,8 +144,6 @@ globalconflict counter.
 
 - rethink permanent listener; registration once is complicated.
 
-- lean mono speculative & non automatic readtracking not possible.
-
 - blocking and speculative readonly?
 
 - transaction.prepareForPooling & add it to objectpool.
@@ -168,6 +166,8 @@ globalconflict counter.
 - testing: array transaction and conflict counter setting`
 
 - testing: mono transaction and partial read tracking
+
+    - all kinds of variations with non automatic read tracking
 
 - testing: array transaction and partial read tracking
 
@@ -203,9 +203,16 @@ globalconflict counter.
 
 - testing: atomic block & propagation and committed/aborted/prepared/new transaction on threadlocal
 
-- non repeatable read?
-
 done
+
+- invisible checked exception should be moved to ap.exceptions
+
+- lean mono speculative & non automatic readtracking not possible.
+
+- stresstest for read consistency and partial readtracking
+
+
+old done
 
 - add abortOnly to commit/prepare
 
@@ -255,7 +262,7 @@ done
 
 - prepareForPooling should be the method name for preparing a poolable resource for pooling.
 
-- testing: objectpool.listeners functionality 
+- testing: objectpool.listeners functionality
 
 - removed the listeners.read
 
@@ -282,6 +289,4 @@ done
 
 - add project to multiverse git
 
-
-old done
 

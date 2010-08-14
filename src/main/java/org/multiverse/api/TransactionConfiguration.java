@@ -4,6 +4,8 @@ import org.multiverse.stms.beta.BetaStm;
 
 public interface TransactionConfiguration {
 
+    long getTimeoutNs();
+
     PropagationLevel getPropagationLevel();
 
     TraceLevel getTraceLevel();
@@ -32,7 +34,7 @@ public interface TransactionConfiguration {
 
     int getMinimalArrayTreeSize();
 
-    boolean isTrackReads();
+    boolean isReadTrackingEnabled();
 
     boolean isBlockingAllowed();
 

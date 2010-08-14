@@ -4,7 +4,6 @@ import org.multiverse.api.*;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.closures.*;
 import org.multiverse.stms.beta.transactions.*;
-import org.multiverse.templates.InvisibleCheckedException;
 
 import static java.lang.String.format;
 import static org.multiverse.api.ThreadLocalTransaction.*;
@@ -31,8 +30,7 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
     }
 #foreach($closure in $closures)
 #if(${atomicBlock.lean})
-    public ${closure.typeParameter} ${closure.type} execute(
-        final ${closure.name}${closure.typeParameter} closure){
+    public ${closure.typeParameter} ${closure.type} execute(final ${closure.name}${closure.typeParameter} closure){
 
         if(closure == null){
             throw new NullPointerException();
@@ -60,8 +58,7 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
 
     }
 #else ## end of atomicblock.lean
-    public ${closure.typeParameter} ${closure.type} execute(
-        final ${closure.name}${closure.typeParameter} closure){
+    public ${closure.typeParameter} ${closure.type} execute(final ${closure.name}${closure.typeParameter} closure){
 
         if(closure == null){
             throw new NullPointerException();

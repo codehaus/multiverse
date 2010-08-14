@@ -129,7 +129,7 @@ public abstract class AbstractLeanBetaTransaction implements BetaTransaction {
     public final TransactionStatus getStatus() {
         switch (status) {
             case NEW:
-                return TransactionStatus.New;
+                return TransactionStatus.Unstarted;
             case ACTIVE:
                 return TransactionStatus.Active;
             case ABORTED:

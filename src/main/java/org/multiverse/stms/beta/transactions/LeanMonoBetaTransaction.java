@@ -121,7 +121,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
                 }else if(config.trackReads){
                     attached = read;
                 }else{
-                    throw new TodoException("Speculative stuff for upgrading to fat mono");
+                    throw abortOnTooSmallSize(pool, 2);
                 }
 
                 return read;
@@ -378,7 +378,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
                 }else if(config.trackReads){
                     attached = read;
                 }else{
-                    throw new TodoException("Speculative stuff for upgrading to fat mono");
+                    throw abortOnTooSmallSize(pool, 2);
                 }
 
                 return read;
@@ -635,7 +635,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
                 }else if(config.trackReads){
                     attached = read;
                 }else{
-                    throw new TodoException("Speculative stuff for upgrading to fat mono");
+                    throw abortOnTooSmallSize(pool, 2);
                 }
 
                 return read;
@@ -892,7 +892,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
                 }else if(config.trackReads){
                     attached = read;
                 }else{
-                    throw new TodoException("Speculative stuff for upgrading to fat mono");
+                    throw abortOnTooSmallSize(pool, 2);
                 }
 
                 return read;

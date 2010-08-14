@@ -35,36 +35,76 @@ public class ReadConsistencyStressTest {
     }
 
     @Test
-    public void testRefCount_2() {
-        test(2);
+    public void with2RefsAndReadTracking() {
+        test(2, true);
     }
 
     @Test
-    public void testRefCount_4() {
-        test(4);
+    public void with2RefsAndNoReadTracking() {
+        test(2, false);
     }
 
     @Test
-    public void testRefCount_16() {
-        test(16);
+    public void with4RefsAndReadTracking() {
+        test(4, true);
     }
 
     @Test
-    public void testRefCount_64() {
-        test(64);
+    public void with4RefsAndNoReadTracking() {
+        test(4, false);
     }
 
     @Test
-    public void testRefCount_256() {
-        test(256);
+    public void with16RefsAndReadTracking() {
+        test(16, true);
     }
 
     @Test
-    public void testRefCount_1024() {
-        test(1024);
+    public void with16RefsAndNoReadTracking() {
+        test(16, false);
     }
 
-    public void test(int refCount) {
+    @Test
+    public void with64RefsAndReadTracking() {
+        test(64, true);
+    }
+
+    @Test
+    public void with64RefsAndNoReadTracking() {
+        test(64, false);
+    }
+
+    @Test
+    public void with256RefsAndReadTracking() {
+        test(256, true);
+    }
+
+    @Test
+    public void with256RefsAndNoReadTracking() {
+        test(256, false);
+    }
+
+    @Test
+    public void with1024RefsAndReadTracking() {
+        test(1024, true);
+    }
+
+    @Test
+    public void with1024RefsAndNoReadTracking() {
+        test(1024, false);
+    }
+
+    @Test
+    public void with4096RefsAndReadTracking() {
+        test(4096, true);
+    }
+
+    @Test
+    public void with4096RefsAndNoReadTracking() {
+        test(4096, false);
+    }
+
+    public void test(int refCount, boolean readtracking) {
 
         refs = new LongRef[refCount];
         for (int k = 0; k < refs.length; k++) {
@@ -73,7 +113,7 @@ public class ReadConsistencyStressTest {
 
         ReadThread[] readerThreads = new ReadThread[readerCount];
         for (int k = 0; k < readerThreads.length; k++) {
-            readerThreads[k] = new ReadThread(k);
+            readerThreads[k] = new ReadThread(k, readtracking);
         }
 
         WriterThread[] writerThreads = new WriterThread[writerCount];
@@ -110,6 +150,7 @@ public class ReadConsistencyStressTest {
                 }
             };
 
+            int mod = 1;
             int k = 0;
             while (!stop) {
                 block.execute(closure);
@@ -117,7 +158,8 @@ public class ReadConsistencyStressTest {
 
                 k++;
 
-                if (k % 500000 == 0) {
+                if (k % mod == 0) {
+                    mod = mod * 10;
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
             }
@@ -125,15 +167,21 @@ public class ReadConsistencyStressTest {
     }
 
     public class ReadThread extends TestThread {
-        public ReadThread(int id) {
+        private final boolean readTracking;
+
+        public ReadThread(int id, boolean readTracking) {
             super("ReadThread-" + id);
+            this.readTracking = readTracking;
         }
 
         @Override
         public void doRun() throws Exception {
             AtomicBlock block = stm.getTransactionFactoryBuilder()
+                    .setReadTrackingEnabled(readTracking)
+                    .setBlockingAllowed(false)
                     .setReadonly(true)
                     .buildAtomicBlock();
+
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
@@ -150,12 +198,14 @@ public class ReadConsistencyStressTest {
                 }
             };
 
+            int mod = 1;
             int k = 0;
             while (!stop) {
                 block.execute(closure);
                 k++;
 
-                if (k % 100000 == 0) {
+                if (k % mod == 0) {
+                    mod = mod * 10;
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
             }

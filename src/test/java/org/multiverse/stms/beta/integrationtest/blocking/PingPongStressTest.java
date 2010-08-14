@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.closures.AtomicVoidClosure;
+import org.multiverse.api.closures.AtomicBooleanClosure;
 import org.multiverse.stms.beta.*;
 import org.multiverse.stms.beta.refs.LongRef;
 import org.multiverse.stms.beta.refs.LongRefTranlocal;
@@ -121,14 +121,14 @@ public class PingPongStressTest {
         public void doRun() {
             final BetaObjectPool pool = new BetaObjectPool();
 
-            AtomicVoidClosure closure = new AtomicVoidClosure() {
+            AtomicBooleanClosure closure = new AtomicBooleanClosure() {
                 @Override
-                public void execute(Transaction tx) throws Exception {
+                public boolean execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
                     LongRefTranlocal write = btx.openForWrite(ref, false, pool);
 
                     if (write.value < 0) {
-                        throw new RuntimeException();
+                        return false;
                     }
 
                     if (write.value % threadCount != id) {
@@ -136,6 +136,7 @@ public class PingPongStressTest {
                     }
 
                     write.value++;
+                    return true;
                 }
             };
 
@@ -144,12 +145,13 @@ public class PingPongStressTest {
                     System.out.println(getName() + " " + count);
                 }
 
-                block.execute(closure);
+                if(!block.execute(closure)){
+                    break;
+                }
                 count++;
             }
 
             System.out.printf("%s finished\n", getName());
         }
     }
-
 }

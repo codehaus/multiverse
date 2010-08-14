@@ -2,10 +2,10 @@ package org.multiverse.stms.beta;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.exceptions.InvisibleCheckedException;
 import org.multiverse.stms.beta.refs.LongRef;
 import org.multiverse.stms.beta.refs.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
-import org.multiverse.templates.InvisibleCheckedException;
 
 import java.util.LinkedList;
 import java.util.List;

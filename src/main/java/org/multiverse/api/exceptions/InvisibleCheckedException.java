@@ -1,4 +1,4 @@
-package org.multiverse.templates;
+package org.multiverse.api.exceptions;
 
 /**
  * An {@link RuntimeException} that wraps a checked exception. It is useful if a checked exception

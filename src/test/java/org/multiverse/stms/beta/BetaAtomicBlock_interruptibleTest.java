@@ -6,10 +6,10 @@ import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
+import org.multiverse.api.exceptions.InvisibleCheckedException;
 import org.multiverse.stms.beta.refs.LongRef;
 import org.multiverse.stms.beta.refs.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
-import org.multiverse.templates.InvisibleCheckedException;
 
 import java.util.concurrent.TimeUnit;
 

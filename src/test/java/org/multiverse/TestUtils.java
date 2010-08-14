@@ -156,7 +156,7 @@ public class TestUtils {
     }
 
     public static void assertNew(BetaTransaction tx) {
-        assertEquals(TransactionStatus.New, tx.getStatus());
+        assertEquals(TransactionStatus.Unstarted, tx.getStatus());
     }
 
     public static void assertPrepared(BetaTransaction tx) {

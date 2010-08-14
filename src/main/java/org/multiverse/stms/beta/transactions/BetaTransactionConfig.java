@@ -65,6 +65,7 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         return speculativeConfig.get();
     }
 
+    @Override
     public long getTimeoutNs() {
         return timeoutNs;
     }
@@ -147,7 +148,7 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
     }
 
     @Override
-    public boolean isTrackReads() {
+    public boolean isReadTrackingEnabled() {
         return trackReads;
     }
 

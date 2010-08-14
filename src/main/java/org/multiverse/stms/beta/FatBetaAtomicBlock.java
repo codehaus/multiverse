@@ -4,7 +4,6 @@ import org.multiverse.api.PropagationLevel;
 import org.multiverse.api.closures.*;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
-import org.multiverse.templates.InvisibleCheckedException;
 
 import static java.lang.String.format;
 import static org.multiverse.api.ThreadLocalTransaction.*;
@@ -25,8 +24,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
     public BetaTransactionFactory getTransactionFactory(){
         return transactionFactory;
     }
-     public <E> E execute(
-        final AtomicClosure<E> closure){
+     public <E> E execute(final AtomicClosure<E> closure){
 
         if(closure == null){
             throw new NullPointerException();
@@ -140,8 +138,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
     }
  
-     public  int execute(
-        final AtomicIntClosure closure){
+     public  int execute(final AtomicIntClosure closure){
 
         if(closure == null){
             throw new NullPointerException();
@@ -255,8 +252,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
     }
  
-     public  long execute(
-        final AtomicLongClosure closure){
+     public  long execute(final AtomicLongClosure closure){
 
         if(closure == null){
             throw new NullPointerException();
@@ -370,8 +366,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
     }
  
-     public  double execute(
-        final AtomicDoubleClosure closure){
+     public  double execute(final AtomicDoubleClosure closure){
 
         if(closure == null){
             throw new NullPointerException();
@@ -485,8 +480,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
     }
  
-     public  boolean execute(
-        final AtomicBooleanClosure closure){
+     public  boolean execute(final AtomicBooleanClosure closure){
 
         if(closure == null){
             throw new NullPointerException();
@@ -600,8 +594,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
     }
  
-     public  void execute(
-        final AtomicVoidClosure closure){
+     public  void execute(final AtomicVoidClosure closure){
 
         if(closure == null){
             throw new NullPointerException();

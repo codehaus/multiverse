@@ -5,7 +5,6 @@ import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.api.blocking.StandardLatch;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
-import org.multiverse.templates.InvisibleCheckedException;
 
 import java.util.concurrent.TimeUnit;
 
