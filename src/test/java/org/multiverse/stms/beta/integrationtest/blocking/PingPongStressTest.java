@@ -3,6 +3,9 @@ package org.multiverse.stms.beta.integrationtest.blocking;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.*;
 import org.multiverse.stms.beta.refs.LongRef;
 import org.multiverse.stms.beta.refs.LongRefTranlocal;
@@ -60,7 +63,8 @@ public class PingPongStressTest {
     }
 
     public void test(BetaTransactionFactory transactionFactory, int threadCount) throws InterruptedException {
-        PingPongThread[] threads = createThreads(transactionFactory, threadCount);
+        AtomicBlock block = new LeanBetaAtomicBlock(transactionFactory);
+        PingPongThread[] threads = createThreads(block, threadCount);
 
         startAll(threads);
 
@@ -84,10 +88,10 @@ public class PingPongStressTest {
         assertEquals(sum(threads), -ref.unsafeLoad().value);
     }
 
-    private PingPongThread[] createThreads(BetaTransactionFactory transactionFactory, int threadCount) {
+    private PingPongThread[] createThreads(AtomicBlock block, int threadCount) {
         PingPongThread[] threads = new PingPongThread[threadCount];
         for (int k = 0; k < threads.length; k++) {
-            threads[k] = new PingPongThread(k, transactionFactory, threadCount);
+            threads[k] = new PingPongThread(k, block, threadCount);
         }
         return threads;
     }
@@ -101,59 +105,50 @@ public class PingPongStressTest {
     }
 
     private class PingPongThread extends TestThread {
-        private final BetaTransactionFactory txFactory;
+        private final AtomicBlock block;
         private final int threadCount;
         private final int id;
         private long count;
 
-        public PingPongThread(int id, BetaTransactionFactory txFactory, int threadCount) {
+        public PingPongThread(int id, AtomicBlock block, int threadCount) {
             super("PingPongThread-" + id);
             this.id = id;
-            this.txFactory = txFactory;
+            this.block = block;
             this.threadCount = threadCount;
         }
 
         @Override
         public void doRun() {
-            try {
-                final BetaObjectPool pool = new BetaObjectPool();
+            final BetaObjectPool pool = new BetaObjectPool();
 
-                BetaTransactionTemplate t = new BetaTransactionTemplate(txFactory) {
-                    @Override
-                    public Object execute(BetaTransaction tx) {
-                        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+            AtomicVoidClosure closure = new AtomicVoidClosure() {
+                @Override
+                public void execute(Transaction tx) throws Exception {
+                    BetaTransaction btx = (BetaTransaction) tx;
+                    LongRefTranlocal write = btx.openForWrite(ref, false, pool);
 
-                        if (write.value < 0) {
-                            throw new RuntimeException();
-                        }
-
-                        if (write.value % threadCount != id) {
-                            retry();
-                        }
-
-                        write.value++;
-                        return null;
-                    }
-                };
-
-                while (!stop) {
-                    if (count % (20000) == 0) {
-                        System.out.println(getName() + " " + count);
+                    if (write.value < 0) {
+                        throw new RuntimeException();
                     }
 
-                    try {
-                        t.execute(pool);
-                    } catch (RuntimeException e) {
-                        break;
+                    if (write.value % threadCount != id) {
+                        retry();
                     }
 
-                    count++;
+                    write.value++;
+                }
+            };
+
+            while (!stop) {
+                if (count % (20000) == 0) {
+                    System.out.println(getName() + " " + count);
                 }
 
-                System.out.printf("%s finished\n", getName());
-            } catch (Throwable e) {
-                e.printStackTrace();
+                block.execute(closure);
+                count++;
             }
+
+            System.out.printf("%s finished\n", getName());
         }
     }
 
