@@ -4,10 +4,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.TestUtils;
+import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaTransactionFactory;
-import org.multiverse.stms.beta.BetaTransactionTemplate;
 import org.multiverse.stms.beta.refs.LongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -33,7 +34,7 @@ public class ReadConsistencyStressTest {
         stm = new BetaStm();
     }
 
-   @Test
+    @Test
     public void testRefCount_2() {
         test(2);
     }
@@ -96,31 +97,30 @@ public class ReadConsistencyStressTest {
 
         @Override
         public void doRun() throws Exception {
+            AtomicBlock block = stm.getTransactionFactoryBuilder()
+                    .buildAtomicBlock();
+            AtomicVoidClosure closure = new AtomicVoidClosure() {
+                @Override
+                public void execute(Transaction tx) throws Exception {
+                    BetaTransaction btx = (BetaTransaction) tx;
+                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
+                    for (LongRef ref : refs) {
+                        ref.set(btx, pool, ref.get(btx, pool));
+                    }
+                }
+            };
+
             int k = 0;
             while (!stop) {
-                write();
+                block.execute(closure);
                 sleepRandomUs(100);
 
-                 k++;
+                k++;
 
-                if(k % 100000 == 0){
-                    System.out.printf("%s is at %s\n",getName(),k);
+                if (k % 500000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), k);
                 }
             }
-        }
-
-        private void write() {
-            final BetaObjectPool pool = getThreadLocalBetaObjectPool();
-
-            new BetaTransactionTemplate(stm) {
-                @Override
-                public Object execute(BetaTransaction tx) throws Exception {
-                    for (LongRef ref : refs) {
-                        ref.set(tx, pool, ref.get(tx, pool));
-                    }
-                    return null;
-                }
-            }.execute();
         }
     }
 
@@ -131,40 +131,34 @@ public class ReadConsistencyStressTest {
 
         @Override
         public void doRun() throws Exception {
-            int k = 0;
-            while (!stop) {
-                read();
-                k++;
-
-                if(k % 100000 == 0){
-                    System.out.printf("%s is at %s\n",getName(),k);
-                }
-            }
-        }
-
-        public void read() {
-            final BetaObjectPool pool = getThreadLocalBetaObjectPool();
-
-            BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+            AtomicBlock block = stm.getTransactionFactoryBuilder()
                     .setReadonly(true)
-                    .build();
-
-            new BetaTransactionTemplate(txFactory) {
+                    .buildAtomicBlock();
+            AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
-                public Object execute(BetaTransaction tx) throws Exception {
+                public void execute(Transaction tx) throws Exception {
+                    BetaTransaction btx = (BetaTransaction) tx;
+                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-                    long initial = refs[0].get(tx, pool);
+                    long initial = refs[0].get(btx, pool);
 
                     for (int k = 1; k < refs.length; k++) {
-                        if (refs[k].get(tx,pool) != initial) {
+                        if (refs[k].get(btx, pool) != initial) {
                             fail();
                         }
                     }
-
-                    return null;
                 }
-            }.execute();
+            };
 
+            int k = 0;
+            while (!stop) {
+                block.execute(closure);
+                k++;
+
+                if (k % 100000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), k);
+                }
+            }
         }
     }
 }
