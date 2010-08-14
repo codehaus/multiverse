@@ -17,7 +17,7 @@ public abstract class AbstractLeanBetaTransaction implements BetaTransaction {
     public final static int ABORTED = 3;
     public final static int COMMITTED = 4;
 
-    private final int poolTransactionType;        
+    private final int poolTransactionType;
     protected int status = ACTIVE;
     protected int attempt = 1;
     protected long remainingTimeoutNs;
@@ -30,11 +30,12 @@ public abstract class AbstractLeanBetaTransaction implements BetaTransaction {
     }
 
     @Override
-    public int getPoolTransactionType() {
+    public final int getPoolTransactionType() {
         return poolTransactionType;
     }
 
-     public final void setAbortOnly() {
+    @Override
+    public final void setAbortOnly() {
         switch (status) {
             case NEW:
                 throw new TodoException();
@@ -72,6 +73,7 @@ public abstract class AbstractLeanBetaTransaction implements BetaTransaction {
         return null;
     }
 
+    @Override
     public final void copyForSpeculativeFailure(BetaTransaction tx) {
         List<TransactionLifecycleListener> listeners = tx.getPermanentListeners();
 
@@ -83,18 +85,16 @@ public abstract class AbstractLeanBetaTransaction implements BetaTransaction {
         attempt = tx.getAttempt();
     }
 
-
     @Override
-    public void registerPermanent(TransactionLifecycleListener listener) {
+    public final void registerPermanent(TransactionLifecycleListener listener) {
         registerPermanent(getThreadLocalBetaObjectPool(), listener);
     }
 
     @Override
-    public void registerPermanent(final BetaObjectPool pool, final TransactionLifecycleListener listener) {
+    public final void registerPermanent(final BetaObjectPool pool, final TransactionLifecycleListener listener) {
         //we can forward to the normal register call since a speculative failure is going to be thrown.
         register(pool, listener);
     }
-
 
     @Override
     public final void register(TransactionLifecycleListener listener) {
@@ -102,7 +102,7 @@ public abstract class AbstractLeanBetaTransaction implements BetaTransaction {
     }
 
     @Override
-    public void register(final BetaObjectPool pool, final TransactionLifecycleListener listener) {
+    public final void register(final BetaObjectPool pool, final TransactionLifecycleListener listener) {
         if (listener == null) {
             abort();
             throw new NullPointerException();
@@ -124,7 +124,6 @@ public abstract class AbstractLeanBetaTransaction implements BetaTransaction {
         }
     }
 
-
     @Override
     public final TransactionStatus getStatus() {
         switch (status) {
@@ -144,12 +143,12 @@ public abstract class AbstractLeanBetaTransaction implements BetaTransaction {
     }
 
     @Override
-    public long getRemainingTimeoutNs() {
+    public final long getRemainingTimeoutNs() {
         return remainingTimeoutNs;
     }
 
     @Override
-    public void setRemainingTimeoutNs(long timeoutNs) {
+    public final void setRemainingTimeoutNs(long timeoutNs) {
         if (timeoutNs > remainingTimeoutNs) {
             throw new IllegalArgumentException();
         }

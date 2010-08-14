@@ -37,7 +37,7 @@ public abstract class AbstractFatBetaTransaction implements BetaTransaction {
     }
 
     @Override
-    public int getPoolTransactionType() {
+    public final int getPoolTransactionType() {
         return poolTransactionType;
     }
 
@@ -57,6 +57,7 @@ public abstract class AbstractFatBetaTransaction implements BetaTransaction {
         }
     }
 
+    @Override
     public final void setAbortOnly() {
         switch (status) {
             case NEW:
@@ -90,6 +91,7 @@ public abstract class AbstractFatBetaTransaction implements BetaTransaction {
         return normalListeners;
     }
 
+    @Override
     public final void copyForSpeculativeFailure(BetaTransaction tx) {
         List<TransactionLifecycleListener> listeners = tx.getPermanentListeners();
 
@@ -107,12 +109,12 @@ public abstract class AbstractFatBetaTransaction implements BetaTransaction {
 
 
     @Override
-    public void registerPermanent(TransactionLifecycleListener listener) {
+    public final void registerPermanent(TransactionLifecycleListener listener) {
         registerPermanent(getThreadLocalBetaObjectPool(), listener);
     }
 
     @Override
-    public void registerPermanent(final BetaObjectPool pool, final TransactionLifecycleListener listener) {
+    public final void registerPermanent(final BetaObjectPool pool, final TransactionLifecycleListener listener) {
         if (listener == null) {
             abort();
             throw new NullPointerException();
@@ -139,14 +141,13 @@ public abstract class AbstractFatBetaTransaction implements BetaTransaction {
         }
     }
 
-
     @Override
     public final void register(TransactionLifecycleListener listener) {
         register(getThreadLocalBetaObjectPool(), listener);
     }
 
     @Override
-    public void register(final BetaObjectPool pool, final TransactionLifecycleListener listener) {
+    public final void register(final BetaObjectPool pool, final TransactionLifecycleListener listener) {
         if (listener == null) {
             abort();
             throw new NullPointerException();
@@ -173,7 +174,6 @@ public abstract class AbstractFatBetaTransaction implements BetaTransaction {
         }
     }
 
-
     @Override
     public final TransactionStatus getStatus() {
         switch (status) {
@@ -193,12 +193,12 @@ public abstract class AbstractFatBetaTransaction implements BetaTransaction {
     }
 
     @Override
-    public long getRemainingTimeoutNs() {
+    public final long getRemainingTimeoutNs() {
         return remainingTimeoutNs;
     }
 
     @Override
-    public void setRemainingTimeoutNs(long timeoutNs) {
+    public final void setRemainingTimeoutNs(long timeoutNs) {
         if (timeoutNs > remainingTimeoutNs) {
             throw new IllegalArgumentException();
         }
