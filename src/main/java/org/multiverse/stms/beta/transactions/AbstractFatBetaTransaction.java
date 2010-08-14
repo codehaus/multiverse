@@ -1,10 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.TransactionStatus;
-import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.ReadConflict;
-import org.multiverse.api.exceptions.SpeculativeConfigurationError;
-import org.multiverse.api.exceptions.WriteConflict;
+import org.multiverse.api.exceptions.*;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaObjectPool;
@@ -31,7 +28,7 @@ public abstract class AbstractFatBetaTransaction implements BetaTransaction {
     protected ArrayList<TransactionLifecycleListener> normalListeners;
     protected int attempt = 1;
     protected long remainingTimeoutNs;
-
+    protected boolean abortOnly;
     private final int poolTransactionType;
 
     public AbstractFatBetaTransaction(int poolTransactionType, BetaTransactionConfig config) {
@@ -57,6 +54,24 @@ public abstract class AbstractFatBetaTransaction implements BetaTransaction {
         int size = listeners.size();
         for (int k = 0; k < size; k++) {
             listeners.get(k).notify(this, event);
+        }
+    }
+
+    public final void setAbortOnly() {
+        switch (status) {
+            case NEW:
+                throw new TodoException();
+            case ACTIVE:
+                abortOnly = true;
+                break;
+            case PREPARED:
+                throw new PreparedTransactionException();
+            case COMMITTED:
+                throw new DeadTransactionException();
+            case ABORTED:
+                throw new DeadTransactionException();
+            default:
+                throw new IllegalStateException();
         }
     }
 

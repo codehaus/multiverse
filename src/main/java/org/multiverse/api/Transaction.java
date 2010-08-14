@@ -24,6 +24,15 @@ public interface Transaction {
     void prepare();
 
     /**
+     * Signals that the only possible outcome of the Transaction is one that aborts.
+     *
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if the transaction is not in the correct
+     *          stat for this operation.
+     */
+    void setAbortOnly();
+
+    /**
      * Resets the transaction so that it can be reused for another attempt to evaluate the transaction.
      *
      * @return true if another attempt can be made, false otherwise.

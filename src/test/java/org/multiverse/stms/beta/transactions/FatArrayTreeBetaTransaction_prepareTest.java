@@ -216,6 +216,20 @@ public class FatArrayTreeBetaTransaction_prepareTest {
         assertFalse(write.isCommitted);
     }
 
+     @Test
+    public void whenAbortOnly() {
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        tx.setAbortOnly();
+
+        try {
+            tx.prepare();
+            fail();
+        } catch (WriteConflict conflict) {
+        }
+
+        assertAborted(tx);
+    }
+
     @Test
     public void whenCommitted_thenDeadTransactionException() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);

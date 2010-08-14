@@ -432,6 +432,20 @@ public class FatArrayBetaTransaction_commitTest {
     }
 
     @Test
+    public void whenAbortOnly() {
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        tx.setAbortOnly();
+
+        try {
+            tx.commit();
+            fail();
+        } catch (WriteConflict conflict) {
+        }
+
+        assertAborted(tx);
+    }
+
+    @Test
     public void whenCommitted_thenIgnore() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.commit(pool);

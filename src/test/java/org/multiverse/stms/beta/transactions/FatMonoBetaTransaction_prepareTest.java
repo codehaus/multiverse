@@ -203,6 +203,20 @@ public class FatMonoBetaTransaction_prepareTest {
     }
 
     @Test
+    public void whenAbortOnly() {
+        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        tx.setAbortOnly();
+
+        try {
+            tx.prepare();
+            fail();
+        } catch (WriteConflict conflict) {
+        }
+
+        assertAborted(tx);
+    }
+
+    @Test
     public void whenPrepared_thenIgnored() {
         LongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.unsafeLoad();

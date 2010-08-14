@@ -13,32 +13,31 @@ import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalB
 /**
  * @author Peter Veentjer
  */
-public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock {
+public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
     public LeanBetaAtomicBlock(final BetaTransactionFactory transactionFactory) {
         super(transactionFactory);
     }
 
-    public BetaTransactionFactory getTransactionFactory() {
+    public BetaTransactionFactory getTransactionFactory(){
         return transactionFactory;
     }
-
     public <E> E execute(
-            final AtomicClosure<E> closure) {
+        final AtomicClosure<E> closure){
 
-        if (closure == null) {
+        if(closure == null){
             throw new NullPointerException();
         }
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction) getThreadLocalTransaction();
-        if (tx == null || !tx.getStatus().isAlive()) {
+        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
 
-        try {
-            if (tx != null && tx.getStatus().isAlive()) {
+        try{
+            if(tx != null && tx.getStatus().isAlive()){
                 return closure.execute(tx);
             }
 
@@ -76,7 +75,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 pool.putBetaTransaction(tx);
                 clearThreadLocalTransaction();
             }
-        } catch (Exception e) {
+        }catch(Exception e){
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             } else {
@@ -85,27 +84,27 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock {
         }
 
         throw new TooManyRetriesException(
-                format("Maximum number of %s retries has been reached for transaction '%s'",
-                        transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
+            format("Maximum number of %s retries has been reached for transaction '%s'",
+                transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
     }
+ 
+    public  int execute(
+        final AtomicIntClosure closure){
 
-    public int execute(
-            final AtomicIntClosure closure) {
-
-        if (closure == null) {
+        if(closure == null){
             throw new NullPointerException();
         }
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction) getThreadLocalTransaction();
-        if (tx == null || !tx.getStatus().isAlive()) {
+        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
 
-        try {
-            if (tx != null && tx.getStatus().isAlive()) {
+        try{
+            if(tx != null && tx.getStatus().isAlive()){
                 return closure.execute(tx);
             }
 
@@ -143,7 +142,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 pool.putBetaTransaction(tx);
                 clearThreadLocalTransaction();
             }
-        } catch (Exception e) {
+        }catch(Exception e){
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             } else {
@@ -152,27 +151,27 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock {
         }
 
         throw new TooManyRetriesException(
-                format("Maximum number of %s retries has been reached for transaction '%s'",
-                        transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
+            format("Maximum number of %s retries has been reached for transaction '%s'",
+                transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
     }
+ 
+    public  long execute(
+        final AtomicLongClosure closure){
 
-    public long execute(
-            final AtomicLongClosure closure) {
-
-        if (closure == null) {
+        if(closure == null){
             throw new NullPointerException();
         }
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction) getThreadLocalTransaction();
-        if (tx == null || !tx.getStatus().isAlive()) {
+        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
 
-        try {
-            if (tx != null && tx.getStatus().isAlive()) {
+        try{
+            if(tx != null && tx.getStatus().isAlive()){
                 return closure.execute(tx);
             }
 
@@ -210,7 +209,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 pool.putBetaTransaction(tx);
                 clearThreadLocalTransaction();
             }
-        } catch (Exception e) {
+        }catch(Exception e){
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             } else {
@@ -219,27 +218,27 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock {
         }
 
         throw new TooManyRetriesException(
-                format("Maximum number of %s retries has been reached for transaction '%s'",
-                        transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
+            format("Maximum number of %s retries has been reached for transaction '%s'",
+                transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
     }
+ 
+    public  double execute(
+        final AtomicDoubleClosure closure){
 
-    public double execute(
-            final AtomicDoubleClosure closure) {
-
-        if (closure == null) {
+        if(closure == null){
             throw new NullPointerException();
         }
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction) getThreadLocalTransaction();
-        if (tx == null || !tx.getStatus().isAlive()) {
+        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
 
-        try {
-            if (tx != null && tx.getStatus().isAlive()) {
+        try{
+            if(tx != null && tx.getStatus().isAlive()){
                 return closure.execute(tx);
             }
 
@@ -277,7 +276,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 pool.putBetaTransaction(tx);
                 clearThreadLocalTransaction();
             }
-        } catch (Exception e) {
+        }catch(Exception e){
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             } else {
@@ -286,27 +285,27 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock {
         }
 
         throw new TooManyRetriesException(
-                format("Maximum number of %s retries has been reached for transaction '%s'",
-                        transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
+            format("Maximum number of %s retries has been reached for transaction '%s'",
+                transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
     }
+ 
+    public  boolean execute(
+        final AtomicBooleanClosure closure){
 
-    public boolean execute(
-            final AtomicBooleanClosure closure) {
-
-        if (closure == null) {
+        if(closure == null){
             throw new NullPointerException();
         }
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction) getThreadLocalTransaction();
-        if (tx == null || !tx.getStatus().isAlive()) {
+        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
 
-        try {
-            if (tx != null && tx.getStatus().isAlive()) {
+        try{
+            if(tx != null && tx.getStatus().isAlive()){
                 return closure.execute(tx);
             }
 
@@ -344,7 +343,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 pool.putBetaTransaction(tx);
                 clearThreadLocalTransaction();
             }
-        } catch (Exception e) {
+        }catch(Exception e){
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             } else {
@@ -353,27 +352,27 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock {
         }
 
         throw new TooManyRetriesException(
-                format("Maximum number of %s retries has been reached for transaction '%s'",
-                        transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
+            format("Maximum number of %s retries has been reached for transaction '%s'",
+                transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
     }
+ 
+    public  void execute(
+        final AtomicVoidClosure closure){
 
-    public void execute(
-            final AtomicVoidClosure closure) {
-
-        if (closure == null) {
+        if(closure == null){
             throw new NullPointerException();
         }
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction) getThreadLocalTransaction();
-        if (tx == null || !tx.getStatus().isAlive()) {
+        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
 
-        try {
-            if (tx != null && tx.getStatus().isAlive()) {
+        try{
+            if(tx != null && tx.getStatus().isAlive()){
                 closure.execute(tx);
                 return;
             }
@@ -412,7 +411,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 pool.putBetaTransaction(tx);
                 clearThreadLocalTransaction();
             }
-        } catch (Exception e) {
+        }catch(Exception e){
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             } else {
@@ -421,10 +420,10 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock {
         }
 
         throw new TooManyRetriesException(
-                format("Maximum number of %s retries has been reached for transaction '%s'",
-                        transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
+            format("Maximum number of %s retries has been reached for transaction '%s'",
+                transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
     }
-
-
-}
+ 
+ 
+ }

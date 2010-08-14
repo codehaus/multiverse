@@ -564,6 +564,20 @@ public class FatMonoBetaTransaction_commitTest {
     }
 
     @Test
+    public void whenAbortOnly() {
+        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        tx.setAbortOnly();
+
+        try {
+            tx.commit();
+            fail();
+        } catch (WriteConflict conflict) {
+        }
+
+        assertAborted(tx);
+    }
+
+    @Test
     public void whenCommitted_thenIgnore() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.commit(pool);

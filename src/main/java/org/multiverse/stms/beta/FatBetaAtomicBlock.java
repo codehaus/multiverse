@@ -13,7 +13,7 @@ import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalB
 /**
  * @author Peter Veentjer
  */
-public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
+public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
     private final PropagationLevel propagationLevel;
 
@@ -22,25 +22,24 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
         this.propagationLevel = transactionConfiguration.propagationLevel;
     }
 
-    public BetaTransactionFactory getTransactionFactory() {
+    public BetaTransactionFactory getTransactionFactory(){
         return transactionFactory;
     }
+     public <E> E execute(
+        final AtomicClosure<E> closure){
 
-    public <E> E execute(
-            final AtomicClosure<E> closure) {
-
-        if (closure == null) {
+        if(closure == null){
             throw new NullPointerException();
         }
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction) getThreadLocalTransaction();
-        if (tx == null || !tx.getStatus().isAlive()) {
+        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
 
-        try {
+        try{
             switch (propagationLevel) {
                 case Requires:
                     if (tx == null) {
@@ -80,7 +79,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 default:
                     throw new IllegalStateException();
             }
-        } catch (Exception e) {
+        }catch(Exception e){
             //double catching of exceptions
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -88,12 +87,12 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 throw new InvisibleCheckedException(e);
             }
         }
-    }
+   }
 
-    private <E> E execute(
-            BetaTransaction tx, final BetaObjectPool pool, final AtomicClosure<E> closure) throws Exception {
+   private <E> E execute(
+       BetaTransaction tx, final BetaObjectPool pool, final AtomicClosure<E> closure)throws Exception{
 
-        try {
+       try{
             boolean abort = true;
 
             try {
@@ -127,7 +126,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 pool.putBetaTransaction(tx);
                 clearThreadLocalTransaction();
             }
-        } catch (Exception e) {
+        }catch(Exception e){
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             } else {
@@ -136,26 +135,26 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
         }
 
         throw new TooManyRetriesException(
-                format("Maximum number of %s retries has been reached for transaction '%s'",
-                        transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
+            format("Maximum number of %s retries has been reached for transaction '%s'",
+                transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
     }
+ 
+     public  int execute(
+        final AtomicIntClosure closure){
 
-    public int execute(
-            final AtomicIntClosure closure) {
-
-        if (closure == null) {
+        if(closure == null){
             throw new NullPointerException();
         }
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction) getThreadLocalTransaction();
-        if (tx == null || !tx.getStatus().isAlive()) {
+        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
 
-        try {
+        try{
             switch (propagationLevel) {
                 case Requires:
                     if (tx == null) {
@@ -195,7 +194,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 default:
                     throw new IllegalStateException();
             }
-        } catch (Exception e) {
+        }catch(Exception e){
             //double catching of exceptions
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -203,12 +202,12 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 throw new InvisibleCheckedException(e);
             }
         }
-    }
+   }
 
-    private int execute(
-            BetaTransaction tx, final BetaObjectPool pool, final AtomicIntClosure closure) throws Exception {
+   private  int execute(
+       BetaTransaction tx, final BetaObjectPool pool, final AtomicIntClosure closure)throws Exception{
 
-        try {
+       try{
             boolean abort = true;
 
             try {
@@ -242,7 +241,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 pool.putBetaTransaction(tx);
                 clearThreadLocalTransaction();
             }
-        } catch (Exception e) {
+        }catch(Exception e){
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             } else {
@@ -251,26 +250,26 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
         }
 
         throw new TooManyRetriesException(
-                format("Maximum number of %s retries has been reached for transaction '%s'",
-                        transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
+            format("Maximum number of %s retries has been reached for transaction '%s'",
+                transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
     }
+ 
+     public  long execute(
+        final AtomicLongClosure closure){
 
-    public long execute(
-            final AtomicLongClosure closure) {
-
-        if (closure == null) {
+        if(closure == null){
             throw new NullPointerException();
         }
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction) getThreadLocalTransaction();
-        if (tx == null || !tx.getStatus().isAlive()) {
+        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
 
-        try {
+        try{
             switch (propagationLevel) {
                 case Requires:
                     if (tx == null) {
@@ -310,7 +309,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 default:
                     throw new IllegalStateException();
             }
-        } catch (Exception e) {
+        }catch(Exception e){
             //double catching of exceptions
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -318,12 +317,12 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 throw new InvisibleCheckedException(e);
             }
         }
-    }
+   }
 
-    private long execute(
-            BetaTransaction tx, final BetaObjectPool pool, final AtomicLongClosure closure) throws Exception {
+   private  long execute(
+       BetaTransaction tx, final BetaObjectPool pool, final AtomicLongClosure closure)throws Exception{
 
-        try {
+       try{
             boolean abort = true;
 
             try {
@@ -357,7 +356,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 pool.putBetaTransaction(tx);
                 clearThreadLocalTransaction();
             }
-        } catch (Exception e) {
+        }catch(Exception e){
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             } else {
@@ -366,26 +365,26 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
         }
 
         throw new TooManyRetriesException(
-                format("Maximum number of %s retries has been reached for transaction '%s'",
-                        transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
+            format("Maximum number of %s retries has been reached for transaction '%s'",
+                transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
     }
+ 
+     public  double execute(
+        final AtomicDoubleClosure closure){
 
-    public double execute(
-            final AtomicDoubleClosure closure) {
-
-        if (closure == null) {
+        if(closure == null){
             throw new NullPointerException();
         }
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction) getThreadLocalTransaction();
-        if (tx == null || !tx.getStatus().isAlive()) {
+        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
 
-        try {
+        try{
             switch (propagationLevel) {
                 case Requires:
                     if (tx == null) {
@@ -425,7 +424,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 default:
                     throw new IllegalStateException();
             }
-        } catch (Exception e) {
+        }catch(Exception e){
             //double catching of exceptions
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -433,12 +432,12 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 throw new InvisibleCheckedException(e);
             }
         }
-    }
+   }
 
-    private double execute(
-            BetaTransaction tx, final BetaObjectPool pool, final AtomicDoubleClosure closure) throws Exception {
+   private  double execute(
+       BetaTransaction tx, final BetaObjectPool pool, final AtomicDoubleClosure closure)throws Exception{
 
-        try {
+       try{
             boolean abort = true;
 
             try {
@@ -472,7 +471,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 pool.putBetaTransaction(tx);
                 clearThreadLocalTransaction();
             }
-        } catch (Exception e) {
+        }catch(Exception e){
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             } else {
@@ -481,26 +480,26 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
         }
 
         throw new TooManyRetriesException(
-                format("Maximum number of %s retries has been reached for transaction '%s'",
-                        transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
+            format("Maximum number of %s retries has been reached for transaction '%s'",
+                transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
     }
+ 
+     public  boolean execute(
+        final AtomicBooleanClosure closure){
 
-    public boolean execute(
-            final AtomicBooleanClosure closure) {
-
-        if (closure == null) {
+        if(closure == null){
             throw new NullPointerException();
         }
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction) getThreadLocalTransaction();
-        if (tx == null || !tx.getStatus().isAlive()) {
+        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
 
-        try {
+        try{
             switch (propagationLevel) {
                 case Requires:
                     if (tx == null) {
@@ -540,7 +539,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 default:
                     throw new IllegalStateException();
             }
-        } catch (Exception e) {
+        }catch(Exception e){
             //double catching of exceptions
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -548,12 +547,12 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 throw new InvisibleCheckedException(e);
             }
         }
-    }
+   }
 
-    private boolean execute(
-            BetaTransaction tx, final BetaObjectPool pool, final AtomicBooleanClosure closure) throws Exception {
+   private  boolean execute(
+       BetaTransaction tx, final BetaObjectPool pool, final AtomicBooleanClosure closure)throws Exception{
 
-        try {
+       try{
             boolean abort = true;
 
             try {
@@ -587,7 +586,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 pool.putBetaTransaction(tx);
                 clearThreadLocalTransaction();
             }
-        } catch (Exception e) {
+        }catch(Exception e){
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             } else {
@@ -596,26 +595,26 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
         }
 
         throw new TooManyRetriesException(
-                format("Maximum number of %s retries has been reached for transaction '%s'",
-                        transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
+            format("Maximum number of %s retries has been reached for transaction '%s'",
+                transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
     }
+ 
+     public  void execute(
+        final AtomicVoidClosure closure){
 
-    public void execute(
-            final AtomicVoidClosure closure) {
-
-        if (closure == null) {
+        if(closure == null){
             throw new NullPointerException();
         }
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction) getThreadLocalTransaction();
-        if (tx == null || !tx.getStatus().isAlive()) {
+        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
 
-        try {
+        try{
             switch (propagationLevel) {
                 case Requires:
                     if (tx == null) {
@@ -662,7 +661,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 default:
                     throw new IllegalStateException();
             }
-        } catch (Exception e) {
+        }catch(Exception e){
             //double catching of exceptions
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -670,12 +669,12 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 throw new InvisibleCheckedException(e);
             }
         }
-    }
+   }
 
-    private void execute(
-            BetaTransaction tx, final BetaObjectPool pool, final AtomicVoidClosure closure) throws Exception {
+   private  void execute(
+       BetaTransaction tx, final BetaObjectPool pool, final AtomicVoidClosure closure)throws Exception{
 
-        try {
+       try{
             boolean abort = true;
 
             try {
@@ -709,7 +708,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
                 pool.putBetaTransaction(tx);
                 clearThreadLocalTransaction();
             }
-        } catch (Exception e) {
+        }catch(Exception e){
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             } else {
@@ -718,10 +717,10 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock {
         }
 
         throw new TooManyRetriesException(
-                format("Maximum number of %s retries has been reached for transaction '%s'",
-                        transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
+            format("Maximum number of %s retries has been reached for transaction '%s'",
+                transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
     }
-
-
-}
+ 
+ 
+ }

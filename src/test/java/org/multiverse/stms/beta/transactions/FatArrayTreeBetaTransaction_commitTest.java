@@ -364,6 +364,20 @@ public class FatArrayTreeBetaTransaction_commitTest {
         assertEquals(created, sum);
     }
 
+     @Test
+    public void whenAbortOnly() {
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        tx.setAbortOnly();
+
+        try {
+            tx.commit();
+            fail();
+        } catch (WriteConflict conflict) {
+        }
+
+        assertAborted(tx);
+    }
+
     @Test
     public void whenCommitted_thenIgnore() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);

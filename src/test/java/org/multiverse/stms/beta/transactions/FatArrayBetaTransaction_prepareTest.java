@@ -240,6 +240,20 @@ public class FatArrayBetaTransaction_prepareTest {
     }
 
     @Test
+    public void whenAbortOnly() {
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        tx.setAbortOnly();
+
+        try {
+            tx.prepare();
+            fail();
+        } catch (WriteConflict conflict) {
+        }
+
+        assertAborted(tx);
+    }
+
+    @Test
     public void whenPreparedAlreadyPrepared() {
         LongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.unsafeLoad();

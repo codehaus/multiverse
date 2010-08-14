@@ -43,27 +43,27 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     }
 
     @Override
-    public void start() {
+    public void start(){
         start(getThreadLocalBetaObjectPool());
     }
 
     @Override
-    public void start(final BetaObjectPool pool) {
-        if (status != NEW) {
-            switch (status) {
+    public void start(final BetaObjectPool pool){
+        if(status != NEW){
+            switch(status){
                 case ACTIVE:
                     //it can't do harm to start an already started transaction
                     return;
                 case PREPARED:
                     abort();
                     throw new PreparedTransactionException(
-                            format("Can't start already prepared transaction '%s'", config.familyName));
+                        format("Can't start already prepared transaction '%s'",config.familyName));
                 case ABORTED:
                     throw new DeadTransactionException(
-                            format("Can't start already aborted transaction '%s'", config.familyName));
+                        format("Can't start already aborted transaction '%s'",config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                            format("Can't start already committed transaction '%s'", config.familyName));
+                        format("Can't start already committed transaction '%s'",config.familyName));
                 default:
                     throw new IllegalStateException();
             }
@@ -72,7 +72,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
     @Override
     public <E> RefTranlocal<E> openForRead(
-            final Ref<E> ref, boolean lock, final BetaObjectPool pool) {
+        final Ref<E> ref, boolean lock, final BetaObjectPool pool) {
 
         //make sure that the state is correct.
         if (status != ACTIVE) {
@@ -80,13 +80,13 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 case PREPARED:
                     abort();
                     throw new PreparedTransactionException(
-                            format("Can't read from already prepared transaction '%s'", config.familyName));
+                        format("Can't read from already prepared transaction '%s'",config.familyName));
                 case ABORTED:
                     throw new DeadTransactionException(
-                            format("Can't read from already aborted transaction '%s'", config.familyName));
+                        format("Can't read from already aborted transaction '%s'",config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                            format("Can't read from already committed transaction '%s'", config.familyName));
+                        format("Can't read from already committed transaction '%s'",config.familyName));
                 default:
                     throw new IllegalStateException();
             }
@@ -101,12 +101,12 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         final int index = indexOf(ref);
 
-        if (index >= 0) {
+        if(index >= 0){
             //we are lucky, at already is attached to the session
-            RefTranlocal<E> found = (RefTranlocal<E>) array[index];
+            RefTranlocal<E> found = (RefTranlocal<E>)array[index];
 
             if (lock) {
-                if (!ref.tryLockAndCheckConflict(this, config.spinCount, found)) {
+                if(!ref.tryLockAndCheckConflict(this, config.spinCount, found)){
                     throw abortOnReadConflict(pool);
                 }
             }
@@ -121,10 +121,10 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //check if the size is not exceeded.
         if (firstFreeIndex == array.length) {
-            throw abortOnTooSmallSize(pool, array.length + 1);
+            throw abortOnTooSmallSize(pool, array.length+1);
         }
 
-        if (!hasReads) {
+        if(!hasReads){
             localConflictCounter.reset();
             hasReads = true;
         }
@@ -141,10 +141,10 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnReadConflict(pool);
         }
 
-        if (lock || config.trackReads || !read.isPermanent) {
+        if( lock || config.trackReads || !read.isPermanent){
             array[firstFreeIndex] = read;
             firstFreeIndex++;
-        } else {
+        }else{
             hasUntrackedReads = true;
         }
 
@@ -153,7 +153,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
     @Override
     public <E> RefTranlocal<E> openForWrite(
-            final Ref<E> ref, boolean lock, final BetaObjectPool pool) {
+        final Ref<E>  ref, boolean lock, final BetaObjectPool pool) {
 
         //check if the status of the transaction is correct.
         if (status != ACTIVE) {
@@ -161,13 +161,13 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 case PREPARED:
                     abort();
                     throw new PreparedTransactionException(
-                            format("Can't write to already prepared transaction '%s'", config.familyName));
+                        format("Can't write to already prepared transaction '%s'",config.familyName));
                 case ABORTED:
                     throw new DeadTransactionException(
-                            format("Can't write to already aborted transaction '%s'", config.familyName));
+                        format("Can't write to already aborted transaction '%s'",config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                            format("Can't write to already committed transaction '%s'", config.familyName));
+                        format("Can't write to already committed transaction '%s'",config.familyName));
                 default:
                     throw new IllegalStateException();
             }
@@ -176,7 +176,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if (config.readonly) {
             abort(pool);
             throw new ReadonlyException(
-                    format("Can't write to readonly transaction '%s'", config.familyName));
+                format("Can't write to readonly transaction '%s'",config.familyName));
         }
 
         //an openForWrite can't open a null ref.
@@ -188,8 +188,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         lock = lock || config.lockWrites;
 
         final int index = indexOf(ref);
-        if (index != -1) {
-            RefTranlocal<E> result = (RefTranlocal<E>) array[index];
+        if(index != -1){
+            RefTranlocal<E> result = (RefTranlocal<E>)array[index];
 
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
             if (index > 0) {
@@ -198,7 +198,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             }
 
             if (lock) {
-                if (!ref.tryLockAndCheckConflict(this, config.spinCount, result)) {
+                if(!ref.tryLockAndCheckConflict(this, config.spinCount, result)){
                     throw abortOnReadConflict(pool);
                 }
             }
@@ -215,14 +215,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //make sure that the transaction doesn't overflow.
         if (firstFreeIndex == array.length) {
-            throw abortOnTooSmallSize(pool, array.length + 1);
+            throw abortOnTooSmallSize(pool, array.length+1);
         }
 
         //only if the size currently is 0, we are going to initialize the localConflictCounter,
         //not before. So the localConflictCounter is set at the latest moment possible. It is
         //very important that this is done before the actual reading since we don't want to loose
         //a conflict.
-        if (!hasReads) {
+        if(!hasReads){
             localConflictCounter.reset();
             hasReads = true;
         }
@@ -230,8 +230,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         //the tranlocal was not loaded before in this transaction, now load it.
         final RefTranlocal<E> read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
 
-        if (read.isLocked) {
-            throw abortOnReadConflict(pool);
+        if(read.isLocked){
+           throw abortOnReadConflict(pool);
         }
 
         if (hasReadConflict()) {
@@ -240,8 +240,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         //open the tranlocal for writing.
-        RefTranlocal<E> result = pool.take(ref);
-        if (result == null) {
+        RefTranlocal<E>  result =  pool.take(ref);
+        if(result == null){
             result = new RefTranlocal<E>(ref);
         }
 
@@ -254,7 +254,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
     @Override
     public final <E> RefTranlocal<E> openForConstruction(
-            final Ref<E> ref, final BetaObjectPool pool) {
+        final Ref<E> ref, final BetaObjectPool pool) {
 
         //check if the status of the transaction is correct.
         if (status != ACTIVE) {
@@ -262,13 +262,13 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 case PREPARED:
                     abort();
                     throw new PreparedTransactionException(
-                            format("Can't write fresh object on already prepared transaction '%s'", config.familyName));
+                        format("Can't write fresh object on already prepared transaction '%s'",config.familyName));
                 case ABORTED:
                     throw new DeadTransactionException(
-                            format("Can't write fresh object on already aborted transaction '%s'", config.familyName));
+                        format("Can't write fresh object on already aborted transaction '%s'",config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                            format("Can't write fresh object on already committed transaction '%s'", config.familyName));
+                        format("Can't write fresh object on already committed transaction '%s'",config.familyName));
                 default:
                     throw new IllegalStateException();
             }
@@ -276,7 +276,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         if (config.readonly) {
             abort(pool);
-            throw new ReadonlyException(format("Can't write to readonly transaction '%s'", config.familyName));
+            throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
         }
 
         //an openForWrite can't open a null ref.
@@ -286,14 +286,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         int index = indexOf(ref);
-        if (index >= 0) {
-            RefTranlocal<E> result = (RefTranlocal<E>) array[index];
+        if(index >= 0){
+            RefTranlocal<E> result = (RefTranlocal<E>)array[index];
 
-            if (result.isCommitted || result.read != null) {
+            if(result.isCommitted || result.read!= null){
                 abort();
                 throw new IllegalArgumentException(
-                        format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
-                                config.familyName, ref.getClass().getName()));
+                    format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
+                        config.familyName, ref.getClass().getName()));
 
             }
 
@@ -307,20 +307,20 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //it was not previously attached to this transaction
 
-        if (ref.unsafeLoad() != null) {
+        if(ref.unsafeLoad() != null){
             abort();
             throw new IllegalArgumentException(
-                    format("Can't open for construction a previous committed object on transaction '%s'", config.familyName));
+                format("Can't open for construction a previous committed object on transaction '%s'",config.familyName));
         }
 
         //make sure that the transaction doesn't overflow.
         if (firstFreeIndex == array.length) {
-            throw abortOnTooSmallSize(pool, array.length + 1);
+            throw abortOnTooSmallSize(pool, array.length+1);
         }
 
         //open the tranlocal for writing.
-        RefTranlocal<E> result = pool.take(ref);
-        if (result == null) {
+        RefTranlocal<E> result =  pool.take(ref);
+        if(result == null){
             result = new RefTranlocal<E>(ref);
         }
         array[firstFreeIndex] = result;
@@ -328,14 +328,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         return result;
     }
 
-    public <E> void commute(Ref<E> ref, BetaObjectPool pool, Function<E> function) {
+    public <E> void commute(Ref<E> ref, BetaObjectPool pool, Function<E> function){
         throw new TodoException();
     }
 
 
     @Override
-    public IntRefTranlocal openForRead(
-            final IntRef ref, boolean lock, final BetaObjectPool pool) {
+    public  IntRefTranlocal openForRead(
+        final IntRef ref, boolean lock, final BetaObjectPool pool) {
 
         //make sure that the state is correct.
         if (status != ACTIVE) {
@@ -343,13 +343,13 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 case PREPARED:
                     abort();
                     throw new PreparedTransactionException(
-                            format("Can't read from already prepared transaction '%s'", config.familyName));
+                        format("Can't read from already prepared transaction '%s'",config.familyName));
                 case ABORTED:
                     throw new DeadTransactionException(
-                            format("Can't read from already aborted transaction '%s'", config.familyName));
+                        format("Can't read from already aborted transaction '%s'",config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                            format("Can't read from already committed transaction '%s'", config.familyName));
+                        format("Can't read from already committed transaction '%s'",config.familyName));
                 default:
                     throw new IllegalStateException();
             }
@@ -364,12 +364,12 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         final int index = indexOf(ref);
 
-        if (index >= 0) {
+        if(index >= 0){
             //we are lucky, at already is attached to the session
-            IntRefTranlocal found = (IntRefTranlocal) array[index];
+            IntRefTranlocal found = (IntRefTranlocal)array[index];
 
             if (lock) {
-                if (!ref.tryLockAndCheckConflict(this, config.spinCount, found)) {
+                if(!ref.tryLockAndCheckConflict(this, config.spinCount, found)){
                     throw abortOnReadConflict(pool);
                 }
             }
@@ -384,10 +384,10 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //check if the size is not exceeded.
         if (firstFreeIndex == array.length) {
-            throw abortOnTooSmallSize(pool, array.length + 1);
+            throw abortOnTooSmallSize(pool, array.length+1);
         }
 
-        if (!hasReads) {
+        if(!hasReads){
             localConflictCounter.reset();
             hasReads = true;
         }
@@ -404,10 +404,10 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnReadConflict(pool);
         }
 
-        if (lock || config.trackReads || !read.isPermanent) {
+        if( lock || config.trackReads || !read.isPermanent){
             array[firstFreeIndex] = read;
             firstFreeIndex++;
-        } else {
+        }else{
             hasUntrackedReads = true;
         }
 
@@ -415,8 +415,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     }
 
     @Override
-    public IntRefTranlocal openForWrite(
-            final IntRef ref, boolean lock, final BetaObjectPool pool) {
+    public  IntRefTranlocal openForWrite(
+        final IntRef  ref, boolean lock, final BetaObjectPool pool) {
 
         //check if the status of the transaction is correct.
         if (status != ACTIVE) {
@@ -424,13 +424,13 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 case PREPARED:
                     abort();
                     throw new PreparedTransactionException(
-                            format("Can't write to already prepared transaction '%s'", config.familyName));
+                        format("Can't write to already prepared transaction '%s'",config.familyName));
                 case ABORTED:
                     throw new DeadTransactionException(
-                            format("Can't write to already aborted transaction '%s'", config.familyName));
+                        format("Can't write to already aborted transaction '%s'",config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                            format("Can't write to already committed transaction '%s'", config.familyName));
+                        format("Can't write to already committed transaction '%s'",config.familyName));
                 default:
                     throw new IllegalStateException();
             }
@@ -439,7 +439,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if (config.readonly) {
             abort(pool);
             throw new ReadonlyException(
-                    format("Can't write to readonly transaction '%s'", config.familyName));
+                format("Can't write to readonly transaction '%s'",config.familyName));
         }
 
         //an openForWrite can't open a null ref.
@@ -451,8 +451,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         lock = lock || config.lockWrites;
 
         final int index = indexOf(ref);
-        if (index != -1) {
-            IntRefTranlocal result = (IntRefTranlocal) array[index];
+        if(index != -1){
+            IntRefTranlocal result = (IntRefTranlocal)array[index];
 
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
             if (index > 0) {
@@ -461,7 +461,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             }
 
             if (lock) {
-                if (!ref.tryLockAndCheckConflict(this, config.spinCount, result)) {
+                if(!ref.tryLockAndCheckConflict(this, config.spinCount, result)){
                     throw abortOnReadConflict(pool);
                 }
             }
@@ -478,14 +478,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //make sure that the transaction doesn't overflow.
         if (firstFreeIndex == array.length) {
-            throw abortOnTooSmallSize(pool, array.length + 1);
+            throw abortOnTooSmallSize(pool, array.length+1);
         }
 
         //only if the size currently is 0, we are going to initialize the localConflictCounter,
         //not before. So the localConflictCounter is set at the latest moment possible. It is
         //very important that this is done before the actual reading since we don't want to loose
         //a conflict.
-        if (!hasReads) {
+        if(!hasReads){
             localConflictCounter.reset();
             hasReads = true;
         }
@@ -493,8 +493,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         //the tranlocal was not loaded before in this transaction, now load it.
         final IntRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
 
-        if (read.isLocked) {
-            throw abortOnReadConflict(pool);
+        if(read.isLocked){
+           throw abortOnReadConflict(pool);
         }
 
         if (hasReadConflict()) {
@@ -503,8 +503,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         //open the tranlocal for writing.
-        IntRefTranlocal result = pool.take(ref);
-        if (result == null) {
+        IntRefTranlocal  result =  pool.take(ref);
+        if(result == null){
             result = new IntRefTranlocal(ref);
         }
 
@@ -516,8 +516,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     }
 
     @Override
-    public final IntRefTranlocal openForConstruction(
-            final IntRef ref, final BetaObjectPool pool) {
+    public final  IntRefTranlocal openForConstruction(
+        final IntRef ref, final BetaObjectPool pool) {
 
         //check if the status of the transaction is correct.
         if (status != ACTIVE) {
@@ -525,13 +525,13 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 case PREPARED:
                     abort();
                     throw new PreparedTransactionException(
-                            format("Can't write fresh object on already prepared transaction '%s'", config.familyName));
+                        format("Can't write fresh object on already prepared transaction '%s'",config.familyName));
                 case ABORTED:
                     throw new DeadTransactionException(
-                            format("Can't write fresh object on already aborted transaction '%s'", config.familyName));
+                        format("Can't write fresh object on already aborted transaction '%s'",config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                            format("Can't write fresh object on already committed transaction '%s'", config.familyName));
+                        format("Can't write fresh object on already committed transaction '%s'",config.familyName));
                 default:
                     throw new IllegalStateException();
             }
@@ -539,7 +539,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         if (config.readonly) {
             abort(pool);
-            throw new ReadonlyException(format("Can't write to readonly transaction '%s'", config.familyName));
+            throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
         }
 
         //an openForWrite can't open a null ref.
@@ -549,14 +549,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         int index = indexOf(ref);
-        if (index >= 0) {
-            IntRefTranlocal result = (IntRefTranlocal) array[index];
+        if(index >= 0){
+            IntRefTranlocal result = (IntRefTranlocal)array[index];
 
-            if (result.isCommitted || result.read != null) {
+            if(result.isCommitted || result.read!= null){
                 abort();
                 throw new IllegalArgumentException(
-                        format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
-                                config.familyName, ref.getClass().getName()));
+                    format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
+                        config.familyName, ref.getClass().getName()));
 
             }
 
@@ -570,20 +570,20 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //it was not previously attached to this transaction
 
-        if (ref.unsafeLoad() != null) {
+        if(ref.unsafeLoad() != null){
             abort();
             throw new IllegalArgumentException(
-                    format("Can't open for construction a previous committed object on transaction '%s'", config.familyName));
+                format("Can't open for construction a previous committed object on transaction '%s'",config.familyName));
         }
 
         //make sure that the transaction doesn't overflow.
         if (firstFreeIndex == array.length) {
-            throw abortOnTooSmallSize(pool, array.length + 1);
+            throw abortOnTooSmallSize(pool, array.length+1);
         }
 
         //open the tranlocal for writing.
-        IntRefTranlocal result = pool.take(ref);
-        if (result == null) {
+        IntRefTranlocal result =  pool.take(ref);
+        if(result == null){
             result = new IntRefTranlocal(ref);
         }
         array[firstFreeIndex] = result;
@@ -591,14 +591,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         return result;
     }
 
-    public void commute(IntRef ref, BetaObjectPool pool, IntFunction function) {
+    public  void commute(IntRef ref, BetaObjectPool pool, IntFunction function){
         throw new TodoException();
     }
 
 
     @Override
-    public LongRefTranlocal openForRead(
-            final LongRef ref, boolean lock, final BetaObjectPool pool) {
+    public  LongRefTranlocal openForRead(
+        final LongRef ref, boolean lock, final BetaObjectPool pool) {
 
         //make sure that the state is correct.
         if (status != ACTIVE) {
@@ -606,13 +606,13 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 case PREPARED:
                     abort();
                     throw new PreparedTransactionException(
-                            format("Can't read from already prepared transaction '%s'", config.familyName));
+                        format("Can't read from already prepared transaction '%s'",config.familyName));
                 case ABORTED:
                     throw new DeadTransactionException(
-                            format("Can't read from already aborted transaction '%s'", config.familyName));
+                        format("Can't read from already aborted transaction '%s'",config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                            format("Can't read from already committed transaction '%s'", config.familyName));
+                        format("Can't read from already committed transaction '%s'",config.familyName));
                 default:
                     throw new IllegalStateException();
             }
@@ -627,12 +627,12 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         final int index = indexOf(ref);
 
-        if (index >= 0) {
+        if(index >= 0){
             //we are lucky, at already is attached to the session
-            LongRefTranlocal found = (LongRefTranlocal) array[index];
+            LongRefTranlocal found = (LongRefTranlocal)array[index];
 
             if (lock) {
-                if (!ref.tryLockAndCheckConflict(this, config.spinCount, found)) {
+                if(!ref.tryLockAndCheckConflict(this, config.spinCount, found)){
                     throw abortOnReadConflict(pool);
                 }
             }
@@ -647,10 +647,10 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //check if the size is not exceeded.
         if (firstFreeIndex == array.length) {
-            throw abortOnTooSmallSize(pool, array.length + 1);
+            throw abortOnTooSmallSize(pool, array.length+1);
         }
 
-        if (!hasReads) {
+        if(!hasReads){
             localConflictCounter.reset();
             hasReads = true;
         }
@@ -667,10 +667,10 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnReadConflict(pool);
         }
 
-        if (lock || config.trackReads || !read.isPermanent) {
+        if( lock || config.trackReads || !read.isPermanent){
             array[firstFreeIndex] = read;
             firstFreeIndex++;
-        } else {
+        }else{
             hasUntrackedReads = true;
         }
 
@@ -678,8 +678,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     }
 
     @Override
-    public LongRefTranlocal openForWrite(
-            final LongRef ref, boolean lock, final BetaObjectPool pool) {
+    public  LongRefTranlocal openForWrite(
+        final LongRef  ref, boolean lock, final BetaObjectPool pool) {
 
         //check if the status of the transaction is correct.
         if (status != ACTIVE) {
@@ -687,13 +687,13 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 case PREPARED:
                     abort();
                     throw new PreparedTransactionException(
-                            format("Can't write to already prepared transaction '%s'", config.familyName));
+                        format("Can't write to already prepared transaction '%s'",config.familyName));
                 case ABORTED:
                     throw new DeadTransactionException(
-                            format("Can't write to already aborted transaction '%s'", config.familyName));
+                        format("Can't write to already aborted transaction '%s'",config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                            format("Can't write to already committed transaction '%s'", config.familyName));
+                        format("Can't write to already committed transaction '%s'",config.familyName));
                 default:
                     throw new IllegalStateException();
             }
@@ -702,7 +702,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if (config.readonly) {
             abort(pool);
             throw new ReadonlyException(
-                    format("Can't write to readonly transaction '%s'", config.familyName));
+                format("Can't write to readonly transaction '%s'",config.familyName));
         }
 
         //an openForWrite can't open a null ref.
@@ -714,8 +714,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         lock = lock || config.lockWrites;
 
         final int index = indexOf(ref);
-        if (index != -1) {
-            LongRefTranlocal result = (LongRefTranlocal) array[index];
+        if(index != -1){
+            LongRefTranlocal result = (LongRefTranlocal)array[index];
 
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
             if (index > 0) {
@@ -724,7 +724,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             }
 
             if (lock) {
-                if (!ref.tryLockAndCheckConflict(this, config.spinCount, result)) {
+                if(!ref.tryLockAndCheckConflict(this, config.spinCount, result)){
                     throw abortOnReadConflict(pool);
                 }
             }
@@ -741,14 +741,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //make sure that the transaction doesn't overflow.
         if (firstFreeIndex == array.length) {
-            throw abortOnTooSmallSize(pool, array.length + 1);
+            throw abortOnTooSmallSize(pool, array.length+1);
         }
 
         //only if the size currently is 0, we are going to initialize the localConflictCounter,
         //not before. So the localConflictCounter is set at the latest moment possible. It is
         //very important that this is done before the actual reading since we don't want to loose
         //a conflict.
-        if (!hasReads) {
+        if(!hasReads){
             localConflictCounter.reset();
             hasReads = true;
         }
@@ -756,8 +756,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         //the tranlocal was not loaded before in this transaction, now load it.
         final LongRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
 
-        if (read.isLocked) {
-            throw abortOnReadConflict(pool);
+        if(read.isLocked){
+           throw abortOnReadConflict(pool);
         }
 
         if (hasReadConflict()) {
@@ -766,8 +766,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         //open the tranlocal for writing.
-        LongRefTranlocal result = pool.take(ref);
-        if (result == null) {
+        LongRefTranlocal  result =  pool.take(ref);
+        if(result == null){
             result = new LongRefTranlocal(ref);
         }
 
@@ -779,8 +779,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     }
 
     @Override
-    public final LongRefTranlocal openForConstruction(
-            final LongRef ref, final BetaObjectPool pool) {
+    public final  LongRefTranlocal openForConstruction(
+        final LongRef ref, final BetaObjectPool pool) {
 
         //check if the status of the transaction is correct.
         if (status != ACTIVE) {
@@ -788,13 +788,13 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 case PREPARED:
                     abort();
                     throw new PreparedTransactionException(
-                            format("Can't write fresh object on already prepared transaction '%s'", config.familyName));
+                        format("Can't write fresh object on already prepared transaction '%s'",config.familyName));
                 case ABORTED:
                     throw new DeadTransactionException(
-                            format("Can't write fresh object on already aborted transaction '%s'", config.familyName));
+                        format("Can't write fresh object on already aborted transaction '%s'",config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                            format("Can't write fresh object on already committed transaction '%s'", config.familyName));
+                        format("Can't write fresh object on already committed transaction '%s'",config.familyName));
                 default:
                     throw new IllegalStateException();
             }
@@ -802,7 +802,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         if (config.readonly) {
             abort(pool);
-            throw new ReadonlyException(format("Can't write to readonly transaction '%s'", config.familyName));
+            throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
         }
 
         //an openForWrite can't open a null ref.
@@ -812,14 +812,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         int index = indexOf(ref);
-        if (index >= 0) {
-            LongRefTranlocal result = (LongRefTranlocal) array[index];
+        if(index >= 0){
+            LongRefTranlocal result = (LongRefTranlocal)array[index];
 
-            if (result.isCommitted || result.read != null) {
+            if(result.isCommitted || result.read!= null){
                 abort();
                 throw new IllegalArgumentException(
-                        format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
-                                config.familyName, ref.getClass().getName()));
+                    format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
+                        config.familyName, ref.getClass().getName()));
 
             }
 
@@ -833,20 +833,20 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //it was not previously attached to this transaction
 
-        if (ref.unsafeLoad() != null) {
+        if(ref.unsafeLoad() != null){
             abort();
             throw new IllegalArgumentException(
-                    format("Can't open for construction a previous committed object on transaction '%s'", config.familyName));
+                format("Can't open for construction a previous committed object on transaction '%s'",config.familyName));
         }
 
         //make sure that the transaction doesn't overflow.
         if (firstFreeIndex == array.length) {
-            throw abortOnTooSmallSize(pool, array.length + 1);
+            throw abortOnTooSmallSize(pool, array.length+1);
         }
 
         //open the tranlocal for writing.
-        LongRefTranlocal result = pool.take(ref);
-        if (result == null) {
+        LongRefTranlocal result =  pool.take(ref);
+        if(result == null){
             result = new LongRefTranlocal(ref);
         }
         array[firstFreeIndex] = result;
@@ -854,14 +854,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         return result;
     }
 
-    public void commute(LongRef ref, BetaObjectPool pool, LongFunction function) {
+    public  void commute(LongRef ref, BetaObjectPool pool, LongFunction function){
         throw new TodoException();
     }
 
 
     @Override
-    public Tranlocal openForRead(
-            final BetaTransactionalObject ref, boolean lock, final BetaObjectPool pool) {
+    public  Tranlocal openForRead(
+        final BetaTransactionalObject ref, boolean lock, final BetaObjectPool pool) {
 
         //make sure that the state is correct.
         if (status != ACTIVE) {
@@ -869,13 +869,13 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 case PREPARED:
                     abort();
                     throw new PreparedTransactionException(
-                            format("Can't read from already prepared transaction '%s'", config.familyName));
+                        format("Can't read from already prepared transaction '%s'",config.familyName));
                 case ABORTED:
                     throw new DeadTransactionException(
-                            format("Can't read from already aborted transaction '%s'", config.familyName));
+                        format("Can't read from already aborted transaction '%s'",config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                            format("Can't read from already committed transaction '%s'", config.familyName));
+                        format("Can't read from already committed transaction '%s'",config.familyName));
                 default:
                     throw new IllegalStateException();
             }
@@ -890,12 +890,12 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         final int index = indexOf(ref);
 
-        if (index >= 0) {
+        if(index >= 0){
             //we are lucky, at already is attached to the session
-            Tranlocal found = (Tranlocal) array[index];
+            Tranlocal found = (Tranlocal)array[index];
 
             if (lock) {
-                if (!ref.tryLockAndCheckConflict(this, config.spinCount, found)) {
+                if(!ref.tryLockAndCheckConflict(this, config.spinCount, found)){
                     throw abortOnReadConflict(pool);
                 }
             }
@@ -910,10 +910,10 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //check if the size is not exceeded.
         if (firstFreeIndex == array.length) {
-            throw abortOnTooSmallSize(pool, array.length + 1);
+            throw abortOnTooSmallSize(pool, array.length+1);
         }
 
-        if (!hasReads) {
+        if(!hasReads){
             localConflictCounter.reset();
             hasReads = true;
         }
@@ -930,10 +930,10 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnReadConflict(pool);
         }
 
-        if (lock || config.trackReads || !read.isPermanent) {
+        if( lock || config.trackReads || !read.isPermanent){
             array[firstFreeIndex] = read;
             firstFreeIndex++;
-        } else {
+        }else{
             hasUntrackedReads = true;
         }
 
@@ -941,8 +941,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     }
 
     @Override
-    public Tranlocal openForWrite(
-            final BetaTransactionalObject ref, boolean lock, final BetaObjectPool pool) {
+    public  Tranlocal openForWrite(
+        final BetaTransactionalObject  ref, boolean lock, final BetaObjectPool pool) {
 
         //check if the status of the transaction is correct.
         if (status != ACTIVE) {
@@ -950,13 +950,13 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 case PREPARED:
                     abort();
                     throw new PreparedTransactionException(
-                            format("Can't write to already prepared transaction '%s'", config.familyName));
+                        format("Can't write to already prepared transaction '%s'",config.familyName));
                 case ABORTED:
                     throw new DeadTransactionException(
-                            format("Can't write to already aborted transaction '%s'", config.familyName));
+                        format("Can't write to already aborted transaction '%s'",config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                            format("Can't write to already committed transaction '%s'", config.familyName));
+                        format("Can't write to already committed transaction '%s'",config.familyName));
                 default:
                     throw new IllegalStateException();
             }
@@ -965,7 +965,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if (config.readonly) {
             abort(pool);
             throw new ReadonlyException(
-                    format("Can't write to readonly transaction '%s'", config.familyName));
+                format("Can't write to readonly transaction '%s'",config.familyName));
         }
 
         //an openForWrite can't open a null ref.
@@ -977,8 +977,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         lock = lock || config.lockWrites;
 
         final int index = indexOf(ref);
-        if (index != -1) {
-            Tranlocal result = (Tranlocal) array[index];
+        if(index != -1){
+            Tranlocal result = (Tranlocal)array[index];
 
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
             if (index > 0) {
@@ -987,7 +987,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             }
 
             if (lock) {
-                if (!ref.tryLockAndCheckConflict(this, config.spinCount, result)) {
+                if(!ref.tryLockAndCheckConflict(this, config.spinCount, result)){
                     throw abortOnReadConflict(pool);
                 }
             }
@@ -1004,14 +1004,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //make sure that the transaction doesn't overflow.
         if (firstFreeIndex == array.length) {
-            throw abortOnTooSmallSize(pool, array.length + 1);
+            throw abortOnTooSmallSize(pool, array.length+1);
         }
 
         //only if the size currently is 0, we are going to initialize the localConflictCounter,
         //not before. So the localConflictCounter is set at the latest moment possible. It is
         //very important that this is done before the actual reading since we don't want to loose
         //a conflict.
-        if (!hasReads) {
+        if(!hasReads){
             localConflictCounter.reset();
             hasReads = true;
         }
@@ -1019,8 +1019,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         //the tranlocal was not loaded before in this transaction, now load it.
         final Tranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
 
-        if (read.isLocked) {
-            throw abortOnReadConflict(pool);
+        if(read.isLocked){
+           throw abortOnReadConflict(pool);
         }
 
         if (hasReadConflict()) {
@@ -1029,15 +1029,15 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         //open the tranlocal for writing.
-        Tranlocal result = read.openForWrite(pool);
+        Tranlocal  result = read.openForWrite(pool);
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
     }
 
     @Override
-    public final Tranlocal openForConstruction(
-            final BetaTransactionalObject ref, final BetaObjectPool pool) {
+    public final  Tranlocal openForConstruction(
+        final BetaTransactionalObject ref, final BetaObjectPool pool) {
 
         //check if the status of the transaction is correct.
         if (status != ACTIVE) {
@@ -1045,13 +1045,13 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 case PREPARED:
                     abort();
                     throw new PreparedTransactionException(
-                            format("Can't write fresh object on already prepared transaction '%s'", config.familyName));
+                        format("Can't write fresh object on already prepared transaction '%s'",config.familyName));
                 case ABORTED:
                     throw new DeadTransactionException(
-                            format("Can't write fresh object on already aborted transaction '%s'", config.familyName));
+                        format("Can't write fresh object on already aborted transaction '%s'",config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                            format("Can't write fresh object on already committed transaction '%s'", config.familyName));
+                        format("Can't write fresh object on already committed transaction '%s'",config.familyName));
                 default:
                     throw new IllegalStateException();
             }
@@ -1059,7 +1059,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         if (config.readonly) {
             abort(pool);
-            throw new ReadonlyException(format("Can't write to readonly transaction '%s'", config.familyName));
+            throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
         }
 
         //an openForWrite can't open a null ref.
@@ -1069,14 +1069,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         int index = indexOf(ref);
-        if (index >= 0) {
-            Tranlocal result = (Tranlocal) array[index];
+        if(index >= 0){
+            Tranlocal result = (Tranlocal)array[index];
 
-            if (result.isCommitted || result.read != null) {
+            if(result.isCommitted || result.read!= null){
                 abort();
                 throw new IllegalArgumentException(
-                        format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
-                                config.familyName, ref.getClass().getName()));
+                    format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
+                        config.familyName, ref.getClass().getName()));
 
             }
 
@@ -1090,15 +1090,15 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //it was not previously attached to this transaction
 
-        if (ref.unsafeLoad() != null) {
+        if(ref.unsafeLoad() != null){
             abort();
             throw new IllegalArgumentException(
-                    format("Can't open for construction a previous committed object on transaction '%s'", config.familyName));
+                format("Can't open for construction a previous committed object on transaction '%s'",config.familyName));
         }
 
         //make sure that the transaction doesn't overflow.
         if (firstFreeIndex == array.length) {
-            throw abortOnTooSmallSize(pool, array.length + 1);
+            throw abortOnTooSmallSize(pool, array.length+1);
         }
 
         //open the tranlocal for writing.
@@ -1108,23 +1108,23 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         return result;
     }
 
-    public void commute(BetaTransactionalObject ref, BetaObjectPool pool, Function function) {
+    public  void commute(BetaTransactionalObject ref, BetaObjectPool pool, Function function){
         throw new TodoException();
     }
 
-
+ 
     /**
      * Finds the index of the tranlocal that has the ref as owner. Return -1 if not found.
      *
      * @param owner the owner of the tranlocal to look for.
      * @return the index of the tranlocal, or -1 if not found.
      */
-    private int indexOf(BetaTransactionalObject owner) {
-        assert owner != null;
+    private int indexOf(BetaTransactionalObject owner){
+        assert owner!=null;
 
-        for (int k = 0; k < firstFreeIndex; k++) {
+        for(int k=0; k < firstFreeIndex; k++){
             Tranlocal tranlocal = array[k];
-            if (tranlocal.owner == owner) {
+            if(tranlocal.owner == owner){
                 return k;
             }
         }
@@ -1137,11 +1137,11 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             return false;
         }
 
-        if (hasUntrackedReads) {
+        if(hasUntrackedReads){
             return localConflictCounter.syncAndCheckConflict();
         }
 
-        if (firstFreeIndex == 0) {
+        if(firstFreeIndex == 0){
             return false;
         }
 
@@ -1186,7 +1186,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 break;
             case COMMITTED:
                 throw new DeadTransactionException(
-                        format("Can't abort already committed transaction '%s'", config.familyName));
+                    format("Can't abort already committed transaction '%s'",config.familyName));
             default:
                 throw new IllegalStateException();
         }
@@ -1196,7 +1196,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
     @Override
     public void commit() {
-        commit(getThreadLocalBetaObjectPool());
+         commit(getThreadLocalBetaObjectPool());
     }
 
     @Override
@@ -1205,7 +1205,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             switch (status) {
                 case ABORTED:
                     throw new DeadTransactionException(
-                            format("Can't commit already aborted transaction '%s'", config.familyName));
+                        format("Can't commit already aborted transaction '%s'",config.familyName));
                 case COMMITTED:
                     return;
                 default:
@@ -1213,18 +1213,22 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             }
         }
 
+        if(abortOnly){
+            throw abortOnWriteConflict(pool);
+        }
+            
         Listeners[] listeners = null;
 
         if (firstFreeIndex > 0) {
-            if (config.dirtyCheck) {
-                if (status == ACTIVE && !doPrepareDirty()) {
+            if(config.dirtyCheck){
+                if(status == ACTIVE && !doPrepareDirty()){
                     throw abortOnWriteConflict(pool);
                 }
 
                 listeners = commitDirty(pool);
-            } else {
-                if (status == ACTIVE && !doPrepareAll()) {
-                    throw abortOnWriteConflict(pool);
+            }else{
+                if(status == ACTIVE && !doPrepareAll()){
+                     throw abortOnWriteConflict(pool);
                 }
 
                 listeners = commitAll(pool);
@@ -1233,7 +1237,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         status = COMMITTED;
 
-        if (listeners != null) {
+        if(listeners != null){
             Listeners.openAll(listeners, pool);
         }
     }
@@ -1246,15 +1250,15 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             Tranlocal tranlocal = array[k];
             Listeners listeners = tranlocal.owner.commitAll(tranlocal, this, pool, config.globalConflictCounter);
 
-            if (listeners != null) {
-                if (listenersArray == null) {
+            if(listeners != null){
+                if(listenersArray == null){
                     int length = firstFreeIndex - k;
                     listenersArray = pool.takeListenersArray(length);
-                    if (listenersArray == null) {
+                    if(listenersArray == null){
                         listenersArray = new Listeners[length];
                     }
                 }
-                listenersArray[storeIndex] = listeners;
+                listenersArray[storeIndex]=listeners;
                 storeIndex++;
             }
         }
@@ -1270,15 +1274,15 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             Tranlocal tranlocal = array[k];
             Listeners listeners = tranlocal.owner.commitDirty(tranlocal, this, pool, config.globalConflictCounter);
 
-            if (listeners != null) {
-                if (listenersArray == null) {
+            if(listeners != null){
+                if(listenersArray == null){
                     int length = firstFreeIndex - k;
                     listenersArray = pool.takeListenersArray(length);
-                    if (listenersArray == null) {
+                    if(listenersArray == null){
                         listenersArray = new Listeners[length];
                     }
                 }
-                listenersArray[storeIndex] = listeners;
+                listenersArray[storeIndex]=listeners;
                 storeIndex++;
             }
         }
@@ -1298,26 +1302,30 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if (status != ACTIVE) {
             switch (status) {
                 case PREPARED:
-                    //won't harm to call it more than once.
-                    return;
+                     //won't harm to call it more than once.
+                     return;
                 case ABORTED:
                     throw new DeadTransactionException(
-                            format("Can't prepare already aborted transaction '%s'", config.familyName));
+                        format("Can't prepare already aborted transaction '%s'", config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                            format("Can't prepare already committed transaction '%s'", config.familyName));
+                        format("Can't prepare already committed transaction '%s'", config.familyName));
                 default:
                     throw new IllegalStateException();
             }
         }
 
-        if (firstFreeIndex > 0) {
-            if (config.dirtyCheck) {
-                if (!doPrepareDirty()) {
+        if(abortOnly){
+            throw abortOnWriteConflict(pool);
+        }
+
+        if(firstFreeIndex > 0){
+           if(config.dirtyCheck){
+                if(!doPrepareDirty()){
                     throw abortOnWriteConflict(pool);
                 }
-            } else {
-                if (!doPrepareAll()) {
+            }else{
+                if(!doPrepareAll()){
                     throw abortOnWriteConflict(pool);
                 }
             }
@@ -1331,7 +1339,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             Tranlocal tranlocal = array[k];
 
             if (!tranlocal.isCommitted) {
-                if (!tranlocal.owner.tryLockAndCheckConflict(this, config.spinCount, tranlocal)) {
+                if(!tranlocal.owner.tryLockAndCheckConflict(this, config.spinCount, tranlocal)){
                     return false;
                 }
             }
@@ -1345,7 +1353,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             Tranlocal tranlocal = array[k];
 
             if (!tranlocal.isCommitted && tranlocal.calculateIsDirty()) {
-                if (!tranlocal.owner.tryLockAndCheckConflict(this, config.spinCount, tranlocal)) {
+                if(!tranlocal.owner.tryLockAndCheckConflict(this, config.spinCount, tranlocal)){
                     return false;
                 }
             }
@@ -1357,7 +1365,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     // ============================== registerChangeListenerAndAbort ========================
 
     @Override
-    public void registerChangeListenerAndAbort(final Latch listener) {
+    public void registerChangeListenerAndAbort(final Latch listener){
         registerChangeListenerAndAbort(listener, getThreadLocalBetaObjectPool());
     }
 
@@ -1368,28 +1376,28 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 case PREPARED:
                     abort();
                     throw new PreparedTransactionException(
-                            format("Can't block on already prepared transaction '%s'", config.familyName));
+                        format("Can't block on already prepared transaction '%s'", config.familyName));
                 case ABORTED:
                     throw new DeadTransactionException(
-                            format("Can't block on already aborted transaction '%s'", config.familyName));
+                        format("Can't block on already aborted transaction '%s'", config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                            format("Can't block on already committed transaction '%s'", config.familyName));
+                        format("Can't block on already committed transaction '%s'", config.familyName));
                 default:
                     throw new IllegalStateException();
             }
         }
 
-        if (!config.blockingAllowed) {
+        if(!config.blockingAllowed){
             abort();
             throw new NoRetryPossibleException(
-                    format("Can't block transaction '%s', since it explicitly is configured as non blockable", config.familyName));
+                format("Can't block transaction '%s', since it explicitly is configured as non blockable",config.familyName));
         }
 
-        if (firstFreeIndex == 0) {
+        if( firstFreeIndex == 0){
             abort();
             throw new NoRetryPossibleException(
-                    format("Can't block transaction '%s', since there are no tracked reads", config.familyName));
+                format("Can't block transaction '%s', since there are no tracked reads",config.familyName));
         }
 
         final long listenerEra = listener.getEra();
@@ -1397,13 +1405,13 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         boolean furtherRegistrationNeeded = true;
         boolean atLeastOneRegistration = false;
 
-        for (int k = 0; k < firstFreeIndex; k++) {
+        for(int k=0; k < firstFreeIndex; k++){
 
             final Tranlocal tranlocal = array[k];
             final BetaTransactionalObject owner = tranlocal.owner;
 
-            if (furtherRegistrationNeeded) {
-                switch (owner.registerChangeListener(listener, tranlocal, pool, listenerEra)) {
+            if(furtherRegistrationNeeded){
+                switch(owner.registerChangeListener(listener, tranlocal, pool, listenerEra)){
                     case BetaTransactionalObject.REGISTRATION_DONE:
                         atLeastOneRegistration = true;
                         break;
@@ -1423,16 +1431,16 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         status = ABORTED;
 
-        if (!atLeastOneRegistration) {
+        if(!atLeastOneRegistration){
             throw new NoRetryPossibleException(
-                    format("Can't block transaction '%s', since there are no tracked reads", config.familyName));
+                format("Can't block transaction '%s', since there are no tracked reads",config.familyName));
         }
     }
 
     // ==================== reset ==============================
 
     @Override
-    public boolean softReset() {
+    public boolean softReset(){
         return softReset(getThreadLocalBetaObjectPool());
     }
 
@@ -1442,11 +1450,12 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             abort(pool);
         }
 
-        if (attempt >= config.getMaxRetries()) {
+        if(attempt>=config.getMaxRetries()){
             return false;
         }
 
         status = ACTIVE;
+        abortOnly = false;
         attempt++;
         firstFreeIndex = 0;
         hasReads = false;
@@ -1455,19 +1464,20 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     }
 
     @Override
-    public void hardReset() {
+    public void hardReset(){
         hardReset(getThreadLocalBetaObjectPool());
     }
 
     @Override
-    public void hardReset(final BetaObjectPool pool) {
+    public void hardReset(final BetaObjectPool pool){
         if (status == ACTIVE || status == PREPARED) {
             abort(pool);
         }
         status = ACTIVE;
+        abortOnly = false;
         hasReads = false;
         hasUntrackedReads = false;
-        attempt = 1;
+        attempt=1;
         firstFreeIndex = 0;
         remainingTimeoutNs = config.timeoutNs;
     }
@@ -1475,18 +1485,18 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     // ==================== init =============================
 
     @Override
-    public void init(BetaTransactionConfig transactionConfig) {
+    public void init(BetaTransactionConfig transactionConfig){
         init(transactionConfig, getThreadLocalBetaObjectPool());
     }
 
     @Override
-    public void init(BetaTransactionConfig transactionConfig, BetaObjectPool pool) {
-        if (transactionConfig == null) {
+    public void init(BetaTransactionConfig transactionConfig, BetaObjectPool pool){
+        if(transactionConfig == null){
             abort();
             throw new NullPointerException();
         }
 
-        if (status == ACTIVE || status == PREPARED) {
+        if(status == ACTIVE || status == PREPARED){
             abort(pool);
         }
 
@@ -1497,32 +1507,32 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     // ================== orelse ============================
 
     @Override
-    public final void startEitherBranch() {
+    public final void startEitherBranch(){
         startEitherBranch(getThreadLocalBetaObjectPool());
     }
 
     @Override
-    public final void startEitherBranch(BetaObjectPool pool) {
+    public final void startEitherBranch(BetaObjectPool pool){
         throw new TodoException();
     }
 
     @Override
-    public final void endEitherBranch() {
+    public final void endEitherBranch(){
         endEitherBranch(getThreadLocalBetaObjectPool());
     }
 
     @Override
-    public final void endEitherBranch(BetaObjectPool pool) {
+    public final void endEitherBranch(BetaObjectPool pool){
         throw new TodoException();
     }
 
     @Override
-    public final void startOrElseBranch() {
+    public final void startOrElseBranch(){
         startOrElseBranch(getThreadLocalBetaObjectPool());
     }
 
     @Override
-    public final void startOrElseBranch(BetaObjectPool pool) {
+    public final void startOrElseBranch(BetaObjectPool pool){
         throw new TodoException();
     }
 }

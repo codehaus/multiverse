@@ -5,30 +5,30 @@ import org.multiverse.stms.beta.BetaObjectPool;
 
 /**
  * The {@link Tranlocal} for the {@link E).
- * <p/>
+ *
  * This class is generated.
  *
  * @author Peter Veentjer
  */
-public final class RefTranlocal<E> extends Tranlocal {
+public final class RefTranlocal<E> extends Tranlocal{
 
-    public final static RefTranlocal LOCKED = new RefTranlocal(null, true);
+    public final static RefTranlocal LOCKED = new RefTranlocal(null,true);
 
     public E value;
     public CallableNode<E> headCallable;
 
-    public RefTranlocal(Ref ref) {
+    public RefTranlocal(Ref ref){
         super(ref, false);
     }
 
-    public RefTranlocal(Ref ref, boolean locked) {
+    public RefTranlocal(Ref ref, boolean locked){
         super(ref, locked);
     }
 
     public RefTranlocal openForWrite(final BetaObjectPool pool) {
         assert isCommitted;
 
-        Ref _ref = (Ref) owner;
+        Ref _ref = (Ref)owner;
         RefTranlocal tranlocal = pool.take(_ref);
         if (tranlocal == null) {
             tranlocal = new RefTranlocal(_ref);
@@ -39,35 +39,35 @@ public final class RefTranlocal<E> extends Tranlocal {
         return tranlocal;
     }
 
-    public void evaluateCommutingFunctions(final BetaObjectPool pool) {
+    public void evaluateCommutingFunctions(final BetaObjectPool  pool){
         assert isCommuting;
 
-        RefTranlocal<E> tranlocal = (RefTranlocal<E>) read;
+        RefTranlocal<E> tranlocal = (RefTranlocal<E>)read;
         value = tranlocal.value;
 
         CallableNode<E> current = headCallable;
-        do {
+        do{
             value = current.callable.call(value);
             current = current.next;
-        } while (current != null);
+        }while(current!=null);
 
         isDirty = tranlocal.value != value;
         isCommuting = false;
         headCallable = null;
     }
 
-    public void addCommutingFunction(final Function function, final BetaObjectPool pool) {
+    public void addCommutingFunction(final Function function, final BetaObjectPool pool){
         assert isCommuting;
 
         headCallable = new CallableNode<E>(
-                (Function) function,
-                headCallable);
+            (Function)function,
+            headCallable);
     }
 
     public RefTranlocal openForCommute(final BetaObjectPool pool) {
         assert isCommitted;
 
-        Ref _ref = (Ref) owner;
+        Ref _ref = (Ref)owner;
         RefTranlocal tranlocal = pool.take(_ref);
         if (tranlocal == null) {
             tranlocal = new RefTranlocal(_ref);
@@ -104,16 +104,16 @@ public final class RefTranlocal<E> extends Tranlocal {
         }
 
         //check if it really is dirty.
-        RefTranlocal _read = (RefTranlocal) read;
+        RefTranlocal _read = (RefTranlocal)read;
         isDirty = value != _read.value;
         return isDirty;
     }
 
-    public static class CallableNode<E> {
+    public static class CallableNode<E>{
         public Function<E> callable;
         public CallableNode<E> next;
 
-        CallableNode(Function<E> callable, CallableNode<E> next) {
+        CallableNode(Function<E> callable, CallableNode<E> next){
             this.callable = callable;
             this.next = next;
         }

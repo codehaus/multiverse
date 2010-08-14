@@ -157,8 +157,6 @@ globalconflict counter.
 - clojure: add watch. Basic functionality already is there, but atm it is done to all
      reads and not specific ones.
 
-- testing: propagation level.
-
 - mono transaction: error messages should include classname
 
 - array transaction: error messages should include classname
@@ -205,7 +203,13 @@ globalconflict counter.
 
 - testing: atomic block & propagation and committed/aborted/prepared/new transaction on threadlocal
 
+- non repeatable read?
+
 done
+
+- add abortOnly to commit/prepare
+
+- added the abortOnly field + method
 
 - testing: fat atomicblock & propagation
 
