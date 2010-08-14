@@ -37,7 +37,7 @@ public class FatArrayBetaTransaction_openForConstructionTest {
 
     @Test
     public void whenOverflowing() {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm,3);
+        BetaTransactionConfig config = new BetaTransactionConfig(stm, 3);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
 
         LongRef ref1 = new LongRef(tx);
@@ -219,8 +219,8 @@ public class FatArrayBetaTransaction_openForConstructionTest {
 
         assertEquals(oldLocalConflictCount, tx.getLocalConflictCounter().get());
     }
-    
-     @Test
+
+    @Test
     public void conflictCounterIsNotReset() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         long oldConflictCount = tx.getLocalConflictCounter().get();

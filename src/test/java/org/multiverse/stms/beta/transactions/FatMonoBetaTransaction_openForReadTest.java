@@ -35,7 +35,7 @@ public class FatMonoBetaTransaction_openForReadTest {
 
     @Test
     @Ignore
-    public void whenNew(){
+    public void whenNew() {
 
     }
 
@@ -163,7 +163,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         assertLocked(ref);
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
-        assertSame(tx,ref.getLockOwner());
+        assertSame(tx, ref.getLockOwner());
     }
 
     @Test
@@ -278,7 +278,7 @@ public class FatMonoBetaTransaction_openForReadTest {
 
         assertAborted(tx);
         assertUnlocked(ref);
-        assertSurplus(0,ref);
+        assertSurplus(0, ref);
         assertSame(committed, ref.unsafeLoad());
         assertUpdateBiased(ref);
     }

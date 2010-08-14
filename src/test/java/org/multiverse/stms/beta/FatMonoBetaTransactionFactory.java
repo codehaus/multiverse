@@ -9,7 +9,7 @@ import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalB
 public final class FatMonoBetaTransactionFactory implements BetaTransactionFactory {
     private final BetaTransactionConfig config;
 
-    public FatMonoBetaTransactionFactory(BetaStm stm){
+    public FatMonoBetaTransactionFactory(BetaStm stm) {
         this(new BetaTransactionConfig(stm));
     }
 

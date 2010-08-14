@@ -12,7 +12,7 @@ import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertLocked;
 
 public class LongRef_lockAndSetTest {
-     private BetaStm stm;
+    private BetaStm stm;
     private BetaObjectPool pool;
 
     @Before

@@ -10,12 +10,12 @@ public final class SpeculativeBetaConfig {
     private final boolean listenersRequired;
     private final int minimalLength;
 
-    public SpeculativeBetaConfig(){
+    public SpeculativeBetaConfig() {
         this(false, 1);
     }
 
     public SpeculativeBetaConfig(boolean listenersRequired, int minimalLength) {
-        if(minimalLength<0){
+        if (minimalLength < 0) {
             throw new IllegalArgumentException();
         }
         this.listenersRequired = listenersRequired;
@@ -30,20 +30,20 @@ public final class SpeculativeBetaConfig {
         return minimalLength;
     }
 
-    public SpeculativeBetaConfig createWithMinimalLength(int newMinimalLength){
-        if(newMinimalLength<0){
+    public SpeculativeBetaConfig createWithMinimalLength(int newMinimalLength) {
+        if (newMinimalLength < 0) {
             throw new IllegalArgumentException();
         }
 
-        if(minimalLength>=newMinimalLength){
+        if (minimalLength >= newMinimalLength) {
             return this;
         }
 
         return new SpeculativeBetaConfig(listenersRequired, newMinimalLength);
     }
 
-    public SpeculativeBetaConfig createWithListenersEnabled(){
-        if(listenersRequired){
+    public SpeculativeBetaConfig createWithListenersEnabled() {
+        if (listenersRequired) {
             return this;
         }
 

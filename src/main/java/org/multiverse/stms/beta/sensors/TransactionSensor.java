@@ -17,7 +17,7 @@ public final class TransactionSensor implements Sensor {
     private final StripedCounter startedCounter;
     private final FrequencyDistribution frequencyDistribution;
 
-    public TransactionSensor(int stripeSize){
+    public TransactionSensor(int stripeSize) {
         this.commitCounter = new StripedCounter(stripeSize);
         this.abortCounter = new StripedCounter(stripeSize);
         this.startedCounter = new StripedCounter(stripeSize);
@@ -32,9 +32,9 @@ public final class TransactionSensor implements Sensor {
         frequencyDistribution.reset();
     }
 
-    public void publish(int randomFactor, LocalTransactionStatistics statistics){
+    public void publish(int randomFactor, LocalTransactionStatistics statistics) {
         commitCounter.inc(randomFactor, statistics.commitCount);
-        abortCounter.inc(randomFactor,statistics.abortCount);
+        abortCounter.inc(randomFactor, statistics.abortCount);
         startedCounter.inc(randomFactor, statistics.startedCount);
 
         statistics.abortCount = 0;

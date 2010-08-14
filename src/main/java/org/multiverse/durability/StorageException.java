@@ -1,11 +1,11 @@
 package org.multiverse.durability;
 
 /**
- * A {@link RuntimeException} that is thrown when something fails while 
+ * A {@link RuntimeException} that is thrown when something fails while
  *
  * @author Peter Veentjer.
  */
-public class StorageException extends RuntimeException{
+public class StorageException extends RuntimeException {
 
     public StorageException() {
     }

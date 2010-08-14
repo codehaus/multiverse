@@ -23,10 +23,10 @@ public class LongRef_alterTest {
 
     @Test
     public void test() {
-        LongFunction function = new LongFunction(){
+        LongFunction function = new LongFunction() {
             @Override
             public long call(long current) {
-                return current+1;
+                return current + 1;
             }
         };
 
@@ -35,7 +35,7 @@ public class LongRef_alterTest {
         long result = ref.alter(tx, pool, function);
         tx.commit();
 
-        assertEquals(101,ref.unsafeLoad().value);
+        assertEquals(101, ref.unsafeLoad().value);
         assertEquals(101, result);
     }
 }

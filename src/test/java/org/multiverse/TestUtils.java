@@ -31,14 +31,14 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
  */
 public class TestUtils {
 
-    public static void assertHasNoCommutingFunctions(LongRefTranlocal tranlocal){
+    public static void assertHasNoCommutingFunctions(LongRefTranlocal tranlocal) {
         assertHasCommutingFunctions(tranlocal);
     }
 
     public static void assertHasCommutingFunctions(LongRefTranlocal tranlocal, LongFunction... expected) {
         LongRefTranlocal.CallableNode current = tranlocal.headCallable;
         List<LongFunction> functions = new LinkedList<LongFunction>();
-        while(current!=null){
+        while (current != null) {
             functions.add(current.callable);
             current = current.next;
         }
@@ -250,9 +250,9 @@ public class TestUtils {
     }
 
     public static void sleepRandomUs(int maxUs) {
-         Bugshaker.sleepUs((long) randomInt(maxUs));
-     }
-    
+        Bugshaker.sleepUs((long) randomInt(maxUs));
+    }
+
 
     /**
      * Joins all threads. If this can't be done within 5 minutes, an assertion failure is thrown.

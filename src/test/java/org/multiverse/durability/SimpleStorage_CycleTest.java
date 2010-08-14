@@ -54,7 +54,7 @@ public class SimpleStorage_CycleTest {
     }
 
     @Test
-    public void testIndirectCycle(){
+    public void testIndirectCycle() {
         Node root = new Node();
 
         Node child = new Node();
@@ -72,13 +72,13 @@ public class SimpleStorage_CycleTest {
 
         //NodeState foundRootState = (NodeState)storage.loadState(root.getStorageId());
         //assertNotNull(foundRootState);
-       // assertSame(root, foundRootState.getOwner());
-      //  assertSame(child, rootState.ref);
+        // assertSame(root, foundRootState.getOwner());
+        //  assertSame(child, rootState.ref);
 
-      //  NodeState foundChildState = (NodeState)storage.loadState(child.getStorageId());
-      //  assertNotNull(foundChildState);
-      //  assertSame(child, foundChildState.getOwner());
-      //  assertSame(root, foundChildState.ref);
+        //  NodeState foundChildState = (NodeState)storage.loadState(child.getStorageId());
+        //  assertNotNull(foundChildState);
+        //  assertSame(child, foundChildState.getOwner());
+        //  assertSame(root, foundChildState.ref);
     }
 
     class NodeSerializer implements DurableObjectSerializer<Node, NodeState> {
@@ -98,7 +98,7 @@ public class SimpleStorage_CycleTest {
 
             if (!"null".equals(refId)) {
                 state.ref = (Node) loader.load(refId);
-            }            
+            }
         }
 
         @Override

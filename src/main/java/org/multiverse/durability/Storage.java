@@ -15,7 +15,7 @@ public interface Storage {
      *
      * @param id the id of the DurableObject to load.
      * @return the loaded DurableObject.
-     * @throws StorageException if something fails while loading
+     * @throws StorageException     if something fails while loading
      * @throws NullPointerException if id is null.
      */
     DurableObject loadDurableObject(String id);
@@ -29,7 +29,7 @@ public interface Storage {
 
     /**
      * Removes all persistent objects.
-     *
+     * <p/>
      * This method is only here for debugging purposes.
      */
     void clear();

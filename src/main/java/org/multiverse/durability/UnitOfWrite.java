@@ -15,8 +15,6 @@ package org.multiverse.durability;
 public interface UnitOfWrite {
 
     /**
-     *
-     *
      * @param id
      * @param factory
      * @return

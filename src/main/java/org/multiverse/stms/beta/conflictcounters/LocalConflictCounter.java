@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.conflictcounters;
 
-import org.multiverse.stms.beta.BetaTransactionalObject;
 import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.stms.beta.BetaTransactionalObject;
 
 /**
  * @author Peter Veentjer
@@ -28,10 +28,10 @@ public final class LocalConflictCounter {
     public boolean syncAndCheckConflict() {
         if (array.length == 1) {
             long globalConflictCount = globalConflictCounter.getConflictCount(0);
-            if(globalConflictCount != localConflictCount){
+            if (globalConflictCount != localConflictCount) {
                 localConflictCount = globalConflictCount;
                 return true;
-            }else{
+            } else {
                 return false;
             }
         }

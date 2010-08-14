@@ -14,100 +14,106 @@ import org.multiverse.stms.beta.refs.*;
 import java.util.*;
 
 /**
- * @author Peter Veentjer
- */
+* @author Peter Veentjer
+*/
 public interface BetaTransaction extends Transaction {
 
 #foreach($transaction in $transactions)
-    int ${transaction.poolName} = ${transaction.poolIndex};
+int ${transaction.poolName} = ${transaction.poolIndex};
 #end
 
-    int getPoolTransactionType();
+int getPoolTransactionType();
 
-    void start(BetaObjectPool pool);
+void start(BetaObjectPool pool);
+
+/**
+* Prepares this BetaTransaction.
+*
+* @param pool the BetaObjectPool
+*/
+void prepare(BetaObjectPool pool);
+
+/**
+* Commits this BetaTransaction.
+*
+* @param pool the BetaObjectPool for putting/taking poolable resources.
+* @throws ControlFlowError e.g. on read or write conflicts.
+* @throws DeadTransactionException if the transaction already is aborted.
+*/
+void commit(BetaObjectPool pool);
+
+/**
+* Aborts this BetaTransaction.
+*
+* throws DeadTransactionException if the transaction already is committed.
+*/
+void abort(BetaObjectPool pool);
+
+/**
+* Resets this BetaTransaction.
+*
+* @param pool the BetaObjectPool for putting/taking poolable resources.
+*/
+boolean softReset(BetaObjectPool pool);
+
+/**
+*
+*/
+void hardReset(BetaObjectPool pool);
+
+/**
+* Returns a list containing the permanent TransactionLifecycleListeners. The returned list
+* can be null (essentially the same as an empty list).
+*/
+ArrayList
+<TransactionLifecycleListener> getPermanentListeners();
 
     /**
-     * Prepares this BetaTransaction.
-     *
-     * @param pool the BetaObjectPool
-     */
-    void prepare(BetaObjectPool pool);
+    * Returns a list containing the normal TransactionLifecycleListeners. The returned list
+    * can be null (essentially the same as an empty list).
+    *
+    */
+    ArrayList
+    <TransactionLifecycleListener> getNormalListeners();
 
-    /**
-     * Commits this BetaTransaction.
-     *
-     * @param pool the BetaObjectPool for putting/taking poolable resources.
-     * @throws ControlFlowError e.g. on read or write conflicts.
-     * @throws DeadTransactionException if the transaction already is aborted.
-     */
-    void commit(BetaObjectPool pool);
+        void register(BetaObjectPool pool, TransactionLifecycleListener listener);
 
-    /**
-     * Aborts this BetaTransaction.
-     *
-     * throws DeadTransactionException if the transaction already is committed.
-     */
-    void abort(BetaObjectPool pool);
+        void registerPermanent(BetaObjectPool pool, TransactionLifecycleListener listener);
 
-    /**
-     * Resets this BetaTransaction.
-     *
-     * @param pool the BetaObjectPool for putting/taking poolable resources.
-     */
-    boolean softReset(BetaObjectPool pool);
+        void copyForSpeculativeFailure(BetaTransaction tx);
 
-    /**
-     *
-     */
-    void hardReset(BetaObjectPool pool);
+        @Override
+        BetaTransactionConfig getConfiguration();
 
-    /**
-     * Returns a list containing the permanent TransactionLifecycleListeners. The returned list
-     * can be null (essentially the same as an empty list).
-     */
-    ArrayList<TransactionLifecycleListener> getPermanentListeners();
+        /**
+        *
+        *
+        */
+        void init(BetaTransactionConfig transactionConfig, BetaObjectPool pool);
 
-    /**
-     * Returns a list containing the normal TransactionLifecycleListeners. The returned list
-     * can be null (essentially the same as an empty list).
-     *
-     */
-    ArrayList<TransactionLifecycleListener> getNormalListeners();
+        /**
+        * Registers the changelistener and aborts the transaction (so also releasing its acquired resources
+        * like locks.
+        */
+        void registerChangeListenerAndAbort(Latch changeListener, BetaObjectPool pool);
 
-    void register(BetaObjectPool pool, TransactionLifecycleListener listener);
+        void startEitherBranch(BetaObjectPool pool);
 
-    void registerPermanent(BetaObjectPool pool, TransactionLifecycleListener listener);
+        void endEitherBranch(BetaObjectPool pool);
 
-    void copyForSpeculativeFailure(BetaTransaction tx);    
+        void startOrElseBranch(BetaObjectPool pool);
+        #foreach($ref in $refs)
 
-    @Override
-    BetaTransactionConfig getConfiguration();
-  
-    /**
-     *
-     *
-     */
-    void init(BetaTransactionConfig transactionConfig, BetaObjectPool pool);
-    
-    /**
-     * Registers the changelistener and aborts the transaction (so also releasing its acquired resources
-     * like locks.
-     */
-    void registerChangeListenerAndAbort(Latch changeListener, BetaObjectPool pool);
+            ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForRead(${ref.name}${ref.typeParameter} ref,
+            boolean lock, BetaObjectPool pool);
 
-    void startEitherBranch(BetaObjectPool pool);
+            ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForWrite(${ref.name}${ref.typeParameter} ref,
+            boolean lock, BetaObjectPool pool);
 
-    void endEitherBranch(BetaObjectPool pool);
+            ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter}
+            openForConstruction(${ref.name}${ref.typeParameter} ref, BetaObjectPool pool);
 
-    void startOrElseBranch(BetaObjectPool pool);
-#foreach($ref in $refs)
-
-    ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForRead(${ref.name}${ref.typeParameter} ref, boolean lock, BetaObjectPool pool);
-
-    ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForWrite(${ref.name}${ref.typeParameter} ref, boolean lock, BetaObjectPool pool);
-
-    ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForConstruction(${ref.name}${ref.typeParameter} ref, BetaObjectPool pool);
-
-    ${ref.typeParameter} void commute(${ref.name}${ref.typeParameter} ref, BetaObjectPool pool, ${ref.functionClass}${ref.typeParameter} function);        
-#end
-}
+            ${ref.typeParameter} void commute(${ref.name}${ref.typeParameter} ref, BetaObjectPool
+            pool, ${ref.functionClass}${ref.typeParameter} function);
+        #end
+        }

@@ -136,7 +136,7 @@ public class QueueWithCapacityStressTest {
             return popBlock.execute(new AtomicClosure<E>() {
                 @Override
                 public E execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction)tx;
+                    BetaTransaction btx = (BetaTransaction) tx;
                     BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
                     IntRefTranlocal sizeTranlocal = btx.openForWrite(size, pessimistic, pool);

@@ -1,8 +1,8 @@
 package org.multiverse.stms.beta;
 
-import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfig;
+import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
 
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
@@ -10,11 +10,11 @@ public final class FatArrayBetaTransactionFactory implements BetaTransactionFact
 
     private final BetaTransactionConfig config;
 
-    public FatArrayBetaTransactionFactory(BetaStm stm){
+    public FatArrayBetaTransactionFactory(BetaStm stm) {
         this(new BetaTransactionConfig(stm));
     }
 
-    public FatArrayBetaTransactionFactory(BetaTransactionConfig config){
+    public FatArrayBetaTransactionFactory(BetaTransactionConfig config) {
         this.config = config;
     }
 

@@ -1,9 +1,7 @@
 package org.multiverse.stms.beta.orec;
 
 import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Veentjer
@@ -18,40 +16,40 @@ public class OrecTestUtils {
         assertFalse(orec.isLocked());
     }
 
-    public static void assertSurplus(int expectedSurplus, Orec orec){
+    public static void assertSurplus(int expectedSurplus, Orec orec) {
         assertEquals(expectedSurplus, orec.getSurplus());
     }
 
-    public static void assertReadBiased(Orec orec){
+    public static void assertReadBiased(Orec orec) {
         assertTrue(orec.isReadBiased());
     }
 
-    public static void assertUpdateBiased(Orec orec){
+    public static void assertUpdateBiased(Orec orec) {
         assertFalse(orec.isReadBiased());
     }
 
 
-    public static void assertReadonlyCount(int expectedReadonlyCount, Orec orec){
+    public static void assertReadonlyCount(int expectedReadonlyCount, Orec orec) {
         assertEquals(expectedReadonlyCount, orec.getReadonlyCount());
     }
 
-    public static <O extends Orec> O makeReadBiased(O  orec){
-        if(orec.isReadBiased()){
+    public static <O extends Orec> O makeReadBiased(O orec) {
+        if (orec.isReadBiased()) {
             return orec;
         }
 
         int x = orec.getReadonlyCount();
-        for(int k= x;k<orec.getReadBiasedThreshold()-1;k++){
+        for (int k = x; k < orec.getReadBiasedThreshold() - 1; k++) {
             orec.arrive(1);
-            if(orec.departAfterReading()){
+            if (orec.departAfterReading()) {
                 throw new RuntimeException();
             }
         }
 
         orec.arrive(1);
-        if(orec.departAfterReading()){
+        if (orec.departAfterReading()) {
             orec.unlockAfterBecomingReadBiased();
-        } else{
+        } else {
             fail();
         }
 

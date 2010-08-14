@@ -50,7 +50,7 @@ public class SimpleDurabilityIntegrationTest {
         assertEquals(100, loaded.unsafeLoad().value);
     }
 
-    
+
     @Test
     public void whenUpdated() {
         LongRef ref = createLongRef(stm, 100);
@@ -65,7 +65,7 @@ public class SimpleDurabilityIntegrationTest {
         LongRef loaded = (LongRef) storage.loadDurableObject(ref.getStorageId());
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(loaded,false, pool).value++;
+        tx.openForWrite(loaded, false, pool).value++;
         tx.commit();
 
         UnitOfWrite write2 = storage.startUnitOfWrite();

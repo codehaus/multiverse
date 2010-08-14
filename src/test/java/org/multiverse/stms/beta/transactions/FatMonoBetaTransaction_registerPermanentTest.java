@@ -52,7 +52,7 @@ public class FatMonoBetaTransaction_registerPermanentTest {
 
         assertActive(tx);
         verifyZeroInteractions(listener);
-        assertHasPermanentListeners(tx,listener);
+        assertHasPermanentListeners(tx, listener);
         assertHasNoNormalListeners(tx);
     }
 

@@ -21,7 +21,7 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
  * @author Peter Veentjer
  */
 public class FatArrayBetaTransaction_softResetTest {
-     private BetaStm stm;
+    private BetaStm stm;
     private BetaObjectPool pool;
 
     @Before

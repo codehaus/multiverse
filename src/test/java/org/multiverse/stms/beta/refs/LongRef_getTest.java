@@ -21,7 +21,7 @@ public class LongRef_getTest {
     }
 
     @Test
-    public void test(){
+    public void test() {
         LongRef ref = createLongRef(stm, 10);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);

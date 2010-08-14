@@ -27,7 +27,7 @@ public class LongRef_atomicGetTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void whenUnconstructed(){
+    public void whenUnconstructed() {
         BetaTransaction tx = stm.start();
         LongRef ref = new LongRef(tx);
         ref.atomicGet();
@@ -48,7 +48,7 @@ public class LongRef_atomicGetTest {
         BetaTransaction lockOwner = stm.start();
         lockOwner.openForRead(ref, true, new BetaObjectPool());
 
-        long result =    ref.atomicGet();
+        long result = ref.atomicGet();
 
         assertEquals(100, result);
         assertSame(lockOwner, ref.getLockOwner());

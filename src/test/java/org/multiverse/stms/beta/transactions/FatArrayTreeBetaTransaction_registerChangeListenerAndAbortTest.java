@@ -10,8 +10,8 @@ import org.multiverse.api.exceptions.NoRetryPossibleException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.refs.LongRef;
 import org.multiverse.stms.beta.refs.LongRefTranlocal;
 
@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.*;
@@ -81,9 +80,9 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         assertUpdateBiased(ref);
         assertNull(ref.unsafeLoad());
         assertNull(constructed.read);
-    //    assertSame(ref, constructed.owner);
-    //    assertFalse(constructed.isCommitted);
-    //    assertFalse(constructed.isPermanent);
+        //    assertSame(ref, constructed.owner);
+        //    assertFalse(constructed.isCommitted);
+        //    assertFalse(constructed.isPermanent);
     }
 
     @Test
@@ -95,9 +94,9 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongRef ref3 = new LongRef(tx);
-        tx.openForRead(ref1,false,pool);
-        LongRefTranlocal write3 = tx.openForConstruction(ref3,pool);
-        tx.openForWrite(ref2,false,pool);
+        tx.openForRead(ref1, false, pool);
+        LongRefTranlocal write3 = tx.openForConstruction(ref3, pool);
+        tx.openForWrite(ref2, false, pool);
         tx.registerChangeListenerAndAbort(latch);
 
         assertAborted(tx);
@@ -208,7 +207,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         assertUnlocked(ref);
     }
 
-      @Test
+    @Test
     public void whenNormalListenerAvailable() {
         LongRef ref = createLongRef(stm, 0);
 
@@ -216,9 +215,9 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         Latch latch = new CheapLatch();
         tx.register(pool, listenerMock);
-        tx.openForRead(ref,false,pool);
+        tx.openForRead(ref, false, pool);
 
-        tx.registerChangeListenerAndAbort(latch,pool);
+        tx.registerChangeListenerAndAbort(latch, pool);
 
         assertEquals(1, listenerMock.events.size());
         assertEquals(TransactionLifecycleEvent.PostAbort, listenerMock.events.get(0));
@@ -226,15 +225,15 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenPermanentListenerAvailable() {
-         LongRef ref = createLongRef(stm, 0);
+        LongRef ref = createLongRef(stm, 0);
 
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         Latch latch = new CheapLatch();
         tx.registerPermanent(pool, listenerMock);
-        tx.openForRead(ref,false,pool);
+        tx.openForRead(ref, false, pool);
 
-        tx.registerChangeListenerAndAbort(latch,pool);
+        tx.registerChangeListenerAndAbort(latch, pool);
 
         assertEquals(1, listenerMock.events.size());
         assertEquals(TransactionLifecycleEvent.PostAbort, listenerMock.events.get(0));

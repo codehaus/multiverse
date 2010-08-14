@@ -58,7 +58,7 @@ public abstract class BetaTransactionTemplate<E> {
     }
 
     public final E executeChecked(BetaObjectPool pool) throws Exception {
-        if(pool == null){
+        if (pool == null) {
             throw new NullPointerException();
         }
 
@@ -96,7 +96,7 @@ public abstract class BetaTransactionTemplate<E> {
                 } else {
                     BetaTransaction suspendedTransaction = tx;
                     tx = transactionFactory.start();
-                    setThreadLocalTransaction(tx);                                          
+                    setThreadLocalTransaction(tx);
                     try {
                         return doWithTransaction(tx, pool);
                     } finally {

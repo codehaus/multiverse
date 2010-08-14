@@ -7,6 +7,7 @@ public class BetaObjectPool_listenerArrayTest {
 
     @Test
     @Ignore
-    public void test(){}
+    public void test() {
+    }
 
 }

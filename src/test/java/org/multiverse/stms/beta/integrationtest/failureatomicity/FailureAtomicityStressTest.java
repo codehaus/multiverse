@@ -104,11 +104,11 @@ public class FailureAtomicityStressTest {
         }
 
         private void modifyButAbort() {
-            atomicBlock.execute(new AtomicVoidClosure(){
+            atomicBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    BetaTransaction btx = (BetaTransaction)tx;
+                    BetaTransaction btx = (BetaTransaction) tx;
                     int value = ref.get(btx, pool);
                     ref.set(btx, pool, value + 1);
                     btx.abort(pool);

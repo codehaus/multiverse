@@ -64,11 +64,11 @@ public class RetryInterruptibleTest {
 
             final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-            block.execute(new AtomicVoidClosure(){
+            block.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction)tx;
-                    if(ref.get(btx, pool) != 1){
+                    BetaTransaction btx = (BetaTransaction) tx;
+                    if (ref.get(btx, pool) != 1) {
                         retry();
                     }
                 }

@@ -128,7 +128,7 @@ public class StackWithCapacityStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaObjectPool objectPool = getThreadLocalBetaObjectPool();
-                    BetaTransaction btx = (BetaTransaction)tx;
+                    BetaTransaction btx = (BetaTransaction) tx;
 
                     IntRefTranlocal sizeTranlocal = btx.openForWrite(size, pessimistic, objectPool);
 
@@ -144,11 +144,11 @@ public class StackWithCapacityStressTest {
         }
 
         public E pop() {
-            return popBlock.execute(new AtomicClosure<E>(){
+            return popBlock.execute(new AtomicClosure<E>() {
                 @Override
                 public E execute(Transaction tx) throws Exception {
                     BetaObjectPool objectPool = getThreadLocalBetaObjectPool();
-                    BetaTransaction btx = (BetaTransaction)tx;
+                    BetaTransaction btx = (BetaTransaction) tx;
 
                     RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, pessimistic, objectPool);
 

@@ -153,7 +153,7 @@ public class FatArrayTreeBetaTransaction_commuteTest {
 
     @Test
     @Ignore
-    public void testingOfConflictCounter(){
+    public void testingOfConflictCounter() {
 
     }
 

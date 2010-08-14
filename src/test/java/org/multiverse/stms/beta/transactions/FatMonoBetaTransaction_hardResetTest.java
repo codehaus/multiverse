@@ -76,7 +76,8 @@ public class FatMonoBetaTransaction_hardResetTest {
         tx.hardReset(pool);
         assertWasHardReset(tx);
     }
-       private static void assertWasHardReset(FatMonoBetaTransaction tx) {
+
+    private static void assertWasHardReset(FatMonoBetaTransaction tx) {
         assertActive(tx);
         assertHasNoNormalListeners(tx);
         assertHasNoPermanentListeners(tx);
@@ -84,6 +85,7 @@ public class FatMonoBetaTransaction_hardResetTest {
         assertFalse((Boolean) getField(tx, "hasReads"));
         assertFalse((Boolean) getField(tx, "hasUntrackedReads"));
     }
+
     @Test
     @Ignore
     public void whenHasCommute() {
@@ -102,7 +104,6 @@ public class FatMonoBetaTransaction_hardResetTest {
         assertWasHardReset(tx);
         assertEquals(100, tx.getRemainingTimeoutNs());
     }
-
 
 
     @Test

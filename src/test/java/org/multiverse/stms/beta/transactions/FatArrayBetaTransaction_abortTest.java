@@ -16,7 +16,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
@@ -146,7 +145,7 @@ public class FatArrayBetaTransaction_abortTest {
 
     }
 
-     @Test
+    @Test
     public void whenNormalListenerAvailable() {
         LongRef ref = createLongRef(stm, 0);
 

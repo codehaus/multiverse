@@ -31,7 +31,7 @@ public class FatMonoBetaTransaction_prepareTest {
 
     @Test
     @Ignore
-    public void whenNew(){
+    public void whenNew() {
 
     }
 
@@ -68,7 +68,7 @@ public class FatMonoBetaTransaction_prepareTest {
     }
 
     @Test
-    public void whenReadIsConflictedByLock_thenPrepareSuccess(){
+    public void whenReadIsConflictedByLock_thenPrepareSuccess() {
         LongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.unsafeLoad();
 
@@ -165,7 +165,7 @@ public class FatMonoBetaTransaction_prepareTest {
         tx.prepare();
 
         assertPrepared(tx);
-        assertSame(tx,ref.getLockOwner());
+        assertSame(tx, ref.getLockOwner());
         assertLocked(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -175,7 +175,7 @@ public class FatMonoBetaTransaction_prepareTest {
     @Test
     public void whenConflictingWrite() {
         LongRef ref = createLongRef(stm);
-      
+
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
         write.value++;

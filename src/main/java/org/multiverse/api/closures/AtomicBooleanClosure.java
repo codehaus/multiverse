@@ -7,7 +7,7 @@ import org.multiverse.api.Transaction;
  *
  * @author Peter Veentjer.
  */
-public interface AtomicBooleanClosure{
+public interface AtomicBooleanClosure {
 
     /**
      * Executes the closure.
@@ -17,5 +17,5 @@ public interface AtomicBooleanClosure{
      * @return the result of the closure.
      * @throws Exception
      */
-    boolean execute(Transaction tx)throws Exception;
+    boolean execute(Transaction tx) throws Exception;
 }

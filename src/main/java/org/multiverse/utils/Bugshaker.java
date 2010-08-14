@@ -18,7 +18,7 @@ public class Bugshaker {
         int random = ThreadLocalRandom.current().nextInt(100);
         if (random == 10) {
             sleepUs(10);
-        }else if(random == 20){
+        } else if (random == 20) {
             yield();
         }
     }

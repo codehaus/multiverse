@@ -42,7 +42,7 @@ public class LongRef_registerRetryLatchTest {
         long listenerEra = latch.getEra();
         int result = ref.registerChangeListener(latch, read, pool, listenerEra);
 
-        assertEquals(BetaTransactionalObject.REGISTRATION_NOT_NEEDED,result);
+        assertEquals(BetaTransactionalObject.REGISTRATION_NOT_NEEDED, result);
         assertNull(getField(ref, "listeners"));
         assertTrue(latch.isOpen());
     }
@@ -59,7 +59,7 @@ public class LongRef_registerRetryLatchTest {
 
     }
 
-     @Test
+    @Test
     public void whenConstructed_thenNoRegistration() {
         BetaTransaction tx = stm.start();
         LongRef ref = new LongRef(tx);
@@ -112,7 +112,7 @@ public class LongRef_registerRetryLatchTest {
         long listenerEra2 = latch2.getEra();
         int result = ref.registerChangeListener(latch2, read2, pool, listenerEra2);
 
-        assertEquals(BetaTransactionalObject.REGISTRATION_DONE,result);
+        assertEquals(BetaTransactionalObject.REGISTRATION_DONE, result);
         Listeners listeners = (Listeners) getField(ref, "listeners");
         assertNotNull(listeners);
         assertSame(latch2, listeners.listener);

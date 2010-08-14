@@ -220,7 +220,7 @@ public class FatMonoBetaTransaction_softResetTest {
         boolean result = tx.softReset(pool);
 
         assertTrue(result);
-        verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);      
+        verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
         assertHasNoNormalListeners(tx);
         assertHasNoPermanentListeners(tx);
     }

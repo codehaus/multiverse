@@ -2,10 +2,10 @@ package org.multiverse.stms.beta.refs;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.BetaTransactionalObject;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.orec.Orec;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -97,7 +97,7 @@ public class LongRef_abortTest {
 
     @Test
     public void whenLockedBySelfAndOpenedForWrite() {
-       LongRef ref = createLongRef(stm);
+        LongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.unsafeLoad();
 
         BetaTransaction tx = stm.start();

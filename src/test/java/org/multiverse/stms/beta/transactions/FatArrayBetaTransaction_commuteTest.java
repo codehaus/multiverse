@@ -19,52 +19,52 @@ public class FatArrayBetaTransaction_commuteTest {
 
     @Test
     @Ignore
-    public void whenAlreadyOpenedForRead(){
+    public void whenAlreadyOpenedForRead() {
 
     }
 
     @Test
     @Ignore
-    public void whenAlreadyOpenedForWrite(){
+    public void whenAlreadyOpenedForWrite() {
 
     }
 
     @Test
     @Ignore
-    public void whenNotOpenedBefore(){
+    public void whenNotOpenedBefore() {
 
     }
 
     @Test
     @Ignore
-    public void whenNotOpenedBeforeAndLocked(){
+    public void whenNotOpenedBeforeAndLocked() {
 
     }
 
     @Test
     @Ignore
-    public void whenAlreadyOpenedForCommute(){
+    public void whenAlreadyOpenedForCommute() {
 
     }
 
     @Test
     @Ignore
-    public void whenLocked(){
+    public void whenLocked() {
 
     }
 
     @Test
     @Ignore
-    public void whenPrepared(){
+    public void whenPrepared() {
     }
 
     @Test
     @Ignore
-    public void whenAlreadyCommitted_thenDeadTransactionException(){
+    public void whenAlreadyCommitted_thenDeadTransactionException() {
     }
 
     @Test
     @Ignore
-    public void whenAlreadyAborted_thenDeadTransactionException(){
+    public void whenAlreadyAborted_thenDeadTransactionException() {
     }
 }

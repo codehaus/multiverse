@@ -102,7 +102,7 @@ public class MoneyTransferStressTest {
             closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction)tx;
+                    BetaTransaction btx = (BetaTransaction) tx;
                     LongRef from = accounts[randomInt(accounts.length)];
                     LongRef to = accounts[randomInt(accounts.length)];
                     int amount = randomInt(100);

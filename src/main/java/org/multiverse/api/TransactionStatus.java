@@ -5,15 +5,15 @@ package org.multiverse.api;
  */
 public enum TransactionStatus {
 
-    New(false), Aborted(false), Committed(false), Active(true) , Prepared(true);
+    New(false), Aborted(false), Committed(false), Active(true), Prepared(true);
 
     private final boolean alive;
 
-    TransactionStatus(boolean alive){
-        this.alive  = alive;
+    TransactionStatus(boolean alive) {
+        this.alive = alive;
     }
 
-    public boolean isAlive(){
+    public boolean isAlive() {
         return alive;
     }
 }

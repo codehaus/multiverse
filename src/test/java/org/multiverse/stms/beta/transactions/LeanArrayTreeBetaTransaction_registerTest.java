@@ -14,7 +14,7 @@ import static org.multiverse.TestUtils.assertAborted;
 
 public class LeanArrayTreeBetaTransaction_registerTest {
 
-     private BetaStm stm;
+    private BetaStm stm;
     private BetaObjectPool pool;
 
     @Before

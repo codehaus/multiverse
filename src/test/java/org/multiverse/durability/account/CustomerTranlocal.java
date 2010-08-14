@@ -15,7 +15,7 @@ public class CustomerTranlocal implements DurableState {
     public int age;
     private final Customer owner;
 
-    public CustomerTranlocal(Customer owner){
+    public CustomerTranlocal(Customer owner) {
         this.owner = owner;
     }
 

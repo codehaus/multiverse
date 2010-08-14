@@ -40,7 +40,7 @@ public final class StandardLatch implements Latch {
             } else {
                 isOpenCondition.signalAll();
             }
-            era++;            
+            era++;
         } finally {
             lock.unlock();
         }

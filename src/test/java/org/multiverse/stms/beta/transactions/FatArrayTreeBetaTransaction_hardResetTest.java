@@ -27,8 +27,8 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
     }
 
     @Test
-    public void testThatAttemptsAreReset(){
-         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+    public void testThatAttemptsAreReset() {
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.softReset(pool);
         tx.softReset(pool);
         tx.softReset(pool);
@@ -38,55 +38,55 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
         assertActive(tx);
         assertEquals(1, tx.getAttempt());
     }
-    
+
     @Test
-      public void whenHasConstructed() {
-          FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-          LongRef ref = new LongRef(tx);
-          tx.openForConstruction(ref, pool);
+    public void whenHasConstructed() {
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        LongRef ref = new LongRef(tx);
+        tx.openForConstruction(ref, pool);
 
-          tx.hardReset(pool);
-          assertWasHardReset(tx);
-      }
+        tx.hardReset(pool);
+        assertWasHardReset(tx);
+    }
 
-      @Test
-      public void whenHasNormalRead() {
-          LongRef ref = createLongRef(stm);
-          FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-          tx.openForRead(ref, false, pool);
+    @Test
+    public void whenHasNormalRead() {
+        LongRef ref = createLongRef(stm);
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        tx.openForRead(ref, false, pool);
 
-          tx.hardReset(pool);
-          assertWasHardReset(tx);
-      }
+        tx.hardReset(pool);
+        assertWasHardReset(tx);
+    }
 
-      @Test
-      public void whenHasPermanentRead() {
-          LongRef ref = createReadBiasedLongRef(stm);
-          FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-          tx.openForRead(ref, false, pool);
-          tx.hardReset(pool);
-          assertWasHardReset(tx);
-      }
+    @Test
+    public void whenHasPermanentRead() {
+        LongRef ref = createReadBiasedLongRef(stm);
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        tx.openForRead(ref, false, pool);
+        tx.hardReset(pool);
+        assertWasHardReset(tx);
+    }
 
-      @Test
-      public void whenHasWrite() {
-          LongRef ref = createLongRef(stm);
-          FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-          tx.openForWrite(ref, false, pool);
-          tx.hardReset(pool);
-          assertWasHardReset(tx);
-      }
+    @Test
+    public void whenHasWrite() {
+        LongRef ref = createLongRef(stm);
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        tx.openForWrite(ref, false, pool);
+        tx.hardReset(pool);
+        assertWasHardReset(tx);
+    }
 
-      private static void assertWasHardReset(FatArrayTreeBetaTransaction tx) {
-          assertActive(tx);
-          assertHasNoNormalListeners(tx);
-          assertHasNoPermanentListeners(tx);
-          assertEquals(1, tx.getAttempt());
-          assertFalse((Boolean) getField(tx, "hasReads"));
-          //todo: needs to be enabled as soon as the non automatic readtracking is added
-          //assertFalse((Boolean) getField(tx, "hasUntrackedReads"));
-      }
-    
+    private static void assertWasHardReset(FatArrayTreeBetaTransaction tx) {
+        assertActive(tx);
+        assertHasNoNormalListeners(tx);
+        assertHasNoPermanentListeners(tx);
+        assertEquals(1, tx.getAttempt());
+        assertFalse((Boolean) getField(tx, "hasReads"));
+        //todo: needs to be enabled as soon as the non automatic readtracking is added
+        //assertFalse((Boolean) getField(tx, "hasUntrackedReads"));
+    }
+
 
     @Test
     public void whenTimeout() {

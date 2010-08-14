@@ -119,7 +119,7 @@ public class StandardLatch_tryAwaitTest {
 
         long remaining = latch.tryAwait(era, -10, TimeUnit.NANOSECONDS);
 
-        assertTrue(remaining<0);
+        assertTrue(remaining < 0);
         assertOpen(latch);
         assertEra(latch, era);
     }
@@ -131,7 +131,7 @@ public class StandardLatch_tryAwaitTest {
 
         long remaining = latch.tryAwait(era, -10, TimeUnit.NANOSECONDS);
 
-        assertTrue(remaining<0);
+        assertTrue(remaining < 0);
         assertClosed(latch);
         assertEra(latch, era);
     }

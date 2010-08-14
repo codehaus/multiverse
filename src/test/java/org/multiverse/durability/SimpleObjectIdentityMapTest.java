@@ -39,13 +39,13 @@ public class SimpleObjectIdentityMapTest {
         assertSame(found, account1);
     }
 
-    @Test(expected =  NullPointerException.class)
-    public void put_whenNull_thenNullPointerException(){
+    @Test(expected = NullPointerException.class)
+    public void put_whenNull_thenNullPointerException() {
         map.putIfAbsent(null);
     }
 
     @Test
-    public void put_whenFirstTime(){
+    public void put_whenFirstTime() {
         DurableObject account = new Account();
 
         DurableObject result = map.putIfAbsent(account);
@@ -56,7 +56,7 @@ public class SimpleObjectIdentityMapTest {
     }
 
     @Test
-    public void put_whenAlreadyPut(){
+    public void put_whenAlreadyPut() {
         DurableObject account1 = new Account();
         DurableObject account2 = new Account();
         account2.setStorageId(account1.getStorageId());

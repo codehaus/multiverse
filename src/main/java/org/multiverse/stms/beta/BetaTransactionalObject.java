@@ -15,7 +15,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
  *
  * @author Peter Veentjer
  */
-public interface BetaTransactionalObject extends DurableObject,  TransactionalObject {
+public interface BetaTransactionalObject extends DurableObject, TransactionalObject {
 
     int REGISTRATION_DONE = 0;
     int REGISTRATION_NOT_NEEDED = 1;
@@ -53,7 +53,7 @@ public interface BetaTransactionalObject extends DurableObject,  TransactionalOb
      *
      * @param spinCount the number of times to spin when locked.
      * @return the loaded tranlocal. It could be that a locked tranlocal is returned, the value itself is only
-     * used as a marked to indicate that it is locked. The value should not be used.
+     *         used as a marked to indicate that it is locked. The value should not be used.
      */
     Tranlocal load(int spinCount);
 
@@ -65,7 +65,7 @@ public interface BetaTransactionalObject extends DurableObject,  TransactionalOb
      * @param spinCount    the maximum number of times to spin
      * @param newLockOwner the transaction that wants to own the lock (not allowed to be null).
      * @return the loaded tranlocal. It could be that a locked tranlocal is returned, the value itself is only
-     * used as a marked to indicate that it is locked. The value should not be used.
+     *         used as a marked to indicate that it is locked. The value should not be used.
      */
     Tranlocal lockAndLoad(int spinCount, BetaTransaction newLockOwner);
 
@@ -153,7 +153,7 @@ public interface BetaTransactionalObject extends DurableObject,  TransactionalOb
     /**
      * Registers a change listener (needed for blocking operations).
      *
-     * @param latch the Latch that gets opened when the change happens
+     * @param latch     the Latch that gets opened when the change happens
      * @param tranlocal the current read/written tranlocal of the transaction. It is needed to determine
      *                  if a potentially desired write already has happened.
      * @param pool      the BetaObjectPool for pooling listeners

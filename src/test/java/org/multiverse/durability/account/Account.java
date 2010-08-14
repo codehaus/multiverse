@@ -24,7 +24,7 @@ public class Account implements DurableObject {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return storageId;
     }
 

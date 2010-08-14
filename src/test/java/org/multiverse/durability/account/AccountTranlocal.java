@@ -16,7 +16,7 @@ public class AccountTranlocal implements DurableState {
     public int balance;
     private Account owner;
 
-    public AccountTranlocal(Account owner){
+    public AccountTranlocal(Account owner) {
         this.owner = owner;
     }
 

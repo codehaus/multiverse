@@ -3,7 +3,7 @@ package org.multiverse.api.exceptions;
 /**
  * @author Peter Veentjer
  */
-public class TodoException extends RuntimeException{
+public class TodoException extends RuntimeException {
 
     public TodoException() {
     }

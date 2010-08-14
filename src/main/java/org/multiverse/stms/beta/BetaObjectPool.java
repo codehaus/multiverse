@@ -1,9 +1,11 @@
 package org.multiverse.stms.beta;
 
-import org.multiverse.api.blocking.*;
-import org.multiverse.api.exceptions.*;
+import org.multiverse.api.blocking.CheapLatch;
+import org.multiverse.api.blocking.Listeners;
+import org.multiverse.api.blocking.StandardLatch;
 import org.multiverse.stms.beta.refs.*;
 import org.multiverse.stms.beta.transactions.*;
+
 import java.util.ArrayList;
 
 /**
@@ -17,7 +19,7 @@ import java.util.ArrayList;
  * second array (that contains pooled tranlocals) can be found easily.
  * <p/>
  * ObjectPool is not thread safe and should not be shared between threads.
- *
+ * <p/>
  * This class is generated.
  *
  * @author Peter Veentjer
@@ -25,28 +27,28 @@ import java.util.ArrayList;
 public final class BetaObjectPool {
 
     private final static boolean ENABLED = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm,beta.BetaObjectPool.enabled","true"));
+            System.getProperty("org.multiverse.stm,beta.BetaObjectPool.enabled", "true"));
 
     private final static boolean TRANLOCAL_POOLING_ENABLED = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.tranlocalPooling",""+ENABLED));
+            System.getProperty("org.multiverse.stm.beta.BetaObjectPool.tranlocalPooling", "" + ENABLED));
 
     private final static boolean TRANLOCALARRAY_POOLING_ENABLED = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.tranlocalArrayPooling",""+ENABLED));
+            System.getProperty("org.multiverse.stm.beta.BetaObjectPool.tranlocalArrayPooling", "" + ENABLED));
 
     private final static boolean LATCH_POOLING_ENABLED = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.latchPooling",""+ENABLED));
+            System.getProperty("org.multiverse.stm.beta.BetaObjectPool.latchPooling", "" + ENABLED));
 
-    private final static boolean LISTENER_POOLING_ENABLED  = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.listenersPooling",""+ENABLED));
+    private final static boolean LISTENER_POOLING_ENABLED = Boolean.parseBoolean(
+            System.getProperty("org.multiverse.stm.beta.BetaObjectPool.listenersPooling", "" + ENABLED));
 
-    private final static boolean LISTENERSARRAY_POOLING_ENABLED  = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.listenersArrayPooling",""+ENABLED));
+    private final static boolean LISTENERSARRAY_POOLING_ENABLED = Boolean.parseBoolean(
+            System.getProperty("org.multiverse.stm.beta.BetaObjectPool.listenersArrayPooling", "" + ENABLED));
 
     private final static boolean TRANSACTION_POOLING_ENABLED = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.transactionPooling",""+ENABLED));
+            System.getProperty("org.multiverse.stm.beta.BetaObjectPool.transactionPooling", "" + ENABLED));
 
     private final static boolean ARRAYLIST_POOLING_ENABLED = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.arrayListPooling",""+ENABLED));
+            System.getProperty("org.multiverse.stm.beta.BetaObjectPool.arrayListPooling", "" + ENABLED));
 
     private final boolean tranlocalPoolingEnabled;
     private final boolean tranlocalArrayPoolingEnabled;
@@ -82,7 +84,7 @@ public final class BetaObjectPool {
     private int cheapLatchPoolIndex = -1;
 
     private StandardLatch[] standardLatchPool = new StandardLatch[10];
-    private int standardLatchPoolIndex = -1;   
+    private int standardLatchPoolIndex = -1;
 
     private Listeners[] listenersPool = new Listeners[1000];
     private int listenersPoolIndex = -1;
@@ -94,7 +96,7 @@ public final class BetaObjectPool {
         arrayListPoolingEnabled = ARRAYLIST_POOLING_ENABLED;
         tranlocalArrayPoolingEnabled = TRANLOCALARRAY_POOLING_ENABLED;
         tranlocalPoolingEnabled = TRANLOCAL_POOLING_ENABLED;
-        latchPoolingEnabled = LATCH_POOLING_ENABLED;        
+        latchPoolingEnabled = LATCH_POOLING_ENABLED;
         listenersPoolingEnabled = LISTENER_POOLING_ENABLED;
         listenersArrayPoolingEnabled = LISTENERSARRAY_POOLING_ENABLED;
         transactionPoolingEnabled = TRANSACTION_POOLING_ENABLED;
@@ -103,7 +105,7 @@ public final class BetaObjectPool {
     /**
      * Takes a RefTranlocal from the pool for the specified Ref.
      *
-     * @param owner the Ref to get the RefTranlocal for.     
+     * @param owner the Ref to get the RefTranlocal for.
      * @return the pooled tranlocal, or null if none is found.
      * @throws NullPointerException if owner is null.
      */
@@ -135,7 +137,7 @@ public final class BetaObjectPool {
      * @param tranlocal the RefTranlocal to pool.
      */
     public void put(final RefTranlocal tranlocal) {
-        if (!tranlocalPoolingEnabled || tranlocal == null||tranlocal.isPermanent) {
+        if (!tranlocalPoolingEnabled || tranlocal == null || tranlocal.isPermanent) {
             return;
         }
 
@@ -151,7 +153,7 @@ public final class BetaObjectPool {
     /**
      * Takes a IntRefTranlocal from the pool for the specified IntRef.
      *
-     * @param owner the IntRef to get the IntRefTranlocal for.     
+     * @param owner the IntRef to get the IntRefTranlocal for.
      * @return the pooled tranlocal, or null if none is found.
      * @throws NullPointerException if owner is null.
      */
@@ -183,7 +185,7 @@ public final class BetaObjectPool {
      * @param tranlocal the IntRefTranlocal to pool.
      */
     public void put(final IntRefTranlocal tranlocal) {
-        if (!tranlocalPoolingEnabled || tranlocal == null||tranlocal.isPermanent) {
+        if (!tranlocalPoolingEnabled || tranlocal == null || tranlocal.isPermanent) {
             return;
         }
 
@@ -199,7 +201,7 @@ public final class BetaObjectPool {
     /**
      * Takes a LongRefTranlocal from the pool for the specified LongRef.
      *
-     * @param owner the LongRef to get the LongRefTranlocal for.     
+     * @param owner the LongRef to get the LongRefTranlocal for.
      * @return the pooled tranlocal, or null if none is found.
      * @throws NullPointerException if owner is null.
      */
@@ -231,7 +233,7 @@ public final class BetaObjectPool {
      * @param tranlocal the LongRefTranlocal to pool.
      */
     public void put(final LongRefTranlocal tranlocal) {
-        if (!tranlocalPoolingEnabled || tranlocal == null||tranlocal.isPermanent) {
+        if (!tranlocalPoolingEnabled || tranlocal == null || tranlocal.isPermanent) {
             return;
         }
 
@@ -249,27 +251,27 @@ public final class BetaObjectPool {
             throw new NullPointerException();
         }
 
-        if(!tranlocalPoolingEnabled){
+        if (!tranlocalPoolingEnabled) {
             return null;
         }
 
         int classIndex = owner.getClassIndex();
 
-        switch(classIndex){
+        switch (classIndex) {
             case 0:
-                return take((Ref)owner);
+                return take((Ref) owner);
             case 1:
-                return take((IntRef)owner);
+                return take((IntRef) owner);
             case 2:
-                return take((LongRef)owner);
+                return take((LongRef) owner);
         }
 
-        if(classIndex >= pools.length){
+        if (classIndex >= pools.length) {
             return null;
         }
 
         TranlocalPool pool = pools[classIndex];
-        if(pool.lastUsed == -1){
+        if (pool.lastUsed == -1) {
             return null;
         }
 
@@ -288,31 +290,31 @@ public final class BetaObjectPool {
         BetaTransactionalObject owner = tranlocal.owner;
         int classIndex = owner.getClassIndex();
 
-        switch(classIndex){
+        switch (classIndex) {
             case 0:
-                put((RefTranlocal)tranlocal);
+                put((RefTranlocal) tranlocal);
                 return;
             case 1:
-                put((IntRefTranlocal)tranlocal);
+                put((IntRefTranlocal) tranlocal);
                 return;
             case 2:
-                put((LongRefTranlocal)tranlocal);
+                put((LongRefTranlocal) tranlocal);
                 return;
         }
 
-        if(classIndex >= pools.length){
+        if (classIndex >= pools.length) {
             TranlocalPool[] newPools = new TranlocalPool[pools.length * 2];
             System.arraycopy(pools, 0, newPools, 0, pools.length);
             pools = newPools;
         }
 
         TranlocalPool pool = pools[classIndex];
-        if(pool == null){
+        if (pool == null) {
             pool = new TranlocalPool();
-            pools[classIndex]=pool;
+            pools[classIndex] = pool;
         }
 
-        if(pool.lastUsed == pool.tranlocals.length - 1){
+        if (pool.lastUsed == pool.tranlocals.length - 1) {
             return;
         }
 
@@ -321,115 +323,115 @@ public final class BetaObjectPool {
         pool.tranlocals[pool.lastUsed] = tranlocal;
     }
 
-    static class TranlocalPool{
+    static class TranlocalPool {
         int lastUsed = -1;
         Tranlocal[] tranlocals = new Tranlocal[100];
     }
 
     private Tranlocal[][] tranlocalArrayPool = new Tranlocal[8193][];
 
-    public void putTranlocalArray(final Tranlocal[] array){
-        if(array == null){
+    public void putTranlocalArray(final Tranlocal[] array) {
+        if (array == null) {
             throw new NullPointerException();
         }
 
-        if(!tranlocalArrayPoolingEnabled){
+        if (!tranlocalArrayPoolingEnabled) {
             return;
         }
 
-        if(array.length-1>tranlocalArrayPool.length){
+        if (array.length - 1 > tranlocalArrayPool.length) {
             return;
         }
 
         int index = array.length;
 
-        if(tranlocalArrayPool[index]!=null){
+        if (tranlocalArrayPool[index] != null) {
             return;
         }
 
         //lets clean the array
-        for(int k=0;k < array.length;k++){
-            array[k]=null;
+        for (int k = 0; k < array.length; k++) {
+            array[k] = null;
         }
 
-        tranlocalArrayPool[index]=array;
+        tranlocalArrayPool[index] = array;
     }
 
     /**
      * Takes a tranlocal array from the pool
      */
-    public Tranlocal[] takeTranlocalArray(final int size){
-        if(size<0){
+    public Tranlocal[] takeTranlocalArray(final int size) {
+        if (size < 0) {
             throw new IllegalArgumentException();
         }
 
-        if(!tranlocalArrayPoolingEnabled){
+        if (!tranlocalArrayPoolingEnabled) {
             return null;
         }
 
         int index = size;
 
-        if(index>=tranlocalArrayPool.length){
+        if (index >= tranlocalArrayPool.length) {
             return null;
         }
 
-        if(tranlocalArrayPool[index]==null){
+        if (tranlocalArrayPool[index] == null) {
             return null;
         }
 
         Tranlocal[] array = tranlocalArrayPool[index];
-        tranlocalArrayPool[index]=null;
+        tranlocalArrayPool[index] = null;
         return array;
     }
 
-    public CheapLatch takeCheapLatch(){
-        if(!latchPoolingEnabled || cheapLatchPoolIndex == -1){
+    public CheapLatch takeCheapLatch() {
+        if (!latchPoolingEnabled || cheapLatchPoolIndex == -1) {
             return null;
         }
 
         CheapLatch latch = cheapLatchPool[cheapLatchPoolIndex];
-        cheapLatchPool[cheapLatchPoolIndex]=null;
+        cheapLatchPool[cheapLatchPoolIndex] = null;
         cheapLatchPoolIndex--;
         return latch;
     }
 
-    public void putCheapLatch(CheapLatch latch){
-        if(latch == null){
+    public void putCheapLatch(CheapLatch latch) {
+        if (latch == null) {
             throw new NullPointerException();
         }
 
-        if(!latchPoolingEnabled || cheapLatchPoolIndex == cheapLatchPool.length-1){
+        if (!latchPoolingEnabled || cheapLatchPoolIndex == cheapLatchPool.length - 1) {
             return;
         }
 
         latch.prepareForPooling();
         cheapLatchPoolIndex++;
-        cheapLatchPool[cheapLatchPoolIndex]=latch;        
+        cheapLatchPool[cheapLatchPoolIndex] = latch;
     }
 
-    public StandardLatch takeStandardLatch(){
-        if(!latchPoolingEnabled || standardLatchPoolIndex == -1){
+    public StandardLatch takeStandardLatch() {
+        if (!latchPoolingEnabled || standardLatchPoolIndex == -1) {
             return null;
         }
 
         StandardLatch latch = standardLatchPool[standardLatchPoolIndex];
-        standardLatchPool[standardLatchPoolIndex]=null;
+        standardLatchPool[standardLatchPoolIndex] = null;
         standardLatchPoolIndex--;
         return latch;
     }
 
-    public void putStandardLatch(StandardLatch latch){
-        if(latch == null){
+    public void putStandardLatch(StandardLatch latch) {
+        if (latch == null) {
             throw new NullPointerException();
         }
 
-        if(!latchPoolingEnabled || standardLatchPoolIndex == standardLatchPool.length-1){
+        if (!latchPoolingEnabled || standardLatchPoolIndex == standardLatchPool.length - 1) {
             return;
         }
 
         latch.prepareForPooling();
         standardLatchPoolIndex++;
-        standardLatchPool[standardLatchPoolIndex]=latch;
+        standardLatchPool[standardLatchPoolIndex] = latch;
     }
 
     // ====================== array list ===================================
@@ -439,13 +441,13 @@ public final class BetaObjectPool {
      *
      * @return the ArrayList from the pool, or null of none is found.
      */
-    public ArrayList takeArrayList(){
-        if(!arrayListPoolingEnabled || arrayListPoolIndex == -1){
+    public ArrayList takeArrayList() {
+        if (!arrayListPoolingEnabled || arrayListPoolIndex == -1) {
             return null;
         }
 
         ArrayList list = arrayListPool[arrayListPoolIndex];
-        arrayListPool[arrayListPoolIndex]=null;
+        arrayListPool[arrayListPoolIndex] = null;
         arrayListPoolIndex--;
         return list;
     }
@@ -457,46 +459,46 @@ public final class BetaObjectPool {
      * @param list the ArrayList to place in the pool.
      * @throws NullPointerException if list is null.
      */
-    public void putArrayList(ArrayList list){
-        if(list == null){
+    public void putArrayList(ArrayList list) {
+        if (list == null) {
             throw new NullPointerException();
         }
 
-        if(!arrayListPoolingEnabled || arrayListPoolIndex == arrayListPool.length-1){
+        if (!arrayListPoolingEnabled || arrayListPoolIndex == arrayListPool.length - 1) {
             return;
         }
 
         list.clear();
         arrayListPoolIndex++;
-        arrayListPool[arrayListPoolIndex]=list;
+        arrayListPool[arrayListPoolIndex] = list;
     }
 
 
     // ============================ listeners ==================================
 
-    public Listeners takeListeners(){
-        if(!listenersPoolingEnabled || listenersPoolIndex == -1){
+    public Listeners takeListeners() {
+        if (!listenersPoolingEnabled || listenersPoolIndex == -1) {
             return null;
         }
 
         Listeners listeners = listenersPool[listenersPoolIndex];
-        listenersPool[listenersPoolIndex]=null;
+        listenersPool[listenersPoolIndex] = null;
         listenersPoolIndex--;
         return listeners;
     }
 
-    public void putListeners(Listeners listeners){
-        if(listeners == null){
+    public void putListeners(Listeners listeners) {
+        if (listeners == null) {
             throw new NullPointerException();
         }
 
-        if(!listenersPoolingEnabled || listenersPoolIndex == listenersPool.length-1){
+        if (!listenersPoolingEnabled || listenersPoolIndex == listenersPool.length - 1) {
             return;
         }
 
         listeners.prepareForPooling();
         listenersPoolIndex++;
-        listenersPool[listenersPoolIndex]=listeners;
+        listenersPool[listenersPoolIndex] = listeners;
     }
 
     // ============================= listeners array =============================
@@ -507,19 +509,19 @@ public final class BetaObjectPool {
      * Takes a Listeners array from the pool. If an array is returned, it is completely nulled.
      *
      * @param minimalSize the minimalSize of the Listeners array.
-     * @returns the found Listeners array, or null if none is taken from the pool.
      * @throws IllegalArgumentException if minimalSize is smaller than 0.
+     * @returns the found Listeners array, or null if none is taken from the pool.
      */
-    public Listeners[] takeListenersArray(int minimalSize){
-        if( minimalSize < 0 ){
+    public Listeners[] takeListenersArray(int minimalSize) {
+        if (minimalSize < 0) {
             throw new IllegalArgumentException();
         }
 
-        if(!listenersArrayPoolingEnabled){
+        if (!listenersArrayPoolingEnabled) {
             return null;
         }
 
-        if(listenersArray == null || listenersArray.length < minimalSize){
+        if (listenersArray == null || listenersArray.length < minimalSize) {
             return null;
         }
 
@@ -530,22 +532,22 @@ public final class BetaObjectPool {
 
     /**
      * Puts a Listeners array in the pool.
-     *
+     * <p/>
      * Listeners array should be nulled before being put in the pool. It is not going to be done by this
      * BetaObjectPool but should be done when the listeners on the listeners array are notified.
      *
      * @throws NullPointerException if listenersArray is null.
      */
-    public void putListenersArray(Listeners[] listenersArray){
-        if(listenersArray == null){
+    public void putListenersArray(Listeners[] listenersArray) {
+        if (listenersArray == null) {
             throw new NullPointerException();
         }
 
-        if(!listenersArrayPoolingEnabled){
+        if (!listenersArrayPoolingEnabled) {
             return;
         }
 
-        if(this.listenersArray!=listenersArray){
+        if (this.listenersArray != listenersArray) {
             return;
         }
 
@@ -554,141 +556,135 @@ public final class BetaObjectPool {
 
     // ========================== transactions ==============================
 
-    public LeanMonoBetaTransaction takeLeanMonoBetaTransaction(){
-        if(!transactionPoolingEnabled || poolLeanMonoBetaTransactionIndex == -1){
+    public LeanMonoBetaTransaction takeLeanMonoBetaTransaction() {
+        if (!transactionPoolingEnabled || poolLeanMonoBetaTransactionIndex == -1) {
             return null;
         }
 
         LeanMonoBetaTransaction tx = poolLeanMonoBetaTransaction[poolLeanMonoBetaTransactionIndex];
-        poolLeanMonoBetaTransaction[poolLeanMonoBetaTransactionIndex]=null;
+        poolLeanMonoBetaTransaction[poolLeanMonoBetaTransactionIndex] = null;
         poolLeanMonoBetaTransactionIndex--;
         return tx;
     }
 
-    public FatMonoBetaTransaction takeFatMonoBetaTransaction(){
-        if(!transactionPoolingEnabled || poolFatMonoBetaTransactionIndex == -1){
+    public FatMonoBetaTransaction takeFatMonoBetaTransaction() {
+        if (!transactionPoolingEnabled || poolFatMonoBetaTransactionIndex == -1) {
             return null;
         }
 
         FatMonoBetaTransaction tx = poolFatMonoBetaTransaction[poolFatMonoBetaTransactionIndex];
-        poolFatMonoBetaTransaction[poolFatMonoBetaTransactionIndex]=null;
+        poolFatMonoBetaTransaction[poolFatMonoBetaTransactionIndex] = null;
         poolFatMonoBetaTransactionIndex--;
         return tx;
     }
 
-    public LeanArrayBetaTransaction takeLeanArrayBetaTransaction(){
-        if(!transactionPoolingEnabled || poolLeanArrayBetaTransactionIndex == -1){
+    public LeanArrayBetaTransaction takeLeanArrayBetaTransaction() {
+        if (!transactionPoolingEnabled || poolLeanArrayBetaTransactionIndex == -1) {
             return null;
         }
 
         LeanArrayBetaTransaction tx = poolLeanArrayBetaTransaction[poolLeanArrayBetaTransactionIndex];
-        poolLeanArrayBetaTransaction[poolLeanArrayBetaTransactionIndex]=null;
+        poolLeanArrayBetaTransaction[poolLeanArrayBetaTransactionIndex] = null;
         poolLeanArrayBetaTransactionIndex--;
         return tx;
     }
 
-    public FatArrayBetaTransaction takeFatArrayBetaTransaction(){
-        if(!transactionPoolingEnabled || poolFatArrayBetaTransactionIndex == -1){
+    public FatArrayBetaTransaction takeFatArrayBetaTransaction() {
+        if (!transactionPoolingEnabled || poolFatArrayBetaTransactionIndex == -1) {
             return null;
         }
 
         FatArrayBetaTransaction tx = poolFatArrayBetaTransaction[poolFatArrayBetaTransactionIndex];
-        poolFatArrayBetaTransaction[poolFatArrayBetaTransactionIndex]=null;
+        poolFatArrayBetaTransaction[poolFatArrayBetaTransactionIndex] = null;
         poolFatArrayBetaTransactionIndex--;
         return tx;
     }
 
-    public LeanArrayTreeBetaTransaction takeLeanArrayTreeBetaTransaction(){
-        if(!transactionPoolingEnabled || poolLeanArrayTreeBetaTransactionIndex == -1){
+    public LeanArrayTreeBetaTransaction takeLeanArrayTreeBetaTransaction() {
+        if (!transactionPoolingEnabled || poolLeanArrayTreeBetaTransactionIndex == -1) {
             return null;
         }
 
         LeanArrayTreeBetaTransaction tx = poolLeanArrayTreeBetaTransaction[poolLeanArrayTreeBetaTransactionIndex];
-        poolLeanArrayTreeBetaTransaction[poolLeanArrayTreeBetaTransactionIndex]=null;
+        poolLeanArrayTreeBetaTransaction[poolLeanArrayTreeBetaTransactionIndex] = null;
         poolLeanArrayTreeBetaTransactionIndex--;
         return tx;
     }
 
-    public FatArrayTreeBetaTransaction takeFatArrayTreeBetaTransaction(){
-        if(!transactionPoolingEnabled || poolFatArrayTreeBetaTransactionIndex == -1){
+    public FatArrayTreeBetaTransaction takeFatArrayTreeBetaTransaction() {
+        if (!transactionPoolingEnabled || poolFatArrayTreeBetaTransactionIndex == -1) {
             return null;
         }
 
         FatArrayTreeBetaTransaction tx = poolFatArrayTreeBetaTransaction[poolFatArrayTreeBetaTransactionIndex];
-        poolFatArrayTreeBetaTransaction[poolFatArrayTreeBetaTransactionIndex]=null;
+        poolFatArrayTreeBetaTransaction[poolFatArrayTreeBetaTransactionIndex] = null;
         poolFatArrayTreeBetaTransactionIndex--;
         return tx;
     }
 
-  
-    public void putBetaTransaction(BetaTransaction tx){
-        if(tx == null){
+
+    public void putBetaTransaction(BetaTransaction tx) {
+        if (tx == null) {
             throw new NullPointerException();
         }
 
-        if(!transactionPoolingEnabled){
+        if (!transactionPoolingEnabled) {
             return;
         }
 
-        switch(tx.getPoolTransactionType()){
-            case BetaTransaction.POOL_TRANSACTIONTYPE_LEAN_MONO:
-            {
-                if(poolLeanMonoBetaTransactionIndex == poolLeanMonoBetaTransaction.length - 1){
+        switch (tx.getPoolTransactionType()) {
+            case BetaTransaction.POOL_TRANSACTIONTYPE_LEAN_MONO: {
+                if (poolLeanMonoBetaTransactionIndex == poolLeanMonoBetaTransaction.length - 1) {
                     return;
                 }
 
                 poolLeanMonoBetaTransactionIndex++;
-                poolLeanMonoBetaTransaction[poolLeanMonoBetaTransactionIndex] = (LeanMonoBetaTransaction)tx;
+                poolLeanMonoBetaTransaction[poolLeanMonoBetaTransactionIndex] = (LeanMonoBetaTransaction) tx;
             }
             break;
-            case BetaTransaction.POOL_TRANSACTIONTYPE_FAT_MONO:
-            {
-                if(poolFatMonoBetaTransactionIndex == poolFatMonoBetaTransaction.length - 1){
+            case BetaTransaction.POOL_TRANSACTIONTYPE_FAT_MONO: {
+                if (poolFatMonoBetaTransactionIndex == poolFatMonoBetaTransaction.length - 1) {
                     return;
                 }
 
                 poolFatMonoBetaTransactionIndex++;
-                poolFatMonoBetaTransaction[poolFatMonoBetaTransactionIndex] = (FatMonoBetaTransaction)tx;
+                poolFatMonoBetaTransaction[poolFatMonoBetaTransactionIndex] = (FatMonoBetaTransaction) tx;
             }
             break;
-            case BetaTransaction.POOL_TRANSACTIONTYPE_LEAN_ARRAY:
-            {
-                if(poolLeanArrayBetaTransactionIndex == poolLeanArrayBetaTransaction.length - 1){
+            case BetaTransaction.POOL_TRANSACTIONTYPE_LEAN_ARRAY: {
+                if (poolLeanArrayBetaTransactionIndex == poolLeanArrayBetaTransaction.length - 1) {
                     return;
                 }
 
                 poolLeanArrayBetaTransactionIndex++;
-                poolLeanArrayBetaTransaction[poolLeanArrayBetaTransactionIndex] = (LeanArrayBetaTransaction)tx;
+                poolLeanArrayBetaTransaction[poolLeanArrayBetaTransactionIndex] = (LeanArrayBetaTransaction) tx;
             }
             break;
-            case BetaTransaction.POOL_TRANSACTIONTYPE_FAT_ARRAY:
-            {
-                if(poolFatArrayBetaTransactionIndex == poolFatArrayBetaTransaction.length - 1){
+            case BetaTransaction.POOL_TRANSACTIONTYPE_FAT_ARRAY: {
+                if (poolFatArrayBetaTransactionIndex == poolFatArrayBetaTransaction.length - 1) {
                     return;
                 }
 
                 poolFatArrayBetaTransactionIndex++;
-                poolFatArrayBetaTransaction[poolFatArrayBetaTransactionIndex] = (FatArrayBetaTransaction)tx;
+                poolFatArrayBetaTransaction[poolFatArrayBetaTransactionIndex] = (FatArrayBetaTransaction) tx;
             }
             break;
-            case BetaTransaction.POOL_TRANSACTIONTYPE_LEAN_ARRAYTREE:
-            {
-                if(poolLeanArrayTreeBetaTransactionIndex == poolLeanArrayTreeBetaTransaction.length - 1){
+            case BetaTransaction.POOL_TRANSACTIONTYPE_LEAN_ARRAYTREE: {
+                if (poolLeanArrayTreeBetaTransactionIndex == poolLeanArrayTreeBetaTransaction.length - 1) {
                     return;
                 }
 
                 poolLeanArrayTreeBetaTransactionIndex++;
-                poolLeanArrayTreeBetaTransaction[poolLeanArrayTreeBetaTransactionIndex] = (LeanArrayTreeBetaTransaction)tx;
+                poolLeanArrayTreeBetaTransaction[poolLeanArrayTreeBetaTransactionIndex] = (LeanArrayTreeBetaTransaction) tx;
             }
             break;
-            case BetaTransaction.POOL_TRANSACTIONTYPE_FAT_ARRAYTREE:
-            {
-                if(poolFatArrayTreeBetaTransactionIndex == poolFatArrayTreeBetaTransaction.length - 1){
+            case BetaTransaction.POOL_TRANSACTIONTYPE_FAT_ARRAYTREE: {
+                if (poolFatArrayTreeBetaTransactionIndex == poolFatArrayTreeBetaTransaction.length - 1) {
                     return;
                 }
 
                 poolFatArrayTreeBetaTransactionIndex++;
-                poolFatArrayTreeBetaTransaction[poolFatArrayTreeBetaTransactionIndex] = (FatArrayTreeBetaTransaction)tx;
+                poolFatArrayTreeBetaTransaction[poolFatArrayTreeBetaTransactionIndex] = (FatArrayTreeBetaTransaction) tx;
             }
             break;
             default:

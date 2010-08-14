@@ -15,10 +15,10 @@ public class CheapLatch_tryAwaitTest {
         CheapLatch latch = new CheapLatch();
         long era = latch.getEra();
 
-        try{
-        latch.tryAwait(1,1, TimeUnit.NANOSECONDS);
+        try {
+            latch.tryAwait(1, 1, TimeUnit.NANOSECONDS);
             fail();
-        }catch(UnsupportedOperationException expected){
+        } catch (UnsupportedOperationException expected) {
         }
 
         assertEquals(era, latch.getEra());

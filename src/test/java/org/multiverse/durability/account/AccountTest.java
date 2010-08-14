@@ -33,7 +33,7 @@ public class AccountTest {
     public void test() {
         Account root = new Account();
 
-        System.out.println("root.storageId:"+root.getStorageId());
+        System.out.println("root.storageId:" + root.getStorageId());
 
         Customer customer = new Customer();
         customer.active = new CustomerTranlocal(customer);
@@ -98,7 +98,7 @@ public class AccountTest {
         }
 
         @Override
-        public CustomerTranlocal deserializeState(DurableObject o, byte[] content,DurableObjectLoader loader) {
+        public CustomerTranlocal deserializeState(DurableObject o, byte[] content, DurableObjectLoader loader) {
             Customer owner = (Customer) o;
             Map<String, String> map = SerializeUtils.deserializeMap(content);
             CustomerTranlocal tranlocal = new CustomerTranlocal(owner);

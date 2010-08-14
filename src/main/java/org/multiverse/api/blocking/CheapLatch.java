@@ -87,7 +87,7 @@ public final class CheapLatch implements Latch {
             } else {
                 isOpen = false;
             }
-            era++;            
+            era++;
         }
     }
 

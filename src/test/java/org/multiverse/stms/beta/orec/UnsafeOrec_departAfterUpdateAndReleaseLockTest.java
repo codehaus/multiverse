@@ -46,7 +46,7 @@ public class UnsafeOrec_departAfterUpdateAndReleaseLockTest {
 
         long oldConflictCount = globalConflictCounter.count();
         try {
-            orec.departAfterUpdateAndReleaseLock(globalConflictCounter,null);
+            orec.departAfterUpdateAndReleaseLock(globalConflictCounter, null);
             fail();
         } catch (PanicError expected) {
         }
@@ -64,7 +64,7 @@ public class UnsafeOrec_departAfterUpdateAndReleaseLockTest {
 
         long oldConflictCount = globalConflictCounter.count();
 
-        long result = orec.departAfterUpdateAndReleaseLock(globalConflictCounter,null);
+        long result = orec.departAfterUpdateAndReleaseLock(globalConflictCounter, null);
 
         assertEquals(0, result);
         assertEquals(oldConflictCount, globalConflictCounter.count());
@@ -82,7 +82,7 @@ public class UnsafeOrec_departAfterUpdateAndReleaseLockTest {
 
         long oldConflictCount = globalConflictCounter.count();
 
-        long result = orec.departAfterUpdateAndReleaseLock(globalConflictCounter,null);
+        long result = orec.departAfterUpdateAndReleaseLock(globalConflictCounter, null);
 
         assertEquals(oldConflictCount + 1, globalConflictCounter.count());
         assertEquals(2, result);

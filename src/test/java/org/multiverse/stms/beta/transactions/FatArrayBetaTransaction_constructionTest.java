@@ -2,8 +2,8 @@ package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStm;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,8 +28,8 @@ public class FatArrayBetaTransaction_constructionTest {
         assertEquals(1, tx.getAttempt());
     }
 
-     @Test
-    public void testTimeout(){
+    @Test
+    public void testTimeout() {
         BetaTransactionConfig config = new BetaTransactionConfig(stm)
                 .setTimeoutNs(TimeUnit.SECONDS.toNanos(10));
 

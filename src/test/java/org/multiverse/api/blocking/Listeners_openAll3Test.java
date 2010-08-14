@@ -7,5 +7,6 @@ public class Listeners_openAll3Test {
 
     @Test
     @Ignore
-    public void test(){}
+    public void test() {
+    }
 }

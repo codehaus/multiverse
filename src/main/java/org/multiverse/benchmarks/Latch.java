@@ -7,16 +7,16 @@ public final class Latch {
 
     private boolean isOpen = false;
 
-    public void open(){
-        synchronized (this){
-            isOpen=true;
+    public void open() {
+        synchronized (this) {
+            isOpen = true;
             notifyAll();
         }
     }
 
-    public void await(){
-        synchronized (this){
-            while(!isOpen){
+    public void await() {
+        synchronized (this) {
+            while (!isOpen) {
                 try {
                     wait();
                 } catch (InterruptedException e) {

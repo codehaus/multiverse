@@ -18,32 +18,32 @@ public final class GlobalConflictCounter {
 
         for (int k = 0; k < length; k++) {
             counters[k] = new AtomicLong();
-            initArray[k]=-1;
+            initArray[k] = -1;
         }
     }
 
-    public void signalConflict(BetaTransactionalObject ref){
+    public void signalConflict(BetaTransactionalObject ref) {
         int index = getIndex(ref);
-        if(counters.length == 1){
+        if (counters.length == 1) {
             index = 0;
-        }else{
+        } else {
             index = getIndex(ref);
         }
 
         AtomicLong counter = counters[index];
         long oldValue = counter.get();
-        counter.compareAndSet(oldValue, oldValue+1);
+        counter.compareAndSet(oldValue, oldValue + 1);
     }
 
     private int getIndex(BetaTransactionalObject ref) {
         return 0;  //To change body of created methods use File | Settings | File Templates.
     }
 
-    public LocalConflictCounter createLocalConflictCounter(){
+    public LocalConflictCounter createLocalConflictCounter() {
         return new LocalConflictCounter(this);
     }
 
-    protected int[] getInitArray(){
+    protected int[] getInitArray() {
         return initArray;
     }
 
@@ -51,10 +51,10 @@ public final class GlobalConflictCounter {
         return counters.length;
     }
 
-    public long count(){
+    public long count() {
         long result = 0;
-        for(int k=0;k<counters.length;k++){
-            result+=counters[k].get();
+        for (int k = 0; k < counters.length; k++) {
+            result += counters[k].get();
         }
         return result;
     }

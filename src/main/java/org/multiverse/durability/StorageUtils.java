@@ -1,12 +1,6 @@
 package org.multiverse.durability;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -72,5 +66,7 @@ public class StorageUtils {
     }
 
     //we don't want instances.
-    private StorageUtils(){}
+
+    private StorageUtils() {
+    }
 }

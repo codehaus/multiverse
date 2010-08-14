@@ -3,8 +3,8 @@ package org.multiverse.stms.beta.transactions;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.refs.LongRef;
 
 import static org.junit.Assert.*;

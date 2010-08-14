@@ -115,7 +115,7 @@ public class BetaTransactionTemplate_timeoutTest {
             block.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction)tx;
+                    BetaTransaction btx = (BetaTransaction) tx;
                     BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
                     LongRefTranlocal write = btx.openForWrite(ref, false, pool);

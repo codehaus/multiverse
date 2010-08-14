@@ -57,8 +57,8 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         this.maxArrayTransactionSize = maxArrayTransactionSize;
     }
 
-    public boolean hasTimeout(){
-        return timeoutNs!=Long.MAX_VALUE;
+    public boolean hasTimeout() {
+        return timeoutNs != Long.MAX_VALUE;
     }
 
     public SpeculativeBetaConfig getSpeculativeConfig() {

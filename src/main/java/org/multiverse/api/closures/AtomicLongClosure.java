@@ -7,7 +7,7 @@ import org.multiverse.api.Transaction;
  *
  * @author Peter Veentjer.
  */
-public interface AtomicLongClosure{
+public interface AtomicLongClosure {
 
     /**
      * Executes the closure.
@@ -17,5 +17,5 @@ public interface AtomicLongClosure{
      * @return the result of the closure.
      * @throws Exception
      */
-    long execute(Transaction tx)throws Exception;
+    long execute(Transaction tx) throws Exception;
 }

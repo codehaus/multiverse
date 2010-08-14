@@ -14,7 +14,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.*;
 
 public class FatMonoBetaTransaction_registerTest {
-     private BetaStm stm;
+    private BetaStm stm;
     private BetaObjectPool pool;
 
     @Before

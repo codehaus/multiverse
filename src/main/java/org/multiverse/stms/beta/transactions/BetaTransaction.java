@@ -3,15 +3,17 @@ package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.Latch;
-import org.multiverse.api.exceptions.*;
-import org.multiverse.api.lifecycle.*;
-import org.multiverse.functions.*;
-import org.multiverse.stms.beta.BetaTransactionalObject;
+import org.multiverse.api.exceptions.ControlFlowError;
+import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.functions.Function;
+import org.multiverse.functions.IntFunction;
+import org.multiverse.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
-import org.multiverse.stms.beta.refs.Tranlocal;
+import org.multiverse.stms.beta.BetaTransactionalObject;
 import org.multiverse.stms.beta.refs.*;
 
-import java.util.*;
+import java.util.ArrayList;
 
 /**
  * @author Peter Veentjer
@@ -40,14 +42,14 @@ public interface BetaTransaction extends Transaction {
      * Commits this BetaTransaction.
      *
      * @param pool the BetaObjectPool for putting/taking poolable resources.
-     * @throws ControlFlowError e.g. on read or write conflicts.
+     * @throws ControlFlowError         e.g. on read or write conflicts.
      * @throws DeadTransactionException if the transaction already is aborted.
      */
     void commit(BetaObjectPool pool);
 
     /**
      * Aborts this BetaTransaction.
-     *
+     * <p/>
      * throws DeadTransactionException if the transaction already is committed.
      */
     void abort(BetaObjectPool pool);
@@ -73,7 +75,6 @@ public interface BetaTransaction extends Transaction {
     /**
      * Returns a list containing the normal TransactionLifecycleListeners. The returned list
      * can be null (essentially the same as an empty list).
-     *
      */
     ArrayList<TransactionLifecycleListener> getNormalListeners();
 
@@ -81,17 +82,17 @@ public interface BetaTransaction extends Transaction {
 
     void registerPermanent(BetaObjectPool pool, TransactionLifecycleListener listener);
 
-    void copyForSpeculativeFailure(BetaTransaction tx);    
+    void copyForSpeculativeFailure(BetaTransaction tx);
 
     @Override
     BetaTransactionConfig getConfiguration();
-  
+
     /**
      *
      *
      */
     void init(BetaTransactionConfig transactionConfig, BetaObjectPool pool);
-    
+
     /**
      * Registers the changelistener and aborts the transaction (so also releasing its acquired resources
      * like locks.
@@ -110,29 +111,29 @@ public interface BetaTransaction extends Transaction {
 
     <E> RefTranlocal<E> openForConstruction(Ref<E> ref, BetaObjectPool pool);
 
-    <E> void commute(Ref<E> ref, BetaObjectPool pool, Function<E> function);        
+    <E> void commute(Ref<E> ref, BetaObjectPool pool, Function<E> function);
 
-     IntRefTranlocal openForRead(IntRef ref, boolean lock, BetaObjectPool pool);
+    IntRefTranlocal openForRead(IntRef ref, boolean lock, BetaObjectPool pool);
 
-     IntRefTranlocal openForWrite(IntRef ref, boolean lock, BetaObjectPool pool);
+    IntRefTranlocal openForWrite(IntRef ref, boolean lock, BetaObjectPool pool);
 
-     IntRefTranlocal openForConstruction(IntRef ref, BetaObjectPool pool);
+    IntRefTranlocal openForConstruction(IntRef ref, BetaObjectPool pool);
 
-     void commute(IntRef ref, BetaObjectPool pool, IntFunction function);        
+    void commute(IntRef ref, BetaObjectPool pool, IntFunction function);
 
-     LongRefTranlocal openForRead(LongRef ref, boolean lock, BetaObjectPool pool);
+    LongRefTranlocal openForRead(LongRef ref, boolean lock, BetaObjectPool pool);
 
-     LongRefTranlocal openForWrite(LongRef ref, boolean lock, BetaObjectPool pool);
+    LongRefTranlocal openForWrite(LongRef ref, boolean lock, BetaObjectPool pool);
 
-     LongRefTranlocal openForConstruction(LongRef ref, BetaObjectPool pool);
+    LongRefTranlocal openForConstruction(LongRef ref, BetaObjectPool pool);
 
-     void commute(LongRef ref, BetaObjectPool pool, LongFunction function);        
+    void commute(LongRef ref, BetaObjectPool pool, LongFunction function);
 
-     Tranlocal openForRead(BetaTransactionalObject ref, boolean lock, BetaObjectPool pool);
+    Tranlocal openForRead(BetaTransactionalObject ref, boolean lock, BetaObjectPool pool);
 
-     Tranlocal openForWrite(BetaTransactionalObject ref, boolean lock, BetaObjectPool pool);
+    Tranlocal openForWrite(BetaTransactionalObject ref, boolean lock, BetaObjectPool pool);
 
-     Tranlocal openForConstruction(BetaTransactionalObject ref, BetaObjectPool pool);
+    Tranlocal openForConstruction(BetaTransactionalObject ref, BetaObjectPool pool);
 
-     void commute(BetaTransactionalObject ref, BetaObjectPool pool, Function function);        
+    void commute(BetaTransactionalObject ref, BetaObjectPool pool, Function function);
 }

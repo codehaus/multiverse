@@ -30,7 +30,7 @@ public class BetaObjectPool_cheapLatchTest {
 
         pool.putCheapLatch(latch);
 
-        assertEra(latch, era+1);
+        assertEra(latch, era + 1);
         assertClosed(latch);
     }
 

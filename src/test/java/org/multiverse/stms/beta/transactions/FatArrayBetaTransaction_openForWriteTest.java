@@ -445,7 +445,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertNull(ref.getLockOwner());
     }
 
-   @Test
+    @Test
     public void conflictCounterIsSetAtFirstWrite() {
         LongRef ref = createLongRef(stm, 10);
 

@@ -15,7 +15,7 @@ import static org.multiverse.stms.beta.BetaStmUtils.format;
 
 public class UncontendedLeanReadScalabilityTest {
 
-     private BetaStm stm;
+    private BetaStm stm;
 
     public static void main(String[] args) {
         UncontendedLeanReadScalabilityTest test = new UncontendedLeanReadScalabilityTest();

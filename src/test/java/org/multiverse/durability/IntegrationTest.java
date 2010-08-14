@@ -22,8 +22,8 @@ public class IntegrationTest {
     }
 
     @Test
-    public void test(){
-        DurableObject entity = new DummyEntity(UUID.randomUUID().toString(),new byte[]{});
+    public void test() {
+        DurableObject entity = new DummyEntity(UUID.randomUUID().toString(), new byte[]{});
 
         UnitOfWrite unitOfWrite = storage.startUnitOfWrite();
         unitOfWrite.addRoot(entity);
@@ -39,7 +39,7 @@ public class IntegrationTest {
 
         @Override
         public void populate(DurableState state, byte[] content, DurableObjectLoader loader) {
-           throw new TodoException();
+            throw new TodoException();
         }
 
         @Override
@@ -48,8 +48,8 @@ public class IntegrationTest {
         }
 
         @Override
-        public DurableState deserializeState(DurableObject owner, byte[] content,DurableObjectLoader loader) {
-           throw new TodoException();
+        public DurableState deserializeState(DurableObject owner, byte[] content, DurableObjectLoader loader) {
+            throw new TodoException();
         }
 
     }

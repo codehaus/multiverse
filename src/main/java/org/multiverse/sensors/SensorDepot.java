@@ -10,32 +10,32 @@ import java.util.concurrent.ConcurrentMap;
  */
 public final class SensorDepot {
 
-    private ConcurrentMap<Sensor, Object> sensorMap = new ConcurrentHashMap<Sensor,Object>();
+    private ConcurrentMap<Sensor, Object> sensorMap = new ConcurrentHashMap<Sensor, Object>();
 
-    public void register(Sensor sensor){
-        if(sensor == null){
+    public void register(Sensor sensor) {
+        if (sensor == null) {
             throw new NullPointerException();
         }
 
         sensorMap.put(sensor, null);
     }
 
-    class PrintStatisticsThread extends Thread{
+    class PrintStatisticsThread extends Thread {
 
-        public PrintStatisticsThread(){
+        public PrintStatisticsThread() {
             super("PrintStatistics");
             setPriority(Thread.MIN_PRIORITY);
             setDaemon(true);
         }
 
-        public void run(){
+        public void run() {
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
                 //ignore
             }
 
-            for(Sensor sensor: sensorMap.keySet()){
+            for (Sensor sensor : sensorMap.keySet()) {
                 System.out.println(sensor);
             }
         }

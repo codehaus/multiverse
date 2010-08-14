@@ -3,21 +3,21 @@ package org.multiverse.api.closures;
 import org.multiverse.api.Transaction;
 
 /**
- * An AtomicClosure tailored for ${closure.type}
- *
- * @author Peter Veentjer.
- */
+* An AtomicClosure tailored for ${closure.type}
+*
+* @author Peter Veentjer.
+*/
 public interface ${closure.name}${closure.typeParameter}{
 
-    /**
-     * Executes the closure.
-     *
-     * @param tx the Transaction. Depending on the TransactionPropagation level, this could
-     *           be null.
+/**
+* Executes the closure.
+*
+* @param tx the Transaction. Depending on the TransactionPropagation level, this could
+*           be null.
 #if(${closure.type})
-     * @return the result of the closure.
+* @return the result of the closure.
 #end
-     * @throws Exception
-     */
-    ${closure.type} execute(Transaction tx)throws Exception;
+* @throws Exception
+*/
+${closure.type} execute(Transaction tx)throws Exception;
 }

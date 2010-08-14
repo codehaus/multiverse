@@ -1,10 +1,11 @@
 package org.multiverse.benchmarks;
 
-import org.multiverse.stms.beta.*;
+import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.refs.LongRef;
 import org.multiverse.stms.beta.refs.LongRefTranlocal;
-import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfig;
+import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -123,7 +124,7 @@ public class MultipleWriteScalabilityTest {
 
             for (int iteration = 0; iteration < transactionCount; iteration++) {
                 for (int k = 0; k < refs.length; k++) {
-                    LongRefTranlocal tranlocal = (LongRefTranlocal)tx.openForWrite(refs[0], false, pool);
+                    LongRefTranlocal tranlocal = (LongRefTranlocal) tx.openForWrite(refs[0], false, pool);
                     tranlocal.value++;
                 }
                 tx.commit(pool);

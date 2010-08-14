@@ -62,7 +62,7 @@ public final class BetaStm implements Stm {
         return new FatArrayTreeBetaTransaction(config);
     }
 
-    public AtomicBlock getDefaultAtomicBlock(){
+    public AtomicBlock getDefaultAtomicBlock() {
         return atomicBlock;
     }
 
@@ -151,9 +151,9 @@ public final class BetaStm implements Stm {
 
         @Override
         public AtomicBlock buildAtomicBlock() {
-            if(leanAtomicBlock()){
+            if (leanAtomicBlock()) {
                 return new LeanBetaAtomicBlock(build());
-            }else{
+            } else {
                 return new FatBetaAtomicBlock(build());
             }
         }

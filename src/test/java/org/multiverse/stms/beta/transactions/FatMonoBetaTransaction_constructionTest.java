@@ -11,17 +11,17 @@ import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.assertActive;
 
 public class FatMonoBetaTransaction_constructionTest {
-       private BetaStm stm;
+    private BetaStm stm;
     private BetaObjectPool pool;
 
     @Before
-    public void setUp(){
-           stm = new BetaStm();
+    public void setUp() {
+        stm = new BetaStm();
         pool = new BetaObjectPool();
     }
 
     @Test
-    public void test(){
+    public void test() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
 
         assertActive(tx);
@@ -29,7 +29,7 @@ public class FatMonoBetaTransaction_constructionTest {
     }
 
     @Test
-    public void testTimeout(){
+    public void testTimeout() {
         BetaTransactionConfig config = new BetaTransactionConfig(stm)
                 .setTimeoutNs(TimeUnit.SECONDS.toNanos(10));
 

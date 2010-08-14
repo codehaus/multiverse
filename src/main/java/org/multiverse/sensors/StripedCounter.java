@@ -46,19 +46,19 @@ public final class StripedCounter {
     /**
      * Resets the counter. No consistency is provided.
      */
-    public void reset(){
-        for(int k=0;k<stripe.length;k++){
+    public void reset() {
+        for (int k = 0; k < stripe.length; k++) {
             stripe[k].set(0);
         }
     }
 
     /**
      * Increments the counter.
-     *
+     * <p/>
      * If counter is 0, the call is ignored.
      *
      * @param randomFactor the random factor is needed to select a element of the stripe.
-     * @param count the number to increase the counter with.
+     * @param count        the number to increase the counter with.
      */
     public void inc(final int randomFactor, final long count) {
         if (count == 0) {

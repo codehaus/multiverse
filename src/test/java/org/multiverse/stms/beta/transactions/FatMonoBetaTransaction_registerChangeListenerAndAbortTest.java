@@ -20,7 +20,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.*;
@@ -170,7 +169,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         assertNull(ref.unsafeLoad());
     }
 
-      @Test
+    @Test
     public void whenNormalListenerAvailable() {
         LongRef ref = createLongRef(stm, 0);
 
@@ -178,9 +177,9 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         Latch latch = new CheapLatch();
         tx.register(pool, listenerMock);
-        tx.openForRead(ref,false,pool);
+        tx.openForRead(ref, false, pool);
 
-        tx.registerChangeListenerAndAbort(latch,pool);
+        tx.registerChangeListenerAndAbort(latch, pool);
 
         assertEquals(1, listenerMock.events.size());
         assertEquals(TransactionLifecycleEvent.PostAbort, listenerMock.events.get(0));
@@ -188,15 +187,15 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenPermanentListenerAvailable() {
-         LongRef ref = createLongRef(stm, 0);
+        LongRef ref = createLongRef(stm, 0);
 
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         Latch latch = new CheapLatch();
         tx.registerPermanent(pool, listenerMock);
-        tx.openForRead(ref,false,pool);
+        tx.openForRead(ref, false, pool);
 
-        tx.registerChangeListenerAndAbort(latch,pool);
+        tx.registerChangeListenerAndAbort(latch, pool);
 
         assertEquals(1, listenerMock.events.size());
         assertEquals(TransactionLifecycleEvent.PostAbort, listenerMock.events.get(0));

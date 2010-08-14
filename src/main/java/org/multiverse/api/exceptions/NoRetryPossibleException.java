@@ -1,6 +1,6 @@
 package org.multiverse.api.exceptions;
 
-public class NoRetryPossibleException extends IllegalTransactionStateException{
+public class NoRetryPossibleException extends IllegalTransactionStateException {
 
     public NoRetryPossibleException() {
     }

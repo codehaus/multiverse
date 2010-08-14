@@ -1,11 +1,11 @@
 package org.multiverse.benchmarks;
 
-import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.refs.LongRef;
+import org.multiverse.stms.beta.transactions.BetaTransactionConfig;
 import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
 import org.multiverse.stms.beta.transactions.FatArrayTreeBetaTransaction;
-import org.multiverse.stms.beta.transactions.BetaTransactionConfig;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -133,7 +133,7 @@ public class UncontendedMultipleUpdateScalabilityTest {
             BetaObjectPool pool = new BetaObjectPool();
             LongRef ref1 = createReadBiasedLongRef(stm);
 
-            BetaTransactionConfig config = new BetaTransactionConfig(stm,1);
+            BetaTransactionConfig config = new BetaTransactionConfig(stm, 1);
 
             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
 
@@ -155,7 +155,7 @@ public class UncontendedMultipleUpdateScalabilityTest {
 
             BetaObjectPool pool = new BetaObjectPool();
 
-            BetaTransactionConfig config = new BetaTransactionConfig(stm,1);
+            BetaTransactionConfig config = new BetaTransactionConfig(stm, 1);
 
             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
 

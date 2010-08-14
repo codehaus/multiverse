@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 
 public class BetaObjectPool_arrayListTest {
 
-     private BetaObjectPool pool;
+    private BetaObjectPool pool;
 
     @Before
     public void setUp() {

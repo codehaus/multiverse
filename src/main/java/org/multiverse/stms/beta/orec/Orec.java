@@ -40,7 +40,7 @@ public interface Orec {
 
     /**
      * Arrive: when the arrive is called.
-      * <p/>
+     * <p/>
      * This call will also act as a barrier. So all changed made after a depart successfully is executed,
      * will be visible after this arrive is done.
      *
@@ -51,7 +51,7 @@ public interface Orec {
 
     /**
      * Arrives at this orec an acquired the lock.
-     *
+     * <p/>
      * This call also acts as a barrier.
      *
      * @param spinCount the maximum number of spins when locked.
@@ -61,7 +61,7 @@ public interface Orec {
 
     /**
      * Lowers the amount of surplus.
-     *
+     * <p/>
      * If there is no surplus, and the orec becomes biased towards
      * readonly, the orec is locked and true is returned. This means that no other transactions are able to
      * access the orec.
@@ -70,7 +70,8 @@ public interface Orec {
      * <p/>
      *
      * @return true if the orec just has become read biased, false otherwise.
-     * @throws org.multiverse.api.exceptions.PanicError if read biased.
+     * @throws org.multiverse.api.exceptions.PanicError
+     *          if read biased.
      */
     boolean departAfterReading();
 
@@ -79,10 +80,10 @@ public interface Orec {
      * <p/>
      * This method normally is called when a successful update is done.
      *
-     * @return the current surplus (so after the depart is done)
-     * @throws IllegalStateException if the orec is not locked.
      * @param globalConflictCounter
      * @param ref
+     * @return the current surplus (so after the depart is done)
+     * @throws IllegalStateException if the orec is not locked.
      */
     long departAfterUpdateAndReleaseLock(GlobalConflictCounter globalConflictCounter, BetaTransactionalObject ref);
 
@@ -95,7 +96,8 @@ public interface Orec {
      * Departs after failure and releases the lock.
      *
      * @return the remaining surplus
-     * @throws org.multiverse.api.exceptions.PanicError if surplus is 0, or readbiased, or not locked.
+     * @throws org.multiverse.api.exceptions.PanicError
+     *          if surplus is 0, or readbiased, or not locked.
      */
     long departAfterFailureAndReleaseLock();
 
@@ -120,15 +122,18 @@ public interface Orec {
      *
      * @param spinCount the maximum number of times to spin on the lock.
      * @return true if the lock was acquired successfully, false otherwise.
-     * @throws org.multiverse.api.exceptions.PanicError if the surplus is 0 (a tryUpdateLock only can be done if the current
-     *                               transaction did an arrive).
+     * @throws org.multiverse.api.exceptions.PanicError
+     *          if the surplus is 0 (a tryUpdateLock only can be done if the current
+     *          transaction did an arrive).
      */
     boolean tryUpdateLock(int spinCount);
-   /**
+
+    /**
      * Releases the lock. Doesn't change the surplus or being biased to reading.  This call should only
      * be made after the {@link #departAfterReading()} has left the orec locked.
      *
-     * @throws org.multiverse.api.exceptions.PanicError if the lock is not acquired.
+     * @throws org.multiverse.api.exceptions.PanicError
+     *          if the lock is not acquired.
      */
     void unlockAfterBecomingReadBiased();
 

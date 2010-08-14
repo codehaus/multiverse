@@ -84,7 +84,7 @@ public class AntWorldBenchmark {
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction)tx;
+                    BetaTransaction btx = (BetaTransaction) tx;
                     for (int k = 0; k < cells.length; k++) {
                         btx.openForRead(cells[k], false, pool);
                     }

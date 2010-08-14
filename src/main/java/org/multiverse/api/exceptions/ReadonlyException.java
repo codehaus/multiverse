@@ -1,6 +1,6 @@
 package org.multiverse.api.exceptions;
 
-public class ReadonlyException extends IllegalTransactionStateException{
+public class ReadonlyException extends IllegalTransactionStateException {
 
     public ReadonlyException() {
     }

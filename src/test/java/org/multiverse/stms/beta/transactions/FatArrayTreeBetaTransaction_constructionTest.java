@@ -12,7 +12,7 @@ import static org.multiverse.TestUtils.assertActive;
 
 public class FatArrayTreeBetaTransaction_constructionTest {
 
-     private BetaObjectPool pool;
+    private BetaObjectPool pool;
     private BetaStm stm;
 
     @Before
@@ -29,8 +29,8 @@ public class FatArrayTreeBetaTransaction_constructionTest {
         assertEquals(1, tx.getAttempt());
     }
 
-     @Test
-    public void testTimeout(){
+    @Test
+    public void testTimeout() {
         BetaTransactionConfig config = new BetaTransactionConfig(stm)
                 .setTimeoutNs(TimeUnit.SECONDS.toNanos(10));
 

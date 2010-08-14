@@ -52,7 +52,7 @@ public class TimeoutRollbackTest {
         block.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                BetaTransaction btx = (BetaTransaction)tx;
+                BetaTransaction btx = (BetaTransaction) tx;
                 BetaObjectPool pool = getThreadLocalBetaObjectPool();
                 modifyRef.set(btx, pool, 1);
 

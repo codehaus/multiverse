@@ -36,5 +36,5 @@ public interface TransactionConfiguration {
 
     boolean isBlockingAllowed();
 
-    int getMaxRetries();    
+    int getMaxRetries();
 }

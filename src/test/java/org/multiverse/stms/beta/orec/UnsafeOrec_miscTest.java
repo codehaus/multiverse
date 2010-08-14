@@ -3,9 +3,7 @@ package org.multiverse.stms.beta.orec;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.makeReadBiased;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
  * @author Peter Veentjer
@@ -13,7 +11,7 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.makeReadBiased;
 public class UnsafeOrec_miscTest {
 
     @Test
-    public void testToReadonly(){
+    public void testToReadonly() {
         UnsafeOrec orec = makeReadBiased(new UnsafeOrec());
 
         assertTrue(orec.isReadBiased());

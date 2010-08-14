@@ -41,7 +41,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenNotCommittedBefore_thenReadConflict() {
-        BetaTransaction otherTx = stm. start();
+        BetaTransaction otherTx = stm.start();
         LongRef ref = new LongRef(otherTx);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);

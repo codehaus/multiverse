@@ -22,7 +22,7 @@ public class FatArrayBetaTransaction_registerPermanentTest {
         stm = new BetaStm();
         pool = new BetaObjectPool();
     }
-       
+
     @Test
     public void whenNullListener_thenNullPointerException() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);

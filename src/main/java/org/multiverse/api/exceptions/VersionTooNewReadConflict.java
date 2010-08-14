@@ -3,5 +3,5 @@ package org.multiverse.api.exceptions;
 /**
  * @author Peter Veentjer
  */
-public class VersionTooNewReadConflict extends ReadConflict{
+public class VersionTooNewReadConflict extends ReadConflict {
 }

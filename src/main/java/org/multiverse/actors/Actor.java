@@ -38,7 +38,7 @@ public abstract class Actor {
                     Object item = mailbox.take();
                     if (item == SHUTDOWN) {
                         again = false;
-                    }else{
+                    } else {
                         process(item);
                     }
                 } while (again);

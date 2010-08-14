@@ -8,7 +8,6 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 public interface TransactionFactory {
 
     /**
-     * 
      * @return
      */
     TransactionConfiguration getTransactionConfiguration();

@@ -1,7 +1,9 @@
 package org.multiverse.benchmarks;
 
 import org.multiverse.stms.beta.BetaObjectPool;
-import org.multiverse.stms.beta.refs.*;
+import org.multiverse.stms.beta.refs.IntRef;
+import org.multiverse.stms.beta.refs.LongRef;
+import org.multiverse.stms.beta.refs.Ref;
 
 import java.text.NumberFormat;
 import java.util.*;

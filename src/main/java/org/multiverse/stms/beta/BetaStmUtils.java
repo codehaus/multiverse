@@ -30,7 +30,7 @@ public class BetaStmUtils {
         return ref;
     }
 
-     public static IntRef createIntRef(BetaStm stm) {
+    public static IntRef createIntRef(BetaStm stm) {
         return createIntRef(stm, 0);
     }
 

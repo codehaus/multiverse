@@ -60,15 +60,15 @@ public final class Listeners {
         } while (current != null);
     }
 
-   /**
+    /**
      * Opens all the listeners. As soon as in the array a null element is found, it signals the end of
      * the list of listeners. This makes is possible to place an array that is larger than the actual
      * number of writes.
-     *
+     * <p/>
      * The call safely can be made with a null listenersArray. In that case the call is ignored.
      *
      * @param listenersArray the array of Listeners to notify.
-     * @param pool the BetaObjectPool to pool the Listeners and the array containing the listeners.
+     * @param pool           the BetaObjectPool to pool the Listeners and the array containing the listeners.
      */
     public static void openAll(final Listeners[] listenersArray, final BetaObjectPool pool) {
         if (listenersArray == null) {

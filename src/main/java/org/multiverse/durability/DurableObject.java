@@ -9,7 +9,7 @@ public interface DurableObject {
 
     /**
      * Returns the storage id.
-     *
+     * <p/>
      * todo: what does it mean when null is returned?
      * todo: can this value only be read when it is unlocked?
      *
@@ -18,7 +18,6 @@ public interface DurableObject {
     String getStorageId();
 
     /**
-     *
      * @param id
      */
     void setStorageId(String id);
@@ -32,7 +31,7 @@ public interface DurableObject {
 
     /**
      * Checks if this DurableObject is durable. This call can only be made when the object already
-     * is locked. 
+     * is locked.
      *
      * @return true if it is durable, false otherwise.
      */

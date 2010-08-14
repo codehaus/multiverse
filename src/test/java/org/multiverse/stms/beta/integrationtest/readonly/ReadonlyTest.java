@@ -28,7 +28,7 @@ public class ReadonlyTest {
 
     @Test
     public void whenReadonly_thenUpdateFails() {
-       IntRef ref = createIntRef(stm);
+        IntRef ref = createIntRef(stm);
         try {
             updateInReadonlyMethod(ref, 10);
             fail();
@@ -38,7 +38,7 @@ public class ReadonlyTest {
         assertEquals(0, ref.unsafeLoad().value);
     }
 
-    public void updateInReadonlyMethod(final IntRef ref, final int newValue) {        
+    public void updateInReadonlyMethod(final IntRef ref, final int newValue) {
         BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
                 .setReadonly(true)
                 .build();
@@ -203,7 +203,7 @@ public class ReadonlyTest {
             @Override
             public Object execute(BetaTransaction tx) throws Exception {
                 BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                ref.set(tx,pool, newValue);
+                ref.set(tx, pool, newValue);
                 return null;
             }
         }.execute();

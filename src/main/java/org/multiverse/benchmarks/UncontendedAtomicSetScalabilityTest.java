@@ -97,7 +97,7 @@ public class UncontendedAtomicSetScalabilityTest {
         }
 
         public void run() {
-            LongRef ref = BetaStmUtils.createReadBiasedLongRef(stm,-1);
+            LongRef ref = BetaStmUtils.createReadBiasedLongRef(stm, -1);
 
             BetaObjectPool pool = new BetaObjectPool();
 
@@ -107,7 +107,7 @@ public class UncontendedAtomicSetScalabilityTest {
                 ref.atomicSet(k, pool, 8, globalConflictCounter);
             }
 
-            assertEquals(transactionCount, ref.unsafeLoad().value+1);
+            assertEquals(transactionCount, ref.unsafeLoad().value + 1);
 
             durationMs = System.currentTimeMillis() - startMs;
             System.out.printf("Multiverse> %s is finished in %s ms\n", getName(), durationMs);

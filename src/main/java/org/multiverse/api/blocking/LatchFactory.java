@@ -8,7 +8,7 @@ public interface LatchFactory {
     /**
      * Creates a new Latch.
      *
-     * @return 
+     * @return
      */
     Latch create();
 }

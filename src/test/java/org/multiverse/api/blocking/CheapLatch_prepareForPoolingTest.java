@@ -25,6 +25,6 @@ public class CheapLatch_prepareForPoolingTest {
 
         latch.prepareForPooling();
         assertClosed(latch);
-        assertEquals(era+1, latch.getEra());
+        assertEquals(era + 1, latch.getEra());
     }
 }

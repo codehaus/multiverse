@@ -35,29 +35,29 @@ public class MultipleReadsRetryStressTest {
     @Test
     public void withArrayTreeTransactionAnd2Threads() throws InterruptedException {
         FatArrayTreeBetaTransactionFactory txFactory = new FatArrayTreeBetaTransactionFactory(stm);
-        test(new LeanBetaAtomicBlock(txFactory), 10,2);
+        test(new LeanBetaAtomicBlock(txFactory), 10, 2);
     }
 
     @Test
     public void withArrayTransactionAnd2Threads() throws InterruptedException {
         int refCount = 10;
-        BetaTransactionConfig config = new BetaTransactionConfig(stm, refCount+1);
+        BetaTransactionConfig config = new BetaTransactionConfig(stm, refCount + 1);
         FatArrayBetaTransactionFactory txFactory = new FatArrayBetaTransactionFactory(config);
-        test(new LeanBetaAtomicBlock(txFactory), refCount,2);
+        test(new LeanBetaAtomicBlock(txFactory), refCount, 2);
     }
 
     @Test
     public void withArrayTreeTransactionAnd5Threads() throws InterruptedException {
         FatArrayTreeBetaTransactionFactory txFactory = new FatArrayTreeBetaTransactionFactory(stm);
-        test(new LeanBetaAtomicBlock(txFactory), 10,5);
+        test(new LeanBetaAtomicBlock(txFactory), 10, 5);
     }
 
     @Test
     public void withArrayTransactionAnd5Threads() throws InterruptedException {
         int refCount = 10;
-        BetaTransactionConfig config = new BetaTransactionConfig(stm, refCount+1);
+        BetaTransactionConfig config = new BetaTransactionConfig(stm, refCount + 1);
         FatArrayBetaTransactionFactory txFactory = new FatArrayBetaTransactionFactory(config);
-        test(new LeanBetaAtomicBlock(txFactory), refCount,5);
+        test(new LeanBetaAtomicBlock(txFactory), refCount, 5);
     }
 
     public void test(AtomicBlock atomicBlock, int refCount, int threadCount) throws InterruptedException {
@@ -68,7 +68,7 @@ public class MultipleReadsRetryStressTest {
 
         UpdateThread[] threads = new UpdateThread[threadCount];
         for (int k = 0; k < threads.length; k++) {
-            threads[k] = new UpdateThread(k, atomicBlock,threadCount);
+            threads[k] = new UpdateThread(k, atomicBlock, threadCount);
         }
 
         startAll(threads);
@@ -76,10 +76,10 @@ public class MultipleReadsRetryStressTest {
         sleepMs(30 * 1000);
         stop = true;
 
-        new BetaTransactionTemplate(stm){
+        new BetaTransactionTemplate(stm) {
             @Override
             public Object execute(BetaTransaction tx) {
-                tx.openForWrite(stopRef,false,new BetaObjectPool()).value=-1;
+                tx.openForWrite(stopRef, false, new BetaObjectPool()).value = -1;
                 return null;
             }
         }.execute(new BetaObjectPool());
@@ -128,7 +128,7 @@ public class MultipleReadsRetryStressTest {
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction)tx;
+                    BetaTransaction btx = (BetaTransaction) tx;
 
                     if (btx.openForRead(stopRef, false, pool).value < 0) {
                         throw new StopException();

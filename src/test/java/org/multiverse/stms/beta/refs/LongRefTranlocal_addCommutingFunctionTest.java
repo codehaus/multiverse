@@ -19,5 +19,6 @@ public class LongRefTranlocal_addCommutingFunctionTest {
 
     @Test
     @Ignore
-    public void test(){}
+    public void test() {
+    }
 }

@@ -402,7 +402,7 @@ public class FatArrayBetaTransaction_commitTest {
         assertEquals(TransactionLifecycleEvent.PreCommit, listenerMock.events.get(2));
         assertEquals(TransactionLifecycleEvent.PostCommit, listenerMock.events.get(3));
     }
-       
+
     @Test
     public void whenPermanentListenerAvailable() {
         LongRef ref = createLongRef(stm, 0);

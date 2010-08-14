@@ -69,7 +69,7 @@ public class FatArrayTreeBetaTransaction_registerTest {
 
         assertActive(tx);
         verifyZeroInteractions(listener1);
-        assertHasNormalListeners(tx,listener1, listener2);
+        assertHasNormalListeners(tx, listener1, listener2);
         assertHasNoPermanentListeners(tx);
     }
 

@@ -51,7 +51,7 @@ public interface Transaction {
      * Registers a permanent TransactionLifecycleListener. The only difference between this method and the
      * {@link #register(TransactionLifecycleListener)} is that this listener is not removed if the transaction
      * is reset for another attempt. But it is removed
-     *
+     * <p/>
      * If a TransactionLifecycleListener is added more than once, it is executed more than once. No checks
      * are made. The permanent listeners are executed in the order they are added.
      *

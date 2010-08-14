@@ -3,7 +3,7 @@ package org.multiverse.api.exceptions;
 /**
  * @author Peter Veentjer
  */
-public class TooManyRetriesException extends RuntimeException{
+public class TooManyRetriesException extends RuntimeException {
 
     public TooManyRetriesException() {
     }

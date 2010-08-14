@@ -46,9 +46,9 @@ public abstract class AbstractLeanBetaTransaction implements BetaTransaction {
     }
 
     @Override
-      public final BetaTransactionConfig getConfiguration() {
-          return config;
-      }
+    public final BetaTransactionConfig getConfiguration() {
+        return config;
+    }
 
     @Override
     public final int getAttempt() {

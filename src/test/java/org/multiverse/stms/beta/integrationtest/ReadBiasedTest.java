@@ -13,9 +13,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertReadBiased;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class ReadBiasedTest {
     private BetaStm stm;
@@ -33,7 +31,7 @@ public class ReadBiasedTest {
         LongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.unsafeLoad();
 
-        for(int k=0;k<10000;k++){
+        for (int k = 0; k < 10000; k++) {
             BetaTransaction tx = new FatMonoBetaTransaction(stm);
             tx.openForRead(ref, false, pool);
             tx.commit();
@@ -45,6 +43,6 @@ public class ReadBiasedTest {
         assertNull(ref.getLockOwner());
         assertSame(committed, ref.unsafeLoad());
 
-        System.out.println("orec: "+ref.toOrecString());
+        System.out.println("orec: " + ref.toOrecString());
     }
 }

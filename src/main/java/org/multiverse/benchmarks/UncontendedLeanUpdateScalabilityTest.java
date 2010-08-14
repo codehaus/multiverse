@@ -105,7 +105,7 @@ public class UncontendedLeanUpdateScalabilityTest {
             //FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm,1);
             LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
                     new BetaTransactionConfig(stm)
-                        .setDirtyCheckEnabled(false));
+                            .setDirtyCheckEnabled(false));
             long startMs = System.currentTimeMillis();
             for (long k = 0; k < transactionCount; k++) {
                 tx.openForWrite(ref, true, pool).value++;

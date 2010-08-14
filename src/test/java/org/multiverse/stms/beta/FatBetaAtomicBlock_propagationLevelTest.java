@@ -1,7 +1,6 @@
 package org.multiverse.stms.beta;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.PropagationLevel;
@@ -18,9 +17,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.assertActive;
-import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
@@ -195,7 +192,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
 
         int result = block.execute(closure);
 
-        assertEquals(10, result);        
+        assertEquals(10, result);
         assertEquals(1, ref.unsafeLoad().value);
         assertNull(getThreadLocalTransaction());
     }

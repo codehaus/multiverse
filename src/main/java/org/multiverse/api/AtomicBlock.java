@@ -24,41 +24,46 @@ public interface AtomicBlock {
      * Executes the closure.
      *
      * @param closure the closure to execute.
-    * @return the result of the execution.
+     * @return the result of the execution.
      */
     <E> E execute(AtomicClosure<E> closure);
+
     /**
      * Executes the closure.
      *
      * @param closure the closure to execute.
-    * @return the result of the execution.
+     * @return the result of the execution.
      */
-     int execute(AtomicIntClosure closure);
+    int execute(AtomicIntClosure closure);
+
     /**
      * Executes the closure.
      *
      * @param closure the closure to execute.
-    * @return the result of the execution.
+     * @return the result of the execution.
      */
-     long execute(AtomicLongClosure closure);
+    long execute(AtomicLongClosure closure);
+
     /**
      * Executes the closure.
      *
      * @param closure the closure to execute.
-    * @return the result of the execution.
+     * @return the result of the execution.
      */
-     double execute(AtomicDoubleClosure closure);
+    double execute(AtomicDoubleClosure closure);
+
     /**
      * Executes the closure.
      *
      * @param closure the closure to execute.
-    * @return the result of the execution.
+     * @return the result of the execution.
      */
-     boolean execute(AtomicBooleanClosure closure);
+    boolean execute(AtomicBooleanClosure closure);
+
     /**
      * Executes the closure.
      *
      * @param closure the closure to execute.
      */
-     void execute(AtomicVoidClosure closure);
+    void execute(AtomicVoidClosure closure);
 }

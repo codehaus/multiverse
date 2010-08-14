@@ -20,19 +20,18 @@ import java.util.concurrent.locks.ReentrantLock;
  * ..the thread that does a put on the first item successfully, should also enable the
  * 'stuff available flag'. This needs to be done under a lock so the waiting thread will
  * be notified.
- *
+ * <p/>
  * When the putting thread can't place an item on the last, it enters the also a a synchronized block
  * and waits until the taking thread has cleared his queue and replaced it.
- *
+ * <p/>
  * The problem: it could be that a transaction placed an item on the array that already is switched and
  * you get out of order items.
- *
+ * <p/>
  * Advantage of current approach, placing an item only takes one volatile read (to get the array) and
  * one cas (if you are lucky) to place the item. Only on the end and at the beginning it gets more
  * expensive. Another advantage is that taking an item can be done without any synchronization.
- *
- * A placer will never do the switching.. only the taker. 
- *
+ * <p/>
+ * A placer will never do the switching.. only the taker.
  *
  * @author Peter Veentjer
  */
@@ -40,7 +39,7 @@ public class Mailbox<E> implements BlockingQueue<E> {
     private final int spinCount;
 
     private final Lock switchLock = new ReentrantLock();
-   // private final AtomicReference<Node<E>> firstFree;
+    // private final AtomicReference<Node<E>> firstFree;
     //private final AtomicReference<Node<E>> firstFull;
 
     public Mailbox(int capacity, int spinCount) {
@@ -61,13 +60,13 @@ public class Mailbox<E> implements BlockingQueue<E> {
     @Override
     public E take() throws InterruptedException {
         while (true) {
-          //  Node<E> node = firstFull.get();
-          //  E value = node.value.get();
-          //  if (value != null) {
-          //
-          //  } else {
-          //
-          //  }
+            //  Node<E> node = firstFull.get();
+            //  E value = node.value.get();
+            //  if (value != null) {
+            //
+            //  } else {
+            //
+            //  }
         }
     }
 

@@ -1,8 +1,8 @@
 package org.multiverse.stms.beta;
 
-import org.multiverse.stms.beta.transactions.FatArrayTreeBetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfig;
+import org.multiverse.stms.beta.transactions.FatArrayTreeBetaTransaction;
 
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 

@@ -9,12 +9,12 @@ import org.junit.Test;
 public class FatArrayBetaTransaction_abortStressTest {
 
     @Before
-    public void setUp(){
+    public void setUp() {
 
     }
 
     @Test
-    public void test(){
-        
+    public void test() {
+
     }
 }

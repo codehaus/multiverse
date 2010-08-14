@@ -144,7 +144,7 @@ public class DiningPhilosophersStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    BetaTransaction btx = (BetaTransaction)tx;
+                    BetaTransaction btx = (BetaTransaction) tx;
 
                     if (leftFork.get(btx, pool) == 1) {
                         retry();

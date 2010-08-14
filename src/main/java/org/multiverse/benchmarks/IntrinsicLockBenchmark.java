@@ -75,9 +75,9 @@ public class IntrinsicLockBenchmark {
                 }
 
                 synchronized (lock) {
-                    while(value % threadCount != id){
+                    while (value % threadCount != id) {
                         try {
-                           lock. wait();
+                            lock.wait();
                         } catch (InterruptedException e) {
 
                         }
@@ -85,7 +85,7 @@ public class IntrinsicLockBenchmark {
                     value++;
 
                     lock.notifyAll();
-               }
+                }
 
                 expected += threadCount;
                 count++;

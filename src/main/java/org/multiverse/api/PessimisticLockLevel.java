@@ -3,7 +3,7 @@ package org.multiverse.api;
 
 public enum PessimisticLockLevel {
 
-    Write(false,true), Read(true, true), None(false,false);
+    Write(false, true), Read(true, true), None(false, false);
 
     private final boolean lockReads;
     private final boolean lockWrites;
@@ -13,11 +13,11 @@ public enum PessimisticLockLevel {
         this.lockWrites = lockWrites;
     }
 
-    public final boolean lockWrites(){
+    public final boolean lockWrites() {
         return lockWrites;
     }
 
-    public final boolean lockReads(){
-        return lockReads;        
+    public final boolean lockReads() {
+        return lockReads;
     }
 }

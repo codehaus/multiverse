@@ -7,7 +7,7 @@ import org.multiverse.api.Transaction;
  *
  * @author Peter Veentjer.
  */
-public interface AtomicVoidClosure{
+public interface AtomicVoidClosure {
 
     /**
      * Executes the closure.
@@ -17,5 +17,5 @@ public interface AtomicVoidClosure{
      * @return the result of the closure.
      * @throws Exception
      */
-    void execute(Transaction tx)throws Exception;
+    void execute(Transaction tx) throws Exception;
 }

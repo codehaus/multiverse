@@ -44,12 +44,12 @@ public class StackWithoutCapacityStressTest {
     }
 
     @Test
-    public void testPessimistic(){
-         test(true);
+    public void testPessimistic() {
+        test(true);
     }
 
     @Test
-    public void testOptimistic(){
+    public void testOptimistic() {
         test(false);
     }
 
@@ -118,10 +118,10 @@ public class StackWithoutCapacityStressTest {
         private final AtomicBlock popBlock = stm.getTransactionFactoryBuilder().buildAtomicBlock();
 
         public void push(final E item) {
-            pushBlock.execute(new AtomicVoidClosure(){
+            pushBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction)tx;
+                    BetaTransaction btx = (BetaTransaction) tx;
                     RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, pessimistic, getThreadLocalBetaObjectPool());
                     headTranlocal.value = new Node<E>(item, headTranlocal.value);
                 }
@@ -129,10 +129,10 @@ public class StackWithoutCapacityStressTest {
         }
 
         public E pop() {
-            return popBlock.execute(new AtomicClosure<E>(){
+            return popBlock.execute(new AtomicClosure<E>() {
                 @Override
                 public E execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction)tx;
+                    BetaTransaction btx = (BetaTransaction) tx;
                     RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, pessimistic, getThreadLocalBetaObjectPool());
                     if (headTranlocal.value == null) {
                         retry();

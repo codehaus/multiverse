@@ -102,7 +102,7 @@ public class StandardLatch_awaitTest {
         t.assertInterrupted();
     }
 
-     @Test
+    @Test
     public void whenResetWhileWaiting_thenSleepingThreadsNotified() {
         StandardLatch latch = new StandardLatch();
         long era = latch.getEra();
@@ -116,7 +116,7 @@ public class StandardLatch_awaitTest {
         joinAll(t);
 
         assertClosed(latch);
-        assertEra(latch, era+1);
+        assertEra(latch, era + 1);
     }
 
     class AwaitThread extends TestThread {

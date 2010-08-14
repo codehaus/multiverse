@@ -3,9 +3,9 @@ package org.multiverse.api.exceptions;
 /**
  * A {@link org.multiverse.api.exceptions.PropagationException} thrown when a transaction is found, but is not allowed.
  *
- * @author  Peter Veentjer.
+ * @author Peter Veentjer.
  */
-public class NoTransactionAllowedException extends PropagationException{
+public class NoTransactionAllowedException extends PropagationException {
 
     public NoTransactionAllowedException() {
     }

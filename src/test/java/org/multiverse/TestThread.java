@@ -13,7 +13,7 @@ public abstract class TestThread extends Thread {
     private volatile Boolean endedWithInterruptStatus;
     private volatile boolean startInterrupted;
     private volatile boolean printStackTrace = true;
-    
+
 
     public TestThread() {
         this("TestThread");
@@ -69,11 +69,11 @@ public abstract class TestThread extends Thread {
         return throwable;
     }
 
-    public void assertInterrupted(){
+    public void assertInterrupted() {
         assertFailedWithException(InterruptedException.class);
     }
 
-    public void assertEndedWithInterruptStatus(boolean interrupt){
+    public void assertEndedWithInterruptStatus(boolean interrupt) {
         assertEquals(endedWithInterruptStatus, interrupt);
     }
 

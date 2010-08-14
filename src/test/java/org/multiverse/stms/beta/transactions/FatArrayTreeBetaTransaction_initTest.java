@@ -3,8 +3,8 @@ package org.multiverse.stms.beta.transactions;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.refs.LongRef;
 import org.multiverse.stms.beta.refs.Tranlocal;
 
@@ -30,8 +30,8 @@ public class FatArrayTreeBetaTransaction_initTest {
     }
 
     @Test
-    public void whenTimeoutSetThenCopied(){
-         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+    public void whenTimeoutSetThenCopied() {
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
 
         BetaTransactionConfig config = new BetaTransactionConfig(stm)
                 .setTimeoutNs(100);

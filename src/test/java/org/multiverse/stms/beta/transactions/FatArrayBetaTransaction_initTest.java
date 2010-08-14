@@ -29,9 +29,9 @@ public class FatArrayBetaTransaction_initTest {
 
     }
 
-     @Test
-    public void whenTimeoutSetThenCopied(){
-         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+    @Test
+    public void whenTimeoutSetThenCopied() {
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
 
         BetaTransactionConfig config = new BetaTransactionConfig(stm)
                 .setTimeoutNs(100);

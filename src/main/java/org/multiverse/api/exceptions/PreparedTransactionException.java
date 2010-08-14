@@ -3,7 +3,7 @@ package org.multiverse.api.exceptions;
 /**
  * @author Peter Veentjer
  */
-public class PreparedTransactionException extends IllegalTransactionStateException{
+public class PreparedTransactionException extends IllegalTransactionStateException {
 
     public PreparedTransactionException() {
     }
