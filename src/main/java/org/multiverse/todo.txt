@@ -115,8 +115,6 @@ todo
 
 - mono transaction can do a cheap read of the current tranlocal already is permanent.
 
-- add project to multiverse git
-
 - need to think more about the ref & retry especially reading/writing safety
 
 - generate an abstract betatransactionalobject that can be used as mixin and for creating hand written
@@ -205,7 +203,11 @@ globalconflict counter.
 
 - betatransactiontemplate needs to be removed
 
+- testing: atomic block & propagation and committed/aborted/prepared/new transaction on threadlocal
+
 done
+
+- testing: fat atomicblock & propagation
 
 - fat atomic block: add propagation
 
@@ -273,6 +275,9 @@ done
 - instead of an illegal state exception in the orec, a panic error should be thrown.
 
 - clean up testing for fastorec (not relying on ref anymore).
+
+- add project to multiverse git
+
 
 old done
 

@@ -36,7 +36,7 @@ import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalB
 public class StackWithCapacityStressTest {
 
     private BetaStm stm;
-    private int itemCount = 2 * 1000 * 100000;
+    private int itemCount = 2 * 1000 * 1000;
     private Stack<Integer> stack;
     private int maxCapacity = 1000;
     private boolean pessimistic;

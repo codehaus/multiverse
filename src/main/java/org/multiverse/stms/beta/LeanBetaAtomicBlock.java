@@ -22,6 +22,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
     public BetaTransactionFactory getTransactionFactory(){
         return transactionFactory;
     }
+
     public <E> E execute(
         final AtomicClosure<E> closure){
 

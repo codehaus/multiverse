@@ -25,6 +25,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
     public BetaTransactionFactory getTransactionFactory(){
         return transactionFactory;
     }
+
      public <E> E execute(
         final AtomicClosure<E> closure){
         

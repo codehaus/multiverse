@@ -117,47 +117,92 @@ public class FatBetaAtomicBlock_propagationLevelTest {
         assertSame(otherTx, getThreadLocalTransaction());
     }
 
-    @Ignore
     @Test
     public void whenRequiresAndNoTransactionAvailable_thenNewTransactionUsed() {
+        BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+                .setPropagationLevel(PropagationLevel.Requires)
+                .build();
 
-    }
-
-    @Ignore
-    @Test
-    public void whenRequiresAndTransactionAvailable_thenExistingTransactionUsed() {
-
-    }
-
-    @Test
-    public void whenRequiresNewAndNoTransactionAvailable_thenNewTransactionCreated() {
-         AtomicBlock block = stm.getTransactionFactoryBuilder()
-                .setPropagationLevel(PropagationLevel.RequiresNew)
-                .buildAtomicBlock();
-
-        final LongRef ref = createLongRef(stm, 10);
+        final LongRef ref = createLongRef(stm);
 
         AtomicIntClosure closure = new AtomicIntClosure() {
             @Override
             public int execute(Transaction tx) throws Exception {
                 assertNotNull(tx);
-                BetaTransaction btx = (BetaTransaction)tx;
+                BetaTransaction btx = (BetaTransaction) tx;
                 BetaObjectPool pool = getThreadLocalBetaObjectPool();
                 btx.openForWrite(ref, false, pool).value++;
-                return 1;
+                return 10;
+            }
+        };
+
+        int result = new FatBetaAtomicBlock(txFactory).execute(closure);
+
+        assertEquals(10, result);
+        assertNull(getThreadLocalTransaction());
+        assertEquals(1, ref.unsafeLoad().value);
+    }
+
+    @Test
+    public void whenRequiresAndTransactionAvailable_thenExistingTransactionUsed() {
+        BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+                .setPropagationLevel(PropagationLevel.Requires)
+                .build();
+
+        final BetaTransaction existingTx = stm.start();
+        setThreadLocalTransaction(existingTx);
+
+        final LongRef ref = createLongRef(stm);
+
+        AtomicIntClosure closure = new AtomicIntClosure() {
+            @Override
+            public int execute(Transaction tx) throws Exception {
+                assertSame(existingTx, tx);
+                BetaTransaction btx = (BetaTransaction) tx;
+                BetaObjectPool pool = getThreadLocalBetaObjectPool();
+                btx.openForWrite(ref, false, pool).value++;
+                return 10;
+            }
+        };
+
+        int result = new FatBetaAtomicBlock(txFactory).execute(closure);
+
+        assertEquals(10, result);
+        assertSame(existingTx, getThreadLocalTransaction());
+        assertActive(existingTx);
+        //since the value hasn't committed yet, it still is zero (the value before the transaction began).
+        assertEquals(0, ref.unsafeLoad().value);
+    }
+
+    @Test
+    public void whenRequiresNewAndNoTransactionAvailable_thenNewTransactionCreated() {
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
+                .setPropagationLevel(PropagationLevel.RequiresNew)
+                .buildAtomicBlock();
+
+        final LongRef ref = createLongRef(stm, 0);
+
+        AtomicIntClosure closure = new AtomicIntClosure() {
+            @Override
+            public int execute(Transaction tx) throws Exception {
+                assertNotNull(tx);
+                BetaTransaction btx = (BetaTransaction) tx;
+                BetaObjectPool pool = getThreadLocalBetaObjectPool();
+                btx.openForWrite(ref, false, pool).value++;
+                return 10;
             }
         };
 
         int result = block.execute(closure);
 
-        assertEquals(1, result);
-        assertEquals(11,ref.unsafeLoad().value);
+        assertEquals(10, result);        
+        assertEquals(1, ref.unsafeLoad().value);
         assertNull(getThreadLocalTransaction());
     }
 
     @Test
     public void whenRequiresNewAndTransactionAvailable_thenExistingTransactionSuspended() {
-           AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.RequiresNew)
                 .buildAtomicBlock();
 
@@ -171,7 +216,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
             public int execute(Transaction tx) throws Exception {
                 assertNotNull(tx);
                 assertNotSame(otherTx, tx);
-                BetaTransaction btx = (BetaTransaction)tx;
+                BetaTransaction btx = (BetaTransaction) tx;
                 BetaObjectPool pool = getThreadLocalBetaObjectPool();
                 btx.openForWrite(ref, false, pool).value++;
                 return 1;
@@ -181,7 +226,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
         int result = block.execute(closure);
 
         assertEquals(1, result);
-        assertEquals(11,ref.unsafeLoad().value);
+        assertEquals(11, ref.unsafeLoad().value);
         assertSame(otherTx, getThreadLocalTransaction());
         assertActive(otherTx);
     }
@@ -212,7 +257,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
 
     @Test
     public void whenSupportsAndNoTransactionAvailable() {
-         AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Supports)
                 .buildAtomicBlock();
 

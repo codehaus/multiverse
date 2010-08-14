@@ -29,6 +29,7 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
     public BetaTransactionFactory getTransactionFactory(){
         return transactionFactory;
     }
+
 #foreach($closure in $closures)
 #if(${atomicBlock.lean})
     public ${closure.typeParameter} ${closure.type} execute(
