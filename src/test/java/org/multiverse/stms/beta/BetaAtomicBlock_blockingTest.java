@@ -3,6 +3,8 @@ package org.multiverse.stms.beta;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.refs.LongRef;
 import org.multiverse.stms.beta.refs.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -11,18 +13,19 @@ import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.assertAlive;
 import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.api.StmUtils.retry;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.benchmarks.BenchmarkUtils.joinAll;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
-public class BetaTransactionTemplate_blockingTest {
+public class BetaAtomicBlock_blockingTest {
 
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
+        clearThreadLocalTransaction();
     }
 
     @Test
@@ -35,14 +38,15 @@ public class BetaTransactionTemplate_blockingTest {
         sleepMs(1000);
         assertAlive(t);
 
-        new BetaTransactionTemplate(stm){
+        stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
             @Override
-            public Object execute(BetaTransaction tx) throws Exception {
-                LongRefTranlocal write = tx.openForWrite(ref, false, pool);
-                write.value=1;
-                return null;
+            public void execute(Transaction tx) throws Exception {
+                BetaTransaction btx = (BetaTransaction) tx;
+                BetaObjectPool pool = getThreadLocalBetaObjectPool();
+                LongRefTranlocal write = btx.openForWrite(ref, false, pool);
+                write.value = 1;
             }
-        }.execute(pool);
+        });
 
         joinAll(t);
         assertEquals(2, ref.unsafeLoad().value);
@@ -57,20 +61,19 @@ public class BetaTransactionTemplate_blockingTest {
 
         @Override
         public void doRun() throws Exception {
-            final BetaObjectPool pool = new BetaObjectPool();
-
-            new BetaTransactionTemplate(stm) {
+            stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
                 @Override
-                public Object execute(BetaTransaction tx) throws Exception {
-                    LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+                public void execute(Transaction tx) throws Exception {
+                    BetaTransaction btx = (BetaTransaction) tx;
+                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
+                    LongRefTranlocal write = btx.openForWrite(ref, false, pool);
                     if (write.value == 0) {
                         retry();
                     }
 
                     write.value++;
-                    return null;
                 }
-            }.execute(pool);
+            });
         }
     }
 }

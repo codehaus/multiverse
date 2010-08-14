@@ -4,11 +4,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.TestUtils;
+import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaTransactionFactory;
-import org.multiverse.stms.beta.BetaTransactionTemplate;
 import org.multiverse.stms.beta.refs.IntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -57,15 +58,27 @@ public class DirtyReadStressTest {
 
 
     class FailingModifyThread extends TestThread {
+
         public FailingModifyThread(int threadId) {
             super("FailingModifyThread-" + threadId);
         }
 
         @Override
         public void doRun() {
+            AtomicBlock block = stm.getDefaultAtomicBlock();
+            AtomicVoidClosure closure = new AtomicVoidClosure() {
+                @Override
+                public void execute(Transaction tx) throws Exception {
+                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
+                    BetaTransaction btx = (BetaTransaction) tx;
+                    ref.set(btx, pool, ref.get(btx, pool));
+                    btx.abort(pool);
+                }
+            };
+
             while (!stop) {
                 try {
-                    modify();
+                    block.execute(closure);
                     fail();
                 } catch (DeadTransactionException ignore) {
                 }
@@ -73,36 +86,48 @@ public class DirtyReadStressTest {
                 sleepRandomMs(10);
             }
         }
-
-        private void modify() {
-            new BetaTransactionTemplate(stm){
-                @Override
-                public Object execute(BetaTransaction tx) throws Exception {
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    ref.set(tx, pool, ref.get(tx, pool));
-                    tx.abort(pool);
-                    return null;
-                }
-            }.execute();
-        }
     }
 
     class ReadThread extends TestThread {
+
+
         public ReadThread(int threadId) {
             super("ReadThread-" + threadId);
         }
 
         @Override
         public void doRun() {
+            AtomicVoidClosure closure = new AtomicVoidClosure() {
+                @Override
+                public void execute(Transaction tx) throws Exception {
+                    BetaTransaction btx = (BetaTransaction) tx;
+                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
+
+                    if (ref.get(btx, pool) % 2 != 0) {
+                        fail();
+                    }
+                }
+            };
+
+            AtomicBlock readonlyReadtrackingBlock = stm.getTransactionFactoryBuilder()
+                    .setReadonly(true)
+                    .setReadTrackingEnabled(true)
+                    .buildAtomicBlock();
+
+            AtomicBlock updateReadtrackingBlock = stm.getTransactionFactoryBuilder()
+                    .setReadonly(false)
+                    .setReadTrackingEnabled(true)
+                    .buildAtomicBlock();
+
             int k = 0;
             while (!stop) {
-                switch (k% 2){
+                switch (k % 2) {
                     case 0:
-                        observeUsingReadtrackingReadonlyTransaction();
+                        readonlyReadtrackingBlock.execute(closure);
                         break;
                     case 1:
                     case 3:
-                        observeUsingReadtrackingUpdateTransaction();
+                        updateReadtrackingBlock.execute(closure);
                         break;
                     default:
                         throw new IllegalStateException();
@@ -110,76 +135,6 @@ public class DirtyReadStressTest {
 
                 k++;
                 sleepRandomMs(5);
-            }
-        }
-
-        private void _observeUsingReadonlyTransaction() {
-            BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
-                    .setReadonly(false)
-                    .setReadTrackingEnabled(true)
-                    .build();
-
-
-            new BetaTransactionTemplate(txFactory){
-                @Override
-                public Object execute(BetaTransaction tx) throws Exception {
-                    observe(tx, getThreadLocalBetaObjectPool());
-                    return null;
-                }
-            }.execute();
-        }
-
-
-        private void _observeUsingUpdateTransaction() {
-            BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
-                    .setReadonly(false)
-                    .setReadTrackingEnabled(true)
-                    .build();
-
-
-            new BetaTransactionTemplate(txFactory){
-                @Override
-                public Object execute(BetaTransaction tx) throws Exception {
-                    observe(tx, getThreadLocalBetaObjectPool());
-                    return null;
-                }
-            }.execute();
-        }
-
-        private void observeUsingReadtrackingReadonlyTransaction() {
-            BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
-                    .setReadonly(true)
-                    .setReadTrackingEnabled(true)
-                    .build();
-
-            new BetaTransactionTemplate(txFactory){
-                @Override
-                public Object execute(BetaTransaction tx) throws Exception {
-                    observe(tx, getThreadLocalBetaObjectPool());
-                    return null;
-                }
-            }.execute();
-        }
-
-
-        private void observeUsingReadtrackingUpdateTransaction() {
-            BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
-                    .setReadonly(false)
-                    .setReadTrackingEnabled(true)
-                    .build();
-
-            new BetaTransactionTemplate(txFactory){
-                @Override
-                public Object execute(BetaTransaction tx) throws Exception {
-                    observe(tx, getThreadLocalBetaObjectPool());
-                    return null;
-                }
-            }.execute();
-        }
-
-        private void observe(BetaTransaction tx, BetaObjectPool pool) {
-            if (ref.get(tx, pool) % 2 != 0) {
-                fail();
             }
         }
     }

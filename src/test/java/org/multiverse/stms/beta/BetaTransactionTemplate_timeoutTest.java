@@ -3,6 +3,9 @@ package org.multiverse.stms.beta;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.RetryTimeoutException;
 import org.multiverse.stms.beta.refs.LongRef;
 import org.multiverse.stms.beta.refs.LongRefTranlocal;
@@ -14,8 +17,10 @@ import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.assertAlive;
 import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.api.StmUtils.retry;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.benchmarks.BenchmarkUtils.joinAll;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class BetaTransactionTemplate_timeoutTest {
 
@@ -26,6 +31,7 @@ public class BetaTransactionTemplate_timeoutTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         stm = new BetaStm();
         pool = new BetaObjectPool();
         ref = createLongRef(stm);
@@ -34,11 +40,11 @@ public class BetaTransactionTemplate_timeoutTest {
 
     @Test
     public void whenTimeout() {
-        BetaTransactionFactory factory = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setTimeoutNs(timeoutNs)
-                .build();
+                .buildAtomicBlock();
 
-        AwaitThread t = new AwaitThread(factory);
+        AwaitThread t = new AwaitThread(block);
         t.setPrintStackTrace(false);
         t.start();
 
@@ -49,24 +55,24 @@ public class BetaTransactionTemplate_timeoutTest {
 
     @Test
     public void whenSuccess() {
-        BetaTransactionFactory factory = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setTimeoutNs(timeoutNs)
-                .build();
+                .buildAtomicBlock();
 
-        AwaitThread t = new AwaitThread(factory);
+        AwaitThread t = new AwaitThread(block);
         t.setPrintStackTrace(false);
         t.start();
 
         sleepMs(500);
         assertAlive(t);
 
-        new BetaTransactionTemplate(stm) {
+        stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
             @Override
-            public Object execute(BetaTransaction tx) throws Exception {
-                tx.openForWrite(ref, false, pool).value = 1;
-                return null;
+            public void execute(Transaction tx) throws Exception {
+                BetaTransaction btx = (BetaTransaction) tx;
+                btx.openForWrite(ref, false, pool).value = 1;
             }
-        }.execute(pool);
+        });
 
         joinAll(t);
         t.assertNothingThrown();
@@ -75,19 +81,19 @@ public class BetaTransactionTemplate_timeoutTest {
 
     @Test
     public void whenNoWaitingNeededAndZeroTimeout() {
-        new BetaTransactionTemplate(stm) {
+        stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
             @Override
-            public Object execute(BetaTransaction tx) throws Exception {
-                tx.openForWrite(ref, false, pool).value = 1;
-                return null;
+            public void execute(Transaction tx) throws Exception {
+                BetaTransaction btx = (BetaTransaction) tx;
+                btx.openForWrite(ref, false, pool).value = 1;
             }
-        }.execute(pool);
+        });
 
-        BetaTransactionFactory factory = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setTimeoutNs(0)
-                .build();
+                .buildAtomicBlock();
 
-        AwaitThread t = new AwaitThread(factory);
+        AwaitThread t = new AwaitThread(block);
         t.setPrintStackTrace(false);
         t.start();
 
@@ -98,28 +104,28 @@ public class BetaTransactionTemplate_timeoutTest {
 
     class AwaitThread extends TestThread {
 
-        private final BetaTransactionFactory txFactory;
+        private final AtomicBlock block;
 
-        public AwaitThread(BetaTransactionFactory txFactory) {
-            this.txFactory = txFactory;
+        public AwaitThread(AtomicBlock block) {
+            this.block = block;
         }
 
         @Override
         public void doRun() throws Exception {
-            final BetaObjectPool pool = new BetaObjectPool();
-
-            new BetaTransactionTemplate(txFactory) {
+            block.execute(new AtomicVoidClosure() {
                 @Override
-                public Object execute(BetaTransaction tx) throws Exception {
-                    LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+                public void execute(Transaction tx) throws Exception {
+                    BetaTransaction btx = (BetaTransaction)tx;
+                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
+
+                    LongRefTranlocal write = btx.openForWrite(ref, false, pool);
                     if (write.value == 0) {
                         retry();
                     }
 
                     write.value = 2;
-                    return null;
                 }
-            }.execute(pool);
+            });
         }
     }
 }

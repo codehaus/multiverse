@@ -37,7 +37,9 @@ public final class BetaStm implements Stm {
         this.config = new BetaTransactionConfig(this)
                 .setSpinCount(spinCount);
         this.storage = new SimpleStorage(this);
-        this.atomicBlock = getTransactionFactoryBuilder().buildAtomicBlock();
+        this.atomicBlock = getTransactionFactoryBuilder()
+                .setSpeculativeConfigEnabled(false)
+                .buildAtomicBlock();
     }
 
     public Storage getStorage() {

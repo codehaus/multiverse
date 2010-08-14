@@ -3,6 +3,9 @@ package org.multiverse.stms.beta;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.refs.LongRef;
 import org.multiverse.stms.beta.transactions.*;
@@ -17,7 +20,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
-public class BetaTransactionTemplate_speculativeTest {
+public class BetaAtomicBlock_speculativeTest {
 
     private BetaStm stm;
     private BetaObjectPool pool;
@@ -37,20 +40,24 @@ public class BetaTransactionTemplate_speculativeTest {
 
         final List<BetaTransaction> transactions = new LinkedList<BetaTransaction>();
         final AtomicInteger attempt = new AtomicInteger(1);
-        
-        new BetaTransactionTemplate(stm) {
+
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigEnabled(true)
+                .buildAtomicBlock();
+
+        block.execute(new AtomicVoidClosure() {
             @Override
-            public Object execute(BetaTransaction tx) throws Exception {
+            public void execute(Transaction tx) throws Exception {
+                BetaTransaction btx = (BetaTransaction) tx;
                 assertEquals(attempt.get(), tx.getAttempt());
                 attempt.incrementAndGet();
 
-                transactions.add(tx);
+                transactions.add(btx);
                 for (LongRef ref : refs) {
-                    tx.openForWrite(ref, false, pool).value = 1;
+                    btx.openForWrite(ref, false, pool).value = 1;
                 }
-                return null;
             }
-        }.execute(pool);
+        });
 
         for (LongRef ref : refs) {
             assertEquals(1, ref.unsafeLoad().value);
@@ -68,43 +75,48 @@ public class BetaTransactionTemplate_speculativeTest {
         final AtomicBoolean added = new AtomicBoolean();
         final TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
 
-        new BetaTransactionTemplate(stm) {
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigEnabled(true)
+                .buildAtomicBlock();
+
+        block.execute(new AtomicVoidClosure() {
             @Override
-            public Object execute(BetaTransaction tx) throws Exception {
-                transactions.add(tx);
-
-                if(!added.get()){
-                    tx.registerPermanent(pool, listener);
+            public void execute(Transaction tx) throws Exception {
+                BetaTransaction btx = (BetaTransaction) tx;
+                transactions.add(btx);
+                if (!added.get()) {
+                    btx.registerPermanent(pool, listener);
                 }
-
-                return null;
             }
-        }.execute();
+        });
 
         assertEquals(2, transactions.size());
         assertTrue(transactions.get(0) instanceof LeanMonoBetaTransaction);
         assertTrue(transactions.get(1) instanceof FatMonoBetaTransaction);
-
     }
 
-     @Test
+    @Test
     public void whenNormalListenerAdded() {
         final List<BetaTransaction> transactions = new LinkedList<BetaTransaction>();
         final AtomicBoolean added = new AtomicBoolean();
         final TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
 
-        new BetaTransactionTemplate(stm) {
-            @Override
-            public Object execute(BetaTransaction tx) throws Exception {
-                transactions.add(tx);
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigEnabled(true)
+                .buildAtomicBlock();
 
-                if(!added.get()){
-                    tx.register(pool, listener);
+        block.execute(new AtomicVoidClosure() {
+            @Override
+            public void execute(Transaction tx) throws Exception {
+                BetaTransaction btx = (BetaTransaction) tx;
+                transactions.add(btx);
+
+                if (!added.get()) {
+                    btx.register(pool, listener);
                 }
 
-                return null;
             }
-        }.execute();
+        });
 
         assertEquals(2, transactions.size());
         assertTrue(transactions.get(0) instanceof LeanMonoBetaTransaction);

@@ -3,9 +3,11 @@ package org.multiverse.stms.beta.integrationtest.liveness;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaTransactionTemplate;
 import org.multiverse.stms.beta.refs.IntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -56,20 +58,11 @@ public class DeadLockStressTest {
 
         @Override
         public void doRun() throws Exception {
-            int k = 0;
-            while (!stop) {
-                if (k % 100000 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
-                }
-                transaction();
-                k++;
-            }
-        }
-
-        public void transaction() {
-            new BetaTransactionTemplate(stm) {
+            AtomicBlock block = stm.getTransactionFactoryBuilder().buildAtomicBlock();
+            AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
-                public Object execute(BetaTransaction tx) throws Exception {
+                public void execute(Transaction tx) throws Exception {
+                    BetaTransaction btx = (BetaTransaction) tx;
                     BetaObjectPool pool = getThreadLocalBetaObjectPool();
                     for (int k = 0; k < refs.length; k++) {
                         if (randomInt(3) == 0) {
@@ -77,13 +70,21 @@ public class DeadLockStressTest {
 
                             if (randomInt(5) == 0) {
                                 IntRef ref = refs[index];
-                                ref.set( tx, pool,ref.get(tx, pool)+1);
+                                ref.set(btx, pool, ref.get(btx, pool) + 1);
                             }
                         }
                     }
-                    return null;
                 }
-            }.execute();
+            };
+
+            int k = 0;
+            while (!stop) {
+                if (k % 100000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), k);
+                }
+                block.execute(closure);
+                k++;
+            }
         }
     }
 }
