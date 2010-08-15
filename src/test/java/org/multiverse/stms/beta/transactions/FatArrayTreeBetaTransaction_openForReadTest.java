@@ -1,5 +1,6 @@
 package org.multiverse.stms.beta.transactions;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.PessimisticLockLevel;
@@ -40,6 +41,27 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         Tranlocal result = tx.openForRead((LongRef) null, true, pool);
         assertNull(result);
         assertActive(tx);
+    }
+
+    @Test
+    public void whenUntracked() {
+        LongRef ref = createReadBiasedLongRef(stm, 100);
+        LongRefTranlocal committed = ref.unsafeLoad();
+
+        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+                .setBlockingAllowed(false)
+                .setReadTrackingEnabled(false);
+
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
+        LongRefTranlocal tranlocal = tx.openForRead(ref, false, pool);
+
+        Assert.assertSame(committed, tranlocal);
+        assertNull(tx.get(ref));
+        assertTrue((Boolean) getField(tx, "hasReads"));
+        assertTrue((Boolean) getField(tx, "hasUntrackedReads"));
+        assertSurplus(1, ref);
+        assertUnlocked(ref);
+        assertNull(ref.getLockOwner());
     }
 
     @Test

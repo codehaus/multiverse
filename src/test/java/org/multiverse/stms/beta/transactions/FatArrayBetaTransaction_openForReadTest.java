@@ -90,6 +90,24 @@ public class FatArrayBetaTransaction_openForReadTest {
     }
 
     @Test
+    public void whenUntracked() {
+        LongRef ref = createReadBiasedLongRef(stm, 100);
+        LongRefTranlocal committed = ref.unsafeLoad();
+
+        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+                .setBlockingAllowed(false)
+                .setReadTrackingEnabled(false);
+
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
+        LongRefTranlocal tranlocal = tx.openForRead(ref, false, pool);
+
+        assertSame(committed, tranlocal);
+        assertNull(tx.get(ref));
+        assertTrue((Boolean) getField(tx, "hasReads"));
+        assertTrue((Boolean) getField(tx, "hasUntrackedReads"));
+    }
+
+    @Test
     public void whenReadBiased() {
         LongRef ref = createReadBiasedLongRef(stm, 100);
         LongRefTranlocal committed = ref.unsafeLoad();
@@ -369,7 +387,7 @@ public class FatArrayBetaTransaction_openForReadTest {
         assertActive(tx);
     }
 
-   @Test
+    @Test
     public void whenContainsUntrackedRead_thenCantRecoverFromUnrealReadConflict() {
         LongRef ref1 = createReadBiasedLongRef(stm, 100);
         LongRef ref2 = createLongRef(stm);

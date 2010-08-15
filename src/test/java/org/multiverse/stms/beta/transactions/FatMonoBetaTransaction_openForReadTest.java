@@ -1,5 +1,6 @@
 package org.multiverse.stms.beta.transactions;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -37,6 +38,27 @@ public class FatMonoBetaTransaction_openForReadTest {
     @Ignore
     public void whenNew() {
 
+    }
+
+    @Test
+    public void whenUntracked() {
+        LongRef ref = createReadBiasedLongRef(stm, 100);
+        LongRefTranlocal committed = ref.unsafeLoad();
+
+        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+                .setBlockingAllowed(false)
+                .setReadTrackingEnabled(false);
+
+        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
+        LongRefTranlocal tranlocal = tx.openForRead(ref, false, pool);
+
+        Assert.assertSame(committed, tranlocal);
+        assertNull(tx.get(ref));
+        assertTrue((Boolean) getField(tx, "hasReads"));
+        assertTrue((Boolean) getField(tx, "hasUntrackedReads"));
+        assertSurplus(1, ref);
+        assertUnlocked(ref);
+        assertNull(ref.getLockOwner());
     }
 
     @Test

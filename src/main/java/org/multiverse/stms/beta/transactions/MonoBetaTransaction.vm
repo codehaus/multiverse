@@ -773,10 +773,11 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         abortOnly = false;
         attached = null;
 #if(!$transaction.lean)
+        hasReads = false;
+        hasUntrackedReads = false;
         if(normalListeners!=null){
             normalListeners.clear();
-        }
-        hasUntrackedReads = false;
+        }     
 #end
         return true;
     }
