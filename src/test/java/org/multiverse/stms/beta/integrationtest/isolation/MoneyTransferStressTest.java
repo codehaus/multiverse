@@ -22,6 +22,7 @@ public class MoneyTransferStressTest {
 
     private LongRef[] accounts;
     private BetaStm stm;
+    private boolean optimistic;
 
     @Before
     public void setUp() {
@@ -31,26 +32,47 @@ public class MoneyTransferStressTest {
     }
 
     @Test
-    public void test_10Accounts_2Threads() throws InterruptedException {
-        test(10, 2);
+    public void when10AccountsAnd2ThreadsAndOptimistic() {
+        test(10, 2, true);
     }
 
     @Test
-    public void test_100Account_10Threads() throws InterruptedException {
-        test(100, 10);
+    public void when10AccountsAnd2ThreadsAndPessimistic() {
+        test(10, 2, false);
     }
 
     @Test
-    public void test_1000Accounts_10Threads() throws InterruptedException {
-        test(1000, 10);
+    public void when100AccountAnd10ThreadsAndOptimistic() {
+        test(100, 10, true);
     }
 
     @Test
-    public void test_30Accounts_30Threads() throws InterruptedException {
-        test(30, 30);
+    public void when100AccountAnd10ThreadsAndPessimistic() {
+        test(100, 10, false);
     }
 
-    public void test(int accountCount, int threadCount) throws InterruptedException {
+    @Test
+    public void when1000AccountsAnd10ThreadsAndOptimistic() {
+        test(1000, 10, true);
+    }
+
+    @Test
+    public void when1000AccountsAnd10ThreadsAndPessimistic() {
+        test(1000, 10, false);
+    }
+
+    @Test
+    public void when30AccountsAnd30ThreadsAndOptimistic() {
+        test(30, 30, true);
+    }
+
+    @Test
+    public void when30AccountsAnd30ThreadsAndPessimistic() {
+        test(30, 30, false);
+    }
+
+    public void test(int accountCount, int threadCount, boolean optimistic) {
+        this.optimistic = optimistic;
         accounts = new LongRef[accountCount];
 
         long initialAmount = 0;
@@ -107,11 +129,11 @@ public class MoneyTransferStressTest {
                     LongRef to = accounts[randomInt(accounts.length)];
                     int amount = randomInt(100);
 
-                    btx.openForWrite(to, false, pool).value += amount;
+                    btx.openForWrite(to, !optimistic, pool).value += amount;
 
                     sleepRandomMs(20);
 
-                    btx.openForWrite(from, false, pool).value -= amount;
+                    btx.openForWrite(from, !optimistic, pool).value -= amount;
                 }
             };
         }
