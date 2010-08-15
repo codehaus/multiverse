@@ -637,22 +637,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         prepare();
 
-        boolean abort = true;
-        try{
-            if(permanentListeners != null){
-                notifyListeners(permanentListeners, TransactionLifecycleEvent.PreCommit);
-            }
-
-            if(normalListeners != null){
-                notifyListeners(normalListeners, TransactionLifecycleEvent.PreCommit);
-            }
-            abort = false;
-        }finally{
-            if(abort){
-                abort();
-            }
-        }
-
         Listeners[] listenersArray;
         if(config.dirtyCheck){
             listenersArray = commitDirty(pool);
@@ -814,15 +798,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             }
 
             status = PREPARED;
-
-            if(permanentListeners != null){
-                notifyListeners(permanentListeners, TransactionLifecycleEvent.PostPrepare);
-            }
-
-            if(normalListeners != null){
-                notifyListeners(normalListeners, TransactionLifecycleEvent.PostPrepare);
-            }
-
             abort = false;
         }finally{
             if(abort){
@@ -1056,7 +1031,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end
 
     }
-
 
     // ============================== init =======================================
 

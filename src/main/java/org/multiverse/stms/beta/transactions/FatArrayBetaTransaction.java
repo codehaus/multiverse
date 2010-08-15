@@ -1214,24 +1214,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         prepare();
-
-        boolean abort = true;
-        try{
-
-            if(permanentListeners != null){
-                notifyListeners(permanentListeners, TransactionLifecycleEvent.PreCommit);
-            }
-
-            if(normalListeners != null){
-                notifyListeners(normalListeners, TransactionLifecycleEvent.PreCommit);
-            }
-            abort = false;
-        }finally{
-            if(abort){
-                abort(pool);
-            }
-        }
-
+    
         Listeners[] listeners = null;
 
         if (firstFreeIndex > 0) {
@@ -1357,14 +1340,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             }
 
             status = PREPARED;
-
-            if(permanentListeners != null){
-                notifyListeners(permanentListeners, TransactionLifecycleEvent.PostPrepare);
-            }
-
-            if(normalListeners != null){
-                notifyListeners(normalListeners, TransactionLifecycleEvent.PostPrepare);
-            }
             abort = false;
         }finally{
             if(abort){

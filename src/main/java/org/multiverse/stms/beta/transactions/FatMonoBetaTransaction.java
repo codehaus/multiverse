@@ -1254,23 +1254,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         prepare();
-
-        boolean abort = true;
-        try{
-            if(permanentListeners != null){
-                notifyListeners(permanentListeners, TransactionLifecycleEvent.PreCommit);
-            }
-
-            if(normalListeners != null){
-                notifyListeners(normalListeners, TransactionLifecycleEvent.PreCommit);
-            }
-            abort = false;
-        }finally{
-            if(abort){
-                abort(pool);
-            }
-        }
-
         Listeners listeners = null;
         if (needsRealClose) {
             if(config.dirtyCheck){
@@ -1345,14 +1328,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
 
             status = PREPARED;
-
-            if(permanentListeners != null){
-                notifyListeners(permanentListeners, TransactionLifecycleEvent.PostPrepare);
-            }
-
-            if(normalListeners != null){
-                notifyListeners(normalListeners, TransactionLifecycleEvent.PostPrepare);
-            }
             abort = false;
         }finally{
             if(abort){

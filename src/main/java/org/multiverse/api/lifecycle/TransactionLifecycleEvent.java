@@ -23,23 +23,11 @@ public enum TransactionLifecycleEvent {
     PrePrepare,
 
     /**
-     * Just after preparing
-     */
-    PostPrepare,
-
-    /**
      * Just after aborting.
      */
     PostAbort,
 
-
-    /**
-     * Just before committing.
-     */
-    PreCommit,
-
-
-    /**
+     /**
      * Just after committing.
      */
     PostCommit

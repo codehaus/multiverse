@@ -396,11 +396,9 @@ public class FatArrayBetaTransaction_commitTest {
         tx.openForWrite(ref, false, pool);
         tx.commit();
 
-        assertEquals(4, listenerMock.events.size());
+        assertEquals(2, listenerMock.events.size());
         assertEquals(TransactionLifecycleEvent.PrePrepare, listenerMock.events.get(0));
-        assertEquals(TransactionLifecycleEvent.PostPrepare, listenerMock.events.get(1));
-        assertEquals(TransactionLifecycleEvent.PreCommit, listenerMock.events.get(2));
-        assertEquals(TransactionLifecycleEvent.PostCommit, listenerMock.events.get(3));
+        assertEquals(TransactionLifecycleEvent.PostCommit, listenerMock.events.get(1));
     }
 
     @Test
@@ -413,11 +411,9 @@ public class FatArrayBetaTransaction_commitTest {
         tx.openForWrite(ref, false, pool);
         tx.commit();
 
-        assertEquals(4, listenerMock.events.size());
+        assertEquals(2, listenerMock.events.size());
         assertEquals(TransactionLifecycleEvent.PrePrepare, listenerMock.events.get(0));
-        assertEquals(TransactionLifecycleEvent.PostPrepare, listenerMock.events.get(1));
-        assertEquals(TransactionLifecycleEvent.PreCommit, listenerMock.events.get(2));
-        assertEquals(TransactionLifecycleEvent.PostCommit, listenerMock.events.get(3));
+        assertEquals(TransactionLifecycleEvent.PostCommit, listenerMock.events.get(1));
     }
 
     class TransactionLifecycleListenerMock implements TransactionLifecycleListener {

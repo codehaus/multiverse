@@ -1513,22 +1513,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         prepare();
 
-        boolean abort = true;
-        try{
-            if(permanentListeners != null){
-                notifyListeners(permanentListeners, TransactionLifecycleEvent.PreCommit);
-            }
-
-            if(normalListeners != null){
-                notifyListeners(normalListeners, TransactionLifecycleEvent.PreCommit);
-            }
-            abort = false;
-        }finally{
-            if(abort){
-                abort();
-            }
-        }
-
         Listeners[] listenersArray;
         if(config.dirtyCheck){
             listenersArray = commitDirty(pool);
@@ -1653,15 +1637,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             }
 
             status = PREPARED;
-
-            if(permanentListeners != null){
-                notifyListeners(permanentListeners, TransactionLifecycleEvent.PostPrepare);
-            }
-
-            if(normalListeners != null){
-                notifyListeners(normalListeners, TransactionLifecycleEvent.PostPrepare);
-            }
-
             abort = false;
         }finally{
             if(abort){
@@ -1888,7 +1863,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
     }
-
 
     // ============================== init =======================================
 

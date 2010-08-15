@@ -1830,7 +1830,6 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
     }
 
-
     // ============================== init =======================================
 
     @Override
