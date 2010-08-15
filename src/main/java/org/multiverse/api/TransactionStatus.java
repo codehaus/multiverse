@@ -1,12 +1,11 @@
 package org.multiverse.api;
 
 /**
- * All possible states a {@link Transaction} can be in.
+ * An enumeration of all possible states a {@link Transaction} can be in.
  *
  * @author Peter Veentjer
  */
 public enum TransactionStatus {
-
 
     /**
      */

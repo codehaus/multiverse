@@ -81,8 +81,6 @@ performance.
     only when committing, a dirty transactional object needs to be checked if it is durable. If it isn't
     no unitofwrite needs to be used. If it is, a unit of write needs to be used. So the commit needs to 
 
-- transaction propagation level
-
 - write bit in the orec? Can be used to indicate to another transaction wants to write.. when committing and
  exclusive writebit set by another transaction, no write can happen. The advantage of purely locking is that
  reads still can happen even though it is 'locked' exclusively for writing by one transaction. 
@@ -202,6 +200,10 @@ globalconflict counter.
 - betatransactiontemplate needs to be removed
 
 - testing: atomic block & propagation and committed/aborted/prepared/new transaction on threadlocal
+
+- increment test with commuting increments.
+
+- lean mono should not upgrade to array when untracked read is done, but should just attach it to the session.
 
 done
 

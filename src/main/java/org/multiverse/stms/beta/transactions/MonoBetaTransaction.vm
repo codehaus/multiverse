@@ -386,6 +386,10 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
 #end ##for loop for refs
 
+    public Tranlocal get(BetaTransactionalObject object){
+        return attached == null || attached.owner!= object? null: attached;
+    }
+
 #if(!$transaction.lean)
     // ======================= read conflict =======================================
 

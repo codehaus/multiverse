@@ -1113,6 +1113,11 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     }
 
  
+    public Tranlocal get(BetaTransactionalObject owner){
+        int indexOf = indexOf(owner);
+        return indexOf == -1 ? null: array[indexOf];
+    }
+
     /**
      * Finds the index of the tranlocal that has the ref as owner. Return -1 if not found.
      *

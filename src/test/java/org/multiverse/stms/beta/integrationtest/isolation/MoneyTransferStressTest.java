@@ -147,7 +147,7 @@ public class MoneyTransferStressTest {
             while (!stop) {
                 try {
                     block.execute(closure);
-                    if ((k % 1000) == 0) {
+                    if ((k % 500) == 0) {
                         System.out.printf("%s is at iteration %s\n", getName(), k);
                     }
                     k++;

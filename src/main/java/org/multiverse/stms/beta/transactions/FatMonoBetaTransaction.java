@@ -1182,6 +1182,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
 
  
+    public Tranlocal get(BetaTransactionalObject object){
+        return attached == null || attached.owner!= object? null: attached;
+    }
+
     // ======================= read conflict =======================================
 
     private boolean hasReadConflict() {

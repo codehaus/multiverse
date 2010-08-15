@@ -1081,6 +1081,10 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
 
  
+    public Tranlocal get(BetaTransactionalObject object){
+        return attached == null || attached.owner!= object? null: attached;
+    }
+
     // ======================= abort =======================================
 
     @Override
