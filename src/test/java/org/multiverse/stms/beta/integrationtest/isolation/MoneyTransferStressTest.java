@@ -9,6 +9,7 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.refs.LongRef;
+import org.multiverse.stms.beta.refs.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertEquals;
@@ -114,14 +115,14 @@ public class MoneyTransferStressTest {
     private class TransferThread extends TestThread {
 
         private final BetaObjectPool pool = new BetaObjectPool();
-        private AtomicBlock block;
-        private AtomicVoidClosure closure;
 
         public TransferThread(int id) {
             super("TransferThread-" + id);
+        }
 
-            block = stm.getTransactionFactoryBuilder().buildAtomicBlock();
-            closure = new AtomicVoidClosure() {
+        public void doRun() {
+            AtomicBlock block = stm.getTransactionFactoryBuilder().buildAtomicBlock();
+            AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
@@ -131,21 +132,23 @@ public class MoneyTransferStressTest {
 
                     btx.openForWrite(to, !optimistic, pool).value += amount;
 
-                    sleepRandomMs(20);
+                    sleepRandomMs(10);
 
-                    btx.openForWrite(from, !optimistic, pool).value -= amount;
+                    LongRefTranlocal toTranlocal = btx.openForWrite(from, !optimistic, pool);
+                    if(toTranlocal.value<0){
+                        throw new NotEnoughMoneyException();
+                    }
+
+                    toTranlocal.value -= amount;
                 }
             };
-        }
 
-        public void doRun() {
             int k = 0;
-
             while (!stop) {
                 try {
                     block.execute(closure);
                     if ((k % 1000) == 0) {
-                        System.out.printf("Thread %s is at iteration %s\n", getName(), k);
+                        System.out.printf("%s is at iteration %s\n", getName(), k);
                     }
                     k++;
                 } catch (NotEnoughMoneyException ignore) {
@@ -154,9 +157,6 @@ public class MoneyTransferStressTest {
         }
     }
 
-
     private static class NotEnoughMoneyException extends RuntimeException {
-        static NotEnoughMoneyException INSTANCE = new NotEnoughMoneyException();
     }
-
 }
