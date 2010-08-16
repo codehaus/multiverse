@@ -11,7 +11,6 @@ import org.multiverse.stms.beta.refs.Tranlocal;
 import static junit.framework.Assert.assertSame;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.assertActive;
-import static org.multiverse.TestUtils.assertNeedsRealClose;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class FatArrayTreeBetaTransaction_openingManyItemsTest {
@@ -59,6 +58,5 @@ public class FatArrayTreeBetaTransaction_openingManyItemsTest {
         }
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
     }
 }

@@ -31,15 +31,7 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
  */
 public class TestUtils {
 
-    public static void assertNeedsRealClose(BetaTransaction tx) {
-        assertTrue((Boolean) getField(tx, "needsRealClose"));
-    }
-
-    public static void assertNeedsNoRealClose(BetaTransaction tx) {
-        assertFalse((Boolean) getField(tx, "needsRealClose"));
-    }
-
-    public static void assertHasNoCommutingFunctions(LongRefTranlocal tranlocal) {
+      public static void assertHasNoCommutingFunctions(LongRefTranlocal tranlocal) {
         assertHasCommutingFunctions(tranlocal);
     }
 

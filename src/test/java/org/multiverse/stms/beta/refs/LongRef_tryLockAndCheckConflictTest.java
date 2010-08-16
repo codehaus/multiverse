@@ -29,7 +29,7 @@ public class LongRef_tryLockAndCheckConflictTest {
     public void whenFree() {
         LongRef ref = createLongRef(stm, 0);
 
-        BetaTransaction tx = stm.start();
+        BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal write = tx.openForRead(ref, false, pool);
 
         boolean result = ref.tryLockAndCheckConflict(tx, 1, write);
@@ -66,13 +66,13 @@ public class LongRef_tryLockAndCheckConflictTest {
     public void whenLockedByOtherAndUpdated() {
         LongRef ref = createLongRef(stm);
 
-        BetaTransaction tx = stm.start();
+        BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
 
         arbitraryUpdate(stm, ref);
         LongRefTranlocal committed = ref.unsafeLoad();
 
-        BetaTransaction lockingTx = stm.start();
+        BetaTransaction lockingTx = stm.startDefaultTransaction();
         lockingTx.openForWrite(ref, true, pool);
 
         boolean result = ref.tryLockAndCheckConflict(tx, 1, read);
@@ -88,12 +88,12 @@ public class LongRef_tryLockAndCheckConflictTest {
     public void whenPendingUpdate() {
         LongRef ref = createLongRef(stm, 0);
 
-        BetaTransaction tx = stm.start();
+        BetaTransaction tx = stm.startDefaultTransaction();
 
         Tranlocal read2 = tx.openForRead(ref, false, pool);
 
         //lock it by another thread
-        BetaTransaction otherTx = stm.start();
+        BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, true, pool);
 
         boolean result = ref.tryLockAndCheckConflict(tx, 1, read2);
@@ -110,7 +110,7 @@ public class LongRef_tryLockAndCheckConflictTest {
         LongRef ref = createLongRef(stm, 0);
 
         //lock it by this thread.
-        BetaTransaction tx = stm.start();
+        BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal read = tx.openForRead(ref, true, pool);
 
         boolean result = ref.tryLockAndCheckConflict(tx, 1, read);

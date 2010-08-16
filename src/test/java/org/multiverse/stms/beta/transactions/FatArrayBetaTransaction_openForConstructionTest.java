@@ -65,7 +65,6 @@ public class FatArrayBetaTransaction_openForConstructionTest {
         LongRefTranlocal write = tx.openForConstruction(ref, pool);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertNotNull(write);
         assertEquals(0, write.value);
         assertSame(ref, write.owner);
@@ -85,7 +84,6 @@ public class FatArrayBetaTransaction_openForConstructionTest {
         LongRefTranlocal construction2 = tx.openForConstruction(ref, pool);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertSame(construction1, construction2);
         assertNotNull(construction1);
         assertEquals(0, construction1.value);
@@ -108,7 +106,6 @@ public class FatArrayBetaTransaction_openForConstructionTest {
         } catch (NullPointerException expected) {
         }
 
-        assertNeedsNoRealClose(tx);
         assertAborted(tx);
     }
 
@@ -126,7 +123,6 @@ public class FatArrayBetaTransaction_openForConstructionTest {
         }
 
         assertAborted(tx);
-        assertNeedsNoRealClose(tx);
         assertSame(committed, ref.unsafeLoad());
         assertUnlocked(ref);
         assertNull(ref.getLockOwner());
@@ -149,7 +145,6 @@ public class FatArrayBetaTransaction_openForConstructionTest {
         } catch (IllegalArgumentException expected) {
         }
 
-        assertNeedsRealClose(tx);
         assertAborted(tx);
         assertSame(committed, ref.unsafeLoad());
         assertUnlocked(ref);
@@ -174,7 +169,6 @@ public class FatArrayBetaTransaction_openForConstructionTest {
         }
 
         assertAborted(tx);
-        assertNeedsRealClose(tx);
         assertSame(committed, ref.unsafeLoad());
         assertUnlocked(ref);
         assertNull(ref.getLockOwner());
@@ -199,7 +193,6 @@ public class FatArrayBetaTransaction_openForConstructionTest {
         } catch (ReadonlyException expected) {
         }
 
-        assertNeedsNoRealClose(tx);
         assertUnlocked(ref);
         assertSame(committed, ref.unsafeLoad());
         assertNull(ref.getLockOwner());
@@ -225,7 +218,6 @@ public class FatArrayBetaTransaction_openForConstructionTest {
         tx.openForConstruction(ref2, pool);
 
         assertEquals(oldLocalConflictCount, tx.getLocalConflictCounter().get());
-        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -239,7 +231,6 @@ public class FatArrayBetaTransaction_openForConstructionTest {
 
         assertEquals(oldConflictCount, tx.getLocalConflictCounter().get());
         assertActive(tx);
-        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -256,7 +247,6 @@ public class FatArrayBetaTransaction_openForConstructionTest {
         }
 
         assertAborted(tx);
-        assertNeedsNoRealClose(tx);
     }
 
     @Test
@@ -273,7 +263,6 @@ public class FatArrayBetaTransaction_openForConstructionTest {
         }
 
         assertAborted(tx);
-        assertNeedsNoRealClose(tx);
     }
 
     @Test
@@ -290,6 +279,5 @@ public class FatArrayBetaTransaction_openForConstructionTest {
         }
 
         assertCommitted(tx);
-        assertNeedsNoRealClose(tx);
     }
 }

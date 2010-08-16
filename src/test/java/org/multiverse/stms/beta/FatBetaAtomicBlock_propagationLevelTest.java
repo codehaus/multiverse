@@ -36,7 +36,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
                 .setPropagationLevel(PropagationLevel.Never)
                 .buildAtomicBlock();
 
-        BetaTransaction otherTx = stm.start();
+        BetaTransaction otherTx = stm.startDefaultTransaction();
         setThreadLocalTransaction(otherTx);
 
         AtomicVoidClosure closure = mock(AtomicVoidClosure.class);
@@ -96,7 +96,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
                 .setPropagationLevel(PropagationLevel.Mandatory)
                 .buildAtomicBlock();
 
-        final BetaTransaction otherTx = stm.start();
+        final BetaTransaction otherTx = stm.startDefaultTransaction();
         setThreadLocalTransaction(otherTx);
 
         AtomicIntClosure closure = new AtomicIntClosure() {
@@ -146,7 +146,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
                 .setPropagationLevel(PropagationLevel.Requires)
                 .build();
 
-        final BetaTransaction existingTx = stm.start();
+        final BetaTransaction existingTx = stm.startDefaultTransaction();
         setThreadLocalTransaction(existingTx);
 
         final LongRef ref = createLongRef(stm);
@@ -203,7 +203,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
                 .setPropagationLevel(PropagationLevel.RequiresNew)
                 .buildAtomicBlock();
 
-        final BetaTransaction otherTx = stm.start();
+        final BetaTransaction otherTx = stm.startDefaultTransaction();
         setThreadLocalTransaction(otherTx);
 
         final LongRef ref = createLongRef(stm, 10);
@@ -234,7 +234,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
                 .setPropagationLevel(PropagationLevel.Supports)
                 .buildAtomicBlock();
 
-        final BetaTransaction otherTx = stm.start();
+        final BetaTransaction otherTx = stm.startDefaultTransaction();
         setThreadLocalTransaction(otherTx);
 
         AtomicIntClosure closure = new AtomicIntClosure() {

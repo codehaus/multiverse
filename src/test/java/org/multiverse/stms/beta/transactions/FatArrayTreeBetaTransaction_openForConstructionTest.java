@@ -35,7 +35,6 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
         LongRefTranlocal write = tx.openForConstruction(ref, pool);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertNotNull(write);
         assertEquals(0, write.value);
         assertSame(ref, write.owner);
@@ -92,7 +91,6 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
 
         assertSame(write1, write2);
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertNotNull(write2);
         assertEquals(0, write2.value);
         assertSame(ref, write2.owner);
@@ -196,7 +194,6 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
         assertEquals(oldLocalConflictCount, tx.getLocalConflictCounter().get());
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -210,7 +207,6 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
 
         assertEquals(oldConflictCount, tx.getLocalConflictCounter().get());
         assertActive(tx);
-        assertNeedsRealClose(tx);
     }
 
     @Test

@@ -58,10 +58,12 @@ public final class BetaStm implements Stm {
         return globalConflictCounter;
     }
 
-    public BetaTransaction start() {
+    @Override
+    public BetaTransaction startDefaultTransaction() {
         return new FatArrayTreeBetaTransaction(config);
     }
 
+    @Override
     public AtomicBlock getDefaultAtomicBlock() {
         return atomicBlock;
     }

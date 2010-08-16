@@ -40,7 +40,7 @@ public class LongRef_commitAllTest {
         long listenerEra = latch.getEra();
         ref.registerChangeListener(latch, ref.unsafeLoad(), pool, listenerEra);
 
-        BetaTransaction tx = stm.start();
+        BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
         ref.tryLockAndCheckConflict(tx, 1, write);
 
@@ -68,10 +68,10 @@ public class LongRef_commitAllTest {
         LongRef ref = BetaStmUtils.createLongRef(stm);
         Orec orec = ref.getOrec();
 
-        BetaTransaction tx = stm.start();
+        BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal tranlocal = tx.openForWrite(ref, false, pool);
 
-        BetaTransaction otherTx = stm.start();
+        BetaTransaction otherTx = stm.startDefaultTransaction();
         Tranlocal read2 = otherTx.openForRead(ref, false, pool);
 
         ref.tryLockAndCheckConflict(tx, 1, read2);
@@ -94,7 +94,7 @@ public class LongRef_commitAllTest {
         LongRef ref = BetaStmUtils.createLongRef(stm);
         Orec orec = ref.getOrec();
 
-        BetaTransaction tx = stm.start();
+        BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
         write.value++;
         write.isDirty = true;
@@ -142,7 +142,7 @@ public class LongRef_commitAllTest {
         Orec orec = ref.getOrec();
         assertUnlocked(orec);
 
-        BetaTransaction tx = stm.start();
+        BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal tranlocal = tx.openForWrite(ref, false, pool);
         ref.tryLockAndCheckConflict(tx, 1, tranlocal);
 

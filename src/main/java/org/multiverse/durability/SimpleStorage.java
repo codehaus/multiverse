@@ -260,7 +260,7 @@ public class SimpleStorage implements Storage {
         }
 
         //the object is not there.. so we need to load it        .
-        BetaTransaction tx = betaStm.start();
+        BetaTransaction tx = betaStm.startDefaultTransaction();
         object = loadDurableObject(id, tx);
         DurableState state = tx.openForConstruction((BetaTransactionalObject) object, getThreadLocalBetaObjectPool());
         populate(state);

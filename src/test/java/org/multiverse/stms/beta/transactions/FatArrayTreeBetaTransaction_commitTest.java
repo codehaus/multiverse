@@ -116,7 +116,7 @@ public class FatArrayTreeBetaTransaction_commitTest {
         LongRef ref = createLongRef(stm, 0);
         Tranlocal committed = ref.unsafeLoad();
 
-        BetaTransaction tx = stm.start();
+        BetaTransaction tx = stm.startDefaultTransaction();
         tx.openForRead(ref, false, pool);
         tx.commit(pool);
 
@@ -206,7 +206,7 @@ public class FatArrayTreeBetaTransaction_commitTest {
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
         write.value++;
 
-        BetaTransaction otherTx = stm.start();
+        BetaTransaction otherTx = stm.startDefaultTransaction();
         LongRefTranlocal writeConflict = otherTx.openForWrite(ref, false, pool);
         writeConflict.value++;
         otherTx.commit(pool);

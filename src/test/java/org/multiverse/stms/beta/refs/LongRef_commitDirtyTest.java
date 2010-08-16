@@ -38,7 +38,7 @@ public class LongRef_commitDirtyTest {
         long listenerEra = latch.getEra();
         ref.registerChangeListener(latch, ref.unsafeLoad(), pool, listenerEra);
 
-        BetaTransaction tx = stm.start();
+        BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
         write.value++;
         write.isDirty = true;
@@ -68,12 +68,12 @@ public class LongRef_commitDirtyTest {
         LongRef ref = BetaStmUtils.createLongRef(stm);
         Orec orec = ref.getOrec();
 
-        BetaTransaction tx = stm.start();
+        BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
         write.isDirty = true;
         write.value++;
 
-        BetaTransaction otherTx = stm.start();
+        BetaTransaction otherTx = stm.startDefaultTransaction();
         Tranlocal conflictingRead = otherTx.openForRead(ref, false, pool);
 
         long oldConflictCount = globalConflictCounter.count();
@@ -95,7 +95,7 @@ public class LongRef_commitDirtyTest {
         LongRef ref = BetaStmUtils.createLongRef(stm);
         Orec orec = ref.getOrec();
 
-        BetaTransaction tx = stm.start();
+        BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
         write.value++;
         write.isDirty = true;
@@ -120,7 +120,7 @@ public class LongRef_commitDirtyTest {
         LongRefTranlocal committed = ref.unsafeLoad();
         Orec orec = ref.getOrec();
 
-        BetaTransaction tx = stm.start();
+        BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
         write.isDirty = false;
         ref.tryLockAndCheckConflict(tx, 1, write);
@@ -144,7 +144,7 @@ public class LongRef_commitDirtyTest {
         Orec orec = ref.getOrec();
         assertUnlocked(orec);
 
-        BetaTransaction tx = stm.start();
+        BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
         write.value++;
         write.isDirty = true;

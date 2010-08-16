@@ -48,6 +48,9 @@ public interface TransactionFactoryBuilder {
      * Builds an AtomicBlock optimized for a transactions created by this TransactionFactoryBuilder.
      *
      * @return the created AtomicBlock.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionFactoryException
+     *          if the TransactionFactory could not be build
+     *          because the configuration was not correct.
      */
     AtomicBlock buildAtomicBlock();
 }

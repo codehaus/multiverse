@@ -30,10 +30,10 @@ public class LongRef_registerRetryLatchTest {
     public void whenInterestingWriteAlreadyHappened_thenLatchOpenedAndNoRegistration() {
         LongRef ref = createLongRef(stm);
 
-        BetaTransaction tx = stm.start();
+        BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
 
-        BetaTransaction otherTx = stm.start();
+        BetaTransaction otherTx = stm.startDefaultTransaction();
         LongRefTranlocal write = otherTx.openForWrite(ref, false, pool);
         write.value++;
         otherTx.commit(pool);
@@ -61,7 +61,7 @@ public class LongRef_registerRetryLatchTest {
 
     @Test
     public void whenConstructed_thenNoRegistration() {
-        BetaTransaction tx = stm.start();
+        BetaTransaction tx = stm.startDefaultTransaction();
         LongRef ref = new LongRef(tx);
         LongRefTranlocal read = tx.openForConstruction(ref, pool);
 
@@ -78,7 +78,7 @@ public class LongRef_registerRetryLatchTest {
     public void whenFirstOne_thenRegistrationSuccessful() {
         LongRef ref = createLongRef(stm);
 
-        BetaTransaction tx = stm.start();
+        BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
 
         Latch latch = new CheapLatch();
@@ -98,14 +98,14 @@ public class LongRef_registerRetryLatchTest {
     public void whenSecondOne_thenListenerAddedToChain() {
         LongRef ref = createLongRef(stm);
 
-        BetaTransaction tx1 = stm.start();
+        BetaTransaction tx1 = stm.startDefaultTransaction();
         LongRefTranlocal read1 = tx1.openForRead(ref, false, pool);
 
         Latch latch1 = new CheapLatch();
         long listenerEra1 = latch1.getEra();
         ref.registerChangeListener(latch1, read1, pool, listenerEra1);
 
-        BetaTransaction tx2 = stm.start();
+        BetaTransaction tx2 = stm.startDefaultTransaction();
         LongRefTranlocal read2 = tx2.openForRead(ref, false, pool);
 
         Latch latch2 = new CheapLatch();

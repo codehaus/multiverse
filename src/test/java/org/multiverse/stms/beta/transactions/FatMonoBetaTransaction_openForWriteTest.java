@@ -40,7 +40,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenNotCommittedBefore_thenReadConflict() {
-        BetaTransaction otherTx = stm.start();
+        BetaTransaction otherTx = stm.startDefaultTransaction();
         LongRef ref = new LongRef(otherTx);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -83,7 +83,6 @@ public class FatMonoBetaTransaction_openForWriteTest {
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertNull(ref.getLockOwner());
         assertReadBiased(ref);
         assertSurplus(1, ref);
@@ -108,7 +107,6 @@ public class FatMonoBetaTransaction_openForWriteTest {
         LongRefTranlocal write = tx.openForWrite(ref, true, pool);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertSame(tx, ref.getLockOwner());
         assertReadBiased(ref);
         assertSurplus(1, ref);
@@ -132,7 +130,6 @@ public class FatMonoBetaTransaction_openForWriteTest {
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertNull(ref.getLockOwner());
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
@@ -157,7 +154,6 @@ public class FatMonoBetaTransaction_openForWriteTest {
         LongRefTranlocal write = tx.openForWrite(ref, true, pool);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertSame(tx, ref.getLockOwner());
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
@@ -193,7 +189,6 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertActive(tx);
-        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -217,7 +212,6 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertActive(tx);
-        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -241,7 +235,6 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertActive(tx);
-        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -263,7 +256,6 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertActive(tx);
-        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -284,7 +276,6 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertActive(tx);
-        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -306,7 +297,6 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertActive(tx);
-        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -329,7 +319,6 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertActive(tx);
-        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -351,7 +340,6 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertActive(tx);
-        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -373,7 +361,6 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertActive(tx);
-        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -517,7 +504,6 @@ public class FatMonoBetaTransaction_openForWriteTest {
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertNotSame(committed, write);
         assertFalse(write.isCommitted);
         assertFalse(write.isPermanent);
@@ -539,7 +525,6 @@ public class FatMonoBetaTransaction_openForWriteTest {
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertNotSame(committed, write);
         assertFalse(write.isCommitted);
         assertFalse(write.isPermanent);

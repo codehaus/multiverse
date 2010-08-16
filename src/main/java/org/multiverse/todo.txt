@@ -103,12 +103,6 @@ todo
 
 - atomic inc on refs for values
 
-- array transaction and 'needtocommit'
-
-- array tree transaction and 'needstocommit'
-
-- needs to commit on openForWrite on monobetatransaction is not complete
-
 - unshared atomicget, with periodic atomicset.
 
 - mono transaction can do a cheap read of the current tranlocal already is permanent.
@@ -208,13 +202,9 @@ globalconflict counter.
 - idea for the array, arraytree: keep seperate read/write buffer? This makes committing and preparing cheaper
 since you don't need to look at the reads/
 
+- testing: check if stuff is attached.
+
 done
-
-- invisible checked exception should be moved to ap.exceptions
-
-- lean mono speculative & non automatic readtracking not possible.
-
-- stresstest for read consistency and partial readtracking
 
 
 old done
@@ -294,4 +284,14 @@ old done
 
 - add project to multiverse git
 
+- do you really need 'needstocommit'?
 
+- array transaction and 'needtocommit'
+
+- array tree transaction and 'needstocommit'
+
+- invisible checked exception should be moved to ap.exceptions
+
+- lean mono speculative & non automatic readtracking not possible.
+
+- stresstest for read consistency and partial readtracking

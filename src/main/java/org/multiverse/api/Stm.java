@@ -15,6 +15,28 @@ package org.multiverse.api;
 public interface Stm {
 
     /**
+     * Starts a default Transaction that is useful for testing/experimentation purposes. This method is purely
+     * for easy to use access, but doesn't provide any configuration options. See the
+     * {@link #getTransactionFactoryBuilder()} for something more configurable.
+     * <p/>
+     * Transactions returned by this method are not speculative.
+     *
+     * @return the started default Transaction.
+     */    
+    Transaction startDefaultTransaction();
+
+    /**
+     * Returns the default atomic block that is useful for testing/experimentation purposes. This method is purely
+     * for easy to use access, but it doesn't provide any configuration options. See the
+     * {@link #getTransactionFactoryBuilder()} for something more configurable.
+     * <p/>
+     * Transactions used in this Block are not speculative.
+     *
+     * @return the default AtomicBlock.
+     */
+    AtomicBlock getDefaultAtomicBlock();
+
+    /**
      * Gets the {@link TransactionFactoryBuilder} that needs to be used to execute transactions on this Stm. See the
      * {@link TransactionFactoryBuilder} for more info.
      *

@@ -82,7 +82,6 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
         assertHasNoNormalListeners(tx);
         assertHasNoPermanentListeners(tx);
         assertEquals(1, tx.getAttempt());
-        assertNeedsNoRealClose(tx);
         assertFalse((Boolean) getField(tx, "hasReads"));
         assertFalse((Boolean) getField(tx, "hasUntrackedReads"));
     }
@@ -98,7 +97,6 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
         tx.hardReset(pool);
 
         assertActive(tx);
-        assertNeedsNoRealClose(tx);
         assertHasNoNormalListeners(tx);
         assertHasNoPermanentListeners(tx);
         assertEquals(1, tx.getAttempt());
@@ -114,7 +112,6 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
 
         assertEquals(1, tx.getAttempt());
         assertActive(tx);
-        assertNeedsNoRealClose(tx);
         assertHasNoNormalListeners(tx);
         assertHasNoPermanentListeners(tx);
         assertEquals(Long.MAX_VALUE, tx.getRemainingTimeoutNs());
@@ -130,7 +127,6 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
 
         assertEquals(1, tx.getAttempt());
         assertActive(tx);
-        assertNeedsNoRealClose(tx);
         verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
         assertHasNoNormalListeners(tx);
         assertHasNoPermanentListeners(tx);
@@ -146,7 +142,6 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
         tx.hardReset(pool);
 
         assertActive(tx);
-        assertNeedsNoRealClose(tx);
         assertEquals(1, tx.getAttempt());
         verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
         assertHasNoNormalListeners(tx);
@@ -162,7 +157,6 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
         tx.hardReset(pool);
         assertEquals(1, tx.getAttempt());
         assertActive(tx);
-        assertNeedsNoRealClose(tx);
         assertHasNoNormalListeners(tx);
         assertHasNoPermanentListeners(tx);
         assertEquals(Long.MAX_VALUE, tx.getRemainingTimeoutNs());
@@ -176,7 +170,6 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
         tx.hardReset(pool);
         assertEquals(1, tx.getAttempt());
         assertActive(tx);
-        assertNeedsNoRealClose(tx);
         assertHasNoNormalListeners(tx);
         assertHasNoPermanentListeners(tx);
         assertEquals(Long.MAX_VALUE, tx.getRemainingTimeoutNs());

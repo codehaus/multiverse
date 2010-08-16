@@ -66,7 +66,6 @@ public class FatArrayBetaTransaction_hardResetTest {
 
     private static void assertWasHardReset(FatArrayBetaTransaction tx) {
         assertActive(tx);
-        assertNeedsNoRealClose(tx);
         assertHasNoNormalListeners(tx);
         assertHasNoPermanentListeners(tx);
         assertEquals(1, tx.getAttempt());

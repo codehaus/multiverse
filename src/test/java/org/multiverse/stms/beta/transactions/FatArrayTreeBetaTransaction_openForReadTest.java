@@ -41,7 +41,6 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
 
         assertNull(result);
         assertActive(tx);
-        assertNeedsNoRealClose(tx);
     }
 
     @Test
@@ -57,7 +56,6 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         LongRefTranlocal tranlocal = tx.openForRead(ref, false, pool);
 
         assertActive(tx);
-        assertNeedsNoRealClose(tx);
         assertSame(committed, tranlocal);
         assertNull(tx.get(ref));
         assertTrue((Boolean) getField(tx, "hasReads"));
@@ -76,7 +74,6 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertSame(committed, read);
         assertSurplus(1, ref.getOrec());
         assertUnlocked(ref.getOrec());
@@ -97,7 +94,6 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
 
         assertActive(tx);
-        assertNeedsNoRealClose(tx);
         assertSame(committed, read);
         assertSurplus(1, ref);
         assertUnlocked(ref);
@@ -117,7 +113,6 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         LongRefTranlocal read2 = tx.openForRead(ref, false, pool);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertSame(read1, read2);
         assertUnlocked(ref.getOrec());
         assertUpdateBiased(ref.getOrec());
@@ -134,7 +129,6 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertSame(write, read);
         assertUnlocked(ref);
         assertUpdateBiased(ref);
@@ -147,7 +141,7 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         LongRef ref = createLongRef(stm);
         Tranlocal committed = ref.unsafeLoad();
 
-        BetaTransaction otherTx = stm.start();
+        BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, true, pool);
 
         FatArrayTreeBetaTransaction tx2 = new FatArrayTreeBetaTransaction(stm);
@@ -175,7 +169,6 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         LongRefTranlocal read = tx.openForRead(ref, true, pool);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertSame(committed, read);
         assertLocked(ref);
         assertSame(tx, ref.getLockOwner());
@@ -193,7 +186,6 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         LongRefTranlocal read2 = tx.openForRead(ref, true, pool);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertSame(read1, read2);
         assertSame(committed, read2);
         assertLocked(ref);
@@ -264,7 +256,6 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertSame(committed, read);
         assertUnlocked(ref);
         assertNull(ref.getLockOwner());
@@ -282,7 +273,6 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertSame(construction, read);
         assertLocked(ref);
         assertUpdateBiased(ref);
@@ -300,7 +290,6 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         LongRefTranlocal read = tx.openForRead(ref, true, pool);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertSame(construction, read);
         assertNull(ref.unsafeLoad());
         assertLocked(ref);
@@ -325,7 +314,6 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
 
         assertEquals(tx.getLocalConflictCounter().get(), stm.getGlobalConflictCounter().count());
         assertActive(tx);
-        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -372,7 +360,6 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         assertFalse(oldLocalConflictCounter == stm.getGlobalConflictCounter().count());
         assertEquals(tx.getLocalConflictCounter().get(), stm.getGlobalConflictCounter().count());
         assertActive(tx);
-        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -393,8 +380,7 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         tx.openForRead(ref2, false, pool);
 
         assertEquals(oldLocalConflictCount, tx.getLocalConflictCounter().get());
-        assertActive(tx);
-        assertNeedsRealClose(tx);
+        assertActive(tx);        
     }
 
     @Test
@@ -411,7 +397,6 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         LongRefTranlocal read = tx.openForWrite(ref, false, pool);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertSame(commuting, read);
         assertSame(committed, read.read);
         assertFalse(read.isCommuting);
@@ -461,7 +446,6 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
 
         assertEquals(stm.getGlobalConflictCounter().count(), tx.getLocalConflictCounter().get());
         assertActive(tx);
-        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -480,7 +464,6 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
 
         assertEquals(localConflictCount, tx.getLocalConflictCounter().get());
         assertActive(tx);
-        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -505,7 +488,6 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         tx.openForRead(ref3, false, pool);
         assertEquals(stm.getGlobalConflictCounter().count(), tx.getLocalConflictCounter().get());
         assertActive(tx);
-        assertNeedsRealClose(tx);
     }
 
     @Test

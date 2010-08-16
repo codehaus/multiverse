@@ -31,7 +31,7 @@ public class LongRef_alterTest {
         };
 
         LongRef ref = createLongRef(stm, 100);
-        BetaTransaction tx = stm.start();
+        BetaTransaction tx = stm.startDefaultTransaction();
         long result = ref.alter(tx, pool, function);
         tx.commit();
 

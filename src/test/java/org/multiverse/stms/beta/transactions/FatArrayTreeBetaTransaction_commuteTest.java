@@ -41,7 +41,6 @@ public class FatArrayTreeBetaTransaction_commuteTest {
         tx.commute(ref, pool, function);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
         assertNotNull(tranlocal);
         assertSame(ref, tranlocal.owner);
@@ -67,7 +66,6 @@ public class FatArrayTreeBetaTransaction_commuteTest {
         tx.commute(ref, pool, function2);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
 
         assertNotNull(tranlocal);
@@ -93,7 +91,6 @@ public class FatArrayTreeBetaTransaction_commuteTest {
 
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertFalse(tranlocal.isCommuting);
         assertFalse(tranlocal.isCommitted);
         assertSame(read, tranlocal.read);
@@ -114,7 +111,6 @@ public class FatArrayTreeBetaTransaction_commuteTest {
         tx.commute(ref, pool, new IncLongFunction());
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertSame(ref, tranlocal.owner);
         assertFalse(tranlocal.isCommuting);
         assertFalse(tranlocal.isCommitted);
@@ -142,7 +138,6 @@ public class FatArrayTreeBetaTransaction_commuteTest {
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertSame(ref, tranlocal.owner);
         assertFalse(tranlocal.isCommuting);
         assertFalse(tranlocal.isCommitted);
@@ -164,7 +159,7 @@ public class FatArrayTreeBetaTransaction_commuteTest {
     public void whenLocked_thenNoProblem() {
         LongRef ref = createLongRef(stm);
 
-        BetaTransaction otherTx = stm.start();
+        BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, true, pool);
 
         LongFunction function = mock(LongFunction.class);
@@ -174,7 +169,6 @@ public class FatArrayTreeBetaTransaction_commuteTest {
         LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
 
         assertActive(tx);
-        assertNeedsRealClose(tx);
         assertTrue(commuting.isCommuting);
         assertFalse(commuting.isCommitted);
         assertNull(commuting.read);
