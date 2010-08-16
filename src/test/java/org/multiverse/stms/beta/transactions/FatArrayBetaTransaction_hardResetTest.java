@@ -66,12 +66,12 @@ public class FatArrayBetaTransaction_hardResetTest {
 
     private static void assertWasHardReset(FatArrayBetaTransaction tx) {
         assertActive(tx);
+        assertNeedsNoRealClose(tx);
         assertHasNoNormalListeners(tx);
         assertHasNoPermanentListeners(tx);
         assertEquals(1, tx.getAttempt());
         assertFalse((Boolean) getField(tx, "hasReads"));
-        //todo: needs to be enabled as soon as the non automatic readtracking is added
-        //assertFalse((Boolean) getField(tx, "hasUntrackedReads"));
+        assertFalse((Boolean) getField(tx, "hasUntrackedReads"));
     }
 
     @Test

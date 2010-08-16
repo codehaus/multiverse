@@ -33,6 +33,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
     private int size;
     private boolean hasReads;
     private boolean hasUntrackedReads;
+    private boolean needsRealClose;
 
     public LeanArrayTreeBetaTransaction(BetaStm stm) {
         this(new BetaTransactionConfig(stm));
@@ -119,7 +120,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
         final int identityHashCode = ref.identityHashCode();
         int index = findAttachedIndex(ref, identityHashCode);
-        if (index>-1) {
+        if (index > -1) {
             //we are lucky, at already is attached to the session
             RefTranlocal<E> found = (RefTranlocal<E>)array[index];
 
@@ -147,6 +148,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
                 throw abortOnReadConflict(pool);
             }
 
+            if(lock || !found.isPermanent){
+                needsRealClose = true;
+            }
+
             return found;
         }
 
@@ -166,6 +171,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if (hasReadConflict()) {
             ref.abort(this, read, pool);
             throw abortOnReadConflict(pool);
+        }
+
+        if(lock || !read.isPermanent){
+            needsRealClose = true;                     
         }
 
         if(lock || !read.isPermanent || config.trackReads){
@@ -245,6 +254,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
                 return result;
             }
 
+            needsRealClose = true;
             //it was opened for reading so we need to open it for writing.
             result = result.openForWrite(pool);
             array[index]=result;
@@ -270,6 +280,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict(pool);
         }
 
+        needsRealClose = true;
+
         //open the tranlocal for writing.
         RefTranlocal<E> result =  pool.take(ref);
         if(result == null){
@@ -279,7 +291,6 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         result.value = read.value;
         attach(ref, result, identityHashCode, pool);
         size++;
-
         return result;
     }
 
@@ -337,6 +348,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
                     config.familyName, ref.getClass().getName()));
         }
 
+        needsRealClose = true;
+
         RefTranlocal<E> result =  pool.take(ref);
         if(result == null){
             result = new RefTranlocal<E>(ref);
@@ -383,6 +396,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             attach(ref, result, identityHashCode, pool);
             result.addCommutingFunction(function, pool);
             size++;
+            needsRealClose = true;
             return;
         }
 
@@ -392,6 +406,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             return;
         }
 
+        needsRealClose = true;
         if(result.isCommitted){
             RefTranlocal<E> read = result;
             result =  pool.take(ref);
@@ -439,7 +454,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
         final int identityHashCode = ref.identityHashCode();
         int index = findAttachedIndex(ref, identityHashCode);
-        if (index>-1) {
+        if (index > -1) {
             //we are lucky, at already is attached to the session
             IntRefTranlocal found = (IntRefTranlocal)array[index];
 
@@ -467,6 +482,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
                 throw abortOnReadConflict(pool);
             }
 
+            if(lock || !found.isPermanent){
+                needsRealClose = true;
+            }
+
             return found;
         }
 
@@ -486,6 +505,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if (hasReadConflict()) {
             ref.abort(this, read, pool);
             throw abortOnReadConflict(pool);
+        }
+
+        if(lock || !read.isPermanent){
+            needsRealClose = true;                     
         }
 
         if(lock || !read.isPermanent || config.trackReads){
@@ -565,6 +588,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
                 return result;
             }
 
+            needsRealClose = true;
             //it was opened for reading so we need to open it for writing.
             result = result.openForWrite(pool);
             array[index]=result;
@@ -590,6 +614,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict(pool);
         }
 
+        needsRealClose = true;
+
         //open the tranlocal for writing.
         IntRefTranlocal result =  pool.take(ref);
         if(result == null){
@@ -599,7 +625,6 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         result.value = read.value;
         attach(ref, result, identityHashCode, pool);
         size++;
-
         return result;
     }
 
@@ -657,6 +682,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
                     config.familyName, ref.getClass().getName()));
         }
 
+        needsRealClose = true;
+
         IntRefTranlocal result =  pool.take(ref);
         if(result == null){
             result = new IntRefTranlocal(ref);
@@ -703,6 +730,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             attach(ref, result, identityHashCode, pool);
             result.addCommutingFunction(function, pool);
             size++;
+            needsRealClose = true;
             return;
         }
 
@@ -712,6 +740,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             return;
         }
 
+        needsRealClose = true;
         if(result.isCommitted){
             IntRefTranlocal read = result;
             result =  pool.take(ref);
@@ -759,7 +788,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
         final int identityHashCode = ref.identityHashCode();
         int index = findAttachedIndex(ref, identityHashCode);
-        if (index>-1) {
+        if (index > -1) {
             //we are lucky, at already is attached to the session
             LongRefTranlocal found = (LongRefTranlocal)array[index];
 
@@ -787,6 +816,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
                 throw abortOnReadConflict(pool);
             }
 
+            if(lock || !found.isPermanent){
+                needsRealClose = true;
+            }
+
             return found;
         }
 
@@ -806,6 +839,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if (hasReadConflict()) {
             ref.abort(this, read, pool);
             throw abortOnReadConflict(pool);
+        }
+
+        if(lock || !read.isPermanent){
+            needsRealClose = true;                     
         }
 
         if(lock || !read.isPermanent || config.trackReads){
@@ -885,6 +922,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
                 return result;
             }
 
+            needsRealClose = true;
             //it was opened for reading so we need to open it for writing.
             result = result.openForWrite(pool);
             array[index]=result;
@@ -910,6 +948,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict(pool);
         }
 
+        needsRealClose = true;
+
         //open the tranlocal for writing.
         LongRefTranlocal result =  pool.take(ref);
         if(result == null){
@@ -919,7 +959,6 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         result.value = read.value;
         attach(ref, result, identityHashCode, pool);
         size++;
-
         return result;
     }
 
@@ -977,6 +1016,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
                     config.familyName, ref.getClass().getName()));
         }
 
+        needsRealClose = true;
+
         LongRefTranlocal result =  pool.take(ref);
         if(result == null){
             result = new LongRefTranlocal(ref);
@@ -1023,6 +1064,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             attach(ref, result, identityHashCode, pool);
             result.addCommutingFunction(function, pool);
             size++;
+            needsRealClose = true;
             return;
         }
 
@@ -1032,6 +1074,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             return;
         }
 
+        needsRealClose = true;
         if(result.isCommitted){
             LongRefTranlocal read = result;
             result =  pool.take(ref);
@@ -1079,7 +1122,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
         final int identityHashCode = ref.identityHashCode();
         int index = findAttachedIndex(ref, identityHashCode);
-        if (index>-1) {
+        if (index > -1) {
             //we are lucky, at already is attached to the session
             Tranlocal found = (Tranlocal)array[index];
 
@@ -1107,6 +1150,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
                 throw abortOnReadConflict(pool);
             }
 
+            if(lock || !found.isPermanent){
+                needsRealClose = true;
+            }
+
             return found;
         }
 
@@ -1126,6 +1173,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if (hasReadConflict()) {
             ref.abort(this, read, pool);
             throw abortOnReadConflict(pool);
+        }
+
+        if(lock || !read.isPermanent){
+            needsRealClose = true;                     
         }
 
         if(lock || !read.isPermanent || config.trackReads){
@@ -1205,6 +1256,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
                 return result;
             }
 
+            needsRealClose = true;
             //it was opened for reading so we need to open it for writing.
             result = result.openForWrite(pool);
             array[index]=result;
@@ -1230,11 +1282,12 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict(pool);
         }
 
+        needsRealClose = true;
+
         //open the tranlocal for writing.
         Tranlocal result = read.openForWrite(pool);
         attach(ref, result, identityHashCode, pool);
         size++;
-
         return result;
     }
 
@@ -1292,6 +1345,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
                     config.familyName, ref.getClass().getName()));
         }
 
+        needsRealClose = true;
+
         Tranlocal result = ref.openForConstruction(pool);
         attach(ref, result, identityHashCode, pool);
         size++;
@@ -1335,6 +1390,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             attach(ref, result, identityHashCode, pool);
             result.addCommutingFunction(function, pool);
             size++;
+            needsRealClose = true;
             return;
         }
 
@@ -1344,6 +1400,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             return;
         }
 
+        needsRealClose = true;
         if(result.isCommitted){
             Tranlocal read = result;
             result = read.openForWrite(pool);
@@ -1471,13 +1528,15 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             case ACTIVE:
                 //fall through
             case PREPARED:
-                for (int k = 0; k < array.length; k++) {
-                    Tranlocal tranlocal = array[k];
-                    if(tranlocal != null){
-                        tranlocal.owner.abort(this, tranlocal, pool);
+                if(needsRealClose){
+                    for (int k = 0; k < array.length; k++) {
+                        Tranlocal tranlocal = array[k];
+                        if(tranlocal != null){
+                            tranlocal.owner.abort(this, tranlocal, pool);
+                        }
                     }
                 }
-              status = ABORTED;
+                status = ABORTED;
 
               break;
           case ABORTED:
@@ -1515,19 +1574,21 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnWriteConflict(pool);
         }
 
-        Listeners[] listenersArray;
-        if(config.dirtyCheck){
-            if(status == ACTIVE && !doPrepareDirty(pool)){
-                throw abortOnWriteConflict(pool);
-            }
+        Listeners[] listenersArray = null;
+        if(needsRealClose){
+            if(config.dirtyCheck){
+                if(status == ACTIVE && !doPrepareDirty(pool)){
+                    throw abortOnWriteConflict(pool);
+                }
 
-            listenersArray = commitDirty(pool);
-        }else{
-            if(status == ACTIVE && !doPrepareAll(pool)){
-                throw abortOnWriteConflict(pool);
-            }
+                listenersArray = commitDirty(pool);
+            }else{
+                if(status == ACTIVE && !doPrepareAll(pool)){
+                    throw abortOnWriteConflict(pool);
+                }
 
-            listenersArray = commitAll(pool);
+                listenersArray = commitAll(pool);
+            }
         }
         status = COMMITTED;
 
@@ -1617,13 +1678,15 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnWriteConflict(pool);
         }
 
-        if(config.dirtyCheck){
-            if(!doPrepareDirty(pool)){
-                throw abortOnWriteConflict(pool);
-            }
-        }else{
-            if(!doPrepareAll(pool)){
-                throw abortOnWriteConflict(pool);
+        if(needsRealClose){
+            if(config.dirtyCheck){
+                if(!doPrepareDirty(pool)){
+                    throw abortOnWriteConflict(pool);
+                }
+            }else{
+                if(!doPrepareAll(pool)){
+                    throw abortOnWriteConflict(pool);
+                }
             }
         }
 
@@ -1794,6 +1857,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         abortOnly = false;
         hasReads = false;
         hasUntrackedReads = false;
+        needsRealClose = false;
         size = 0;
         attempt++;
         return true;
@@ -1821,13 +1885,13 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         }
 
         status = ACTIVE;
+        needsRealClose = false;
         abortOnly = false;
         hasReads = false;
         hasUntrackedReads = false;
         attempt = 1;
         remainingTimeoutNs = config.timeoutNs;
         size = 0;
-
     }
 
     // ============================== init =======================================

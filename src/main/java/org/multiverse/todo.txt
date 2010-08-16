@@ -205,6 +205,9 @@ globalconflict counter.
 
 - lean mono should not upgrade to array when untracked read is done, but should just attach it to the session.
 
+- idea for the array, arraytree: keep seperate read/write buffer? This makes committing and preparing cheaper
+since you don't need to look at the reads/
+
 done
 
 - invisible checked exception should be moved to ap.exceptions

@@ -34,6 +34,7 @@ public class FatMonoBetaTransaction_openForConstructionTest {
         LongRefTranlocal write = tx.openForConstruction(ref, pool);
 
         assertActive(tx);
+        assertNeedsRealClose(tx);
         assertNotNull(write);
         assertEquals(0, write.value);
         assertSame(ref, write.owner);
@@ -109,6 +110,7 @@ public class FatMonoBetaTransaction_openForConstructionTest {
 
         assertSame(write1, write2);
         assertActive(tx);
+        assertNeedsRealClose(tx);
         assertNotNull(write2);
         assertEquals(0, write2.value);
         assertSame(ref, write2.owner);
@@ -182,6 +184,7 @@ public class FatMonoBetaTransaction_openForConstructionTest {
         } catch (ReadonlyException expected) {
         }
 
+        assertAborted(tx);
         assertUnlocked(ref);
         assertSame(committed, ref.unsafeLoad());
         assertNull(ref.getLockOwner());
@@ -201,6 +204,7 @@ public class FatMonoBetaTransaction_openForConstructionTest {
 
         assertEquals(stm.getGlobalConflictCounter().count(), tx.getLocalConflictCounter().get());
         assertActive(tx);
+        assertNeedsRealClose(tx);
     }
 
     @Test

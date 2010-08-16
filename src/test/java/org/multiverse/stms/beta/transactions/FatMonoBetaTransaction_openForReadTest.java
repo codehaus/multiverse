@@ -1,6 +1,5 @@
 package org.multiverse.stms.beta.transactions;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -52,7 +51,9 @@ public class FatMonoBetaTransaction_openForReadTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
         LongRefTranlocal tranlocal = tx.openForRead(ref, false, pool);
 
-        Assert.assertSame(committed, tranlocal);
+        assertActive(tx);
+        assertNeedsNoRealClose(tx);
+        assertSame(committed, tranlocal);
         assertNull(tx.get(ref));
         assertTrue((Boolean) getField(tx, "hasReads"));
         assertTrue((Boolean) getField(tx, "hasUntrackedReads"));
@@ -65,8 +66,10 @@ public class FatMonoBetaTransaction_openForReadTest {
     public void whenNull() {
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         Tranlocal result = tx.openForRead((LongRef) null, true, pool);
+
         assertNull(result);
         assertActive(tx);
+        assertNeedsNoRealClose(tx);
     }
 
     @Test
@@ -97,6 +100,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
 
         assertActive(tx);
+        assertNeedsRealClose(tx);
         assertSame(committed, read);
         assertSurplus(1, ref.getOrec());
         assertUnlocked(ref.getOrec());
@@ -117,6 +121,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
 
         assertActive(tx);
+        assertNeedsNoRealClose(tx);
         assertSame(committed, read);
         assertSurplus(1, ref);
         assertUnlocked(ref);
@@ -135,6 +140,8 @@ public class FatMonoBetaTransaction_openForReadTest {
         LongRefTranlocal read1 = tx.openForRead(ref, false, pool);
         LongRefTranlocal read2 = tx.openForRead(ref, false, pool);
 
+        assertActive(tx);
+        assertNeedsRealClose(tx);
         assertSame(read1, read2);
         assertUnlocked(ref.getOrec());
         assertUpdateBiased(ref.getOrec());
@@ -150,6 +157,8 @@ public class FatMonoBetaTransaction_openForReadTest {
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
 
+        assertActive(tx);
+        assertNeedsRealClose(tx);
         assertSame(write, read);
         assertUnlocked(ref);
         assertUpdateBiased(ref);
@@ -164,6 +173,8 @@ public class FatMonoBetaTransaction_openForReadTest {
         LongRefTranlocal construction = tx.openForConstruction(ref, pool);
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
 
+        assertActive(tx);
+        assertNeedsRealClose(tx);
         assertSame(construction, read);
         assertLocked(ref);
         assertUpdateBiased(ref);
@@ -180,6 +191,8 @@ public class FatMonoBetaTransaction_openForReadTest {
 
         LongRefTranlocal read = tx.openForRead(ref, true, pool);
 
+        assertActive(tx);
+        assertNeedsRealClose(tx);
         assertSame(construction, read);
         assertNull(ref.unsafeLoad());
         assertLocked(ref);
@@ -221,6 +234,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         LongRefTranlocal read = tx.openForRead(ref, true, pool);
 
         assertActive(tx);
+        assertNeedsRealClose(tx);
         assertSame(committed, read);
         assertLocked(ref);
         assertSame(tx, ref.getLockOwner());
@@ -238,6 +252,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         LongRefTranlocal read2 = tx.openForRead(ref, true, pool);
 
         assertActive(tx);
+        assertNeedsRealClose(tx);
         assertSame(read1, read2);
         assertSame(committed, read2);
         assertLocked(ref);
@@ -285,6 +300,8 @@ public class FatMonoBetaTransaction_openForReadTest {
         BetaTransaction tx = new FatMonoBetaTransaction(config);
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
 
+        assertActive(tx);
+        assertNeedsRealClose(tx);
         assertSame(committed, read);
         assertLocked(ref);
         assertSame(tx, ref.getLockOwner());
@@ -304,6 +321,8 @@ public class FatMonoBetaTransaction_openForReadTest {
         BetaTransaction tx = new FatMonoBetaTransaction(config);
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
 
+        assertActive(tx);
+        assertNeedsRealClose(tx);
         assertSame(committed, read);
         assertUnlocked(ref);
         assertNull(ref.getLockOwner());

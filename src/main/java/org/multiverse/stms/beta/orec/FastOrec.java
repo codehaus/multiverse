@@ -17,6 +17,16 @@ import static java.lang.String.format;
  * transactions are forced to do a read conflict scan the next time they do a read (or a write since that
  * also requires a read to get the initial value).
  *
+ * Each transaction needs to track all reads (and of course all writes). To prevent contention on orecs that
+ * mostly are read, an orec can become readonly after a certain number of only reads are done. Once this happens
+ * additional arrives/departs are ignored. When an update happens on a readbiased orec, it will always cause
+ * a conflict on the global conflict counter and even if a transaction didn't read that orec at all, it will need
+ * to do a conflict scan.
+ *
+ * Another advantage of this approach is that transaction don't need to track all reads anymore; once something
+ * has become read biased, it depends on the transaction setting trackReads if the read still is tracked. The
+ * disadvantage for these transactions is that they can't recover from a change in the global conflict counter. 
+ *
  * Layout:
  * In total 64 bits
  * 0: bit contains lock
@@ -30,7 +40,7 @@ public final class FastOrec implements Orec {
 
     //it is important that the maximum threshold is not larger than 1023 (there are 10 bits for
     //the readonly count)
-    public final static int READ_THRESHOLD = 3;
+    public final static int READ_THRESHOLD = 16;
 
     private final AtomicLong state = new AtomicLong(0);
 

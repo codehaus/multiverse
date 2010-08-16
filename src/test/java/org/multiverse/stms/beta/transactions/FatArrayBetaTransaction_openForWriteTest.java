@@ -1,6 +1,5 @@
 package org.multiverse.stms.beta.transactions;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -129,6 +128,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
 
         assertActive(tx);
+        assertNeedsRealClose(tx);
         assertNull(ref.getLockOwner());
         assertReadBiased(ref);
         assertSurplus(1, ref);
@@ -153,6 +153,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         LongRefTranlocal write = tx.openForWrite(ref, true, pool);
 
         assertActive(tx);
+        assertNeedsRealClose(tx);
         assertSame(tx, ref.getLockOwner());
         assertReadBiased(ref);
         assertSurplus(1, ref);
@@ -176,6 +177,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
 
         assertActive(tx);
+        assertNeedsRealClose(tx);
         assertNull(ref.getLockOwner());
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
@@ -200,6 +202,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         LongRefTranlocal write = tx.openForWrite(ref, true, pool);
 
         assertActive(tx);
+        assertNeedsRealClose(tx);
         assertSame(tx, ref.getLockOwner());
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
@@ -223,6 +226,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
 
         assertNotNull(write);
+        assertNeedsRealClose(tx);
         assertNotSame(read, write);
         assertSame(read, write.read);
         assertEquals(100, write.value);
@@ -245,15 +249,16 @@ public class FatArrayBetaTransaction_openForWriteTest {
         constructed.value = 100;
         Tranlocal write = tx.openForWrite(ref, false, pool);
 
-        Assert.assertSame(constructed, write);
+        assertActive(tx);
+        assertNeedsRealClose(tx);
+        assertSame(constructed, write);
         assertEquals(100, constructed.value);
         assertFalse(constructed.isCommitted);
         assertFalse(constructed.isPermanent);
         assertLocked(ref.getOrec());
-        Assert.assertSame(tx, ref.getLockOwner());
+        assertSame(tx, ref.getLockOwner());
         assertSurplus(1, ref.getOrec());
         assertUpdateBiased(ref.getOrec());
-        assertActive(tx);
         assertNull(ref.unsafeLoad());
     }
 
@@ -265,15 +270,16 @@ public class FatArrayBetaTransaction_openForWriteTest {
         constructed.value = 100;
         Tranlocal write = tx.openForWrite(ref, true, pool);
 
-        Assert.assertSame(constructed, write);
+        assertActive(tx);
+        assertNeedsRealClose(tx);
+        assertSame(constructed, write);
         assertEquals(100, constructed.value);
         assertFalse(constructed.isCommitted);
         assertFalse(constructed.isPermanent);
         assertLocked(ref.getOrec());
-        Assert.assertSame(tx, ref.getLockOwner());
+        assertSame(tx, ref.getLockOwner());
         assertSurplus(1, ref.getOrec());
         assertUpdateBiased(ref.getOrec());
-        assertActive(tx);
         assertNull(ref.unsafeLoad());
     }
 
@@ -325,8 +331,10 @@ public class FatArrayBetaTransaction_openForWriteTest {
         tx.openForRead(ref, false, pool);
         Tranlocal tranlocal = tx.openForWrite(ref, false, pool);
 
+        assertActive(tx);
         assertOpenedForWrite(ref, tranlocal);
         assertFalse(ref.getOrec().isLocked());
+        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -356,6 +364,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
 
         assertSame(write1, write2);
         assertActive(tx);
+        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -370,6 +379,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         Tranlocal write3 = tx.openForWrite(ref3, false, pool);
 
         assertActive(tx);
+        assertNeedsRealClose(tx);
         assertOpenedForWrite(ref1, write1);
         assertOpenedForWrite(ref2, write2);
         assertOpenedForWrite(ref3, write3);
@@ -385,12 +395,14 @@ public class FatArrayBetaTransaction_openForWriteTest {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
 
+        assertActive(tx);
+        assertNeedsRealClose(tx);
         assertNotSame(committed, write);
         assertFalse(write.isCommitted);
         assertFalse(write.isPermanent);
         assertSame(committed, write.read);
         assertLocked(ref);
-        Assert.assertSame(tx, ref.getLockOwner());
+        assertSame(tx, ref.getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
     }
@@ -405,12 +417,14 @@ public class FatArrayBetaTransaction_openForWriteTest {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
 
+        assertActive(tx);
+        assertNeedsRealClose(tx);
         assertNotSame(committed, write);
         assertFalse(write.isCommitted);
         assertFalse(write.isPermanent);
         assertSame(committed, write.read);
         assertLocked(ref);
-        Assert.assertSame(tx, ref.getLockOwner());
+        assertSame(tx, ref.getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
     }
@@ -438,6 +452,8 @@ public class FatArrayBetaTransaction_openForWriteTest {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.openForWrite(ref, false, pool);
 
+        assertActive(tx);
+        assertNeedsRealClose(tx);
         assertSame(committed, ref.unsafeLoad());
         assertReadBiased(ref);
         assertSurplus(1, ref);
@@ -456,6 +472,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
 
         assertEquals(stm.getGlobalConflictCounter().count(), tx.getLocalConflictCounter().get());
         assertActive(tx);
+        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -474,6 +491,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
 
         assertEquals(localConflictCount, tx.getLocalConflictCounter().get());
         assertActive(tx);
+        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -497,7 +515,9 @@ public class FatArrayBetaTransaction_openForWriteTest {
         stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
         tx.openForWrite(ref3, false, pool);
         assertEquals(stm.getGlobalConflictCounter().count(), tx.getLocalConflictCounter().get());
+
         assertActive(tx);
+        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -553,6 +573,8 @@ public class FatArrayBetaTransaction_openForWriteTest {
         tx.openForWrite(ref2, false, pool);
 
         assertEquals(oldLocalConflictCount, tx.getLocalConflictCounter().get());
+        assertActive(tx);
+        assertNeedsRealClose(tx);
     }
 
     @Test

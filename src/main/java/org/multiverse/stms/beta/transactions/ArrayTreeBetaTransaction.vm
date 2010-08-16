@@ -34,6 +34,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     private int size;
     private boolean hasReads;
     private boolean hasUntrackedReads;
+    private boolean needsRealClose;
 
     public ${transaction.name}(BetaStm stm) {
         this(new BetaTransactionConfig(stm));
@@ -121,7 +122,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         final int identityHashCode = ref.identityHashCode();
         int index = findAttachedIndex(ref, identityHashCode);
-        if (index>-1) {
+        if (index > -1) {
             //we are lucky, at already is attached to the session
             ${ref.tranlocal}${ref.typeParameter} found = (${ref.tranlocal}${ref.typeParameter})array[index];
 
@@ -149,6 +150,10 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 throw abortOnReadConflict(pool);
             }
 
+            if(lock || !found.isPermanent){
+                needsRealClose = true;
+            }
+
             return found;
         }
 
@@ -168,6 +173,10 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         if (hasReadConflict()) {
             ref.abort(this, read, pool);
             throw abortOnReadConflict(pool);
+        }
+
+        if(lock || !read.isPermanent){
+            needsRealClose = true;                     
         }
 
         if(lock || !read.isPermanent || config.trackReads){
@@ -247,6 +256,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 return result;
             }
 
+            needsRealClose = true;
             //it was opened for reading so we need to open it for writing.
 #if($ref.isSpecialized)
             ${ref.tranlocal}${ref.typeParameter} read = result;
@@ -283,6 +293,8 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOnReadConflict(pool);
         }
 
+        needsRealClose = true;
+
         //open the tranlocal for writing.
 #if($ref.isSpecialization())
         ${ref.tranlocal}${ref.typeParameter} result =  pool.take(ref);
@@ -296,7 +308,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end
         attach(ref, result, identityHashCode, pool);
         size++;
-
         return result;
     }
 
@@ -354,6 +365,8 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                     config.familyName, ref.getClass().getName()));
         }
 
+        needsRealClose = true;
+
 #if($ref.isSpecialization())
         ${ref.tranlocal}${ref.typeParameter} result =  pool.take(ref);
         if(result == null){
@@ -404,6 +417,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             attach(ref, result, identityHashCode, pool);
             result.addCommutingFunction(function, pool);
             size++;
+            needsRealClose = true;
             return;
         }
 
@@ -413,6 +427,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             return;
         }
 
+        needsRealClose = true;
         if(result.isCommitted){
             ${ref.tranlocal}${ref.typeParameter} read = result;
 #if($ref.isSpecialization())
@@ -554,13 +569,15 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             case ACTIVE:
                 //fall through
             case PREPARED:
-                for (int k = 0; k < array.length; k++) {
-                    Tranlocal tranlocal = array[k];
-                    if(tranlocal != null){
-                        tranlocal.owner.abort(this, tranlocal, pool);
+                if(needsRealClose){
+                    for (int k = 0; k < array.length; k++) {
+                        Tranlocal tranlocal = array[k];
+                        if(tranlocal != null){
+                            tranlocal.owner.abort(this, tranlocal, pool);
+                        }
                     }
                 }
-              status = ABORTED;
+                status = ABORTED;
 
 #if(!$transaction.lean)
                 if(permanentListeners != null){
@@ -608,19 +625,21 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOnWriteConflict(pool);
         }
 
-        Listeners[] listenersArray;
-        if(config.dirtyCheck){
-            if(status == ACTIVE && !doPrepareDirty(pool)){
-                throw abortOnWriteConflict(pool);
-            }
+        Listeners[] listenersArray = null;
+        if(needsRealClose){
+            if(config.dirtyCheck){
+                if(status == ACTIVE && !doPrepareDirty(pool)){
+                    throw abortOnWriteConflict(pool);
+                }
 
-            listenersArray = commitDirty(pool);
-        }else{
-            if(status == ACTIVE && !doPrepareAll(pool)){
-                throw abortOnWriteConflict(pool);
-            }
+                listenersArray = commitDirty(pool);
+            }else{
+                if(status == ACTIVE && !doPrepareAll(pool)){
+                    throw abortOnWriteConflict(pool);
+                }
 
-            listenersArray = commitAll(pool);
+                listenersArray = commitAll(pool);
+            }
         }
         status = COMMITTED;
 
@@ -637,11 +656,13 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         prepare();
 
-        Listeners[] listenersArray;
-        if(config.dirtyCheck){
-            listenersArray = commitDirty(pool);
-        }else{
-            listenersArray = commitAll(pool);
+        Listeners[] listenersArray = null;
+        if(needsRealClose){
+            if(config.dirtyCheck){
+                listenersArray = commitDirty(pool);
+            }else{
+                listenersArray = commitAll(pool);
+            }
         }
 
         status = COMMITTED;
@@ -742,13 +763,15 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOnWriteConflict(pool);
         }
 
-        if(config.dirtyCheck){
-            if(!doPrepareDirty(pool)){
-                throw abortOnWriteConflict(pool);
-            }
-        }else{
-            if(!doPrepareAll(pool)){
-                throw abortOnWriteConflict(pool);
+        if(needsRealClose){
+            if(config.dirtyCheck){
+                if(!doPrepareDirty(pool)){
+                    throw abortOnWriteConflict(pool);
+                }
+            }else{
+                if(!doPrepareAll(pool)){
+                    throw abortOnWriteConflict(pool);
+                }
             }
         }
 
@@ -787,13 +810,15 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 throw abortOnWriteConflict(pool);
             }
 
-            if(config.dirtyCheck){
-                if(!doPrepareDirty(pool)){
-                    throw abortOnWriteConflict(pool);
-                }
-            }else{
-                if(!doPrepareAll(pool)){
-                    throw abortOnWriteConflict(pool);
+            if(needsRealClose){
+                if(config.dirtyCheck){
+                    if(!doPrepareDirty(pool)){
+                        throw abortOnWriteConflict(pool);
+                    }
+                }else{
+                    if(!doPrepareAll(pool)){
+                        throw abortOnWriteConflict(pool);
+                    }
                 }
             }
 
@@ -980,6 +1005,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         abortOnly = false;
         hasReads = false;
         hasUntrackedReads = false;
+        needsRealClose = false;
         size = 0;
         attempt++;
 #if(!$transaction.lean)
@@ -1012,6 +1038,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         status = ACTIVE;
+        needsRealClose = false;
         abortOnly = false;
         hasReads = false;
         hasUntrackedReads = false;
@@ -1029,7 +1056,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             permanentListeners = null;
         }
 #end
-
     }
 
     // ============================== init =======================================

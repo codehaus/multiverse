@@ -1,6 +1,5 @@
 package org.multiverse.stms.beta.transactions;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -84,6 +83,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
 
         assertActive(tx);
+        assertNeedsRealClose(tx);
         assertNull(ref.getLockOwner());
         assertReadBiased(ref);
         assertSurplus(1, ref);
@@ -108,6 +108,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         LongRefTranlocal write = tx.openForWrite(ref, true, pool);
 
         assertActive(tx);
+        assertNeedsRealClose(tx);
         assertSame(tx, ref.getLockOwner());
         assertReadBiased(ref);
         assertSurplus(1, ref);
@@ -131,6 +132,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
 
         assertActive(tx);
+        assertNeedsRealClose(tx);
         assertNull(ref.getLockOwner());
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
@@ -155,6 +157,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         LongRefTranlocal write = tx.openForWrite(ref, true, pool);
 
         assertActive(tx);
+        assertNeedsRealClose(tx);
         assertSame(tx, ref.getLockOwner());
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
@@ -190,6 +193,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertActive(tx);
+        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -213,6 +217,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertActive(tx);
+        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -236,6 +241,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertActive(tx);
+        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -257,6 +263,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertActive(tx);
+        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -277,6 +284,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertActive(tx);
+        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -298,6 +306,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertActive(tx);
+        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -320,6 +329,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertActive(tx);
+        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -341,6 +351,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertActive(tx);
+        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -362,6 +373,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertActive(tx);
+        assertNeedsRealClose(tx);
     }
 
     @Test
@@ -504,12 +516,14 @@ public class FatMonoBetaTransaction_openForWriteTest {
         BetaTransaction tx = new FatMonoBetaTransaction(config);
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
 
+        assertActive(tx);
+        assertNeedsRealClose(tx);
         assertNotSame(committed, write);
         assertFalse(write.isCommitted);
         assertFalse(write.isPermanent);
         assertSame(committed, write.read);
         assertLocked(ref);
-        Assert.assertSame(tx, ref.getLockOwner());
+        assertSame(tx, ref.getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
     }
@@ -524,6 +538,8 @@ public class FatMonoBetaTransaction_openForWriteTest {
         BetaTransaction tx = new FatMonoBetaTransaction(config);
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
 
+        assertActive(tx);
+        assertNeedsRealClose(tx);
         assertNotSame(committed, write);
         assertFalse(write.isCommitted);
         assertFalse(write.isPermanent);
