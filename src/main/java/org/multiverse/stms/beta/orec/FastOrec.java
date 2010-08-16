@@ -9,6 +9,15 @@ import java.util.concurrent.atomic.AtomicLong;
 import static java.lang.String.format;
 
 /**
+ * A Orec (ownership record) that is completely safe and essentially the heart of the Multiverse-beta stm.
+ * Each transactional object (e.g. a ref) has such an Orec (it extends from it to make it cheaper). It works
+ * with an arrive/depart system (semi visible reads) to prevent isolation problems; when an update is done
+ * on an transactional object, where the orec has a surplus of readers, you know that transactions are still
+ * dependant on this value. When this happens, the global conflict counter is increased, and all reading
+ * transactions are forced to do a read conflict scan the next time they do a read (or a write since that
+ * also requires a read to get the initial value).
+ *
+ * Layout:
  * In total 64 bits
  * 0: bit contains lock
  * 1: bit contains readbiased.
