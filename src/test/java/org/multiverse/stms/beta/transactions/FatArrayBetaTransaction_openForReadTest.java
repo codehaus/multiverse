@@ -107,6 +107,8 @@ public class FatArrayBetaTransaction_openForReadTest {
         assertTrue((Boolean) getField(tx, "hasUntrackedReads"));
     }
 
+    
+
     @Test
     public void whenReadBiased() {
         LongRef ref = createReadBiasedLongRef(stm, 100);

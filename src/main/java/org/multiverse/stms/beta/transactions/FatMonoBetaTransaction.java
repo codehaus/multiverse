@@ -117,6 +117,11 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                     throw abortOnReadConflict(pool);
                 }
 
+                if(hasReadConflict()){
+                    read.owner.abort(this, read, pool);
+                    throw abortOnReadConflict(pool);
+                }
+
                 needsRealClose = true;
                 attached = read;
                 return read;
@@ -125,6 +130,11 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
                 //if it was locked, lets abort.
                 if (read.isLocked) {
+                    throw abortOnReadConflict(pool);
+                }
+
+                if(hasReadConflict()){
+                    read.owner.abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
@@ -240,6 +250,11 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnReadConflict(pool);
             }
 
+            if(hasReadConflict()){
+                read.owner.abort(this, read, pool);
+                throw abortOnReadConflict(pool);
+            }
+    
             RefTranlocal<E> result = pool.take(ref);
             if (result == null) {
                 result = new RefTranlocal<E>(ref);
@@ -397,6 +412,11 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                     throw abortOnReadConflict(pool);
                 }
 
+                if(hasReadConflict()){
+                    read.owner.abort(this, read, pool);
+                    throw abortOnReadConflict(pool);
+                }
+
                 needsRealClose = true;
                 attached = read;
                 return read;
@@ -405,6 +425,11 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
                 //if it was locked, lets abort.
                 if (read.isLocked) {
+                    throw abortOnReadConflict(pool);
+                }
+
+                if(hasReadConflict()){
+                    read.owner.abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
@@ -520,6 +545,11 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnReadConflict(pool);
             }
 
+            if(hasReadConflict()){
+                read.owner.abort(this, read, pool);
+                throw abortOnReadConflict(pool);
+            }
+    
             IntRefTranlocal result = pool.take(ref);
             if (result == null) {
                 result = new IntRefTranlocal(ref);
@@ -677,6 +707,11 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                     throw abortOnReadConflict(pool);
                 }
 
+                if(hasReadConflict()){
+                    read.owner.abort(this, read, pool);
+                    throw abortOnReadConflict(pool);
+                }
+
                 needsRealClose = true;
                 attached = read;
                 return read;
@@ -685,6 +720,11 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
                 //if it was locked, lets abort.
                 if (read.isLocked) {
+                    throw abortOnReadConflict(pool);
+                }
+
+                if(hasReadConflict()){
+                    read.owner.abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
@@ -800,6 +840,11 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnReadConflict(pool);
             }
 
+            if(hasReadConflict()){
+                read.owner.abort(this, read, pool);
+                throw abortOnReadConflict(pool);
+            }
+    
             LongRefTranlocal result = pool.take(ref);
             if (result == null) {
                 result = new LongRefTranlocal(ref);
@@ -957,6 +1002,11 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                     throw abortOnReadConflict(pool);
                 }
 
+                if(hasReadConflict()){
+                    read.owner.abort(this, read, pool);
+                    throw abortOnReadConflict(pool);
+                }
+
                 needsRealClose = true;
                 attached = read;
                 return read;
@@ -965,6 +1015,11 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
                 //if it was locked, lets abort.
                 if (read.isLocked) {
+                    throw abortOnReadConflict(pool);
+                }
+
+                if(hasReadConflict()){
+                    read.owner.abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
@@ -1080,6 +1135,11 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnReadConflict(pool);
             }
 
+            if(hasReadConflict()){
+                read.owner.abort(this, read, pool);
+                throw abortOnReadConflict(pool);
+            }
+    
             Tranlocal result = read.openForWrite(pool);
 
             needsRealClose = true;
@@ -1470,10 +1530,11 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         needsRealClose = false;
         abortOnly = false;
         attached = null;
+        hasReads = false;
+        hasUntrackedReads = false;
         if(normalListeners!=null){
             normalListeners.clear();
-        }
-        hasUntrackedReads = false;
+        }     
         return true;
     }
 

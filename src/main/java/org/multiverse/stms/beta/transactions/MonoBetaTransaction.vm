@@ -123,6 +123,13 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                     throw abortOnReadConflict(pool);
                 }
 
+#if(!$transaction.lean)
+                if(hasReadConflict()){
+                    read.owner.abort(this, read, pool);
+                    throw abortOnReadConflict(pool);
+                }
+
+#end
                 needsRealClose = true;
                 attached = read;
                 return read;
@@ -134,6 +141,13 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                     throw abortOnReadConflict(pool);
                 }
 
+#if(!$transaction.lean)
+                if(hasReadConflict()){
+                    read.owner.abort(this, read, pool);
+                    throw abortOnReadConflict(pool);
+                }
+
+#end
                 if(!read.isPermanent){
                     needsRealClose = true;
                     attached = read;
@@ -258,6 +272,13 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 throw abortOnReadConflict(pool);
             }
 
+#if(!${transaction.lean})
+            if(hasReadConflict()){
+                read.owner.abort(this, read, pool);
+                throw abortOnReadConflict(pool);
+            }
+    
+#end
 #if($ref.isSpecialization())
             ${ref.tranlocal}${ref.typeParameter} result = pool.take(ref);
             if (result == null) {

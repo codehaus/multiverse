@@ -420,6 +420,35 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertAborted(tx);
     }
 
+     @Test
+    public void whenContainsUntrackedRead_thenCantRecoverFromUnrealReadConflict() {
+        LongRef ref1 = createReadBiasedLongRef(stm, 100);
+        LongRef ref2 = createLongRef(stm);
+
+        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+                .setReadTrackingEnabled(false);
+
+        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
+        tx.openForRead(ref1, false, pool);
+
+        //an unreal readconflict
+        stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
+
+        try {
+            tx.openForWrite(ref2, false, pool);
+            fail();
+        } catch (ReadConflict expected) {
+        }
+
+        assertAborted(tx);
+        assertSurplus(1, ref1);
+        assertUnlocked(ref1);
+        assertNull(ref1.getLockOwner());
+        assertSurplus(0, ref2);
+        assertUnlocked(ref2);
+        assertNull(ref2.getLockOwner());
+    }
+
     @Test
     public void whenReadonly_thenAbortedAndReadonlyException() {
         LongRef ref = createLongRef(stm, 0);
