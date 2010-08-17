@@ -1,6 +1,9 @@
 package org.multiverse.functions;
 
 /**
+ * A {@link Function} optimized for booleans. It depends on the stm if {@link #call(boolean)} without boxing or 
+ * {@link #call(Boolean)} is done (with boxing).
+ *
  * @author Peter Veentjer
  */
 public abstract class BooleanFunction implements Function<Boolean> {

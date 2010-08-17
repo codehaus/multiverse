@@ -5,29 +5,37 @@ package org.multiverse.functions;
  *
  * @author Peter Veentjer.
  */
-public class IncLongFunction extends LongFunction {
+public final class IncLongFunction extends LongFunction {
 
     public final static IncLongFunction INSTANCE = new IncLongFunction();
 
-    private final long extra;
+    private final long inc;
 
+    /**
+     * Creates an IncLongFunction that increments with 1.
+     */
     public IncLongFunction() {
         this(1);
     }
 
-    public IncLongFunction(long extra) {
-        this.extra = extra;
+    /**
+     * Creates an IncLongFunction that increments with the given inc.
+     *
+     * @param inc the number to increment with.
+     */
+    public IncLongFunction(long inc) {
+        this.inc = inc;
     }
 
     @Override
     public long call(long current) {
-        return current + 1;
+        return current + inc;
     }
 
     @Override
     public String toString() {
         return "IncLongFunction{" +
-                "extra=" + extra +
+                "inc=" + inc +
                 '}';
     }
 }

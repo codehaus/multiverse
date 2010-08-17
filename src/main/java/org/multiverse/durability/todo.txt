@@ -97,7 +97,7 @@ TODO
     this would be an easy first approach.
 
 - how does a beta transaction know when the UnitOfWork needs to be called...
-    - an extra bit could be set/unset on the orec of the transactional object. When an object becomes durable/
+    - an inc bit could be set/unset on the orec of the transactional object. When an object becomes durable/
     transient, the bit can be set/unset and all readers notified. Each transaction can recheck for a readconflict,
     but can also recheck if an object has become transient or durable. If it is made durable, it should also receive
     a persistence id.

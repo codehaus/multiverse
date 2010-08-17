@@ -9,25 +9,33 @@ public final class IncIntFunction extends IntFunction {
 
     public final static IncIntFunction INSTANCE = new IncIntFunction();
 
-    private final int extra;
+    private final int inc;
 
+    /**
+     * Creates an IncIntFunction that adds one.
+     */
     public IncIntFunction() {
         this(1);
     }
 
-    public IncIntFunction(int extra) {
-        this.extra = extra;
+    /**
+     * Creates an IncIntFunction with the specified
+     *
+     * @param inc the number to increment with.
+     */
+    public IncIntFunction(int inc) {
+        this.inc = inc;
     }
 
     @Override
     public int call(int current) {
-        return current + 1;
+        return current + inc;
     }
 
     @Override
     public String toString() {
         return "IncIntFunction{" +
-                "extra=" + extra +
+                "inc=" + inc +
                 '}';
     }
 }

@@ -1,6 +1,9 @@
 package org.multiverse.functions;
 
 /**
+ * A {@link Function} optimized for booleans. It depends on the stm if {@link #call(long)} without boxiing or
+ * {@link #call(Long)} is done (with boxing).
+ *
  * @author Peter Veentjer
  */
 public abstract class LongFunction implements Function<Long> {
