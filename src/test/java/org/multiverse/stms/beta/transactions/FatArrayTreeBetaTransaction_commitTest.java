@@ -8,6 +8,7 @@ import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.WriteConflict;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.functions.IncLongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
@@ -364,7 +365,127 @@ public class FatArrayTreeBetaTransaction_commitTest {
         assertEquals(created, sum);
     }
 
-     @Test
+    @Test
+    public void whenNoDirtyCheckAndCommute() {
+        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+                .setDirtyCheckEnabled(false);
+
+        LongRef ref = createLongRef(stm);
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
+        tx.commute(ref, pool, IncLongFunction.INSTANCE);
+        tx.commit(pool);
+
+        assertCommitted(tx);
+        assertSurplus(0, ref);
+        assertUpdateBiased(ref);
+        assertReadonlyCount(0, ref);
+        assertEquals(1, ref.unsafeLoad().value);
+    }
+
+    @Test
+    public void whenDirtyCheckAndCommute() {
+        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+                .setDirtyCheckEnabled(true);
+
+        LongRef ref = createLongRef(stm);
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
+        tx.commute(ref, pool, IncLongFunction.INSTANCE);
+        tx.commit(pool);
+
+        assertCommitted(tx);
+        assertSurplus(0, ref);
+        assertUpdateBiased(ref);
+        assertReadonlyCount(0, ref);
+        assertEquals(1, ref.unsafeLoad().value);
+    }
+
+    @Test
+    public void whenMultipleReferencesWithCommute() {
+        LongRef ref1 = createLongRef(stm);
+        LongRef ref2 = createLongRef(stm);
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        tx.commute(ref1, pool, IncLongFunction.INSTANCE);
+        tx.commute(ref2, pool, IncLongFunction.INSTANCE);
+        tx.commit(pool);
+
+        assertCommitted(tx);
+        assertSurplus(0, ref1);
+        assertUpdateBiased(ref1);
+        assertReadonlyCount(0, ref1);
+        assertEquals(1, ref1.unsafeLoad().value);
+        assertSurplus(0, ref2);
+        assertUpdateBiased(ref2);
+        assertReadonlyCount(0, ref2);
+        assertEquals(1, ref2.unsafeLoad().value);
+    }
+
+    @Test
+    public void whenMultipleCommutes() {
+        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+                .setDirtyCheckEnabled(true);
+
+        LongRef ref = createLongRef(stm);
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
+        tx.commute(ref, pool, IncLongFunction.INSTANCE);
+        tx.commute(ref, pool, IncLongFunction.INSTANCE);
+        tx.commute(ref, pool, IncLongFunction.INSTANCE);
+        tx.commit(pool);
+
+        assertCommitted(tx);
+        assertSurplus(0, ref);
+        assertUpdateBiased(ref);
+        assertReadonlyCount(0, ref);
+        assertEquals(3, ref.unsafeLoad().value);
+    }
+
+    @Test
+    public void whenInterleavingPossibleWithCommute() {
+        LongRef ref1 = createLongRef(stm);
+        LongRef ref2 = createLongRef(stm);
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        tx.openForWrite(ref1, false, pool).value++;
+
+        FatArrayTreeBetaTransaction otherTx = new FatArrayTreeBetaTransaction(stm);
+        otherTx.openForWrite(ref2, false, pool).value++;
+        otherTx.commit();
+
+        tx.commute(ref2, pool, IncLongFunction.INSTANCE);
+        tx.commit(pool);
+
+        assertCommitted(tx);
+        assertSurplus(0, ref1);
+        assertUpdateBiased(ref1);
+        assertReadonlyCount(0, ref1);
+        assertEquals(1, ref1.unsafeLoad().value);
+        assertSurplus(0, ref2);
+        assertUpdateBiased(ref2);
+        assertReadonlyCount(0, ref2);
+        assertEquals(2, ref2.unsafeLoad().value);
+    }
+
+    @Test
+    public void whenCommuteAndLockedByOtherTransaction_thenWriteConflict() {
+        LongRef ref = createLongRef(stm);
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        tx.commute(ref, pool, IncLongFunction.INSTANCE);
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        otherTx.openForRead(ref, true, pool);
+
+        try {
+            tx.commit(pool);
+            fail();
+        } catch (WriteConflict expected) {
+        }
+
+        assertAborted(tx);
+        assertSurplus(1, ref);
+        assertUpdateBiased(ref);
+        assertReadonlyCount(0, ref);
+        assertEquals(0, ref.unsafeLoad().value);
+    }
+
+    @Test
     public void whenAbortOnly() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.setAbortOnly();

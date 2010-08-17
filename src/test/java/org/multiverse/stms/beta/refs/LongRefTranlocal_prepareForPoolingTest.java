@@ -3,6 +3,7 @@ package org.multiverse.stms.beta.refs;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.functions.IncLongFunction;
 import org.multiverse.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
@@ -23,9 +24,15 @@ public class LongRefTranlocal_prepareForPoolingTest {
     }
 
     @Test
-    @Ignore
     public void whenConstructed() {
+        LongRef ref = createLongRef(stm);
 
+        LongRefTranlocal tranlocal = ref.openForConstruction(pool);
+        tranlocal.value = 200;
+
+        tranlocal.prepareForPooling(pool);
+
+        assertCleaned(tranlocal);
     }
 
     @Test
@@ -47,19 +54,26 @@ public class LongRefTranlocal_prepareForPoolingTest {
     }
 
     @Test
-    public void whenUpdate() {
-        LongRef ref = createLongRef(stm, 100);
-        LongRefTranlocal tranlocal = ref.unsafeLoad().openForWrite(pool);
+    public void whenIsCommuting() {
+        LongRef ref = createLongRef(stm);
+
+        LongRefTranlocal tranlocal = ref.openForCommute(pool);
+        tranlocal.addCommutingFunction(IncLongFunction.INSTANCE, pool);
 
         tranlocal.prepareForPooling(pool);
 
-        assertFalse(tranlocal.isPermanent);
-        assertFalse(tranlocal.isDirty);
-        assertEquals(0, tranlocal.value);
-        assertFalse(tranlocal.isCommitted);
-        assertFalse(tranlocal.isCommuting);
-        assertNull(tranlocal.headCallable);
-        assertNull(tranlocal.owner);
+        assertCleaned(tranlocal);
+    }
+
+    @Test
+    public void whenUpdate() {
+        LongRef ref = createLongRef(stm);
+        LongRefTranlocal tranlocal = ref.unsafeLoad().openForWrite(pool);
+        tranlocal.value = 200;
+
+        tranlocal.prepareForPooling(pool);
+
+        assertCleaned(tranlocal);
     }
 
     @Test
@@ -72,6 +86,10 @@ public class LongRefTranlocal_prepareForPoolingTest {
 
         tranlocal.prepareForPooling(pool);
 
+        assertCleaned(tranlocal);
+    }
+
+    private void assertCleaned(LongRefTranlocal tranlocal) {
         assertFalse(tranlocal.isPermanent);
         assertFalse(tranlocal.isDirty);
         assertEquals(0, tranlocal.value);

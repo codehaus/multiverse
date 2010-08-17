@@ -167,9 +167,15 @@ globalconflict counter.
 
 - commute
 
-    - add commuting to mono beta transaction
+    - array tree: prepare test
 
-    - add commuting to array beta transaction
+    - array: prepare test
+
+    - mono: commit test
+
+    - mono: prepare test
+
+    - add commuting to mono beta transaction
 
     - when a commuting function fails, the transaction should be aborted.
 
@@ -213,8 +219,17 @@ the task not being executed at all.
 
 done
 
+- array tree commit: interleaved test
 
+- array commit: interleaved test
+
+- array tree: commit test
+
+- array: commit test
+      
 old done
+
+- add commuting to array beta transaction
 
 - add abortOnly to commit/prepare
 
