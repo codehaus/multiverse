@@ -1,11 +1,12 @@
 package org.multiverse.stms.beta.refs;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.functions.IncLongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 
+import static org.junit.Assert.*;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class LongRefTranlocal_evaluateCommutingFunctionsTest {
@@ -20,10 +21,40 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest {
     }
 
     @Test
-    @Ignore
-    public void test() {
-        LongRef ref = createLongRef(stm);
+    public void whenSingleCommutingFunction() {
+        LongRef ref = createLongRef(stm, 100);
+        LongRefTranlocal committed = ref.unsafeLoad();
 
-        //ref.openForCommute()
+        LongRefTranlocal tranlocal = ref.openForCommute(pool);
+        tranlocal.addCommutingFunction(IncLongFunction.INSTANCE, pool);
+        tranlocal.read = committed;
+        tranlocal.evaluateCommutingFunctions(pool);
+
+        assertFalse(tranlocal.isCommitted);
+        assertFalse(tranlocal.isCommuting);
+        assertTrue(tranlocal.isDirty);
+        assertSame(ref, tranlocal.owner);
+        assertSame(committed, tranlocal.read);
+        assertEquals(101, tranlocal.value);
+    }
+
+    @Test
+    public void whenMultipleCommutingFunctions() {
+        LongRef ref = createLongRef(stm, 100);
+        LongRefTranlocal committed = ref.unsafeLoad();
+
+        LongRefTranlocal tranlocal = ref.openForCommute(pool);
+        tranlocal.addCommutingFunction(IncLongFunction.INSTANCE, pool);
+        tranlocal.addCommutingFunction(IncLongFunction.INSTANCE, pool);
+        tranlocal.addCommutingFunction(IncLongFunction.INSTANCE, pool);
+        tranlocal.read = committed;
+        tranlocal.evaluateCommutingFunctions(pool);
+
+        assertFalse(tranlocal.isCommitted);
+        assertFalse(tranlocal.isCommuting);
+        assertTrue(tranlocal.isDirty);
+        assertSame(ref, tranlocal.owner);
+        assertSame(committed, tranlocal.read);
+        assertEquals(103, tranlocal.value);
     }
 }

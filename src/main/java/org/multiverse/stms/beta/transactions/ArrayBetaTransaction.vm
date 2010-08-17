@@ -94,6 +94,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             ${ref.tranlocal}${ref.typeParameter} found = (${ref.tranlocal}${ref.typeParameter})array[index];
 
             if(found.isCommuting){
+                System.out.println("commuting");    
                 if(!hasReads){
                     localConflictCounter.reset();
                     hasReads = true;
@@ -186,6 +187,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             ${ref.tranlocal}${ref.typeParameter} result = (${ref.tranlocal}${ref.typeParameter})array[index];
 
             if(result.isCommuting){
+                System.out.println("Commuting");
                 if(!hasReads){
                     localConflictCounter.reset();
                     hasReads = true;
@@ -211,12 +213,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 return result;
             }
 
-             //an optimization that shifts the read index to the front, so it can be access faster the next time.
-            if (index > 0) {
-                array[index] = array[0];
-                array[index] = result;
-            }
-
 #if($ref.isSpecialized)
             final ${ref.tranlocal}${ref.typeParameter} read = result;
             result = pool.take(ref);
@@ -228,7 +224,13 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #else
             result = result.openForWrite(pool);
 #end
-            array[0] = result;
+            //an optimization that shifts the read index to the front, so it can be access faster the next time.
+            //if (index > 0) {
+            //    array[index] = array[0];
+            //    array[index] = result;
+            //}
+
+            array[index]=result;
             return result;
         }
 
@@ -739,6 +741,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             }
 
             if(tranlocal.isCommuting){
+                System.out.println("commuting");
                 Tranlocal read = tranlocal.owner.lockAndLoad(spinCount, this);
 
                 if(read.isLocked){
@@ -766,6 +769,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             }
 
             if(tranlocal.isCommuting){
+                System.out.println("commuting");
                 Tranlocal read = tranlocal.owner.lockAndLoad(spinCount, this);
 
                 if(read.isLocked){

@@ -93,6 +93,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             RefTranlocal<E> found = (RefTranlocal<E>)array[index];
 
             if(found.isCommuting){
+                System.out.println("commuting");    
                 if(!hasReads){
                     localConflictCounter.reset();
                     hasReads = true;
@@ -185,6 +186,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             RefTranlocal<E> result = (RefTranlocal<E>)array[index];
 
             if(result.isCommuting){
+                System.out.println("Commuting");
                 if(!hasReads){
                     localConflictCounter.reset();
                     hasReads = true;
@@ -210,14 +212,16 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 return result;
             }
 
-             //an optimization that shifts the read index to the front, so it can be access faster the next time.
-            if (index > 0) {
-                array[index] = array[0];
-                array[index] = result;
-            }
+
 
             result = result.openForWrite(pool);
-            array[0] = result;
+            //an optimization that shifts the read index to the front, so it can be access faster the next time.
+            //if (index > 0) {
+            //    array[index] = array[0];
+            //    array[index] = result;
+            //}
+
+            array[index]=result;
             return result;
         }
 
@@ -401,6 +405,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             IntRefTranlocal found = (IntRefTranlocal)array[index];
 
             if(found.isCommuting){
+                System.out.println("commuting");    
                 if(!hasReads){
                     localConflictCounter.reset();
                     hasReads = true;
@@ -493,6 +498,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             IntRefTranlocal result = (IntRefTranlocal)array[index];
 
             if(result.isCommuting){
+                System.out.println("Commuting");
                 if(!hasReads){
                     localConflictCounter.reset();
                     hasReads = true;
@@ -518,14 +524,16 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 return result;
             }
 
-             //an optimization that shifts the read index to the front, so it can be access faster the next time.
-            if (index > 0) {
-                array[index] = array[0];
-                array[index] = result;
-            }
+
 
             result = result.openForWrite(pool);
-            array[0] = result;
+            //an optimization that shifts the read index to the front, so it can be access faster the next time.
+            //if (index > 0) {
+            //    array[index] = array[0];
+            //    array[index] = result;
+            //}
+
+            array[index]=result;
             return result;
         }
 
@@ -709,6 +717,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             LongRefTranlocal found = (LongRefTranlocal)array[index];
 
             if(found.isCommuting){
+                System.out.println("commuting");    
                 if(!hasReads){
                     localConflictCounter.reset();
                     hasReads = true;
@@ -801,6 +810,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             LongRefTranlocal result = (LongRefTranlocal)array[index];
 
             if(result.isCommuting){
+                System.out.println("Commuting");
                 if(!hasReads){
                     localConflictCounter.reset();
                     hasReads = true;
@@ -826,14 +836,16 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 return result;
             }
 
-             //an optimization that shifts the read index to the front, so it can be access faster the next time.
-            if (index > 0) {
-                array[index] = array[0];
-                array[index] = result;
-            }
+
 
             result = result.openForWrite(pool);
-            array[0] = result;
+            //an optimization that shifts the read index to the front, so it can be access faster the next time.
+            //if (index > 0) {
+            //    array[index] = array[0];
+            //    array[index] = result;
+            //}
+
+            array[index]=result;
             return result;
         }
 
@@ -1017,6 +1029,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             Tranlocal found = (Tranlocal)array[index];
 
             if(found.isCommuting){
+                System.out.println("commuting");    
                 if(!hasReads){
                     localConflictCounter.reset();
                     hasReads = true;
@@ -1109,6 +1122,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             Tranlocal result = (Tranlocal)array[index];
 
             if(result.isCommuting){
+                System.out.println("Commuting");
                 if(!hasReads){
                     localConflictCounter.reset();
                     hasReads = true;
@@ -1134,14 +1148,16 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 return result;
             }
 
-             //an optimization that shifts the read index to the front, so it can be access faster the next time.
-            if (index > 0) {
-                array[index] = array[0];
-                array[index] = result;
-            }
+
 
             result = result.openForWrite(pool);
-            array[0] = result;
+            //an optimization that shifts the read index to the front, so it can be access faster the next time.
+            //if (index > 0) {
+            //    array[index] = array[0];
+            //    array[index] = result;
+            //}
+
+            array[index]=result;
             return result;
         }
 
@@ -1522,6 +1538,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             }
 
             if(tranlocal.isCommuting){
+                System.out.println("commuting");
                 Tranlocal read = tranlocal.owner.lockAndLoad(spinCount, this);
 
                 if(read.isLocked){
@@ -1549,6 +1566,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             }
 
             if(tranlocal.isCommuting){
+                System.out.println("commuting");
                 Tranlocal read = tranlocal.owner.lockAndLoad(spinCount, this);
 
                 if(read.isLocked){

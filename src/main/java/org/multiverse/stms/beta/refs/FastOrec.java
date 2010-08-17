@@ -1,5 +1,6 @@
 package org.multiverse.stms.beta.refs;
 
+import org.multiverse.api.exceptions.PanicError;
 import org.multiverse.stms.beta.BetaTransactionalObject;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 import org.multiverse.stms.beta.orec.Orec;
@@ -138,12 +139,12 @@ public abstract class FastOrec implements Orec {
             long surplus = getSurplus(current);
 
             if (surplus == 0) {
-                throw new IllegalStateException();
+                throw new PanicError();
             }
 
             boolean isReadBiased = isReadBiased(current);
             if (isReadBiased) {
-                throw new IllegalStateException();
+                throw new PanicError();
             }
 
             int readonlyCount = getReadonlyCount(current);
@@ -174,17 +175,17 @@ public abstract class FastOrec implements Orec {
             long surplus = getSurplus(current);
 
             if (surplus == 0) {
-                throw new IllegalStateException();
+                throw new PanicError();
             }
 
             boolean isLocked = isLocked(current);
             if (!isLocked) {
-                throw new IllegalStateException();
+                throw new PanicError();
             }
 
             boolean isReadBiased = isReadBiased(current);
             if (isReadBiased) {
-                throw new IllegalStateException();
+                throw new PanicError();
             }
 
             int readonlyCount = getReadonlyCount(current);
@@ -216,7 +217,7 @@ public abstract class FastOrec implements Orec {
             long current = value;
 
             if (!isLocked(current)) {
-                throw new IllegalStateException();
+                throw new PanicError();
             }
 
             boolean isReadBiased = isReadBiased(current);
@@ -256,12 +257,12 @@ public abstract class FastOrec implements Orec {
             long current = value;
 
             if (!isLocked(current)) {
-                throw new IllegalStateException();
+                throw new PanicError();
             }
 
             long surplus = getSurplus(current);
             if (surplus == 0) {
-                throw new IllegalStateException();
+                throw new PanicError();
             }
 
             //we can only decrease the surplus if it is not read biased. Because with a read biased
@@ -284,18 +285,18 @@ public abstract class FastOrec implements Orec {
             long current = value;
 
             if (isReadBiased(current)) {
-                throw new IllegalStateException();
+                throw new PanicError();
             }
 
             long surplus = getSurplus(current);
 
             if (isLocked(current)) {
                 if (surplus < 2) {
-                    throw new IllegalStateException();
+                    throw new PanicError();
                 }
             } else {
                 if (surplus == 0) {
-                    throw new IllegalStateException();
+                    throw new PanicError();
                 }
             }
             surplus--;
@@ -317,7 +318,7 @@ public abstract class FastOrec implements Orec {
                 spinCount--;
             } else {
                 if (getSurplus() == 0) {
-                    throw new IllegalStateException();
+                    throw new PanicError();
                 }
 
                 long next = setLocked(current, true);
@@ -338,7 +339,7 @@ public abstract class FastOrec implements Orec {
             long current = value;
 
             if (!isLocked(current)) {
-                throw new IllegalStateException();
+                throw new PanicError();
             }
 
             long next = setLocked(current, false);
@@ -354,7 +355,7 @@ public abstract class FastOrec implements Orec {
             long current = value;
 
             if (!isLocked(current)) {
-                throw new IllegalStateException();
+                throw new PanicError();
             }
 
             long next = setLocked(current, false);
