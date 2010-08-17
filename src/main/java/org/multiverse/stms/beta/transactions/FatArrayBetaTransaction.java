@@ -25,7 +25,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
     private final LocalConflictCounter localConflictCounter;
     private final Tranlocal[] array;
     private int firstFreeIndex = 0;
-    private boolean needsRealClose;
     private boolean hasReads;
     private boolean hasUntrackedReads;
 
@@ -111,10 +110,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 if(!ref.tryLockAndCheckConflict(this, config.spinCount, found)){
                     throw abortOnReadConflict(pool);
                 }
-
-                needsRealClose = true;
-            }else if(!found.isPermanent){
-                needsRealClose = true;
             }
 
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
@@ -145,10 +140,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if (hasReadConflict()) {
             ref.abort(this, read, pool);
             throw abortOnReadConflict(pool);
-        }
-
-        if(lock || !read.isPermanent){
-            needsRealClose = true;
         }
 
         if( lock || config.trackReads || !read.isPermanent){
@@ -213,7 +204,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 }
             }
 
-            needsRealClose = true;
             //and open it for write if needed.
             if (result.isCommitted) {
                 result = result.openForWrite(pool);
@@ -250,7 +240,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnReadConflict(pool);
         }
 
-        needsRealClose = true;
         //open the tranlocal for writing.
         RefTranlocal<E>  result =  pool.take(ref);
         if(result == null){
@@ -330,7 +319,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnTooSmallSize(pool, array.length+1);
         }
 
-        needsRealClose = true;
         //open the tranlocal for writing.
         RefTranlocal<E> result =  pool.take(ref);
         if(result == null){
@@ -385,10 +373,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 if(!ref.tryLockAndCheckConflict(this, config.spinCount, found)){
                     throw abortOnReadConflict(pool);
                 }
-
-                needsRealClose = true;
-            }else if(!found.isPermanent){
-                needsRealClose = true;
             }
 
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
@@ -419,10 +403,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if (hasReadConflict()) {
             ref.abort(this, read, pool);
             throw abortOnReadConflict(pool);
-        }
-
-        if(lock || !read.isPermanent){
-            needsRealClose = true;
         }
 
         if( lock || config.trackReads || !read.isPermanent){
@@ -487,7 +467,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 }
             }
 
-            needsRealClose = true;
             //and open it for write if needed.
             if (result.isCommitted) {
                 result = result.openForWrite(pool);
@@ -524,7 +503,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnReadConflict(pool);
         }
 
-        needsRealClose = true;
         //open the tranlocal for writing.
         IntRefTranlocal  result =  pool.take(ref);
         if(result == null){
@@ -604,7 +582,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnTooSmallSize(pool, array.length+1);
         }
 
-        needsRealClose = true;
         //open the tranlocal for writing.
         IntRefTranlocal result =  pool.take(ref);
         if(result == null){
@@ -659,10 +636,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 if(!ref.tryLockAndCheckConflict(this, config.spinCount, found)){
                     throw abortOnReadConflict(pool);
                 }
-
-                needsRealClose = true;
-            }else if(!found.isPermanent){
-                needsRealClose = true;
             }
 
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
@@ -693,10 +666,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if (hasReadConflict()) {
             ref.abort(this, read, pool);
             throw abortOnReadConflict(pool);
-        }
-
-        if(lock || !read.isPermanent){
-            needsRealClose = true;
         }
 
         if( lock || config.trackReads || !read.isPermanent){
@@ -761,7 +730,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 }
             }
 
-            needsRealClose = true;
             //and open it for write if needed.
             if (result.isCommitted) {
                 result = result.openForWrite(pool);
@@ -798,7 +766,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnReadConflict(pool);
         }
 
-        needsRealClose = true;
         //open the tranlocal for writing.
         LongRefTranlocal  result =  pool.take(ref);
         if(result == null){
@@ -878,7 +845,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnTooSmallSize(pool, array.length+1);
         }
 
-        needsRealClose = true;
         //open the tranlocal for writing.
         LongRefTranlocal result =  pool.take(ref);
         if(result == null){
@@ -933,10 +899,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 if(!ref.tryLockAndCheckConflict(this, config.spinCount, found)){
                     throw abortOnReadConflict(pool);
                 }
-
-                needsRealClose = true;
-            }else if(!found.isPermanent){
-                needsRealClose = true;
             }
 
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
@@ -967,10 +929,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if (hasReadConflict()) {
             ref.abort(this, read, pool);
             throw abortOnReadConflict(pool);
-        }
-
-        if(lock || !read.isPermanent){
-            needsRealClose = true;
         }
 
         if( lock || config.trackReads || !read.isPermanent){
@@ -1035,7 +993,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 }
             }
 
-            needsRealClose = true;
             //and open it for write if needed.
             if (result.isCommitted) {
                 result = result.openForWrite(pool);
@@ -1072,7 +1029,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnReadConflict(pool);
         }
 
-        needsRealClose = true;
         //open the tranlocal for writing.
         Tranlocal  result = read.openForWrite(pool);
         array[firstFreeIndex] = result;
@@ -1146,7 +1102,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnTooSmallSize(pool, array.length+1);
         }
 
-        needsRealClose = true;
         //open the tranlocal for writing.
         Tranlocal result = ref.openForConstruction(pool);
         array[firstFreeIndex] = result;
@@ -1224,23 +1179,19 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             case ACTIVE:
                 //fall through
             case PREPARED:
-                if(needsRealClose){
-                    final int _firstFreeIndex = firstFreeIndex;
+                final int _firstFreeIndex = firstFreeIndex;
 
-                    for (int k = 0; k < _firstFreeIndex; k++) {
-                        Tranlocal tranlocal = array[k];
-                        //abort could be expensive.
-                        tranlocal.owner.abort(this, tranlocal, pool);
-                    }
+                for (int k = 0; k < _firstFreeIndex; k++) {
+                    Tranlocal tranlocal = array[k];
+                    tranlocal.owner.abort(this, tranlocal, pool);
                 }
-                status = ABORTED;
-                  if(permanentListeners != null){
-                        notifyListeners(permanentListeners, TransactionLifecycleEvent.PostAbort);
-                  }
+                if(permanentListeners != null){
+                    notifyListeners(permanentListeners, TransactionLifecycleEvent.PostAbort);
+                }
 
-                  if(normalListeners != null){
-                        notifyListeners(normalListeners, TransactionLifecycleEvent.PostAbort);
-                  }
+                if(normalListeners != null){
+                    notifyListeners(normalListeners, TransactionLifecycleEvent.PostAbort);
+                }
                 break;
             case ABORTED:
                 break;
@@ -1269,7 +1220,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
     
         Listeners[] listeners = null;
 
-        if (firstFreeIndex > 0  && needsRealClose) {
+        if (firstFreeIndex > 0) {
             if(config.dirtyCheck){
                 listeners = commitDirty(pool);
             }else{
@@ -1379,7 +1330,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnWriteConflict(pool);
             }
              
-            if(firstFreeIndex > 0 && needsRealClose){
+            if(firstFreeIndex > 0){
                 if(config.dirtyCheck){
                     if(!doPrepareDirty()){
                         throw abortOnWriteConflict(pool);
@@ -1533,7 +1484,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         firstFreeIndex = 0;
         hasReads = false;
         hasUntrackedReads = false;
-        needsRealClose = false;
         if(normalListeners != null){
             normalListeners.clear();
         }
@@ -1556,8 +1506,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         hasUntrackedReads = false;
         attempt=1;
         firstFreeIndex = 0;
-        remainingTimeoutNs = config.timeoutNs;
-        needsRealClose = false;
+        remainingTimeoutNs = config.timeoutNs;        
         if(normalListeners !=null){
             pool.putArrayList(normalListeners);
             normalListeners = null;

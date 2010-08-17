@@ -33,7 +33,6 @@ public class IntrinsicLockBenchmark {
         }
 
         assertEquals(sum(threads), value);
-
     }
 
     private PingPongThread[] createThreads() {
@@ -57,7 +56,7 @@ public class IntrinsicLockBenchmark {
         private int id;
         private long count;
         private int expected;
-        private Object lock;
+        private final Object lock;
 
         public PingPongThread(int id, Object lock) {
             super("PingPongThread-" + id);
@@ -67,8 +66,6 @@ public class IntrinsicLockBenchmark {
 
         @Override
         public void run() {
-
-
             while (!stop) {
                 if (count % (100 * 1000) == 0) {
                     System.out.println(getName() + " " + count);
@@ -78,8 +75,7 @@ public class IntrinsicLockBenchmark {
                     while (value % threadCount != id) {
                         try {
                             lock.wait();
-                        } catch (InterruptedException e) {
-
+                        } catch (InterruptedException ignore) {
                         }
                     }
                     value++;

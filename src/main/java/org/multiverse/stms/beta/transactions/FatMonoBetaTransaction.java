@@ -26,7 +26,6 @@ import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalB
 public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
     private Tranlocal attached;
-    private boolean needsRealClose;
     private boolean hasReads;
     private boolean hasUntrackedReads;
     private final LocalConflictCounter localConflictCounter;
@@ -122,7 +121,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                     throw abortOnReadConflict(pool);
                 }
 
-                needsRealClose = true;
                 attached = read;
                 return read;
             }else{
@@ -139,7 +137,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 }
 
                 if(!read.isPermanent){
-                    needsRealClose = true;
                     attached = read;
                 }else if(config.trackReads){
                     attached = read;
@@ -161,8 +158,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 if(!ref.tryLockAndCheckConflict(this, config.spinCount, read)){
                     throw abortOnReadConflict(pool);
                 }
-
-                needsRealClose = true;
             }
 
             return read;
@@ -262,7 +257,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             result.value = read.value;
             result.read = read;
 
-            needsRealClose = true;
             attached = result;
             return result;
         }
@@ -292,7 +286,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
         result.value = current.value;
         result.read = current;
-        needsRealClose = true;
         attached = result;
         return result;
     }
@@ -330,8 +323,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw new ReadonlyException(
                 format("Can't open for construction a new object using readonly transaction '%s'",config.familyName));
         }
-
-        needsRealClose = true;
 
         RefTranlocal<E> result = (attached == null || attached.owner != ref) ? null : (RefTranlocal<E>)attached;
 
@@ -417,7 +408,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                     throw abortOnReadConflict(pool);
                 }
 
-                needsRealClose = true;
                 attached = read;
                 return read;
             }else{
@@ -434,7 +424,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 }
 
                 if(!read.isPermanent){
-                    needsRealClose = true;
                     attached = read;
                 }else if(config.trackReads){
                     attached = read;
@@ -456,8 +445,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 if(!ref.tryLockAndCheckConflict(this, config.spinCount, read)){
                     throw abortOnReadConflict(pool);
                 }
-
-                needsRealClose = true;
             }
 
             return read;
@@ -557,7 +544,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             result.value = read.value;
             result.read = read;
 
-            needsRealClose = true;
             attached = result;
             return result;
         }
@@ -587,7 +573,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
         result.value = current.value;
         result.read = current;
-        needsRealClose = true;
         attached = result;
         return result;
     }
@@ -625,8 +610,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw new ReadonlyException(
                 format("Can't open for construction a new object using readonly transaction '%s'",config.familyName));
         }
-
-        needsRealClose = true;
 
         IntRefTranlocal result = (attached == null || attached.owner != ref) ? null : (IntRefTranlocal)attached;
 
@@ -712,7 +695,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                     throw abortOnReadConflict(pool);
                 }
 
-                needsRealClose = true;
                 attached = read;
                 return read;
             }else{
@@ -729,7 +711,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 }
 
                 if(!read.isPermanent){
-                    needsRealClose = true;
                     attached = read;
                 }else if(config.trackReads){
                     attached = read;
@@ -751,8 +732,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 if(!ref.tryLockAndCheckConflict(this, config.spinCount, read)){
                     throw abortOnReadConflict(pool);
                 }
-
-                needsRealClose = true;
             }
 
             return read;
@@ -852,7 +831,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             result.value = read.value;
             result.read = read;
 
-            needsRealClose = true;
             attached = result;
             return result;
         }
@@ -882,7 +860,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
         result.value = current.value;
         result.read = current;
-        needsRealClose = true;
         attached = result;
         return result;
     }
@@ -920,8 +897,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw new ReadonlyException(
                 format("Can't open for construction a new object using readonly transaction '%s'",config.familyName));
         }
-
-        needsRealClose = true;
 
         LongRefTranlocal result = (attached == null || attached.owner != ref) ? null : (LongRefTranlocal)attached;
 
@@ -1007,7 +982,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                     throw abortOnReadConflict(pool);
                 }
 
-                needsRealClose = true;
                 attached = read;
                 return read;
             }else{
@@ -1024,7 +998,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 }
 
                 if(!read.isPermanent){
-                    needsRealClose = true;
                     attached = read;
                 }else if(config.trackReads){
                     attached = read;
@@ -1046,8 +1019,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 if(!ref.tryLockAndCheckConflict(this, config.spinCount, read)){
                     throw abortOnReadConflict(pool);
                 }
-
-                needsRealClose = true;
             }
 
             return read;
@@ -1142,7 +1113,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     
             Tranlocal result = read.openForWrite(pool);
 
-            needsRealClose = true;
             attached = result;
             return result;
         }
@@ -1167,7 +1137,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         Tranlocal result = current.openForWrite(pool);
-        needsRealClose = true;
         attached = result;
         return result;
     }
@@ -1205,8 +1174,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw new ReadonlyException(
                 format("Can't open for construction a new object using readonly transaction '%s'",config.familyName));
         }
-
-        needsRealClose = true;
 
         Tranlocal result = (attached == null || attached.owner != ref) ? null : (Tranlocal)attached;
 
@@ -1319,7 +1286,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         prepare();
         Listeners listeners = null;
-        if (needsRealClose) {
+        if (attached!=null) {
             if(config.dirtyCheck){
                 listeners = attached.owner.commitDirty(attached, this, pool, config.globalConflictCounter);
             }else{
@@ -1379,7 +1346,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnWriteConflict(pool);
             }
           
-            if(needsRealClose){
+            if(attached!=null){
                 if(config.dirtyCheck){
                     if(!doPrepareDirty()){
                         throw abortOnWriteConflict(pool);
@@ -1527,7 +1494,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         status = ACTIVE;
         attempt++;
-        needsRealClose = false;
         abortOnly = false;
         attached = null;
         hasReads = false;
@@ -1551,7 +1517,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         status = ACTIVE;
         abortOnly = false;        
-        needsRealClose = false;
         remainingTimeoutNs = config.timeoutNs;
         attached = null;
         attempt = 1;

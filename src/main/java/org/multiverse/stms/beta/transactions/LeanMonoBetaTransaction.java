@@ -24,7 +24,6 @@ import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalB
 public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     private Tranlocal attached;
-    private boolean needsRealClose;
 
     public LeanMonoBetaTransaction(final BetaStm stm){
         this(new BetaTransactionConfig(stm));
@@ -104,7 +103,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
                     throw abortOnReadConflict(pool);
                 }
 
-                needsRealClose = true;
                 attached = read;
                 return read;
             }else{
@@ -116,7 +114,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
                 }
 
                 if(!read.isPermanent){
-                    needsRealClose = true;
                     attached = read;
                 }else if(config.trackReads){
                     attached = read;
@@ -138,8 +135,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
                 if(!ref.tryLockAndCheckConflict(this, config.spinCount, read)){
                     throw abortOnReadConflict(pool);
                 }
-
-                needsRealClose = true;
             }
 
             return read;
@@ -215,7 +210,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             result.value = read.value;
             result.read = read;
 
-            needsRealClose = true;
             attached = result;
             return result;
         }
@@ -245,7 +239,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
         result.value = current.value;
         result.read = current;
-        needsRealClose = true;
         attached = result;
         return result;
     }
@@ -283,8 +276,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw new ReadonlyException(
                 format("Can't open for construction a new object using readonly transaction '%s'",config.familyName));
         }
-
-        needsRealClose = true;
 
         RefTranlocal<E> result = (attached == null || attached.owner != ref) ? null : (RefTranlocal<E>)attached;
 
@@ -361,7 +352,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
                     throw abortOnReadConflict(pool);
                 }
 
-                needsRealClose = true;
                 attached = read;
                 return read;
             }else{
@@ -373,7 +363,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
                 }
 
                 if(!read.isPermanent){
-                    needsRealClose = true;
                     attached = read;
                 }else if(config.trackReads){
                     attached = read;
@@ -395,8 +384,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
                 if(!ref.tryLockAndCheckConflict(this, config.spinCount, read)){
                     throw abortOnReadConflict(pool);
                 }
-
-                needsRealClose = true;
             }
 
             return read;
@@ -472,7 +459,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             result.value = read.value;
             result.read = read;
 
-            needsRealClose = true;
             attached = result;
             return result;
         }
@@ -502,7 +488,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
         result.value = current.value;
         result.read = current;
-        needsRealClose = true;
         attached = result;
         return result;
     }
@@ -540,8 +525,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw new ReadonlyException(
                 format("Can't open for construction a new object using readonly transaction '%s'",config.familyName));
         }
-
-        needsRealClose = true;
 
         IntRefTranlocal result = (attached == null || attached.owner != ref) ? null : (IntRefTranlocal)attached;
 
@@ -618,7 +601,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
                     throw abortOnReadConflict(pool);
                 }
 
-                needsRealClose = true;
                 attached = read;
                 return read;
             }else{
@@ -630,7 +612,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
                 }
 
                 if(!read.isPermanent){
-                    needsRealClose = true;
                     attached = read;
                 }else if(config.trackReads){
                     attached = read;
@@ -652,8 +633,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
                 if(!ref.tryLockAndCheckConflict(this, config.spinCount, read)){
                     throw abortOnReadConflict(pool);
                 }
-
-                needsRealClose = true;
             }
 
             return read;
@@ -729,7 +708,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             result.value = read.value;
             result.read = read;
 
-            needsRealClose = true;
             attached = result;
             return result;
         }
@@ -759,7 +737,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
         result.value = current.value;
         result.read = current;
-        needsRealClose = true;
         attached = result;
         return result;
     }
@@ -797,8 +774,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw new ReadonlyException(
                 format("Can't open for construction a new object using readonly transaction '%s'",config.familyName));
         }
-
-        needsRealClose = true;
 
         LongRefTranlocal result = (attached == null || attached.owner != ref) ? null : (LongRefTranlocal)attached;
 
@@ -875,7 +850,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
                     throw abortOnReadConflict(pool);
                 }
 
-                needsRealClose = true;
                 attached = read;
                 return read;
             }else{
@@ -887,7 +861,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
                 }
 
                 if(!read.isPermanent){
-                    needsRealClose = true;
                     attached = read;
                 }else if(config.trackReads){
                     attached = read;
@@ -909,8 +882,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
                 if(!ref.tryLockAndCheckConflict(this, config.spinCount, read)){
                     throw abortOnReadConflict(pool);
                 }
-
-                needsRealClose = true;
             }
 
             return read;
@@ -981,7 +952,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
             Tranlocal result = read.openForWrite(pool);
 
-            needsRealClose = true;
             attached = result;
             return result;
         }
@@ -1006,7 +976,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         Tranlocal result = current.openForWrite(pool);
-        needsRealClose = true;
         attached = result;
         return result;
     }
@@ -1044,8 +1013,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw new ReadonlyException(
                 format("Can't open for construction a new object using readonly transaction '%s'",config.familyName));
         }
-
-        needsRealClose = true;
 
         Tranlocal result = (attached == null || attached.owner != ref) ? null : (Tranlocal)attached;
 
@@ -1140,7 +1107,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
             
         Listeners listeners = null;
-        if (needsRealClose) {
+        if(attached!=null){
             if(config.dirtyCheck){
                 if(status == ACTIVE){
                     if(!doPrepareDirty()){
@@ -1195,7 +1162,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOnWriteConflict(pool);
         }
 
-        if(needsRealClose){
+        if(attached!=null){
             if(config.dirtyCheck){
                 if(!doPrepareDirty()){
                     throw abortOnWriteConflict(pool);
@@ -1332,7 +1299,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
         status = ACTIVE;
         attempt++;
-        needsRealClose = false;
         abortOnly = false;
         attached = null;
         return true;
@@ -1353,7 +1319,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
         status = ACTIVE;
         abortOnly = false;        
-        needsRealClose = false;
         remainingTimeoutNs = config.timeoutNs;
         attached = null;
         attempt = 1;

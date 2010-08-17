@@ -118,7 +118,7 @@ public class LongRef_commitAllTest {
         LongRef ref = BetaStmUtils.createLongRef(stm);
         Orec orec = ref.getOrec();
 
-        BetaTransaction tx = stm.start();
+        BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal write = tx.openForWrite(ref, false, pool);
         ref.tryLockAndCheckConflict(tx, 1, write);
 
