@@ -131,7 +131,6 @@ public class FatMonoBetaTransaction_initTest {
         assertHasNoNormalListeners(tx);
         assertHasNoPermanentListeners(tx);
         assertEquals(null, getField(tx, "attached"));
-        assertEquals(false, getField(tx, "needsRealClose"));
         assertEquals(1, tx.getAttempt());
     }
 }

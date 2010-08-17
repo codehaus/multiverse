@@ -95,20 +95,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         //make sure that the state is correct.
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't read from already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+            throw abortOpenForRead(pool);
         }
 
         //a read on a null ref, always returns a null tranlocal.
@@ -130,7 +117,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     hasReads = true;
                 }
 
-                RefTranlocal<E> read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final RefTranlocal<E> read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
@@ -157,7 +144,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         //none is found in this transaction, lets load it.
-        RefTranlocal<E> read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+        final RefTranlocal<E> read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
 
         if (read.isLocked) {
             throw abortOnReadConflict(pool);
@@ -185,20 +172,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         //check if the status of the transaction is correct.
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't write to already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't write to already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't write to already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+            throw abortOpenForWrite(pool);
          }
 
         if (config.readonly) {
@@ -226,7 +200,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     hasReads = true;
                 }
 
-                RefTranlocal<E> read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final RefTranlocal<E> read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
@@ -242,7 +216,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 return result;
             }else if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,result)){
                 throw abortOnReadConflict(pool);
-            }else if(!result.isCommitted){
+            }
+
+            if(!result.isCommitted){
                 return result;
             }
 
@@ -289,20 +265,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         assert pool!=null;
 
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't write fresh object on already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't write fresh object on already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't write fresh object on already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+            throw abortOpenForConstruction(pool);
         }
 
         if (config.readonly) {
@@ -321,7 +284,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         final int index = findAttachedIndex(ref, identityHashCode);
 
         if(index >- 1){
-            RefTranlocal<E> result = (RefTranlocal<E>)array[index];
+            final RefTranlocal<E> result = (RefTranlocal<E>)array[index];
             if(result.isCommitted || result.read!=null){
                 throw new IllegalArgumentException(
                     format("Can't open a previous committed object for construction on transaction '%s'",config.familyName));
@@ -346,22 +309,11 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         return result;
     }
 
-    public <E> void commute(Ref<E> ref, BetaObjectPool pool, Function<E> function){
+    public <E> void commute(
+        final Ref<E> ref, final BetaObjectPool pool, final Function<E> function){
+
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't add a commting operation on already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't add a commting operation on already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't add a commting operation on already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+            throw abortCommute(pool);
         }
 
         if (config.readonly) {
@@ -376,7 +328,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         final int identityHashCode = ref.identityHashCode();
-        int index = findAttachedIndex(ref, identityHashCode);
+        final int index = findAttachedIndex(ref, identityHashCode);
         if(index == -1){
             //todo: call to 'openForCommute' can be inlined.
             RefTranlocal<E> result = ref.openForCommute(pool);
@@ -414,20 +366,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         //make sure that the state is correct.
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't read from already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+            throw abortOpenForRead(pool);
         }
 
         //a read on a null ref, always returns a null tranlocal.
@@ -449,7 +388,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     hasReads = true;
                 }
 
-                IntRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final IntRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
@@ -476,7 +415,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         //none is found in this transaction, lets load it.
-        IntRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+        final IntRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
 
         if (read.isLocked) {
             throw abortOnReadConflict(pool);
@@ -504,20 +443,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         //check if the status of the transaction is correct.
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't write to already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't write to already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't write to already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+            throw abortOpenForWrite(pool);
          }
 
         if (config.readonly) {
@@ -545,7 +471,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     hasReads = true;
                 }
 
-                IntRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final IntRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
@@ -561,7 +487,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 return result;
             }else if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,result)){
                 throw abortOnReadConflict(pool);
-            }else if(!result.isCommitted){
+            }
+
+            if(!result.isCommitted){
                 return result;
             }
 
@@ -608,20 +536,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         assert pool!=null;
 
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't write fresh object on already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't write fresh object on already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't write fresh object on already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+            throw abortOpenForConstruction(pool);
         }
 
         if (config.readonly) {
@@ -640,7 +555,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         final int index = findAttachedIndex(ref, identityHashCode);
 
         if(index >- 1){
-            IntRefTranlocal result = (IntRefTranlocal)array[index];
+            final IntRefTranlocal result = (IntRefTranlocal)array[index];
             if(result.isCommitted || result.read!=null){
                 throw new IllegalArgumentException(
                     format("Can't open a previous committed object for construction on transaction '%s'",config.familyName));
@@ -665,22 +580,11 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         return result;
     }
 
-    public  void commute(IntRef ref, BetaObjectPool pool, IntFunction function){
+    public  void commute(
+        final IntRef ref, final BetaObjectPool pool, final IntFunction function){
+
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't add a commting operation on already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't add a commting operation on already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't add a commting operation on already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+            throw abortCommute(pool);
         }
 
         if (config.readonly) {
@@ -695,7 +599,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         final int identityHashCode = ref.identityHashCode();
-        int index = findAttachedIndex(ref, identityHashCode);
+        final int index = findAttachedIndex(ref, identityHashCode);
         if(index == -1){
             //todo: call to 'openForCommute' can be inlined.
             IntRefTranlocal result = ref.openForCommute(pool);
@@ -733,20 +637,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         //make sure that the state is correct.
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't read from already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+            throw abortOpenForRead(pool);
         }
 
         //a read on a null ref, always returns a null tranlocal.
@@ -768,7 +659,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     hasReads = true;
                 }
 
-                LongRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final LongRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
@@ -795,7 +686,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         //none is found in this transaction, lets load it.
-        LongRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+        final LongRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
 
         if (read.isLocked) {
             throw abortOnReadConflict(pool);
@@ -823,20 +714,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         //check if the status of the transaction is correct.
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't write to already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't write to already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't write to already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+            throw abortOpenForWrite(pool);
          }
 
         if (config.readonly) {
@@ -864,7 +742,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     hasReads = true;
                 }
 
-                LongRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final LongRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
@@ -880,7 +758,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 return result;
             }else if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,result)){
                 throw abortOnReadConflict(pool);
-            }else if(!result.isCommitted){
+            }
+
+            if(!result.isCommitted){
                 return result;
             }
 
@@ -927,20 +807,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         assert pool!=null;
 
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't write fresh object on already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't write fresh object on already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't write fresh object on already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+            throw abortOpenForConstruction(pool);
         }
 
         if (config.readonly) {
@@ -959,7 +826,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         final int index = findAttachedIndex(ref, identityHashCode);
 
         if(index >- 1){
-            LongRefTranlocal result = (LongRefTranlocal)array[index];
+            final LongRefTranlocal result = (LongRefTranlocal)array[index];
             if(result.isCommitted || result.read!=null){
                 throw new IllegalArgumentException(
                     format("Can't open a previous committed object for construction on transaction '%s'",config.familyName));
@@ -984,22 +851,11 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         return result;
     }
 
-    public  void commute(LongRef ref, BetaObjectPool pool, LongFunction function){
+    public  void commute(
+        final LongRef ref, final BetaObjectPool pool, final LongFunction function){
+
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't add a commting operation on already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't add a commting operation on already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't add a commting operation on already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+            throw abortCommute(pool);
         }
 
         if (config.readonly) {
@@ -1014,7 +870,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         final int identityHashCode = ref.identityHashCode();
-        int index = findAttachedIndex(ref, identityHashCode);
+        final int index = findAttachedIndex(ref, identityHashCode);
         if(index == -1){
             //todo: call to 'openForCommute' can be inlined.
             LongRefTranlocal result = ref.openForCommute(pool);
@@ -1052,20 +908,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         //make sure that the state is correct.
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't read from already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+            throw abortOpenForRead(pool);
         }
 
         //a read on a null ref, always returns a null tranlocal.
@@ -1087,7 +930,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     hasReads = true;
                 }
 
-                Tranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final Tranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
@@ -1114,7 +957,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         //none is found in this transaction, lets load it.
-        Tranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+        final Tranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
 
         if (read.isLocked) {
             throw abortOnReadConflict(pool);
@@ -1142,20 +985,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         //check if the status of the transaction is correct.
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't write to already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't write to already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't write to already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+            throw abortOpenForWrite(pool);
          }
 
         if (config.readonly) {
@@ -1183,7 +1013,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     hasReads = true;
                 }
 
-                Tranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final Tranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
@@ -1199,7 +1029,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 return result;
             }else if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,result)){
                 throw abortOnReadConflict(pool);
-            }else if(!result.isCommitted){
+            }
+
+            if(!result.isCommitted){
                 return result;
             }
 
@@ -1241,20 +1073,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         assert pool!=null;
 
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't write fresh object on already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't write fresh object on already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't write fresh object on already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+            throw abortOpenForConstruction(pool);
         }
 
         if (config.readonly) {
@@ -1273,7 +1092,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         final int index = findAttachedIndex(ref, identityHashCode);
 
         if(index >- 1){
-            Tranlocal result = (Tranlocal)array[index];
+            final Tranlocal result = (Tranlocal)array[index];
             if(result.isCommitted || result.read!=null){
                 throw new IllegalArgumentException(
                     format("Can't open a previous committed object for construction on transaction '%s'",config.familyName));
@@ -1295,22 +1114,11 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         return result;
     }
 
-    public  void commute(BetaTransactionalObject ref, BetaObjectPool pool, Function function){
+    public  void commute(
+        final BetaTransactionalObject ref, final BetaObjectPool pool, final Function function){
+
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't add a commting operation on already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't add a commting operation on already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't add a commting operation on already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+            throw abortCommute(pool);
         }
 
         if (config.readonly) {
@@ -1325,7 +1133,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         final int identityHashCode = ref.identityHashCode();
-        int index = findAttachedIndex(ref, identityHashCode);
+        final int index = findAttachedIndex(ref, identityHashCode);
         if(index == -1){
             //todo: call to 'openForCommute' can be inlined.
             Tranlocal result = ref.openForCommute(pool);
@@ -1347,13 +1155,13 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             array[index]=result;
          }
 
-          throw new TodoException();
+         throw new TodoException();
     }
 
 
  
     public Tranlocal get(BetaTransactionalObject ref){
-        int indexOf = findAttachedIndex(ref, ref.identityHashCode());
+        final int indexOf = findAttachedIndex(ref, ref.identityHashCode());
         if(indexOf == -1){
             return null;
         }
@@ -1468,6 +1276,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             case ACTIVE:
                 //fall through
             case PREPARED:
+                status = ABORTED;
                 if(size>0){
                     for (int k = 0; k < array.length; k++) {
                         Tranlocal tranlocal = array[k];
@@ -1476,7 +1285,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                         }
                     }
                 }
-                status = ABORTED;
 
                 if(permanentListeners != null){
                     notifyListeners(permanentListeners, TransactionLifecycleEvent.PostAbort);
@@ -1654,15 +1462,19 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         for (int k = 0; k < array.length; k++) {
             Tranlocal tranlocal = array[k];
 
-            if (tranlocal==null||tranlocal.isCommitted){
+            if (tranlocal==null || tranlocal.isCommitted){
                 continue;
             }
 
             if(tranlocal.isCommuting){
+                Tranlocal read = tranlocal.owner.lockAndLoad(spinCount, this);
 
-                //todo: evaluate the commuting callables
+                if(read.isLocked){
+                    return false;
+                }
 
-                throw new TodoException();
+                tranlocal.read = read;
+                tranlocal.evaluateCommutingFunctions(pool);
             }
 
             if(!tranlocal.owner.tryLockAndCheckConflict(this, spinCount, tranlocal)){
@@ -1686,8 +1498,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             if(tranlocal.isCommuting){
                 Tranlocal read = tranlocal.owner.lockAndLoad(spinCount, this);
 
-                //todo: here could be a problem since the read is not set, the object could be seen as
-                //a constructed object.
                 if(read.isLocked){
                     return false;
                 }
@@ -1882,7 +1692,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             throw new NullPointerException();
         }
 
-        if(status == ACTIVE || status ==PREPARED){
+        if(status == ACTIVE || status == PREPARED){
             abort(pool);
         }
 

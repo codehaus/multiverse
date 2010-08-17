@@ -1,9 +1,29 @@
 package org.multiverse.api;
 
-
+/**
+ * With the PessimisticLockLevel one can influence various levels of pessimistic behavior in the Stm.
+ * For more information on configuration see
+ * {@link org.multiverse.api.TransactionFactoryBuilder#setPessimisticLockLevel(PessimisticLockLevel)}. 
+ *
+ * @author Peter Veentjer.
+ */
 public enum PessimisticLockLevel {
 
-    Write(false, true), Read(true, true), None(false, false);
+    /**
+     * A PessimisticLockLevel that requires the locks of all writes.
+     */
+    Write(false, true),
+
+    /**
+     * A PessimisticLockLevel that requires the locks of all reads (and therefor all writes). It is the most
+     * strict PessimisticLockLevel.
+     */
+    Read(true, true),
+
+    /**
+     * A PessimisticLockLevel that doesn't require any locking.
+     */
+    None(false, false);
 
     private final boolean lockReads;
     private final boolean lockWrites;
@@ -13,10 +33,21 @@ public enum PessimisticLockLevel {
         this.lockWrites = lockWrites;
     }
 
+    /**
+     * Checks if this PessimisticLockLevel requires the lock of a write.
+     *
+     * @return true if it requires the lock of a write.
+     */
     public final boolean lockWrites() {
         return lockWrites;
     }
 
+    /**
+     * Checks if this PessimisticLockLevel requires the lock of a read (and also the lock of a write since
+     * a read is needed before doing a write).
+     *
+     * @return true if it requires the lock of a read.
+     */
     public final boolean lockReads() {
         return lockReads;
     }

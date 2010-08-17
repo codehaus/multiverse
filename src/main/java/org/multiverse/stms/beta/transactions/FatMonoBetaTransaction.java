@@ -78,21 +78,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     public final <E> RefTranlocal openForRead(final Ref<E> ref,  boolean lock, final BetaObjectPool pool) {
 //        assert pool!=null;
 
-        if (status > ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't read from already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+        if (status != ACTIVE) {
+            throw abortOpenForRead(pool);
         }
 
         if (ref == null) {
@@ -200,21 +187,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     public final <E> RefTranlocal<E> openForWrite(
         final Ref<E> ref, boolean lock, final BetaObjectPool pool) {
 
-        if (status > ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't read from already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+        if (status != ACTIVE) {
+            throw abortOpenForWrite(pool);
         }
 
         if (ref == null) {
@@ -295,21 +269,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         final Ref<E> ref, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't write fresh object on already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't write fresh object on already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't write fresh object on already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-
-            }
+           throw abortOpenForConstruction(pool);
         }
 
         if (ref == null) {
@@ -365,21 +325,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     public final  IntRefTranlocal openForRead(final IntRef ref,  boolean lock, final BetaObjectPool pool) {
 //        assert pool!=null;
 
-        if (status > ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't read from already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+        if (status != ACTIVE) {
+            throw abortOpenForRead(pool);
         }
 
         if (ref == null) {
@@ -487,21 +434,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     public final  IntRefTranlocal openForWrite(
         final IntRef ref, boolean lock, final BetaObjectPool pool) {
 
-        if (status > ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't read from already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+        if (status != ACTIVE) {
+            throw abortOpenForWrite(pool);
         }
 
         if (ref == null) {
@@ -582,21 +516,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         final IntRef ref, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't write fresh object on already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't write fresh object on already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't write fresh object on already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-
-            }
+           throw abortOpenForConstruction(pool);
         }
 
         if (ref == null) {
@@ -652,21 +572,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     public final  LongRefTranlocal openForRead(final LongRef ref,  boolean lock, final BetaObjectPool pool) {
 //        assert pool!=null;
 
-        if (status > ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't read from already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+        if (status != ACTIVE) {
+            throw abortOpenForRead(pool);
         }
 
         if (ref == null) {
@@ -774,21 +681,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     public final  LongRefTranlocal openForWrite(
         final LongRef ref, boolean lock, final BetaObjectPool pool) {
 
-        if (status > ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't read from already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+        if (status != ACTIVE) {
+            throw abortOpenForWrite(pool);
         }
 
         if (ref == null) {
@@ -869,21 +763,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         final LongRef ref, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't write fresh object on already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't write fresh object on already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't write fresh object on already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-
-            }
+           throw abortOpenForConstruction(pool);
         }
 
         if (ref == null) {
@@ -939,21 +819,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     public final  Tranlocal openForRead(final BetaTransactionalObject ref,  boolean lock, final BetaObjectPool pool) {
 //        assert pool!=null;
 
-        if (status > ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't read from already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+        if (status != ACTIVE) {
+            throw abortOpenForRead(pool);
         }
 
         if (ref == null) {
@@ -1061,21 +928,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     public final  Tranlocal openForWrite(
         final BetaTransactionalObject ref, boolean lock, final BetaObjectPool pool) {
 
-        if (status > ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't read from already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+        if (status != ACTIVE) {
+            throw abortOpenForWrite(pool);
         }
 
         if (ref == null) {
@@ -1146,21 +1000,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         final BetaTransactionalObject ref, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't write fresh object on already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't write fresh object on already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't write fresh object on already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-
-            }
+           throw abortOpenForConstruction(pool);
         }
 
         if (ref == null) {

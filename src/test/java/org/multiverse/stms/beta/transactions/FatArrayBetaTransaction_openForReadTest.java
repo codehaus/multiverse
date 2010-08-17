@@ -17,6 +17,7 @@ import org.multiverse.stms.beta.refs.LongRef;
 import org.multiverse.stms.beta.refs.LongRefTranlocal;
 import org.multiverse.stms.beta.refs.Tranlocal;
 
+import static junit.framework.Assert.assertSame;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
@@ -497,29 +498,57 @@ public class FatArrayBetaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenHasCommutingFunctions() {
-        LongRef ref = createLongRef(stm, 10);
-        LongRefTranlocal committed = ref.unsafeLoad();
+       public void whenHasCommutingFunctions() {
+           LongRef ref = createLongRef(stm, 10);
+           LongRefTranlocal committed = ref.unsafeLoad();
 
-        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongFunction function = new IncLongFunction();
-        tx.commute(ref, pool, function);
+           FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+           LongFunction function = new IncLongFunction();
+           tx.commute(ref, pool, function);
 
-        LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
+           LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
 
-        LongRefTranlocal read = tx.openForRead(ref, false, pool);
+           LongRefTranlocal read = tx.openForWrite(ref, false, pool);
 
-        assertActive(tx);
-        assertSame(commuting, read);
-        assertSame(committed, read.read);
-        assertFalse(read.isCommuting);
-        assertFalse(read.isCommitted);
-        assertEquals(11, read.value);
-        assertUnlocked(ref);
-        assertNull(ref.getLockOwner());
-        assertSurplus(1, ref);
-        assertUpdateBiased(ref);
-    }
+           assertActive(tx);
+           assertSame(commuting, read);
+           assertSame(committed, read.read);
+           assertFalse(read.isCommuting);
+           assertFalse(read.isCommitted);
+           assertEquals(11, read.value);
+           assertUnlocked(ref);
+           assertNull(ref.getLockOwner());
+           assertSurplus(1, ref);
+           assertUpdateBiased(ref);
+       }
+
+       @Test
+       public void whenHasCommutingFunctionsAndLocked() {
+           LongRef ref = createLongRef(stm, 10);
+           LongRefTranlocal committed = ref.unsafeLoad();
+
+           FatArrayBetaTransaction otherTx = new FatArrayBetaTransaction(stm);
+           otherTx.openForRead(ref, true, pool);
+
+           FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+           LongFunction function = new IncLongFunction();
+           tx.commute(ref, pool, function);
+
+           try {
+               tx.openForRead(ref, false, pool);
+               fail();
+           } catch (ReadConflict expected) {
+
+           }
+
+           assertAborted(tx);
+           assertSame(otherTx, ref.lockOwner);
+           assertLocked(ref);
+           assertSurplus(1, ref);
+           assertUpdateBiased(ref);
+           assertSame(committed, ref.unsafeLoad());
+       }
+
 
     @Test
     public void whenPrepared_thenPreparedException() {

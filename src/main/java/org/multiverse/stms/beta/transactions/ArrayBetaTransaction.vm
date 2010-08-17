@@ -77,20 +77,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         //make sure that the state is correct.
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't read from already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't read from already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+            throw abortOpenForRead(pool);
         }
 
         //a read on a null ref, always return a null tranlocal.
@@ -102,14 +89,32 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         final int index = indexOf(ref);
 
-        if(index >= 0){
+        if(index > -1){
             //we are lucky, at already is attached to the session
             ${ref.tranlocal}${ref.typeParameter} found = (${ref.tranlocal}${ref.typeParameter})array[index];
 
-            if (lock) {
-                if(!ref.tryLockAndCheckConflict(this, config.spinCount, found)){
+            if(found.isCommuting){
+                if(!hasReads){
+                    localConflictCounter.reset();
+                    hasReads = true;
+                }
+
+                final ${ref.tranlocal}${ref.typeParameter} read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+
+                if (read.isLocked) {
                     throw abortOnReadConflict(pool);
                 }
+
+                //make sure that there are no conflicts.
+                if (hasReadConflict()) {
+                    ref.abort(this, read, pool);
+                    throw abortOnReadConflict(pool);
+                }
+
+                found.read = read;
+                found.evaluateCommutingFunctions(pool);
+            }else if (lock && !ref.tryLockAndCheckConflict(this, config.spinCount, found)){
+                throw abortOnReadConflict(pool);
             }
 
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
@@ -117,6 +122,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 array[index] = array[0];
                 array[index] = found;
             }
+
             return found;
         }
 
@@ -158,20 +164,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         //check if the status of the transaction is correct.
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't write to already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't write to already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't write to already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+           throw abortOpenForWrite(pool);
         }
 
         if (config.readonly) {
@@ -192,33 +185,50 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         if(index != -1){
             ${ref.tranlocal}${ref.typeParameter} result = (${ref.tranlocal}${ref.typeParameter})array[index];
 
-            //an optimization that shifts the read index to the front, so it can be access faster the next time.
-            if (index > 0) {
-                array[index] = array[0];
-                array[0] = result;
-            }
+            if(result.isCommuting){
+                if(!hasReads){
+                    localConflictCounter.reset();
+                    hasReads = true;
+                }
 
-            if (lock) {
-                if(!ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+                final ${ref.tranlocal}${ref.typeParameter} read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+
+                if (read.isLocked) {
                     throw abortOnReadConflict(pool);
                 }
+
+                if (hasReadConflict()) {
+                    ref.abort(this, read, pool);
+                    throw abortOnReadConflict(pool);
+                }
+
+                result.read = read;
+                result.evaluateCommutingFunctions(pool);
+                return result;
+            }else if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+                throw abortOnReadConflict(pool);
+            }else if(!result.isCommitted){
+                return result;
             }
 
-            //and open it for write if needed.
-            if (result.isCommitted) {
-#if($ref.isSpecialized)
-                ${ref.tranlocal}${ref.typeParameter} read = result;
-                result = pool.take(ref);
-                if (result == null) {
-                    result = new ${ref.tranlocal}${ref.typeParameter}(ref);
-                }
-                result.value = read.value;
-                result.read = read;
-#else
-                result = result.openForWrite(pool);
-#end
-                array[0] = result;
+             //an optimization that shifts the read index to the front, so it can be access faster the next time.
+            if (index > 0) {
+                array[index] = array[0];
+                array[index] = result;
             }
+
+#if($ref.isSpecialized)
+            final ${ref.tranlocal}${ref.typeParameter} read = result;
+            result = pool.take(ref);
+            if (result == null) {
+                result = new ${ref.tranlocal}${ref.typeParameter}(ref);
+            }
+            result.value = read.value;
+            result.read = read;
+#else
+            result = result.openForWrite(pool);
+#end
+            array[0] = result;
             return result;
         }
 
@@ -273,20 +283,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         //check if the status of the transaction is correct.
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't write fresh object on already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't write fresh object on already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't write fresh object on already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+          throw abortOpenForConstruction(pool);
         }
 
         if (config.readonly) {
@@ -300,7 +297,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw new NullPointerException();
         }
 
-        int index = indexOf(ref);
+        final int index = indexOf(ref);
         if(index >= 0){
             ${ref.tranlocal}${ref.typeParameter} result = (${ref.tranlocal}${ref.typeParameter})array[index];
 
@@ -347,8 +344,64 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         return result;
     }
 
-    public ${ref.typeParameter} void commute(${ref.name}${ref.typeParameter} ref, BetaObjectPool pool, ${ref.functionClass}${ref.typeParameter} function){
+    public ${ref.typeParameter} void commute(
+        final ${ref.name}${ref.typeParameter} ref, final BetaObjectPool pool, ${ref.functionClass}${ref.typeParameter} function){
+
+        if (status != ACTIVE) {
+            throw abortCommute(pool);
+        }
+
+        if (config.readonly) {
+            abort(pool);
+            throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
+        }
+
+        //an openForWrite can't open a null ref.
+        if (ref == null) {
+            abort(pool);
+            throw new NullPointerException();
+        }
+
+        int index = indexOf(ref);
+        if(index == -1){
+            if(firstFreeIndex == array.length) {
+                throw abortOnTooSmallSize(pool, array.length+1);
+            }
+
+            //todo: call to 'openForCommute' can be inlined.
+            ${ref.tranlocal}${ref.typeParameter} result = ref.openForCommute(pool);
+            array[firstFreeIndex]=result;
+            result.addCommutingFunction(function, pool);
+            firstFreeIndex++;
+            return;
+        }
+
+        ${ref.tranlocal}${ref.typeParameter} result = (${ref.tranlocal}${ref.typeParameter})array[index];
+        if(result.isCommuting){
+            result.addCommutingFunction(function, pool);
+            return;
+        }
+
+        if(result.isCommitted){
+            final ${ref.tranlocal}${ref.typeParameter} read = result;
+#if($ref.isSpecialization())
+            result =  pool.take(ref);
+            if(result == null){
+                result = new ${ref.tranlocal}${ref.typeParameter}(ref);
+            }
+            result.read = read;
+            result.value = read.value;
+#else
+            result = read.openForWrite(pool);
+#end
+            array[index]=result;
+        }
+
+#if($ref.isSpecialization())
+        result.value = function.call(result.value);
+#else
         throw new TodoException();
+#end
     }
 
 #end ##for loop of refs.
@@ -418,9 +471,8 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             case ACTIVE:
                 //fall through
             case PREPARED:
-                final int _firstFreeIndex = firstFreeIndex;
-
-                for (int k = 0; k < _firstFreeIndex; k++) {
+                status = ABORTED;                
+                for (int k = 0; k < firstFreeIndex; k++) {
                     Tranlocal tranlocal = array[k];
                     tranlocal.owner.abort(this, tranlocal, pool);
                 }
@@ -474,13 +526,13 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         if (firstFreeIndex > 0) {
             if(config.dirtyCheck){
-                if(status == ACTIVE && !doPrepareDirty()){
+                if(status == ACTIVE && !doPrepareDirty(pool)){
                     throw abortOnWriteConflict(pool);
                 }
 
                 listeners = commitDirty(pool);
             }else{
-                if(status == ACTIVE && !doPrepareAll()){
+                if(status == ACTIVE && !doPrepareAll(pool)){
                      throw abortOnWriteConflict(pool);
                 }
 
@@ -609,11 +661,11 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         if(firstFreeIndex > 0){
            if(config.dirtyCheck){
-                if(!doPrepareDirty()){
+                if(!doPrepareDirty(pool)){
                     throw abortOnWriteConflict(pool);
                 }
             }else{
-                if(!doPrepareAll()){
+                if(!doPrepareAll(pool)){
                     throw abortOnWriteConflict(pool);
                 }
             }
@@ -656,11 +708,11 @@ public final class ${transaction.name} extends ${transaction.superClass} {
              
             if(firstFreeIndex > 0){
                 if(config.dirtyCheck){
-                    if(!doPrepareDirty()){
+                    if(!doPrepareDirty(pool)){
                         throw abortOnWriteConflict(pool);
                     }
                 }else{
-                    if(!doPrepareAll()){
+                    if(!doPrepareAll(pool)){
                         throw abortOnWriteConflict(pool);
                     }
                 }
@@ -676,26 +728,54 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     }
 #end
 
-    private boolean doPrepareAll() {
+    private boolean doPrepareAll(final BetaObjectPool pool) {
+        int spinCount = config.spinCount;
+
         for (int k = 0; k < firstFreeIndex; k++) {
             Tranlocal tranlocal = array[k];
 
-            if (!tranlocal.isCommitted) {
-                if(!tranlocal.owner.tryLockAndCheckConflict(this, config.spinCount, tranlocal)){
+            if(tranlocal.isCommitted){
+                continue;
+            }
+
+            if(tranlocal.isCommuting){
+                Tranlocal read = tranlocal.owner.lockAndLoad(spinCount, this);
+
+                if(read.isLocked){
                     return false;
                 }
+
+                tranlocal.read = read;
+                tranlocal.evaluateCommutingFunctions(pool);
+            }else if(!tranlocal.owner.tryLockAndCheckConflict(this, spinCount, tranlocal)){
+                return false;
             }
         }
 
         return true;
     }
 
-    private boolean doPrepareDirty() {
+    private boolean doPrepareDirty(final BetaObjectPool pool) {
+        int spinCount = config.spinCount;
+
         for (int k = 0; k < firstFreeIndex; k++) {
             Tranlocal tranlocal = array[k];
 
-            if (!tranlocal.isCommitted && tranlocal.calculateIsDirty()) {
-                if(!tranlocal.owner.tryLockAndCheckConflict(this, config.spinCount, tranlocal)){
+            if(tranlocal.isCommitted){
+                continue;
+            }
+
+            if(tranlocal.isCommuting){
+                Tranlocal read = tranlocal.owner.lockAndLoad(spinCount, this);
+
+                if(read.isLocked){
+                    return false;
+                }
+
+                tranlocal.read = read;
+                tranlocal.evaluateCommutingFunctions(pool);
+            }else if (tranlocal.calculateIsDirty()) {
+                if(!tranlocal.owner.tryLockAndCheckConflict(this, spinCount, tranlocal)){
                     return false;
                 }
             }

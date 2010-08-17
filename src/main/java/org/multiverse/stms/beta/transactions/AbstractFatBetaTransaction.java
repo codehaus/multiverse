@@ -9,6 +9,7 @@ import org.multiverse.stms.beta.BetaObjectPool;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.String.format;
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
@@ -71,6 +72,74 @@ public abstract class AbstractFatBetaTransaction implements BetaTransaction {
                 throw new DeadTransactionException();
             case ABORTED:
                 throw new DeadTransactionException();
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
+    public final RuntimeException abortOpenForRead(final BetaObjectPool pool) {
+        switch (status) {
+            case PREPARED:
+                abort(pool);
+                return new PreparedTransactionException(
+                        format("Can't read from already prepared transaction '%s'", config.familyName));
+            case ABORTED:
+                return new DeadTransactionException(
+                        format("Can't read from already aborted transaction '%s'", config.familyName));
+            case COMMITTED:
+                return new DeadTransactionException(
+                        format("Can't read from already committed transaction '%s'", config.familyName));
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
+    public final RuntimeException abortOpenForWrite(final BetaObjectPool pool) {
+        switch (status) {
+            case PREPARED:
+                abort(pool);
+                return new PreparedTransactionException(
+                        format("Can't write to already prepared transaction '%s'", config.familyName));
+            case ABORTED:
+                return new DeadTransactionException(
+                        format("Can't write to already aborted transaction '%s'", config.familyName));
+            case COMMITTED:
+                return new DeadTransactionException(
+                        format("Can't write to already committed transaction '%s'", config.familyName));
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
+    public final RuntimeException abortOpenForConstruction(final BetaObjectPool pool) {
+        switch (status) {
+            case PREPARED:
+                abort(pool);
+                return new PreparedTransactionException(
+                        format("Can't write fresh object on already prepared transaction '%s'", config.familyName));
+            case ABORTED:
+                return new DeadTransactionException(
+                        format("Can't write fresh object on already aborted transaction '%s'", config.familyName));
+            case COMMITTED:
+                return new DeadTransactionException(
+                        format("Can't write fresh object on already committed transaction '%s'", config.familyName));
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
+    public final RuntimeException abortCommute(final BetaObjectPool pool) {
+        switch (status) {
+            case PREPARED:
+                abort();
+                return new PreparedTransactionException(
+                        format("Can't add a commuting operation on already prepared transaction '%s'", config.familyName));
+            case ABORTED:
+                return new DeadTransactionException(
+                        format("Can't add a commuting operation on already aborted transaction '%s'", config.familyName));
+            case COMMITTED:
+                return new DeadTransactionException(
+                        format("Can't add a commuting operation on already committed transaction '%s'", config.familyName));
             default:
                 throw new IllegalStateException();
         }

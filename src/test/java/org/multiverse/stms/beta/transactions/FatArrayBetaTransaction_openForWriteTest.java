@@ -1,10 +1,11 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.exceptions.*;
+import org.multiverse.functions.IncLongFunction;
+import org.multiverse.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
@@ -534,10 +535,59 @@ public class FatArrayBetaTransaction_openForWriteTest {
     }
 
     @Test
-    @Ignore
     public void whenHasCommutingFunctions() {
+        LongRef ref = createLongRef(stm, 10);
+        LongRefTranlocal committed = ref.unsafeLoad();
 
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        LongFunction function = new IncLongFunction();
+        tx.commute(ref, pool, function);
+
+        LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
+
+        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+
+        assertActive(tx);
+        assertSame(commuting, write);
+        assertSame(committed, write.read);
+        assertFalse(write.isCommuting);
+        assertFalse(write.isCommitted);
+        assertEquals(11, write.value);
+        assertNull(ref.lockOwner);
+        assertHasNoCommutingFunctions(write);
+        assertUnlocked(ref);
+        assertNull(ref.getLockOwner());
+        assertSurplus(1, ref);
+        assertUpdateBiased(ref);
     }
+
+    @Test
+    public void whenHasCommutingFunctionsAndLocked() {
+        LongRef ref = createLongRef(stm, 10);
+        LongRefTranlocal committed = ref.unsafeLoad();
+
+        FatArrayBetaTransaction otherTx = new FatArrayBetaTransaction(stm);
+        otherTx.openForRead(ref, true, pool);
+
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        LongFunction function = new IncLongFunction();
+        tx.commute(ref, pool, function);
+
+        try {
+            tx.openForWrite(ref, false, pool);
+            fail();
+        } catch (ReadConflict expected) {
+
+        }
+
+        assertAborted(tx);
+        assertSame(otherTx, ref.lockOwner);
+        assertLocked(ref);
+        assertSurplus(1, ref);
+        assertUpdateBiased(ref);
+        assertSame(committed, ref.unsafeLoad());
+    }
+
 
     @Test
     public void whenPessimisticThenNoConflictDetectionNeeded() {

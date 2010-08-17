@@ -187,6 +187,8 @@ globalconflict counter.
 
     - registerAndAbort: doesn't deal with commuting values correctly.
 
+    - testing: commute in combination with commitall (instead of only commute dirty)
+
 - rollbackfor/rollnotbackfor exception configuration
 
 - atomic block: add checked stuff
@@ -203,6 +205,11 @@ globalconflict counter.
 since you don't need to look at the reads/
 
 - testing: check if stuff is attached.
+
+- speculative + register doesn't combine because it can lead to transaction not accepting the task and therefor
+the task not being executed at all.
+
+- expose the ref
 
 done
 

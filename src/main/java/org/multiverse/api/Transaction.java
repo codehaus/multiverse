@@ -143,6 +143,8 @@ public interface Transaction {
      * <p/>
      * The abortOnly marker is reset when a {@link #softReset()} or {@link #hardReset()} is done.
      *
+     * This method is not threadsafe, so can only be called by the thread that used the transaction.
+     *
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if the transaction is not in the correct
      *          stat for this operation.
