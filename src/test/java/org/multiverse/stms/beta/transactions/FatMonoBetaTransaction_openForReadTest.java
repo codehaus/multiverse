@@ -49,16 +49,17 @@ public class FatMonoBetaTransaction_openForReadTest {
                 .setReadTrackingEnabled(false);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
-        LongRefTranlocal tranlocal = tx.openForRead(ref, false, pool);
+        LongRefTranlocal read = tx.openForRead(ref, false, pool);
 
         assertActive(tx);
-        assertSame(committed, tranlocal);
+        assertSame(committed, read);
         assertNull(tx.get(ref));
         assertTrue((Boolean) getField(tx, "hasReads"));
         assertTrue((Boolean) getField(tx, "hasUntrackedReads"));
         assertSurplus(1, ref);
         assertUnlocked(ref);
         assertNull(ref.getLockOwner());
+        assertNotAttached(tx, ref);
     }
 
     @Test
@@ -107,6 +108,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         assertTrue(committed.isCommitted);
         assertFalse(committed.isPermanent);
         assertEquals(10, read.value);
+        assertAttached(tx, read);
     }
 
     @Test
@@ -126,6 +128,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         assertTrue(read.isCommitted);
         assertTrue(read.isPermanent);
         assertEquals(10, read.value);
+        assertAttached(tx, read);
     }
 
     @Test
@@ -142,6 +145,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         assertUpdateBiased(ref.getOrec());
         assertReadonlyCount(0, ref.getOrec());
         assertSurplus(1, ref.getOrec());
+        assertAttached(tx, read2);
     }
 
     @Test
@@ -158,6 +162,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
         assertNull(ref.getLockOwner());
+        assertAttached(tx, read);
     }
 
     @Test
@@ -174,6 +179,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         assertSurplus(1, ref);
         assertSame(tx, ref.getLockOwner());
         assertNull(ref.unsafeLoad());
+        assertAttached(tx, read);
     }
 
     @Test
@@ -191,6 +197,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
         assertSame(tx, ref.getLockOwner());
+        assertAttached(tx, read);
     }
 
     @Test
@@ -231,6 +238,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         assertSame(tx, ref.getLockOwner());
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
+        assertAttached(tx, read);
     }
 
     @Test
@@ -249,6 +257,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         assertSame(tx, ref.getLockOwner());
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
+        assertAttached(tx, read2);
     }
 
     @Test
@@ -298,6 +307,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         assertUpdateBiased(ref);
         assertTrue(read.isCommitted);
         assertFalse(read.isPermanent);
+        assertAttached(tx, read);
     }
 
     @Test
@@ -318,6 +328,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         assertUpdateBiased(ref);
         assertTrue(read.isCommitted);
         assertFalse(read.isPermanent);
+        assertAttached(tx, read);
     }
 
     @Test

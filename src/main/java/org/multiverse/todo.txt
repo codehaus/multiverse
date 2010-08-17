@@ -187,8 +187,6 @@ globalconflict counter.
 
     - testing: commute: check if conflict counters are set correctly when an addCommute is done
 
-    - commute: tranlocal commute functionality needs to be tested better
-    
     - when commute function is evaluated, there should be protection against openForXXX on transaction.
 
     - registerAndAbort: doesn't deal with commuting values correctly.
@@ -210,14 +208,16 @@ globalconflict counter.
 - idea for the array, arraytree: keep seperate read/write buffer? This makes committing and preparing cheaper
 since you don't need to look at the reads/
 
-- testing: check if stuff is attached.
-
 - speculative + register doesn't combine because it can lead to transaction not accepting the task and therefor
 the task not being executed at all.
 
 - expose the ref
 
 done
+
+- testing: check if stuff is attached.
+
+old done
 
 - array tree commit: interleaved test
 
@@ -226,8 +226,8 @@ done
 - array tree: commit test
 
 - array: commit test
-      
-old done
+
+- commute: tranlocal commute functionality needs to be tested better
 
 - add commuting to array beta transaction
 

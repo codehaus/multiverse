@@ -44,6 +44,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
         assertSame(tx, ref.getLockOwner());
         assertLocked(ref);
         assertSurplus(1, ref);
+        assertAttached(tx, write);
     }
 
     @Test
@@ -60,7 +61,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
     }
 
     @Test
-    public void whenAlreadyCommitted() {
+    public void whenAlreadyCommitted_thenIllegalArgumentException() {
         LongRef ref = createLongRef(stm, 100);
         LongRefTranlocal committed = ref.unsafeLoad();
 
@@ -100,6 +101,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
         assertSame(tx, ref.getLockOwner());
         assertLocked(ref);
         assertSurplus(1, ref);
+        assertAttached(tx, write1);
     }
 
     @Test
@@ -183,17 +185,19 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
                 .setPessimisticLockLevel(PessimisticLockLevel.Read);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
-        tx.openForRead(ref1, false, pool);
+        LongRefTranlocal read1 = tx.openForRead(ref1, false, pool);
 
         long oldLocalConflictCount = tx.getLocalConflictCounter().get();
 
         stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
         LongRef ref2 = new LongRef(tx);
-        tx.openForConstruction(ref2, pool);
+        LongRefTranlocal constructed2 = tx.openForConstruction(ref2, pool);
 
         assertEquals(oldLocalConflictCount, tx.getLocalConflictCounter().get());
 
         assertActive(tx);
+        assertAttached(tx, read1);
+        assertAttached(tx, constructed2);
     }
 
     @Test
@@ -203,10 +207,11 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
         LongRef ref = new LongRef(tx);
 
         stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
-        tx.openForConstruction(ref, pool);
+        LongRefTranlocal constructed = tx.openForConstruction(ref, pool);
 
         assertEquals(oldConflictCount, tx.getLocalConflictCounter().get());
         assertActive(tx);
+        assertAttached(tx, constructed);
     }
 
     @Test

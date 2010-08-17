@@ -43,6 +43,7 @@ public class FatMonoBetaTransaction_openForConstructionTest {
         assertSame(tx, ref.getLockOwner());
         assertLocked(ref);
         assertSurplus(1, ref);
+        assertAttached(tx, write);
     }
 
     @Test
@@ -118,6 +119,7 @@ public class FatMonoBetaTransaction_openForConstructionTest {
         assertSame(tx, ref.getLockOwner());
         assertLocked(ref);
         assertSurplus(1, ref);
+        assertAttached(tx, write1);
     }
 
     @Test
@@ -198,10 +200,11 @@ public class FatMonoBetaTransaction_openForConstructionTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
 
         stm.getGlobalConflictCounter().signalConflict(ref);
-        tx.openForRead(ref, false, pool);
+        LongRefTranlocal read = tx.openForRead(ref, false, pool);
 
         assertEquals(stm.getGlobalConflictCounter().count(), tx.getLocalConflictCounter().get());
         assertActive(tx);
+        assertAttached(tx, read);
     }
 
     @Test

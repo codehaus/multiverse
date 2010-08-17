@@ -67,6 +67,13 @@ public interface BetaTransaction extends Transaction {
     void hardReset(BetaObjectPool pool);
 
     /**
+     * Returns the tranlocal that belongs to the given transactional object.
+     *
+     * @returns the found tranlocal, or null if not found.
+     */
+    Tranlocal get(BetaTransactionalObject object);
+
+    /**
      * Returns a list containing the permanent TransactionLifecycleListeners. The returned list
      * can be null (essentially the same as an empty list).
      */

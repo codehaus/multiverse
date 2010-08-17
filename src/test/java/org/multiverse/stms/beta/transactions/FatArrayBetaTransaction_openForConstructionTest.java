@@ -65,6 +65,7 @@ public class FatArrayBetaTransaction_openForConstructionTest {
         LongRefTranlocal write = tx.openForConstruction(ref, pool);
 
         assertActive(tx);
+        assertAttached(tx, write);
         assertNotNull(write);
         assertEquals(0, write.value);
         assertSame(ref, write.owner);
@@ -84,6 +85,7 @@ public class FatArrayBetaTransaction_openForConstructionTest {
         LongRefTranlocal construction2 = tx.openForConstruction(ref, pool);
 
         assertActive(tx);
+        assertAttached(tx,construction1);
         assertSame(construction1, construction2);
         assertNotNull(construction1);
         assertEquals(0, construction1.value);
@@ -193,6 +195,7 @@ public class FatArrayBetaTransaction_openForConstructionTest {
         } catch (ReadonlyException expected) {
         }
 
+        assertAborted(tx);
         assertUnlocked(ref);
         assertSame(committed, ref.unsafeLoad());
         assertNull(ref.getLockOwner());
@@ -217,7 +220,7 @@ public class FatArrayBetaTransaction_openForConstructionTest {
         LongRef ref2 = new LongRef(tx);
         tx.openForConstruction(ref2, pool);
 
-        assertEquals(oldLocalConflictCount, tx.getLocalConflictCounter().get());
+        assertEquals(oldLocalConflictCount, tx.getLocalConflictCounter().get());        
     }
 
     @Test

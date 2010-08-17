@@ -212,8 +212,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 return result;
             }
 
-
-
             result = result.openForWrite(pool);
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
             //if (index > 0) {
@@ -523,8 +521,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             }else if(!result.isCommitted){
                 return result;
             }
-
-
 
             result = result.openForWrite(pool);
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
@@ -836,8 +832,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 return result;
             }
 
-
-
             result = result.openForWrite(pool);
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
             //if (index > 0) {
@@ -1148,8 +1142,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 return result;
             }
 
-
-
             result = result.openForWrite(pool);
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
             //if (index > 0) {
@@ -1304,6 +1296,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     }
 
  
+    @Override
     public Tranlocal get(BetaTransactionalObject owner){
         int indexOf = indexOf(owner);
         return indexOf == -1 ? null: array[indexOf];

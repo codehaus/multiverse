@@ -141,6 +141,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertFalse(write.isCommitted);
         assertFalse(write.isPermanent);
         assertSame(committed, ref.unsafeLoad());
+        assertAttached(tx, write);
     }
 
     @Test
@@ -165,6 +166,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertFalse(write.isCommitted);
         assertFalse(write.isPermanent);
         assertSame(committed, ref.unsafeLoad());
+        assertAttached(tx, write);
     }
 
     @Test
@@ -188,6 +190,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertFalse(write.isCommitted);
         assertFalse(write.isPermanent);
         assertSame(committed, ref.unsafeLoad());
+        assertAttached(tx, write);
     }
 
     @Test
@@ -212,6 +215,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertFalse(write.isCommitted);
         assertFalse(write.isPermanent);
         assertSame(committed, ref.unsafeLoad());
+        assertAttached(tx, write);
     }
 
     @Test
@@ -235,6 +239,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertActive(tx);
+        assertAttached(tx, write);
     }
 
     @Test
@@ -255,6 +260,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertSurplus(1, ref.getOrec());
         assertUpdateBiased(ref.getOrec());
         assertNull(ref.unsafeLoad());
+        assertAttached(tx, write);
     }
 
     @Test
@@ -275,6 +281,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertSurplus(1, ref.getOrec());
         assertUpdateBiased(ref.getOrec());
         assertNull(ref.unsafeLoad());
+        assertAttached(tx, write);
     }
 
     @Test
@@ -323,11 +330,12 @@ public class FatArrayBetaTransaction_openForWriteTest {
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.openForRead(ref, false, pool);
-        Tranlocal tranlocal = tx.openForWrite(ref, false, pool);
+        Tranlocal write = tx.openForWrite(ref, false, pool);
 
         assertActive(tx);
-        assertOpenedForWrite(ref, tranlocal);
+        assertOpenedForWrite(ref, write);
         assertFalse(ref.getOrec().isLocked());
+        assertAttached(tx, write);
     }
 
     @Test
@@ -357,6 +365,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
 
         assertSame(write1, write2);
         assertActive(tx);
+        assertAttached(tx, write1);
     }
 
     @Test
@@ -374,6 +383,9 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertOpenedForWrite(ref1, write1);
         assertOpenedForWrite(ref2, write2);
         assertOpenedForWrite(ref3, write3);
+        assertAttached(tx, write1);
+        assertAttached(tx, write2);
+        assertAttached(tx, write3);
     }
 
     @Test
@@ -395,6 +407,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertSame(tx, ref.getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
+        assertAttached(tx, write);
     }
 
     @Test
@@ -416,6 +429,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertSame(tx, ref.getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
+        assertAttached(tx, write);
     }
 
     @Test
@@ -559,10 +573,11 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertNull(ref.getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
+        assertAttached(tx, write);
     }
 
     @Test
-    public void whenHasCommutingFunctionsAndLocked() {
+    public void whenHasCommutingFunctionAndLocked_thenReadConflict() {
         LongRef ref = createLongRef(stm, 10);
         LongRefTranlocal committed = ref.unsafeLoad();
 
@@ -598,16 +613,18 @@ public class FatArrayBetaTransaction_openForWriteTest {
                 .setPessimisticLockLevel(PessimisticLockLevel.Read);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
-        tx.openForWrite(ref1, false, pool);
+        LongRefTranlocal write1 = tx.openForWrite(ref1, false, pool);
 
         long oldLocalConflictCount = tx.getLocalConflictCounter().get();
 
         stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
 
-        tx.openForWrite(ref2, false, pool);
+        LongRefTranlocal write2 = tx.openForWrite(ref2, false, pool);
 
         assertEquals(oldLocalConflictCount, tx.getLocalConflictCounter().get());
         assertActive(tx);
+        assertAttached(tx, write1);
+        assertAttached(tx, write2);
     }
 
     @Test

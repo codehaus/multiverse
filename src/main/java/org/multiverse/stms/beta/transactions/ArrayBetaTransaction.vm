@@ -408,6 +408,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
 #end ##for loop of refs.
 
+    @Override
     public Tranlocal get(BetaTransactionalObject owner){
         int indexOf = indexOf(owner);
         return indexOf == -1 ? null: array[indexOf];

@@ -888,6 +888,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
 
  
+    @Override
     public Tranlocal get(BetaTransactionalObject object){
         return attached == null || attached.owner!= object? null: attached;
     }

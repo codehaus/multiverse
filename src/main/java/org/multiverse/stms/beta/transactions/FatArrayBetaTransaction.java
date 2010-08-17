@@ -213,8 +213,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 return result;
             }
 
-
-
             result = result.openForWrite(pool);
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
             //if (index > 0) {
@@ -524,8 +522,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             }else if(!result.isCommitted){
                 return result;
             }
-
-
 
             result = result.openForWrite(pool);
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
@@ -837,8 +833,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 return result;
             }
 
-
-
             result = result.openForWrite(pool);
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
             //if (index > 0) {
@@ -1149,8 +1143,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 return result;
             }
 
-
-
             result = result.openForWrite(pool);
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
             //if (index > 0) {
@@ -1305,6 +1297,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
     }
 
  
+    @Override
     public Tranlocal get(BetaTransactionalObject owner){
         int indexOf = indexOf(owner);
         return indexOf == -1 ? null: array[indexOf];
