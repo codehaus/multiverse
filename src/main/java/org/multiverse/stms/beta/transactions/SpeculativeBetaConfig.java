@@ -9,17 +9,19 @@ public final class SpeculativeBetaConfig {
 
     private final boolean listenersRequired;
     private final int minimalLength;
+    private final boolean commuteRequired;
 
     public SpeculativeBetaConfig() {
-        this(false, 1);
+        this(false, false, 1);
     }
 
-    public SpeculativeBetaConfig(boolean listenersRequired, int minimalLength) {
+    public SpeculativeBetaConfig(boolean listenersRequired, boolean commuteRequired, int minimalLength) {
         if (minimalLength < 0) {
             throw new IllegalArgumentException();
         }
         this.listenersRequired = listenersRequired;
         this.minimalLength = minimalLength;
+        this.commuteRequired = commuteRequired;
     }
 
     public boolean isListenerRequired() {
@@ -28,6 +30,10 @@ public final class SpeculativeBetaConfig {
 
     public int getMinimalLength() {
         return minimalLength;
+    }
+
+    public boolean isCommuteRequired() {
+        return commuteRequired;
     }
 
     public SpeculativeBetaConfig createWithMinimalLength(int newMinimalLength) {
@@ -39,21 +45,30 @@ public final class SpeculativeBetaConfig {
             return this;
         }
 
-        return new SpeculativeBetaConfig(listenersRequired, newMinimalLength);
+        return new SpeculativeBetaConfig(listenersRequired, commuteRequired, newMinimalLength);
     }
 
-    public SpeculativeBetaConfig createWithListenersEnabled() {
+    public SpeculativeBetaConfig createWithListenersRequired() {
         if (listenersRequired) {
             return this;
         }
 
-        return new SpeculativeBetaConfig(true, minimalLength);
+        return new SpeculativeBetaConfig(true, commuteRequired, minimalLength);
+    }
+
+    public SpeculativeBetaConfig createWithCommuteRequired() {
+        if (commuteRequired) {
+            return this;
+        }
+
+        return new SpeculativeBetaConfig(listenersRequired, true, minimalLength);
     }
 
     @Override
     public String toString() {
         return "SpeculativeBetaConfig{" +
                 "listenersRequired=" + listenersRequired +
+                ", commuteRequired=" + commuteRequired +
                 ", minimalLength=" + minimalLength +
                 '}';
     }

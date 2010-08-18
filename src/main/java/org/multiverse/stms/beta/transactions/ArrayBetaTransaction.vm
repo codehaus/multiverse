@@ -93,6 +93,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             //we are lucky, at already is attached to the session
             ${ref.tranlocal}${ref.typeParameter} found = (${ref.tranlocal}${ref.typeParameter})array[index];
 
+#if(!$transaction.lean)
             if(found.isCommuting){
                 System.out.println("commuting");    
                 if(!hasReads){
@@ -114,7 +115,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
                 found.read = read;
                 found.evaluateCommutingFunctions(pool);
-            }else if (lock && !ref.tryLockAndCheckConflict(this, config.spinCount, found)){
+            }else
+#end
+            if (lock && !ref.tryLockAndCheckConflict(this, config.spinCount, found)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -185,9 +188,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         final int index = indexOf(ref);
         if(index != -1){
             ${ref.tranlocal}${ref.typeParameter} result = (${ref.tranlocal}${ref.typeParameter})array[index];
+#if(!$transaction.lean)
 
             if(result.isCommuting){
-                System.out.println("Commuting");
                 if(!hasReads){
                     localConflictCounter.reset();
                     hasReads = true;
@@ -207,7 +210,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 result.read = read;
                 result.evaluateCommutingFunctions(pool);
                 return result;
-            }else if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+            }else
+#end
+            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
                 throw abortOnReadConflict(pool);
             }else if(!result.isCommitted){
                 return result;
@@ -353,6 +358,11 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortCommute(pool);
         }
 
+#if($transaction.lean)
+        config.needsCommute();
+        abort();
+        throw SpeculativeConfigurationError.INSTANCE;
+#else    
         if (config.readonly) {
             abort(pool);
             throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
@@ -404,6 +414,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #else
         throw new TodoException();
 #end
+#end  ## end transaction.lean
     }
 
 #end ##for loop of refs.
@@ -740,6 +751,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             if(tranlocal.isCommitted){
                 continue;
             }
+#if(!$transaction.lean)
 
             if(tranlocal.isCommuting){
                 Tranlocal read = tranlocal.owner.lockAndLoad(spinCount, this);
@@ -750,7 +762,10 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
                 tranlocal.read = read;
                 tranlocal.evaluateCommutingFunctions(pool);
-            }else if(!tranlocal.owner.tryLockAndCheckConflict(this, spinCount, tranlocal)){
+            }else
+#end
+
+            if(!tranlocal.owner.tryLockAndCheckConflict(this, spinCount, tranlocal)){
                 return false;
             }
         }
@@ -768,6 +783,8 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 continue;
             }
 
+#if(!$transaction.lean)
+
             if(tranlocal.isCommuting){
                 Tranlocal read = tranlocal.owner.lockAndLoad(spinCount, this);
 
@@ -777,7 +794,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
                 tranlocal.read = read;
                 tranlocal.evaluateCommutingFunctions(pool);
-            }else if (tranlocal.calculateIsDirty()) {
+            }else
+#end
+            if (tranlocal.calculateIsDirty()) {
                 if(!tranlocal.owner.tryLockAndCheckConflict(this, spinCount, tranlocal)){
                     return false;
                 }

@@ -121,7 +121,8 @@ todo
 - tracing
 
 - support for writeskew detection
-    - how should the writeskew detection be done? Should it lock all reads? 
+    - how should the writeskew detection be done? Should it lock all reads?
+    - could be part of the fat tx.
 
 - when hard reset is done, no new local conflict counter is created, so still attached to the old
 globalconflict counter.
@@ -207,7 +208,14 @@ the task not being executed at all.
 
 - expose the ref
 
+
 done
+
+old done
+
+- commute behavior should be part fat transaction and not lean.
+
+- added the commute required to the speculative configuration
 
 - testing: commute in combination with commitall (instead of only commute dirty)
 
@@ -216,8 +224,6 @@ done
 - array tree: prepare test
 
 - array: prepare test
-
-old done
 
 - basic smoke tests added for working with different types in transaction than only the longref.
 

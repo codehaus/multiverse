@@ -275,49 +275,10 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortCommute(pool);
         }
 
-        if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
-        }
-
-        //an openForWrite can't open a null ref.
-        if (ref == null) {
-            abort(pool);
-            throw new NullPointerException();
-        }
-
-        boolean contains = (attached != null && attached.owner == ref);
-        if(!contains){
-            if(attached!=null) {
-                throw abortOnTooSmallSize(pool, 2);
-            }
-
-            //todo: call to 'openForCommute' can be inlined.
-            RefTranlocal<E> result = ref.openForCommute(pool);
-            attached=result;
-            result.addCommutingFunction(function, pool);
-            return;
-        }
-
-        RefTranlocal<E> result = (RefTranlocal<E>)attached;
-        if(result.isCommuting){
-            result.addCommutingFunction(function, pool);
-            return;
-        }
-
-        if(result.isCommitted){
-            final RefTranlocal<E> read = result;
-            result =  pool.take(ref);
-            if(result == null){
-                result = new RefTranlocal<E>(ref);
-            }
-            result.read = read;
-            result.value = read.value;
-            attached=result;
-        }
-
-        result.value = function.call(result.value);
-    }
+        config.needsCommute();
+        abort();
+        throw SpeculativeConfigurationError.INSTANCE;
+     }
 
 
 
@@ -531,49 +492,10 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortCommute(pool);
         }
 
-        if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
-        }
-
-        //an openForWrite can't open a null ref.
-        if (ref == null) {
-            abort(pool);
-            throw new NullPointerException();
-        }
-
-        boolean contains = (attached != null && attached.owner == ref);
-        if(!contains){
-            if(attached!=null) {
-                throw abortOnTooSmallSize(pool, 2);
-            }
-
-            //todo: call to 'openForCommute' can be inlined.
-            IntRefTranlocal result = ref.openForCommute(pool);
-            attached=result;
-            result.addCommutingFunction(function, pool);
-            return;
-        }
-
-        IntRefTranlocal result = (IntRefTranlocal)attached;
-        if(result.isCommuting){
-            result.addCommutingFunction(function, pool);
-            return;
-        }
-
-        if(result.isCommitted){
-            final IntRefTranlocal read = result;
-            result =  pool.take(ref);
-            if(result == null){
-                result = new IntRefTranlocal(ref);
-            }
-            result.read = read;
-            result.value = read.value;
-            attached=result;
-        }
-
-        result.value = function.call(result.value);
-    }
+        config.needsCommute();
+        abort();
+        throw SpeculativeConfigurationError.INSTANCE;
+     }
 
 
 
@@ -787,49 +709,10 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortCommute(pool);
         }
 
-        if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
-        }
-
-        //an openForWrite can't open a null ref.
-        if (ref == null) {
-            abort(pool);
-            throw new NullPointerException();
-        }
-
-        boolean contains = (attached != null && attached.owner == ref);
-        if(!contains){
-            if(attached!=null) {
-                throw abortOnTooSmallSize(pool, 2);
-            }
-
-            //todo: call to 'openForCommute' can be inlined.
-            LongRefTranlocal result = ref.openForCommute(pool);
-            attached=result;
-            result.addCommutingFunction(function, pool);
-            return;
-        }
-
-        LongRefTranlocal result = (LongRefTranlocal)attached;
-        if(result.isCommuting){
-            result.addCommutingFunction(function, pool);
-            return;
-        }
-
-        if(result.isCommitted){
-            final LongRefTranlocal read = result;
-            result =  pool.take(ref);
-            if(result == null){
-                result = new LongRefTranlocal(ref);
-            }
-            result.read = read;
-            result.value = read.value;
-            attached=result;
-        }
-
-        result.value = function.call(result.value);
-    }
+        config.needsCommute();
+        abort();
+        throw SpeculativeConfigurationError.INSTANCE;
+     }
 
 
 
@@ -1030,44 +913,10 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortCommute(pool);
         }
 
-        if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
-        }
-
-        //an openForWrite can't open a null ref.
-        if (ref == null) {
-            abort(pool);
-            throw new NullPointerException();
-        }
-
-        boolean contains = (attached != null && attached.owner == ref);
-        if(!contains){
-            if(attached!=null) {
-                throw abortOnTooSmallSize(pool, 2);
-            }
-
-            //todo: call to 'openForCommute' can be inlined.
-            Tranlocal result = ref.openForCommute(pool);
-            attached=result;
-            result.addCommutingFunction(function, pool);
-            return;
-        }
-
-        Tranlocal result = (Tranlocal)attached;
-        if(result.isCommuting){
-            result.addCommutingFunction(function, pool);
-            return;
-        }
-
-        if(result.isCommitted){
-            final Tranlocal read = result;
-            result = read.openForWrite(pool);
-            attached=result;
-        }
-
-        throw new TodoException();
-    }
+        config.needsCommute();
+        abort();
+        throw SpeculativeConfigurationError.INSTANCE;
+     }
 
 
  
@@ -1204,16 +1053,9 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
     private boolean doPrepareDirty(final BetaObjectPool pool){
         if(attached.isCommitted){
             return true;
-        }else if(attached.isCommuting){
-            Tranlocal read = attached.owner.lockAndLoad(config.spinCount, this);
+        }
 
-            if(read.isLocked){
-                return false;
-            }
-
-            attached.read = read;
-            attached.evaluateCommutingFunctions(pool);            
-        }else if (attached.calculateIsDirty()
+        if (attached.calculateIsDirty()
                     && !attached.owner.tryLockAndCheckConflict(this, config.spinCount, attached)){
             return false;
         }
@@ -1224,16 +1066,9 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
     private boolean doPrepareAll(final BetaObjectPool pool){
         if(attached.isCommitted){
             return true;
-        }else if(attached.isCommuting){
-            Tranlocal read = attached.owner.lockAndLoad(config.spinCount, this);
+        }
 
-            if(read.isLocked){
-                return false;
-            }
-
-            attached.read = read;
-            attached.evaluateCommutingFunctions(pool);
-        }else if(!attached.owner.tryLockAndCheckConflict(this, config.spinCount, attached)){
+        if(!attached.owner.tryLockAndCheckConflict(this, config.spinCount, attached)){
             return false;
         }
 

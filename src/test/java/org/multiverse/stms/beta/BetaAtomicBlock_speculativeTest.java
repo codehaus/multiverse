@@ -7,6 +7,7 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.functions.LongFunction;
 import org.multiverse.stms.beta.refs.LongRef;
 import org.multiverse.stms.beta.transactions.*;
 
@@ -87,6 +88,30 @@ public class BetaAtomicBlock_speculativeTest {
                 if (!added.get()) {
                     btx.registerPermanent(pool, listener);
                 }
+            }
+        });
+
+        assertEquals(2, transactions.size());
+        assertTrue(transactions.get(0) instanceof LeanMonoBetaTransaction);
+        assertTrue(transactions.get(1) instanceof FatMonoBetaTransaction);
+    }
+    
+     @Test
+    public void whenCommute() {
+        final List<BetaTransaction> transactions = new LinkedList<BetaTransaction>();
+        final LongRef ref = createLongRef(stm);
+        final LongFunction function = mock(LongFunction.class);
+
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
+                .setSpeculativeConfigEnabled(true)
+                .buildAtomicBlock();
+
+        block.execute(new AtomicVoidClosure() {
+            @Override
+            public void execute(Transaction tx) throws Exception {
+                BetaTransaction btx = (BetaTransaction) tx;
+                transactions.add(btx);
+                btx.commute(ref,pool, function);
             }
         });
 

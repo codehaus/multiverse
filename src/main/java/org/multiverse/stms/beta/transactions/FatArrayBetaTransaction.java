@@ -114,7 +114,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
                 found.read = read;
                 found.evaluateCommutingFunctions(pool);
-            }else if (lock && !ref.tryLockAndCheckConflict(this, config.spinCount, found)){
+            }else
+            if (lock && !ref.tryLockAndCheckConflict(this, config.spinCount, found)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -187,7 +188,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             RefTranlocal<E> result = (RefTranlocal<E>)array[index];
 
             if(result.isCommuting){
-                System.out.println("Commuting");
                 if(!hasReads){
                     localConflictCounter.reset();
                     hasReads = true;
@@ -207,7 +207,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 result.read = read;
                 result.evaluateCommutingFunctions(pool);
                 return result;
-            }else if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+            }else
+            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
                 throw abortOnReadConflict(pool);
             }else if(!result.isCommitted){
                 return result;
@@ -378,7 +379,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         result.value = function.call(result.value);
-    }
+      }
 
 
     @Override
@@ -424,7 +425,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
                 found.read = read;
                 found.evaluateCommutingFunctions(pool);
-            }else if (lock && !ref.tryLockAndCheckConflict(this, config.spinCount, found)){
+            }else
+            if (lock && !ref.tryLockAndCheckConflict(this, config.spinCount, found)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -497,7 +499,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             IntRefTranlocal result = (IntRefTranlocal)array[index];
 
             if(result.isCommuting){
-                System.out.println("Commuting");
                 if(!hasReads){
                     localConflictCounter.reset();
                     hasReads = true;
@@ -517,7 +518,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 result.read = read;
                 result.evaluateCommutingFunctions(pool);
                 return result;
-            }else if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+            }else
+            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
                 throw abortOnReadConflict(pool);
             }else if(!result.isCommitted){
                 return result;
@@ -688,7 +690,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         result.value = function.call(result.value);
-    }
+      }
 
 
     @Override
@@ -734,7 +736,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
                 found.read = read;
                 found.evaluateCommutingFunctions(pool);
-            }else if (lock && !ref.tryLockAndCheckConflict(this, config.spinCount, found)){
+            }else
+            if (lock && !ref.tryLockAndCheckConflict(this, config.spinCount, found)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -807,7 +810,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             LongRefTranlocal result = (LongRefTranlocal)array[index];
 
             if(result.isCommuting){
-                System.out.println("Commuting");
                 if(!hasReads){
                     localConflictCounter.reset();
                     hasReads = true;
@@ -827,7 +829,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 result.read = read;
                 result.evaluateCommutingFunctions(pool);
                 return result;
-            }else if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+            }else
+            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
                 throw abortOnReadConflict(pool);
             }else if(!result.isCommitted){
                 return result;
@@ -998,7 +1001,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         result.value = function.call(result.value);
-    }
+      }
 
 
     @Override
@@ -1044,7 +1047,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
                 found.read = read;
                 found.evaluateCommutingFunctions(pool);
-            }else if (lock && !ref.tryLockAndCheckConflict(this, config.spinCount, found)){
+            }else
+            if (lock && !ref.tryLockAndCheckConflict(this, config.spinCount, found)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -1117,7 +1121,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             Tranlocal result = (Tranlocal)array[index];
 
             if(result.isCommuting){
-                System.out.println("Commuting");
                 if(!hasReads){
                     localConflictCounter.reset();
                     hasReads = true;
@@ -1137,7 +1140,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 result.read = read;
                 result.evaluateCommutingFunctions(pool);
                 return result;
-            }else if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+            }else
+            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
                 throw abortOnReadConflict(pool);
             }else if(!result.isCommitted){
                 return result;
@@ -1294,7 +1298,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         throw new TodoException();
-    }
+      }
 
  
     @Override
@@ -1553,7 +1557,9 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
                 tranlocal.read = read;
                 tranlocal.evaluateCommutingFunctions(pool);
-            }else if(!tranlocal.owner.tryLockAndCheckConflict(this, spinCount, tranlocal)){
+            }else
+
+            if(!tranlocal.owner.tryLockAndCheckConflict(this, spinCount, tranlocal)){
                 return false;
             }
         }
@@ -1571,6 +1577,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 continue;
             }
 
+
             if(tranlocal.isCommuting){
                 Tranlocal read = tranlocal.owner.lockAndLoad(spinCount, this);
 
@@ -1580,7 +1587,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
                 tranlocal.read = read;
                 tranlocal.evaluateCommutingFunctions(pool);
-            }else if (tranlocal.calculateIsDirty()) {
+            }else
+            if (tranlocal.calculateIsDirty()) {
                 if(!tranlocal.owner.tryLockAndCheckConflict(this, spinCount, tranlocal)){
                     return false;
                 }

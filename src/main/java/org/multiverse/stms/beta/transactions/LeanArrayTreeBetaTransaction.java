@@ -110,27 +110,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             //we are lucky, at already is attached to the session
             RefTranlocal<E> found = (RefTranlocal<E>)array[index];
 
-            if(found.isCommuting){
-                if(!hasReads){
-                    localConflictCounter.reset();
-                    hasReads = true;
-                }
-
-                final RefTranlocal<E> read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
-
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                //make sure that there are no conflicts.
-                if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
-                    throw abortOnReadConflict(pool);
-                }
-
-                found.read = read;
-                found.evaluateCommutingFunctions(pool);
-            }else if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,found)){
+            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,found)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -193,27 +173,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if(index >- 1){
             RefTranlocal<E> result = (RefTranlocal<E>)array[index];
 
-            if(result.isCommuting){
-                if(!hasReads){
-                    localConflictCounter.reset();
-                    hasReads = true;
-                }
-
-                final RefTranlocal<E> read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
-
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
-                    throw abortOnReadConflict(pool);
-                }
-
-                result.read = read;
-                result.evaluateCommutingFunctions(pool);
-                return result;
-            }else if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,result)){
+            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,result)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -315,47 +275,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortCommute(pool);
         }
 
-        if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
-        }
-
-        //an openForWrite can't open a null ref.
-        if (ref == null) {
-            abort(pool);
-            throw new NullPointerException();
-        }
-
-        final int identityHashCode = ref.identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
-        if(index == -1){
-            //todo: call to 'openForCommute' can be inlined.
-            RefTranlocal<E> result = ref.openForCommute(pool);
-            attach(ref, result, identityHashCode, pool);
-            result.addCommutingFunction(function, pool);
-            size++;
-            return;
-        }
-
-        RefTranlocal<E> result = (RefTranlocal<E>)array[index];
-        if(result.isCommuting){
-            result.addCommutingFunction(function, pool);
-            return;
-        }
-
-        if(result.isCommitted){
-            RefTranlocal<E> read = result;
-            result =  pool.take(ref);
-            if(result == null){
-                result = new RefTranlocal<E>(ref);
-            }
-            result.read = read;
-            result.value = read.value;
-            array[index]=result;
-         }
-
-         result.value = function.call(result.value);
-    }
+        config.needsCommute();
+        abort();
+        throw SpeculativeConfigurationError.INSTANCE;
+     }
 
 
 
@@ -381,27 +304,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             //we are lucky, at already is attached to the session
             IntRefTranlocal found = (IntRefTranlocal)array[index];
 
-            if(found.isCommuting){
-                if(!hasReads){
-                    localConflictCounter.reset();
-                    hasReads = true;
-                }
-
-                final IntRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
-
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                //make sure that there are no conflicts.
-                if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
-                    throw abortOnReadConflict(pool);
-                }
-
-                found.read = read;
-                found.evaluateCommutingFunctions(pool);
-            }else if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,found)){
+            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,found)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -464,27 +367,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if(index >- 1){
             IntRefTranlocal result = (IntRefTranlocal)array[index];
 
-            if(result.isCommuting){
-                if(!hasReads){
-                    localConflictCounter.reset();
-                    hasReads = true;
-                }
-
-                final IntRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
-
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
-                    throw abortOnReadConflict(pool);
-                }
-
-                result.read = read;
-                result.evaluateCommutingFunctions(pool);
-                return result;
-            }else if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,result)){
+            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,result)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -586,47 +469,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortCommute(pool);
         }
 
-        if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
-        }
-
-        //an openForWrite can't open a null ref.
-        if (ref == null) {
-            abort(pool);
-            throw new NullPointerException();
-        }
-
-        final int identityHashCode = ref.identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
-        if(index == -1){
-            //todo: call to 'openForCommute' can be inlined.
-            IntRefTranlocal result = ref.openForCommute(pool);
-            attach(ref, result, identityHashCode, pool);
-            result.addCommutingFunction(function, pool);
-            size++;
-            return;
-        }
-
-        IntRefTranlocal result = (IntRefTranlocal)array[index];
-        if(result.isCommuting){
-            result.addCommutingFunction(function, pool);
-            return;
-        }
-
-        if(result.isCommitted){
-            IntRefTranlocal read = result;
-            result =  pool.take(ref);
-            if(result == null){
-                result = new IntRefTranlocal(ref);
-            }
-            result.read = read;
-            result.value = read.value;
-            array[index]=result;
-         }
-
-         result.value = function.call(result.value);
-    }
+        config.needsCommute();
+        abort();
+        throw SpeculativeConfigurationError.INSTANCE;
+     }
 
 
 
@@ -652,27 +498,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             //we are lucky, at already is attached to the session
             LongRefTranlocal found = (LongRefTranlocal)array[index];
 
-            if(found.isCommuting){
-                if(!hasReads){
-                    localConflictCounter.reset();
-                    hasReads = true;
-                }
-
-                final LongRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
-
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                //make sure that there are no conflicts.
-                if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
-                    throw abortOnReadConflict(pool);
-                }
-
-                found.read = read;
-                found.evaluateCommutingFunctions(pool);
-            }else if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,found)){
+            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,found)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -735,27 +561,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if(index >- 1){
             LongRefTranlocal result = (LongRefTranlocal)array[index];
 
-            if(result.isCommuting){
-                if(!hasReads){
-                    localConflictCounter.reset();
-                    hasReads = true;
-                }
-
-                final LongRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
-
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
-                    throw abortOnReadConflict(pool);
-                }
-
-                result.read = read;
-                result.evaluateCommutingFunctions(pool);
-                return result;
-            }else if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,result)){
+            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,result)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -857,47 +663,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortCommute(pool);
         }
 
-        if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
-        }
-
-        //an openForWrite can't open a null ref.
-        if (ref == null) {
-            abort(pool);
-            throw new NullPointerException();
-        }
-
-        final int identityHashCode = ref.identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
-        if(index == -1){
-            //todo: call to 'openForCommute' can be inlined.
-            LongRefTranlocal result = ref.openForCommute(pool);
-            attach(ref, result, identityHashCode, pool);
-            result.addCommutingFunction(function, pool);
-            size++;
-            return;
-        }
-
-        LongRefTranlocal result = (LongRefTranlocal)array[index];
-        if(result.isCommuting){
-            result.addCommutingFunction(function, pool);
-            return;
-        }
-
-        if(result.isCommitted){
-            LongRefTranlocal read = result;
-            result =  pool.take(ref);
-            if(result == null){
-                result = new LongRefTranlocal(ref);
-            }
-            result.read = read;
-            result.value = read.value;
-            array[index]=result;
-         }
-
-         result.value = function.call(result.value);
-    }
+        config.needsCommute();
+        abort();
+        throw SpeculativeConfigurationError.INSTANCE;
+     }
 
 
 
@@ -923,27 +692,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             //we are lucky, at already is attached to the session
             Tranlocal found = (Tranlocal)array[index];
 
-            if(found.isCommuting){
-                if(!hasReads){
-                    localConflictCounter.reset();
-                    hasReads = true;
-                }
-
-                final Tranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
-
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                //make sure that there are no conflicts.
-                if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
-                    throw abortOnReadConflict(pool);
-                }
-
-                found.read = read;
-                found.evaluateCommutingFunctions(pool);
-            }else if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,found)){
+            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,found)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -1006,27 +755,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if(index >- 1){
             Tranlocal result = (Tranlocal)array[index];
 
-            if(result.isCommuting){
-                if(!hasReads){
-                    localConflictCounter.reset();
-                    hasReads = true;
-                }
-
-                final Tranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
-
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
-                    throw abortOnReadConflict(pool);
-                }
-
-                result.read = read;
-                result.evaluateCommutingFunctions(pool);
-                return result;
-            }else if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,result)){
+            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,result)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -1120,42 +849,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortCommute(pool);
         }
 
-        if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
-        }
-
-        //an openForWrite can't open a null ref.
-        if (ref == null) {
-            abort(pool);
-            throw new NullPointerException();
-        }
-
-        final int identityHashCode = ref.identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
-        if(index == -1){
-            //todo: call to 'openForCommute' can be inlined.
-            Tranlocal result = ref.openForCommute(pool);
-            attach(ref, result, identityHashCode, pool);
-            result.addCommutingFunction(function, pool);
-            size++;
-            return;
-        }
-
-        Tranlocal result = (Tranlocal)array[index];
-        if(result.isCommuting){
-            result.addCommutingFunction(function, pool);
-            return;
-        }
-
-        if(result.isCommitted){
-            Tranlocal read = result;
-            result = read.openForWrite(pool);
-            array[index]=result;
-         }
-
-         throw new TodoException();
-    }
+        config.needsCommute();
+        abort();
+        throw SpeculativeConfigurationError.INSTANCE;
+     }
 
 
  
@@ -1451,17 +1148,6 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
                 continue;
             }
 
-            if(tranlocal.isCommuting){
-                Tranlocal read = tranlocal.owner.lockAndLoad(spinCount, this);
-
-                if(read.isLocked){
-                    return false;
-                }
-
-                tranlocal.read = read;
-                tranlocal.evaluateCommutingFunctions(pool);
-            }
-
             if(!tranlocal.owner.tryLockAndCheckConflict(this, spinCount, tranlocal)){
                return false;
             }
@@ -1480,16 +1166,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
                 continue;
             }
 
-            if(tranlocal.isCommuting){
-                Tranlocal read = tranlocal.owner.lockAndLoad(spinCount, this);
-
-                if(read.isLocked){
-                    return false;
-                }
-
-                tranlocal.read = read;
-                tranlocal.evaluateCommutingFunctions(pool);
-            }else if (tranlocal.calculateIsDirty()) {
+            if (tranlocal.calculateIsDirty()) {
                 if(!tranlocal.owner.tryLockAndCheckConflict(this, spinCount, tranlocal)){
                     return false;
                 }

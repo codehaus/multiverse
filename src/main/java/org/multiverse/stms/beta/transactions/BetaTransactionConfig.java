@@ -170,7 +170,17 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
     public void needsListeners() {
         while (true) {
             SpeculativeBetaConfig current = speculativeConfig.get();
-            SpeculativeBetaConfig update = current.createWithListenersEnabled();
+            SpeculativeBetaConfig update = current.createWithListenersRequired();
+            if (speculativeConfig.compareAndSet(current, update)) {
+                return;
+            }
+        }
+    }
+
+    public void needsCommute() {
+        while (true) {
+            SpeculativeBetaConfig current = speculativeConfig.get();
+            SpeculativeBetaConfig update = current.createWithCommuteRequired();
             if (speculativeConfig.compareAndSet(current, update)) {
                 return;
             }
@@ -632,5 +642,35 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
         return config;
+    }
+
+    @Override
+    public String toString() {
+        return "BetaTransactionConfig{" +
+                "interruptible=" + interruptible +
+                ", durable=" + durable +
+                ", readonly=" + readonly +
+                ", spinCount=" + spinCount +
+                ", lockReads=" + lockReads +
+                ", lockWrites=" + lockWrites +
+                ", pessimisticLockLevel=" + pessimisticLockLevel +
+                ", dirtyCheck=" + dirtyCheck +
+                ", stm=" + stm +
+                ", globalConflictCounter=" + globalConflictCounter +
+                ", minimalArrayTreeSize=" + minimalArrayTreeSize +
+                ", trackReads=" + trackReads +
+                ", blockingAllowed=" + blockingAllowed +
+                ", maxRetries=" + maxRetries +
+                ", familyName='" + familyName + '\'' +
+                ", speculativeConfigEnabled=" + speculativeConfigEnabled +
+                ", maxArrayTransactionSize=" + maxArrayTransactionSize +
+                ", isAnonymous=" + isAnonymous +
+                ", backoffPolicy=" + backoffPolicy +
+                ", timeoutNs=" + timeoutNs +
+                ", traceLevel=" + traceLevel +
+                ", writeSkewAllowed=" + writeSkewAllowed +
+                ", propagationLevel=" + propagationLevel +
+                ", speculativeConfig=" + speculativeConfig +
+                '}';
     }
 }

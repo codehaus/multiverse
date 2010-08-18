@@ -253,7 +253,7 @@ public final class BetaStm implements Stm {
             final int length = speculativeConfig.getMinimalLength();
 
             if (length <= 1) {
-                if (speculativeConfig.isListenerRequired()) {
+                if (speculativeConfig.isListenerRequired() || speculativeConfig.isCommuteRequired()) {
                     FatMonoBetaTransaction tx = pool.takeFatMonoBetaTransaction();
                     if (tx == null) {
                         tx = new FatMonoBetaTransaction(config);
@@ -271,7 +271,7 @@ public final class BetaStm implements Stm {
                     return tx;
                 }
             } else if (length <= config.getMaxArrayTransactionSize()) {
-                if (speculativeConfig.isListenerRequired()) {
+                if (speculativeConfig.isListenerRequired() || speculativeConfig.isCommuteRequired()) {
                     FatArrayBetaTransaction tx = pool.takeFatArrayBetaTransaction();
                     if (tx == null) {
                         tx = new FatArrayBetaTransaction(config);
@@ -289,7 +289,7 @@ public final class BetaStm implements Stm {
                     return tx;
                 }
             } else {
-                if (speculativeConfig.isListenerRequired()) {
+                if (speculativeConfig.isListenerRequired() || speculativeConfig.isCommuteRequired()) {
                     FatArrayTreeBetaTransaction tx = pool.takeFatArrayTreeBetaTransaction();
                     if (tx == null) {
                         tx = new FatArrayTreeBetaTransaction(config);

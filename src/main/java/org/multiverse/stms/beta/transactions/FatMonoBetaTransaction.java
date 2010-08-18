@@ -364,7 +364,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         result.value = function.call(result.value);
-    }
+     }
 
 
 
@@ -658,7 +658,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         result.value = function.call(result.value);
-    }
+     }
 
 
 
@@ -952,7 +952,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         result.value = function.call(result.value);
-    }
+     }
 
 
 
@@ -1228,7 +1228,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         throw new TodoException();
-    }
+     }
 
 
  
@@ -1394,7 +1394,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     private boolean doPrepareDirty(final BetaObjectPool pool){
         if(attached.isCommitted){
             return true;
-        }else if(attached.isCommuting){
+        }
+
+        if(attached.isCommuting){
             Tranlocal read = attached.owner.lockAndLoad(config.spinCount, this);
 
             if(read.isLocked){
@@ -1403,7 +1405,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
             attached.read = read;
             attached.evaluateCommutingFunctions(pool);            
-        }else if (attached.calculateIsDirty()
+        }else
+        if (attached.calculateIsDirty()
                     && !attached.owner.tryLockAndCheckConflict(this, config.spinCount, attached)){
             return false;
         }
@@ -1414,7 +1417,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     private boolean doPrepareAll(final BetaObjectPool pool){
         if(attached.isCommitted){
             return true;
-        }else if(attached.isCommuting){
+        }
+
+        if(attached.isCommuting){
             Tranlocal read = attached.owner.lockAndLoad(config.spinCount, this);
 
             if(read.isLocked){
@@ -1423,7 +1428,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
             attached.read = read;
             attached.evaluateCommutingFunctions(pool);
-        }else if(!attached.owner.tryLockAndCheckConflict(this, config.spinCount, attached)){
+        }else
+        if(!attached.owner.tryLockAndCheckConflict(this, config.spinCount, attached)){
             return false;
         }
 

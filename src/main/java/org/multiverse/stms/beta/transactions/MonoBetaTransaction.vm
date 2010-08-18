@@ -358,6 +358,11 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortCommute(pool);
         }
 
+#if($transaction.lean)
+        config.needsCommute();
+        abort();
+        throw SpeculativeConfigurationError.INSTANCE;
+#else
         if (config.readonly) {
             abort(pool);
             throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
@@ -408,6 +413,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #else
         throw new TodoException();
 #end
+#end ##if(transaction.lean)    
     }
 
 
@@ -665,7 +671,10 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     private boolean doPrepareDirty(final BetaObjectPool pool){
         if(attached.isCommitted){
             return true;
-        }else if(attached.isCommuting){
+        }
+
+#if(!$transaction.lean)
+        if(attached.isCommuting){
             Tranlocal read = attached.owner.lockAndLoad(config.spinCount, this);
 
             if(read.isLocked){
@@ -674,7 +683,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
             attached.read = read;
             attached.evaluateCommutingFunctions(pool);            
-        }else if (attached.calculateIsDirty()
+        }else
+#end
+        if (attached.calculateIsDirty()
                     && !attached.owner.tryLockAndCheckConflict(this, config.spinCount, attached)){
             return false;
         }
@@ -685,7 +696,10 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     private boolean doPrepareAll(final BetaObjectPool pool){
         if(attached.isCommitted){
             return true;
-        }else if(attached.isCommuting){
+        }
+
+#if(!$transaction.lean)
+        if(attached.isCommuting){
             Tranlocal read = attached.owner.lockAndLoad(config.spinCount, this);
 
             if(read.isLocked){
@@ -694,7 +708,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
             attached.read = read;
             attached.evaluateCommutingFunctions(pool);
-        }else if(!attached.owner.tryLockAndCheckConflict(this, config.spinCount, attached)){
+        }else
+#end
+        if(!attached.owner.tryLockAndCheckConflict(this, config.spinCount, attached)){
             return false;
         }
 
