@@ -31,6 +31,10 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
  */
 public class TestUtils {
 
+    public static int processorCount() {
+        return Runtime.getRuntime().availableProcessors();
+    }
+
     public static void assertAttached(BetaTransaction tx, Tranlocal tranlocal) {
         Tranlocal result = tx.get(tranlocal.getOwner());
         assertSame(tranlocal, result);

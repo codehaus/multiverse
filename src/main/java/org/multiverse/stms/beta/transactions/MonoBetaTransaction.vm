@@ -351,8 +351,63 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         return result;
     }
 
-    public ${ref.typeParameter} void commute(${ref.name}${ref.typeParameter} ref, BetaObjectPool pool, ${ref.functionClass}${ref.typeParameter} function){
+    public ${ref.typeParameter} void commute(
+        ${ref.name}${ref.typeParameter} ref, BetaObjectPool pool, ${ref.functionClass}${ref.typeParameter} function){
+
+        if (status != ACTIVE) {
+            throw abortCommute(pool);
+        }
+
+        if (config.readonly) {
+            abort(pool);
+            throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
+        }
+
+        //an openForWrite can't open a null ref.
+        if (ref == null) {
+            abort(pool);
+            throw new NullPointerException();
+        }
+
+        boolean contains = (attached != null && attached.owner == ref);
+        if(!contains){
+            if(attached!=null) {
+                throw abortOnTooSmallSize(pool, 2);
+            }
+
+            //todo: call to 'openForCommute' can be inlined.
+            ${ref.tranlocal}${ref.typeParameter} result = ref.openForCommute(pool);
+            attached=result;
+            result.addCommutingFunction(function, pool);
+            return;
+        }
+
+        ${ref.tranlocal}${ref.typeParameter} result = (${ref.tranlocal}${ref.typeParameter})attached;
+        if(result.isCommuting){
+            result.addCommutingFunction(function, pool);
+            return;
+        }
+
+        if(result.isCommitted){
+            final ${ref.tranlocal}${ref.typeParameter} read = result;
+#if($ref.isSpecialization())
+            result =  pool.take(ref);
+            if(result == null){
+                result = new ${ref.tranlocal}${ref.typeParameter}(ref);
+            }
+            result.read = read;
+            result.value = read.value;
+#else
+            result = read.openForWrite(pool);
+#end
+            attached=result;
+        }
+
+#if($ref.isSpecialization())
+        result.value = function.call(result.value);
+#else
         throw new TodoException();
+#end
     }
 
 
@@ -455,7 +510,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         if(attached!=null){
             if(config.dirtyCheck){
                 if(status == ACTIVE){
-                    if(!doPrepareDirty()){
+                    if(!doPrepareDirty(pool)){
                         throw abortOnWriteConflict(pool);
                     }
                 }
@@ -463,7 +518,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 listeners = attached.owner.commitDirty(attached, this, pool, config.globalConflictCounter);
             }else{
                 if(status == ACTIVE){
-                    if(!doPrepareAll()){
+                    if(!doPrepareAll(pool)){
                         throw abortOnWriteConflict(pool);
                     }
                 }
@@ -541,11 +596,11 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         if(attached!=null){
             if(config.dirtyCheck){
-                if(!doPrepareDirty()){
+                if(!doPrepareDirty(pool)){
                     throw abortOnWriteConflict(pool);
                 }
             }else{
-                if(!doPrepareAll()){
+                if(!doPrepareAll(pool)){
                     throw abortOnWriteConflict(pool);
                 }
             }
@@ -587,11 +642,11 @@ public final class ${transaction.name} extends ${transaction.superClass} {
           
             if(attached!=null){
                 if(config.dirtyCheck){
-                    if(!doPrepareDirty()){
+                    if(!doPrepareDirty(pool)){
                         throw abortOnWriteConflict(pool);
                     }
                 }else{
-                    if(!doPrepareAll()){
+                    if(!doPrepareAll(pool)){
                         throw abortOnWriteConflict(pool);
                     }
                 }
@@ -607,21 +662,40 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     }
 #end
 
-    private boolean doPrepareDirty(){
-        if (!attached.isCommitted && attached.calculateIsDirty()){
-            if(!attached.owner.tryLockAndCheckConflict(this, config.spinCount, attached)){
+    private boolean doPrepareDirty(final BetaObjectPool pool){
+        if(attached.isCommitted){
+            return true;
+        }else if(attached.isCommuting){
+            Tranlocal read = attached.owner.lockAndLoad(config.spinCount, this);
+
+            if(read.isLocked){
                 return false;
             }
+
+            attached.read = read;
+            attached.evaluateCommutingFunctions(pool);            
+        }else if (attached.calculateIsDirty()
+                    && !attached.owner.tryLockAndCheckConflict(this, config.spinCount, attached)){
+            return false;
         }
 
         return true;
     }
 
-    private boolean doPrepareAll(){
-        if (!attached.isCommitted){
-            if(!attached.owner.tryLockAndCheckConflict(this, config.spinCount, attached)){
+    private boolean doPrepareAll(final BetaObjectPool pool){
+        if(attached.isCommitted){
+            return true;
+        }else if(attached.isCommuting){
+            Tranlocal read = attached.owner.lockAndLoad(config.spinCount, this);
+
+            if(read.isLocked){
                 return false;
             }
+
+            attached.read = read;
+            attached.evaluateCommutingFunctions(pool);
+        }else if(!attached.owner.tryLockAndCheckConflict(this, config.spinCount, attached)){
+            return false;
         }
 
         return true;

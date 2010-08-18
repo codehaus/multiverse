@@ -5,8 +5,7 @@ import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.refs.LongRef;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertNotEquals;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
@@ -19,19 +18,27 @@ public class LocalConflictCounterTest {
     }
 
     @Test
-    public void test(){
-        GlobalConflictCounter globalConflictCounter = new GlobalConflictCounter(1);
+    public void whenConflictHappened(){
+        GlobalConflictCounter global = new GlobalConflictCounter(1);
 
-        LocalConflictCounter localConflictCounter = globalConflictCounter.createLocalConflictCounter();
-
-        assertFalse(localConflictCounter.syncAndCheckConflict());
+        LocalConflictCounter local = global.createLocalConflictCounter();
 
         LongRef ref = createLongRef(stm);
-        globalConflictCounter.signalConflict(ref);
-        long oldCount = localConflictCounter.get();
+        global.signalConflict(ref);
+        long oldCount = local.get();
 
-        assertTrue(localConflictCounter.syncAndCheckConflict());
+        assertTrue(local.syncAndCheckConflict());
 
-        assertNotEquals(oldCount, localConflictCounter.get());
+        assertNotEquals(oldCount, local.get());
+    }
+
+    @Test
+    public void whenNoConflictHappened(){
+        GlobalConflictCounter global = new GlobalConflictCounter(1);
+
+        LocalConflictCounter local = global.createLocalConflictCounter();
+
+        assertFalse(local.syncAndCheckConflict());
+        assertSame(global.count(), local.get());
     }
 }

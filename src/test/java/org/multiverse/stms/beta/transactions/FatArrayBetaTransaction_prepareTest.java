@@ -5,6 +5,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.WriteConflict;
+import org.multiverse.functions.IncLongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.refs.LongRef;
@@ -252,6 +253,165 @@ public class FatArrayBetaTransaction_prepareTest {
 
         assertAborted(tx);
     }
+
+    @Test
+    public void whenReferenceHasMultipleCommutes() {
+        LongRef ref = createLongRef(stm);
+        LongRefTranlocal committed = ref.unsafeLoad();
+
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        tx.commute(ref, pool, IncLongFunction.INSTANCE);
+        tx.commute(ref, pool, IncLongFunction.INSTANCE);
+        tx.commute(ref, pool, IncLongFunction.INSTANCE);
+        tx.prepare();
+
+        LongRefTranlocal commute = (LongRefTranlocal) tx.get(ref);
+
+        assertNotNull(commute);
+        assertFalse(commute.isCommuting);
+        assertFalse(commute.isCommitted);
+        assertSame(ref, commute.owner);
+        assertSame(committed, commute.read);
+        assertEquals(3, commute.value);
+        assertTrue(commute.isDirty);
+        assertLocked(ref);
+        assertSame(tx, ref.getLockOwner());
+        assertSurplus(1, ref);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    @Ignore
+    public void whenMultipleReferencesHaveCommute() {
+        LongRef ref1 = createLongRef(stm, 10);
+        LongRef ref2 = createLongRef(stm, 20);
+        LongRef ref3 = createLongRef(stm, 30);
+
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        tx.commute(ref1, pool, IncLongFunction.INSTANCE);
+        tx.commute(ref2, pool, IncLongFunction.INSTANCE);
+        tx.commute(ref3, pool, IncLongFunction.INSTANCE);
+        tx.prepare();
+
+        LongRefTranlocal commute1 = (LongRefTranlocal) tx.get(ref1);
+        LongRefTranlocal commute2 = (LongRefTranlocal) tx.get(ref1);
+        LongRefTranlocal commute3 = (LongRefTranlocal) tx.get(ref1);
+
+        assertNotNull(commute1);
+        assertEquals(11, commute1.value);
+        assertNotNull(commute1);
+        assertEquals(21, commute2.value);
+        assertNotNull(commute1);
+        assertEquals(31, commute3.value);
+    }
+
+    @Test
+    public void whenHasCommuteAndNoDirtyCheck() {
+        LongRef ref = createLongRef(stm);
+        LongRefTranlocal committed = ref.unsafeLoad();
+
+        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+                .setDirtyCheckEnabled(false);
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
+        tx.commute(ref, pool, IncLongFunction.INSTANCE);
+        tx.prepare();
+
+        LongRefTranlocal commute = (LongRefTranlocal) tx.get(ref);
+
+        assertNotNull(commute);
+        assertFalse(commute.isCommuting);
+        assertFalse(commute.isCommitted);
+        assertSame(ref, commute.owner);
+        assertSame(committed, commute.read);
+        assertEquals(1, commute.value);
+        assertTrue(commute.isDirty);
+        assertLocked(ref);
+        assertSame(tx, ref.getLockOwner());
+        assertSurplus(1, ref);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    public void whenHasCommuteAndDirtyCheck() {
+        LongRef ref = createLongRef(stm);
+        LongRefTranlocal committed = ref.unsafeLoad();
+
+        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+                .setDirtyCheckEnabled(true);
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
+        tx.commute(ref, pool, IncLongFunction.INSTANCE);
+        tx.prepare();
+
+        LongRefTranlocal commute = (LongRefTranlocal) tx.get(ref);
+
+        assertNotNull(commute);
+        assertFalse(commute.isCommuting);
+        assertFalse(commute.isCommitted);
+        assertSame(ref, commute.owner);
+        assertSame(committed, commute.read);
+        assertEquals(1, commute.value);
+        assertTrue(commute.isDirty);
+        assertLocked(ref);
+        assertSame(tx, ref.getLockOwner());
+        assertSurplus(1, ref);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    public void whenHasCommuteButLockedByOtherTransaction_thenWriteConflict() {
+        LongRef ref = createLongRef(stm);
+        LongRefTranlocal committed = ref.unsafeLoad();
+
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        tx.commute(ref, pool, IncLongFunction.INSTANCE);
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        otherTx.openForRead(ref, true, pool);
+
+        try {
+            tx.prepare();
+            fail();
+        } catch (WriteConflict expected) {
+        }
+
+        assertAborted(tx);
+
+        assertLocked(ref);
+        assertSame(otherTx, ref.getLockOwner());
+        assertSurplus(1, ref);
+        assertUpdateBiased(ref);
+        assertSame(committed, ref.unsafeLoad());
+    }
+
+    @Test
+    public void whenHasCommuteThatConflicts() {
+        LongRef ref = createLongRef(stm);
+
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        tx.commute(ref, pool, IncLongFunction.INSTANCE);
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        otherTx.openForWrite(ref, false, pool).value++;
+        otherTx.commit();
+        LongRefTranlocal committed = ref.unsafeLoad();
+
+        tx.prepare();
+
+        LongRefTranlocal commute = (LongRefTranlocal) tx.get(ref);
+
+        assertNotNull(commute);
+        assertFalse(commute.isCommuting);
+        assertFalse(commute.isCommitted);
+        assertSame(ref, commute.owner);
+        assertSame(committed, commute.read);
+        assertEquals(2, commute.value);
+        assertTrue(commute.isDirty);
+        assertLocked(ref);
+        assertSame(tx, ref.getLockOwner());
+        assertSurplus(1, ref);
+        assertUpdateBiased(ref);
+    }
+
 
     @Test
     public void whenPreparedAlreadyPrepared() {

@@ -322,7 +322,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             result = new ${ref.tranlocal}${ref.typeParameter}(ref);
         }
 #else
-        ${ref.tranlocal}${ref.typeParameter} result = ref.openForConstruction(pool);
+        final ${ref.tranlocal}${ref.typeParameter} result = ref.openForConstruction(pool);
 #end
         attach(ref, result, identityHashCode, pool);
         size++;

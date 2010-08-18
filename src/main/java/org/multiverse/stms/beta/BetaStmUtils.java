@@ -1,9 +1,6 @@
 package org.multiverse.stms.beta;
 
-import org.multiverse.stms.beta.refs.IntRef;
-import org.multiverse.stms.beta.refs.LongRef;
-import org.multiverse.stms.beta.refs.LongRefTranlocal;
-import org.multiverse.stms.beta.refs.Ref;
+import org.multiverse.stms.beta.refs.*;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
@@ -21,13 +18,18 @@ public class BetaStmUtils {
         tx.commit();
     }
 
-    public static Ref createRef(BetaStm stm) {
+    public static <E> Ref<E> createRef(BetaStm stm, E value) {
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         BetaObjectPool pool = new BetaObjectPool();
-        Ref ref = new Ref(tx);
-        tx.openForConstruction(ref, pool);
+        Ref<E> ref = new Ref<E>(tx);
+        RefTranlocal<E> tranlocal = tx.openForConstruction(ref, pool);
+        tranlocal.value = value;
         tx.commit(pool);
         return ref;
+    }
+
+    public static Ref createRef(BetaStm stm) {
+        return createRef(stm, null);
     }
 
     public static IntRef createIntRef(BetaStm stm) {

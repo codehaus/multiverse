@@ -1108,7 +1108,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     config.familyName, ref.getClass().getName()));
         }
 
-        Tranlocal result = ref.openForConstruction(pool);
+        final Tranlocal result = ref.openForConstruction(pool);
         attach(ref, result, identityHashCode, pool);
         size++;
         return result;

@@ -346,7 +346,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             throw new NullPointerException();
         }
 
-        int index = indexOf(ref);
+        final int index = indexOf(ref);
         if(index == -1){
             if(firstFreeIndex == array.length) {
                 throw abortOnTooSmallSize(pool, array.length+1);
@@ -656,7 +656,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             throw new NullPointerException();
         }
 
-        int index = indexOf(ref);
+        final int index = indexOf(ref);
         if(index == -1){
             if(firstFreeIndex == array.length) {
                 throw abortOnTooSmallSize(pool, array.length+1);
@@ -966,7 +966,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             throw new NullPointerException();
         }
 
-        int index = indexOf(ref);
+        final int index = indexOf(ref);
         if(index == -1){
             if(firstFreeIndex == array.length) {
                 throw abortOnTooSmallSize(pool, array.length+1);
@@ -1267,7 +1267,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             throw new NullPointerException();
         }
 
-        int index = indexOf(ref);
+        final int index = indexOf(ref);
         if(index == -1){
             if(firstFreeIndex == array.length) {
                 throw abortOnTooSmallSize(pool, array.length+1);
@@ -1545,7 +1545,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             }
 
             if(tranlocal.isCommuting){
-                System.out.println("commuting");
                 Tranlocal read = tranlocal.owner.lockAndLoad(spinCount, this);
 
                 if(read.isLocked){
@@ -1573,7 +1572,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             }
 
             if(tranlocal.isCommuting){
-                System.out.println("commuting");
                 Tranlocal read = tranlocal.owner.lockAndLoad(spinCount, this);
 
                 if(read.isLocked){

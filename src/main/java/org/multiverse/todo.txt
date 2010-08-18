@@ -167,10 +167,6 @@ globalconflict counter.
 
 - commute
 
-    - array tree: prepare test
-
-    - array: prepare test
-
     - mono: commit test
 
     - mono: prepare test
@@ -189,9 +185,7 @@ globalconflict counter.
 
     - when commute function is evaluated, there should be protection against openForXXX on transaction.
 
-    - registerAndAbort: doesn't deal with commuting values correctly.
-
-    - testing: commute in combination with commitall (instead of only commute dirty)
+    - registerAndAbort: doesn't deal with commuting values correctly. it sees it as a correct read
 
 - rollbackfor/rollnotbackfor exception configuration
 
@@ -215,9 +209,17 @@ the task not being executed at all.
 
 done
 
+- testing: commute in combination with commitall (instead of only commute dirty)
+
 - testing: check if stuff is attached.
 
+- array tree: prepare test
+
+- array: prepare test
+
 old done
+
+- basic smoke tests added for working with different types in transaction than only the longref.
 
 - array tree commit: interleaved test
 
