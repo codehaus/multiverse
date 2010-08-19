@@ -84,7 +84,7 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
     public void whenExplicitRetryNotAllowed_thenNoRetryPossibleException() {
         LongRef ref = createLongRef(stm);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setBlockingAllowed(false);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);

@@ -4,7 +4,7 @@ import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.refs.LongRef;
-import org.multiverse.stms.beta.transactions.BetaTransactionConfig;
+import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 import org.multiverse.stms.beta.transactions.LeanMonoBetaTransaction;
 
 import java.util.Arrays;
@@ -105,7 +105,7 @@ public class UncontendedLeanReadScalabilityTest {
             BetaObjectPool pool = new BetaObjectPool();
 
             LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
-                    new BetaTransactionConfig(stm).setReadonly(true));
+                    new BetaTransactionConfiguration(stm).setReadonly(true));
 
             long startMs = System.currentTimeMillis();
 

@@ -47,7 +47,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         LongRef ref = createReadBiasedLongRef(stm, 100);
         LongRefTranlocal committed = ref.unsafeLoad();
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setBlockingAllowed(false)
                 .setReadTrackingEnabled(false);
 
@@ -79,7 +79,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         LongRef ref1 = BetaStmUtils.createLongRef(stm);
         LongRef ref2 = BetaStmUtils.createLongRef(stm);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         BetaTransaction tx = new FatMonoBetaTransaction(config);
         tx.openForRead(ref1, false, pool);
         try {
@@ -268,7 +268,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         LongRef ref1 = createReadBiasedLongRef(stm, 100);
         LongRef ref2 = createLongRef(stm);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setReadTrackingEnabled(false);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
@@ -297,7 +297,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         LongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.unsafeLoad();
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.Read);
         BetaTransaction tx = new FatMonoBetaTransaction(config);
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
@@ -318,7 +318,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         LongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.unsafeLoad();
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.Write);
         BetaTransaction tx = new FatMonoBetaTransaction(config);
         LongRefTranlocal read = tx.openForRead(ref, false, pool);

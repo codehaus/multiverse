@@ -22,7 +22,7 @@ public abstract class AbstractFatBetaTransaction implements BetaTransaction {
     public final static int ABORTED = 3;
     public final static int COMMITTED = 4;
 
-    protected BetaTransactionConfig config;
+    protected BetaTransactionConfiguration config;
     protected int status = ACTIVE;
 
     protected ArrayList<TransactionLifecycleListener> permanentListeners;
@@ -32,7 +32,7 @@ public abstract class AbstractFatBetaTransaction implements BetaTransaction {
     protected boolean abortOnly;
     private final int poolTransactionType;
 
-    public AbstractFatBetaTransaction(int poolTransactionType, BetaTransactionConfig config) {
+    public AbstractFatBetaTransaction(int poolTransactionType, BetaTransactionConfiguration config) {
         this.poolTransactionType = poolTransactionType;
         this.config = config;
     }
@@ -43,7 +43,7 @@ public abstract class AbstractFatBetaTransaction implements BetaTransaction {
     }
 
     @Override
-    public final BetaTransactionConfig getConfiguration() {
+    public final BetaTransactionConfiguration getConfiguration() {
         return config;
     }
 
@@ -177,12 +177,6 @@ public abstract class AbstractFatBetaTransaction implements BetaTransaction {
     }
 
 
-    @Override
-    public final void registerPermanent(TransactionLifecycleListener listener) {
-        registerPermanent(getThreadLocalBetaObjectPool(), listener);
-    }
-
-    @Override
     public final void registerPermanent(final BetaObjectPool pool, final TransactionLifecycleListener listener) {
         if (listener == null) {
             abort();

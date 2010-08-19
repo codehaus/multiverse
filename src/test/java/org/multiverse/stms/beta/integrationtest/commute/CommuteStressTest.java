@@ -13,7 +13,7 @@ import org.multiverse.stms.beta.FatArrayTreeBetaTransactionFactory;
 import org.multiverse.stms.beta.LeanBetaAtomicBlock;
 import org.multiverse.stms.beta.refs.LongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
-import org.multiverse.stms.beta.transactions.BetaTransactionConfig;
+import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
@@ -81,7 +81,7 @@ public class CommuteStressTest {
 
         @Override
         public void doRun() throws Exception {
-            BetaTransactionConfig config = new BetaTransactionConfig(stm);
+            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
             AtomicBlock block = new LeanBetaAtomicBlock(new FatArrayTreeBetaTransactionFactory(config));
 
             AtomicLongClosure commutingClosure = new AtomicLongClosure() {

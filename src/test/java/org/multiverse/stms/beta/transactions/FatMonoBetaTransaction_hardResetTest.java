@@ -93,7 +93,7 @@ public class FatMonoBetaTransaction_hardResetTest {
 
     @Test
     public void whenTimeout() {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setTimeoutNs(100);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
         tx.setRemainingTimeoutNs(50);
@@ -121,7 +121,7 @@ public class FatMonoBetaTransaction_hardResetTest {
     public void whenHasPermanentListener() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        tx.registerPermanent(listener);
+        tx.registerPermanent(pool,listener);
 
         tx.hardReset(pool);
 

@@ -35,10 +35,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
     private boolean hasUntrackedReads;
 
     public LeanArrayTreeBetaTransaction(BetaStm stm) {
-        this(new BetaTransactionConfig(stm));
+        this(new BetaTransactionConfiguration(stm));
     }
 
-    public LeanArrayTreeBetaTransaction(BetaTransactionConfig config) {
+    public LeanArrayTreeBetaTransaction(BetaTransactionConfiguration config) {
         super(POOL_TRANSACTIONTYPE_LEAN_ARRAYTREE, config);
         this.localConflictCounter = config.globalConflictCounter.createLocalConflictCounter();
         this.array = new Tranlocal[config.minimalArrayTreeSize];
@@ -1139,6 +1139,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
     }
 
     private boolean doPrepareAll(final BetaObjectPool pool) {
+        if(config.lockWrites){
+            return true;
+        }
+
         final int spinCount = config.spinCount;
 
         for (int k = 0; k < array.length; k++) {
@@ -1157,6 +1161,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
     }
 
     private boolean doPrepareDirty(final BetaObjectPool pool) {
+        if(config.lockWrites){
+            return true;
+        }
+
         final int spinCount = config.spinCount;
 
         for (int k = 0; k < array.length; k++) {
@@ -1323,12 +1331,12 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
     // ============================== init =======================================
 
     @Override
-    public void init(BetaTransactionConfig transactionConfig){
+    public void init(BetaTransactionConfiguration transactionConfig){
         init(transactionConfig, getThreadLocalBetaObjectPool());
     }
 
     @Override
-    public void init(BetaTransactionConfig transactionConfig, BetaObjectPool pool){
+    public void init(BetaTransactionConfiguration transactionConfig, BetaObjectPool pool){
         if(transactionConfig == null){
             abort();
             throw new NullPointerException();

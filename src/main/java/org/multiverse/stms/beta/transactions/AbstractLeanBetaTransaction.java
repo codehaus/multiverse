@@ -22,10 +22,10 @@ public abstract class AbstractLeanBetaTransaction implements BetaTransaction {
     protected int status = ACTIVE;
     protected int attempt = 1;
     protected long remainingTimeoutNs;
-    protected BetaTransactionConfig config;
+    protected BetaTransactionConfiguration config;
     protected boolean abortOnly;
 
-    public AbstractLeanBetaTransaction(int poolTransactionType, BetaTransactionConfig config) {
+    public AbstractLeanBetaTransaction(int poolTransactionType, BetaTransactionConfiguration config) {
         this.poolTransactionType = poolTransactionType;
         this.config = config;
     }
@@ -123,7 +123,7 @@ public abstract class AbstractLeanBetaTransaction implements BetaTransaction {
     }
 
     @Override
-    public final BetaTransactionConfig getConfiguration() {
+    public final BetaTransactionConfiguration getConfiguration() {
         return config;
     }
 
@@ -154,12 +154,7 @@ public abstract class AbstractLeanBetaTransaction implements BetaTransaction {
         attempt = tx.getAttempt();
     }
 
-    @Override
-    public final void registerPermanent(TransactionLifecycleListener listener) {
-        registerPermanent(getThreadLocalBetaObjectPool(), listener);
-    }
 
-    @Override
     public final void registerPermanent(final BetaObjectPool pool, final TransactionLifecycleListener listener) {
         //we can forward to the normal register call since a speculative failure is going to be thrown.
         register(pool, listener);

@@ -15,7 +15,7 @@ import static java.lang.String.format;
  *
  * @author Peter Veentjer
  */
-public final class BetaTransactionConfig implements TransactionConfiguration {
+public final class BetaTransactionConfiguration implements TransactionConfiguration {
 
     public final static AtomicLong idGenerator = new AtomicLong();
 
@@ -45,13 +45,13 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
     private final AtomicReference<SpeculativeBetaConfig> speculativeConfig
             = new AtomicReference<SpeculativeBetaConfig>(new SpeculativeBetaConfig());
 
-    public BetaTransactionConfig(BetaStm stm) {
+    public BetaTransactionConfiguration(BetaStm stm) {
         this.stm = stm;
         this.globalConflictCounter = stm.getGlobalConflictCounter();
         this.maxArrayTransactionSize = stm.getMaxArrayTransactionSize();
     }
 
-    public BetaTransactionConfig(BetaStm stm, int maxArrayTransactionSize) {
+    public BetaTransactionConfiguration(BetaStm stm, int maxArrayTransactionSize) {
         this.stm = stm;
         this.globalConflictCounter = stm.getGlobalConflictCounter();
         this.maxArrayTransactionSize = maxArrayTransactionSize;
@@ -213,12 +213,12 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         }
     }
 
-    public BetaTransactionConfig setTimeoutNs(long timeoutNs) {
+    public BetaTransactionConfiguration setTimeoutNs(long timeoutNs) {
         if (timeoutNs < 0) {
             throw new IllegalArgumentException("timeoutNs can't be smaller than 0");
         }
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         config.readonly = readonly;
         config.spinCount = spinCount;
         config.pessimisticLockLevel = pessimisticLockLevel;
@@ -242,12 +242,12 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         return config;
     }
 
-    public BetaTransactionConfig setFamilyName(String familyName) {
+    public BetaTransactionConfiguration setFamilyName(String familyName) {
         if (familyName == null) {
             throw new NullPointerException("familyName can't be null");
         }
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         config.readonly = readonly;
         config.spinCount = spinCount;
         config.pessimisticLockLevel = pessimisticLockLevel;
@@ -271,12 +271,12 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         return config;
     }
 
-    public BetaTransactionConfig setMaxRetries(int maxRetries) {
+    public BetaTransactionConfiguration setMaxRetries(int maxRetries) {
         if (maxRetries < 0) {
             throw new IllegalArgumentException("maxRetries can't be smaller than 0");
         }
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         config.readonly = readonly;
         config.spinCount = spinCount;
         config.pessimisticLockLevel = pessimisticLockLevel;
@@ -300,8 +300,8 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         return config;
     }
 
-    public BetaTransactionConfig setReadTrackingEnabled(boolean trackReads) {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+    public BetaTransactionConfiguration setReadTrackingEnabled(boolean trackReads) {
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         config.readonly = readonly;
         config.spinCount = spinCount;
         config.pessimisticLockLevel = pessimisticLockLevel;
@@ -325,8 +325,8 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         return config;
     }
 
-    public BetaTransactionConfig setSpeculativeConfigurationEnabled(boolean speculativeConfigEnabled) {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+    public BetaTransactionConfiguration setSpeculativeConfigurationEnabled(boolean speculativeConfigEnabled) {
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         config.readonly = readonly;
         config.spinCount = spinCount;
         config.pessimisticLockLevel = pessimisticLockLevel;
@@ -350,8 +350,8 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         return config;
     }
 
-    public BetaTransactionConfig setReadonly(boolean readonly) {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+    public BetaTransactionConfiguration setReadonly(boolean readonly) {
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         config.readonly = readonly;
         config.spinCount = spinCount;
         config.pessimisticLockLevel = pessimisticLockLevel;
@@ -374,33 +374,8 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         return config;
     }
 
-    public BetaTransactionConfig setDurable(boolean durable) {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
-        config.readonly = readonly;
-        config.spinCount = spinCount;
-        config.pessimisticLockLevel = pessimisticLockLevel;
-        config.lockReads = pessimisticLockLevel.lockReads();
-        config.lockWrites = pessimisticLockLevel.lockWrites();
-        config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.familyName = familyName;
-        config.durable = durable;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxArrayTransactionSize = maxArrayTransactionSize;
-        config.isAnonymous = isAnonymous;
-        config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.writeSkewAllowed = writeSkewAllowed;
-        config.propagationLevel = propagationLevel;
-        return config;
-    }
-
-    public BetaTransactionConfig setDirtyCheckEnabled(boolean dirtyCheck) {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+    public BetaTransactionConfiguration setDurable(boolean durable) {
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         config.readonly = readonly;
         config.spinCount = spinCount;
         config.pessimisticLockLevel = pessimisticLockLevel;
@@ -424,8 +399,33 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         return config;
     }
 
-    public BetaTransactionConfig setBlockingAllowed(boolean blockingEnabled) {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+    public BetaTransactionConfiguration setDirtyCheckEnabled(boolean dirtyCheck) {
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
+        config.readonly = readonly;
+        config.spinCount = spinCount;
+        config.pessimisticLockLevel = pessimisticLockLevel;
+        config.lockReads = pessimisticLockLevel.lockReads();
+        config.lockWrites = pessimisticLockLevel.lockWrites();
+        config.dirtyCheck = dirtyCheck;
+        config.trackReads = trackReads;
+        config.maxRetries = maxRetries;
+        config.blockingAllowed = blockingAllowed;
+        config.familyName = familyName;
+        config.durable = durable;
+        config.speculativeConfigEnabled = speculativeConfigEnabled;
+        config.maxArrayTransactionSize = maxArrayTransactionSize;
+        config.isAnonymous = isAnonymous;
+        config.backoffPolicy = backoffPolicy;
+        config.interruptible = interruptible;
+        config.timeoutNs = timeoutNs;
+        config.traceLevel = traceLevel;
+        config.writeSkewAllowed = writeSkewAllowed;
+        config.propagationLevel = propagationLevel;
+        return config;
+    }
+
+    public BetaTransactionConfiguration setBlockingAllowed(boolean blockingEnabled) {
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         config.readonly = readonly;
         config.spinCount = spinCount;
         config.pessimisticLockLevel = pessimisticLockLevel;
@@ -449,8 +449,8 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         return config;
     }
 
-    public BetaTransactionConfig setInterruptible(boolean interruptible) {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+    public BetaTransactionConfiguration setInterruptible(boolean interruptible) {
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         config.readonly = readonly;
         config.spinCount = spinCount;
         config.pessimisticLockLevel = pessimisticLockLevel;
@@ -474,12 +474,12 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         return config;
     }
 
-    public BetaTransactionConfig setSpinCount(int spinCount) {
+    public BetaTransactionConfiguration setSpinCount(int spinCount) {
         if (spinCount < 0) {
             throw new IllegalArgumentException("spinCount can't be smaller than 0");
         }
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         config.readonly = readonly;
         config.spinCount = spinCount;
         config.pessimisticLockLevel = pessimisticLockLevel;
@@ -502,12 +502,12 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         return config;
     }
 
-    public BetaTransactionConfig setPessimisticLockLevel(PessimisticLockLevel pessimisticLockLevel) {
+    public BetaTransactionConfiguration setPessimisticLockLevel(PessimisticLockLevel pessimisticLockLevel) {
         if (pessimisticLockLevel == null) {
             throw new NullPointerException("pessimisticLockLevel can't be null");
         }
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         config.readonly = readonly;
         config.spinCount = spinCount;
         config.pessimisticLockLevel = pessimisticLockLevel;
@@ -530,12 +530,12 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         return config;
     }
 
-    public BetaTransactionConfig setBackoffPolicy(BackoffPolicy backoffPolicy) {
+    public BetaTransactionConfiguration setBackoffPolicy(BackoffPolicy backoffPolicy) {
         if (backoffPolicy == null) {
             throw new NullPointerException("backoffPolicy can't be null");
         }
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         config.readonly = readonly;
         config.spinCount = spinCount;
         config.pessimisticLockLevel = pessimisticLockLevel;
@@ -559,12 +559,12 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         return config;
     }
 
-    public BetaTransactionConfig setTraceLevel(TraceLevel traceLevel) {
+    public BetaTransactionConfiguration setTraceLevel(TraceLevel traceLevel) {
         if (traceLevel == null) {
             throw new NullPointerException("traceLevel can't be null");
         }
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         config.readonly = readonly;
         config.spinCount = spinCount;
         config.pessimisticLockLevel = pessimisticLockLevel;
@@ -588,8 +588,8 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         return config;
     }
 
-    public BetaTransactionConfig setWriteSkewAllowed(boolean writeSkewAllowed) {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+    public BetaTransactionConfiguration setWriteSkewAllowed(boolean writeSkewAllowed) {
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         config.readonly = readonly;
         config.spinCount = spinCount;
         config.pessimisticLockLevel = pessimisticLockLevel;
@@ -613,12 +613,12 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         return config;
     }
 
-    public BetaTransactionConfig setPropagationLevel(PropagationLevel propagationLevel) {
+    public BetaTransactionConfiguration setPropagationLevel(PropagationLevel propagationLevel) {
         if (propagationLevel == null) {
             throw new NullPointerException();
         }
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         config.readonly = readonly;
         config.spinCount = spinCount;
         config.pessimisticLockLevel = pessimisticLockLevel;
@@ -644,7 +644,7 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
 
     @Override
     public String toString() {
-        return "BetaTransactionConfig{" +
+        return "BetaTransactionConfiguration{" +
                 "interruptible=" + interruptible +
                 ", durable=" + durable +
                 ", readonly=" + readonly +

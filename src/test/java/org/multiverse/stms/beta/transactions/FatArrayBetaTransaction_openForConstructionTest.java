@@ -37,7 +37,7 @@ public class FatArrayBetaTransaction_openForConstructionTest {
 
     @Test
     public void whenOverflowing() {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm, 3);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 3);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
 
         LongRef ref1 = new LongRef(tx);
@@ -184,7 +184,7 @@ public class FatArrayBetaTransaction_openForConstructionTest {
         LongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.unsafeLoad();
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setReadonly(true);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
@@ -208,7 +208,7 @@ public class FatArrayBetaTransaction_openForConstructionTest {
     public void whenPessimisticThenNoConflictDetectionNeeded() {
         LongRef ref1 = createLongRef(stm);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.Read);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);

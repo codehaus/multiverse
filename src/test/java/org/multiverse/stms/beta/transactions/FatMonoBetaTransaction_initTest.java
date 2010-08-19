@@ -32,7 +32,7 @@ public class FatMonoBetaTransaction_initTest {
     public void whenTimeoutSetThenCopied() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setTimeoutNs(100);
 
         tx.init(config, pool);
@@ -58,9 +58,9 @@ public class FatMonoBetaTransaction_initTest {
     public void whenPermanentListenersAvailable_thenTheyAreRemoved() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        tx.registerPermanent(listener);
+        tx.registerPermanent(pool,listener);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         tx.init(config);
 
         assertSame(config, tx.getConfiguration());
@@ -73,7 +73,7 @@ public class FatMonoBetaTransaction_initTest {
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         tx.register(listener);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         tx.init(config);
 
         assertSame(config, tx.getConfiguration());
@@ -88,7 +88,7 @@ public class FatMonoBetaTransaction_initTest {
         tx.openForWrite(ref, true, pool);
         tx.prepare(pool);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         tx.init(config);
 
         assertSame(config, tx.getConfiguration());
@@ -105,7 +105,7 @@ public class FatMonoBetaTransaction_initTest {
         tx.openForWrite(ref, false, pool).value++;
         tx.abort(pool);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         tx.init(config);
 
         assertSame(config, tx.getConfiguration());
@@ -119,7 +119,7 @@ public class FatMonoBetaTransaction_initTest {
         tx.openForWrite(ref, false, pool).value++;
         tx.commit(pool);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         tx.init(config);
 
         assertSame(config, tx.getConfiguration());

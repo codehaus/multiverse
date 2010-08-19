@@ -38,7 +38,7 @@ public class FatArrayBetaTransaction_softResetTest {
 
     @Test
     public void whenMaximumNumberOfRetriesReached() {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setMaxRetries(3);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
@@ -199,7 +199,7 @@ public class FatArrayBetaTransaction_softResetTest {
     public void whenHasPermanentListener_thenTheyRemain() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        tx.registerPermanent(listener);
+        tx.registerPermanent(pool,listener);
 
         boolean result = tx.softReset(pool);
 

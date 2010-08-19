@@ -26,10 +26,10 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
     private Tranlocal attached;
 
     public LeanMonoBetaTransaction(final BetaStm stm){
-        this(new BetaTransactionConfig(stm));
+        this(new BetaTransactionConfiguration(stm));
     }
 
-    public LeanMonoBetaTransaction(final BetaTransactionConfig config) {
+    public LeanMonoBetaTransaction(final BetaTransactionConfiguration config) {
         super(POOL_TRANSACTIONTYPE_LEAN_MONO, config);
         this.remainingTimeoutNs = config.timeoutNs;
     }
@@ -865,7 +865,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
-    }
+     }
 
  
     @Override
@@ -983,7 +983,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOnWriteConflict(pool);
         }
 
-        if(attached!=null){
+        if(attached!=null && !config.lockWrites){
             if(config.dirtyCheck){
                 if(!doPrepareDirty(pool)){
                     throw abortOnWriteConflict(pool);
@@ -999,6 +999,10 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
     }
 
     private boolean doPrepareDirty(final BetaObjectPool pool){
+        if(config.lockWrites){
+            return true;
+        }
+
         if(attached.isCommitted){
             return true;
         }
@@ -1012,6 +1016,10 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
     }
 
     private boolean doPrepareAll(final BetaObjectPool pool){
+        if(config.lockWrites){
+            return true;
+        }
+        
         if(attached.isCommitted){
             return true;
         }
@@ -1085,12 +1093,12 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
     // =========================== init ================================
 
     @Override
-    public void init(BetaTransactionConfig transactionConfig){
+    public void init(BetaTransactionConfiguration transactionConfig){
         init(transactionConfig, getThreadLocalBetaObjectPool());
     }
 
     @Override
-    public void init(BetaTransactionConfig transactionConfig, BetaObjectPool pool){
+    public void init(BetaTransactionConfiguration transactionConfig, BetaObjectPool pool){
         if(transactionConfig == null){
             abort();
             throw new NullPointerException();

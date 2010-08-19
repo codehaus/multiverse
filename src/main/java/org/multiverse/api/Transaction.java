@@ -2,7 +2,7 @@ package org.multiverse.api;
 
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.transactions.BetaTransactionConfig;
+import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 
 /**
  * All changes on transaction objects must be done through a Transaction. The transaction make sure that changes
@@ -178,7 +178,7 @@ public interface Transaction {
      *                              when the transaction isn't in the
      *                              correct state for this operation.
      */
-    void init(BetaTransactionConfig transactionConfig);
+    void init(BetaTransactionConfiguration transactionConfig);
 
     /**
      * Registers a permanent TransactionLifecycleListener.
@@ -193,22 +193,6 @@ public interface Transaction {
      *                              state (e.g. aborted or committed).
      */
     void register(TransactionLifecycleListener listener);
-
-    /**
-     * Registers a permanent TransactionLifecycleListener. The only difference between this method and the
-     * {@link #register(TransactionLifecycleListener)} is that this listener is not removed if the transaction
-     * is reset for another attempt. But it is removed
-     * <p/>
-     * If a TransactionLifecycleListener is added more than once, it is executed more than once. No checks
-     * are made. The permanent listeners are executed in the order they are added.
-     *
-     * @param listener the listener to add.
-     * @throws NullPointerException if listener is null
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is not in the correct
-     *                              state (e.g. aborted or committed).
-     */
-    void registerPermanent(TransactionLifecycleListener listener);
 
     /**
      * Gets the remaining timeout in nanoseconds. Long.MAX_VALUE indicates that no timeout should be used.

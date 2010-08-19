@@ -4,7 +4,7 @@ import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.refs.LongRef;
-import org.multiverse.stms.beta.transactions.BetaTransactionConfig;
+import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
 import java.util.Arrays;
@@ -107,7 +107,7 @@ public class UncontendedFatUpdateScalabilityTest {
             //FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
             //FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm,1);
             FatMonoBetaTransaction tx = new FatMonoBetaTransaction(
-                    new BetaTransactionConfig(stm)
+                    new BetaTransactionConfiguration(stm)
                             .setDirtyCheckEnabled(false));
             long startMs = System.currentTimeMillis();
             for (long k = 0; k < transactionCount; k++) {

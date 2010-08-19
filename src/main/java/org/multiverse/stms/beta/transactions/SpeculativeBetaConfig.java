@@ -2,7 +2,7 @@ package org.multiverse.stms.beta.transactions;
 
 
 /**
- * Transaction configuration that contains the speculative settings for the BetaTransactionConfig.
+ * Transaction configuration that contains the speculative settings for the BetaTransactionConfiguration.
  * This object is immutable.
  */
 public final class SpeculativeBetaConfig {

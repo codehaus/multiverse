@@ -3,7 +3,7 @@ package org.multiverse.benchmarks;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.refs.LongRef;
-import org.multiverse.stms.beta.transactions.BetaTransactionConfig;
+import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
 
 import java.util.Arrays;
@@ -132,7 +132,7 @@ public class UncontendedMultipleReadScalabilityTest {
             BetaObjectPool pool = new BetaObjectPool();
             LongRef ref1 = createReadBiasedLongRef(stm);
 
-            BetaTransactionConfig config = new BetaTransactionConfig(stm, 1)
+            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 1)
                     .setReadonly(true);
             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
 
@@ -154,7 +154,7 @@ public class UncontendedMultipleReadScalabilityTest {
 
             BetaObjectPool pool = new BetaObjectPool();
 
-            BetaTransactionConfig config = new BetaTransactionConfig(stm, 2)
+            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 2)
                     .setReadonly(true);
             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
 
@@ -180,7 +180,7 @@ public class UncontendedMultipleReadScalabilityTest {
 
             BetaObjectPool pool = new BetaObjectPool();
 
-            BetaTransactionConfig config = new BetaTransactionConfig(stm, 4)
+            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 4)
                     .setReadonly(true);
             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
 
@@ -212,7 +212,7 @@ public class UncontendedMultipleReadScalabilityTest {
 
             BetaObjectPool pool = new BetaObjectPool();
 
-            BetaTransactionConfig config = new BetaTransactionConfig(stm, 8)
+            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 8)
                     .setReadonly(true);
             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
 
@@ -258,7 +258,7 @@ public class UncontendedMultipleReadScalabilityTest {
 
             BetaObjectPool pool = new BetaObjectPool();
 
-            BetaTransactionConfig config = new BetaTransactionConfig(stm, 16)
+            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 16)
                     .setReadonly(true);
             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
 
@@ -329,7 +329,7 @@ public class UncontendedMultipleReadScalabilityTest {
 
             BetaObjectPool pool = new BetaObjectPool();
 
-            BetaTransactionConfig config = new BetaTransactionConfig(stm, 32)
+            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 32)
                     .setReadonly(true);
             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
 

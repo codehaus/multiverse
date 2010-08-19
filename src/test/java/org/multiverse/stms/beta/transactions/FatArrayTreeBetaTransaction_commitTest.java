@@ -68,7 +68,7 @@ public class FatArrayTreeBetaTransaction_commitTest {
     public void whenPermanentLifecycleListenerAvailable_thenNotified() {
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.registerPermanent(listener);
+        tx.registerPermanent(pool,listener);
         tx.commit();
 
         assertCommitted(tx);
@@ -92,7 +92,7 @@ public class FatArrayTreeBetaTransaction_commitTest {
         TransactionLifecycleListener permanentListener = mock(TransactionLifecycleListener.class);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.register(normalListener);
-        tx.registerPermanent(permanentListener);
+        tx.registerPermanent(pool,permanentListener);
         tx.commit();
 
         assertCommitted(tx);
@@ -168,7 +168,7 @@ public class FatArrayTreeBetaTransaction_commitTest {
         LongRef ref = BetaStmUtils.createLongRef(stm);
         LongRefTranlocal committed = ref.unsafeLoad();
 
-        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(new BetaTransactionConfig(stm));
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(new BetaTransactionConfiguration(stm));
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
         tx.commit(pool);
 
@@ -343,7 +343,7 @@ public class FatArrayTreeBetaTransaction_commitTest {
         int transactionCount = 10000;
         for (int transaction = 0; transaction < transactionCount; transaction++) {
             FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(
-                    new BetaTransactionConfig(stm).setDirtyCheckEnabled(dirtyCheck));
+                    new BetaTransactionConfiguration(stm).setDirtyCheckEnabled(dirtyCheck));
 
             for (int k = 0; k < refs.length; k++) {
                 if (random.nextInt(3) == 1) {
@@ -367,7 +367,7 @@ public class FatArrayTreeBetaTransaction_commitTest {
 
     @Test
     public void whenNoDirtyCheckAndCommute() {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setDirtyCheckEnabled(false);
 
         LongRef ref = createLongRef(stm);
@@ -384,7 +384,7 @@ public class FatArrayTreeBetaTransaction_commitTest {
 
     @Test
     public void whenDirtyCheckAndCommute() {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setDirtyCheckEnabled(true);
 
         LongRef ref = createLongRef(stm);
@@ -421,7 +421,7 @@ public class FatArrayTreeBetaTransaction_commitTest {
 
     @Test
     public void whenMultipleCommutes() {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setDirtyCheckEnabled(true);
 
         LongRef ref = createLongRef(stm);

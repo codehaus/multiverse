@@ -10,7 +10,7 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.*;
 import org.multiverse.stms.beta.refs.LongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
-import org.multiverse.stms.beta.transactions.BetaTransactionConfig;
+import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
@@ -41,7 +41,7 @@ public class MultipleReadsRetryStressTest {
     @Test
     public void withArrayTransactionAnd2Threads() throws InterruptedException {
         int refCount = 10;
-        BetaTransactionConfig config = new BetaTransactionConfig(stm, refCount + 1);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, refCount + 1);
         FatArrayBetaTransactionFactory txFactory = new FatArrayBetaTransactionFactory(config);
         test(new LeanBetaAtomicBlock(txFactory), refCount, 2);
     }
@@ -55,7 +55,7 @@ public class MultipleReadsRetryStressTest {
     @Test
     public void withArrayTransactionAnd5Threads() throws InterruptedException {
         int refCount = 10;
-        BetaTransactionConfig config = new BetaTransactionConfig(stm, refCount + 1);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, refCount + 1);
         FatArrayBetaTransactionFactory txFactory = new FatArrayBetaTransactionFactory(config);
         test(new LeanBetaAtomicBlock(txFactory), refCount, 5);
     }

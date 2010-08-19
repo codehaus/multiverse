@@ -28,7 +28,7 @@ public class LeanArrayTreeBetaTransaction_commuteTest {
     @Test
     public void whenCalled_thenSpeculativeConfigurationError() {
         LongRef ref = createLongRef(stm);
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         LeanArrayTreeBetaTransaction tx = new LeanArrayTreeBetaTransaction(config);
         LongFunction function = mock(LongFunction.class);
 

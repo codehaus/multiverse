@@ -29,10 +29,10 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
     private boolean hasUntrackedReads;
 
     public FatArrayBetaTransaction(final BetaStm stm) {
-        this(new BetaTransactionConfig(stm));
+        this(new BetaTransactionConfiguration(stm));
     }
 
-    public FatArrayBetaTransaction(final BetaTransactionConfig config) {
+    public FatArrayBetaTransaction(final BetaTransactionConfiguration config) {
         super(POOL_TRANSACTIONTYPE_FAT_ARRAY, config);
         this.localConflictCounter = config.globalConflictCounter.createLocalConflictCounter();
         this.array = new Tranlocal[config.maxArrayTransactionSize];
@@ -1539,6 +1539,10 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     private boolean doPrepareAll(final BetaObjectPool pool) {
+        if(config.lockWrites){
+            return true;
+        }
+
         int spinCount = config.spinCount;
 
         for (int k = 0; k < firstFreeIndex; k++) {
@@ -1568,6 +1572,10 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     private boolean doPrepareDirty(final BetaObjectPool pool) {
+        if(config.lockWrites){
+            return true;
+        }
+
         int spinCount = config.spinCount;
 
         for (int k = 0; k < firstFreeIndex; k++) {
@@ -1740,12 +1748,12 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
     // ==================== init =============================
 
     @Override
-    public void init(BetaTransactionConfig transactionConfig){
+    public void init(BetaTransactionConfiguration transactionConfig){
         init(transactionConfig, getThreadLocalBetaObjectPool());
     }
 
     @Override
-    public void init(BetaTransactionConfig transactionConfig, BetaObjectPool pool){
+    public void init(BetaTransactionConfiguration transactionConfig, BetaObjectPool pool){
         if(transactionConfig == null){
             abort();
             throw new NullPointerException();

@@ -135,8 +135,6 @@ globalconflict counter.
 
 - stm callback for external logic. goal should be that lean transactions still are usable
 
-- rethink permanent listener; registration once is complicated.
-
 - blocking and speculative readtracking?
 
 - transaction.prepareForPooling & add it to objectpool.
@@ -168,17 +166,11 @@ globalconflict counter.
 
 - commute
 
-    - mono: commit test
-
-    - mono: prepare test
-
     - add commuting to mono beta transaction
 
     - when a commuting function fails, the transaction should be aborted.
 
     - the nodes for the commute functions need to be pooled.
-
-    - commute: improved integration tests
 
     - commute: commuting functions are executed in reverse order.
 
@@ -211,115 +203,3 @@ done
 
 old done
 
-- commute behavior should be part fat transaction and not lean.
-
-- added the commute required to the speculative configuration
-
-- testing: commute in combination with commitall (instead of only commute dirty)
-
-- testing: check if stuff is attached.
-
-- array tree: prepare test
-
-- array: prepare test
-
-- basic smoke tests added for working with different types in transaction than only the longref.
-
-- array tree commit: interleaved test
-
-- array commit: interleaved test
-
-- array tree: commit test
-
-- array: commit test
-
-- commute: tranlocal commute functionality needs to be tested better
-
-- add commuting to array beta transaction
-
-- add abortOnly to commit/prepare
-
-- added the abortOnly field + method
-
-- testing: fat atomicblock & propagation
-
-- fat atomic block: add propagation
-
-- create abstract betaatomic block that contains the general pluming to reduce class size.
-
-- lean and fat atomic blocks are not generated
-
-- atomic block needs to be generated
-
-- atomic closures are being generated
-
-- basic atomic block architecture is in place and a naive version implemented in the betastm.
-
-- mono transaction and partial read tracking
-
-- array transaction and partial read tracking
-
-- array tree transaction and partial read tracking
-
-- improved testing of the hard reset.
-
-- testing: mono transaction: hasReads improvement
-
-- testing: array transaction: hasReads improvement
-
-- commute: check if conflict counters are set correctly when an addCommute is done
-
-- maxLinearSearch: should be renamed to minimal arraytreesize.
-
-- transactionfactorybuilder now throws an IllegalTransactionFactoryException instead of an IllegalStateException.
-
-- when a tranlocal with commuting operations is pooled, the commuting stuff should be cleaned
-
-- propagation level
-
-- improved testing for for openForRead/openForWrite and commuting operation where the read is locked.
-
-- improved exception messages for all transaction for openForConstruction operations.
-
-- improved exception messages in the mono transaction
-
-- prepareForPooling should be the method name for preparing a poolable resource for pooling.
-
-- testing: objectpool.listeners functionality
-
-- removed the listeners.read
-
-- listeners should have a prepareForPooling & should be added to the objectpool.
-
-- latch.reset -> prepareForPooling
-
-- rename tranlocal.clean to tranlocal.prepareForPooling
-
-- commute: improved testing of clear of tranlocal with regard to commute.
-
-- mono transaction and partial read tracking: conflict scan also needs to be added
-
-- when something is read, and there is a read conflict, make sure that the thing that is read, is aborted.
-
-- clojure: alter;
-    would be quite simple.. just inject a function
-
-- rename addCommute to commute.
-
-- instead of an illegal state exception in the orec, a panic error should be thrown.
-
-- clean up testing for fastorec (not relying on ref anymore).
-
-- add project to multiverse git
-
-- do you really need 'needstocommit'?
-
-- array transaction and 'needtocommit'
-
-- array tree transaction and 'needstocommit'
-
-- invisible checked exception should be moved to ap.exceptions
-
-- lean mono speculative & non automatic readtracking not possible.
-
-- stresstest for read consistency and partial readtracking

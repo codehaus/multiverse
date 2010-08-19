@@ -157,7 +157,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
         LongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.unsafeLoad();
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setReadonly(true);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
@@ -181,7 +181,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
     public void whenPessimisticThenNoConflictDetectionNeeded() {
         LongRef ref1 = createLongRef(stm);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.Read);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);

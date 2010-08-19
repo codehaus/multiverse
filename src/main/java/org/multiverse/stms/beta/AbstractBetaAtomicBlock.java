@@ -6,7 +6,7 @@ import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.api.blocking.StandardLatch;
 import org.multiverse.api.exceptions.RetryTimeoutException;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
-import org.multiverse.stms.beta.transactions.BetaTransactionConfig;
+import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 
 import java.util.concurrent.TimeUnit;
 
@@ -15,7 +15,7 @@ import static java.lang.String.format;
 public abstract class AbstractBetaAtomicBlock implements AtomicBlock {
 
     protected final BetaTransactionFactory transactionFactory;
-    protected final BetaTransactionConfig transactionConfiguration;
+    protected final BetaTransactionConfiguration transactionConfiguration;
     protected final BackoffPolicy backoffPolicy;
     protected final boolean hasTimeout;
 

@@ -83,18 +83,16 @@ public interface BetaTransaction extends Transaction {
 
     void register(BetaObjectPool pool, TransactionLifecycleListener listener);
 
-    void registerPermanent(BetaObjectPool pool, TransactionLifecycleListener listener);
-
     void copyForSpeculativeFailure(BetaTransaction tx);
 
     @Override
-    BetaTransactionConfig getConfiguration();
+    BetaTransactionConfiguration getConfiguration();
 
     /**
      *
      *
      */
-    void init(BetaTransactionConfig transactionConfig, BetaObjectPool pool);
+    void init(BetaTransactionConfiguration transactionConfig, BetaObjectPool pool);
 
     /**
      * Registers the changelistener and aborts the transaction (so also releasing its acquired resources

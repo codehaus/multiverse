@@ -185,7 +185,7 @@ public class FatArrayTreeBetaTransaction_commuteTest {
 
         LongFunction function = mock(LongFunction.class);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setReadonly(true);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
 

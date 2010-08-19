@@ -28,7 +28,7 @@ public class FatArrayBetaTransaction_registerPermanentTest {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
 
         try {
-            tx.registerPermanent(null);
+            tx.registerPermanent(pool,null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -47,7 +47,7 @@ public class FatArrayBetaTransaction_registerPermanentTest {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
 
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        tx.registerPermanent(listener);
+        tx.registerPermanent(pool,listener);
 
         assertActive(tx);
         verifyZeroInteractions(listener);
@@ -61,8 +61,8 @@ public class FatArrayBetaTransaction_registerPermanentTest {
 
         TransactionLifecycleListener listener1 = mock(TransactionLifecycleListener.class);
         TransactionLifecycleListener listener2 = mock(TransactionLifecycleListener.class);
-        tx.registerPermanent(listener1);
-        tx.registerPermanent(listener2);
+        tx.registerPermanent(pool,listener1);
+        tx.registerPermanent(pool,listener2);
 
         assertActive(tx);
         verifyZeroInteractions(listener1);
@@ -77,7 +77,7 @@ public class FatArrayBetaTransaction_registerPermanentTest {
 
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
 
-        tx.registerPermanent(listener);
+        tx.registerPermanent(pool,listener);
 
         assertPrepared(tx);
         verifyZeroInteractions(listener);
@@ -92,7 +92,7 @@ public class FatArrayBetaTransaction_registerPermanentTest {
 
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         try {
-            tx.registerPermanent(listener);
+            tx.registerPermanent(pool,listener);
             fail();
         } catch (DeadTransactionException expected) {
 
@@ -111,7 +111,7 @@ public class FatArrayBetaTransaction_registerPermanentTest {
 
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         try {
-            tx.registerPermanent(listener);
+            tx.registerPermanent(pool,listener);
             fail();
         } catch (DeadTransactionException expected) {
         }

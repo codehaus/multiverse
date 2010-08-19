@@ -48,7 +48,7 @@ public class FatMonoBetaTransaction_openForConstructionTest {
 
     @Test
     public void whenOverflowing() {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         BetaTransaction tx = new FatMonoBetaTransaction(config);
         LongRef ref1 = new LongRef(tx);
         LongRef ref2 = new LongRef(tx);
@@ -173,7 +173,7 @@ public class FatMonoBetaTransaction_openForConstructionTest {
         LongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.unsafeLoad();
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setReadonly(true);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);

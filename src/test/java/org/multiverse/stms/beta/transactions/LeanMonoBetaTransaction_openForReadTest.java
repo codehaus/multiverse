@@ -27,7 +27,7 @@ public class LeanMonoBetaTransaction_openForReadTest {
     public void whenUntrackedRead_thenSpeculativeConfigError() {
         LongRef ref = createReadBiasedLongRef(stm, 100);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setBlockingAllowed(false)
                 .setReadTrackingEnabled(false);
 

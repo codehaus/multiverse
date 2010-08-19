@@ -1,24 +1,24 @@
 package org.multiverse.stms.beta;
 
 import org.multiverse.stms.beta.transactions.BetaTransaction;
-import org.multiverse.stms.beta.transactions.BetaTransactionConfig;
+import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public final class FatMonoBetaTransactionFactory implements BetaTransactionFactory {
-    private final BetaTransactionConfig config;
+    private final BetaTransactionConfiguration config;
 
     public FatMonoBetaTransactionFactory(BetaStm stm) {
-        this(new BetaTransactionConfig(stm));
+        this(new BetaTransactionConfiguration(stm));
     }
 
-    public FatMonoBetaTransactionFactory(BetaTransactionConfig config) {
+    public FatMonoBetaTransactionFactory(BetaTransactionConfiguration config) {
         this.config = config;
     }
 
     @Override
-    public BetaTransactionConfig getTransactionConfiguration() {
+    public BetaTransactionConfiguration getTransactionConfiguration() {
         return config;
     }
 

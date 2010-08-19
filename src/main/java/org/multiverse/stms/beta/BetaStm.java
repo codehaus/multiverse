@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta;
 
 import org.multiverse.api.*;
+import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.durability.SimpleStorage;
 import org.multiverse.durability.Storage;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
@@ -22,7 +23,7 @@ public final class BetaStm implements Stm {
     private final AtomicBlock atomicBlock;
     private final GlobalConflictCounter globalConflictCounter;
     private final int spinCount = 8;
-    private final BetaTransactionConfig config;
+    private final BetaTransactionConfiguration config;
     private final SimpleStorage storage;
 
     private final ConcurrentHashMap<String, BetaTransactionFactory> factoryMap
@@ -34,7 +35,7 @@ public final class BetaStm implements Stm {
 
     public BetaStm(final int conflictCounterWidth) {
         this.globalConflictCounter = new GlobalConflictCounter(conflictCounterWidth);
-        this.config = new BetaTransactionConfig(this)
+        this.config = new BetaTransactionConfiguration(this)
                 .setSpinCount(spinCount);
         this.storage = new SimpleStorage(this);
         this.atomicBlock = getTransactionFactoryBuilder()
@@ -74,15 +75,20 @@ public final class BetaStm implements Stm {
 
     public final class BetaTransactionFactoryBuilderImpl implements BetaTransactionFactoryBuilder {
 
-        private final BetaTransactionConfig config;
+        private final BetaTransactionConfiguration config;
 
-        BetaTransactionFactoryBuilderImpl(final BetaTransactionConfig config) {
+        BetaTransactionFactoryBuilderImpl(final BetaTransactionConfiguration config) {
             this.config = config;
         }
 
         @Override
-        public BetaTransactionConfig getTransactionConfiguration() {
+        public BetaTransactionConfiguration getTransactionConfiguration() {
             return config;
+        }
+
+        @Override
+        public BetaTransactionFactoryBuilder addPermanentListener(TransactionLifecycleListener listener) {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
 
         @Override
@@ -141,9 +147,9 @@ public final class BetaStm implements Stm {
         }
 
         @Override
-        public BetaTransactionFactoryBuilder setSpeculativeConfigEnabled(final boolean speculativeConfigEnabled) {
+        public BetaTransactionFactoryBuilder setSpeculativeConfigEnabled(final boolean enabled) {
             return new BetaTransactionFactoryBuilderImpl(
-                    config.setSpeculativeConfigurationEnabled(speculativeConfigEnabled));
+                    config.setSpeculativeConfigurationEnabled(enabled));
         }
 
         @Override
@@ -195,14 +201,14 @@ public final class BetaStm implements Stm {
 
     public final class NonSpeculativeBetaTransactionFactory implements BetaTransactionFactory {
 
-        private final BetaTransactionConfig config;
+        private final BetaTransactionConfiguration config;
 
-        NonSpeculativeBetaTransactionFactory(final BetaTransactionConfig config) {
+        NonSpeculativeBetaTransactionFactory(final BetaTransactionConfiguration config) {
             this.config = config;
         }
 
         @Override
-        public BetaTransactionConfig getTransactionConfiguration() {
+        public BetaTransactionConfiguration getTransactionConfiguration() {
             return config;
         }
 
@@ -233,14 +239,14 @@ public final class BetaStm implements Stm {
 
     public final class SpeculativeBetaTransactionFactory implements BetaTransactionFactory {
 
-        private final BetaTransactionConfig config;
+        private final BetaTransactionConfiguration config;
 
-        SpeculativeBetaTransactionFactory(final BetaTransactionConfig config) {
+        SpeculativeBetaTransactionFactory(final BetaTransactionConfiguration config) {
             this.config = config;
         }
 
         @Override
-        public BetaTransactionConfig getTransactionConfiguration() {
+        public BetaTransactionConfiguration getTransactionConfiguration() {
             return config;
         }
 

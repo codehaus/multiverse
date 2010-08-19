@@ -70,6 +70,7 @@ public class BetaAtomicBlock_speculativeTest {
         assertTrue(transactions.get(2) instanceof LeanArrayTreeBetaTransaction);
     }
 
+    /*
     @Test
     public void whenPermanentListenerAdded() {
         final List<BetaTransaction> transactions = new LinkedList<BetaTransaction>();
@@ -94,9 +95,9 @@ public class BetaAtomicBlock_speculativeTest {
         assertEquals(2, transactions.size());
         assertTrue(transactions.get(0) instanceof LeanMonoBetaTransaction);
         assertTrue(transactions.get(1) instanceof FatMonoBetaTransaction);
-    }
-    
-     @Test
+    }           */
+
+    @Test
     public void whenCommute() {
         final List<BetaTransaction> transactions = new LinkedList<BetaTransaction>();
         final LongRef ref = createLongRef(stm);
@@ -111,7 +112,7 @@ public class BetaAtomicBlock_speculativeTest {
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
                 transactions.add(btx);
-                btx.commute(ref,pool, function);
+                btx.commute(ref, pool, function);
             }
         });
 

@@ -78,7 +78,7 @@ public class FatArrayBetaTransaction_openForReadTest {
         LongRef ref3 = createLongRef(stm);
         LongRef ref4 = createLongRef(stm);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm, 3);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 3);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         tx.openForRead(ref1, false, pool);
         tx.openForRead(ref2, false, pool);
@@ -98,7 +98,7 @@ public class FatArrayBetaTransaction_openForReadTest {
         LongRef ref = createReadBiasedLongRef(stm, 100);
         LongRefTranlocal committed = ref.unsafeLoad();
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setBlockingAllowed(false)
                 .setReadTrackingEnabled(false);
 
@@ -405,7 +405,7 @@ public class FatArrayBetaTransaction_openForReadTest {
         LongRef ref1 = createReadBiasedLongRef(stm, 100);
         LongRef ref2 = createLongRef(stm);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setReadTrackingEnabled(false);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
@@ -479,7 +479,7 @@ public class FatArrayBetaTransaction_openForReadTest {
         LongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.unsafeLoad();
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.Read);
         BetaTransaction tx = new FatArrayBetaTransaction(config);
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
@@ -499,7 +499,7 @@ public class FatArrayBetaTransaction_openForReadTest {
         LongRef ref1 = createLongRef(stm);
         LongRef ref2 = createLongRef(stm);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.Read);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);

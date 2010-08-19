@@ -31,10 +31,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     private final LocalConflictCounter localConflictCounter;
 
     public FatMonoBetaTransaction(final BetaStm stm){
-        this(new BetaTransactionConfig(stm));
+        this(new BetaTransactionConfiguration(stm));
     }
 
-    public FatMonoBetaTransaction(final BetaTransactionConfig config) {
+    public FatMonoBetaTransaction(final BetaTransactionConfiguration config) {
         super(POOL_TRANSACTIONTYPE_FAT_MONO, config);
         this.remainingTimeoutNs = config.timeoutNs;
         this.localConflictCounter = config.globalConflictCounter.createLocalConflictCounter();
@@ -1508,6 +1508,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     private boolean doPrepareDirty(final BetaObjectPool pool){
+        if(config.lockWrites){
+            return true;
+        }
+
         if(attached.isCommitted){
             return true;
         }
@@ -1531,6 +1535,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     private boolean doPrepareAll(final BetaObjectPool pool){
+        if(config.lockWrites){
+            return true;
+        }
+        
         if(attached.isCommitted){
             return true;
         }
@@ -1621,12 +1629,12 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     // =========================== init ================================
 
     @Override
-    public void init(BetaTransactionConfig transactionConfig){
+    public void init(BetaTransactionConfiguration transactionConfig){
         init(transactionConfig, getThreadLocalBetaObjectPool());
     }
 
     @Override
-    public void init(BetaTransactionConfig transactionConfig, BetaObjectPool pool){
+    public void init(BetaTransactionConfiguration transactionConfig, BetaObjectPool pool){
         if(transactionConfig == null){
             abort();
             throw new NullPointerException();

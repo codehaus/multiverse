@@ -28,10 +28,10 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     private boolean hasUntrackedReads;
 
     public LeanArrayBetaTransaction(final BetaStm stm) {
-        this(new BetaTransactionConfig(stm));
+        this(new BetaTransactionConfiguration(stm));
     }
 
-    public LeanArrayBetaTransaction(final BetaTransactionConfig config) {
+    public LeanArrayBetaTransaction(final BetaTransactionConfiguration config) {
         super(POOL_TRANSACTIONTYPE_LEAN_ARRAY, config);
         this.localConflictCounter = config.globalConflictCounter.createLocalConflictCounter();
         this.array = new Tranlocal[config.maxArrayTransactionSize];
@@ -1194,6 +1194,10 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     }
 
     private boolean doPrepareAll(final BetaObjectPool pool) {
+        if(config.lockWrites){
+            return true;
+        }
+
         int spinCount = config.spinCount;
 
         for (int k = 0; k < firstFreeIndex; k++) {
@@ -1212,6 +1216,10 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     }
 
     private boolean doPrepareDirty(final BetaObjectPool pool) {
+        if(config.lockWrites){
+            return true;
+        }
+
         int spinCount = config.spinCount;
 
         for (int k = 0; k < firstFreeIndex; k++) {
@@ -1354,12 +1362,12 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     // ==================== init =============================
 
     @Override
-    public void init(BetaTransactionConfig transactionConfig){
+    public void init(BetaTransactionConfiguration transactionConfig){
         init(transactionConfig, getThreadLocalBetaObjectPool());
     }
 
     @Override
-    public void init(BetaTransactionConfig transactionConfig, BetaObjectPool pool){
+    public void init(BetaTransactionConfiguration transactionConfig, BetaObjectPool pool){
         if(transactionConfig == null){
             abort();
             throw new NullPointerException();

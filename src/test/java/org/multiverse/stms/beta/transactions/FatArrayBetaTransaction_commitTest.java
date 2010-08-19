@@ -82,7 +82,7 @@ public class FatArrayBetaTransaction_commitTest {
     public void whenPermanentLifecycleListenerAvailable_thenNotified() {
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.registerPermanent(listener);
+        tx.registerPermanent(pool,listener);
         tx.commit();
 
         assertCommitted(tx);
@@ -106,7 +106,7 @@ public class FatArrayBetaTransaction_commitTest {
         TransactionLifecycleListener permanentListener = mock(TransactionLifecycleListener.class);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.register(normalListener);
-        tx.registerPermanent(permanentListener);
+        tx.registerPermanent(pool,permanentListener);
         tx.commit();
 
         assertCommitted(tx);
@@ -230,7 +230,7 @@ public class FatArrayBetaTransaction_commitTest {
         LongRef ref = BetaStmUtils.createLongRef(stm);
         LongRefTranlocal committed = ref.unsafeLoad();
 
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(new BetaTransactionConfig(stm));
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(new BetaTransactionConfiguration(stm));
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
         tx.commit(pool);
 
@@ -267,7 +267,7 @@ public class FatArrayBetaTransaction_commitTest {
         Random random = new Random();
         int transactionCount = 100000;
         for (int transaction = 0; transaction < transactionCount; transaction++) {
-            BetaTransactionConfig config = new BetaTransactionConfig(stm, refs.length)
+            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, refs.length)
                     .setDirtyCheckEnabled(dirtyCheck);
             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
 
@@ -320,7 +320,7 @@ public class FatArrayBetaTransaction_commitTest {
             refs[k] = BetaStmUtils.createLongRef(stm);
         }
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm, refs.length);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, refs.length);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         for (LongRef ref : refs) {
             LongRefTranlocal tranlocal = tx.openForWrite(ref, false, pool);
@@ -430,7 +430,7 @@ public class FatArrayBetaTransaction_commitTest {
 
     @Test
     public void whenNoDirtyCheckAndCommute() {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setDirtyCheckEnabled(false);
 
         LongRef ref = createLongRef(stm);
@@ -447,7 +447,7 @@ public class FatArrayBetaTransaction_commitTest {
 
     @Test
     public void whenDirtyCheckAndCommute() {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setDirtyCheckEnabled(true);
 
         LongRef ref = createLongRef(stm);
@@ -509,7 +509,7 @@ public class FatArrayBetaTransaction_commitTest {
 
     @Test
     public void whenMultipleCommutes() {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setDirtyCheckEnabled(true);
 
         LongRef ref = createLongRef(stm);

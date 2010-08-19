@@ -1,7 +1,8 @@
 package org.multiverse.stms.beta;
 
 import org.multiverse.api.*;
-import org.multiverse.stms.beta.transactions.BetaTransactionConfig;
+import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 
 /**
  * A {@link org.multiverse.api.TransactionFactoryBuilder}  for the {@link org.multiverse.stms.beta.BetaStm}.
@@ -11,7 +12,10 @@ import org.multiverse.stms.beta.transactions.BetaTransactionConfig;
 public interface BetaTransactionFactoryBuilder extends TransactionFactoryBuilder {
 
     @Override
-    BetaTransactionConfig getTransactionConfiguration();
+    BetaTransactionConfiguration getTransactionConfiguration();
+
+    @Override
+    BetaTransactionFactoryBuilder addPermanentListener(TransactionLifecycleListener listener);
 
     @Override
     BetaTransactionFactoryBuilder setFamilyName(String familyName);
@@ -47,7 +51,7 @@ public interface BetaTransactionFactoryBuilder extends TransactionFactoryBuilder
     BetaTransactionFactoryBuilder setSpinCount(int spinCount);
 
     @Override
-    BetaTransactionFactoryBuilder setSpeculativeConfigEnabled(boolean speculativeConfigEnabled);
+    BetaTransactionFactoryBuilder setSpeculativeConfigEnabled(boolean enabled);
 
     @Override
     BetaTransactionFactoryBuilder setReadonly(boolean readonly);

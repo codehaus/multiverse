@@ -2,7 +2,7 @@ package org.multiverse.stms.beta;
 
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
-import org.multiverse.stms.beta.transactions.BetaTransactionConfig;
+import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 
 /**
  * A {@link TransactionFactory} specific for the BetaStm.
@@ -12,7 +12,7 @@ import org.multiverse.stms.beta.transactions.BetaTransactionConfig;
 public interface BetaTransactionFactory extends TransactionFactory {
 
     @Override
-    BetaTransactionConfig getTransactionConfiguration();
+    BetaTransactionConfiguration getTransactionConfiguration();
 
     @Override
     BetaTransaction start();

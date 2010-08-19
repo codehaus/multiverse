@@ -30,10 +30,10 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end
 
     public ${transaction.name}(final BetaStm stm){
-        this(new BetaTransactionConfig(stm));
+        this(new BetaTransactionConfiguration(stm));
     }
 
-    public ${transaction.name}(final BetaTransactionConfig config) {
+    public ${transaction.name}(final BetaTransactionConfiguration config) {
         super(${transaction.poolName}, config);
         this.remainingTimeoutNs = config.timeoutNs;
 #if(!${transaction.lean})
@@ -633,7 +633,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOnWriteConflict(pool);
         }
 
-        if(attached!=null){
+        if(attached!=null && !config.lockWrites){
             if(config.dirtyCheck){
                 if(!doPrepareDirty(pool)){
                     throw abortOnWriteConflict(pool);
@@ -702,6 +702,10 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end
 
     private boolean doPrepareDirty(final BetaObjectPool pool){
+        if(config.lockWrites){
+            return true;
+        }
+
         if(attached.isCommitted){
             return true;
         }
@@ -727,6 +731,10 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     }
 
     private boolean doPrepareAll(final BetaObjectPool pool){
+        if(config.lockWrites){
+            return true;
+        }
+        
         if(attached.isCommitted){
             return true;
         }
@@ -797,7 +805,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         final long listenerEra = listener.getEra();
         final BetaTransactionalObject owner = attached.owner;
 
-
         boolean failure = owner.registerChangeListener(listener, attached, pool, listenerEra) == BetaTransactionalObject.REGISTRATION_NONE;
         owner.abort(this, attached, pool);
         status = ABORTED;
@@ -821,12 +828,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     // =========================== init ================================
 
     @Override
-    public void init(BetaTransactionConfig transactionConfig){
+    public void init(BetaTransactionConfiguration transactionConfig){
         init(transactionConfig, getThreadLocalBetaObjectPool());
     }
 
     @Override
-    public void init(BetaTransactionConfig transactionConfig, BetaObjectPool pool){
+    public void init(BetaTransactionConfiguration transactionConfig, BetaObjectPool pool){
         if(transactionConfig == null){
             abort();
             throw new NullPointerException();

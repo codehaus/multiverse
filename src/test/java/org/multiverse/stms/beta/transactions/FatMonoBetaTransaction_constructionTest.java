@@ -30,7 +30,7 @@ public class FatMonoBetaTransaction_constructionTest {
 
     @Test
     public void testTimeout() {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setTimeoutNs(TimeUnit.SECONDS.toNanos(10));
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);

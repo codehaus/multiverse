@@ -48,7 +48,7 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         LongRef ref = createReadBiasedLongRef(stm, 100);
         LongRefTranlocal committed = ref.unsafeLoad();
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setBlockingAllowed(false)
                 .setReadTrackingEnabled(false);
 
@@ -206,7 +206,7 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         LongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.unsafeLoad();
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.Read);
         BetaTransaction tx = new FatArrayTreeBetaTransaction(config);
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
@@ -313,7 +313,7 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         LongRef ref1 = createReadBiasedLongRef(stm, 100);
         LongRef ref2 = createLongRef(stm);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setReadTrackingEnabled(false);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
@@ -361,7 +361,7 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         LongRef ref1 = createLongRef(stm);
         LongRef ref2 = createLongRef(stm);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.Read);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);

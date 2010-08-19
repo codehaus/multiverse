@@ -4,7 +4,7 @@ import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.refs.LongRef;
 import org.multiverse.stms.beta.refs.LongRefTranlocal;
-import org.multiverse.stms.beta.transactions.BetaTransactionConfig;
+import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
 
 import java.util.Arrays;
@@ -115,7 +115,7 @@ public class MultipleWriteScalabilityTest {
 
             //AnotherInlinedMonoUpdateTransaction tx = new AnotherInlinedMonoUpdateTransaction(stm);
             //MonoUpdateTransaction tx = new MonoUpdateTransaction(stm);
-            BetaTransactionConfig config = new BetaTransactionConfig(stm, refs.length);
+            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, refs.length);
 
             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
 

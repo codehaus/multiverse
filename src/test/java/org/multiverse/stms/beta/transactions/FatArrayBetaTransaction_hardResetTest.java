@@ -88,7 +88,7 @@ public class FatArrayBetaTransaction_hardResetTest {
 
     @Test
     public void whenTimeout() {
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setTimeoutNs(100);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
         tx.setRemainingTimeoutNs(50);
@@ -121,7 +121,7 @@ public class FatArrayBetaTransaction_hardResetTest {
     public void whenHasPermanentListener() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        tx.registerPermanent(listener);
+        tx.registerPermanent(pool,listener);
 
         tx.hardReset(pool);
 

@@ -185,7 +185,7 @@ public class FatMonoBetaTransaction_commuteTest {
 
         LongFunction function = mock(LongFunction.class);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setReadonly(true);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
 

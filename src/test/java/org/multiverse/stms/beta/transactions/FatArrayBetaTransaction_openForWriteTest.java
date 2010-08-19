@@ -68,7 +68,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         BetaTransactionalObject ref = createLongRef(stm, 0);
         Tranlocal committed = ref.unsafeLoad();
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm).setReadonly(true);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm).setReadonly(true);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         try {
             tx.openForWrite(ref, false, pool);
@@ -84,7 +84,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
     public void whenReadonlyAndAlreadyOpenedForRead_thenReadonlyException() {
         LongRef ref = createLongRef(stm, 0);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm).setReadonly(true);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm).setReadonly(true);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
 
@@ -104,7 +104,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         LongRef ref3 = createLongRef(stm);
         LongRef ref4 = createLongRef(stm);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm, 3);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 3);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         tx.openForWrite(ref1, false, pool);
         tx.openForWrite(ref2, false, pool);
@@ -393,7 +393,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         LongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.unsafeLoad();
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.Read);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
@@ -415,7 +415,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         LongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.unsafeLoad();
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.Write);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
@@ -524,7 +524,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         LongRef ref1 = createReadBiasedLongRef(stm, 100);
         LongRef ref2 = createLongRef(stm);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setReadTrackingEnabled(false);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
@@ -609,7 +609,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         LongRef ref1 = createLongRef(stm);
         LongRef ref2 = createLongRef(stm);
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.Read);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);

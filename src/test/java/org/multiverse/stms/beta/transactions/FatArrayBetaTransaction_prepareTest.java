@@ -310,7 +310,7 @@ public class FatArrayBetaTransaction_prepareTest {
         LongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.unsafeLoad();
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setDirtyCheckEnabled(false);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         tx.commute(ref, pool, IncLongFunction.INSTANCE);
@@ -336,7 +336,7 @@ public class FatArrayBetaTransaction_prepareTest {
         LongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.unsafeLoad();
 
-        BetaTransactionConfig config = new BetaTransactionConfig(stm)
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setDirtyCheckEnabled(true);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         tx.commute(ref, pool, IncLongFunction.INSTANCE);
