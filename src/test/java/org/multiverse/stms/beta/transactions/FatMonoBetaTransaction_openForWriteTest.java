@@ -5,6 +5,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.exceptions.*;
+import org.multiverse.functions.IncLongFunction;
+import org.multiverse.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
@@ -432,7 +434,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertAborted(tx);
     }
 
-     @Test
+    @Test
     public void whenContainsUntrackedRead_thenCantRecoverFromUnrealReadConflict() {
         LongRef ref1 = createReadBiasedLongRef(stm, 100);
         LongRef ref2 = createLongRef(stm);
@@ -548,6 +550,61 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertAttached(tx, write);
+    }
+
+    @Test
+    public void whenHasCommutingFunctions() {
+        LongRef ref = createLongRef(stm, 10);
+        LongRefTranlocal committed = ref.unsafeLoad();
+
+        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        LongFunction function = new IncLongFunction();
+        tx.commute(ref, pool, function);
+
+        LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
+
+        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+
+        assertActive(tx);
+        assertSame(commuting, write);
+        assertSame(committed, write.read);
+        assertFalse(write.isCommuting);
+        assertFalse(write.isCommitted);
+        assertEquals(11, write.value);
+        assertNull(ref.lockOwner);
+        assertHasNoCommutingFunctions(write);
+        assertUnlocked(ref);
+        assertNull(ref.getLockOwner());
+        assertSurplus(1, ref);
+        assertUpdateBiased(ref);
+        assertAttached(tx, write);
+    }
+
+    @Test
+    public void whenHasCommutingFunctionAndLocked_thenReadConflict() {
+        LongRef ref = createLongRef(stm, 10);
+        LongRefTranlocal committed = ref.unsafeLoad();
+
+        FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
+        otherTx.openForRead(ref, true, pool);
+
+        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        LongFunction function = new IncLongFunction();
+        tx.commute(ref, pool, function);
+
+        try {
+            tx.openForWrite(ref, false, pool);
+            fail();
+        } catch (ReadConflict expected) {
+
+        }
+
+        assertAborted(tx);
+        assertSame(otherTx, ref.lockOwner);
+        assertLocked(ref);
+        assertSurplus(1, ref);
+        assertUpdateBiased(ref);
+        assertSame(committed, ref.unsafeLoad());
     }
 
     @Test

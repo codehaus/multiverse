@@ -8,6 +8,8 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadConflict;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
+import org.multiverse.functions.IncLongFunction;
+import org.multiverse.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
@@ -15,6 +17,7 @@ import org.multiverse.stms.beta.refs.LongRef;
 import org.multiverse.stms.beta.refs.LongRefTranlocal;
 import org.multiverse.stms.beta.refs.Tranlocal;
 
+import static junit.framework.Assert.assertSame;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
@@ -330,7 +333,58 @@ public class FatMonoBetaTransaction_openForReadTest {
         assertFalse(read.isPermanent);
         assertAttached(tx, read);
     }
+          @Test
+    public void whenHasCommutingFunctions() {
+        LongRef ref = createLongRef(stm, 10);
+        LongRefTranlocal committed = ref.unsafeLoad();
 
+        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        LongFunction function = new IncLongFunction();
+        tx.commute(ref, pool, function);
+
+        LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
+
+        LongRefTranlocal read = tx.openForWrite(ref, false, pool);
+
+        assertActive(tx);
+        assertSame(commuting, read);
+        assertSame(committed, read.read);
+        assertFalse(read.isCommuting);
+        assertFalse(read.isCommitted);
+        assertEquals(11, read.value);
+        assertUnlocked(ref);
+        assertNull(ref.getLockOwner());
+        assertSurplus(1, ref);
+        assertUpdateBiased(ref);
+        assertAttached(tx, read);
+    }
+
+    @Test
+    public void whenHasCommutingFunctionsAndLocked_thenReadConflict() {
+        LongRef ref = createLongRef(stm, 10);
+        LongRefTranlocal committed = ref.unsafeLoad();
+
+        FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
+        otherTx.openForRead(ref, true, pool);
+
+        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        LongFunction function = new IncLongFunction();
+        tx.commute(ref, pool, function);
+
+        try {
+            tx.openForRead(ref, false, pool);
+            fail();
+        } catch (ReadConflict expected) {
+
+        }
+
+        assertAborted(tx);
+        assertSame(otherTx, ref.lockOwner);
+        assertLocked(ref);
+        assertSurplus(1, ref);
+        assertUpdateBiased(ref);
+        assertSame(committed, ref.unsafeLoad());
+    }
     @Test
     public void whenPrepared_thenPreparedTransactionException() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
