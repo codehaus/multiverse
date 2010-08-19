@@ -64,7 +64,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         status = ACTIVE;
     }
 
-
     @Override
     public final <E> RefTranlocal openForRead(final Ref<E> ref,  boolean lock, final BetaObjectPool pool) {
 //        assert pool!=null;
@@ -92,28 +91,24 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
                 attached = read;
                 return read;
-            }else{
-                RefTranlocal<E> read = ref.load(config.spinCount);
-
-                //if it was locked, lets abort.
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                if(!read.isPermanent){
-                    attached = read;
-                }else if(config.trackReads){
-                    attached = read;
-                }else{
-                    throw abortOnTooSmallSize(pool, 2);
-                }
-
-                return read;
             }
+
+            RefTranlocal<E> read = ref.load(config.spinCount);
+
+            if (read.isLocked) {
+                throw abortOnReadConflict(pool);
+            }
+
+            if(!read.isPermanent || config.trackReads){
+                attached = read;
+            }else{
+                throw abortOnTooSmallSize(pool, 2);
+            }
+
+            return read;
         }
 
         //the transaction has a previous attached reference
-
         if(attached.owner == ref){
             //the reference is the one we are looking for.
             RefTranlocal<E> result = (RefTranlocal<E>)attached;
@@ -128,10 +123,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         if(lock || config.trackReads){
             throw abortOnTooSmallSize(pool, 2);
         }
-
-        //it is not the reference we are looking for, lets try to load it. They only good outcome
-        //if this path is reading an untracked read.
-
 
         RefTranlocal<E> read = ref.load(config.spinCount);
 
@@ -277,8 +268,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
-
-
     @Override
     public final  IntRefTranlocal openForRead(final IntRef ref,  boolean lock, final BetaObjectPool pool) {
 //        assert pool!=null;
@@ -306,28 +295,24 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
                 attached = read;
                 return read;
-            }else{
-                IntRefTranlocal read = ref.load(config.spinCount);
-
-                //if it was locked, lets abort.
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                if(!read.isPermanent){
-                    attached = read;
-                }else if(config.trackReads){
-                    attached = read;
-                }else{
-                    throw abortOnTooSmallSize(pool, 2);
-                }
-
-                return read;
             }
+
+            IntRefTranlocal read = ref.load(config.spinCount);
+
+            if (read.isLocked) {
+                throw abortOnReadConflict(pool);
+            }
+
+            if(!read.isPermanent || config.trackReads){
+                attached = read;
+            }else{
+                throw abortOnTooSmallSize(pool, 2);
+            }
+
+            return read;
         }
 
         //the transaction has a previous attached reference
-
         if(attached.owner == ref){
             //the reference is the one we are looking for.
             IntRefTranlocal result = (IntRefTranlocal)attached;
@@ -342,10 +327,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         if(lock || config.trackReads){
             throw abortOnTooSmallSize(pool, 2);
         }
-
-        //it is not the reference we are looking for, lets try to load it. They only good outcome
-        //if this path is reading an untracked read.
-
 
         IntRefTranlocal read = ref.load(config.spinCount);
 
@@ -491,8 +472,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
-
-
     @Override
     public final  LongRefTranlocal openForRead(final LongRef ref,  boolean lock, final BetaObjectPool pool) {
 //        assert pool!=null;
@@ -520,28 +499,24 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
                 attached = read;
                 return read;
-            }else{
-                LongRefTranlocal read = ref.load(config.spinCount);
-
-                //if it was locked, lets abort.
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                if(!read.isPermanent){
-                    attached = read;
-                }else if(config.trackReads){
-                    attached = read;
-                }else{
-                    throw abortOnTooSmallSize(pool, 2);
-                }
-
-                return read;
             }
+
+            LongRefTranlocal read = ref.load(config.spinCount);
+
+            if (read.isLocked) {
+                throw abortOnReadConflict(pool);
+            }
+
+            if(!read.isPermanent || config.trackReads){
+                attached = read;
+            }else{
+                throw abortOnTooSmallSize(pool, 2);
+            }
+
+            return read;
         }
 
         //the transaction has a previous attached reference
-
         if(attached.owner == ref){
             //the reference is the one we are looking for.
             LongRefTranlocal result = (LongRefTranlocal)attached;
@@ -556,10 +531,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         if(lock || config.trackReads){
             throw abortOnTooSmallSize(pool, 2);
         }
-
-        //it is not the reference we are looking for, lets try to load it. They only good outcome
-        //if this path is reading an untracked read.
-
 
         LongRefTranlocal read = ref.load(config.spinCount);
 
@@ -705,8 +676,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
-
-
     @Override
     public final  Tranlocal openForRead(final BetaTransactionalObject ref,  boolean lock, final BetaObjectPool pool) {
 //        assert pool!=null;
@@ -734,28 +703,24 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
                 attached = read;
                 return read;
-            }else{
-                Tranlocal read = ref.load(config.spinCount);
-
-                //if it was locked, lets abort.
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                if(!read.isPermanent){
-                    attached = read;
-                }else if(config.trackReads){
-                    attached = read;
-                }else{
-                    throw abortOnTooSmallSize(pool, 2);
-                }
-
-                return read;
             }
+
+            Tranlocal read = ref.load(config.spinCount);
+
+            if (read.isLocked) {
+                throw abortOnReadConflict(pool);
+            }
+
+            if(!read.isPermanent || config.trackReads){
+                attached = read;
+            }else{
+                throw abortOnTooSmallSize(pool, 2);
+            }
+
+            return read;
         }
 
         //the transaction has a previous attached reference
-
         if(attached.owner == ref){
             //the reference is the one we are looking for.
             Tranlocal result = (Tranlocal)attached;
@@ -770,10 +735,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         if(lock || config.trackReads){
             throw abortOnTooSmallSize(pool, 2);
         }
-
-        //it is not the reference we are looking for, lets try to load it. They only good outcome
-        //if this path is reading an untracked read.
-
 
         Tranlocal read = ref.load(config.spinCount);
 
@@ -904,8 +865,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
-     }
-
+    }
 
  
     @Override

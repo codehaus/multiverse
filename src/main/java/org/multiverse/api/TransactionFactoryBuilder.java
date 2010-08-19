@@ -5,6 +5,8 @@ package org.multiverse.api;
  */
 public interface TransactionFactoryBuilder {
 
+    TransactionFactoryBuilder setFamilyName(String familyName);
+
     TransactionFactoryBuilder setPropagationLevel(PropagationLevel propagationLevel);
 
     TransactionFactoryBuilder setTraceLevel(TraceLevel traceLevel);

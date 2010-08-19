@@ -10,6 +10,9 @@ import org.multiverse.api.*;
 public interface BetaTransactionFactoryBuilder extends TransactionFactoryBuilder {
 
     @Override
+    BetaTransactionFactoryBuilder setFamilyName(String familyName);
+
+    @Override
     BetaTransactionFactoryBuilder setPropagationLevel(PropagationLevel level);
 
     @Override

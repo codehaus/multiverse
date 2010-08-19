@@ -3,7 +3,7 @@ package org.multiverse.api;
 /**
  * With the PessimisticLockLevel one can influence various levels of pessimistic behavior in the Stm.
  * For more information on configuration see
- * {@link org.multiverse.api.TransactionFactoryBuilder#setPessimisticLockLevel(PessimisticLockLevel)}. 
+ * {@link TransactionFactoryBuilder#setPessimisticLockLevel(PessimisticLockLevel)}.
  *
  * @author Peter Veentjer.
  */

@@ -80,6 +80,7 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         return traceLevel;
     }
 
+    @Override
     public boolean isInterruptible() {
         return interruptible;
     }
@@ -113,12 +114,10 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         return spinCount;
     }
 
-    @Override
     public boolean isLockReads() {
         return lockReads;
     }
 
-    @Override
     public boolean isLockWrites() {
         return lockWrites;
     }
@@ -142,7 +141,6 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
         return globalConflictCounter;
     }
 
-    @Override
     public int getMinimalArrayTreeSize() {
         return minimalArrayTreeSize;
     }

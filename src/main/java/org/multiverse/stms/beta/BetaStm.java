@@ -81,6 +81,11 @@ public final class BetaStm implements Stm {
         }
 
         @Override
+        public BetaTransactionFactoryBuilder setFamilyName(String familyName) {
+            return new BetaTransactionFactoryBuilderImpl(config.setFamilyName(familyName));
+        }
+
+        @Override
         public BetaTransactionFactoryBuilder setPropagationLevel(final PropagationLevel level) {
             return new BetaTransactionFactoryBuilderImpl(config.setPropagationLevel(level));
         }

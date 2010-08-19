@@ -123,7 +123,7 @@ public interface Transaction {
     /**
      * Prepares this transaction to be committed. It can lock resources to make sure that no conflicting changes are
      * made after the transaction has been prepared. If the transaction already is prepared, the call is ignored.  If
-     * the prepare fails, the transaction automatically is aborted. Once a transaction is prepared, it can always
+     * the prepare fails, the transaction automatically is aborted. Once a transaction is prepared, it will always
      * succeed with the commit.
      * <p/>
      * It is very important that the transaction eventually commits or aborts, if it doesn't no other transaction
