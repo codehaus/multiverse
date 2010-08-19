@@ -29,9 +29,9 @@ public class LongRef_loadTest {
 
         BetaTransaction other = stm.startDefaultTransaction();
         Tranlocal read1 = other.openForRead(ref, false, pool);
-        ref.tryLockAndCheckConflict(other, 1, read1);
+        ref.___tryLockAndCheckConflict(other, 1, read1);
 
-        Tranlocal read = ref.load(1);
+        Tranlocal read = ref.___load(1);
 
         assertNotNull(read);
         assertTrue(read.isLocked);
@@ -40,9 +40,9 @@ public class LongRef_loadTest {
     @Test
     public void whenSuccess() {
         BetaTransactionalObject ref = BetaStmUtils.createLongRef(stm);
-        Tranlocal committed = ref.unsafeLoad();
+        Tranlocal committed = ref.___unsafeLoad();
 
-        Tranlocal tranlocal = ref.load(1);
+        Tranlocal tranlocal = ref.___load(1);
         assertSame(committed, tranlocal);
     }
 }

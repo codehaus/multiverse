@@ -29,7 +29,7 @@ public class ReadBiasedWithPeriodicUpdateTest {
     @Test
     public void test() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         for (int l = 0; l < 100; l++) {
             BetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -46,7 +46,7 @@ public class ReadBiasedWithPeriodicUpdateTest {
         assertSurplus(1, ref);
         assertReadBiased(ref);
         assertUnlocked(ref);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
 
         System.out.println("orec: " + ref.toOrecString());
     }

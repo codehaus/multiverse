@@ -57,7 +57,7 @@ public class BetaAtomicBlock_integrationTest {
             }
         });
 
-        assertEquals(1, ref.unsafeLoad().value);
+        assertEquals(1, ref.___unsafeLoad().value);
     }
 
     @Test

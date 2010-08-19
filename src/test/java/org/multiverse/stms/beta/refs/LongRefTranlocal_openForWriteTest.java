@@ -21,7 +21,7 @@ public class LongRefTranlocal_openForWriteTest {
     @Test
     public void test(){
         LongRef ref = createLongRef(stm, 200);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         LongRefTranlocal write = committed.openForWrite(pool);
         assertNotNull(write);

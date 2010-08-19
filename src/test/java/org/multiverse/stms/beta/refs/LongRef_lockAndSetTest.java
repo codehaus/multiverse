@@ -27,13 +27,13 @@ public class LongRef_lockAndSetTest {
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         ref.lockAndSet(tx, pool, 20);
-        assertSame(tx, ref.getLockOwner());
+        assertSame(tx, ref.___getLockOwner());
         assertLocked(ref);
 
         tx.commit();
 
-        assertNull(ref.getLockOwner());
-        assertEquals(20, ref.unsafeLoad().value);
+        assertNull(ref.___getLockOwner());
+        assertEquals(20, ref.___unsafeLoad().value);
     }
 
     @Test
@@ -43,13 +43,13 @@ public class LongRef_lockAndSetTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         ref.lockAndSet(tx, pool, 10);
         ref.lockAndSet(tx, pool, 20);
-        assertSame(tx, ref.getLockOwner());
+        assertSame(tx, ref.___getLockOwner());
         assertLocked(ref);
 
         tx.commit();
 
-        assertNull(ref.getLockOwner());
-        assertEquals(20, ref.unsafeLoad().value);
+        assertNull(ref.___getLockOwner());
+        assertEquals(20, ref.___unsafeLoad().value);
     }
 
     @Test
@@ -66,7 +66,7 @@ public class LongRef_lockAndSetTest {
 
         }
 
-        assertSame(otherTx, ref.getLockOwner());
+        assertSame(otherTx, ref.___getLockOwner());
         assertLocked(ref);
     }
 }

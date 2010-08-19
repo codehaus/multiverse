@@ -29,7 +29,7 @@ public class LongRef_hasReadConflictTest {
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
 
-        boolean hasReadConflict = ref.hasReadConflict(read, tx);
+        boolean hasReadConflict = ref.___hasReadConflict(read, tx);
 
         assertFalse(hasReadConflict);
     }
@@ -41,7 +41,7 @@ public class LongRef_hasReadConflictTest {
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
 
-        boolean hasReadConflict = ref.hasReadConflict(write, tx);
+        boolean hasReadConflict = ref.___hasReadConflict(write, tx);
 
         assertFalse(hasReadConflict);
     }
@@ -54,7 +54,7 @@ public class LongRef_hasReadConflictTest {
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         Tranlocal read = tx.openForRead(ref, true, pool);
 
-        boolean hasConflict = ref.hasReadConflict(read, tx);
+        boolean hasConflict = ref.___hasReadConflict(read, tx);
 
         assertFalse(hasConflict);
     }
@@ -71,7 +71,7 @@ public class LongRef_hasReadConflictTest {
         updatingTx.openForWrite(ref, false, pool).value++;
         updatingTx.commit();
 
-        boolean hasConflict = ref.hasReadConflict(read, tx);
+        boolean hasConflict = ref.___hasReadConflict(read, tx);
         assertTrue(hasConflict);
     }
 
@@ -97,7 +97,7 @@ public class LongRef_hasReadConflictTest {
         BetaTransaction lockingTx = new FatMonoBetaTransaction(stm);
         lockingTx.openForRead(ref, true, pool);
 
-        boolean hasConflict = ref.hasReadConflict(read, tx);
+        boolean hasConflict = ref.___hasReadConflict(read, tx);
         assertTrue(hasConflict);
     }
 
@@ -111,7 +111,7 @@ public class LongRef_hasReadConflictTest {
         BetaTransaction otherTx = new FatMonoBetaTransaction(stm);
         otherTx.openForRead(ref, true, pool);
 
-        boolean hasReadConflict = ref.hasReadConflict(write, tx);
+        boolean hasReadConflict = ref.___hasReadConflict(write, tx);
 
         assertTrue(hasReadConflict);
     }

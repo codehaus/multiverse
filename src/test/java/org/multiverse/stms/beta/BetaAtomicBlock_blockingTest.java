@@ -49,7 +49,7 @@ public class BetaAtomicBlock_blockingTest {
         });
 
         joinAll(t);
-        assertEquals(2, ref.unsafeLoad().value);
+        assertEquals(2, ref.___unsafeLoad().value);
     }
 
     class WaitThread extends TestThread {

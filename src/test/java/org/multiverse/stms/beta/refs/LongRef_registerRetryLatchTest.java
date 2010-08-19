@@ -40,7 +40,7 @@ public class LongRef_registerRetryLatchTest {
 
         Latch latch = new CheapLatch();
         long listenerEra = latch.getEra();
-        int result = ref.registerChangeListener(latch, read, pool, listenerEra);
+        int result = ref.___registerChangeListener(latch, read, pool, listenerEra);
 
         assertEquals(BetaTransactionalObject.REGISTRATION_NOT_NEEDED, result);
         assertNull(getField(ref, "listeners"));
@@ -67,7 +67,7 @@ public class LongRef_registerRetryLatchTest {
 
         Latch latch = new CheapLatch();
         long listenerEra = latch.getEra();
-        int result = ref.registerChangeListener(latch, read, pool, listenerEra);
+        int result = ref.___registerChangeListener(latch, read, pool, listenerEra);
 
         assertEquals(BetaTransactionalObject.REGISTRATION_NONE, result);
         TestUtils.assertHasNoListeners(ref);
@@ -83,7 +83,7 @@ public class LongRef_registerRetryLatchTest {
 
         Latch latch = new CheapLatch();
         long listenerEra = latch.getEra();
-        int result = ref.registerChangeListener(latch, read, pool, listenerEra);
+        int result = ref.___registerChangeListener(latch, read, pool, listenerEra);
 
         assertEquals(BetaTransactionalObject.REGISTRATION_DONE, result);
         Listeners listeners = (Listeners) getField(ref, "listeners");
@@ -103,14 +103,14 @@ public class LongRef_registerRetryLatchTest {
 
         Latch latch1 = new CheapLatch();
         long listenerEra1 = latch1.getEra();
-        ref.registerChangeListener(latch1, read1, pool, listenerEra1);
+        ref.___registerChangeListener(latch1, read1, pool, listenerEra1);
 
         BetaTransaction tx2 = stm.startDefaultTransaction();
         LongRefTranlocal read2 = tx2.openForRead(ref, false, pool);
 
         Latch latch2 = new CheapLatch();
         long listenerEra2 = latch2.getEra();
-        int result = ref.registerChangeListener(latch2, read2, pool, listenerEra2);
+        int result = ref.___registerChangeListener(latch2, read2, pool, listenerEra2);
 
         assertEquals(BetaTransactionalObject.REGISTRATION_DONE, result);
         Listeners listeners = (Listeners) getField(ref, "listeners");

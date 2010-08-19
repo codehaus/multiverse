@@ -9,7 +9,7 @@ import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
  * set of n arrive/departs that were only used for reading (you know when someone wants to do
  * an update if he acquires the lock), that the Orec goes to readonly mode. So each Orec tracks
  * how many readonly operations have been done on it. Once the orec has become read biased, it
- * is very important the no depart is called (only the departAfterUpdateAndReleaseLock can be
+ * is very important the no depart is called (only the ___departAfterUpdateAndReleaseLock can be
  * called).
  * <p/>
  * Once a Orec becomes biased to reading, the tranlocal that belongs to the Orec, can't be pooled
@@ -29,14 +29,14 @@ public interface Orec {
      *
      * @return true if there is a surplus, false otherwise.
      */
-    boolean query();
+    boolean ___query();
 
     /**
      * Returns the current number of surplus. Value is unspecified if Orec is biased to reading.
      *
      * @return the current surplus.
      */
-    long getSurplus();
+    long ___getSurplus();
 
     /**
      * Arrive: when the arrive is called.
@@ -47,7 +47,7 @@ public interface Orec {
      * @param spinCount the maximum number of spins in the lock.
      * @return true if the arrive was a success, false if it was locked.
      */
-    boolean arrive(int spinCount);
+    boolean ___arrive(int spinCount);
 
     /**
      * Arrives at this orec an acquired the lock.
@@ -57,7 +57,7 @@ public interface Orec {
      * @param spinCount the maximum number of spins when locked.
      * @return true if the arrive and the lock was done successfully, false otherwise.
      */
-    boolean arriveAndLockForUpdate(int spinCount);
+    boolean ___arriveAndLockForUpdate(int spinCount);
 
     /**
      * Lowers the amount of surplus.
@@ -73,7 +73,7 @@ public interface Orec {
      * @throws org.multiverse.api.exceptions.PanicError
      *          if read biased.
      */
-    boolean departAfterReading();
+    boolean ___departAfterReading();
 
     /**
      * Departs and releases the lock.
@@ -85,12 +85,12 @@ public interface Orec {
      * @return the current surplus (so after the depart is done)
      * @throws IllegalStateException if the orec is not locked.
      */
-    long departAfterUpdateAndReleaseLock(GlobalConflictCounter globalConflictCounter, BetaTransactionalObject ref);
+    long ___departAfterUpdateAndReleaseLock(GlobalConflictCounter globalConflictCounter, BetaTransactionalObject ref);
 
     /**
      *
      */
-    void departAfterFailure();
+    void ___departAfterFailure();
 
     /**
      * Departs after failure and releases the lock.
@@ -99,14 +99,14 @@ public interface Orec {
      * @throws org.multiverse.api.exceptions.PanicError
      *          if surplus is 0, or readbiased, or not locked.
      */
-    long departAfterFailureAndReleaseLock();
+    long ___departAfterFailureAndReleaseLock();
 
     /**
      * Departs
      *
      * @return true if the orec has just become read biased, false otherwise.
      */
-    boolean departAfterReadingAndReleaseLock();
+    boolean ___departAfterReadingAndReleaseLock();
 
 
     /**
@@ -114,7 +114,7 @@ public interface Orec {
      *
      * @return true if the Orec is locked.
      */
-    boolean isLocked();
+    boolean ___isLocked();
 
     /**
      * Tries to lock this Orec for update purposes. This automatically resets the biased to reading
@@ -126,23 +126,23 @@ public interface Orec {
      *          if the surplus is 0 (a tryUpdateLock only can be done if the current
      *          transaction did an arrive).
      */
-    boolean tryUpdateLock(int spinCount);
+    boolean ___tryUpdateLock(int spinCount);
 
     /**
      * Releases the lock. Doesn't change the surplus or being biased to reading.  This call should only
-     * be made after the {@link #departAfterReading()} has left the orec locked.
+     * be made after the {@link #___departAfterReading()} has left the orec locked.
      *
      * @throws org.multiverse.api.exceptions.PanicError
      *          if the lock is not acquired.
      */
-    void unlockAfterBecomingReadBiased();
+    void ___unlockAfterBecomingReadBiased();
 
     /**
      * Checks if this Orec is biased towards reading.
      *
      * @return true if this Orec is biased towards reading.
      */
-    boolean isReadBiased();
+    boolean ___isReadBiased();
 
     /**
      * Returns the number of readonly operations that need to be done before being biased to
@@ -150,7 +150,7 @@ public interface Orec {
      *
      * @return the number of readonly operations
      */
-    int getReadBiasedThreshold();
+    int ___getReadBiasedThreshold();
 
     /**
      * Returns the current number of consecutive readonly operations.
@@ -159,5 +159,5 @@ public interface Orec {
      *
      * @return the current number of consecutive readonly operations.
      */
-    int getReadonlyCount();
+    int ___getReadonlyCount();
 }

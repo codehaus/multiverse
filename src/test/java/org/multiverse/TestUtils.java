@@ -214,14 +214,14 @@ public class TestUtils {
     public static LongRef createReadBiasedLongRef(BetaStm stm, long value) {
         LongRef ref = BetaStmUtils.createLongRef(stm, value);
 
-        for (int k = 0; k < ref.getOrec().getReadBiasedThreshold(); k++) {
+        for (int k = 0; k < ref.___getOrec().___getReadBiasedThreshold(); k++) {
             BetaTransaction tx = new FatMonoBetaTransaction(stm);
             tx.openForRead(ref, false, new BetaObjectPool());
             tx.commit(new BetaObjectPool());
-            assertUnlocked(ref.getOrec());
+            assertUnlocked(ref.___getOrec());
         }
 
-        assertTrue(ref.getOrec().isReadBiased());
+        assertTrue(ref.___getOrec().___isReadBiased());
 
         return ref;
     }

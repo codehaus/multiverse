@@ -32,12 +32,12 @@ public class LongRef_tryLockAndCheckConflictTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal write = tx.openForRead(ref, false, pool);
 
-        boolean result = ref.tryLockAndCheckConflict(tx, 1, write);
+        boolean result = ref.___tryLockAndCheckConflict(tx, 1, write);
 
         assertTrue(result);
-        assertSame(tx, ref.getLockOwner());
-        assertLocked(ref.getOrec());
-        assertUpdateBiased(ref.getOrec());
+        assertSame(tx, ref.___getLockOwner());
+        assertLocked(ref.___getOrec());
+        assertUpdateBiased(ref.___getOrec());
     }
 
     @Test
@@ -52,14 +52,14 @@ public class LongRef_tryLockAndCheckConflictTest {
         write.value++;
         otherTx.commit();
 
-        boolean result = ref.tryLockAndCheckConflict(tx, 1, read);
+        boolean result = ref.___tryLockAndCheckConflict(tx, 1, read);
 
         assertFalse(result);
-        assertSame(tx, ref.getLockOwner());
+        assertSame(tx, ref.___getLockOwner());
         assertLocked(ref);
-        assertUpdateBiased(ref.getOrec());
+        assertUpdateBiased(ref.___getOrec());
         assertReadonlyCount(0, ref);
-        assertSame(write, ref.unsafeLoad());
+        assertSame(write, ref.___unsafeLoad());
     }
 
     @Test
@@ -70,18 +70,18 @@ public class LongRef_tryLockAndCheckConflictTest {
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
 
         arbitraryUpdate(stm, ref);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction lockingTx = stm.startDefaultTransaction();
         lockingTx.openForWrite(ref, true, pool);
 
-        boolean result = ref.tryLockAndCheckConflict(tx, 1, read);
+        boolean result = ref.___tryLockAndCheckConflict(tx, 1, read);
         assertFalse(result);
-        assertSame(lockingTx, ref.getLockOwner());
+        assertSame(lockingTx, ref.___getLockOwner());
         assertLocked(ref);
-        assertUpdateBiased(ref.getOrec());
+        assertUpdateBiased(ref.___getOrec());
         assertReadonlyCount(1, ref);
-        assertSame(committed, ref.unsafeLoad());
+        assertSame(committed, ref.___unsafeLoad());
     }
 
     @Test
@@ -96,13 +96,13 @@ public class LongRef_tryLockAndCheckConflictTest {
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, true, pool);
 
-        boolean result = ref.tryLockAndCheckConflict(tx, 1, read2);
+        boolean result = ref.___tryLockAndCheckConflict(tx, 1, read2);
 
         assertFalse(result);
-        assertLocked(ref.getOrec());
-        assertSurplus(2, ref.getOrec());
-        assertUpdateBiased(ref.getOrec());
-        assertSame(otherTx, ref.getLockOwner());
+        assertLocked(ref.___getOrec());
+        assertSurplus(2, ref.___getOrec());
+        assertUpdateBiased(ref.___getOrec());
+        assertSame(otherTx, ref.___getLockOwner());
     }
 
     @Test
@@ -113,11 +113,11 @@ public class LongRef_tryLockAndCheckConflictTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal read = tx.openForRead(ref, true, pool);
 
-        boolean result = ref.tryLockAndCheckConflict(tx, 1, read);
+        boolean result = ref.___tryLockAndCheckConflict(tx, 1, read);
 
         assertTrue(result);
-        assertLocked(ref.getOrec());
-        assertUpdateBiased(ref.getOrec());
-        assertSame(tx, ref.getLockOwner());
+        assertLocked(ref.___getOrec());
+        assertUpdateBiased(ref.___getOrec());
+        assertSame(tx, ref.___getLockOwner());
     }
 }

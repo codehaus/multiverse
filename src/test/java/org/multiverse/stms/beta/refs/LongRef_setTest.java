@@ -28,6 +28,6 @@ public class LongRef_setTest {
         ref.set(tx, pool, 20);
         tx.commit();
 
-        assertEquals(20, ref.unsafeLoad().value);
+        assertEquals(20, ref.___unsafeLoad().value);
     }
 }

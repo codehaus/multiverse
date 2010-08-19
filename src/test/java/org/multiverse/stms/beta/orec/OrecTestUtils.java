@@ -9,46 +9,46 @@ import static org.junit.Assert.*;
 public class OrecTestUtils {
 
     public static void assertLocked(Orec orec) {
-        assertTrue(orec.isLocked());
+        assertTrue(orec.___isLocked());
     }
 
     public static void assertUnlocked(Orec orec) {
-        assertFalse(orec.isLocked());
+        assertFalse(orec.___isLocked());
     }
 
     public static void assertSurplus(int expectedSurplus, Orec orec) {
-        assertEquals(expectedSurplus, orec.getSurplus());
+        assertEquals(expectedSurplus, orec.___getSurplus());
     }
 
     public static void assertReadBiased(Orec orec) {
-        assertTrue(orec.isReadBiased());
+        assertTrue(orec.___isReadBiased());
     }
 
     public static void assertUpdateBiased(Orec orec) {
-        assertFalse(orec.isReadBiased());
+        assertFalse(orec.___isReadBiased());
     }
 
 
     public static void assertReadonlyCount(int expectedReadonlyCount, Orec orec) {
-        assertEquals(expectedReadonlyCount, orec.getReadonlyCount());
+        assertEquals(expectedReadonlyCount, orec.___getReadonlyCount());
     }
 
     public static <O extends Orec> O makeReadBiased(O orec) {
-        if (orec.isReadBiased()) {
+        if (orec.___isReadBiased()) {
             return orec;
         }
 
-        int x = orec.getReadonlyCount();
-        for (int k = x; k < orec.getReadBiasedThreshold() - 1; k++) {
-            orec.arrive(1);
-            if (orec.departAfterReading()) {
+        int x = orec.___getReadonlyCount();
+        for (int k = x; k < orec.___getReadBiasedThreshold() - 1; k++) {
+            orec.___arrive(1);
+            if (orec.___departAfterReading()) {
                 throw new RuntimeException();
             }
         }
 
-        orec.arrive(1);
-        if (orec.departAfterReading()) {
-            orec.unlockAfterBecomingReadBiased();
+        orec.___arrive(1);
+        if (orec.___departAfterReading()) {
+            orec.___unlockAfterBecomingReadBiased();
         } else {
             fail();
         }

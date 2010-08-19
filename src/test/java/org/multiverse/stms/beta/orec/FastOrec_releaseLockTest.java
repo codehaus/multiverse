@@ -16,7 +16,7 @@ public class FastOrec_releaseLockTest {
         FastOrec orec = new FastOrec();
 
         try {
-            orec.unlockAfterBecomingReadBiased();
+            orec.___unlockAfterBecomingReadBiased();
             fail();
         } catch (PanicError expected) {
         }
@@ -29,11 +29,11 @@ public class FastOrec_releaseLockTest {
     @Test
     public void whenSurplusAndNotLocked_thenPanicError() {
         FastOrec orec = new FastOrec();
-        orec.arrive(1);
+        orec.___arrive(1);
 
 
         try {
-            orec.unlockAfterBecomingReadBiased();
+            orec.___unlockAfterBecomingReadBiased();
             fail();
         } catch (PanicError expected) {
         }
@@ -46,17 +46,17 @@ public class FastOrec_releaseLockTest {
     @Test
     public void testReadBiased() {
         FastOrec orec = new FastOrec();
-        for (int k = 0; k < orec.getReadBiasedThreshold() - 1; k++) {
-            orec.arrive(1);
-            orec.departAfterReading();
+        for (int k = 0; k < orec.___getReadBiasedThreshold() - 1; k++) {
+            orec.___arrive(1);
+            orec.___departAfterReading();
             OrecTestUtils.assertReadonlyCount(k + 1, orec);
         }
 
-        orec.arrive(1);
-        boolean result = orec.departAfterReading();
+        orec.___arrive(1);
+        boolean result = orec.___departAfterReading();
         assertTrue(result);
 
-        orec.unlockAfterBecomingReadBiased();
+        orec.___unlockAfterBecomingReadBiased();
         OrecTestUtils.assertUnlocked(orec);
         OrecTestUtils.assertReadBiased(orec);
         OrecTestUtils.assertSurplus(0, orec);
@@ -66,10 +66,10 @@ public class FastOrec_releaseLockTest {
     @Test
     public void whenLocked() {
         FastOrec orec = new FastOrec();
-        orec.arrive(1);
-        orec.tryUpdateLock(1);
+        orec.___arrive(1);
+        orec.___tryUpdateLock(1);
 
-        orec.unlockAfterBecomingReadBiased();
+        orec.___unlockAfterBecomingReadBiased();
 
         OrecTestUtils.assertUnlocked(orec);
         OrecTestUtils.assertUpdateBiased(orec);

@@ -110,8 +110,8 @@ public interface Transaction {
     /**
      * Aborts this Transaction. This means that the changes made in this transaction are not committed. It depends on
      * the implementation if this operation is simple (ditching objects for example), or if changes need to be rolled
-     * back. If an exception is thrown while executing the abort, the transaction is still aborted. And example of
-     * such a situation is a pre-abort task that fails. So the transaction always is aborted (unless it is committed).
+     * back. If an exception is thrown while executing the ___abort, the transaction is still aborted. And example of
+     * such a situation is a pre-___abort task that fails. So the transaction always is aborted (unless it is committed).
      * <p/>
      * If the Transaction already is aborted, the call is ignored.
      *
@@ -138,7 +138,7 @@ public interface Transaction {
 
     /**
      * Signals that the only possible outcome of the Transaction is one that aborts. When the transaction prepares or
-     * commits it checks if the transaction is marked for abort. If so, it will automatically aborted. If the
+     * commits it checks if the transaction is marked for ___abort. If so, it will automatically aborted. If the
      * transaction is executed inside an AtomicBlock, it is automatically retried.
      * <p/>
      * The abortOnly marker is reset when a {@link #softReset()} or {@link #hardReset()} is done.
@@ -222,7 +222,7 @@ public interface Transaction {
      * this is know as the 'retry' and 'orelse' functionality.
      *
      * @param changeListener the Latch the is notified when a change happens on one of the reads.
-     * @throws NullPointerException if changeListener is null (will also abort the transaction).
+     * @throws NullPointerException if changeListener is null (will also ___abort the transaction).
      * @throws org.multiverse.api.exceptions.NoRetryPossibleException
      *                              if no registration can be done because the
      *                              transaction doesn't have any reads. When this exception happens, the transaction

@@ -255,7 +255,7 @@ public final class BetaObjectPool {
             return null;
         }
 
-        int classIndex = owner.getClassIndex();
+        int classIndex = owner.___getClassIndex();
 
         switch(classIndex){
             case 0:
@@ -288,7 +288,7 @@ public final class BetaObjectPool {
         }
 
         BetaTransactionalObject owner = tranlocal.owner;
-        int classIndex = owner.getClassIndex();
+        int classIndex = owner.___getClassIndex();
 
         switch(classIndex){
             case 0:

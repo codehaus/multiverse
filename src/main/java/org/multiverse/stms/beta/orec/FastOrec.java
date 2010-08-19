@@ -45,17 +45,17 @@ public final class FastOrec implements Orec {
     private final AtomicLong state = new AtomicLong(0);
 
     @Override
-    public int getReadBiasedThreshold() {
+    public int ___getReadBiasedThreshold() {
         return READ_THRESHOLD;
     }
 
     @Override
-    public long getSurplus() {
+    public long ___getSurplus() {
         return getSurplus(state.get());
     }
 
     @Override
-    public boolean arrive(int spinCount) {
+    public boolean ___arrive(int spinCount) {
         do {
             long current = state.get();
 
@@ -86,7 +86,7 @@ public final class FastOrec implements Orec {
     }
 
     @Override
-    public boolean arriveAndLockForUpdate(int spinCount) {
+    public boolean ___arriveAndLockForUpdate(int spinCount) {
         do {
             long current = state.get();
 
@@ -118,12 +118,12 @@ public final class FastOrec implements Orec {
     }
 
     @Override
-    public boolean query() {
+    public boolean ___query() {
         return getSurplus(state.get()) > 0;
     }
 
     @Override
-    public boolean departAfterReading() {
+    public boolean ___departAfterReading() {
         while (true) {
             long current = state.get();
             long surplus = getSurplus(current);
@@ -159,12 +159,12 @@ public final class FastOrec implements Orec {
     }
 
     @Override
-    public int getReadonlyCount() {
+    public int ___getReadonlyCount() {
         return getReadonlyCount(state.get());
     }
 
     @Override
-    public final boolean departAfterReadingAndReleaseLock() {
+    public final boolean ___departAfterReadingAndReleaseLock() {
         while (true) {
             long current = state.get();
             long surplus = getSurplus(current);
@@ -204,7 +204,7 @@ public final class FastOrec implements Orec {
     }
 
     @Override
-    public long departAfterUpdateAndReleaseLock(GlobalConflictCounter globalConflictCounter, BetaTransactionalObject ref) {
+    public long ___departAfterUpdateAndReleaseLock(GlobalConflictCounter globalConflictCounter, BetaTransactionalObject ref) {
         while (true) {
             long current = state.get();
 
@@ -244,7 +244,7 @@ public final class FastOrec implements Orec {
     }
 
     @Override
-    public long departAfterFailureAndReleaseLock() {
+    public long ___departAfterFailureAndReleaseLock() {
         while (true) {
             long current = state.get();
 
@@ -272,7 +272,7 @@ public final class FastOrec implements Orec {
     }
 
     @Override
-    public void departAfterFailure() {
+    public void ___departAfterFailure() {
         while (true) {
             long current = state.get();
 
@@ -301,24 +301,24 @@ public final class FastOrec implements Orec {
     }
 
     @Override
-    public boolean isReadBiased() {
+    public boolean ___isReadBiased() {
         return isReadBiased(state.get());
     }
 
     @Override
-    public boolean isLocked() {
+    public boolean ___isLocked() {
         return isLocked(state.get());
     }
 
     @Override
-    public boolean tryUpdateLock(int spinCount) {
+    public boolean ___tryUpdateLock(int spinCount) {
         do {
             long current = state.get();
 
             if (isLocked(current)) {
                 spinCount--;
             } else {
-                if (getSurplus() == 0) {
+                if (___getSurplus() == 0) {
                     throw new PanicError();
                 }
 
@@ -334,7 +334,7 @@ public final class FastOrec implements Orec {
     }
 
     @Override
-    public void unlockAfterBecomingReadBiased() {
+    public void ___unlockAfterBecomingReadBiased() {
         while (true) {
             long current = state.get();
 

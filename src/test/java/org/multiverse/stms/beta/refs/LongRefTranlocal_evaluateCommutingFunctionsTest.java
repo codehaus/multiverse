@@ -23,9 +23,9 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest {
     @Test
     public void whenSingleCommutingFunction() {
         LongRef ref = createLongRef(stm, 100);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
-        LongRefTranlocal tranlocal = ref.openForCommute(pool);
+        LongRefTranlocal tranlocal = ref.___openForCommute(pool);
         tranlocal.addCommutingFunction(IncLongFunction.INSTANCE, pool);
         tranlocal.read = committed;
         tranlocal.evaluateCommutingFunctions(pool);
@@ -41,9 +41,9 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest {
     @Test
     public void whenMultipleCommutingFunctions() {
         LongRef ref = createLongRef(stm, 100);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
-        LongRefTranlocal tranlocal = ref.openForCommute(pool);
+        LongRefTranlocal tranlocal = ref.___openForCommute(pool);
         tranlocal.addCommutingFunction(IncLongFunction.INSTANCE, pool);
         tranlocal.addCommutingFunction(IncLongFunction.INSTANCE, pool);
         tranlocal.addCommutingFunction(IncLongFunction.INSTANCE, pool);

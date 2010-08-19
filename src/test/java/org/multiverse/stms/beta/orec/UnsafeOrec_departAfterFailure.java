@@ -16,7 +16,7 @@ public class UnsafeOrec_departAfterFailure {
         UnsafeOrec orec = new UnsafeOrec();
 
         try {
-            orec.departAfterFailure();
+            orec.___departAfterFailure();
             fail();
         } catch (PanicError expected) {
         }
@@ -30,9 +30,9 @@ public class UnsafeOrec_departAfterFailure {
     @Test
     public void whenUpdateBiasedAndSurplusAndNotLocked() {
         UnsafeOrec orec = new UnsafeOrec();
-        orec.arrive(1);
+        orec.___arrive(1);
 
-        orec.departAfterFailure();
+        orec.___departAfterFailure();
 
         assertSurplus(0, orec);
         assertUpdateBiased(orec);
@@ -42,11 +42,11 @@ public class UnsafeOrec_departAfterFailure {
     @Test
     public void whenUpdateBiasedAndSurplusAndLocked() {
         UnsafeOrec orec = new UnsafeOrec();
-        orec.arrive(1);
-        orec.arrive(1);
-        orec.tryUpdateLock(1);
+        orec.___arrive(1);
+        orec.___arrive(1);
+        orec.___tryUpdateLock(1);
 
-        orec.departAfterFailure();
+        orec.___departAfterFailure();
 
         assertSurplus(1, orec);
         assertUpdateBiased(orec);

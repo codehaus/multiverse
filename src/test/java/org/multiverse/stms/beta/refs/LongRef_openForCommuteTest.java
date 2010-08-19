@@ -21,7 +21,7 @@ public class LongRef_openForCommuteTest {
     @Test
     public void test(){
         LongRef ref = createLongRef(stm, 100);
-        LongRefTranlocal tranlocal = ref.openForCommute(pool);
+        LongRefTranlocal tranlocal = ref.___openForCommute(pool);
 
         assertNotNull(tranlocal);
         assertFalse(tranlocal.isCommitted);

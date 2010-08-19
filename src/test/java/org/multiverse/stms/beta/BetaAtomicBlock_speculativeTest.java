@@ -61,7 +61,7 @@ public class BetaAtomicBlock_speculativeTest {
         });
 
         for (LongRef ref : refs) {
-            assertEquals(1, ref.unsafeLoad().value);
+            assertEquals(1, ref.___unsafeLoad().value);
         }
 
         assertEquals(3, transactions.size());

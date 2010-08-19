@@ -16,13 +16,13 @@ import static java.lang.String.format;
  */
 public abstract class FastOrec implements Orec {
 
-    protected final static Unsafe unsafe = ToolUnsafe.getUnsafe();
+    protected final static Unsafe ___unsafe = ToolUnsafe.getUnsafe();
 
     protected final static long valueOffset;
 
     static {
         try {
-            valueOffset = unsafe.objectFieldOffset(FastOrec.class.getDeclaredField("value"));
+            valueOffset = ___unsafe.objectFieldOffset(FastOrec.class.getDeclaredField("value"));
         } catch (Exception ex) {
             throw new Error(ex);
         }
@@ -30,9 +30,9 @@ public abstract class FastOrec implements Orec {
 
     //it is important that the maximum threshold is not larger than 1023 (there are 10 bits for
     //the readonly count)
-    public final static int READ_THRESHOLD = 16;
+    public final static int ___READ_THRESHOLD = 16;
 
-    protected volatile long value;
+    private volatile long value;
 
     /**
      * Atomically sets the value to the given updated value
@@ -43,42 +43,42 @@ public abstract class FastOrec implements Orec {
      * @return true if successful. False return indicates that
      *         the actual value was not equal to the expected value.
      */
-    protected boolean compareAndSet(final long expect, final long update) {
-        return unsafe.compareAndSwapLong(this, valueOffset, expect, update);
+    protected boolean ___compareAndSet(final long expect, final long update) {
+        return ___unsafe.compareAndSwapLong(this, valueOffset, expect, update);
     }
 
     @Override
-    public final int getReadBiasedThreshold() {
-        return READ_THRESHOLD;
+    public final int ___getReadBiasedThreshold() {
+        return ___READ_THRESHOLD;
     }
 
     @Override
-    public final long getSurplus() {
+    public final long ___getSurplus() {
         return getSurplus(value);
     }
 
     @Override
-    public final boolean isReadBiased() {
+    public final boolean ___isReadBiased() {
         return isReadBiased(value);
     }
 
     @Override
-    public final boolean isLocked() {
+    public final boolean ___isLocked() {
         return isLocked(value);
     }
 
     @Override
-    public final int getReadonlyCount() {
+    public final int ___getReadonlyCount() {
         return getReadonlyCount(value);
     }
 
     @Override
-    public final boolean query() {
+    public final boolean ___query() {
         return getSurplus(value) > 0;
     }
 
     @Override
-    public final boolean arrive(int spinCount) {
+    public final boolean ___arrive(int spinCount) {
         do {
             long current = value;
 
@@ -99,7 +99,7 @@ public abstract class FastOrec implements Orec {
 
                 long next = setSurplus(current, surplus);
 
-                if (compareAndSet(current, next)) {
+                if (___compareAndSet(current, next)) {
                     return true;
                 }
             }
@@ -109,7 +109,7 @@ public abstract class FastOrec implements Orec {
     }
 
     @Override
-    public final boolean arriveAndLockForUpdate(int spinCount) {
+    public final boolean ___arriveAndLockForUpdate(int spinCount) {
         do {
             long current = value;
 
@@ -123,7 +123,7 @@ public abstract class FastOrec implements Orec {
                 long next = setSurplus(current, surplus);
                 next = setLocked(next, true);
 
-                if (compareAndSet(current, next)) {
+                if (___compareAndSet(current, next)) {
                     return true;
                 }
             }
@@ -133,7 +133,7 @@ public abstract class FastOrec implements Orec {
     }
 
     @Override
-    public final boolean departAfterReading() {
+    public final boolean ___departAfterReading() {
         while (true) {
             long current = value;
             long surplus = getSurplus(current);
@@ -152,7 +152,7 @@ public abstract class FastOrec implements Orec {
             surplus--;
             readonlyCount++;
             boolean isLocked = isLocked(current);
-            if (surplus == 0 && readonlyCount >= READ_THRESHOLD) {
+            if (surplus == 0 && readonlyCount >= ___READ_THRESHOLD) {
                 isReadBiased = true;
                 isLocked = true;
                 readonlyCount = 0;
@@ -162,14 +162,14 @@ public abstract class FastOrec implements Orec {
             next = setIsReadBiased(next, isReadBiased);
             next = setReadonlyCount(next, readonlyCount);
             next = setSurplus(next, surplus);
-            if (compareAndSet(current, next)) {
+            if (___compareAndSet(current, next)) {
                 return isReadBiased;
             }
         }
     }
 
     @Override
-    public final boolean departAfterReadingAndReleaseLock() {
+    public final boolean ___departAfterReadingAndReleaseLock() {
         while (true) {
             long current = value;
             long surplus = getSurplus(current);
@@ -192,7 +192,7 @@ public abstract class FastOrec implements Orec {
 
             surplus--;
             readonlyCount++;
-            if (surplus == 0 && readonlyCount >= READ_THRESHOLD) {
+            if (surplus == 0 && readonlyCount >= ___READ_THRESHOLD) {
                 isReadBiased = true;
                 isLocked = true;
                 readonlyCount = 0;
@@ -204,14 +204,14 @@ public abstract class FastOrec implements Orec {
             next = setIsReadBiased(next, isReadBiased);
             next = setReadonlyCount(next, readonlyCount);
             next = setSurplus(next, surplus);
-            if (compareAndSet(current, next)) {
+            if (___compareAndSet(current, next)) {
                 return isReadBiased;
             }
         }
     }
 
     @Override
-    public final long departAfterUpdateAndReleaseLock(
+    public final long ___departAfterUpdateAndReleaseLock(
             final GlobalConflictCounter globalConflictCounter, final BetaTransactionalObject ref) {
         while (true) {
             long current = value;
@@ -245,14 +245,14 @@ public abstract class FastOrec implements Orec {
             next = setReadonlyCount(next, 0);
             next = setIsReadBiased(next, isReadBiased);
             next = setSurplus(next, surplus);
-            if (compareAndSet(current, next)) {
+            if (___compareAndSet(current, next)) {
                 return resultingSurplus;
             }
         }
     }
 
     @Override
-    public final long departAfterFailureAndReleaseLock() {
+    public final long ___departAfterFailureAndReleaseLock() {
         while (true) {
             long current = value;
 
@@ -273,14 +273,14 @@ public abstract class FastOrec implements Orec {
 
             long next = setLocked(current, false);
             next = setSurplus(next, surplus);
-            if (compareAndSet(current, next)) {
+            if (___compareAndSet(current, next)) {
                 return surplus;
             }
         }
     }
 
     @Override
-    public final void departAfterFailure() {
+    public final void ___departAfterFailure() {
         while (true) {
             long current = value;
 
@@ -303,27 +303,27 @@ public abstract class FastOrec implements Orec {
 
             long next = setSurplus(current, surplus);
 
-            if (compareAndSet(current, next)) {
+            if (___compareAndSet(current, next)) {
                 return;
             }
         }
     }
 
     @Override
-    public final boolean tryUpdateLock(int spinCount) {
+    public final boolean ___tryUpdateLock(int spinCount) {
         do {
             long current = value;
 
             if (isLocked(current)) {
                 spinCount--;
             } else {
-                if (getSurplus() == 0) {
+                if (___getSurplus() == 0) {
                     throw new PanicError();
                 }
 
                 long next = setLocked(current, true);
 
-                if (compareAndSet(current, next)) {
+                if (___compareAndSet(current, next)) {
                     return true;
                 }
             }
@@ -334,7 +334,7 @@ public abstract class FastOrec implements Orec {
 
 //    @Override
 
-    public final void unlockByPermanent() {
+    public final void ___unlockByPermanent() {
         while (true) {
             long current = value;
 
@@ -343,14 +343,14 @@ public abstract class FastOrec implements Orec {
             }
 
             long next = setLocked(current, false);
-            if (compareAndSet(current, next)) {
+            if (___compareAndSet(current, next)) {
                 return;
             }
         }
     }
 
     @Override
-    public final void unlockAfterBecomingReadBiased() {
+    public final void ___unlockAfterBecomingReadBiased() {
         while (true) {
             long current = value;
 
@@ -359,7 +359,7 @@ public abstract class FastOrec implements Orec {
             }
 
             long next = setLocked(current, false);
-            if (compareAndSet(current, next)) {
+            if (___compareAndSet(current, next)) {
                 return;
             }
         }
@@ -398,7 +398,7 @@ public abstract class FastOrec implements Orec {
     }
 
     public final String toOrecString() {
-        return format("FastOrec(isLocked=%s, surplus=%s, isReadBiased=%s, readonlyCount=%s)",
+        return format("FastOrec(isLocked=%s, surplus=%s, ___isReadBiased=%s, readonlyCount=%s)",
                 isLocked(value), getSurplus(value), isReadBiased(value), getReadonlyCount(value));
     }
 }

@@ -51,7 +51,7 @@ public class LongRef_atomicGetTest {
         long result = ref.atomicGet();
 
         assertEquals(100, result);
-        assertSame(lockOwner, ref.getLockOwner());
+        assertSame(lockOwner, ref.___getLockOwner());
         assertUpdateBiased(ref);
     }
 
@@ -73,7 +73,7 @@ public class LongRef_atomicGetTest {
         long result = ref.atomicGet();
 
         assertEquals(100, result);
-        assertSame(lockOwner, ref.getLockOwner());
+        assertSame(lockOwner, ref.___getLockOwner());
         assertReadBiased(ref);
     }
 }

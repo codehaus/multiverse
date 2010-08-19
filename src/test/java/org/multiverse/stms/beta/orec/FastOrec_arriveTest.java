@@ -14,7 +14,7 @@ public class FastOrec_arriveTest {
     @Test
     public void whenUpdateBiasedNotLockedAndNoSurplus() {
         FastOrec orec = new FastOrec();
-        boolean result = orec.arrive(1);
+        boolean result = orec.___arrive(1);
 
         assertTrue(result);
         OrecTestUtils.assertSurplus(1, orec);
@@ -26,10 +26,10 @@ public class FastOrec_arriveTest {
     @Test
     public void whenUpdateBiasedAndNotLockedAndSurplus() {
         FastOrec orec = new FastOrec();
-        orec.arrive(1);
-        orec.arrive(1);
+        orec.___arrive(1);
+        orec.___arrive(1);
 
-        boolean result = orec.arrive(1);
+        boolean result = orec.___arrive(1);
 
         assertTrue(result);
         OrecTestUtils.assertSurplus(3, orec);
@@ -41,10 +41,10 @@ public class FastOrec_arriveTest {
     @Test
     public void whenUpdateBiasedAndLocked_thenReturnFalse() {
         FastOrec orec = new FastOrec();
-        orec.arrive(1);
-        orec.tryUpdateLock(1);
+        orec.___arrive(1);
+        orec.___tryUpdateLock(1);
 
-        boolean result = orec.arrive(1);
+        boolean result = orec.___arrive(1);
 
         assertFalse(result);
         OrecTestUtils.assertSurplus(1, orec);
@@ -56,10 +56,10 @@ public class FastOrec_arriveTest {
     @Test
     public void whenReadBiasedAndLocked_thenReturnFalse() {
         FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
-        orec.arrive(1);
-        orec.tryUpdateLock(1);
+        orec.___arrive(1);
+        orec.___tryUpdateLock(1);
 
-        boolean result = orec.arrive(1);
+        boolean result = orec.___arrive(1);
 
         assertFalse(result);
         OrecTestUtils.assertSurplus(1, orec);
@@ -72,7 +72,7 @@ public class FastOrec_arriveTest {
     public void whenReadBiasedAndNoSurplus() {
         FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
 
-        boolean result = orec.arrive(1);
+        boolean result = orec.___arrive(1);
 
         assertTrue(result);
         OrecTestUtils.assertUnlocked(orec);
@@ -84,9 +84,9 @@ public class FastOrec_arriveTest {
     @Test
     public void whenReadBiasedAndSurplus_thenCallIgnored() {
         FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
-        orec.arrive(1);
+        orec.___arrive(1);
 
-        boolean result = orec.arrive(1);
+        boolean result = orec.___arrive(1);
 
         assertTrue(result);
         OrecTestUtils.assertUnlocked(orec);

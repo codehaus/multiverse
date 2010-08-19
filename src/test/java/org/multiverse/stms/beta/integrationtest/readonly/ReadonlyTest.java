@@ -35,7 +35,7 @@ public class ReadonlyTest {
         } catch (ReadonlyException expected) {
         }
 
-        assertEquals(0, ref.unsafeLoad().value);
+        assertEquals(0, ref.___unsafeLoad().value);
     }
 
     public void updateInReadonlyMethod(final IntRef ref, final int newValue) {
@@ -103,7 +103,7 @@ public class ReadonlyTest {
         IntRef ref = createIntRef(stm, 10);
         int result = readInReadonlyMethod(ref);
         assertEquals(10, result);
-        assertEquals(10, ref.unsafeLoad().value);
+        assertEquals(10, ref.___unsafeLoad().value);
     }
 
     public int readInReadonlyMethod(final IntRef ref) {
@@ -124,7 +124,7 @@ public class ReadonlyTest {
     public void whenUpdate_thenCreationOfNewTransactionalObjectsSucceeds() {
         IntRef ref = update_createNewTransactionObject(100);
         assertNotNull(ref);
-        assertEquals(100, ref.unsafeLoad().value);
+        assertEquals(100, ref.___unsafeLoad().value);
     }
 
     public IntRef update_createNewTransactionObject(final int value) {
@@ -168,7 +168,7 @@ public class ReadonlyTest {
         IntRef ref = createIntRef(stm, 10);
         int result = readInUpdateMethod(ref);
         assertEquals(10, result);
-        assertEquals(10, ref.unsafeLoad().value);
+        assertEquals(10, ref.___unsafeLoad().value);
     }
 
 
@@ -190,7 +190,7 @@ public class ReadonlyTest {
     public void whenUpdate_thenUpdateSucceeds() {
         IntRef ref = createIntRef(stm);
         updateInUpdateMethod(ref, 10);
-        assertEquals(10, ref.unsafeLoad().value);
+        assertEquals(10, ref.___unsafeLoad().value);
     }
 
     public void updateInUpdateMethod(final IntRef ref, final int newValue) {
@@ -215,7 +215,7 @@ public class ReadonlyTest {
         IntRef ref = createIntRef(stm);
         defaultTransactionalMethod(ref);
 
-        assertEquals(1, ref.unsafeLoad().value);
+        assertEquals(1, ref.___unsafeLoad().value);
     }
 
 

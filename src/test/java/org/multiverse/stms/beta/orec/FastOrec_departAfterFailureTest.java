@@ -15,7 +15,7 @@ public class FastOrec_departAfterFailureTest {
         FastOrec orec = new FastOrec();
 
         try {
-            orec.departAfterFailure();
+            orec.___departAfterFailure();
             fail();
         } catch (PanicError expected) {
         }
@@ -29,9 +29,9 @@ public class FastOrec_departAfterFailureTest {
     @Test
     public void whenUpdateBiasedAndSurplusAndNotLocked() {
         FastOrec orec = new FastOrec();
-        orec.arrive(1);
+        orec.___arrive(1);
 
-        orec.departAfterFailure();
+        orec.___departAfterFailure();
 
         OrecTestUtils.assertSurplus(0, orec);
         OrecTestUtils.assertUpdateBiased(orec);
@@ -42,11 +42,11 @@ public class FastOrec_departAfterFailureTest {
     @Test
     public void whenUpdateBiasedAndSurplusAndLocked() {
         FastOrec orec = new FastOrec();
-        orec.arrive(1);
-        orec.arrive(1);
-        orec.tryUpdateLock(1);
+        orec.___arrive(1);
+        orec.___arrive(1);
+        orec.___tryUpdateLock(1);
 
-        orec.departAfterFailure();
+        orec.___departAfterFailure();
 
         OrecTestUtils.assertSurplus(1, orec);
         OrecTestUtils.assertUpdateBiased(orec);
@@ -58,11 +58,11 @@ public class FastOrec_departAfterFailureTest {
     public void whenReadBiasedAndLocked_thenPanicError() {
         FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
 
-        orec.arrive(1);
-        orec.tryUpdateLock(1);
+        orec.___arrive(1);
+        orec.___tryUpdateLock(1);
 
         try {
-            orec.departAfterFailure();
+            orec.___departAfterFailure();
             fail();
         } catch (PanicError expected) {
         }
@@ -78,7 +78,7 @@ public class FastOrec_departAfterFailureTest {
         FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
 
         try {
-            orec.departAfterFailure();
+            orec.___departAfterFailure();
             fail();
         } catch (PanicError expected) {
         }

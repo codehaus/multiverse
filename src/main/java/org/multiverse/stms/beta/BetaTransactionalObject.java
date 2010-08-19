@@ -27,14 +27,14 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      *
      * @return the index that uniquely identifies this class
      */
-    int getClassIndex();
+    int ___getClassIndex();
 
     /**
      * Returns the Orec that belongs to this TransactionalObject.
      *
      * @return the Orec that belongs to this TransactionalObject.
      */
-    Orec getOrec();
+    Orec ___getOrec();
 
     /**
      * Opens the TransactionalObject for construction.
@@ -42,9 +42,9 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      * @param pool the BetaObjectPool to use for garbage collected objects.
      * @return the opened Tranlocal.
      */
-    Tranlocal openForConstruction(BetaObjectPool pool);
+    Tranlocal ___openForConstruction(BetaObjectPool pool);
 
-    Tranlocal openForCommute(BetaObjectPool pool);
+    Tranlocal ___openForCommute(BetaObjectPool pool);
 
     /**
      * Loads the active value. If the value already is locked, by another this call will return a tranlocal
@@ -55,7 +55,7 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      * @return the loaded tranlocal. It could be that a locked tranlocal is returned, the value itself is only
      *         used as a marked to indicate that it is locked. The value should not be used.
      */
-    Tranlocal load(int spinCount);
+    Tranlocal ___load(int spinCount);
 
     /**
      * Loads and locks the value. If the value already is locked, by another this call will return a tranlocal
@@ -67,7 +67,7 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      * @return the loaded tranlocal. It could be that a locked tranlocal is returned, the value itself is only
      *         used as a marked to indicate that it is locked. The value should not be used.
      */
-    Tranlocal lockAndLoad(int spinCount, BetaTransaction newLockOwner);
+    Tranlocal ___lockAndLoad(int spinCount, BetaTransaction newLockOwner);
 
     /**
      * Loads the current stored Tranlocal without any form of consistency guarantees. This method is purely
@@ -75,7 +75,7 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      *
      * @return the current stored tranlocal.
      */
-    Tranlocal unsafeLoad();
+    Tranlocal ___unsafeLoad();
 
     /**
      * Tries to acquire the lock and checks for conflict. It is safe to call this method when it already is
@@ -89,7 +89,7 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      * @param tranlocal    the tranlocal used for conflict detection.
      * @return true if locking was a success, false otherwise.
      */
-    boolean tryLockAndCheckConflict(BetaTransaction newLockOwner, int spinCount, Tranlocal tranlocal);
+    boolean ___tryLockAndCheckConflict(BetaTransaction newLockOwner, int spinCount, Tranlocal tranlocal);
 
     /**
      * Returns the transaction that currently owns the lock. If no transaction owns the lock, null
@@ -97,7 +97,7 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      *
      * @return the transaction that currently owns the lock.
      */
-    BetaTransaction getLockOwner();
+    BetaTransaction ___getLockOwner();
 
     /**
      * Checks if the tranlocal has a read conflict. There is a readconflict when the current value is
@@ -108,7 +108,7 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      * @param transaction the transaction
      * @return true if there was a readconflict, false otherwise.
      */
-    boolean hasReadConflict(Tranlocal tranlocal, BetaTransaction transaction);
+    boolean ___hasReadConflict(Tranlocal tranlocal, BetaTransaction transaction);
 
     /**
      * Commits the all the dirty changes. The call also needs to be done when the tranlocal is readonly and
@@ -122,7 +122,7 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      * @return the listeners that should be notified after the transaction completes. Value could be null,
      *         if no listeners need to be notified.
      */
-    Listeners commitDirty(
+    Listeners ___commitDirty(
             Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool, GlobalConflictCounter globalConflictCounter);
 
     /**
@@ -137,18 +137,18 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      * @return the listeners that should be notified after the transaction completes. Value could be null,
      *         if no listeners need to be notified.
      */
-    Listeners commitAll(
+    Listeners ___commitAll(
             Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool, GlobalConflictCounter globalConflictCounter);
 
     /**
      * Aborts this BetaTransactionalObject (so releases the lock if acquired, does departs etc).
      *
-     * @param transaction the transaction that wants to abort. This is needed to figure out if the
+     * @param transaction the transaction that wants to ___abort. This is needed to figure out if the
      *                    resource is locked by that transaction.
      * @param tranlocal   the tranlocal currently read/written
      * @param pool        the BetaObjectPool
      */
-    void abort(BetaTransaction transaction, Tranlocal tranlocal, BetaObjectPool pool);
+    void ___abort(BetaTransaction transaction, Tranlocal tranlocal, BetaObjectPool pool);
 
     /**
      * Registers a change listener (needed for blocking operations).
@@ -160,7 +160,7 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      * @param lockEra   the era of the lock when it when it 'started'. LockEra is needed for lock pooling.
      * @return true if there already is write has happened an no further registration is needed.
      */
-    int registerChangeListener(Latch latch, Tranlocal tranlocal, BetaObjectPool pool, long lockEra);
+    int ___registerChangeListener(Latch latch, Tranlocal tranlocal, BetaObjectPool pool, long lockEra);
 
     /**
      * Returns the identity hash of this object. Once calculated it should be cached so that it
@@ -168,5 +168,5 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      *
      * @return the identity hashcode.
      */
-    int identityHashCode();
+    int ___identityHashCode();
 }

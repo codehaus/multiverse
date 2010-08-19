@@ -30,7 +30,7 @@ public class LongRef_constructionTest {
         assertLocked(ref);
         assertReadonlyCount(0, ref);
         assertUpdateBiased(ref);
-        assertNull(ref.unsafeLoad());
-        assertSame(tx, ref.getLockOwner());
+        assertNull(ref.___unsafeLoad());
+        assertSame(tx, ref.___getLockOwner());
     }
 }

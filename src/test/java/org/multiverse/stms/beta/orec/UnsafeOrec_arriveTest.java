@@ -15,7 +15,7 @@ public class UnsafeOrec_arriveTest {
     @Test
     public void whenUpdateBiasedNotLockedAndNoSurplus() {
         UnsafeOrec orec = new UnsafeOrec();
-        boolean result = orec.arrive(1);
+        boolean result = orec.___arrive(1);
 
         assertTrue(result);
         assertSurplus(1, orec);
@@ -26,10 +26,10 @@ public class UnsafeOrec_arriveTest {
     @Test
     public void whenUpdateBiasedAndNotLockedAndSurplus() {
         UnsafeOrec orec = new UnsafeOrec();
-        orec.arrive(1);
-        orec.arrive(1);
+        orec.___arrive(1);
+        orec.___arrive(1);
 
-        boolean result = orec.arrive(1);
+        boolean result = orec.___arrive(1);
 
         assertTrue(result);
         assertSurplus(3, orec);
@@ -40,10 +40,10 @@ public class UnsafeOrec_arriveTest {
     @Test
     public void whenUpdateBiasedAndLocked_thenLockedConflict() {
         UnsafeOrec orec = new UnsafeOrec();
-        orec.arrive(1);
-        orec.tryUpdateLock(1);
+        orec.___arrive(1);
+        orec.___tryUpdateLock(1);
 
-        boolean result = orec.arrive(1);
+        boolean result = orec.___arrive(1);
 
         assertFalse(result);
         assertSurplus(1, orec);
@@ -53,10 +53,10 @@ public class UnsafeOrec_arriveTest {
     @Test
     public void whenReadBiasedAndLocked_thenLockConflict() {
         UnsafeOrec orec = makeReadBiased(new UnsafeOrec());
-        orec.arrive(1);
-        orec.tryUpdateLock(1);
+        orec.___arrive(1);
+        orec.___tryUpdateLock(1);
 
-        boolean result = orec.arrive(1);
+        boolean result = orec.___arrive(1);
 
         assertFalse(result);
         assertSurplus(1, orec);
@@ -67,7 +67,7 @@ public class UnsafeOrec_arriveTest {
     public void whenReadBiasedAndNoSurplus() {
         UnsafeOrec orec = makeReadBiased(new UnsafeOrec());
 
-        boolean result = orec.arrive(1);
+        boolean result = orec.___arrive(1);
 
         assertTrue(result);
         assertUnlocked(orec);
@@ -77,9 +77,9 @@ public class UnsafeOrec_arriveTest {
     @Test
     public void whenReadBiasedAndSurplus_thenCallIgnored() {
         UnsafeOrec orec = makeReadBiased(new UnsafeOrec());
-        orec.arrive(1);
+        orec.___arrive(1);
 
-        boolean result = orec.arrive(1);
+        boolean result = orec.___arrive(1);
 
         assertTrue(result);
         assertUnlocked(orec);

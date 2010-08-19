@@ -41,7 +41,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
         assertNull(write.read);
         assertFalse(write.isCommitted);
         assertFalse(write.isPermanent);
-        assertSame(tx, ref.getLockOwner());
+        assertSame(tx, ref.___getLockOwner());
         assertLocked(ref);
         assertSurplus(1, ref);
         assertAttached(tx, write);
@@ -63,7 +63,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
     @Test
     public void whenAlreadyCommitted_thenIllegalArgumentException() {
         LongRef ref = createLongRef(stm, 100);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
 
@@ -74,9 +74,9 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
         }
 
         assertAborted(tx);
-        assertSame(committed, ref.unsafeLoad());
+        assertSame(committed, ref.___unsafeLoad());
         assertUnlocked(ref);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -98,7 +98,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
         assertNull(write2.read);
         assertFalse(write2.isCommitted);
         assertFalse(write2.isPermanent);
-        assertSame(tx, ref.getLockOwner());
+        assertSame(tx, ref.___getLockOwner());
         assertLocked(ref);
         assertSurplus(1, ref);
         assertAttached(tx, write1);
@@ -107,7 +107,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
     @Test
     public void whenAlreadyOpenedForReading_thenIllegalArgumentException() {
         LongRef ref = createLongRef(stm, 100);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.openForRead(ref, false, pool);
@@ -120,9 +120,9 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
 
         //todo: this should be aborted.
         assertActive(tx);
-        assertSame(committed, ref.unsafeLoad());
+        assertSame(committed, ref.___unsafeLoad());
         assertUnlocked(ref);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -131,7 +131,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
     @Test
     public void whenAlreadyOpenedForWrite_thenIllegalArgumentException() {
         LongRef ref = createLongRef(stm, 100);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.openForWrite(ref, false, pool);
@@ -144,9 +144,9 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
 
         //todo: this should be aborted.
         assertActive(tx);
-        assertSame(committed, ref.unsafeLoad());
+        assertSame(committed, ref.___unsafeLoad());
         assertUnlocked(ref);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -155,7 +155,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
     @Test
     public void whenReadonly_thenReadonlyException() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setReadonly(true);
@@ -170,8 +170,8 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
 
         assertAborted(tx);
         assertUnlocked(ref);
-        assertSame(committed, ref.unsafeLoad());
-        assertNull(ref.getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);

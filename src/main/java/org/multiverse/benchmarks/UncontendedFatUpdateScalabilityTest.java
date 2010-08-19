@@ -116,7 +116,7 @@ public class UncontendedFatUpdateScalabilityTest {
                 tx.hardReset(pool);
             }
 
-            assertEquals(transactionCount, ref.unsafeLoad().value);
+            assertEquals(transactionCount, ref.___unsafeLoad().value);
 
             durationMs = System.currentTimeMillis() - startMs;
             System.out.printf("Multiverse> %s is finished in %s ms\n", getName(), durationMs);

@@ -22,7 +22,7 @@ public class LongRef_openForConstructionTest {
     public void test() {
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRef ref = new LongRef(tx);
-        LongRefTranlocal constructed = ref.openForConstruction(pool);
+        LongRefTranlocal constructed = ref.___openForConstruction(pool);
 
         assertNotNull(constructed);
         assertSame(ref, constructed.owner);

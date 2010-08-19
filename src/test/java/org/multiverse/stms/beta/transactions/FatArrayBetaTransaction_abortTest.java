@@ -44,8 +44,8 @@ public class FatArrayBetaTransaction_abortTest {
     @Test
     public void whenHasUnlockedWrite() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
-        int oldReadonlyCount = ref.getReadonlyCount();
+        LongRefTranlocal committed = ref.___unsafeLoad();
+        int oldReadonlyCount = ref.___getReadonlyCount();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.openForWrite(ref, false, pool);
@@ -54,9 +54,9 @@ public class FatArrayBetaTransaction_abortTest {
 
         assertAborted(tx);
         assertUnlocked(ref);
-        assertSame(committed, ref.unsafeLoad());
+        assertSame(committed, ref.___unsafeLoad());
         assertSurplus(0, ref);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
         assertReadonlyCount(oldReadonlyCount, ref);
         assertUpdateBiased(ref);
     }
@@ -64,8 +64,8 @@ public class FatArrayBetaTransaction_abortTest {
     @Test
     public void whenHasLockedWrite() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
-        int oldReadonlyCount = ref.getReadonlyCount();
+        LongRefTranlocal committed = ref.___unsafeLoad();
+        int oldReadonlyCount = ref.___getReadonlyCount();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.openForWrite(ref, true, pool);
@@ -74,9 +74,9 @@ public class FatArrayBetaTransaction_abortTest {
 
         assertAborted(tx);
         assertUnlocked(ref);
-        assertSame(committed, ref.unsafeLoad());
+        assertSame(committed, ref.___unsafeLoad());
         assertSurplus(0, ref);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
         assertReadonlyCount(oldReadonlyCount, ref);
         assertUpdateBiased(ref);
     }
@@ -84,8 +84,8 @@ public class FatArrayBetaTransaction_abortTest {
     @Test
     public void whenHasLockedRead() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
-        int oldReadonlyCount = ref.getReadonlyCount();
+        LongRefTranlocal committed = ref.___unsafeLoad();
+        int oldReadonlyCount = ref.___getReadonlyCount();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.openForRead(ref, true, pool);
@@ -94,9 +94,9 @@ public class FatArrayBetaTransaction_abortTest {
 
         assertAborted(tx);
         assertUnlocked(ref);
-        assertSame(committed, ref.unsafeLoad());
+        assertSame(committed, ref.___unsafeLoad());
         assertSurplus(0, ref);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
         assertReadonlyCount(oldReadonlyCount, ref);
         assertUpdateBiased(ref);
     }
@@ -104,8 +104,8 @@ public class FatArrayBetaTransaction_abortTest {
     @Test
     public void whenHasPermanentReadThatIsNotLocked() {
         LongRef ref = createReadBiasedLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
-        int oldReadonlyCount = ref.getReadonlyCount();
+        LongRefTranlocal committed = ref.___unsafeLoad();
+        int oldReadonlyCount = ref.___getReadonlyCount();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.openForRead(ref, false, pool);
@@ -117,8 +117,8 @@ public class FatArrayBetaTransaction_abortTest {
         assertReadBiased(ref);
         assertReadonlyCount(oldReadonlyCount, ref);
         assertSurplus(1, ref);
-        assertSame(committed, ref.unsafeLoad());
-        assertNull(ref.getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertNull(ref.___getLockOwner());
     }
 
     @Test
@@ -130,11 +130,11 @@ public class FatArrayBetaTransaction_abortTest {
 
         assertAborted(tx);
 
-        assertSame(tx, ref.getLockOwner());
+        assertSame(tx, ref.___getLockOwner());
         assertLocked(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
-        assertNull(ref.unsafeLoad());
+        assertNull(ref.___unsafeLoad());
         assertFalse(write.isPermanent);
         assertFalse(write.isCommitted);
     }

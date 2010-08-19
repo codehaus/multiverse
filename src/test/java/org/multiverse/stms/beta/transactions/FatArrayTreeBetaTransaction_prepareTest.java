@@ -55,8 +55,8 @@ public class FatArrayTreeBetaTransaction_prepareTest {
         assertPrepared(tx);
         assertCommitted(otherTx);
         assertUnlocked(ref);
-        assertNull(ref.getLockOwner());
-        assertSame(conflictingWrite, ref.unsafeLoad());
+        assertNull(ref.___getLockOwner());
+        assertSame(conflictingWrite, ref.___unsafeLoad());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
     }
@@ -64,7 +64,7 @@ public class FatArrayTreeBetaTransaction_prepareTest {
     @Test
     public void whenReadIsConflictedByLock_thenPrepareSuccess() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
@@ -77,8 +77,8 @@ public class FatArrayTreeBetaTransaction_prepareTest {
         assertPrepared(tx);
         assertActive(otherTx);
         assertLocked(ref);
-        assertSame(otherTx, ref.getLockOwner());
-        assertSame(committed, ref.unsafeLoad());
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
         assertSurplus(2, ref);
         assertUpdateBiased(ref);
     }
@@ -86,7 +86,7 @@ public class FatArrayTreeBetaTransaction_prepareTest {
     @Test
     public void whenUpdate() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
@@ -96,8 +96,8 @@ public class FatArrayTreeBetaTransaction_prepareTest {
         assertPrepared(tx);
 
         assertLocked(ref);
-        assertSame(tx, ref.getLockOwner());
-        assertSame(committed, ref.unsafeLoad());
+        assertSame(tx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertFalse(write.isCommitted);
@@ -106,7 +106,7 @@ public class FatArrayTreeBetaTransaction_prepareTest {
     @Test
     public void whenUpdateAlreadyLockedBySelf() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, true, pool);
@@ -115,8 +115,8 @@ public class FatArrayTreeBetaTransaction_prepareTest {
         assertPrepared(tx);
 
         assertLocked(ref);
-        assertSame(tx, ref.getLockOwner());
-        assertSame(committed, ref.unsafeLoad());
+        assertSame(tx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertFalse(write.isCommitted);
@@ -125,7 +125,7 @@ public class FatArrayTreeBetaTransaction_prepareTest {
     @Test
     public void whenUpdateAndLockedByOther_thenWriteConflict() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
@@ -144,8 +144,8 @@ public class FatArrayTreeBetaTransaction_prepareTest {
         assertActive(otherTx);
 
         assertLocked(ref);
-        assertSame(otherTx, ref.getLockOwner());
-        assertSame(committed, ref.unsafeLoad());
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertFalse(write.isCommitted);
@@ -160,11 +160,11 @@ public class FatArrayTreeBetaTransaction_prepareTest {
         tx.prepare();
 
         assertPrepared(tx);
-        assertSame(tx, ref.getLockOwner());
+        assertSame(tx, ref.___getLockOwner());
         assertLocked(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
-        assertNull(ref.unsafeLoad());
+        assertNull(ref.___unsafeLoad());
     }
 
     @Test
@@ -190,8 +190,8 @@ public class FatArrayTreeBetaTransaction_prepareTest {
         assertCommitted(otherTx);
 
         assertUnlocked(ref);
-        assertNull(ref.getLockOwner());
-        assertSame(conflictingWrite, ref.unsafeLoad());
+        assertNull(ref.___getLockOwner());
+        assertSame(conflictingWrite, ref.___unsafeLoad());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertFalse(write.isCommitted);
@@ -200,7 +200,7 @@ public class FatArrayTreeBetaTransaction_prepareTest {
     @Test
     public void whenAlreadyPrepared() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
@@ -211,8 +211,8 @@ public class FatArrayTreeBetaTransaction_prepareTest {
         assertPrepared(tx);
 
         assertLocked(ref);
-        assertSame(tx, ref.getLockOwner());
-        assertSame(committed, ref.unsafeLoad());
+        assertSame(tx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertFalse(write.isCommitted);
@@ -221,7 +221,7 @@ public class FatArrayTreeBetaTransaction_prepareTest {
     @Test
     public void whenReferenceHasMultipleCommutes() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.commute(ref, pool, IncLongFunction.INSTANCE);
@@ -239,7 +239,7 @@ public class FatArrayTreeBetaTransaction_prepareTest {
         assertEquals(3, commute.value);
         assertTrue(commute.isDirty);
         assertLocked(ref);
-        assertSame(tx, ref.getLockOwner());
+        assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
     }
@@ -272,7 +272,7 @@ public class FatArrayTreeBetaTransaction_prepareTest {
     @Test
     public void whenHasCommuteAndNoDirtyCheck() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setDirtyCheckEnabled(false);
@@ -290,7 +290,7 @@ public class FatArrayTreeBetaTransaction_prepareTest {
         assertEquals(1, commute.value);
         assertTrue(commute.isDirty);
         assertLocked(ref);
-        assertSame(tx, ref.getLockOwner());
+        assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
     }
@@ -298,7 +298,7 @@ public class FatArrayTreeBetaTransaction_prepareTest {
     @Test
     public void whenHasCommuteAndDirtyCheck() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setDirtyCheckEnabled(true);
@@ -316,7 +316,7 @@ public class FatArrayTreeBetaTransaction_prepareTest {
         assertEquals(1, commute.value);
         assertTrue(commute.isDirty);
         assertLocked(ref);
-        assertSame(tx, ref.getLockOwner());
+        assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
     }
@@ -324,7 +324,7 @@ public class FatArrayTreeBetaTransaction_prepareTest {
     @Test
     public void whenHasCommuteButLockedByOtherTransaction_thenWriteConflict() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.commute(ref, pool, IncLongFunction.INSTANCE);
@@ -341,10 +341,10 @@ public class FatArrayTreeBetaTransaction_prepareTest {
         assertAborted(tx);
 
         assertLocked(ref);
-        assertSame(otherTx, ref.getLockOwner());
+        assertSame(otherTx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
-        assertSame(committed, ref.unsafeLoad());
+        assertSame(committed, ref.___unsafeLoad());
     }
 
     @Test
@@ -359,7 +359,7 @@ public class FatArrayTreeBetaTransaction_prepareTest {
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForWrite(ref, false, pool).value++;
         otherTx.commit();
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         tx.prepare();
 
@@ -373,7 +373,7 @@ public class FatArrayTreeBetaTransaction_prepareTest {
         assertEquals(2, commute.value);
         assertTrue(commute.isDirty);
         assertLocked(ref);
-        assertSame(tx, ref.getLockOwner());
+        assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
     }

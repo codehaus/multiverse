@@ -12,9 +12,9 @@ public class FastOrec_tryLockForUpdateTest {
     @Test
     public void whenFree() {
         FastOrec orec = new FastOrec();
-        orec.arrive(1);
+        orec.___arrive(1);
 
-        boolean result = orec.tryUpdateLock(1);
+        boolean result = orec.___tryUpdateLock(1);
         assertTrue(result);
         OrecTestUtils.assertLocked(orec);
         OrecTestUtils.assertSurplus(1, orec);
@@ -24,10 +24,10 @@ public class FastOrec_tryLockForUpdateTest {
     @Test
     public void whenFreeAndSurplus() {
         FastOrec orec = new FastOrec();
-        orec.arrive(1);
-        orec.arrive(1);
+        orec.___arrive(1);
+        orec.___arrive(1);
 
-        boolean result = orec.tryUpdateLock(1);
+        boolean result = orec.___tryUpdateLock(1);
         assertTrue(result);
         OrecTestUtils.assertLocked(orec);
         OrecTestUtils.assertSurplus(2, orec);
@@ -37,22 +37,22 @@ public class FastOrec_tryLockForUpdateTest {
     @Test
     public void whenLocked() {
         FastOrec orec = new FastOrec();
-        orec.arrive(1);
-        orec.tryUpdateLock(1);
+        orec.___arrive(1);
+        orec.___tryUpdateLock(1);
 
-        boolean result = orec.tryUpdateLock(1);
+        boolean result = orec.___tryUpdateLock(1);
         assertFalse(result);
         OrecTestUtils.assertLocked(orec);
-        assertEquals(1, orec.getSurplus());
-        assertFalse(orec.isReadBiased());
+        assertEquals(1, orec.___getSurplus());
+        assertFalse(orec.___isReadBiased());
     }
 
     @Test
     public void whenReadBiasedMode() {
         FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
 
-        orec.arrive(1);
-        boolean result = orec.tryUpdateLock(1);
+        orec.___arrive(1);
+        boolean result = orec.___tryUpdateLock(1);
 
         assertTrue(result);
         OrecTestUtils.assertReadBiased(orec);

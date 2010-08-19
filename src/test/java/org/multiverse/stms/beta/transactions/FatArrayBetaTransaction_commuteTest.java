@@ -50,7 +50,7 @@ public class FatArrayBetaTransaction_commuteTest {
         assertNull(tranlocal.read);
         assertHasCommutingFunctions(tranlocal, function);
         assertUnlocked(ref);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
     }
 
@@ -76,7 +76,7 @@ public class FatArrayBetaTransaction_commuteTest {
         assertNull(tranlocal.read);
         assertHasCommutingFunctions(tranlocal, function2, function1);
         assertUnlocked(ref);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         verifyZeroInteractions(function1);
         verifyZeroInteractions(function2);
@@ -98,14 +98,14 @@ public class FatArrayBetaTransaction_commuteTest {
         assertEquals(101, tranlocal.value);
         assertHasNoCommutingFunctions(tranlocal);
         assertUnlocked(ref);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
         assertSurplus(1, ref);
     }
 
     @Test
     public void whenAlreadyOpenedForWrite() {
         LongRef ref = createLongRef(stm, 100);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         LongRefTranlocal tranlocal = tx.openForWrite(ref, false, pool);
@@ -119,7 +119,7 @@ public class FatArrayBetaTransaction_commuteTest {
         assertEquals(101, tranlocal.value);
         assertHasNoCommutingFunctions(tranlocal);
         assertUnlocked(ref);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
         assertSurplus(1, ref);
     }
 
@@ -146,7 +146,7 @@ public class FatArrayBetaTransaction_commuteTest {
         assertEquals(1, tranlocal.value);
         assertHasNoCommutingFunctions(tranlocal);
         assertLocked(ref);
-        assertSame(tx, ref.getLockOwner());
+        assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
     }
 
@@ -175,7 +175,7 @@ public class FatArrayBetaTransaction_commuteTest {
         assertNull(commuting.read);
         assertHasCommutingFunctions(commuting, function);
         assertLocked(ref);
-        assertSame(otherTx, ref.getLockOwner());
+        assertSame(otherTx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
     }

@@ -14,8 +14,8 @@ public class UnsafeOrec_constructionTest {
     public void test() {
         UnsafeOrec orec = new UnsafeOrec();
 
-        assertEquals(0, orec.getSurplus());
-        assertFalse(orec.isLocked());
-        assertFalse(orec.isReadBiased());
+        assertEquals(0, orec.___getSurplus());
+        assertFalse(orec.___isLocked());
+        assertFalse(orec.___isReadBiased());
     }
 }

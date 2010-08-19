@@ -13,9 +13,9 @@ public class LongRef_tryUpdateLock {
     @Test
     public void whenFree() {
         Ref orec = new Ref();
-        orec.arrive(1);
+        orec.___arrive(1);
 
-        boolean result = orec.tryUpdateLock(1);
+        boolean result = orec.___tryUpdateLock(1);
         assertTrue(result);
         OrecTestUtils.assertLocked(orec);
         OrecTestUtils.assertSurplus(1, orec);
@@ -25,10 +25,10 @@ public class LongRef_tryUpdateLock {
     @Test
     public void whenFreeAndSurplus() {
         Ref orec = new Ref();
-        orec.arrive(1);
-        orec.arrive(1);
+        orec.___arrive(1);
+        orec.___arrive(1);
 
-        boolean result = orec.tryUpdateLock(1);
+        boolean result = orec.___tryUpdateLock(1);
         assertTrue(result);
         OrecTestUtils.assertLocked(orec);
         OrecTestUtils.assertSurplus(2, orec);
@@ -38,22 +38,22 @@ public class LongRef_tryUpdateLock {
     @Test
     public void whenLocked() {
         Ref orec = new Ref();
-        orec.arrive(1);
-        orec.tryUpdateLock(1);
+        orec.___arrive(1);
+        orec.___tryUpdateLock(1);
 
-        boolean result = orec.tryUpdateLock(1);
+        boolean result = orec.___tryUpdateLock(1);
         assertFalse(result);
         OrecTestUtils.assertLocked(orec);
-        assertEquals(1, orec.getSurplus());
-        assertFalse(orec.isReadBiased());
+        assertEquals(1, orec.___getSurplus());
+        assertFalse(orec.___isReadBiased());
     }
 
     @Test
     public void whenReadBiasedMode() {
         Ref orec = OrecTestUtils.makeReadBiased(new Ref());
 
-        orec.arrive(1);
-        boolean result = orec.tryUpdateLock(1);
+        orec.___arrive(1);
+        boolean result = orec.___tryUpdateLock(1);
 
         assertTrue(result);
         OrecTestUtils.assertReadBiased(orec);

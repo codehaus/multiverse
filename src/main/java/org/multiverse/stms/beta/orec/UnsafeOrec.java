@@ -23,17 +23,17 @@ public final class UnsafeOrec implements Orec {
     private boolean isReadBiased = false;
 
     @Override
-    public int getReadBiasedThreshold() {
+    public int ___getReadBiasedThreshold() {
         return READ_THRESHOLD;
     }
 
     @Override
-    public long getSurplus() {
+    public long ___getSurplus() {
         return surplus;
     }
 
     @Override
-    public boolean arrive(int spinCount) {
+    public boolean ___arrive(int spinCount) {
         if (isLocked) {
             return false;
         }
@@ -50,12 +50,12 @@ public final class UnsafeOrec implements Orec {
     }
 
     @Override
-    public boolean query() {
+    public boolean ___query() {
         return surplus > 0;
     }
 
     @Override
-    public boolean departAfterReading() {
+    public boolean ___departAfterReading() {
         if (surplus == 0) {
             throw new PanicError();
         }
@@ -76,12 +76,12 @@ public final class UnsafeOrec implements Orec {
     }
 
     @Override
-    public int getReadonlyCount() {
+    public int ___getReadonlyCount() {
         return readonlyCount;
     }
 
     @Override
-    public long departAfterUpdateAndReleaseLock(GlobalConflictCounter globalConflictCounter, BetaTransactionalObject ref) {
+    public long ___departAfterUpdateAndReleaseLock(GlobalConflictCounter globalConflictCounter, BetaTransactionalObject ref) {
         if (!isLocked) {
             throw new PanicError();
         }
@@ -109,12 +109,12 @@ public final class UnsafeOrec implements Orec {
     }
 
     @Override
-    public boolean departAfterReadingAndReleaseLock() {
+    public boolean ___departAfterReadingAndReleaseLock() {
         throw new TodoException();
     }
 
     @Override
-    public long departAfterFailureAndReleaseLock() {
+    public long ___departAfterFailureAndReleaseLock() {
         if (!isLocked) {
             throw new PanicError();
         }
@@ -125,7 +125,7 @@ public final class UnsafeOrec implements Orec {
     }
 
     @Override
-    public void departAfterFailure() {
+    public void ___departAfterFailure() {
         if (isReadBiased) {
             throw new PanicError();
         }
@@ -144,17 +144,17 @@ public final class UnsafeOrec implements Orec {
     }
 
     @Override
-    public boolean isReadBiased() {
+    public boolean ___isReadBiased() {
         return isReadBiased;
     }
 
     @Override
-    public boolean isLocked() {
+    public boolean ___isLocked() {
         return isLocked;
     }
 
     @Override
-    public boolean tryUpdateLock(int spinCount) {
+    public boolean ___tryUpdateLock(int spinCount) {
         if (isLocked) {
             return false;
         }
@@ -168,7 +168,7 @@ public final class UnsafeOrec implements Orec {
     }
 
     @Override
-    public void unlockAfterBecomingReadBiased() {
+    public void ___unlockAfterBecomingReadBiased() {
         if (!isLocked) {
             throw new PanicError();
         }
@@ -177,7 +177,7 @@ public final class UnsafeOrec implements Orec {
     }
 
     @Override
-    public boolean arriveAndLockForUpdate(int spinCount) {
+    public boolean ___arriveAndLockForUpdate(int spinCount) {
         throw new TodoException();
     }
 }

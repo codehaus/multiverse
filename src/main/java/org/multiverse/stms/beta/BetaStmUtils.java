@@ -53,7 +53,7 @@ public class BetaStmUtils {
     public static LongRef createReadBiasedLongRef(BetaStm stm, long value) {
         LongRef ref = createLongRef(stm, value);
 
-        for (int k = 0; k < ref.getOrec().getReadBiasedThreshold(); k++) {
+        for (int k = 0; k < ref.___getOrec().___getReadBiasedThreshold(); k++) {
             BetaTransaction tx = new FatMonoBetaTransaction(stm);
             tx.openForRead(ref, false, new BetaObjectPool());
             tx.commit(new BetaObjectPool());

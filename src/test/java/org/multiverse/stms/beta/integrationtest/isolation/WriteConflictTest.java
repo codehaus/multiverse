@@ -59,7 +59,7 @@ public class WriteConflictTest {
         }
 
         assertAborted(tx);
-        assertSame(conflictingWrite, ref.unsafeLoad());
+        assertSame(conflictingWrite, ref.___unsafeLoad());
     }
 
     @Test
@@ -81,7 +81,7 @@ public class WriteConflictTest {
         tx.commit();
 
         assertCommitted(tx);
-        assertSame(conflictingWrite, ref.unsafeLoad());
+        assertSame(conflictingWrite, ref.___unsafeLoad());
     }
 
 
@@ -109,7 +109,7 @@ public class WriteConflictTest {
         }
 
         assertAborted(tx);
-        assertSame(conflictingWrite, ref.unsafeLoad());
+        assertSame(conflictingWrite, ref.___unsafeLoad());
     }
 
     @Test
@@ -136,6 +136,6 @@ public class WriteConflictTest {
         }
 
         assertAborted(tx);
-        assertSame(conflictingWrite, ref.unsafeLoad());
+        assertSame(conflictingWrite, ref.___unsafeLoad());
     }
 }

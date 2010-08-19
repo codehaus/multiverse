@@ -105,7 +105,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         lock = lock || config.lockReads;
 
-        final int identityHashCode = ref.identityHashCode();
+        final int identityHashCode = ref.___identityHashCode();
         int index = findAttachedIndex(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
@@ -118,7 +118,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     hasReads = true;
                 }
 
-                final RefTranlocal<E> read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final RefTranlocal<E> read = lock
+                    ? ref.___lockAndLoad(config.spinCount, this)
+                    : ref.___load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
@@ -126,14 +128,14 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
                 //make sure that there are no conflicts.
                 if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
+                    ref.___abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
                 found.read = read;
                 found.evaluateCommutingFunctions(pool);
             }else
-            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,found)){
+            if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,found)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -146,7 +148,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         //none is found in this transaction, lets load it.
-        final RefTranlocal<E> read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+        final RefTranlocal<E> read = lock
+            ? ref.___lockAndLoad(config.spinCount, this)
+            : ref.___load(config.spinCount);
 
         if (read.isLocked) {
             throw abortOnReadConflict(pool);
@@ -154,7 +158,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         //make sure that there are no conflicts.
         if (hasReadConflict()) {
-            ref.abort(this, read, pool);
+            ref.___abort(this, read, pool);
             throw abortOnReadConflict(pool);
         }
 
@@ -189,7 +193,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         //lets find the tranlocal
-        final int identityHashCode = ref.identityHashCode();
+        final int identityHashCode = ref.___identityHashCode();
         final int index = findAttachedIndex(ref, identityHashCode);
         lock = lock || config.lockWrites;
 
@@ -202,14 +206,16 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     hasReads = true;
                 }
 
-                final RefTranlocal<E> read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final RefTranlocal<E> read = lock
+                    ? ref.___lockAndLoad(config.spinCount, this)
+                    : ref.___load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
                 }
 
                 if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
+                    ref.___abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
@@ -217,7 +223,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 result.evaluateCommutingFunctions(pool);
                 return result;
             }else
-            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,result)){
+            if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,result)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -239,14 +245,16 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         //the tranlocal was not loaded before in this transaction, now load it.
-        final RefTranlocal<E> read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+        final RefTranlocal<E> read = lock
+            ? ref.___lockAndLoad(config.spinCount, this)
+            : ref.___load(config.spinCount);
 
         if(read.isLocked){
            throw abortOnReadConflict(pool);
         }
 
         if (hasReadConflict()) {
-            read.owner.abort(this, read, pool);
+            read.owner.___abort(this, read, pool);
             throw abortOnReadConflict(pool);
         }
 
@@ -283,7 +291,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 format("Can't open a null transactionalobject or ref for construction on transaction '%s'",config.familyName));
         }
 
-        final int identityHashCode = ref.identityHashCode();
+        final int identityHashCode = ref.___identityHashCode();
         final int index = findAttachedIndex(ref, identityHashCode);
 
         if(index >- 1){
@@ -296,7 +304,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             return result;
         }
 
-        if(ref.unsafeLoad()!=null){
+        if(ref.___unsafeLoad()!=null){
             abort();
             throw new IllegalArgumentException(
                 format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
@@ -330,11 +338,11 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             throw new NullPointerException();
         }
 
-        final int identityHashCode = ref.identityHashCode();
+        final int identityHashCode = ref.___identityHashCode();
         final int index = findAttachedIndex(ref, identityHashCode);
         if(index == -1){
             //todo: call to 'openForCommute' can be inlined.
-            RefTranlocal<E> result = ref.openForCommute(pool);
+            RefTranlocal<E> result = ref.___openForCommute(pool);
             attach(ref, result, identityHashCode, pool);
             result.addCommutingFunction(function, pool);
             size++;
@@ -379,7 +387,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         lock = lock || config.lockReads;
 
-        final int identityHashCode = ref.identityHashCode();
+        final int identityHashCode = ref.___identityHashCode();
         int index = findAttachedIndex(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
@@ -392,7 +400,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     hasReads = true;
                 }
 
-                final IntRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final IntRefTranlocal read = lock
+                    ? ref.___lockAndLoad(config.spinCount, this)
+                    : ref.___load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
@@ -400,14 +410,14 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
                 //make sure that there are no conflicts.
                 if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
+                    ref.___abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
                 found.read = read;
                 found.evaluateCommutingFunctions(pool);
             }else
-            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,found)){
+            if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,found)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -420,7 +430,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         //none is found in this transaction, lets load it.
-        final IntRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+        final IntRefTranlocal read = lock
+            ? ref.___lockAndLoad(config.spinCount, this)
+            : ref.___load(config.spinCount);
 
         if (read.isLocked) {
             throw abortOnReadConflict(pool);
@@ -428,7 +440,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         //make sure that there are no conflicts.
         if (hasReadConflict()) {
-            ref.abort(this, read, pool);
+            ref.___abort(this, read, pool);
             throw abortOnReadConflict(pool);
         }
 
@@ -463,7 +475,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         //lets find the tranlocal
-        final int identityHashCode = ref.identityHashCode();
+        final int identityHashCode = ref.___identityHashCode();
         final int index = findAttachedIndex(ref, identityHashCode);
         lock = lock || config.lockWrites;
 
@@ -476,14 +488,16 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     hasReads = true;
                 }
 
-                final IntRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final IntRefTranlocal read = lock
+                    ? ref.___lockAndLoad(config.spinCount, this)
+                    : ref.___load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
                 }
 
                 if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
+                    ref.___abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
@@ -491,7 +505,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 result.evaluateCommutingFunctions(pool);
                 return result;
             }else
-            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,result)){
+            if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,result)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -513,14 +527,16 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         //the tranlocal was not loaded before in this transaction, now load it.
-        final IntRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+        final IntRefTranlocal read = lock
+            ? ref.___lockAndLoad(config.spinCount, this)
+            : ref.___load(config.spinCount);
 
         if(read.isLocked){
            throw abortOnReadConflict(pool);
         }
 
         if (hasReadConflict()) {
-            read.owner.abort(this, read, pool);
+            read.owner.___abort(this, read, pool);
             throw abortOnReadConflict(pool);
         }
 
@@ -557,7 +573,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 format("Can't open a null transactionalobject or ref for construction on transaction '%s'",config.familyName));
         }
 
-        final int identityHashCode = ref.identityHashCode();
+        final int identityHashCode = ref.___identityHashCode();
         final int index = findAttachedIndex(ref, identityHashCode);
 
         if(index >- 1){
@@ -570,7 +586,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             return result;
         }
 
-        if(ref.unsafeLoad()!=null){
+        if(ref.___unsafeLoad()!=null){
             abort();
             throw new IllegalArgumentException(
                 format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
@@ -604,11 +620,11 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             throw new NullPointerException();
         }
 
-        final int identityHashCode = ref.identityHashCode();
+        final int identityHashCode = ref.___identityHashCode();
         final int index = findAttachedIndex(ref, identityHashCode);
         if(index == -1){
             //todo: call to 'openForCommute' can be inlined.
-            IntRefTranlocal result = ref.openForCommute(pool);
+            IntRefTranlocal result = ref.___openForCommute(pool);
             attach(ref, result, identityHashCode, pool);
             result.addCommutingFunction(function, pool);
             size++;
@@ -653,7 +669,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         lock = lock || config.lockReads;
 
-        final int identityHashCode = ref.identityHashCode();
+        final int identityHashCode = ref.___identityHashCode();
         int index = findAttachedIndex(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
@@ -666,7 +682,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     hasReads = true;
                 }
 
-                final LongRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final LongRefTranlocal read = lock
+                    ? ref.___lockAndLoad(config.spinCount, this)
+                    : ref.___load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
@@ -674,14 +692,14 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
                 //make sure that there are no conflicts.
                 if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
+                    ref.___abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
                 found.read = read;
                 found.evaluateCommutingFunctions(pool);
             }else
-            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,found)){
+            if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,found)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -694,7 +712,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         //none is found in this transaction, lets load it.
-        final LongRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+        final LongRefTranlocal read = lock
+            ? ref.___lockAndLoad(config.spinCount, this)
+            : ref.___load(config.spinCount);
 
         if (read.isLocked) {
             throw abortOnReadConflict(pool);
@@ -702,7 +722,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         //make sure that there are no conflicts.
         if (hasReadConflict()) {
-            ref.abort(this, read, pool);
+            ref.___abort(this, read, pool);
             throw abortOnReadConflict(pool);
         }
 
@@ -737,7 +757,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         //lets find the tranlocal
-        final int identityHashCode = ref.identityHashCode();
+        final int identityHashCode = ref.___identityHashCode();
         final int index = findAttachedIndex(ref, identityHashCode);
         lock = lock || config.lockWrites;
 
@@ -750,14 +770,16 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     hasReads = true;
                 }
 
-                final LongRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final LongRefTranlocal read = lock
+                    ? ref.___lockAndLoad(config.spinCount, this)
+                    : ref.___load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
                 }
 
                 if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
+                    ref.___abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
@@ -765,7 +787,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 result.evaluateCommutingFunctions(pool);
                 return result;
             }else
-            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,result)){
+            if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,result)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -787,14 +809,16 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         //the tranlocal was not loaded before in this transaction, now load it.
-        final LongRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+        final LongRefTranlocal read = lock
+            ? ref.___lockAndLoad(config.spinCount, this)
+            : ref.___load(config.spinCount);
 
         if(read.isLocked){
            throw abortOnReadConflict(pool);
         }
 
         if (hasReadConflict()) {
-            read.owner.abort(this, read, pool);
+            read.owner.___abort(this, read, pool);
             throw abortOnReadConflict(pool);
         }
 
@@ -831,7 +855,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 format("Can't open a null transactionalobject or ref for construction on transaction '%s'",config.familyName));
         }
 
-        final int identityHashCode = ref.identityHashCode();
+        final int identityHashCode = ref.___identityHashCode();
         final int index = findAttachedIndex(ref, identityHashCode);
 
         if(index >- 1){
@@ -844,7 +868,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             return result;
         }
 
-        if(ref.unsafeLoad()!=null){
+        if(ref.___unsafeLoad()!=null){
             abort();
             throw new IllegalArgumentException(
                 format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
@@ -878,11 +902,11 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             throw new NullPointerException();
         }
 
-        final int identityHashCode = ref.identityHashCode();
+        final int identityHashCode = ref.___identityHashCode();
         final int index = findAttachedIndex(ref, identityHashCode);
         if(index == -1){
             //todo: call to 'openForCommute' can be inlined.
-            LongRefTranlocal result = ref.openForCommute(pool);
+            LongRefTranlocal result = ref.___openForCommute(pool);
             attach(ref, result, identityHashCode, pool);
             result.addCommutingFunction(function, pool);
             size++;
@@ -927,7 +951,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         lock = lock || config.lockReads;
 
-        final int identityHashCode = ref.identityHashCode();
+        final int identityHashCode = ref.___identityHashCode();
         int index = findAttachedIndex(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
@@ -940,7 +964,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     hasReads = true;
                 }
 
-                final Tranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final Tranlocal read = lock
+                    ? ref.___lockAndLoad(config.spinCount, this)
+                    : ref.___load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
@@ -948,14 +974,14 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
                 //make sure that there are no conflicts.
                 if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
+                    ref.___abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
                 found.read = read;
                 found.evaluateCommutingFunctions(pool);
             }else
-            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,found)){
+            if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,found)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -968,7 +994,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         //none is found in this transaction, lets load it.
-        final Tranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+        final Tranlocal read = lock
+            ? ref.___lockAndLoad(config.spinCount, this)
+            : ref.___load(config.spinCount);
 
         if (read.isLocked) {
             throw abortOnReadConflict(pool);
@@ -976,7 +1004,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         //make sure that there are no conflicts.
         if (hasReadConflict()) {
-            ref.abort(this, read, pool);
+            ref.___abort(this, read, pool);
             throw abortOnReadConflict(pool);
         }
 
@@ -1011,7 +1039,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         //lets find the tranlocal
-        final int identityHashCode = ref.identityHashCode();
+        final int identityHashCode = ref.___identityHashCode();
         final int index = findAttachedIndex(ref, identityHashCode);
         lock = lock || config.lockWrites;
 
@@ -1024,14 +1052,16 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     hasReads = true;
                 }
 
-                final Tranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final Tranlocal read = lock
+                    ? ref.___lockAndLoad(config.spinCount, this)
+                    : ref.___load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
                 }
 
                 if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
+                    ref.___abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
@@ -1039,7 +1069,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 result.evaluateCommutingFunctions(pool);
                 return result;
             }else
-            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount,result)){
+            if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,result)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -1061,14 +1091,16 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         //the tranlocal was not loaded before in this transaction, now load it.
-        final Tranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+        final Tranlocal read = lock
+            ? ref.___lockAndLoad(config.spinCount, this)
+            : ref.___load(config.spinCount);
 
         if(read.isLocked){
            throw abortOnReadConflict(pool);
         }
 
         if (hasReadConflict()) {
-            read.owner.abort(this, read, pool);
+            read.owner.___abort(this, read, pool);
             throw abortOnReadConflict(pool);
         }
 
@@ -1100,7 +1132,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 format("Can't open a null transactionalobject or ref for construction on transaction '%s'",config.familyName));
         }
 
-        final int identityHashCode = ref.identityHashCode();
+        final int identityHashCode = ref.___identityHashCode();
         final int index = findAttachedIndex(ref, identityHashCode);
 
         if(index >- 1){
@@ -1113,14 +1145,14 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             return result;
         }
 
-        if(ref.unsafeLoad()!=null){
+        if(ref.___unsafeLoad()!=null){
             abort();
             throw new IllegalArgumentException(
                 format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
                     config.familyName, ref.getClass().getName()));
         }
 
-        final Tranlocal result = ref.openForConstruction(pool);
+        final Tranlocal result = ref.___openForConstruction(pool);
         attach(ref, result, identityHashCode, pool);
         size++;
         return result;
@@ -1144,11 +1176,11 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             throw new NullPointerException();
         }
 
-        final int identityHashCode = ref.identityHashCode();
+        final int identityHashCode = ref.___identityHashCode();
         final int index = findAttachedIndex(ref, identityHashCode);
         if(index == -1){
             //todo: call to 'openForCommute' can be inlined.
-            Tranlocal result = ref.openForCommute(pool);
+            Tranlocal result = ref.___openForCommute(pool);
             attach(ref, result, identityHashCode, pool);
             result.addCommutingFunction(function, pool);
             size++;
@@ -1174,7 +1206,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
  
     @Override
     public Tranlocal get(BetaTransactionalObject ref){
-        final int indexOf = findAttachedIndex(ref, ref.identityHashCode());
+        final int indexOf = findAttachedIndex(ref, ref.___identityHashCode());
         if(indexOf == -1){
             return null;
         }
@@ -1199,7 +1231,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 return index;
             }
 
-            int currentHash = current.owner.identityHashCode();
+            int currentHash = current.owner.___identityHashCode();
             goLeft = currentHash > hash;
             jump = jump == 0 ? 1 : jump*2;
         }while(jump < array.length);
@@ -1221,7 +1253,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 return;
             }
 
-            int currentHash = current.owner.identityHashCode();
+            int currentHash = current.owner.___identityHashCode();
             goLeft = currentHash > hash;
             jump = jump == 0?1:jump*2;
         }while(jump < array.length);
@@ -1242,7 +1274,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             Tranlocal tranlocal = oldArray[k];
 
             if(tranlocal != null){
-               attach(tranlocal.owner, tranlocal, tranlocal.owner.identityHashCode(),pool);
+               attach(tranlocal.owner, tranlocal, tranlocal.owner.___identityHashCode(),pool);
             }
         }
 
@@ -1268,7 +1300,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         for (int k = 0; k < array.length; k++) {
             Tranlocal tranlocal = array[k];
-            if (tranlocal != null && tranlocal.owner.hasReadConflict(tranlocal, this)) {
+            if (tranlocal != null && tranlocal.owner.___hasReadConflict(tranlocal, this)) {
                 return true;
             }
         }
@@ -1294,7 +1326,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     for (int k = 0; k < array.length; k++) {
                         Tranlocal tranlocal = array[k];
                         if(tranlocal != null){
-                            tranlocal.owner.abort(this, tranlocal, pool);
+                            tranlocal.owner.___abort(this, tranlocal, pool);
                         }
                     }
                 }
@@ -1364,7 +1396,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         for (int k = 0; k < array.length; k++) {
             Tranlocal tranlocal = array[k];
             if(tranlocal != null){
-                Listeners listeners = tranlocal.owner.commitAll(tranlocal, this, pool, config.globalConflictCounter);
+                Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool, config.globalConflictCounter);
 
                 if(listeners != null){
                     if(listenersArray == null){
@@ -1390,7 +1422,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         for (int k = 0; k < array.length; k++) {
             Tranlocal tranlocal = array[k];
             if(tranlocal != null){
-                 Listeners listeners = tranlocal.owner.commitDirty(tranlocal, this, pool, config.globalConflictCounter);
+                 Listeners listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool, config.globalConflictCounter);
 
                 if(listeners != null){
                     if(listenersArray == null){
@@ -1484,7 +1516,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             }
 
             if(tranlocal.isCommuting){
-                Tranlocal read = tranlocal.owner.lockAndLoad(spinCount, this);
+                Tranlocal read = tranlocal.owner.___lockAndLoad(spinCount, this);
 
                 if(read.isLocked){
                     return false;
@@ -1493,7 +1525,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 tranlocal.read = read;
                 tranlocal.evaluateCommutingFunctions(pool);
             }else
-            if(!tranlocal.owner.tryLockAndCheckConflict(this, spinCount, tranlocal)){
+            if(!tranlocal.owner.___tryLockAndCheckConflict(this, spinCount, tranlocal)){
                return false;
             }
         }
@@ -1516,7 +1548,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             }
 
             if(tranlocal.isCommuting){
-                Tranlocal read = tranlocal.owner.lockAndLoad(spinCount, this);
+                Tranlocal read = tranlocal.owner.___lockAndLoad(spinCount, this);
 
                 if(read.isLocked){
                     return false;
@@ -1526,7 +1558,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 tranlocal.evaluateCommutingFunctions(pool);
             }else
             if (tranlocal.calculateIsDirty()) {
-                if(!tranlocal.owner.tryLockAndCheckConflict(this, spinCount, tranlocal)){
+                if(!tranlocal.owner.___tryLockAndCheckConflict(this, spinCount, tranlocal)){
                     return false;
                 }
             }
@@ -1585,7 +1617,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     final BetaTransactionalObject owner = tranlocal.owner;
 
                     if(furtherRegistrationNeeded){
-                        switch(owner.registerChangeListener(listener, tranlocal, pool, listenerEra)){
+                        switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
                             case BetaTransactionalObject.REGISTRATION_DONE:
                                 atLeastOneRegistration = true;
                                 break;
@@ -1600,7 +1632,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                         }
                     }
 
-                    owner.abort(this, tranlocal, pool);
+                    owner.___abort(this, tranlocal, pool);
                 }
             }
         }

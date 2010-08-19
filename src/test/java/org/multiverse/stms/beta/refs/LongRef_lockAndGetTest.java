@@ -29,7 +29,7 @@ public class LongRef_lockAndGetTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         long value = ref.lockAndGet(tx, pool);
         assertEquals(10, value);
-        assertSame(tx, ref.getLockOwner());
+        assertSame(tx, ref.___getLockOwner());
         assertLocked(ref);
 
         tx.commit();
@@ -44,7 +44,7 @@ public class LongRef_lockAndGetTest {
         ref.lockAndGet(tx, pool);
         long value = ref.lockAndGet(tx, pool);
         assertEquals(10, value);
-        assertSame(tx, ref.getLockOwner());
+        assertSame(tx, ref.___getLockOwner());
         assertLocked(ref);
 
         tx.commit();
@@ -63,7 +63,7 @@ public class LongRef_lockAndGetTest {
         } catch (ReadConflict e) {
 
         }
-        assertSame(otherTx, ref.getLockOwner());
+        assertSame(otherTx, ref.___getLockOwner());
         assertLocked(ref);
     }
 }

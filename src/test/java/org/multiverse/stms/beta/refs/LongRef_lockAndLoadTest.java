@@ -28,55 +28,55 @@ public class LongRef_lockAndLoadTest {
     public void whenFresh() {
         BetaTransaction lockOwner = stm.startDefaultTransaction();
         LongRef ref = BetaStmUtils.createLongRef(stm);
-        Tranlocal committed = ref.unsafeLoad();
+        Tranlocal committed = ref.___unsafeLoad();
 
-        Tranlocal tranlocal = ref.lockAndLoad(0, lockOwner);
+        Tranlocal tranlocal = ref.___lockAndLoad(0, lockOwner);
 
         assertSame(committed, tranlocal);
-        assertLocked(ref.getOrec());
-        assertUpdateBiased(ref.getOrec());
-        assertReadonlyCount(0, ref.getOrec());
-        assertSame(lockOwner, ref.getLockOwner());
-        assertSurplus(1, ref.getOrec());
+        assertLocked(ref.___getOrec());
+        assertUpdateBiased(ref.___getOrec());
+        assertReadonlyCount(0, ref.___getOrec());
+        assertSame(lockOwner, ref.___getLockOwner());
+        assertSurplus(1, ref.___getOrec());
     }
 
     @Test
     public void whenAlreadyLockedByOtherTransaction() {
         LongRef ref = BetaStmUtils.createLongRef(stm);
-        Tranlocal committed = ref.unsafeLoad();
+        Tranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction lockingTx = new FatMonoBetaTransaction(stm);
         lockingTx.openForRead(ref, true, pool);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal read = ref.lockAndLoad(0, tx);
+        Tranlocal read = ref.___lockAndLoad(0, tx);
 
         assertNotNull(read);
         assertTrue(read.isLocked);
-        assertSame(committed, ref.unsafeLoad());
-        assertLocked(ref.getOrec());
-        assertUpdateBiased(ref.getOrec());
-        assertReadonlyCount(0, ref.getOrec());
-        assertSame(lockingTx, ref.getLockOwner());
-        assertSurplus(1, ref.getOrec());
+        assertSame(committed, ref.___unsafeLoad());
+        assertLocked(ref.___getOrec());
+        assertUpdateBiased(ref.___getOrec());
+        assertReadonlyCount(0, ref.___getOrec());
+        assertSame(lockingTx, ref.___getLockOwner());
+        assertSurplus(1, ref.___getOrec());
     }
 
     @Test
     public void whenAlreadyLockedBySelf() {
         LongRef ref = BetaStmUtils.createLongRef(stm);
-        Tranlocal committed = ref.unsafeLoad();
+        Tranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction lockOwner = stm.startDefaultTransaction();
         Tranlocal read = lockOwner.openForRead(ref, true, pool);
-        ref.tryLockAndCheckConflict(lockOwner, 1, read);
+        ref.___tryLockAndCheckConflict(lockOwner, 1, read);
 
-        Tranlocal tranlocal = ref.lockAndLoad(0, lockOwner);
+        Tranlocal tranlocal = ref.___lockAndLoad(0, lockOwner);
 
         assertSame(committed, tranlocal);
-        assertLocked(ref.getOrec());
-        assertUpdateBiased(ref.getOrec());
-        assertReadonlyCount(0, ref.getOrec());
-        assertSame(lockOwner, ref.getLockOwner());
-        assertSurplus(1, ref.getOrec());
+        assertLocked(ref.___getOrec());
+        assertUpdateBiased(ref.___getOrec());
+        assertReadonlyCount(0, ref.___getOrec());
+        assertSame(lockOwner, ref.___getLockOwner());
+        assertSurplus(1, ref.___getOrec());
     }
 }

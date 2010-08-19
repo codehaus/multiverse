@@ -29,11 +29,11 @@ public class LongRef_readBiasedTest {
     public void test() {
         BetaTransactionalObject ref = createReadBiasedLongRef(stm);
 
-        Tranlocal active = ref.unsafeLoad();
+        Tranlocal active = ref.___unsafeLoad();
         assertNotNull(active);
         assertTrue(active.isCommitted());
         assertTrue(active.isPermanent());
-        assertUnlocked(ref.getOrec());
-        assertSurplus(0, ref.getOrec());
+        assertUnlocked(ref.___getOrec());
+        assertSurplus(0, ref.___getOrec());
     }
 }

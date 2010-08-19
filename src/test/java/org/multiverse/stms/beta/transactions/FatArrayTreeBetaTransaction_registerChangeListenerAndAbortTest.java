@@ -78,7 +78,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         //assertNull(ref.getLockOwner());
         //assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertNull(ref.unsafeLoad());
+        assertNull(ref.___unsafeLoad());
         assertNull(constructed.read);
         //    assertSame(ref, constructed.owner);
         //    assertFalse(constructed.isCommitted);
@@ -168,7 +168,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
 
         assertFalse(latch.isOpen());
         assertAborted(tx);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
         assertUnlocked(ref);
         assertSurplus(0, ref);
     }
@@ -186,7 +186,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         assertFalse(latch.isOpen());
         assertAborted(tx);
         assertSurplus(0, ref);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
         assertUnlocked(ref);
     }
 
@@ -202,7 +202,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
 
         assertFalse(latch.isOpen());
         assertAborted(tx);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         assertUnlocked(ref);
     }

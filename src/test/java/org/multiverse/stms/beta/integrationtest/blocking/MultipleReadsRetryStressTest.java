@@ -94,7 +94,7 @@ public class MultipleReadsRetryStressTest {
     private long sumRefs() {
         long result = 0;
         for (LongRef ref : refs) {
-            result += ref.unsafeLoad().value;
+            result += ref.___unsafeLoad().value;
         }
         return result;
     }

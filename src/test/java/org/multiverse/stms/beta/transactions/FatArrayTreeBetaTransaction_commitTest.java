@@ -115,13 +115,13 @@ public class FatArrayTreeBetaTransaction_commitTest {
     @Test
     public void whenOnlyReads() {
         LongRef ref = createLongRef(stm, 0);
-        Tranlocal committed = ref.unsafeLoad();
+        Tranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.openForRead(ref, false, pool);
         tx.commit(pool);
 
-        assertSame(committed, ref.unsafeLoad());
+        assertSame(committed, ref.___unsafeLoad());
     }
 
     @Test
@@ -142,7 +142,7 @@ public class FatArrayTreeBetaTransaction_commitTest {
         assertTrue(latch.isOpen());
         assertHasNoListeners(ref);
         assertUnlocked(ref);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
     }
@@ -156,7 +156,7 @@ public class FatArrayTreeBetaTransaction_commitTest {
         tranlocal.value++;
         tx.commit(pool);
 
-        assertSame(tranlocal, ref.unsafeLoad());
+        assertSame(tranlocal, ref.___unsafeLoad());
         assertNull(tranlocal.read);
         assertSame(ref, tranlocal.owner);
         assertTrue(tranlocal.isCommitted());
@@ -166,7 +166,7 @@ public class FatArrayTreeBetaTransaction_commitTest {
     @Test
     public void whenNormalUpdateButNotChange() {
         LongRef ref = BetaStmUtils.createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(new BetaTransactionConfiguration(stm));
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
@@ -174,12 +174,12 @@ public class FatArrayTreeBetaTransaction_commitTest {
 
         assertFalse(write.isCommitted);
         assertCommitted(tx);
-        assertSame(committed, ref.unsafeLoad());
-        assertNull(ref.getLockOwner());
-        assertUnlocked(ref.getOrec());
-        assertUpdateBiased(ref.getOrec());
-        assertSurplus(0, ref.getOrec());
-        assertReadonlyCount(1, ref.getOrec());
+        assertSame(committed, ref.___unsafeLoad());
+        assertNull(ref.___getLockOwner());
+        assertUnlocked(ref.___getOrec());
+        assertUpdateBiased(ref.___getOrec());
+        assertSurplus(0, ref.___getOrec());
+        assertReadonlyCount(1, ref.___getOrec());
     }
 
     @Test
@@ -218,12 +218,12 @@ public class FatArrayTreeBetaTransaction_commitTest {
         } catch (WriteConflict e) {
         }
 
-        assertNull(ref.getLockOwner());
-        assertSame(writeConflict, ref.unsafeLoad());
-        assertSurplus(0, ref.getOrec());
-        assertReadonlyCount(0, ref.getOrec());
-        assertUpdateBiased(ref.getOrec());
-        assertUnlocked(ref.getOrec());
+        assertNull(ref.___getLockOwner());
+        assertSame(writeConflict, ref.___unsafeLoad());
+        assertSurplus(0, ref.___getOrec());
+        assertReadonlyCount(0, ref.___getOrec());
+        assertUpdateBiased(ref.___getOrec());
+        assertUnlocked(ref.___getOrec());
     }
 
     @Test
@@ -243,7 +243,7 @@ public class FatArrayTreeBetaTransaction_commitTest {
         tx.commit(pool);
 
         for (LongRef ref : refs) {
-            LongRefTranlocal tranlocal = ref.unsafeLoad();
+            LongRefTranlocal tranlocal = ref.___unsafeLoad();
             assertEquals(1, tranlocal.value);
         }
     }
@@ -263,8 +263,8 @@ public class FatArrayTreeBetaTransaction_commitTest {
             tx.hardReset(pool);
         }
 
-        assertEquals(100L, ref1.unsafeLoad().value);
-        assertEquals(100L, ref2.unsafeLoad().value);
+        assertEquals(100L, ref1.___unsafeLoad().value);
+        assertEquals(100L, ref2.___unsafeLoad().value);
     }
 
     @Test
@@ -280,7 +280,7 @@ public class FatArrayTreeBetaTransaction_commitTest {
     @Test
     public void whenPreparedAndContainsRead() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
@@ -290,8 +290,8 @@ public class FatArrayTreeBetaTransaction_commitTest {
         assertCommitted(tx);
 
         assertUnlocked(ref);
-        assertNull(ref.getLockOwner());
-        assertSame(committed, ref.unsafeLoad());
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
     }
@@ -310,8 +310,8 @@ public class FatArrayTreeBetaTransaction_commitTest {
         assertCommitted(tx);
 
         assertUnlocked(ref);
-        assertNull(ref.getLockOwner());
-        assertSame(write, ref.unsafeLoad());
+        assertNull(ref.___getLockOwner());
+        assertSame(write, ref.___unsafeLoad());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertTrue(write.isCommitted);
@@ -359,7 +359,7 @@ public class FatArrayTreeBetaTransaction_commitTest {
 
         long sum = 0;
         for (int k = 0; k < refs.length; k++) {
-            sum += refs[k].unsafeLoad().value;
+            sum += refs[k].___unsafeLoad().value;
         }
 
         assertEquals(created, sum);
@@ -379,7 +379,7 @@ public class FatArrayTreeBetaTransaction_commitTest {
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertEquals(1, ref.unsafeLoad().value);
+        assertEquals(1, ref.___unsafeLoad().value);
     }
 
     @Test
@@ -396,7 +396,7 @@ public class FatArrayTreeBetaTransaction_commitTest {
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertEquals(1, ref.unsafeLoad().value);
+        assertEquals(1, ref.___unsafeLoad().value);
     }
 
     @Test
@@ -412,11 +412,11 @@ public class FatArrayTreeBetaTransaction_commitTest {
         assertSurplus(0, ref1);
         assertUpdateBiased(ref1);
         assertReadonlyCount(0, ref1);
-        assertEquals(1, ref1.unsafeLoad().value);
+        assertEquals(1, ref1.___unsafeLoad().value);
         assertSurplus(0, ref2);
         assertUpdateBiased(ref2);
         assertReadonlyCount(0, ref2);
-        assertEquals(1, ref2.unsafeLoad().value);
+        assertEquals(1, ref2.___unsafeLoad().value);
     }
 
     @Test
@@ -435,7 +435,7 @@ public class FatArrayTreeBetaTransaction_commitTest {
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertEquals(3, ref.unsafeLoad().value);
+        assertEquals(3, ref.___unsafeLoad().value);
     }
 
     @Test
@@ -456,11 +456,11 @@ public class FatArrayTreeBetaTransaction_commitTest {
         assertSurplus(0, ref1);
         assertUpdateBiased(ref1);
         assertReadonlyCount(0, ref1);
-        assertEquals(1, ref1.unsafeLoad().value);
+        assertEquals(1, ref1.___unsafeLoad().value);
         assertSurplus(0, ref2);
         assertUpdateBiased(ref2);
         assertReadonlyCount(0, ref2);
-        assertEquals(2, ref2.unsafeLoad().value);
+        assertEquals(2, ref2.___unsafeLoad().value);
     }
 
     @Test
@@ -482,7 +482,7 @@ public class FatArrayTreeBetaTransaction_commitTest {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertEquals(0, ref.unsafeLoad().value);
+        assertEquals(0, ref.___unsafeLoad().value);
     }
 
     @Test

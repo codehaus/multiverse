@@ -101,7 +101,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             }
 #end
             if(lock){
-                ${ref.tranlocal}${ref.typeParameter} read = ref.lockAndLoad(config.spinCount, this);
+                ${ref.tranlocal}${ref.typeParameter} read = ref.___lockAndLoad(config.spinCount, this);
 
                 //if it was locked, lets abort.
                 if (read.isLocked) {
@@ -110,7 +110,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
 #if(!$transaction.lean)
                 if(hasReadConflict()){
-                    read.owner.abort(this, read, pool);
+                    read.owner.___abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
@@ -119,7 +119,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 return read;
             }
 
-            ${ref.tranlocal}${ref.typeParameter} read = ref.load(config.spinCount);
+            ${ref.tranlocal}${ref.typeParameter} read = ref.___load(config.spinCount);
 
             if (read.isLocked) {
                 throw abortOnReadConflict(pool);
@@ -127,7 +127,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
 #if(!$transaction.lean)
             if(hasReadConflict()){
-                read.owner.abort(this, read, pool);
+                read.owner.___abort(this, read, pool);
                 throw abortOnReadConflict(pool);
             }
 
@@ -157,14 +157,16 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                     hasReads = true;
                 }
 
-                final ${ref.tranlocal}${ref.typeParameter} read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final ${ref.tranlocal}${ref.typeParameter} read = lock
+                    ? ref.___lockAndLoad(config.spinCount, this)
+                    : ref.___load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
                 }
 
                 if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
+                    ref.___abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
@@ -173,7 +175,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 return result;
             }else
 #end
-            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+            if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount, result)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -191,7 +193,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
 #end
-        ${ref.tranlocal}${ref.typeParameter} read = ref.load(config.spinCount);
+        ${ref.tranlocal}${ref.typeParameter} read = ref.___load(config.spinCount);
 
         //if it was locked, lets abort.
         if (read.isLocked) {
@@ -206,7 +208,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         if(hasReadConflict()){
-            read.owner.abort(this, read, pool);
+            read.owner.___abort(this, read, pool);
             throw abortOnReadConflict(pool);
         }
 
@@ -246,7 +248,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 hasReads = true;
             }
 #end
-            ${ref.tranlocal}${ref.typeParameter} read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+            ${ref.tranlocal}${ref.typeParameter} read = lock
+                ? ref.___lockAndLoad(config.spinCount, this)
+                : ref.___load(config.spinCount);
 
             //if it was locked, lets abort.
             if (read.isLocked) {
@@ -255,7 +259,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
 #if(!${transaction.lean})
             if(hasReadConflict()){
-                read.owner.abort(this, read, pool);
+                read.owner.___abort(this, read, pool);
                 throw abortOnReadConflict(pool);
             }
     
@@ -291,14 +295,16 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 hasReads = true;
             }
 
-            final ${ref.tranlocal}${ref.typeParameter} read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+            final ${ref.tranlocal}${ref.typeParameter} read = lock
+                ? ref.___lockAndLoad(config.spinCount, this)
+                : ref.___load(config.spinCount);
 
             if (read.isLocked) {
                 throw abortOnReadConflict(pool);
             }
 
             if (hasReadConflict()) {
-                ref.abort(this, read, pool);
+                ref.___abort(this, read, pool);
                 throw abortOnReadConflict(pool);
             }
 
@@ -307,7 +313,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             return result;
         }else
 #end
-        if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+        if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount, result)){
             throw abortOnReadConflict(pool);
         }
 
@@ -368,7 +374,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOnTooSmallSize(pool, 2);
         }
 
-        if(ref.unsafeLoad()!=null){
+        if(ref.___unsafeLoad()!=null){
             abort();
             throw new IllegalArgumentException();
         }
@@ -379,7 +385,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             result = new ${ref.tranlocal}${ref.typeParameter}(ref);
         }
 #else
-        result = ref.openForConstruction(pool);
+        result = ref.___openForConstruction(pool);
 #end
         attached = result;
         return result;
@@ -415,7 +421,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             }
 
             //todo: call to 'openForCommute' can be inlined.
-            ${ref.tranlocal}${ref.typeParameter} result = ref.openForCommute(pool);
+            ${ref.tranlocal}${ref.typeParameter} result = ref.___openForCommute(pool);
             attached=result;
             result.addCommutingFunction(function, pool);
             return;
@@ -477,7 +483,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             return false;
         }
 
-        return attached.owner.hasReadConflict(attached, this);
+        return attached.owner.___hasReadConflict(attached, this);
     }
 
 #end
@@ -503,7 +509,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         if (attached != null) {
-            attached.owner.abort(this, attached, pool);
+            attached.owner.___abort(this, attached, pool);
         }
 
         status = ABORTED;
@@ -554,7 +560,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                     }
                 }
 
-                listeners = attached.owner.commitDirty(attached, this, pool, config.globalConflictCounter);
+                listeners = attached.owner.___commitDirty(attached, this, pool, config.globalConflictCounter);
             }else{
                 if(status == ACTIVE){
                     if(!doPrepareAll(pool)){
@@ -562,7 +568,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                     }
                 }
 
-                listeners = attached.owner.commitAll(attached, this, pool, config.globalConflictCounter);
+                listeners = attached.owner.___commitAll(attached, this, pool, config.globalConflictCounter);
             }
         }
 
@@ -583,9 +589,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         Listeners listeners = null;
         if (attached!=null) {
             if(config.dirtyCheck){
-                listeners = attached.owner.commitDirty(attached, this, pool, config.globalConflictCounter);
+                listeners = attached.owner.___commitDirty(attached, this, pool, config.globalConflictCounter);
             }else{
-                listeners = attached.owner.commitAll(attached, this, pool, config.globalConflictCounter);
+                listeners = attached.owner.___commitAll(attached, this, pool, config.globalConflictCounter);
             }
         }
         status = COMMITTED;
@@ -712,7 +718,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
 #if(!$transaction.lean)
         if(attached.isCommuting){
-            Tranlocal read = attached.owner.lockAndLoad(config.spinCount, this);
+            Tranlocal read = attached.owner.___lockAndLoad(config.spinCount, this);
 
             if(read.isLocked){
                 return false;
@@ -723,7 +729,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }else
 #end
         if (attached.calculateIsDirty()
-                    && !attached.owner.tryLockAndCheckConflict(this, config.spinCount, attached)){
+                    && !attached.owner.___tryLockAndCheckConflict(this, config.spinCount, attached)){
             return false;
         }
 
@@ -741,7 +747,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
 #if(!$transaction.lean)
         if(attached.isCommuting){
-            Tranlocal read = attached.owner.lockAndLoad(config.spinCount, this);
+            Tranlocal read = attached.owner.___lockAndLoad(config.spinCount, this);
 
             if(read.isLocked){
                 return false;
@@ -751,7 +757,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             attached.evaluateCommutingFunctions(pool);
         }else
 #end
-        if(!attached.owner.tryLockAndCheckConflict(this, config.spinCount, attached)){
+        if(!attached.owner.___tryLockAndCheckConflict(this, config.spinCount, attached)){
             return false;
         }
 
@@ -805,8 +811,8 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         final long listenerEra = listener.getEra();
         final BetaTransactionalObject owner = attached.owner;
 
-        boolean failure = owner.registerChangeListener(listener, attached, pool, listenerEra) == BetaTransactionalObject.REGISTRATION_NONE;
-        owner.abort(this, attached, pool);
+        boolean failure = owner.___registerChangeListener(listener, attached, pool, listenerEra) == BetaTransactionalObject.REGISTRATION_NONE;
+        owner.___abort(this, attached, pool);
         status = ABORTED;
 
 #if(!$transaction.lean)
@@ -859,7 +865,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         if (status == ACTIVE || status == PREPARED) {
 #if($transaction.lean)
             if(attached!=null){
-                attached.owner.abort(this, attached, pool);
+                attached.owner.___abort(this, attached, pool);
             }
 #else
             abort(pool);
@@ -894,7 +900,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         if (status == ACTIVE || status == PREPARED) {
 #if($transaction.lean)
             if(attached!=null){
-                attached.owner.abort(this, attached, pool);
+                attached.owner.___abort(this, attached, pool);
             }
 #else
             abort(pool);

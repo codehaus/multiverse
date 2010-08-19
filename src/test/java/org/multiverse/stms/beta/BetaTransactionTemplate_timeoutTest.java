@@ -50,7 +50,7 @@ public class BetaTransactionTemplate_timeoutTest {
 
         joinAll(t);
         t.assertFailedWithException(RetryTimeoutException.class);
-        assertEquals(0, ref.unsafeLoad().value);
+        assertEquals(0, ref.___unsafeLoad().value);
     }
 
     @Test
@@ -76,7 +76,7 @@ public class BetaTransactionTemplate_timeoutTest {
 
         joinAll(t);
         t.assertNothingThrown();
-        assertEquals(2, ref.unsafeLoad().value);
+        assertEquals(2, ref.___unsafeLoad().value);
     }
 
     @Test
@@ -99,7 +99,7 @@ public class BetaTransactionTemplate_timeoutTest {
 
         joinAll(t);
         t.assertNothingThrown();
-        assertEquals(2, ref.unsafeLoad().value);
+        assertEquals(2, ref.___unsafeLoad().value);
     }
 
     class AwaitThread extends TestThread {

@@ -30,54 +30,54 @@ public class LongRef_abortTest {
     @Test
     public void whenOpenedForRead() {
         LongRef ref = BetaStmUtils.createLongRef(stm);
-        Orec orec = ref.getOrec();
+        Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal tranlocal = tx.openForRead(ref, false, pool);
 
-        ref.abort(tx, tranlocal, pool);
+        ref.___abort(tx, tranlocal, pool);
 
         assertUnlocked(orec);
         assertSurplus(0, orec);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
     }
 
     @Test
     public void whenOpenedForWrite() {
         BetaTransactionalObject ref = BetaStmUtils.createLongRef(stm);
-        Orec orec = ref.getOrec();
+        Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal tranlocal = tx.openForWrite(ref, false, pool);
 
-        ref.abort(tx, tranlocal, pool);
+        ref.___abort(tx, tranlocal, pool);
 
         assertUnlocked(orec);
         assertSurplus(0, orec);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
     }
 
     @Test
     public void whenLockedBySelfAndOpenedForRead() {
         LongRef ref = BetaStmUtils.createLongRef(stm);
 
-        Orec orec = ref.getOrec();
+        Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal tranlocal = tx.openForRead(ref, false, pool);
-        ref.tryLockAndCheckConflict(tx, 1, tranlocal);
+        ref.___tryLockAndCheckConflict(tx, 1, tranlocal);
 
-        ref.abort(tx, tranlocal, pool);
+        ref.___abort(tx, tranlocal, pool);
 
         assertUnlocked(orec);
         assertSurplus(0, orec);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
     }
 
     @Test
     public void whenLockedByOtherAndOpenedForRead() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal read2 = tx.openForRead(ref, false, pool);
@@ -85,11 +85,11 @@ public class LongRef_abortTest {
         BetaTransaction otherTx = stm.startDefaultTransaction();
         LongRefTranlocal read1 = otherTx.openForRead(ref, true, pool);
 
-        ref.abort(tx, read2, pool);
+        ref.___abort(tx, read2, pool);
 
-        assertSame(committed, ref.unsafeLoad());
+        assertSame(committed, ref.___unsafeLoad());
         assertLocked(ref);
-        assertSame(otherTx, ref.getLockOwner());
+        assertSame(otherTx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertReadonlyCount(0, ref);
         assertUpdateBiased(ref);
@@ -98,16 +98,16 @@ public class LongRef_abortTest {
     @Test
     public void whenLockedBySelfAndOpenedForWrite() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, true, pool);
 
-        ref.abort(tx, write, pool);
+        ref.___abort(tx, write, pool);
 
-        assertSame(committed, ref.unsafeLoad());
+        assertSame(committed, ref.___unsafeLoad());
         assertUnlocked(ref);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         assertReadonlyCount(0, ref);
         assertUpdateBiased(ref);
@@ -116,7 +116,7 @@ public class LongRef_abortTest {
     @Test
     public void whenLockedByOtherAndOpenedForWrite() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
@@ -124,11 +124,11 @@ public class LongRef_abortTest {
         BetaTransaction otherTx = stm.startDefaultTransaction();
         LongRefTranlocal read1 = otherTx.openForRead(ref, true, pool);
 
-        ref.abort(tx, write, pool);
+        ref.___abort(tx, write, pool);
 
-        assertSame(committed, ref.unsafeLoad());
+        assertSame(committed, ref.___unsafeLoad());
         assertLocked(ref);
-        assertSame(otherTx, ref.getLockOwner());
+        assertSame(otherTx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertReadonlyCount(0, ref);
         assertUpdateBiased(ref);

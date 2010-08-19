@@ -43,7 +43,7 @@ public class FatMonoBetaTransaction_abortTest {
     @Test
     public void whenContainsReadBiasedRead() {
         LongRef ref = createReadBiasedLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.openForRead(ref, false, pool);
@@ -51,84 +51,84 @@ public class FatMonoBetaTransaction_abortTest {
 
         assertAborted(tx);
 
-        assertNull(ref.getLockOwner());
-        assertSame(committed, ref.unsafeLoad());
-        assertUnlocked(ref.getOrec());
-        assertReadBiased(ref.getOrec());
-        assertReadonlyCount(0, ref.getOrec());
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertUnlocked(ref.___getOrec());
+        assertReadBiased(ref.___getOrec());
+        assertReadonlyCount(0, ref.___getOrec());
         //once arrived, a depart will not be called on a readbiased tranlocal
-        assertSurplus(1, ref.getOrec());
+        assertSurplus(1, ref.___getOrec());
     }
 
     @Test
     public void whenContainsNormalRead() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.openForRead(ref, false, pool);
         tx.abort();
 
         assertAborted(tx);
-        assertUnlocked(ref.getOrec());
+        assertUnlocked(ref.___getOrec());
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
-        assertNull(ref.getLockOwner());
-        assertSame(committed, ref.unsafeLoad());
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
         assertFalse(committed.isPermanent);
     }
 
     @Test
     public void whenContainsLockedNormalRead() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.openForRead(ref, true, pool);
         tx.abort();
 
         assertAborted(tx);
-        assertUnlocked(ref.getOrec());
+        assertUnlocked(ref.___getOrec());
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
-        assertNull(ref.getLockOwner());
-        assertSame(committed, ref.unsafeLoad());
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
         assertFalse(committed.isPermanent);
     }
 
     @Test
     public void whenContainsUnlockedWrite() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.openForWrite(ref, false, pool);
         tx.abort();
 
         assertAborted(tx);
-        assertUnlocked(ref.getOrec());
+        assertUnlocked(ref.___getOrec());
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
-        assertNull(ref.getLockOwner());
-        assertSame(committed, ref.unsafeLoad());
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
         assertFalse(committed.isPermanent);
     }
 
     @Test
     public void whenContainsLockedWrite() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.openForWrite(ref, true, pool);
         tx.abort();
 
         assertAborted(tx);
-        assertUnlocked(ref.getOrec());
+        assertUnlocked(ref.___getOrec());
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
-        assertNull(ref.getLockOwner());
-        assertSame(committed, ref.unsafeLoad());
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
         assertFalse(committed.isPermanent);
     }
 
@@ -141,11 +141,11 @@ public class FatMonoBetaTransaction_abortTest {
 
         assertAborted(tx);
 
-        assertSame(tx, ref.getLockOwner());
+        assertSame(tx, ref.___getLockOwner());
         assertLocked(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
-        assertNull(ref.unsafeLoad());
+        assertNull(ref.___unsafeLoad());
         assertFalse(write.isPermanent);
         assertFalse(write.isCommitted);
     }

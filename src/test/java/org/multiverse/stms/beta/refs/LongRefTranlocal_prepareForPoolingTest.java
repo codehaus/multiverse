@@ -27,7 +27,7 @@ public class LongRefTranlocal_prepareForPoolingTest {
     public void whenConstructed() {
         LongRef ref = createLongRef(stm);
 
-        LongRefTranlocal tranlocal = ref.openForConstruction(pool);
+        LongRefTranlocal tranlocal = ref.___openForConstruction(pool);
         tranlocal.value = 200;
 
         tranlocal.prepareForPooling(pool);
@@ -57,7 +57,7 @@ public class LongRefTranlocal_prepareForPoolingTest {
     public void whenIsCommuting() {
         LongRef ref = createLongRef(stm);
 
-        LongRefTranlocal tranlocal = ref.openForCommute(pool);
+        LongRefTranlocal tranlocal = ref.___openForCommute(pool);
         tranlocal.addCommutingFunction(IncLongFunction.INSTANCE, pool);
 
         tranlocal.prepareForPooling(pool);
@@ -68,7 +68,7 @@ public class LongRefTranlocal_prepareForPoolingTest {
     @Test
     public void whenUpdate() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal tranlocal = ref.unsafeLoad().openForWrite(pool);
+        LongRefTranlocal tranlocal = ref.___unsafeLoad().openForWrite(pool);
         tranlocal.value = 200;
 
         tranlocal.prepareForPooling(pool);
@@ -79,7 +79,7 @@ public class LongRefTranlocal_prepareForPoolingTest {
     @Test
     public void whenCommuting() {
         LongRef ref = createLongRef(stm, 100);
-        LongRefTranlocal tranlocal = ref.openForCommute(pool);
+        LongRefTranlocal tranlocal = ref.___openForCommute(pool);
 
         LongFunction function = mock(LongFunction.class);
         tranlocal.addCommutingFunction(function, pool);

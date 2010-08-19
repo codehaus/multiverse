@@ -29,7 +29,7 @@ public class ReadBiasedTest {
     @Test
     public void test() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         for (int k = 0; k < 10000; k++) {
             BetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -40,8 +40,8 @@ public class ReadBiasedTest {
         assertSurplus(1, ref);
         assertReadBiased(ref);
         assertUnlocked(ref);
-        assertNull(ref.getLockOwner());
-        assertSame(committed, ref.unsafeLoad());
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
 
         System.out.println("orec: " + ref.toOrecString());
     }

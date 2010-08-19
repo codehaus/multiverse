@@ -14,7 +14,7 @@ public class UnsafeOrec_miscTest {
     public void testToReadonly() {
         UnsafeOrec orec = makeReadBiased(new UnsafeOrec());
 
-        assertTrue(orec.isReadBiased());
+        assertTrue(orec.___isReadBiased());
         assertUnlocked(orec);
         assertSurplus(0, orec);
     }

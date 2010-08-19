@@ -12,7 +12,7 @@ public class BenchmarkUtils {
 
     public static void loadOtherTransactionalObjectClasses() {
         Ref ref = new Ref();
-        ref.openForConstruction(new BetaObjectPool());
+        ref.___openForConstruction(new BetaObjectPool());
 
         //todo: better loading.. stress transaction
         LongRef longRef = new LongRef(0);

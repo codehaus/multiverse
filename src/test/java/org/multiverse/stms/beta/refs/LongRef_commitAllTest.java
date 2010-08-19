@@ -34,18 +34,18 @@ public class LongRef_commitAllTest {
     @Test
     public void whenWriteHasListeners() {
         LongRef ref = BetaStmUtils.createLongRef(stm);
-        Orec orec = ref.getOrec();
+        Orec orec = ref.___getOrec();
 
         CheapLatch latch = new CheapLatch();
         long listenerEra = latch.getEra();
-        ref.registerChangeListener(latch, ref.unsafeLoad(), pool, listenerEra);
+        ref.___registerChangeListener(latch, ref.___unsafeLoad(), pool, listenerEra);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
-        ref.tryLockAndCheckConflict(tx, 1, write);
+        ref.___tryLockAndCheckConflict(tx, 1, write);
 
         long oldConflictCount = globalConflictCounter.count();
-        Listeners listeners = ref.commitAll(write, tx, pool, globalConflictCounter);
+        Listeners listeners = ref.___commitAll(write, tx, pool, globalConflictCounter);
 
         assertNotNull(listeners);
         assertNull(listeners.next);
@@ -53,7 +53,7 @@ public class LongRef_commitAllTest {
         assertSame(latch, listeners.listener);
         assertNull(getField(ref, "listeners"));
         assertEquals(oldConflictCount, globalConflictCounter.count());
-        assertSame(write, ref.unsafeLoad());
+        assertSame(write, ref.___unsafeLoad());
         assertNull(write.read);
         assertSame(ref, write.owner);
         assertUnlocked(orec);
@@ -66,7 +66,7 @@ public class LongRef_commitAllTest {
     @Test
     public void whenCommitWithConflict() {
         LongRef ref = BetaStmUtils.createLongRef(stm);
-        Orec orec = ref.getOrec();
+        Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal tranlocal = tx.openForWrite(ref, false, pool);
@@ -74,14 +74,14 @@ public class LongRef_commitAllTest {
         BetaTransaction otherTx = stm.startDefaultTransaction();
         Tranlocal read2 = otherTx.openForRead(ref, false, pool);
 
-        ref.tryLockAndCheckConflict(tx, 1, read2);
+        ref.___tryLockAndCheckConflict(tx, 1, read2);
 
         long oldConflictCount = globalConflictCounter.count();
-        Listeners listeners = ref.commitAll(tranlocal, tx, pool, globalConflictCounter);
+        Listeners listeners = ref.___commitAll(tranlocal, tx, pool, globalConflictCounter);
 
         assertNull(listeners);
         assertEquals(oldConflictCount + 1, globalConflictCounter.count());
-        assertSame(tranlocal, ref.unsafeLoad());
+        assertSame(tranlocal, ref.___unsafeLoad());
         assertNull(tranlocal.read);
         assertSame(ref, tranlocal.owner);
         assertUnlocked(orec);
@@ -92,20 +92,20 @@ public class LongRef_commitAllTest {
     @Test
     public void whenDirtyWrite() {
         LongRef ref = BetaStmUtils.createLongRef(stm);
-        Orec orec = ref.getOrec();
+        Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
         write.value++;
         write.isDirty = true;
-        ref.tryLockAndCheckConflict(tx, 1, write);
+        ref.___tryLockAndCheckConflict(tx, 1, write);
 
         long oldConflictCount = globalConflictCounter.count();
-        Listeners result = ref.commitAll(write, tx, pool, globalConflictCounter);
+        Listeners result = ref.___commitAll(write, tx, pool, globalConflictCounter);
 
         assertNull(result);
         assertEquals(oldConflictCount, globalConflictCounter.count());
-        assertSame(write, ref.unsafeLoad());
+        assertSame(write, ref.___unsafeLoad());
         assertNull(write.read);
         assertSame(ref, write.owner);
         assertUnlocked(orec);
@@ -116,18 +116,18 @@ public class LongRef_commitAllTest {
     @Test
     public void whenNonDirtyWrite() {
         LongRef ref = BetaStmUtils.createLongRef(stm);
-        Orec orec = ref.getOrec();
+        Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal write = tx.openForWrite(ref, false, pool);
-        ref.tryLockAndCheckConflict(tx, 1, write);
+        ref.___tryLockAndCheckConflict(tx, 1, write);
 
         long oldConflictCount = globalConflictCounter.count();
-        Listeners result = ref.commitAll(write, tx, pool, globalConflictCounter);
+        Listeners result = ref.___commitAll(write, tx, pool, globalConflictCounter);
 
         assertNull(result);
         assertEquals(oldConflictCount, globalConflictCounter.count());
-        assertSame(write, ref.unsafeLoad());
+        assertSame(write, ref.___unsafeLoad());
         assertNull(write.read);
         assertSame(ref, write.owner);
         assertUnlocked(orec);
@@ -139,19 +139,19 @@ public class LongRef_commitAllTest {
     public void whenCommitOnReadBiasedOrec() {
         LongRef ref = createReadBiasedLongRef(stm);
 
-        Orec orec = ref.getOrec();
+        Orec orec = ref.___getOrec();
         assertUnlocked(orec);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal tranlocal = tx.openForWrite(ref, false, pool);
-        ref.tryLockAndCheckConflict(tx, 1, tranlocal);
+        ref.___tryLockAndCheckConflict(tx, 1, tranlocal);
 
         long oldConflictCount = globalConflictCounter.count();
-        Listeners listeners = ref.commitAll(tranlocal, tx, pool, globalConflictCounter);
+        Listeners listeners = ref.___commitAll(tranlocal, tx, pool, globalConflictCounter);
 
         assertNull(listeners);
         assertEquals(oldConflictCount + 1, globalConflictCounter.count());
-        assertSame(tranlocal, ref.unsafeLoad());
+        assertSame(tranlocal, ref.___unsafeLoad());
         assertNull(tranlocal.read);
         assertSame(ref, tranlocal.owner);
         assertUnlocked(orec);

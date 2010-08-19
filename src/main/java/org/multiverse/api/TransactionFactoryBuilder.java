@@ -59,7 +59,7 @@ public interface TransactionFactoryBuilder {
      * multiple times.
      * <p/>
      * This method is very useful for integrating Multiverse in other JVM based environments because with this
-     * approach you have a callback when transaction start/abort/commit and can add your own logic.
+     * approach you have a callback when transaction start/___abort/commit and can add your own logic.
      *
      * @param listener the permanent listener to add.
      * @return the updated TransactionFactoryBuilder.

@@ -95,7 +95,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 hasReads = true;
             }
             if(lock){
-                RefTranlocal<E> read = ref.lockAndLoad(config.spinCount, this);
+                RefTranlocal<E> read = ref.___lockAndLoad(config.spinCount, this);
 
                 //if it was locked, lets abort.
                 if (read.isLocked) {
@@ -103,7 +103,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 }
 
                 if(hasReadConflict()){
-                    read.owner.abort(this, read, pool);
+                    read.owner.___abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
@@ -111,14 +111,14 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 return read;
             }
 
-            RefTranlocal<E> read = ref.load(config.spinCount);
+            RefTranlocal<E> read = ref.___load(config.spinCount);
 
             if (read.isLocked) {
                 throw abortOnReadConflict(pool);
             }
 
             if(hasReadConflict()){
-                read.owner.abort(this, read, pool);
+                read.owner.___abort(this, read, pool);
                 throw abortOnReadConflict(pool);
             }
 
@@ -142,14 +142,16 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                     hasReads = true;
                 }
 
-                final RefTranlocal<E> read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final RefTranlocal<E> read = lock
+                    ? ref.___lockAndLoad(config.spinCount, this)
+                    : ref.___load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
                 }
 
                 if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
+                    ref.___abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
@@ -157,7 +159,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 result.evaluateCommutingFunctions(pool);
                 return result;
             }else
-            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+            if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount, result)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -173,7 +175,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             hasReads = true;
         }
 
-        RefTranlocal<E> read = ref.load(config.spinCount);
+        RefTranlocal<E> read = ref.___load(config.spinCount);
 
         //if it was locked, lets abort.
         if (read.isLocked) {
@@ -185,7 +187,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         if(hasReadConflict()){
-            read.owner.abort(this, read, pool);
+            read.owner.___abort(this, read, pool);
             throw abortOnReadConflict(pool);
         }
 
@@ -222,7 +224,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 localConflictCounter.reset();
                 hasReads = true;
             }
-            RefTranlocal<E> read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+            RefTranlocal<E> read = lock
+                ? ref.___lockAndLoad(config.spinCount, this)
+                : ref.___load(config.spinCount);
 
             //if it was locked, lets abort.
             if (read.isLocked) {
@@ -230,7 +234,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
 
             if(hasReadConflict()){
-                read.owner.abort(this, read, pool);
+                read.owner.___abort(this, read, pool);
                 throw abortOnReadConflict(pool);
             }
     
@@ -260,14 +264,16 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 hasReads = true;
             }
 
-            final RefTranlocal<E> read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+            final RefTranlocal<E> read = lock
+                ? ref.___lockAndLoad(config.spinCount, this)
+                : ref.___load(config.spinCount);
 
             if (read.isLocked) {
                 throw abortOnReadConflict(pool);
             }
 
             if (hasReadConflict()) {
-                ref.abort(this, read, pool);
+                ref.___abort(this, read, pool);
                 throw abortOnReadConflict(pool);
             }
 
@@ -275,7 +281,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             result.evaluateCommutingFunctions(pool);
             return result;
         }else
-        if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+        if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount, result)){
             throw abortOnReadConflict(pool);
         }
 
@@ -332,7 +338,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnTooSmallSize(pool, 2);
         }
 
-        if(ref.unsafeLoad()!=null){
+        if(ref.___unsafeLoad()!=null){
             abort();
             throw new IllegalArgumentException();
         }
@@ -370,7 +376,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
 
             //todo: call to 'openForCommute' can be inlined.
-            RefTranlocal<E> result = ref.openForCommute(pool);
+            RefTranlocal<E> result = ref.___openForCommute(pool);
             attached=result;
             result.addCommutingFunction(function, pool);
             return;
@@ -418,7 +424,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 hasReads = true;
             }
             if(lock){
-                IntRefTranlocal read = ref.lockAndLoad(config.spinCount, this);
+                IntRefTranlocal read = ref.___lockAndLoad(config.spinCount, this);
 
                 //if it was locked, lets abort.
                 if (read.isLocked) {
@@ -426,7 +432,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 }
 
                 if(hasReadConflict()){
-                    read.owner.abort(this, read, pool);
+                    read.owner.___abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
@@ -434,14 +440,14 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 return read;
             }
 
-            IntRefTranlocal read = ref.load(config.spinCount);
+            IntRefTranlocal read = ref.___load(config.spinCount);
 
             if (read.isLocked) {
                 throw abortOnReadConflict(pool);
             }
 
             if(hasReadConflict()){
-                read.owner.abort(this, read, pool);
+                read.owner.___abort(this, read, pool);
                 throw abortOnReadConflict(pool);
             }
 
@@ -465,14 +471,16 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                     hasReads = true;
                 }
 
-                final IntRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final IntRefTranlocal read = lock
+                    ? ref.___lockAndLoad(config.spinCount, this)
+                    : ref.___load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
                 }
 
                 if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
+                    ref.___abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
@@ -480,7 +488,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 result.evaluateCommutingFunctions(pool);
                 return result;
             }else
-            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+            if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount, result)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -496,7 +504,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             hasReads = true;
         }
 
-        IntRefTranlocal read = ref.load(config.spinCount);
+        IntRefTranlocal read = ref.___load(config.spinCount);
 
         //if it was locked, lets abort.
         if (read.isLocked) {
@@ -508,7 +516,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         if(hasReadConflict()){
-            read.owner.abort(this, read, pool);
+            read.owner.___abort(this, read, pool);
             throw abortOnReadConflict(pool);
         }
 
@@ -545,7 +553,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 localConflictCounter.reset();
                 hasReads = true;
             }
-            IntRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+            IntRefTranlocal read = lock
+                ? ref.___lockAndLoad(config.spinCount, this)
+                : ref.___load(config.spinCount);
 
             //if it was locked, lets abort.
             if (read.isLocked) {
@@ -553,7 +563,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
 
             if(hasReadConflict()){
-                read.owner.abort(this, read, pool);
+                read.owner.___abort(this, read, pool);
                 throw abortOnReadConflict(pool);
             }
     
@@ -583,14 +593,16 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 hasReads = true;
             }
 
-            final IntRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+            final IntRefTranlocal read = lock
+                ? ref.___lockAndLoad(config.spinCount, this)
+                : ref.___load(config.spinCount);
 
             if (read.isLocked) {
                 throw abortOnReadConflict(pool);
             }
 
             if (hasReadConflict()) {
-                ref.abort(this, read, pool);
+                ref.___abort(this, read, pool);
                 throw abortOnReadConflict(pool);
             }
 
@@ -598,7 +610,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             result.evaluateCommutingFunctions(pool);
             return result;
         }else
-        if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+        if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount, result)){
             throw abortOnReadConflict(pool);
         }
 
@@ -655,7 +667,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnTooSmallSize(pool, 2);
         }
 
-        if(ref.unsafeLoad()!=null){
+        if(ref.___unsafeLoad()!=null){
             abort();
             throw new IllegalArgumentException();
         }
@@ -693,7 +705,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
 
             //todo: call to 'openForCommute' can be inlined.
-            IntRefTranlocal result = ref.openForCommute(pool);
+            IntRefTranlocal result = ref.___openForCommute(pool);
             attached=result;
             result.addCommutingFunction(function, pool);
             return;
@@ -741,7 +753,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 hasReads = true;
             }
             if(lock){
-                LongRefTranlocal read = ref.lockAndLoad(config.spinCount, this);
+                LongRefTranlocal read = ref.___lockAndLoad(config.spinCount, this);
 
                 //if it was locked, lets abort.
                 if (read.isLocked) {
@@ -749,7 +761,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 }
 
                 if(hasReadConflict()){
-                    read.owner.abort(this, read, pool);
+                    read.owner.___abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
@@ -757,14 +769,14 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 return read;
             }
 
-            LongRefTranlocal read = ref.load(config.spinCount);
+            LongRefTranlocal read = ref.___load(config.spinCount);
 
             if (read.isLocked) {
                 throw abortOnReadConflict(pool);
             }
 
             if(hasReadConflict()){
-                read.owner.abort(this, read, pool);
+                read.owner.___abort(this, read, pool);
                 throw abortOnReadConflict(pool);
             }
 
@@ -788,14 +800,16 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                     hasReads = true;
                 }
 
-                final LongRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final LongRefTranlocal read = lock
+                    ? ref.___lockAndLoad(config.spinCount, this)
+                    : ref.___load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
                 }
 
                 if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
+                    ref.___abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
@@ -803,7 +817,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 result.evaluateCommutingFunctions(pool);
                 return result;
             }else
-            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+            if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount, result)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -819,7 +833,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             hasReads = true;
         }
 
-        LongRefTranlocal read = ref.load(config.spinCount);
+        LongRefTranlocal read = ref.___load(config.spinCount);
 
         //if it was locked, lets abort.
         if (read.isLocked) {
@@ -831,7 +845,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         if(hasReadConflict()){
-            read.owner.abort(this, read, pool);
+            read.owner.___abort(this, read, pool);
             throw abortOnReadConflict(pool);
         }
 
@@ -868,7 +882,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 localConflictCounter.reset();
                 hasReads = true;
             }
-            LongRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+            LongRefTranlocal read = lock
+                ? ref.___lockAndLoad(config.spinCount, this)
+                : ref.___load(config.spinCount);
 
             //if it was locked, lets abort.
             if (read.isLocked) {
@@ -876,7 +892,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
 
             if(hasReadConflict()){
-                read.owner.abort(this, read, pool);
+                read.owner.___abort(this, read, pool);
                 throw abortOnReadConflict(pool);
             }
     
@@ -906,14 +922,16 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 hasReads = true;
             }
 
-            final LongRefTranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+            final LongRefTranlocal read = lock
+                ? ref.___lockAndLoad(config.spinCount, this)
+                : ref.___load(config.spinCount);
 
             if (read.isLocked) {
                 throw abortOnReadConflict(pool);
             }
 
             if (hasReadConflict()) {
-                ref.abort(this, read, pool);
+                ref.___abort(this, read, pool);
                 throw abortOnReadConflict(pool);
             }
 
@@ -921,7 +939,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             result.evaluateCommutingFunctions(pool);
             return result;
         }else
-        if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+        if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount, result)){
             throw abortOnReadConflict(pool);
         }
 
@@ -978,7 +996,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnTooSmallSize(pool, 2);
         }
 
-        if(ref.unsafeLoad()!=null){
+        if(ref.___unsafeLoad()!=null){
             abort();
             throw new IllegalArgumentException();
         }
@@ -1016,7 +1034,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
 
             //todo: call to 'openForCommute' can be inlined.
-            LongRefTranlocal result = ref.openForCommute(pool);
+            LongRefTranlocal result = ref.___openForCommute(pool);
             attached=result;
             result.addCommutingFunction(function, pool);
             return;
@@ -1064,7 +1082,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 hasReads = true;
             }
             if(lock){
-                Tranlocal read = ref.lockAndLoad(config.spinCount, this);
+                Tranlocal read = ref.___lockAndLoad(config.spinCount, this);
 
                 //if it was locked, lets abort.
                 if (read.isLocked) {
@@ -1072,7 +1090,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 }
 
                 if(hasReadConflict()){
-                    read.owner.abort(this, read, pool);
+                    read.owner.___abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
@@ -1080,14 +1098,14 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 return read;
             }
 
-            Tranlocal read = ref.load(config.spinCount);
+            Tranlocal read = ref.___load(config.spinCount);
 
             if (read.isLocked) {
                 throw abortOnReadConflict(pool);
             }
 
             if(hasReadConflict()){
-                read.owner.abort(this, read, pool);
+                read.owner.___abort(this, read, pool);
                 throw abortOnReadConflict(pool);
             }
 
@@ -1111,14 +1129,16 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                     hasReads = true;
                 }
 
-                final Tranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+                final Tranlocal read = lock
+                    ? ref.___lockAndLoad(config.spinCount, this)
+                    : ref.___load(config.spinCount);
 
                 if (read.isLocked) {
                     throw abortOnReadConflict(pool);
                 }
 
                 if (hasReadConflict()) {
-                    ref.abort(this, read, pool);
+                    ref.___abort(this, read, pool);
                     throw abortOnReadConflict(pool);
                 }
 
@@ -1126,7 +1146,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 result.evaluateCommutingFunctions(pool);
                 return result;
             }else
-            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+            if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount, result)){
                 throw abortOnReadConflict(pool);
             }
 
@@ -1142,7 +1162,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             hasReads = true;
         }
 
-        Tranlocal read = ref.load(config.spinCount);
+        Tranlocal read = ref.___load(config.spinCount);
 
         //if it was locked, lets abort.
         if (read.isLocked) {
@@ -1154,7 +1174,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         if(hasReadConflict()){
-            read.owner.abort(this, read, pool);
+            read.owner.___abort(this, read, pool);
             throw abortOnReadConflict(pool);
         }
 
@@ -1191,7 +1211,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 localConflictCounter.reset();
                 hasReads = true;
             }
-            Tranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+            Tranlocal read = lock
+                ? ref.___lockAndLoad(config.spinCount, this)
+                : ref.___load(config.spinCount);
 
             //if it was locked, lets abort.
             if (read.isLocked) {
@@ -1199,7 +1221,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
 
             if(hasReadConflict()){
-                read.owner.abort(this, read, pool);
+                read.owner.___abort(this, read, pool);
                 throw abortOnReadConflict(pool);
             }
     
@@ -1224,14 +1246,16 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 hasReads = true;
             }
 
-            final Tranlocal read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+            final Tranlocal read = lock
+                ? ref.___lockAndLoad(config.spinCount, this)
+                : ref.___load(config.spinCount);
 
             if (read.isLocked) {
                 throw abortOnReadConflict(pool);
             }
 
             if (hasReadConflict()) {
-                ref.abort(this, read, pool);
+                ref.___abort(this, read, pool);
                 throw abortOnReadConflict(pool);
             }
 
@@ -1239,7 +1263,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             result.evaluateCommutingFunctions(pool);
             return result;
         }else
-        if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+        if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount, result)){
             throw abortOnReadConflict(pool);
         }
 
@@ -1291,12 +1315,12 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnTooSmallSize(pool, 2);
         }
 
-        if(ref.unsafeLoad()!=null){
+        if(ref.___unsafeLoad()!=null){
             abort();
             throw new IllegalArgumentException();
         }
 
-        result = ref.openForConstruction(pool);
+        result = ref.___openForConstruction(pool);
         attached = result;
         return result;
     }
@@ -1326,7 +1350,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
 
             //todo: call to 'openForCommute' can be inlined.
-            Tranlocal result = ref.openForCommute(pool);
+            Tranlocal result = ref.___openForCommute(pool);
             attached=result;
             result.addCommutingFunction(function, pool);
             return;
@@ -1372,7 +1396,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             return false;
         }
 
-        return attached.owner.hasReadConflict(attached, this);
+        return attached.owner.___hasReadConflict(attached, this);
     }
 
     // ======================= abort =======================================
@@ -1397,7 +1421,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         if (attached != null) {
-            attached.owner.abort(this, attached, pool);
+            attached.owner.___abort(this, attached, pool);
         }
 
         status = ABORTED;
@@ -1428,9 +1452,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         Listeners listeners = null;
         if (attached!=null) {
             if(config.dirtyCheck){
-                listeners = attached.owner.commitDirty(attached, this, pool, config.globalConflictCounter);
+                listeners = attached.owner.___commitDirty(attached, this, pool, config.globalConflictCounter);
             }else{
-                listeners = attached.owner.commitAll(attached, this, pool, config.globalConflictCounter);
+                listeners = attached.owner.___commitAll(attached, this, pool, config.globalConflictCounter);
             }
         }
         status = COMMITTED;
@@ -1517,7 +1541,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         if(attached.isCommuting){
-            Tranlocal read = attached.owner.lockAndLoad(config.spinCount, this);
+            Tranlocal read = attached.owner.___lockAndLoad(config.spinCount, this);
 
             if(read.isLocked){
                 return false;
@@ -1527,7 +1551,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             attached.evaluateCommutingFunctions(pool);            
         }else
         if (attached.calculateIsDirty()
-                    && !attached.owner.tryLockAndCheckConflict(this, config.spinCount, attached)){
+                    && !attached.owner.___tryLockAndCheckConflict(this, config.spinCount, attached)){
             return false;
         }
 
@@ -1544,7 +1568,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         if(attached.isCommuting){
-            Tranlocal read = attached.owner.lockAndLoad(config.spinCount, this);
+            Tranlocal read = attached.owner.___lockAndLoad(config.spinCount, this);
 
             if(read.isLocked){
                 return false;
@@ -1553,7 +1577,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             attached.read = read;
             attached.evaluateCommutingFunctions(pool);
         }else
-        if(!attached.owner.tryLockAndCheckConflict(this, config.spinCount, attached)){
+        if(!attached.owner.___tryLockAndCheckConflict(this, config.spinCount, attached)){
             return false;
         }
 
@@ -1607,9 +1631,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         final long listenerEra = listener.getEra();
         final BetaTransactionalObject owner = attached.owner;
 
-
-        boolean failure = owner.registerChangeListener(listener, attached, pool, listenerEra) == BetaTransactionalObject.REGISTRATION_NONE;
-        owner.abort(this, attached, pool);
+        boolean failure = owner.___registerChangeListener(listener, attached, pool, listenerEra) == BetaTransactionalObject.REGISTRATION_NONE;
+        owner.___abort(this, attached, pool);
         status = ABORTED;
 
         if(permanentListeners != null){

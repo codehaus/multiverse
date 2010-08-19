@@ -119,7 +119,7 @@ public class AccountBenchmark {
 
     private void printAccounts(LongRef[] accounts) {
         for (BetaTransactionalObject account : accounts) {
-            System.out.println("Account: " + ((LongRefTranlocal) account.unsafeLoad()).value + " " + account.getOrec());
+            System.out.println("Account: " + ((LongRefTranlocal) account.___unsafeLoad()).value + " " + account.___getOrec());
         }
     }
 

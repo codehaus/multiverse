@@ -107,7 +107,7 @@ public class UncontendedAtomicSetScalabilityTest {
                 ref.atomicSet(k, pool, 8, globalConflictCounter);
             }
 
-            assertEquals(transactionCount, ref.unsafeLoad().value + 1);
+            assertEquals(transactionCount, ref.___unsafeLoad().value + 1);
 
             durationMs = System.currentTimeMillis() - startMs;
             System.out.printf("Multiverse> %s is finished in %s ms\n", getName(), durationMs);

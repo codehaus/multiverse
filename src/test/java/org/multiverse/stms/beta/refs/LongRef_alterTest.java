@@ -35,7 +35,7 @@ public class LongRef_alterTest {
         long result = ref.alter(tx, pool, function);
         tx.commit();
 
-        assertEquals(101, ref.unsafeLoad().value);
+        assertEquals(101, ref.___unsafeLoad().value);
         assertEquals(101, result);
     }
 }

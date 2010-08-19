@@ -46,7 +46,7 @@ public class BetaTransactionTemplate_exceptionTest {
             assertSame(ex, found);
         }
 
-        assertEquals(0, ref.unsafeLoad().value);
+        assertEquals(0, ref.___unsafeLoad().value);
         assertEquals(1, transactions.size());
         assertAborted(transactions.get(0));
     }
@@ -72,7 +72,7 @@ public class BetaTransactionTemplate_exceptionTest {
             assertSame(ex, found);
         }
 
-        assertEquals(0, ref.unsafeLoad().value);
+        assertEquals(0, ref.___unsafeLoad().value);
         assertEquals(1, transactions.size());
         assertAborted(transactions.get(0));
     }
@@ -97,7 +97,7 @@ public class BetaTransactionTemplate_exceptionTest {
             assertSame(ex, found.getCause());
         }
 
-        assertEquals(0, ref.unsafeLoad().value);
+        assertEquals(0, ref.___unsafeLoad().value);
         assertEquals(1, transactions.size());
         assertAborted(transactions.get(0));
     }
@@ -122,7 +122,7 @@ public class BetaTransactionTemplate_exceptionTest {
             assertSame(ex, found);
         }
 
-        assertEquals(0, ref.unsafeLoad().value);
+        assertEquals(0, ref.___unsafeLoad().value);
         assertEquals(1, transactions.size());
         assertAborted(transactions.get(0));
     }
@@ -147,7 +147,7 @@ public class BetaTransactionTemplate_exceptionTest {
             assertSame(ex, found);
         }
 
-        assertEquals(0, ref.unsafeLoad().value);
+        assertEquals(0, ref.___unsafeLoad().value);
         assertEquals(1, transactions.size());
         assertAborted(transactions.get(0));
     }
@@ -172,7 +172,7 @@ public class BetaTransactionTemplate_exceptionTest {
             assertSame(ex, found);
         }
 
-        assertEquals(0, ref.unsafeLoad().value);
+        assertEquals(0, ref.___unsafeLoad().value);
         assertEquals(1, transactions.size());
         assertAborted(transactions.get(0));
     }

@@ -41,7 +41,7 @@ public class TimeoutRollbackTest {
         } catch (RetryTimeoutException expected) {
         }
 
-        assertEquals(0, modifyRef.unsafeLoad().value);
+        assertEquals(0, modifyRef.___unsafeLoad().value);
     }
 
     public void setAndTimeout() {

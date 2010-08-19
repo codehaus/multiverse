@@ -109,7 +109,7 @@ public class FatMonoBetaTransaction_commitTest {
         assertTrue(latch.isOpen());
         assertHasNoListeners(ref);
         assertUnlocked(ref);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
     }
@@ -139,34 +139,34 @@ public class FatMonoBetaTransaction_commitTest {
     @Test
     public void whenContainsOnlyNormalRead() {
         LongRef ref = BetaStmUtils.createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
-        int oldReadonlyCount = ref.getReadonlyCount();
+        int oldReadonlyCount = ref.___getReadonlyCount();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.openForRead(ref, false, pool);
         tx.commit(pool);
 
         assertCommitted(tx);
-        assertSame(committed, ref.unsafeLoad());
-        assertSurplus(0, ref.getOrec());
+        assertSame(committed, ref.___unsafeLoad());
+        assertSurplus(0, ref.___getOrec());
         assertEquals(0, committed.value);
-        assertUpdateBiased(ref.getOrec());
-        assertUnlocked(ref.getOrec());
-        assertReadonlyCount(oldReadonlyCount + 1, ref.getOrec());
+        assertUpdateBiased(ref.___getOrec());
+        assertUnlocked(ref.___getOrec());
+        assertReadonlyCount(oldReadonlyCount + 1, ref.___getOrec());
     }
 
     @Test
     public void whenContainsReadBiasedRead() {
         LongRef ref = createReadBiasedLongRef(stm, 100);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.openForRead(ref, false, pool);
         tx.commit(pool);
 
-        assertSame(committed, ref.unsafeLoad());
-        assertNull(ref.getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertNull(ref.___getLockOwner());
         assertUnlocked(ref);
         assertSurplus(1, ref);
         assertReadBiased(ref);
@@ -177,14 +177,14 @@ public class FatMonoBetaTransaction_commitTest {
     @Test
     public void whenContainsLockedNormalRead() {
         LongRef ref = createLongRef(stm, 100);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.openForRead(ref, true, pool);
         tx.commit(pool);
 
-        assertSame(committed, ref.unsafeLoad());
-        assertNull(ref.getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertNull(ref.___getLockOwner());
         assertUnlocked(ref);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
@@ -195,14 +195,14 @@ public class FatMonoBetaTransaction_commitTest {
     @Test
     public void whenContainsLockedReadBiasedRead() {
         LongRef ref = createReadBiasedLongRef(stm, 100);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.openForRead(ref, true, pool);
         tx.commit(pool);
 
-        assertSame(committed, ref.unsafeLoad());
-        assertNull(ref.getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertNull(ref.___getLockOwner());
         assertUnlocked(ref);
         assertSurplus(1, ref);
         assertReadBiased(ref);
@@ -219,12 +219,12 @@ public class FatMonoBetaTransaction_commitTest {
         write.value++;
         tx.commit(pool);
 
-        assertSame(write, ref.unsafeLoad());
+        assertSame(write, ref.___unsafeLoad());
         assertTrue(write.isCommitted);
         assertFalse(write.isPermanent);
         assertSame(ref, write.owner);
         assertNull(write.read);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
         assertUnlocked(ref);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
@@ -242,21 +242,21 @@ public class FatMonoBetaTransaction_commitTest {
         tx.commit(pool);
 
         assertCommitted(tx);
-        assertSame(write, ref.unsafeLoad());
+        assertSame(write, ref.___unsafeLoad());
         assertTrue(write.isCommitted);
         assertNull(write.read);
         assertSame(ref, write.owner);
         assertEquals(1, write.value);
-        assertUnlocked(ref.getOrec());
-        assertUpdateBiased(ref.getOrec());
-        assertSurplus(0, ref.getOrec());
-        assertReadonlyCount(0, ref.getOrec());
+        assertUnlocked(ref.___getOrec());
+        assertUpdateBiased(ref.___getOrec());
+        assertSurplus(0, ref.___getOrec());
+        assertReadonlyCount(0, ref.___getOrec());
     }
 
     @Test
     public void whenNormalUpdateButNotChange() {
         LongRef ref = BetaStmUtils.createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(new BetaTransactionConfiguration(stm).setDirtyCheckEnabled(true));
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
@@ -264,12 +264,12 @@ public class FatMonoBetaTransaction_commitTest {
 
         assertFalse(write.isCommitted);
         assertCommitted(tx);
-        assertSame(committed, ref.unsafeLoad());
-        assertNull(ref.getLockOwner());
-        assertUnlocked(ref.getOrec());
-        assertUpdateBiased(ref.getOrec());
-        assertSurplus(0, ref.getOrec());
-        assertReadonlyCount(1, ref.getOrec());
+        assertSame(committed, ref.___unsafeLoad());
+        assertNull(ref.___getLockOwner());
+        assertUnlocked(ref.___getOrec());
+        assertUpdateBiased(ref.___getOrec());
+        assertSurplus(0, ref.___getOrec());
+        assertReadonlyCount(1, ref.___getOrec());
     }
 
     @Test
@@ -281,15 +281,15 @@ public class FatMonoBetaTransaction_commitTest {
         tx.commit(pool);
 
         assertCommitted(tx);
-        assertSame(write, ref.unsafeLoad());
+        assertSame(write, ref.___unsafeLoad());
         assertTrue(write.isCommitted);
         assertNull(write.read);
         assertSame(ref, write.owner);
         assertEquals(1, write.value);
-        assertUnlocked(ref.getOrec());
-        assertUpdateBiased(ref.getOrec());
-        assertSurplus(0, ref.getOrec());
-        assertReadonlyCount(0, ref.getOrec());
+        assertUnlocked(ref.___getOrec());
+        assertUpdateBiased(ref.___getOrec());
+        assertSurplus(0, ref.___getOrec());
+        assertReadonlyCount(0, ref.___getOrec());
     }
 
     @Test
@@ -311,17 +311,17 @@ public class FatMonoBetaTransaction_commitTest {
         } catch (WriteConflict e) {
         }
 
-        assertSame(conflictingWrite, ref.unsafeLoad());
-        assertSurplus(0, ref.getOrec());
-        assertReadonlyCount(0, ref.getOrec());
-        assertUpdateBiased(ref.getOrec());
-        assertUnlocked(ref.getOrec());
+        assertSame(conflictingWrite, ref.___unsafeLoad());
+        assertSurplus(0, ref.___getOrec());
+        assertReadonlyCount(0, ref.___getOrec());
+        assertUpdateBiased(ref.___getOrec());
+        assertUnlocked(ref.___getOrec());
     }
 
     @Test
     public void whenWriteConflictCausedByLock() {
         LongRef ref = createLongRef(stm, 0);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
@@ -340,8 +340,8 @@ public class FatMonoBetaTransaction_commitTest {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertSame(otherTx, ref.getLockOwner());
-        assertSame(committed, ref.unsafeLoad());
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
         assertFalse(write.isPermanent);
         assertFalse(write.isCommitted);
     }
@@ -349,10 +349,10 @@ public class FatMonoBetaTransaction_commitTest {
     @Test
     public void whenAlmostReadBiased() {
         LongRef ref = createLongRef(stm, 10);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         //make almost read biased.
-        for (int k = 0; k < ref.getReadBiasedThreshold() - 1; k++) {
+        for (int k = 0; k < ref.___getReadBiasedThreshold() - 1; k++) {
             BetaTransaction tx = new FatMonoBetaTransaction(stm);
             tx.openForRead(ref, false, pool);
             tx.commit();
@@ -362,18 +362,18 @@ public class FatMonoBetaTransaction_commitTest {
         tx.openForRead(ref, false, pool);
         tx.commit();
 
-        assertSame(committed, ref.unsafeLoad());
+        assertSame(committed, ref.___unsafeLoad());
         assertCommitted(tx);
-        assertSame(committed, ref.unsafeLoad());
+        assertSame(committed, ref.___unsafeLoad());
         assertTrue(committed.isCommitted);
         assertTrue(committed.isPermanent);
         assertNull(committed.read);
         assertSame(ref, committed.owner);
         assertEquals(10, committed.value);
-        assertUnlocked(ref.getOrec());
-        assertReadBiased(ref.getOrec());
-        assertSurplus(0, ref.getOrec());
-        assertReadonlyCount(0, ref.getOrec());
+        assertUnlocked(ref.___getOrec());
+        assertReadBiased(ref.___getOrec());
+        assertSurplus(0, ref.___getOrec());
+        assertReadonlyCount(0, ref.___getOrec());
     }
 
     @Test
@@ -386,15 +386,15 @@ public class FatMonoBetaTransaction_commitTest {
         tx.commit();
 
         assertCommitted(tx);
-        assertSame(write, ref.unsafeLoad());
+        assertSame(write, ref.___unsafeLoad());
         assertTrue(write.isCommitted);
         assertNull(write.read);
         assertSame(ref, write.owner);
         assertEquals(11, write.value);
-        assertUnlocked(ref.getOrec());
-        assertUpdateBiased(ref.getOrec());
-        assertSurplus(0, ref.getOrec());
-        assertReadonlyCount(0, ref.getOrec());
+        assertUnlocked(ref.___getOrec());
+        assertUpdateBiased(ref.___getOrec());
+        assertSurplus(0, ref.___getOrec());
+        assertReadonlyCount(0, ref.___getOrec());
     }
 
     @Test
@@ -409,21 +409,21 @@ public class FatMonoBetaTransaction_commitTest {
             tx.hardReset(pool);
         }
 
-        assertEquals(100L, ref.unsafeLoad().value);
+        assertEquals(100L, ref.___unsafeLoad().value);
     }
 
     @Test
     public void whenNotDirtyAndNotLocked() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
         tx.commit();
 
         assertCommitted(tx);
-        assertSame(committed, ref.unsafeLoad());
-        assertNull(ref.getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertNull(ref.___getLockOwner());
         assertUnlocked(ref);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
@@ -434,15 +434,15 @@ public class FatMonoBetaTransaction_commitTest {
     @Test
     public void whenNotDirtyAndLocked() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, true, pool);
         tx.commit();
 
         assertCommitted(tx);
-        assertSame(committed, ref.unsafeLoad());
-        assertNull(ref.getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertNull(ref.___getLockOwner());
         assertUnlocked(ref);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
@@ -459,15 +459,15 @@ public class FatMonoBetaTransaction_commitTest {
         tx.commit(pool);
 
         assertCommitted(tx);
-        assertSame(write, ref.unsafeLoad());
+        assertSame(write, ref.___unsafeLoad());
         assertTrue(write.isCommitted);
         assertNull(write.read);
         assertSame(ref, write.owner);
         assertEquals(0, write.value);
-        assertUnlocked(ref.getOrec());
-        assertUpdateBiased(ref.getOrec());
-        assertSurplus(0, ref.getOrec());
-        assertReadonlyCount(0, ref.getOrec());
+        assertUnlocked(ref.___getOrec());
+        assertUpdateBiased(ref.___getOrec());
+        assertSurplus(0, ref.___getOrec());
+        assertReadonlyCount(0, ref.___getOrec());
     }
 
     @Test
@@ -524,7 +524,7 @@ public class FatMonoBetaTransaction_commitTest {
     @Test
     public void whenPreparedAndContainsRead() {
         LongRef ref = createLongRef(stm);
-        LongRefTranlocal committed = ref.unsafeLoad();
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
@@ -534,8 +534,8 @@ public class FatMonoBetaTransaction_commitTest {
         assertCommitted(tx);
 
         assertUnlocked(ref);
-        assertNull(ref.getLockOwner());
-        assertSame(committed, ref.unsafeLoad());
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
     }
@@ -554,8 +554,8 @@ public class FatMonoBetaTransaction_commitTest {
         assertCommitted(tx);
 
         assertUnlocked(ref);
-        assertNull(ref.getLockOwner());
-        assertSame(write, ref.unsafeLoad());
+        assertNull(ref.___getLockOwner());
+        assertSame(write, ref.___unsafeLoad());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertTrue(write.isCommitted);
@@ -577,7 +577,7 @@ public class FatMonoBetaTransaction_commitTest {
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertEquals(1, ref.unsafeLoad().value);
+        assertEquals(1, ref.___unsafeLoad().value);
     }
 
     @Test
@@ -594,7 +594,7 @@ public class FatMonoBetaTransaction_commitTest {
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertEquals(1, ref.unsafeLoad().value);
+        assertEquals(1, ref.___unsafeLoad().value);
     }
 
      @Test
@@ -616,11 +616,11 @@ public class FatMonoBetaTransaction_commitTest {
         assertSurplus(0, ref1);
         assertUpdateBiased(ref1);
         assertReadonlyCount(0, ref1);
-        assertEquals(1, ref1.unsafeLoad().value);
+        assertEquals(1, ref1.___unsafeLoad().value);
         assertSurplus(0, ref2);
         assertUpdateBiased(ref2);
         assertReadonlyCount(0, ref2);
-        assertEquals(2, ref2.unsafeLoad().value);
+        assertEquals(2, ref2.___unsafeLoad().value);
     }
 
     @Test
@@ -639,7 +639,7 @@ public class FatMonoBetaTransaction_commitTest {
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertEquals(3, ref.unsafeLoad().value);
+        assertEquals(3, ref.___unsafeLoad().value);
     }
 
     @Test
@@ -661,7 +661,7 @@ public class FatMonoBetaTransaction_commitTest {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertEquals(0, ref.unsafeLoad().value);
+        assertEquals(0, ref.___unsafeLoad().value);
     }
 
     @Test
@@ -741,7 +741,7 @@ public class FatMonoBetaTransaction_commitTest {
 
         long sum = 0;
         for (int k = 0; k < refs.length; k++) {
-            sum += refs[k].unsafeLoad().value;
+            sum += refs[k].___unsafeLoad().value;
         }
 
         assertEquals(created, sum);

@@ -31,7 +31,7 @@ public class FatArrayBetaTransaction_typesTest {
         write.value++;
         tx.commit();
 
-        assertEquals(101, ref.unsafeLoad().value);
+        assertEquals(101, ref.___unsafeLoad().value);
     }
 
     @Test
@@ -45,7 +45,7 @@ public class FatArrayBetaTransaction_typesTest {
         write.value++;
         tx.commit();
 
-        assertEquals(101, ref.unsafeLoad().value);
+        assertEquals(101, ref.___unsafeLoad().value);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class FatArrayBetaTransaction_typesTest {
         write.value = "john";
         tx.commit();
 
-        assertEquals("john", ref.unsafeLoad().value);
+        assertEquals("john", ref.___unsafeLoad().value);
     }
 
     @Test

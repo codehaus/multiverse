@@ -17,7 +17,7 @@ public class UnsafeOrec_departAfterReadingTest {
         UnsafeOrec orec = new UnsafeOrec();
 
         try {
-            orec.departAfterReading();
+            orec.___departAfterReading();
             fail();
         } catch (PanicError expected) {
         }
@@ -26,10 +26,10 @@ public class UnsafeOrec_departAfterReadingTest {
     @Test
     public void whenMuchSurplus() {
         UnsafeOrec orec = new UnsafeOrec();
-        orec.arrive(1);
-        orec.arrive(1);
+        orec.___arrive(1);
+        orec.___arrive(1);
 
-        boolean result = orec.departAfterReading();
+        boolean result = orec.___departAfterReading();
         assertFalse(result);
         assertSurplus(1, orec);
         assertUnlocked(orec);
@@ -38,15 +38,15 @@ public class UnsafeOrec_departAfterReadingTest {
     @Test
     public void whenLocked() {
         UnsafeOrec orec = new UnsafeOrec();
-        orec.arrive(1);
-        orec.arrive(1);
-        orec.tryUpdateLock(1);
+        orec.___arrive(1);
+        orec.___arrive(1);
+        orec.___tryUpdateLock(1);
 
-        boolean result = orec.departAfterReading();
+        boolean result = orec.___departAfterReading();
         assertFalse(result);
         assertLocked(orec);
         assertSurplus(1, orec);
-        assertFalse(orec.isReadBiased());
+        assertFalse(orec.___isReadBiased());
     }
 
     @Test
@@ -54,7 +54,7 @@ public class UnsafeOrec_departAfterReadingTest {
         UnsafeOrec orec = makeReadBiased(new UnsafeOrec());
 
         try {
-            orec.departAfterReading();
+            orec.___departAfterReading();
             fail();
         } catch (PanicError expected) {
         }

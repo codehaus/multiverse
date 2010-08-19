@@ -45,7 +45,7 @@ public class AtomicReadBiasedWithPeriodicUpdateTest {
         //atomicget.
         assertUpdateBiased(ref);
         assertUnlocked(ref);
-        assertNull(ref.getLockOwner());
+        assertNull(ref.___getLockOwner());
 
         System.out.println("orec: " + ref.toOrecString());
     }

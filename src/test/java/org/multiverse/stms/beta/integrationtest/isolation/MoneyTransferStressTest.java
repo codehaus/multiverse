@@ -99,7 +99,7 @@ public class MoneyTransferStressTest {
     private long getTotal() {
         long sum = 0;
         for (LongRef account : accounts) {
-            sum += account.unsafeLoad().value;
+            sum += account.___unsafeLoad().value;
         }
         return sum;
     }
