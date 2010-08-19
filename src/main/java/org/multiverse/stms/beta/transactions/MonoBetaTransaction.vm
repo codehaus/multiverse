@@ -153,15 +153,36 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         if(attached.owner == ref){
             //the reference is the one we are looking for.
-            ${ref.tranlocal}${ref.typeParameter} read = (${ref.tranlocal}${ref.typeParameter})attached;
+            ${ref.tranlocal}${ref.typeParameter} result = (${ref.tranlocal}${ref.typeParameter})attached;
 
-            if(lock){
-                if(!ref.tryLockAndCheckConflict(this, config.spinCount, read)){
+#if(!$transaction.lean)
+            if(result.isCommuting){
+                if(!hasReads){
+                    localConflictCounter.reset();
+                    hasReads = true;
+                }
+
+                final ${ref.tranlocal}${ref.typeParameter} read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+
+                if (read.isLocked) {
                     throw abortOnReadConflict(pool);
                 }
+
+                if (hasReadConflict()) {
+                    ref.abort(this, read, pool);
+                    throw abortOnReadConflict(pool);
+                }
+
+                result.read = read;
+                result.evaluateCommutingFunctions(pool);
+                return result;
+            }else
+#end
+            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+                throw abortOnReadConflict(pool);
             }
 
-            return read;
+            return result;
         }
 
         if(lock || config.trackReads){
@@ -270,27 +291,49 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         //the reference is the one we are looking for.
-        ${ref.tranlocal}${ref.typeParameter} current = (${ref.tranlocal}${ref.typeParameter})attached;
+        ${ref.tranlocal}${ref.typeParameter} result = (${ref.tranlocal}${ref.typeParameter})attached;
 
-        if(lock){
-            if(!ref.tryLockAndCheckConflict(this, config.spinCount, current)){
+#if(!$transaction.lean)
+        if(result.isCommuting){
+            if(!hasReads){
+                localConflictCounter.reset();
+                hasReads = true;
+            }
+
+            final ${ref.tranlocal}${ref.typeParameter} read = lock ? ref.lockAndLoad(config.spinCount, this) : ref.load(config.spinCount);
+
+            if (read.isLocked) {
                 throw abortOnReadConflict(pool);
             }
+
+            if (hasReadConflict()) {
+                ref.abort(this, read, pool);
+                throw abortOnReadConflict(pool);
+            }
+
+            result.read = read;
+            result.evaluateCommutingFunctions(pool);
+            return result;
+        }else
+#end
+        if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+            throw abortOnReadConflict(pool);
         }
 
-        if(!current.isCommitted){
-            return current;
+        if(!result.isCommitted){
+            return result;
         }
 
+        final ${ref.tranlocal}${ref.typeParameter} read = result;
 #if($ref.isSpecialization())
-        ${ref.tranlocal}${ref.typeParameter} result = pool.take(ref);
+        result = pool.take(ref);
         if (result == null) {
             result = new ${ref.tranlocal}${ref.typeParameter}(ref);
         }
-        result.value = current.value;
-        result.read = current;
+        result.value = read.value;
+        result.read = read;
 #else
-        ${ref.tranlocal}${ref.typeParameter} result = current.openForWrite(pool);
+        result = read.openForWrite(pool);
 #end
         attached = result;
         return result;

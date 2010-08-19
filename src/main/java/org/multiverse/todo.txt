@@ -137,7 +137,7 @@ globalconflict counter.
 
 - rethink permanent listener; registration once is complicated.
 
-- blocking and speculative readonly?
+- blocking and speculative readtracking?
 
 - transaction.prepareForPooling & add it to objectpool.
    - make sure that the object that are pooled, are not a potential source of memory leaks. E.g. transactions
@@ -200,14 +200,12 @@ globalconflict counter.
 
 - lean mono should not upgrade to array when untracked read is done, but should just attach it to the session.
 
-- idea for the array, arraytree: keep seperate read/write buffer? This makes committing and preparing cheaper
-since you don't need to look at the reads/
-
 - speculative + register doesn't combine because it can lead to transaction not accepting the task and therefor
 the task not being executed at all.
 
 - expose the ref
 
+- actor atomic block, doesn't look at an existing transaction. Automatically exposes the onAbort/onCommit
 
 done
 

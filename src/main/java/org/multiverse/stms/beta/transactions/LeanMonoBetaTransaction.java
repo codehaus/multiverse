@@ -116,15 +116,13 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
         if(attached.owner == ref){
             //the reference is the one we are looking for.
-            RefTranlocal<E> read = (RefTranlocal<E>)attached;
+            RefTranlocal<E> result = (RefTranlocal<E>)attached;
 
-            if(lock){
-                if(!ref.tryLockAndCheckConflict(this, config.spinCount, read)){
-                    throw abortOnReadConflict(pool);
-                }
+            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+                throw abortOnReadConflict(pool);
             }
 
-            return read;
+            return result;
         }
 
         if(lock || config.trackReads){
@@ -195,24 +193,23 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         //the reference is the one we are looking for.
-        RefTranlocal<E> current = (RefTranlocal<E>)attached;
+        RefTranlocal<E> result = (RefTranlocal<E>)attached;
 
-        if(lock){
-            if(!ref.tryLockAndCheckConflict(this, config.spinCount, current)){
-                throw abortOnReadConflict(pool);
-            }
+        if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+            throw abortOnReadConflict(pool);
         }
 
-        if(!current.isCommitted){
-            return current;
+        if(!result.isCommitted){
+            return result;
         }
 
-        RefTranlocal<E> result = pool.take(ref);
+        final RefTranlocal<E> read = result;
+        result = pool.take(ref);
         if (result == null) {
             result = new RefTranlocal<E>(ref);
         }
-        result.value = current.value;
-        result.read = current;
+        result.value = read.value;
+        result.read = read;
         attached = result;
         return result;
     }
@@ -333,15 +330,13 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
         if(attached.owner == ref){
             //the reference is the one we are looking for.
-            IntRefTranlocal read = (IntRefTranlocal)attached;
+            IntRefTranlocal result = (IntRefTranlocal)attached;
 
-            if(lock){
-                if(!ref.tryLockAndCheckConflict(this, config.spinCount, read)){
-                    throw abortOnReadConflict(pool);
-                }
+            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+                throw abortOnReadConflict(pool);
             }
 
-            return read;
+            return result;
         }
 
         if(lock || config.trackReads){
@@ -412,24 +407,23 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         //the reference is the one we are looking for.
-        IntRefTranlocal current = (IntRefTranlocal)attached;
+        IntRefTranlocal result = (IntRefTranlocal)attached;
 
-        if(lock){
-            if(!ref.tryLockAndCheckConflict(this, config.spinCount, current)){
-                throw abortOnReadConflict(pool);
-            }
+        if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+            throw abortOnReadConflict(pool);
         }
 
-        if(!current.isCommitted){
-            return current;
+        if(!result.isCommitted){
+            return result;
         }
 
-        IntRefTranlocal result = pool.take(ref);
+        final IntRefTranlocal read = result;
+        result = pool.take(ref);
         if (result == null) {
             result = new IntRefTranlocal(ref);
         }
-        result.value = current.value;
-        result.read = current;
+        result.value = read.value;
+        result.read = read;
         attached = result;
         return result;
     }
@@ -550,15 +544,13 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
         if(attached.owner == ref){
             //the reference is the one we are looking for.
-            LongRefTranlocal read = (LongRefTranlocal)attached;
+            LongRefTranlocal result = (LongRefTranlocal)attached;
 
-            if(lock){
-                if(!ref.tryLockAndCheckConflict(this, config.spinCount, read)){
-                    throw abortOnReadConflict(pool);
-                }
+            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+                throw abortOnReadConflict(pool);
             }
 
-            return read;
+            return result;
         }
 
         if(lock || config.trackReads){
@@ -629,24 +621,23 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         //the reference is the one we are looking for.
-        LongRefTranlocal current = (LongRefTranlocal)attached;
+        LongRefTranlocal result = (LongRefTranlocal)attached;
 
-        if(lock){
-            if(!ref.tryLockAndCheckConflict(this, config.spinCount, current)){
-                throw abortOnReadConflict(pool);
-            }
+        if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+            throw abortOnReadConflict(pool);
         }
 
-        if(!current.isCommitted){
-            return current;
+        if(!result.isCommitted){
+            return result;
         }
 
-        LongRefTranlocal result = pool.take(ref);
+        final LongRefTranlocal read = result;
+        result = pool.take(ref);
         if (result == null) {
             result = new LongRefTranlocal(ref);
         }
-        result.value = current.value;
-        result.read = current;
+        result.value = read.value;
+        result.read = read;
         attached = result;
         return result;
     }
@@ -767,15 +758,13 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
         if(attached.owner == ref){
             //the reference is the one we are looking for.
-            Tranlocal read = (Tranlocal)attached;
+            Tranlocal result = (Tranlocal)attached;
 
-            if(lock){
-                if(!ref.tryLockAndCheckConflict(this, config.spinCount, read)){
-                    throw abortOnReadConflict(pool);
-                }
+            if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+                throw abortOnReadConflict(pool);
             }
 
-            return read;
+            return result;
         }
 
         if(lock || config.trackReads){
@@ -841,19 +830,18 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         //the reference is the one we are looking for.
-        Tranlocal current = (Tranlocal)attached;
+        Tranlocal result = (Tranlocal)attached;
 
-        if(lock){
-            if(!ref.tryLockAndCheckConflict(this, config.spinCount, current)){
-                throw abortOnReadConflict(pool);
-            }
+        if(lock && !ref.tryLockAndCheckConflict(this, config.spinCount, result)){
+            throw abortOnReadConflict(pool);
         }
 
-        if(!current.isCommitted){
-            return current;
+        if(!result.isCommitted){
+            return result;
         }
 
-        Tranlocal result = current.openForWrite(pool);
+        final Tranlocal read = result;
+        result = read.openForWrite(pool);
         attached = result;
         return result;
     }
