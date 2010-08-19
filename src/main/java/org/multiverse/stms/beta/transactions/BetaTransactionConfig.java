@@ -37,7 +37,7 @@ public final class BetaTransactionConfig implements TransactionConfiguration {
     public boolean speculativeConfigEnabled = true;
     public int maxArrayTransactionSize;
     public boolean isAnonymous = true;
-    public BackoffPolicy backoffPolicy = BackoffPolicy.INSTANCE_100_MS_MAX;
+    public BackoffPolicy backoffPolicy = ExponentialBackoffPolicy.INSTANCE_100_MS_MAX;
     public long timeoutNs = Long.MAX_VALUE;
     public TraceLevel traceLevel = TraceLevel.None;
     public boolean writeSkewAllowed = true;
