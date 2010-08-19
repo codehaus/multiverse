@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta;
 
 import org.multiverse.api.*;
+import org.multiverse.stms.beta.transactions.BetaTransactionConfig;
 
 /**
  * A {@link org.multiverse.api.TransactionFactoryBuilder}  for the {@link org.multiverse.stms.beta.BetaStm}.
@@ -8,6 +9,9 @@ import org.multiverse.api.*;
  * @author Peter Veentjer.
  */
 public interface BetaTransactionFactoryBuilder extends TransactionFactoryBuilder {
+
+    @Override
+    BetaTransactionConfig getTransactionConfiguration();
 
     @Override
     BetaTransactionFactoryBuilder setFamilyName(String familyName);

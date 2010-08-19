@@ -5,10 +5,25 @@ package org.multiverse.api;
  */
 public interface TransactionFactoryBuilder {
 
+    /**
+     * Returns the TransactionConfiguration used by this TransactionFactoryBuilder.
+     *
+     * @return
+     */
+    TransactionConfiguration getTransactionConfiguration();
+
     TransactionFactoryBuilder setFamilyName(String familyName);
 
     TransactionFactoryBuilder setPropagationLevel(PropagationLevel propagationLevel);
 
+    /**
+     * Sets the TraceLevel. With tracing it is possible to see what is happening inside a transaction.
+     *
+     * @param traceLevel the new traceLevel.
+     * @return the updated TransactionFactoryBuilder.
+     * @throws NullPointerException if traceLevel is null.
+     * @see TransactionConfiguration#getTraceLevel()
+     */
     TransactionFactoryBuilder setTraceLevel(TraceLevel traceLevel);
 
     TransactionFactoryBuilder setTimeoutNs(long timeoutNs);
@@ -44,7 +59,6 @@ public interface TransactionFactoryBuilder {
      *          because the configuration was not correct.
      */
     TransactionFactory build();
-
 
     /**
      * Builds an AtomicBlock optimized for a transactions created by this TransactionFactoryBuilder.

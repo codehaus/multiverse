@@ -26,13 +26,15 @@ public interface TransactionConfiguration {
      * is dealing with nesting of transactions.
      *
      * @return the PropagationLevel used.
+     * @see org.multiverse.api.TransactionFactoryBuilder#setPropagationLevel(PropagationLevel)
      */
     PropagationLevel getPropagationLevel();
 
     /**
-     * Returns the TraceLevel
+     * Returns the TraceLevel. With the TraceLevel you have control on the logging.
      *
      * @return the TraceLevel.
+     * @see org.multiverse.api.TransactionFactoryBuilder#setTraceLevel(TraceLevel)
      */
     TraceLevel getTraceLevel();
 
@@ -50,6 +52,7 @@ public interface TransactionConfiguration {
      * {@link org.multiverse.api.exceptions.SpeculativeConfigurationError}.
      *
      * @return true if speculative configuration is enabled.
+     * @see TransactionFactoryBuilder#setSpeculativeConfigEnabled(boolean)
      */
     boolean isSpeculativeConfigEnabled();
 
@@ -64,7 +67,8 @@ public interface TransactionConfiguration {
     String getFamilyName();
 
     /**
-     * Checks if this Transaction is readonly.
+     * Checks if this Transaction is readonly. With a readonly transaction you can prevent any updates or
+     * new objects being created.
      *
      * @return true if readonly, false otherwise.
      * @see TransactionFactoryBuilder#setReadonly(boolean)
@@ -76,9 +80,16 @@ public interface TransactionConfiguration {
      * readable (perhaps it is locked).
      *
      * @return the maximum number of spins
+     * @see org.multiverse.api.TransactionFactoryBuilder#setSpinCount(int)
      */
     int getSpinCount();
 
+    /**
+     * Returns the PessimisticLockLevel used on all reads/writes.
+     *
+     * @return the PessimisticLockLevel.
+     * @see org.multiverse.api.TransactionFactoryBuilder#setPessimisticLockLevel(PessimisticLockLevel)
+     */
     PessimisticLockLevel getPessimisticLockLevel();
 
     /**
@@ -86,6 +97,7 @@ public interface TransactionConfiguration {
      * but forces writes that cause no change.
      *
      * @return true of dirtycheck is enabled.
+     * @see org.multiverse.api.TransactionFactoryBuilder#setDirtyCheckEnabled(boolean)
      */
     boolean isDirtyCheck();
 
