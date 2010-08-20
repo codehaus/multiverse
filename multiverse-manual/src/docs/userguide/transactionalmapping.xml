@@ -129,7 +129,7 @@
     <h3 id="transactionalmethod.maxRetries">1.3.2 @TransactionalMethod.maxRetries</h3>
     Transactions run in Multiverse can fail for all kinds of reasons:
     <ol>
-        <li><b>read conflicts:</b> when a transaction tries to load a transactional object for reading or writing,
+        <li><b>read conflicts:</b> when a transaction tries to ___load a transactional object for reading or writing,
             but the version it needs, doesn't exist anymore. If the transaction would have been able to see this change,
             you could run into race problems.
         </li>
@@ -207,7 +207,7 @@
 
     <h3 id="transactionalmethod.and.exceptions">@TransactionalMethod and exceptions</h3>
     When a TransactionalMethod encounters an exception (no matter if it is checked, unchecked or an error),
-    it will automatically abort the transaction. In the future this behavior is going to be customizable.
+    it will automatically ___abort the transaction. In the future this behavior is going to be customizable.
 
     <h3 id="transactionalmethod.and.nesting">@TransactionalMethod and nesting</h3>
     TransactionalMethods can be nested so they are able to be composed, for example:

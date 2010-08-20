@@ -13,6 +13,13 @@ import org.multiverse.api.backoff.BackoffPolicy;
 public interface TransactionConfiguration {
 
     /**
+     * Returns the PropagationLevel.
+     *
+     * @return the PropagationLevel.
+     */
+    PropagationLevel getPropagationLevel();
+
+    /**
      * Returns the TraceLevel
      *
      * @return the TraceLevel.

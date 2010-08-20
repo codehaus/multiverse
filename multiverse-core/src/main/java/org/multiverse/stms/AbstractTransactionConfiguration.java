@@ -1,5 +1,6 @@
 package org.multiverse.stms;
 
+import org.multiverse.api.PropagationLevel;
 import org.multiverse.api.TraceLevel;
 import org.multiverse.api.TransactionConfiguration;
 import org.multiverse.api.TransactionFactory;
@@ -33,13 +34,15 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
     public final int maxReadSpinCount;
     public final TransactionFactory transactionFactory;
     public final TraceLevel traceLevel;
+    public final PropagationLevel propagationLevel;
 
     /**
      * This method should be removed, only used for testing purposes.
      */
     public AbstractTransactionConfiguration() {
         this(new StrictPrimitiveClock(), ExponentialBackoffPolicy.INSTANCE_100_MS_MAX,
-                null, true, 1000, true, true, true, true, Long.MIN_VALUE, 10, null, TraceLevel.none);
+                null, true, 1000, true, true, true, true, Long.MIN_VALUE, 10,
+                null, TraceLevel.none, PropagationLevel.Requires);
     }
 
     public AbstractTransactionConfiguration(
@@ -47,7 +50,7 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
             boolean readOnly, int maxRetries, boolean interruptible,
             boolean writeSkewAllowed, boolean readTrackingEnabled,
             boolean explicitRetryAllowed, long timeoutNs, int maxReadSpinCount,
-            TransactionFactory transactionFactory, TraceLevel traceLevel) {
+            TransactionFactory transactionFactory, TraceLevel traceLevel, PropagationLevel propagationLevel) {
 
         if (clock == null) {
             throw new NullPointerException();
@@ -70,6 +73,7 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
         this.maxReadSpinCount = maxReadSpinCount;
         this.transactionFactory = transactionFactory;
         this.traceLevel = traceLevel;
+        this.propagationLevel = propagationLevel;
 
         if (!readOnly && !readTrackingEnabled && !writeSkewAllowed) {
             String msg = format("Update transaction '%s' isn't  " +
@@ -79,6 +83,11 @@ public class AbstractTransactionConfiguration implements TransactionConfiguratio
                     familyName);
             throw new IllegalArgumentException(msg);
         }
+    }
+
+    @Override
+    public PropagationLevel getPropagationLevel() {
+        return propagationLevel;
     }
 
     @Override

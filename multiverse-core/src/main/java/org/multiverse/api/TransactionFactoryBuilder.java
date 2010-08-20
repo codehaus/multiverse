@@ -38,6 +38,22 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
     Stm getStm();
 
     /**
+     * Gets the PropagationLevel.
+     *
+     * @return the PropagationLevel.
+     */
+    PropagationLevel getPropagationLevel();
+
+    /**
+     * Sets the TransactionPropagationLevel.
+     *
+     * @param level the new PropagationLevel.
+     * @return the updated TransactionFactoryBuilder.
+     * @throws NullPointerException if level is null.
+     */
+    B setPropagationLevel(PropagationLevel level);
+
+    /**
      * Sets the TraceLevel. With tracing it is possible to see what is happening inside a transaction.
      *
      * @param traceLevel the new traceLevel.
@@ -275,7 +291,6 @@ public interface TransactionFactoryBuilder<T extends Transaction, B extends Tran
      *
      * @param timeoutNs the timeout specified in nano seconds
      * @return the updated TransactionFactoryBuilder
-     * @throws NullPointerException if unit is null.
      */
     B setTimeoutNs(long timeoutNs);
 

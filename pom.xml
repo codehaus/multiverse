@@ -59,10 +59,15 @@
     </developers>
 
     <repositories>
+	<repository>
+		<id>jboss</id>
+		<name>jboss</name>
+		<url>http://repository.jboss.org/maven2</url>
+	</repository>
         <repository>
             <id>maven.atlassian.com</id>
             <name>Atlassian Maven Proxy</name>
-            <url>https://maven.atlassian.com/content/groups/public</url>
+            <url>https://maven.atlassian.com/repository/public</url>
         </repository>
         <repository>
             <id>repo1.maven</id>
@@ -99,10 +104,10 @@
             <url>http://maven-plugins.sourceforge.net/repository</url>
         </repository>
         <!-- contains the google data api's-->
-        <repository>
+        <!-- repository>
             <id>mandubian-mvn</id>
             <url>http://mandubian-mvn.googlecode.com/svn/trunk/mandubian-mvn/repository</url>
-        </repository>
+        </repository -->
     </repositories>
 
     <pluginRepositories>
