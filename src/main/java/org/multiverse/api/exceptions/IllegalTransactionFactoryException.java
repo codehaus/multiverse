@@ -8,17 +8,30 @@ package org.multiverse.api.exceptions;
  */
 public class IllegalTransactionFactoryException extends IllegalStateException {
 
-    public IllegalTransactionFactoryException() {
+    /**
+     * Creates a new IllegalTransactionFactoryException.
+     *
+     * @param message the message of the IllegalTransactionFactoryException.
+     */
+    public IllegalTransactionFactoryException(String message) {
+        super(message);
     }
 
-    public IllegalTransactionFactoryException(String s) {
-        super(s);
-    }
-
+    /**
+     * Creates a new IllegalTransactionFactoryException with the provided message and cause.
+     *
+     * @param message the message of the IllegalTransactionFactoryException.
+     * @param cause the cause of the IllegalTransactionFactoryException
+     */
     public IllegalTransactionFactoryException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Creates a new IllegalTransactionFactoryException.
+     *
+     * @param cause
+     */
     public IllegalTransactionFactoryException(Throwable cause) {
         super(cause);
     }

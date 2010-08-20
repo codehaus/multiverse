@@ -1,6 +1,6 @@
 package org.multiverse.api;
 
-import org.multiverse.api.exceptions.RetryError;
+import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 
@@ -20,11 +20,11 @@ public class StmUtils {
      * to happen on certain datastructures, e.g. an item to come available on a transactional blocking queue.
      * <p/>
      * Under the hood the retry throws an Retry that will be caught up the callstack
-     * (by the {@link AtomicBlock for example). The RetryError should not be caught by user code in 99% procent
+     * (by the {@link AtomicBlock for example). The Retry should not be caught by user code in 99% procent
      * of the cases.
      */
     public static void retry() {
-        throw RetryError.INSTANCE;
+        throw Retry.INSTANCE;
     }
 
     /**

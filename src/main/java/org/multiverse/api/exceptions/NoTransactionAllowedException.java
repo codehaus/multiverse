@@ -1,24 +1,36 @@
 package org.multiverse.api.exceptions;
 
 /**
- * A {@link org.multiverse.api.exceptions.PropagationException} thrown when a transaction is found, but is not allowed.
+ * A {@link org.multiverse.api.exceptions.PropagationException} thrown when a transaction is found, but
+ * is not allowed. A typical cause of this exception is that the PropagationLevel NEVER is used and
+ * a transaction is available.
  *
  * @author Peter Veentjer.
  */
 public class NoTransactionAllowedException extends PropagationException {
 
+    /**
+     * Creates a new NoTransactionAllowedException.
+     */
     public NoTransactionAllowedException() {
     }
 
-    public NoTransactionAllowedException(String s) {
-        super(s);
+    /**
+     * Creates a new NoTransactionAllowedException with the provided message.
+     *
+     * @param message the message for the exception.
+     */
+    public NoTransactionAllowedException(String message) {
+        super(message);
     }
 
+    /**
+     * Creates a new NoTransactionAllowedException with the provided message and cause.
+     *
+     * @param message the message of the exception.
+     * @param cause the cause of the Exception.
+     */
     public NoTransactionAllowedException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    public NoTransactionAllowedException(Throwable cause) {
-        super(cause);
     }
 }

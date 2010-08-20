@@ -100,7 +100,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         tx.commit(pool);
                         abort = false;
                         return result;
-                    } catch (RetryError e) {
+                    } catch (Retry e) {
                         waitForChange(pool, tx);
                         abort = false;
                     } catch (SpeculativeConfigurationError e) {
@@ -214,7 +214,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         tx.commit(pool);
                         abort = false;
                         return result;
-                    } catch (RetryError e) {
+                    } catch (Retry e) {
                         waitForChange(pool, tx);
                         abort = false;
                     } catch (SpeculativeConfigurationError e) {
@@ -328,7 +328,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         tx.commit(pool);
                         abort = false;
                         return result;
-                    } catch (RetryError e) {
+                    } catch (Retry e) {
                         waitForChange(pool, tx);
                         abort = false;
                     } catch (SpeculativeConfigurationError e) {
@@ -442,7 +442,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         tx.commit(pool);
                         abort = false;
                         return result;
-                    } catch (RetryError e) {
+                    } catch (Retry e) {
                         waitForChange(pool, tx);
                         abort = false;
                     } catch (SpeculativeConfigurationError e) {
@@ -556,7 +556,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         tx.commit(pool);
                         abort = false;
                         return result;
-                    } catch (RetryError e) {
+                    } catch (Retry e) {
                         waitForChange(pool, tx);
                         abort = false;
                     } catch (SpeculativeConfigurationError e) {
@@ -677,7 +677,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         tx.commit(pool);
                         abort = false;
                         return;
-                    } catch (RetryError e) {
+                    } catch (Retry e) {
                         waitForChange(pool, tx);
                         abort = false;
                     } catch (SpeculativeConfigurationError e) {

@@ -2,7 +2,8 @@ package org.multiverse.api.exceptions;
 
 /**
  * An {@link RuntimeException} that wraps a checked exception. It is useful if a checked exception
- * is thrown, but can't be rethrown.
+ * is thrown, but can't be rethrown. The original checked exception can be retrieved by calling the
+ * {@link #getCause()}.
  *
  * @author Peter Veentjer
  */
@@ -10,6 +11,11 @@ public class InvisibleCheckedException extends RuntimeException {
 
     static final long serialVersionUID = 0;
 
+    /**
+     * Creates a new InvisibleCheckedException with the given cause.
+     *
+     * @param cause the cause of the Exception.
+     */
     public InvisibleCheckedException(Exception cause) {
         super(cause);
     }

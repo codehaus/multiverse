@@ -121,7 +121,7 @@ public abstract class BetaTransactionTemplate<E> {
                     tx.commit(pool);
                     abort = false;
                     return value;
-                } catch (RetryError e) {
+                } catch (Retry e) {
                     controlFlowErrorCount++;
                     waitForChange(pool, tx);
                     abort = false;
