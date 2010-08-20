@@ -8,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 public class IntrinsicLockBenchmark {
 
     private volatile boolean stop = false;
-    private int threadCount = 2;
+    private final int threadCount = 2;
     private volatile long value;
 
     @Before
@@ -53,7 +53,7 @@ public class IntrinsicLockBenchmark {
     }
 
     private class PingPongThread extends Thread {
-        private int id;
+        private final int id;
         private long count;
         private int expected;
         private final Object lock;

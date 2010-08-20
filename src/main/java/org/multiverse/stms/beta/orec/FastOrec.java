@@ -204,7 +204,7 @@ public final class FastOrec implements Orec {
     }
 
     @Override
-    public long ___departAfterUpdateAndReleaseLock(GlobalConflictCounter globalConflictCounter, BetaTransactionalObject ref) {
+    public long ___departAfterUpdateAndReleaseLock(GlobalConflictCounter globalConflictCounter, BetaTransactionalObject transactionalObject) {
         while (true) {
             long current = state.get();
 
@@ -230,7 +230,7 @@ public final class FastOrec implements Orec {
             }
 
             if (conflict) {
-                globalConflictCounter.signalConflict(ref);
+                globalConflictCounter.signalConflict(transactionalObject);
             }
 
             long next = setLocked(current, false);

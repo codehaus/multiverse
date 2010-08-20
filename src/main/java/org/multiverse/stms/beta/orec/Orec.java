@@ -80,12 +80,13 @@ public interface Orec {
      * <p/>
      * This method normally is called when a successful update is done.
      *
-     * @param globalConflictCounter
-     * @param ref
-     * @return the current surplus (so after the depart is done)
+     * @param globalConflictCounter  the GlobalConflictCounter that is called when a writeconflict is found
+     * @param transactionalObject the reference that is updated
+     * @return the current surplus (so transactionalobject the depart is done)
      * @throws IllegalStateException if the orec is not locked.
      */
-    long ___departAfterUpdateAndReleaseLock(GlobalConflictCounter globalConflictCounter, BetaTransactionalObject ref);
+    long ___departAfterUpdateAndReleaseLock(
+            GlobalConflictCounter globalConflictCounter, BetaTransactionalObject transactionalObject);
 
     /**
      *

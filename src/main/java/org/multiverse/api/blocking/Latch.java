@@ -17,6 +17,8 @@ public interface Latch {
 
     /**
      * Awaits this latch to go open.
+     *
+     * @param expectedEra the expected era. If the era is different, the await always succeeds.
      */
     void awaitUninterruptible(long expectedEra);
 
@@ -27,7 +29,9 @@ public interface Latch {
     long tryAwait(long expectedEra, long timeout, TimeUnit unit) throws InterruptedException;
 
     /**
-     * @return
+     * Checks if the Latch is open.
+     *
+     * @return true if the Latch is open, false otherwise.
      */
     boolean isOpen();
 

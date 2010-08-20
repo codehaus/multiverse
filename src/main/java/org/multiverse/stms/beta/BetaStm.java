@@ -26,6 +26,7 @@ public final class BetaStm implements Stm {
     private final BetaTransactionConfiguration config;
     private final SimpleStorage storage;
 
+    @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection"})
     private final ConcurrentHashMap<String, BetaTransactionFactory> factoryMap
             = new ConcurrentHashMap<String, BetaTransactionFactory>();
 

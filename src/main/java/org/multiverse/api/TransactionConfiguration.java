@@ -93,10 +93,10 @@ public interface TransactionConfiguration {
     PessimisticLockLevel getPessimisticLockLevel();
 
     /**
-     * Checks if dirtycheck is enabled on writes when a transaction commits. Turning of saves time,
+     * Checks if dirty check is enabled on writes when a transaction commits. Turning of saves time,
      * but forces writes that cause no change.
      *
-     * @return true of dirtycheck is enabled.
+     * @return true of dirty check is enabled.
      * @see org.multiverse.api.TransactionFactoryBuilder#setDirtyCheckEnabled(boolean)
      */
     boolean isDirtyCheck();

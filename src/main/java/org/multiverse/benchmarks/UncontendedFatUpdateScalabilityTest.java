@@ -65,8 +65,6 @@ public class UncontendedFatUpdateScalabilityTest {
             threads[k] = new UpdateThread(k, transactionCount);
         }
 
-        long startNs = System.nanoTime();
-
         for (UpdateThread thread : threads) {
             thread.start();
         }

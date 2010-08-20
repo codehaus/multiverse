@@ -9,13 +9,13 @@ import org.multiverse.api.Transaction;
 */
 public interface AtomicDoubleClosure{
 
-/**
-* Executes the closure.
-*
-* @param tx the Transaction. Depending on the TransactionPropagation level, this could
-*           be null.
-* @return the result of the closure.
-* @throws Exception
-*/
-double execute(Transaction tx)throws Exception;
+    /**
+     * Executes the closure.
+     *
+     * @param tx the Transaction. Depending on the TransactionPropagation level, this could
+     *           be null.
+     * @returns the result of the execution.
+     * @throws Exception if unable to compute a result
+     */
+     double execute(Transaction tx)throws Exception;
 }

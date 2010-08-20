@@ -13,6 +13,8 @@ public class ToolUnsafe {
 
     /**
      * Fetch the Unsafe.  Use With Caution.
+     *
+     * @return an Unsafe instance.
      */
     public static Unsafe getUnsafe() {
         // Not on bootclasspath

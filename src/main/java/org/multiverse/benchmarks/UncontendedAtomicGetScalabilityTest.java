@@ -63,8 +63,6 @@ public class UncontendedAtomicGetScalabilityTest {
             threads[k] = new ReadThread(k, transactionCount);
         }
 
-        long startNs = System.nanoTime();
-
         for (ReadThread thread : threads) {
             thread.start();
         }

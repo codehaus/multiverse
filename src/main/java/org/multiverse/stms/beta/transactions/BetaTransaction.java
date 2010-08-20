@@ -98,7 +98,7 @@ public interface BetaTransaction extends Transaction {
     void init(BetaTransactionConfiguration transactionConfig, BetaObjectPool pool);
 
     /**
-     * Registers the changelistener and aborts the transaction (so also releasing its acquired resources
+     * Registers the changeListener and aborts the transaction (so also releasing its acquired resources
      * like locks.
      */
     void registerChangeListenerAndAbort(Latch changeListener, BetaObjectPool pool);

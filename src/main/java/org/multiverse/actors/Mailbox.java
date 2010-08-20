@@ -35,6 +35,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author Peter Veentjer
  */
+@SuppressWarnings({"FieldCanBeLocal"})
 public class Mailbox<E> implements BlockingQueue<E> {
     private final int spinCount;
 

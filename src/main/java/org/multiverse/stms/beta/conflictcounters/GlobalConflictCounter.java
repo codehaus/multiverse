@@ -10,11 +10,11 @@ import java.util.concurrent.atomic.AtomicLong;
 public final class GlobalConflictCounter {
 
     private final AtomicLong[] counters;
-    private final int[] initArray;
+    private final long[] initArray;
 
     public GlobalConflictCounter(int length) {
         this.counters = new AtomicLong[length];
-        this.initArray = new int[length];
+        this.initArray = new long[length];
 
         for (int k = 0; k < length; k++) {
             counters[k] = new AtomicLong();
@@ -23,7 +23,7 @@ public final class GlobalConflictCounter {
     }
 
     public void signalConflict(BetaTransactionalObject ref) {
-        int index = getIndex(ref);
+        int index  ;
         if (counters.length == 1) {
             index = 0;
         } else {
@@ -43,7 +43,7 @@ public final class GlobalConflictCounter {
         return new LocalConflictCounter(this);
     }
 
-    protected int[] getInitArray() {
+    protected long[] getInitArray() {
         return initArray;
     }
 

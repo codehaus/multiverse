@@ -84,7 +84,7 @@ public abstract class AbstractBetaTransactionalObject
             }
 
             //JMM safety:
-            //The volatile read of active can't be reordened so that it jump in front of the volatile read of
+            //The volatile read of active can't be reordered so that it jump in front of the volatile read of
             //the orec-value when the arrive method is called.
             //An instruction is allowed to jump in front of the write of orec-value, but it is not allowed to
             //jump in front of the read or orec-value (volatile read happens before rule).
@@ -250,8 +250,8 @@ public abstract class AbstractBetaTransactionalObject
 
         //we don't need to worry about other updates since it is locked, but we do need to worry about threads
         //that register themselves for change. One of the biggest problems that can happen is that we forget to
-        //wake up a a transaction we should have woken up. Wakeing them up too too early (a spurious wakeup) is
-        //less harmfull since the transaction will be retried.
+        //wake up a a transaction we should have woken up. Waking them up too too early (a spurious wakeup) is
+        //less harmful since the transaction will be retried.
 
         //it is important that this call is done after the actual write. This is needed to give the guarantee
         //that we are going to take care of all listeners that are registered before that write.
@@ -297,12 +297,12 @@ public abstract class AbstractBetaTransactionalObject
         }
 
         //there is never a conflict on a fresh object.
-        if(committed && read==null){
+        if(!committed && read==null){
             return false;
         }
 
         //another transaction currently has the lock, and chances are that the transaction
-        //is going to update the value. We can't asume that even though the current active value
+        //is going to update the value. We can't assume that even though the current active value
         //is still the same, that the transaction isn't going to overwrite it and cause a read conflict.
         return ___isLocked();
     }
@@ -323,11 +323,7 @@ public abstract class AbstractBetaTransactionalObject
         lockOwner = newLockOwner;
 
         Tranlocal read = tranlocal.isCommitted ? tranlocal : tranlocal.read;
-        if(read != ___active){
-            return false;
-        }
-
-        return true;
+        return read == ___active;
     }
 
     @Override
@@ -353,7 +349,7 @@ public abstract class AbstractBetaTransactionalObject
         }
 
         //if it is a constructed object, we don't need to abort. Constructed objects from aborted transactions,
-        //should remain locked indefinitly since their behavior is undefined.
+        //should remain locked indefinitely since their behavior is undefined.
         if(read == null){
             return;
         }

@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public final class SensorDepot {
 
-    private ConcurrentMap<Sensor, Object> sensorMap = new ConcurrentHashMap<Sensor, Object>();
+    private final ConcurrentMap<Sensor, Object> sensorMap = new ConcurrentHashMap<Sensor, Object>();
 
     public void register(Sensor sensor) {
         if (sensor == null) {

@@ -81,7 +81,7 @@ public final class UnsafeOrec implements Orec {
     }
 
     @Override
-    public long ___departAfterUpdateAndReleaseLock(GlobalConflictCounter globalConflictCounter, BetaTransactionalObject ref) {
+    public long ___departAfterUpdateAndReleaseLock(GlobalConflictCounter globalConflictCounter, BetaTransactionalObject transactionalObject) {
         if (!isLocked) {
             throw new PanicError();
         }
@@ -100,7 +100,7 @@ public final class UnsafeOrec implements Orec {
         }
 
         if (conflict) {
-            globalConflictCounter.signalConflict(ref);
+            globalConflictCounter.signalConflict(transactionalObject);
         }
 
         readonlyCount = 0;

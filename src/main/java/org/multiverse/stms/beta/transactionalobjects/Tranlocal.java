@@ -111,11 +111,6 @@ public abstract class Tranlocal implements DurableState {
         return isPermanent;
     }
 
-    /**
-     * Returns an iterator over all DurableObject that can be reached from this State.
-     *
-     * @return
-     */
     public Iterator<DurableObject> getReferences() {
         return new LinkedList<DurableObject>().iterator();
     }

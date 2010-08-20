@@ -8,9 +8,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * java.util.concurrency library provides a {@link java.util.concurrent.ThreadFactory} interface, which is a great
  * thing, but strangely enough it doesn't provide an customizable implementation.
  * <p/>
- * If the maximum priority of the threadgroup is changed after this StandardThreadFactory is
+ * If the maximum priority of the ThreadGroup is changed after this StandardThreadFactory is
  * constructed, then this will be ignored by the StandardThreadFactory. So it could be that a
- * StandardThreadFactory has a higher priority than the threadgroup allowed. What will happen at
+ * StandardThreadFactory has a higher priority than the ThreadGroup allowed. What will happen at
  * construction?
  *
  * @author Peter Veentjer.
@@ -60,7 +60,7 @@ public final class StandardThreadFactory implements ThreadFactory {
 
     /**
      * Constructs a new StandardThreadFactory with the given priority and with a newly created
-     * ThreadGroup with the given groupname.  The created threads are not daemons.
+     * ThreadGroup with the given groupName.  The created threads are not daemons.
      *
      * @param priority  the priority of the threads this StandardThreadFactory is going to createReference.
      * @param groupName the name of the ThreadGroup (is allowed to be null).
@@ -72,7 +72,7 @@ public final class StandardThreadFactory implements ThreadFactory {
 
     /**
      * Constructs a new StandardThreadFactory with the given priority and are part of the give
-     * ThreadGroup. The created threads are not deamons.
+     * ThreadGroup. The created threads are not daemons.
      *
      * @param priority    the priority of the created threads.
      * @param threadGroup the ThreadGroup the created Threads are part of.
@@ -83,15 +83,23 @@ public final class StandardThreadFactory implements ThreadFactory {
         this(priority, threadGroup, false);
     }
 
+    /**
+     * Creates a new StandardThreadFactory with the given priority and if the threads are daemons
+     * @param priority the priority of the thread.
+     * @param daemon if the thread is a daemon.
+     */
     public StandardThreadFactory(int priority, boolean daemon) {
-        this(priority, new ThreadGroup(Thread.currentThread().getThreadGroup(), createThreadGroupName()), daemon);
+        this(priority, new ThreadGroup(
+                Thread.currentThread().getThreadGroup(),
+                createThreadGroupName()),
+                daemon);
     }
 
     /**
-     * Constructs a new StandardThreadFactory with the given priority and threadgroup.
+     * Constructs a new StandardThreadFactory with the given priority and ThreadGroup.
      *
      * @param priority    the priority of the threads this StandardThreadFactory is going to createReference.
-     * @param threadGroup the threadgroup the thread is part of
+     * @param threadGroup the ThreadGroup the thread is part of
      * @param daemon      if the thread should be a daemon.
      * @throws IllegalArgumentException if the priority is not valid.
      * @throws NullPointerException     if threadGroup is null.
@@ -128,10 +136,10 @@ public final class StandardThreadFactory implements ThreadFactory {
     }
 
     /**
-     * Returns true if this StandardThreadFactory is producing deamon threads, false
+     * Returns true if this StandardThreadFactory is producing daemon threads, false
      * otherwise.
      *
-     * @return true if this StandardThreadFactory is producing deamon threads, false
+     * @return true if this StandardThreadFactory is producing daemon threads, false
      *         otherwise.
      */
     public boolean isProducingDaemons() {
@@ -151,7 +159,7 @@ public final class StandardThreadFactory implements ThreadFactory {
      * Returns the priority of created Threads. This is a value ranging from
      * Thread.MIN_PRIORITY to Thread.MAX_PRIORITY.
      *
-     * @return the priortity of created Threads.
+     * @return the priority of created Threads.
      */
     public int getPriority() {
         return priority;
@@ -164,7 +172,7 @@ public final class StandardThreadFactory implements ThreadFactory {
      * This call is not completely threadsafe, the following scenario could happen:
      * <ol>
      * <li>thread1 call setPriority and start the checking part of this method and the check passes</li>
-     * <li>thread2 calls the threadgroup directly and lowers the priority</li>
+     * <li>thread2 calls the ThreadGroup directly and lowers the priority</li>
      * <li>thread1 sets the priority on this StandardThreadFactory</li>
      * </ol>
      * The consequence is that the priority of this StandardThreadFactory is higher than the maximum

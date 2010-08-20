@@ -172,13 +172,15 @@ public interface Transaction {
     /**
      * todo: this operation should only be allowed when it is in the new state?
      *
-     * @param transactionConfig
-     * @throws NullPointerException if transactionConfig is null.
+     * todo: instead of accepting a BetaTransactionConfiguration, TransactionConfiguration should be used.
+     *
+     * @param transactionConfiguration the TransactionConfiguration to initialize the Transaction with.
+     * @throws NullPointerException if transactionConfiguration is null.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              when the transaction isn't in the
      *                              correct state for this operation.
      */
-    void init(BetaTransactionConfiguration transactionConfig);
+    void init(BetaTransactionConfiguration transactionConfiguration);
 
     /**
      * Registers a permanent TransactionLifecycleListener.

@@ -12,7 +12,7 @@ public interface DurableState<D extends DurableObject> {
     /**
      * Returns an iterator over all DurableObject that can be reached from this State.
      *
-     * @return
+     * @return an iterator containing all durable objects.
      */
     Iterator<DurableObject> getReferences();
 

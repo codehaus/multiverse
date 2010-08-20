@@ -70,8 +70,6 @@ public class MultipleWriteScalabilityTest {
             threads[k] = new ReadThread(k, refCount);
         }
 
-        long startNs = System.nanoTime();
-
         for (ReadThread thread : threads) {
             thread.start();
         }

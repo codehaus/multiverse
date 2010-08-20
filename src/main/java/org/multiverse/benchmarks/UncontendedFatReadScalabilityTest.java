@@ -66,8 +66,6 @@ public class UncontendedFatReadScalabilityTest {
             threads[k] = new ReadThread(k, transactionCount);
         }
 
-        long startNs = System.nanoTime();
-
         for (ReadThread thread : threads) {
             thread.start();
         }
@@ -92,6 +90,7 @@ public class UncontendedFatReadScalabilityTest {
         return transactionsPerSecond;
     }
 
+    @SuppressWarnings({"UnusedAssignment"})
     class ReadThread extends Thread {
         private final long transactionCount;
         private long durationMs;

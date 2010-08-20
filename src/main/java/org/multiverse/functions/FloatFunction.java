@@ -1,7 +1,7 @@
 package org.multiverse.functions;
 
 /**
- * A {@link Function} optimized for booleans. It depends on the stm if {@link #call(float)} without boxing or
+ * A {@link Function} optimized for a float. It depends on the stm if {@link #call(float)} without boxing or
  * {@link #call(Float)} is done (with boxing).
  *
  * @author Peter Veentjer

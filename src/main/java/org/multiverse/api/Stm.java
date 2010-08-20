@@ -5,8 +5,8 @@ package org.multiverse.api;
  * {@link Transaction}. So see that for more details.
  * <p/>
  * It is important that an TransactionalObject only is used within a single stm. If it is 'shared' between different
- * stm's, isolation problems could happen. This can be caused by the fact that different stm's probably use
- * different clocks or completely different mechanisms for preventing isolation problems.
+ * stm instances, isolation problems could happen. This can be caused by the fact that different stm instances
+ * probably use different clocks or completely different mechanisms for preventing isolation problems.
  * <p/>
  * All methods on the Stm are of course thread safe.
  *

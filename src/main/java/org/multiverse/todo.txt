@@ -93,7 +93,7 @@ todo
 
 - array transaction:  support for orelse
 
-- array tree transaction: supoprt for orelse
+- array tree transaction: support for orelse
 
 - mono transaction and unstarted state
 
@@ -199,6 +199,8 @@ the task not being executed at all.
 - when all reads/writes are pessimistic, cheap conflict detection and cheap prepare.
 
 - is there a need for ref.specialization?
+
+- integration test for the object granularity functionality (since the abstractbetatransactionalobject is added)
 
 done
 

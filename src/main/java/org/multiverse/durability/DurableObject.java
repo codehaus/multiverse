@@ -13,12 +13,14 @@ public interface DurableObject {
      * todo: what does it mean when null is returned?
      * todo: can this value only be read when it is unlocked?
      *
-     * @return
+     * @return   the storage id.
      */
     String ___getStorageId();
 
     /**
-     * @param id
+     * Sets the storage id.
+     *
+     * @param id the storageId
      */
     void ___setStorageId(String id);
 

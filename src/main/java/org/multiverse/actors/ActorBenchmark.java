@@ -7,9 +7,10 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Peter Veentjer
  */
+@SuppressWarnings({"FieldCanBeLocal"})
 public class ActorBenchmark {
 
-    private long transactionCount = 200 * 1000 * 1000;
+    private final long transactionCount = 200 * 1000 * 1000;
 
     public static void main(String[] args) throws InterruptedException {
         ActorBenchmark benchmark = new ActorBenchmark();
