@@ -203,5 +203,7 @@ done
 
 - orec now has ___ as prefix for methods to prevent clashes.
 
+- all methods of the betatransactionalobject have prefix
+
 old done
 

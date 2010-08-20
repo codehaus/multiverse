@@ -5,8 +5,7 @@ import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static java.lang.String.format;
-import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
@@ -40,6 +39,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
             }
 
             tx = transactionFactory.start();
+            setThreadLocalTransaction(tx);
             boolean abort = true;
 
             try {
@@ -106,6 +106,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
             }
 
             tx = transactionFactory.start();
+            setThreadLocalTransaction(tx);
             boolean abort = true;
 
             try {
@@ -172,6 +173,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
             }
 
             tx = transactionFactory.start();
+            setThreadLocalTransaction(tx);
             boolean abort = true;
 
             try {
@@ -238,6 +240,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
             }
 
             tx = transactionFactory.start();
+            setThreadLocalTransaction(tx);
             boolean abort = true;
 
             try {
@@ -304,6 +307,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
             }
 
             tx = transactionFactory.start();
+            setThreadLocalTransaction(tx);
             boolean abort = true;
 
             try {
@@ -371,6 +375,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
             }
 
             tx = transactionFactory.start();
+            setThreadLocalTransaction(tx);
             boolean abort = true;
 
             try {

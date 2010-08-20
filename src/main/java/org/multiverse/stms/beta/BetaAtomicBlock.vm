@@ -54,6 +54,7 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
             }
 
             tx = transactionFactory.start();
+            setThreadLocalTransaction(tx);
 #transactionLogic()
 
     }

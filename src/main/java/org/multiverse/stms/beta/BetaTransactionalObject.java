@@ -13,6 +13,9 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
  * Basic interface each transactional object for the BetaStm needs to implement. When instrumentation is used,
  * this interface will be mixed in.
  *
+ * All methods in this class are prefixed with '___' to prevent nameclashes when this class is mixed into
+ * existing classes using instrumentation.
+ *
  * @author Peter Veentjer
  */
 public interface BetaTransactionalObject extends DurableObject, TransactionalObject {

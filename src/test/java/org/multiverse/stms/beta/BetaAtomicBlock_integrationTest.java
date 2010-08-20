@@ -28,6 +28,7 @@ public class BetaAtomicBlock_integrationTest {
         pool = new BetaObjectPool();
     }
 
+    
     @Test
     public void whenRead() {
         final LongRef ref = createLongRef(stm, 10);
