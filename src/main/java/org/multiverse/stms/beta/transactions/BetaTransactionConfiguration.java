@@ -2,6 +2,8 @@ package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.*;
 import org.multiverse.api.exceptions.IllegalTransactionFactoryException;
+import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 
@@ -641,6 +643,14 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.propagationLevel = propagationLevel;
         return config;
     }
+    
+    public BetaTransactionConfiguration addPermanentListener(TransactionLifecycleListener listener) {
+        if(listener == null){
+            throw new NullPointerException();
+        }
+
+        throw new TodoException();
+    }
 
     @Override
     public String toString() {
@@ -671,4 +681,5 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
                 ", speculativeConfig=" + speculativeConfig +
                 '}';
     }
+
 }

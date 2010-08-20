@@ -199,6 +199,8 @@ the task not being executed at all.
 
 - actor atomic block, doesn't look at an existing transaction. Automatically exposes the onAbort/onCommit
 
+- when all reads/writes are pessimistic, cheap conflict detection and cheap prepare.
+
 done
 
 - orec now has ___ as prefix for methods to prevent clashes.

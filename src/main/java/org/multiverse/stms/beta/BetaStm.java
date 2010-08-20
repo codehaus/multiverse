@@ -88,7 +88,7 @@ public final class BetaStm implements Stm {
 
         @Override
         public BetaTransactionFactoryBuilder addPermanentListener(TransactionLifecycleListener listener) {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return new BetaTransactionFactoryBuilderImpl(config.addPermanentListener(listener));
         }
 
         @Override
