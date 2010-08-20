@@ -6,6 +6,7 @@ import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicBooleanClosure;
+import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.*;
 import org.multiverse.stms.beta.transactionalobjects.LongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
@@ -73,14 +74,14 @@ public class PingPongStressTest {
 
         final BetaObjectPool pool = new BetaObjectPool();
 
-        new BetaTransactionTemplate(stm) {
+        stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure(){
             @Override
-            public Object execute(BetaTransaction tx) {
-                LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+            public void execute(Transaction tx) throws Exception {
+                BetaTransaction btx = (BetaTransaction)tx;
+                LongRefTranlocal write = btx.openForWrite(ref, false, pool);
                 write.value = -abs(write.value);
-                return null;
             }
-        }.execute(pool);
+        });
 
         System.out.println("Waiting for joining threads");
         joinAll(threads);

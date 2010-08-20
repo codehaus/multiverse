@@ -102,6 +102,8 @@ public interface BetaTransaction extends Transaction {
     void endEitherBranch(BetaObjectPool pool);
 
     void startOrElseBranch(BetaObjectPool pool);
+
+    void addWatch(BetaTransactionalObject object, Watch watch);    
 #foreach($ref in $transactionalObjects)
 
     ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForRead(${ref.name}${ref.typeParameter} ref, boolean lock, BetaObjectPool pool);

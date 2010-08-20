@@ -2,11 +2,14 @@ package org.multiverse.stms.beta.integrationtest.readonly;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.closures.AtomicClosure;
+import org.multiverse.api.closures.AtomicIntClosure;
+import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaTransactionFactory;
-import org.multiverse.stms.beta.BetaTransactionTemplate;
 import org.multiverse.stms.beta.transactionalobjects.IntRef;
 import org.multiverse.stms.beta.transactionalobjects.Ref;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -39,18 +42,18 @@ public class ReadonlyTest {
     }
 
     public void updateInReadonlyMethod(final IntRef ref, final int newValue) {
-        BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+         AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setReadonly(true)
-                .build();
+                .buildAtomicBlock();
 
-        new BetaTransactionTemplate(txFactory) {
+        block.execute(new AtomicVoidClosure() {
             @Override
-            public Object execute(BetaTransaction tx) throws Exception {
+            public void execute(Transaction tx) throws Exception {
+                BetaTransaction btx = (BetaTransaction) tx;
                 BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                ref.set(tx, pool, newValue);
-                return null;
+                ref.set(btx, pool, newValue);
             }
-        }.execute();
+        });
     }
 
     @Test
@@ -63,19 +66,19 @@ public class ReadonlyTest {
     }
 
     public void readonly_createNewTransactionObject(final int value) {
-        BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setReadonly(true)
-                .build();
+                .buildAtomicBlock();
 
-        new BetaTransactionTemplate(txFactory) {
+        block.execute(new AtomicVoidClosure() {
             @Override
-            public IntRef execute(BetaTransaction tx) throws Exception {
+            public void execute(Transaction tx) throws Exception {
+                BetaTransaction btx = (BetaTransaction) tx;
                 BetaObjectPool pool = getThreadLocalBetaObjectPool();
                 Ref ref = new Ref(tx);
-                tx.openForConstruction(ref, pool).value = value;
-                return null;
+                btx.openForConstruction(ref, pool).value = value;
             }
-        }.execute();
+        });
     }
 
     @Test
@@ -86,16 +89,16 @@ public class ReadonlyTest {
     }
 
     public Integer readonly_createNormalObject(final int value) {
-        BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setReadonly(true)
-                .build();
+                .buildAtomicBlock();
 
-        return new BetaTransactionTemplate<Integer>(txFactory) {
+        return block.execute(new AtomicClosure<Integer>() {
             @Override
-            public Integer execute(BetaTransaction tx) throws Exception {
+            public Integer execute(Transaction tx) throws Exception {
                 return new Integer(value);
             }
-        }.execute();
+        });
     }
 
     @Test
@@ -107,17 +110,18 @@ public class ReadonlyTest {
     }
 
     public int readInReadonlyMethod(final IntRef ref) {
-        BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setReadonly(true)
-                .build();
+                .buildAtomicBlock();
 
-        return new BetaTransactionTemplate<Integer>(txFactory) {
+        return block.execute(new AtomicIntClosure() {
             @Override
-            public Integer execute(BetaTransaction tx) throws Exception {
+            public int execute(Transaction tx) throws Exception {
+                BetaTransaction btx = (BetaTransaction) tx;
                 BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                return ref.get(tx, pool);
+                return ref.get(btx, pool);
             }
-        }.execute();
+        });
     }
 
     @Test
@@ -128,19 +132,20 @@ public class ReadonlyTest {
     }
 
     public IntRef update_createNewTransactionObject(final int value) {
-        BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
-                .build();
+                .buildAtomicBlock();
 
-        return new BetaTransactionTemplate<IntRef>(txFactory) {
+        return block.execute(new AtomicClosure<IntRef>() {
             @Override
-            public IntRef execute(BetaTransaction tx) throws Exception {
+            public IntRef execute(Transaction tx) throws Exception {
+                BetaTransaction btx = (BetaTransaction) tx;
                 BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                IntRef ref = new IntRef(tx);
-                tx.openForConstruction(ref, pool).value = value;
+                IntRef ref = new IntRef(btx);
+                btx.openForConstruction(ref, pool).value = value;
                 return ref;
             }
-        }.execute();
+        });
     }
 
     @Test
@@ -151,16 +156,16 @@ public class ReadonlyTest {
     }
 
     public Integer update_createNormalObject(final int value) {
-        BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
-                .build();
+                .buildAtomicBlock();
 
-        return new BetaTransactionTemplate<Integer>(txFactory) {
+        return block.execute(new AtomicClosure<Integer>() {
             @Override
-            public Integer execute(BetaTransaction tx) throws Exception {
+            public Integer execute(Transaction tx) throws Exception {
                 return new Integer(value);
             }
-        }.execute();
+        });
     }
 
     @Test
@@ -173,17 +178,18 @@ public class ReadonlyTest {
 
 
     public int readInUpdateMethod(final IntRef ref) {
-        BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
-                .build();
+                .buildAtomicBlock();
 
-        return new BetaTransactionTemplate<Integer>(txFactory) {
+        return block.execute(new AtomicIntClosure() {
             @Override
-            public Integer execute(BetaTransaction tx) throws Exception {
+            public int execute(Transaction tx) throws Exception {
                 BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                return ref.get(tx, pool);
+                BetaTransaction btx = (BetaTransaction) tx;
+                return ref.get(btx, pool);
             }
-        }.execute();
+        });
     }
 
     @Test
@@ -194,20 +200,19 @@ public class ReadonlyTest {
     }
 
     public void updateInUpdateMethod(final IntRef ref, final int newValue) {
-        BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
-                .build();
+                .buildAtomicBlock();
 
-
-        new BetaTransactionTemplate(stm) {
+        block.execute(new AtomicVoidClosure() {
             @Override
-            public Object execute(BetaTransaction tx) throws Exception {
+            public void execute(Transaction tx) throws Exception {
+                assertFalse(tx.getConfiguration().isReadonly());
+                BetaTransaction btx = (BetaTransaction) tx;
                 BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                ref.set(tx, pool, newValue);
-                return null;
+                ref.set(btx, pool, newValue);
             }
-        }.execute();
-
+        });
     }
 
     @Test
@@ -220,13 +225,14 @@ public class ReadonlyTest {
 
 
     public void defaultTransactionalMethod(final IntRef ref) {
-        new BetaTransactionTemplate(stm) {
+        stm.getTransactionFactoryBuilder().buildAtomicBlock().execute(new AtomicVoidClosure() {
             @Override
-            public Object execute(BetaTransaction tx) throws Exception {
+            public void execute(Transaction tx) throws Exception {
+                assertFalse(tx.getConfiguration().isReadonly());
+                BetaTransaction btx = (BetaTransaction) tx;
                 BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                ref.set(tx, pool, ref.get(tx, pool) + 1);
-                return null;
+                ref.set(btx, pool, ref.get(btx, pool) + 1);
             }
-        }.execute();
+        });
     }
 }

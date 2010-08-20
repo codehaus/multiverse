@@ -17,6 +17,7 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class MultipleReadsRetryStressTest {
     private BetaStm stm;
@@ -76,15 +77,18 @@ public class MultipleReadsRetryStressTest {
         sleepMs(30 * 1000);
         stop = true;
 
-        new BetaTransactionTemplate(stm) {
-            @Override
-            public Object execute(BetaTransaction tx) {
-                tx.openForWrite(stopRef, false, new BetaObjectPool()).value = -1;
-                return null;
-            }
-        }.execute(new BetaObjectPool());
+        stm.getTransactionFactoryBuilder().buildAtomicBlock().execute(
+                new AtomicVoidClosure() {
+                    @Override
+                    public void execute(Transaction tx) throws Exception {
+                        BetaTransaction btx = (BetaTransaction)tx;
+                        BetaObjectPool pool = getThreadLocalBetaObjectPool();
+                        btx.openForWrite(stopRef, false,pool).value = -1;
+                    }
+                }
+        );
 
-        System.out.println("Waiting for joining threads");
+         System.out.println("Waiting for joining threads");
 
         joinAll(threads);
 

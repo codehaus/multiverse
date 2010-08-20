@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.Transaction;
+import org.multiverse.api.Watch;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.ControlFlowError;
 import org.multiverse.api.exceptions.DeadTransactionException;
@@ -108,6 +109,8 @@ public interface BetaTransaction extends Transaction {
     void endEitherBranch(BetaObjectPool pool);
 
     void startOrElseBranch(BetaObjectPool pool);
+
+    void addWatch(BetaTransactionalObject object, Watch watch);    
 
     <E> RefTranlocal<E> openForRead(Ref<E> ref, boolean lock, BetaObjectPool pool);
 

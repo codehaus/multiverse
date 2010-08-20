@@ -2,7 +2,7 @@ package org.multiverse.stms.beta.transactions;
 
 import java.util.*;
 
-import org.multiverse.api.TransactionStatus;
+import org.multiverse.api.*;
 import org.multiverse.api.blocking.*;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.lifecycle.*;
@@ -509,6 +509,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         return false;
+    }
+
+    // ============================= addWatch ===================================
+
+    public void addWatch(BetaTransactionalObject object, Watch watch){
+        throw new TodoException();
     }
 
     // ============================== abort ===================================================

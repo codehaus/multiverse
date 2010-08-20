@@ -3,8 +3,8 @@ package org.multiverse.api.blocking;
 import org.multiverse.stms.beta.BetaObjectPool;
 
 /**
- * A Listeners object contains all the Latches of blockingAllowed transactions that listen to a write on a transactional
- * object. Essentially it is a single linked list.
+ * A Listeners object contains all the Latches of blockingAllowed transactions that listen to a write on a
+ * transactional object. Essentially it is a single linked list.
  * <p/>
  * This is an 'immutable' class. As long as it is registered to a transactional object, it should not be mutated.
  * But as soon as it is removed as listener, only a single thread has access to this Listeners object. This means

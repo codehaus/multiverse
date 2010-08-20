@@ -1,5 +1,6 @@
 package org.multiverse.stms.beta.transactions;
 
+import org.multiverse.api.Watch;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.blocking.Listeners;
 import org.multiverse.api.exceptions.*;
@@ -879,6 +880,13 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
     public Tranlocal get(BetaTransactionalObject object){
         return attached == null || attached.owner!= object? null: attached;
     }
+
+    // ============================= addWatch ===================================
+
+    public void addWatch(BetaTransactionalObject object, Watch watch){
+        throw new TodoException();
+    }
+
 
     // ======================= abort =======================================
 

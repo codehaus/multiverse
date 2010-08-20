@@ -107,8 +107,6 @@ todo
 
 - mono transaction can do a cheap read of the current tranlocal already is permanent.
 
-- need to think more about the ref & retry especially reading/writing safety
-
 - transaction completely optimized for ref.
 
 - integratie into the main multiverse branch
@@ -185,8 +183,6 @@ globalconflict counter.
 
 - testing: atomic block & propagation and committed/aborted/prepared/new transaction on threadlocal
 
-- increment test with commuting increments.
-
 - lean mono should not upgrade to array when untracked read is done, but should just attach it to the session.
 
 - speculative + register doesn't combine because it can lead to transaction not accepting the task and therefor
@@ -210,8 +206,11 @@ the task not being executed at all.
 
 - pooling for generic transactional object tranlocals.
 
-
 done
+
+- added empty add watch signature to transaction.
+
+- increment test with commuting increments.
 
 - old contructors need to be removed from ref
 
@@ -237,6 +236,9 @@ done
 - orec now has ___ as prefix for methods to prevent clashes.
 
 - all methods of the betatransactionalobject have prefix
+
+- need to think more about the ref & retry especially reading/writing safety
+
 
 old done
 
