@@ -567,6 +567,11 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                 }
 
                 @Override
+                public TransactionConfiguration getTransactionConfiguration() {
+                    return ro_nort;
+                }
+
+                @Override
                 public TransactionFactoryBuilder getTransactionFactoryBuilder() {
                     return AlphaTransactionFactoryBuilder.this;
                 }
@@ -643,6 +648,8 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
 
         private TransactionFactory<AlphaTransaction> createNonSpeculativeReadonlyTxFactory() {
             return new TransactionFactory<AlphaTransaction>() {
+
+
                 ReadonlyConfiguration config =
                         new ReadonlyConfiguration(
                                 clock, backoffPolicy, familyName, speculativeConfig, maxRetries,
@@ -652,6 +659,11 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                 @Override
                 public Stm getStm() {
                     return AlphaStm.this;
+                }
+
+                @Override
+                public TransactionConfiguration getTransactionConfiguration() {
+                    return config;
                 }
 
                 @Override
@@ -695,6 +707,11 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
                                 optimizeConflictDetectionEnabled, true, quickReleaseEnabled,
                                 explicitRetryAllowed, timeoutNs, maxReadSpinCount, this,
                                 traceLevel, syncToClock,propagationLevel);
+
+                @Override
+                public TransactionConfiguration getTransactionConfiguration() {
+                    return config;
+                }
 
                 @Override
                 public Stm getStm() {

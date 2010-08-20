@@ -7,6 +7,7 @@ import org.multiverse.api.exceptions.*;
 import org.multiverse.api.latches.CheapLatch;
 import org.multiverse.api.latches.Latch;
 import org.multiverse.api.latches.StandardLatch;
+import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 
 import static java.lang.String.format;
@@ -194,24 +195,73 @@ public final class TransactionBoilerplate implements MultiverseConstants {
             throw new NullPointerException("callable can't be null");
         }
 
+
         Transaction tx = threadLocalAware ? getThreadLocalTransaction() : null;
 
-        if (isDead(tx)) {
-            if (sameTransactionFactory(tx)) {
-                tx.reset();
-                tx.setAttempt(0);
-                tx.setRemainingTimeoutNs(tx.getConfiguration().getTimeoutNs());
-            } else {
-                tx = transactionFactory.create();
-            }
+        switch (transactionFactory.getTransactionConfiguration().getPropagationLevel()) {
+            case Requires:
+                if (!isDead(tx)) {
+                    return callable.call(tx);
+                } else {
+                    if (sameTransactionFactory(tx)) {
+                        tx.reset();
+                        tx.setAttempt(0);
+                        tx.setRemainingTimeoutNs(tx.getConfiguration().getTimeoutNs());
+                    } else {
+                        tx = transactionFactory.create();
+                    }
 
-            if (threadLocalAware) {
-                setThreadLocalTransaction(tx);
-            }
+                    if (threadLocalAware) {
+                        setThreadLocalTransaction(tx);
+                    }
 
-            return executeWithTransaction(tx, callable);
-        } else {
-            return callable.call(tx);
+                    return executeWithTransaction(tx, callable);
+                }
+            case Mandatory:
+                if (isDead(tx)) {
+                    throw new NoTransactionFoundException();
+                }
+
+                if (sameTransactionFactory(tx)) {
+                    tx.reset();
+                    tx.setAttempt(0);
+                    tx.setRemainingTimeoutNs(tx.getConfiguration().getTimeoutNs());
+                } else {
+                    tx = transactionFactory.create();
+                }
+
+                if (threadLocalAware) {
+                    setThreadLocalTransaction(tx);
+                }
+
+                return executeWithTransaction(tx, callable);
+            case RequiresNew:
+                Transaction suspendedTx = tx;
+                try {
+                    tx = transactionFactory.create();
+                    if (threadLocalAware) {
+                        setThreadLocalTransaction(tx);
+                    }
+
+                    return executeWithTransaction(tx, callable);
+                } finally {
+                    if (threadLocalAware) {
+                        setThreadLocalTransaction(suspendedTx);
+                    }
+                }                
+            case Never:
+                if (!isDead(tx)) {
+                    throw new NoTransactionAllowedException();
+                }
+                return callable.call(null);
+            case Supports:
+                if (isDead(tx)) {
+                    return callable.call(null);
+                } else {
+                    return callable.call(tx);
+                }
+            default:
+                throw new IllegalStateException();
         }
     }
 
@@ -222,9 +272,8 @@ public final class TransactionBoilerplate implements MultiverseConstants {
     private <E> E executeWithTransaction(Transaction tx, TransactionalCallable<E> callable) throws Exception {
         Throwable lastFailureCause = null;
 
-        if (listener == null) {
-            //todo
-            //listener.notify();
+        if (listener != null) {
+            listener.notify(tx, TransactionLifecycleEvent.PostStart);
         }
 
         try {

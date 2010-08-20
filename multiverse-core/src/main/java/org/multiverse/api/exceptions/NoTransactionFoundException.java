@@ -5,7 +5,7 @@ package org.multiverse.api.exceptions;
  *
  * @author Peter Veentjer
  */
-public class NoTransactionFoundException extends IllegalStateException {
+public class NoTransactionFoundException extends PropagationException {
 
     private static final long serialVersionUID = 0;
 

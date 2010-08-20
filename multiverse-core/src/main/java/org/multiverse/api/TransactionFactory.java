@@ -11,6 +11,8 @@ package org.multiverse.api;
  */
 public interface TransactionFactory<T extends Transaction> {
 
+    TransactionConfiguration getTransactionConfiguration();
+
     /**
      * Returns the TransactionFactoryBuilder that created this TransactionFactory.
      *
