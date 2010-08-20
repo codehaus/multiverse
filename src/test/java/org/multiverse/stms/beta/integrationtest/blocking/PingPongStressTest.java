@@ -7,8 +7,8 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicBooleanClosure;
 import org.multiverse.stms.beta.*;
-import org.multiverse.stms.beta.refs.LongRef;
-import org.multiverse.stms.beta.refs.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static java.lang.Math.abs;

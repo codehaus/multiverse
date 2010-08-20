@@ -5,7 +5,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.refs.*;
+import org.multiverse.stms.beta.transactionalobjects.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.stms.beta.BetaStmUtils.*;

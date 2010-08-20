@@ -14,12 +14,12 @@ public class Account implements DurableObject {
     private String storageId = UUID.randomUUID().toString();
 
     @Override
-    public String getStorageId() {
+    public String ___getStorageId() {
         return storageId;
     }
 
     @Override
-    public void setStorageId(String id) {
+    public void ___setStorageId(String id) {
         this.storageId = id;
     }
 
@@ -29,12 +29,12 @@ public class Account implements DurableObject {
     }
 
     @Override
-    public void markAsDurable() {
+    public void ___markAsDurable() {
         throw new TodoException();
     }
 
     @Override
-    public boolean isDurable() {
+    public boolean ___isDurable() {
         throw new TodoException();
     }
 }

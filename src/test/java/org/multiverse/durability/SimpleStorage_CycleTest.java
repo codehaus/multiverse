@@ -29,7 +29,7 @@ public class SimpleStorage_CycleTest {
         unitOfWrite.addChange(nodeState);
         unitOfWrite.commit();
 
-        //NodeState state = (NodeState) storage.loadState(node.getStorageId());
+        //NodeState state = (NodeState) storage.loadState(node.___getStorageId());
         //assertNotNull(state);
         //assertSame(node, state.getOwner());
         //assertNull(state.ref);
@@ -47,7 +47,7 @@ public class SimpleStorage_CycleTest {
         unitOfWrite.addChange(nodeState);
         unitOfWrite.commit();
 
-        //NodeState found = (NodeState) storage.loadState(node.getStorageId());
+        //NodeState found = (NodeState) storage.loadState(node.___getStorageId());
         //assertNotNull(found);
         //assertSame(node, found.getOwner());
         //assertSame(node, found.ref);
@@ -70,12 +70,12 @@ public class SimpleStorage_CycleTest {
         unitOfWrite.addRoot(root);
         unitOfWrite.commit();
 
-        //NodeState foundRootState = (NodeState)storage.loadState(root.getStorageId());
+        //NodeState foundRootState = (NodeState)storage.loadState(root.___getStorageId());
         //assertNotNull(foundRootState);
         // assertSame(root, foundRootState.getOwner());
         //  assertSame(child, rootState.ref);
 
-        //  NodeState foundChildState = (NodeState)storage.loadState(child.getStorageId());
+        //  NodeState foundChildState = (NodeState)storage.loadState(child.___getStorageId());
         //  assertNotNull(foundChildState);
         //  assertSame(child, foundChildState.getOwner());
         //  assertSame(root, foundChildState.ref);
@@ -86,7 +86,7 @@ public class SimpleStorage_CycleTest {
         @Override
         public byte[] serialize(NodeState state) {
             Map<String, String> map = new HashMap<String, String>();
-            map.put("ref", state.ref == null ? "null" : state.ref.getStorageId());
+            map.put("ref", state.ref == null ? "null" : state.ref.___getStorageId());
             return SerializeUtils.serialize(map);
         }
 
@@ -117,7 +117,7 @@ public class SimpleStorage_CycleTest {
         @Override
         public Node deserializeObject(String id, byte[] content, BetaTransaction transaction) {
             Node node = new Node();
-            node.setStorageId(id);
+            node.___setStorageId(id);
             return node;
         }
 
@@ -128,22 +128,22 @@ public class SimpleStorage_CycleTest {
         public String storageId = UUID.randomUUID().toString();
 
         @Override
-        public String getStorageId() {
+        public String ___getStorageId() {
             return storageId;
         }
 
         @Override
-        public void setStorageId(String id) {
+        public void ___setStorageId(String id) {
             this.storageId = id;
         }
 
         @Override
-        public void markAsDurable() {
+        public void ___markAsDurable() {
             throw new TodoException();
         }
 
         @Override
-        public boolean isDurable() {
+        public boolean ___isDurable() {
             throw new TodoException();
         }
     }

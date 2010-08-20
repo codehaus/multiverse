@@ -1,15 +1,12 @@
 package org.multiverse.stms.beta.transactions;
 
-
-import org.multiverse.api.Transaction;
-import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.*;
+import org.multiverse.api.blocking.*;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.lifecycle.*;
 import org.multiverse.functions.*;
-import org.multiverse.stms.beta.BetaTransactionalObject;
-import org.multiverse.stms.beta.BetaObjectPool;
-import org.multiverse.stms.beta.refs.Tranlocal;
-import org.multiverse.stms.beta.refs.*;
+import org.multiverse.stms.beta.*;
+import org.multiverse.stms.beta.transactionalobjects.*;
 
 import java.util.*;
 
@@ -105,7 +102,7 @@ public interface BetaTransaction extends Transaction {
     void endEitherBranch(BetaObjectPool pool);
 
     void startOrElseBranch(BetaObjectPool pool);
-#foreach($ref in $refs)
+#foreach($ref in $transactionalObjects)
 
     ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForRead(${ref.name}${ref.typeParameter} ref, boolean lock, BetaObjectPool pool);
 

@@ -59,8 +59,8 @@ public class IntegrationTest {
     //    DummyEntity write = new DummyEntity("foo",new byte[]{1,2,3});
     //    //storage.persist(write);
     //
-    //    DummyEntity read = (DummyEntity) storage.loadEntity(write.getStorageId());
-    //    assertEquals(write.getStorageId(),read.getStorageId());
+    //    DummyEntity read = (DummyEntity) storage.loadEntity(write.___getStorageId());
+    //    assertEquals(write.___getStorageId(),read.___getStorageId());
     //    assertEqualByteArray(write.toBytes(), read.toBytes());
     //}
 }

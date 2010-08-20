@@ -7,8 +7,8 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicLongClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.TooManyRetriesException;
-import org.multiverse.stms.beta.refs.LongRef;
-import org.multiverse.stms.beta.refs.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
@@ -103,6 +103,6 @@ public class BetaAtomicBlock_integrationTest {
             }
         });
 
-        assertEquals(10, ref.active.value);
+        assertEquals(10, ref.___active.value);
     }
 }

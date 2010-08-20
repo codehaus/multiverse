@@ -2,8 +2,8 @@ package org.multiverse.stms.beta.orec;
 
 import org.multiverse.api.exceptions.PanicError;
 import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.stms.beta.BetaTransactionalObject;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
+import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
 
 /**
  * A thread unsafe snzi, useful for figuring out the amount of overhead caused by synchronization

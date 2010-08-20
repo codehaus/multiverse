@@ -1,6 +1,6 @@
 package org.multiverse.stms.beta.conflictcounters;
 
-import org.multiverse.stms.beta.BetaTransactionalObject;
+import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
 
 import java.util.concurrent.atomic.AtomicLong;
 

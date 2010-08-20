@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.conflictcounters;
 
 import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.stms.beta.BetaTransactionalObject;
+import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
 
 /**
  * @author Peter Veentjer

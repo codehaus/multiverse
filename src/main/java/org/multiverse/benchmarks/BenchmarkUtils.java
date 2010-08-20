@@ -1,9 +1,7 @@
 package org.multiverse.benchmarks;
 
 import org.multiverse.stms.beta.BetaObjectPool;
-import org.multiverse.stms.beta.refs.IntRef;
-import org.multiverse.stms.beta.refs.LongRef;
-import org.multiverse.stms.beta.refs.Ref;
+import org.multiverse.stms.beta.transactionalobjects.Ref;
 
 import java.text.NumberFormat;
 import java.util.*;
@@ -13,10 +11,6 @@ public class BenchmarkUtils {
     public static void loadOtherTransactionalObjectClasses() {
         Ref ref = new Ref();
         ref.___openForConstruction(new BetaObjectPool());
-
-        //todo: better loading.. stress transaction
-        LongRef longRef = new LongRef(0);
-        IntRef floatRef = new IntRef(0);
     }
 
 

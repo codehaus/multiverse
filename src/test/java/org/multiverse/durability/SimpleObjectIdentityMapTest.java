@@ -34,7 +34,7 @@ public class SimpleObjectIdentityMapTest {
         map.putIfAbsent(account1);
         map.putIfAbsent(account2);
 
-        DurableObject found = map.get(account1.getStorageId());
+        DurableObject found = map.get(account1.___getStorageId());
 
         assertSame(found, account1);
     }
@@ -51,7 +51,7 @@ public class SimpleObjectIdentityMapTest {
         DurableObject result = map.putIfAbsent(account);
 
         assertNull(result);
-        DurableObject found = map.get(account.getStorageId());
+        DurableObject found = map.get(account.___getStorageId());
         assertSame(found, account);
     }
 
@@ -59,12 +59,12 @@ public class SimpleObjectIdentityMapTest {
     public void put_whenAlreadyPut() {
         DurableObject account1 = new Account();
         DurableObject account2 = new Account();
-        account2.setStorageId(account1.getStorageId());
+        account2.___setStorageId(account1.___getStorageId());
 
         map.putIfAbsent(account1);
         DurableObject result = map.putIfAbsent(account2);
 
         assertSame(account1, result);
-        assertSame(account1, map.get(account2.getStorageId()));
+        assertSame(account1, map.get(account2.___getStorageId()));
     }
 }

@@ -1,6 +1,5 @@
 package org.multiverse.stms.beta.transactions;
 
-
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.ControlFlowError;
@@ -10,8 +9,7 @@ import org.multiverse.functions.Function;
 import org.multiverse.functions.IntFunction;
 import org.multiverse.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
-import org.multiverse.stms.beta.BetaTransactionalObject;
-import org.multiverse.stms.beta.refs.*;
+import org.multiverse.stms.beta.transactionalobjects.*;
 
 import java.util.ArrayList;
 

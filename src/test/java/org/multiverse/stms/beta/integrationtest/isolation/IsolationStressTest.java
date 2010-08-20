@@ -10,8 +10,8 @@ import org.multiverse.benchmarks.BenchmarkUtils;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
-import org.multiverse.stms.beta.refs.LongRef;
-import org.multiverse.stms.beta.refs.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static java.lang.System.currentTimeMillis;
@@ -74,7 +74,7 @@ public class IsolationStressTest {
 
         double performance = BenchmarkUtils.perSecond(txCount, durationMs, threadCount);
         System.out.printf("Performance %s transactions/second\n", BenchmarkUtils.format(performance));
-        assertEquals(threadCount * txCount, ref.active.value);
+        assertEquals(threadCount * txCount, ref.___active.value);
         System.out.println("ref.orec: " + ref.toOrecString());
     }
 

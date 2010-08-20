@@ -2,7 +2,7 @@ package org.multiverse.benchmarks;
 
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
-import org.multiverse.stms.beta.refs.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.LongRef;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;

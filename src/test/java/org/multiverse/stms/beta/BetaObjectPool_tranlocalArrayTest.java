@@ -2,8 +2,8 @@ package org.multiverse.stms.beta;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.stms.beta.refs.LongRefTranlocal;
-import org.multiverse.stms.beta.refs.Tranlocal;
+import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;

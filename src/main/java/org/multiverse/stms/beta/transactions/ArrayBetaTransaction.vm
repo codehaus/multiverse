@@ -5,13 +5,10 @@ import org.multiverse.api.blocking.*;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.lifecycle.*;
 import org.multiverse.functions.*;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.refs.*;
-import org.multiverse.stms.beta.BetaTransactionalObject;
-import org.multiverse.stms.beta.BetaObjectPool;
-import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
-import org.multiverse.stms.beta.conflictcounters.LocalConflictCounter;
-import org.multiverse.stms.beta.refs.Tranlocal;
+import org.multiverse.stms.beta.*;
+import org.multiverse.stms.beta.transactionalobjects.*;
+import org.multiverse.stms.beta.conflictcounters.*;
+
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.*;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -69,7 +66,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             }
         }
     }
-#foreach($ref in $refs)
+#foreach($ref in $transactionalObjects)
 
     @Override
     public ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForRead(
@@ -424,7 +421,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end  ## end transaction.lean
     }
 
-#end ##for loop of refs.
+#end ##for loop of transactionalobjects.
 
     @Override
     public Tranlocal get(BetaTransactionalObject owner){

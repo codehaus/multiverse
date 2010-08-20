@@ -9,7 +9,7 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.refs.IntRef;
+import org.multiverse.stms.beta.transactionalobjects.IntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertEquals;

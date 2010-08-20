@@ -109,9 +109,6 @@ todo
 
 - need to think more about the ref & retry especially reading/writing safety
 
-- generate an abstract betatransactionalobject that can be used as mixin and for creating hand written
- transactional datastructures.
-
 - transaction completely optimized for ref.
 
 - integratie into the main multiverse branch
@@ -201,7 +198,30 @@ the task not being executed at all.
 
 - when all reads/writes are pessimistic, cheap conflict detection and cheap prepare.
 
+- is there a need for ref.specialization?
+
 done
+
+- old contructors need to be removed from ref
+
+- org.multiverse.stms.beta.transactionalobjects -> org.multiverse.stms.beta.transactionalobjects
+
+- refs package now contains all tranlocals,refs, betatransactionalobjects.
+
+- ref in groovy script needs to be renamed to betatransactionalobject
+
+- DurableObject needs to have ___ methods.
+
+- generate an abstract betatransactionalobject that can be used as mixin and for creating hand written
+ transactional datastructures.
+
+- active needs to have ___ as prefix in ref
+
+- listeners needs to have ___ as prefix in ref
+
+- AbstractBetaTransactionalObject needs to have a locked instance.
+
+- identityHashCode needs to have ___ prefix
 
 - orec now has ___ as prefix for methods to prevent clashes.
 

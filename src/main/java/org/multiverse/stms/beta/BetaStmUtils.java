@@ -1,6 +1,6 @@
 package org.multiverse.stms.beta;
 
-import org.multiverse.stms.beta.refs.*;
+import org.multiverse.stms.beta.transactionalobjects.*;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 

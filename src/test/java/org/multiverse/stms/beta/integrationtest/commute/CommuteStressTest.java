@@ -11,7 +11,7 @@ import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.FatArrayTreeBetaTransactionFactory;
 import org.multiverse.stms.beta.LeanBetaAtomicBlock;
-import org.multiverse.stms.beta.refs.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.LongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 

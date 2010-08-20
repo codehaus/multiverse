@@ -15,19 +15,19 @@ public interface DurableObject {
      *
      * @return
      */
-    String getStorageId();
+    String ___getStorageId();
 
     /**
      * @param id
      */
-    void setStorageId(String id);
+    void ___setStorageId(String id);
 
     /**
      * Marks the current object as durable. It can only be marked when the object is locked,
      * so it can't happen that it is going to be marked as durable if already locked by another
      * transaction.
      */
-    void markAsDurable();
+    void ___markAsDurable();
 
     /**
      * Checks if this DurableObject is durable. This call can only be made when the object already
@@ -35,5 +35,5 @@ public interface DurableObject {
      *
      * @return true if it is durable, false otherwise.
      */
-    boolean isDurable();
+    boolean ___isDurable();
 }

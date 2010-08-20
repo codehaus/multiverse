@@ -2,7 +2,7 @@ package org.multiverse.durability;
 
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaTransactionalObject;
+import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import java.io.File;
@@ -107,7 +107,7 @@ public class SimpleStorage implements Storage {
 
     private void loadGraph(DurableState root, Set<DurableState> result, Map<String, DurableState> overrides) {
         DurableObject owner = root.getOwner();
-        String ownerStorageId = owner.getStorageId();
+        String ownerStorageId = owner.___getStorageId();
 
         if (overrides.containsKey(ownerStorageId)) {
             root = overrides.get(ownerStorageId);
@@ -121,7 +121,7 @@ public class SimpleStorage implements Storage {
 
         for (Iterator<DurableObject> it = root.getReferences(); it.hasNext();) {
             DurableObject dependency = it.next();
-            String storageId = dependency.getStorageId();
+            String storageId = dependency.___getStorageId();
 
             DurableState state;
             if (overrides.containsKey(storageId)) {
@@ -138,7 +138,7 @@ public class SimpleStorage implements Storage {
         Map<String, DurableState> overrides = new HashMap<String, DurableState>();
 
         for (DurableState change : unitOfWork.changes.values()) {
-            overrides.put(change.getOwner().getStorageId(), change);
+            overrides.put(change.getOwner().___getStorageId(), change);
         }
 
         System.out.println("overrides:" + overrides);
@@ -177,7 +177,7 @@ public class SimpleStorage implements Storage {
 
         objectIdentityMap.putIfAbsent(entity);
 
-        File file = new File(dir, entity.getStorageId());
+        File file = new File(dir, entity.___getStorageId());
 
         if (!file.exists()) {
             try {
@@ -269,7 +269,7 @@ public class SimpleStorage implements Storage {
     }
 
     private void populate(DurableState state) {
-        String id = state.getOwner().getStorageId();
+        String id = state.getOwner().___getStorageId();
         File file = new File(dir, id);
 
         if (!file.exists()) {
@@ -383,7 +383,7 @@ public class SimpleStorage implements Storage {
             //it is not in memory and it isn't isn't on disk. So lets create it.
             entity = factory.create();
             objectIdentityMap.putIfAbsent(entity);
-            entity.setStorageId(id);
+            entity.___setStorageId(id);
             //return entity;
             throw new TodoException();
         }
@@ -440,7 +440,7 @@ public class SimpleStorage implements Storage {
             switch (state) {
                 case Active:
                     for (DurableObject root : roots) {
-                        rootIds.add(root.getStorageId());
+                        rootIds.add(root.___getStorageId());
                         StorageUtils.saveLines(rootsFile, new LinkedList<String>(rootIds));
                     }
 

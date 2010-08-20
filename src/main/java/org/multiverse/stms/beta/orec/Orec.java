@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.orec;
 
-import org.multiverse.stms.beta.BetaTransactionalObject;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
+import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
 
 /**
  * The problem with the traditional approach of this Orec, is that even if the transaction only

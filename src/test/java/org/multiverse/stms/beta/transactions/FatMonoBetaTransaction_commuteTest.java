@@ -10,8 +10,8 @@ import org.multiverse.functions.IncLongFunction;
 import org.multiverse.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.refs.LongRef;
-import org.multiverse.stms.beta.refs.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;

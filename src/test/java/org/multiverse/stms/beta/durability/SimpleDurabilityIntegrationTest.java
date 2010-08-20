@@ -10,8 +10,8 @@ import org.multiverse.durability.UnitOfWrite;
 import org.multiverse.durability.account.SerializeUtils;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.refs.LongRef;
-import org.multiverse.stms.beta.refs.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
@@ -40,13 +40,13 @@ public class SimpleDurabilityIntegrationTest {
         LongRef ref = createLongRef(stm, 100);
 
         UnitOfWrite unitOfWrite = storage.startUnitOfWrite();
-        unitOfWrite.addChange(ref.active);
+        unitOfWrite.addChange(ref.___active);
         unitOfWrite.addRoot(ref);
         unitOfWrite.commit();
 
         storage.clearEntities();
 
-        LongRef loaded = (LongRef) storage.loadDurableObject(ref.getStorageId());
+        LongRef loaded = (LongRef) storage.loadDurableObject(ref.___getStorageId());
         assertEquals(100, loaded.___unsafeLoad().value);
     }
 
@@ -56,23 +56,23 @@ public class SimpleDurabilityIntegrationTest {
         LongRef ref = createLongRef(stm, 100);
 
         UnitOfWrite write1 = storage.startUnitOfWrite();
-        write1.addChange(ref.active);
+        write1.addChange(ref.___active);
         write1.addRoot(ref);
         write1.commit();
 
         storage.clearEntities();
 
-        LongRef loaded = (LongRef) storage.loadDurableObject(ref.getStorageId());
+        LongRef loaded = (LongRef) storage.loadDurableObject(ref.___getStorageId());
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.openForWrite(loaded, false, pool).value++;
         tx.commit();
 
         UnitOfWrite write2 = storage.startUnitOfWrite();
-        write2.addChange(loaded.active);
+        write2.addChange(loaded.___active);
         write2.commit();
 
-        LongRef loaded2 = (LongRef) storage.loadDurableObject(loaded.getStorageId());
+        LongRef loaded2 = (LongRef) storage.loadDurableObject(loaded.___getStorageId());
         assertEquals(101, loaded2.___unsafeLoad().value);
     }
 
@@ -83,17 +83,17 @@ public class SimpleDurabilityIntegrationTest {
 
 
         UnitOfWrite unitOfWrite = storage.startUnitOfWrite();
-        unitOfWrite.addChange(ref1.active);
-        unitOfWrite.addChange(ref2.active);
+        unitOfWrite.addChange(ref1.___active);
+        unitOfWrite.addChange(ref2.___active);
         unitOfWrite.addRoot(ref1);
         unitOfWrite.addRoot(ref2);
         unitOfWrite.commit();
 
         storage.clearEntities();
 
-        LongRef loaded1 = (LongRef) storage.loadDurableObject(ref1.getStorageId());
+        LongRef loaded1 = (LongRef) storage.loadDurableObject(ref1.___getStorageId());
         assertEquals(100, loaded1.___unsafeLoad().value);
-        LongRef loaded2 = (LongRef) storage.loadDurableObject(ref2.getStorageId());
+        LongRef loaded2 = (LongRef) storage.loadDurableObject(ref2.___getStorageId());
         assertEquals(200, loaded2.___unsafeLoad().value);
     }
 
@@ -121,7 +121,7 @@ public class SimpleDurabilityIntegrationTest {
         @Override
         public LongRef deserializeObject(String id, byte[] content, BetaTransaction transaction) {
             LongRef ref = new LongRef(transaction);
-            ref.setStorageId(id);
+            ref.___setStorageId(id);
             return ref;
         }
     }

@@ -3,7 +3,7 @@ package org.multiverse.stms.beta.conflictcounters;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.refs.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.LongRef;
 
 import static org.multiverse.TestUtils.assertNotEquals;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;

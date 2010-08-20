@@ -9,10 +9,10 @@ import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.refs.IntRef;
-import org.multiverse.stms.beta.refs.IntRefTranlocal;
-import org.multiverse.stms.beta.refs.Ref;
-import org.multiverse.stms.beta.refs.RefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.IntRef;
+import org.multiverse.stms.beta.transactionalobjects.IntRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.Ref;
+import org.multiverse.stms.beta.transactionalobjects.RefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import java.util.LinkedList;

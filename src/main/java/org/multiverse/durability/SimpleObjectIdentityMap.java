@@ -28,7 +28,7 @@ public class SimpleObjectIdentityMap implements ObjectIdentityMap {
             throw new NullPointerException();
         }
 
-        String id = object.getStorageId();
+        String id = object.___getStorageId();
         return entities.putIfAbsent(id, object);
     }
 }

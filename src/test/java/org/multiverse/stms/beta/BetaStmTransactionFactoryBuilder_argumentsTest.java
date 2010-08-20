@@ -32,22 +32,22 @@ public class BetaStmTransactionFactoryBuilder_argumentsTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void whenNegativeSpinCount_thenIllegalArgumentException(){
+    public void whenNegativeSpinCount_thenIllegalArgumentException() {
         stm.getTransactionFactoryBuilder().setSpinCount(-1);
     }
 
     @Test(expected = NullPointerException.class)
-    public void whenNullTraceLevel_thenIllegalArgumentException(){
+    public void whenNullTraceLevel_thenIllegalArgumentException() {
         stm.getTransactionFactoryBuilder().setTraceLevel(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void whenNegativeTimeout_thenIllegalArgumentException(){
-         stm.getTransactionFactoryBuilder().setTimeoutNs(-1);
+    public void whenNegativeTimeout_thenIllegalArgumentException() {
+        stm.getTransactionFactoryBuilder().setTimeoutNs(-1);
     }
 
     @Test(expected = NullPointerException.class)
-    public void whenAddNullPermanentListener_thenNullPointerException(){
-      stm.getTransactionFactoryBuilder().addPermanentListener(null);
+    public void whenAddNullPermanentListener_thenNullPointerException() {
+        stm.getTransactionFactoryBuilder().addPermanentListener(null);
     }
 }

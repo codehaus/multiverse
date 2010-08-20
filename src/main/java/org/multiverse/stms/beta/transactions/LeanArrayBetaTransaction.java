@@ -8,9 +8,8 @@ import org.multiverse.functions.IntFunction;
 import org.multiverse.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaTransactionalObject;
 import org.multiverse.stms.beta.conflictcounters.LocalConflictCounter;
-import org.multiverse.stms.beta.refs.*;
+import org.multiverse.stms.beta.transactionalobjects.*;
 
 import java.util.concurrent.atomic.AtomicLong;
 

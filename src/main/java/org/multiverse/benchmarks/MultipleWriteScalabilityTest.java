@@ -2,8 +2,8 @@ package org.multiverse.benchmarks;
 
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.refs.LongRef;
-import org.multiverse.stms.beta.refs.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
 
@@ -36,7 +36,7 @@ public class MultipleWriteScalabilityTest {
 
         System.out.printf("Multiverse> Unshared update transaction benchmark\n");
         System.out.printf("Multiverse> Running with the following processor range %s\n", Arrays.toString(processors));
-        System.out.printf("Multiverse> Running with %s refs per transaction\n", refCount);
+        System.out.printf("Multiverse> Running with %s transactionalobjects per transaction\n", refCount);
         System.out.printf("Multiverse> %s Transactions per thread\n", format(transactionCount));
         Result[] result = new Result[processors.length];
 

@@ -14,7 +14,7 @@ public class Customer implements DurableObject {
     public CustomerTranlocal active;
 
     @Override
-    public String getStorageId() {
+    public String ___getStorageId() {
         if (storageId == null) {
             storageId = UUID.randomUUID().toString();
         }
@@ -23,17 +23,17 @@ public class Customer implements DurableObject {
     }
 
     @Override
-    public void setStorageId(String id) {
+    public void ___setStorageId(String id) {
         this.storageId = id;
     }
 
     @Override
-    public void markAsDurable() {
+    public void ___markAsDurable() {
         throw new TodoException();
     }
 
     @Override
-    public boolean isDurable() {
+    public boolean ___isDurable() {
         throw new TodoException();
     }
 }

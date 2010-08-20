@@ -1,8 +1,8 @@
 package org.multiverse.stms.beta.orec;
 
 import org.multiverse.api.exceptions.PanicError;
-import org.multiverse.stms.beta.BetaTransactionalObject;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
+import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
 
 import java.util.concurrent.atomic.AtomicLong;
 

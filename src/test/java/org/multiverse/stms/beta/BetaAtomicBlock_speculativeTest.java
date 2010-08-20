@@ -8,7 +8,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.functions.LongFunction;
-import org.multiverse.stms.beta.refs.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.LongRef;
 import org.multiverse.stms.beta.transactions.*;
 
 import java.util.LinkedList;

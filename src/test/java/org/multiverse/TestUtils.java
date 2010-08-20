@@ -8,10 +8,10 @@ import org.multiverse.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
-import org.multiverse.stms.beta.BetaTransactionalObject;
-import org.multiverse.stms.beta.refs.LongRef;
-import org.multiverse.stms.beta.refs.LongRefTranlocal;
-import org.multiverse.stms.beta.refs.Tranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
+import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 import org.multiverse.utils.Bugshaker;
@@ -124,7 +124,7 @@ public class TestUtils {
         Set<Latch> expected = new HashSet(Arrays.asList(listeners));
 
         Set<Latch> found = new HashSet<Latch>();
-        Listeners l = (Listeners) getField(ref, "listeners");
+        Listeners l = (Listeners) getField(ref, "___listeners");
         while (l != null) {
             found.add(l.listener);
             l = l.next;

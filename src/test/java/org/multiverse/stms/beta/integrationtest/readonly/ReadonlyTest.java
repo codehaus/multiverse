@@ -7,8 +7,8 @@ import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaTransactionFactory;
 import org.multiverse.stms.beta.BetaTransactionTemplate;
-import org.multiverse.stms.beta.refs.IntRef;
-import org.multiverse.stms.beta.refs.Ref;
+import org.multiverse.stms.beta.transactionalobjects.IntRef;
+import org.multiverse.stms.beta.transactionalobjects.Ref;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;

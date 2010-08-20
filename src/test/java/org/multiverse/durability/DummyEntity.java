@@ -12,12 +12,12 @@ public class DummyEntity implements DurableObject {
     }
 
     @Override
-    public String getStorageId() {
+    public String ___getStorageId() {
         return id;
     }
 
     @Override
-    public void setStorageId(String id) {
+    public void ___setStorageId(String id) {
         this.id = id;
     }
 
@@ -26,12 +26,12 @@ public class DummyEntity implements DurableObject {
     }
 
     @Override
-    public void markAsDurable() {
+    public void ___markAsDurable() {
         throw new TodoException();
     }
 
     @Override
-    public boolean isDurable() {
+    public boolean ___isDurable() {
         throw new TodoException();
     }
 }

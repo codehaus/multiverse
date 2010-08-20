@@ -9,7 +9,7 @@ import org.multiverse.api.closures.AtomicIntClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.NoTransactionAllowedException;
 import org.multiverse.api.exceptions.NoTransactionFoundException;
-import org.multiverse.stms.beta.refs.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.LongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static junit.framework.Assert.assertEquals;

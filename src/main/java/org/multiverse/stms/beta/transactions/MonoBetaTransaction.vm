@@ -6,7 +6,7 @@ import org.multiverse.api.exceptions.*;
 import org.multiverse.api.lifecycle.*;
 import org.multiverse.functions.*;
 import org.multiverse.stms.beta.*;
-import org.multiverse.stms.beta.refs.*;
+import org.multiverse.stms.beta.transactionalobjects.*;
 import org.multiverse.stms.beta.conflictcounters.*;
 
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.*;
@@ -76,7 +76,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         status = ACTIVE;
     }
 
-#foreach($ref in $refs)
+#foreach($ref in $transactionalObjects)
     @Override
     public final ${ref.typeParameter} ${ref.tranlocal} openForRead(final ${ref.name}${ref.typeParameter} ref,  boolean lock, final BetaObjectPool pool) {
 //        assert pool!=null;
@@ -456,7 +456,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end ##if(transaction.lean)    
     }
 
-#end ##for loop for refs
+#end ##for loop for transactionalobjects
 
     @Override
     public Tranlocal get(BetaTransactionalObject object){

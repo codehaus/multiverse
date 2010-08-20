@@ -2,7 +2,7 @@ package org.multiverse.stms.beta;
 
 import org.multiverse.api.blocking.*;
 import org.multiverse.api.exceptions.*;
-import org.multiverse.stms.beta.refs.*;
+import org.multiverse.stms.beta.transactionalobjects.*;
 import org.multiverse.stms.beta.transactions.*;
 import java.util.ArrayList;
 
@@ -62,10 +62,10 @@ public final class BetaObjectPool {
 #end
 
 
-#foreach($ref in $refs)
-#if($ref.isSpecialization())
-    private final ${ref.tranlocal}[] tranlocals${ref.name} = new ${ref.tranlocal}[100];
-    private int lastUsed${ref.name} = -1;
+#foreach($transactionalObject in $transactionalObjects)
+#if($transactionalObject.isSpecialization())
+    private final ${transactionalObject.tranlocal}[] tranlocals${transactionalObject.name} = new ${transactionalObject.tranlocal}[100];
+    private int lastUsed${transactionalObject.name} = -1;
 #end
 #end
     private TranlocalPool[] pools = new TranlocalPool[1000];
@@ -91,17 +91,17 @@ public final class BetaObjectPool {
         listenersArrayPoolingEnabled = LISTENERSARRAY_POOLING_ENABLED;
         transactionPoolingEnabled = TRANSACTION_POOLING_ENABLED;
     }
-#foreach($ref in $refs)
-#if($ref.isSpecialization())
+#foreach($transactionalObject in $transactionalObjects)
+#if($transactionalObject.isSpecialization())
 
     /**
-     * Takes a ${ref.tranlocal} from the pool for the specified ${ref.name}.
+     * Takes a ${transactionalObject.tranlocal} from the pool for the specified ${transactionalObject.name}.
      *
-     * @param owner the ${ref.name} to get the ${ref.tranlocal} for.
+     * @param owner the ${transactionalObject.name} to get the ${transactionalObject.tranlocal} for.
      * @return the pooled tranlocal, or null if none is found.
      * @throws NullPointerException if owner is null.
      */
-    public ${ref.tranlocal} take(final ${ref.name} owner) {
+    public ${transactionalObject.tranlocal} take(final ${transactionalObject.name} owner) {
         if (owner == null) {
             throw new NullPointerException();
         }
@@ -110,36 +110,36 @@ public final class BetaObjectPool {
             return null;
         }
 
-        if (lastUsed${ref.name} == -1) {
+        if (lastUsed${transactionalObject.name} == -1) {
             return null;
         }
 
-        ${ref.tranlocal} tranlocal = tranlocals${ref.name}[lastUsed${ref.name}];
+        ${transactionalObject.tranlocal} tranlocal = tranlocals${transactionalObject.name}[lastUsed${transactionalObject.name}];
         tranlocal.owner = owner;
-        tranlocals${ref.name}[lastUsed${ref.name}] = null;
-        lastUsed${ref.name}--;
+        tranlocals${transactionalObject.name}[lastUsed${transactionalObject.name}] = null;
+        lastUsed${transactionalObject.name}--;
         return tranlocal;
     }
 
     /**
-     * Puts an old ${ref.tranlocal} in this pool. If the tranlocal is allowed to be null,
+     * Puts an old ${transactionalObject.tranlocal} in this pool. If the tranlocal is allowed to be null,
      * the call is ignored. The same goes for when the tranlocal is permanent, since you
      * can't now how many transactions are still using it.
      *
-     * @param tranlocal the ${ref.tranlocal} to pool.
+     * @param tranlocal the ${transactionalObject.tranlocal} to pool.
      */
-    public void put(final ${ref.tranlocal} tranlocal) {
+    public void put(final ${transactionalObject.tranlocal} tranlocal) {
         if (!tranlocalPoolingEnabled || tranlocal == null||tranlocal.isPermanent) {
             return;
         }
 
-        if (lastUsed${ref.name} == tranlocals${ref.name}.length - 1) {
+        if (lastUsed${transactionalObject.name} == tranlocals${transactionalObject.name}.length - 1) {
             return;
         }
 
         tranlocal.prepareForPooling(this);
-        lastUsed${ref.name}++;
-        tranlocals${ref.name}[lastUsed${ref.name}] = tranlocal;
+        lastUsed${transactionalObject.name}++;
+        tranlocals${transactionalObject.name}[lastUsed${transactionalObject.name}] = tranlocal;
     }
 #end
 #end
@@ -156,10 +156,10 @@ public final class BetaObjectPool {
         int classIndex = owner.___getClassIndex();
 
         switch(classIndex){
-#foreach($ref in $refs)
-#if($ref.isSpecialization())
-            case ${ref.classIndex}:
-                return take((${ref.name})owner);
+#foreach($transactionalObject in $transactionalObjects)
+#if($transactionalObject.isSpecialization())
+            case ${transactionalObject.classIndex}:
+                return take((${transactionalObject.name})owner);
 #end
 #end
         }
@@ -189,10 +189,10 @@ public final class BetaObjectPool {
         int classIndex = owner.___getClassIndex();
 
         switch(classIndex){
-#foreach($ref in $refs)
-#if($ref.isSpecialization())
-            case ${ref.classIndex}:
-                put((${ref.tranlocal})tranlocal);
+#foreach($transactionalObject in $transactionalObjects)
+#if($transactionalObject.isSpecialization())
+            case ${transactionalObject.classIndex}:
+                put((${transactionalObject.tranlocal})tranlocal);
                 return;
 #end
 #end

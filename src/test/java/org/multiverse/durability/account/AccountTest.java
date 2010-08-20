@@ -33,7 +33,7 @@ public class AccountTest {
     public void test() {
         Account root = new Account();
 
-        System.out.println("root.storageId:" + root.getStorageId());
+        System.out.println("root.storageId:" + root.___getStorageId());
 
         Customer customer = new Customer();
         customer.active = new CustomerTranlocal(customer);
@@ -70,7 +70,7 @@ public class AccountTest {
 
         storage.clearEntities();
 
-        Account found = (Account) storage.loadDurableObject(account.getStorageId());
+        Account found = (Account) storage.loadDurableObject(account.___getStorageId());
         AccountTranlocal tranlocal = found.active;
         assertNotNull(tranlocal);
         assertEquals(accountTranlocal.balance, tranlocal.balance);
@@ -129,7 +129,7 @@ public class AccountTest {
             if (accountTranlocal.customer == null) {
                 map.put("owner", null);
             } else {
-                map.put("owner", "" + accountTranlocal.customer.getStorageId());
+                map.put("owner", "" + accountTranlocal.customer.___getStorageId());
             }
 
             map.put("balance", "" + accountTranlocal.balance);

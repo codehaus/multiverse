@@ -3,7 +3,7 @@ package org.multiverse.stms.beta;
 import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.api.blocking.Listeners;
 import org.multiverse.api.blocking.StandardLatch;
-import org.multiverse.stms.beta.refs.*;
+import org.multiverse.stms.beta.transactionalobjects.*;
 import org.multiverse.stms.beta.transactions.*;
 
 import java.util.ArrayList;

@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.refs.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.LongRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
