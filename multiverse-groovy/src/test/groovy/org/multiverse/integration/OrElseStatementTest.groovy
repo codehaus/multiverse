@@ -12,13 +12,13 @@ import org.multiverse.api.exceptions.ReadonlyException
  * To change this template use File | Settings | File Templates.
  */
 
-public class OrElseTransactionTest extends GroovyTestCase {
+public class OrElseStatementTest extends GroovyTestCase {
 
   void testShouldExecuteTheEitherSectionWhenThereAreNoIssuesInThatSection() {
 
     def executedSection = ""
 
-    new OrElseTransaction().identity {
+    new OrElseStatement().identity {
       either {
         executedSection = "either"
       }
@@ -35,7 +35,7 @@ public class OrElseTransactionTest extends GroovyTestCase {
   void testShouldExecuteOrElseSectionWhenEitherSectionFails() {
     def executedSection = ""
 
-    new OrElseTransaction().identity {
+    new OrElseStatement().identity {
       either {
         executedSection = "either"
         retry()
@@ -51,7 +51,7 @@ public class OrElseTransactionTest extends GroovyTestCase {
 
   void testExceptionInEitherSectionShouldBeBubbledUpToCaller() {
     shouldFail(RuntimeException) {
-      new OrElseTransaction().identity {
+      new OrElseStatement().identity {
         either {
           throw new RuntimeException();
         }
@@ -62,7 +62,7 @@ public class OrElseTransactionTest extends GroovyTestCase {
 
   void testExceptionInOrElseSectionShouldBeBubbledUpToCaller() {
     shouldFail(RuntimeException) {
-      new OrElseTransaction().identity {
+      new OrElseStatement().identity {
         either {
           retry()
         }
@@ -79,7 +79,7 @@ public class OrElseTransactionTest extends GroovyTestCase {
     LongRef number = new LongRef();
 
     shouldFail(ReadonlyException) {
-      new OrElseTransaction().identity {
+      new OrElseStatement().identity {
         either {
           number.inc()
         }

@@ -10,7 +10,7 @@ import static org.multiverse.integration.MultiverseGroovyLibrary.*
  * To change this template use File | Settings | File Templates.
  */
 
-public class OrElseTransaction {
+public class OrElseStatement {
 
   private Closure either
   private Closure orelse

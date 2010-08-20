@@ -1,0 +1,132 @@
+<h2>Groovy support</h2>
+
+Multiverse can be used to build stm support into jvm based languages. Akka framework for scala is also one example.
+This is a an attempt to build stm support into groovy. Watch out groovy++ support as well.
+
+<ol>
+    <li>
+        <h3>Getting Started</h3>
+
+        To start using Multiverse in groovy, you will need to start using multiverse-groovy-0.6. Multiverse groovy
+        integration depends on alpha stm (the primary stm implemented using the multiverse core).
+        TODO: provide maven group id and version number
+        TODO: complete dependency list for those not using maven or other dependency management tools
+    </li>
+    <li>
+        <h3>Transactional Constructs</h3>
+
+        Below are some of the operational sematics currently supported by multiverse groovy,
+        <ol>
+            <li>
+                Atomic
+
+                The usual approach to gaurd a critical section would be to use locks. If you are using STM I guess
+                we can assume that you are already aware of the issues. With multiverse groovy, the critcal section
+                needs to be wrapped within the atomic block.
+
+                import static org.multiverse.integration.MultiverseGroovyLibary.*
+
+                <pre>
+                atomic {
+                   obj.x = 1;
+                   if (obj.x != 1) fireMissiles();
+                }
+                    </pre>
+
+                In the above setup, all configurations for the atomic block are in default settings. The atomic block
+                is highly configurable. Below is a version which sheds more light on some configurations that can be
+                made.
+
+                <pre>
+                atomic(trackreads: true, explicitRetryAllowed: true, timeoutInNanoSeconds: 10) {
+                   //mission critical code
+                }
+                    </pre>
+
+                All the configurations available as part of multiverse alpha stm which is in java.
+                are also supported by groovy version
+
+                Please refer to the explanation for these configurations as well.
+                TODO: provide link to configuration explanation
+            </li>
+            <li>
+                Retry
+
+                A transaction that executes a retry statement aborts and then reexecutes. This may be
+                useful when implenting datastructures like blocking queues.
+
+                <pre>
+                public class BlockingQueue {
+
+                  def private TransactionalList buffer
+                  def maxSize = 2, timeout
+
+                  BlockingQueue() {
+                    buffer = new TransactionalArrayList(maxSize);
+                  }
+
+                  Object dequeue() {
+                    def ret
+                    atomic(explicitRetryAllowed: true, trackreads: true) {
+                      if (buffer.isEmpty()) <b>retry()</b>;
+                      ret = buffer.pop();
+                    }
+                    return ret;
+                  }
+
+                  void enqueue(value) {
+                    atomic(explicitRetryAllowed: true, trackreads: true) {
+                      if (buffer.size() >= maxSize) <b>retry()</b>;
+                      buffer.add(0, value)
+                    }
+                  }
+                }
+                    </pre>
+
+            </li>
+            <li>
+                OrElseStatement
+
+                This is specially useful when we have two transactions, we start by executung one, when that
+                aborts we execute the other transaction. If there is an irrecoverable error in transaction 1
+                that will mean transaction 2 will not be executed and exception is bubbled up to the caller.
+
+                <pre>
+                new OrElseStatement().identity {
+                  either {
+                    // critical section 1
+                  }
+                  orelse {
+                    // critical section 2
+                  }
+                  execute()
+                }
+                    </pre>
+
+                We are using the identity in groovy to make it easily readable. Underneath the covers both
+                "either" and "or" are closures which are executed atomically.
+
+                Like atomic, ever orElseStaement has configurability.
+
+                <pre>
+                new OrElseStatement().identity {
+                  either {
+                    // critical section 1
+                  }
+                  orelse {
+                    // critical section 2
+                  }
+                  config readonly: true, trackreads: true
+                  execute()
+                }
+                    </pre>
+            </li>
+        </ol>
+
+    </li>
+
+    <p>We encourage you to checkout our codebase and would be thankful to receive any feedback. There are test
+        cases and examples which will help get started. The multiverse manual provide a good overview of the
+        alpha stm. Since groovy integration just builds on top of existing infrastructure, please spend some
+        understanding multiverse.</p>
+</ol>

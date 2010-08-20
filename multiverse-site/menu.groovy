@@ -65,6 +65,7 @@ def pages = [
         new Page(pageid: 'manual-compiler'),
         new Page(pageid: 'manual-runtime'),
         new Page(pageid: 'manual-programmaticapi'),
+        new Page(pageid: 'manual-groovy-integration'),
         new Page(pageid: 'contact'),
         new Page(pageid: 'missionstatement'),
         new Page(pageid: 'download'),
