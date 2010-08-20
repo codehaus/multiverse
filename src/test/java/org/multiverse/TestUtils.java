@@ -36,7 +36,7 @@ public class TestUtils {
     }
 
     public static void assertAttached(BetaTransaction tx, Tranlocal tranlocal) {
-        Tranlocal result = tx.get(tranlocal.getOwner());
+        Tranlocal result = tx.get(tranlocal.owner);
         assertSame(tranlocal, result);
     }
 

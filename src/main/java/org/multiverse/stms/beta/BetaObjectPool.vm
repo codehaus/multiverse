@@ -155,6 +155,10 @@ public final class BetaObjectPool {
 
         int classIndex = owner.___getClassIndex();
 
+        if(classIndex == -1){
+            return null;
+        }
+
         switch(classIndex){
 #foreach($transactionalObject in $transactionalObjects)
 #if($transactionalObject.isSpecialization())
@@ -187,6 +191,10 @@ public final class BetaObjectPool {
 
         BetaTransactionalObject owner = tranlocal.owner;
         int classIndex = owner.___getClassIndex();
+
+        if(classIndex == -1){
+            return;
+        }
 
         switch(classIndex){
 #foreach($transactionalObject in $transactionalObjects)

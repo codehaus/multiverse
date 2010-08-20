@@ -14,7 +14,7 @@ public interface AtomicBooleanClosure{
      *
      * @param tx the Transaction. Depending on the TransactionPropagation level, this could
      *           be null.
-     * @returns the result of the execution.
+     * @return the result of the execution.
      * @throws Exception if unable to compute a result
      */
      boolean execute(Transaction tx)throws Exception;

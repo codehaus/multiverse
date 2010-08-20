@@ -51,11 +51,22 @@ public abstract class AbstractBetaTransactionalObject
     //controlled JMM problem (just like the hashcode of String).
     private int ___identityHashCode;
 
+
+    /**
+     * Creates a uncommitted AbstractBetaTransactionalObject that should be attached to the transaction (this
+     * is not done)
+     *
+     * @param tx the transaction this AbstractBetaTransactionalObject should be attached to.
+     * @throws NullPointerException if tx is null.
+     */
     public AbstractBetaTransactionalObject(BetaTransaction tx){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
         ___arriveAndLockForUpdate(0);
         this.lockOwner = tx;
     }
-
 
     @Override
     public final BetaTransaction ___getLockOwner() {
@@ -444,7 +455,7 @@ public abstract class AbstractBetaTransactionalObject
 
 
     @Override
-    public LockStatus getLockStatus(Transaction tx) {
+    public LockStatus getLockStatus(final Transaction tx) {
         if(tx == null){
             throw new NullPointerException();
         }

@@ -5,6 +5,9 @@ import java.util.concurrent.TimeUnit;
 import static java.lang.String.format;
 
 /**
+ * A Cheap {@link Latch} implementation based on the intrinsic lock. This Latch has no support for bounded
+ * waiting.
+ *
  * @author Peter Veentjer
  */
 public final class CheapLatch implements Latch {

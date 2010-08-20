@@ -54,18 +54,38 @@ public final class IntRef
     //controlled JMM problem (just like the hashcode of String).
     private int ___identityHashCode;
 
+
+    /**
+     * Creates a uncommitted IntRef that should be attached to the transaction (this
+     * is not done)
+     *
+     * @param tx the transaction this IntRef should be attached to.
+     * @throws NullPointerException if tx is null.
+     */
     public IntRef(BetaTransaction tx){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
         ___arriveAndLockForUpdate(0);
         this.lockOwner = tx;
     }
 
-    //todo: this constructor needs to be removed.
+    /**
+     * Creates a committed IntRef with 0 as initial value.
+     */
     public IntRef(){
+        this((int)0);
     }
 
-    public IntRef(final int value){
+    /**
+     * Creates a committed IntRef with the given initial value.
+     *
+     * @param initialValue the initial value
+     */
+    public IntRef(final int initialValue){
         ___active = new IntRefTranlocal(this);
-        ___active.value = value;
+        ___active.value = initialValue;
         ___active.isCommitted = true;
     }
 
@@ -568,7 +588,7 @@ public final class IntRef
     }
 
     @Override
-    public LockStatus getLockStatus(Transaction tx) {
+    public LockStatus getLockStatus(final Transaction tx) {
         if(tx == null){
             throw new NullPointerException();
         }

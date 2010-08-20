@@ -7,6 +7,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import static java.lang.String.format;
 
+/**
+ * A {@link Latch} implementation that is based on the {@link Condition} and supports timed blocking calls.
+ *
+ * @author Peter Veentjer.
+ */
 public final class StandardLatch implements Latch {
     private volatile boolean isOpen;
     private final Lock lock;

@@ -7,14 +7,13 @@ import org.multiverse.stms.beta.BetaObjectPool;
 
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Peter Veentjer
  */
 public abstract class Tranlocal implements DurableState {
 
-    public final static Tranlocal LOCKED = new Tranlocal(null, true){
+    public final static Tranlocal LOCKED = new Tranlocal(null, true) {
         @Override
         public void prepareForPooling(BetaObjectPool pool) {
             throw new UnsupportedOperationException();
@@ -46,22 +45,17 @@ public abstract class Tranlocal implements DurableState {
         }
     };
 
-    public final static AtomicLong created = new AtomicLong();
-
     public BetaTransactionalObject owner;
     public boolean isPermanent;
     public boolean isCommitted;
     public boolean isCommuting;
     public boolean isDirty;
     public final boolean isLocked;
-
     public Tranlocal read;
-    public long version;
-
+ 
     public Tranlocal(BetaTransactionalObject owner, boolean locked) {
         this.owner = owner;
         this.isLocked = locked;
-        //created.incrementAndGet();
     }
 
     /**
@@ -72,6 +66,14 @@ public abstract class Tranlocal implements DurableState {
      */
     public abstract void prepareForPooling(BetaObjectPool pool);
 
+    /**
+     * Prepares this Tranlocal for committing. If there is a read, the read is set to null (to prevent
+     * retaining an uncontrollable number of objects). Also the isDirty field is set to false and the isCommitted
+     * field to false.
+     *
+     * No checks are done if the Tranlocal is in the committed state, so make sure that this is done from
+     * the outside.
+     */
     public final void prepareForCommit() {
         assert !isCommitted;
         this.isCommitted = true;
@@ -79,16 +81,61 @@ public abstract class Tranlocal implements DurableState {
         this.isDirty = false;
     }
 
+    @Override
+    public final BetaTransactionalObject getOwner() {
+        return owner;
+    }
+
+    /**
+     * Opens the Tranlocal for writing. This means that a copy is made that is updatable.
+     *
+     * @param pool the BetaObjectPool used to retrieve a Tranlocal
+     * @return the opened Tranlocal.
+     */
     public abstract Tranlocal openForWrite(BetaObjectPool pool);
 
+    /**
+     * Opens the Tranlocal for a commute operation. This means that an updatable copy is made that
+     * is put in the 'isCommuting' state.
+     *
+     * @param pool the BetaObjectPool used to retrieve the Tranlocal
+     * @return the opened Tranlocal.
+     */
     public abstract Tranlocal openForCommute(BetaObjectPool pool);
 
+    /**
+     * Calculates if this Tranlocal is dirty (so needs to be written) and stores the result in the
+     * isDirty field.
+     *
+     * @return true if this Tranlocal is dirty, false otherwise.
+     */
     public abstract boolean calculateIsDirty();
 
+    /**
+     * Evaluates the commuting functions that are applied to this Tranlocal. This call is made under the
+     * assumption that the Tranlocal is not committed, is in the 'isCommuting' mode and that the read
+     * field has been set. If there is a change, the isDirty field also is set.
+     *
+     * @param pool the BetaObjectPool used to pool resources.
+     */
     public abstract void evaluateCommutingFunctions(BetaObjectPool pool);
 
+    /**
+     * Adds a Function for commute to this Tranlocal. This call is made under the assumption that
+     * the Tranlocal is not committed and in the 'isCommuting' mode.
+     *
+     * No checks on the Function are done, so no null check or check if the Function already is added.
+     *
+     * @param function the Function to add.
+     * @param pool the BetaObjectPool that can be used to pool resources for this operation.
+     */
     public abstract void addCommutingFunction(Function function, BetaObjectPool pool);
 
+    /**
+     * Checks if this Tranlocal is committed.
+     *
+     * @return true if committed, false otherwise.
+     */
     public final boolean isCommitted() {
         return isCommitted;
     }
@@ -113,10 +160,5 @@ public abstract class Tranlocal implements DurableState {
 
     public Iterator<DurableObject> getReferences() {
         return new LinkedList<DurableObject>().iterator();
-    }
-
-    @Override
-    public BetaTransactionalObject getOwner() {
-        return owner;
     }
 }

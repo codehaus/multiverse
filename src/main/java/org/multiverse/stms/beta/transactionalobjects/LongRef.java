@@ -54,18 +54,38 @@ public final class LongRef
     //controlled JMM problem (just like the hashcode of String).
     private int ___identityHashCode;
 
+
+    /**
+     * Creates a uncommitted LongRef that should be attached to the transaction (this
+     * is not done)
+     *
+     * @param tx the transaction this LongRef should be attached to.
+     * @throws NullPointerException if tx is null.
+     */
     public LongRef(BetaTransaction tx){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
         ___arriveAndLockForUpdate(0);
         this.lockOwner = tx;
     }
 
-    //todo: this constructor needs to be removed.
+    /**
+     * Creates a committed LongRef with 0 as initial value.
+     */
     public LongRef(){
+        this((long)0);
     }
 
-    public LongRef(final long value){
+    /**
+     * Creates a committed LongRef with the given initial value.
+     *
+     * @param initialValue the initial value
+     */
+    public LongRef(final long initialValue){
         ___active = new LongRefTranlocal(this);
-        ___active.value = value;
+        ___active.value = initialValue;
         ___active.isCommitted = true;
     }
 
@@ -568,7 +588,7 @@ public final class LongRef
     }
 
     @Override
-    public LockStatus getLockStatus(Transaction tx) {
+    public LockStatus getLockStatus(final Transaction tx) {
         if(tx == null){
             throw new NullPointerException();
         }

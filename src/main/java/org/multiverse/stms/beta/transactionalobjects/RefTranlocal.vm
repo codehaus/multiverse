@@ -4,7 +4,7 @@ import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.functions.*;
 
 /**
- * The {@link Tranlocal} for the {@link ${transactionalObject.type}).
+ * The {@link Tranlocal} for the {@link ${transactionalObject.name}).
  *
  * This class is generated.
  *
@@ -55,15 +55,15 @@ public final class ${transactionalObject.tranlocal}${transactionalObject.typePar
         isCommuting = false;
         headCallable = null;
     }
-#if(${transactionalObject.name} ne 'Ref')
 
+#if(${transactionalObject.name} ne 'Ref')
     public void addCommutingFunction(final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function, final BetaObjectPool pool){
         assert isCommuting;
 
         headCallable = new CallableNode${transactionalObject.typeParameter}(function, headCallable);
     }
-#end
 
+#end
     public void addCommutingFunction(final Function function, final BetaObjectPool pool){
         assert isCommuting;
 

@@ -257,6 +257,10 @@ public final class BetaObjectPool {
 
         int classIndex = owner.___getClassIndex();
 
+        if(classIndex == -1){
+            return null;
+        }
+
         switch(classIndex){
             case 0:
                 return take((Ref)owner);
@@ -289,6 +293,10 @@ public final class BetaObjectPool {
 
         BetaTransactionalObject owner = tranlocal.owner;
         int classIndex = owner.___getClassIndex();
+
+        if(classIndex == -1){
+            return;
+        }
 
         switch(classIndex){
             case 0:

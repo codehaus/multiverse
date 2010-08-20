@@ -202,6 +202,15 @@ the task not being executed at all.
 
 - integration test for the object granularity functionality (since the abstractbetatransactionalobject is added)
 
+- openForConstruction on generic transactional object should return current type of tranlocal
+
+- openForRead on generic transactional object should return current type of tranlocal
+
+- openForWrite on generic transactional object should return current type of tranlocal
+
+- pooling for generic transactional object tranlocals.
+
+
 done
 
 - old contructors need to be removed from ref

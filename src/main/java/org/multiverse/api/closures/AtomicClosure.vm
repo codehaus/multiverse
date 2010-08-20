@@ -14,8 +14,8 @@ public interface ${closure.name}${closure.typeParameter}{
      *
      * @param tx the Transaction. Depending on the TransactionPropagation level, this could
      *           be null.
-#if(${closure.type})
-     * @returns the result of the execution.
+#if(${closure.type} ne 'void')
+     * @return the result of the execution.
 #end
      * @throws Exception if unable to compute a result
      */

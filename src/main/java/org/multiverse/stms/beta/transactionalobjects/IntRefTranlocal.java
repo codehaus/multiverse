@@ -5,7 +5,7 @@ import org.multiverse.functions.IntFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 
 /**
- * The {@link Tranlocal} for the {@link int).
+ * The {@link Tranlocal} for the {@link IntRef).
  *
  * This class is generated.
  *

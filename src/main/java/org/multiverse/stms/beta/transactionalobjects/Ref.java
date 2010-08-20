@@ -54,18 +54,38 @@ public final class Ref<E>
     //controlled JMM problem (just like the hashcode of String).
     private int ___identityHashCode;
 
+
+    /**
+     * Creates a uncommitted Ref that should be attached to the transaction (this
+     * is not done)
+     *
+     * @param tx the transaction this Ref should be attached to.
+     * @throws NullPointerException if tx is null.
+     */
     public Ref(BetaTransaction tx){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
         ___arriveAndLockForUpdate(0);
         this.lockOwner = tx;
     }
 
-    //todo: this constructor needs to be removed.
+    /**
+     * Creates a committed Ref with null as initial value.
+     */
     public Ref(){
+        this((E)null);
     }
 
-    public Ref(final E value){
+    /**
+     * Creates a committed Ref with the given initial value.
+     *
+     * @param initialValue the initial value
+     */
+    public Ref(final E initialValue){
         ___active = new RefTranlocal<E>(this);
-        ___active.value = value;
+        ___active.value = initialValue;
         ___active.isCommitted = true;
     }
 
@@ -568,7 +588,7 @@ public final class Ref<E>
     }
 
     @Override
-    public LockStatus getLockStatus(Transaction tx) {
+    public LockStatus getLockStatus(final Transaction tx) {
         if(tx == null){
             throw new NullPointerException();
         }

@@ -5,7 +5,7 @@ import org.multiverse.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 
 /**
- * The {@link Tranlocal} for the {@link long).
+ * The {@link Tranlocal} for the {@link LongRef).
  *
  * This class is generated.
  *

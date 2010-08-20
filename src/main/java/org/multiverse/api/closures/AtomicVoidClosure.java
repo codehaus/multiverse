@@ -14,7 +14,6 @@ public interface AtomicVoidClosure{
      *
      * @param tx the Transaction. Depending on the TransactionPropagation level, this could
      *           be null.
-     * @returns the result of the execution.
      * @throws Exception if unable to compute a result
      */
      void execute(Transaction tx)throws Exception;

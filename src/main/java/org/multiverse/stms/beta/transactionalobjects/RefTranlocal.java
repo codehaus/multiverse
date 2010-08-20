@@ -4,7 +4,7 @@ import org.multiverse.functions.Function;
 import org.multiverse.stms.beta.BetaObjectPool;
 
 /**
- * The {@link Tranlocal} for the {@link E).
+ * The {@link Tranlocal} for the {@link Ref).
  *
  * This class is generated.
  *

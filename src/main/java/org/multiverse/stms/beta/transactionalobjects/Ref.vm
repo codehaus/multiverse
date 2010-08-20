@@ -53,23 +53,43 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     //controlled JMM problem (just like the hashcode of String).
     private int ___identityHashCode;
 
+
+    /**
+     * Creates a uncommitted ${transactionalObject.name} that should be attached to the transaction (this
+     * is not done)
+     *
+     * @param tx the transaction this ${transactionalObject.name} should be attached to.
+     * @throws NullPointerException if tx is null.
+     */
     public ${transactionalObject.name}(BetaTransaction tx){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
         ___arriveAndLockForUpdate(0);
         this.lockOwner = tx;
     }
 
 #if($transactionalObject.isReference)
-    //todo: this constructor needs to be removed.
+    /**
+     * Creates a committed ${transactionalObject.name} with ${transactionalObject.initialValue} as initial value.
+     */
     public ${transactionalObject.name}(){
+        this((${transactionalObject.type})${transactionalObject.initialValue});
     }
 
-    public ${transactionalObject.name}(final ${transactionalObject.type} value){
+    /**
+     * Creates a committed ${transactionalObject.name} with the given initial value.
+     *
+     * @param initialValue the initial value
+     */
+    public ${transactionalObject.name}(final ${transactionalObject.type} initialValue){
         ___active = new ${transactionalObject.tranlocal}${transactionalObject.typeParameter}(this);
-        ___active.value = value;
+        ___active.value = initialValue;
         ___active.isCommitted = true;
     }
-#end
 
+#end
     @Override
     public final BetaTransaction ___getLockOwner() {
         return lockOwner;
@@ -573,7 +593,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 #end
 
     @Override
-    public LockStatus getLockStatus(Transaction tx) {
+    public LockStatus getLockStatus(final Transaction tx) {
         if(tx == null){
             throw new NullPointerException();
         }
