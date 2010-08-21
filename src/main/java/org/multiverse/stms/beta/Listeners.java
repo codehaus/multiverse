@@ -1,6 +1,6 @@
-package org.multiverse.api.blocking;
+package org.multiverse.stms.beta;
 
-import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.api.blocking.Latch;
 
 /**
  * A Listeners object contains all the Latches of blockingAllowed transactions that listen to a write on a

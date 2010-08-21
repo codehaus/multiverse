@@ -179,7 +179,7 @@ public abstract class FastOrec implements Orec {
 
             boolean isLocked = isLocked(current);
             if (!isLocked) {
-                throw new PanicError();
+                throw new PanicError("Can't departAfterReadingAndReleaseLock if the lock is not acquired");
             }
 
             boolean isReadBiased = isReadBiased(current);

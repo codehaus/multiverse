@@ -118,12 +118,11 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
         } catch (IllegalArgumentException expected) {
         }
 
-        //todo: this should be aborted.
-        assertActive(tx);
+        assertAborted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
-        assertSurplus(1, ref);
+        assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
     }
@@ -142,12 +141,11 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
         } catch (IllegalArgumentException expected) {
         }
 
-        //todo: this should be aborted.
-        assertActive(tx);
+        assertAborted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
-        assertSurplus(1, ref);
+        assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
     }

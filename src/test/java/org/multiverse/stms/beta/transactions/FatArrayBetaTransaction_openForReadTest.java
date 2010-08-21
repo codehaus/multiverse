@@ -112,6 +112,30 @@ public class FatArrayBetaTransaction_openForReadTest {
         assertTrue((Boolean) getField(tx, "hasUntrackedReads"));
         assertNotAttached(tx, ref);
     }
+    
+     @Test
+    public void whenReadBiasedAndNoReadTrackingAndLock_thenAttached() {
+        LongRef ref = createReadBiasedLongRef(stm, 10);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .setBlockingAllowed(false)
+                .setReadTrackingEnabled(false);
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
+        LongRefTranlocal read = tx.openForRead(ref, true, pool);
+
+        assertActive(tx);
+        assertSame(committed, read);
+        assertSurplus(1, ref);
+        assertLocked(ref);
+        assertSame(tx, ref.___getLockOwner());
+        assertReadBiased(ref);
+        assertReadonlyCount(0, ref);
+        assertTrue(read.isCommitted);
+        assertTrue(read.isPermanent);
+        assertEquals(10, read.value);
+        assertAttached(tx, read);
+    }
 
     @Test
     public void whenReadBiased() {

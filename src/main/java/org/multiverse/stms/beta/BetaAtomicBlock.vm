@@ -111,7 +111,9 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
                     }
                 case Mandatory:
                     if (tx == null) {
-                        throw new NoTransactionFoundException();
+                        throw new NoTransactionFoundException(
+                            format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
+                                transactionConfiguration.familyName));
                     }
 #if($closure.type eq 'void')
                     closure.execute(tx);
@@ -121,7 +123,11 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
 #end
                 case Never:
                     if (tx != null) {
-                        throw new NoTransactionAllowedException();
+                        throw new NoTransactionAllowedException(
+                            format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
+                                ", but transaction '%s' was found",
+                                transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
+                        );
                     }
 #if($closure.type eq 'void')
                     closure.execute(null);

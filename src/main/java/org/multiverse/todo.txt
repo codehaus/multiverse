@@ -1,5 +1,7 @@
 ideas:
 
+- actor atomic block, doesn't look at an existing transaction. Automatically exposes the onAbort/onCommit
+
 - non repeatable read?
 
 - on read/ on write function
@@ -87,8 +89,6 @@ performance.
 
 todo
 
-- the atomic get isn't valid, it could potentially return dirty writes since the tranlocal could be pooled.
-
 - mono transaction: support for orelse
 
 - array transaction:  support for orelse
@@ -106,6 +106,7 @@ todo
 - unshared atomicget, with periodic atomicset.
 
 - mono transaction can do a cheap read of the current tranlocal already is permanent.
+    - can only be done if a permanent tranlocal is never pooled.
 
 - transaction completely optimized for ref.
 
@@ -141,12 +142,6 @@ globalconflict counter.
 - clojure: add watch. Basic functionality already is there, but atm it is done to all
      reads and not specific ones.
 
-- mono transaction: error messages should include classname
-
-- array transaction: error messages should include classname
-
-- array tree transaction: error messages should include classname
-
 - testing: mono transaction and conflict counter setting
 
 - testing: array transaction and conflict counter setting`
@@ -155,15 +150,9 @@ globalconflict counter.
 
     - all kinds of variations with non automatic read tracking
 
-- testing: array transaction and partial read tracking
-
-- testing: array tree transaction and partial read tracking
-
 - commute
 
-    - add commuting to mono beta transaction
-
-    - when a commuting function fails, the transaction should be aborted.
+   - when a commuting function fails, the transaction should be aborted.
 
     - the nodes for the commute functions need to be pooled.
 
@@ -186,8 +175,6 @@ the task not being executed at all.
 
 - expose the ref
 
-- actor atomic block, doesn't look at an existing transaction. Automatically exposes the onAbort/onCommit
-
 - when all reads/writes are pessimistic, cheap conflict detection and cheap prepare.
 
 - is there a need for ref.specialization?
@@ -200,7 +187,32 @@ the task not being executed at all.
 
 - pooling for generic transactional object tranlocals.
 
+- abort commute on nullpointer function
+
+- transaction should be prefixed to all exceptions.
+
+- retry exception fix
+
 done
+
+- mono transaction: error messages should include classname
+
+- array transaction: error messages should include classname
+
+- array tree transaction: error messages should include classname
+
+- no transaction found exception improve message
+
+- no transaction allowed exception improve message
+
+- drop the betatransaction interface and replace by the AbstractBetaTransaction
+    - the AbstractBetaTransaction should take that place.
+
+- place the AbstractBetaTransaction as general implementation behind transactions
+
+- testing: array tree transaction and partial read tracking
+
+- testing: array transaction and partial read tracking
 
 - betatransactiontemplate needs to be removed
 
@@ -238,6 +250,11 @@ done
 - need to think more about the ref & retry especially reading/writing safety
 
 - atomic block: add checked stuff
+
+- add commuting to mono beta transaction
+
+- the atomic get isn't valid, it could potentially return dirty writes since the tranlocal could be pooled.
+
 
 old done
 

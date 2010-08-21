@@ -81,7 +81,8 @@ public class CommuteStressTest {
 
         @Override
         public void doRun() throws Exception {
-            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
+            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                    .setMaxRetries(10000);
             AtomicBlock block = new LeanBetaAtomicBlock(new FatArrayTreeBetaTransactionFactory(config));
 
             AtomicLongClosure commutingClosure = new AtomicLongClosure() {

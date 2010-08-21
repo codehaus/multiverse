@@ -108,6 +108,31 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
     }
 
     @Test
+    public void whenReadBiasedAndNoReadTrackingAndLock_thenAttached() {
+        LongRef ref = createReadBiasedLongRef(stm, 10);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .setBlockingAllowed(false)
+                .setReadTrackingEnabled(false);
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
+        LongRefTranlocal read = tx.openForRead(ref, true, pool);
+
+        assertActive(tx);
+        assertSame(committed, read);
+        assertSurplus(1, ref);
+        assertLocked(ref);
+        assertSame(tx, ref.___getLockOwner());
+        assertReadBiased(ref);
+        assertReadonlyCount(0, ref);
+        assertTrue(read.isCommitted);
+        assertTrue(read.isPermanent);
+        assertEquals(10, read.value);
+        assertAttached(tx, read);
+    }
+
+
+    @Test
     public void whenAlreadyOpenedForRead() {
         LongRef ref = createLongRef(stm, 10);
 
@@ -488,7 +513,7 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         assertEquals(stm.getGlobalConflictCounter().count(), tx.getLocalConflictCounter().get());
 
         assertActive(tx);
-        assertAttached(tx,read1);
+        assertAttached(tx, read1);
         assertAttached(tx, read2);
         assertAttached(tx, read3);
     }

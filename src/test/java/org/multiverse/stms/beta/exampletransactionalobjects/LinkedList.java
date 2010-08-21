@@ -8,7 +8,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
 import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-public class LinkedList<E> extends AbstractBetaTransactionalObject {
+public class LinkedList<E> extends AbstractBetaTransactionalObject{
 
     public LinkedList(BetaTransaction tx) {
         super(tx);
@@ -181,7 +181,7 @@ class LinkedListTranlocal<E> extends Tranlocal {
     }
 }
 
-class LinkedListNode<E> extends AbstractBetaTransactionalObject {
+class LinkedListNode<E> extends AbstractBetaTransactionalObject{
 
     LinkedListNode(BetaTransaction tx) {
         super(tx);

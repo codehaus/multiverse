@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * A blockingAllowed structure that can be used to create blockingAllowed transactions. When a transaction blocks, a 'listener' is
  * added to each read transactional object. This listener is the Latch. Each transactional object can have a set
- * of listeners, see the {@link Listeners} for more information.
+ * of listeners, see the {@link org.multiverse.stms.beta.Listeners} for more information.
  * <p/>
  * The Latch can safely be garbage collected because it works based on an listenerEra. When a transaction wants to block
  * it gets a Latch from the pool and reset it so it can be used. By resetting it, the listenerEra-counter is incremented,

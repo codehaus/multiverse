@@ -79,10 +79,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #foreach($ref in $transactionalObjects)
     @Override
     public final ${ref.typeParameter} ${ref.tranlocal} openForRead(final ${ref.name}${ref.typeParameter} ref,  boolean lock, final BetaObjectPool pool) {
-//        assert pool!=null;
 
         if (status != ACTIVE) {
-            throw abortOpenForRead(pool);
+            throw abortOpenForRead(pool, ref);
         }
 
         if (ref == null) {
@@ -222,19 +221,15 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         final ${ref.name}${ref.typeParameter} ref, boolean lock, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
-            throw abortOpenForWrite(pool);
+            throw abortOpenForWrite(pool, ref);
         }
 
         if (ref == null) {
-            abort(pool);
-            throw new NullPointerException(
-                format("Can't open for writing a null ref/transactionalobject using transaction '%s'",config.familyName));
+            throw abortOpenForWriteWhenNullReference(pool);
         }
 
         if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(
-                format("Can't write to readonly transaction '%s'", config.familyName));
+            throw abortOpenForWriteWhenReadonly(pool, ref);
         }
 
         lock = lock || config.lockWrites;
@@ -341,29 +336,22 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         final ${ref.name}${ref.typeParameter} ref, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
-           throw abortOpenForConstruction(pool);
+           throw abortOpenForConstruction(pool, ref);
         }
 
         if (ref == null) {
-            abort(pool);
-            throw new NullPointerException(
-                format("Can't open for construction a null transactionalobject/ref using transaction '%s'",config.familyName));
+            throw abortOpenForConstructionWhenNullReference(pool);
         }
 
         if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(
-                format("Can't open for construction a new object using readonly transaction '%s'",config.familyName));
+            throw abortOpenForConstructionWhenReadonly(pool, ref);                        
         }
 
         ${ref.tranlocal}${ref.typeParameter} result = (attached == null || attached.owner != ref) ? null : (${ref.tranlocal}${ref.typeParameter})attached;
 
         if(result != null){
             if(result.isCommitted || result.read != null){
-                abort();
-                throw new IllegalArgumentException(
-                    format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
-                        config.familyName, ref.getClass().getName()));
+               throw abortOpenForConstructionWithBadReference(pool, ref);
             }
 
             return result;
@@ -375,8 +363,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         if(ref.___unsafeLoad()!=null){
-            abort();
-            throw new IllegalArgumentException();
+            throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
 #if($ref.isSpecialization())
@@ -395,7 +382,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         ${ref.name}${ref.typeParameter} ref, BetaObjectPool pool, ${ref.functionClass}${ref.typeParameter} function){
 
         if (status != ACTIVE) {
-            throw abortCommute(pool);
+            throw abortCommute(pool, ref, function);
         }
 
 #if($transaction.lean)
@@ -404,14 +391,11 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         throw SpeculativeConfigurationError.INSTANCE;
 #else
         if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
+            throw abortCommuteWhenReadonly(pool, ref, function);
         }
 
-        //an openForWrite can't open a null ref.
         if (ref == null) {
-            abort(pool);
-            throw new NullPointerException();
+            throw abortCommuteWhenNullReference(pool, function);
         }
 
         boolean contains = (attached != null && attached.owner == ref);
@@ -509,7 +493,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                     return;
                 case COMMITTED:
                     throw new DeadTransactionException(
-                        format("Can't abort already aborted transaction '%s'",config.familyName));
+                        format("[%s] Can't abort an already aborted transaction",config.familyName));
                 default:
                     throw new IllegalStateException();
             }
@@ -542,11 +526,15 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #if(${transaction.lean})
     @Override
     public final void commit(final BetaObjectPool pool) {
+        if(status == COMMITTED){
+            return;
+        }
+
         if (status != ACTIVE && status != PREPARED) {
             switch (status) {
                 case ABORTED:
                     throw new DeadTransactionException(
-                        format("Can't commit already aborted transaction '%s'", config.familyName));
+                        format("[%s] Can't commit an already aborted transaction", config.familyName));
                 case COMMITTED:
                     return;
                 default:
@@ -627,16 +615,20 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #if($transaction.lean)
     @Override
     public final void prepare(final BetaObjectPool pool) {
+        if(status == PREPARED){
+            return;
+        }
+
         if(status != ACTIVE){
             switch (status) {
                 case PREPARED:
                     return;
                 case ABORTED:
                     throw new DeadTransactionException(
-                        format("Can't prepare already aborted transaction '%s'", config.familyName));
+                        format("[%s] Can't prepare already aborted transaction", config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                        format("Can't prepare already committed transaction '%s'", config.familyName));
+                        format("[%s] Can't prepare already committed transaction", config.familyName));
                 default:
                     throw new IllegalStateException();
             }
@@ -669,10 +661,10 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                     return;
                 case ABORTED:
                     throw new DeadTransactionException(
-                        format("Can't prepare already aborted transaction '%s'", config.familyName));
+                        format("[%s] Can't prepare an already aborted transaction", config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                        format("Can't prepare already committed transaction '%s'", config.familyName));
+                        format("[%s] Can't prepare an already committed transaction", config.familyName));
                 default:
                     throw new IllegalStateException();
             }
@@ -781,20 +773,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     @Override
     public final void registerChangeListenerAndAbort(final Latch listener, final BetaObjectPool pool) {
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't block on already prepared transaction '%s'", config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't block on already aborted transaction '%s'", config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't block on already committed transaction '%s'", config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+            throw abortOnFaultyStatusOfRegisterChangeListenerAndAbort(pool);
         }
 
         if(listener == null){
@@ -804,15 +783,11 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         if(!config.blockingAllowed){
-            abort();
-            throw new NoRetryPossibleException(
-                format("Can't block transaction '%s', since it explicitly is configured as non blockable",config.familyName));
+            throw abortOnNoBlockingAllowed(pool);
         }
 
         if( attached == null){
-            abort();
-            throw new NoRetryPossibleException(
-                format("Can't block transaction '%s', since there are no tracked reads",config.familyName));
+            throw abortOnNoRetryPossible(pool);
         }
 
         final long listenerEra = listener.getEra();
@@ -830,11 +805,10 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         if(normalListeners != null){
             notifyListeners(normalListeners, TransactionLifecycleEvent.PostAbort);
         }
-#end
 
+#end
         if(failure){
-            throw new NoRetryPossibleException(
-            format("Can't block transaction '%s', since there are no tracked reads",config.familyName));
+            throw abortOnNoRetryPossible(pool);
         }
     }
 

@@ -12,6 +12,14 @@ import java.util.Locale;
  */
 public class BetaStmUtils {
 
+    public static String toDebugString(BetaTransactionalObject o){
+        if(o == null){
+            return "null";
+        }else{
+            return o.getClass().getName();
+        }
+    }
+
     public static void arbitraryUpdate(BetaStm stm, LongRef ref) {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.openForWrite(ref, false, new BetaObjectPool());

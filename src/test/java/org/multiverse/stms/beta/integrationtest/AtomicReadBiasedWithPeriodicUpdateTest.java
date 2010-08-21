@@ -38,12 +38,10 @@ public class AtomicReadBiasedWithPeriodicUpdateTest {
             }
         }
 
-        //since the value only is returned, we don't need to worry about conflicts.
-        //This means that the surplus doesn't need to be increased.
-        assertSurplus(0, ref);
+        assertSurplus(1, ref);
         //since no arrive/depart is done, the orec doesn't become read biased based on the
         //atomicget.
-        assertUpdateBiased(ref);
+        assertReadBiased(ref);
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
 

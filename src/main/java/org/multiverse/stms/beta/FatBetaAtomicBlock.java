@@ -61,12 +61,18 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                     }
                 case Mandatory:
                     if (tx == null) {
-                        throw new NoTransactionFoundException();
+                        throw new NoTransactionFoundException(
+                            format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
+                                transactionConfiguration.familyName));
                     }
                     return closure.execute(tx);
                 case Never:
                     if (tx != null) {
-                        throw new NoTransactionAllowedException();
+                        throw new NoTransactionAllowedException(
+                            format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
+                                ", but transaction '%s' was found",
+                                transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
+                        );
                     }
                     return closure.execute(null);
                 case RequiresNew:
@@ -183,12 +189,18 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                     }
                 case Mandatory:
                     if (tx == null) {
-                        throw new NoTransactionFoundException();
+                        throw new NoTransactionFoundException(
+                            format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
+                                transactionConfiguration.familyName));
                     }
                     return closure.execute(tx);
                 case Never:
                     if (tx != null) {
-                        throw new NoTransactionAllowedException();
+                        throw new NoTransactionAllowedException(
+                            format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
+                                ", but transaction '%s' was found",
+                                transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
+                        );
                     }
                     return closure.execute(null);
                 case RequiresNew:
@@ -305,12 +317,18 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                     }
                 case Mandatory:
                     if (tx == null) {
-                        throw new NoTransactionFoundException();
+                        throw new NoTransactionFoundException(
+                            format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
+                                transactionConfiguration.familyName));
                     }
                     return closure.execute(tx);
                 case Never:
                     if (tx != null) {
-                        throw new NoTransactionAllowedException();
+                        throw new NoTransactionAllowedException(
+                            format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
+                                ", but transaction '%s' was found",
+                                transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
+                        );
                     }
                     return closure.execute(null);
                 case RequiresNew:
@@ -427,12 +445,18 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                     }
                 case Mandatory:
                     if (tx == null) {
-                        throw new NoTransactionFoundException();
+                        throw new NoTransactionFoundException(
+                            format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
+                                transactionConfiguration.familyName));
                     }
                     return closure.execute(tx);
                 case Never:
                     if (tx != null) {
-                        throw new NoTransactionAllowedException();
+                        throw new NoTransactionAllowedException(
+                            format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
+                                ", but transaction '%s' was found",
+                                transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
+                        );
                     }
                     return closure.execute(null);
                 case RequiresNew:
@@ -549,12 +573,18 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                     }
                 case Mandatory:
                     if (tx == null) {
-                        throw new NoTransactionFoundException();
+                        throw new NoTransactionFoundException(
+                            format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
+                                transactionConfiguration.familyName));
                     }
                     return closure.execute(tx);
                 case Never:
                     if (tx != null) {
-                        throw new NoTransactionAllowedException();
+                        throw new NoTransactionAllowedException(
+                            format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
+                                ", but transaction '%s' was found",
+                                transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
+                        );
                     }
                     return closure.execute(null);
                 case RequiresNew:
@@ -673,13 +703,19 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                     }
                 case Mandatory:
                     if (tx == null) {
-                        throw new NoTransactionFoundException();
+                        throw new NoTransactionFoundException(
+                            format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
+                                transactionConfiguration.familyName));
                     }
                     closure.execute(tx);
                     return;
                 case Never:
                     if (tx != null) {
-                        throw new NoTransactionAllowedException();
+                        throw new NoTransactionAllowedException(
+                            format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
+                                ", but transaction '%s' was found",
+                                transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
+                        );
                     }
                     closure.execute(null);
                     return;

@@ -147,7 +147,6 @@ public class BetaAtomicBlock_speculativeTest {
         assertEquals(2, transactions.size());
         assertTrue(transactions.get(0) instanceof LeanMonoBetaTransaction);
         assertTrue(transactions.get(1) instanceof FatMonoBetaTransaction);
-
     }
 
     @Test
@@ -157,8 +156,32 @@ public class BetaAtomicBlock_speculativeTest {
     }
 
     @Test
-    @Ignore
     public void whenTimeoutAvailable_thenCopied() {
+        final LongRef ref1 = createLongRef(stm);
+        final LongRef ref2 = createLongRef(stm);
 
+        final List<BetaTransaction> transactions = new LinkedList<BetaTransaction>();
+
+        AtomicBlock block = stm.getTransactionFactoryBuilder()
+                .setTimeoutNs(1000)
+                .setSpeculativeConfigEnabled(true)
+                .buildAtomicBlock();
+
+        block.execute(new AtomicVoidClosure() {
+            @Override
+            public void execute(Transaction tx) throws Exception {
+                BetaTransaction btx = (BetaTransaction) tx;
+                transactions.add(btx);
+
+                if(transactions.size()==1){
+                    btx.setRemainingTimeoutNs(500);
+                }else{
+                    assertEquals(500, btx.getRemainingTimeoutNs());
+                }
+
+                btx.openForWrite(ref1,false, pool);
+                btx.openForWrite(ref2,false, pool);
+            }
+        });
     }
 }

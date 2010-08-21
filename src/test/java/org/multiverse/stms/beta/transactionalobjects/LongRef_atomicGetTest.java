@@ -6,8 +6,7 @@ import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 import static org.multiverse.stms.beta.BetaStmUtils.createReadBiasedLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertReadBiased;
@@ -43,14 +42,18 @@ public class LongRef_atomicGetTest {
     }
 
     @Test
-    public void whenUpdateBiasedAndLocked() {
+    public void whenUpdateBiasedAndLocked_thenIllegalStateException() {
         LongRef ref = createLongRef(stm, 100);
         BetaTransaction lockOwner = stm.startDefaultTransaction();
         lockOwner.openForRead(ref, true, new BetaObjectPool());
 
-        long result = ref.atomicGet();
+        try {
+            ref.atomicGet();
+            fail();
+        } catch (IllegalStateException ex) {
 
-        assertEquals(100, result);
+        }
+
         assertSame(lockOwner, ref.___getLockOwner());
         assertUpdateBiased(ref);
     }
@@ -70,9 +73,13 @@ public class LongRef_atomicGetTest {
         BetaTransaction lockOwner = stm.startDefaultTransaction();
         lockOwner.openForRead(ref, true, new BetaObjectPool());
 
-        long result = ref.atomicGet();
+        try {
+            ref.atomicGet();
+            fail();
+        } catch (IllegalStateException expected) {
 
-        assertEquals(100, result);
+        }
+
         assertSame(lockOwner, ref.___getLockOwner());
         assertReadBiased(ref);
     }

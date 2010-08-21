@@ -4,11 +4,11 @@ import org.multiverse.MultiverseConstants;
 import org.multiverse.api.LockStatus;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.Latch;
-import org.multiverse.api.blocking.Listeners;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.exceptions.WriteConflict;
 import org.multiverse.functions.IntFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 import org.multiverse.stms.beta.orec.Orec;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -499,13 +499,23 @@ public final class IntRef
      * @throws IllegalStateException if there hasn't been any commit before.
      */
     public final int atomicGet(){
-        IntRefTranlocal read = ___active;
-
-        if(___active == null){
+        IntRefTranlocal read = ___load(50);
+        if(read == null){
             throw new IllegalStateException();
         }
 
-        return read.value;
+        if(read.isLocked){
+            throw new IllegalStateException("Can't read locked reference");
+        }
+
+        int result = read.value;
+
+        if(!read.isPermanent && ___departAfterReading()){
+            read.markAsPermanent();
+            ___unlockAfterBecomingReadBiased();
+        }
+
+        return result;
     }
 
     public final int atomicSet(int newValue){

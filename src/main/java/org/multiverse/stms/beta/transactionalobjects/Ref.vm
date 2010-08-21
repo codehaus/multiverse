@@ -503,13 +503,23 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
      * @throws IllegalStateException if there hasn't been any commit before.
      */
     public final ${transactionalObject.type} atomicGet(){
-        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} read = ___active;
-
-        if(___active == null){
+        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} read = ___load(50);
+        if(read == null){
             throw new IllegalStateException();
         }
 
-        return read.value;
+        if(read.isLocked){
+            throw new IllegalStateException("Can't read locked reference");
+        }
+
+        ${transactionalObject.type} result = read.value;
+
+        if(!read.isPermanent && ___departAfterReading()){
+            read.markAsPermanent();
+            ___unlockAfterBecomingReadBiased();
+        }
+
+        return result;
     }
 
     public final ${transactionalObject.type} atomicSet(${transactionalObject.type} newValue){

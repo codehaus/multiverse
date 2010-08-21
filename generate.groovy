@@ -32,6 +32,7 @@ class TransactionalObject {
   String initialValue;//the initial value
   int classIndex;
   String typeParameter;
+//  String parametrizedTranlocal
   boolean specialization;
   String accessModifier//the access modifier the ref gets
   String functionClass//the class of the callable used for commuting operations
@@ -169,6 +170,7 @@ List<TransactionalObject> createTransactionalObjects() {
           tranlocal: 'RefTranlocal',
           type: 'E',
           typeParameter: '<E>',
+//          parametrizedTranlocal: 'RefTranlocal<E>',
           initialValue: 'null',
           classIndex: 0,
           specialization: true,
@@ -178,6 +180,7 @@ List<TransactionalObject> createTransactionalObjects() {
   result.add new TransactionalObject(
           name: 'IntRef',
           tranlocal: 'IntRefTranlocal',
+//          parametrizedTranlocal: 'IntRefTranlocal',
           type: 'int',
           typeParameter: '',
           initialValue: '0',

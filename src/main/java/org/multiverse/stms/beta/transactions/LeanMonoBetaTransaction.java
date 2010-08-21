@@ -2,13 +2,16 @@ package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.Watch;
 import org.multiverse.api.blocking.Latch;
-import org.multiverse.api.blocking.Listeners;
-import org.multiverse.api.exceptions.*;
+import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.api.exceptions.SpeculativeConfigurationError;
+import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.functions.Function;
 import org.multiverse.functions.IntFunction;
 import org.multiverse.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
 import static java.lang.String.format;
@@ -66,10 +69,9 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     @Override
     public final <E> RefTranlocal openForRead(final Ref<E> ref,  boolean lock, final BetaObjectPool pool) {
-//        assert pool!=null;
 
         if (status != ACTIVE) {
-            throw abortOpenForRead(pool);
+            throw abortOpenForRead(pool, ref);
         }
 
         if (ref == null) {
@@ -139,19 +141,15 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         final Ref<E> ref, boolean lock, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
-            throw abortOpenForWrite(pool);
+            throw abortOpenForWrite(pool, ref);
         }
 
         if (ref == null) {
-            abort(pool);
-            throw new NullPointerException(
-                format("Can't open for writing a null ref/transactionalobject using transaction '%s'",config.familyName));
+            throw abortOpenForWriteWhenNullReference(pool);
         }
 
         if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(
-                format("Can't write to readonly transaction '%s'", config.familyName));
+            throw abortOpenForWriteWhenReadonly(pool, ref);
         }
 
         lock = lock || config.lockWrites;
@@ -212,29 +210,22 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         final Ref<E> ref, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
-           throw abortOpenForConstruction(pool);
+           throw abortOpenForConstruction(pool, ref);
         }
 
         if (ref == null) {
-            abort(pool);
-            throw new NullPointerException(
-                format("Can't open for construction a null transactionalobject/ref using transaction '%s'",config.familyName));
+            throw abortOpenForConstructionWhenNullReference(pool);
         }
 
         if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(
-                format("Can't open for construction a new object using readonly transaction '%s'",config.familyName));
+            throw abortOpenForConstructionWhenReadonly(pool, ref);                        
         }
 
         RefTranlocal<E> result = (attached == null || attached.owner != ref) ? null : (RefTranlocal<E>)attached;
 
         if(result != null){
             if(result.isCommitted || result.read != null){
-                abort();
-                throw new IllegalArgumentException(
-                    format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
-                        config.familyName, ref.getClass().getName()));
+               throw abortOpenForConstructionWithBadReference(pool, ref);
             }
 
             return result;
@@ -246,8 +237,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         if(ref.___unsafeLoad()!=null){
-            abort();
-            throw new IllegalArgumentException();
+            throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
         result =  pool.take(ref);
@@ -262,7 +252,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         Ref<E> ref, BetaObjectPool pool, Function<E> function){
 
         if (status != ACTIVE) {
-            throw abortCommute(pool);
+            throw abortCommute(pool, ref, function);
         }
 
         config.needsCommute();
@@ -272,10 +262,9 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     @Override
     public final  IntRefTranlocal openForRead(final IntRef ref,  boolean lock, final BetaObjectPool pool) {
-//        assert pool!=null;
 
         if (status != ACTIVE) {
-            throw abortOpenForRead(pool);
+            throw abortOpenForRead(pool, ref);
         }
 
         if (ref == null) {
@@ -345,19 +334,15 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         final IntRef ref, boolean lock, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
-            throw abortOpenForWrite(pool);
+            throw abortOpenForWrite(pool, ref);
         }
 
         if (ref == null) {
-            abort(pool);
-            throw new NullPointerException(
-                format("Can't open for writing a null ref/transactionalobject using transaction '%s'",config.familyName));
+            throw abortOpenForWriteWhenNullReference(pool);
         }
 
         if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(
-                format("Can't write to readonly transaction '%s'", config.familyName));
+            throw abortOpenForWriteWhenReadonly(pool, ref);
         }
 
         lock = lock || config.lockWrites;
@@ -418,29 +403,22 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         final IntRef ref, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
-           throw abortOpenForConstruction(pool);
+           throw abortOpenForConstruction(pool, ref);
         }
 
         if (ref == null) {
-            abort(pool);
-            throw new NullPointerException(
-                format("Can't open for construction a null transactionalobject/ref using transaction '%s'",config.familyName));
+            throw abortOpenForConstructionWhenNullReference(pool);
         }
 
         if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(
-                format("Can't open for construction a new object using readonly transaction '%s'",config.familyName));
+            throw abortOpenForConstructionWhenReadonly(pool, ref);                        
         }
 
         IntRefTranlocal result = (attached == null || attached.owner != ref) ? null : (IntRefTranlocal)attached;
 
         if(result != null){
             if(result.isCommitted || result.read != null){
-                abort();
-                throw new IllegalArgumentException(
-                    format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
-                        config.familyName, ref.getClass().getName()));
+               throw abortOpenForConstructionWithBadReference(pool, ref);
             }
 
             return result;
@@ -452,8 +430,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         if(ref.___unsafeLoad()!=null){
-            abort();
-            throw new IllegalArgumentException();
+            throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
         result =  pool.take(ref);
@@ -468,7 +445,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         IntRef ref, BetaObjectPool pool, IntFunction function){
 
         if (status != ACTIVE) {
-            throw abortCommute(pool);
+            throw abortCommute(pool, ref, function);
         }
 
         config.needsCommute();
@@ -478,10 +455,9 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     @Override
     public final  LongRefTranlocal openForRead(final LongRef ref,  boolean lock, final BetaObjectPool pool) {
-//        assert pool!=null;
 
         if (status != ACTIVE) {
-            throw abortOpenForRead(pool);
+            throw abortOpenForRead(pool, ref);
         }
 
         if (ref == null) {
@@ -551,19 +527,15 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         final LongRef ref, boolean lock, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
-            throw abortOpenForWrite(pool);
+            throw abortOpenForWrite(pool, ref);
         }
 
         if (ref == null) {
-            abort(pool);
-            throw new NullPointerException(
-                format("Can't open for writing a null ref/transactionalobject using transaction '%s'",config.familyName));
+            throw abortOpenForWriteWhenNullReference(pool);
         }
 
         if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(
-                format("Can't write to readonly transaction '%s'", config.familyName));
+            throw abortOpenForWriteWhenReadonly(pool, ref);
         }
 
         lock = lock || config.lockWrites;
@@ -624,29 +596,22 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         final LongRef ref, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
-           throw abortOpenForConstruction(pool);
+           throw abortOpenForConstruction(pool, ref);
         }
 
         if (ref == null) {
-            abort(pool);
-            throw new NullPointerException(
-                format("Can't open for construction a null transactionalobject/ref using transaction '%s'",config.familyName));
+            throw abortOpenForConstructionWhenNullReference(pool);
         }
 
         if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(
-                format("Can't open for construction a new object using readonly transaction '%s'",config.familyName));
+            throw abortOpenForConstructionWhenReadonly(pool, ref);                        
         }
 
         LongRefTranlocal result = (attached == null || attached.owner != ref) ? null : (LongRefTranlocal)attached;
 
         if(result != null){
             if(result.isCommitted || result.read != null){
-                abort();
-                throw new IllegalArgumentException(
-                    format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
-                        config.familyName, ref.getClass().getName()));
+               throw abortOpenForConstructionWithBadReference(pool, ref);
             }
 
             return result;
@@ -658,8 +623,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         if(ref.___unsafeLoad()!=null){
-            abort();
-            throw new IllegalArgumentException();
+            throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
         result =  pool.take(ref);
@@ -674,7 +638,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         LongRef ref, BetaObjectPool pool, LongFunction function){
 
         if (status != ACTIVE) {
-            throw abortCommute(pool);
+            throw abortCommute(pool, ref, function);
         }
 
         config.needsCommute();
@@ -684,10 +648,9 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     @Override
     public final  Tranlocal openForRead(final BetaTransactionalObject ref,  boolean lock, final BetaObjectPool pool) {
-//        assert pool!=null;
 
         if (status != ACTIVE) {
-            throw abortOpenForRead(pool);
+            throw abortOpenForRead(pool, ref);
         }
 
         if (ref == null) {
@@ -757,19 +720,15 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         final BetaTransactionalObject ref, boolean lock, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
-            throw abortOpenForWrite(pool);
+            throw abortOpenForWrite(pool, ref);
         }
 
         if (ref == null) {
-            abort(pool);
-            throw new NullPointerException(
-                format("Can't open for writing a null ref/transactionalobject using transaction '%s'",config.familyName));
+            throw abortOpenForWriteWhenNullReference(pool);
         }
 
         if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(
-                format("Can't write to readonly transaction '%s'", config.familyName));
+            throw abortOpenForWriteWhenReadonly(pool, ref);
         }
 
         lock = lock || config.lockWrites;
@@ -820,29 +779,22 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         final BetaTransactionalObject ref, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
-           throw abortOpenForConstruction(pool);
+           throw abortOpenForConstruction(pool, ref);
         }
 
         if (ref == null) {
-            abort(pool);
-            throw new NullPointerException(
-                format("Can't open for construction a null transactionalobject/ref using transaction '%s'",config.familyName));
+            throw abortOpenForConstructionWhenNullReference(pool);
         }
 
         if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(
-                format("Can't open for construction a new object using readonly transaction '%s'",config.familyName));
+            throw abortOpenForConstructionWhenReadonly(pool, ref);                        
         }
 
         Tranlocal result = (attached == null || attached.owner != ref) ? null : (Tranlocal)attached;
 
         if(result != null){
             if(result.isCommitted || result.read != null){
-                abort();
-                throw new IllegalArgumentException(
-                    format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
-                        config.familyName, ref.getClass().getName()));
+               throw abortOpenForConstructionWithBadReference(pool, ref);
             }
 
             return result;
@@ -854,8 +806,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         if(ref.___unsafeLoad()!=null){
-            abort();
-            throw new IllegalArgumentException();
+            throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
         result = ref.___openForConstruction(pool);
@@ -867,7 +818,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         BetaTransactionalObject ref, BetaObjectPool pool, Function function){
 
         if (status != ACTIVE) {
-            throw abortCommute(pool);
+            throw abortCommute(pool, ref, function);
         }
 
         config.needsCommute();
@@ -903,7 +854,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
                     return;
                 case COMMITTED:
                     throw new DeadTransactionException(
-                        format("Can't abort already aborted transaction '%s'",config.familyName));
+                        format("[%s] Can't abort an already aborted transaction",config.familyName));
                 default:
                     throw new IllegalStateException();
             }
@@ -926,11 +877,15 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     @Override
     public final void commit(final BetaObjectPool pool) {
+        if(status == COMMITTED){
+            return;
+        }
+
         if (status != ACTIVE && status != PREPARED) {
             switch (status) {
                 case ABORTED:
                     throw new DeadTransactionException(
-                        format("Can't commit already aborted transaction '%s'", config.familyName));
+                        format("[%s] Can't commit an already aborted transaction", config.familyName));
                 case COMMITTED:
                     return;
                 default:
@@ -979,16 +934,20 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     @Override
     public final void prepare(final BetaObjectPool pool) {
+        if(status == PREPARED){
+            return;
+        }
+
         if(status != ACTIVE){
             switch (status) {
                 case PREPARED:
                     return;
                 case ABORTED:
                     throw new DeadTransactionException(
-                        format("Can't prepare already aborted transaction '%s'", config.familyName));
+                        format("[%s] Can't prepare already aborted transaction", config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                        format("Can't prepare already committed transaction '%s'", config.familyName));
+                        format("[%s] Can't prepare already committed transaction", config.familyName));
                 default:
                     throw new IllegalStateException();
             }
@@ -1056,20 +1015,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
     @Override
     public final void registerChangeListenerAndAbort(final Latch listener, final BetaObjectPool pool) {
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't block on already prepared transaction '%s'", config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't block on already aborted transaction '%s'", config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't block on already committed transaction '%s'", config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+            throw abortOnFaultyStatusOfRegisterChangeListenerAndAbort(pool);
         }
 
         if(listener == null){
@@ -1079,15 +1025,11 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         if(!config.blockingAllowed){
-            abort();
-            throw new NoRetryPossibleException(
-                format("Can't block transaction '%s', since it explicitly is configured as non blockable",config.familyName));
+            throw abortOnNoBlockingAllowed(pool);
         }
 
         if( attached == null){
-            abort();
-            throw new NoRetryPossibleException(
-                format("Can't block transaction '%s', since there are no tracked reads",config.familyName));
+            throw abortOnNoRetryPossible(pool);
         }
 
         final long listenerEra = listener.getEra();
@@ -1097,10 +1039,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         owner.___abort(this, attached, pool);
         status = ABORTED;
 
-
         if(failure){
-            throw new NoRetryPossibleException(
-            format("Can't block transaction '%s', since there are no tracked reads",config.familyName));
+            throw abortOnNoRetryPossible(pool);
         }
     }
 

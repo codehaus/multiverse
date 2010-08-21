@@ -2,7 +2,6 @@ package org.multiverse.stms.beta;
 
 import org.junit.Test;
 import org.multiverse.api.blocking.CheapLatch;
-import org.multiverse.api.blocking.Listeners;
 
 import static org.junit.Assert.*;
 

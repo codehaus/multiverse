@@ -2,13 +2,16 @@ package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.Watch;
 import org.multiverse.api.blocking.Latch;
-import org.multiverse.api.blocking.Listeners;
-import org.multiverse.api.exceptions.*;
+import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.api.exceptions.SpeculativeConfigurationError;
+import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.functions.Function;
 import org.multiverse.functions.IntFunction;
 import org.multiverse.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.conflictcounters.LocalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
@@ -74,20 +77,16 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     public <E> RefTranlocal<E> openForRead(
         final Ref<E> ref, boolean lock, final BetaObjectPool pool) {
 
-        //make sure that the state is correct.
         if (status != ACTIVE) {
-            throw abortOpenForRead(pool);
+            throw abortOpenForRead(pool, ref);
         }
 
-        //a read on a null ref, always return a null tranlocal.
         if (ref == null) {
             return null;
         }
 
         lock = lock || config.lockReads;
-
         final int index = indexOf(ref);
-
         if(index > -1){
             //we are lucky, at already is attached to the session
             RefTranlocal<E> found = (RefTranlocal<E>)array[index];
@@ -143,25 +142,19 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     public <E> RefTranlocal<E> openForWrite(
         final Ref<E>  ref, boolean lock, final BetaObjectPool pool) {
 
-        //check if the status of the transaction is correct.
         if (status != ACTIVE) {
-           throw abortOpenForWrite(pool);
+           throw abortOpenForWrite(pool, ref);
         }
 
         if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(
-                format("Can't write to readonly transaction '%s'",config.familyName));
+            throw abortOpenForWriteWhenReadonly(pool, ref);
         }
 
-        //an openForWrite can't open a null ref.
         if (ref == null) {
-            abort(pool);
-            throw new NullPointerException();
+            throw abortOpenForWriteWhenNullReference(pool);
         }
 
         lock = lock || config.lockWrites;
-
         final int index = indexOf(ref);
         if(index != -1){
             RefTranlocal<E> result = (RefTranlocal<E>)array[index];
@@ -189,10 +182,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnTooSmallSize(pool, array.length+1);
         }
 
-        //only if the size currently is 0, we are going to initialize the localConflictCounter,
-        //not before. So the localConflictCounter is set at the latest moment possible. It is
-        //very important that this is done before the actual reading since we don't want to loose
-        //a conflict.
         if(!hasReads){
             localConflictCounter.reset();
             hasReads = true;
@@ -229,20 +218,16 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     public final <E> RefTranlocal<E> openForConstruction(
         final Ref<E> ref, final BetaObjectPool pool) {
 
-        //check if the status of the transaction is correct.
         if (status != ACTIVE) {
-          throw abortOpenForConstruction(pool);
+            throw abortOpenForConstruction(pool, ref);
         }
 
         if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
+            throw abortOpenForConstructionWhenReadonly(pool, ref);
         }
 
-        //an openForWrite can't open a null ref.
         if (ref == null) {
-            abort(pool);
-            throw new NullPointerException();
+            throw abortOpenForConstructionWhenNullReference(pool);
         }
 
         final int index = indexOf(ref);
@@ -250,11 +235,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             RefTranlocal<E> result = (RefTranlocal<E>)array[index];
 
             if(result.isCommitted || result.read!= null){
-                abort();
-                throw new IllegalArgumentException(
-                    format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
-                        config.familyName, ref.getClass().getName()));
-
+                throw abortOpenForConstructionWithBadReference(pool, ref);
             }
 
             if (index > 0) {
@@ -268,9 +249,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         //it was not previously attached to this transaction
 
         if(ref.___unsafeLoad() != null){
-            abort();
-            throw new IllegalArgumentException(
-                format("Can't open for construction a previous committed object on transaction '%s'",config.familyName));
+            throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
         //make sure that the transaction doesn't overflow.
@@ -292,9 +271,9 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         final Ref<E> ref, final BetaObjectPool pool, Function<E> function){
 
         if (status != ACTIVE) {
-            throw abortCommute(pool);
+            throw abortCommute(pool, ref, function);
         }
-
+        
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
@@ -305,20 +284,16 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     public  IntRefTranlocal openForRead(
         final IntRef ref, boolean lock, final BetaObjectPool pool) {
 
-        //make sure that the state is correct.
         if (status != ACTIVE) {
-            throw abortOpenForRead(pool);
+            throw abortOpenForRead(pool, ref);
         }
 
-        //a read on a null ref, always return a null tranlocal.
         if (ref == null) {
             return null;
         }
 
         lock = lock || config.lockReads;
-
         final int index = indexOf(ref);
-
         if(index > -1){
             //we are lucky, at already is attached to the session
             IntRefTranlocal found = (IntRefTranlocal)array[index];
@@ -374,25 +349,19 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     public  IntRefTranlocal openForWrite(
         final IntRef  ref, boolean lock, final BetaObjectPool pool) {
 
-        //check if the status of the transaction is correct.
         if (status != ACTIVE) {
-           throw abortOpenForWrite(pool);
+           throw abortOpenForWrite(pool, ref);
         }
 
         if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(
-                format("Can't write to readonly transaction '%s'",config.familyName));
+            throw abortOpenForWriteWhenReadonly(pool, ref);
         }
 
-        //an openForWrite can't open a null ref.
         if (ref == null) {
-            abort(pool);
-            throw new NullPointerException();
+            throw abortOpenForWriteWhenNullReference(pool);
         }
 
         lock = lock || config.lockWrites;
-
         final int index = indexOf(ref);
         if(index != -1){
             IntRefTranlocal result = (IntRefTranlocal)array[index];
@@ -420,10 +389,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnTooSmallSize(pool, array.length+1);
         }
 
-        //only if the size currently is 0, we are going to initialize the localConflictCounter,
-        //not before. So the localConflictCounter is set at the latest moment possible. It is
-        //very important that this is done before the actual reading since we don't want to loose
-        //a conflict.
         if(!hasReads){
             localConflictCounter.reset();
             hasReads = true;
@@ -460,20 +425,16 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     public final  IntRefTranlocal openForConstruction(
         final IntRef ref, final BetaObjectPool pool) {
 
-        //check if the status of the transaction is correct.
         if (status != ACTIVE) {
-          throw abortOpenForConstruction(pool);
+            throw abortOpenForConstruction(pool, ref);
         }
 
         if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
+            throw abortOpenForConstructionWhenReadonly(pool, ref);
         }
 
-        //an openForWrite can't open a null ref.
         if (ref == null) {
-            abort(pool);
-            throw new NullPointerException();
+            throw abortOpenForConstructionWhenNullReference(pool);
         }
 
         final int index = indexOf(ref);
@@ -481,11 +442,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             IntRefTranlocal result = (IntRefTranlocal)array[index];
 
             if(result.isCommitted || result.read!= null){
-                abort();
-                throw new IllegalArgumentException(
-                    format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
-                        config.familyName, ref.getClass().getName()));
-
+                throw abortOpenForConstructionWithBadReference(pool, ref);
             }
 
             if (index > 0) {
@@ -499,9 +456,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         //it was not previously attached to this transaction
 
         if(ref.___unsafeLoad() != null){
-            abort();
-            throw new IllegalArgumentException(
-                format("Can't open for construction a previous committed object on transaction '%s'",config.familyName));
+            throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
         //make sure that the transaction doesn't overflow.
@@ -523,9 +478,9 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         final IntRef ref, final BetaObjectPool pool, IntFunction function){
 
         if (status != ACTIVE) {
-            throw abortCommute(pool);
+            throw abortCommute(pool, ref, function);
         }
-
+        
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
@@ -536,20 +491,16 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     public  LongRefTranlocal openForRead(
         final LongRef ref, boolean lock, final BetaObjectPool pool) {
 
-        //make sure that the state is correct.
         if (status != ACTIVE) {
-            throw abortOpenForRead(pool);
+            throw abortOpenForRead(pool, ref);
         }
 
-        //a read on a null ref, always return a null tranlocal.
         if (ref == null) {
             return null;
         }
 
         lock = lock || config.lockReads;
-
         final int index = indexOf(ref);
-
         if(index > -1){
             //we are lucky, at already is attached to the session
             LongRefTranlocal found = (LongRefTranlocal)array[index];
@@ -605,25 +556,19 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     public  LongRefTranlocal openForWrite(
         final LongRef  ref, boolean lock, final BetaObjectPool pool) {
 
-        //check if the status of the transaction is correct.
         if (status != ACTIVE) {
-           throw abortOpenForWrite(pool);
+           throw abortOpenForWrite(pool, ref);
         }
 
         if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(
-                format("Can't write to readonly transaction '%s'",config.familyName));
+            throw abortOpenForWriteWhenReadonly(pool, ref);
         }
 
-        //an openForWrite can't open a null ref.
         if (ref == null) {
-            abort(pool);
-            throw new NullPointerException();
+            throw abortOpenForWriteWhenNullReference(pool);
         }
 
         lock = lock || config.lockWrites;
-
         final int index = indexOf(ref);
         if(index != -1){
             LongRefTranlocal result = (LongRefTranlocal)array[index];
@@ -651,10 +596,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnTooSmallSize(pool, array.length+1);
         }
 
-        //only if the size currently is 0, we are going to initialize the localConflictCounter,
-        //not before. So the localConflictCounter is set at the latest moment possible. It is
-        //very important that this is done before the actual reading since we don't want to loose
-        //a conflict.
         if(!hasReads){
             localConflictCounter.reset();
             hasReads = true;
@@ -691,20 +632,16 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     public final  LongRefTranlocal openForConstruction(
         final LongRef ref, final BetaObjectPool pool) {
 
-        //check if the status of the transaction is correct.
         if (status != ACTIVE) {
-          throw abortOpenForConstruction(pool);
+            throw abortOpenForConstruction(pool, ref);
         }
 
         if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
+            throw abortOpenForConstructionWhenReadonly(pool, ref);
         }
 
-        //an openForWrite can't open a null ref.
         if (ref == null) {
-            abort(pool);
-            throw new NullPointerException();
+            throw abortOpenForConstructionWhenNullReference(pool);
         }
 
         final int index = indexOf(ref);
@@ -712,11 +649,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             LongRefTranlocal result = (LongRefTranlocal)array[index];
 
             if(result.isCommitted || result.read!= null){
-                abort();
-                throw new IllegalArgumentException(
-                    format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
-                        config.familyName, ref.getClass().getName()));
-
+                throw abortOpenForConstructionWithBadReference(pool, ref);
             }
 
             if (index > 0) {
@@ -730,9 +663,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         //it was not previously attached to this transaction
 
         if(ref.___unsafeLoad() != null){
-            abort();
-            throw new IllegalArgumentException(
-                format("Can't open for construction a previous committed object on transaction '%s'",config.familyName));
+            throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
         //make sure that the transaction doesn't overflow.
@@ -754,9 +685,9 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         final LongRef ref, final BetaObjectPool pool, LongFunction function){
 
         if (status != ACTIVE) {
-            throw abortCommute(pool);
+            throw abortCommute(pool, ref, function);
         }
-
+        
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
@@ -767,20 +698,16 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     public  Tranlocal openForRead(
         final BetaTransactionalObject ref, boolean lock, final BetaObjectPool pool) {
 
-        //make sure that the state is correct.
         if (status != ACTIVE) {
-            throw abortOpenForRead(pool);
+            throw abortOpenForRead(pool, ref);
         }
 
-        //a read on a null ref, always return a null tranlocal.
         if (ref == null) {
             return null;
         }
 
         lock = lock || config.lockReads;
-
         final int index = indexOf(ref);
-
         if(index > -1){
             //we are lucky, at already is attached to the session
             Tranlocal found = (Tranlocal)array[index];
@@ -836,25 +763,19 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     public  Tranlocal openForWrite(
         final BetaTransactionalObject  ref, boolean lock, final BetaObjectPool pool) {
 
-        //check if the status of the transaction is correct.
         if (status != ACTIVE) {
-           throw abortOpenForWrite(pool);
+           throw abortOpenForWrite(pool, ref);
         }
 
         if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(
-                format("Can't write to readonly transaction '%s'",config.familyName));
+            throw abortOpenForWriteWhenReadonly(pool, ref);
         }
 
-        //an openForWrite can't open a null ref.
         if (ref == null) {
-            abort(pool);
-            throw new NullPointerException();
+            throw abortOpenForWriteWhenNullReference(pool);
         }
 
         lock = lock || config.lockWrites;
-
         final int index = indexOf(ref);
         if(index != -1){
             Tranlocal result = (Tranlocal)array[index];
@@ -882,10 +803,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnTooSmallSize(pool, array.length+1);
         }
 
-        //only if the size currently is 0, we are going to initialize the localConflictCounter,
-        //not before. So the localConflictCounter is set at the latest moment possible. It is
-        //very important that this is done before the actual reading since we don't want to loose
-        //a conflict.
         if(!hasReads){
             localConflictCounter.reset();
             hasReads = true;
@@ -916,20 +833,16 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     public final  Tranlocal openForConstruction(
         final BetaTransactionalObject ref, final BetaObjectPool pool) {
 
-        //check if the status of the transaction is correct.
         if (status != ACTIVE) {
-          throw abortOpenForConstruction(pool);
+            throw abortOpenForConstruction(pool, ref);
         }
 
         if (config.readonly) {
-            abort(pool);
-            throw new ReadonlyException(format("Can't write to readonly transaction '%s'",config.familyName));
+            throw abortOpenForConstructionWhenReadonly(pool, ref);
         }
 
-        //an openForWrite can't open a null ref.
         if (ref == null) {
-            abort(pool);
-            throw new NullPointerException();
+            throw abortOpenForConstructionWhenNullReference(pool);
         }
 
         final int index = indexOf(ref);
@@ -937,11 +850,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             Tranlocal result = (Tranlocal)array[index];
 
             if(result.isCommitted || result.read!= null){
-                abort();
-                throw new IllegalArgumentException(
-                    format("Can't open a previous committed object of class '%s' for construction on transaction '%s'",
-                        config.familyName, ref.getClass().getName()));
-
+                throw abortOpenForConstructionWithBadReference(pool, ref);
             }
 
             if (index > 0) {
@@ -955,9 +864,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         //it was not previously attached to this transaction
 
         if(ref.___unsafeLoad() != null){
-            abort();
-            throw new IllegalArgumentException(
-                format("Can't open for construction a previous committed object on transaction '%s'",config.familyName));
+            throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
         //make sure that the transaction doesn't overflow.
@@ -976,9 +883,9 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         final BetaTransactionalObject ref, final BetaObjectPool pool, Function function){
 
         if (status != ACTIVE) {
-            throw abortCommute(pool);
+            throw abortCommute(pool, ref, function);
         }
-
+        
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
@@ -1067,7 +974,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 break;
             case COMMITTED:
                 throw new DeadTransactionException(
-                    format("Can't abort already committed transaction '%s'",config.familyName));
+                    format("[%s] Can't abort an already committed transaction",config.familyName));
             default:
                 throw new IllegalStateException();
         }
@@ -1086,7 +993,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             switch (status) {
                 case ABORTED:
                     throw new DeadTransactionException(
-                        format("Can't commit already aborted transaction '%s'",config.familyName));
+                        format("[%s] Can't commit an already aborted transaction",config.familyName));
                 case COMMITTED:
                     return;
                 default:
@@ -1187,10 +1094,10 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                      return;
                 case ABORTED:
                     throw new DeadTransactionException(
-                        format("Can't prepare already aborted transaction '%s'", config.familyName));
+                        format("[%s] Can't prepare already aborted transaction", config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                        format("Can't prepare already committed transaction '%s'", config.familyName));
+                        format("[%s] Can't prepare already committed transaction", config.familyName));
                 default:
                     throw new IllegalStateException();
             }
@@ -1271,32 +1178,15 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     @Override
     public void registerChangeListenerAndAbort(final Latch listener, final BetaObjectPool pool) {
         if (status != ACTIVE) {
-            switch (status) {
-                case PREPARED:
-                    abort();
-                    throw new PreparedTransactionException(
-                        format("Can't block on already prepared transaction '%s'", config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't block on already aborted transaction '%s'", config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't block on already committed transaction '%s'", config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
+            throw abortOnFaultyStatusOfRegisterChangeListenerAndAbort(pool);
         }
 
         if(!config.blockingAllowed){
-            abort();
-            throw new NoRetryPossibleException(
-                format("Can't block transaction '%s', since it explicitly is configured as non blockable",config.familyName));
+            throw abortOnNoBlockingAllowed(pool);
         }
 
         if( firstFreeIndex == 0){
-            abort();
-            throw new NoRetryPossibleException(
-                format("Can't block transaction '%s', since there are no tracked reads",config.familyName));
+            throw abortOnNoRetryPossible(pool);
         }
 
         final long listenerEra = listener.getEra();
@@ -1331,8 +1221,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         status = ABORTED;
 
         if(!atLeastOneRegistration){
-            throw new NoRetryPossibleException(
-                format("Can't block transaction '%s', since there are no tracked reads",config.familyName));
+            throw abortOnNoRetryPossible(pool);
         }
     }
 

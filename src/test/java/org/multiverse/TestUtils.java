@@ -2,12 +2,12 @@ package org.multiverse;
 
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.blocking.Latch;
-import org.multiverse.api.blocking.Listeners;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
+import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
 import org.multiverse.stms.beta.transactionalobjects.LongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
