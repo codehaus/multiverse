@@ -177,8 +177,6 @@ globalconflict counter.
 
 - rollbackfor/rollnotbackfor exception configuration
 
-- atomic block: add checked stuff
-
 - betatransactiontemplate needs to be removed
 
 - testing: atomic block & propagation and committed/aborted/prepared/new transaction on threadlocal
@@ -239,6 +237,7 @@ done
 
 - need to think more about the ref & retry especially reading/writing safety
 
+- atomic block: add checked stuff
 
 old done
 

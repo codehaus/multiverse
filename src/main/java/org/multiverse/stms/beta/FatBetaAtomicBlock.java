@@ -24,6 +24,18 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
     public BetaTransactionFactory getTransactionFactory(){
         return transactionFactory;
     }
+
+    @Override
+    public <E> E executeChecked(
+        final AtomicClosure<E> closure)throws Exception{
+    
+        try{
+            return execute(closure);
+        }catch(InvisibleCheckedException e){
+            throw e.getCause();
+        }
+    }
+
      public <E> E execute(final AtomicClosure<E> closure){
 
         if(closure == null){
@@ -77,13 +89,10 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 default:
                     throw new IllegalStateException();
             }
+        }catch(RuntimeException e){
+            throw e;
         }catch(Exception e){
-            //double catching of exceptions
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            } else {
-                throw new InvisibleCheckedException(e);
-            }
+            throw new InvisibleCheckedException(e);            
         }
    }
 
@@ -136,8 +145,19 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
             format("Maximum number of %s retries has been reached for transaction '%s'",
                 transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
+   }
+    
+     @Override
+    public  int executeChecked(
+        final AtomicIntClosure closure)throws Exception{
+    
+        try{
+            return execute(closure);
+        }catch(InvisibleCheckedException e){
+            throw e.getCause();
+        }
     }
- 
+
      public  int execute(final AtomicIntClosure closure){
 
         if(closure == null){
@@ -191,13 +211,10 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 default:
                     throw new IllegalStateException();
             }
+        }catch(RuntimeException e){
+            throw e;
         }catch(Exception e){
-            //double catching of exceptions
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            } else {
-                throw new InvisibleCheckedException(e);
-            }
+            throw new InvisibleCheckedException(e);            
         }
    }
 
@@ -250,8 +267,19 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
             format("Maximum number of %s retries has been reached for transaction '%s'",
                 transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
+   }
+    
+     @Override
+    public  long executeChecked(
+        final AtomicLongClosure closure)throws Exception{
+    
+        try{
+            return execute(closure);
+        }catch(InvisibleCheckedException e){
+            throw e.getCause();
+        }
     }
- 
+
      public  long execute(final AtomicLongClosure closure){
 
         if(closure == null){
@@ -305,13 +333,10 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 default:
                     throw new IllegalStateException();
             }
+        }catch(RuntimeException e){
+            throw e;
         }catch(Exception e){
-            //double catching of exceptions
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            } else {
-                throw new InvisibleCheckedException(e);
-            }
+            throw new InvisibleCheckedException(e);            
         }
    }
 
@@ -364,8 +389,19 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
             format("Maximum number of %s retries has been reached for transaction '%s'",
                 transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
+   }
+    
+     @Override
+    public  double executeChecked(
+        final AtomicDoubleClosure closure)throws Exception{
+    
+        try{
+            return execute(closure);
+        }catch(InvisibleCheckedException e){
+            throw e.getCause();
+        }
     }
- 
+
      public  double execute(final AtomicDoubleClosure closure){
 
         if(closure == null){
@@ -419,13 +455,10 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 default:
                     throw new IllegalStateException();
             }
+        }catch(RuntimeException e){
+            throw e;
         }catch(Exception e){
-            //double catching of exceptions
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            } else {
-                throw new InvisibleCheckedException(e);
-            }
+            throw new InvisibleCheckedException(e);            
         }
    }
 
@@ -478,8 +511,19 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
             format("Maximum number of %s retries has been reached for transaction '%s'",
                 transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
+   }
+    
+     @Override
+    public  boolean executeChecked(
+        final AtomicBooleanClosure closure)throws Exception{
+    
+        try{
+            return execute(closure);
+        }catch(InvisibleCheckedException e){
+            throw e.getCause();
+        }
     }
- 
+
      public  boolean execute(final AtomicBooleanClosure closure){
 
         if(closure == null){
@@ -533,13 +577,10 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 default:
                     throw new IllegalStateException();
             }
+        }catch(RuntimeException e){
+            throw e;
         }catch(Exception e){
-            //double catching of exceptions
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            } else {
-                throw new InvisibleCheckedException(e);
-            }
+            throw new InvisibleCheckedException(e);            
         }
    }
 
@@ -592,8 +633,19 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
             format("Maximum number of %s retries has been reached for transaction '%s'",
                 transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
+   }
+    
+     @Override
+    public  void executeChecked(
+        final AtomicVoidClosure closure)throws Exception{
+    
+        try{
+            execute(closure);
+        }catch(InvisibleCheckedException e){
+            throw e.getCause();
+        }
     }
- 
+
      public  void execute(final AtomicVoidClosure closure){
 
         if(closure == null){
@@ -654,13 +706,10 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 default:
                     throw new IllegalStateException();
             }
+        }catch(RuntimeException e){
+            throw e;
         }catch(Exception e){
-            //double catching of exceptions
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            } else {
-                throw new InvisibleCheckedException(e);
-            }
+            throw new InvisibleCheckedException(e);            
         }
    }
 
@@ -713,7 +762,6 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
             format("Maximum number of %s retries has been reached for transaction '%s'",
                 transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
-    }
- 
- 
- }
+   }
+    
+   }

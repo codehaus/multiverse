@@ -20,6 +20,19 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
     public BetaTransactionFactory getTransactionFactory(){
         return transactionFactory;
     }
+
+    @Override
+    public <E> E executeChecked(
+        final AtomicClosure<E> closure)throws Exception{
+    
+        try{
+            return execute(closure);
+        }catch(InvisibleCheckedException e){
+            throw e.getCause();
+        }
+    }
+
+    @Override
     public <E> E execute(final AtomicClosure<E> closure){
 
         if(closure == null){
@@ -86,7 +99,18 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
     }
- 
+     @Override
+    public  int executeChecked(
+        final AtomicIntClosure closure)throws Exception{
+    
+        try{
+            return execute(closure);
+        }catch(InvisibleCheckedException e){
+            throw e.getCause();
+        }
+    }
+
+    @Override
     public  int execute(final AtomicIntClosure closure){
 
         if(closure == null){
@@ -153,7 +177,18 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
     }
- 
+     @Override
+    public  long executeChecked(
+        final AtomicLongClosure closure)throws Exception{
+    
+        try{
+            return execute(closure);
+        }catch(InvisibleCheckedException e){
+            throw e.getCause();
+        }
+    }
+
+    @Override
     public  long execute(final AtomicLongClosure closure){
 
         if(closure == null){
@@ -220,7 +255,18 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
     }
- 
+     @Override
+    public  double executeChecked(
+        final AtomicDoubleClosure closure)throws Exception{
+    
+        try{
+            return execute(closure);
+        }catch(InvisibleCheckedException e){
+            throw e.getCause();
+        }
+    }
+
+    @Override
     public  double execute(final AtomicDoubleClosure closure){
 
         if(closure == null){
@@ -287,7 +333,18 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
     }
- 
+     @Override
+    public  boolean executeChecked(
+        final AtomicBooleanClosure closure)throws Exception{
+    
+        try{
+            return execute(closure);
+        }catch(InvisibleCheckedException e){
+            throw e.getCause();
+        }
+    }
+
+    @Override
     public  boolean execute(final AtomicBooleanClosure closure){
 
         if(closure == null){
@@ -354,7 +411,18 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
     }
- 
+     @Override
+    public  void executeChecked(
+        final AtomicVoidClosure closure)throws Exception{
+    
+        try{
+            execute(closure);
+        }catch(InvisibleCheckedException e){
+            throw e.getCause();
+        }
+    }
+
+    @Override
     public  void execute(final AtomicVoidClosure closure){
 
         if(closure == null){
@@ -422,6 +490,4 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
 
     }
- 
- 
- }
+   }

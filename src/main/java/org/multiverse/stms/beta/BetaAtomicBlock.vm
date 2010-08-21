@@ -28,8 +28,25 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
     public BetaTransactionFactory getTransactionFactory(){
         return transactionFactory;
     }
+
 #foreach($closure in $closures)
+    @Override
+    public ${closure.typeParameter} ${closure.type} executeChecked(
+        final ${closure.name}${closure.typeParameter} closure)throws Exception{
+    
+        try{
+#if(${closure.type} eq 'void')
+            execute(closure);
+#else
+            return execute(closure);
+#end
+        }catch(InvisibleCheckedException e){
+            throw e.getCause();
+        }
+    }
+
 #if(${atomicBlock.lean})
+    @Override
     public ${closure.typeParameter} ${closure.type} execute(final ${closure.name}${closure.typeParameter} closure){
 
         if(closure == null){
@@ -147,13 +164,10 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
                 default:
                     throw new IllegalStateException();
             }
+        }catch(RuntimeException e){
+            throw e;
         }catch(Exception e){
-            //double catching of exceptions
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            } else {
-                throw new InvisibleCheckedException(e);
-            }
+            throw new InvisibleCheckedException(e);            
         }
    }
 
@@ -163,11 +177,10 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
        try{
 #transactionLogic()
 
-    }
+   }
+    
 #end ##end of atomicblock.lean
-
 #end ##end of for loop over closures
-
 #macro( transactionLogic )
             boolean abort = true;
 
