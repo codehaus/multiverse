@@ -65,7 +65,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     //it can't do harm to start an already started transaction
                     return;
                 case PREPARED:
-                    abort();
+                    abort(pool);
                     throw new PreparedTransactionException(
                         format("Can't start already prepared transaction '%s'", config.familyName));
                 case ABORTED:
@@ -105,7 +105,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         lock = lock || config.lockReads;
         final int identityHashCode = ref.___identityHashCode();
-        int index = findAttachedIndex(ref, identityHashCode);
+        final int index = findAttachedIndex(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
             RefTranlocal<E> found = (RefTranlocal<E>)array[index];
@@ -295,7 +295,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         if(ref.___unsafeLoad()!=null){
-            abort();
+            abort(pool);
             throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
@@ -342,7 +342,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         if(result.isCommitted){
-            RefTranlocal<E> read = result;
+            final RefTranlocal<E> read = result;
             result =  pool.take(ref);
             if(result == null){
                 result = new RefTranlocal<E>(ref);
@@ -371,7 +371,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         lock = lock || config.lockReads;
         final int identityHashCode = ref.___identityHashCode();
-        int index = findAttachedIndex(ref, identityHashCode);
+        final int index = findAttachedIndex(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
             IntRefTranlocal found = (IntRefTranlocal)array[index];
@@ -561,7 +561,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         if(ref.___unsafeLoad()!=null){
-            abort();
+            abort(pool);
             throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
@@ -608,7 +608,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         if(result.isCommitted){
-            IntRefTranlocal read = result;
+            final IntRefTranlocal read = result;
             result =  pool.take(ref);
             if(result == null){
                 result = new IntRefTranlocal(ref);
@@ -637,7 +637,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         lock = lock || config.lockReads;
         final int identityHashCode = ref.___identityHashCode();
-        int index = findAttachedIndex(ref, identityHashCode);
+        final int index = findAttachedIndex(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
             LongRefTranlocal found = (LongRefTranlocal)array[index];
@@ -827,7 +827,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         if(ref.___unsafeLoad()!=null){
-            abort();
+            abort(pool);
             throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
@@ -874,7 +874,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         if(result.isCommitted){
-            LongRefTranlocal read = result;
+            final LongRefTranlocal read = result;
             result =  pool.take(ref);
             if(result == null){
                 result = new LongRefTranlocal(ref);
@@ -903,7 +903,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         lock = lock || config.lockReads;
         final int identityHashCode = ref.___identityHashCode();
-        int index = findAttachedIndex(ref, identityHashCode);
+        final int index = findAttachedIndex(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
             Tranlocal found = (Tranlocal)array[index];
@@ -1088,7 +1088,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         if(ref.___unsafeLoad()!=null){
-            abort();
+            abort(pool);
             throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
@@ -1132,7 +1132,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         if(result.isCommitted){
-            Tranlocal read = result;
+            final Tranlocal read = result;
             result = read.openForWrite(pool);
             array[index]=result;
          }
@@ -1157,10 +1157,10 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         boolean goLeft = true;
 
         do{
-            int offset = goLeft?-jump:jump;
-            int index = (hash + offset) % array.length;
+            final int offset = goLeft?-jump:jump;
+            final int index = (hash + offset) % array.length;
 
-            Tranlocal current = array[index];
+            final Tranlocal current = array[index];
             if(current == null){
                 return -1;
             }
@@ -1169,7 +1169,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 return index;
             }
 
-            int currentHash = current.owner.___identityHashCode();
+            final int currentHash = current.owner.___identityHashCode();
             goLeft = currentHash > hash;
             jump = jump == 0 ? 1 : jump*2;
         }while(jump < array.length);
@@ -1182,8 +1182,8 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         boolean goLeft = true;
 
         do{
-            int offset = goLeft?-jump:jump;
-            int index = (hash + offset) % array.length;
+            final int offset = goLeft?-jump:jump;
+            final int index = (hash + offset) % array.length;
 
             Tranlocal current = array[index];
             if(current == null){
@@ -1191,7 +1191,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 return;
             }
 
-            int currentHash = current.owner.___identityHashCode();
+            final int currentHash = current.owner.___identityHashCode();
             goLeft = currentHash > hash;
             jump = jump == 0?1:jump*2;
         }while(jump < array.length);
@@ -1209,7 +1209,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         for(int k=0; k < oldArray.length; k++){
-            Tranlocal tranlocal = oldArray[k];
+            final Tranlocal tranlocal = oldArray[k];
 
             if(tranlocal != null){
                attach(tranlocal.owner, tranlocal, tranlocal.owner.___identityHashCode(),pool);
@@ -1237,7 +1237,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         for (int k = 0; k < array.length; k++) {
-            Tranlocal tranlocal = array[k];
+            final Tranlocal tranlocal = array[k];
             if (tranlocal != null && tranlocal.owner.___hasReadConflict(tranlocal, this)) {
                 return true;
             }
@@ -1268,7 +1268,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 status = ABORTED;
                 if(size>0){
                     for (int k = 0; k < array.length; k++) {
-                        Tranlocal tranlocal = array[k];
+                        final Tranlocal tranlocal = array[k];
                         if(tranlocal != null){
                             tranlocal.owner.___abort(this, tranlocal, pool);
                         }
@@ -1306,7 +1306,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             return;
         }
 
-        prepare();
+        prepare(pool);
 
         Listeners[] listenersArray = null;
 
@@ -1340,7 +1340,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         for (int k = 0; k < array.length; k++) {
             Tranlocal tranlocal = array[k];
             if(tranlocal != null){
-                Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool, config.globalConflictCounter);
+                final Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool, config.globalConflictCounter);
 
                 if(listeners != null){
                     if(listenersArray == null){
@@ -1366,7 +1366,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         for (int k = 0; k < array.length; k++) {
             Tranlocal tranlocal = array[k];
             if(tranlocal != null){
-                 Listeners listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool, config.globalConflictCounter);
+                final Listeners listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool, config.globalConflictCounter);
 
                 if(listeners != null){
                     if(listenersArray == null){
@@ -1440,7 +1440,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             abort = false;
         }finally{
             if(abort){
-                abort();
+                abort(pool);
             }
         }
     }
@@ -1453,14 +1453,14 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         final int spinCount = config.spinCount;
 
         for (int k = 0; k < array.length; k++) {
-            Tranlocal tranlocal = array[k];
+            final Tranlocal tranlocal = array[k];
 
             if (tranlocal==null || tranlocal.isCommitted){
                 continue;
             }
 
             if(tranlocal.isCommuting){
-                Tranlocal read = tranlocal.owner.___lockAndLoad(spinCount, this);
+                final Tranlocal read = tranlocal.owner.___lockAndLoad(spinCount, this);
 
                 if(read.isLocked){
                     return false;
@@ -1485,14 +1485,14 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         final int spinCount = config.spinCount;
 
         for (int k = 0; k < array.length; k++) {
-            Tranlocal tranlocal = array[k];
+            final Tranlocal tranlocal = array[k];
 
             if(tranlocal == null || tranlocal.isCommitted){
                 continue;
             }
 
             if(tranlocal.isCommuting){
-                Tranlocal read = tranlocal.owner.___lockAndLoad(spinCount, this);
+                final Tranlocal read = tranlocal.owner.___lockAndLoad(spinCount, this);
 
                 if(read.isLocked){
                     return false;
@@ -1665,7 +1665,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
     @Override
     public void init(BetaTransactionConfiguration transactionConfig, BetaObjectPool pool){
         if(transactionConfig == null){
-            abort();
+            abort(pool);
             throw new NullPointerException();
         }
 

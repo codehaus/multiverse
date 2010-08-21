@@ -1,11 +1,12 @@
 package org.multiverse.stms.beta;
 
+import org.multiverse.api.ThreadLocalTransaction;
 import org.multiverse.api.closures.*;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static java.lang.String.format;
-import static org.multiverse.api.ThreadLocalTransaction.*;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactionContainer;
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
@@ -41,7 +42,8 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
         if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
@@ -52,7 +54,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
             }
 
             tx = transactionFactory.start();
-            setThreadLocalTransaction(tx);
+            transactionContainer.transaction=tx;
             boolean abort = true;
 
             try {
@@ -84,7 +86,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 }
 
                 pool.putBetaTransaction(tx);
-                clearThreadLocalTransaction();
+                transactionContainer.transaction = null;
             }
         }catch(Exception e){
             if (e instanceof RuntimeException) {
@@ -119,7 +121,8 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
         if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
@@ -130,7 +133,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
             }
 
             tx = transactionFactory.start();
-            setThreadLocalTransaction(tx);
+            transactionContainer.transaction=tx;
             boolean abort = true;
 
             try {
@@ -162,7 +165,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 }
 
                 pool.putBetaTransaction(tx);
-                clearThreadLocalTransaction();
+                transactionContainer.transaction = null;
             }
         }catch(Exception e){
             if (e instanceof RuntimeException) {
@@ -197,7 +200,8 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
         if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
@@ -208,7 +212,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
             }
 
             tx = transactionFactory.start();
-            setThreadLocalTransaction(tx);
+            transactionContainer.transaction=tx;
             boolean abort = true;
 
             try {
@@ -240,7 +244,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 }
 
                 pool.putBetaTransaction(tx);
-                clearThreadLocalTransaction();
+                transactionContainer.transaction = null;
             }
         }catch(Exception e){
             if (e instanceof RuntimeException) {
@@ -275,7 +279,8 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
         if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
@@ -286,7 +291,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
             }
 
             tx = transactionFactory.start();
-            setThreadLocalTransaction(tx);
+            transactionContainer.transaction=tx;
             boolean abort = true;
 
             try {
@@ -318,7 +323,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 }
 
                 pool.putBetaTransaction(tx);
-                clearThreadLocalTransaction();
+                transactionContainer.transaction = null;
             }
         }catch(Exception e){
             if (e instanceof RuntimeException) {
@@ -353,7 +358,8 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
         if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
@@ -364,7 +370,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
             }
 
             tx = transactionFactory.start();
-            setThreadLocalTransaction(tx);
+            transactionContainer.transaction=tx;
             boolean abort = true;
 
             try {
@@ -396,7 +402,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 }
 
                 pool.putBetaTransaction(tx);
-                clearThreadLocalTransaction();
+                transactionContainer.transaction = null;
             }
         }catch(Exception e){
             if (e instanceof RuntimeException) {
@@ -431,7 +437,8 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
         if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
@@ -443,7 +450,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
             }
 
             tx = transactionFactory.start();
-            setThreadLocalTransaction(tx);
+            transactionContainer.transaction=tx;
             boolean abort = true;
 
             try {
@@ -475,7 +482,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 }
 
                 pool.putBetaTransaction(tx);
-                clearThreadLocalTransaction();
+                transactionContainer.transaction = null;
             }
         }catch(Exception e){
             if (e instanceof RuntimeException) {

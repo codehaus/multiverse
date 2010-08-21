@@ -60,7 +60,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                     //it can't do harm to start an already started transaction
                     return;
                 case PREPARED:
-                    abort();
+                    abort(pool);
                     throw new PreparedTransactionException(
                         format("Can't start already prepared transaction '%s'",config.familyName));
                 case ABORTED:
@@ -387,7 +387,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
 #if($transaction.lean)
         config.needsCommute();
-        abort();
+        abort(pool);
         throw SpeculativeConfigurationError.INSTANCE;
 #else
         if (config.readonly) {
@@ -580,7 +580,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             return;
         }
 
-        prepare();
+        prepare(pool);
         Listeners listeners = null;
         if (attached!=null) {
             if(config.dirtyCheck){

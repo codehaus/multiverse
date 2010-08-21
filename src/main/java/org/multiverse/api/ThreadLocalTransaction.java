@@ -6,12 +6,22 @@ import org.multiverse.api.exceptions.NoTransactionFoundException;
  * A {@link ThreadLocal} that contains the current {@link Transaction}. The {@link Stm} and the {@link Transaction}
  * should not rely on threadlocals, they are only used for convenience to reduce the need to carry around a
  * Transaction.
+ * <p/>
+ * This ThreadLocalTransaction has an optimization that prevents accessing the threadlocal too many times.
+ * The Container wraps the Transaction, so if a Thread gets a reference to that container and holds it, it
+ * can modify the current transaction with a direct field access instead of another threadlocal access. It should
+ * be used with extreme care, because the Container can't leak to another thread. It is very useful for the
+ * AtomicBlock for example because a get/set/clear needs to be called otherwise.
  *
  * @author Peter Veentjer.
  */
 public final class ThreadLocalTransaction {
 
-    public final static ThreadLocal<Transaction> threadlocal = new ThreadLocal<Transaction>();
+    public final static ThreadLocal<Container> threadlocal = new ThreadLocal<Container>() {
+        protected Container initialValue() {
+            return new Container();
+        }
+    };
 
     /**
      * Gets the threadlocal transaction. If no transaction is set, null is returned.
@@ -22,6 +32,17 @@ public final class ThreadLocalTransaction {
      * @return the threadlocal transaction.
      */
     public static Transaction getThreadLocalTransaction() {
+        return threadlocal.get().transaction;
+    }
+
+    /**
+     * Gets the ThreadLocal container that stores the Transaction. Use this with extreme care because
+     * the Container should not leak to another thread. It is purely means as a performance optimization
+     * to prevent repeated (expensive) threadlocal access, and replace it by a cheap field access.
+     *
+     * @return the Container. The returned value will never be null.
+     */
+    public static Container getThreadLocalTransactionContainer() {
         return threadlocal.get();
     }
 
@@ -35,7 +56,7 @@ public final class ThreadLocalTransaction {
      * @throws NoTransactionFoundException if no thread local transaction is found.
      */
     public static Transaction getRequiredThreadLocalTransaction() {
-        Transaction tx = threadlocal.get();
+        Transaction tx = threadlocal.get().transaction;
 
         if (tx == null) {
             throw new NoTransactionFoundException("No transaction is found on the ThreadLocalTransaction");
@@ -50,7 +71,7 @@ public final class ThreadLocalTransaction {
      * If a transaction is available, it isn't aborted or committed.
      */
     public static void clearThreadLocalTransaction() {
-        threadlocal.set(null);
+        threadlocal.get().transaction = null;
     }
 
     /**
@@ -62,11 +83,15 @@ public final class ThreadLocalTransaction {
      * @param tx the new thread local transaction.
      */
     public static void setThreadLocalTransaction(Transaction tx) {
-        threadlocal.set(tx);
+        threadlocal.get().transaction = tx;
     }
 
     //we don't want any instances.
 
     private ThreadLocalTransaction() {
+    }
+
+    public static class Container {
+        public Transaction transaction;
     }
 }

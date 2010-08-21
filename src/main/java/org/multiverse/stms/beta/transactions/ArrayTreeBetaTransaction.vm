@@ -60,7 +60,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                     //it can't do harm to start an already started transaction
                     return;
                 case PREPARED:
-                    abort();
+                    abort(pool);
                     throw new PreparedTransactionException(
                         format("Can't start already prepared transaction '%s'", config.familyName));
                 case ABORTED:
@@ -101,7 +101,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         lock = lock || config.lockReads;
         final int identityHashCode = ref.___identityHashCode();
-        int index = findAttachedIndex(ref, identityHashCode);
+        final int index = findAttachedIndex(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
             ${ref.tranlocal}${ref.typeParameter} found = (${ref.tranlocal}${ref.typeParameter})array[index];
@@ -310,7 +310,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         if(ref.___unsafeLoad()!=null){
-            abort();
+            abort(pool);
             throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
@@ -336,7 +336,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
 #if($transaction.lean)
         config.needsCommute();
-        abort();
+        abort(pool);
         throw SpeculativeConfigurationError.INSTANCE;
 #else
 
@@ -366,7 +366,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         if(result.isCommitted){
-            ${ref.tranlocal}${ref.typeParameter} read = result;
+            final ${ref.tranlocal}${ref.typeParameter} read = result;
 #if($ref.isSpecialization())
             result =  pool.take(ref);
             if(result == null){
@@ -406,10 +406,10 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         boolean goLeft = true;
 
         do{
-            int offset = goLeft?-jump:jump;
-            int index = (hash + offset) % array.length;
+            final int offset = goLeft?-jump:jump;
+            final int index = (hash + offset) % array.length;
 
-            Tranlocal current = array[index];
+            final Tranlocal current = array[index];
             if(current == null){
                 return -1;
             }
@@ -418,7 +418,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 return index;
             }
 
-            int currentHash = current.owner.___identityHashCode();
+            final int currentHash = current.owner.___identityHashCode();
             goLeft = currentHash > hash;
             jump = jump == 0 ? 1 : jump*2;
         }while(jump < array.length);
@@ -431,8 +431,8 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         boolean goLeft = true;
 
         do{
-            int offset = goLeft?-jump:jump;
-            int index = (hash + offset) % array.length;
+            final int offset = goLeft?-jump:jump;
+            final int index = (hash + offset) % array.length;
 
             Tranlocal current = array[index];
             if(current == null){
@@ -440,7 +440,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 return;
             }
 
-            int currentHash = current.owner.___identityHashCode();
+            final int currentHash = current.owner.___identityHashCode();
             goLeft = currentHash > hash;
             jump = jump == 0?1:jump*2;
         }while(jump < array.length);
@@ -458,7 +458,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         for(int k=0; k < oldArray.length; k++){
-            Tranlocal tranlocal = oldArray[k];
+            final Tranlocal tranlocal = oldArray[k];
 
             if(tranlocal != null){
                attach(tranlocal.owner, tranlocal, tranlocal.owner.___identityHashCode(),pool);
@@ -486,7 +486,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         for (int k = 0; k < array.length; k++) {
-            Tranlocal tranlocal = array[k];
+            final Tranlocal tranlocal = array[k];
             if (tranlocal != null && tranlocal.owner.___hasReadConflict(tranlocal, this)) {
                 return true;
             }
@@ -517,7 +517,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 status = ABORTED;
                 if(size>0){
                     for (int k = 0; k < array.length; k++) {
-                        Tranlocal tranlocal = array[k];
+                        final Tranlocal tranlocal = array[k];
                         if(tranlocal != null){
                             tranlocal.owner.___abort(this, tranlocal, pool);
                         }
@@ -601,7 +601,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             return;
         }
 
-        prepare();
+        prepare(pool);
 
         Listeners[] listenersArray = null;
 
@@ -636,7 +636,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         for (int k = 0; k < array.length; k++) {
             Tranlocal tranlocal = array[k];
             if(tranlocal != null){
-                Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool, config.globalConflictCounter);
+                final Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool, config.globalConflictCounter);
 
                 if(listeners != null){
                     if(listenersArray == null){
@@ -662,7 +662,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         for (int k = 0; k < array.length; k++) {
             Tranlocal tranlocal = array[k];
             if(tranlocal != null){
-                 Listeners listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool, config.globalConflictCounter);
+                final Listeners listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool, config.globalConflictCounter);
 
                 if(listeners != null){
                     if(listenersArray == null){
@@ -774,7 +774,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             abort = false;
         }finally{
             if(abort){
-                abort();
+                abort(pool);
             }
         }
     }
@@ -788,7 +788,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         final int spinCount = config.spinCount;
 
         for (int k = 0; k < array.length; k++) {
-            Tranlocal tranlocal = array[k];
+            final Tranlocal tranlocal = array[k];
 
             if (tranlocal==null || tranlocal.isCommitted){
                 continue;
@@ -796,7 +796,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
 #if(!$transaction.lean)
             if(tranlocal.isCommuting){
-                Tranlocal read = tranlocal.owner.___lockAndLoad(spinCount, this);
+                final Tranlocal read = tranlocal.owner.___lockAndLoad(spinCount, this);
 
                 if(read.isLocked){
                     return false;
@@ -822,7 +822,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         final int spinCount = config.spinCount;
 
         for (int k = 0; k < array.length; k++) {
-            Tranlocal tranlocal = array[k];
+            final Tranlocal tranlocal = array[k];
 
             if(tranlocal == null || tranlocal.isCommitted){
                 continue;
@@ -830,7 +830,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
 #if(!$transaction.lean)
             if(tranlocal.isCommuting){
-                Tranlocal read = tranlocal.owner.___lockAndLoad(spinCount, this);
+                final Tranlocal read = tranlocal.owner.___lockAndLoad(spinCount, this);
 
                 if(read.isLocked){
                     return false;
@@ -1010,7 +1010,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     @Override
     public void init(BetaTransactionConfiguration transactionConfig, BetaObjectPool pool){
         if(transactionConfig == null){
-            abort();
+            abort(pool);
             throw new NullPointerException();
         }
 

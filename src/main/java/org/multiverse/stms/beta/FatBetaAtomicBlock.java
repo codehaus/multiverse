@@ -1,12 +1,13 @@
 package org.multiverse.stms.beta;
 
 import org.multiverse.api.PropagationLevel;
+import org.multiverse.api.ThreadLocalTransaction;
 import org.multiverse.api.closures.*;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static java.lang.String.format;
-import static org.multiverse.api.ThreadLocalTransaction.*;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactionContainer;
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
@@ -44,7 +45,8 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
         if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
@@ -54,8 +56,8 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 case Requires:
                     if (tx == null) {
                         tx = transactionFactory.start(pool);
-                        setThreadLocalTransaction(tx);
-                        return execute(tx, pool, closure);
+                        transactionContainer.transaction = tx;
+                        return execute(tx,transactionContainer, pool, closure);
                     } else {
                         return closure.execute(tx);
                     }
@@ -78,16 +80,16 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 case RequiresNew:
                     if (tx == null) {
                         tx = transactionFactory.start(pool);
-                        setThreadLocalTransaction(tx);
-                        return execute(tx, pool, closure);
+                        transactionContainer.transaction = tx;
+                        return execute(tx, transactionContainer, pool, closure);
                     } else {
                         BetaTransaction suspendedTransaction = tx;
                         tx = transactionFactory.start();
-                        setThreadLocalTransaction(tx);
+                        transactionContainer.transaction = tx;
                         try {
-                            return execute(tx, pool, closure);
+                            return execute(tx, transactionContainer, pool, closure);
                         } finally {
-                            setThreadLocalTransaction(suspendedTransaction);
+                            transactionContainer.transaction = suspendedTransaction;
                         }
                     }
                 case Supports:
@@ -103,7 +105,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
    }
 
    private <E> E execute(
-       BetaTransaction tx, final BetaObjectPool pool, final AtomicClosure<E> closure)throws Exception{
+       BetaTransaction tx, final ThreadLocalTransaction.Container transactionContainer, final BetaObjectPool pool, final AtomicClosure<E> closure)throws Exception{
 
        try{
             boolean abort = true;
@@ -137,7 +139,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 }
 
                 pool.putBetaTransaction(tx);
-                clearThreadLocalTransaction();
+                transactionContainer.transaction = null;
             }
         }catch(Exception e){
             if (e instanceof RuntimeException) {
@@ -172,7 +174,8 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
         if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
@@ -182,8 +185,8 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 case Requires:
                     if (tx == null) {
                         tx = transactionFactory.start(pool);
-                        setThreadLocalTransaction(tx);
-                        return execute(tx, pool, closure);
+                        transactionContainer.transaction = tx;
+                        return execute(tx,transactionContainer, pool, closure);
                     } else {
                         return closure.execute(tx);
                     }
@@ -206,16 +209,16 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 case RequiresNew:
                     if (tx == null) {
                         tx = transactionFactory.start(pool);
-                        setThreadLocalTransaction(tx);
-                        return execute(tx, pool, closure);
+                        transactionContainer.transaction = tx;
+                        return execute(tx, transactionContainer, pool, closure);
                     } else {
                         BetaTransaction suspendedTransaction = tx;
                         tx = transactionFactory.start();
-                        setThreadLocalTransaction(tx);
+                        transactionContainer.transaction = tx;
                         try {
-                            return execute(tx, pool, closure);
+                            return execute(tx, transactionContainer, pool, closure);
                         } finally {
-                            setThreadLocalTransaction(suspendedTransaction);
+                            transactionContainer.transaction = suspendedTransaction;
                         }
                     }
                 case Supports:
@@ -231,7 +234,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
    }
 
    private  int execute(
-       BetaTransaction tx, final BetaObjectPool pool, final AtomicIntClosure closure)throws Exception{
+       BetaTransaction tx, final ThreadLocalTransaction.Container transactionContainer, final BetaObjectPool pool, final AtomicIntClosure closure)throws Exception{
 
        try{
             boolean abort = true;
@@ -265,7 +268,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 }
 
                 pool.putBetaTransaction(tx);
-                clearThreadLocalTransaction();
+                transactionContainer.transaction = null;
             }
         }catch(Exception e){
             if (e instanceof RuntimeException) {
@@ -300,7 +303,8 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
         if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
@@ -310,8 +314,8 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 case Requires:
                     if (tx == null) {
                         tx = transactionFactory.start(pool);
-                        setThreadLocalTransaction(tx);
-                        return execute(tx, pool, closure);
+                        transactionContainer.transaction = tx;
+                        return execute(tx,transactionContainer, pool, closure);
                     } else {
                         return closure.execute(tx);
                     }
@@ -334,16 +338,16 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 case RequiresNew:
                     if (tx == null) {
                         tx = transactionFactory.start(pool);
-                        setThreadLocalTransaction(tx);
-                        return execute(tx, pool, closure);
+                        transactionContainer.transaction = tx;
+                        return execute(tx, transactionContainer, pool, closure);
                     } else {
                         BetaTransaction suspendedTransaction = tx;
                         tx = transactionFactory.start();
-                        setThreadLocalTransaction(tx);
+                        transactionContainer.transaction = tx;
                         try {
-                            return execute(tx, pool, closure);
+                            return execute(tx, transactionContainer, pool, closure);
                         } finally {
-                            setThreadLocalTransaction(suspendedTransaction);
+                            transactionContainer.transaction = suspendedTransaction;
                         }
                     }
                 case Supports:
@@ -359,7 +363,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
    }
 
    private  long execute(
-       BetaTransaction tx, final BetaObjectPool pool, final AtomicLongClosure closure)throws Exception{
+       BetaTransaction tx, final ThreadLocalTransaction.Container transactionContainer, final BetaObjectPool pool, final AtomicLongClosure closure)throws Exception{
 
        try{
             boolean abort = true;
@@ -393,7 +397,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 }
 
                 pool.putBetaTransaction(tx);
-                clearThreadLocalTransaction();
+                transactionContainer.transaction = null;
             }
         }catch(Exception e){
             if (e instanceof RuntimeException) {
@@ -428,7 +432,8 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
         if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
@@ -438,8 +443,8 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 case Requires:
                     if (tx == null) {
                         tx = transactionFactory.start(pool);
-                        setThreadLocalTransaction(tx);
-                        return execute(tx, pool, closure);
+                        transactionContainer.transaction = tx;
+                        return execute(tx,transactionContainer, pool, closure);
                     } else {
                         return closure.execute(tx);
                     }
@@ -462,16 +467,16 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 case RequiresNew:
                     if (tx == null) {
                         tx = transactionFactory.start(pool);
-                        setThreadLocalTransaction(tx);
-                        return execute(tx, pool, closure);
+                        transactionContainer.transaction = tx;
+                        return execute(tx, transactionContainer, pool, closure);
                     } else {
                         BetaTransaction suspendedTransaction = tx;
                         tx = transactionFactory.start();
-                        setThreadLocalTransaction(tx);
+                        transactionContainer.transaction = tx;
                         try {
-                            return execute(tx, pool, closure);
+                            return execute(tx, transactionContainer, pool, closure);
                         } finally {
-                            setThreadLocalTransaction(suspendedTransaction);
+                            transactionContainer.transaction = suspendedTransaction;
                         }
                     }
                 case Supports:
@@ -487,7 +492,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
    }
 
    private  double execute(
-       BetaTransaction tx, final BetaObjectPool pool, final AtomicDoubleClosure closure)throws Exception{
+       BetaTransaction tx, final ThreadLocalTransaction.Container transactionContainer, final BetaObjectPool pool, final AtomicDoubleClosure closure)throws Exception{
 
        try{
             boolean abort = true;
@@ -521,7 +526,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 }
 
                 pool.putBetaTransaction(tx);
-                clearThreadLocalTransaction();
+                transactionContainer.transaction = null;
             }
         }catch(Exception e){
             if (e instanceof RuntimeException) {
@@ -556,7 +561,8 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
         if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
@@ -566,8 +572,8 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 case Requires:
                     if (tx == null) {
                         tx = transactionFactory.start(pool);
-                        setThreadLocalTransaction(tx);
-                        return execute(tx, pool, closure);
+                        transactionContainer.transaction = tx;
+                        return execute(tx,transactionContainer, pool, closure);
                     } else {
                         return closure.execute(tx);
                     }
@@ -590,16 +596,16 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 case RequiresNew:
                     if (tx == null) {
                         tx = transactionFactory.start(pool);
-                        setThreadLocalTransaction(tx);
-                        return execute(tx, pool, closure);
+                        transactionContainer.transaction = tx;
+                        return execute(tx, transactionContainer, pool, closure);
                     } else {
                         BetaTransaction suspendedTransaction = tx;
                         tx = transactionFactory.start();
-                        setThreadLocalTransaction(tx);
+                        transactionContainer.transaction = tx;
                         try {
-                            return execute(tx, pool, closure);
+                            return execute(tx, transactionContainer, pool, closure);
                         } finally {
-                            setThreadLocalTransaction(suspendedTransaction);
+                            transactionContainer.transaction = suspendedTransaction;
                         }
                     }
                 case Supports:
@@ -615,7 +621,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
    }
 
    private  boolean execute(
-       BetaTransaction tx, final BetaObjectPool pool, final AtomicBooleanClosure closure)throws Exception{
+       BetaTransaction tx, final ThreadLocalTransaction.Container transactionContainer, final BetaObjectPool pool, final AtomicBooleanClosure closure)throws Exception{
 
        try{
             boolean abort = true;
@@ -649,7 +655,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 }
 
                 pool.putBetaTransaction(tx);
-                clearThreadLocalTransaction();
+                transactionContainer.transaction = null;
             }
         }catch(Exception e){
             if (e instanceof RuntimeException) {
@@ -684,7 +690,8 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
         final BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-        BetaTransaction tx = (BetaTransaction)getThreadLocalTransaction();
+        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
         if(tx == null || !tx.getStatus().isAlive()){
             tx = null;
         }
@@ -694,8 +701,8 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 case Requires:
                     if (tx == null) {
                         tx = transactionFactory.start(pool);
-                        setThreadLocalTransaction(tx);
-                        execute(tx, pool, closure);
+                        transactionContainer.transaction = tx;
+                        execute(tx,transactionContainer,  pool, closure);
                         return;
                     } else {
                         closure.execute(tx);
@@ -722,18 +729,18 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 case RequiresNew:
                     if (tx == null) {
                         tx = transactionFactory.start(pool);
-                        setThreadLocalTransaction(tx);
-                        execute(tx, pool, closure);
+                        transactionContainer.transaction = tx;
+                        execute(tx, transactionContainer, pool, closure);
                         return;
                     } else {
                         BetaTransaction suspendedTransaction = tx;
                         tx = transactionFactory.start();
-                        setThreadLocalTransaction(tx);
+                        transactionContainer.transaction = tx;
                         try {
-                            execute(tx, pool, closure);
+                            execute(tx, transactionContainer, pool, closure);
                             return;
                         } finally {
-                            setThreadLocalTransaction(suspendedTransaction);
+                            transactionContainer.transaction = suspendedTransaction;
                         }
                     }
                 case Supports:
@@ -750,7 +757,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
    }
 
    private  void execute(
-       BetaTransaction tx, final BetaObjectPool pool, final AtomicVoidClosure closure)throws Exception{
+       BetaTransaction tx, final ThreadLocalTransaction.Container transactionContainer, final BetaObjectPool pool, final AtomicVoidClosure closure)throws Exception{
 
        try{
             boolean abort = true;
@@ -784,7 +791,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 }
 
                 pool.putBetaTransaction(tx);
-                clearThreadLocalTransaction();
+                transactionContainer.transaction = null;
             }
         }catch(Exception e){
             if (e instanceof RuntimeException) {

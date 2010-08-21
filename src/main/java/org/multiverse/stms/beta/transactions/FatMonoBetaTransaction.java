@@ -59,7 +59,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                     //it can't do harm to start an already started transaction
                     return;
                 case PREPARED:
-                    abort();
+                    abort(pool);
                     throw new PreparedTransactionException(
                         format("Can't start already prepared transaction '%s'",config.familyName));
                 case ABORTED:
@@ -1393,7 +1393,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             return;
         }
 
-        prepare();
+        prepare(pool);
         Listeners listeners = null;
         if (attached!=null) {
             if(config.dirtyCheck){
@@ -1542,12 +1542,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnFaultyStatusOfRegisterChangeListenerAndAbort(pool);
         }
 
-        if(listener == null){
-            abort();
-            throw new NullPointerException(
-                format("Can't block with a null listener on transaction '%s'", config.familyName));
-        }
-
         if(!config.blockingAllowed){
             throw abortOnNoBlockingAllowed(pool);
         }
@@ -1559,7 +1553,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         final long listenerEra = listener.getEra();
         final BetaTransactionalObject owner = attached.owner;
 
-        boolean failure = owner.___registerChangeListener(listener, attached, pool, listenerEra) == BetaTransactionalObject.REGISTRATION_NONE;
+        final boolean failure = owner.___registerChangeListener(listener, attached, pool, listenerEra)
+            == BetaTransactionalObject.REGISTRATION_NONE;
         owner.___abort(this, attached, pool);
         status = ABORTED;
 

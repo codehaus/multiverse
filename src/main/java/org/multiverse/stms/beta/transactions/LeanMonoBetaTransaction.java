@@ -51,7 +51,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
                     //it can't do harm to start an already started transaction
                     return;
                 case PREPARED:
-                    abort();
+                    abort(pool);
                     throw new PreparedTransactionException(
                         format("Can't start already prepared transaction '%s'",config.familyName));
                 case ABORTED:
@@ -256,7 +256,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         config.needsCommute();
-        abort();
+        abort(pool);
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
@@ -449,7 +449,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         config.needsCommute();
-        abort();
+        abort(pool);
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
@@ -642,7 +642,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         config.needsCommute();
-        abort();
+        abort(pool);
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
@@ -822,7 +822,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         config.needsCommute();
-        abort();
+        abort(pool);
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
@@ -1018,12 +1018,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOnFaultyStatusOfRegisterChangeListenerAndAbort(pool);
         }
 
-        if(listener == null){
-            abort();
-            throw new NullPointerException(
-                format("Can't block with a null listener on transaction '%s'", config.familyName));
-        }
-
         if(!config.blockingAllowed){
             throw abortOnNoBlockingAllowed(pool);
         }
@@ -1035,7 +1029,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         final long listenerEra = listener.getEra();
         final BetaTransactionalObject owner = attached.owner;
 
-        boolean failure = owner.___registerChangeListener(listener, attached, pool, listenerEra) == BetaTransactionalObject.REGISTRATION_NONE;
+        final boolean failure = owner.___registerChangeListener(listener, attached, pool, listenerEra)
+            == BetaTransactionalObject.REGISTRATION_NONE;
         owner.___abort(this, attached, pool);
         status = ABORTED;
 

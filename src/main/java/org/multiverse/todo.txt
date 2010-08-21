@@ -187,6 +187,8 @@ the task not being executed at all.
 
 done
 
+- use a threadlocal container for the transaction, so you don't need to access the threadlocal every time.
+
 - testing: mono transaction and partial read tracking
 
     - all kinds of variations with non automatic read tracking
@@ -256,7 +258,6 @@ done
 - add commuting to mono beta transaction
 
 - the atomic get isn't valid, it could potentially return dirty writes since the tranlocal could be pooled.
-
 
 old done
 

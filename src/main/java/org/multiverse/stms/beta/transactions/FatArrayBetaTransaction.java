@@ -58,7 +58,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                     //it can't do harm to start an already started transaction
                     return;
                 case PREPARED:
-                    abort();
+                    abort(pool);
                     throw new PreparedTransactionException(
                         format("Can't start already prepared transaction '%s'",config.familyName));
                 case ABORTED:
@@ -1239,7 +1239,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         assert owner!=null;
 
         for(int k=0; k < firstFreeIndex; k++){
-            Tranlocal tranlocal = array[k];
+            final Tranlocal tranlocal = array[k];
             if(tranlocal.owner == owner){
                 return k;
             }
@@ -1266,7 +1266,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         for (int k = 0; k < firstFreeIndex; k++) {
-            Tranlocal tranlocal = array[k];
+            final Tranlocal tranlocal = array[k];
 
             if (tranlocal.owner.___hasReadConflict(tranlocal, this)) {
                 return true;
@@ -1297,7 +1297,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             case PREPARED:
                 status = ABORTED;                
                 for (int k = 0; k < firstFreeIndex; k++) {
-                    Tranlocal tranlocal = array[k];
+                    final Tranlocal tranlocal = array[k];
                     tranlocal.owner.___abort(this, tranlocal, pool);
                 }
                 if(permanentListeners != null){
@@ -1331,7 +1331,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             return;
         }
 
-        prepare();
+        prepare(pool);
     
         Listeners[] listeners = null;
 
@@ -1363,12 +1363,12 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         int storeIndex = 0;
         for (int k = 0; k < firstFreeIndex; k++) {
-            Tranlocal tranlocal = array[k];
-            Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool, config.globalConflictCounter);
+            final Tranlocal tranlocal = array[k];
+            final Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool, config.globalConflictCounter);
 
             if(listeners != null){
                 if(listenersArray == null){
-                    int length = firstFreeIndex - k;
+                    final int length = firstFreeIndex - k;
                     listenersArray = pool.takeListenersArray(length);
                     if(listenersArray == null){
                         listenersArray = new Listeners[length];
@@ -1387,12 +1387,12 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         int storeIndex = 0;
         for (int k = 0; k < firstFreeIndex; k++) {
-            Tranlocal tranlocal = array[k];
-            Listeners listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool, config.globalConflictCounter);
+            final Tranlocal tranlocal = array[k];
+            final Listeners listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool, config.globalConflictCounter);
 
             if(listeners != null){
                 if(listenersArray == null){
-                    int length = firstFreeIndex - k;
+                    final int length = firstFreeIndex - k;
                     listenersArray = pool.takeListenersArray(length);
                     if(listenersArray == null){
                         listenersArray = new Listeners[length];
@@ -1471,17 +1471,17 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             return true;
         }
 
-        int spinCount = config.spinCount;
+        final int spinCount = config.spinCount;
 
         for (int k = 0; k < firstFreeIndex; k++) {
-            Tranlocal tranlocal = array[k];
+            final Tranlocal tranlocal = array[k];
 
             if(tranlocal.isCommitted){
                 continue;
             }
 
             if(tranlocal.isCommuting){
-                Tranlocal read = tranlocal.owner.___lockAndLoad(spinCount, this);
+                final Tranlocal read = tranlocal.owner.___lockAndLoad(spinCount, this);
 
                 if(read.isLocked){
                     return false;
@@ -1504,10 +1504,10 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             return true;
         }
 
-        int spinCount = config.spinCount;
+        final int spinCount = config.spinCount;
 
         for (int k = 0; k < firstFreeIndex; k++) {
-            Tranlocal tranlocal = array[k];
+            final Tranlocal tranlocal = array[k];
 
             if(tranlocal.isCommitted){
                 continue;
@@ -1515,7 +1515,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
 
             if(tranlocal.isCommuting){
-                Tranlocal read = tranlocal.owner.___lockAndLoad(spinCount, this);
+                final Tranlocal read = tranlocal.owner.___lockAndLoad(spinCount, this);
 
                 if(read.isLocked){
                     return false;
@@ -1665,7 +1665,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
     @Override
     public void init(BetaTransactionConfiguration transactionConfig, BetaObjectPool pool){
         if(transactionConfig == null){
-            abort();
+            abort(pool);
             throw new NullPointerException();
         }
 
