@@ -44,8 +44,6 @@ public final class AlphaStmConfig {
         return config;
     }
 
-    public int syncToClock = 0;
-            
     public int maxReadSpinCount = 50;
 
     public PrimitiveClock clock = new StrictPrimitiveClock();
@@ -114,10 +112,6 @@ public final class AlphaStmConfig {
 
         if (traceLevel == null) {
             throw new IllegalStateException("Invalid configuration, traceLevel can't be null");
-        }
-
-        if(syncToClock <0){
-            throw new IllegalStateException("Invalid configuration, syncToClock can't be smaller than zero");
         }
     }
 }

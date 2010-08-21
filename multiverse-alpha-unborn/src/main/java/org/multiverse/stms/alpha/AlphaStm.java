@@ -115,7 +115,7 @@ public final class AlphaStm implements Stm<AlphaStm.AlphaTransactionFactoryBuild
         this.interruptible = config.interruptible;
         this.maxReadSpinCount = config.maxReadSpinCount;
         this.traceLevel = config.traceLevel;
-        this.syncToClock = config.syncToClock;
+        this.syncToClock = 0;
 
         if (clock.getVersion() == 0) {
             clock.tick();

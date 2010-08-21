@@ -222,19 +222,7 @@ public final class TransactionBoilerplate implements MultiverseConstants {
                     throw new NoTransactionFoundException();
                 }
 
-                if (sameTransactionFactory(tx)) {
-                    tx.reset();
-                    tx.setAttempt(0);
-                    tx.setRemainingTimeoutNs(tx.getConfiguration().getTimeoutNs());
-                } else {
-                    tx = transactionFactory.create();
-                }
-
-                if (threadLocalAware) {
-                    setThreadLocalTransaction(tx);
-                }
-
-                return executeWithTransaction(tx, callable);
+                return callable.call(tx);
             case RequiresNew:
                 Transaction suspendedTx = tx;
                 try {
