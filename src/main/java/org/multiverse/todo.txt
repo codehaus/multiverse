@@ -177,8 +177,6 @@ globalconflict counter.
 
 - rollbackfor/rollnotbackfor exception configuration
 
-- betatransactiontemplate needs to be removed
-
 - testing: atomic block & propagation and committed/aborted/prepared/new transaction on threadlocal
 
 - lean mono should not upgrade to array when untracked read is done, but should just attach it to the session.
@@ -194,8 +192,6 @@ the task not being executed at all.
 
 - is there a need for ref.specialization?
 
-- integration test for the object granularity functionality (since the abstractbetatransactionalobject is added)
-
 - openForConstruction on generic transactional object should return current type of tranlocal
 
 - openForRead on generic transactional object should return current type of tranlocal
@@ -205,6 +201,10 @@ the task not being executed at all.
 - pooling for generic transactional object tranlocals.
 
 done
+
+- betatransactiontemplate needs to be removed
+
+- integration test for the object granularity functionality (since the abstractbetatransactionalobject is added)
 
 - added empty add watch signature to transaction.
 
