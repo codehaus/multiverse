@@ -1,4 +1,4 @@
-package org.multiverse.functions;
+package org.multiverse.api.functions;
 
 /**
  * A {@link Function} optimized for a float. It depends on the stm if {@link #call(float)} without boxing or

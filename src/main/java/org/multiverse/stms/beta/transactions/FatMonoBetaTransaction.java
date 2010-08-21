@@ -5,10 +5,10 @@ import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.functions.Function;
+import org.multiverse.api.functions.IntFunction;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
-import org.multiverse.functions.Function;
-import org.multiverse.functions.IntFunction;
-import org.multiverse.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.Listeners;
@@ -1359,7 +1359,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                     return;
                 case COMMITTED:
                     throw new DeadTransactionException(
-                        format("[%s] Can't abort an already committed transaction",config.familyName));
+                        format("[%s] Can't abort an already aborted transaction",config.familyName));
                 default:
                     throw new IllegalStateException();
             }

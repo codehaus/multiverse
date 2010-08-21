@@ -3,8 +3,8 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.multiverse.functions.IncLongFunction;
-import org.multiverse.functions.LongFunction;
+import org.multiverse.api.functions.IncLongFunction;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 

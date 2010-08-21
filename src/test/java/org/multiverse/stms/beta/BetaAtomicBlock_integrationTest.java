@@ -103,6 +103,6 @@ public class BetaAtomicBlock_integrationTest {
             }
         });
 
-        assertEquals(10, ref.___active.value);
+        assertEquals(10, ref.___unsafeLoad().value);
     }
 }

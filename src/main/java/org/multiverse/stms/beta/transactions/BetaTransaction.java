@@ -5,10 +5,10 @@ import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.Watch;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.*;
+import org.multiverse.api.functions.Function;
+import org.multiverse.api.functions.IntFunction;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.functions.Function;
-import org.multiverse.functions.IntFunction;
-import org.multiverse.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
@@ -61,16 +61,16 @@ public abstract class BetaTransaction implements Transaction {
                 break;
             case PREPARED:
                 throw new PreparedTransactionException(
-                    format("[%s] Can't setAbortOnly on an already prepared transaction", config.familyName)        
-                );
+                    format("[%s] Can't setAbortOnly on an already prepared transaction",
+                        config.familyName));
             case COMMITTED:
                 throw new DeadTransactionException(
-                    format("[%s] Can't setAbortOnly on an already committed transaction", config.familyName)
-                );
+                    format("[%s] Can't setAbortOnly on an already committed transaction",
+                        config.familyName));
             case ABORTED:
                 throw new DeadTransactionException(
-                    format("[%s] Can't setAbortOnly on an already aborted transaction", config.familyName)
-                );
+                    format("[%s] Can't setAbortOnly on an already aborted transaction",
+                        config.familyName));
             default:
                 throw new IllegalStateException();
         }
@@ -95,13 +95,16 @@ public abstract class BetaTransaction implements Transaction {
             case PREPARED:
                 abort(pool);
                 return new PreparedTransactionException(
-                        format("[%s] Can't block on an already prepared transaction", config.familyName));
+                    format("[%s] Can't block on an already prepared transaction",
+                        config.familyName));
             case ABORTED:
                 return new DeadTransactionException(
-                    format("[%s] Can't block on already aborted transaction", config.familyName));
+                    format("[%s] Can't block on already aborted transaction",
+                        config.familyName));
             case COMMITTED:
                 return new DeadTransactionException(
-                    format("[%s] Can't block on already committed transaction", config.familyName));
+                    format("[%s] Can't block on already committed transaction",
+                        config.familyName));
             default:
                 throw new IllegalStateException();
         }
@@ -171,56 +174,60 @@ public abstract class BetaTransaction implements Transaction {
             case PREPARED:
                 abort(pool);
                 return new PreparedTransactionException(
-                        format("[%s] Can't openForRead '%s' using an already prepared transaction",
-                                config.familyName, toDebugString(object)));
+                    format("[%s] Can't openForRead '%s' using an already prepared transaction",
+                        config.familyName, toDebugString(object)));
             case ABORTED:
                 return new DeadTransactionException(
-                        format("[%s] Can't openForRead '%s' using an already aborted transaction",
-                                config.familyName, toDebugString(object)));
+                    format("[%s] Can't openForRead '%s' using an already aborted transaction",
+                        config.familyName, toDebugString(object)));
             case COMMITTED:
                 return new DeadTransactionException(
-                        format("[%s] Can't openForRead '%s' using already committed transaction",
-                                config.familyName, toDebugString(object)));
+                    format("[%s] Can't openForRead '%s' using already committed transaction",
+                        config.familyName, toDebugString(object)));
             default:
                 throw new IllegalStateException();
         }
     }
 
-    public final IllegalTransactionStateException abortOpenForWrite(final BetaObjectPool pool, final BetaTransactionalObject object) {
+    public final IllegalTransactionStateException abortOpenForWrite(
+        final BetaObjectPool pool, final BetaTransactionalObject object) {
+
         switch (status) {
             case PREPARED:
                 abort(pool);
                 return new PreparedTransactionException(
-                        format("[%s] Can't openForWrite '%s' using an already prepared transaction",
-                                config.familyName, toDebugString(object)));
+                    format("[%s] Can't openForWrite '%s' using an already prepared transaction",
+                        config.familyName, toDebugString(object)));
             case ABORTED:
                 return new DeadTransactionException(
-                        format("[%s] Can't openForWrite '%s' using an already aborted transaction",
-                                config.familyName, toDebugString(object)));
+                    format("[%s] Can't openForWrite '%s' using an already aborted transaction",
+                        config.familyName, toDebugString(object)));
             case COMMITTED:
                 return new DeadTransactionException(
-                        format("[%s] Can't openForWrite '%s' using an already committed transaction",
-                                config.familyName, toDebugString(object)));
+                    format("[%s] Can't openForWrite '%s' using an already committed transaction",
+                        config.familyName, toDebugString(object)));
             default:
                 throw new IllegalStateException();
         }
     }
 
-    public final IllegalTransactionStateException abortOpenForConstruction(final BetaObjectPool pool, final BetaTransactionalObject object) {
+    public final IllegalTransactionStateException abortOpenForConstruction(
+        final BetaObjectPool pool, final BetaTransactionalObject object) {
+
         switch (status) {
             case PREPARED:
                 abort(pool);
                 return new PreparedTransactionException(
-                        format("[%s] Can't openForConstruction '%s' using an already prepared transaction",
-                                config.familyName, toDebugString(object)));
+                    format("[%s] Can't openForConstruction '%s' using an already prepared transaction",
+                        config.familyName, toDebugString(object)));
             case ABORTED:
                 return new DeadTransactionException(
-                        format("[%s] Can't openForConstruction '%s' using an already aborted transaction",
-                                config.familyName, toDebugString(object)));
+                    format("[%s] Can't openForConstruction '%s' using an already aborted transaction",
+                        config.familyName, toDebugString(object)));
             case COMMITTED:
                 return new DeadTransactionException(
-                        format("[%s] Can't openForConstruction '%s' using an already committed transaction",
-                                config.familyName, toDebugString(object)));
+                    format("[%s] Can't openForConstruction '%s' using an already committed transaction",
+                        config.familyName, toDebugString(object)));
             default:
                 throw new IllegalStateException();
         }
@@ -231,22 +238,22 @@ public abstract class BetaTransaction implements Transaction {
 
         switch (status) {
            case PREPARED:
-               abort();
+               abort(pool);
                return new PreparedTransactionException(
-                       format("[%s] Can't commuting '%s' with reference '%s' using an already prepared transaction",
-                            config.familyName, toDebugString(object), function));
+                    format("[%s] Can't commuting '%s' with reference '%s' using an already prepared transaction",
+                        config.familyName, toDebugString(object), function));
            case ABORTED:
                return new DeadTransactionException(
-                       format("[%s] Can't commuting '%s' with reference '%s' using an already aborted transaction",
-                            config.familyName, toDebugString(object), function));
+                    format("[%s] Can't commuting '%s' with reference '%s' using an already aborted transaction",
+                        config.familyName, toDebugString(object), function));
            case COMMITTED:
                return new DeadTransactionException(
-                       format("[%s] Can't commuting '%s' with reference '%s' using an already committed transaction",
-                            config.familyName, toDebugString(object), function));
+                    format("[%s] Can't commuting '%s' with reference '%s' using an already committed transaction",
+                        config.familyName, toDebugString(object), function));
            default:
                throw new IllegalStateException();
        }
-   }
+    }
 
     @Override
     public final BetaTransactionConfiguration getConfiguration() {

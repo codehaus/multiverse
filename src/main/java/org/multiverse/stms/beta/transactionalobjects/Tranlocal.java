@@ -1,8 +1,8 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
+import org.multiverse.api.functions.Function;
 import org.multiverse.durability.DurableObject;
 import org.multiverse.durability.DurableState;
-import org.multiverse.functions.Function;
 import org.multiverse.stms.beta.BetaObjectPool;
 
 import java.util.Iterator;

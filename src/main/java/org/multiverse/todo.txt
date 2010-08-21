@@ -146,10 +146,6 @@ globalconflict counter.
 
 - testing: array transaction and conflict counter setting`
 
-- testing: mono transaction and partial read tracking
-
-    - all kinds of variations with non automatic read tracking
-
 - commute
 
    - when a commuting function fails, the transaction should be aborted.
@@ -189,11 +185,17 @@ the task not being executed at all.
 
 - abort commute on nullpointer function
 
-- transaction should be prefixed to all exceptions.
+done
+
+- testing: mono transaction and partial read tracking
+
+    - all kinds of variations with non automatic read tracking
 
 - retry exception fix
 
-done
+- value & lockOwner now is now private and replaced by getters (easier for mixins)
+
+- transaction should be prefixed to all exceptions.
 
 - mono transaction: error messages should include classname
 

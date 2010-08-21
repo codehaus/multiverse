@@ -7,8 +7,8 @@ import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadConflict;
 import org.multiverse.api.exceptions.ReadonlyException;
-import org.multiverse.functions.IncLongFunction;
-import org.multiverse.functions.LongFunction;
+import org.multiverse.api.functions.IncLongFunction;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
@@ -394,7 +394,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         assertFalse(write.isCommuting);
         assertFalse(write.isCommitted);
         assertEquals(11, write.value);
-        assertNull(ref.lockOwner);
+        assertNull(ref.___getLockOwner());
         assertHasNoCommutingFunctions(write);
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
@@ -423,7 +423,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         }
 
         assertAborted(tx);
-        assertSame(otherTx, ref.lockOwner);
+        assertSame(otherTx, ref.___getLockOwner());
         assertLocked(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);

@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.functions.Function;
-import org.multiverse.functions.LongFunction;
+import org.multiverse.api.functions.Function;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 
 /**

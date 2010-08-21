@@ -40,7 +40,7 @@ public class SimpleDurabilityIntegrationTest {
         LongRef ref = createLongRef(stm, 100);
 
         UnitOfWrite unitOfWrite = storage.startUnitOfWrite();
-        unitOfWrite.addChange(ref.___active);
+        unitOfWrite.addChange(ref.___unsafeLoad());
         unitOfWrite.addRoot(ref);
         unitOfWrite.commit();
 
@@ -56,7 +56,7 @@ public class SimpleDurabilityIntegrationTest {
         LongRef ref = createLongRef(stm, 100);
 
         UnitOfWrite write1 = storage.startUnitOfWrite();
-        write1.addChange(ref.___active);
+        write1.addChange(ref.___unsafeLoad());
         write1.addRoot(ref);
         write1.commit();
 
@@ -69,7 +69,7 @@ public class SimpleDurabilityIntegrationTest {
         tx.commit();
 
         UnitOfWrite write2 = storage.startUnitOfWrite();
-        write2.addChange(loaded.___active);
+        write2.addChange(loaded.___unsafeLoad());
         write2.commit();
 
         LongRef loaded2 = (LongRef) storage.loadDurableObject(loaded.___getStorageId());
@@ -83,8 +83,8 @@ public class SimpleDurabilityIntegrationTest {
 
 
         UnitOfWrite unitOfWrite = storage.startUnitOfWrite();
-        unitOfWrite.addChange(ref1.___active);
-        unitOfWrite.addChange(ref2.___active);
+        unitOfWrite.addChange(ref1.___unsafeLoad());
+        unitOfWrite.addChange(ref2.___unsafeLoad());
         unitOfWrite.addRoot(ref1);
         unitOfWrite.addRoot(ref2);
         unitOfWrite.commit();

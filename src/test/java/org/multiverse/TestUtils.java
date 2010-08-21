@@ -2,8 +2,8 @@ package org.multiverse;
 
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;

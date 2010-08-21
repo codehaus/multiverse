@@ -1,4 +1,4 @@
-package org.multiverse.functions;
+package org.multiverse.api.functions;
 
 /**
  * A {@link LongFunction} that increments the value with the specified amount.

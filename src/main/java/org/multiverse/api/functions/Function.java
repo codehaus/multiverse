@@ -1,4 +1,4 @@
-package org.multiverse.functions;
+package org.multiverse.api.functions;
 
 /**
  * A Function that accepts an argument of a certain type and returns a new value of the same type.

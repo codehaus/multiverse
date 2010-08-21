@@ -1,4 +1,4 @@
-package org.multiverse.functions;
+package org.multiverse.api.functions;
 
 /**
  * A {@link Function} optimized for a boolean. It depends on the stm if {@link #call(boolean)} without boxing or

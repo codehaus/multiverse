@@ -8,8 +8,8 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadConflict;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
-import org.multiverse.functions.IncLongFunction;
-import org.multiverse.functions.LongFunction;
+import org.multiverse.api.functions.IncLongFunction;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
@@ -583,7 +583,7 @@ public class FatArrayBetaTransaction_openForReadTest {
         }
 
         assertAborted(tx);
-        assertSame(otherTx, ref.lockOwner);
+        assertSame(otherTx, ref.___getLockOwner());
         assertLocked(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);

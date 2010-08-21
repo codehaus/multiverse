@@ -8,8 +8,8 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadConflict;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
-import org.multiverse.functions.IncLongFunction;
-import org.multiverse.functions.LongFunction;
+import org.multiverse.api.functions.IncLongFunction;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
@@ -264,6 +264,30 @@ public class FatMonoBetaTransaction_openForReadTest {
     }
 
     @Test
+    public void whenReadBiasedAndNoReadTrackingAndLock_thenAttached() {
+        LongRef ref = createReadBiasedLongRef(stm, 10);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .setBlockingAllowed(false)
+                .setReadTrackingEnabled(false);
+        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
+        LongRefTranlocal read = tx.openForRead(ref, true, pool);
+
+        assertActive(tx);
+        assertSame(committed, read);
+        assertSurplus(1, ref);
+        assertLocked(ref);
+        assertSame(tx, ref.___getLockOwner());
+        assertReadBiased(ref);
+        assertReadonlyCount(0, ref);
+        assertTrue(read.isCommitted);
+        assertTrue(read.isPermanent);
+        assertEquals(10, read.value);
+        assertAttached(tx, read);
+    }
+
+    @Test
     public void whenContainsUntrackedRead_thenCantRecoverFromUnrealReadConflict() {
         LongRef ref1 = createReadBiasedLongRef(stm, 100);
         LongRef ref2 = createLongRef(stm);
@@ -333,7 +357,8 @@ public class FatMonoBetaTransaction_openForReadTest {
         assertFalse(read.isPermanent);
         assertAttached(tx, read);
     }
-          @Test
+
+    @Test
     public void whenHasCommutingFunctions() {
         LongRef ref = createLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
@@ -379,12 +404,13 @@ public class FatMonoBetaTransaction_openForReadTest {
         }
 
         assertAborted(tx);
-        assertSame(otherTx, ref.lockOwner);
+        assertSame(otherTx, ref.___getLockOwner());
         assertLocked(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertSame(committed, ref.___unsafeLoad());
     }
+
     @Test
     public void whenPrepared_thenPreparedTransactionException() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);

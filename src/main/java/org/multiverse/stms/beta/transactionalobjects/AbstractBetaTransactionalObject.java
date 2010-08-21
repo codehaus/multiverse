@@ -40,11 +40,11 @@ public abstract class AbstractBetaTransactionalObject
         }
     }
 
-    public BetaTransaction lockOwner;
+    private BetaTransaction lockOwner;
 
     //Active needs to be volatile. If not, the both load statements in the load function, can be reordered
     //(the instruction above can jump below the orec.arrive if no write is done)
-    public volatile Tranlocal ___active;
+    private volatile Tranlocal ___active;
 
     private volatile Listeners ___listeners;
 

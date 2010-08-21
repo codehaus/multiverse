@@ -3,8 +3,8 @@ package org.multiverse.stms.beta.transactions;
 import org.multiverse.api.*;
 import org.multiverse.api.blocking.*;
 import org.multiverse.api.exceptions.*;
+import org.multiverse.api.functions.*;
 import org.multiverse.api.lifecycle.*;
-import org.multiverse.functions.*;
 import org.multiverse.stms.beta.*;
 import org.multiverse.stms.beta.transactionalobjects.*;
 

@@ -1,4 +1,4 @@
-package org.multiverse.functions;
+package org.multiverse.api.functions;
 
 /**
  * A {@link Function} optimized for a long. It depends on the stm if {@link #call(long)} without boxing or

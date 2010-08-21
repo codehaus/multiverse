@@ -4,7 +4,7 @@ import org.multiverse.*;
 import org.multiverse.api.*;
 import org.multiverse.api.blocking.*;
 import org.multiverse.api.exceptions.*;
-import org.multiverse.functions.*;
+import org.multiverse.api.functions.*;
 import org.multiverse.stms.beta.*;
 import org.multiverse.stms.beta.conflictcounters.*;
 import org.multiverse.stms.beta.orec.Orec;
@@ -42,11 +42,11 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         }
     }
 
-    public BetaTransaction lockOwner;
+    private BetaTransaction lockOwner;
 
     //Active needs to be volatile. If not, the both load statements in the load function, can be reordered
     //(the instruction above can jump below the orec.arrive if no write is done)
-    public volatile ${transactionalObject.tranlocal}${transactionalObject.typeParameter} ___active;
+    private volatile ${transactionalObject.tranlocal}${transactionalObject.typeParameter} ___active;
 
     private volatile Listeners ___listeners;
 

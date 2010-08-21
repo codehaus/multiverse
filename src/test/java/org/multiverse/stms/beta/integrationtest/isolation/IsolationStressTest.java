@@ -74,7 +74,7 @@ public class IsolationStressTest {
 
         double performance = BenchmarkUtils.perSecond(txCount, durationMs, threadCount);
         System.out.printf("Performance %s transactions/second\n", BenchmarkUtils.format(performance));
-        assertEquals(threadCount * txCount, ref.___active.value);
+        assertEquals(threadCount * txCount, ref.___unsafeLoad().value);
         System.out.println("ref.orec: " + ref.toOrecString());
     }
 

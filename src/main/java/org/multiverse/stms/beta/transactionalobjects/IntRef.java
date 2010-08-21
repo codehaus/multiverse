@@ -6,7 +6,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.exceptions.WriteConflict;
-import org.multiverse.functions.IntFunction;
+import org.multiverse.api.functions.IntFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
@@ -43,11 +43,11 @@ public final class IntRef
         }
     }
 
-    public BetaTransaction lockOwner;
+    private BetaTransaction lockOwner;
 
     //Active needs to be volatile. If not, the both load statements in the load function, can be reordered
     //(the instruction above can jump below the orec.arrive if no write is done)
-    public volatile IntRefTranlocal ___active;
+    private volatile IntRefTranlocal ___active;
 
     private volatile Listeners ___listeners;
 

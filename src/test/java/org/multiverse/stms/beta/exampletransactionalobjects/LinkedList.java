@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.exampletransactionalobjects;
 
 import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.functions.Function;
+import org.multiverse.api.functions.Function;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.transactionalobjects.AbstractBetaTransactionalObject;
 import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
