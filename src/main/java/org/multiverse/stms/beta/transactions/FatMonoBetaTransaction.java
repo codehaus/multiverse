@@ -27,6 +27,7 @@ import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalB
 public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
     private Tranlocal attached;
+    private boolean hasUpdates;
     private boolean hasReads;
     private boolean hasUntrackedReads;
     private final LocalConflictCounter localConflictCounter;
@@ -212,6 +213,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             result.value = read.value;
             result.read = read;
 
+            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -263,6 +265,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
         result.value = read.value;
         result.read = read;
+        hasUpdates = true;    
         attached = result;
         return result;
     }
@@ -306,6 +309,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(result == null){
             result = new RefTranlocal<E>(ref);
         }
+        result.isDirty = true;
         attached = result;
         return result;
     }
@@ -334,6 +338,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             //todo: call to 'openForCommute' can be inlined.
             RefTranlocal<E> result = ref.___openForCommute(pool);
             attached=result;
+            hasUpdates = true;
             result.addCommutingFunction(function, pool);
             return;
         }
@@ -352,6 +357,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
             result.read = read;
             result.value = read.value;
+            hasUpdates = true;
             attached=result;
         }
 
@@ -525,6 +531,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             result.value = read.value;
             result.read = read;
 
+            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -576,6 +583,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
         result.value = read.value;
         result.read = read;
+        hasUpdates = true;    
         attached = result;
         return result;
     }
@@ -619,6 +627,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(result == null){
             result = new IntRefTranlocal(ref);
         }
+        result.isDirty = true;
         attached = result;
         return result;
     }
@@ -647,6 +656,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             //todo: call to 'openForCommute' can be inlined.
             IntRefTranlocal result = ref.___openForCommute(pool);
             attached=result;
+            hasUpdates = true;
             result.addCommutingFunction(function, pool);
             return;
         }
@@ -665,6 +675,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
             result.read = read;
             result.value = read.value;
+            hasUpdates = true;
             attached=result;
         }
 
@@ -838,6 +849,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             result.value = read.value;
             result.read = read;
 
+            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -889,6 +901,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
         result.value = read.value;
         result.read = read;
+        hasUpdates = true;    
         attached = result;
         return result;
     }
@@ -932,6 +945,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(result == null){
             result = new LongRefTranlocal(ref);
         }
+        result.isDirty = true;
         attached = result;
         return result;
     }
@@ -960,6 +974,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             //todo: call to 'openForCommute' can be inlined.
             LongRefTranlocal result = ref.___openForCommute(pool);
             attached=result;
+            hasUpdates = true;
             result.addCommutingFunction(function, pool);
             return;
         }
@@ -978,6 +993,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
             result.read = read;
             result.value = read.value;
+            hasUpdates = true;
             attached=result;
         }
 
@@ -1146,6 +1162,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     
             Tranlocal result = read.openForWrite(pool);
 
+            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -1192,6 +1209,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         final Tranlocal read = result;
         result = read.openForWrite(pool);
+        hasUpdates = true;    
         attached = result;
         return result;
     }
@@ -1232,6 +1250,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         result = ref.___openForConstruction(pool);
+        result.isDirty = true;
         attached = result;
         return result;
     }
@@ -1260,6 +1279,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             //todo: call to 'openForCommute' can be inlined.
             Tranlocal result = ref.___openForCommute(pool);
             attached=result;
+            hasUpdates = true;
             result.addCommutingFunction(function, pool);
             return;
         }
@@ -1273,6 +1293,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(result.isCommitted){
             final Tranlocal read = result;
             result = read.openForWrite(pool);
+            hasUpdates = true;
             attached=result;
         }
 
@@ -1425,7 +1446,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnWriteConflict(pool);
             }
           
-            if(attached!=null){
+            if(hasUpdates){
                 if(config.dirtyCheck){
                     if(!doPrepareDirty(pool)){
                         throw abortOnWriteConflict(pool);
@@ -1581,6 +1602,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         status = ACTIVE;
+        hasUpdates = false;
         attempt++;
         abortOnly = false;
         attached = null;
@@ -1603,6 +1625,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             abort(pool);
         }
 
+        hasUpdates = false;
         status = ACTIVE;
         abortOnly = false;        
         remainingTimeoutNs = config.timeoutNs;

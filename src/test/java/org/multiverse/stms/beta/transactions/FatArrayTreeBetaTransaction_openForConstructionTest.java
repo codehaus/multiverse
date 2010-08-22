@@ -45,6 +45,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
         assertLocked(ref);
         assertSurplus(1, ref);
         assertAttached(tx, write);
+        assertTrue(write.isDirty);
     }
 
     @Test
@@ -102,6 +103,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest {
         assertLocked(ref);
         assertSurplus(1, ref);
         assertAttached(tx, write1);
+        assertTrue(write1.isDirty);
     }
 
     @Test

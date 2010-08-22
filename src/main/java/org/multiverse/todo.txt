@@ -187,6 +187,20 @@ the task not being executed at all.
 
 done
 
+- mono transaction & hasUpdates
+
+- array transaction &  hasUpdates
+
+- array tree transaction & hasUpdates
+
+- openForConstruction and isDirty field needs to be set on tranlocal test
+
+- transaction with lean commit should also make use of that hasNoUpdates fields.
+
+- prepare has become cheaper when the transaction hasNoUpdates
+
+- removed Transaction.start
+
 - speculative stuff for orelse added
 
 - use a threadlocal container for the transaction, so you don't need to access the threadlocal every time.

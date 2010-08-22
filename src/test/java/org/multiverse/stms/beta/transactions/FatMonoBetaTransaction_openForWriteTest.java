@@ -98,6 +98,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertFalse(write.isPermanent);
         assertSame(committed, ref.___unsafeLoad());
         assertAttached(tx, write);
+        assertHasUpdates(tx);
     }
 
     @Test
@@ -123,6 +124,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertFalse(write.isPermanent);
         assertSame(committed, ref.___unsafeLoad());
         assertAttached(tx, write);
+        assertHasUpdates(tx);
     }
 
     @Test
@@ -147,6 +149,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertFalse(write.isPermanent);
         assertSame(committed, ref.___unsafeLoad());
         assertAttached(tx, write);
+        assertHasUpdates(tx);
     }
 
     @Test
@@ -172,6 +175,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertFalse(write.isPermanent);
         assertSame(committed, ref.___unsafeLoad());
         assertAttached(tx, write);
+        assertHasUpdates(tx);
     }
 
     @Test
@@ -196,6 +200,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertReadonlyCount(0, ref);
         assertActive(tx);
         assertAttached(tx, write);
+        assertHasUpdates(tx);
     }
 
     @Test
@@ -220,6 +225,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertReadonlyCount(0, ref);
         assertActive(tx);
         assertAttached(tx, write);
+        assertHasNoUpdates(tx);
     }
 
     @Test
@@ -244,6 +250,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertReadonlyCount(0, ref);
         assertActive(tx);
         assertAttached(tx, write);
+        assertHasNoUpdates(tx);
     }
 
     @Test
@@ -266,6 +273,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertReadonlyCount(0, ref);
         assertActive(tx);
         assertAttached(tx, write2);
+        assertHasUpdates(tx);
     }
 
     @Test
@@ -287,6 +295,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertReadonlyCount(0, ref);
         assertActive(tx);
         assertAttached(tx, write);
+        assertHasUpdates(tx);
     }
 
     @Test
@@ -309,6 +318,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertReadonlyCount(0, ref);
         assertActive(tx);
         assertAttached(tx, write1);
+        assertHasUpdates(tx);
     }
 
     @Test
@@ -332,6 +342,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertReadonlyCount(0, ref);
         assertActive(tx);
         assertAttached(tx, write);
+        assertHasUpdates(tx);
     }
 
     @Test
@@ -354,6 +365,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertReadonlyCount(0, ref);
         assertActive(tx);
         assertAttached(tx, write2);
+        assertHasUpdates(tx);
     }
 
     @Test
@@ -376,6 +388,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertReadonlyCount(0, ref);
         assertActive(tx);
         assertAttached(tx, write2);
+        assertHasUpdates(tx);
     }
 
     @Test

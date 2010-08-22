@@ -75,6 +75,7 @@ public class FatArrayBetaTransaction_openForConstructionTest {
         assertSame(tx, ref.___getLockOwner());
         assertLocked(ref);
         assertSurplus(1, ref);
+        assertTrue(write.isDirty);
     }
 
     @Test
@@ -96,6 +97,7 @@ public class FatArrayBetaTransaction_openForConstructionTest {
         assertSame(tx, ref.___getLockOwner());
         assertLocked(ref);
         assertSurplus(1, ref);
+        assertTrue(construction1.isDirty);
     }
 
     @Test

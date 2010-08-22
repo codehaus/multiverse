@@ -27,6 +27,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
     private final Tranlocal[] array;
     private int firstFreeIndex = 0;
     private boolean hasReads;
+    private boolean hasUpdates;
     private boolean hasUntrackedReads;
 
     public FatArrayBetaTransaction(final BetaStm stm) {
@@ -189,7 +190,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             //    array[index] = array[0];
             //    array[index] = result;
             //}
-
+            hasUpdates = true;
             array[index]=result;
             return result;
         }
@@ -228,6 +229,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         result.read = read;
         result.value = read.value;
+        hasUpdates = true;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -281,6 +283,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(result == null){
             result = new RefTranlocal<E>(ref);
         }
+        result.isDirty = true;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -310,6 +313,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             //todo: call to 'openForCommute' can be inlined.
             RefTranlocal<E> result = ref.___openForCommute(pool);
             array[firstFreeIndex]=result;
+            hasUpdates = true;
             result.addCommutingFunction(function, pool);
             firstFreeIndex++;
             return;
@@ -329,6 +333,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             }
             result.read = read;
             result.value = read.value;
+            hasUpdates = true;
             array[index]=result;
         }
 
@@ -480,7 +485,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             //    array[index] = array[0];
             //    array[index] = result;
             //}
-
+            hasUpdates = true;
             array[index]=result;
             return result;
         }
@@ -519,6 +524,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         result.read = read;
         result.value = read.value;
+        hasUpdates = true;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -572,6 +578,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(result == null){
             result = new IntRefTranlocal(ref);
         }
+        result.isDirty = true;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -601,6 +608,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             //todo: call to 'openForCommute' can be inlined.
             IntRefTranlocal result = ref.___openForCommute(pool);
             array[firstFreeIndex]=result;
+            hasUpdates = true;
             result.addCommutingFunction(function, pool);
             firstFreeIndex++;
             return;
@@ -620,6 +628,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             }
             result.read = read;
             result.value = read.value;
+            hasUpdates = true;
             array[index]=result;
         }
 
@@ -771,7 +780,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             //    array[index] = array[0];
             //    array[index] = result;
             //}
-
+            hasUpdates = true;
             array[index]=result;
             return result;
         }
@@ -810,6 +819,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         result.read = read;
         result.value = read.value;
+        hasUpdates = true;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -863,6 +873,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(result == null){
             result = new LongRefTranlocal(ref);
         }
+        result.isDirty = true;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -892,6 +903,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             //todo: call to 'openForCommute' can be inlined.
             LongRefTranlocal result = ref.___openForCommute(pool);
             array[firstFreeIndex]=result;
+            hasUpdates = true;
             result.addCommutingFunction(function, pool);
             firstFreeIndex++;
             return;
@@ -911,6 +923,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             }
             result.read = read;
             result.value = read.value;
+            hasUpdates = true;
             array[index]=result;
         }
 
@@ -1062,7 +1075,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             //    array[index] = array[0];
             //    array[index] = result;
             //}
-
+            hasUpdates = true;
             array[index]=result;
             return result;
         }
@@ -1095,6 +1108,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         //open the tranlocal for writing.
         Tranlocal  result = read.openForWrite(pool);
+        hasUpdates = true;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -1145,6 +1159,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         //open the tranlocal for writing.
         Tranlocal result = ref.___openForConstruction(pool);
+        result.isDirty = true;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -1174,6 +1189,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             //todo: call to 'openForCommute' can be inlined.
             Tranlocal result = ref.___openForCommute(pool);
             array[firstFreeIndex]=result;
+            hasUpdates = true;
             result.addCommutingFunction(function, pool);
             firstFreeIndex++;
             return;
@@ -1188,6 +1204,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(result.isCommitted){
             final Tranlocal read = result;
             result = read.openForWrite(pool);
+            hasUpdates = true;
             array[index]=result;
         }
 
@@ -1417,7 +1434,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnWriteConflict(pool);
             }
              
-            if(firstFreeIndex > 0){
+            if(hasUpdates){
                 if(config.dirtyCheck){
                     if(!doPrepareDirty(pool)){
                         throw abortOnWriteConflict(pool);
@@ -1593,6 +1610,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         firstFreeIndex = 0;
         hasReads = false;
         hasUntrackedReads = false;
+        hasUpdates = false;
         if(normalListeners != null){
             normalListeners.clear();
         }
@@ -1612,6 +1630,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         status = ACTIVE;
         abortOnly = false;
         hasReads = false;
+        hasUpdates = false;
         hasUntrackedReads = false;
         attempt=1;
         firstFreeIndex = 0;

@@ -84,6 +84,7 @@ public class FatMonoBetaTransaction_hardResetTest {
         assertEquals(1, tx.getAttempt());
         assertFalse((Boolean) getField(tx, "hasReads"));
         assertFalse((Boolean) getField(tx, "hasUntrackedReads"));
+        assertHasNoUpdates(tx);
     }
 
     @Test

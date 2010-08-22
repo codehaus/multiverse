@@ -31,6 +31,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     private int size;
     private boolean hasReads;
     private boolean hasUntrackedReads;
+    private boolean hasUpdates;
 
     public ${transaction.name}(BetaStm stm) {
         this(new BetaTransactionConfiguration(stm));
@@ -209,6 +210,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #else
             result = result.openForWrite(pool);
 #end
+            hasUpdates = true;
             array[index]=result;
             return result;
         }
@@ -245,8 +247,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #else
         ${ref.tranlocal}${ref.typeParameter} result = read.openForWrite(pool);
 #end
+        hasUpdates = true;
         attach(ref, result, identityHashCode, pool);
-        size++;
+        size++;        
         return result;
     }
 
@@ -292,6 +295,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #else
         final ${ref.tranlocal}${ref.typeParameter} result = ref.___openForConstruction(pool);
 #end
+        result.isDirty = true;    
         attach(ref, result, identityHashCode, pool);
         size++;
         return result;
@@ -325,6 +329,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             ${ref.tranlocal}${ref.typeParameter} result = ref.___openForCommute(pool);
             attach(ref, result, identityHashCode, pool);
             result.addCommutingFunction(function, pool);
+            hasUpdates = true;
             size++;
             return;
         }
@@ -347,6 +352,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #else
             result = read.openForWrite(pool);
 #end
+            hasUpdates = true;
             array[index]=result;
          }
 
@@ -544,14 +550,15 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         Listeners[] listenersArray = null;
         if(size>0){
+            final boolean needsPrepare = status == ACTIVE && hasUpdates;
             if(config.dirtyCheck){
-                if(status == ACTIVE && !doPrepareDirty(pool)){
+                if(needsPrepare && !doPrepareDirty(pool)){
                     throw abortOnWriteConflict(pool);
                 }
 
                 listenersArray = commitDirty(pool);
             }else{
-                if(status == ACTIVE && !doPrepareAll(pool)){
+                if(needsPrepare && !doPrepareAll(pool)){
                     throw abortOnWriteConflict(pool);
                 }
 
@@ -681,7 +688,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOnWriteConflict(pool);
         }
 
-        if(size>0){
+        if(hasUpdates){
             if(config.dirtyCheck){
                 if(!doPrepareDirty(pool)){
                     throw abortOnWriteConflict(pool);
@@ -728,7 +735,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 throw abortOnWriteConflict(pool);
             }
 
-            if(size>0){
+            if(hasUpdates){
                 if(config.dirtyCheck){
                     if(!doPrepareDirty(pool)){
                         throw abortOnWriteConflict(pool);
@@ -918,6 +925,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         status = ACTIVE;
         abortOnly = false;
         hasReads = false;
+        hasUpdates = false;
         hasUntrackedReads = false;
         size = 0;
         attempt++;
@@ -952,6 +960,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         status = ACTIVE;
         abortOnly = false;
+        hasUpdates = false;
         hasReads = false;
         hasUntrackedReads = false;
         attempt = 1;

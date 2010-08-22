@@ -44,6 +44,7 @@ public class FatMonoBetaTransaction_openForConstructionTest {
         assertLocked(ref);
         assertSurplus(1, ref);
         assertAttached(tx, write);
+        assertTrue(write.isDirty);
     }
 
     @Test
@@ -120,6 +121,7 @@ public class FatMonoBetaTransaction_openForConstructionTest {
         assertLocked(ref);
         assertSurplus(1, ref);
         assertAttached(tx, write1);
+        assertTrue(write1.isDirty);
     }
 
     @Test

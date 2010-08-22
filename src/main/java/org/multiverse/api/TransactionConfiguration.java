@@ -8,6 +8,8 @@ import org.multiverse.stms.beta.BetaStm;
  * complicating its usage. So all the configurational properties of the transaction are contained in
  * this structure.
  *
+ * The same TransactionConfiguration 
+ *
  * @author Peter Veentjer.
  */
 public interface TransactionConfiguration {

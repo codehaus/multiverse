@@ -35,6 +35,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
     private int size;
     private boolean hasReads;
     private boolean hasUntrackedReads;
+    private boolean hasUpdates;
 
     public FatArrayTreeBetaTransaction(BetaStm stm) {
         this(new BetaTransactionConfiguration(stm));
@@ -197,6 +198,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
             //it was opened for reading so we need to open it for writing.
             result = result.openForWrite(pool);
+            hasUpdates = true;
             array[index]=result;
             return result;
         }
@@ -229,8 +231,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
         result.read = read;
         result.value = read.value;
+        hasUpdates = true;
         attach(ref, result, identityHashCode, pool);
-        size++;
+        size++;        
         return result;
     }
 
@@ -272,6 +275,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         if(result == null){
             result = new RefTranlocal<E>(ref);
         }
+        result.isDirty = true;    
         attach(ref, result, identityHashCode, pool);
         size++;
         return result;
@@ -300,6 +304,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             RefTranlocal<E> result = ref.___openForCommute(pool);
             attach(ref, result, identityHashCode, pool);
             result.addCommutingFunction(function, pool);
+            hasUpdates = true;
             size++;
             return;
         }
@@ -318,6 +323,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             }
             result.read = read;
             result.value = read.value;
+            hasUpdates = true;
             array[index]=result;
          }
 
@@ -463,6 +469,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
             //it was opened for reading so we need to open it for writing.
             result = result.openForWrite(pool);
+            hasUpdates = true;
             array[index]=result;
             return result;
         }
@@ -495,8 +502,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
         result.read = read;
         result.value = read.value;
+        hasUpdates = true;
         attach(ref, result, identityHashCode, pool);
-        size++;
+        size++;        
         return result;
     }
 
@@ -538,6 +546,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         if(result == null){
             result = new IntRefTranlocal(ref);
         }
+        result.isDirty = true;    
         attach(ref, result, identityHashCode, pool);
         size++;
         return result;
@@ -566,6 +575,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             IntRefTranlocal result = ref.___openForCommute(pool);
             attach(ref, result, identityHashCode, pool);
             result.addCommutingFunction(function, pool);
+            hasUpdates = true;
             size++;
             return;
         }
@@ -584,6 +594,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             }
             result.read = read;
             result.value = read.value;
+            hasUpdates = true;
             array[index]=result;
          }
 
@@ -729,6 +740,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
             //it was opened for reading so we need to open it for writing.
             result = result.openForWrite(pool);
+            hasUpdates = true;
             array[index]=result;
             return result;
         }
@@ -761,8 +773,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
         result.read = read;
         result.value = read.value;
+        hasUpdates = true;
         attach(ref, result, identityHashCode, pool);
-        size++;
+        size++;        
         return result;
     }
 
@@ -804,6 +817,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         if(result == null){
             result = new LongRefTranlocal(ref);
         }
+        result.isDirty = true;    
         attach(ref, result, identityHashCode, pool);
         size++;
         return result;
@@ -832,6 +846,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             LongRefTranlocal result = ref.___openForCommute(pool);
             attach(ref, result, identityHashCode, pool);
             result.addCommutingFunction(function, pool);
+            hasUpdates = true;
             size++;
             return;
         }
@@ -850,6 +865,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             }
             result.read = read;
             result.value = read.value;
+            hasUpdates = true;
             array[index]=result;
          }
 
@@ -995,6 +1011,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
             //it was opened for reading so we need to open it for writing.
             result = result.openForWrite(pool);
+            hasUpdates = true;
             array[index]=result;
             return result;
         }
@@ -1022,8 +1039,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         //open the tranlocal for writing.
         Tranlocal result = read.openForWrite(pool);
+        hasUpdates = true;
         attach(ref, result, identityHashCode, pool);
-        size++;
+        size++;        
         return result;
     }
 
@@ -1062,6 +1080,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         final Tranlocal result = ref.___openForConstruction(pool);
+        result.isDirty = true;    
         attach(ref, result, identityHashCode, pool);
         size++;
         return result;
@@ -1090,6 +1109,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             Tranlocal result = ref.___openForCommute(pool);
             attach(ref, result, identityHashCode, pool);
             result.addCommutingFunction(function, pool);
+            hasUpdates = true;
             size++;
             return;
         }
@@ -1103,6 +1123,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         if(result.isCommitted){
             final Tranlocal read = result;
             result = read.openForWrite(pool);
+            hasUpdates = true;
             array[index]=result;
          }
 
@@ -1393,7 +1414,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 throw abortOnWriteConflict(pool);
             }
 
-            if(size>0){
+            if(hasUpdates){
                 if(config.dirtyCheck){
                     if(!doPrepareDirty(pool)){
                         throw abortOnWriteConflict(pool);
@@ -1576,6 +1597,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         status = ACTIVE;
         abortOnly = false;
         hasReads = false;
+        hasUpdates = false;
         hasUntrackedReads = false;
         size = 0;
         attempt++;
@@ -1608,6 +1630,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         status = ACTIVE;
         abortOnly = false;
+        hasUpdates = false;
         hasReads = false;
         hasUntrackedReads = false;
         attempt = 1;

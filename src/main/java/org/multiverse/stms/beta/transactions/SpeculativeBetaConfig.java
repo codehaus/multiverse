@@ -11,12 +11,13 @@ public final class SpeculativeBetaConfig {
     private final int minimalLength;
     private final boolean commuteRequired;
     private final boolean orelseRequired;
+    private final boolean fat;
 
-    public SpeculativeBetaConfig() {
-        this(false, false, 1, false);
+    public SpeculativeBetaConfig(boolean fat) {
+        this(fat, false, false, 1, false);
     }
 
-    public SpeculativeBetaConfig(boolean listenersRequired, boolean commuteRequired, int minimalLength, boolean orelseRequired) {
+    public SpeculativeBetaConfig(boolean fat, boolean listenersRequired, boolean commuteRequired, int minimalLength, boolean orelseRequired) {
         if (minimalLength < 0) {
             throw new IllegalArgumentException();
         }
@@ -24,6 +25,11 @@ public final class SpeculativeBetaConfig {
         this.minimalLength = minimalLength;
         this.commuteRequired = commuteRequired;
         this.orelseRequired = orelseRequired;
+        this.fat = fat;
+    }
+
+    public boolean isFat() {
+        return fat;
     }
 
     public boolean isOrelseRequired() {
@@ -51,7 +57,9 @@ public final class SpeculativeBetaConfig {
             return this;
         }
 
-        return new SpeculativeBetaConfig(listenersRequired,
+        return new SpeculativeBetaConfig(
+                fat,
+                listenersRequired,
                 commuteRequired,
                 newMinimalLength,
                 orelseRequired);
@@ -62,7 +70,9 @@ public final class SpeculativeBetaConfig {
             return this;
         }
 
-        return new SpeculativeBetaConfig(true,
+        return new SpeculativeBetaConfig(
+                true,
+                true,
                 commuteRequired,
                 minimalLength,
                 orelseRequired);
@@ -73,7 +83,9 @@ public final class SpeculativeBetaConfig {
             return this;
         }
 
-        return new SpeculativeBetaConfig(listenersRequired,
+        return new SpeculativeBetaConfig(
+                true,
+                listenersRequired,
                 listenersRequired,
                 minimalLength,
                 true);
@@ -84,7 +96,9 @@ public final class SpeculativeBetaConfig {
             return this;
         }
 
-        return new SpeculativeBetaConfig(listenersRequired,
+        return new SpeculativeBetaConfig(
+                true,
+                listenersRequired,
                 true,
                 minimalLength,
                 orelseRequired);

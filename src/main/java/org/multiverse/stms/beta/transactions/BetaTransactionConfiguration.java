@@ -45,7 +45,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     public boolean writeSkewAllowed = true;
     public PropagationLevel propagationLevel = PropagationLevel.Requires;
     private final AtomicReference<SpeculativeBetaConfig> speculativeConfig
-            = new AtomicReference<SpeculativeBetaConfig>(new SpeculativeBetaConfig());
+            = new AtomicReference<SpeculativeBetaConfig>(new SpeculativeBetaConfig(true));
 
     public BetaTransactionConfiguration(BetaStm stm) {
         this.stm = stm;
@@ -167,8 +167,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         return propagationLevel;
     }
 
-    public void needsOrelse(){
-         while (true) {
+    public void needsOrelse() {
+        while (true) {
             SpeculativeBetaConfig current = speculativeConfig.get();
             SpeculativeBetaConfig update = current.createWithOrElseRequired();
             if (speculativeConfig.compareAndSet(current, update)) {
@@ -210,18 +210,23 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
 
     public void validate() {
         if (!writeSkewAllowed && !trackReads && !readonly) {
-            String msg = format("'%s': If no writeskew is allowed, read tracking should be enabled", familyName);
+            String msg = format("'[%s] If no writeskew is allowed, read tracking should be enabled", familyName);
             throw new IllegalTransactionFactoryException(msg);
         }
 
         if (blockingAllowed && !trackReads) {
-            String msg = format("'%s': If blocking is allowed, read tracking should be enabled", familyName);
+            String msg = format("[%s] If blocking is allowed, read tracking should be enabled", familyName);
             throw new IllegalTransactionFactoryException(msg);
         }
 
         if (pessimisticLockLevel == PessimisticLockLevel.Read && !trackReads) {
-            String msg = format("'%s': If all reads are locked, read tracking should be enabled", familyName);
+            String msg = format("[%s] If all reads should be locked, read tracking should be enabled", familyName);
             throw new IllegalTransactionFactoryException(msg);
+        }
+
+        if (speculativeConfigEnabled) {
+            boolean isFat = !writeSkewAllowed;
+            speculativeConfig.set(new SpeculativeBetaConfig(isFat));
         }
     }
 
@@ -653,9 +658,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.propagationLevel = propagationLevel;
         return config;
     }
-    
+
     public BetaTransactionConfiguration addPermanentListener(TransactionLifecycleListener listener) {
-        if(listener == null){
+        if (listener == null) {
             throw new NullPointerException();
         }
 

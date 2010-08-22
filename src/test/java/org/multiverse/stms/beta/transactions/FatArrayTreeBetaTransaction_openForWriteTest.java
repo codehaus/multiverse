@@ -87,7 +87,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
     }
 
     @Test
-    public void whenFresh() {
+    public void whenInitialOpenForWrite() {
         LongRef ref = createLongRef(stm, 0);
         Tranlocal committed = ref.___unsafeLoad();
 
@@ -99,6 +99,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         assertSame(committed, write.read);
         assertSame(write.owner, ref);
         assertAttached(tx, write);
+        assertHasUpdates(tx);
     }
 
     @Test
@@ -115,6 +116,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         assertSame(write.owner, ref);
         assertSame(ref, write.owner);
         assertAttached(tx, write);
+        assertHasUpdates(tx);
     }
 
     @Test
@@ -132,6 +134,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         assertFalse(write2.isCommitted());
         assertSame(committed, write1.read);
         assertAttached(tx, write1);
+        assertHasUpdates(tx);
     }
 
     @Test
@@ -153,6 +156,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         assertSame(read, write.read);
         assertSame(ref, write.owner);
         assertAttached(tx, write);
+        assertHasUpdates(tx);
     }
 
     @Test
@@ -172,6 +176,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         assertSame(write2, write1);
         assertFalse(write2.isCommitted());
         assertAttached(tx, write2);
+        assertHasUpdates(tx);
     }
 
     @Test
@@ -231,6 +236,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertAttached(tx, write);
+        assertHasUpdates(tx);
     }
 
     @Test
@@ -253,6 +259,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertAttached(tx, write);
+        assertHasUpdates(tx);
     }
 
     @Test
@@ -309,6 +316,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         assertReadonlyCount(0, ref);
         assertActive(tx);
         assertAttached(tx, write);
+        assertHasNoUpdates(tx);
     }
 
     @Test
@@ -333,6 +341,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         assertReadonlyCount(0, ref);
         assertActive(tx);
         assertAttached(tx, write);
+        assertHasNoUpdates(tx);
     }
 
     @Test
@@ -401,6 +410,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertAttached(tx, write);
+        assertHasUpdates(tx);
     }
 
     @Test

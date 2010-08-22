@@ -26,6 +26,7 @@ import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalB
 public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     private Tranlocal attached;
+    private boolean hasUpdates;
 
     public LeanMonoBetaTransaction(final BetaStm stm){
         this(new BetaTransactionConfiguration(stm));
@@ -143,6 +144,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             result.value = read.value;
             result.read = read;
 
+            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -171,6 +173,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
         result.value = read.value;
         result.read = read;
+        hasUpdates = true;    
         attached = result;
         return result;
     }
@@ -214,6 +217,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         if(result == null){
             result = new RefTranlocal<E>(ref);
         }
+        result.isDirty = true;
         attached = result;
         return result;
     }
@@ -336,6 +340,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             result.value = read.value;
             result.read = read;
 
+            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -364,6 +369,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
         result.value = read.value;
         result.read = read;
+        hasUpdates = true;    
         attached = result;
         return result;
     }
@@ -407,6 +413,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         if(result == null){
             result = new IntRefTranlocal(ref);
         }
+        result.isDirty = true;
         attached = result;
         return result;
     }
@@ -529,6 +536,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             result.value = read.value;
             result.read = read;
 
+            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -557,6 +565,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
         result.value = read.value;
         result.read = read;
+        hasUpdates = true;    
         attached = result;
         return result;
     }
@@ -600,6 +609,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         if(result == null){
             result = new LongRefTranlocal(ref);
         }
+        result.isDirty = true;
         attached = result;
         return result;
     }
@@ -717,6 +727,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
             Tranlocal result = read.openForWrite(pool);
 
+            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -740,6 +751,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
         final Tranlocal read = result;
         result = read.openForWrite(pool);
+        hasUpdates = true;    
         attached = result;
         return result;
     }
@@ -780,6 +792,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         result = ref.___openForConstruction(pool);
+        result.isDirty = true;
         attached = result;
         return result;
     }
@@ -869,19 +882,16 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             
         Listeners listeners = null;
         if(attached!=null){
+            final boolean needsPrepare = status == ACTIVE && hasUpdates;
             if(config.dirtyCheck){
-                if(status == ACTIVE){
-                    if(!doPrepareDirty(pool)){
-                        throw abortOnWriteConflict(pool);
-                    }
+                if(needsPrepare && !doPrepareDirty(pool)){
+                    throw abortOnWriteConflict(pool);
                 }
 
                 listeners = attached.owner.___commitDirty(attached, this, pool, config.globalConflictCounter);
             }else{
-                if(status == ACTIVE){
-                    if(!doPrepareAll(pool)){
-                        throw abortOnWriteConflict(pool);
-                    }
+                if(needsPrepare && !doPrepareAll(pool)){
+                    throw abortOnWriteConflict(pool);
                 }
 
                 listeners = attached.owner.___commitAll(attached, this, pool, config.globalConflictCounter);
@@ -927,7 +937,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOnWriteConflict(pool);
         }
 
-        if(attached!=null && !config.lockWrites){
+        if(hasUpdates){
             if(config.dirtyCheck){
                 if(!doPrepareDirty(pool)){
                     throw abortOnWriteConflict(pool);
@@ -1051,6 +1061,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         status = ACTIVE;
+        hasUpdates = false;
         attempt++;
         abortOnly = false;
         attached = null;
@@ -1070,6 +1081,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             }
         }
 
+        hasUpdates = false;
         status = ACTIVE;
         abortOnly = false;        
         remainingTimeoutNs = config.timeoutNs;

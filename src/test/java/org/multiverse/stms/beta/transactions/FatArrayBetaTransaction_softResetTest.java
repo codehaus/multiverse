@@ -82,6 +82,7 @@ public class FatArrayBetaTransaction_softResetTest {
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
+        assertHasNoUpdates(tx);
     }
 
     @Test
@@ -101,6 +102,7 @@ public class FatArrayBetaTransaction_softResetTest {
         assertSurplus(1, ref);
         assertNull(ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
+        assertHasNoUpdates(tx);
     }
 
     @Test
@@ -122,6 +124,7 @@ public class FatArrayBetaTransaction_softResetTest {
         assertSame(committed, ref.___unsafeLoad());
         assertFalse(write.isPermanent);
         assertFalse(write.isCommitted);
+        assertHasNoUpdates(tx);
     }
 
     @Test
@@ -143,6 +146,7 @@ public class FatArrayBetaTransaction_softResetTest {
         assertSame(committed, ref.___unsafeLoad());
         assertFalse(write.isPermanent);
         assertFalse(write.isCommitted);
+        assertHasNoUpdates(tx);
     }
 
     @Test
@@ -176,6 +180,7 @@ public class FatArrayBetaTransaction_softResetTest {
         assertSame(committed, ref.___unsafeLoad());
         assertFalse(write.isPermanent);
         assertFalse(write.isCommitted);
+        assertHasNoUpdates(tx);
     }
 
     @Test
@@ -193,6 +198,7 @@ public class FatArrayBetaTransaction_softResetTest {
         assertLocked(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
+        assertHasNoUpdates(tx);
     }
 
     @Test

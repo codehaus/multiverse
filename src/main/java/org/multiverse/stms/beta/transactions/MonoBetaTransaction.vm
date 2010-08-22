@@ -23,6 +23,7 @@ import static java.lang.String.format;
 public final class ${transaction.name} extends ${transaction.superClass} {
 
     private Tranlocal attached;
+    private boolean hasUpdates;
 #if(!${transaction.lean})
     private boolean hasReads;
     private boolean hasUntrackedReads;
@@ -241,6 +242,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             ${ref.tranlocal}${ref.typeParameter} result = read.openForWrite(pool);
 #end
 
+            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -298,6 +300,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #else
         result = read.openForWrite(pool);
 #end
+        hasUpdates = true;    
         attached = result;
         return result;
     }
@@ -345,6 +348,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #else
         result = ref.___openForConstruction(pool);
 #end
+        result.isDirty = true;
         attached = result;
         return result;
     }
@@ -378,6 +382,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             //todo: call to 'openForCommute' can be inlined.
             ${ref.tranlocal}${ref.typeParameter} result = ref.___openForCommute(pool);
             attached=result;
+            hasUpdates = true;
             result.addCommutingFunction(function, pool);
             return;
         }
@@ -400,6 +405,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #else
             result = read.openForWrite(pool);
 #end
+            hasUpdates = true;
             attached=result;
         }
 
@@ -519,19 +525,16 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             
         Listeners listeners = null;
         if(attached!=null){
+            final boolean needsPrepare = status == ACTIVE && hasUpdates;
             if(config.dirtyCheck){
-                if(status == ACTIVE){
-                    if(!doPrepareDirty(pool)){
-                        throw abortOnWriteConflict(pool);
-                    }
+                if(needsPrepare && !doPrepareDirty(pool)){
+                    throw abortOnWriteConflict(pool);
                 }
 
                 listeners = attached.owner.___commitDirty(attached, this, pool, config.globalConflictCounter);
             }else{
-                if(status == ACTIVE){
-                    if(!doPrepareAll(pool)){
-                        throw abortOnWriteConflict(pool);
-                    }
+                if(needsPrepare && !doPrepareAll(pool)){
+                    throw abortOnWriteConflict(pool);
                 }
 
                 listeners = attached.owner.___commitAll(attached, this, pool, config.globalConflictCounter);
@@ -609,7 +612,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOnWriteConflict(pool);
         }
 
-        if(attached!=null && !config.lockWrites){
+        if(hasUpdates){
             if(config.dirtyCheck){
                 if(!doPrepareDirty(pool)){
                     throw abortOnWriteConflict(pool);
@@ -655,7 +658,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 throw abortOnWriteConflict(pool);
             }
           
-            if(attached!=null){
+            if(hasUpdates){
                 if(config.dirtyCheck){
                     if(!doPrepareDirty(pool)){
                         throw abortOnWriteConflict(pool);
@@ -824,6 +827,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         status = ACTIVE;
+        hasUpdates = false;
         attempt++;
         abortOnly = false;
         attached = null;
@@ -854,6 +858,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end
         }
 
+        hasUpdates = false;
         status = ACTIVE;
         abortOnly = false;        
         remainingTimeoutNs = config.timeoutNs;

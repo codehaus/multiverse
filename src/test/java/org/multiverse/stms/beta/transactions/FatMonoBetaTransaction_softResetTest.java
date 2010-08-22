@@ -83,6 +83,7 @@ public class FatMonoBetaTransaction_softResetTest {
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
+        assertHasNoUpdates(tx);
     }
 
     @Test
@@ -102,6 +103,7 @@ public class FatMonoBetaTransaction_softResetTest {
         assertSurplus(1, ref);
         assertNull(ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
+        assertHasNoUpdates(tx);
     }
 
     @Test
@@ -123,6 +125,7 @@ public class FatMonoBetaTransaction_softResetTest {
         assertSame(committed, ref.___unsafeLoad());
         assertFalse(write.isPermanent);
         assertFalse(write.isCommitted);
+        assertHasNoUpdates(tx);
     }
 
     @Test
@@ -144,6 +147,7 @@ public class FatMonoBetaTransaction_softResetTest {
         assertSame(committed, ref.___unsafeLoad());
         assertFalse(write.isPermanent);
         assertFalse(write.isCommitted);
+        assertHasNoUpdates(tx);
     }
 
     @Test
@@ -155,6 +159,7 @@ public class FatMonoBetaTransaction_softResetTest {
 
         assertTrue(result);
         assertActive(tx);
+        assertHasNoUpdates(tx);
     }
 
     @Test
@@ -177,6 +182,7 @@ public class FatMonoBetaTransaction_softResetTest {
         assertSame(committed, ref.___unsafeLoad());
         assertFalse(write.isPermanent);
         assertFalse(write.isCommitted);
+        assertHasNoUpdates(tx);
     }
 
     @Test
@@ -194,6 +200,7 @@ public class FatMonoBetaTransaction_softResetTest {
         assertLocked(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
+        assertHasNoUpdates(tx);
     }
 
     @Test
@@ -208,7 +215,8 @@ public class FatMonoBetaTransaction_softResetTest {
         verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
 
         assertHasNoNormalListeners(tx);
-        assertHasPermanentListeners(tx, listener);
+        assertHasPermanentListeners(tx, listener); 
+
     }
 
     @Test

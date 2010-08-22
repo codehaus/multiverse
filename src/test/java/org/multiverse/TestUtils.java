@@ -49,6 +49,14 @@ public class TestUtils {
         assertHasCommutingFunctions(tranlocal);
     }
 
+    public static void assertHasUpdates(BetaTransaction tx) {
+        assertTrue((Boolean) getField(tx, "hasUpdates"));
+    }
+
+    public static void assertHasNoUpdates(BetaTransaction tx) {
+        assertFalse((Boolean) getField(tx, "hasUpdates"));
+    }
+
     public static void assertHasCommutingFunctions(LongRefTranlocal tranlocal, LongFunction... expected) {
         LongRefTranlocal.CallableNode current = tranlocal.headCallable;
         List<LongFunction> functions = new LinkedList<LongFunction>();

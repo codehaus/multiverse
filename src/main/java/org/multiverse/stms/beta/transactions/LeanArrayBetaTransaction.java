@@ -27,6 +27,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     private final Tranlocal[] array;
     private int firstFreeIndex = 0;
     private boolean hasReads;
+    private boolean hasUpdates;
     private boolean hasUntrackedReads;
 
     public LeanArrayBetaTransaction(final BetaStm stm) {
@@ -142,7 +143,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             //    array[index] = array[0];
             //    array[index] = result;
             //}
-
+            hasUpdates = true;
             array[index]=result;
             return result;
         }
@@ -181,6 +182,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         result.read = read;
         result.value = read.value;
+        hasUpdates = true;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -234,6 +236,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(result == null){
             result = new RefTranlocal<E>(ref);
         }
+        result.isDirty = true;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -349,7 +352,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             //    array[index] = array[0];
             //    array[index] = result;
             //}
-
+            hasUpdates = true;
             array[index]=result;
             return result;
         }
@@ -388,6 +391,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         result.read = read;
         result.value = read.value;
+        hasUpdates = true;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -441,6 +445,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(result == null){
             result = new IntRefTranlocal(ref);
         }
+        result.isDirty = true;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -556,7 +561,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             //    array[index] = array[0];
             //    array[index] = result;
             //}
-
+            hasUpdates = true;
             array[index]=result;
             return result;
         }
@@ -595,6 +600,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         result.read = read;
         result.value = read.value;
+        hasUpdates = true;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -648,6 +654,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(result == null){
             result = new LongRefTranlocal(ref);
         }
+        result.isDirty = true;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -763,7 +770,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             //    array[index] = array[0];
             //    array[index] = result;
             //}
-
+            hasUpdates = true;
             array[index]=result;
             return result;
         }
@@ -796,6 +803,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //open the tranlocal for writing.
         Tranlocal  result = read.openForWrite(pool);
+        hasUpdates = true;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -846,6 +854,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //open the tranlocal for writing.
         Tranlocal result = ref.___openForConstruction(pool);
+        result.isDirty = true;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -980,14 +989,15 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         Listeners[] listeners = null;
 
         if (firstFreeIndex > 0) {
+            final boolean needsPrepare = status == ACTIVE && hasUpdates;
             if(config.dirtyCheck){
-                if(status == ACTIVE && !doPrepareDirty(pool)){
+                if(needsPrepare && !doPrepareDirty(pool)){
                     throw abortOnWriteConflict(pool);
                 }
 
                 listeners = commitDirty(pool);
             }else{
-                if(status == ACTIVE && !doPrepareAll(pool)){
+                if(needsPrepare && !doPrepareAll(pool)){
                      throw abortOnWriteConflict(pool);
                 }
 
@@ -1079,7 +1089,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnWriteConflict(pool);
         }
 
-        if(firstFreeIndex > 0){
+        if(hasUpdates){
            if(config.dirtyCheck){
                 if(!doPrepareDirty(pool)){
                     throw abortOnWriteConflict(pool);
@@ -1220,6 +1230,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         firstFreeIndex = 0;
         hasReads = false;
         hasUntrackedReads = false;
+        hasUpdates = false;
         return true;
     }
 
@@ -1236,6 +1247,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         status = ACTIVE;
         abortOnly = false;
         hasReads = false;
+        hasUpdates = false;
         hasUntrackedReads = false;
         attempt=1;
         firstFreeIndex = 0;
