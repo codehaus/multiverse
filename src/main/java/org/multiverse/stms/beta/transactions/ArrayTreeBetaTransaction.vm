@@ -1024,6 +1024,8 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     // ================== orelse ============================
 
+    // ================== orelse ============================
+
     @Override
     public final void startEitherBranch(){
         startEitherBranch(getThreadLocalBetaObjectPool());
@@ -1031,7 +1033,13 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     @Override
     public final void startEitherBranch(BetaObjectPool pool){
+#if($transaction.lean)
+        config.needsOrelse();
+        abort(pool);
+        throw SpeculativeConfigurationError.INSTANCE;
+#else
         throw new TodoException();
+#end
     }
 
     @Override
@@ -1041,7 +1049,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     @Override
     public final void endEitherBranch(BetaObjectPool pool){
+#if($transaction.lean)
+        abort(pool);
+        throw new IllegalStateException();
+#else
         throw new TodoException();
+#end
     }
 
     @Override
@@ -1051,6 +1064,11 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     @Override
     public final void startOrElseBranch(BetaObjectPool pool){
+#if($transaction.lean)
+        abort(pool);
+        throw new IllegalStateException();
+#else
         throw new TodoException();
+#end
     }
 }

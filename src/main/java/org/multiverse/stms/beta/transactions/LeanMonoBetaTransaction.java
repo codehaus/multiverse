@@ -1109,6 +1109,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     // ================== orelse ============================
 
+    // ================== orelse ============================
+
     @Override
     public final void startEitherBranch(){
         startEitherBranch(getThreadLocalBetaObjectPool());
@@ -1116,7 +1118,9 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     @Override
     public final void startEitherBranch(BetaObjectPool pool){
-        throw new TodoException();
+        config.needsOrelse();
+        abort(pool);
+        throw SpeculativeConfigurationError.INSTANCE;
     }
 
     @Override
@@ -1126,7 +1130,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     @Override
     public final void endEitherBranch(BetaObjectPool pool){
-        throw new TodoException();
+        abort(pool);
+        throw new IllegalStateException();
     }
 
     @Override
@@ -1136,7 +1141,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     @Override
     public final void startOrElseBranch(BetaObjectPool pool){
-        throw new TodoException();
+        abort(pool);
+        throw new IllegalStateException();
     }
 }
 

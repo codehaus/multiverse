@@ -167,6 +167,16 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         return propagationLevel;
     }
 
+    public void needsOrelse(){
+         while (true) {
+            SpeculativeBetaConfig current = speculativeConfig.get();
+            SpeculativeBetaConfig update = current.createWithOrElseRequired();
+            if (speculativeConfig.compareAndSet(current, update)) {
+                return;
+            }
+        }
+    }
+
     public void needsListeners() {
         while (true) {
             SpeculativeBetaConfig current = speculativeConfig.get();

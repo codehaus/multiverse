@@ -571,7 +571,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertFalse(write.isCommuting);
         assertFalse(write.isCommitted);
         assertEquals(11, write.value);
-        assertNull(ref.___unsafeLoad());
+        assertSame(committed, ref.___unsafeLoad());
         assertHasNoCommutingFunctions(write);
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());

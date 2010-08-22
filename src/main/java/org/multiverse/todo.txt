@@ -89,6 +89,8 @@ performance.
 
 todo
 
+- added missing type parameter on the mono tx openForRead
+
 - mono transaction: support for orelse
 
 - array transaction:  support for orelse
@@ -137,8 +139,6 @@ globalconflict counter.
    - make sure that the object that are pooled, are not a potential source of memory leaks. E.g. transactions
    still holding references to old data.
 
-- methods of the atomic object need to be prefixed so they won't cause problems with user methods     
-
 - clojure: add watch. Basic functionality already is there, but atm it is done to all
      reads and not specific ones.
 
@@ -186,6 +186,8 @@ the task not being executed at all.
 - abort commute on nullpointer function
 
 done
+
+- speculative stuff for orelse added
 
 - use a threadlocal container for the transaction, so you don't need to access the threadlocal every time.
 
@@ -258,6 +260,9 @@ done
 - add commuting to mono beta transaction
 
 - the atomic get isn't valid, it could potentially return dirty writes since the tranlocal could be pooled.
+
+- methods of the atomic object need to be prefixed so they won't cause problems with user methods
+
 
 old done
 
