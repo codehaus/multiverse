@@ -3,7 +3,6 @@ package org.multiverse.stms.beta.transactions;
 import org.multiverse.api.Watch;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.Function;
@@ -39,36 +38,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
 
     @Override
-    public void start(){
-        start(getThreadLocalBetaObjectPool());
-    }
-
-    @Override
-    public void start(final BetaObjectPool pool){
-        if(status != NEW){
-            switch(status){
-                case ACTIVE:
-                    //it can't do harm to start an already started transaction
-                    return;
-                case PREPARED:
-                    abort(pool);
-                    throw new PreparedTransactionException(
-                        format("Can't start already prepared transaction '%s'",config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't start already aborted transaction '%s'",config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't start already committed transaction '%s'",config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
-        }
-        status = ACTIVE;
-    }
-
-    @Override
-    public final <E> RefTranlocal openForRead(final Ref<E> ref,  boolean lock, final BetaObjectPool pool) {
+    public final <E> RefTranlocal<E> openForRead(final Ref<E> ref,  boolean lock, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(pool, ref);

@@ -312,8 +312,6 @@ public abstract class BetaTransaction implements Transaction {
         return WriteConflict.INSTANCE;
     }
 
-    public abstract void start(BetaObjectPool pool);
-
     /**
      * Prepares this BetaTransaction.
      *

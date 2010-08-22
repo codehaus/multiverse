@@ -3,7 +3,6 @@ package org.multiverse.stms.beta.transactions;
 import org.multiverse.api.Watch;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.Function;
 import org.multiverse.api.functions.IntFunction;
@@ -50,36 +49,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
     public final LocalConflictCounter getLocalConflictCounter() {
         return localConflictCounter;
-    }
-
-    @Override
-    public void start(){
-        start(getThreadLocalBetaObjectPool());
-    }
-
-    @Override
-    public void start(final BetaObjectPool pool){
-        if(status != NEW){
-            switch(status){
-                case ACTIVE:
-                    //it can't do harm to start an already started transaction
-                    return;
-                case PREPARED:
-                    abort(pool);
-                    throw new PreparedTransactionException(
-                        format("Can't start already prepared transaction '%s'", config.familyName));
-                case ABORTED:
-                    throw new DeadTransactionException(
-                        format("Can't start already aborted transaction '%s'", config.familyName));
-                case COMMITTED:
-                    throw new DeadTransactionException(
-                        format("Can't start already committed transaction '%s'", config.familyName));
-                default:
-                    throw new IllegalStateException();
-            }
-        }
-
-        throw new TodoException();
     }
 
     public int size(){

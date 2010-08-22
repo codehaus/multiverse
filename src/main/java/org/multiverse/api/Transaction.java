@@ -73,17 +73,6 @@ public interface Transaction {
     int getAttempt();
 
     /**
-     * Starts the transaction.
-     * <p/>
-     * todo: this functionality isn't implemented yet for the BetaSTM.
-     *
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *          if the transaction isn't in the correct
-     *          state for this operation.
-     */
-    void start();
-
-    /**
      * Commits this Transaction. If the Transaction is:
      * <ol>
      * <li>new: is is started and following the same flow as an active transaction. This is done so that
