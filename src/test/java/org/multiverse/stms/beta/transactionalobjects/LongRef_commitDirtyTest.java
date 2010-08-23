@@ -3,10 +3,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.blocking.CheapLatch;
-import org.multiverse.stms.beta.BetaObjectPool;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
-import org.multiverse.stms.beta.Listeners;
+import org.multiverse.stms.beta.*;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 import org.multiverse.stms.beta.orec.Orec;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -16,7 +13,7 @@ import static org.multiverse.TestUtils.createReadBiasedLongRef;
 import static org.multiverse.TestUtils.getField;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
-public class LongRef_commitDirtyTest {
+public class LongRef_commitDirtyTest implements BetaStmConstants{
 
     private BetaStm stm;
     private BetaObjectPool pool;
@@ -41,7 +38,7 @@ public class LongRef_commitDirtyTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
         write.value++;
-        write.isDirty = true;
+        write.isDirty = DIRTY_TRUE;
         ref.___tryLockAndCheckConflict(tx, 1, write);
 
         long oldConflictCount = globalConflictCounter.count();
@@ -70,7 +67,7 @@ public class LongRef_commitDirtyTest {
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
-        write.isDirty = true;
+        write.isDirty = DIRTY_TRUE;
         write.value++;
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
@@ -98,7 +95,7 @@ public class LongRef_commitDirtyTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
         write.value++;
-        write.isDirty = true;
+        write.isDirty = DIRTY_TRUE;
         ref.___tryLockAndCheckConflict(tx, 1, write);
 
         long oldConflictCount = globalConflictCounter.count();
@@ -122,7 +119,7 @@ public class LongRef_commitDirtyTest {
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
-        write.isDirty = false;
+        write.isDirty = DIRTY_FALSE;
         ref.___tryLockAndCheckConflict(tx, 1, write);
 
         long oldConflictCount = globalConflictCounter.count();
@@ -147,7 +144,7 @@ public class LongRef_commitDirtyTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
         write.value++;
-        write.isDirty = true;
+        write.isDirty = DIRTY_TRUE;
         ref.___tryLockAndCheckConflict(tx, 1, write);
 
         long oldConflictCount = globalConflictCounter.count();

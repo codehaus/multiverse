@@ -43,6 +43,6 @@ public class ReadBiasedTest {
         assertNull(ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
 
-        System.out.println("orec: " + ref.toOrecString());
+        System.out.println("orec: " + ref.___toOrecString());
     }
 }

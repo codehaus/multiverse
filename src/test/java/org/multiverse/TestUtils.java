@@ -213,8 +213,7 @@ public class TestUtils {
         Bugshaker.sleepUs((long) randomInt((int) TimeUnit.MILLISECONDS.toMicros(maxMs)));
     }
 
-
-    public static void sleepMs(long ms) {
+     public static void sleepMs(long ms) {
         long us = TimeUnit.MILLISECONDS.toMicros(ms);
         Bugshaker.sleepUs(us);
     }

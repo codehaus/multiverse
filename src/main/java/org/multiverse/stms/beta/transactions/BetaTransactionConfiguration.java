@@ -508,6 +508,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.blockingAllowed = blockingAllowed;
         config.familyName = familyName;
         config.durable = durable;
+        config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.maxArrayTransactionSize = maxArrayTransactionSize;
         config.isAnonymous = isAnonymous;
         config.backoffPolicy = backoffPolicy;
@@ -544,6 +545,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.traceLevel = traceLevel;
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
+        config.speculativeConfigEnabled = speculativeConfigEnabled;
         return config;
     }
 

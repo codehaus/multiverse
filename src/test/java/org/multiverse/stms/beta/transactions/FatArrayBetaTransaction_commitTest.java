@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InOrder;
+import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.api.blocking.Latch;
@@ -14,6 +15,7 @@ import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.LongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
@@ -32,7 +34,7 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 /**
  * @author Peter Veentjer
  */
-public class FatArrayBetaTransaction_commitTest {
+public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
 
     private BetaStm stm;
     private BetaObjectPool pool;
@@ -62,7 +64,7 @@ public class FatArrayBetaTransaction_commitTest {
         assertSame(constructed1, ref1.___unsafeLoad());
         assertTrue(constructed1.isCommitted);
         assertFalse(constructed1.isPermanent);
-        assertFalse(constructed1.isDirty);
+        assertEquals(DIRTY_FALSE, constructed1.isDirty);
         assertNull(ref1.___getLockOwner());
         assertUnlocked(ref1);
         assertSurplus(0, ref1);
@@ -71,7 +73,7 @@ public class FatArrayBetaTransaction_commitTest {
         assertSame(constructed2, ref2.___unsafeLoad());
         assertTrue(constructed2.isCommitted);
         assertFalse(constructed2.isPermanent);
-        assertFalse(constructed2.isDirty);
+        assertEquals(DIRTY_FALSE, constructed1.isDirty);
         assertNull(ref2.___getLockOwner());
         assertUnlocked(ref2);
         assertSurplus(0, ref2);
@@ -82,7 +84,7 @@ public class FatArrayBetaTransaction_commitTest {
     public void whenPermanentLifecycleListenerAvailable_thenNotified() {
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.registerPermanent(pool,listener);
+        tx.registerPermanent(pool, listener);
         tx.commit();
 
         assertCommitted(tx);
@@ -106,7 +108,7 @@ public class FatArrayBetaTransaction_commitTest {
         TransactionLifecycleListener permanentListener = mock(TransactionLifecycleListener.class);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.register(normalListener);
-        tx.registerPermanent(pool,permanentListener);
+        tx.registerPermanent(pool, permanentListener);
         tx.commit();
 
         assertCommitted(tx);
@@ -149,7 +151,7 @@ public class FatArrayBetaTransaction_commitTest {
         FatArrayBetaTransaction updatingTx = new FatArrayBetaTransaction(stm);
         LongRefTranlocal write = updatingTx.openForWrite(ref, false, pool);
         write.value++;
-        write.isDirty = true;
+        write.isDirty = DIRTY_TRUE;
         updatingTx.commit();
 
         assertTrue(latch.isOpen());
@@ -171,7 +173,7 @@ public class FatArrayBetaTransaction_commitTest {
 
         FatArrayBetaTransaction updatingTx = new FatArrayBetaTransaction(stm);
         LongRefTranlocal write = updatingTx.openForWrite(ref, false, pool);
-        write.isDirty = false;
+        //write.isDirty = false;
         updatingTx.commit();
 
         assertFalse(latch.isOpen());
@@ -546,6 +548,32 @@ public class FatArrayBetaTransaction_commitTest {
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertEquals(0, ref.___unsafeLoad().value);
+    }
+
+    @Test
+    public void whenPessimisticLockLevelWriteAndDirtyCheck() {
+        LongRef ref = createLongRef(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .setPessimisticLockLevel(PessimisticLockLevel.Write)
+                .setDirtyCheckEnabled(true);
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
+        tx.openForWrite(ref, false, pool).value++;
+        tx.commit();
+
+        assertEquals(1, ref.___unsafeLoad().value);
+    }
+
+    @Test
+    public void whenPessimisticLockLevelReadAndDirtyCheck() {
+        LongRef ref = createLongRef(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .setPessimisticLockLevel(PessimisticLockLevel.Read)
+                .setDirtyCheckEnabled(true);
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
+        tx.openForWrite(ref, false, pool).value++;
+        tx.commit();
+
+        assertEquals(1, ref.___unsafeLoad().value);
     }
 
     @Test

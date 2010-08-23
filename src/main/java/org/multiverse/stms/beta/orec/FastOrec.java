@@ -3,8 +3,8 @@ package org.multiverse.stms.beta.orec;
 import org.multiverse.api.exceptions.PanicError;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
-
-import java.util.concurrent.atomic.AtomicLong;
+import org.multiverse.utils.ToolUnsafe;
+import sun.misc.Unsafe;
 
 import static java.lang.String.format;
 
@@ -16,17 +16,17 @@ import static java.lang.String.format;
  * dependant on this value. When this happens, the global conflict counter is increased, and all reading
  * transactions are forced to do a read conflict scan the next time they do a read (or a write since that
  * also requires a read to get the initial value).
- *
+ * <p/>
  * Each transaction needs to track all reads (and of course all writes). To prevent contention on orecs that
  * mostly are read, an orec can become readonly after a certain number of only reads are done. Once this happens
  * additional arrives/departs are ignored. When an update happens on a readbiased orec, it will always cause
  * a conflict on the global conflict counter and even if a transaction didn't read that orec at all, it will need
  * to do a conflict scan.
- *
+ * <p/>
  * Another advantage of this approach is that transaction don't need to track all reads anymore; once something
  * has become read biased, it depends on the transaction setting trackReads if the read still is tracked. The
- * disadvantage for these transactions is that they can't recover from a change in the global conflict counter. 
- *
+ * disadvantage for these transactions is that they can't recover from a change in the global conflict counter.
+ * <p/>
  * Layout:
  * In total 64 bits
  * 0: bit contains lock
@@ -36,28 +36,73 @@ import static java.lang.String.format;
  *
  * @author Peter Veentjer
  */
-public final class FastOrec implements Orec {
+public class FastOrec implements Orec {
+
+    protected final static Unsafe ___unsafe = ToolUnsafe.getUnsafe();
+
+    protected final static long valueOffset;
+
+    static {
+        try {
+            valueOffset = ___unsafe.objectFieldOffset(FastOrec.class.getDeclaredField("value"));
+        } catch (Exception ex) {
+            throw new Error(ex);
+        }
+    }
 
     //it is important that the maximum threshold is not larger than 1023 (there are 10 bits for
     //the readonly count)
-    public final static int READ_THRESHOLD = 16;
+    public final static int ___READ_THRESHOLD = 16;
 
-    private final AtomicLong state = new AtomicLong(0);
+    private volatile long value;
 
-    @Override
-    public int ___getReadBiasedThreshold() {
-        return READ_THRESHOLD;
+    /**
+     * Atomically sets the value to the given updated value
+     * if the current value {@code ==} the expected value.
+     *
+     * @param expect the expected value
+     * @param update the new value
+     * @return true if successful. False return indicates that
+     *         the actual value was not equal to the expected value.
+     */
+    protected boolean ___compareAndSet(final long expect, final long update) {
+        return ___unsafe.compareAndSwapLong(this, valueOffset, expect, update);
     }
 
     @Override
-    public long ___getSurplus() {
-        return getSurplus(state.get());
+    public final int ___getReadBiasedThreshold() {
+        return ___READ_THRESHOLD;
     }
 
     @Override
-    public boolean ___arrive(int spinCount) {
+    public final long ___getSurplus() {
+        return getSurplus(value);
+    }
+
+    @Override
+    public final boolean ___isReadBiased() {
+        return isReadBiased(value);
+    }
+
+    @Override
+    public final boolean ___isLocked() {
+        return isLocked(value);
+    }
+
+    @Override
+    public final int ___getReadonlyCount() {
+        return getReadonlyCount(value);
+    }
+
+    @Override
+    public final boolean ___query() {
+        return getSurplus(value) > 0;
+    }
+
+    @Override
+    public final boolean ___arrive(int spinCount) {
         do {
-            long current = state.get();
+            long current = value;
 
             if (isLocked(current)) {
                 spinCount--;
@@ -76,7 +121,7 @@ public final class FastOrec implements Orec {
 
                 long next = setSurplus(current, surplus);
 
-                if (state.compareAndSet(current, next)) {
+                if (___compareAndSet(current, next)) {
                     return true;
                 }
             }
@@ -86,29 +131,21 @@ public final class FastOrec implements Orec {
     }
 
     @Override
-    public boolean ___arriveAndLockForUpdate(int spinCount) {
+    public final boolean ___arriveAndLockForUpdate(int spinCount) {
         do {
-            long current = state.get();
+            long current = value;
 
             if (isLocked(current)) {
                 spinCount--;
             } else {
                 long surplus = getSurplus(current);
 
-                if (isReadBiased(current)) {
-                    if (surplus > 0) {
-                        return true;
-                    }
-
-                    surplus = 1;
-                } else {
-                    surplus++;
-                }
+                surplus = isReadBiased(current) ? 1 : surplus + 1;
 
                 long next = setSurplus(current, surplus);
                 next = setLocked(next, true);
 
-                if (state.compareAndSet(current, next)) {
+                if (___compareAndSet(current, next)) {
                     return true;
                 }
             }
@@ -118,14 +155,9 @@ public final class FastOrec implements Orec {
     }
 
     @Override
-    public boolean ___query() {
-        return getSurplus(state.get()) > 0;
-    }
-
-    @Override
-    public boolean ___departAfterReading() {
+    public final boolean ___departAfterReading() {
         while (true) {
-            long current = state.get();
+            long current = value;
             long surplus = getSurplus(current);
 
             if (surplus == 0) {
@@ -134,7 +166,7 @@ public final class FastOrec implements Orec {
 
             boolean isReadBiased = isReadBiased(current);
             if (isReadBiased) {
-                throw new PanicError();
+                throw new PanicError("Can't depart from a readbiased orec");
             }
 
             int readonlyCount = getReadonlyCount(current);
@@ -142,7 +174,7 @@ public final class FastOrec implements Orec {
             surplus--;
             readonlyCount++;
             boolean isLocked = isLocked(current);
-            if (surplus == 0 && readonlyCount >= READ_THRESHOLD) {
+            if (surplus == 0 && readonlyCount >= ___READ_THRESHOLD) {
                 isReadBiased = true;
                 isLocked = true;
                 readonlyCount = 0;
@@ -152,21 +184,19 @@ public final class FastOrec implements Orec {
             next = setIsReadBiased(next, isReadBiased);
             next = setReadonlyCount(next, readonlyCount);
             next = setSurplus(next, surplus);
-            if (state.compareAndSet(current, next)) {
+            if (___compareAndSet(current, next)) {
+                if(isReadBiased){
+                    System.out.println("has become read biased");
+                }
                 return isReadBiased;
             }
         }
     }
 
     @Override
-    public int ___getReadonlyCount() {
-        return getReadonlyCount(state.get());
-    }
-
-    @Override
     public final boolean ___departAfterReadingAndReleaseLock() {
         while (true) {
-            long current = state.get();
+            long current = value;
             long surplus = getSurplus(current);
 
             if (surplus == 0) {
@@ -175,7 +205,7 @@ public final class FastOrec implements Orec {
 
             boolean isLocked = isLocked(current);
             if (!isLocked) {
-                throw new PanicError();
+                throw new PanicError("Can't departAfterReadingAndReleaseLock if the lock is not acquired");
             }
 
             boolean isReadBiased = isReadBiased(current);
@@ -187,26 +217,32 @@ public final class FastOrec implements Orec {
 
             surplus--;
             readonlyCount++;
-            if (surplus == 0 && readonlyCount >= READ_THRESHOLD) {
+            if (surplus == 0 && readonlyCount >= ___READ_THRESHOLD) {
                 isReadBiased = true;
                 isLocked = true;
                 readonlyCount = 0;
+            } else {
+                isLocked = false;
             }
 
             long next = setLocked(current, isLocked);
             next = setIsReadBiased(next, isReadBiased);
             next = setReadonlyCount(next, readonlyCount);
             next = setSurplus(next, surplus);
-            if (state.compareAndSet(current, next)) {
+            if (___compareAndSet(current, next)) {
+                if(isReadBiased){
+                    System.out.println("has become read biased");
+                }
                 return isReadBiased;
             }
         }
     }
 
     @Override
-    public long ___departAfterUpdateAndReleaseLock(GlobalConflictCounter globalConflictCounter, BetaTransactionalObject transactionalObject) {
+    public final long ___departAfterUpdateAndReleaseLock(
+            final GlobalConflictCounter globalConflictCounter, final BetaTransactionalObject transactionalObject) {
         while (true) {
-            long current = state.get();
+            long current = value;
 
             if (!isLocked(current)) {
                 throw new PanicError();
@@ -216,17 +252,14 @@ public final class FastOrec implements Orec {
             long surplus = getSurplus(current);
 
             boolean conflict;
-            long resultingSurplus;
             if (isReadBiased) {
                 conflict = surplus > 0;
                 //todo: correct?
-                resultingSurplus = surplus;
                 surplus = 0;
                 isReadBiased = false;
             } else {
                 surplus--;
-                conflict = surplus > 0;
-                resultingSurplus = surplus;
+                conflict = surplus > 0;                
             }
 
             if (conflict) {
@@ -237,16 +270,16 @@ public final class FastOrec implements Orec {
             next = setReadonlyCount(next, 0);
             next = setIsReadBiased(next, isReadBiased);
             next = setSurplus(next, surplus);
-            if (state.compareAndSet(current, next)) {
-                return resultingSurplus;
+            if (___compareAndSet(current, next)) {
+                return surplus;
             }
         }
     }
 
     @Override
-    public long ___departAfterFailureAndReleaseLock() {
+    public final long ___departAfterFailureAndReleaseLock() {
         while (true) {
-            long current = state.get();
+            long current = value;
 
             if (!isLocked(current)) {
                 throw new PanicError();
@@ -265,19 +298,19 @@ public final class FastOrec implements Orec {
 
             long next = setLocked(current, false);
             next = setSurplus(next, surplus);
-            if (state.compareAndSet(current, next)) {
+            if (___compareAndSet(current, next)) {
                 return surplus;
             }
         }
     }
 
     @Override
-    public void ___departAfterFailure() {
+    public final void ___departAfterFailure() {
         while (true) {
-            long current = state.get();
+            long current = value;
 
             if (isReadBiased(current)) {
-                throw new PanicError();
+                throw new PanicError("Can't depart when orec is readbiased");
             }
 
             long surplus = getSurplus(current);
@@ -288,32 +321,23 @@ public final class FastOrec implements Orec {
                 }
             } else {
                 if (surplus == 0) {
-                    throw new PanicError();
+                    throw new PanicError("Can't depart if there is no surplus");
                 }
             }
             surplus--;
 
             long next = setSurplus(current, surplus);
-            if (state.compareAndSet(current, next)) {
+
+            if (___compareAndSet(current, next)) {
                 return;
             }
         }
     }
 
     @Override
-    public boolean ___isReadBiased() {
-        return isReadBiased(state.get());
-    }
-
-    @Override
-    public boolean ___isLocked() {
-        return isLocked(state.get());
-    }
-
-    @Override
-    public boolean ___tryUpdateLock(int spinCount) {
+    public final boolean ___tryUpdateLock(int spinCount) {
         do {
-            long current = state.get();
+            long current = value;
 
             if (isLocked(current)) {
                 spinCount--;
@@ -324,7 +348,7 @@ public final class FastOrec implements Orec {
 
                 long next = setLocked(current, true);
 
-                if (state.compareAndSet(current, next)) {
+                if (___compareAndSet(current, next)) {
                     return true;
                 }
             }
@@ -333,58 +357,74 @@ public final class FastOrec implements Orec {
         return false;
     }
 
-    @Override
-    public void ___unlockAfterBecomingReadBiased() {
+//    @Override
+
+    public final void ___unlockByPermanent() {
         while (true) {
-            long current = state.get();
+            long current = value;
 
             if (!isLocked(current)) {
                 throw new PanicError();
             }
 
             long next = setLocked(current, false);
-            if (state.compareAndSet(current, next)) {
+            if (___compareAndSet(current, next)) {
                 return;
             }
         }
     }
 
     @Override
-    public String toString() {
-        long value = state.get();
-        return format("FastOrec(isLocked=%s, surplus=%s, isReadBiased=%s, readonlyCount=%s)",
-                isLocked(value), getSurplus(value), isReadBiased(value), getReadonlyCount(value));
+    public final void ___unlockAfterBecomingReadBiased() {
+        while (true) {
+            long current = value;
+
+            if (!isLocked(current)) {
+                throw new PanicError();
+            }
+
+            long next = setLocked(current, false);
+            if (___compareAndSet(current, next)) {
+                return;
+            }
+        }
     }
 
-    private static long setLocked(long value, boolean isLocked) {
+    public static long setLocked(final long value, final boolean isLocked) {
         return (value & ~0x8000000000000000L) | ((isLocked ? 1L : 0L) << 63);
     }
 
-    private static boolean isLocked(long value) {
+    public static boolean isLocked(final long value) {
         return (value & 0x8000000000000000L) != 0;
     }
 
-    private static long setIsReadBiased(long value, boolean isReadBiased) {
+    public static long setIsReadBiased(final long value, final boolean isReadBiased) {
         return (value & ~0x4000000000000000L) | ((isReadBiased ? 1L : 0L) << 62);
     }
 
-    private static boolean isReadBiased(long value) {
+    public static boolean isReadBiased(final long value) {
         return (value & 0x4000000000000000L) != 0;
     }
 
-    private static int getReadonlyCount(long value) {
+    public static int getReadonlyCount(final long value) {
         return (int) (value & 0x00000000000003FFL);
     }
 
-    private static long setReadonlyCount(long value, int readonlyCount) {
+    public static long setReadonlyCount(final long value, final int readonlyCount) {
         return (value & ~0x00000000000003FFL) | readonlyCount;
     }
 
-    private static long setSurplus(long value, long surplus) {
+    public static long setSurplus(final long value, final long surplus) {
         return (value & ~0x3FFFFFFFFFFFFC00L) | (surplus << 10);
     }
 
-    private static long getSurplus(long value) {
+    public static long getSurplus(final long value) {
         return (value & 0x3FFFFFFFFFFFFC00L) >> 10;
     }
+
+    public final String ___toOrecString() {
+        return format("FastOrec(isLocked=%s, surplus=%s, ___isReadBiased=%s, readonlyCount=%s)",
+                isLocked(value), getSurplus(value), isReadBiased(value), getReadonlyCount(value));
+    }
+
 }

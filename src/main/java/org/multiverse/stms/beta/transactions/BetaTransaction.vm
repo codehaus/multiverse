@@ -16,7 +16,7 @@ import static java.lang.String.*;
 /**
  * @author Peter Veentjer
  */
-public abstract class BetaTransaction implements Transaction {
+public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
 #foreach($transaction in $transactions)
     public final static int ${transaction.poolName} = ${transaction.poolIndex};

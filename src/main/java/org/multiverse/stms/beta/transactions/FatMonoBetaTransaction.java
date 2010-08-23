@@ -309,7 +309,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(result == null){
             result = new RefTranlocal<E>(ref);
         }
-        result.isDirty = true;
+        result.isDirty = DIRTY_TRUE;
         attached = result;
         return result;
     }
@@ -627,7 +627,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(result == null){
             result = new IntRefTranlocal(ref);
         }
-        result.isDirty = true;
+        result.isDirty = DIRTY_TRUE;
         attached = result;
         return result;
     }
@@ -945,7 +945,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(result == null){
             result = new LongRefTranlocal(ref);
         }
-        result.isDirty = true;
+        result.isDirty = DIRTY_TRUE;
         attached = result;
         return result;
     }
@@ -1250,7 +1250,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         result = ref.___openForConstruction(pool);
-        result.isDirty = true;
+        result.isDirty = DIRTY_TRUE;
         attached = result;
         return result;
     }
@@ -1545,7 +1545,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         final BetaTransactionalObject owner = attached.owner;
 
         final boolean failure = owner.___registerChangeListener(listener, attached, pool, listenerEra)
-            == BetaTransactionalObject.REGISTRATION_NONE;
+            == REGISTRATION_NONE;
         owner.___abort(this, attached, pool);
         status = ABORTED;
 

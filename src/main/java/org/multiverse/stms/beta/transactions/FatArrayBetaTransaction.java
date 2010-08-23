@@ -283,7 +283,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(result == null){
             result = new RefTranlocal<E>(ref);
         }
-        result.isDirty = true;
+        result.isDirty = DIRTY_TRUE;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -578,7 +578,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(result == null){
             result = new IntRefTranlocal(ref);
         }
-        result.isDirty = true;
+        result.isDirty = DIRTY_TRUE;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -873,7 +873,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(result == null){
             result = new LongRefTranlocal(ref);
         }
-        result.isDirty = true;
+        result.isDirty = DIRTY_TRUE;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -1159,7 +1159,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         //open the tranlocal for writing.
         Tranlocal result = ref.___openForConstruction(pool);
-        result.isDirty = true;
+        result.isDirty = DIRTY_TRUE;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -1435,7 +1435,11 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             }
              
             if(hasUpdates){
-                if(config.dirtyCheck){
+                if(!config.writeSkewAllowed){
+                    if(!doPrepareWithWriteSkewPrevention(pool)){
+                        throw abortOnWriteConflict(pool);
+                    }
+                }else if(config.dirtyCheck){
                     if(!doPrepareDirty(pool)){
                         throw abortOnWriteConflict(pool);
                     }
@@ -1453,6 +1457,43 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 abort(pool);
             }
         }
+    }
+
+    private boolean doPrepareWithWriteSkewPrevention(final BetaObjectPool pool) {
+        if(config.lockReads){
+            return true;
+        }
+
+        final int spinCount = config.spinCount;
+        final boolean dirtyCheck = config.dirtyCheck;
+        for (int k = 0; k < firstFreeIndex; k++) {
+            final Tranlocal tranlocal = array[k];
+
+            if(tranlocal.isCommitted){
+                if(!tranlocal.owner.___tryLockAndCheckConflict(this, config.spinCount, tranlocal)){
+                    return false;
+                }
+            }else if(tranlocal.isCommuting){
+                final Tranlocal read = tranlocal.owner.___lockAndLoad(spinCount, this);
+
+                if(read.isLocked){
+                    return false;
+                }
+
+                tranlocal.read = read;
+                tranlocal.evaluateCommutingFunctions(pool);
+            }else{
+                if(dirtyCheck){
+                    tranlocal.calculateIsDirty();
+                }
+
+                if(!tranlocal.owner.___tryLockAndCheckConflict(this, spinCount, tranlocal)){
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     private boolean doPrepareAll(final BetaObjectPool pool) {
@@ -1556,14 +1597,14 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
             if(furtherRegistrationNeeded){
                 switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
-                    case BetaTransactionalObject.REGISTRATION_DONE:
+                    case REGISTRATION_DONE:
                         atLeastOneRegistration = true;
                         break;
-                    case BetaTransactionalObject.REGISTRATION_NOT_NEEDED:
+                    case REGISTRATION_NOT_NEEDED:
                         furtherRegistrationNeeded = false;
                         atLeastOneRegistration = true;
                         break;
-                    case BetaTransactionalObject.REGISTRATION_NONE:
+                    case REGISTRATION_NONE:
                         break;
                     default:
                         throw new IllegalStateException();

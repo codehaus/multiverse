@@ -348,7 +348,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #else
         result = ref.___openForConstruction(pool);
 #end
-        result.isDirty = true;
+        result.isDirty = DIRTY_TRUE;
         attached = result;
         return result;
     }
@@ -762,7 +762,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         final BetaTransactionalObject owner = attached.owner;
 
         final boolean failure = owner.___registerChangeListener(listener, attached, pool, listenerEra)
-            == BetaTransactionalObject.REGISTRATION_NONE;
+            == REGISTRATION_NONE;
         owner.___abort(this, attached, pool);
         status = ABORTED;
 

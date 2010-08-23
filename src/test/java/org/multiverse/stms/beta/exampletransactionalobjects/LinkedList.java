@@ -152,21 +152,22 @@ class LinkedListTranlocal<E> extends Tranlocal {
         }
 
         if (read == null) {
-            isDirty = true;
+            isDirty = DIRTY_TRUE;
             return true;
         }
 
         LinkedListTranlocal<E> r = (LinkedListTranlocal<E>) read;
         if (r.head != head) {
-            isDirty = true;
+            isDirty = DIRTY_TRUE;
             return true;
         }
 
         if (r.tail != tail) {
-            isDirty = true;
+            isDirty = DIRTY_TRUE;
             return true;
         }
 
+        isDirty = DIRTY_FALSE;
         return false;
     }
 
@@ -239,26 +240,27 @@ class LinkedListNodeTranlocal<E> extends Tranlocal {
         }
 
         if (read == null) {
-            isDirty = true;
+            isDirty = DIRTY_TRUE;
             return true;
         }
 
         LinkedListNodeTranlocal<E> r = (LinkedListNodeTranlocal<E>) read;
         if (r.next != next) {
-            isDirty = true;
+            isDirty = DIRTY_TRUE;
             return true;
         }
 
         if (r.prev != prev) {
-            isDirty = true;
+            isDirty = DIRTY_TRUE;
             return true;
         }
 
         if (r.value != value) {
-            isDirty = true;
+            isDirty = DIRTY_TRUE;
             return true;
         }
 
+        isDirty = DIRTY_FALSE;
         return false;
     }
 

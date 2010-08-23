@@ -118,10 +118,6 @@ todo
 
 - tracing
 
-- support for writeskew detection
-    - how should the writeskew detection be done? Should it lock all reads?
-    - could be part of the fat tx.
-
 - when hard reset is done, no new local conflict counter is created, so still attached to the old
 globalconflict counter.
 
@@ -185,7 +181,29 @@ the task not being executed at all.
 
 - abort commute on nullpointer function
 
+- array tx: prepare testing with writeskew
+
+- array tx: commit testing with writeskew
+
+- array tree tx: prepare testing with writeskew
+
+- array tree tx: commit testing with writeskew
+
+- problem with PessimisticLock.Write and commitDirty since the dirty flag is not set (and no changes written).
+
+- test for basic constructors of refs without transaction
+
+- writeskew test: whenPessimisticLockingUsed
+
+- writeskew test: whenlockedread
+
+- fast-orec needs to have a lower ___READ_THRESHOLD
+
 done
+
+- support for writeskew detection
+    - how should the writeskew detection be done? Should it lock all reads?
+    - could be part of the fat tx.
 
 - mono transaction & hasUpdates
 

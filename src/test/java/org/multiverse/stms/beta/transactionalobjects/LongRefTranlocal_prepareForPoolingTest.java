@@ -7,12 +7,13 @@ import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
-public class LongRefTranlocal_prepareForPoolingTest {
+public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants {
 
     private BetaObjectPool pool;
     private BetaStm stm;
@@ -91,7 +92,7 @@ public class LongRefTranlocal_prepareForPoolingTest {
 
     private void assertCleaned(LongRefTranlocal tranlocal) {
         assertFalse(tranlocal.isPermanent);
-        assertFalse(tranlocal.isDirty);
+        assertEquals(DIRTY_UNKNOWN, tranlocal.isDirty);
         assertEquals(0, tranlocal.value);
         assertFalse(tranlocal.isCommitted);
         assertFalse(tranlocal.isCommuting);

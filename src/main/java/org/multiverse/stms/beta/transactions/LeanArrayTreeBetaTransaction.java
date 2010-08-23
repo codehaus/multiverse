@@ -228,7 +228,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if(result == null){
             result = new RefTranlocal<E>(ref);
         }
-        result.isDirty = true;    
+        result.isDirty = DIRTY_TRUE;
         attach(ref, result, identityHashCode, pool);
         size++;
         return result;
@@ -415,7 +415,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if(result == null){
             result = new IntRefTranlocal(ref);
         }
-        result.isDirty = true;    
+        result.isDirty = DIRTY_TRUE;
         attach(ref, result, identityHashCode, pool);
         size++;
         return result;
@@ -602,7 +602,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if(result == null){
             result = new LongRefTranlocal(ref);
         }
-        result.isDirty = true;    
+        result.isDirty = DIRTY_TRUE;
         attach(ref, result, identityHashCode, pool);
         size++;
         return result;
@@ -781,7 +781,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         }
 
         final Tranlocal result = ref.___openForConstruction(pool);
-        result.isDirty = true;    
+        result.isDirty = DIRTY_TRUE;
         attach(ref, result, identityHashCode, pool);
         size++;
         return result;
@@ -1171,14 +1171,14 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
                     if(furtherRegistrationNeeded){
                         switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
-                            case BetaTransactionalObject.REGISTRATION_DONE:
+                            case REGISTRATION_DONE:
                                 atLeastOneRegistration = true;
                                 break;
-                            case BetaTransactionalObject.REGISTRATION_NOT_NEEDED:
+                            case REGISTRATION_NOT_NEEDED:
                                 furtherRegistrationNeeded = false;
                                 atLeastOneRegistration = true;
                                 break;
-                            case BetaTransactionalObject.REGISTRATION_NONE:
+                            case REGISTRATION_NONE:
                                 break;
                             default:
                                 throw new IllegalStateException();

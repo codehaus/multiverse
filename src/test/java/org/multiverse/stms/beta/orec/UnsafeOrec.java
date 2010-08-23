@@ -15,7 +15,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
  */
 public final class UnsafeOrec implements Orec {
 
-    public final static int READ_THRESHOLD = 3;
+    public final static int READ_THRESHOLD = 16;
 
     private int surplus = 0;
     private int readonlyCount = 0;
@@ -178,6 +178,11 @@ public final class UnsafeOrec implements Orec {
 
     @Override
     public boolean ___arriveAndLockForUpdate(int spinCount) {
+        throw new TodoException();
+    }
+
+    @Override
+    public String ___toOrecString() {
         throw new TodoException();
     }
 }

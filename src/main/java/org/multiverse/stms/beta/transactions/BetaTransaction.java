@@ -10,6 +10,7 @@ import org.multiverse.api.functions.IntFunction;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ import static org.multiverse.stms.beta.BetaStmUtils.toDebugString;
 /**
  * @author Peter Veentjer
  */
-public abstract class BetaTransaction implements Transaction {
+public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public final static int POOL_TRANSACTIONTYPE_LEAN_MONO = 0;
     public final static int POOL_TRANSACTIONTYPE_FAT_MONO = 1;

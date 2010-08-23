@@ -4,11 +4,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 
 import static org.junit.Assert.*;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
-public class LongRef_openForCommuteTest {
+public class LongRef_openForCommuteTest implements BetaStmConstants{
     private BetaStm stm;
     private BetaObjectPool pool;
 
@@ -26,7 +27,7 @@ public class LongRef_openForCommuteTest {
         assertNotNull(tranlocal);
         assertFalse(tranlocal.isCommitted);
         assertTrue(tranlocal.isCommuting);
-        assertFalse(tranlocal.isDirty);
+        assertEquals(DIRTY_UNKNOWN, tranlocal.isDirty);
         assertEquals(0, tranlocal.value);
         assertNull(tranlocal.read);
         assertNull(tranlocal.headCallable);

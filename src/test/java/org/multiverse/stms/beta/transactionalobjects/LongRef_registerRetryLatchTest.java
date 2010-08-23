@@ -8,6 +8,7 @@ import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -15,7 +16,7 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.getField;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
-public class LongRef_registerRetryLatchTest {
+public class LongRef_registerRetryLatchTest implements BetaStmConstants {
     private BetaStm stm;
     private BetaObjectPool pool;
 
@@ -41,7 +42,7 @@ public class LongRef_registerRetryLatchTest {
         long listenerEra = latch.getEra();
         int result = ref.___registerChangeListener(latch, read, pool, listenerEra);
 
-        assertEquals(BetaTransactionalObject.REGISTRATION_NOT_NEEDED, result);
+        assertEquals(REGISTRATION_NOT_NEEDED, result);
         assertNull(getField(ref, "___listeners"));
         assertTrue(latch.isOpen());
     }
@@ -68,7 +69,7 @@ public class LongRef_registerRetryLatchTest {
         long listenerEra = latch.getEra();
         int result = ref.___registerChangeListener(latch, read, pool, listenerEra);
 
-        assertEquals(BetaTransactionalObject.REGISTRATION_NONE, result);
+        assertEquals(REGISTRATION_NONE, result);
         TestUtils.assertHasNoListeners(ref);
         assertFalse(latch.isOpen());
     }
@@ -84,7 +85,7 @@ public class LongRef_registerRetryLatchTest {
         long listenerEra = latch.getEra();
         int result = ref.___registerChangeListener(latch, read, pool, listenerEra);
 
-        assertEquals(BetaTransactionalObject.REGISTRATION_DONE, result);
+        assertEquals(REGISTRATION_DONE, result);
         Listeners listeners = (Listeners) getField(ref, "___listeners");
         assertNotNull(listeners);
         assertSame(latch, listeners.listener);
@@ -111,7 +112,7 @@ public class LongRef_registerRetryLatchTest {
         long listenerEra2 = latch2.getEra();
         int result = ref.___registerChangeListener(latch2, read2, pool, listenerEra2);
 
-        assertEquals(BetaTransactionalObject.REGISTRATION_DONE, result);
+        assertEquals(REGISTRATION_DONE, result);
         Listeners listeners = (Listeners) getField(ref, "___listeners");
         assertNotNull(listeners);
         assertSame(latch2, listeners.listener);

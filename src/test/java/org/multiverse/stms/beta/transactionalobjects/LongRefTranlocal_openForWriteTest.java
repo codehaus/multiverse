@@ -4,11 +4,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 
 import static org.junit.Assert.*;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
-public class LongRefTranlocal_openForWriteTest {
+public class LongRefTranlocal_openForWriteTest implements BetaStmConstants {
     private BetaStm stm;
     private BetaObjectPool pool;
 
@@ -29,7 +30,7 @@ public class LongRefTranlocal_openForWriteTest {
         assertEquals(200, write.value);
         assertFalse(write.isCommuting);
         assertFalse(write.isCommitted);
-        assertFalse(write.isDirty);
+        assertEquals(DIRTY_UNKNOWN, write.isDirty);
         assertSame(committed, write.read);
     }
 }

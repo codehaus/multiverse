@@ -1,19 +1,19 @@
 package org.multiverse.stms.beta;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.stms.beta.transactionalobjects.LongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 /**
  * @author Peter Veentjer
  */
-public class Tranlocal_calculateIsDirtyTest {
+public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants{
 
     @Test
     public void whenConstructed() {
@@ -22,7 +22,13 @@ public class Tranlocal_calculateIsDirtyTest {
         Tranlocal tranlocal = new LongRefTranlocal(ref);
 
         assertTrue(tranlocal.calculateIsDirty());
-        assertTrue(tranlocal.isDirty);
+        assertEquals(DIRTY_TRUE, tranlocal.isDirty);
+    }
+
+    @Test
+    @Ignore
+    public void whenCommuting(){
+
     }
 
     @Test
@@ -32,7 +38,7 @@ public class Tranlocal_calculateIsDirtyTest {
         tranlocal.prepareForCommit();
 
         assertFalse(tranlocal.calculateIsDirty());
-        assertFalse(tranlocal.isDirty);
+        assertEquals(DIRTY_FALSE, tranlocal.isDirty);
     }
 
     @Test
@@ -43,7 +49,7 @@ public class Tranlocal_calculateIsDirtyTest {
         Tranlocal opened = tranlocal.openForWrite(new BetaObjectPool());
 
         assertFalse(opened.calculateIsDirty());
-        assertFalse(opened.isDirty);
+        assertEquals(DIRTY_FALSE, tranlocal.isDirty);
     }
 
     @Test
@@ -51,10 +57,11 @@ public class Tranlocal_calculateIsDirtyTest {
         LongRef ref = new LongRef(0);
         LongRefTranlocal tranlocal = new LongRefTranlocal(ref);
         tranlocal.prepareForCommit();
+
         LongRefTranlocal opened = tranlocal.openForWrite(new BetaObjectPool());
         opened.value++;
 
         assertTrue(opened.calculateIsDirty());
-        assertTrue(opened.isDirty);
+        assertEquals(DIRTY_TRUE, opened.isDirty);
     }
 }

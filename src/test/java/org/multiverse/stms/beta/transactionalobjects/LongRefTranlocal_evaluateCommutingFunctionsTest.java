@@ -1,15 +1,17 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 
 import static org.junit.Assert.*;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
-public class LongRefTranlocal_evaluateCommutingFunctionsTest {
+public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmConstants {
 
     private BetaObjectPool pool;
     private BetaStm stm;
@@ -18,6 +20,12 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest {
     public void setUp() {
         stm = new BetaStm();
         pool = new BetaObjectPool();
+    }
+
+    @Test
+    @Ignore
+    public void whenCommutingFunctionDoesntChangeValue(){
+
     }
 
     @Test
@@ -32,7 +40,7 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest {
 
         assertFalse(tranlocal.isCommitted);
         assertFalse(tranlocal.isCommuting);
-        assertTrue(tranlocal.isDirty);
+        assertEquals(DIRTY_TRUE, tranlocal.isDirty);
         assertSame(ref, tranlocal.owner);
         assertSame(committed, tranlocal.read);
         assertEquals(101, tranlocal.value);
@@ -52,7 +60,7 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest {
 
         assertFalse(tranlocal.isCommitted);
         assertFalse(tranlocal.isCommuting);
-        assertTrue(tranlocal.isDirty);
+        assertEquals(DIRTY_TRUE, tranlocal.isDirty);
         assertSame(ref, tranlocal.owner);
         assertSame(committed, tranlocal.read);
         assertEquals(103, tranlocal.value);

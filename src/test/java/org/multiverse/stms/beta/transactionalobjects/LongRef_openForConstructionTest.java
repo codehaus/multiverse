@@ -4,11 +4,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
 
-public class LongRef_openForConstructionTest {
+public class LongRef_openForConstructionTest implements BetaStmConstants{
     private BetaStm stm;
     private BetaObjectPool pool;
 
@@ -29,7 +30,7 @@ public class LongRef_openForConstructionTest {
         assertNull(constructed.read);
         assertFalse(constructed.isCommitted);
         assertFalse(constructed.isCommuting);
-        assertFalse(constructed.isDirty);
+        assertEquals(DIRTY_UNKNOWN, constructed.isDirty);
         assertEquals(0, constructed.value);
     }
 }

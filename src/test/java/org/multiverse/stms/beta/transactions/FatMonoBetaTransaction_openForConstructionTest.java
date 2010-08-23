@@ -8,6 +8,7 @@ import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.LongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
@@ -16,7 +17,7 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
-public class FatMonoBetaTransaction_openForConstructionTest {
+public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmConstants {
     private BetaStm stm;
     private BetaObjectPool pool;
 
@@ -44,7 +45,7 @@ public class FatMonoBetaTransaction_openForConstructionTest {
         assertLocked(ref);
         assertSurplus(1, ref);
         assertAttached(tx, write);
-        assertTrue(write.isDirty);
+        assertEquals(DIRTY_TRUE, write.isDirty);
     }
 
     @Test
@@ -121,7 +122,7 @@ public class FatMonoBetaTransaction_openForConstructionTest {
         assertLocked(ref);
         assertSurplus(1, ref);
         assertAttached(tx, write1);
-        assertTrue(write1.isDirty);
+        assertEquals(DIRTY_TRUE, write1.isDirty);
     }
 
     @Test

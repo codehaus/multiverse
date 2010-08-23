@@ -4,6 +4,7 @@ import org.multiverse.api.functions.Function;
 import org.multiverse.durability.DurableObject;
 import org.multiverse.durability.DurableState;
 import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStmConstants;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -11,7 +12,7 @@ import java.util.LinkedList;
 /**
  * @author Peter Veentjer
  */
-public abstract class Tranlocal implements DurableState {
+public abstract class Tranlocal implements DurableState, BetaStmConstants {
 
     public final static Tranlocal LOCKED = new Tranlocal(null, true) {
         @Override
@@ -49,7 +50,7 @@ public abstract class Tranlocal implements DurableState {
     public boolean isPermanent;
     public boolean isCommitted;
     public boolean isCommuting;
-    public boolean isDirty;
+    public int isDirty = DIRTY_UNKNOWN;
     public final boolean isLocked;
     public Tranlocal read;
  
@@ -78,7 +79,7 @@ public abstract class Tranlocal implements DurableState {
         assert !isCommitted;
         this.isCommitted = true;
         this.read = null;
-        this.isDirty = false;
+        this.isDirty = DIRTY_FALSE;
     }
 
     @Override
@@ -107,7 +108,9 @@ public abstract class Tranlocal implements DurableState {
      * Calculates if this Tranlocal is dirty (so needs to be written) and stores the result in the
      * isDirty field.
      *
-     * @return true if this Tranlocal is dirty, false otherwise.
+     * todo: say something about repeated calls.
+     *
+     * @return true if dirty, false otherwise.
      */
     public abstract boolean calculateIsDirty();
 

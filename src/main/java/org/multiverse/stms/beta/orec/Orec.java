@@ -161,4 +161,6 @@ public interface Orec {
      * @return the current number of consecutive readonly operations.
      */
     int ___getReadonlyCount();
+
+    String ___toOrecString();
 }

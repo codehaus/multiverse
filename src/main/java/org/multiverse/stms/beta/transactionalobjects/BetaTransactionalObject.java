@@ -20,10 +20,6 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
  */
 public interface BetaTransactionalObject extends DurableObject, TransactionalObject {
 
-    int REGISTRATION_DONE = 0;
-    int REGISTRATION_NOT_NEEDED = 1;
-    int REGISTRATION_NONE = 2;
-
     /**
      * Gets the index that uniquely identifies this class. This index can be used to in arrays to collect
      * information about classes of transactional objects.

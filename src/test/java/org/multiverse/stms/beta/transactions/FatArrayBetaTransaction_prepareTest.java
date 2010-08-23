@@ -8,6 +8,7 @@ import org.multiverse.api.exceptions.WriteConflict;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.LongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
@@ -19,7 +20,7 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 /**
  * @author Peter Veentjer
  */
-public class FatArrayBetaTransaction_prepareTest {
+public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
     private BetaStm stm;
     private BetaObjectPool pool;
 
@@ -273,7 +274,7 @@ public class FatArrayBetaTransaction_prepareTest {
         assertSame(ref, commute.owner);
         assertSame(committed, commute.read);
         assertEquals(3, commute.value);
-        assertTrue(commute.isDirty);
+        assertEquals(DIRTY_TRUE, commute.isDirty);
         assertLocked(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
@@ -324,7 +325,7 @@ public class FatArrayBetaTransaction_prepareTest {
         assertSame(ref, commute.owner);
         assertSame(committed, commute.read);
         assertEquals(1, commute.value);
-        assertTrue(commute.isDirty);
+        assertEquals(DIRTY_TRUE, commute.isDirty);
         assertLocked(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
@@ -350,7 +351,7 @@ public class FatArrayBetaTransaction_prepareTest {
         assertSame(ref, commute.owner);
         assertSame(committed, commute.read);
         assertEquals(1, commute.value);
-        assertTrue(commute.isDirty);
+        assertEquals(DIRTY_TRUE, commute.isDirty);
         assertLocked(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
@@ -405,7 +406,7 @@ public class FatArrayBetaTransaction_prepareTest {
         assertSame(ref, commute.owner);
         assertSame(committed, commute.read);
         assertEquals(2, commute.value);
-        assertTrue(commute.isDirty);
+        assertEquals(DIRTY_TRUE, commute.isDirty);
         assertLocked(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);

@@ -51,7 +51,7 @@ public final class RefTranlocal<E> extends Tranlocal{
             current = current.next;
         }while(current!=null);
 
-        isDirty = tranlocal.value != value;
+        isDirty = tranlocal.value != value?DIRTY_TRUE : DIRTY_FALSE;
         isCommuting = false;
         headCallable = null;
     }
@@ -84,13 +84,17 @@ public final class RefTranlocal<E> extends Tranlocal{
         value = null;
         read = null;
         isCommitted = false;
-        isDirty = false;
+        isDirty = DIRTY_UNKNOWN;
         isCommuting = false;
         //todo: this should be pooled.
         headCallable = null;
     }
 
     public boolean calculateIsDirty() {
+        if(isDirty != DIRTY_UNKNOWN){
+            return isDirty == DIRTY_TRUE;
+        }
+
         //once committed, it never can become dirty (unless it is pooled and reused)
         if (isCommitted) {
             return false;
@@ -99,14 +103,15 @@ public final class RefTranlocal<E> extends Tranlocal{
         if (read == null) {
             //when the read is null, and it is an update, then is a tranlocal for a newly created
             //transactional object, since it certainly needs to be committed.
-            isDirty = true;
+            isDirty = DIRTY_TRUE;
             return true;
         }
 
         //check if it really is dirty.
         RefTranlocal _read = (RefTranlocal)read;
-        isDirty = value != _read.value;
-        return isDirty;
+        isDirty = value != _read.value? DIRTY_TRUE: DIRTY_FALSE;
+
+        return isDirty == DIRTY_TRUE;
     }
 
     public static class CallableNode<E>{

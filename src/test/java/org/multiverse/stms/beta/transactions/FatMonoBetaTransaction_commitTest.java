@@ -3,6 +3,7 @@ package org.multiverse.stms.beta.transactions;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.api.blocking.Latch;
@@ -12,6 +13,7 @@ import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
 import org.multiverse.stms.beta.transactionalobjects.LongRef;
@@ -32,7 +34,7 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 /**
  * @author Peter Veentjer
  */
-public class FatMonoBetaTransaction_commitTest {
+public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
     private BetaStm stm;
     private BetaObjectPool pool;
 
@@ -103,7 +105,7 @@ public class FatMonoBetaTransaction_commitTest {
         FatMonoBetaTransaction updatingTx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = updatingTx.openForWrite(ref, false, pool);
         write.value++;
-        write.isDirty = true;
+        write.isDirty = DIRTY_TRUE;
         updatingTx.commit();
 
         assertTrue(latch.isOpen());
@@ -597,8 +599,8 @@ public class FatMonoBetaTransaction_commitTest {
         assertEquals(1, ref.___unsafeLoad().value);
     }
 
-     @Test
-     @Ignore("can't be done with a mono, try with an untracked read")
+    @Test
+    @Ignore("can't be done with a mono, try with an untracked read")
     public void whenInterleavingPossibleWithCommute() {
         LongRef ref1 = createLongRef(stm);
         LongRef ref2 = createLongRef(stm);
@@ -679,6 +681,32 @@ public class FatMonoBetaTransaction_commitTest {
     }
 
     @Test
+    public void whenPessimisticLockLevelWriteAndDirtyCheck() {
+        LongRef ref = createLongRef(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .setPessimisticLockLevel(PessimisticLockLevel.Write)
+                .setDirtyCheckEnabled(true);
+        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
+        tx.openForWrite(ref, false, pool).value++;
+        tx.commit();
+
+        assertEquals(1, ref.___unsafeLoad().value);
+    }
+
+    @Test
+    public void whenPessimisticLockLevelReadAndDirtyCheck() {
+        LongRef ref = createLongRef(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .setPessimisticLockLevel(PessimisticLockLevel.Read)
+                .setDirtyCheckEnabled(true);
+        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
+        tx.openForWrite(ref, false, pool).value++;
+        tx.commit();
+
+        assertEquals(1, ref.___unsafeLoad().value);
+    }
+
+    @Test
     public void whenCommitted_thenIgnore() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.commit(pool);
@@ -712,38 +740,28 @@ public class FatMonoBetaTransaction_commitTest {
     }
 
     public void integrationTest_whenMultipleUpdatesAndDirtyCheck(final boolean dirtyCheck) {
-        LongRef[] refs = new LongRef[1];
+        LongRef ref = createLongRef(stm);
         long created = 0;
-
-        //create the references
-        for (int k = 0; k < refs.length; k++) {
-            refs[k] = createLongRef(stm);
-        }
 
         //execute all transactions
         Random random = new Random();
         int transactionCount = 10000;
         for (int transaction = 0; transaction < transactionCount; transaction++) {
             FatMonoBetaTransaction tx = new FatMonoBetaTransaction(
-                    new BetaTransactionConfiguration(stm).setDirtyCheckEnabled(dirtyCheck));
+                    new BetaTransactionConfiguration(stm)
+                            .setDirtyCheckEnabled(dirtyCheck));
 
-            for (int k = 0; k < refs.length; k++) {
-                if (random.nextInt(3) == 1) {
-                    tx.openForWrite(refs[k], false, pool).value++;
-                    created++;
-                } else {
-                    tx.openForWrite(refs[k], false, pool);
-                }
+             if (random.nextInt(3) == 1) {
+                tx.openForWrite(ref, false, pool).value++;
+                created++;
+            } else {
+                tx.openForWrite(ref, false, pool);
             }
             tx.commit(pool);
             tx.softReset();
         }
 
-        long sum = 0;
-        for (int k = 0; k < refs.length; k++) {
-            sum += refs[k].___unsafeLoad().value;
-        }
-
+        long sum =  ref.___unsafeLoad().value;
         assertEquals(created, sum);
     }
 }

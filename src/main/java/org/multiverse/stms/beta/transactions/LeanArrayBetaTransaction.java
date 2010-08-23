@@ -236,7 +236,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(result == null){
             result = new RefTranlocal<E>(ref);
         }
-        result.isDirty = true;
+        result.isDirty = DIRTY_TRUE;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -445,7 +445,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(result == null){
             result = new IntRefTranlocal(ref);
         }
-        result.isDirty = true;
+        result.isDirty = DIRTY_TRUE;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -654,7 +654,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(result == null){
             result = new LongRefTranlocal(ref);
         }
-        result.isDirty = true;
+        result.isDirty = DIRTY_TRUE;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -854,7 +854,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //open the tranlocal for writing.
         Tranlocal result = ref.___openForConstruction(pool);
-        result.isDirty = true;
+        result.isDirty = DIRTY_TRUE;
         array[firstFreeIndex] = result;
         firstFreeIndex++;
         return result;
@@ -1090,7 +1090,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         if(hasUpdates){
-           if(config.dirtyCheck){
+            if(config.dirtyCheck){
                 if(!doPrepareDirty(pool)){
                     throw abortOnWriteConflict(pool);
                 }
@@ -1183,14 +1183,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
             if(furtherRegistrationNeeded){
                 switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
-                    case BetaTransactionalObject.REGISTRATION_DONE:
+                    case REGISTRATION_DONE:
                         atLeastOneRegistration = true;
                         break;
-                    case BetaTransactionalObject.REGISTRATION_NOT_NEEDED:
+                    case REGISTRATION_NOT_NEEDED:
                         furtherRegistrationNeeded = false;
                         atLeastOneRegistration = true;
                         break;
-                    case BetaTransactionalObject.REGISTRATION_NONE:
+                    case REGISTRATION_NONE:
                         break;
                     default:
                         throw new IllegalStateException();

@@ -1,6 +1,5 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.MultiverseConstants;
 import org.multiverse.api.LockStatus;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.Latch;
@@ -8,8 +7,10 @@ import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.exceptions.WriteConflict;
 import org.multiverse.api.functions.IntFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
+import org.multiverse.stms.beta.orec.FastOrec;
 import org.multiverse.stms.beta.orec.Orec;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -30,7 +31,7 @@ import java.util.UUID;
  * @author Peter Veentjer
  */
 public final class IntRef
-    extends FastOrec implements BetaTransactionalObject, MultiverseConstants {
+    extends FastOrec implements BetaTransactionalObject, BetaStmConstants {
 
     private final static long listenersOffset;
 
@@ -108,7 +109,7 @@ public final class IntRef
     public final IntRefTranlocal ___load(final int spinCount) {
         while (true) {
             //JMM: nothing can jump over the following statement.
-            IntRefTranlocal loaded = ___active;
+            IntRefTranlocal read = ___active;
 
             //JMM:
             if (!___arrive(spinCount)) {
@@ -121,14 +122,14 @@ public final class IntRef
             //An instruction is allowed to jump in front of the write of orec-value, but it is not allowed to
             //jump in front of the read or orec-value (volatile read happens before rule).
             //This means that it isn't possible that a locked value illegally is seen as unlocked.
-            if (___active == loaded) {
+            if (___active == read) {
                 //at this point we are sure that the tranlocal we have read is unlocked.
-                return loaded;
+                return read;
             }
 
             //we are not lucky, the value has changed. But before retrying, we need to depart if the value isn't
             //permanent.
-            if (loaded != null && !loaded.isPermanent()) {
+            if (read != null && !read.isPermanent()) {
                 ___departAfterFailure();
             }
         }
@@ -181,41 +182,52 @@ public final class IntRef
             final Tranlocal tranlocal, final BetaTransaction expectedLockOwner, final BetaObjectPool pool,
             final GlobalConflictCounter globalConflictCounter) {
 
-        if(expectedLockOwner != lockOwner){
-            Tranlocal read = tranlocal.isCommitted ? tranlocal : tranlocal.read;
+        final boolean notDirty = tranlocal.isDirty == DIRTY_FALSE;
 
-            //it can't be an update, otherwise the lock would have been acquired.
-            if(!read.isPermanent && ___departAfterReading()){
-                //Only a non parmenent tranlocal is allowed to do a depart.
-                //The orec indicates that it has become time to transform the tranlocal to mark as permanent.
+        if(notDirty){
+            final boolean ownsLock = expectedLockOwner == lockOwner;
+            final IntRefTranlocal read = (IntRefTranlocal)(tranlocal.isCommitted
+                ?tranlocal
+                :tranlocal.read);
 
+            boolean hasBecomeReadBiased = false;
+
+            if(ownsLock){
+                lockOwner = null;
+
+                if(read.isPermanent){
+                    ___unlockByPermanent();
+                }else{
+                    hasBecomeReadBiased = ___departAfterReadingAndReleaseLock();
+                }
+            }else{
+                if(!read.isPermanent){
+                    hasBecomeReadBiased = ___departAfterReading();
+                }
+            }
+
+            if(hasBecomeReadBiased){
                 ((IntRefTranlocal)read).markAsPermanent();
+
+                //now release the lock.
                 ___unlockAfterBecomingReadBiased();
             }
+
             return null;
         }
 
         lockOwner = null;
 
-        //JMM: it can't happen that lockOwner jumps underneath the releasing of the lock since that contains
-        //a volatile write.
-        if(!tranlocal.isDirty){
-            Tranlocal read = tranlocal.isCommitted?tranlocal:tranlocal.read;
-
-            if(read.isPermanent){
-                ___unlockByPermanent();
-            }else{
-                if(___departAfterReadingAndReleaseLock()){
-                    //the orec indicates that it has become time to transform the tranlocal to mark as permanent
-
-                    ((IntRefTranlocal)read).markAsPermanent();
-                    ___unlockAfterBecomingReadBiased();
-                }
+        if(tranlocal.isDirty == DIRTY_UNKNOWN){
+            System.out.println("called with DIRTY_UKNOWN");
+            try{
+                throw new Exception();
+            }catch(Exception ex){
+                ex.printStackTrace();
             }
-            return null;
         }
 
-        //it is a full blown update (so locked).
+       //it is a full blown update (so locked).
         final IntRefTranlocal newActive = (IntRefTranlocal)tranlocal;
         newActive.prepareForCommit();
         final IntRefTranlocal oldActive = ___active;
@@ -378,30 +390,21 @@ public final class IntRef
 
     @Override
     public final void ___abort(final BetaTransaction transaction, final Tranlocal tranlocal, final BetaObjectPool pool) {
-        assert transaction != null;
-        assert tranlocal != null;
-        assert pool!=null;
-
-        IntRefTranlocal update;
         IntRefTranlocal read;
+
         if (tranlocal.isCommitted) {
-            update = null;
             read = (IntRefTranlocal)tranlocal;
         } else {
-            update = (IntRefTranlocal)tranlocal;
             read = (IntRefTranlocal)tranlocal.read;
-        }
-
-        if (update != null) {
-            //if there is an update, it can always be pooled since it is impossible that it has been
+             //if there is an update, it can always be pooled since it is impossible that it has been
             //read by another transaction.
-            pool.put(update);
-        }
+            pool.put((IntRefTranlocal)tranlocal);
 
-        //if it is a constructed object, we don't need to abort. Constructed objects from aborted transactions,
-        //should remain locked indefinitely since their behavior is undefined.
-        if(read == null){
-            return;
+            //if it is a constructed object, we don't need to abort. Constructed objects from aborted transactions,
+            //should remain locked indefinitely since their behavior is undefined.
+            if(read == null){
+                return;
+            }
         }
 
         if (lockOwner != transaction) {
