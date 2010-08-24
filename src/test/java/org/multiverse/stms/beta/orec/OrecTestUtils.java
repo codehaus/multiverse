@@ -48,7 +48,7 @@ public class OrecTestUtils {
 
         orec.___arrive(1);
         if (orec.___departAfterReading()) {
-            orec.___unlockAfterBecomingReadBiased();
+            orec.___releaseLockAfterBecomingReadBiased();
         } else {
             fail();
         }

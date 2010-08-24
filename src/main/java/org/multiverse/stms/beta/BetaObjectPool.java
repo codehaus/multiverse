@@ -26,7 +26,7 @@ import java.util.ArrayList;
 public final class BetaObjectPool {
 
     private final static boolean ENABLED = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm,beta.BetaObjectPool.enabled","true"));
+        System.getProperty("org.multiverse.stm,beta.BetaObjectPool.enabled","false"));
 
     private final static boolean TRANLOCAL_POOLING_ENABLED = Boolean.parseBoolean(
         System.getProperty("org.multiverse.stm.beta.BetaObjectPool.tranlocalPooling",""+ENABLED));

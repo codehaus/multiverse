@@ -141,17 +141,15 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 pool.putBetaTransaction(tx);
                 transactionContainer.transaction = null;
             }
+        }catch(RuntimeException e){
+            throw e;
         }catch(Exception e){
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            } else {
-                throw new InvisibleCheckedException(e);
-            }
+            throw new InvisibleCheckedException(e);            
         }
 
         throw new TooManyRetriesException(
-            format("Maximum number of %s retries has been reached for transaction '%s'",
-                transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
+            format("[%s] Maximum number of %s retries has been reached",
+                transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
 
    }
     
@@ -270,17 +268,15 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 pool.putBetaTransaction(tx);
                 transactionContainer.transaction = null;
             }
+        }catch(RuntimeException e){
+            throw e;
         }catch(Exception e){
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            } else {
-                throw new InvisibleCheckedException(e);
-            }
+            throw new InvisibleCheckedException(e);            
         }
 
         throw new TooManyRetriesException(
-            format("Maximum number of %s retries has been reached for transaction '%s'",
-                transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
+            format("[%s] Maximum number of %s retries has been reached",
+                transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
 
    }
     
@@ -399,17 +395,15 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 pool.putBetaTransaction(tx);
                 transactionContainer.transaction = null;
             }
+        }catch(RuntimeException e){
+            throw e;
         }catch(Exception e){
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            } else {
-                throw new InvisibleCheckedException(e);
-            }
+            throw new InvisibleCheckedException(e);            
         }
 
         throw new TooManyRetriesException(
-            format("Maximum number of %s retries has been reached for transaction '%s'",
-                transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
+            format("[%s] Maximum number of %s retries has been reached",
+                transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
 
    }
     
@@ -528,17 +522,15 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 pool.putBetaTransaction(tx);
                 transactionContainer.transaction = null;
             }
+        }catch(RuntimeException e){
+            throw e;
         }catch(Exception e){
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            } else {
-                throw new InvisibleCheckedException(e);
-            }
+            throw new InvisibleCheckedException(e);            
         }
 
         throw new TooManyRetriesException(
-            format("Maximum number of %s retries has been reached for transaction '%s'",
-                transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
+            format("[%s] Maximum number of %s retries has been reached",
+                transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
 
    }
     
@@ -657,17 +649,15 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 pool.putBetaTransaction(tx);
                 transactionContainer.transaction = null;
             }
+        }catch(RuntimeException e){
+            throw e;
         }catch(Exception e){
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            } else {
-                throw new InvisibleCheckedException(e);
-            }
+            throw new InvisibleCheckedException(e);            
         }
 
         throw new TooManyRetriesException(
-            format("Maximum number of %s retries has been reached for transaction '%s'",
-                transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
+            format("[%s] Maximum number of %s retries has been reached",
+                transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
 
    }
     
@@ -793,17 +783,15 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 pool.putBetaTransaction(tx);
                 transactionContainer.transaction = null;
             }
+        }catch(RuntimeException e){
+            throw e;
         }catch(Exception e){
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            } else {
-                throw new InvisibleCheckedException(e);
-            }
+            throw new InvisibleCheckedException(e);            
         }
 
         throw new TooManyRetriesException(
-            format("Maximum number of %s retries has been reached for transaction '%s'",
-                transactionConfiguration.getMaxRetries(), transactionConfiguration.getFamilyName()));
+            format("[%s] Maximum number of %s retries has been reached",
+                transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
 
    }
     

@@ -1468,9 +1468,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     private boolean doPrepareDirty(final BetaObjectPool pool){
-        if(config.lockWrites){
-            return true;
-        }
+        //if(config.lockWrites){
+        //    return true;
+        //}
 
         if(attached.isCommitted){
             return true;
@@ -1495,9 +1495,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     private boolean doPrepareAll(final BetaObjectPool pool){
-        if(config.lockWrites){
-            return true;
-        }
+        //if(config.lockWrites){
+        //    return true;
+        //}
         
         if(attached.isCommitted){
             return true;

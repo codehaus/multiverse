@@ -71,7 +71,7 @@ public class WriteSkewStressTest {
     public void whenWriteSkewAllowed() {
         allowWriteSkew = true;
         startAll(threads);
-        sleepMs(getStressTestDurationMs(60 * 1000));
+        sleepMs(getStressTestDurationMs(30 * 1000));
         stop = true;
         joinAll(threads);
 

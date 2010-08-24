@@ -168,7 +168,7 @@ public final class UnsafeOrec implements Orec {
     }
 
     @Override
-    public void ___unlockAfterBecomingReadBiased() {
+    public void ___releaseLockAfterBecomingReadBiased() {
         if (!isLocked) {
             throw new PanicError();
         }

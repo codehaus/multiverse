@@ -953,9 +953,9 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
     }
 
     private boolean doPrepareDirty(final BetaObjectPool pool){
-        if(config.lockWrites){
-            return true;
-        }
+        //if(config.lockWrites){
+        //    return true;
+        //}
 
         if(attached.isCommitted){
             return true;
@@ -970,9 +970,9 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
     }
 
     private boolean doPrepareAll(final BetaObjectPool pool){
-        if(config.lockWrites){
-            return true;
-        }
+        //if(config.lockWrites){
+        //    return true;
+        //}
         
         if(attached.isCommitted){
             return true;

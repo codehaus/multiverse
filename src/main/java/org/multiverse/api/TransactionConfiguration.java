@@ -8,7 +8,8 @@ import org.multiverse.stms.beta.BetaStm;
  * complicating its usage. So all the configurational properties of the transaction are contained in
  * this structure.
  *
- * The same TransactionConfiguration 
+ * The same TransactionConfiguration is used for multiple transactions. Each TransactionFactory has just a
+ * single configuration and all Transactions created by that TransactionFactory, share that configuration.
  *
  * @author Peter Veentjer.
  */

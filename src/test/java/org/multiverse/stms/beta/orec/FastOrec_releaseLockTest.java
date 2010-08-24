@@ -16,7 +16,7 @@ public class FastOrec_releaseLockTest {
         FastOrec orec = new FastOrec();
 
         try {
-            orec.___unlockAfterBecomingReadBiased();
+            orec.___releaseLockAfterBecomingReadBiased();
             fail();
         } catch (PanicError expected) {
         }
@@ -33,7 +33,7 @@ public class FastOrec_releaseLockTest {
 
 
         try {
-            orec.___unlockAfterBecomingReadBiased();
+            orec.___releaseLockAfterBecomingReadBiased();
             fail();
         } catch (PanicError expected) {
         }
@@ -56,7 +56,7 @@ public class FastOrec_releaseLockTest {
         boolean result = orec.___departAfterReading();
         assertTrue(result);
 
-        orec.___unlockAfterBecomingReadBiased();
+        orec.___releaseLockAfterBecomingReadBiased();
         OrecTestUtils.assertUnlocked(orec);
         OrecTestUtils.assertReadBiased(orec);
         OrecTestUtils.assertSurplus(0, orec);
@@ -69,7 +69,7 @@ public class FastOrec_releaseLockTest {
         orec.___arrive(1);
         orec.___tryUpdateLock(1);
 
-        orec.___unlockAfterBecomingReadBiased();
+        orec.___releaseLockAfterBecomingReadBiased();
 
         OrecTestUtils.assertUnlocked(orec);
         OrecTestUtils.assertUpdateBiased(orec);

@@ -107,6 +107,9 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
     @Override
     public final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} ___load(final int spinCount) {
+        //it can't happen that the isPermanent status of a tranlocal is changed while it is being used. This is
+        //because an arrive is done, and as long as there is at least 1 arive, the orec never can become readbiased.
+
         while (true) {
             //JMM: nothing can jump over the following statement.
             ${transactionalObject.tranlocal}${transactionalObject.typeParameter} read = ___active;
@@ -123,7 +126,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             //jump in front of the read or orec-value (volatile read happens before rule).
             //This means that it isn't possible that a locked value illegally is seen as unlocked.
             if (___active == read) {
-                //at this point we are sure that the tranlocal we have read is unlocked.
+                //at this point we are sure that the read was unlocked.
                 return read;
             }
 
@@ -136,7 +139,10 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
     @Override
-    public final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} ___lockAndLoad(final int spinCount, final BetaTransaction newLockOwner) {
+    public final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} ___lockAndLoad(
+            final int spinCount,
+            final BetaTransaction newLockOwner){
+
         assert newLockOwner != null;
 
         //JMM: no instructions will jump in front of a volatile read. So this stays on top.
@@ -181,7 +187,9 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 #end 
     @Override
     public final Listeners ___commitDirty(
-            final Tranlocal tranlocal, final BetaTransaction expectedLockOwner, final BetaObjectPool pool,
+            final Tranlocal tranlocal,
+            final BetaTransaction expectedLockOwner,
+            final BetaObjectPool pool,
             final GlobalConflictCounter globalConflictCounter) {
 
         final boolean notDirty = tranlocal.isDirty == DIRTY_FALSE;
@@ -192,34 +200,37 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
                 ?tranlocal
                 :tranlocal.read);
 
-            boolean hasBecomeReadBiased = false;
-
             if(ownsLock){
                 lockOwner = null;
 
                 if(read.isPermanent){
-                    ___unlockByPermanent();
+                    ___unlockByReadBiased();
                 }else{
-                    hasBecomeReadBiased = ___departAfterReadingAndReleaseLock();
+                    if(___departAfterReadingAndReleaseLock()){
+                        read.markAsPermanent();
+                        ___releaseLockAfterBecomingReadBiased();
+                    }
                 }
             }else{
                 if(!read.isPermanent){
-                    hasBecomeReadBiased = ___departAfterReading();
+                    if(___departAfterReading()){
+                        read.markAsPermanent();
+                        ___releaseLockAfterBecomingReadBiased();
+                    }
                 }
-            }
-
-            if(hasBecomeReadBiased){
-                ((${transactionalObject.tranlocal})read).markAsPermanent();
-
-                //now release the lock.
-                ___unlockAfterBecomingReadBiased();
             }
 
             return null;
         }
 
+        //todo: this code needs to go.
+        if(expectedLockOwner!=lockOwner){
+            throw new PanicError();
+        }
+     
         lockOwner = null;
 
+        //todo: this code needs to go.
         if(tranlocal.isDirty == DIRTY_UNKNOWN){
             System.out.println("called with DIRTY_UKNOWN");
             try{
@@ -229,7 +240,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             }
         }
 
-       //it is a full blown update (so locked).
+        //it is a full blown update (so locked).
         final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} newActive = (${transactionalObject.tranlocal})tranlocal;
         newActive.prepareForCommit();
         final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} oldActive = ___active;
@@ -272,7 +283,9 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
     @Override
     public final Listeners ___commitAll(
-            final Tranlocal tranlocal, final BetaTransaction expectedLockOwner, final BetaObjectPool pool,
+            final Tranlocal tranlocal,
+            final BetaTransaction expectedLockOwner,
+            final BetaObjectPool pool,
             final GlobalConflictCounter globalConflictCounter) {
 
 
@@ -284,7 +297,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
                 //The orec indicates that it has become time to transform the tranlocal to mark as permanent.
 
                 ((${transactionalObject.tranlocal})tranlocal).markAsPermanent();
-                ___unlockAfterBecomingReadBiased();
+                ___releaseLockAfterBecomingReadBiased();
             }
             return null;
         }
@@ -293,13 +306,13 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
         if(tranlocal.isCommitted){
             if(tranlocal.isPermanent){
-                ___unlockByPermanent();
+                ___unlockByReadBiased();
             }else{
                 if(___departAfterReadingAndReleaseLock()){
                     //the orec indicates that it has become time to transform the tranlocal to mark as permanent
 
                     ((${transactionalObject.tranlocal})tranlocal).markAsPermanent();
-                    ___unlockAfterBecomingReadBiased();
+                    ___releaseLockAfterBecomingReadBiased();
                 }
             }
             return null;
@@ -372,28 +385,40 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
     @Override
-    public final boolean ___tryLockAndCheckConflict(final BetaTransaction newLockOwner, final int spinCount, final Tranlocal tranlocal) {
+    public final boolean ___tryLockAndCheckConflict(
+        final BetaTransaction newLockOwner,
+        final int spinCount,
+        final Tranlocal tranlocal) {
+
         //if it already is locked by the current transaction, we are done.
         if (lockOwner == newLockOwner) {
             return true;
         }
 
-        //if the lock can't be acquired, we are done and can return false.
-        if (!___tryUpdateLock(spinCount)) {
-            return false;
+        Tranlocal read = tranlocal.isCommitted ? tranlocal : tranlocal.read;
+        if(read.isPermanent){
+            //if the read was permanent, 
+            if(!___arriveAndLockForUpdate(spinCount)){
+                return false;
+            }
+        }else{
+            if (!___tryUpdateLock(spinCount)) {
+                return false;
+            }
         }
 
         //we have successfully acquired the lock
         lockOwner = newLockOwner;
-
-        Tranlocal read = tranlocal.isCommitted ? tranlocal : tranlocal.read;
         return read == ___active;
     }
 
     @Override
-    public final void ___abort(final BetaTransaction transaction, final Tranlocal tranlocal, final BetaObjectPool pool) {
-        ${transactionalObject.tranlocal} read;
+    public final void ___abort(
+        final BetaTransaction transaction,
+        final Tranlocal tranlocal,
+        final BetaObjectPool pool) {
 
+        ${transactionalObject.tranlocal} read;
         if (tranlocal.isCommitted) {
             read = (${transactionalObject.tranlocal})tranlocal;
         } else {
@@ -428,7 +453,10 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
     @Override
     public final int ___registerChangeListener(
-        final Latch latch, final Tranlocal tranlocal, final BetaObjectPool pool, final long listenerEra){
+        final Latch latch,
+        final Tranlocal tranlocal,
+        final BetaObjectPool pool,
+        final long listenerEra){
 
         final Tranlocal read = tranlocal.isCommitted ? tranlocal:tranlocal.read;
 
@@ -518,7 +546,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
         if(!read.isPermanent && ___departAfterReading()){
             read.markAsPermanent();
-            ___unlockAfterBecomingReadBiased();
+            ___releaseLockAfterBecomingReadBiased();
         }
 
         return result;
@@ -529,7 +557,9 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
     public final ${transactionalObject.type} atomicSet(
-        final ${transactionalObject.type} newValue, final BetaObjectPool pool, final int spinCount,
+        final ${transactionalObject.type} newValue,
+        final BetaObjectPool pool,
+        final int spinCount,
         final GlobalConflictCounter globalConflictCounter){
 
         if (!___arriveAndLockForUpdate(spinCount)) {
@@ -540,11 +570,11 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
         if(oldActive.value== newValue){
             if(oldActive.isPermanent){
-                ___unlockByPermanent();
+                ___unlockByReadBiased();
             } else{
                 if(___departAfterReadingAndReleaseLock()){
                     oldActive.markAsPermanent();
-                    ___unlockAfterBecomingReadBiased();
+                    ___releaseLockAfterBecomingReadBiased();
                 }
             }
         }
@@ -568,19 +598,33 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         return oldActive.value;
     }
 
-    public final ${transactionalObject.type} get(final BetaTransaction transaction, final BetaObjectPool pool){
+    public final ${transactionalObject.type} get(
+        final BetaTransaction transaction,
+        final BetaObjectPool pool){
+
         return transaction.openForRead(this, false, pool).value;
     }
 
-    public final void set(final BetaTransaction transaction, final BetaObjectPool pool, ${transactionalObject.type} value){
+    public final void set(
+        final BetaTransaction transaction,
+        final BetaObjectPool pool,
+        final ${transactionalObject.type} value){
+
         transaction.openForWrite(this, false, pool).value = value;
     }
 
-    public final ${transactionalObject.type} lockAndGet(final BetaTransaction transaction, final BetaObjectPool pool){
+    public final ${transactionalObject.type} lockAndGet(
+        final BetaTransaction transaction,
+        final BetaObjectPool pool){
+
         return transaction.openForRead(this, true, pool).value;
     }
 
-    public final void lockAndSet(final BetaTransaction transaction, final BetaObjectPool pool, ${transactionalObject.type} value){
+    public final void lockAndSet(
+        final BetaTransaction transaction,
+        final BetaObjectPool pool,
+        final ${transactionalObject.type} value){
+
         transaction.openForWrite(this, true, pool).value = value;
     }
 
@@ -592,7 +636,11 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
      * @param function the function to apply.
      * @return the new value.
      */
-    public ${transactionalObject.type} alter(final BetaTransaction tx, final BetaObjectPool pool, final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
+    public ${transactionalObject.type} alter(
+        final BetaTransaction tx,
+        final BetaObjectPool pool,
+        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
+    
         if(tx == null || pool == null || function == null){
             throw new NullPointerException();
         }

@@ -87,6 +87,8 @@ performance.
  exclusive writebit set by another transaction, no write can happen. The advantage of purely locking is that
  reads still can happen even though it is 'locked' exclusively for writing by one transaction. 
 
+- create an orec that never become readbiased (useful for performance comparison).
+
 todo
 
 - added missing type parameter on the mono tx openForRead

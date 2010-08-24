@@ -1355,20 +1355,26 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         int listenersArrayIndex = 0;
         for (int k = 0; k < array.length; k++) {
             Tranlocal tranlocal = array[k];
-            if(tranlocal != null){
-                final Listeners listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool, config.globalConflictCounter);
+            if(tranlocal == null){
+                continue;
+            }
 
-                if(listeners != null){
+            if(tranlocal.isDirty == DIRTY_UNKNOWN){
+                tranlocal.calculateIsDirty();
+            }
+            
+            final Listeners listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool, config.globalConflictCounter);
+
+            if(listeners != null){
+                if(listenersArray == null){
+                    int length = array.length - k;
+                    listenersArray = pool.takeListenersArray(length);
                     if(listenersArray == null){
-                        int length = array.length - k;
-                        listenersArray = pool.takeListenersArray(length);
-                        if(listenersArray == null){
-                            listenersArray = new Listeners[length];
-                        }
+                        listenersArray = new Listeners[length];
                     }
-                    listenersArray[listenersArrayIndex]=listeners;
-                    listenersArrayIndex++;
                 }
+                listenersArray[listenersArrayIndex]=listeners;
+                listenersArrayIndex++;
             }
         }
 
@@ -1479,9 +1485,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
     }
 
     private boolean doPrepareAll(final BetaObjectPool pool) {
-        if(config.lockWrites){
-            return true;
-        }
+        //if(config.lockWrites){
+        //    return true;
+        //}
 
         final int spinCount = config.spinCount;
 
@@ -1511,9 +1517,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
     }
 
     private boolean doPrepareDirty(final BetaObjectPool pool) {
-        if(config.lockWrites){
-            return true;
-        }
+        //if(config.lockWrites){
+        //    return true;
+        //}
 
         final int spinCount = config.spinCount;
 

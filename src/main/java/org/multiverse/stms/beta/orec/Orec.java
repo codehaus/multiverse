@@ -136,7 +136,7 @@ public interface Orec {
      * @throws org.multiverse.api.exceptions.PanicError
      *          if the lock is not acquired.
      */
-    void ___unlockAfterBecomingReadBiased();
+    void ___releaseLockAfterBecomingReadBiased();
 
     /**
      * Checks if this Orec is biased towards reading.

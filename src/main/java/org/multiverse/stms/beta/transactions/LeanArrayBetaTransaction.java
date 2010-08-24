@@ -1042,6 +1042,11 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         int storeIndex = 0;
         for (int k = 0; k < firstFreeIndex; k++) {
             final Tranlocal tranlocal = array[k];
+
+            if(tranlocal.isDirty == DIRTY_UNKNOWN){
+                tranlocal.calculateIsDirty();
+            }
+
             final Listeners listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool, config.globalConflictCounter);
 
             if(listeners != null){
@@ -1105,9 +1110,9 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     }
 
     private boolean doPrepareAll(final BetaObjectPool pool) {
-        if(config.lockWrites){
-            return true;
-        }
+        //if(config.lockWrites){
+        //    return true;
+        //}
 
         final int spinCount = config.spinCount;
 

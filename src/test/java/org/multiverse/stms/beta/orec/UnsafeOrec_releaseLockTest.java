@@ -16,7 +16,7 @@ public class UnsafeOrec_releaseLockTest {
         UnsafeOrec orec = new UnsafeOrec();
 
         try {
-            orec.___unlockAfterBecomingReadBiased();
+            orec.___releaseLockAfterBecomingReadBiased();
             fail();
         } catch (PanicError expected) {
         }
@@ -33,7 +33,7 @@ public class UnsafeOrec_releaseLockTest {
 
 
         try {
-            orec.___unlockAfterBecomingReadBiased();
+            orec.___releaseLockAfterBecomingReadBiased();
             fail();
         } catch (PanicError expected) {
         }
@@ -49,7 +49,7 @@ public class UnsafeOrec_releaseLockTest {
         orec.___arrive(1);
         orec.___tryUpdateLock(1);
 
-        orec.___unlockAfterBecomingReadBiased();
+        orec.___releaseLockAfterBecomingReadBiased();
 
         assertUnlocked(orec);
         assertUpdateBiased(orec);
