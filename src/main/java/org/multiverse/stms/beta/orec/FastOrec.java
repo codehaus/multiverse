@@ -34,6 +34,11 @@ import static java.lang.String.format;
  * 3-54: contains surplus
  * 54-63 contains readonly count
  *
+ *
+ * Cause of problems perhaps; while it is locked, only 'simple' departs should be allowed. But it should not
+ * be allowed that the readbiased behavior is changed. Atm it can happen. So when a transaction has locked an orec,
+ * and an other one does a depart 
+ *
  * @author Peter Veentjer
  */
 public class FastOrec implements Orec {
@@ -117,7 +122,7 @@ public class FastOrec implements Orec {
                 } else if (surplus == 1) {
                     return true;
                 } else {
-                    throw new PanicError();
+                    throw new PanicError("Surplus for a readbiased orec can never be larger than 1");
                 }
             } else {
                 surplus++;
@@ -181,12 +186,18 @@ public class FastOrec implements Orec {
             }
 
             int readonlyCount = getReadonlyCount(current);
+            if(readonlyCount<___READBIASED_THRESHOLD){
+                readonlyCount++;
+            }
 
             surplus--;
-            readonlyCount++;
             boolean isLocked = isLocked(current);
-            if (surplus == 0 && readonlyCount >= ___READBIASED_THRESHOLD) {
+            if (surplus == 0 && readonlyCount == ___READBIASED_THRESHOLD) {
+                surplus = 1;
                 isReadBiased = true;
+                if(isLocked){
+                    System.out.println("funky situation");
+                }
                 isLocked = true;
                 readonlyCount = 0;
             }
@@ -399,16 +410,23 @@ public class FastOrec implements Orec {
 
 //    @Override
 
-    public final void ___unlockByReadBiased() {
+    public final void ___releaseLockByReadBiased() {
         while (true) {
             long current = value;
 
             if (!isReadBiased(current)) {
-                throw new PanicError("Can't unlock when it is not readbiased "+___toOrecString(current));
+                throw new PanicError(
+                        "Can't releaseLockByReadBiased when it is not readbiased "+___toOrecString(current));
             }
 
             if (!isLocked(current)) {
-                throw new PanicError("Can't unlock if it isn't locked "+___toOrecString(current));
+                throw new PanicError(
+                        "Can't releaseLockByReadBiased if it isn't locked "+___toOrecString(current));
+            }
+
+            if(getSurplus(current)>1){
+                throw new PanicError(
+                        "Surplus for a readbiased orec never can be larger than 1 "+___toOrecString(current));
             }
 
             long next = setLocked(current, false);
@@ -424,15 +442,18 @@ public class FastOrec implements Orec {
             long current = value;
 
             if (!isLocked(current)) {
-                throw new PanicError("Can't unlockAfterBecomingReadBiased if it isn't locked "+___toOrecString(current));
+                throw new PanicError(
+                        "Can't unlockAfterBecomingReadBiased if it isn't locked "+___toOrecString(current));
             }
 
-            if (getSurplus(current) != 0) {
-                throw new PanicError("Can't unlockAfterBecomingReadBiased if there is surplus "+___toOrecString(current));
-            }
+            //if (getSurplus(current) != 0) {
+            //    throw new PanicError(
+            //            "Can't unlockAfterBecomingReadBiased if there is surplus "+___toOrecString(current));
+            //}
 
             if (!isReadBiased(value)) {
-                throw new PanicError("Can't unlockAfterBecomingReadBiased if it isn't read biased "+___toOrecString(current));
+                throw new PanicError(
+                        "Can't unlockAfterBecomingReadBiased if it isn't read biased "+___toOrecString(current));
             }
 
             long next = setLocked(current, false);

@@ -133,7 +133,7 @@ public final class Ref<E>
 
             //we are not lucky, the value has changed. But before retrying, we need to depart if the value isn't
             //permanent.
-            if (read != null && !read.isPermanent()) {
+            if (read != null && !read.isPermanent) {
                 ___departAfterFailure();
             }
         }
@@ -203,7 +203,7 @@ public final class Ref<E>
                 lockOwner = null;
 
                 if(read.isPermanent){
-                    ___unlockByReadBiased();
+                    ___releaseLockByReadBiased();
                 }else{
                     if(___departAfterReadingAndReleaseLock()){
                         read.markAsPermanent();
@@ -305,7 +305,7 @@ public final class Ref<E>
 
         if(tranlocal.isCommitted){
             if(tranlocal.isPermanent){
-                ___unlockByReadBiased();
+                ___releaseLockByReadBiased();
             }else{
                 if(___departAfterReadingAndReleaseLock()){
                     //the orec indicates that it has become time to transform the tranlocal to mark as permanent
@@ -357,24 +357,17 @@ public final class Ref<E>
 
     @Override
     public final boolean ___hasReadConflict(final Tranlocal tranlocal, final BetaTransaction tx) {
-        final boolean committed = tranlocal.isCommitted();
-
-        Tranlocal read = committed ? tranlocal: tranlocal.read;
-
-        //if the active value is different, we are certain of a conflict
-        if(___active != read){
-            return true;
-        }
-
         //if the current transaction owns the lock, there is no conflict...
         //todo: only going to work when the acquire lock also does a conflict check.
         if(lockOwner == tx){
             return false;
         }
 
-        //there is never a conflict on a fresh object.
-        if(!committed && read==null){
-            return false;
+        final Tranlocal read = tranlocal.isCommitted ? tranlocal: tranlocal.read;
+
+        //if the active value is different, we are certain of a conflict
+        if(___active != read){
+            return true;
         }
 
         //another transaction currently has the lock, and chances are that the transaction
@@ -389,14 +382,15 @@ public final class Ref<E>
         final int spinCount,
         final Tranlocal tranlocal) {
 
-        //if it already is locked by the current transaction, we are done.
+        //If it already is locked by the current transaction, we are done.
+        //Fresh constructed objects always have the tx set.
         if (lockOwner == newLockOwner) {
             return true;
         }
 
         Tranlocal read = tranlocal.isCommitted ? tranlocal : tranlocal.read;
         if(read.isPermanent){
-            //if the read was permanent, 
+            //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
             if(!___arriveAndLockForUpdate(spinCount)){
                 return false;
             }
@@ -447,6 +441,8 @@ public final class Ref<E>
 
         //the current transaction owns the lock.. so lets release it
         lockOwner = null;
+
+        //depart and release the lock. This call is able to deal with readbiased and normal reads.
         ___departAfterFailureAndReleaseLock();
     }
 
@@ -568,7 +564,7 @@ public final class Ref<E>
 
         if(oldActive.value== newValue){
             if(oldActive.isPermanent){
-                ___unlockByReadBiased();
+                ___releaseLockByReadBiased();
             } else{
                 if(___departAfterReadingAndReleaseLock()){
                     oldActive.markAsPermanent();

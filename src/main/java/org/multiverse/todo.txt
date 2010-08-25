@@ -199,9 +199,13 @@ the task not being executed at all.
 
 - writeskew test: whenlockedread
 
-- fast-orec needs to have a lower ___READ_THRESHOLD
+- check transaction prepare optimization when pessimistic locking used. Disabled atm
+
+- reenable objectpooling
 
 done
+
+- fast-orec needs to have a lower ___READ_THRESHOLD
 
 - support for writeskew detection
     - how should the writeskew detection be done? Should it lock all reads?

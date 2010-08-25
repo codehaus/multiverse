@@ -133,7 +133,11 @@ public final class IntRef
 
             //we are not lucky, the value has changed. But before retrying, we need to depart if the value isn't
             //permanent.
-            if (read != null && !read.isPermanent()) {
+            if (read != null && !read.isPermanent) {
+                if(___getSurplus()==0){
+                    throw new PanicError();
+                }
+
                 ___departAfterFailure();
             }
         }
@@ -203,7 +207,11 @@ public final class IntRef
                 lockOwner = null;
 
                 if(read.isPermanent){
-                    ___unlockByReadBiased();
+                    if(___getSurplus()==0){
+                        throw new PanicError();
+                    }
+
+                    ___releaseLockByReadBiased();
                 }else{
                     if(___departAfterReadingAndReleaseLock()){
                         read.markAsPermanent();
@@ -212,6 +220,10 @@ public final class IntRef
                 }
             }else{
                 if(!read.isPermanent){
+                    if(___getSurplus()==0){
+                        throw new PanicError();
+                    }
+
                     if(___departAfterReading()){
                         read.markAsPermanent();
                         ___releaseLockAfterBecomingReadBiased();
@@ -291,7 +303,14 @@ public final class IntRef
         if(expectedLockOwner != lockOwner){
             //it can't be an update, otherwise the lock would have been acquired.
 
+            if(!tranlocal.isPermanent){
+                if(___getSurplus()==0){
+                    throw new PanicError();
+                }
+            }
+
             if(!tranlocal.isPermanent && ___departAfterReading()){
+
                 //Only a non parmenent tranlocal is allowed to do a depart.
                 //The orec indicates that it has become time to transform the tranlocal to mark as permanent.
 
@@ -305,8 +324,13 @@ public final class IntRef
 
         if(tranlocal.isCommitted){
             if(tranlocal.isPermanent){
-                ___unlockByReadBiased();
+                ___releaseLockByReadBiased();
             }else{
+                if(___getSurplus()==0){
+                    throw new PanicError();
+                }
+
+
                 if(___departAfterReadingAndReleaseLock()){
                     //the orec indicates that it has become time to transform the tranlocal to mark as permanent
 
@@ -357,24 +381,17 @@ public final class IntRef
 
     @Override
     public final boolean ___hasReadConflict(final Tranlocal tranlocal, final BetaTransaction tx) {
-        final boolean committed = tranlocal.isCommitted();
-
-        Tranlocal read = committed ? tranlocal: tranlocal.read;
-
-        //if the active value is different, we are certain of a conflict
-        if(___active != read){
-            return true;
-        }
-
         //if the current transaction owns the lock, there is no conflict...
         //todo: only going to work when the acquire lock also does a conflict check.
         if(lockOwner == tx){
             return false;
         }
 
-        //there is never a conflict on a fresh object.
-        if(!committed && read==null){
-            return false;
+        final Tranlocal read = tranlocal.isCommitted ? tranlocal: tranlocal.read;
+
+        //if the active value is different, we are certain of a conflict
+        if(___active != read){
+            return true;
         }
 
         //another transaction currently has the lock, and chances are that the transaction
@@ -389,18 +406,24 @@ public final class IntRef
         final int spinCount,
         final Tranlocal tranlocal) {
 
-        //if it already is locked by the current transaction, we are done.
+        //If it already is locked by the current transaction, we are done.
+        //Fresh constructed objects always have the tx set.
         if (lockOwner == newLockOwner) {
             return true;
         }
 
         Tranlocal read = tranlocal.isCommitted ? tranlocal : tranlocal.read;
         if(read.isPermanent){
-            //if the read was permanent, 
+            //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
             if(!___arriveAndLockForUpdate(spinCount)){
                 return false;
             }
         }else{
+            if(___getSurplus()==0){
+                throw new PanicError();
+            }
+
+
             if (!___tryUpdateLock(spinCount)) {
                 return false;
             }
@@ -436,6 +459,10 @@ public final class IntRef
         if (lockOwner != transaction) {
             //the current transaction didn't own the lock.
             if (!read.isPermanent) {
+                if(___getSurplus()==0){
+                    throw new PanicError();
+                }
+
                 //it is important that the depart is not called when the read isReadBiased. It could
                 //be that the orec already has become updateBiased, and if we call a depart, we are
                 //departing too much.
@@ -447,6 +474,8 @@ public final class IntRef
 
         //the current transaction owns the lock.. so lets release it
         lockOwner = null;
+
+        //depart and release the lock. This call is able to deal with readbiased and normal reads.
         ___departAfterFailureAndReleaseLock();
     }
 
@@ -568,7 +597,7 @@ public final class IntRef
 
         if(oldActive.value== newValue){
             if(oldActive.isPermanent){
-                ___unlockByReadBiased();
+                ___releaseLockByReadBiased();
             } else{
                 if(___departAfterReadingAndReleaseLock()){
                     oldActive.markAsPermanent();
