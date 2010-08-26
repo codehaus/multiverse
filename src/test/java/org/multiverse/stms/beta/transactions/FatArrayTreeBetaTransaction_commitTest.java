@@ -185,20 +185,46 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
     }
 
     @Test
-    public void writeSkewStillPossible() {
+    public void whenWriteSkewStillPossibleWithWriteSkewEnabled() {
         LongRef ref1 = createLongRef(stm, 0);
         LongRef ref2 = createLongRef(stm, 0);
 
         BetaTransaction tx1 = new FatArrayTreeBetaTransaction(stm);
-        tx1.openForWrite(ref1, false, pool);
+        tx1.openForWrite(ref1, false, pool).value++;
         tx1.openForRead(ref2, false, pool);
 
         BetaTransaction tx2 = new FatArrayTreeBetaTransaction(stm);
         tx2.openForRead(ref1, false, pool);
-        tx2.openForWrite(ref2, false, pool);
+        tx2.openForWrite(ref2, false, pool).value++;
 
         tx1.commit(pool);
         tx2.commit(pool);
+    }
+
+    @Test
+    public void whenWriteSkewNotPossibleWithoutWriteSkewDisabled() {
+        LongRef ref1 = createLongRef(stm, 0);
+        LongRef ref2 = createLongRef(stm, 0);
+
+        BetaTransaction tx1 = new FatArrayTreeBetaTransaction(stm);
+        tx1.openForWrite(ref1, false, pool).value++;
+        tx1.openForRead(ref2, false, pool);
+
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .setWriteSkewAllowed(false);
+        BetaTransaction tx2 = new FatArrayTreeBetaTransaction(config);
+        tx2.openForRead(ref1, false, pool);
+        tx2.openForWrite(ref2, false, pool).value++;
+
+        tx1.commit(pool);
+
+        try {
+            tx2.commit(pool);
+            fail();
+        } catch (WriteConflict expected) {
+        }
+
+        assertAborted(tx2);
     }
 
     @Test

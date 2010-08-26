@@ -52,14 +52,14 @@ public class IsolationStressTest {
         test(true, false);
     }
 
-    public void test(boolean pessimistic, boolean diryCheckEnabled) {
+    public void test(boolean pessimistic, boolean dirtyCheckEnabled) {
         int threadCount = 2;
         UpdateThread[] threads = new UpdateThread[threadCount];
         LongRef ref = BetaStmUtils.createLongRef(stm);
         long txCount = 100 * 1000 * 1000;
 
         for (int k = 0; k < threads.length; k++) {
-            threads[k] = new UpdateThread(k, ref, txCount, pessimistic, diryCheckEnabled);
+            threads[k] = new UpdateThread(k, ref, txCount, pessimistic, dirtyCheckEnabled);
         }
 
         for (UpdateThread thread : threads) {
@@ -79,12 +79,12 @@ public class IsolationStressTest {
     }
 
     class UpdateThread extends TestThread {
+        private final boolean dirtyCheckEnabled;
         private final LongRef ref;
         private final long count;
         private final boolean pessimistic;
         private long durationMs;
-        private final boolean dirtyCheckEnabled;
-
+        
         public UpdateThread(int id, LongRef ref, long count, boolean pessimistic, boolean dirtyCheckEnabled) {
             super("UpdateThread-" + id);
             this.ref = ref;

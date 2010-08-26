@@ -413,6 +413,48 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
         assertUpdateBiased(ref);
     }
 
+     @Test
+    public void whenWriteSkewStillPossibleWithWriteSkewEnabled() {
+        LongRef ref1 = createLongRef(stm, 0);
+        LongRef ref2 = createLongRef(stm, 0);
+
+        BetaTransaction tx1 = new FatArrayBetaTransaction(stm);
+        tx1.openForWrite(ref1, false, pool).value++;
+        tx1.openForRead(ref2, false, pool);
+
+        BetaTransaction tx2 = new FatArrayBetaTransaction(stm);
+        tx2.openForRead(ref1, false, pool);
+        tx2.openForWrite(ref2, false, pool).value++;
+
+        tx1.prepare(pool);
+        tx2.prepare(pool);
+    }
+
+    @Test
+    public void whenWriteSkewNotPossibleWithoutWriteSkewDisabled() {
+        LongRef ref1 = createLongRef(stm, 0);
+        LongRef ref2 = createLongRef(stm, 0);
+
+        BetaTransaction tx1 = new FatArrayBetaTransaction(stm);
+        tx1.openForWrite(ref1, false, pool).value++;
+        tx1.openForRead(ref2, false, pool);
+
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .setWriteSkewAllowed(false);
+        BetaTransaction tx2 = new FatArrayBetaTransaction(config);
+        tx2.openForRead(ref1, false, pool);
+        tx2.openForWrite(ref2, false, pool).value++;
+
+        tx1.prepare(pool);
+
+        try {
+            tx2.prepare(pool);
+            fail();
+        } catch (WriteConflict expected) {
+        }
+
+        assertAborted(tx2);
+    }
 
     @Test
     public void whenPreparedAlreadyPrepared() {

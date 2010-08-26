@@ -93,8 +93,6 @@ performance.
 
 todo
 
-- added missing type parameter on the mono tx openForRead
-
 - mono transaction: support for orelse
 
 - array transaction:  support for orelse
@@ -185,14 +183,6 @@ the task not being executed at all.
 
 - abort commute on nullpointer function
 
-- array tx: prepare testing with writeskew
-
-- array tx: commit testing with writeskew
-
-- array tree tx: prepare testing with writeskew
-
-- array tree tx: commit testing with writeskew
-
 - problem with PessimisticLock.Write and commitDirty since the dirty flag is not set (and no changes written).
 
 - test for basic constructors of refs without transaction
@@ -206,6 +196,14 @@ the task not being executed at all.
 - transaction.abortIfNotCommitted
 
 done
+
+- array tx: prepare testing with writeskew
+
+- array tx: commit testing with writeskew
+
+- array tree tx: prepare testing with writeskew
+
+- array tree tx: commit testing with writeskew
 
 - check transaction prepare optimization when pessimistic locking used. Disabled atm
 
@@ -308,6 +306,8 @@ done
 - the atomic get isn't valid, it could potentially return dirty writes since the tranlocal could be pooled.
 
 - methods of the atomic object need to be prefixed so they won't cause problems with user methods
+
+- added missing type parameter on the mono tx openForRead
 
 
 old done
