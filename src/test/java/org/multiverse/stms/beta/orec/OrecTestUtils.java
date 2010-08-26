@@ -28,7 +28,6 @@ public class OrecTestUtils {
         assertFalse(orec.___isReadBiased());
     }
 
-
     public static void assertReadonlyCount(int expectedReadonlyCount, Orec orec) {
         assertEquals(expectedReadonlyCount, orec.___getReadonlyCount());
     }
@@ -39,18 +38,9 @@ public class OrecTestUtils {
         }
 
         int x = orec.___getReadonlyCount();
-        for (int k = x; k < orec.___getReadBiasedThreshold() - 1; k++) {
+        for (int k = x; k < orec.___getReadBiasedThreshold() ; k++) {
             orec.___arrive(1);
-            if (orec.___departAfterReading()) {
-                throw new RuntimeException();
-            }
-        }
-
-        orec.___arrive(1);
-        if (orec.___departAfterReading()) {
-            orec.___releaseLockAfterBecomingReadBiased();
-        } else {
-            fail();
+            orec.___departAfterReading();
         }
 
         assertReadBiased(orec);

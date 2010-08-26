@@ -44,7 +44,7 @@ public class WriteSkewStressTest {
         stop = false;
         writeSkewEncountered.set(false);
 
-        threads = new TransferThread[2];
+        threads = new TransferThread[1];
         for (int k = 0; k < threads.length; k++) {
             threads[k] = new TransferThread(k);
         }
@@ -71,18 +71,18 @@ public class WriteSkewStressTest {
     public void whenWriteSkewAllowed() {
         allowWriteSkew = true;
         startAll(threads);
-        sleepMs(getStressTestDurationMs(300 * 1000));
+        sleepMs(getStressTestDurationMs(30 * 1000));
         stop = true;
         joinAll(threads);
 
         System.out.println("User1: " + user1);
         System.out.println("User2: " + user2);
 
-        System.out.println("User1: " + user1.account1.___toOrecString());
-        System.out.println("User1: " + user1.account2.___toOrecString());
-        System.out.println("User2: " + user2.account1.___toOrecString());
-        System.out.println("User2: " + user2.account2.___toOrecString());
+        System.out.println("User1.account1: " + user1.account1.___toOrecString());
+        System.out.println("User1.account2: " + user1.account2.___toOrecString());
 
+        System.out.println("User2.account1: " + user2.account1.___toOrecString());
+        System.out.println("User2.account2: " + user2.account2.___toOrecString());
 
         assertTrue(writeSkewEncountered.get());
     }
@@ -91,7 +91,7 @@ public class WriteSkewStressTest {
     public void whenWriteSkewNotAllowed() {
         allowWriteSkew = false;
         startAll(threads);
-        sleepMs(getStressTestDurationMs(600 * 1000));
+        sleepMs(getStressTestDurationMs(60 * 1000));
         stop = true;
 
         joinAll(threads);
@@ -179,10 +179,6 @@ public class WriteSkewStressTest {
             }
 
             sleepRandomUs(1000);
-
-            if (randomOneOf(2)) {
-                tx.abort();
-            }
         }
     }
 

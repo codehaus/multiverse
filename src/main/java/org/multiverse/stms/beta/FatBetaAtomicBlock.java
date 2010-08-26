@@ -1,13 +1,12 @@
 package org.multiverse.stms.beta;
 
-import org.multiverse.api.PropagationLevel;
-import org.multiverse.api.ThreadLocalTransaction;
-import org.multiverse.api.closures.*;
+import org.multiverse.api.*;
 import org.multiverse.api.exceptions.*;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.api.closures.*;
+import org.multiverse.stms.beta.transactions.*;
 
 import static java.lang.String.format;
-import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactionContainer;
+import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
@@ -29,7 +28,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
     @Override
     public <E> E executeChecked(
         final AtomicClosure<E> closure)throws Exception{
-    
+
         try{
             return execute(closure);
         }catch(InvisibleCheckedException e){
@@ -100,7 +99,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
         }catch(RuntimeException e){
             throw e;
         }catch(Exception e){
-            throw new InvisibleCheckedException(e);            
+            throw new InvisibleCheckedException(e);
         }
    }
 
@@ -114,9 +113,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 do {
                     try {
                         E result = closure.execute(tx);
-                        if(tx.getStatus().isAlive()){
-                            tx.commit(pool);
-                        }
+                        tx.commit(pool);
                         abort = false;
                         return result;
                     } catch (Retry e) {
@@ -146,7 +143,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
         }catch(RuntimeException e){
             throw e;
         }catch(Exception e){
-            throw new InvisibleCheckedException(e);            
+            throw new InvisibleCheckedException(e);
         }
 
         throw new TooManyRetriesException(
@@ -154,11 +151,11 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
 
    }
-    
+
      @Override
     public  int executeChecked(
         final AtomicIntClosure closure)throws Exception{
-    
+
         try{
             return execute(closure);
         }catch(InvisibleCheckedException e){
@@ -229,7 +226,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
         }catch(RuntimeException e){
             throw e;
         }catch(Exception e){
-            throw new InvisibleCheckedException(e);            
+            throw new InvisibleCheckedException(e);
         }
    }
 
@@ -243,9 +240,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 do {
                     try {
                         int result = closure.execute(tx);
-                        if(tx.getStatus().isAlive()){
-                            tx.commit(pool);
-                        }
+                        tx.commit(pool);
                         abort = false;
                         return result;
                     } catch (Retry e) {
@@ -275,7 +270,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
         }catch(RuntimeException e){
             throw e;
         }catch(Exception e){
-            throw new InvisibleCheckedException(e);            
+            throw new InvisibleCheckedException(e);
         }
 
         throw new TooManyRetriesException(
@@ -283,11 +278,11 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
 
    }
-    
+
      @Override
     public  long executeChecked(
         final AtomicLongClosure closure)throws Exception{
-    
+
         try{
             return execute(closure);
         }catch(InvisibleCheckedException e){
@@ -358,7 +353,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
         }catch(RuntimeException e){
             throw e;
         }catch(Exception e){
-            throw new InvisibleCheckedException(e);            
+            throw new InvisibleCheckedException(e);
         }
    }
 
@@ -372,9 +367,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 do {
                     try {
                         long result = closure.execute(tx);
-                        if(tx.getStatus().isAlive()){
-                            tx.commit(pool);
-                        }
+                        tx.commit(pool);
                         abort = false;
                         return result;
                     } catch (Retry e) {
@@ -404,7 +397,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
         }catch(RuntimeException e){
             throw e;
         }catch(Exception e){
-            throw new InvisibleCheckedException(e);            
+            throw new InvisibleCheckedException(e);
         }
 
         throw new TooManyRetriesException(
@@ -412,11 +405,11 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
 
    }
-    
+
      @Override
     public  double executeChecked(
         final AtomicDoubleClosure closure)throws Exception{
-    
+
         try{
             return execute(closure);
         }catch(InvisibleCheckedException e){
@@ -487,7 +480,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
         }catch(RuntimeException e){
             throw e;
         }catch(Exception e){
-            throw new InvisibleCheckedException(e);            
+            throw new InvisibleCheckedException(e);
         }
    }
 
@@ -501,9 +494,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 do {
                     try {
                         double result = closure.execute(tx);
-                        if(tx.getStatus().isAlive()){
-                            tx.commit(pool);
-                        }
+                        tx.commit(pool);
                         abort = false;
                         return result;
                     } catch (Retry e) {
@@ -533,7 +524,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
         }catch(RuntimeException e){
             throw e;
         }catch(Exception e){
-            throw new InvisibleCheckedException(e);            
+            throw new InvisibleCheckedException(e);
         }
 
         throw new TooManyRetriesException(
@@ -541,11 +532,11 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
 
    }
-    
+
      @Override
     public  boolean executeChecked(
         final AtomicBooleanClosure closure)throws Exception{
-    
+
         try{
             return execute(closure);
         }catch(InvisibleCheckedException e){
@@ -616,7 +607,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
         }catch(RuntimeException e){
             throw e;
         }catch(Exception e){
-            throw new InvisibleCheckedException(e);            
+            throw new InvisibleCheckedException(e);
         }
    }
 
@@ -630,9 +621,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 do {
                     try {
                         boolean result = closure.execute(tx);
-                        if(tx.getStatus().isAlive()){
-                            tx.commit(pool);
-                        }
+                        tx.commit(pool);
                         abort = false;
                         return result;
                     } catch (Retry e) {
@@ -662,7 +651,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
         }catch(RuntimeException e){
             throw e;
         }catch(Exception e){
-            throw new InvisibleCheckedException(e);            
+            throw new InvisibleCheckedException(e);
         }
 
         throw new TooManyRetriesException(
@@ -670,11 +659,11 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
 
    }
-    
+
      @Override
     public  void executeChecked(
         final AtomicVoidClosure closure)throws Exception{
-    
+
         try{
             execute(closure);
         }catch(InvisibleCheckedException e){
@@ -752,7 +741,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
         }catch(RuntimeException e){
             throw e;
         }catch(Exception e){
-            throw new InvisibleCheckedException(e);            
+            throw new InvisibleCheckedException(e);
         }
    }
 
@@ -766,9 +755,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 do {
                     try {
                         closure.execute(tx);
-                        if(tx.getStatus().isAlive()){
-                            tx.commit(pool);
-                        }
+                        tx.commit(pool);
                         abort = false;
                         return;
                     } catch (Retry e) {
@@ -798,7 +785,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
         }catch(RuntimeException e){
             throw e;
         }catch(Exception e){
-            throw new InvisibleCheckedException(e);            
+            throw new InvisibleCheckedException(e);
         }
 
         throw new TooManyRetriesException(
@@ -806,5 +793,5 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
 
    }
-    
+
    }

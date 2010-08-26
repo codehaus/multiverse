@@ -1,5 +1,6 @@
 package org.multiverse.stms.beta.orec;
 
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
 
@@ -18,7 +19,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
  *
  * @author Peter Veentjer
  */
-public interface Orec {
+public interface Orec extends BetaStmConstants {
 
     /**
      * Returns true if there is a surplus, false otherwise. When there is a surplus, there are transactions
@@ -52,6 +53,8 @@ public interface Orec {
     //o is ok, 1 is ok and read biased, 2 is locked
     int ___arrive2(int spinCount);
 
+    int ___arriveAndLock2(int spinCount);
+
 
     /**
      * Arrives at this orec an acquired the lock.
@@ -73,11 +76,10 @@ public interface Orec {
      * Biased towards reading, only happens when there is no surplus.
      * <p/>
      *
-     * @return true if the orec just has become read biased, false otherwise.
      * @throws org.multiverse.api.exceptions.PanicError
      *          if read biased.
      */
-    boolean ___departAfterReading();
+    void ___departAfterReading();
 
     /**
      * Departs and releases the lock.
@@ -109,9 +111,8 @@ public interface Orec {
     /**
      * Departs
      *
-     * @return true if the orec has just become read biased, false otherwise.
-     */
-    boolean ___departAfterReadingAndReleaseLock();
+      */
+    void ___departAfterReadingAndReleaseLock();
 
 
     /**
@@ -133,16 +134,7 @@ public interface Orec {
      */
     boolean ___tryLockAfterArrive(int spinCount);
 
-    /**
-     * Releases the lock. Doesn't change the surplus or being biased to reading.  This call should only
-     * be made after the {@link #___departAfterReading()} has left the orec locked.
-     *
-     * @throws org.multiverse.api.exceptions.PanicError
-     *          if the lock is not acquired.
-     */
-    void ___releaseLockAfterBecomingReadBiased();
-
-    /**
+   /**
      * Checks if this Orec is biased towards reading.
      *
      * @return true if this Orec is biased towards reading.

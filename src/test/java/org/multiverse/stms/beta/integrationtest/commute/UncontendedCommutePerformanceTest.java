@@ -51,7 +51,7 @@ public class UncontendedCommutePerformanceTest {
         CommuteIncThread thread = new CommuteIncThread();
 
         startAll(thread);
-        long durationMs = getStressTestDurationMs(60 * 1000);
+        long durationMs = getStressTestDurationMs(30 * 1000);
         sleepMs(durationMs);
         stop = true;
         joinAll(thread);

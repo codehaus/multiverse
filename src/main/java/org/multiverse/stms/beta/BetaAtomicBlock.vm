@@ -33,7 +33,7 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
     @Override
     public ${closure.typeParameter} ${closure.type} executeChecked(
         final ${closure.name}${closure.typeParameter} closure)throws Exception{
-    
+
         try{
 #if(${closure.type} eq 'void')
             execute(closure);
@@ -175,7 +175,7 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
         }catch(RuntimeException e){
             throw e;
         }catch(Exception e){
-            throw new InvisibleCheckedException(e);            
+            throw new InvisibleCheckedException(e);
         }
    }
 
@@ -186,7 +186,7 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
 #transactionLogic()
 
    }
-    
+
 #end ##end of atomicblock.lean
 #end ##end of for loop over closures
 #macro( transactionLogic )
@@ -200,9 +200,7 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
 #else
                         ${closure.type} result = closure.execute(tx);
 #end
-                        if(tx.getStatus().isAlive()){
-                            tx.commit(pool);
-                        }
+                        tx.commit(pool);
                         abort = false;
 #if(${closure.type} eq 'void')
                         return;
@@ -236,7 +234,7 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
         }catch(RuntimeException e){
             throw e;
         }catch(Exception e){
-            throw new InvisibleCheckedException(e);            
+            throw new InvisibleCheckedException(e);
         }
 
         throw new TooManyRetriesException(

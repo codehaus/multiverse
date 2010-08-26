@@ -33,9 +33,8 @@ public class FastOrec_departAfterReadingTest {
         orec.___arrive(1);
         orec.___arrive(1);
 
-        boolean result = orec.___departAfterReading();
+        orec.___departAfterReading();
 
-        assertFalse(result);
         OrecTestUtils.assertSurplus(1, orec);
         OrecTestUtils.assertUnlocked(orec);
         OrecTestUtils.assertReadonlyCount(1, orec);
@@ -49,9 +48,8 @@ public class FastOrec_departAfterReadingTest {
         orec.___arrive(1);
         orec.___tryLockAfterArrive(1);
 
-        boolean result = orec.___departAfterReading();
+        orec.___departAfterReading();
 
-        assertFalse(result);
         OrecTestUtils.assertLocked(orec);
         OrecTestUtils.assertSurplus(1, orec);
         OrecTestUtils.assertUpdateBiased(orec);

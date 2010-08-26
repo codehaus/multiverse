@@ -1,18 +1,18 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.api.LockStatus;
-import org.multiverse.api.Transaction;
-import org.multiverse.api.blocking.Latch;
-import org.multiverse.api.exceptions.PanicError;
-import org.multiverse.stms.beta.BetaObjectPool;
-import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.Listeners;
-import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
-import org.multiverse.stms.beta.orec.FastOrec;
-import org.multiverse.stms.beta.orec.Orec;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.*;
+import org.multiverse.api.*;
+import org.multiverse.api.blocking.*;
+import org.multiverse.api.exceptions.*;
+import org.multiverse.api.functions.*;
+import org.multiverse.stms.beta.*;
+import org.multiverse.stms.beta.conflictcounters.*;
+import org.multiverse.stms.beta.orec.*;
+import org.multiverse.stms.beta.transactions.*;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * The transactional object. Atm it is just a reference for an int, more complex stuff will be added again
@@ -95,7 +95,9 @@ public abstract class AbstractBetaTransactionalObject
             Tranlocal read = ___active;
 
             //JMM:
-            if (!___arrive(spinCount)) {
+            final int arriveStatus = ___arrive2(spinCount);
+
+            if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
                 return Tranlocal.LOCKED;
             }
 
@@ -107,12 +109,16 @@ public abstract class AbstractBetaTransactionalObject
             //This means that it isn't possible that a locked value illegally is seen as unlocked.
             if (___active == read) {
                 //at this point we are sure that the read was unlocked.
+
+                if(arriveStatus == ARRIVE_READBIASED){
+                    read.isPermanent = true;
+                }
                 return read;
             }
 
-            //we are not lucky, the value has changed. But before retrying, we need to depart if the value isn't
-            //permanent.
-            if (read != null && !read.isPermanent) {
+            //we are not lucky, the value has changed. But before retrying, we need to depart if the arrive was
+            //not permanent.
+            if (read != null && arriveStatus == ARRIVE_NORMAL) {
                 ___departAfterFailure();
             }
         }
@@ -123,21 +129,23 @@ public abstract class AbstractBetaTransactionalObject
             final int spinCount,
             final BetaTransaction newLockOwner){
 
-        assert newLockOwner != null;
-
-        //JMM: no instructions will jump in front of a volatile read. So this stays on top.
+       //JMM: no instructions will jump in front of a volatile read. So this stays on top.
         if (lockOwner == newLockOwner) {
             return ___active;
         }
 
-        //JMM:
-        if (!___arriveAndLock(spinCount)) {
+        final int arriveStatus = ___arriveAndLock2(spinCount);
+        if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
             return  Tranlocal.LOCKED;
         }
-
-        //JMM:
         lockOwner = newLockOwner;
-        return ___active;
+
+        Tranlocal read = ___active;
+        if(arriveStatus == ARRIVE_READBIASED){
+            read.isPermanent = true;
+        }
+
+        return read;
     }
 
     @Override
@@ -166,17 +174,11 @@ public abstract class AbstractBetaTransactionalObject
                 if(read.isPermanent){
                     ___releaseLockByReadBiased();
                 }else{
-                    if(___departAfterReadingAndReleaseLock()){
-                        read.markAsPermanent();
-                        ___releaseLockAfterBecomingReadBiased();
-                    }
+                    ___departAfterReadingAndReleaseLock();
                 }
             }else{
                 if(!read.isPermanent){
-                    if(___departAfterReading()){
-                        read.markAsPermanent();
-                        ___releaseLockAfterBecomingReadBiased();
-                    }
+                    ___departAfterReading();
                 }
             }
 
@@ -187,7 +189,7 @@ public abstract class AbstractBetaTransactionalObject
         if(expectedLockOwner!=lockOwner){
             throw new PanicError();
         }
-     
+
         lockOwner = null;
 
         //todo: this code needs to go.
@@ -252,12 +254,8 @@ public abstract class AbstractBetaTransactionalObject
         if(expectedLockOwner != lockOwner){
             //it can't be an update, otherwise the lock would have been acquired.
 
-            if(!tranlocal.isPermanent && ___departAfterReading()){
-                //Only a non parmenent tranlocal is allowed to do a depart.
-                //The orec indicates that it has become time to transform the tranlocal to mark as permanent.
-
-                ((Tranlocal)tranlocal).markAsPermanent();
-                ___releaseLockAfterBecomingReadBiased();
+            if(!tranlocal.isPermanent){
+                ___departAfterReading();
             }
             return null;
         }
@@ -268,12 +266,7 @@ public abstract class AbstractBetaTransactionalObject
             if(tranlocal.isPermanent){
                 ___releaseLockByReadBiased();
             }else{
-                if(___departAfterReadingAndReleaseLock()){
-                    //the orec indicates that it has become time to transform the tranlocal to mark as permanent
-
-                    ((Tranlocal)tranlocal).markAsPermanent();
-                    ___releaseLockAfterBecomingReadBiased();
-                }
+                ___departAfterReadingAndReleaseLock();
             }
             return null;
         }

@@ -81,13 +81,15 @@ performance.
 
 - durability:
     only when committing, a dirty transactional object needs to be checked if it is durable. If it isn't
-    no unitofwrite needs to be used. If it is, a unit of write needs to be used. So the commit needs to 
+    no unitofwrite needs to be used. If it is, a unit of write needs to be used. So the commit needs to
 
 - write bit in the orec? Can be used to indicate to another transaction wants to write.. when committing and
  exclusive writebit set by another transaction, no write can happen. The advantage of purely locking is that
- reads still can happen even though it is 'locked' exclusively for writing by one transaction. 
+ reads still can happen even though it is 'locked' exclusively for writing by one transaction.
 
 - create an orec that never become readbiased (useful for performance comparison).
+
+-
 
 todo
 
