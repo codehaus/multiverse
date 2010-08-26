@@ -114,7 +114,9 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 do {
                     try {
                         E result = closure.execute(tx);
-                        tx.commit(pool);
+                        if(tx.getStatus().isAlive()){
+                            tx.commit(pool);
+                        }
                         abort = false;
                         return result;
                     } catch (Retry e) {
@@ -241,7 +243,9 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 do {
                     try {
                         int result = closure.execute(tx);
-                        tx.commit(pool);
+                        if(tx.getStatus().isAlive()){
+                            tx.commit(pool);
+                        }
                         abort = false;
                         return result;
                     } catch (Retry e) {
@@ -368,7 +372,9 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 do {
                     try {
                         long result = closure.execute(tx);
-                        tx.commit(pool);
+                        if(tx.getStatus().isAlive()){
+                            tx.commit(pool);
+                        }
                         abort = false;
                         return result;
                     } catch (Retry e) {
@@ -495,7 +501,9 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 do {
                     try {
                         double result = closure.execute(tx);
-                        tx.commit(pool);
+                        if(tx.getStatus().isAlive()){
+                            tx.commit(pool);
+                        }
                         abort = false;
                         return result;
                     } catch (Retry e) {
@@ -622,7 +630,9 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 do {
                     try {
                         boolean result = closure.execute(tx);
-                        tx.commit(pool);
+                        if(tx.getStatus().isAlive()){
+                            tx.commit(pool);
+                        }
                         abort = false;
                         return result;
                     } catch (Retry e) {
@@ -756,7 +766,9 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 do {
                     try {
                         closure.execute(tx);
-                        tx.commit(pool);
+                        if(tx.getStatus().isAlive()){
+                            tx.commit(pool);
+                        }
                         abort = false;
                         return;
                     } catch (Retry e) {

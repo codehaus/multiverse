@@ -15,7 +15,7 @@ public class UnsafeOrec_tryLockForUpdateTest {
         UnsafeOrec orec = new UnsafeOrec();
         orec.___arrive(1);
 
-        boolean result = orec.___tryUpdateLock(1);
+        boolean result = orec.___tryLockAfterArrive(1);
         assertTrue(result);
         assertLocked(orec);
         assertSurplus(1, orec);
@@ -28,7 +28,7 @@ public class UnsafeOrec_tryLockForUpdateTest {
         orec.___arrive(1);
         orec.___arrive(1);
 
-        boolean result = orec.___tryUpdateLock(1);
+        boolean result = orec.___tryLockAfterArrive(1);
         assertTrue(result);
         assertLocked(orec);
         assertSurplus(2, orec);
@@ -39,9 +39,9 @@ public class UnsafeOrec_tryLockForUpdateTest {
     public void whenLocked() {
         UnsafeOrec orec = new UnsafeOrec();
         orec.___arrive(1);
-        orec.___tryUpdateLock(1);
+        orec.___tryLockAfterArrive(1);
 
-        boolean result = orec.___tryUpdateLock(1);
+        boolean result = orec.___tryLockAfterArrive(1);
         assertFalse(result);
         assertLocked(orec);
         assertEquals(1, orec.___getSurplus());
@@ -53,7 +53,7 @@ public class UnsafeOrec_tryLockForUpdateTest {
         UnsafeOrec orec = makeReadBiased(new UnsafeOrec());
 
         orec.___arrive(1);
-        boolean result = orec.___tryUpdateLock(1);
+        boolean result = orec.___tryLockAfterArrive(1);
 
         assertTrue(result);
         assertReadBiased(orec);

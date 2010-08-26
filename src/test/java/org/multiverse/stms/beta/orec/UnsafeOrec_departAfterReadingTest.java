@@ -40,7 +40,7 @@ public class UnsafeOrec_departAfterReadingTest {
         UnsafeOrec orec = new UnsafeOrec();
         orec.___arrive(1);
         orec.___arrive(1);
-        orec.___tryUpdateLock(1);
+        orec.___tryLockAfterArrive(1);
 
         boolean result = orec.___departAfterReading();
         assertFalse(result);

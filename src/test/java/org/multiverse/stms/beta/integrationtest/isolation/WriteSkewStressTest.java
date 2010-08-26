@@ -57,13 +57,13 @@ public class WriteSkewStressTest {
 
     @Test
     @Ignore
-    public void whenPessimisticLockingUsed(){
+    public void whenPessimisticLockingUsed() {
 
     }
 
     @Test
     @Ignore
-    public void whenLockedRead(){
+    public void whenLockedRead() {
 
     }
 
@@ -71,12 +71,18 @@ public class WriteSkewStressTest {
     public void whenWriteSkewAllowed() {
         allowWriteSkew = true;
         startAll(threads);
-        sleepMs(getStressTestDurationMs(30 * 1000));
+        sleepMs(getStressTestDurationMs(300 * 1000));
         stop = true;
         joinAll(threads);
 
         System.out.println("User1: " + user1);
         System.out.println("User2: " + user2);
+
+        System.out.println("User1: " + user1.account1.___toOrecString());
+        System.out.println("User1: " + user1.account2.___toOrecString());
+        System.out.println("User2: " + user2.account1.___toOrecString());
+        System.out.println("User2: " + user2.account2.___toOrecString());
+
 
         assertTrue(writeSkewEncountered.get());
     }
@@ -85,7 +91,7 @@ public class WriteSkewStressTest {
     public void whenWriteSkewNotAllowed() {
         allowWriteSkew = false;
         startAll(threads);
-        sleepMs(getStressTestDurationMs(60 * 1000));
+        sleepMs(getStressTestDurationMs(600 * 1000));
         stop = true;
 
         joinAll(threads);
@@ -165,7 +171,7 @@ public class WriteSkewStressTest {
             }
 
             if (sum >= amount) {
-                IntRef fromAccount = from.getRandomAccount();                                
+                IntRef fromAccount = from.getRandomAccount();
                 fromAccount.set(tx, pool, fromAccount.get(tx, pool) - amount);
 
                 IntRef toAccount = to.getRandomAccount();
@@ -173,6 +179,10 @@ public class WriteSkewStressTest {
             }
 
             sleepRandomUs(1000);
+
+            if (randomOneOf(2)) {
+                tx.abort();
+            }
         }
     }
 

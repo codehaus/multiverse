@@ -41,7 +41,7 @@ public class UnsafeOrec_arriveTest {
     public void whenUpdateBiasedAndLocked_thenLockedConflict() {
         UnsafeOrec orec = new UnsafeOrec();
         orec.___arrive(1);
-        orec.___tryUpdateLock(1);
+        orec.___tryLockAfterArrive(1);
 
         boolean result = orec.___arrive(1);
 
@@ -54,7 +54,7 @@ public class UnsafeOrec_arriveTest {
     public void whenReadBiasedAndLocked_thenLockConflict() {
         UnsafeOrec orec = makeReadBiased(new UnsafeOrec());
         orec.___arrive(1);
-        orec.___tryUpdateLock(1);
+        orec.___tryLockAfterArrive(1);
 
         boolean result = orec.___arrive(1);
 

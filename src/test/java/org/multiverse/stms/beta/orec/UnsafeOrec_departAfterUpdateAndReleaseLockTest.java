@@ -60,7 +60,7 @@ public class UnsafeOrec_departAfterUpdateAndReleaseLockTest {
     public void whenLockedAndNoAdditionalSurplus() {
         UnsafeOrec orec = new UnsafeOrec();
         orec.___arrive(1);
-        orec.___tryUpdateLock(1);
+        orec.___tryLockAfterArrive(1);
 
         long oldConflictCount = globalConflictCounter.count();
 
@@ -78,7 +78,7 @@ public class UnsafeOrec_departAfterUpdateAndReleaseLockTest {
         orec.___arrive(1);
         orec.___arrive(1);
         orec.___arrive(1);
-        orec.___tryUpdateLock(1);
+        orec.___tryLockAfterArrive(1);
 
         long oldConflictCount = globalConflictCounter.count();
 

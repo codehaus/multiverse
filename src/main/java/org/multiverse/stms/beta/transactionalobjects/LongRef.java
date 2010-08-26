@@ -69,7 +69,7 @@ public final class LongRef
             throw new NullPointerException();
         }
 
-        ___arriveAndLockForUpdate(0);
+        ___arriveAndLock(0);
         this.lockOwner = tx;
     }
 
@@ -152,7 +152,7 @@ public final class LongRef
         }
 
         //JMM:
-        if (!___arriveAndLockForUpdate(spinCount)) {
+        if (!___arriveAndLock(spinCount)) {
             return  LongRefTranlocal.LOCKED;
         }
 
@@ -391,11 +391,11 @@ public final class LongRef
         Tranlocal read = tranlocal.isCommitted ? tranlocal : tranlocal.read;
         if(read.isPermanent){
             //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
-            if(!___arriveAndLockForUpdate(spinCount)){
+            if(!___arriveAndLock(spinCount)){
                 return false;
             }
         }else{
-            if (!___tryUpdateLock(spinCount)) {
+            if (!___tryLockAfterArrive(spinCount)) {
                 return false;
             }
         }
@@ -556,7 +556,7 @@ public final class LongRef
         final int spinCount,
         final GlobalConflictCounter globalConflictCounter){
 
-        if (!___arriveAndLockForUpdate(spinCount)) {
+        if (!___arriveAndLock(spinCount)) {
             throw new WriteConflict();
         }
 

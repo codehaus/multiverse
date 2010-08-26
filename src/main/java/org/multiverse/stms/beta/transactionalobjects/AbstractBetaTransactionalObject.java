@@ -66,7 +66,7 @@ public abstract class AbstractBetaTransactionalObject
             throw new NullPointerException();
         }
 
-        ___arriveAndLockForUpdate(0);
+        ___arriveAndLock(0);
         this.lockOwner = tx;
     }
 
@@ -131,7 +131,7 @@ public abstract class AbstractBetaTransactionalObject
         }
 
         //JMM:
-        if (!___arriveAndLockForUpdate(spinCount)) {
+        if (!___arriveAndLock(spinCount)) {
             return  Tranlocal.LOCKED;
         }
 
@@ -352,11 +352,11 @@ public abstract class AbstractBetaTransactionalObject
         Tranlocal read = tranlocal.isCommitted ? tranlocal : tranlocal.read;
         if(read.isPermanent){
             //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
-            if(!___arriveAndLockForUpdate(spinCount)){
+            if(!___arriveAndLock(spinCount)){
                 return false;
             }
         }else{
-            if (!___tryUpdateLock(spinCount)) {
+            if (!___tryLockAfterArrive(spinCount)) {
                 return false;
             }
         }

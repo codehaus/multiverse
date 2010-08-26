@@ -47,7 +47,7 @@ public class UnsafeOrec_releaseLockTest {
     public void whenLocked() {
         UnsafeOrec orec = new UnsafeOrec();
         orec.___arrive(1);
-        orec.___tryUpdateLock(1);
+        orec.___tryLockAfterArrive(1);
 
         orec.___releaseLockAfterBecomingReadBiased();
 

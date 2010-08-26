@@ -30,7 +30,7 @@ public class FastOrec_regressionTest {
         orec.___arrive(1);
 
         //transaction 1
-        orec.___tryUpdateLock(1);
+        orec.___tryLockAfterArrive(1);
         //transaction 1
         orec.___departAfterUpdateAndReleaseLock(globalConflictCounter, dummyRef);
 
@@ -53,18 +53,18 @@ public class FastOrec_regressionTest {
         orec.___arrive(1);
 
         //transaction 1 does the update
-        orec.___tryUpdateLock(1);
+        orec.___tryLockAfterArrive(1);
         orec.___departAfterUpdateAndReleaseLock(globalConflictCounter, dummyRef);
 
         //transaction 2 now does the update.
-        orec.___arriveAndLockForUpdate(1);
+        orec.___arriveAndLock(1);
         orec.___departAfterUpdateAndReleaseLock(globalConflictCounter, dummyRef);
 
         System.out.println("orec: "+orec.___toOrecString());
 
         //transaction 2
         //try {
-        //    orec.___tryUpdateLock(1);
+        //    orec.___tryLockAfterArrive(1);
         //    fail();
         //} catch (PanicError expected) {
         //}

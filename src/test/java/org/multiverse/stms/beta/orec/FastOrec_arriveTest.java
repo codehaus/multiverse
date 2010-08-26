@@ -42,7 +42,7 @@ public class FastOrec_arriveTest {
     public void whenUpdateBiasedAndLocked_thenReturnFalse() {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
-        orec.___tryUpdateLock(1);
+        orec.___tryLockAfterArrive(1);
 
         boolean result = orec.___arrive(1);
 
@@ -57,7 +57,7 @@ public class FastOrec_arriveTest {
     public void whenReadBiasedAndLocked_thenReturnFalse() {
         FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
         orec.___arrive(1);
-        orec.___tryUpdateLock(1);
+        orec.___tryLockAfterArrive(1);
 
         boolean result = orec.___arrive(1);
 

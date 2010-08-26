@@ -23,23 +23,23 @@ import java.util.UUID;
  * <p/>
  * remember:
  * it could be that the lock is acquired, but the lockOwner has not been set yet.
- *
+ * <p/>
  * The whole idea of code generation is that once you are inside a concrete class,
  * polymorphism is needed anymore.
- *
+ * <p/>
  * This class is generated.
  *
  * @author Peter Veentjer
  */
 public final class IntRef
-    extends FastOrec implements BetaTransactionalObject, BetaStmConstants {
+        extends FastOrec implements BetaTransactionalObject, BetaStmConstants {
 
     private final static long listenersOffset;
 
     static {
         try {
             listenersOffset = ___unsafe.objectFieldOffset(
-                IntRef.class.getDeclaredField("___listeners"));
+                    IntRef.class.getDeclaredField("___listeners"));
         } catch (Exception ex) {
             throw new Error(ex);
         }
@@ -64,20 +64,20 @@ public final class IntRef
      * @param tx the transaction this IntRef should be attached to.
      * @throws NullPointerException if tx is null.
      */
-    public IntRef(BetaTransaction tx){
-        if(tx == null){
+    public IntRef(BetaTransaction tx) {
+        if (tx == null) {
             throw new NullPointerException();
         }
 
-        ___arriveAndLockForUpdate(0);
+        ___arriveAndLock(0);
         this.lockOwner = tx;
     }
 
     /**
      * Creates a committed IntRef with 0 as initial value.
      */
-    public IntRef(){
-        this((int)0);
+    public IntRef() {
+        this((int) 0);
     }
 
     /**
@@ -85,7 +85,7 @@ public final class IntRef
      *
      * @param initialValue the initial value
      */
-    public IntRef(final int initialValue){
+    public IntRef(final int initialValue) {
         ___active = new IntRefTranlocal(this);
         ___active.value = initialValue;
         ___active.isCommitted = true;
@@ -97,7 +97,7 @@ public final class IntRef
     }
 
     @Override
-    public final int ___getClassIndex(){
+    public final int ___getClassIndex() {
         return 1;
     }
 
@@ -105,6 +105,8 @@ public final class IntRef
     public final Orec ___getOrec() {
         return this;
     }
+
+    //public Log log = new Log();
 
     @Override
     public final IntRefTranlocal ___load(final int spinCount) {
@@ -116,8 +118,15 @@ public final class IntRef
             IntRefTranlocal read = ___active;
 
             //JMM:
-            if (!___arrive(spinCount)) {
-                return IntRefTranlocal.LOCKED;
+            boolean readBiased = false;
+            switch(___arrive2(spinCount)) {
+                case 0:
+                    break;
+                case 1:
+                    readBiased = true;
+                    break;
+                case 2:
+                    return IntRefTranlocal.LOCKED;
             }
 
             //JMM safety:
@@ -127,17 +136,18 @@ public final class IntRef
             //jump in front of the read or orec-value (volatile read happens before rule).
             //This means that it isn't possible that a locked value illegally is seen as unlocked.
             if (___active == read) {
+                if(readBiased){
+                read.isPermanent = true;
+                }
+            //    log.log(Thread.currentThread().getName()+" arrive (success)"+___toOrecString() +" isReadBiased "+read.isPermanent);
                 //at this point we are sure that the read was unlocked.
                 return read;
             }
 
             //we are not lucky, the value has changed. But before retrying, we need to depart if the value isn't
             //permanent.
-            if (read != null && !read.isPermanent) {
-                if(___getSurplus()==0){
-                    throw new PanicError();
-                }
-
+            if (read != null && !readBiased) {
+             //   log.log(Thread.currentThread().getName()+" arrive ___departAfterFailure "+___toOrecString());
                 ___departAfterFailure();
             }
         }
@@ -146,7 +156,7 @@ public final class IntRef
     @Override
     public final IntRefTranlocal ___lockAndLoad(
             final int spinCount,
-            final BetaTransaction newLockOwner){
+            final BetaTransaction newLockOwner) {
 
         assert newLockOwner != null;
 
@@ -156,8 +166,8 @@ public final class IntRef
         }
 
         //JMM:
-        if (!___arriveAndLockForUpdate(spinCount)) {
-            return  IntRefTranlocal.LOCKED;
+        if (!___arriveAndLock(spinCount)) {
+            return IntRefTranlocal.LOCKED;
         }
 
         //JMM:
@@ -172,16 +182,16 @@ public final class IntRef
 
     @Override
     public final IntRefTranlocal ___openForConstruction(final BetaObjectPool pool) {
-        IntRefTranlocal tranlocal =  pool.take(this);
+        IntRefTranlocal tranlocal = pool.take(this);
         return tranlocal != null ? tranlocal : new IntRefTranlocal(this);
     }
 
     @Override
     public final IntRefTranlocal ___openForCommute(final BetaObjectPool pool) {
-        IntRefTranlocal tranlocal =  pool.take(this);
+        IntRefTranlocal tranlocal = pool.take(this);
 
-        if(tranlocal == null){
-             tranlocal = new IntRefTranlocal(this);
+        if (tranlocal == null) {
+            tranlocal = new IntRefTranlocal(this);
         }
 
         tranlocal.isCommuting = true;
@@ -197,36 +207,46 @@ public final class IntRef
 
         final boolean notDirty = tranlocal.isDirty == DIRTY_FALSE;
 
-        if(notDirty){
-            final boolean ownsLock = expectedLockOwner == lockOwner;
-            final IntRefTranlocal read = (IntRefTranlocal)(tranlocal.isCommitted
-                ?tranlocal
-                :tranlocal.read);
 
-            if(ownsLock){
+        if (notDirty) {
+            final boolean ownsLock = expectedLockOwner == lockOwner;
+            final IntRefTranlocal read = (IntRefTranlocal) (tranlocal.isCommitted
+                    ? tranlocal
+                    : tranlocal.read);
+
+            if (ownsLock) {
                 lockOwner = null;
 
-                if(read.isPermanent){
-                    if(___getSurplus()==0){
-                        throw new PanicError();
-                    }
+                if (read.isPermanent) {
+                //    log.log(Thread.currentThread().getName() + " commitDirty (notdirty but locked) ___releaseLockByReadBiased "+___toOrecString());
 
                     ___releaseLockByReadBiased();
-                }else{
-                    if(___departAfterReadingAndReleaseLock()){
+                } else {
+
+                    if (___departAfterReadingAndReleaseLock()) {
                         read.markAsPermanent();
                         ___releaseLockAfterBecomingReadBiased();
+                  //      log.log(Thread.currentThread().getName() + " commitDirty (notdirty but locked and success with lock) ___departAfterReadingAndReleaseLock "+___toOrecString());
+
+                    }else{
+                   //     log.log(Thread.currentThread().getName() + " commitDirty (notdirty but locked) ___departAfterReadingAndReleaseLock no success"+___toOrecString());
                     }
                 }
-            }else{
-                if(!read.isPermanent){
-                    if(___getSurplus()==0){
-                        throw new PanicError();
-                    }
+            } else {
+               // log.log(Thread.currentThread().getName() + " commitDirty (notdirty and not locked) ___releaseLockByReadBiased "+___toOrecString());
 
-                    if(___departAfterReading()){
-                        read.markAsPermanent();
-                        ___releaseLockAfterBecomingReadBiased();
+                if (!read.isPermanent) {
+                    try {
+                        if (___departAfterReading()) {
+
+                            read.markAsPermanent();
+                    //        log.log(Thread.currentThread().getName() + " commitDirty making permanent  "+___toOrecString());
+
+                            ___releaseLockAfterBecomingReadBiased();
+                        }
+                    } catch (PanicError e) {
+                   //     log.print();
+                        throw e;
                     }
                 }
             }
@@ -235,24 +255,26 @@ public final class IntRef
         }
 
         //todo: this code needs to go.
-        if(expectedLockOwner!=lockOwner){
+        if (expectedLockOwner != lockOwner) {
             throw new PanicError();
         }
-     
+
+     //   log.log(Thread.currentThread().getName() + " commitDirty (really dirty)___departAfterReadingAndReleaseLock "+___toOrecString());
+
         lockOwner = null;
 
         //todo: this code needs to go.
-        if(tranlocal.isDirty == DIRTY_UNKNOWN){
+        if (tranlocal.isDirty == DIRTY_UNKNOWN) {
             System.out.println("called with DIRTY_UKNOWN");
-            try{
+            try {
                 throw new Exception();
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
 
         //it is a full blown update (so locked).
-        final IntRefTranlocal newActive = (IntRefTranlocal)tranlocal;
+        final IntRefTranlocal newActive = (IntRefTranlocal) tranlocal;
         newActive.prepareForCommit();
         final IntRefTranlocal oldActive = ___active;
         ___active = newActive;
@@ -263,12 +285,12 @@ public final class IntRef
         //after the actual write happens.
         Listeners listenersAfterWrite = null;
 
-        if(___listeners != null){
+        if (___listeners != null) {
             //at this point it could have happened that the listener has changed.. it could also
 
-            while(true){
+            while (true) {
                 listenersAfterWrite = ___listeners;
-                if(___unsafe.compareAndSwapObject(this, listenersOffset, listenersAfterWrite, null)){
+                if (___unsafe.compareAndSwapObject(this, listenersOffset, listenersAfterWrite, null)) {
                     break;
                 }
             }
@@ -277,14 +299,14 @@ public final class IntRef
         long remainingSurplus = ___departAfterUpdateAndReleaseLock(globalConflictCounter, this);
 
         //it is important that this call is done after the actual write. This is needed to give the guarantee
-       //that we are going to take care of all listeners that are registered before that write. The read is done
+        //that we are going to take care of all listeners that are registered before that write. The read is done
         //after the unlock because that requires a volatile read. It could be that a listener is notified that
         //already has registered for the following read, so there could be a spurious wakeup. This was done
         //to prevent a JMM problem where the read of the listeners, could jump in front of the write to the value
         //and it is not possible that the read jump over the release of the lock.
 
 
-       if (remainingSurplus == 0) {
+        if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);
         }
@@ -300,21 +322,14 @@ public final class IntRef
             final GlobalConflictCounter globalConflictCounter) {
 
 
-        if(expectedLockOwner != lockOwner){
+        if (expectedLockOwner != lockOwner) {
             //it can't be an update, otherwise the lock would have been acquired.
 
-            if(!tranlocal.isPermanent){
-                if(___getSurplus()==0){
-                    throw new PanicError();
-                }
-            }
-
-            if(!tranlocal.isPermanent && ___departAfterReading()){
-
+            if (!tranlocal.isPermanent && ___departAfterReading()) {
                 //Only a non parmenent tranlocal is allowed to do a depart.
                 //The orec indicates that it has become time to transform the tranlocal to mark as permanent.
 
-                ((IntRefTranlocal)tranlocal).markAsPermanent();
+                ((IntRefTranlocal) tranlocal).markAsPermanent();
                 ___releaseLockAfterBecomingReadBiased();
             }
             return null;
@@ -322,19 +337,14 @@ public final class IntRef
 
         lockOwner = null;
 
-        if(tranlocal.isCommitted){
-            if(tranlocal.isPermanent){
+        if (tranlocal.isCommitted) {
+            if (tranlocal.isPermanent) {
                 ___releaseLockByReadBiased();
-            }else{
-                if(___getSurplus()==0){
-                    throw new PanicError();
-                }
-
-
-                if(___departAfterReadingAndReleaseLock()){
+            } else {
+                if (___departAfterReadingAndReleaseLock()) {
                     //the orec indicates that it has become time to transform the tranlocal to mark as permanent
 
-                    ((IntRefTranlocal)tranlocal).markAsPermanent();
+                    ((IntRefTranlocal) tranlocal).markAsPermanent();
                     ___releaseLockAfterBecomingReadBiased();
                 }
             }
@@ -342,7 +352,7 @@ public final class IntRef
         }
 
         //it is a full blown update (so locked).
-        final IntRefTranlocal newActive = (IntRefTranlocal)tranlocal;
+        final IntRefTranlocal newActive = (IntRefTranlocal) tranlocal;
         newActive.prepareForCommit();
         final IntRefTranlocal oldActive = ___active;
 
@@ -359,10 +369,10 @@ public final class IntRef
 
         Listeners listenersAfterWrite = ___listeners;
 
-        if(listenersAfterWrite != null){
+        if (listenersAfterWrite != null) {
             //at this point it could have happened that the listener has changed.. it could also
 
-            if(!___unsafe.compareAndSwapObject(this, listenersOffset, listenersAfterWrite, null)){
+            if (!___unsafe.compareAndSwapObject(this, listenersOffset, listenersAfterWrite, null)) {
                 listenersAfterWrite = null;
             }
         }
@@ -383,14 +393,14 @@ public final class IntRef
     public final boolean ___hasReadConflict(final Tranlocal tranlocal, final BetaTransaction tx) {
         //if the current transaction owns the lock, there is no conflict...
         //todo: only going to work when the acquire lock also does a conflict check.
-        if(lockOwner == tx){
+        if (lockOwner == tx) {
             return false;
         }
 
-        final Tranlocal read = tranlocal.isCommitted ? tranlocal: tranlocal.read;
+        final Tranlocal read = tranlocal.isCommitted ? tranlocal : tranlocal.read;
 
         //if the active value is different, we are certain of a conflict
-        if(___active != read){
+        if (___active != read) {
             return true;
         }
 
@@ -402,9 +412,9 @@ public final class IntRef
 
     @Override
     public final boolean ___tryLockAndCheckConflict(
-        final BetaTransaction newLockOwner,
-        final int spinCount,
-        final Tranlocal tranlocal) {
+            final BetaTransaction newLockOwner,
+            final int spinCount,
+            final Tranlocal tranlocal) {
 
         //If it already is locked by the current transaction, we are done.
         //Fresh constructed objects always have the tx set.
@@ -413,18 +423,17 @@ public final class IntRef
         }
 
         Tranlocal read = tranlocal.isCommitted ? tranlocal : tranlocal.read;
-        if(read.isPermanent){
+        if (read.isPermanent) {
             //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
-            if(!___arriveAndLockForUpdate(spinCount)){
+        //    log.log(Thread.currentThread().getName()+" ___tryLockAndCheckConflict ___arriveAndLock "+___toOrecString());
+
+            if (!___arriveAndLock(spinCount)) {
                 return false;
             }
-        }else{
-            if(___getSurplus()==0){
-                throw new PanicError();
-            }
+        } else {
+         //   log.log(Thread.currentThread().getName()+" ___tryLockAndCheckConflict ___tryLockAfterArrive "+___toOrecString());
 
-
-            if (!___tryUpdateLock(spinCount)) {
+            if (!___tryLockAfterArrive(spinCount)) {
                 return false;
             }
         }
@@ -436,41 +445,57 @@ public final class IntRef
 
     @Override
     public final void ___abort(
-        final BetaTransaction transaction,
-        final Tranlocal tranlocal,
-        final BetaObjectPool pool) {
+            final BetaTransaction transaction,
+            final Tranlocal tranlocal,
+            final BetaObjectPool pool) {
 
-        IntRefTranlocal read;
+
+       IntRefTranlocal read;
         if (tranlocal.isCommitted) {
-            read = (IntRefTranlocal)tranlocal;
+            read = (IntRefTranlocal) tranlocal;
         } else {
-            read = (IntRefTranlocal)tranlocal.read;
-             //if there is an update, it can always be pooled since it is impossible that it has been
+            read = (IntRefTranlocal) tranlocal.read;
+            //if there is an update, it can always be pooled since it is impossible that it has been
             //read by another transaction.
-            pool.put((IntRefTranlocal)tranlocal);
+            pool.put((IntRefTranlocal) tranlocal);
 
             //if it is a constructed object, we don't need to abort. Constructed objects from aborted transactions,
             //should remain locked indefinitely since their behavior is undefined.
-            if(read == null){
+            if (read == null) {
                 return;
             }
         }
 
         if (lockOwner != transaction) {
+
+
             //the current transaction didn't own the lock.
             if (!read.isPermanent) {
-                if(___getSurplus()==0){
-                    throw new PanicError();
-                }
+            //    log.log(Thread.currentThread().getName() + " abort ___departAfterFailure "+___toOrecString());
+
+
 
                 //it is important that the depart is not called when the read isReadBiased. It could
                 //be that the orec already has become updateBiased, and if we call a depart, we are
                 //departing too much.
-                ___departAfterFailure();
+
+                try {
+                    ___departAfterFailure();
+                } catch (PanicError e) {
+            //        log.print();
+                    throw e;
+                }
+            } else{
+             //   log.log(Thread.currentThread().getName() + " abort ___departAfterFailure "+___toOrecString());
+
             }
 
             return;
         }
+
+        //log.log(Thread.currentThread().getName() + " abort ___departAfterFailureAndReleaseLock "+___toOrecString() );
+
+
 
         //the current transaction owns the lock.. so lets release it
         lockOwner = null;
@@ -481,20 +506,20 @@ public final class IntRef
 
     @Override
     public final int ___registerChangeListener(
-        final Latch latch,
-        final Tranlocal tranlocal,
-        final BetaObjectPool pool,
-        final long listenerEra){
+            final Latch latch,
+            final Tranlocal tranlocal,
+            final BetaObjectPool pool,
+            final long listenerEra) {
 
-        final Tranlocal read = tranlocal.isCommitted ? tranlocal:tranlocal.read;
+        final Tranlocal read = tranlocal.isCommitted ? tranlocal : tranlocal.read;
 
-        if(read == null){
+        if (read == null) {
             //it is a constructed one, and we can't register for change on it.
             return REGISTRATION_NONE;
         }
 
         //if it currently contains a different active tranlocal, we don't need to wait at all.
-        if(read != ___active){
+        if (read != ___active) {
             latch.open(listenerEra);
             return REGISTRATION_NOT_NEEDED;
         }
@@ -504,7 +529,7 @@ public final class IntRef
 
         //lets create us an update
         Listeners newListeners = pool.takeListeners();
-        if(newListeners == null){
+        if (newListeners == null) {
             newListeners = new Listeners();
         }
         newListeners.listener = latch;
@@ -512,7 +537,7 @@ public final class IntRef
 
         //we need to do this in a loop because other register thread could be contending for the same
         //listeners field.
-        while(true){
+        while (true) {
             //the listeners object is mutable, but as long as it isn't yet registered, this calling
             //thread has full ownership of it.
             final Listeners oldListeners = ___listeners;
@@ -522,13 +547,13 @@ public final class IntRef
             //if(oldListeners!=null && oldListeners
 
             //lets try to register our listeners.
-            if(___unsafe.compareAndSwapObject(this, listenersOffset, oldListeners, newListeners)){
+            if (___unsafe.compareAndSwapObject(this, listenersOffset, oldListeners, newListeners)) {
                 //the registration was a success. We need to make sure that the active hasn't changed.
 
                 //the registration was a success.
 
                 //JMM: the volatile read can't jump in front of the unsafe.compareAndSwap.
-                if(read == ___active){
+                if (read == ___active) {
                     //we are lucky, the registration was done successfully and we managed to cas the listener
                     //before the update (since the update hasn't happened yet). This means that the updating thread
                     //is now responsible for notifying the listeners.
@@ -539,9 +564,9 @@ public final class IntRef
                 //the update has taken place, we need to check if our listeners still is in place.
                 //if it is, it should be removed and the listeners notified. If the listeners already has changed,
                 //it is the task for the other to do the listener cleanup and notify them
-                if(___unsafe.compareAndSwapObject(this, listenersOffset, newListeners, null)){
+                if (___unsafe.compareAndSwapObject(this, listenersOffset, newListeners, null)) {
                     newListeners.openAll(pool);
-                }else{
+                } else {
                     latch.open(listenerEra);
                 }
 
@@ -559,19 +584,19 @@ public final class IntRef
      * @return the current state.
      * @throws IllegalStateException if there hasn't been any commit before.
      */
-    public final int atomicGet(){
+    public final int atomicGet() {
         IntRefTranlocal read = ___load(50);
-        if(read == null){
+        if (read == null) {
             throw new IllegalStateException();
         }
 
-        if(read.isLocked){
+        if (read.isLocked) {
             throw new IllegalStateException("Can't read locked reference");
         }
 
         int result = read.value;
 
-        if(!read.isPermanent && ___departAfterReading()){
+        if (!read.isPermanent && ___departAfterReading()) {
             read.markAsPermanent();
             ___releaseLockAfterBecomingReadBiased();
         }
@@ -579,27 +604,27 @@ public final class IntRef
         return result;
     }
 
-    public final int atomicSet(int newValue){
+    public final int atomicSet(int newValue) {
         throw new TodoException();
     }
 
     public final int atomicSet(
-        final int newValue,
-        final BetaObjectPool pool,
-        final int spinCount,
-        final GlobalConflictCounter globalConflictCounter){
+            final int newValue,
+            final BetaObjectPool pool,
+            final int spinCount,
+            final GlobalConflictCounter globalConflictCounter) {
 
-        if (!___arriveAndLockForUpdate(spinCount)) {
+        if (!___arriveAndLock(spinCount)) {
             throw new WriteConflict();
         }
 
         final IntRefTranlocal oldActive = ___active;
 
-        if(oldActive.value== newValue){
-            if(oldActive.isPermanent){
+        if (oldActive.value == newValue) {
+            if (oldActive.isPermanent) {
                 ___releaseLockByReadBiased();
-            } else{
-                if(___departAfterReadingAndReleaseLock()){
+            } else {
+                if (___departAfterReadingAndReleaseLock()) {
                     oldActive.markAsPermanent();
                     ___releaseLockAfterBecomingReadBiased();
                 }
@@ -608,7 +633,7 @@ public final class IntRef
 
         //lets create a tranlocal for the update.
         IntRefTranlocal update = pool.take(this);
-        if(update == null){
+        if (update == null) {
             update = new IntRefTranlocal(this);
         }
 
@@ -626,31 +651,31 @@ public final class IntRef
     }
 
     public final int get(
-        final BetaTransaction transaction,
-        final BetaObjectPool pool){
+            final BetaTransaction transaction,
+            final BetaObjectPool pool) {
 
         return transaction.openForRead(this, false, pool).value;
     }
 
     public final void set(
-        final BetaTransaction transaction,
-        final BetaObjectPool pool,
-        final int value){
+            final BetaTransaction transaction,
+            final BetaObjectPool pool,
+            final int value) {
 
         transaction.openForWrite(this, false, pool).value = value;
     }
 
     public final int lockAndGet(
-        final BetaTransaction transaction,
-        final BetaObjectPool pool){
+            final BetaTransaction transaction,
+            final BetaObjectPool pool) {
 
         return transaction.openForRead(this, true, pool).value;
     }
 
     public final void lockAndSet(
-        final BetaTransaction transaction,
-        final BetaObjectPool pool,
-        final int value){
+            final BetaTransaction transaction,
+            final BetaObjectPool pool,
+            final int value) {
 
         transaction.openForWrite(this, true, pool).value = value;
     }
@@ -658,29 +683,29 @@ public final class IntRef
     /**
      * Applies the function to the reference and returns the new value.
      *
-     * @param tx the BetaTransaction used
-     * @param pool the BetaObjectPool used to pool
+     * @param tx       the BetaTransaction used
+     * @param pool     the BetaObjectPool used to pool
      * @param function the function to apply.
      * @return the new value.
      */
     public int alter(
-        final BetaTransaction tx,
-        final BetaObjectPool pool,
-        final IntFunction function){
-    
-        if(tx == null || pool == null || function == null){
+            final BetaTransaction tx,
+            final BetaObjectPool pool,
+            final IntFunction function) {
+
+        if (tx == null || pool == null || function == null) {
             throw new NullPointerException();
         }
 
         IntRefTranlocal write = tx.openForWrite(this, false, pool);
-        int value  = function.call(write.value);
+        int value = function.call(write.value);
         write.value = value;
         return value;
     }
 
     @Override
     public LockStatus getLockStatus(final Transaction tx) {
-        if(tx == null){
+        if (tx == null) {
             throw new NullPointerException();
         }
 
@@ -694,10 +719,11 @@ public final class IntRef
 
     //a controlled jmm problem here since identityHashCode is not synchronized/volatile/final.
     //this is the same as with the hashcode and String.
+
     @Override
-    public final int ___identityHashCode(){
+    public final int ___identityHashCode() {
         int tmp = ___identityHashCode;
-        if(tmp != 0){
+        if (tmp != 0) {
             return tmp;
         }
 
@@ -721,12 +747,12 @@ public final class IntRef
     }
 
     @Override
-    public final void ___markAsDurable(){
+    public final void ___markAsDurable() {
         durable = true;
     }
 
     @Override
-    public  final boolean ___isDurable(){
+    public final boolean ___isDurable() {
         return durable;
     }
 }

@@ -49,6 +49,10 @@ public interface Orec {
      */
     boolean ___arrive(int spinCount);
 
+    //o is ok, 1 is ok and read biased, 2 is locked
+    int ___arrive2(int spinCount);
+
+
     /**
      * Arrives at this orec an acquired the lock.
      * <p/>
@@ -57,7 +61,7 @@ public interface Orec {
      * @param spinCount the maximum number of spins when locked.
      * @return true if the arrive and the lock was done successfully, false otherwise.
      */
-    boolean ___arriveAndLockForUpdate(int spinCount);
+    boolean ___arriveAndLock(int spinCount);
 
     /**
      * Lowers the amount of surplus.
@@ -127,7 +131,7 @@ public interface Orec {
      *          if the surplus is 0 (a tryUpdateLock only can be done if the current
      *          transaction did an arrive).
      */
-    boolean ___tryUpdateLock(int spinCount);
+    boolean ___tryLockAfterArrive(int spinCount);
 
     /**
      * Releases the lock. Doesn't change the surplus or being biased to reading.  This call should only

@@ -33,6 +33,11 @@ public final class UnsafeOrec implements Orec {
     }
 
     @Override
+    public int ___arrive2(int spinCount) {
+        throw new TodoException();
+    }
+
+    @Override
     public boolean ___arrive(int spinCount) {
         if (isLocked) {
             return false;
@@ -154,7 +159,7 @@ public final class UnsafeOrec implements Orec {
     }
 
     @Override
-    public boolean ___tryUpdateLock(int spinCount) {
+    public boolean ___tryLockAfterArrive(int spinCount) {
         if (isLocked) {
             return false;
         }
@@ -177,7 +182,7 @@ public final class UnsafeOrec implements Orec {
     }
 
     @Override
-    public boolean ___arriveAndLockForUpdate(int spinCount) {
+    public boolean ___arriveAndLock(int spinCount) {
         throw new TodoException();
     }
 

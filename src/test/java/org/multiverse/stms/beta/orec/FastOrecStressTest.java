@@ -94,7 +94,7 @@ public class FastOrecStressTest {
 
            sleepRandomUs(10);
 
-           if (!orec.___tryUpdateLock(spinCount)) {
+           if (!orec.___tryLockAfterArrive(spinCount)) {
                orec.___departAfterFailure();
                return;
            }

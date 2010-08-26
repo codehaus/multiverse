@@ -67,7 +67,7 @@ public class FastOrec_releaseLockTest {
     public void whenLocked() {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
-        orec.___tryUpdateLock(1);
+        orec.___tryLockAfterArrive(1);
 
         orec.___releaseLockAfterBecomingReadBiased();
 

@@ -203,6 +203,10 @@ the task not being executed at all.
 
 - reenable objectpooling
 
+- transaction.commitIfNotAborted
+
+- transaction.abortIfNotCommitted
+
 done
 
 - fast-orec needs to have a lower ___READ_THRESHOLD
