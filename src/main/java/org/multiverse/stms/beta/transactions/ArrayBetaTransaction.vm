@@ -593,7 +593,8 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 tranlocal.calculateIsDirty();
             }
 
-            final Listeners listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool, config.globalConflictCounter);
+            final Listeners listeners = tranlocal.owner.___commitDirty(
+                tranlocal, this, pool, config.globalConflictCounter);
 
             if(listeners != null){
                 if(listenersArray == null){
@@ -714,9 +715,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     }
 
     private boolean doPrepareWithWriteSkewPrevention(final BetaObjectPool pool) {
-        //if(config.lockReads){
-        //    return true;
-        //}
+        if(config.lockReads){
+            return true;
+        }
 
         final int spinCount = config.spinCount;
         final boolean dirtyCheck = config.dirtyCheck;
@@ -752,9 +753,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end
 
     private boolean doPrepareAll(final BetaObjectPool pool) {
-        //if(config.lockWrites){
-        //    return true;
-        //}
+        if(config.lockWrites){
+            return true;
+        }
 
         final int spinCount = config.spinCount;
 

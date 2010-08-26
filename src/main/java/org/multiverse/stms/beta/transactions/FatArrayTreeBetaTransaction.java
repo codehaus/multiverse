@@ -1,20 +1,24 @@
 package org.multiverse.stms.beta.transactions;
 
-import java.util.*;
-
-import org.multiverse.api.*;
-import org.multiverse.api.blocking.*;
-import org.multiverse.api.exceptions.*;
-import org.multiverse.api.functions.*;
-import org.multiverse.api.lifecycle.*;
-import org.multiverse.stms.beta.*;
+import org.multiverse.api.Watch;
+import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.functions.Function;
+import org.multiverse.api.functions.IntFunction;
+import org.multiverse.api.functions.LongFunction;
+import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
+import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.Listeners;
+import org.multiverse.stms.beta.conflictcounters.LocalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.*;
-import org.multiverse.stms.beta.conflictcounters.*;
 
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.*;
-
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLong;
+
 import static java.lang.String.format;
+import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 
 /**
@@ -1481,9 +1485,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
     }
 
     private boolean doPrepareAll(final BetaObjectPool pool) {
-        //if(config.lockWrites){
-        //    return true;
-        //}
+        if(config.lockWrites){
+            return true;
+        }
 
         final int spinCount = config.spinCount;
 
@@ -1513,9 +1517,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
     }
 
     private boolean doPrepareDirty(final BetaObjectPool pool) {
-        //if(config.lockWrites){
-        //    return true;
-        //}
+        if(config.lockWrites){
+            return true;
+        }
 
         final int spinCount = config.spinCount;
 
@@ -1555,7 +1559,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
     @Override
     public void registerChangeListenerAndAbort(final Latch listener, final BetaObjectPool pool) {
-         if (status != ACTIVE) {
+        if (status != ACTIVE) {
             throw abortOnFaultyStatusOfRegisterChangeListenerAndAbort(pool);
         }
 

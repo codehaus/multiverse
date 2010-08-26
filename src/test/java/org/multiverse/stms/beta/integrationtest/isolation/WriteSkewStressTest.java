@@ -33,6 +33,7 @@ public class WriteSkewStressTest {
     private AtomicBoolean writeSkewEncountered = new AtomicBoolean();
     private BetaStm stm;
     private BetaObjectPool pool;
+    private int threadCount = 8;
 
     @Before
     public void setUp() {
@@ -44,7 +45,7 @@ public class WriteSkewStressTest {
         stop = false;
         writeSkewEncountered.set(false);
 
-        threads = new TransferThread[1];
+        threads = new TransferThread[threadCount];
         for (int k = 0; k < threads.length; k++) {
             threads[k] = new TransferThread(k);
         }
@@ -91,7 +92,7 @@ public class WriteSkewStressTest {
     public void whenWriteSkewNotAllowed() {
         allowWriteSkew = false;
         startAll(threads);
-        sleepMs(getStressTestDurationMs(60 * 1000));
+        sleepMs(getStressTestDurationMs(30 * 1000));
         stop = true;
 
         joinAll(threads);

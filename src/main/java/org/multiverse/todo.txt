@@ -201,15 +201,17 @@ the task not being executed at all.
 
 - writeskew test: whenlockedread
 
-- check transaction prepare optimization when pessimistic locking used. Disabled atm
-
-- reenable objectpooling
-
 - transaction.commitIfNotAborted
 
 - transaction.abortIfNotCommitted
 
 done
+
+- check transaction prepare optimization when pessimistic locking used. Disabled atm
+
+- fixed the panicerrors that appeared while doing the writeskew tests
+
+- reenable objectpooling
 
 - fast-orec needs to have a lower ___READ_THRESHOLD
 

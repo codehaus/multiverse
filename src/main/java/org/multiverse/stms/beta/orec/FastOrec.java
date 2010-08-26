@@ -57,7 +57,7 @@ public class FastOrec implements Orec {
 
     //it is important that the maximum threshold is not larger than 1023 (there are 10 bits for
     //the readonly count)
-    public final static int ___READBIASED_THRESHOLD = 2;
+    public final static int ___READBIASED_THRESHOLD = 16;
 
     private volatile long value;
 

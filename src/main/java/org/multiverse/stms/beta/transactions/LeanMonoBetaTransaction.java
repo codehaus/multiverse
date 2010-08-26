@@ -1,17 +1,20 @@
 package org.multiverse.stms.beta.transactions;
 
-import org.multiverse.api.*;
-import org.multiverse.api.blocking.*;
-import org.multiverse.api.exceptions.*;
-import org.multiverse.api.functions.*;
-import org.multiverse.api.lifecycle.*;
-import org.multiverse.stms.beta.*;
+import org.multiverse.api.Watch;
+import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.SpeculativeConfigurationError;
+import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.functions.Function;
+import org.multiverse.api.functions.IntFunction;
+import org.multiverse.api.functions.LongFunction;
+import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.transactionalobjects.*;
-import org.multiverse.stms.beta.conflictcounters.*;
-
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.*;
 
 import static java.lang.String.format;
+import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
  * A BetaTransaction tailored for dealing with 1 transactional object.
@@ -950,9 +953,9 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
     }
 
     private boolean doPrepareDirty(final BetaObjectPool pool){
-        //if(config.lockWrites){
-        //    return true;
-        //}
+        if(config.lockWrites){
+            return true;
+        }
 
         if(attached.isCommitted){
             return true;
@@ -967,9 +970,9 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
     }
 
     private boolean doPrepareAll(final BetaObjectPool pool){
-        //if(config.lockWrites){
-        //    return true;
-        //}
+        if(config.lockWrites){
+            return true;
+        }
         
         if(attached.isCommitted){
             return true;

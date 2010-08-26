@@ -368,7 +368,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         assertCommitted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertTrue(committed.isCommitted);
-        assertTrue(committed.isPermanent);
+        assertFalse(committed.isPermanent);
         assertNull(committed.read);
         assertSame(ref, committed.owner);
         assertEquals(10, committed.value);

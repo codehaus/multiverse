@@ -32,7 +32,7 @@ public class UncontendedCommutePerformanceTest {
     }
 
     @Test
-    public void testNormalIncrement() {
+    public void withNormalIncrement() {
         NormalIncThread thread = new NormalIncThread();
 
         startAll(thread);
@@ -47,7 +47,7 @@ public class UncontendedCommutePerformanceTest {
     }
 
     @Test
-    public void testCommuteIncrement() {
+    public void withCommuteIncrement() {
         CommuteIncThread thread = new CommuteIncThread();
 
         startAll(thread);

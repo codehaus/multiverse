@@ -807,9 +807,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end
 
     private boolean doPrepareAll(final BetaObjectPool pool) {
-        //if(config.lockWrites){
-        //    return true;
-        //}
+        if(config.lockWrites){
+            return true;
+        }
 
         final int spinCount = config.spinCount;
 
@@ -841,9 +841,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     }
 
     private boolean doPrepareDirty(final BetaObjectPool pool) {
-        //if(config.lockWrites){
-        //    return true;
-        //}
+        if(config.lockWrites){
+            return true;
+        }
 
         final int spinCount = config.spinCount;
 
@@ -885,7 +885,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     @Override
     public void registerChangeListenerAndAbort(final Latch listener, final BetaObjectPool pool) {
-         if (status != ACTIVE) {
+        if (status != ACTIVE) {
             throw abortOnFaultyStatusOfRegisterChangeListenerAndAbort(pool);
         }
 

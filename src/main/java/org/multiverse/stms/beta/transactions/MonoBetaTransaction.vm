@@ -558,6 +558,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         Listeners listeners = null;
         if (attached!=null) {
             if(config.dirtyCheck){
+                if(attached.isDirty == DIRTY_UNKNOWN){
+                    attached.calculateIsDirty();
+                }
                 listeners = attached.owner.___commitDirty(attached, this, pool, config.globalConflictCounter);
             }else{
                 listeners = attached.owner.___commitAll(attached, this, pool, config.globalConflictCounter);
@@ -681,9 +684,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end
 
     private boolean doPrepareDirty(final BetaObjectPool pool){
-        //if(config.lockWrites){
-        //    return true;
-        //}
+        if(config.lockWrites){
+            return true;
+        }
 
         if(attached.isCommitted){
             return true;
@@ -710,9 +713,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     }
 
     private boolean doPrepareAll(final BetaObjectPool pool){
-        //if(config.lockWrites){
-        //    return true;
-        //}
+        if(config.lockWrites){
+            return true;
+        }
         
         if(attached.isCommitted){
             return true;
