@@ -1,10 +1,10 @@
 package org.multiverse.stms.beta.integrationtest.isolation;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicIntClosure;
@@ -28,7 +28,17 @@ public class WriteSkewStressTest {
     private volatile boolean stop;
     private User user1;
     private User user2;
-    private boolean allowWriteSkew;
+
+    enum Mode {
+        normal,
+        pessimisticLockLevelRead,
+        pessimisticLockLevelWrite,
+        pessimisticRead,
+        pessimisticWrite,
+        withoutWriteSkew
+    }
+
+    private Mode mode;
     private TransferThread[] threads;
     private AtomicBoolean writeSkewEncountered = new AtomicBoolean();
     private BetaStm stm;
@@ -57,20 +67,68 @@ public class WriteSkewStressTest {
     }
 
     @Test
-    @Ignore
-    public void whenPessimisticLockingUsed() {
+    public void whenPessimisticRead_thenNoWriteSkewPossible() {
+        mode = Mode.pessimisticRead;
+        startAll(threads);
+        sleepMs(getStressTestDurationMs(30 * 1000));
+        stop = true;
 
+        joinAll(threads);
+
+        System.out.println("User1: " + user1);
+        System.out.println("User2: " + user2);
+
+        assertFalse("writeskew detected", writeSkewEncountered.get());
     }
 
     @Test
-    @Ignore
-    public void whenLockedRead() {
+    public void whenPessimisticWrite_thenWriteSkewPossible() {
+        mode = Mode.pessimisticWrite;
+        startAll(threads);
+        sleepMs(getStressTestDurationMs(30 * 1000));
+        stop = true;
 
+        joinAll(threads);
+
+        System.out.println("User1: " + user1);
+        System.out.println("User2: " + user2);
+
+        assertTrue("writeskew detected", writeSkewEncountered.get());
     }
 
     @Test
-    public void whenWriteSkewAllowed() {
-        allowWriteSkew = true;
+    public void whenPessimisticLockLevelWrite_thenWriteSkewPossible() {
+        mode = Mode.pessimisticLockLevelWrite;
+        startAll(threads);
+        sleepMs(getStressTestDurationMs(30 * 1000));
+        stop = true;
+
+        joinAll(threads);
+
+        System.out.println("User1: " + user1);
+        System.out.println("User2: " + user2);
+
+        assertTrue("writeskew detected", writeSkewEncountered.get());
+    }
+
+    @Test
+    public void whenPessimisticLockLevelRead_thenNoWriteSkewPossible() {
+        mode = Mode.pessimisticLockLevelRead;
+        startAll(threads);
+        sleepMs(getStressTestDurationMs(30 * 1000));
+        stop = true;
+
+        joinAll(threads);
+
+        System.out.println("User1: " + user1);
+        System.out.println("User2: " + user2);
+
+        assertFalse("writeskew detected", writeSkewEncountered.get());
+    }
+
+    @Test
+    public void whenWriteSkewAllowed_thenWriteSkewPossible() {
+        mode = Mode.normal;
         startAll(threads);
         sleepMs(getStressTestDurationMs(30 * 1000));
         stop = true;
@@ -89,8 +147,8 @@ public class WriteSkewStressTest {
     }
 
     @Test
-    public void whenWriteSkewNotAllowed() {
-        allowWriteSkew = false;
+    public void whenWriteSkewNotAllowed_thenNoWriteSkewPossible() {
+        mode = Mode.withoutWriteSkew;
         startAll(threads);
         sleepMs(getStressTestDurationMs(30 * 1000));
         stop = true;
@@ -105,13 +163,25 @@ public class WriteSkewStressTest {
 
     public class TransferThread extends TestThread {
 
-        private final AtomicBlock withWriteSkew = stm.getTransactionFactoryBuilder()
+        private final AtomicBlock normal = stm.getTransactionFactoryBuilder()
                 .setWriteSkewAllowed(true)
+                .setMaxRetries(10000)
                 .buildAtomicBlock();
-
         private final AtomicBlock noWriteSkew = stm.getTransactionFactoryBuilder()
                 .setWriteSkewAllowed(false)
+                .setMaxRetries(10000)
                 .buildAtomicBlock();
+        private final AtomicBlock pessimisticReadLockLevel = stm.getTransactionFactoryBuilder()
+                .setPessimisticLockLevel(PessimisticLockLevel.Read)
+                .setWriteSkewAllowed(true)
+                .setMaxRetries(10000)
+                .buildAtomicBlock();
+        private final AtomicBlock pessimisticWriteLockLevel = stm.getTransactionFactoryBuilder()
+                .setPessimisticLockLevel(PessimisticLockLevel.Write)
+                .setWriteSkewAllowed(true)
+                .setMaxRetries(10000)
+                .buildAtomicBlock();
+
 
         public TransferThread(int id) {
             super("TransferThread-" + id);
@@ -125,13 +195,53 @@ public class WriteSkewStressTest {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
 
-                if (allowWriteSkew) {
-                    doItWithWriteSkew();
-                } else {
-                    doItWithNoWriteSkew();
+                switch (mode) {
+                    case normal:
+                        doItNormal();
+                        break;
+                    case withoutWriteSkew:
+                        doItWithNoWriteSkew();
+                        break;
+                    case pessimisticLockLevelRead:
+                        doItWithPessimisticReadLockLevel();
+                        break;
+                    case pessimisticLockLevelWrite:
+                        doItWithPessimisticWriteLockLevel();
+                        break;
+                    case pessimisticRead:
+                        doItPessimisticRead();
+                        break;
+                    case pessimisticWrite:
+                        doItPessimisticWrite();
+                        break;
+                    default:
+                        throw new IllegalStateException();
                 }
+
                 k++;
             }
+        }
+
+        private void doItWithPessimisticReadLockLevel() {
+            pessimisticReadLockLevel.execute(new AtomicVoidClosure() {
+                @Override
+                public void execute(Transaction tx) throws Exception {
+                    BetaTransaction btx = (BetaTransaction) tx;
+                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
+                    doIt(btx, pool, false, false);
+                }
+            });
+        }
+
+        private void doItWithPessimisticWriteLockLevel() {
+            pessimisticWriteLockLevel.execute(new AtomicVoidClosure() {
+                @Override
+                public void execute(Transaction tx) throws Exception {
+                    BetaTransaction btx = (BetaTransaction) tx;
+                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
+                    doIt(btx, pool, false, false);
+                }
+            });
         }
 
         private void doItWithNoWriteSkew() {
@@ -140,29 +250,52 @@ public class WriteSkewStressTest {
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
                     BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    doIt(btx, pool);
+                    doIt(btx, pool, false, false);
                 }
             });
         }
 
-        private void doItWithWriteSkew() {
-            withWriteSkew.execute(new AtomicVoidClosure() {
+        private void doItNormal() {
+            normal.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
                     BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    doIt(btx, pool);
+                    doIt(btx, pool, false, false);
                 }
             });
         }
 
-        public void doIt(BetaTransaction tx, BetaObjectPool pool) {
+        private void doItPessimisticRead() {
+            normal.execute(new AtomicVoidClosure() {
+                @Override
+                public void execute(Transaction tx) throws Exception {
+                    BetaTransaction btx = (BetaTransaction) tx;
+                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
+                    doIt(btx, pool, true, true);
+                }
+            });
+        }
+
+        private void doItPessimisticWrite() {
+            normal.execute(new AtomicVoidClosure() {
+                @Override
+                public void execute(Transaction tx) throws Exception {
+                    BetaTransaction btx = (BetaTransaction) tx;
+                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
+                    doIt(btx, pool, false, true);
+                }
+            });
+        }
+
+        public void doIt(BetaTransaction tx, BetaObjectPool pool, boolean pessimisticRead, boolean pessimisticWrite) {
             int amount = randomInt(100);
 
             User from = random(user1, user2);
             User to = random(user1, user2);
 
-            int sum = from.account1.get(tx, pool) + from.account2.get(tx, pool);
+            int sum = tx.openForRead(from.account1, pessimisticRead, pool).value
+                    + tx.openForRead(from.account2, pessimisticRead, pool).value;
 
             if (sum < 0) {
                 if (!writeSkewEncountered.get()) {
@@ -173,10 +306,10 @@ public class WriteSkewStressTest {
 
             if (sum >= amount) {
                 IntRef fromAccount = from.getRandomAccount();
-                fromAccount.set(tx, pool, fromAccount.get(tx, pool) - amount);
+                tx.openForWrite(fromAccount, pessimisticWrite, pool).value -= amount;
 
                 IntRef toAccount = to.getRandomAccount();
-                toAccount.set(tx, pool, toAccount.get(tx, pool) + amount);
+                tx.openForWrite(toAccount, pessimisticWrite, pool).value += amount;
             }
 
             sleepRandomUs(1000);

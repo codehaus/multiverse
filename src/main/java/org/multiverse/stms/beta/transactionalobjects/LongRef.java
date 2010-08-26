@@ -1,18 +1,21 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.*;
-import org.multiverse.api.*;
-import org.multiverse.api.blocking.*;
-import org.multiverse.api.exceptions.*;
-import org.multiverse.api.functions.*;
-import org.multiverse.stms.beta.*;
-import org.multiverse.stms.beta.conflictcounters.*;
-import org.multiverse.stms.beta.orec.*;
-import org.multiverse.stms.beta.transactions.*;
+import org.multiverse.api.LockStatus;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.exceptions.PanicError;
+import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.exceptions.WriteConflict;
+import org.multiverse.api.functions.LongFunction;
+import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStmConstants;
+import org.multiverse.stms.beta.Listeners;
+import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
+import org.multiverse.stms.beta.orec.FastOrec;
+import org.multiverse.stms.beta.orec.Orec;
+import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * The transactional object. Atm it is just a reference for an int, more complex stuff will be added again
@@ -83,9 +86,13 @@ public final class LongRef
      * @param initialValue the initial value
      */
     public LongRef(final long initialValue){
-        ___active = new LongRefTranlocal(this);
-        ___active.value = initialValue;
-        ___active.isCommitted = true;
+        LongRefTranlocal tranlocal =
+            new LongRefTranlocal(this);
+
+        tranlocal.value = initialValue;
+        tranlocal.isCommitted = true;
+        tranlocal.isDirty = DIRTY_FALSE;
+        ___active = tranlocal;
     }
 
     @Override

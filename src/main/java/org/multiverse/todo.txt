@@ -89,8 +89,6 @@ performance.
 
 - create an orec that never become readbiased (useful for performance comparison).
 
--
-
 todo
 
 - mono transaction: support for orelse
@@ -185,17 +183,13 @@ the task not being executed at all.
 
 - problem with PessimisticLock.Write and commitDirty since the dirty flag is not set (and no changes written).
 
-- test for basic constructors of refs without transaction
+done
 
 - writeskew test: whenPessimisticLockingUsed
 
 - writeskew test: whenlockedread
 
-- transaction.commitIfNotAborted
-
-- transaction.abortIfNotCommitted
-
-done
+- test for basic constructors of refs without transaction
 
 - array tx: prepare testing with writeskew
 

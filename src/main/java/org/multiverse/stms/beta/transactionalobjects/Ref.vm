@@ -84,9 +84,13 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
      * @param initialValue the initial value
      */
     public ${transactionalObject.name}(final ${transactionalObject.type} initialValue){
-        ___active = new ${transactionalObject.tranlocal}${transactionalObject.typeParameter}(this);
-        ___active.value = initialValue;
-        ___active.isCommitted = true;
+        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} tranlocal =
+            new ${transactionalObject.tranlocal}${transactionalObject.typeParameter}(this);
+
+        tranlocal.value = initialValue;
+        tranlocal.isCommitted = true;
+        tranlocal.isDirty = DIRTY_FALSE;
+        ___active = tranlocal;
     }
 
 #end
