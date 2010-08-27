@@ -12,6 +12,10 @@ public final class GlobalConflictCounter {
     private final AtomicLong[] counters;
     private final long[] initArray;
 
+    public GlobalConflictCounter(){
+        this(1);
+    }
+
     public GlobalConflictCounter(int length) {
         this.counters = new AtomicLong[length];
         this.initArray = new long[length];

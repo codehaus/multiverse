@@ -1,13 +1,18 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.api.*;
-import org.multiverse.api.blocking.*;
-import org.multiverse.api.exceptions.*;
-import org.multiverse.api.functions.*;
-import org.multiverse.stms.beta.*;
-import org.multiverse.stms.beta.conflictcounters.*;
-import org.multiverse.stms.beta.orec.*;
-import org.multiverse.stms.beta.transactions.*;
+import org.multiverse.api.LockStatus;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.exceptions.WriteConflict;
+import org.multiverse.api.functions.IntFunction;
+import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStmConstants;
+import org.multiverse.stms.beta.Listeners;
+import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
+import org.multiverse.stms.beta.orec.FastOrec;
+import org.multiverse.stms.beta.orec.Orec;
+import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import java.util.UUID;
 
@@ -222,22 +227,7 @@ public final class IntRef
             return null;
         }
 
-        //todo: this code needs to go.
-        if(expectedLockOwner!=lockOwner){
-            throw new PanicError();
-        }
-
         lockOwner = null;
-
-        //todo: this code needs to go.
-        if(tranlocal.isDirty == DIRTY_UNKNOWN){
-            System.out.println("called with DIRTY_UKNOWN");
-            try{
-                throw new Exception();
-            }catch(Exception ex){
-                ex.printStackTrace();
-            }
-        }
 
         //it is a full blown update (so locked).
         final IntRefTranlocal newActive = (IntRefTranlocal)tranlocal;
@@ -379,16 +369,21 @@ public final class IntRef
             return true;
         }
 
-        Tranlocal read = tranlocal.isCommitted ? tranlocal : tranlocal.read;
+        final Tranlocal read = tranlocal.isCommitted ? tranlocal : tranlocal.read;
         if(read.isPermanent){
             //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
-            if(!___tryLockAndArrive(spinCount)){
+            final int arriveStatus = ___tryLockAndArrive(spinCount);
+            if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
                 return false;
             }
-        }else{
-            if (!___tryLockAfterNormalArrive(spinCount)) {
-                return false;
-            }
+
+            //we have successfully acquired the lock
+            lockOwner = newLockOwner;
+            return read == ___active;
+        }
+
+        if (!___tryLockAfterNormalArrive(spinCount)) {
+            return false;
         }
 
         //we have successfully acquired the lock
@@ -546,14 +541,15 @@ public final class IntRef
         final int spinCount,
         final GlobalConflictCounter globalConflictCounter){
 
-        if (!___tryLockAndArrive(spinCount)) {
+        final int arriveStatus = ___tryLockAndArrive(spinCount);
+        if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
             throw new WriteConflict();
         }
 
         final IntRefTranlocal oldActive = ___active;
 
         if(oldActive.value== newValue){
-            if(oldActive.isPermanent){
+            if(arriveStatus == ARRIVE_READBIASED){
                 ___unlockByReadBiased();
             } else{
                 ___departAfterReadingAndUnlock();

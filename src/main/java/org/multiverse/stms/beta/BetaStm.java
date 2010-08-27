@@ -29,12 +29,14 @@ public final class BetaStm implements Stm {
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection"})
     private final ConcurrentHashMap<String, BetaTransactionFactory> factoryMap
             = new ConcurrentHashMap<String, BetaTransactionFactory>();
+    private final StmCallback callback;
 
     public BetaStm() {
-        this(1);
+        this(1, null);
     }
 
-    public BetaStm(final int conflictCounterWidth) {
+    public BetaStm(final int conflictCounterWidth, StmCallback callback) {
+        this.callback = callback;
         this.globalConflictCounter = new GlobalConflictCounter(conflictCounterWidth);
         this.config = new BetaTransactionConfiguration(this)
                 .setSpinCount(spinCount);
@@ -42,6 +44,10 @@ public final class BetaStm implements Stm {
         this.atomicBlock = getTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(false)
                 .buildAtomicBlock();
+    }
+
+    public StmCallback getCallback() {
+        return callback;
     }
 
     public Storage getStorage() {

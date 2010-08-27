@@ -26,14 +26,13 @@ class Transaction {
 }
 
 class TransactionalObject {
-  String tranlocal;
-  String name;//the name of the reference.
-  String type;//the type of data it contains
-  String initialValue;//the initial value
-  int classIndex;
-  String typeParameter;
+  String tranlocal
+  String name//the name of the reference.
+  String type//the type of data it contains
+  String initialValue//the initial value
+  int classIndex
+  String typeParameter
 //  String parametrizedTranlocal
-  boolean specialization;
   String accessModifier//the access modifier the ref gets
   String functionClass//the class of the callable used for commuting operations
   boolean isReference
@@ -107,7 +106,6 @@ for (def param in refs) {
           typeParameter: '',
           initialValue: '',
           classIndex: -1,
-          specialization: true,
           accessModifier: 'abstract',
           functionClass: 'Function',
           isReference : false
@@ -173,7 +171,6 @@ List<TransactionalObject> createTransactionalObjects() {
 //          parametrizedTranlocal: 'RefTranlocal<E>',
           initialValue: 'null',
           classIndex: 0,
-          specialization: true,
           accessModifier: 'final',
           functionClass: 'Function',
           isReference: true)
@@ -185,7 +182,6 @@ List<TransactionalObject> createTransactionalObjects() {
           typeParameter: '',
           initialValue: '0',
           classIndex: 1,
-          specialization: true,
           accessModifier: 'final',
           functionClass: 'IntFunction',
           isReference: true)
@@ -196,7 +192,6 @@ List<TransactionalObject> createTransactionalObjects() {
           typeParameter: '',
           initialValue: '0',
           classIndex: 2,
-          specialization: true,
           accessModifier: 'final',
           functionClass: 'LongFunction',
           isReference: true)
@@ -207,7 +202,6 @@ List<TransactionalObject> createTransactionalObjects() {
           typeParameter: '',
           initialValue: '',
           classIndex: -1,
-          specialization: false,
           accessModifier: 'abstract',
           functionClass: 'Function',
           isReference: false)
@@ -333,7 +327,7 @@ void generateMonoTransaction(VelocityEngine engine, List<TransactionalObject> tr
 }
 
 void generateTranlocal(VelocityEngine engine, TransactionalObject transactionalObject) {
-  if (!transactionalObject.isSpecialization()) {
+  if (!transactionalObject.isReference) {
     return
   }
 
@@ -351,7 +345,7 @@ void generateTranlocal(VelocityEngine engine, TransactionalObject transactionalO
 }
 
 void generateTransactionalObject(VelocityEngine engine, TransactionalObject transactionalObject) {
-  if (!transactionalObject.isSpecialization()) {
+  if (!transactionalObject.isReference) {
     return;
   }
 

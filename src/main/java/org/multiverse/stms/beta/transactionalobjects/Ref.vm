@@ -70,7 +70,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         this.lockOwner = tx;
     }
 
-#if($transactionalObject.isReference)
+#if(${transactionalObject.isReference})
     /**
      * Creates a committed ${transactionalObject.name} with ${transactionalObject.initialValue} as initial value.
      */
@@ -177,7 +177,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         return ___active;
     }
 
-#if($transactionalObject.isReference)
+#if(${transactionalObject.isReference})
     @Override
     public final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} ___openForConstruction(final BetaObjectPool pool) {
         ${transactionalObject.tranlocal}${transactionalObject.typeParameter} tranlocal =  pool.take(this);
@@ -229,22 +229,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             return null;
         }
 
-        //todo: this code needs to go.
-        if(expectedLockOwner!=lockOwner){
-            throw new PanicError();
-        }
-
         lockOwner = null;
-
-        //todo: this code needs to go.
-        if(tranlocal.isDirty == DIRTY_UNKNOWN){
-            System.out.println("called with DIRTY_UKNOWN");
-            try{
-                throw new Exception();
-            }catch(Exception ex){
-                ex.printStackTrace();
-            }
-        }
 
         //it is a full blown update (so locked).
         final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} newActive = (${transactionalObject.tranlocal})tranlocal;
@@ -386,16 +371,21 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             return true;
         }
 
-        Tranlocal read = tranlocal.isCommitted ? tranlocal : tranlocal.read;
+        final Tranlocal read = tranlocal.isCommitted ? tranlocal : tranlocal.read;
         if(read.isPermanent){
             //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
-            if(!___tryLockAndArrive(spinCount)){
+            final int arriveStatus = ___tryLockAndArrive(spinCount);
+            if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
                 return false;
             }
-        }else{
-            if (!___tryLockAfterArrive(spinCount)) {
-                return false;
-            }
+
+            //we have successfully acquired the lock
+            lockOwner = newLockOwner;
+            return read == ___active;
+        }
+
+        if (!___tryLockAfterNormalArrive(spinCount)) {
+            return false;
         }
 
         //we have successfully acquired the lock
@@ -554,14 +544,15 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final int spinCount,
         final GlobalConflictCounter globalConflictCounter){
 
-        if (!___tryLockAndArrive(spinCount)) {
+        final int arriveStatus = ___tryLockAndArrive(spinCount);
+        if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
             throw new WriteConflict();
         }
 
         final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} oldActive = ___active;
 
         if(oldActive.value== newValue){
-            if(oldActive.isPermanent){
+            if(arriveStatus == ARRIVE_READBIASED){
                 ___unlockByReadBiased();
             } else{
                 ___departAfterReadingAndUnlock();

@@ -63,7 +63,7 @@ public final class BetaObjectPool {
 
 
 #foreach($transactionalObject in $transactionalObjects)
-#if($transactionalObject.isSpecialization())
+#if(${transactionalObject.isReference})
     private final ${transactionalObject.tranlocal}[] tranlocals${transactionalObject.name} = new ${transactionalObject.tranlocal}[100];
     private int lastUsed${transactionalObject.name} = -1;
 #end
@@ -92,7 +92,7 @@ public final class BetaObjectPool {
         transactionPoolingEnabled = TRANSACTION_POOLING_ENABLED;
     }
 #foreach($transactionalObject in $transactionalObjects)
-#if($transactionalObject.isSpecialization())
+#if(${transactionalObject.isReference})
 
     /**
      * Takes a ${transactionalObject.tranlocal} from the pool for the specified ${transactionalObject.name}.
@@ -161,7 +161,7 @@ public final class BetaObjectPool {
 
         switch(classIndex){
 #foreach($transactionalObject in $transactionalObjects)
-#if($transactionalObject.isSpecialization())
+#if(${transactionalObject.isReference})
             case ${transactionalObject.classIndex}:
                 return take((${transactionalObject.name})owner);
 #end
@@ -198,7 +198,7 @@ public final class BetaObjectPool {
 
         switch(classIndex){
 #foreach($transactionalObject in $transactionalObjects)
-#if($transactionalObject.isSpecialization())
+#if(${transactionalObject.isReference})
             case ${transactionalObject.classIndex}:
                 put((${transactionalObject.tranlocal})tranlocal);
                 return;

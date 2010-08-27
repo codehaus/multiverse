@@ -46,17 +46,27 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     public PropagationLevel propagationLevel = PropagationLevel.Requires;
     private final AtomicReference<SpeculativeBetaConfig> speculativeConfig
             = new AtomicReference<SpeculativeBetaConfig>(new SpeculativeBetaConfig(true));
+    private final StmCallback stmCallback;
 
     public BetaTransactionConfiguration(BetaStm stm) {
+        if(stm == null){
+            throw new NullPointerException();
+        }
         this.stm = stm;
+        this.stmCallback = stm.getCallback();
         this.globalConflictCounter = stm.getGlobalConflictCounter();
         this.maxArrayTransactionSize = stm.getMaxArrayTransactionSize();
     }
 
     public BetaTransactionConfiguration(BetaStm stm, int maxArrayTransactionSize) {
+        if(stm == null){
+            throw new NullPointerException();
+        }
+
         this.stm = stm;
         this.globalConflictCounter = stm.getGlobalConflictCounter();
         this.maxArrayTransactionSize = maxArrayTransactionSize;
+        this.stmCallback = stm.getCallback();
     }
 
     public boolean hasTimeout() {
@@ -116,14 +126,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         return spinCount;
     }
 
-    public boolean isLockReads() {
-        return lockReads;
-    }
-
-    public boolean isLockWrites() {
-        return lockWrites;
-    }
-
     @Override
     public PessimisticLockLevel getPessimisticLockLevel() {
         return pessimisticLockLevel;
@@ -141,10 +143,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
 
     public GlobalConflictCounter getGlobalConflictCounter() {
         return globalConflictCounter;
-    }
-
-    public int getMinimalArrayTreeSize() {
-        return minimalArrayTreeSize;
     }
 
     @Override
@@ -256,6 +254,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.traceLevel = traceLevel;
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
+
         return config;
     }
 

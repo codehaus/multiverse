@@ -1,20 +1,24 @@
 package org.multiverse.stms.beta.transactions;
 
-import java.util.*;
-
-import org.multiverse.api.*;
-import org.multiverse.api.blocking.*;
-import org.multiverse.api.exceptions.*;
-import org.multiverse.api.functions.*;
-import org.multiverse.api.lifecycle.*;
-import org.multiverse.stms.beta.*;
+import org.multiverse.api.Watch;
+import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.SpeculativeConfigurationError;
+import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.functions.Function;
+import org.multiverse.api.functions.IntFunction;
+import org.multiverse.api.functions.LongFunction;
+import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.Listeners;
+import org.multiverse.stms.beta.conflictcounters.LocalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.*;
-import org.multiverse.stms.beta.conflictcounters.*;
 
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.*;
-
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLong;
+
 import static java.lang.String.format;
+import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 
 /**
@@ -174,12 +178,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         }
 
         //open the tranlocal for writing.
-        RefTranlocal<E> result =  pool.take(ref);
-        if(result == null){
-            result = new RefTranlocal<E>(ref);
-        }
-        result.read = read;
-        result.value = read.value;
+        RefTranlocal<E> result = read.openForWrite(pool);
         hasUpdates = true;
         attach(ref, result, identityHashCode, pool);
         size++;        
@@ -220,10 +219,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
-        RefTranlocal<E> result =  pool.take(ref);
-        if(result == null){
-            result = new RefTranlocal<E>(ref);
-        }
+        final RefTranlocal<E> result = ref.___openForConstruction(pool);
         result.isDirty = DIRTY_TRUE;
         attach(ref, result, identityHashCode, pool);
         size++;
@@ -361,12 +357,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         }
 
         //open the tranlocal for writing.
-        IntRefTranlocal result =  pool.take(ref);
-        if(result == null){
-            result = new IntRefTranlocal(ref);
-        }
-        result.read = read;
-        result.value = read.value;
+        IntRefTranlocal result = read.openForWrite(pool);
         hasUpdates = true;
         attach(ref, result, identityHashCode, pool);
         size++;        
@@ -407,10 +398,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
-        IntRefTranlocal result =  pool.take(ref);
-        if(result == null){
-            result = new IntRefTranlocal(ref);
-        }
+        final IntRefTranlocal result = ref.___openForConstruction(pool);
         result.isDirty = DIRTY_TRUE;
         attach(ref, result, identityHashCode, pool);
         size++;
@@ -548,12 +536,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         }
 
         //open the tranlocal for writing.
-        LongRefTranlocal result =  pool.take(ref);
-        if(result == null){
-            result = new LongRefTranlocal(ref);
-        }
-        result.read = read;
-        result.value = read.value;
+        LongRefTranlocal result = read.openForWrite(pool);
         hasUpdates = true;
         attach(ref, result, identityHashCode, pool);
         size++;        
@@ -594,10 +577,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
-        LongRefTranlocal result =  pool.take(ref);
-        if(result == null){
-            result = new LongRefTranlocal(ref);
-        }
+        final LongRefTranlocal result = ref.___openForConstruction(pool);
         result.isDirty = DIRTY_TRUE;
         attach(ref, result, identityHashCode, pool);
         size++;

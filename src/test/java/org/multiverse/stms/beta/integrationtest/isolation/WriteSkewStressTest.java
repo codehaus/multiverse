@@ -21,7 +21,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class WriteSkewStressTest {
@@ -85,7 +84,7 @@ public class WriteSkewStressTest {
     public void whenPessimisticWrite_thenWriteSkewPossible() {
         mode = Mode.pessimisticWrite;
         startAll(threads);
-        sleepMs(getStressTestDurationMs(30 * 1000));
+        sleepMs(getStressTestDurationMs(60 * 1000));
         stop = true;
 
         joinAll(threads);
@@ -93,7 +92,7 @@ public class WriteSkewStressTest {
         System.out.println("User1: " + user1);
         System.out.println("User2: " + user2);
 
-        assertTrue("writeskew detected", writeSkewEncountered.get());
+        assertTrue("no writeskew detected", writeSkewEncountered.get());
     }
 
     @Test
@@ -108,7 +107,7 @@ public class WriteSkewStressTest {
         System.out.println("User1: " + user1);
         System.out.println("User2: " + user2);
 
-        assertTrue("writeskew detected", writeSkewEncountered.get());
+        assertTrue("no writeskew detected", writeSkewEncountered.get());
     }
 
     @Test
@@ -325,8 +324,8 @@ public class WriteSkewStressTest {
                 .setReadonly(true)
                 .buildAtomicBlock();
 
-        private IntRef account1 = createIntRef(stm);
-        private IntRef account2 = createIntRef(stm);
+        private IntRef account1 = new IntRef();
+        private IntRef account2 = new IntRef();
 
         public IntRef getRandomAccount() {
             return randomBoolean() ? account1 : account2;

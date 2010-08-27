@@ -233,7 +233,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         //open the tranlocal for writing.
-#if($ref.isSpecialization())
+#if(${ref.isReference})
         ${ref.tranlocal}${ref.typeParameter}  result =  pool.take(ref);
         if(result == null){
             result = new ${ref.tranlocal}${ref.typeParameter}(ref);
@@ -294,7 +294,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         //open the tranlocal for writing.
-#if($ref.isSpecialization())
+#if($ref.isReference)
         ${ref.tranlocal}${ref.typeParameter} result =  pool.take(ref);
         if(result == null){
             result = new ${ref.tranlocal}${ref.typeParameter}(ref);
@@ -351,7 +351,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         if(result.isCommitted){
             final ${ref.tranlocal}${ref.typeParameter} read = result;
-#if($ref.isSpecialization())
+#if(${ref.isReference})
             result =  pool.take(ref);
             if(result == null){
                 result = new ${ref.tranlocal}${ref.typeParameter}(ref);
@@ -365,7 +365,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             array[index]=result;
         }
 
-#if($ref.isSpecialization())
+#if($ref.isReference())
         result.value = function.call(result.value);
 #else
         throw new TodoException();
