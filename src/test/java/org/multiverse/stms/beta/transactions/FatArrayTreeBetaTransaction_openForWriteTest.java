@@ -37,7 +37,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         pool = new BetaObjectPool();
     }
 
-  
+
 
     @Test
     public void whenNull_thenNullPointerException() {
@@ -184,7 +184,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         LongRef ref = BetaStmUtils.createLongRef(stm);
         Orec orec = ref.___getOrec();
         orec.___arrive(1);
-        orec.___tryLockAfterArrive(1);
+        orec.___tryLockAfterNormalArrive(1);
 
         BetaTransaction tx1 = stm.startDefaultTransaction();
 

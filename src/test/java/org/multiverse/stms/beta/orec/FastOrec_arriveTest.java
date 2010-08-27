@@ -1,26 +1,29 @@
 package org.multiverse.stms.beta.orec;
 
 import org.junit.Test;
+import org.multiverse.stms.beta.BetaStmConstants;
 
+import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 
 /**
  * @author Peter Veentjer
  */
-public class FastOrec_arriveTest {
+public class FastOrec_arriveTest implements BetaStmConstants{
 
     @Test
     public void whenUpdateBiasedNotLockedAndNoSurplus() {
         FastOrec orec = new FastOrec();
-        boolean result = orec.___arrive(1);
+        int result = orec.___arrive(1);
 
-        assertTrue(result);
-        OrecTestUtils.assertSurplus(1, orec);
-        OrecTestUtils.assertUnlocked(orec);
-        OrecTestUtils.assertReadonlyCount(0, orec);
-        OrecTestUtils.assertUpdateBiased(orec);
+        assertEquals(ARRIVE_NORMAL, result);
+        assertSurplus(1, orec);
+        assertUnlocked(orec);
+        assertReadonlyCount(0, orec);
+        assertUpdateBiased(orec);
     }
 
     @Test
@@ -29,56 +32,56 @@ public class FastOrec_arriveTest {
         orec.___arrive(1);
         orec.___arrive(1);
 
-        boolean result = orec.___arrive(1);
+        int result = orec.___arrive(1);
 
-        assertTrue(result);
-        OrecTestUtils.assertSurplus(3, orec);
-        OrecTestUtils.assertReadonlyCount(0, orec);
-        OrecTestUtils.assertUnlocked(orec);
-        OrecTestUtils.assertUpdateBiased(orec);
+        assertEquals(ARRIVE_NORMAL, result);
+        assertSurplus(3, orec);
+        assertReadonlyCount(0, orec);
+        assertUnlocked(orec);
+        assertUpdateBiased(orec);
     }
 
     @Test
-    public void whenUpdateBiasedAndLocked_thenReturnFalse() {
+    public void whenUpdateBiasedAndLocked() {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
-        orec.___tryLockAfterArrive(1);
+        orec.___tryLockAfterNormalArrive(1);
 
-        boolean result = orec.___arrive(1);
+        int result = orec.___arrive(1);
 
-        assertFalse(result);
-        OrecTestUtils.assertSurplus(1, orec);
-        OrecTestUtils.assertLocked(orec);
-        OrecTestUtils.assertReadonlyCount(0, orec);
-        OrecTestUtils.assertUpdateBiased(orec);
+        assertEquals(ARRIVE_LOCK_NOT_FREE,result);
+        assertSurplus(1, orec);
+        assertLocked(orec);
+        assertReadonlyCount(0, orec);
+        assertUpdateBiased(orec);
     }
 
     @Test
-    public void whenReadBiasedAndLocked_thenReturnFalse() {
+    public void whenReadBiasedAndLocked() {
         FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
         orec.___arrive(1);
-        orec.___tryLockAfterArrive(1);
+        orec.___tryLockAfterNormalArrive(1);
 
-        boolean result = orec.___arrive(1);
+        int result = orec.___arrive(1);
 
-        assertFalse(result);
-        OrecTestUtils.assertSurplus(1, orec);
-        OrecTestUtils.assertReadonlyCount(0, orec);
-        OrecTestUtils.assertLocked(orec);
-        OrecTestUtils.assertReadBiased(orec);
+        assertEquals(ARRIVE_LOCK_NOT_FREE,result);
+        assertSurplus(1, orec);
+        assertReadonlyCount(0, orec);
+        assertLocked(orec);
+        assertReadBiased(orec);
     }
 
     @Test
     public void whenReadBiasedAndNoSurplus() {
         FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
 
-        boolean result = orec.___arrive(1);
+        int result = orec.___arrive(1);
 
-        assertTrue(result);
-        OrecTestUtils.assertUnlocked(orec);
-        OrecTestUtils.assertSurplus(1, orec);
-        OrecTestUtils.assertReadBiased(orec);
-        OrecTestUtils.assertReadonlyCount(0, orec);
+        assertEquals(ARRIVE_READBIASED,result);
+        assertUnlocked(orec);
+        assertSurplus(1, orec);
+        assertReadBiased(orec);
+        assertReadonlyCount(0, orec);
     }
 
     @Test
@@ -86,12 +89,12 @@ public class FastOrec_arriveTest {
         FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
         orec.___arrive(1);
 
-        boolean result = orec.___arrive(1);
+        int result = orec.___arrive(1);
 
-        assertTrue(result);
-        OrecTestUtils.assertUnlocked(orec);
-        OrecTestUtils.assertSurplus(1, orec);
-        OrecTestUtils.assertReadBiased(orec);
-        OrecTestUtils.assertReadonlyCount(0, orec);
+        assertEquals(ARRIVE_READBIASED,result);
+        assertUnlocked(orec);
+        assertSurplus(1, orec);
+        assertReadBiased(orec);
+        assertReadonlyCount(0, orec);
     }
 }

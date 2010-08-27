@@ -35,9 +35,6 @@ import static java.lang.String.format;
  * 54-63 contains readonly count
  * <p/>
  * <p/>
- * Cause of problems perhaps; while it is locked, only 'simple' departs should be allowed. But it should not
- * be allowed that the readbiased behavior is changed. Atm it can happen. So when a transaction has locked an orec,
- * and an other one does a depart
  *
  * @author Peter Veentjer
  */
@@ -55,8 +52,7 @@ public class FastOrec implements Orec {
         }
     }
 
-    //it is important that the maximum threshold is not larger than 1023 (there are 10 bits for
-    //the readonly count)
+    //it is important that the maximum threshold is not larger than 1023 (there are 10 bits for the readonly count)
     public final static int ___READBIASED_THRESHOLD = 16;
 
     private volatile long value;
@@ -91,44 +87,8 @@ public class FastOrec implements Orec {
         return getSurplus(value) > 0;
     }
 
-    public volatile boolean requiresOnUpdateBiased = false;
-
     @Override
-    public final boolean ___arrive(int spinCount) {
-        do {
-            long current = value;
-
-            if (isLocked(current)) {
-                spinCount--;
-                continue;
-            }
-
-            long surplus = getSurplus(current);
-
-            if (isReadBiased(current)) {
-                if (surplus == 0) {
-                    surplus = 1;
-                } else if (surplus == 1) {
-                    return true;
-                } else {
-                    throw new PanicError("Surplus for a readbiased orec can never be larger than 1");
-                }
-            } else {
-                surplus++;
-            }
-
-            long next = setSurplus(current, surplus);
-
-            if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
-                return true;
-            }
-        } while (spinCount >= 0);
-
-        return false;
-    }
-
-    @Override
-    public final int ___arrive2(int spinCount) {
+    public final int ___arrive(int spinCount) {
         do {
             long current = value;
 
@@ -164,39 +124,7 @@ public class FastOrec implements Orec {
     }
 
     @Override
-    public final boolean ___arriveAndLock(int spinCount) {
-        do {
-            long current = value;
-
-            if (isLocked(current)) {
-                spinCount--;
-                continue;
-            }
-
-            long surplus = getSurplus(current);
-            if (isReadBiased(current)) {
-                if (surplus == 0) {
-                    surplus = 1;
-                } else if (surplus > 1) {
-                    throw new PanicError("Can't arriveAndLockForUpdate; surplus is larger than 2: " + ___toOrecString(current));
-                }
-            } else {
-                surplus++;
-            }
-
-            long next = setSurplus(current, surplus);
-            next = setLocked(next, true);
-
-            if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
-                return true;
-            }
-        } while (spinCount >= 0);
-
-        return false;
-    }
-
-    @Override
-    public final int ___arriveAndLock2(int spinCount) {
+    public final int ___tryLockAndArrive(int spinCount) {
         do {
             long current = value;
 
@@ -228,6 +156,32 @@ public class FastOrec implements Orec {
         } while (spinCount >= 0);
 
         return ARRIVE_LOCK_NOT_FREE;
+    }
+
+    @Override
+    public final boolean ___tryLockAfterNormalArrive(int spinCount) {
+        do {
+            long current = value;
+
+            if (isLocked(current)) {
+                spinCount--;
+                continue;
+            }
+
+            if (___getSurplus() == 0) {
+                throw new PanicError(
+                        "Can't acquire the updatelock is there is no surplus (so if it didn't do a read before)" +
+                                ___toOrecString(current));
+            }
+
+            long next = setLocked(current, true);
+
+            if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
+                return true;
+            }
+        } while (spinCount >= 0);
+
+        return false;
     }
 
 
@@ -268,26 +222,26 @@ public class FastOrec implements Orec {
     }
 
     @Override
-    public final void ___departAfterReadingAndReleaseLock() {
+    public final void ___departAfterReadingAndUnlock() {
         while (true) {
             long current = value;
             long surplus = getSurplus(current);
 
             if (surplus == 0) {
                 throw new PanicError(
-                        "Can't departAfterReadingAndReleaseLock if there is no surplus: " + ___toOrecString(current));
+                        "Can't ___departAfterReadingAndUnlock if there is no surplus: " + ___toOrecString(current));
             }
 
             final boolean isLocked = isLocked(current);
             if (!isLocked) {
                 throw new PanicError(
-                        "Can't departAfterReadingAndReleaseLock if the lock is not acquired " + ___toOrecString(current));
+                        "Can't ___departAfterReadingAndUnlock if the lock is not acquired " + ___toOrecString(current));
             }
 
             boolean isReadBiased = isReadBiased(current);
             if (isReadBiased) {
                 throw new PanicError(
-                        "Can't departAfterReadingAndReleaseLock when readbiased orec " + ___toOrecString(current));
+                        "Can't ___departAfterReadingAndUnlock when readbiased orec " + ___toOrecString(current));
             }
 
             int readonlyCount = getReadonlyCount(current);
@@ -314,7 +268,7 @@ public class FastOrec implements Orec {
     }
 
     @Override
-    public final long ___departAfterUpdateAndReleaseLock(
+    public final long ___departAfterUpdateAndUnlock(
             final GlobalConflictCounter globalConflictCounter, final BetaTransactionalObject transactionalObject) {
 
         while (true) {
@@ -322,14 +276,14 @@ public class FastOrec implements Orec {
 
             if (!isLocked(current)) {
                 throw new PanicError(
-                        "Can't departAfterUpdateAndReleaseLock is the lock is not acquired " + ___toOrecString(current));
+                        "Can't ___departAfterUpdateAndUnlock is the lock is not acquired " + ___toOrecString(current));
             }
 
             long surplus = getSurplus(current);
 
             if (surplus == 0) {
                 throw new PanicError(
-                        "Can't departAfterUpdateAndReleaseLock is there is no surplus " + ___toOrecString(current));
+                        "Can't ___departAfterUpdateAndUnlock is there is no surplus " + ___toOrecString(current));
             }
 
             boolean conflict;
@@ -364,19 +318,19 @@ public class FastOrec implements Orec {
     }
 
     @Override
-    public final long ___departAfterFailureAndReleaseLock() {
+    public final long ___departAfterFailureAndUnlock() {
         while (true) {
             long current = value;
 
             if (!isLocked(current)) {
                 throw new PanicError(
-                        "Can't departAfterFailureAndReleaseLock if the lock was not acquired " + ___toOrecString(current));
+                        "Can't ___departAfterFailureAndUnlock if the lock was not acquired " + ___toOrecString(current));
             }
 
             long surplus = getSurplus(current);
             if (surplus == 0) {
                 throw new PanicError(
-                        "Can't departAfterFailureAndReleaseLock if there is no surplus " + ___toOrecString(current));
+                        "Can't ___departAfterFailureAndUnlock if there is no surplus " + ___toOrecString(current));
             }
 
             //we can only decrease the surplus if it is not read biased. Because with a read biased
@@ -384,7 +338,7 @@ public class FastOrec implements Orec {
             if (isReadBiased(current)) {
                 if (surplus > 1) {
                     throw new PanicError(
-                            "Can't departAfterFailureAndReleaseLock with a surplus larger than 1 if " +
+                            "Can't ___departAfterFailureAndUnlock with a surplus larger than 1 if " +
                                     "the orec is read biased " + ___toOrecString(current));
                 }
             } else {
@@ -432,46 +386,21 @@ public class FastOrec implements Orec {
         }
     }
 
-    @Override
-    public final boolean ___tryLockAfterArrive(int spinCount) {
-        do {
-            long current = value;
-
-            if (isLocked(current)) {
-                spinCount--;
-                continue;
-            }
-
-            if (___getSurplus() == 0) {
-                throw new PanicError(
-                        "Can't acquire the updatelock is there is no surplus (so if it didn't do a read before)" +
-                                ___toOrecString(current));
-            }
-
-            long next = setLocked(current, true);
-
-            if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
-                return true;
-            }
-        } while (spinCount >= 0);
-
-        return false;
-    }
 
 //    @Override
 
-    public final void ___releaseLockByReadBiased() {
+    public final void ___unlockByReadBiased() {
         while (true) {
             long current = value;
 
             if (!isReadBiased(current)) {
                 throw new PanicError(
-                        "Can't releaseLockByReadBiased when it is not readbiased " + ___toOrecString(current));
+                        "Can't ___unlockByReadBiased when it is not readbiased " + ___toOrecString(current));
             }
 
             if (!isLocked(current)) {
                 throw new PanicError(
-                        "Can't releaseLockByReadBiased if it isn't locked " + ___toOrecString(current));
+                        "Can't ___unlockByReadBiased if it isn't locked " + ___toOrecString(current));
             }
 
             if (getSurplus(current) > 1) {

@@ -1,7 +1,9 @@
 package org.multiverse.stms.beta.orec;
 
 import org.junit.Test;
+import org.multiverse.stms.beta.BetaStmConstants;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
@@ -9,17 +11,17 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 /**
  * @author Peter Veentjer
  */
-public class FastOrec_arriveAndLockForUpdateTest {
+public class FastOrec_tryLockAndArriveTest implements BetaStmConstants {
 
     @Test
-    public void whenUpdateBiasedLocked() {
+    public void whenUpdateBiasedAndAlreadyLocked() {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
-        orec.___tryLockAfterArrive(1);
+        orec.___tryLockAfterNormalArrive(1);
 
-        boolean result = orec.___arriveAndLock(1);
+        int result = orec.___tryLockAndArrive(1);
 
-        assertFalse(result);
+        assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertLocked(orec);
         assertSurplus(1, orec);
         assertUpdateBiased(orec);
@@ -30,9 +32,9 @@ public class FastOrec_arriveAndLockForUpdateTest {
     public void whenUpdateBiasedAndUnlocked() {
         FastOrec orec = new FastOrec();
 
-        boolean result = orec.___arriveAndLock(1);
+        int result = orec.___tryLockAndArrive(1);
 
-        assertTrue(result);
+        assertEquals(ARRIVE_NORMAL, result);
         assertLocked(orec);
         assertSurplus(1, orec);
         assertUpdateBiased(orec);
@@ -43,11 +45,11 @@ public class FastOrec_arriveAndLockForUpdateTest {
     public void whenReadBiasedAndLocked() {
         FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
         orec.___arrive(1);
-        orec.___tryLockAfterArrive(1);
+        orec.___tryLockAfterNormalArrive(1);
 
-        boolean result = orec.___arriveAndLock(1);
+        int result = orec.___tryLockAndArrive(1);
 
-        assertFalse(result);
+        assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertLocked(orec);
         assertSurplus(1, orec);
         assertReadBiased(orec);
@@ -58,9 +60,9 @@ public class FastOrec_arriveAndLockForUpdateTest {
     public void whenReadBiasedAndUnlocked() {
         FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
 
-        boolean result = orec.___arriveAndLock(1);
+        int result = orec.___tryLockAndArrive(1);
 
-        assertTrue(result);
+        assertEquals(ARRIVE_READBIASED, result);
         assertLocked(orec);
         assertSurplus(1, orec);
         assertReadBiased(orec);

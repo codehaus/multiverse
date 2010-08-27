@@ -1,19 +1,13 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.api.LockStatus;
-import org.multiverse.api.Transaction;
-import org.multiverse.api.blocking.Latch;
-import org.multiverse.api.exceptions.PanicError;
-import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.api.exceptions.WriteConflict;
-import org.multiverse.api.functions.IntFunction;
-import org.multiverse.stms.beta.BetaObjectPool;
-import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.Listeners;
-import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
-import org.multiverse.stms.beta.orec.FastOrec;
-import org.multiverse.stms.beta.orec.Orec;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.api.*;
+import org.multiverse.api.blocking.*;
+import org.multiverse.api.exceptions.*;
+import org.multiverse.api.functions.*;
+import org.multiverse.stms.beta.*;
+import org.multiverse.stms.beta.conflictcounters.*;
+import org.multiverse.stms.beta.orec.*;
+import org.multiverse.stms.beta.transactions.*;
 
 import java.util.UUID;
 
@@ -69,7 +63,7 @@ public final class IntRef
             throw new NullPointerException();
         }
 
-        ___arriveAndLock(0);
+        ___tryLockAndArrive(0);
         this.lockOwner = tx;
     }
 
@@ -120,7 +114,7 @@ public final class IntRef
             IntRefTranlocal read = ___active;
 
             //JMM:
-            final int arriveStatus = ___arrive2(spinCount);
+            final int arriveStatus = ___arrive(spinCount);
 
             if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
                 return IntRefTranlocal.LOCKED;
@@ -159,7 +153,7 @@ public final class IntRef
             return ___active;
         }
 
-        final int arriveStatus = ___arriveAndLock2(spinCount);
+        final int arriveStatus = ___tryLockAndArrive(spinCount);
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
             return  IntRefTranlocal.LOCKED;
         }
@@ -215,9 +209,9 @@ public final class IntRef
                 lockOwner = null;
 
                 if(read.isPermanent){
-                    ___releaseLockByReadBiased();
+                    ___unlockByReadBiased();
                 }else{
-                    ___departAfterReadingAndReleaseLock();
+                    ___departAfterReadingAndUnlock();
                 }
             }else{
                 if(!read.isPermanent){
@@ -268,7 +262,7 @@ public final class IntRef
             }
         }
 
-        long remainingSurplus = ___departAfterUpdateAndReleaseLock(globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(globalConflictCounter, this);
 
         //it is important that this call is done after the actual write. This is needed to give the guarantee
        //that we are going to take care of all listeners that are registered before that write. The read is done
@@ -307,9 +301,9 @@ public final class IntRef
 
         if(tranlocal.isCommitted){
             if(tranlocal.isPermanent){
-                ___releaseLockByReadBiased();
+                ___unlockByReadBiased();
             }else{
-                ___departAfterReadingAndReleaseLock();
+                ___departAfterReadingAndUnlock();
             }
             return null;
         }
@@ -340,7 +334,7 @@ public final class IntRef
             }
         }
 
-        long remainingSurplus = ___departAfterUpdateAndReleaseLock(globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
 
@@ -388,11 +382,11 @@ public final class IntRef
         Tranlocal read = tranlocal.isCommitted ? tranlocal : tranlocal.read;
         if(read.isPermanent){
             //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
-            if(!___arriveAndLock(spinCount)){
+            if(!___tryLockAndArrive(spinCount)){
                 return false;
             }
         }else{
-            if (!___tryLockAfterArrive(spinCount)) {
+            if (!___tryLockAfterNormalArrive(spinCount)) {
                 return false;
             }
         }
@@ -440,7 +434,7 @@ public final class IntRef
         lockOwner = null;
 
         //depart and release the lock. This call is able to deal with readbiased and normal reads.
-        ___departAfterFailureAndReleaseLock();
+        ___departAfterFailureAndUnlock();
     }
 
     @Override
@@ -552,7 +546,7 @@ public final class IntRef
         final int spinCount,
         final GlobalConflictCounter globalConflictCounter){
 
-        if (!___arriveAndLock(spinCount)) {
+        if (!___tryLockAndArrive(spinCount)) {
             throw new WriteConflict();
         }
 
@@ -560,9 +554,9 @@ public final class IntRef
 
         if(oldActive.value== newValue){
             if(oldActive.isPermanent){
-                ___releaseLockByReadBiased();
+                ___unlockByReadBiased();
             } else{
-                ___departAfterReadingAndReleaseLock();
+                ___departAfterReadingAndUnlock();
             }
         }
 
@@ -576,7 +570,7 @@ public final class IntRef
         update.value = newValue;
         update.prepareForCommit();
         ___active = update;
-        long remainingSurplus = ___departAfterUpdateAndReleaseLock(globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);

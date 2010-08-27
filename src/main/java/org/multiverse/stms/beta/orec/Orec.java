@@ -10,7 +10,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
  * set of n arrive/departs that were only used for reading (you know when someone wants to do
  * an update if he acquires the lock), that the Orec goes to readonly mode. So each Orec tracks
  * how many readonly operations have been done on it. Once the orec has become read biased, it
- * is very important the no depart is called (only the ___departAfterUpdateAndReleaseLock can be
+ * is very important the no depart is called (only the {@link #___} can be
  * called).
  * <p/>
  * Once a Orec becomes biased to reading, the tranlocal that belongs to the Orec, can't be pooled
@@ -46,15 +46,9 @@ public interface Orec extends BetaStmConstants {
      * will be visible after this arrive is done.
      *
      * @param spinCount the maximum number of spins in the lock.
-     * @return true if the arrive was a success, false if it was locked.
+     * @return the arrive status (see BetaStmConstants).
      */
-    boolean ___arrive(int spinCount);
-
-    //o is ok, 1 is ok and read biased, 2 is locked
-    int ___arrive2(int spinCount);
-
-    int ___arriveAndLock2(int spinCount);
-
+    int ___arrive(int spinCount);
 
     /**
      * Arrives at this orec an acquired the lock.
@@ -62,9 +56,9 @@ public interface Orec extends BetaStmConstants {
      * This call also acts as a barrier.
      *
      * @param spinCount the maximum number of spins when locked.
-     * @return true if the arrive and the lock was done successfully, false otherwise.
+     * @return the arrive status (see BetaStmConstants).
      */
-    boolean ___arriveAndLock(int spinCount);
+    int ___tryLockAndArrive(int spinCount);
 
     /**
      * Lowers the amount of surplus.
@@ -86,12 +80,12 @@ public interface Orec extends BetaStmConstants {
      * <p/>
      * This method normally is called when a successful update is done.
      *
-     * @param globalConflictCounter  the GlobalConflictCounter that is called when a writeconflict is found
-     * @param transactionalObject the reference that is updated
+     * @param globalConflictCounter the GlobalConflictCounter that is called when a writeconflict is found
+     * @param transactionalObject   the reference that is updated
      * @return the current surplus (so transactionalobject the depart is done)
      * @throws IllegalStateException if the orec is not locked.
      */
-    long ___departAfterUpdateAndReleaseLock(
+    long ___departAfterUpdateAndUnlock(
             GlobalConflictCounter globalConflictCounter, BetaTransactionalObject transactionalObject);
 
     /**
@@ -106,13 +100,15 @@ public interface Orec extends BetaStmConstants {
      * @throws org.multiverse.api.exceptions.PanicError
      *          if surplus is 0, or readbiased, or not locked.
      */
-    long ___departAfterFailureAndReleaseLock();
+    long ___departAfterFailureAndUnlock();
+
+    void ___unlockByReadBiased();
+
 
     /**
      * Departs
-     *
-      */
-    void ___departAfterReadingAndReleaseLock();
+     */
+    void ___departAfterReadingAndUnlock();
 
 
     /**
@@ -132,9 +128,9 @@ public interface Orec extends BetaStmConstants {
      *          if the surplus is 0 (a tryUpdateLock only can be done if the current
      *          transaction did an arrive).
      */
-    boolean ___tryLockAfterArrive(int spinCount);
+    boolean ___tryLockAfterNormalArrive(int spinCount);
 
-   /**
+    /**
      * Checks if this Orec is biased towards reading.
      *
      * @return true if this Orec is biased towards reading.

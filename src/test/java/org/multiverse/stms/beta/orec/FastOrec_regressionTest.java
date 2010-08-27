@@ -30,9 +30,9 @@ public class FastOrec_regressionTest {
         orec.___arrive(1);
 
         //transaction 1
-        orec.___tryLockAfterArrive(1);
+        orec.___tryLockAfterNormalArrive(1);
         //transaction 1
-        orec.___departAfterUpdateAndReleaseLock(globalConflictCounter, dummyRef);
+        orec.___departAfterUpdateAndUnlock(globalConflictCounter, dummyRef);
 
         //transaction 2   (this method should not be called since the the read was readbiased).  The ref does check for
         //only calling this method when it isn't read biased, but the exception still happens.
@@ -53,12 +53,12 @@ public class FastOrec_regressionTest {
         orec.___arrive(1);
 
         //transaction 1 does the update
-        orec.___tryLockAfterArrive(1);
-        orec.___departAfterUpdateAndReleaseLock(globalConflictCounter, dummyRef);
+        orec.___tryLockAfterNormalArrive(1);
+        orec.___departAfterUpdateAndUnlock(globalConflictCounter, dummyRef);
 
         //transaction 2 now does the update.
-        orec.___arriveAndLock(1);
-        orec.___departAfterUpdateAndReleaseLock(globalConflictCounter, dummyRef);
+        orec.___tryLockAndArrive(1);
+        orec.___departAfterUpdateAndUnlock(globalConflictCounter, dummyRef);
 
         System.out.println("orec: "+orec.___toOrecString());
 

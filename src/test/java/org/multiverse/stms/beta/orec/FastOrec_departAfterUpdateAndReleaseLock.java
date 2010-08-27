@@ -27,7 +27,7 @@ public class FastOrec_departAfterUpdateAndReleaseLock {
         long oldConflictCount = globalConflictCounter.count();
 
         try {
-            orec.___departAfterUpdateAndReleaseLock(globalConflictCounter, null);
+            orec.___departAfterUpdateAndUnlock(globalConflictCounter, null);
             fail();
         } catch (PanicError expected) {
         }
@@ -47,7 +47,7 @@ public class FastOrec_departAfterUpdateAndReleaseLock {
 
         long oldConflictCount = globalConflictCounter.count();
         try {
-            orec.___departAfterUpdateAndReleaseLock(globalConflictCounter, null);
+            orec.___departAfterUpdateAndUnlock(globalConflictCounter, null);
             fail();
         } catch (PanicError expected) {
         }
@@ -63,11 +63,11 @@ public class FastOrec_departAfterUpdateAndReleaseLock {
     public void whenLockedAndNoAdditionalSurplus() {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
-        orec.___tryLockAfterArrive(1);
+        orec.___tryLockAfterNormalArrive(1);
 
         long oldConflictCount = globalConflictCounter.count();
 
-        long result = orec.___departAfterUpdateAndReleaseLock(globalConflictCounter, null);
+        long result = orec.___departAfterUpdateAndUnlock(globalConflictCounter, null);
 
         assertEquals(0, result);
         assertEquals(oldConflictCount, globalConflictCounter.count());
@@ -83,11 +83,11 @@ public class FastOrec_departAfterUpdateAndReleaseLock {
         orec.___arrive(1);
         orec.___arrive(1);
         orec.___arrive(1);
-        orec.___tryLockAfterArrive(1);
+        orec.___tryLockAfterNormalArrive(1);
 
         long oldConflictCount = globalConflictCounter.count();
 
-        long result = orec.___departAfterUpdateAndReleaseLock(globalConflictCounter, null);
+        long result = orec.___departAfterUpdateAndUnlock(globalConflictCounter, null);
 
         assertEquals(oldConflictCount + 1, globalConflictCounter.count());
         assertEquals(2, result);

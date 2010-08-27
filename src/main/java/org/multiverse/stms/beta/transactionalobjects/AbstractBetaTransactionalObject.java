@@ -1,18 +1,14 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.*;
 import org.multiverse.api.*;
 import org.multiverse.api.blocking.*;
 import org.multiverse.api.exceptions.*;
-import org.multiverse.api.functions.*;
 import org.multiverse.stms.beta.*;
 import org.multiverse.stms.beta.conflictcounters.*;
 import org.multiverse.stms.beta.orec.*;
 import org.multiverse.stms.beta.transactions.*;
 
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * The transactional object. Atm it is just a reference for an int, more complex stuff will be added again
@@ -66,7 +62,7 @@ public abstract class AbstractBetaTransactionalObject
             throw new NullPointerException();
         }
 
-        ___arriveAndLock(0);
+        ___tryLockAndArrive(0);
         this.lockOwner = tx;
     }
 
@@ -95,7 +91,7 @@ public abstract class AbstractBetaTransactionalObject
             Tranlocal read = ___active;
 
             //JMM:
-            final int arriveStatus = ___arrive2(spinCount);
+            final int arriveStatus = ___arrive(spinCount);
 
             if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
                 return Tranlocal.LOCKED;
@@ -134,7 +130,7 @@ public abstract class AbstractBetaTransactionalObject
             return ___active;
         }
 
-        final int arriveStatus = ___arriveAndLock2(spinCount);
+        final int arriveStatus = ___tryLockAndArrive(spinCount);
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
             return  Tranlocal.LOCKED;
         }
@@ -172,9 +168,9 @@ public abstract class AbstractBetaTransactionalObject
                 lockOwner = null;
 
                 if(read.isPermanent){
-                    ___releaseLockByReadBiased();
+                    ___unlockByReadBiased();
                 }else{
-                    ___departAfterReadingAndReleaseLock();
+                    ___departAfterReadingAndUnlock();
                 }
             }else{
                 if(!read.isPermanent){
@@ -225,7 +221,7 @@ public abstract class AbstractBetaTransactionalObject
             }
         }
 
-        long remainingSurplus = ___departAfterUpdateAndReleaseLock(globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(globalConflictCounter, this);
 
         //it is important that this call is done after the actual write. This is needed to give the guarantee
        //that we are going to take care of all listeners that are registered before that write. The read is done
@@ -264,9 +260,9 @@ public abstract class AbstractBetaTransactionalObject
 
         if(tranlocal.isCommitted){
             if(tranlocal.isPermanent){
-                ___releaseLockByReadBiased();
+                ___unlockByReadBiased();
             }else{
-                ___departAfterReadingAndReleaseLock();
+                ___departAfterReadingAndUnlock();
             }
             return null;
         }
@@ -297,7 +293,7 @@ public abstract class AbstractBetaTransactionalObject
             }
         }
 
-        long remainingSurplus = ___departAfterUpdateAndReleaseLock(globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
 
@@ -345,11 +341,11 @@ public abstract class AbstractBetaTransactionalObject
         Tranlocal read = tranlocal.isCommitted ? tranlocal : tranlocal.read;
         if(read.isPermanent){
             //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
-            if(!___arriveAndLock(spinCount)){
+            if(!___tryLockAndArrive(spinCount)){
                 return false;
             }
         }else{
-            if (!___tryLockAfterArrive(spinCount)) {
+            if (!___tryLockAfterNormalArrive(spinCount)) {
                 return false;
             }
         }
@@ -397,7 +393,7 @@ public abstract class AbstractBetaTransactionalObject
         lockOwner = null;
 
         //depart and release the lock. This call is able to deal with readbiased and normal reads.
-        ___departAfterFailureAndReleaseLock();
+        ___departAfterFailureAndUnlock();
     }
 
     @Override
