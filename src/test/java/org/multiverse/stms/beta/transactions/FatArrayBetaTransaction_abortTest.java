@@ -9,7 +9,7 @@ import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
 import java.util.LinkedList;
@@ -43,7 +43,7 @@ public class FatArrayBetaTransaction_abortTest {
 
     @Test
     public void whenHasUnlockedWrite() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         int oldReadonlyCount = ref.___getReadonlyCount();
 
@@ -63,7 +63,7 @@ public class FatArrayBetaTransaction_abortTest {
 
     @Test
     public void whenHasLockedWrite() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         int oldReadonlyCount = ref.___getReadonlyCount();
 
@@ -83,7 +83,7 @@ public class FatArrayBetaTransaction_abortTest {
 
     @Test
     public void whenHasLockedRead() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         int oldReadonlyCount = ref.___getReadonlyCount();
 
@@ -103,7 +103,7 @@ public class FatArrayBetaTransaction_abortTest {
 
     @Test
     public void whenHasPermanentReadThatIsNotLocked() {
-        LongRef ref = createReadBiasedLongRef(stm);
+        BetaLongRef ref = createReadBiasedLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         int oldReadonlyCount = ref.___getReadonlyCount();
 
@@ -124,7 +124,7 @@ public class FatArrayBetaTransaction_abortTest {
     @Test
     public void whenHasConstructed() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRef ref = new LongRef(tx);
+        BetaLongRef ref = new BetaLongRef(tx);
         LongRefTranlocal write = tx.openForConstruction(ref, pool);
         tx.abort(pool);
 
@@ -147,7 +147,7 @@ public class FatArrayBetaTransaction_abortTest {
 
     @Test
     public void whenNormalListenerAvailable() {
-        LongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = createLongRef(stm, 0);
 
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -161,7 +161,7 @@ public class FatArrayBetaTransaction_abortTest {
 
     @Test
     public void whenPermanentListenerAvailable() {
-        LongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = createLongRef(stm, 0);
 
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);

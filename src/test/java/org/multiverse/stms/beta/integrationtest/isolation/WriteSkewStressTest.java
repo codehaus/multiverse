@@ -11,7 +11,7 @@ import org.multiverse.api.closures.AtomicIntClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.IntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -59,7 +59,7 @@ public class WriteSkewStressTest {
             threads[k] = new TransferThread(k);
         }
 
-        IntRef account = user1.getRandomAccount();
+        BetaIntRef account = user1.getRandomAccount();
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.openForWrite(account, false, pool).value = 1000;
         tx.commit();
@@ -304,10 +304,10 @@ public class WriteSkewStressTest {
             }
 
             if (sum >= amount) {
-                IntRef fromAccount = from.getRandomAccount();
+                BetaIntRef fromAccount = from.getRandomAccount();
                 tx.openForWrite(fromAccount, pessimisticWrite, pool).value -= amount;
 
-                IntRef toAccount = to.getRandomAccount();
+                BetaIntRef toAccount = to.getRandomAccount();
                 tx.openForWrite(toAccount, pessimisticWrite, pool).value += amount;
             }
 
@@ -324,10 +324,10 @@ public class WriteSkewStressTest {
                 .setReadonly(true)
                 .buildAtomicBlock();
 
-        private IntRef account1 = new IntRef();
-        private IntRef account2 = new IntRef();
+        private BetaIntRef account1 = new BetaIntRef();
+        private BetaIntRef account2 = new BetaIntRef();
 
-        public IntRef getRandomAccount() {
+        public BetaIntRef getRandomAccount() {
             return randomBoolean() ? account1 : account2;
         }
 

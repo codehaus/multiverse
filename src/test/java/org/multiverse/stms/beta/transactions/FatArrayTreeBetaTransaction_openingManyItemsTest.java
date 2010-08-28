@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 
@@ -37,10 +37,10 @@ public class FatArrayTreeBetaTransaction_openingManyItemsTest {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
 
         int refCount = 10000;
-        LongRef[] refs = new LongRef[refCount];
+        BetaLongRef[] refs = new BetaLongRef[refCount];
         LongRefTranlocal[] tranlocals = new LongRefTranlocal[refCount];
         for (int k = 0; k < refCount; k++) {
-            LongRef ref = createLongRef(stm);
+            BetaLongRef ref = createLongRef(stm);
             refs[k] = ref;
             tranlocals[k] = reading ? tx.openForWrite(ref, false, pool) : tx.openForWrite(ref, false, pool);
         }
@@ -51,7 +51,7 @@ public class FatArrayTreeBetaTransaction_openingManyItemsTest {
         System.out.println("usage percentage: " + (100 * tx.getUsage()));
 
         for (int k = 0; k < refCount; k++) {
-            LongRef ref = refs[k];
+            BetaLongRef ref = refs[k];
             Tranlocal found = reading ? tx.openForWrite(ref, false, pool) : tx.openForWrite(ref, false, pool);
             assertSame(ref, found.owner);
             assertSame("tranlocal is incorrect at " + k, tranlocals[k], found);

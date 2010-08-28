@@ -8,7 +8,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.IntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.multiverse.TestUtils.*;
@@ -21,7 +21,7 @@ public class DeadLockStressTest {
     private volatile boolean stop;
     private int refCount = 100;
     private int threadCount = 10;
-    private IntRef[] refs;
+    private BetaIntRef[] refs;
     private ChangeThread[] threads;
     private BetaStm stm;
 
@@ -34,7 +34,7 @@ public class DeadLockStressTest {
 
     @Test
     public void test() {
-        refs = new IntRef[refCount];
+        refs = new BetaIntRef[refCount];
         for (int k = 0; k < refCount; k++) {
             refs[k] = createIntRef(stm);
         }
@@ -69,7 +69,7 @@ public class DeadLockStressTest {
                             int index = randomInt(refs.length);
 
                             if (randomInt(5) == 0) {
-                                IntRef ref = refs[index];
+                                BetaIntRef ref = refs[index];
                                 ref.set(btx, pool, ref.get(btx, pool) + 1);
                             }
                         }

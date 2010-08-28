@@ -9,7 +9,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.fail;
@@ -20,7 +20,7 @@ import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalB
 
 public class ReadConsistencyStressTest {
 
-    private LongRef[] refs;
+    private BetaLongRef[] refs;
 
     private int readerCount = 10;
     private int writerCount = 2;
@@ -106,7 +106,7 @@ public class ReadConsistencyStressTest {
 
     public void test(int refCount, boolean readtracking) {
 
-        refs = new LongRef[refCount];
+        refs = new BetaLongRef[refCount];
         for (int k = 0; k < refs.length; k++) {
             refs[k] = createLongRef(stm);
         }
@@ -144,7 +144,7 @@ public class ReadConsistencyStressTest {
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
                     BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    for (LongRef ref : refs) {
+                    for (BetaLongRef ref : refs) {
                         ref.set(btx, pool, ref.get(btx, pool));
                     }
                 }

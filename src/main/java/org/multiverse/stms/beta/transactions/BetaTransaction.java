@@ -1,17 +1,22 @@
 package org.multiverse.stms.beta.transactions;
 
-import org.multiverse.api.*;
-import org.multiverse.api.blocking.*;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionStatus;
+import org.multiverse.api.Watch;
+import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.*;
-import org.multiverse.api.functions.*;
-import org.multiverse.api.lifecycle.*;
-import org.multiverse.stms.beta.*;
+import org.multiverse.api.functions.Function;
+import org.multiverse.api.functions.IntFunction;
+import org.multiverse.api.functions.LongFunction;
+import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
-import java.util.*;
+import java.util.ArrayList;
 
+import static java.lang.String.format;
 import static org.multiverse.stms.beta.BetaStmUtils.toDebugString;
-import static java.lang.String.*;
 
 /**
  * @author Peter Veentjer
@@ -387,29 +392,29 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract void addWatch(BetaTransactionalObject object, Watch watch);
 
-    public abstract <E> RefTranlocal<E> openForRead(Ref<E> ref, boolean lock, BetaObjectPool pool);
+    public abstract <E> RefTranlocal<E> openForRead(BetaRef<E> ref, boolean lock, BetaObjectPool pool);
 
-    public abstract <E> RefTranlocal<E> openForWrite(Ref<E> ref, boolean lock, BetaObjectPool pool);
+    public abstract <E> RefTranlocal<E> openForWrite(BetaRef<E> ref, boolean lock, BetaObjectPool pool);
 
-    public abstract <E> RefTranlocal<E> openForConstruction(Ref<E> ref, BetaObjectPool pool);
+    public abstract <E> RefTranlocal<E> openForConstruction(BetaRef<E> ref, BetaObjectPool pool);
 
-    public abstract <E> void commute(Ref<E> ref, BetaObjectPool pool, Function<E> function);
+    public abstract <E> void commute(BetaRef<E> ref, BetaObjectPool pool, Function<E> function);
 
-    public abstract  IntRefTranlocal openForRead(IntRef ref, boolean lock, BetaObjectPool pool);
+    public abstract  IntRefTranlocal openForRead(BetaIntRef ref, boolean lock, BetaObjectPool pool);
 
-    public abstract  IntRefTranlocal openForWrite(IntRef ref, boolean lock, BetaObjectPool pool);
+    public abstract  IntRefTranlocal openForWrite(BetaIntRef ref, boolean lock, BetaObjectPool pool);
 
-    public abstract  IntRefTranlocal openForConstruction(IntRef ref, BetaObjectPool pool);
+    public abstract  IntRefTranlocal openForConstruction(BetaIntRef ref, BetaObjectPool pool);
 
-    public abstract  void commute(IntRef ref, BetaObjectPool pool, IntFunction function);
+    public abstract  void commute(BetaIntRef ref, BetaObjectPool pool, IntFunction function);
 
-    public abstract  LongRefTranlocal openForRead(LongRef ref, boolean lock, BetaObjectPool pool);
+    public abstract  LongRefTranlocal openForRead(BetaLongRef ref, boolean lock, BetaObjectPool pool);
 
-    public abstract  LongRefTranlocal openForWrite(LongRef ref, boolean lock, BetaObjectPool pool);
+    public abstract  LongRefTranlocal openForWrite(BetaLongRef ref, boolean lock, BetaObjectPool pool);
 
-    public abstract  LongRefTranlocal openForConstruction(LongRef ref, BetaObjectPool pool);
+    public abstract  LongRefTranlocal openForConstruction(BetaLongRef ref, BetaObjectPool pool);
 
-    public abstract  void commute(LongRef ref, BetaObjectPool pool, LongFunction function);
+    public abstract  void commute(BetaLongRef ref, BetaObjectPool pool, LongFunction function);
 
     public abstract  Tranlocal openForRead(BetaTransactionalObject ref, boolean lock, BetaObjectPool pool);
 

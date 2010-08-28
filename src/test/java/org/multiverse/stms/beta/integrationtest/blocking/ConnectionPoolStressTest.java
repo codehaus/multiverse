@@ -10,9 +10,9 @@ import org.multiverse.api.closures.AtomicIntClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.IntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaRef;
 import org.multiverse.stms.beta.transactionalobjects.IntRefTranlocal;
-import org.multiverse.stms.beta.transactionalobjects.Ref;
 import org.multiverse.stms.beta.transactionalobjects.RefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -82,8 +82,8 @@ public class ConnectionPoolStressTest {
 
         final AtomicBlock sizeBlock = stm.getTransactionFactoryBuilder().buildAtomicBlock();
 
-        final IntRef size = createIntRef(stm);
-        final Ref<Node<Connection>> head = createRef(stm);
+        final BetaIntRef size = createIntRef(stm);
+        final BetaRef<Node<Connection>> head = createRef(stm);
 
         ConnectionPool(final int poolsize) {
             stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {

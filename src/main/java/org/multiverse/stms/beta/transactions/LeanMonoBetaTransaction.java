@@ -1,17 +1,20 @@
 package org.multiverse.stms.beta.transactions;
 
-import org.multiverse.api.*;
-import org.multiverse.api.blocking.*;
-import org.multiverse.api.exceptions.*;
-import org.multiverse.api.functions.*;
-import org.multiverse.api.lifecycle.*;
-import org.multiverse.stms.beta.*;
+import org.multiverse.api.Watch;
+import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.SpeculativeConfigurationError;
+import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.functions.Function;
+import org.multiverse.api.functions.IntFunction;
+import org.multiverse.api.functions.LongFunction;
+import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.transactionalobjects.*;
-import org.multiverse.stms.beta.conflictcounters.*;
-
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.*;
 
 import static java.lang.String.format;
+import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
  * A BetaTransaction tailored for dealing with 1 transactional object.
@@ -36,7 +39,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
 
     @Override
-    public final <E> RefTranlocal<E> openForRead(final Ref<E> ref,  boolean lock, final BetaObjectPool pool) {
+    public final <E> RefTranlocal<E> openForRead(final BetaRef<E> ref,  boolean lock, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(pool, ref);
@@ -106,7 +109,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     @Override
     public final <E> RefTranlocal<E> openForWrite(
-        final Ref<E> ref, boolean lock, final BetaObjectPool pool) {
+        final BetaRef<E> ref, boolean lock, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
             throw abortOpenForWrite(pool, ref);
@@ -177,7 +180,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     @Override
     public final <E> RefTranlocal<E> openForConstruction(
-        final Ref<E> ref, final BetaObjectPool pool) {
+        final BetaRef<E> ref, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
            throw abortOpenForConstruction(pool, ref);
@@ -220,7 +223,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
     }
 
     public <E> void commute(
-        Ref<E> ref, BetaObjectPool pool, Function<E> function){
+        BetaRef<E> ref, BetaObjectPool pool, Function<E> function){
 
         if (status != ACTIVE) {
             throw abortCommute(pool, ref, function);
@@ -232,7 +235,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
      }
 
     @Override
-    public final  IntRefTranlocal openForRead(final IntRef ref,  boolean lock, final BetaObjectPool pool) {
+    public final  IntRefTranlocal openForRead(final BetaIntRef ref,  boolean lock, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(pool, ref);
@@ -302,7 +305,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     @Override
     public final  IntRefTranlocal openForWrite(
-        final IntRef ref, boolean lock, final BetaObjectPool pool) {
+        final BetaIntRef ref, boolean lock, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
             throw abortOpenForWrite(pool, ref);
@@ -373,7 +376,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     @Override
     public final  IntRefTranlocal openForConstruction(
-        final IntRef ref, final BetaObjectPool pool) {
+        final BetaIntRef ref, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
            throw abortOpenForConstruction(pool, ref);
@@ -416,7 +419,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
     }
 
     public  void commute(
-        IntRef ref, BetaObjectPool pool, IntFunction function){
+        BetaIntRef ref, BetaObjectPool pool, IntFunction function){
 
         if (status != ACTIVE) {
             throw abortCommute(pool, ref, function);
@@ -428,7 +431,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
      }
 
     @Override
-    public final  LongRefTranlocal openForRead(final LongRef ref,  boolean lock, final BetaObjectPool pool) {
+    public final  LongRefTranlocal openForRead(final BetaLongRef ref,  boolean lock, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(pool, ref);
@@ -498,7 +501,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     @Override
     public final  LongRefTranlocal openForWrite(
-        final LongRef ref, boolean lock, final BetaObjectPool pool) {
+        final BetaLongRef ref, boolean lock, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
             throw abortOpenForWrite(pool, ref);
@@ -569,7 +572,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     @Override
     public final  LongRefTranlocal openForConstruction(
-        final LongRef ref, final BetaObjectPool pool) {
+        final BetaLongRef ref, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
            throw abortOpenForConstruction(pool, ref);
@@ -612,7 +615,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
     }
 
     public  void commute(
-        LongRef ref, BetaObjectPool pool, LongFunction function){
+        BetaLongRef ref, BetaObjectPool pool, LongFunction function){
 
         if (status != ACTIVE) {
             throw abortCommute(pool, ref, function);

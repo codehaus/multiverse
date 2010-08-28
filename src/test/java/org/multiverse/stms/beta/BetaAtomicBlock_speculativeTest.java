@@ -8,7 +8,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.*;
 
 import java.util.LinkedList;
@@ -34,7 +34,7 @@ public class BetaAtomicBlock_speculativeTest {
 
     @Test
     public void whenTransactionGrowing() {
-        final LongRef[] refs = new LongRef[1000];
+        final BetaLongRef[] refs = new BetaLongRef[1000];
         for (int k = 0; k < refs.length; k++) {
             refs[k] = createLongRef(stm);
         }
@@ -54,13 +54,13 @@ public class BetaAtomicBlock_speculativeTest {
                 attempt.incrementAndGet();
 
                 transactions.add(btx);
-                for (LongRef ref : refs) {
+                for (BetaLongRef ref : refs) {
                     btx.openForWrite(ref, false, pool).value = 1;
                 }
             }
         });
 
-        for (LongRef ref : refs) {
+        for (BetaLongRef ref : refs) {
             assertEquals(1, ref.___unsafeLoad().value);
         }
 
@@ -100,7 +100,7 @@ public class BetaAtomicBlock_speculativeTest {
     @Test
     public void whenCommute() {
         final List<BetaTransaction> transactions = new LinkedList<BetaTransaction>();
-        final LongRef ref = createLongRef(stm);
+        final BetaLongRef ref = createLongRef(stm);
         final LongFunction function = mock(LongFunction.class);
 
         AtomicBlock block = stm.getTransactionFactoryBuilder()
@@ -157,8 +157,8 @@ public class BetaAtomicBlock_speculativeTest {
 
     @Test
     public void whenTimeoutAvailable_thenCopied() {
-        final LongRef ref1 = createLongRef(stm);
-        final LongRef ref2 = createLongRef(stm);
+        final BetaLongRef ref1 = createLongRef(stm);
+        final BetaLongRef ref2 = createLongRef(stm);
 
         final List<BetaTransaction> transactions = new LinkedList<BetaTransaction>();
 

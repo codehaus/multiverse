@@ -28,7 +28,7 @@ public class LongRef_commitDirtyTest implements BetaStmConstants{
 
     @Test
     public void whenWriteHasListeners() {
-        LongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
         Orec orec = ref.___getOrec();
 
         CheapLatch latch = new CheapLatch();
@@ -62,7 +62,7 @@ public class LongRef_commitDirtyTest implements BetaStmConstants{
 
     @Test
     public void whenCommitWithConflict() {
-        LongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
         Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -89,7 +89,7 @@ public class LongRef_commitDirtyTest implements BetaStmConstants{
 
     @Test
     public void whenDirtyWrite() {
-        LongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
         Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -113,7 +113,7 @@ public class LongRef_commitDirtyTest implements BetaStmConstants{
 
     @Test
     public void whenNonDirtyWrite() {
-        LongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         Orec orec = ref.___getOrec();
 
@@ -136,7 +136,7 @@ public class LongRef_commitDirtyTest implements BetaStmConstants{
 
     @Test
     public void whenCommitOnReadBiasedOrec() {
-        LongRef ref = createReadBiasedLongRef(stm);
+        BetaLongRef ref = createReadBiasedLongRef(stm);
 
         Orec orec = ref.___getOrec();
         assertUnlocked(orec);

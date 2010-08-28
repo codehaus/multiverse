@@ -3,7 +3,7 @@ package org.multiverse.benchmarks;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
@@ -31,7 +31,7 @@ public class UncontendedFatUpdateScalabilityTest {
         int[] processors = generateProcessorRange();
 
         System.out.printf("Multiverse> Uncontended update fat-transaction benchmark\n");
-        System.out.printf("Multiverse> 1 Ref per transaction\n");
+        System.out.printf("Multiverse> 1 BetaRef per transaction\n");
         System.out.printf("Multiverse> %s Transactions per thread\n", format(transactionCount));
         System.out.printf("Multiverse> Running with the following processor range %s\n", Arrays.toString(processors));
         Result[] result = new Result[processors.length];
@@ -98,7 +98,7 @@ public class UncontendedFatUpdateScalabilityTest {
         }
 
         public void run() {
-            LongRef ref = BetaStmUtils.createLongRef(stm);
+            BetaLongRef ref = BetaStmUtils.createLongRef(stm);
 
             BetaObjectPool pool = new BetaObjectPool();
 

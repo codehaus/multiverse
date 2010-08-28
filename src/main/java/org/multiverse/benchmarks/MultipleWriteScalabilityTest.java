@@ -2,7 +2,7 @@ package org.multiverse.benchmarks;
 
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
@@ -104,7 +104,7 @@ public class MultipleWriteScalabilityTest {
         }
 
         public void run() {
-            LongRef[] refs = new LongRef[refCount];
+            BetaLongRef[] refs = new BetaLongRef[refCount];
             for (int k = 0; k < refCount; k++) {
                 refs[k] = createReadBiasedLongRef(stm);
             }

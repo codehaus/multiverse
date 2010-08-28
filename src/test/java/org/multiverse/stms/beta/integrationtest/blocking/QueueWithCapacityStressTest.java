@@ -9,9 +9,9 @@ import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.IntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaRef;
 import org.multiverse.stms.beta.transactionalobjects.IntRefTranlocal;
-import org.multiverse.stms.beta.transactionalobjects.Ref;
 import org.multiverse.stms.beta.transactionalobjects.RefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -112,7 +112,7 @@ public class QueueWithCapacityStressTest {
         final Stack<E> readyToPopStack = new Stack<E>();
         final AtomicBlock pushBlock = stm.getTransactionFactoryBuilder().buildAtomicBlock();
         final AtomicBlock popBlock = stm.getTransactionFactoryBuilder().buildAtomicBlock();
-        final IntRef size = createIntRef(stm);
+        final BetaIntRef size = createIntRef(stm);
 
         public void push(final E item) {
             pushBlock.execute(new AtomicVoidClosure() {
@@ -164,7 +164,7 @@ public class QueueWithCapacityStressTest {
     }
 
     class Stack<E> {
-        final Ref<Node<E>> head = createRef(stm);
+        final BetaRef<Node<E>> head = createRef(stm);
 
         void push(BetaTransaction tx, BetaObjectPool pool, E item) {
             RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, pessimistic, getThreadLocalBetaObjectPool());

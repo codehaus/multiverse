@@ -30,7 +30,7 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
 
     @Test
     public void whenSingleCommutingFunction() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
@@ -48,7 +48,7 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
 
     @Test
     public void whenMultipleCommutingFunctions() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);

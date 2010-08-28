@@ -28,13 +28,13 @@ public class LongRef_atomicGetTest {
     @Test(expected = IllegalStateException.class)
     public void whenUnconstructed() {
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRef ref = new LongRef(tx);
+        BetaLongRef ref = new BetaLongRef(tx);
         ref.atomicGet();
     }
 
     @Test
     public void whenUpdatedBiasedOnUnlocked() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
 
         long result = ref.atomicGet();
         assertEquals(100, result);
@@ -43,7 +43,7 @@ public class LongRef_atomicGetTest {
 
     @Test
     public void whenUpdateBiasedAndLocked_thenIllegalStateException() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
         BetaTransaction lockOwner = stm.startDefaultTransaction();
         lockOwner.openForRead(ref, true, new BetaObjectPool());
 
@@ -60,7 +60,7 @@ public class LongRef_atomicGetTest {
 
     @Test
     public void whenReadBiasedAndUnlocked() {
-        LongRef ref = createReadBiasedLongRef(stm, 100);
+        BetaLongRef ref = createReadBiasedLongRef(stm, 100);
 
         long result = ref.atomicGet();
         assertEquals(100, result);
@@ -69,7 +69,7 @@ public class LongRef_atomicGetTest {
 
     @Test
     public void whenReadBiasedAndLocked() {
-        LongRef ref = createReadBiasedLongRef(stm, 100);
+        BetaLongRef ref = createReadBiasedLongRef(stm, 100);
         BetaTransaction lockOwner = stm.startDefaultTransaction();
         lockOwner.openForRead(ref, true, new BetaObjectPool());
 

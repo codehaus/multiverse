@@ -9,7 +9,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.IntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactionalobjects.IntRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -78,7 +78,7 @@ public class NonReentrantSemaphoreStressTest {
 
     class Semaphore {
 
-        private final IntRef ref;
+        private final BetaIntRef ref;
         private final AtomicBlock upBlock = stm.getTransactionFactoryBuilder().buildAtomicBlock();
         private final AtomicBlock downBlock = stm.getTransactionFactoryBuilder().buildAtomicBlock();
         private final AtomicVoidClosure upClosure = new AtomicVoidClosure() {

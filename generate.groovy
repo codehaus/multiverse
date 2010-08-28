@@ -36,6 +36,7 @@ class TransactionalObject {
   String accessModifier//the access modifier the ref gets
   String functionClass//the class of the callable used for commuting operations
   boolean isReference
+  String referenceInterface
 }
 
 VelocityEngine engine = new VelocityEngine();
@@ -164,21 +165,23 @@ List<AtomicClosure> createClosures() {
 List<TransactionalObject> createTransactionalObjects() {
   def result = []
   result.add new TransactionalObject(
-          name: 'Ref',
+          name: 'BetaRef',
           tranlocal: 'RefTranlocal',
           type: 'E',
           typeParameter: '<E>',
 //          parametrizedTranlocal: 'RefTranlocal<E>',
           initialValue: 'null',
+          referenceInterface: 'Ref',
           classIndex: 0,
           accessModifier: 'final',
           functionClass: 'Function',
           isReference: true)
   result.add new TransactionalObject(
-          name: 'IntRef',
+          name: 'BetaIntRef',
           tranlocal: 'IntRefTranlocal',
 //          parametrizedTranlocal: 'IntRefTranlocal',
           type: 'int',
+          referenceInterface: 'IntRef',
           typeParameter: '',
           initialValue: '0',
           classIndex: 1,
@@ -186,8 +189,9 @@ List<TransactionalObject> createTransactionalObjects() {
           functionClass: 'IntFunction',
           isReference: true)
   result.add new TransactionalObject(
-          name: 'LongRef',
+          name: 'BetaLongRef',
           tranlocal: 'LongRefTranlocal',
+          referenceInterface: 'LongRef',
           type: 'long',
           typeParameter: '',
           initialValue: '0',
@@ -204,6 +208,7 @@ List<TransactionalObject> createTransactionalObjects() {
           classIndex: -1,
           accessModifier: 'abstract',
           functionClass: 'Function',
+          referenceInterface: '',
           isReference: false)
   result
 }

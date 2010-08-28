@@ -6,7 +6,7 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.InvisibleCheckedException;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
@@ -26,7 +26,7 @@ public class BetaAtomicBlock_exceptionsTest {
     @Test
     public void executeChecked_whenCheckedExceptionThrown() {
         AtomicBlock block = stm.getTransactionFactoryBuilder().buildAtomicBlock();
-        final LongRef ref = createLongRef(stm, 10);
+        final BetaLongRef ref = createLongRef(stm, 10);
 
         final Exception ex = new Exception();
 
@@ -51,7 +51,7 @@ public class BetaAtomicBlock_exceptionsTest {
     @Test
     public void executeChecked_whenRuntimeExceptionThrown() throws Exception {
         AtomicBlock block = stm.getTransactionFactoryBuilder().buildAtomicBlock();
-        final LongRef ref = createLongRef(stm, 10);
+        final BetaLongRef ref = createLongRef(stm, 10);
 
         final RuntimeException ex = new RuntimeException();
 
@@ -77,7 +77,7 @@ public class BetaAtomicBlock_exceptionsTest {
     @Test
     public void executeChecked_whenErrorThrown() throws Exception {
         AtomicBlock block = stm.getTransactionFactoryBuilder().buildAtomicBlock();
-        final LongRef ref = createLongRef(stm, 10);
+        final BetaLongRef ref = createLongRef(stm, 10);
 
         final Error ex = new Error();
 
@@ -102,7 +102,7 @@ public class BetaAtomicBlock_exceptionsTest {
      @Test
     public void execute_whenCheckedExceptionThrown() {
         AtomicBlock block = stm.getTransactionFactoryBuilder().buildAtomicBlock();
-        final LongRef ref = createLongRef(stm, 10);
+        final BetaLongRef ref = createLongRef(stm, 10);
 
         final Exception ex = new Exception();
 
@@ -127,7 +127,7 @@ public class BetaAtomicBlock_exceptionsTest {
     @Test
     public void execute_whenRuntimeExceptionThrown() {
         AtomicBlock block = stm.getTransactionFactoryBuilder().buildAtomicBlock();
-        final LongRef ref = createLongRef(stm, 10);
+        final BetaLongRef ref = createLongRef(stm, 10);
 
         final RuntimeException ex = new RuntimeException();
 
@@ -153,7 +153,7 @@ public class BetaAtomicBlock_exceptionsTest {
     @Test
     public void execute_whenErrorThrown() {
         AtomicBlock block = stm.getTransactionFactoryBuilder().buildAtomicBlock();
-        final LongRef ref = createLongRef(stm, 10);
+        final BetaLongRef ref = createLongRef(stm, 10);
 
         final Error ex = new Error();
 

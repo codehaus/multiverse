@@ -8,7 +8,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.IntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertTrue;
@@ -21,7 +21,7 @@ import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalB
 
 public class RetryInterruptibleTest {
 
-    private IntRef ref;
+    private BetaIntRef ref;
     private BetaStm stm;
 
     @Before
@@ -33,7 +33,7 @@ public class RetryInterruptibleTest {
 
     @Test
     public void test() throws InterruptedException {
-        ref = new IntRef(0);
+        ref = new BetaIntRef(0);
 
         AwaitThread t = new AwaitThread();
         t.start();

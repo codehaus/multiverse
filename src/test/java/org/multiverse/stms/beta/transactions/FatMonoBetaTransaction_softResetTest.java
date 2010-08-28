@@ -7,7 +7,7 @@ import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
 import static org.junit.Assert.*;
@@ -68,7 +68,7 @@ public class FatMonoBetaTransaction_softResetTest {
 
     @Test
     public void whenContainsUnlockedNonPermanentRead() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -88,7 +88,7 @@ public class FatMonoBetaTransaction_softResetTest {
 
     @Test
     public void whenContainsUnlockedPermanent() {
-        LongRef ref = createReadBiasedLongRef(stm);
+        BetaLongRef ref = createReadBiasedLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -108,7 +108,7 @@ public class FatMonoBetaTransaction_softResetTest {
 
     @Test
     public void whenNormalUpdate() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -130,7 +130,7 @@ public class FatMonoBetaTransaction_softResetTest {
 
     @Test
     public void whendLockedWrites() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -164,7 +164,7 @@ public class FatMonoBetaTransaction_softResetTest {
 
     @Test
     public void whenPreparedResourcesNeedRelease() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -188,7 +188,7 @@ public class FatMonoBetaTransaction_softResetTest {
     @Test
     public void whenContainsConstructed() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRef ref = new LongRef(tx);
+        BetaLongRef ref = new BetaLongRef(tx);
         LongRefTranlocal constructed = tx.openForConstruction(ref, pool);
 
         boolean result = tx.softReset();

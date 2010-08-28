@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -25,7 +25,7 @@ public class LeanMonoBetaTransaction_openForReadTest {
 
     @Test
     public void whenUntrackedRead_thenSpeculativeConfigError() {
-        LongRef ref = createReadBiasedLongRef(stm, 100);
+        BetaLongRef ref = createReadBiasedLongRef(stm, 100);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setBlockingAllowed(false)

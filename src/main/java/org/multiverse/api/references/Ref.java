@@ -1,11 +1,13 @@
 package org.multiverse.api.references;
 
+import org.multiverse.api.TransactionalObject;
+
 /**
- * Created by IntelliJ IDEA.
- * User: alarmnummer
- * Date: Aug 28, 2010
- * Time: 12:15:35 AM
- * To change this template use File | Settings | File Templates.
+ * A Transactional Reference.
+ *
+ * @param <E>
  */
-public interface Ref {
+public interface Ref<E> extends TransactionalObject{
+
+    E atomicGet();
 }

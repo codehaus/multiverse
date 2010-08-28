@@ -3,7 +3,7 @@ package org.multiverse.api.functions;
 /**
  * A Function that accepts an argument of a certain type and returns a new value of the same type.
  *
- * Can be used for commuting functions or for the Ref.alter.
+ * Can be used for commuting functions or for the BetaRef.alter.
  *
  * @param <E>
  */

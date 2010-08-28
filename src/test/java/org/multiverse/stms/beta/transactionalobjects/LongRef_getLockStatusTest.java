@@ -25,13 +25,13 @@ public class LongRef_getLockStatusTest {
 
     @Test(expected = NullPointerException.class)
     public void whenNull_thenNullPointerException() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         ref.getLockStatus(null);
     }
 
     @Test
     public void whenFree() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         Transaction tx = mock(Transaction.class);
         LockStatus result = ref.getLockStatus(tx);
@@ -40,7 +40,7 @@ public class LongRef_getLockStatusTest {
 
     @Test
     public void whenLockedByOther() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         LeanMonoBetaTransaction otherTx = new LeanMonoBetaTransaction(stm);
         otherTx.openForRead(ref, true, pool);
@@ -53,7 +53,7 @@ public class LongRef_getLockStatusTest {
 
     @Test
     public void whenLockedBySelf() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(stm);
         tx.openForRead(ref, true, pool);

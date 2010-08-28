@@ -10,7 +10,7 @@ import org.multiverse.benchmarks.BenchmarkUtils;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -55,7 +55,7 @@ public class IsolationStressTest {
     public void test(boolean pessimistic, boolean dirtyCheckEnabled) {
         int threadCount = 2;
         UpdateThread[] threads = new UpdateThread[threadCount];
-        LongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
         long txCount = 100 * 1000 * 1000;
 
         for (int k = 0; k < threads.length; k++) {
@@ -80,12 +80,12 @@ public class IsolationStressTest {
 
     class UpdateThread extends TestThread {
         private final boolean dirtyCheckEnabled;
-        private final LongRef ref;
+        private final BetaLongRef ref;
         private final long count;
         private final boolean pessimistic;
         private long durationMs;
         
-        public UpdateThread(int id, LongRef ref, long count, boolean pessimistic, boolean dirtyCheckEnabled) {
+        public UpdateThread(int id, BetaLongRef ref, long count, boolean pessimistic, boolean dirtyCheckEnabled) {
             super("UpdateThread-" + id);
             this.ref = ref;
             this.count = count;

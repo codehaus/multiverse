@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.multiverse.api.exceptions.WriteConflict;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -36,7 +36,7 @@ public class WriteConflictTest {
 
     @Test
     public void whenDirtyCheckAndChange_ThenWriteConflict() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(false)
@@ -64,7 +64,7 @@ public class WriteConflictTest {
 
     @Test
     public void whenDirtyCheckAndNoChange_ThenNoWriteConflict() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(false)
@@ -87,7 +87,7 @@ public class WriteConflictTest {
 
     @Test
     public void whenNoDirtyCheckAndChange_ThenWriteConflict() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(false)
@@ -114,7 +114,7 @@ public class WriteConflictTest {
 
     @Test
     public void whenNoDirtyCheckAndNoChange_ThenWriteConflict() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(false)

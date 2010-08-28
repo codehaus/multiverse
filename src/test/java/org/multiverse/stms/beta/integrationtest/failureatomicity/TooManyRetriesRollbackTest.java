@@ -9,7 +9,7 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.IntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertEquals;
@@ -21,8 +21,8 @@ import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class TooManyRetriesRollbackTest {
-    private IntRef modifyRef;
-    private IntRef retryRef;
+    private BetaIntRef modifyRef;
+    private BetaIntRef retryRef;
     private volatile boolean finished;
     private BetaStm stm;
 

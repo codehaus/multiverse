@@ -3,7 +3,7 @@ package org.multiverse.stms.beta.conflictcounters;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertNotEquals;
@@ -23,7 +23,7 @@ public class LocalConflictCounterTest {
 
         LocalConflictCounter local = global.createLocalConflictCounter();
 
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         global.signalConflict(ref);
         long oldCount = local.get();
 

@@ -8,7 +8,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -21,7 +21,7 @@ public class MoneyTransferStressTest {
 
     private volatile boolean stop;
 
-    private LongRef[] accounts;
+    private BetaLongRef[] accounts;
     private BetaStm stm;
     private boolean optimistic;
 
@@ -74,7 +74,7 @@ public class MoneyTransferStressTest {
 
     public void test(int accountCount, int threadCount, boolean optimistic) {
         this.optimistic = optimistic;
-        accounts = new LongRef[accountCount];
+        accounts = new BetaLongRef[accountCount];
 
         long initialAmount = 0;
         for (int k = 0; k < accountCount; k++) {
@@ -98,7 +98,7 @@ public class MoneyTransferStressTest {
 
     private long getTotal() {
         long sum = 0;
-        for (LongRef account : accounts) {
+        for (BetaLongRef account : accounts) {
             sum += account.___unsafeLoad().value;
         }
         return sum;
@@ -126,8 +126,8 @@ public class MoneyTransferStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    LongRef from = accounts[randomInt(accounts.length)];
-                    LongRef to = accounts[randomInt(accounts.length)];
+                    BetaLongRef from = accounts[randomInt(accounts.length)];
+                    BetaLongRef to = accounts[randomInt(accounts.length)];
                     int amount = randomInt(100);
 
                     btx.openForWrite(to, !optimistic, pool).value += amount;

@@ -48,7 +48,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
     @Override
     public <E> RefTranlocal<E> openForRead(
-        final Ref<E> ref, boolean lock, final BetaObjectPool pool) {
+        final BetaRef<E> ref, boolean lock, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(pool, ref);
@@ -136,7 +136,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
     @Override
     public <E> RefTranlocal<E> openForWrite(
-        final Ref<E>  ref, boolean lock, final BetaObjectPool pool) {
+        final BetaRef<E>  ref, boolean lock, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
            throw abortOpenForWrite(pool, ref);
@@ -237,7 +237,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
     @Override
     public final <E> RefTranlocal<E> openForConstruction(
-        final Ref<E> ref, final BetaObjectPool pool) {
+        final BetaRef<E> ref, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
             throw abortOpenForConstruction(pool, ref);
@@ -290,7 +290,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     public <E> void commute(
-        final Ref<E> ref, final BetaObjectPool pool, Function<E> function){
+        final BetaRef<E> ref, final BetaObjectPool pool, Function<E> function){
 
         if (status != ACTIVE) {
             throw abortCommute(pool, ref, function);
@@ -343,7 +343,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
     @Override
     public  IntRefTranlocal openForRead(
-        final IntRef ref, boolean lock, final BetaObjectPool pool) {
+        final BetaIntRef ref, boolean lock, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(pool, ref);
@@ -431,7 +431,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
     @Override
     public  IntRefTranlocal openForWrite(
-        final IntRef  ref, boolean lock, final BetaObjectPool pool) {
+        final BetaIntRef  ref, boolean lock, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
            throw abortOpenForWrite(pool, ref);
@@ -532,7 +532,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
     @Override
     public final  IntRefTranlocal openForConstruction(
-        final IntRef ref, final BetaObjectPool pool) {
+        final BetaIntRef ref, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
             throw abortOpenForConstruction(pool, ref);
@@ -585,7 +585,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     public  void commute(
-        final IntRef ref, final BetaObjectPool pool, IntFunction function){
+        final BetaIntRef ref, final BetaObjectPool pool, IntFunction function){
 
         if (status != ACTIVE) {
             throw abortCommute(pool, ref, function);
@@ -638,7 +638,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
     @Override
     public  LongRefTranlocal openForRead(
-        final LongRef ref, boolean lock, final BetaObjectPool pool) {
+        final BetaLongRef ref, boolean lock, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(pool, ref);
@@ -726,7 +726,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
     @Override
     public  LongRefTranlocal openForWrite(
-        final LongRef  ref, boolean lock, final BetaObjectPool pool) {
+        final BetaLongRef  ref, boolean lock, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
            throw abortOpenForWrite(pool, ref);
@@ -827,7 +827,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
     @Override
     public final  LongRefTranlocal openForConstruction(
-        final LongRef ref, final BetaObjectPool pool) {
+        final BetaLongRef ref, final BetaObjectPool pool) {
 
         if (status != ACTIVE) {
             throw abortOpenForConstruction(pool, ref);
@@ -880,7 +880,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     public  void commute(
-        final LongRef ref, final BetaObjectPool pool, LongFunction function){
+        final BetaLongRef ref, final BetaObjectPool pool, LongFunction function){
 
         if (status != ACTIVE) {
             throw abortCommute(pool, ref, function);

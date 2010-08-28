@@ -185,6 +185,7 @@ the task not being executed at all.
 
 done
 
+- initial support for externalizing the refs added.
 
 old done
 

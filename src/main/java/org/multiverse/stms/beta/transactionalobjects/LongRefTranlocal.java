@@ -1,10 +1,11 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.api.functions.*;
+import org.multiverse.api.functions.Function;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 
 /**
- * The {@link Tranlocal} for the {@link LongRef).
+ * The {@link Tranlocal} for the {@link BetaLongRef).
  *
  * This class is generated.
  *
@@ -17,18 +18,18 @@ public final class LongRefTranlocal extends Tranlocal{
     public long value;
     public CallableNode headCallable;
 
-    public LongRefTranlocal(LongRef ref){
+    public LongRefTranlocal(BetaLongRef ref){
         super(ref, false);
     }
 
-    public LongRefTranlocal(LongRef ref, boolean locked){
+    public LongRefTranlocal(BetaLongRef ref, boolean locked){
         super(ref, locked);
     }
 
     public LongRefTranlocal openForWrite(final BetaObjectPool pool) {
         assert isCommitted;
 
-        LongRef _ref = (LongRef)owner;
+        BetaLongRef _ref = (BetaLongRef)owner;
         LongRefTranlocal tranlocal = pool.take(_ref);
         if (tranlocal == null) {
             tranlocal = new LongRefTranlocal(_ref);
@@ -73,7 +74,7 @@ public final class LongRefTranlocal extends Tranlocal{
     public LongRefTranlocal openForCommute(final BetaObjectPool pool) {
         assert isCommitted;
 
-        LongRef _ref = (LongRef)owner;
+        BetaLongRef _ref = (BetaLongRef)owner;
         LongRefTranlocal tranlocal = pool.take(_ref);
         if (tranlocal == null) {
             tranlocal = new LongRefTranlocal(_ref);

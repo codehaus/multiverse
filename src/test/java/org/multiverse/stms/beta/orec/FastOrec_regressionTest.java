@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.PanicError;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import static org.junit.Assert.fail;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.makeReadBiased;
@@ -12,12 +12,12 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.makeReadBiased;
 public class FastOrec_regressionTest {
 
     private GlobalConflictCounter globalConflictCounter;
-    private LongRef dummyRef;
+    private BetaLongRef dummyRef;
 
     @Before
     public void setUp() {
         globalConflictCounter = new GlobalConflictCounter(1);
-        dummyRef = new LongRef();
+        dummyRef = new BetaLongRef();
     }
 
     @Test

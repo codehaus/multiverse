@@ -10,8 +10,8 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.IntRef;
-import org.multiverse.stms.beta.transactionalobjects.Ref;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
@@ -31,7 +31,7 @@ public class ReadonlyTest {
 
     @Test
     public void whenReadonly_thenUpdateFails() {
-        IntRef ref = createIntRef(stm);
+        BetaIntRef ref = createIntRef(stm);
         try {
             updateInReadonlyMethod(ref, 10);
             fail();
@@ -41,7 +41,7 @@ public class ReadonlyTest {
         assertEquals(0, ref.___unsafeLoad().value);
     }
 
-    public void updateInReadonlyMethod(final IntRef ref, final int newValue) {
+    public void updateInReadonlyMethod(final BetaIntRef ref, final int newValue) {
          AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setReadonly(true)
                 .buildAtomicBlock();
@@ -75,7 +75,7 @@ public class ReadonlyTest {
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
                 BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                Ref ref = new Ref(tx);
+                BetaRef ref = new BetaRef(tx);
                 btx.openForConstruction(ref, pool).value = value;
             }
         });
@@ -103,13 +103,13 @@ public class ReadonlyTest {
 
     @Test
     public void whenReadonly_thenReadAllowed() {
-        IntRef ref = createIntRef(stm, 10);
+        BetaIntRef ref = createIntRef(stm, 10);
         int result = readInReadonlyMethod(ref);
         assertEquals(10, result);
         assertEquals(10, ref.___unsafeLoad().value);
     }
 
-    public int readInReadonlyMethod(final IntRef ref) {
+    public int readInReadonlyMethod(final BetaIntRef ref) {
         AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setReadonly(true)
                 .buildAtomicBlock();
@@ -126,22 +126,22 @@ public class ReadonlyTest {
 
     @Test
     public void whenUpdate_thenCreationOfNewTransactionalObjectsSucceeds() {
-        IntRef ref = update_createNewTransactionObject(100);
+        BetaIntRef ref = update_createNewTransactionObject(100);
         assertNotNull(ref);
         assertEquals(100, ref.___unsafeLoad().value);
     }
 
-    public IntRef update_createNewTransactionObject(final int value) {
+    public BetaIntRef update_createNewTransactionObject(final int value) {
         AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
                 .buildAtomicBlock();
 
-        return block.execute(new AtomicClosure<IntRef>() {
+        return block.execute(new AtomicClosure<BetaIntRef>() {
             @Override
-            public IntRef execute(Transaction tx) throws Exception {
+            public BetaIntRef execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
                 BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                IntRef ref = new IntRef(btx);
+                BetaIntRef ref = new BetaIntRef(btx);
                 btx.openForConstruction(ref, pool).value = value;
                 return ref;
             }
@@ -170,14 +170,14 @@ public class ReadonlyTest {
 
     @Test
     public void whenUpdate_thenReadSucceeds() {
-        IntRef ref = createIntRef(stm, 10);
+        BetaIntRef ref = createIntRef(stm, 10);
         int result = readInUpdateMethod(ref);
         assertEquals(10, result);
         assertEquals(10, ref.___unsafeLoad().value);
     }
 
 
-    public int readInUpdateMethod(final IntRef ref) {
+    public int readInUpdateMethod(final BetaIntRef ref) {
         AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
                 .buildAtomicBlock();
@@ -194,12 +194,12 @@ public class ReadonlyTest {
 
     @Test
     public void whenUpdate_thenUpdateSucceeds() {
-        IntRef ref = createIntRef(stm);
+        BetaIntRef ref = createIntRef(stm);
         updateInUpdateMethod(ref, 10);
         assertEquals(10, ref.___unsafeLoad().value);
     }
 
-    public void updateInUpdateMethod(final IntRef ref, final int newValue) {
+    public void updateInUpdateMethod(final BetaIntRef ref, final int newValue) {
         AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setReadonly(false)
                 .buildAtomicBlock();
@@ -217,14 +217,14 @@ public class ReadonlyTest {
 
     @Test
     public void whenDefault_thenUpdateSuccess() {
-        IntRef ref = createIntRef(stm);
+        BetaIntRef ref = createIntRef(stm);
         defaultTransactionalMethod(ref);
 
         assertEquals(1, ref.___unsafeLoad().value);
     }
 
 
-    public void defaultTransactionalMethod(final IntRef ref) {
+    public void defaultTransactionalMethod(final BetaIntRef ref) {
         stm.getTransactionFactoryBuilder().buildAtomicBlock().execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {

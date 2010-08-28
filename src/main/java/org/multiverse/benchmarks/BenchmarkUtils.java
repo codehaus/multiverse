@@ -1,7 +1,7 @@
 package org.multiverse.benchmarks;
 
 import org.multiverse.stms.beta.BetaObjectPool;
-import org.multiverse.stms.beta.transactionalobjects.Ref;
+import org.multiverse.stms.beta.transactionalobjects.BetaRef;
 
 import java.text.NumberFormat;
 import java.util.*;
@@ -9,7 +9,7 @@ import java.util.*;
 public class BenchmarkUtils {
 
     public static void loadOtherTransactionalObjectClasses() {
-        Ref ref = new Ref();
+        BetaRef ref = new BetaRef();
         ref.___openForConstruction(new BetaObjectPool());
     }
 

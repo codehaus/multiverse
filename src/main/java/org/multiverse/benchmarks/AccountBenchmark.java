@@ -5,8 +5,8 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
@@ -60,7 +60,7 @@ public class AccountBenchmark {
         System.out.printf("Multiverse> ReadFrequency:    %s\n", writeFrequency);
         System.out.printf("Multiverse> Max amount:       %s\n", max);
 
-        LongRef[] accounts = createAccounts();
+        BetaLongRef[] accounts = createAccounts();
 
         Latch startLatch = new Latch();
         TransferThread[] threads = new TransferThread[threadCount];
@@ -100,7 +100,7 @@ public class AccountBenchmark {
 
         //printAccounts(accounts);
 
-        //double percentage = 100f * Ref.pooled.get() / (Ref.pooled.get() + Ref.nonPooled.get());
+        //double percentage = 100f * BetaRef.pooled.get() / (BetaRef.pooled.get() + BetaRef.nonPooled.get());
         //System.out.printf("Multiverse> Pooled percentage %s\n", percentage);
 
         //long expected = transactionCount * threadCount * 2;
@@ -108,8 +108,8 @@ public class AccountBenchmark {
         //System.out.printf("Created real percentage %s\n", x);
     }
 
-    private LongRef[] createAccounts() {
-        LongRef[] accounts = new LongRef[accountCount];
+    private BetaLongRef[] createAccounts() {
+        BetaLongRef[] accounts = new BetaLongRef[accountCount];
 
         for (int k = 0; k < accounts.length; k++) {
             accounts[k] = createLongRef(stm, initialAmount);
@@ -117,7 +117,7 @@ public class AccountBenchmark {
         return accounts;
     }
 
-    private void printAccounts(LongRef[] accounts) {
+    private void printAccounts(BetaLongRef[] accounts) {
         for (BetaTransactionalObject account : accounts) {
             System.out.println("Account: " + ((LongRefTranlocal) account.___unsafeLoad()).value + " " + account.___getOrec());
         }
@@ -128,9 +128,9 @@ public class AccountBenchmark {
         private final BetaObjectPool pool = new BetaObjectPool();
         private final Random random = new Random();
         private long durationMs;
-        private LongRef[] accounts;
+        private BetaLongRef[] accounts;
 
-        public TransferThread(int id, Latch startLatch, final LongRef[] accounts) {
+        public TransferThread(int id, Latch startLatch, final BetaLongRef[] accounts) {
             super("TransferThread-" + id);
             this.setPriority(Thread.MAX_PRIORITY);
 
@@ -148,7 +148,7 @@ public class AccountBenchmark {
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
                     for (int k = 0; k < accounts.length; k++) {
-                        LongRef account = accounts[k];
+                        BetaLongRef account = accounts[k];
                         LongRefTranlocal tranlocal = btx.openForWrite(account, false, pool);
                         tranlocal.value = Math.round(tranlocal.value * rate);
                     }
@@ -181,8 +181,8 @@ public class AccountBenchmark {
 
                     long amount = random.nextInt(max) + 1;
 
-                    LongRef from = accounts[random.nextInt(accountCount)];
-                    LongRef to = accounts[random.nextInt(accountCount)];
+                    BetaLongRef from = accounts[random.nextInt(accountCount)];
+                    BetaLongRef to = accounts[random.nextInt(accountCount)];
 
                     LongRefTranlocal fromTranlocal = btx.openForWrite(from, true, pool);
                     LongRefTranlocal toTranlocal = btx.openForWrite(to, true, pool);

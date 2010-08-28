@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 
 import static org.junit.Assert.*;
@@ -83,7 +83,7 @@ public class FatArrayTreeBetaTransaction_initTest {
 
     @Test
     public void whenPrepared_thenAborted() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.openForWrite(ref, true, pool);
@@ -100,7 +100,7 @@ public class FatArrayTreeBetaTransaction_initTest {
 
     @Test
     public void whenAborted() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.openForWrite(ref, false, pool).value++;
@@ -115,7 +115,7 @@ public class FatArrayTreeBetaTransaction_initTest {
 
     @Test
     public void whenCommitted() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.openForWrite(ref, false, pool).value++;
         tx.commit(pool);

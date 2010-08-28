@@ -2,9 +2,13 @@ package org.multiverse.stms.beta;
 
 import org.multiverse.api.*;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.references.ReferenceFactoryBuilder;
 import org.multiverse.durability.SimpleStorage;
 import org.multiverse.durability.Storage;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaRef;
 import org.multiverse.stms.beta.transactions.*;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,8 +58,14 @@ public final class BetaStm implements Stm {
         return storage;
     }
 
+    @Override
     public BetaTransactionFactoryBuilder getTransactionFactoryBuilder() {
         return new BetaTransactionFactoryBuilderImpl(config);
+    }
+
+    @Override
+    public ReferenceFactoryBuilder getReferenceFactoryBuilder() {
+        return new BetaReferenceFactoryBuilderImpl();
     }
 
     public int getSpinCount() {
@@ -78,6 +88,30 @@ public final class BetaStm implements Stm {
 
     public int getMaxArrayTransactionSize() {
         return 20;
+    }
+
+    public final class BetaReferenceFactoryBuilderImpl implements BetaReferenceFactoryBuilder{
+        @Override
+        public BetaReferenceFactory build() {
+            return new BetaReferenceFactoryImpl();
+        }
+    }
+
+    public final class BetaReferenceFactoryImpl implements BetaReferenceFactory{
+        @Override
+        public BetaIntRef createIntRef(int value) {
+            return new BetaIntRef(value);
+        }
+
+        @Override
+        public BetaLongRef createLongRef(long value) {
+            return new BetaLongRef(value);
+        }
+
+        @Override
+        public <E> BetaRef<E> createRef(E value) {
+            return new BetaRef<E>(value);
+        }
     }
 
     public final class BetaTransactionFactoryBuilderImpl implements BetaTransactionFactoryBuilder {

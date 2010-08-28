@@ -24,7 +24,7 @@ public class LongRef_hasReadConflictTest {
 
     @Test
     public void whenReadAndNoConflict() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
@@ -36,7 +36,7 @@ public class LongRef_hasReadConflictTest {
 
     @Test
     public void whenWriteAndNoConflict() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
@@ -49,7 +49,7 @@ public class LongRef_hasReadConflictTest {
 
     @Test
     public void whenLockedBySelf() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         Tranlocal read = tx.openForRead(ref, true, pool);
@@ -61,7 +61,7 @@ public class LongRef_hasReadConflictTest {
 
     @Test
     public void whenUpdatedByOther() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         Tranlocal read = tx.openForRead(ref, false, pool);
@@ -83,7 +83,7 @@ public class LongRef_hasReadConflictTest {
 
     @Test
     public void whenValueChangedByOtherAndLocked() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         Tranlocal read = tx.openForRead(ref, false, pool);
@@ -103,7 +103,7 @@ public class LongRef_hasReadConflictTest {
 
     @Test
     public void whenUpdateInProgressBecauseLockedByOther() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForRead(ref, false, pool);

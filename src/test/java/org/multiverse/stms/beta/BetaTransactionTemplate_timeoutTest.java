@@ -7,7 +7,7 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.RetryTimeoutException;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -26,7 +26,7 @@ public class BetaTransactionTemplate_timeoutTest {
 
     private BetaStm stm;
     private BetaObjectPool pool;
-    private LongRef ref;
+    private BetaLongRef ref;
     private long timeoutNs;
 
     @Before

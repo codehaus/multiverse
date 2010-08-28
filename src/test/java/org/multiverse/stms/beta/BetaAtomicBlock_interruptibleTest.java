@@ -7,7 +7,7 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.InvisibleCheckedException;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -33,7 +33,7 @@ public class BetaAtomicBlock_interruptibleTest {
 
     @Test
     public void whenNoTimeoutAndInterruptible() {
-        final LongRef ref = createLongRef(stm);
+        final BetaLongRef ref = createLongRef(stm);
 
         AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setInterruptible(true)
@@ -56,7 +56,7 @@ public class BetaAtomicBlock_interruptibleTest {
 
     @Test
     public void whenTimeoutAndInterruptible() {
-        final LongRef ref = createLongRef(stm);
+        final BetaLongRef ref = createLongRef(stm);
 
         AtomicBlock block = stm.getTransactionFactoryBuilder()
                 .setTimeoutNs(TimeUnit.SECONDS.toNanos(10))
@@ -80,10 +80,10 @@ public class BetaAtomicBlock_interruptibleTest {
 
 
     class WaitWithoutTimeoutThread extends TestThread {
-        final LongRef ref;
+        final BetaLongRef ref;
         private AtomicBlock block;
 
-        public WaitWithoutTimeoutThread(LongRef ref, AtomicBlock block) {
+        public WaitWithoutTimeoutThread(BetaLongRef ref, AtomicBlock block) {
             this.ref = ref;
             this.block = block;
         }

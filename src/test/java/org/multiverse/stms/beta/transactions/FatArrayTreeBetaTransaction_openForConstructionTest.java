@@ -9,7 +9,7 @@ import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
 import static org.junit.Assert.*;
@@ -31,7 +31,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
     @Test
     public void whenSuccess() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRef ref = new LongRef(tx);
+        BetaLongRef ref = new BetaLongRef(tx);
 
         LongRefTranlocal write = tx.openForConstruction(ref, pool);
 
@@ -54,7 +54,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
 
         try {
-            tx.openForConstruction((LongRef) null, pool);
+            tx.openForConstruction((BetaLongRef) null, pool);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -64,7 +64,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
 
     @Test
     public void whenAlreadyCommitted_thenIllegalArgumentException() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
@@ -87,7 +87,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
     @Test
     public void whenAlreadyOpenedForConstruction() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRef ref = new LongRef(tx);
+        BetaLongRef ref = new BetaLongRef(tx);
 
         LongRefTranlocal write1 = tx.openForConstruction(ref, pool);
         LongRefTranlocal write2 = tx.openForConstruction(ref, pool);
@@ -109,7 +109,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
 
     @Test
     public void whenAlreadyOpenedForReading_thenIllegalArgumentException() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
@@ -132,7 +132,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
 
     @Test
     public void whenAlreadyOpenedForWrite_thenIllegalArgumentException() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
@@ -155,7 +155,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
 
     @Test
     public void whenReadonly_thenReadonlyException() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
@@ -180,7 +180,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
 
     @Test
     public void whenPessimisticThenNoConflictDetectionNeeded() {
-        LongRef ref1 = createLongRef(stm);
+        BetaLongRef ref1 = createLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.Read);
@@ -191,7 +191,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
         long oldLocalConflictCount = tx.getLocalConflictCounter().get();
 
         stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
-        LongRef ref2 = new LongRef(tx);
+        BetaLongRef ref2 = new BetaLongRef(tx);
         LongRefTranlocal constructed2 = tx.openForConstruction(ref2, pool);
 
         assertEquals(oldLocalConflictCount, tx.getLocalConflictCounter().get());
@@ -205,7 +205,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
     public void conflictCounterIsNotReset() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         long oldConflictCount = tx.getLocalConflictCounter().get();
-        LongRef ref = new LongRef(tx);
+        BetaLongRef ref = new BetaLongRef(tx);
 
         stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
         LongRefTranlocal constructed = tx.openForConstruction(ref, pool);
@@ -217,7 +217,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
 
     @Test
     public void whenPrepared_thenPreparedTransactionException() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.prepare(pool);
@@ -233,7 +233,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
 
     @Test
     public void whenAborted_thenDeadTransactionException() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.abort(pool);
@@ -249,7 +249,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
 
     @Test
     public void whenCommitted_thenDeadTransactionException() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.commit(pool);

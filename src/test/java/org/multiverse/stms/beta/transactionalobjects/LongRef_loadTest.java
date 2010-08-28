@@ -24,7 +24,7 @@ public class LongRef_loadTest {
 
     @Test
     public void whenLockedByOther_thenLockedException() {
-        LongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
 
         BetaTransaction other = stm.startDefaultTransaction();
         Tranlocal read1 = other.openForRead(ref, false, pool);

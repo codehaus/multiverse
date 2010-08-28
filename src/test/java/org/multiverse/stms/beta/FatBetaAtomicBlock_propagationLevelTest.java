@@ -9,7 +9,7 @@ import org.multiverse.api.closures.AtomicIntClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.NoTransactionAllowedException;
 import org.multiverse.api.exceptions.NoTransactionFoundException;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static junit.framework.Assert.assertEquals;
@@ -120,7 +120,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
                 .setPropagationLevel(PropagationLevel.Requires)
                 .build();
 
-        final LongRef ref = createLongRef(stm);
+        final BetaLongRef ref = createLongRef(stm);
 
         AtomicIntClosure closure = new AtomicIntClosure() {
             @Override
@@ -149,7 +149,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
         final BetaTransaction existingTx = stm.startDefaultTransaction();
         setThreadLocalTransaction(existingTx);
 
-        final LongRef ref = createLongRef(stm);
+        final BetaLongRef ref = createLongRef(stm);
 
         AtomicIntClosure closure = new AtomicIntClosure() {
             @Override
@@ -177,7 +177,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
                 .setPropagationLevel(PropagationLevel.RequiresNew)
                 .buildAtomicBlock();
 
-        final LongRef ref = createLongRef(stm, 0);
+        final BetaLongRef ref = createLongRef(stm, 0);
 
         AtomicIntClosure closure = new AtomicIntClosure() {
             @Override
@@ -206,7 +206,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
         final BetaTransaction otherTx = stm.startDefaultTransaction();
         setThreadLocalTransaction(otherTx);
 
-        final LongRef ref = createLongRef(stm, 10);
+        final BetaLongRef ref = createLongRef(stm, 10);
 
         AtomicIntClosure closure = new AtomicIntClosure() {
             @Override

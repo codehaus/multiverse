@@ -1,7 +1,5 @@
 package org.multiverse.api.references;
 
-import org.multiverse.api.references.ReferenceFactory;
-
 /**
  * A Builder for creating ReferenceFactory.
  *

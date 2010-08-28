@@ -10,7 +10,7 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.multiverse.TestUtils.*;
@@ -22,7 +22,7 @@ import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalB
 public class UncontendedCommutePerformanceTest {
     private volatile boolean stop;
     private BetaStm stm;
-    private LongRef ref;
+    private BetaLongRef ref;
 
     @Before
     public void setUp() {

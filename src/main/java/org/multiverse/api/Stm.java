@@ -1,5 +1,7 @@
 package org.multiverse.api;
 
+import org.multiverse.api.references.ReferenceFactoryBuilder;
+
 /**
  * The main interface for software transactional memory. Updates/reads in the stm should only be done through the
  * {@link Transaction}. So see that for more details.
@@ -43,4 +45,11 @@ public interface Stm {
      * @return the TransactionFactoryBuilder that needs to be used to execute transactions on this Stm.
      */
     TransactionFactoryBuilder getTransactionFactoryBuilder();
+
+    /**
+     * Gets the {@link org.multiverse.api.references.ReferenceFactoryBuilder}.
+     *
+     * @return the ReferenceFactoryBuilder.
+     */
+    ReferenceFactoryBuilder getReferenceFactoryBuilder();
 }

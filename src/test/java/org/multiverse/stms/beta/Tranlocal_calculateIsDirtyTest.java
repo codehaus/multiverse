@@ -2,7 +2,7 @@ package org.multiverse.stms.beta;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -18,7 +18,7 @@ public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants{
     @Test
     public void whenConstructed() {
         BetaTransaction tx = mock(BetaTransaction.class);
-        LongRef ref = new LongRef(tx);
+        BetaLongRef ref = new BetaLongRef(tx);
         Tranlocal tranlocal = new LongRefTranlocal(ref);
 
         assertTrue(tranlocal.calculateIsDirty());
@@ -33,7 +33,7 @@ public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants{
 
     @Test
     public void whenCommitted() {
-        LongRef ref = new LongRef(0);
+        BetaLongRef ref = new BetaLongRef(0);
         Tranlocal tranlocal = new LongRefTranlocal(ref);
         tranlocal.prepareForCommit();
 
@@ -43,7 +43,7 @@ public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants{
 
     @Test
     public void whenNotDirty() {
-        LongRef ref = new LongRef(0);
+        BetaLongRef ref = new BetaLongRef(0);
         Tranlocal tranlocal = new LongRefTranlocal(ref);
         tranlocal.prepareForCommit();
         Tranlocal opened = tranlocal.openForWrite(new BetaObjectPool());
@@ -54,7 +54,7 @@ public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants{
 
     @Test
     public void whenDirty() {
-        LongRef ref = new LongRef(0);
+        BetaLongRef ref = new BetaLongRef(0);
         LongRefTranlocal tranlocal = new LongRefTranlocal(ref);
         tranlocal.prepareForCommit();
 

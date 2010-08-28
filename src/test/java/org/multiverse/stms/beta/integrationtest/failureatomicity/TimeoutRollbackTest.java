@@ -8,7 +8,7 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.RetryTimeoutException;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.IntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import java.util.concurrent.TimeUnit;
@@ -21,8 +21,8 @@ import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class TimeoutRollbackTest {
-    private IntRef modifyRef;
-    private IntRef awaitRef;
+    private BetaIntRef modifyRef;
+    private BetaIntRef awaitRef;
     private BetaStm stm;
 
     @Before

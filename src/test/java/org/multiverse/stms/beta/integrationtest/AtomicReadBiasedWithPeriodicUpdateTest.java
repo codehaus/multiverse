@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -26,7 +26,7 @@ public class AtomicReadBiasedWithPeriodicUpdateTest {
 
     @Test
     public void test() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         for (int l = 0; l < 100; l++) {
             long value = ref.atomicGet() + 1;

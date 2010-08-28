@@ -9,7 +9,7 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.IntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.fail;
@@ -24,7 +24,7 @@ import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalB
  * @author Peter Veentjer.
  */
 public class ReadCommittedStressTest {
-    private IntRef ref;
+    private BetaIntRef ref;
 
     private int readThreadCount = 10;
     private int modifyThreadCount = 2;

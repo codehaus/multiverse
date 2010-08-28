@@ -26,7 +26,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
 
     @Test
     public void whenConstructed() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         LongRefTranlocal tranlocal = ref.___openForConstruction(pool);
         tranlocal.value = 200;
@@ -56,7 +56,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
 
     @Test
     public void whenIsCommuting() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
         tranlocal.addCommutingFunction(IncLongFunction.INSTANCE, pool);
@@ -68,7 +68,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
 
     @Test
     public void whenUpdate() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal tranlocal = ref.___unsafeLoad().openForWrite(pool);
         tranlocal.value = 200;
 
@@ -79,7 +79,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
 
     @Test
     public void whenCommuting() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
 
         LongFunction function = mock(LongFunction.class);

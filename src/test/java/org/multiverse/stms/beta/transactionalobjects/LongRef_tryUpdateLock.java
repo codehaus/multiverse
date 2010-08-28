@@ -12,7 +12,7 @@ public class LongRef_tryUpdateLock {
 
     @Test
     public void whenFree() {
-        Ref orec = new Ref();
+        BetaRef orec = new BetaRef();
         orec.___arrive(1);
 
         boolean result = orec.___tryLockAfterNormalArrive(1);
@@ -24,7 +24,7 @@ public class LongRef_tryUpdateLock {
 
     @Test
     public void whenFreeAndSurplus() {
-        Ref orec = new Ref();
+        BetaRef orec = new BetaRef();
         orec.___arrive(1);
         orec.___arrive(1);
 
@@ -37,7 +37,7 @@ public class LongRef_tryUpdateLock {
 
     @Test
     public void whenLocked() {
-        Ref orec = new Ref();
+        BetaRef orec = new BetaRef();
         orec.___arrive(1);
         orec.___tryLockAfterNormalArrive(1);
 
@@ -50,7 +50,7 @@ public class LongRef_tryUpdateLock {
 
     @Test
     public void whenReadBiasedMode() {
-        Ref orec = OrecTestUtils.makeReadBiased(new Ref());
+        BetaRef orec = OrecTestUtils.makeReadBiased(new BetaRef());
 
         orec.___arrive(1);
         boolean result = orec.___tryLockAfterNormalArrive(1);

@@ -21,7 +21,7 @@ public class LongRef_openForCommuteTest implements BetaStmConstants{
 
     @Test
     public void test(){
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
 
         assertNotNull(tranlocal);

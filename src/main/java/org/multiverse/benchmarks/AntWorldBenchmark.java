@@ -8,7 +8,7 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import java.util.concurrent.TimeUnit;
@@ -21,7 +21,7 @@ import static org.multiverse.benchmarks.BenchmarkUtils.format;
 public class AntWorldBenchmark {
 
     private BetaStm stm;
-    private LongRef[] cells;
+    private BetaLongRef[] cells;
     private long transactionCount;
     private int worldSize = 1600;
 
@@ -30,7 +30,7 @@ public class AntWorldBenchmark {
     public void setUp() {
         transactionCount = 2000 * 1000;
         stm = new BetaStm();
-        cells = new LongRef[worldSize];
+        cells = new BetaLongRef[worldSize];
 
         for (int k = 0; k < cells.length; k++) {
             cells[k] = BetaStmUtils.createLongRef(stm);
@@ -47,7 +47,7 @@ public class AntWorldBenchmark {
         long durationMs = snapshotThread.durationMs;
 
         for (int k = 0; k < worldSize; k++) {
-            LongRef ref = cells[k];
+            BetaLongRef ref = cells[k];
             //assertSurplus(1, ref);
             //assertUnlocked(ref);
             //assertReadBiased(ref);

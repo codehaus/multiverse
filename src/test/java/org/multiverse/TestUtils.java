@@ -8,8 +8,8 @@ import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.Listeners;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -197,7 +197,7 @@ public class TestUtils {
         assertEquals(TransactionStatus.Active, tx.getStatus());
     }
 
-    public static LongRef createReadBiasedLongRef(BetaStm stm) {
+    public static BetaLongRef createReadBiasedLongRef(BetaStm stm) {
         return createReadBiasedLongRef(stm, 0);
     }
 
@@ -218,8 +218,8 @@ public class TestUtils {
         Bugshaker.sleepUs(us);
     }
 
-    public static LongRef createReadBiasedLongRef(BetaStm stm, long value) {
-        LongRef ref = BetaStmUtils.createLongRef(stm, value);
+    public static BetaLongRef createReadBiasedLongRef(BetaStm stm, long value) {
+        BetaLongRef ref = BetaStmUtils.createLongRef(stm, value);
 
         for (int k = 0; k < ref.___getOrec().___getReadBiasedThreshold(); k++) {
             BetaTransaction tx = new FatMonoBetaTransaction(stm);

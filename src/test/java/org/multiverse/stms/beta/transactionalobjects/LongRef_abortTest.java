@@ -28,7 +28,7 @@ public class LongRef_abortTest {
 
     @Test
     public void whenOpenedForRead() {
-        LongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
         Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -58,7 +58,7 @@ public class LongRef_abortTest {
 
     @Test
     public void whenLockedBySelfAndOpenedForRead() {
-        LongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
 
         Orec orec = ref.___getOrec();
 
@@ -75,7 +75,7 @@ public class LongRef_abortTest {
 
     @Test
     public void whenLockedByOtherAndOpenedForRead() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -96,7 +96,7 @@ public class LongRef_abortTest {
 
     @Test
     public void whenLockedBySelfAndOpenedForWrite() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -114,7 +114,7 @@ public class LongRef_abortTest {
 
     @Test
     public void whenLockedByOtherAndOpenedForWrite() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();

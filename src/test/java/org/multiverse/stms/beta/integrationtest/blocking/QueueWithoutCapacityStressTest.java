@@ -9,7 +9,7 @@ import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.Ref;
+import org.multiverse.stms.beta.transactionalobjects.BetaRef;
 import org.multiverse.stms.beta.transactionalobjects.RefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -143,7 +143,7 @@ public class QueueWithoutCapacityStressTest {
     }
 
     class Stack<E> {
-        final Ref<Node<E>> head = createRef(stm);
+        final BetaRef<Node<E>> head = createRef(stm);
 
         void push(BetaTransaction tx, BetaObjectPool pool, E item) {
             RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, pessimistic, getThreadLocalBetaObjectPool());

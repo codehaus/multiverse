@@ -1,9 +1,10 @@
 package org.multiverse.stms.beta;
 
-import org.multiverse.api.blocking.*;
-import org.multiverse.api.exceptions.*;
+import org.multiverse.api.blocking.CheapLatch;
+import org.multiverse.api.blocking.StandardLatch;
 import org.multiverse.stms.beta.transactionalobjects.*;
 import org.multiverse.stms.beta.transactions.*;
+
 import java.util.ArrayList;
 
 /**
@@ -70,12 +71,12 @@ public final class BetaObjectPool {
     private int poolFatArrayTreeBetaTransactionIndex = -1;
 
 
-    private final RefTranlocal[] tranlocalsRef = new RefTranlocal[100];
-    private int lastUsedRef = -1;
-    private final IntRefTranlocal[] tranlocalsIntRef = new IntRefTranlocal[100];
-    private int lastUsedIntRef = -1;
-    private final LongRefTranlocal[] tranlocalsLongRef = new LongRefTranlocal[100];
-    private int lastUsedLongRef = -1;
+    private final RefTranlocal[] tranlocalsBetaRef = new RefTranlocal[100];
+    private int lastUsedBetaRef = -1;
+    private final IntRefTranlocal[] tranlocalsBetaIntRef = new IntRefTranlocal[100];
+    private int lastUsedBetaIntRef = -1;
+    private final LongRefTranlocal[] tranlocalsBetaLongRef = new LongRefTranlocal[100];
+    private int lastUsedBetaLongRef = -1;
     private TranlocalPool[] pools = new TranlocalPool[1000];
 
     private CheapLatch[] cheapLatchPool = new CheapLatch[10];
@@ -101,13 +102,13 @@ public final class BetaObjectPool {
     }
 
     /**
-     * Takes a RefTranlocal from the pool for the specified Ref.
+     * Takes a RefTranlocal from the pool for the specified BetaRef.
      *
-     * @param owner the Ref to get the RefTranlocal for.
+     * @param owner the BetaRef to get the RefTranlocal for.
      * @return the pooled tranlocal, or null if none is found.
      * @throws NullPointerException if owner is null.
      */
-    public RefTranlocal take(final Ref owner) {
+    public RefTranlocal take(final BetaRef owner) {
         if (owner == null) {
             throw new NullPointerException();
         }
@@ -116,14 +117,14 @@ public final class BetaObjectPool {
             return null;
         }
 
-        if (lastUsedRef == -1) {
+        if (lastUsedBetaRef == -1) {
             return null;
         }
 
-        RefTranlocal tranlocal = tranlocalsRef[lastUsedRef];
+        RefTranlocal tranlocal = tranlocalsBetaRef[lastUsedBetaRef];
         tranlocal.owner = owner;
-        tranlocalsRef[lastUsedRef] = null;
-        lastUsedRef--;
+        tranlocalsBetaRef[lastUsedBetaRef] = null;
+        lastUsedBetaRef--;
         return tranlocal;
     }
 
@@ -139,23 +140,23 @@ public final class BetaObjectPool {
             return;
         }
 
-        if (lastUsedRef == tranlocalsRef.length - 1) {
+        if (lastUsedBetaRef == tranlocalsBetaRef.length - 1) {
             return;
         }
 
         tranlocal.prepareForPooling(this);
-        lastUsedRef++;
-        tranlocalsRef[lastUsedRef] = tranlocal;
+        lastUsedBetaRef++;
+        tranlocalsBetaRef[lastUsedBetaRef] = tranlocal;
     }
 
     /**
-     * Takes a IntRefTranlocal from the pool for the specified IntRef.
+     * Takes a IntRefTranlocal from the pool for the specified BetaIntRef.
      *
-     * @param owner the IntRef to get the IntRefTranlocal for.
+     * @param owner the BetaIntRef to get the IntRefTranlocal for.
      * @return the pooled tranlocal, or null if none is found.
      * @throws NullPointerException if owner is null.
      */
-    public IntRefTranlocal take(final IntRef owner) {
+    public IntRefTranlocal take(final BetaIntRef owner) {
         if (owner == null) {
             throw new NullPointerException();
         }
@@ -164,14 +165,14 @@ public final class BetaObjectPool {
             return null;
         }
 
-        if (lastUsedIntRef == -1) {
+        if (lastUsedBetaIntRef == -1) {
             return null;
         }
 
-        IntRefTranlocal tranlocal = tranlocalsIntRef[lastUsedIntRef];
+        IntRefTranlocal tranlocal = tranlocalsBetaIntRef[lastUsedBetaIntRef];
         tranlocal.owner = owner;
-        tranlocalsIntRef[lastUsedIntRef] = null;
-        lastUsedIntRef--;
+        tranlocalsBetaIntRef[lastUsedBetaIntRef] = null;
+        lastUsedBetaIntRef--;
         return tranlocal;
     }
 
@@ -187,23 +188,23 @@ public final class BetaObjectPool {
             return;
         }
 
-        if (lastUsedIntRef == tranlocalsIntRef.length - 1) {
+        if (lastUsedBetaIntRef == tranlocalsBetaIntRef.length - 1) {
             return;
         }
 
         tranlocal.prepareForPooling(this);
-        lastUsedIntRef++;
-        tranlocalsIntRef[lastUsedIntRef] = tranlocal;
+        lastUsedBetaIntRef++;
+        tranlocalsBetaIntRef[lastUsedBetaIntRef] = tranlocal;
     }
 
     /**
-     * Takes a LongRefTranlocal from the pool for the specified LongRef.
+     * Takes a LongRefTranlocal from the pool for the specified BetaLongRef.
      *
-     * @param owner the LongRef to get the LongRefTranlocal for.
+     * @param owner the BetaLongRef to get the LongRefTranlocal for.
      * @return the pooled tranlocal, or null if none is found.
      * @throws NullPointerException if owner is null.
      */
-    public LongRefTranlocal take(final LongRef owner) {
+    public LongRefTranlocal take(final BetaLongRef owner) {
         if (owner == null) {
             throw new NullPointerException();
         }
@@ -212,14 +213,14 @@ public final class BetaObjectPool {
             return null;
         }
 
-        if (lastUsedLongRef == -1) {
+        if (lastUsedBetaLongRef == -1) {
             return null;
         }
 
-        LongRefTranlocal tranlocal = tranlocalsLongRef[lastUsedLongRef];
+        LongRefTranlocal tranlocal = tranlocalsBetaLongRef[lastUsedBetaLongRef];
         tranlocal.owner = owner;
-        tranlocalsLongRef[lastUsedLongRef] = null;
-        lastUsedLongRef--;
+        tranlocalsBetaLongRef[lastUsedBetaLongRef] = null;
+        lastUsedBetaLongRef--;
         return tranlocal;
     }
 
@@ -235,13 +236,13 @@ public final class BetaObjectPool {
             return;
         }
 
-        if (lastUsedLongRef == tranlocalsLongRef.length - 1) {
+        if (lastUsedBetaLongRef == tranlocalsBetaLongRef.length - 1) {
             return;
         }
 
         tranlocal.prepareForPooling(this);
-        lastUsedLongRef++;
-        tranlocalsLongRef[lastUsedLongRef] = tranlocal;
+        lastUsedBetaLongRef++;
+        tranlocalsBetaLongRef[lastUsedBetaLongRef] = tranlocal;
     }
 
     public Tranlocal take(final BetaTransactionalObject owner) {
@@ -261,11 +262,11 @@ public final class BetaObjectPool {
 
         switch(classIndex){
             case 0:
-                return take((Ref)owner);
+                return take((BetaRef)owner);
             case 1:
-                return take((IntRef)owner);
+                return take((BetaIntRef)owner);
             case 2:
-                return take((LongRef)owner);
+                return take((BetaLongRef)owner);
         }
 
         if(classIndex >= pools.length){

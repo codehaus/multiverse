@@ -13,7 +13,7 @@ import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
 import java.util.LinkedList;
@@ -62,7 +62,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenExplicitRetryNotAllowed_thenNoRetryPossibleException() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setBlockingAllowed(false);
@@ -83,7 +83,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenContainsRead_thenSuccess() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
@@ -100,7 +100,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenLockedRead_thenSuccessAndLockReleased() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, true, pool);
@@ -117,7 +117,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenContainsWrite_thenSuccess() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
@@ -132,7 +132,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenLockedWrite_thenSuccessAndLockReleased() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, true, pool);
@@ -150,7 +150,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
     @Test
     public void whenContainsConstructed_thenNoRetryPossibleException() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRef ref = new LongRef(tx);
+        BetaLongRef ref = new BetaLongRef(tx);
         LongRefTranlocal constructed = tx.openForConstruction(ref, pool);
 
         Latch listener = new CheapLatch();
@@ -171,7 +171,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenNormalListenerAvailable() {
-        LongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = createLongRef(stm, 0);
 
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -187,7 +187,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenPermanentListenerAvailable() {
-        LongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = createLongRef(stm, 0);
 
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);

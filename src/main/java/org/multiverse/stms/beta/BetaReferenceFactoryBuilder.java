@@ -1,11 +1,14 @@
 package org.multiverse.stms.beta;
 
+import org.multiverse.api.references.ReferenceFactoryBuilder;
+
 /**
- * Created by IntelliJ IDEA.
- * User: alarmnummer
- * Date: Aug 27, 2010
- * Time: 11:47:47 PM
- * To change this template use File | Settings | File Templates.
+ * A {@link org.multiverse.api.references.ReferenceFactoryBuilder} tailored for the BetaStm.
+ * 
+ * @author Peter Veentjer.
  */
-public class BetaReferenceFactoryBuilder {
+public interface BetaReferenceFactoryBuilder extends ReferenceFactoryBuilder {
+
+    @Override
+    BetaReferenceFactory build();
 }

@@ -9,7 +9,7 @@ import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
 import static org.junit.Assert.*;
@@ -30,7 +30,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
     @Test
     public void whenSuccess() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRef ref = new LongRef(tx);
+        BetaLongRef ref = new BetaLongRef(tx);
 
         LongRefTranlocal write = tx.openForConstruction(ref, pool);
 
@@ -52,8 +52,8 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
     public void whenOverflowing() {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         BetaTransaction tx = new FatMonoBetaTransaction(config);
-        LongRef ref1 = new LongRef(tx);
-        LongRef ref2 = new LongRef(tx);
+        BetaLongRef ref1 = new BetaLongRef(tx);
+        BetaLongRef ref2 = new BetaLongRef(tx);
 
         tx.openForConstruction(ref1, pool);
         try {
@@ -72,7 +72,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
 
         try {
-            tx.openForConstruction((LongRef) null, pool);
+            tx.openForConstruction((BetaLongRef) null, pool);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -82,7 +82,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
 
     @Test
     public void whenAlreadyCommitted() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -105,7 +105,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
     @Test
     public void whenAlreadyOpenedForConstruction() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRef ref = new LongRef(tx);
+        BetaLongRef ref = new BetaLongRef(tx);
 
         LongRefTranlocal write1 = tx.openForConstruction(ref, pool);
         LongRefTranlocal write2 = tx.openForConstruction(ref, pool);
@@ -127,7 +127,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
 
     @Test
     public void whenAlreadyOpenedForReading_thenIllegalArgumentException() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -150,7 +150,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
 
     @Test
     public void whenAlreadyOpenedForWrite_thenIllegalArgumentException() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -173,7 +173,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
 
     @Test
     public void whenReadonly_thenReadonlyException() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
@@ -198,7 +198,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
 
     @Test
     public void conflictCounterIsNotReset() {
-        LongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = createLongRef(stm, 10);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
 
@@ -212,7 +212,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
 
     @Test
     public void whenPrepared_thenPreparedTransactionException() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.prepare(pool);
@@ -228,7 +228,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
 
     @Test
     public void whenAborted_thenDeadTransactionException() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.abort(pool);
@@ -244,7 +244,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
 
     @Test
     public void whenCommitted_thenDeadTransactionException() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.commit(pool);

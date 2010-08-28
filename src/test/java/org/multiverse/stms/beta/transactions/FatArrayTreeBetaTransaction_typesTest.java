@@ -23,7 +23,7 @@ public class FatArrayTreeBetaTransaction_typesTest {
 
     @Test
     public void whenIntRefUsed() {
-        IntRef ref = createIntRef(stm, 100);
+        BetaIntRef ref = createIntRef(stm, 100);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         IntRefTranlocal read = tx.openForRead(ref, false, pool);
@@ -37,7 +37,7 @@ public class FatArrayTreeBetaTransaction_typesTest {
 
     @Test
     public void whenLongRefUsed() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
@@ -51,7 +51,7 @@ public class FatArrayTreeBetaTransaction_typesTest {
 
     @Test
     public void whenRefUsed() {
-        Ref<String> ref = createRef(stm, "peter");
+        BetaRef<String> ref = createRef(stm, "peter");
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         RefTranlocal read = tx.openForRead(ref, false, pool);

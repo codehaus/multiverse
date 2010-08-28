@@ -56,7 +56,7 @@ public final class ${transactionalObject.tranlocal}${transactionalObject.typePar
         headCallable = null;
     }
 
-#if(${transactionalObject.name} ne 'Ref')
+#if(${transactionalObject.name} ne 'BetaRef')
     public void addCommutingFunction(final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function, final BetaObjectPool pool){
         assert isCommuting;
 

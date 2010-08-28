@@ -1,10 +1,11 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.api.functions.*;
+import org.multiverse.api.functions.Function;
+import org.multiverse.api.functions.IntFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 
 /**
- * The {@link Tranlocal} for the {@link IntRef).
+ * The {@link Tranlocal} for the {@link BetaIntRef).
  *
  * This class is generated.
  *
@@ -17,18 +18,18 @@ public final class IntRefTranlocal extends Tranlocal{
     public int value;
     public CallableNode headCallable;
 
-    public IntRefTranlocal(IntRef ref){
+    public IntRefTranlocal(BetaIntRef ref){
         super(ref, false);
     }
 
-    public IntRefTranlocal(IntRef ref, boolean locked){
+    public IntRefTranlocal(BetaIntRef ref, boolean locked){
         super(ref, locked);
     }
 
     public IntRefTranlocal openForWrite(final BetaObjectPool pool) {
         assert isCommitted;
 
-        IntRef _ref = (IntRef)owner;
+        BetaIntRef _ref = (BetaIntRef)owner;
         IntRefTranlocal tranlocal = pool.take(_ref);
         if (tranlocal == null) {
             tranlocal = new IntRefTranlocal(_ref);
@@ -73,7 +74,7 @@ public final class IntRefTranlocal extends Tranlocal{
     public IntRefTranlocal openForCommute(final BetaObjectPool pool) {
         assert isCommitted;
 
-        IntRef _ref = (IntRef)owner;
+        BetaIntRef _ref = (BetaIntRef)owner;
         IntRefTranlocal tranlocal = pool.take(_ref);
         if (tranlocal == null) {
             tranlocal = new IntRefTranlocal(_ref);

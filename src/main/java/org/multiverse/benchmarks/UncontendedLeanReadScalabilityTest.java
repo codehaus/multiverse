@@ -3,7 +3,7 @@ package org.multiverse.benchmarks;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 import org.multiverse.stms.beta.transactions.LeanMonoBetaTransaction;
 
@@ -28,7 +28,7 @@ public class UncontendedLeanReadScalabilityTest {
         int[] processors = generateProcessorRange();
 
         System.out.println("Multiverse> Uncontended readonly lean-transaction benchmark");
-        System.out.println("Multiverse> 1 Ref per transaction");
+        System.out.println("Multiverse> 1 BetaRef per transaction");
         System.out.printf("Multiverse> Running with the following processor range %s\n", Arrays.toString(processors));
         System.out.printf("Multiverse> %s Transactions per thread\n", format(transactionCount));
         Result[] result = new Result[processors.length];
@@ -99,7 +99,7 @@ public class UncontendedLeanReadScalabilityTest {
         }
 
         public void run() {
-            LongRef ref = BetaStmUtils.createReadBiasedLongRef(stm);
+            BetaLongRef ref = BetaStmUtils.createReadBiasedLongRef(stm);
 
             BetaObjectPool pool = new BetaObjectPool();
 

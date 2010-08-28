@@ -6,7 +6,7 @@ import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -42,7 +42,7 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
     @Test
     public void whenHasConstructed() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRef ref = new LongRef(tx);
+        BetaLongRef ref = new BetaLongRef(tx);
         tx.openForConstruction(ref, pool);
 
         tx.hardReset(pool);
@@ -51,7 +51,7 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
 
     @Test
     public void whenHasNormalRead() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.openForRead(ref, false, pool);
 
@@ -61,7 +61,7 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
 
     @Test
     public void whenHasPermanentRead() {
-        LongRef ref = createReadBiasedLongRef(stm);
+        BetaLongRef ref = createReadBiasedLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.openForRead(ref, false, pool);
         tx.hardReset(pool);
@@ -70,7 +70,7 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
 
     @Test
     public void whenHasWrite() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.openForWrite(ref, false, pool);
         tx.hardReset(pool);

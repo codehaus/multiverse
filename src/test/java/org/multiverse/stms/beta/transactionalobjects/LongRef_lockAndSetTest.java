@@ -23,7 +23,7 @@ public class LongRef_lockAndSetTest {
 
     @Test
     public void whenUnlocked() {
-        LongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = createLongRef(stm, 10);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         ref.lockAndSet(tx, pool, 20);
@@ -38,7 +38,7 @@ public class LongRef_lockAndSetTest {
 
     @Test
     public void whenAlreadyLockedBySelf() {
-        LongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = createLongRef(stm, 10);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         ref.lockAndSet(tx, pool, 10);
@@ -54,7 +54,7 @@ public class LongRef_lockAndSetTest {
 
     @Test
     public void whenAlreadyLockedByOther() {
-        LongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = createLongRef(stm, 10);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);

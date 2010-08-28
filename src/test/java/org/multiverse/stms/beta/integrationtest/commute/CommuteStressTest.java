@@ -11,7 +11,7 @@ import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.FatArrayTreeBetaTransactionFactory;
 import org.multiverse.stms.beta.LeanBetaAtomicBlock;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 
@@ -24,7 +24,7 @@ import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalB
 public class CommuteStressTest {
      private BetaStm stm;
     private volatile boolean stop;
-    private LongRef[] refs;
+    private BetaLongRef[] refs;
     private int refCount = 10;
     private int workerCount = 2;
 
@@ -37,7 +37,7 @@ public class CommuteStressTest {
 
     @Test
     public void test() {
-        refs = new LongRef[refCount];
+        refs = new BetaLongRef[refCount];
         for (int k = 0; k < refCount; k++) {
             refs[k] = createLongRef(stm);
         }
@@ -55,9 +55,9 @@ public class CommuteStressTest {
         assertEquals(count(workers), count(refs));
     }
 
-    public long count(LongRef[] refs) {
+    public long count(BetaLongRef[] refs) {
         long result = 0;
-        for (LongRef ref : refs) {
+        for (BetaLongRef ref : refs) {
             result += ref.___unsafeLoad().value;
         }
         return result;

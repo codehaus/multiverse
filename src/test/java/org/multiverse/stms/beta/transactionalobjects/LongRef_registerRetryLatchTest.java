@@ -28,7 +28,7 @@ public class LongRef_registerRetryLatchTest implements BetaStmConstants {
 
     @Test
     public void whenInterestingWriteAlreadyHappened_thenLatchOpenedAndNoRegistration() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
@@ -62,7 +62,7 @@ public class LongRef_registerRetryLatchTest implements BetaStmConstants {
     @Test
     public void whenConstructed_thenNoRegistration() {
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRef ref = new LongRef(tx);
+        BetaLongRef ref = new BetaLongRef(tx);
         LongRefTranlocal read = tx.openForConstruction(ref, pool);
 
         Latch latch = new CheapLatch();
@@ -76,7 +76,7 @@ public class LongRef_registerRetryLatchTest implements BetaStmConstants {
 
     @Test
     public void whenFirstOne_thenRegistrationSuccessful() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
@@ -96,7 +96,7 @@ public class LongRef_registerRetryLatchTest implements BetaStmConstants {
 
     @Test
     public void whenSecondOne_thenListenerAddedToChain() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx1 = stm.startDefaultTransaction();
         LongRefTranlocal read1 = tx1.openForRead(ref, false, pool);

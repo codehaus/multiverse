@@ -7,7 +7,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicLongClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.TooManyRetriesException;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
@@ -31,7 +31,7 @@ public class BetaAtomicBlock_integrationTest {
     
     @Test
     public void whenRead() {
-        final LongRef ref = createLongRef(stm, 10);
+        final BetaLongRef ref = createLongRef(stm, 10);
 
         AtomicBlock block = stm.getTransactionFactoryBuilder().buildAtomicBlock();
         long result = block.execute(new AtomicLongClosure() {
@@ -47,7 +47,7 @@ public class BetaAtomicBlock_integrationTest {
 
     @Test
     public void whenUpdate() {
-        final LongRef ref = createLongRef(stm, 0);
+        final BetaLongRef ref = createLongRef(stm, 0);
 
         AtomicBlock block = stm.getTransactionFactoryBuilder().buildAtomicBlock();
         block.execute(new AtomicVoidClosure() {
@@ -63,7 +63,7 @@ public class BetaAtomicBlock_integrationTest {
 
     @Test
     public void whenTooManyRetries() {
-        final LongRef ref = BetaStmUtils.createLongRef(stm);
+        final BetaLongRef ref = BetaStmUtils.createLongRef(stm);
 
         FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
         otherTx.openForWrite(ref, true, pool);
@@ -88,7 +88,7 @@ public class BetaAtomicBlock_integrationTest {
 
     @Test
     public void whenMultipleUpdatesDoneInSingleTransaction() {
-        final LongRef ref = BetaStmUtils.createLongRef(stm);
+        final BetaLongRef ref = BetaStmUtils.createLongRef(stm);
 
         AtomicBlock block = stm.getTransactionFactoryBuilder().buildAtomicBlock();
         block.execute(new AtomicVoidClosure() {

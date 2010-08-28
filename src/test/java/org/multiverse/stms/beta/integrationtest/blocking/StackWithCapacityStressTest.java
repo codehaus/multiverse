@@ -9,9 +9,9 @@ import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.IntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaRef;
 import org.multiverse.stms.beta.transactionalobjects.IntRefTranlocal;
-import org.multiverse.stms.beta.transactionalobjects.Ref;
 import org.multiverse.stms.beta.transactionalobjects.RefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -118,8 +118,8 @@ public class StackWithCapacityStressTest {
     }
 
     class Stack<E> {
-        private final Ref<Node<E>> head = createRef(stm);
-        private final IntRef size = createIntRef(stm);
+        private final BetaRef<Node<E>> head = createRef(stm);
+        private final BetaIntRef size = createIntRef(stm);
         private final AtomicBlock pushBlock = stm.getTransactionFactoryBuilder().buildAtomicBlock();
         private final AtomicBlock popBlock = stm.getTransactionFactoryBuilder().buildAtomicBlock();
 

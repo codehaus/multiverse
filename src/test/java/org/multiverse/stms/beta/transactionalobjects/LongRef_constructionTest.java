@@ -24,11 +24,11 @@ public class LongRef_constructionTest implements BetaStmConstants {
     @Test
     public void testBasicConstructorWithoutArguments() {
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRef ref1 = new LongRef(tx);
+        BetaLongRef ref1 = new BetaLongRef(tx);
         tx.openForConstruction(ref1, pool);
         tx.commit();
 
-        LongRef ref2 = new LongRef();
+        BetaLongRef ref2 = new BetaLongRef();
         assertEquals(ref1.___toOrecString(), ref2.___toOrecString());
 
         assertNull(ref2.___getLockOwner());
@@ -42,11 +42,11 @@ public class LongRef_constructionTest implements BetaStmConstants {
     @Test
     public void testBasicConstructorWithInitialValue() {
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRef ref1 = new LongRef(tx);
+        BetaLongRef ref1 = new BetaLongRef(tx);
         tx.openForConstruction(ref1, pool).value = 10;
         tx.commit();
 
-        LongRef ref2 = new LongRef(10);
+        BetaLongRef ref2 = new BetaLongRef(10);
         assertEquals(ref1.___toOrecString(), ref2.___toOrecString());
 
         assertNull(ref2.___getLockOwner());
@@ -61,7 +61,7 @@ public class LongRef_constructionTest implements BetaStmConstants {
     @Test
     public void test() {
         BetaTransaction tx = mock(BetaTransaction.class);
-        LongRef ref = new LongRef(tx);
+        BetaLongRef ref = new BetaLongRef(tx);
 
         assertSurplus(1, ref);
         assertLocked(ref);

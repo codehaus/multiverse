@@ -9,7 +9,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.IntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactionalobjects.IntRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -126,7 +126,7 @@ public class NonReentrantMutexStressTest {
     }
 
     class NonReentrantMutex {
-        final IntRef locked = createIntRef(stm, 0);
+        final BetaIntRef locked = createIntRef(stm, 0);
         final AtomicBlock lockBlock = stm.getTransactionFactoryBuilder()
                 .buildAtomicBlock();
         final AtomicBlock unlockBlock = stm.getTransactionFactoryBuilder()

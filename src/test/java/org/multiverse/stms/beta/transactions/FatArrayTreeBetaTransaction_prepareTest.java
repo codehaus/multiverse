@@ -9,7 +9,7 @@ import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
 import static org.junit.Assert.*;
@@ -41,7 +41,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
 
     @Test
     public void whenReadIsConflictedByWrite() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
@@ -64,7 +64,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
 
     @Test
     public void whenReadIsConflictedByLock_thenPrepareSuccess() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
@@ -86,7 +86,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
 
     @Test
     public void whenUpdate() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
@@ -106,7 +106,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
 
     @Test
     public void whenUpdateAlreadyLockedBySelf() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
@@ -125,7 +125,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
 
     @Test
     public void whenUpdateAndLockedByOther_thenWriteConflict() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
@@ -156,7 +156,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
     public void whenOnlyFresh() {
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRef ref = new LongRef(tx);
+        BetaLongRef ref = new BetaLongRef(tx);
         tx.openForConstruction(ref, pool);
         tx.prepare();
 
@@ -170,7 +170,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
 
     @Test
     public void whenConflictingWrite() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
@@ -200,7 +200,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
 
     @Test
     public void whenAlreadyPrepared() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
@@ -221,7 +221,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
 
     @Test
     public void whenReferenceHasMultipleCommutes() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
@@ -248,9 +248,9 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
     @Test
     @Ignore
     public void whenMultipleReferencesHaveCommute() {
-        LongRef ref1 = createLongRef(stm, 10);
-        LongRef ref2 = createLongRef(stm, 20);
-        LongRef ref3 = createLongRef(stm, 30);
+        BetaLongRef ref1 = createLongRef(stm, 10);
+        BetaLongRef ref2 = createLongRef(stm, 20);
+        BetaLongRef ref3 = createLongRef(stm, 30);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.commute(ref1, pool, IncLongFunction.INSTANCE);
@@ -272,7 +272,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
 
     @Test
     public void whenHasCommuteAndNoDirtyCheck() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
@@ -298,7 +298,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
 
     @Test
     public void whenHasCommuteAndDirtyCheck() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
@@ -324,7 +324,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
 
     @Test
     public void whenHasCommuteButLockedByOtherTransaction_thenWriteConflict() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
@@ -350,7 +350,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
 
     @Test
     public void whenHasCommuteThatConflicts() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
@@ -381,8 +381,8 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
 
     @Test
      public void whenWriteSkewStillPossibleWithWriteSkewEnabled() {
-         LongRef ref1 = createLongRef(stm, 0);
-         LongRef ref2 = createLongRef(stm, 0);
+         BetaLongRef ref1 = createLongRef(stm, 0);
+         BetaLongRef ref2 = createLongRef(stm, 0);
 
          BetaTransaction tx1 = new FatArrayTreeBetaTransaction(stm);
          tx1.openForWrite(ref1, false, pool).value++;
@@ -398,8 +398,8 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
 
      @Test
      public void whenWriteSkewNotPossibleWithoutWriteSkewDisabled() {
-         LongRef ref1 = createLongRef(stm, 0);
-         LongRef ref2 = createLongRef(stm, 0);
+         BetaLongRef ref1 = createLongRef(stm, 0);
+         BetaLongRef ref2 = createLongRef(stm, 0);
 
          BetaTransaction tx1 = new FatArrayTreeBetaTransaction(stm);
          tx1.openForWrite(ref1, false, pool).value++;

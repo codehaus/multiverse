@@ -21,7 +21,7 @@ public class LongRefTranlocal_openForWriteTest implements BetaStmConstants {
 
     @Test
     public void test(){
-        LongRef ref = createLongRef(stm, 200);
+        BetaLongRef ref = createLongRef(stm, 200);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         LongRefTranlocal write = committed.openForWrite(pool);

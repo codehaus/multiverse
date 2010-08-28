@@ -10,8 +10,8 @@ import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 
@@ -43,7 +43,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
     @Test
     public void whenNotCommittedBefore_thenReadConflict() {
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        LongRef ref = new LongRef(otherTx);
+        BetaLongRef ref = new BetaLongRef(otherTx);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
 
@@ -58,8 +58,8 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenOverflowing() {
-        LongRef ref1 = BetaStmUtils.createLongRef(stm);
-        LongRef ref2 = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref1 = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref2 = BetaStmUtils.createLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         BetaTransaction tx = new FatMonoBetaTransaction(config);
@@ -77,7 +77,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenReadBiased() {
-        LongRef ref = createReadBiasedLongRef(stm, 100);
+        BetaLongRef ref = createReadBiasedLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
         int oldReadonlyCount = ref.___getReadonlyCount();
 
@@ -103,7 +103,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenReadBiasedAndLock() {
-        LongRef ref = createReadBiasedLongRef(stm, 100);
+        BetaLongRef ref = createReadBiasedLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
         int oldReadonlyCount = ref.___getReadonlyCount();
 
@@ -129,7 +129,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenUpdateBiased() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -154,7 +154,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenUpdateBiasedAndLock() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
         int oldReadonlyCount = ref.___getReadonlyCount();
 
@@ -180,7 +180,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenAlreadyOpenedForRead() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
@@ -206,7 +206,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
     @Test
     public void whenAlreadyOpenedForConstruction() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRef ref = new LongRef(tx);
+        BetaLongRef ref = new BetaLongRef(tx);
         LongRefTranlocal constructed = tx.openForConstruction(ref, pool);
         constructed.value = 100;
 
@@ -231,7 +231,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
     @Test
     public void whenConstructedAndLock() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRef ref = new LongRef(tx);
+        BetaLongRef ref = new BetaLongRef(tx);
         LongRefTranlocal constructed = tx.openForConstruction(ref, pool);
         constructed.value = 100;
 
@@ -255,7 +255,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenOpenForWriteAndLock() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write1 = tx.openForWrite(ref, false, pool);
@@ -278,7 +278,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenAlreadyOpenedForReadAndLocked() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, true, pool);
@@ -300,7 +300,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenAlreadyOpenedForWriteAndLocked() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write1 = tx.openForWrite(ref, true, pool);
@@ -323,7 +323,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenAlreadyOpenedForReadAndLock() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
@@ -347,7 +347,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenAlreadyOpenedForWriteAndLock() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write1 = tx.openForWrite(ref, false, pool);
@@ -370,7 +370,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenRepeatedLockThenNoProblem() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write1 = tx.openForWrite(ref, true, pool);
@@ -393,7 +393,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenLockedByOtherAfterOpenedAndLockRequired() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.openForWrite(ref, false, pool);
@@ -427,7 +427,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
     }
 
     public void whenLockedByOther_thenReadConflict(boolean lockNeeded) {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
 
         FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
         otherTx.openForRead(ref, true, pool);
@@ -449,8 +449,8 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenContainsUntrackedRead_thenCantRecoverFromUnrealReadConflict() {
-        LongRef ref1 = createReadBiasedLongRef(stm, 100);
-        LongRef ref2 = createLongRef(stm);
+        BetaLongRef ref1 = createReadBiasedLongRef(stm, 100);
+        BetaLongRef ref2 = createLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setReadTrackingEnabled(false);
@@ -478,7 +478,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenReadonly_thenAbortedAndReadonlyException() {
-        LongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = createLongRef(stm, 0);
         Tranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(new BetaTransactionConfiguration(stm).setReadonly(true));
@@ -494,7 +494,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenReadonlyAndAlreadyOpenedForRead_thenReadonlyException() {
-        LongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = createLongRef(stm, 0);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(new BetaTransactionConfiguration(stm).setReadonly(true));
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
@@ -513,7 +513,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
 
         try {
-            tx.openForWrite((LongRef) null, true, pool);
+            tx.openForWrite((BetaLongRef) null, true, pool);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -523,7 +523,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenPessimisticReadEnabled() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
@@ -545,7 +545,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenPessimisticWriteEnabled() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
@@ -567,7 +567,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenHasCommutingFunctions() {
-        LongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = createLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -595,7 +595,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenHasCommutingFunctionAndLocked_thenReadConflict() {
-        LongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = createLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
@@ -622,7 +622,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
     @Test
     public void whenPrepared_thenPreparedTransactionException() {
-        LongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);

@@ -9,7 +9,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.IntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertEquals;
@@ -28,7 +28,7 @@ public class DiningPhilosophersStressTest {
     private int philosopherCount = 10;
     private volatile boolean stop;
 
-    private IntRef[] forks;
+    private BetaIntRef[] forks;
     private BetaStm stm;
     private boolean pessimistic;
 
@@ -65,7 +65,7 @@ public class DiningPhilosophersStressTest {
     }
 
     public void assertAllForksHaveReturned() {
-        for (IntRef fork : forks) {
+        for (BetaIntRef fork : forks) {
             assertEquals(0, fork.___unsafeLoad().value);
         }
     }
@@ -73,23 +73,23 @@ public class DiningPhilosophersStressTest {
     public PhilosopherThread[] createPhilosopherThreads() {
         PhilosopherThread[] threads = new PhilosopherThread[philosopherCount];
         for (int k = 0; k < philosopherCount; k++) {
-            IntRef leftFork = forks[k];
-            IntRef rightFork = k == philosopherCount - 1 ? forks[0] : forks[k + 1];
+            BetaIntRef leftFork = forks[k];
+            BetaIntRef rightFork = k == philosopherCount - 1 ? forks[0] : forks[k + 1];
             threads[k] = new PhilosopherThread(k, leftFork, rightFork);
         }
         return threads;
     }
 
     public void createForks() {
-        forks = new IntRef[philosopherCount];
+        forks = new BetaIntRef[philosopherCount];
         for (int k = 0; k < forks.length; k++) {
             forks[k] = createIntRef(stm);
         }
     }
 
     class PhilosopherThread extends TestThread {
-        private final IntRef leftFork;
-        private final IntRef rightFork;
+        private final BetaIntRef leftFork;
+        private final BetaIntRef rightFork;
         private final AtomicBlock releaseForksBlock = stm.getTransactionFactoryBuilder()
                 .setPessimisticLockLevel(pessimistic ? PessimisticLockLevel.Read : PessimisticLockLevel.None)
                 .buildAtomicBlock();
@@ -98,7 +98,7 @@ public class DiningPhilosophersStressTest {
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
 
-        PhilosopherThread(int id, IntRef leftFork, IntRef rightFork) {
+        PhilosopherThread(int id, BetaIntRef leftFork, BetaIntRef rightFork) {
             super("PhilosopherThread-" + id);
             this.leftFork = leftFork;
             this.rightFork = rightFork;

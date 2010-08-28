@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -30,7 +30,7 @@ public class BetaAtomicBlock_blockingTest {
 
     @Test
     public void test() {
-        final LongRef ref = createLongRef(stm);
+        final BetaLongRef ref = createLongRef(stm);
 
         WaitThread t = new WaitThread(ref);
         t.start();
@@ -53,9 +53,9 @@ public class BetaAtomicBlock_blockingTest {
     }
 
     class WaitThread extends TestThread {
-        final LongRef ref;
+        final BetaLongRef ref;
 
-        public WaitThread(LongRef ref) {
+        public WaitThread(BetaLongRef ref) {
             this.ref = ref;
         }
 

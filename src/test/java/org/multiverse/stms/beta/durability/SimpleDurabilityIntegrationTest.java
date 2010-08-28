@@ -10,7 +10,7 @@ import org.multiverse.durability.UnitOfWrite;
 import org.multiverse.durability.account.SerializeUtils;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
@@ -31,13 +31,13 @@ public class SimpleDurabilityIntegrationTest {
         stm = new BetaStm();
         pool = new BetaObjectPool();
         storage = new SimpleStorage(stm);
-        storage.register(LongRef.class, new LongRefSerializer());
+        storage.register(BetaLongRef.class, new LongRefSerializer());
         storage.clear();
     }
 
     @Test
     public void whenSingleItemWritten() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
 
         UnitOfWrite unitOfWrite = storage.startUnitOfWrite();
         unitOfWrite.addChange(ref.___unsafeLoad());
@@ -46,14 +46,14 @@ public class SimpleDurabilityIntegrationTest {
 
         storage.clearEntities();
 
-        LongRef loaded = (LongRef) storage.loadDurableObject(ref.___getStorageId());
+        BetaLongRef loaded = (BetaLongRef) storage.loadDurableObject(ref.___getStorageId());
         assertEquals(100, loaded.___unsafeLoad().value);
     }
 
 
     @Test
     public void whenUpdated() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
 
         UnitOfWrite write1 = storage.startUnitOfWrite();
         write1.addChange(ref.___unsafeLoad());
@@ -62,7 +62,7 @@ public class SimpleDurabilityIntegrationTest {
 
         storage.clearEntities();
 
-        LongRef loaded = (LongRef) storage.loadDurableObject(ref.___getStorageId());
+        BetaLongRef loaded = (BetaLongRef) storage.loadDurableObject(ref.___getStorageId());
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.openForWrite(loaded, false, pool).value++;
@@ -72,14 +72,14 @@ public class SimpleDurabilityIntegrationTest {
         write2.addChange(loaded.___unsafeLoad());
         write2.commit();
 
-        LongRef loaded2 = (LongRef) storage.loadDurableObject(loaded.___getStorageId());
+        BetaLongRef loaded2 = (BetaLongRef) storage.loadDurableObject(loaded.___getStorageId());
         assertEquals(101, loaded2.___unsafeLoad().value);
     }
 
     @Test
     public void whenMultipleItemsWritten() {
-        LongRef ref1 = createLongRef(stm, 100);
-        LongRef ref2 = createLongRef(stm, 200);
+        BetaLongRef ref1 = createLongRef(stm, 100);
+        BetaLongRef ref2 = createLongRef(stm, 200);
 
 
         UnitOfWrite unitOfWrite = storage.startUnitOfWrite();
@@ -91,14 +91,14 @@ public class SimpleDurabilityIntegrationTest {
 
         storage.clearEntities();
 
-        LongRef loaded1 = (LongRef) storage.loadDurableObject(ref1.___getStorageId());
+        BetaLongRef loaded1 = (BetaLongRef) storage.loadDurableObject(ref1.___getStorageId());
         assertEquals(100, loaded1.___unsafeLoad().value);
-        LongRef loaded2 = (LongRef) storage.loadDurableObject(ref2.___getStorageId());
+        BetaLongRef loaded2 = (BetaLongRef) storage.loadDurableObject(ref2.___getStorageId());
         assertEquals(200, loaded2.___unsafeLoad().value);
     }
 
 
-    class LongRefSerializer implements DurableObjectSerializer<LongRef, LongRefTranlocal> {
+    class LongRefSerializer implements DurableObjectSerializer<BetaLongRef, LongRefTranlocal> {
 
         @Override
         public byte[] serialize(LongRefTranlocal state) {
@@ -114,13 +114,13 @@ public class SimpleDurabilityIntegrationTest {
         }
 
         @Override
-        public LongRefTranlocal deserializeState(LongRef owner, byte[] content, DurableObjectLoader loader) {
+        public LongRefTranlocal deserializeState(BetaLongRef owner, byte[] content, DurableObjectLoader loader) {
             throw new TodoException();
         }
 
         @Override
-        public LongRef deserializeObject(String id, byte[] content, BetaTransaction transaction) {
-            LongRef ref = new LongRef(transaction);
+        public BetaLongRef deserializeObject(String id, byte[] content, BetaTransaction transaction) {
+            BetaLongRef ref = new BetaLongRef(transaction);
             ref.___setStorageId(id);
             return ref;
         }

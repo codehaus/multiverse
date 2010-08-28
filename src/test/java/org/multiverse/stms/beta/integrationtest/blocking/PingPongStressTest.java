@@ -8,7 +8,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicBooleanClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.*;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -22,7 +22,7 @@ import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 public class PingPongStressTest {
 
     private volatile boolean stop = false;
-    private LongRef ref;
+    private BetaLongRef ref;
     private BetaStm stm;
 
     @Before

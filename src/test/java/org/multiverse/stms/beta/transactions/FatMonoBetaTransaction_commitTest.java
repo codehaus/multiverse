@@ -15,8 +15,8 @@ import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.BetaStmUtils;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
 import java.util.LinkedList;
@@ -95,7 +95,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenChangeListenerAvailableForUpdate_thenListenerNotified() {
-        LongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
 
         FatMonoBetaTransaction listeningTx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal read = listeningTx.openForRead(ref, false, pool);
@@ -118,7 +118,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenMultipleChangeListeners_thenAllNotified() {
-        LongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
 
         List<Latch> listeners = new LinkedList<Latch>();
         for (int k = 0; k < 10; k++) {
@@ -140,7 +140,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenContainsOnlyNormalRead() {
-        LongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         int oldReadonlyCount = ref.___getReadonlyCount();
@@ -160,7 +160,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenContainsReadBiasedRead() {
-        LongRef ref = createReadBiasedLongRef(stm, 100);
+        BetaLongRef ref = createReadBiasedLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -178,7 +178,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenContainsLockedNormalRead() {
-        LongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = createLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -196,7 +196,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenContainsLockedReadBiasedRead() {
-        LongRef ref = createReadBiasedLongRef(stm, 100);
+        BetaLongRef ref = createReadBiasedLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -214,7 +214,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenContainsLockedUpdate() {
-        LongRef ref = createReadBiasedLongRef(stm, 100);
+        BetaLongRef ref = createReadBiasedLongRef(stm, 100);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, true, pool);
@@ -257,7 +257,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenNormalUpdateButNotChange() {
-        LongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(new BetaTransactionConfiguration(stm).setDirtyCheckEnabled(true));
@@ -277,7 +277,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
     @Test
     public void whenConstructed() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRef ref = new LongRef(tx);
+        BetaLongRef ref = new BetaLongRef(tx);
         LongRefTranlocal write = tx.openForConstruction(ref, pool);
         write.value++;
         tx.commit(pool);
@@ -296,7 +296,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenWriteConflict() {
-        LongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = createLongRef(stm, 0);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
@@ -322,7 +322,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenWriteConflictCausedByLock() {
-        LongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = createLongRef(stm, 0);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -350,7 +350,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenAlmostReadBiased() {
-        LongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = createLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         //make almost read biased.
@@ -380,7 +380,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenUpdateReadBiasedRead() {
-        LongRef ref = createReadBiasedLongRef(stm, 10);
+        BetaLongRef ref = createReadBiasedLongRef(stm, 10);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
@@ -401,7 +401,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void repeatedCommits() {
-        LongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         for (int k = 0; k < 100; k++) {
@@ -416,7 +416,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenNotDirtyAndNotLocked() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -435,7 +435,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenNotDirtyAndLocked() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -474,7 +474,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenNormalListenerAvailable() {
-        LongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = createLongRef(stm, 0);
 
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -489,7 +489,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenPermanentListenerAvailable() {
-        LongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = createLongRef(stm, 0);
 
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -525,7 +525,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenPreparedAndContainsRead() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -544,7 +544,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenPreparedAndContainsUpdate() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false, pool);
@@ -570,7 +570,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setDirtyCheckEnabled(false);
 
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
         tx.commute(ref, pool, IncLongFunction.INSTANCE);
         tx.commit(pool);
@@ -587,7 +587,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setDirtyCheckEnabled(true);
 
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
         tx.commute(ref, pool, IncLongFunction.INSTANCE);
         tx.commit(pool);
@@ -602,8 +602,8 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
     @Test
     @Ignore("can't be done with a mono, try with an untracked read")
     public void whenInterleavingPossibleWithCommute() {
-        LongRef ref1 = createLongRef(stm);
-        LongRef ref2 = createLongRef(stm);
+        BetaLongRef ref1 = createLongRef(stm);
+        BetaLongRef ref2 = createLongRef(stm);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.openForWrite(ref1, false, pool).value++;
 
@@ -630,7 +630,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setDirtyCheckEnabled(true);
 
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
         tx.commute(ref, pool, IncLongFunction.INSTANCE);
         tx.commute(ref, pool, IncLongFunction.INSTANCE);
@@ -646,7 +646,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenCommuteAndLockedByOtherTransaction_thenWriteConflict() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.commute(ref, pool, IncLongFunction.INSTANCE);
 
@@ -682,7 +682,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenPessimisticLockLevelWriteAndDirtyCheck() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.Write)
                 .setDirtyCheckEnabled(true);
@@ -695,7 +695,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenPessimisticLockLevelReadAndDirtyCheck() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.Read)
                 .setDirtyCheckEnabled(true);
@@ -740,7 +740,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
     }
 
     public void integrationTest_whenMultipleUpdatesAndDirtyCheck(final boolean dirtyCheck) {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         long created = 0;
 
         //execute all transactions

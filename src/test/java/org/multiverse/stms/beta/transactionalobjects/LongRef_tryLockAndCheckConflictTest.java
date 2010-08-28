@@ -27,7 +27,7 @@ public class LongRef_tryLockAndCheckConflictTest {
 
     @Test
     public void whenFree() {
-        LongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = createLongRef(stm, 0);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal write = tx.openForRead(ref, false, pool);
@@ -42,7 +42,7 @@ public class LongRef_tryLockAndCheckConflictTest {
 
     @Test
     public void whenConflict() {
-        LongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = createLongRef(stm, 0);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
@@ -64,7 +64,7 @@ public class LongRef_tryLockAndCheckConflictTest {
 
     @Test
     public void whenLockedByOtherAndUpdated() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal read = tx.openForRead(ref, false, pool);
@@ -86,7 +86,7 @@ public class LongRef_tryLockAndCheckConflictTest {
 
     @Test
     public void whenPendingUpdate() {
-        LongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = createLongRef(stm, 0);
 
         BetaTransaction tx = stm.startDefaultTransaction();
 
@@ -107,7 +107,7 @@ public class LongRef_tryLockAndCheckConflictTest {
 
     @Test
     public void whenAlreadyLockedBySelf() {
-        LongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = createLongRef(stm, 0);
 
         //lock it by this thread.
         BetaTransaction tx = stm.startDefaultTransaction();

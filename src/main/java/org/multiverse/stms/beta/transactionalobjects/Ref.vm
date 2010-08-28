@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.*;
 import org.multiverse.api.*;
+import org.multiverse.api.references.*;
 import org.multiverse.api.blocking.*;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.*;
@@ -29,7 +30,12 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Peter Veentjer
  */
 public ${transactionalObject.accessModifier} class ${transactionalObject.name}${transactionalObject.typeParameter}
-    extends FastOrec implements BetaTransactionalObject, BetaStmConstants {
+#if(${transactionalObject.isReference})
+    extends FastOrec implements BetaTransactionalObject, BetaStmConstants, ${transactionalObject.referenceInterface}${transactionalObject.typeParameter}
+#else
+    extends FastOrec implements BetaTransactionalObject, BetaStmConstants
+#end
+{
 
     private final static long listenersOffset;
 

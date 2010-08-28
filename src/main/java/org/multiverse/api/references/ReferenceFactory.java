@@ -1,9 +1,5 @@
 package org.multiverse.api.references;
 
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.BetaRef;
-
 /**
  * A Factory for creating references.
  *
@@ -17,7 +13,7 @@ public interface ReferenceFactory {
      * @param value the initial value.
      * @return the created BetaIntRef.
      */
-    BetaIntRef createIntRef(int value);
+    IntRef createIntRef(int value);
 
     /**
      * Creates a committed BetaLongRef.
@@ -25,7 +21,7 @@ public interface ReferenceFactory {
      * @param value the initial value.
      * @return the created BetaLongRef.
      */
-    BetaLongRef createLongRef(long value);
+    LongRef createLongRef(long value);
 
     /**
      * Creates a committed BetaRef.
@@ -34,5 +30,5 @@ public interface ReferenceFactory {
      * @param <E> the type of the value.
      * @return the created BetaRef.
      */
-    <E> BetaRef<E> createRef(E value);
+    <E> Ref<E> createRef(E value);
 }

@@ -25,7 +25,7 @@ public class LongRefTranlocal_addCommutingFunctionTest {
 
     @Test
     public void whenFirstAddition() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
         tranlocal.addCommutingFunction(IncLongFunction.INSTANCE, pool);
 
@@ -38,7 +38,7 @@ public class LongRefTranlocal_addCommutingFunctionTest {
 
     @Test
     public void whenMultipleAdditions(){
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
 
         LongFunction function1 = mock(LongFunction.class);

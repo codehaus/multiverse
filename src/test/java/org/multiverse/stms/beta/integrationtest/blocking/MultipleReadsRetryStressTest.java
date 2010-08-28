@@ -8,7 +8,7 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.*;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 
@@ -21,8 +21,8 @@ import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalB
 
 public class MultipleReadsRetryStressTest {
     private BetaStm stm;
-    private LongRef[] refs;
-    private LongRef stopRef;
+    private BetaLongRef[] refs;
+    private BetaLongRef stopRef;
     private volatile boolean stop;
 
     @Before
@@ -62,7 +62,7 @@ public class MultipleReadsRetryStressTest {
     }
 
     public void test(AtomicBlock atomicBlock, int refCount, int threadCount) throws InterruptedException {
-        refs = new LongRef[refCount];
+        refs = new BetaLongRef[refCount];
         for (int k = 0; k < refs.length; k++) {
             refs[k] = createLongRef(stm);
         }
@@ -97,7 +97,7 @@ public class MultipleReadsRetryStressTest {
 
     private long sumRefs() {
         long result = 0;
-        for (LongRef ref : refs) {
+        for (BetaLongRef ref : refs) {
             result += ref.___unsafeLoad().value;
         }
         return result;
@@ -139,7 +139,7 @@ public class MultipleReadsRetryStressTest {
                     }
 
                     long sum = 0;
-                    for (LongRef ref : refs) {
+                    for (BetaLongRef ref : refs) {
                         sum += btx.openForRead(ref, false, pool).value;
                     }
 
@@ -147,7 +147,7 @@ public class MultipleReadsRetryStressTest {
                         retry();
                     }
 
-                    LongRef ref = refs[TestUtils.randomInt(refs.length)];
+                    BetaLongRef ref = refs[TestUtils.randomInt(refs.length)];
                     btx.openForWrite(ref, false, pool).value++;
                 }
 

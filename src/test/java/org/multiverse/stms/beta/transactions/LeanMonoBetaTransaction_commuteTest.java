@@ -6,7 +6,7 @@ import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -28,7 +28,7 @@ public class LeanMonoBetaTransaction_commuteTest {
 
     @Test
     public void whenCalled_thenSpeculativeConfigurationError() {
-        LongRef ref = createLongRef(stm);
+        BetaLongRef ref = createLongRef(stm);
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(config);
         LongFunction function = mock(LongFunction.class);

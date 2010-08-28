@@ -22,7 +22,7 @@ public class LongRef_openForConstructionTest implements BetaStmConstants{
     @Test
     public void test() {
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRef ref = new LongRef(tx);
+        BetaLongRef ref = new BetaLongRef(tx);
         LongRefTranlocal constructed = ref.___openForConstruction(pool);
 
         assertNotNull(constructed);
