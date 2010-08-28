@@ -187,5 +187,7 @@ done
 
 - initial support for externalizing the refs added.
 
+- gradle build script
+
 old done
 

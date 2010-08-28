@@ -1,0 +1,71 @@
+allprojects {
+  apply plugin: 'base'
+  apply plugin: 'java'
+  apply plugin: 'maven'
+  apply plugin: 'project-reports'
+
+  install.dependsOn ':build'
+  defaultTasks 'clean', 'install'
+
+  sourceCompatibility = 1.6
+  version = '0.7-SNAPSHOT'
+  asmversion = '3.3'
+  group = 'org.multiverse'
+
+  def localMavenRepo = 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
+
+  repositories {
+    mavenRepo urls: localMavenRepo
+    mavenCentral()
+    mavenRepo(urls: [
+            'http://snapshots.repository.codehaus.org',
+            'http://download.java.net/maven/2/',
+            'https://maven.atlassian.com/content/groups/public'])
+  }
+
+  configurations {
+    deployerJars
+  }
+
+  test {
+    exclude("**/*AbstractTest*")
+    exclude("**/*StressTest*")
+    exclude("**/*LongTest*")
+    exclude("**/*PerformanceTest*")
+    exclude("**/*performanceTest*")
+  }
+
+  task shortintegrationtest(type: Test) {
+    include("**/*StressTest*")
+    include("**/*stressTest*")
+    include("**/*LongTest*")
+    include("**/*longTest*")
+  }
+
+  task integrationtest(type: Test) {
+    include("**/*StressTest*")
+    include("**/*stressTest*")
+    include("**/*LongTest*")
+    include("**/*longTest*")
+  }
+
+  dependencies {
+    compile group: 'junit', name: 'junit', version: '4.8.1'
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.8.2'
+    deployerJars "org.apache.maven.wagon:wagon-ssh:1.0-beta-2"
+  }
+}
+
+project(':multiverse') {
+
+  configurations {
+    testFixtures {
+      extendsFrom testRuntime
+    }
+  }
+
+  shortintegrationtest {
+    jvmArgs = ["-Dorg.multiverse.integrationtest.durationMs=10000","-Dorg.multiverse.bugshaker.enabled=true"]
+  }
+
+}
