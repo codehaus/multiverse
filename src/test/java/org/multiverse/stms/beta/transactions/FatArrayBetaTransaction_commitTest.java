@@ -83,8 +83,10 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
     @Test
     public void whenPermanentLifecycleListenerAvailable_thenNotified() {
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.registerPermanent(pool, listener);
+
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .addPermanentListener(listener);
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         tx.commit();
 
         assertCommitted(tx);
@@ -106,9 +108,11 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
     public void whenNormalAndPermanentLifecycleListenersAvailable_permanentGetsCalledFirst() {
         TransactionLifecycleListener normalListener = mock(TransactionLifecycleListener.class);
         TransactionLifecycleListener permanentListener = mock(TransactionLifecycleListener.class);
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .addPermanentListener(permanentListener);
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         tx.register(normalListener);
-        tx.registerPermanent(pool, permanentListener);
         tx.commit();
 
         assertCommitted(tx);
@@ -409,8 +413,9 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         BetaLongRef ref = createLongRef(stm, 0);
 
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.registerPermanent(pool, listenerMock);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .addPermanentListener(listenerMock);
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         tx.openForWrite(ref, false, pool);
         tx.commit();
 

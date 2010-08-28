@@ -55,19 +55,6 @@ public class FatMonoBetaTransaction_initTest {
     }
 
     @Test
-    public void whenPermanentListenersAvailable_thenTheyAreRemoved() {
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        tx.registerPermanent(pool,listener);
-
-        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
-        tx.init(config);
-
-        assertSame(config, tx.getConfiguration());
-        assertInitialized(tx);
-    }
-
-    @Test
     public void whenNormalListenersAvailable_thenTheyAreRemoved() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
@@ -129,7 +116,6 @@ public class FatMonoBetaTransaction_initTest {
     private void assertInitialized(FatMonoBetaTransaction tx) {
         assertActive(tx);
         assertHasNoNormalListeners(tx);
-        assertHasNoPermanentListeners(tx);
         assertEquals(null, getField(tx, "attached"));
         assertEquals(1, tx.getAttempt());
     }

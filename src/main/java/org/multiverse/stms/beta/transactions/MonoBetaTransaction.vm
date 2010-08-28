@@ -27,7 +27,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #if(!${transaction.lean})
     private boolean hasReads;
     private boolean hasUntrackedReads;
-    private final LocalConflictCounter localConflictCounter;
+    private LocalConflictCounter localConflictCounter;
 #end
 
     public ${transaction.name}(final BetaStm stm){
@@ -483,8 +483,8 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         status = ABORTED;
 
 #if(!$transaction.lean)
-        if(permanentListeners != null){
-            notifyListeners(permanentListeners, TransactionLifecycleEvent.PostAbort);
+        if(config.permanentListeners != null){
+            notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostAbort);
         }
 
         if(normalListeners != null){
@@ -572,8 +572,8 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             listeners.openAll(pool);
         }
 
-        if(permanentListeners != null){
-            notifyListeners(permanentListeners, TransactionLifecycleEvent.PostCommit);
+        if(config.permanentListeners != null){
+            notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostCommit);
         }
 
         if(normalListeners != null){
@@ -649,8 +649,8 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         boolean abort = true;
         try{
-            if(permanentListeners != null){
-                notifyListeners(permanentListeners, TransactionLifecycleEvent.PrePrepare);
+            if(config.permanentListeners != null){
+                notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PrePrepare);
             }
 
             if(normalListeners != null){
@@ -770,8 +770,8 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         status = ABORTED;
 
 #if(!$transaction.lean)
-        if(permanentListeners != null){
-            notifyListeners(permanentListeners, TransactionLifecycleEvent.PostAbort);
+        if(config.permanentListeners != null){
+            notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostAbort);
         }
 
         if(normalListeners != null){
@@ -873,11 +873,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         if(normalListeners !=null){
             pool.putArrayList(normalListeners);
             normalListeners = null;
-        }
-
-        if(permanentListeners!=null){
-            pool.putArrayList(permanentListeners);
-            permanentListeners = null;
         }
 #end
     }

@@ -30,7 +30,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     private boolean hasUpdates;
     private boolean hasReads;
     private boolean hasUntrackedReads;
-    private final LocalConflictCounter localConflictCounter;
+    private LocalConflictCounter localConflictCounter;
 
     public FatMonoBetaTransaction(final BetaStm stm){
         this(new BetaTransactionConfiguration(stm));
@@ -329,9 +329,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortCommuteWhenNullReference(pool, function);
         }
 
-        boolean contains = (attached != null && attached.owner == ref);
+        final boolean contains = (attached != null && attached.owner == ref);
         if(!contains){
-            if(attached!=null) {
+            if(attached != null) {
                 throw abortOnTooSmallSize(pool, 2);
             }
 
@@ -647,9 +647,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortCommuteWhenNullReference(pool, function);
         }
 
-        boolean contains = (attached != null && attached.owner == ref);
+        final boolean contains = (attached != null && attached.owner == ref);
         if(!contains){
-            if(attached!=null) {
+            if(attached != null) {
                 throw abortOnTooSmallSize(pool, 2);
             }
 
@@ -965,9 +965,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortCommuteWhenNullReference(pool, function);
         }
 
-        boolean contains = (attached != null && attached.owner == ref);
+        final boolean contains = (attached != null && attached.owner == ref);
         if(!contains){
-            if(attached!=null) {
+            if(attached != null) {
                 throw abortOnTooSmallSize(pool, 2);
             }
 
@@ -1270,9 +1270,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortCommuteWhenNullReference(pool, function);
         }
 
-        boolean contains = (attached != null && attached.owner == ref);
+        final boolean contains = (attached != null && attached.owner == ref);
         if(!contains){
-            if(attached!=null) {
+            if(attached != null) {
                 throw abortOnTooSmallSize(pool, 2);
             }
 
@@ -1362,8 +1362,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         status = ABORTED;
 
-        if(permanentListeners != null){
-            notifyListeners(permanentListeners, TransactionLifecycleEvent.PostAbort);
+        if(config.permanentListeners != null){
+            notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostAbort);
         }
 
         if(normalListeners != null){
@@ -1402,8 +1402,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             listeners.openAll(pool);
         }
 
-        if(permanentListeners != null){
-            notifyListeners(permanentListeners, TransactionLifecycleEvent.PostCommit);
+        if(config.permanentListeners != null){
+            notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostCommit);
         }
 
         if(normalListeners != null){
@@ -1437,8 +1437,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         boolean abort = true;
         try{
-            if(permanentListeners != null){
-                notifyListeners(permanentListeners, TransactionLifecycleEvent.PrePrepare);
+            if(config.permanentListeners != null){
+                notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PrePrepare);
             }
 
             if(normalListeners != null){
@@ -1552,8 +1552,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         owner.___abort(this, attached, pool);
         status = ABORTED;
 
-        if(permanentListeners != null){
-            notifyListeners(permanentListeners, TransactionLifecycleEvent.PostAbort);
+        if(config.permanentListeners != null){
+            notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostAbort);
         }
 
         if(normalListeners != null){
@@ -1639,11 +1639,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(normalListeners !=null){
             pool.putArrayList(normalListeners);
             normalListeners = null;
-        }
-
-        if(permanentListeners!=null){
-            pool.putArrayList(permanentListeners);
-            permanentListeners = null;
         }
     }
 

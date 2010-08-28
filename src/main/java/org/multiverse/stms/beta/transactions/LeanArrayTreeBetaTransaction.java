@@ -15,7 +15,6 @@ import org.multiverse.stms.beta.conflictcounters.LocalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static java.lang.String.format;
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
@@ -28,10 +27,8 @@ import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalB
  */
 public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransaction {
 
-    public final static AtomicLong conflictScan = new AtomicLong();
-
+    private Tranlocal[] array;        
     private LocalConflictCounter localConflictCounter;
-    private Tranlocal[] array;
     private int size;
     private boolean hasReads;
     private boolean hasUntrackedReads;

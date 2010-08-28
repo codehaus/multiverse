@@ -11,7 +11,8 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 import static org.multiverse.stms.beta.BetaStmUtils.createReadBiasedLongRef;
@@ -200,23 +201,7 @@ public class FatArrayBetaTransaction_softResetTest {
         assertSurplus(1, ref);
         assertHasNoUpdates(tx);
     }
-
-    @Test
-    public void whenHasPermanentListener_thenTheyRemain() {
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        tx.registerPermanent(pool,listener);
-
-        boolean result = tx.softReset(pool);
-
-        assertTrue(result);
-        verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
-
-        verifyZeroInteractions(listener);
-        assertHasNoNormalListeners(tx);
-        assertHasPermanentListeners(tx, listener);
-    }
-
+    
     @Test
     public void whenHasNormalListener_thenTheyAreRemoved() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -227,8 +212,7 @@ public class FatArrayBetaTransaction_softResetTest {
 
         assertTrue(result);
         verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
-        assertHasNoNormalListeners(tx);
-        assertHasNoPermanentListeners(tx);
+        assertHasNoNormalListeners(tx);        
     }
 
     @Test

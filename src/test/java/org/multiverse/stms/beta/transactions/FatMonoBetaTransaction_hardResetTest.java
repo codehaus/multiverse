@@ -80,7 +80,6 @@ public class FatMonoBetaTransaction_hardResetTest {
     private static void assertWasHardReset(FatMonoBetaTransaction tx) {
         assertActive(tx);
         assertHasNoNormalListeners(tx);
-        assertHasNoPermanentListeners(tx);
         assertEquals(1, tx.getAttempt());
         assertFalse((Boolean) getField(tx, "hasReads"));
         assertFalse((Boolean) getField(tx, "hasUntrackedReads"));
@@ -119,23 +118,6 @@ public class FatMonoBetaTransaction_hardResetTest {
     }
 
     @Test
-    public void whenHasPermanentListener() {
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        tx.registerPermanent(pool,listener);
-
-        tx.hardReset(pool);
-
-        assertEquals(1, tx.getAttempt());
-        assertActive(tx);
-        verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
-
-        assertHasNoNormalListeners(tx);
-        assertHasNoPermanentListeners(tx);
-        assertEquals(Long.MAX_VALUE, tx.getRemainingTimeoutNs());
-    }
-
-    @Test
     public void whenHasNormalListener() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
@@ -147,7 +129,6 @@ public class FatMonoBetaTransaction_hardResetTest {
         assertEquals(1, tx.getAttempt());
         verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
         assertHasNoNormalListeners(tx);
-        assertHasNoPermanentListeners(tx);
         assertEquals(Long.MAX_VALUE, tx.getRemainingTimeoutNs());
     }
 
@@ -160,7 +141,6 @@ public class FatMonoBetaTransaction_hardResetTest {
         assertEquals(1, tx.getAttempt());
         assertActive(tx);
         assertHasNoNormalListeners(tx);
-        assertHasNoPermanentListeners(tx);
         assertEquals(Long.MAX_VALUE, tx.getRemainingTimeoutNs());
     }
 
@@ -173,7 +153,6 @@ public class FatMonoBetaTransaction_hardResetTest {
         assertEquals(1, tx.getAttempt());
         assertActive(tx);
         assertHasNoNormalListeners(tx);
-        assertHasNoPermanentListeners(tx);
         assertEquals(Long.MAX_VALUE, tx.getRemainingTimeoutNs());
     }
 }

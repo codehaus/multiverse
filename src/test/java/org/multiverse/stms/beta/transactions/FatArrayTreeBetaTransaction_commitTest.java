@@ -69,8 +69,10 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
     @Test
     public void whenPermanentLifecycleListenerAvailable_thenNotified() {
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.registerPermanent(pool, listener);
+
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .addPermanentListener(listener);
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
         tx.commit();
 
         assertCommitted(tx);
@@ -92,9 +94,10 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
     public void whenNormalAndPermanentLifecycleListenersAvailable_permanentGetsCalledFirst() {
         TransactionLifecycleListener normalListener = mock(TransactionLifecycleListener.class);
         TransactionLifecycleListener permanentListener = mock(TransactionLifecycleListener.class);
-        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .addPermanentListener(permanentListener);
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
         tx.register(normalListener);
-        tx.registerPermanent(pool, permanentListener);
         tx.commit();
 
         assertCommitted(tx);

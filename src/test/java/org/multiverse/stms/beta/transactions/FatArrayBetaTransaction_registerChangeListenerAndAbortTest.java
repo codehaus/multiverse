@@ -236,9 +236,10 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
         BetaLongRef ref = createLongRef(stm, 0);
 
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .addPermanentListener(listenerMock);
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         Latch latch = new CheapLatch();
-        tx.registerPermanent(pool, listenerMock);
         tx.openForRead(ref, false, pool);
 
         tx.registerChangeListenerAndAbort(latch, pool);

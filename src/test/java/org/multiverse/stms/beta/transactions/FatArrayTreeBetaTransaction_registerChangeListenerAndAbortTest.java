@@ -223,22 +223,6 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         assertEquals(TransactionLifecycleEvent.PostAbort, listenerMock.events.get(0));
     }
 
-    @Test
-    public void whenPermanentListenerAvailable() {
-        BetaLongRef ref = createLongRef(stm, 0);
-
-        TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
-        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        Latch latch = new CheapLatch();
-        tx.registerPermanent(pool, listenerMock);
-        tx.openForRead(ref, false, pool);
-
-        tx.registerChangeListenerAndAbort(latch, pool);
-
-        assertEquals(1, listenerMock.events.size());
-        assertEquals(TransactionLifecycleEvent.PostAbort, listenerMock.events.get(0));
-    }
-
     class TransactionLifecycleListenerMock implements TransactionLifecycleListener {
         List<Transaction> transactions = new LinkedList<Transaction>();
         List<TransactionLifecycleEvent> events = new LinkedList<TransactionLifecycleEvent>();

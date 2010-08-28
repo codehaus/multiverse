@@ -492,8 +492,10 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         BetaLongRef ref = createLongRef(stm, 0);
 
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.registerPermanent(pool, listenerMock);
+
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .addPermanentListener(listenerMock);
+        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
         tx.openForWrite(ref, false, pool);
         tx.commit();
 

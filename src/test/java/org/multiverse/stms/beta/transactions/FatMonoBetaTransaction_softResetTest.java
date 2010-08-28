@@ -204,22 +204,6 @@ public class FatMonoBetaTransaction_softResetTest {
     }
 
     @Test
-    public void whenHasPermanentListener_thenTheyRemain() {
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        tx.registerPermanent(pool,listener);
-
-        boolean result = tx.softReset(pool);
-
-        assertTrue(result);
-        verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
-
-        assertHasNoNormalListeners(tx);
-        assertHasPermanentListeners(tx, listener); 
-
-    }
-
-    @Test
     public void whenHasNormalListener_thenTheyAreRemoved() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
@@ -230,7 +214,6 @@ public class FatMonoBetaTransaction_softResetTest {
         assertTrue(result);
         verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
         assertHasNoNormalListeners(tx);
-        assertHasNoPermanentListeners(tx);
     }
 
     @Test

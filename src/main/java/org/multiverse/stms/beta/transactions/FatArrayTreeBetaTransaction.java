@@ -15,7 +15,6 @@ import org.multiverse.stms.beta.conflictcounters.LocalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static java.lang.String.format;
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
@@ -28,10 +27,8 @@ import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalB
  */
 public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransaction {
 
-    public final static AtomicLong conflictScan = new AtomicLong();
-
+    private Tranlocal[] array;        
     private LocalConflictCounter localConflictCounter;
-    private Tranlocal[] array;
     private int size;
     private boolean hasReads;
     private boolean hasUntrackedReads;
@@ -1271,8 +1268,8 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     }
                 }
 
-                if(permanentListeners != null){
-                    notifyListeners(permanentListeners, TransactionLifecycleEvent.PostAbort);
+                if(config.permanentListeners != null){
+                    notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostAbort);
                 }
 
                 if(normalListeners != null){
@@ -1320,8 +1317,8 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             Listeners.openAll(listenersArray, pool);
         }
 
-        if(permanentListeners != null){
-            notifyListeners(permanentListeners, TransactionLifecycleEvent.PostCommit);
+        if(config.permanentListeners != null){
+            notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostCommit);
         }
 
         if(normalListeners != null){
@@ -1414,8 +1411,8 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         boolean abort = true;
         try{
-            if(permanentListeners != null){
-                notifyListeners(permanentListeners, TransactionLifecycleEvent.PrePrepare);
+            if(config.permanentListeners != null){
+                notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PrePrepare);
             }
 
             if(normalListeners != null){
@@ -1609,8 +1606,8 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
 
         status = ABORTED;
-        if(permanentListeners != null){
-            notifyListeners(permanentListeners, TransactionLifecycleEvent.PostAbort);
+        if(config.permanentListeners != null){
+            notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostAbort);
         }
 
         if(normalListeners != null){
@@ -1694,11 +1691,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         if(normalListeners !=null){
             pool.putArrayList(normalListeners);
             normalListeners = null;
-        }
-
-        if(permanentListeners!=null){
-            pool.putArrayList(permanentListeners);
-            permanentListeners = null;
         }
     }
 

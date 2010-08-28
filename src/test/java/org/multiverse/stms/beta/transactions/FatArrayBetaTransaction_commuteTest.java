@@ -150,7 +150,7 @@ public class FatArrayBetaTransaction_commuteTest {
         }
 
         assertAborted(tx);
-        assertEquals(2, config.getSpeculativeConfig().getMinimalLength());
+        assertEquals(2, tx.getConfiguration().getSpeculativeConfig().getMinimalLength());
 
         verifyZeroInteractions(function1);
         assertSurplus(0, ref1);

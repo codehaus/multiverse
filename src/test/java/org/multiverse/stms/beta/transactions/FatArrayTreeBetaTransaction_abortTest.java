@@ -170,8 +170,9 @@ public class FatArrayTreeBetaTransaction_abortTest {
         BetaLongRef ref = createLongRef(stm, 0);
 
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
-        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.registerPermanent(pool, listenerMock);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .addPermanentListener(listenerMock);
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
         tx.openForWrite(ref, false, pool);
         tx.abort();
 

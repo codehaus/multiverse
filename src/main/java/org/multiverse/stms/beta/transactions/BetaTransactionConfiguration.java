@@ -2,11 +2,11 @@ package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.*;
 import org.multiverse.api.exceptions.IllegalTransactionFactoryException;
-import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -21,6 +21,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
 
     public final static AtomicLong idGenerator = new AtomicLong();
 
+    public ArrayList<TransactionLifecycleListener> permanentListeners;
     public boolean interruptible = false;
     public boolean durable = false;
     public boolean readonly = false;
@@ -254,7 +255,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.traceLevel = traceLevel;
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
-
+        config.permanentListeners = permanentListeners;
         return config;
     }
 
@@ -284,6 +285,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.traceLevel = traceLevel;
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
+        config.permanentListeners = permanentListeners;
         return config;
     }
 
@@ -313,6 +315,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.traceLevel = traceLevel;
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
+        config.permanentListeners = permanentListeners;
         return config;
     }
 
@@ -338,6 +341,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.traceLevel = traceLevel;
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
+        config.permanentListeners = permanentListeners;
         return config;
     }
 
@@ -363,6 +367,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.traceLevel = traceLevel;
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
+        config.permanentListeners = permanentListeners;
         return config;
     }
 
@@ -387,6 +392,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.traceLevel = traceLevel;
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
+        config.permanentListeners = permanentListeners;
         return config;
     }
 
@@ -412,6 +418,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.traceLevel = traceLevel;
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
+        config.permanentListeners = permanentListeners;
         return config;
     }
 
@@ -437,6 +444,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.traceLevel = traceLevel;
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
+        config.permanentListeners = permanentListeners;
         return config;
     }
 
@@ -462,6 +470,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.traceLevel = traceLevel;
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
+        config.permanentListeners = permanentListeners;
         return config;
     }
 
@@ -487,6 +496,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.traceLevel = traceLevel;
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
+        config.permanentListeners = permanentListeners;
         return config;
     }
 
@@ -516,6 +526,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.traceLevel = traceLevel;
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
+        config.permanentListeners = permanentListeners;
         return config;
     }
 
@@ -545,6 +556,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
+        config.permanentListeners = permanentListeners;
         return config;
     }
 
@@ -574,6 +586,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.traceLevel = traceLevel;
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
+        config.permanentListeners = permanentListeners;
         return config;
     }
 
@@ -603,6 +616,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.traceLevel = traceLevel;
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
+        config.permanentListeners = permanentListeners;
         return config;
     }
 
@@ -628,6 +642,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.traceLevel = traceLevel;
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
+        config.permanentListeners = permanentListeners;
         return config;
     }
 
@@ -657,6 +672,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.traceLevel = traceLevel;
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
+        config.permanentListeners = permanentListeners;
         return config;
     }
 
@@ -665,7 +681,36 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
             throw new NullPointerException();
         }
 
-        throw new TodoException();
+        ArrayList<TransactionLifecycleListener> newPermanentListeners
+                = new ArrayList<TransactionLifecycleListener>();
+        if(permanentListeners!=null){
+            newPermanentListeners.addAll(permanentListeners);            
+        }
+        newPermanentListeners.add(listener);
+
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
+        config.readonly = readonly;
+        config.spinCount = spinCount;
+        config.pessimisticLockLevel = pessimisticLockLevel;
+        config.lockReads = pessimisticLockLevel.lockReads();
+        config.lockWrites = pessimisticLockLevel.lockWrites();
+        config.dirtyCheck = dirtyCheck;
+        config.trackReads = trackReads;
+        config.maxRetries = maxRetries;
+        config.blockingAllowed = blockingAllowed;
+        config.familyName = familyName;
+        config.durable = durable;
+        config.speculativeConfigEnabled = speculativeConfigEnabled;
+        config.maxArrayTransactionSize = maxArrayTransactionSize;
+        config.isAnonymous = false;
+        config.backoffPolicy = backoffPolicy;
+        config.interruptible = interruptible;
+        config.timeoutNs = timeoutNs;
+        config.traceLevel = traceLevel;
+        config.writeSkewAllowed = writeSkewAllowed;
+        config.propagationLevel = propagationLevel;
+        config.permanentListeners = newPermanentListeners;
+        return config;
     }
 
     @Override
@@ -695,6 +740,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
                 ", writeSkewAllowed=" + writeSkewAllowed +
                 ", propagationLevel=" + propagationLevel +
                 ", speculativeConfig=" + speculativeConfig +
+                ", permanentListeners=" + permanentListeners +
                 '}';
     }
 

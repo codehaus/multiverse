@@ -56,19 +56,6 @@ public class FatArrayTreeBetaTransaction_initTest {
     }
 
     @Test
-    public void whenPermanentListenersAvailable_thenTheyAreRemoved() {
-        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        tx.registerPermanent(pool,listener);
-
-        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
-        tx.init(config);
-
-        assertSame(config, tx.getConfiguration());
-        assertInitialized(tx);
-    }
-
-    @Test
     public void whenNormalListenersAvailable_thenTheyAreRemoved() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
@@ -130,7 +117,6 @@ public class FatArrayTreeBetaTransaction_initTest {
     private void assertInitialized(FatArrayTreeBetaTransaction tx) {
         assertActive(tx);
         assertHasNoNormalListeners(tx);
-        assertHasNoPermanentListeners(tx);
         assertAllNull((Tranlocal[]) getField(tx, "array"));
         assertEquals(1, tx.getAttempt());
     }

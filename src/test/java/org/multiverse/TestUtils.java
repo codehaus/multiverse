@@ -68,18 +68,6 @@ public class TestUtils {
         assertEquals(asList(expected), functions);
     }
 
-    public static void assertHasNoPermanentListeners(BetaTransaction tx) {
-        assertHasPermanentListeners(tx);
-    }
-
-    public static void assertHasPermanentListeners(BetaTransaction tx, TransactionLifecycleListener... listeners) {
-        List<TransactionLifecycleListener> l = (List<TransactionLifecycleListener>) getField(tx, "permanentListeners");
-        if (l == null) {
-            l = new LinkedList();
-        }
-        assertEquals(Arrays.asList(listeners), l);
-    }
-
     public static void assertHasNoNormalListeners(BetaTransaction tx) {
         assertHasNormalListeners(tx);
     }

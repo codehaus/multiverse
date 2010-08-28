@@ -2,12 +2,10 @@ package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
-import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaObjectPool;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
@@ -18,23 +16,12 @@ public abstract class AbstractLeanBetaTransaction extends BetaTransaction {
     }
 
     @Override
-    public final ArrayList<TransactionLifecycleListener> getPermanentListeners() {
-        return null;
-    }
-
-    @Override
     public final ArrayList<TransactionLifecycleListener> getNormalListeners() {
         return null;
     }
 
     @Override
     public final void copyForSpeculativeFailure(BetaTransaction tx) {
-        List<TransactionLifecycleListener> listeners = tx.getPermanentListeners();
-
-        if (listeners != null) {
-            throw new TodoException();
-        }
-
         remainingTimeoutNs = tx.getRemainingTimeoutNs();
         attempt = tx.getAttempt();
     }

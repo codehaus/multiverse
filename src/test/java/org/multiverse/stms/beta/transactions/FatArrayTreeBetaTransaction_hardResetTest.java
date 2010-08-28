@@ -80,7 +80,6 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
     private static void assertWasHardReset(FatArrayTreeBetaTransaction tx) {
         assertActive(tx);
         assertHasNoNormalListeners(tx);
-        assertHasNoPermanentListeners(tx);
         assertEquals(1, tx.getAttempt());
         assertFalse((Boolean) getField(tx, "hasReads"));
         assertFalse((Boolean) getField(tx, "hasUntrackedReads"));
@@ -99,7 +98,6 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
 
         assertActive(tx);
         assertHasNoNormalListeners(tx);
-        assertHasNoPermanentListeners(tx);
         assertEquals(1, tx.getAttempt());
         assertEquals(100, tx.getRemainingTimeoutNs());
     }
@@ -114,15 +112,15 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
         assertEquals(1, tx.getAttempt());
         assertActive(tx);
         assertHasNoNormalListeners(tx);
-        assertHasNoPermanentListeners(tx);
         assertEquals(Long.MAX_VALUE, tx.getRemainingTimeoutNs());
     }
 
     @Test
     public void whenHasPermanentListener() {
-        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        tx.registerPermanent(pool,listener);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .addPermanentListener(listener);
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
 
         tx.hardReset(pool);
 
@@ -130,7 +128,6 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
         assertActive(tx);
         verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
         assertHasNoNormalListeners(tx);
-        assertHasNoPermanentListeners(tx);
         assertEquals(Long.MAX_VALUE, tx.getRemainingTimeoutNs());
     }
 
@@ -146,7 +143,6 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
         assertEquals(1, tx.getAttempt());
         verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
         assertHasNoNormalListeners(tx);
-        assertHasNoPermanentListeners(tx);
         assertEquals(Long.MAX_VALUE, tx.getRemainingTimeoutNs());
     }
 
@@ -159,7 +155,6 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
         assertEquals(1, tx.getAttempt());
         assertActive(tx);
         assertHasNoNormalListeners(tx);
-        assertHasNoPermanentListeners(tx);
         assertEquals(Long.MAX_VALUE, tx.getRemainingTimeoutNs());
     }
 
@@ -172,7 +167,6 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
         assertEquals(1, tx.getAttempt());
         assertActive(tx);
         assertHasNoNormalListeners(tx);
-        assertHasNoPermanentListeners(tx);
         assertEquals(Long.MAX_VALUE, tx.getRemainingTimeoutNs());
     }
 }

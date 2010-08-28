@@ -23,8 +23,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
     public final static AtomicLong conflictScan = new AtomicLong();
 
-    private final LocalConflictCounter localConflictCounter;
     private final Tranlocal[] array;
+    private LocalConflictCounter localConflictCounter;    
     private int firstFreeIndex = 0;
     private boolean hasReads;
     private boolean hasUpdates;
@@ -1289,8 +1289,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                     final Tranlocal tranlocal = array[k];
                     tranlocal.owner.___abort(this, tranlocal, pool);
                 }
-                if(permanentListeners != null){
-                    notifyListeners(permanentListeners, TransactionLifecycleEvent.PostAbort);
+                if(config.permanentListeners != null){
+                    notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostAbort);
                 }
 
                 if(normalListeners != null){
@@ -1338,8 +1338,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             Listeners.openAll(listeners, pool);
         }
 
-        if(permanentListeners != null){
-            notifyListeners(permanentListeners, TransactionLifecycleEvent.PostCommit);
+        if(config.permanentListeners != null){
+            notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostCommit);
         }
 
         if(normalListeners != null){
@@ -1428,8 +1428,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         boolean abort = true;
         try{
-            if(permanentListeners != null){
-                notifyListeners(permanentListeners, TransactionLifecycleEvent.PrePrepare);
+            if(config.permanentListeners != null){
+                notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PrePrepare);
             }
 
             if(normalListeners != null){
@@ -1621,8 +1621,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         status = ABORTED;
-        if(permanentListeners != null){
-            notifyListeners(permanentListeners, TransactionLifecycleEvent.PostAbort);
+        if(config.permanentListeners != null){
+            notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostAbort);
         }
 
         if(normalListeners != null){
@@ -1685,11 +1685,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(normalListeners !=null){
             pool.putArrayList(normalListeners);
             normalListeners = null;
-        }
-
-        if(permanentListeners!=null){
-            pool.putArrayList(permanentListeners);
-            permanentListeners = null;
         }
     }
 

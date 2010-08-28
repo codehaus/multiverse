@@ -53,11 +53,10 @@ public class FatArrayBetaTransaction_registerTest {
         assertActive(tx);
         verifyZeroInteractions(listener);
         assertHasNormalListeners(tx, listener);
-        assertHasNoPermanentListeners(tx);
     }
 
     @Test
-    public void whenTwoRegisters_thenTransformedToList() {
+    public void whenMultipleRegisters() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         //todo: tx.start()
 
@@ -69,7 +68,6 @@ public class FatArrayBetaTransaction_registerTest {
         assertActive(tx);
         verifyZeroInteractions(listener1);
         assertHasNormalListeners(tx, listener1, listener2);
-        assertHasNoPermanentListeners(tx);
     }
 
     @Test
@@ -83,7 +81,6 @@ public class FatArrayBetaTransaction_registerTest {
 
         assertPrepared(tx);
         verifyZeroInteractions(listener);
-        assertHasNoPermanentListeners(tx);
         assertHasNormalListeners(tx, listener);
     }
 
@@ -101,7 +98,6 @@ public class FatArrayBetaTransaction_registerTest {
         }
 
         assertAborted(tx);
-        assertHasNoPermanentListeners(tx);
         assertHasNoNormalListeners(tx);
         verifyZeroInteractions(listener);
     }
@@ -119,7 +115,6 @@ public class FatArrayBetaTransaction_registerTest {
         }
 
         assertCommitted(tx);
-        assertHasNoPermanentListeners(tx);
         assertHasNoNormalListeners(tx);
         verifyZeroInteractions(listener);
     }

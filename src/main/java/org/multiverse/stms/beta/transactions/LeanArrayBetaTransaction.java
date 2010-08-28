@@ -23,8 +23,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
     public final static AtomicLong conflictScan = new AtomicLong();
 
-    private final LocalConflictCounter localConflictCounter;
     private final Tranlocal[] array;
+    private LocalConflictCounter localConflictCounter;    
     private int firstFreeIndex = 0;
     private boolean hasReads;
     private boolean hasUpdates;

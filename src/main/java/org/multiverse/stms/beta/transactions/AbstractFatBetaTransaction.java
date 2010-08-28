@@ -15,7 +15,6 @@ import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalB
  */
 public abstract class AbstractFatBetaTransaction extends BetaTransaction {
 
-    protected ArrayList<TransactionLifecycleListener> permanentListeners;
     protected ArrayList<TransactionLifecycleListener> normalListeners;
 
     public AbstractFatBetaTransaction(int poolTransactionType, BetaTransactionConfiguration config) {
@@ -34,57 +33,14 @@ public abstract class AbstractFatBetaTransaction extends BetaTransaction {
     }
 
     @Override
-    public final ArrayList<TransactionLifecycleListener> getPermanentListeners() {
-        return permanentListeners;
-    }
-
-    @Override
     public final ArrayList<TransactionLifecycleListener> getNormalListeners() {
         return normalListeners;
     }
 
     @Override
     public final void copyForSpeculativeFailure(BetaTransaction tx) {
-        List<TransactionLifecycleListener> listeners = tx.getPermanentListeners();
-
-        if (listeners != null) {
-            if (permanentListeners == null) {
-                permanentListeners = new ArrayList<TransactionLifecycleListener>(listeners.size());
-            }
-
-            permanentListeners.addAll(listeners);
-        }
-
         remainingTimeoutNs = tx.getRemainingTimeoutNs();
         attempt = tx.getAttempt();
-    }
-
-
-    public final void registerPermanent(final BetaObjectPool pool, final TransactionLifecycleListener listener) {
-        if (listener == null) {
-            abort();
-            throw new NullPointerException();
-        }
-
-        switch (status) {
-            case NEW:
-            case ACTIVE:
-            case PREPARED:
-                if (permanentListeners == null) {
-                    permanentListeners = pool.takeArrayList();
-                    if (permanentListeners == null) {
-                        permanentListeners = new ArrayList<TransactionLifecycleListener>();
-                    }
-                }
-                permanentListeners.add(listener);
-                break;
-            case COMMITTED:
-                throw new DeadTransactionException();
-            case ABORTED:
-                throw new DeadTransactionException();
-            default:
-                throw new IllegalStateException();
-        }
     }
 
     @Override
