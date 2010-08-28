@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadonlyException;
+import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
@@ -130,9 +131,34 @@ public class FatArrayBetaTransaction_commuteTest {
 
 
     @Test
-    @Ignore
-    public void whenOverflow(){
+    public void whenOverflow() {
+        BetaLongRef ref1 = createLongRef(stm);
+        BetaLongRef ref2 = createLongRef(stm);
 
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 1);
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
+
+        LongFunction function1 = mock(LongFunction.class);
+        LongFunction function2 = mock(LongFunction.class);
+        tx.commute(ref1, pool, function1);
+
+        try {
+            tx.commute(ref2, pool, function2);
+            fail();
+        } catch (SpeculativeConfigurationError expected) {
+
+        }
+
+        assertAborted(tx);
+        assertEquals(2, config.getSpeculativeConfig().getMinimalLength());
+
+        verifyZeroInteractions(function1);
+        assertSurplus(0, ref1);
+        assertUnlocked(ref1);
+
+        verifyZeroInteractions(function2);
+        assertSurplus(0, ref2);
+        assertUnlocked(ref2);
     }
 
 

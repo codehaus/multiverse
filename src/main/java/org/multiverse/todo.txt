@@ -138,8 +138,6 @@ globalconflict counter.
 
 - commute
 
-    - overflow of array
-
     - when a commuting function fails, the transaction should be aborted.
 
     - the nodes for the commute functions need to be pooled.
@@ -177,9 +175,13 @@ the task not being executed at all.
 
 - commit barriers
 
+- deadlock stress test should be modified with different levels of locking.
+
 done
 
- - overflow of mono
+- testing: commute & overflow of array
+
+- testing: commute & overflow of mono
 
 - testing: commute: check if conflict counters are set correctly when an addCommute is done
     
