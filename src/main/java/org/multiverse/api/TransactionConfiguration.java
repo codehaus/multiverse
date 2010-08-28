@@ -1,7 +1,5 @@
 package org.multiverse.api;
 
-import org.multiverse.stms.beta.BetaStm;
-
 /**
  * Contains the transaction configuration used by a {@link Transaction}. In the beginning this was all
  * placed in the Transaction, adding a lot of 'informational' methods to the transaction and therefor
@@ -123,7 +121,7 @@ public interface TransactionConfiguration {
      *
      * @return the stm.
      */
-    BetaStm getStm();
+    Stm getStm();
 
     /**
      * Checks if this transaction does automatic read tracking. Read tracking is needed for blocking transactions,

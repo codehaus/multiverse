@@ -1,7 +1,5 @@
 package org.multiverse.api;
 
-import org.multiverse.stms.beta.transactions.BetaTransaction;
-
 /**
  * A Factory responsible for creating a {@link Transaction}. To set properties for Transactions you need to look
  * at the {@link TransactionFactoryBuilder}.
@@ -23,5 +21,5 @@ public interface TransactionFactory {
      *
      * @return the started Transaction.
      */
-    BetaTransaction start();
+    Transaction start();
 }
