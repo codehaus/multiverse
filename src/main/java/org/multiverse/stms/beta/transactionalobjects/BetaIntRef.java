@@ -1,20 +1,19 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.api.LockStatus;
-import org.multiverse.api.Transaction;
-import org.multiverse.api.blocking.Latch;
-import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.api.exceptions.WriteConflict;
-import org.multiverse.api.functions.Function;
-import org.multiverse.stms.beta.BetaObjectPool;
-import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.Listeners;
-import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
-import org.multiverse.stms.beta.orec.FastOrec;
-import org.multiverse.stms.beta.orec.Orec;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.*;
+import org.multiverse.api.*;
+import org.multiverse.api.references.*;
+import org.multiverse.api.blocking.*;
+import org.multiverse.api.exceptions.*;
+import org.multiverse.api.functions.*;
+import org.multiverse.stms.beta.*;
+import org.multiverse.stms.beta.conflictcounters.*;
+import org.multiverse.stms.beta.orec.*;
+import org.multiverse.stms.beta.transactions.*;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * The transactional object. Atm it is just a reference for an int, more complex stuff will be added again
@@ -30,15 +29,16 @@ import java.util.UUID;
  *
  * @author Peter Veentjer
  */
-public final class Ref<E>
-    extends FastOrec implements BetaTransactionalObject, BetaStmConstants {
+public final class BetaIntRef
+    extends FastOrec implements BetaTransactionalObject, BetaStmConstants, IntRef
+{
 
     private final static long listenersOffset;
 
     static {
         try {
             listenersOffset = ___unsafe.objectFieldOffset(
-                Ref.class.getDeclaredField("___listeners"));
+                BetaIntRef.class.getDeclaredField("___listeners"));
         } catch (Exception ex) {
             throw new Error(ex);
         }
@@ -48,7 +48,7 @@ public final class Ref<E>
 
     //Active needs to be volatile. If not, the both load statements in the load function, can be reordered
     //(the instruction above can jump below the orec.arrive if no write is done)
-    private volatile RefTranlocal<E> ___active;
+    private volatile IntRefTranlocal ___active;
 
     private volatile Listeners ___listeners;
 
@@ -57,13 +57,13 @@ public final class Ref<E>
 
 
     /**
-     * Creates a uncommitted Ref that should be attached to the transaction (this
+     * Creates a uncommitted BetaIntRef that should be attached to the transaction (this
      * is not done)
      *
-     * @param tx the transaction this Ref should be attached to.
+     * @param tx the transaction this BetaIntRef should be attached to.
      * @throws NullPointerException if tx is null.
      */
-    public Ref(BetaTransaction tx){
+    public BetaIntRef(BetaTransaction tx){
         if(tx == null){
             throw new NullPointerException();
         }
@@ -73,20 +73,20 @@ public final class Ref<E>
     }
 
     /**
-     * Creates a committed Ref with null as initial value.
+     * Creates a committed BetaIntRef with 0 as initial value.
      */
-    public Ref(){
-        this((E)null);
+    public BetaIntRef(){
+        this((int)0);
     }
 
     /**
-     * Creates a committed Ref with the given initial value.
+     * Creates a committed BetaIntRef with the given initial value.
      *
      * @param initialValue the initial value
      */
-    public Ref(final E initialValue){
-        RefTranlocal<E> tranlocal =
-            new RefTranlocal<E>(this);
+    public BetaIntRef(final int initialValue){
+        IntRefTranlocal tranlocal =
+            new IntRefTranlocal(this);
 
         tranlocal.value = initialValue;
         tranlocal.isCommitted = true;
@@ -101,7 +101,7 @@ public final class Ref<E>
 
     @Override
     public final int ___getClassIndex(){
-        return 0;
+        return 1;
     }
 
     @Override
@@ -110,19 +110,19 @@ public final class Ref<E>
     }
 
     @Override
-    public final RefTranlocal<E> ___load(final int spinCount) {
+    public final IntRefTranlocal ___load(final int spinCount) {
         //it can't happen that the isPermanent status of a tranlocal is changed while it is being used. This is
         //because an arrive is done, and as long as there is at least 1 arive, the orec never can become readbiased.
 
         while (true) {
             //JMM: nothing can jump over the following statement.
-            RefTranlocal<E> read = ___active;
+            IntRefTranlocal read = ___active;
 
             //JMM:
             final int arriveStatus = ___arrive(spinCount);
 
             if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
-                return RefTranlocal.LOCKED;
+                return IntRefTranlocal.LOCKED;
             }
 
             //JMM safety:
@@ -149,7 +149,7 @@ public final class Ref<E>
     }
 
     @Override
-    public final RefTranlocal<E> ___lockAndLoad(
+    public final IntRefTranlocal ___lockAndLoad(
             final int spinCount,
             final BetaTransaction newLockOwner){
 
@@ -160,11 +160,11 @@ public final class Ref<E>
 
         final int arriveStatus = ___tryLockAndArrive(spinCount);
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
-            return  RefTranlocal.LOCKED;
+            return  IntRefTranlocal.LOCKED;
         }
         lockOwner = newLockOwner;
 
-        RefTranlocal<E> read = ___active;
+        IntRefTranlocal read = ___active;
         if(arriveStatus == ARRIVE_READBIASED){
             read.isPermanent = true;
         }
@@ -173,22 +173,22 @@ public final class Ref<E>
     }
 
     @Override
-    public final RefTranlocal<E> ___unsafeLoad() {
+    public final IntRefTranlocal ___unsafeLoad() {
         return ___active;
     }
 
     @Override
-    public final RefTranlocal<E> ___openForConstruction(final BetaObjectPool pool) {
-        RefTranlocal<E> tranlocal =  pool.take(this);
-        return tranlocal != null ? tranlocal : new RefTranlocal<E>(this);
+    public final IntRefTranlocal ___openForConstruction(final BetaObjectPool pool) {
+        IntRefTranlocal tranlocal =  pool.take(this);
+        return tranlocal != null ? tranlocal : new IntRefTranlocal(this);
     }
 
     @Override
-    public final RefTranlocal<E> ___openForCommute(final BetaObjectPool pool) {
-        RefTranlocal<E> tranlocal =  pool.take(this);
+    public final IntRefTranlocal ___openForCommute(final BetaObjectPool pool) {
+        IntRefTranlocal tranlocal =  pool.take(this);
 
         if(tranlocal == null){
-             tranlocal = new RefTranlocal<E>(this);
+             tranlocal = new IntRefTranlocal(this);
         }
 
         tranlocal.isCommuting = true;
@@ -206,7 +206,7 @@ public final class Ref<E>
 
         if(notDirty){
             final boolean ownsLock = expectedLockOwner == lockOwner;
-            final RefTranlocal read = (RefTranlocal)(tranlocal.isCommitted
+            final IntRefTranlocal read = (IntRefTranlocal)(tranlocal.isCommitted
                 ?tranlocal
                 :tranlocal.read);
 
@@ -230,9 +230,9 @@ public final class Ref<E>
         lockOwner = null;
 
         //it is a full blown update (so locked).
-        final RefTranlocal<E> newActive = (RefTranlocal)tranlocal;
+        final IntRefTranlocal newActive = (IntRefTranlocal)tranlocal;
         newActive.prepareForCommit();
-        final RefTranlocal<E> oldActive = ___active;
+        final IntRefTranlocal oldActive = ___active;
         ___active = newActive;
 
         //JMM: problem, it could happen that volatile read this.listeners jumps in front of the volatile write
@@ -299,9 +299,9 @@ public final class Ref<E>
         }
 
         //it is a full blown update (so locked).
-        final RefTranlocal<E> newActive = (RefTranlocal)tranlocal;
+        final IntRefTranlocal newActive = (IntRefTranlocal)tranlocal;
         newActive.prepareForCommit();
-        final RefTranlocal<E> oldActive = ___active;
+        final IntRefTranlocal oldActive = ___active;
 
         ___active = newActive;
 
@@ -397,14 +397,14 @@ public final class Ref<E>
         final Tranlocal tranlocal,
         final BetaObjectPool pool) {
 
-        RefTranlocal read;
+        IntRefTranlocal read;
         if (tranlocal.isCommitted) {
-            read = (RefTranlocal)tranlocal;
+            read = (IntRefTranlocal)tranlocal;
         } else {
-            read = (RefTranlocal)tranlocal.read;
+            read = (IntRefTranlocal)tranlocal.read;
              //if there is an update, it can always be pooled since it is impossible that it has been
             //read by another transaction.
-            pool.put((RefTranlocal)tranlocal);
+            pool.put((IntRefTranlocal)tranlocal);
 
             //if it is a constructed object, we don't need to abort. Constructed objects from aborted transactions,
             //should remain locked indefinitely since their behavior is undefined.
@@ -512,8 +512,8 @@ public final class Ref<E>
      * @return the current state.
      * @throws IllegalStateException if there hasn't been any commit before.
      */
-    public final E atomicGet(){
-        RefTranlocal<E> read = ___load(50);
+    public final int atomicGet(){
+        IntRefTranlocal read = ___load(50);
         if(read == null){
             throw new IllegalStateException();
         }
@@ -522,7 +522,7 @@ public final class Ref<E>
             throw new IllegalStateException("Can't read locked reference");
         }
 
-        E result = read.value;
+        int result = read.value;
 
         if(!read.isPermanent){
             ___departAfterReading();
@@ -531,12 +531,12 @@ public final class Ref<E>
         return result;
     }
 
-    public final E atomicSet(E newValue){
+    public final int atomicSet(int newValue){
         throw new TodoException();
     }
 
-    public final E atomicSet(
-        final E newValue,
+    public final int atomicSet(
+        final int newValue,
         final BetaObjectPool pool,
         final int spinCount,
         final GlobalConflictCounter globalConflictCounter){
@@ -546,7 +546,7 @@ public final class Ref<E>
             throw new WriteConflict();
         }
 
-        final RefTranlocal<E> oldActive = ___active;
+        final IntRefTranlocal oldActive = ___active;
 
         if(oldActive.value== newValue){
             if(arriveStatus == ARRIVE_READBIASED){
@@ -557,9 +557,9 @@ public final class Ref<E>
         }
 
         //lets create a tranlocal for the update.
-        RefTranlocal<E> update = pool.take(this);
+        IntRefTranlocal update = pool.take(this);
         if(update == null){
-            update = new RefTranlocal(this);
+            update = new IntRefTranlocal(this);
         }
 
         //lets do the update.
@@ -575,7 +575,7 @@ public final class Ref<E>
         return oldActive.value;
     }
 
-    public final E get(
+    public final int get(
         final BetaTransaction transaction,
         final BetaObjectPool pool){
 
@@ -585,12 +585,12 @@ public final class Ref<E>
     public final void set(
         final BetaTransaction transaction,
         final BetaObjectPool pool,
-        final E value){
+        final int value){
 
         transaction.openForWrite(this, false, pool).value = value;
     }
 
-    public final E lockAndGet(
+    public final int lockAndGet(
         final BetaTransaction transaction,
         final BetaObjectPool pool){
 
@@ -600,7 +600,7 @@ public final class Ref<E>
     public final void lockAndSet(
         final BetaTransaction transaction,
         final BetaObjectPool pool,
-        final E value){
+        final int value){
 
         transaction.openForWrite(this, true, pool).value = value;
     }
@@ -613,17 +613,17 @@ public final class Ref<E>
      * @param function the function to apply.
      * @return the new value.
      */
-    public E alter(
+    public int alter(
         final BetaTransaction tx,
         final BetaObjectPool pool,
-        final Function<E> function){
+        final IntFunction function){
 
         if(tx == null || pool == null || function == null){
             throw new NullPointerException();
         }
 
-        RefTranlocal<E> write = tx.openForWrite(this, false, pool);
-        E value  = function.call(write.value);
+        IntRefTranlocal write = tx.openForWrite(this, false, pool);
+        int value  = function.call(write.value);
         write.value = value;
         return value;
     }

@@ -1,20 +1,19 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.api.LockStatus;
-import org.multiverse.api.Transaction;
-import org.multiverse.api.blocking.Latch;
-import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.api.exceptions.WriteConflict;
-import org.multiverse.api.functions.LongFunction;
-import org.multiverse.stms.beta.BetaObjectPool;
-import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.Listeners;
-import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
-import org.multiverse.stms.beta.orec.FastOrec;
-import org.multiverse.stms.beta.orec.Orec;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.*;
+import org.multiverse.api.*;
+import org.multiverse.api.references.*;
+import org.multiverse.api.blocking.*;
+import org.multiverse.api.exceptions.*;
+import org.multiverse.api.functions.*;
+import org.multiverse.stms.beta.*;
+import org.multiverse.stms.beta.conflictcounters.*;
+import org.multiverse.stms.beta.orec.*;
+import org.multiverse.stms.beta.transactions.*;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * The transactional object. Atm it is just a reference for an int, more complex stuff will be added again
@@ -30,15 +29,16 @@ import java.util.UUID;
  *
  * @author Peter Veentjer
  */
-public final class LongRef
-    extends FastOrec implements BetaTransactionalObject, BetaStmConstants {
+public final class BetaRef<E>
+    extends FastOrec implements BetaTransactionalObject, BetaStmConstants, Ref<E>
+{
 
     private final static long listenersOffset;
 
     static {
         try {
             listenersOffset = ___unsafe.objectFieldOffset(
-                LongRef.class.getDeclaredField("___listeners"));
+                BetaRef.class.getDeclaredField("___listeners"));
         } catch (Exception ex) {
             throw new Error(ex);
         }
@@ -48,7 +48,7 @@ public final class LongRef
 
     //Active needs to be volatile. If not, the both load statements in the load function, can be reordered
     //(the instruction above can jump below the orec.arrive if no write is done)
-    private volatile LongRefTranlocal ___active;
+    private volatile RefTranlocal<E> ___active;
 
     private volatile Listeners ___listeners;
 
@@ -57,13 +57,13 @@ public final class LongRef
 
 
     /**
-     * Creates a uncommitted LongRef that should be attached to the transaction (this
+     * Creates a uncommitted BetaRef that should be attached to the transaction (this
      * is not done)
      *
-     * @param tx the transaction this LongRef should be attached to.
+     * @param tx the transaction this BetaRef should be attached to.
      * @throws NullPointerException if tx is null.
      */
-    public LongRef(BetaTransaction tx){
+    public BetaRef(BetaTransaction tx){
         if(tx == null){
             throw new NullPointerException();
         }
@@ -73,20 +73,20 @@ public final class LongRef
     }
 
     /**
-     * Creates a committed LongRef with 0 as initial value.
+     * Creates a committed BetaRef with null as initial value.
      */
-    public LongRef(){
-        this((long)0);
+    public BetaRef(){
+        this((E)null);
     }
 
     /**
-     * Creates a committed LongRef with the given initial value.
+     * Creates a committed BetaRef with the given initial value.
      *
      * @param initialValue the initial value
      */
-    public LongRef(final long initialValue){
-        LongRefTranlocal tranlocal =
-            new LongRefTranlocal(this);
+    public BetaRef(final E initialValue){
+        RefTranlocal<E> tranlocal =
+            new RefTranlocal<E>(this);
 
         tranlocal.value = initialValue;
         tranlocal.isCommitted = true;
@@ -101,7 +101,7 @@ public final class LongRef
 
     @Override
     public final int ___getClassIndex(){
-        return 2;
+        return 0;
     }
 
     @Override
@@ -110,19 +110,19 @@ public final class LongRef
     }
 
     @Override
-    public final LongRefTranlocal ___load(final int spinCount) {
+    public final RefTranlocal<E> ___load(final int spinCount) {
         //it can't happen that the isPermanent status of a tranlocal is changed while it is being used. This is
         //because an arrive is done, and as long as there is at least 1 arive, the orec never can become readbiased.
 
         while (true) {
             //JMM: nothing can jump over the following statement.
-            LongRefTranlocal read = ___active;
+            RefTranlocal<E> read = ___active;
 
             //JMM:
             final int arriveStatus = ___arrive(spinCount);
 
             if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
-                return LongRefTranlocal.LOCKED;
+                return RefTranlocal.LOCKED;
             }
 
             //JMM safety:
@@ -149,7 +149,7 @@ public final class LongRef
     }
 
     @Override
-    public final LongRefTranlocal ___lockAndLoad(
+    public final RefTranlocal<E> ___lockAndLoad(
             final int spinCount,
             final BetaTransaction newLockOwner){
 
@@ -160,11 +160,11 @@ public final class LongRef
 
         final int arriveStatus = ___tryLockAndArrive(spinCount);
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
-            return  LongRefTranlocal.LOCKED;
+            return  RefTranlocal.LOCKED;
         }
         lockOwner = newLockOwner;
 
-        LongRefTranlocal read = ___active;
+        RefTranlocal<E> read = ___active;
         if(arriveStatus == ARRIVE_READBIASED){
             read.isPermanent = true;
         }
@@ -173,22 +173,22 @@ public final class LongRef
     }
 
     @Override
-    public final LongRefTranlocal ___unsafeLoad() {
+    public final RefTranlocal<E> ___unsafeLoad() {
         return ___active;
     }
 
     @Override
-    public final LongRefTranlocal ___openForConstruction(final BetaObjectPool pool) {
-        LongRefTranlocal tranlocal =  pool.take(this);
-        return tranlocal != null ? tranlocal : new LongRefTranlocal(this);
+    public final RefTranlocal<E> ___openForConstruction(final BetaObjectPool pool) {
+        RefTranlocal<E> tranlocal =  pool.take(this);
+        return tranlocal != null ? tranlocal : new RefTranlocal<E>(this);
     }
 
     @Override
-    public final LongRefTranlocal ___openForCommute(final BetaObjectPool pool) {
-        LongRefTranlocal tranlocal =  pool.take(this);
+    public final RefTranlocal<E> ___openForCommute(final BetaObjectPool pool) {
+        RefTranlocal<E> tranlocal =  pool.take(this);
 
         if(tranlocal == null){
-             tranlocal = new LongRefTranlocal(this);
+             tranlocal = new RefTranlocal<E>(this);
         }
 
         tranlocal.isCommuting = true;
@@ -206,7 +206,7 @@ public final class LongRef
 
         if(notDirty){
             final boolean ownsLock = expectedLockOwner == lockOwner;
-            final LongRefTranlocal read = (LongRefTranlocal)(tranlocal.isCommitted
+            final RefTranlocal read = (RefTranlocal)(tranlocal.isCommitted
                 ?tranlocal
                 :tranlocal.read);
 
@@ -230,9 +230,9 @@ public final class LongRef
         lockOwner = null;
 
         //it is a full blown update (so locked).
-        final LongRefTranlocal newActive = (LongRefTranlocal)tranlocal;
+        final RefTranlocal<E> newActive = (RefTranlocal)tranlocal;
         newActive.prepareForCommit();
-        final LongRefTranlocal oldActive = ___active;
+        final RefTranlocal<E> oldActive = ___active;
         ___active = newActive;
 
         //JMM: problem, it could happen that volatile read this.listeners jumps in front of the volatile write
@@ -299,9 +299,9 @@ public final class LongRef
         }
 
         //it is a full blown update (so locked).
-        final LongRefTranlocal newActive = (LongRefTranlocal)tranlocal;
+        final RefTranlocal<E> newActive = (RefTranlocal)tranlocal;
         newActive.prepareForCommit();
-        final LongRefTranlocal oldActive = ___active;
+        final RefTranlocal<E> oldActive = ___active;
 
         ___active = newActive;
 
@@ -397,14 +397,14 @@ public final class LongRef
         final Tranlocal tranlocal,
         final BetaObjectPool pool) {
 
-        LongRefTranlocal read;
+        RefTranlocal read;
         if (tranlocal.isCommitted) {
-            read = (LongRefTranlocal)tranlocal;
+            read = (RefTranlocal)tranlocal;
         } else {
-            read = (LongRefTranlocal)tranlocal.read;
+            read = (RefTranlocal)tranlocal.read;
              //if there is an update, it can always be pooled since it is impossible that it has been
             //read by another transaction.
-            pool.put((LongRefTranlocal)tranlocal);
+            pool.put((RefTranlocal)tranlocal);
 
             //if it is a constructed object, we don't need to abort. Constructed objects from aborted transactions,
             //should remain locked indefinitely since their behavior is undefined.
@@ -512,8 +512,8 @@ public final class LongRef
      * @return the current state.
      * @throws IllegalStateException if there hasn't been any commit before.
      */
-    public final long atomicGet(){
-        LongRefTranlocal read = ___load(50);
+    public final E atomicGet(){
+        RefTranlocal<E> read = ___load(50);
         if(read == null){
             throw new IllegalStateException();
         }
@@ -522,7 +522,7 @@ public final class LongRef
             throw new IllegalStateException("Can't read locked reference");
         }
 
-        long result = read.value;
+        E result = read.value;
 
         if(!read.isPermanent){
             ___departAfterReading();
@@ -531,12 +531,12 @@ public final class LongRef
         return result;
     }
 
-    public final long atomicSet(long newValue){
+    public final E atomicSet(E newValue){
         throw new TodoException();
     }
 
-    public final long atomicSet(
-        final long newValue,
+    public final E atomicSet(
+        final E newValue,
         final BetaObjectPool pool,
         final int spinCount,
         final GlobalConflictCounter globalConflictCounter){
@@ -546,7 +546,7 @@ public final class LongRef
             throw new WriteConflict();
         }
 
-        final LongRefTranlocal oldActive = ___active;
+        final RefTranlocal<E> oldActive = ___active;
 
         if(oldActive.value== newValue){
             if(arriveStatus == ARRIVE_READBIASED){
@@ -557,9 +557,9 @@ public final class LongRef
         }
 
         //lets create a tranlocal for the update.
-        LongRefTranlocal update = pool.take(this);
+        RefTranlocal<E> update = pool.take(this);
         if(update == null){
-            update = new LongRefTranlocal(this);
+            update = new RefTranlocal(this);
         }
 
         //lets do the update.
@@ -575,7 +575,7 @@ public final class LongRef
         return oldActive.value;
     }
 
-    public final long get(
+    public final E get(
         final BetaTransaction transaction,
         final BetaObjectPool pool){
 
@@ -585,12 +585,12 @@ public final class LongRef
     public final void set(
         final BetaTransaction transaction,
         final BetaObjectPool pool,
-        final long value){
+        final E value){
 
         transaction.openForWrite(this, false, pool).value = value;
     }
 
-    public final long lockAndGet(
+    public final E lockAndGet(
         final BetaTransaction transaction,
         final BetaObjectPool pool){
 
@@ -600,7 +600,7 @@ public final class LongRef
     public final void lockAndSet(
         final BetaTransaction transaction,
         final BetaObjectPool pool,
-        final long value){
+        final E value){
 
         transaction.openForWrite(this, true, pool).value = value;
     }
@@ -613,17 +613,17 @@ public final class LongRef
      * @param function the function to apply.
      * @return the new value.
      */
-    public long alter(
+    public E alter(
         final BetaTransaction tx,
         final BetaObjectPool pool,
-        final LongFunction function){
+        final Function<E> function){
 
         if(tx == null || pool == null || function == null){
             throw new NullPointerException();
         }
 
-        LongRefTranlocal write = tx.openForWrite(this, false, pool);
-        long value  = function.call(write.value);
+        RefTranlocal<E> write = tx.openForWrite(this, false, pool);
+        E value  = function.call(write.value);
         write.value = value;
         return value;
     }
