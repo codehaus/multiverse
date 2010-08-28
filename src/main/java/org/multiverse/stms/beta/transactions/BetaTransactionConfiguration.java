@@ -7,6 +7,8 @@ import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -50,7 +52,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     private final StmCallback stmCallback;
 
     public BetaTransactionConfiguration(BetaStm stm) {
-        if(stm == null){
+        if (stm == null) {
             throw new NullPointerException();
         }
         this.stm = stm;
@@ -60,7 +62,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     }
 
     public BetaTransactionConfiguration(BetaStm stm, int maxArrayTransactionSize) {
-        if(stm == null){
+        if (stm == null) {
             throw new NullPointerException();
         }
 
@@ -164,6 +166,15 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     @Override
     public PropagationLevel getPropagationLevel() {
         return propagationLevel;
+    }
+
+    @Override
+    public List<TransactionLifecycleListener> getPermanentListeners() {
+        if (permanentListeners == null) {
+            return Collections.EMPTY_LIST;
+        } else {
+            return Collections.unmodifiableList(permanentListeners);
+        }
     }
 
     public void needsOrelse() {
@@ -683,8 +694,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
 
         ArrayList<TransactionLifecycleListener> newPermanentListeners
                 = new ArrayList<TransactionLifecycleListener>();
-        if(permanentListeners!=null){
-            newPermanentListeners.addAll(permanentListeners);            
+        if (permanentListeners != null) {
+            newPermanentListeners.addAll(permanentListeners);
         }
         newPermanentListeners.add(listener);
 
@@ -743,5 +754,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
                 ", permanentListeners=" + permanentListeners +
                 '}';
     }
+
 
 }

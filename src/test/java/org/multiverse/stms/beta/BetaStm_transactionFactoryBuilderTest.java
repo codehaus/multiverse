@@ -6,12 +6,17 @@ import org.multiverse.api.ExponentialBackoffPolicy;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.PropagationLevel;
 import org.multiverse.api.TraceLevel;
+import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.transactions.AbstractFatBetaTransaction;
 import org.multiverse.stms.beta.transactions.AbstractLeanBetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 public class BetaStm_transactionFactoryBuilderTest {
     private BetaStm stm;
@@ -45,6 +50,43 @@ public class BetaStm_transactionFactoryBuilderTest {
         assertTrue(config.writeSkewAllowed);
         assertEquals(PropagationLevel.Requires, config.getPropagationLevel());
     }
+
+    @Test(expected = NullPointerException.class)
+    public void whenNullPermanentListener_thenNullPointerException() {
+        stm.getTransactionFactoryBuilder().addPermanentListener(null);
+    }
+
+    @Test
+    public void whenPermanentListenerAdded() {
+        BetaTransactionFactoryBuilder oldBuilder = stm.getTransactionFactoryBuilder();
+        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+        BetaTransactionFactoryBuilder newBuilder = oldBuilder.addPermanentListener(listener);
+
+        assertEquals(asList(listener), newBuilder.getTransactionConfiguration().getPermanentListeners());
+        assertTrue(oldBuilder.getTransactionConfiguration().getPermanentListeners().isEmpty());
+    }
+
+    @Test
+    public void whenNoPermanentListenersAdded_thenEmptyList() {
+        BetaTransactionFactoryBuilder builder = stm.getTransactionFactoryBuilder();
+        assertTrue(builder.getTransactionConfiguration().getPermanentListeners().isEmpty());
+    }
+
+    @Test
+    public void whenGetPermanentListenersCalled_immutableListReturned() {
+        BetaTransactionFactoryBuilder builder = stm.getTransactionFactoryBuilder()
+                .addPermanentListener(mock(TransactionLifecycleListener.class))
+                .addPermanentListener(mock(TransactionLifecycleListener.class));
+
+        List<TransactionLifecycleListener> listeners = builder.getTransactionConfiguration().getPermanentListeners();
+
+        try {
+            listeners.clear();
+            fail();
+        } catch (UnsupportedOperationException e) {
+        }
+    }
+
 
     @Test
     public void whenReadtrackingDisabled() {
@@ -80,9 +122,9 @@ public class BetaStm_transactionFactoryBuilderTest {
         assertTrue(configuration.getSpeculativeConfig().isFat());
         assertTrue(configuration.isSpeculativeConfigEnabled());
     }
-    
+
     @Test
-    public void whenWriteSkewNotAllowedThenFatTransaction(){
+    public void whenWriteSkewNotAllowedThenFatTransaction() {
         BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(true)
                 .setWriteSkewAllowed(false)
@@ -93,7 +135,7 @@ public class BetaStm_transactionFactoryBuilderTest {
     }
 
     @Test
-    public void whenWriteSkewAllowedThenFatTransaction(){
+    public void whenWriteSkewAllowedThenFatTransaction() {
         BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(true)
                 .setWriteSkewAllowed(true)

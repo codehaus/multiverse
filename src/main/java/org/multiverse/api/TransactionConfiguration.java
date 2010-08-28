@@ -1,5 +1,9 @@
 package org.multiverse.api;
 
+import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+
+import java.util.List;
+
 /**
  * Contains the transaction configuration used by a {@link Transaction}. In the beginning this was all
  * placed in the Transaction, adding a lot of 'informational' methods to the transaction and therefor
@@ -149,6 +153,13 @@ public interface TransactionConfiguration {
      * @see TransactionFactoryBuilder#setInterruptible(boolean)
      */
     boolean isInterruptible();
+
+    /**
+     * Returns an unmodifiable list containing all permanent TransactionLifecycleListeners.
+     *
+     * @return unmodifiable List containing all permanent TransactionLifecycleListeners.
+     */
+    List<TransactionLifecycleListener> getPermanentListeners();
 
     /**
      * Returns the maximum number of times this Transaction be retried before failing. The returned value will
