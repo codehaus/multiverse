@@ -175,9 +175,9 @@ the task not being executed at all.
 
 - commit barriers
 
-- deadlock stress test should be modified with different levels of locking.
-
 done
+
+- deadlock stress test should be modified with different levels of locking.
 
 - testing: commute & overflow of array
 

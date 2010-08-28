@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaObjectPool;
@@ -18,12 +19,17 @@ import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalB
 
 public class DeadLockStressTest {
 
+    enum Mode {
+        Normal, Mix, PessimisticReadLevelMode, PessimisticWriteLevelMode
+    }
+
     private volatile boolean stop;
     private int refCount = 100;
     private int threadCount = 10;
     private BetaIntRef[] refs;
     private ChangeThread[] threads;
     private BetaStm stm;
+    private Mode mode;
 
     @Before
     public void setUp() {
@@ -33,7 +39,28 @@ public class DeadLockStressTest {
     }
 
     @Test
-    public void test() {
+    public void whenNormal() {
+        test(Mode.Normal);
+    }
+
+    @Test
+    public void whenMix() {
+        test(Mode.Mix);
+    }
+
+    @Test
+    public void whenPessimisticReadLevel() {
+        test(Mode.PessimisticReadLevelMode);
+    }
+
+    @Test
+    public void whenPessimisticWriteLevel() {
+        test(Mode.PessimisticWriteLevelMode);
+    }
+
+    public void test(Mode mode) {
+        this.mode = mode;
+
         refs = new BetaIntRef[refCount];
         for (int k = 0; k < refCount; k++) {
             refs[k] = createIntRef(stm);
@@ -52,38 +79,101 @@ public class DeadLockStressTest {
 
     public class ChangeThread extends TestThread {
 
+        private final AtomicBlock normalBlock = stm.getTransactionFactoryBuilder()
+                .buildAtomicBlock();
+
+        private final AtomicBlock pessimisticReadLevelBlock = stm.getTransactionFactoryBuilder()
+                .setPessimisticLockLevel(PessimisticLockLevel.Read)
+                .buildAtomicBlock();
+
+        private final AtomicBlock pessimisticWriteLevelBlock = stm.getTransactionFactoryBuilder()
+                .setPessimisticLockLevel(PessimisticLockLevel.Write)
+                .buildAtomicBlock();
+
         public ChangeThread(int id) {
             super("ChangeThread-" + id);
         }
 
         @Override
         public void doRun() throws Exception {
-            AtomicBlock block = stm.getTransactionFactoryBuilder().buildAtomicBlock();
-            AtomicVoidClosure closure = new AtomicVoidClosure() {
-                @Override
-                public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    for (int k = 0; k < refs.length; k++) {
-                        if (randomInt(3) == 0) {
-                            int index = randomInt(refs.length);
-
-                            if (randomInt(5) == 0) {
-                                BetaIntRef ref = refs[index];
-                                ref.set(btx, pool, ref.get(btx, pool) + 1);
-                            }
-                        }
-                    }
-                }
-            };
-
             int k = 0;
             while (!stop) {
                 if (k % 100000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
-                block.execute(closure);
+                switch (mode) {
+                    case PessimisticReadLevelMode:
+                        pessimisticReadLevel();
+                        break;
+                    case PessimisticWriteLevelMode:
+                        pessimisticWriteLevel();
+                        break;
+                    case Normal:
+                        normal();
+                        break;
+                    case Mix:
+                        switch (randomInt(3)) {
+                            case 0:
+                                pessimisticReadLevel();
+                                break;
+                            case 1:
+                                pessimisticWriteLevel();
+                                break;
+                            case 2:
+                                normal();
+                                break;
+                            default:
+                                throw new IllegalStateException();
+                        }
+                        break;
+                    default:
+                        throw new IllegalStateException();
+
+                }
                 k++;
+            }
+        }
+
+        public void normal() {
+            normalBlock.execute(new AtomicVoidClosure() {
+                @Override
+                public void execute(Transaction tx) throws Exception {
+                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
+                    doIt((BetaTransaction) tx, pool);
+                }
+            });
+        }
+
+        public void pessimisticReadLevel() {
+            pessimisticReadLevelBlock.execute(new AtomicVoidClosure() {
+                @Override
+                public void execute(Transaction tx) throws Exception {
+                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
+                    doIt((BetaTransaction) tx, pool);
+                }
+            });
+        }
+
+        public void pessimisticWriteLevel() {
+            pessimisticWriteLevelBlock.execute(new AtomicVoidClosure() {
+                @Override
+                public void execute(Transaction tx) throws Exception {
+                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
+                    doIt((BetaTransaction) tx, pool);
+                }
+            });
+        }
+
+
+        public void doIt(BetaTransaction tx, BetaObjectPool pool) {
+            for (int k = 0; k < refs.length; k++) {
+                if (!randomOneOf(10)) {
+                    continue;
+                }
+
+                int index = randomInt(refs.length);
+                BetaIntRef ref = refs[index];
+                ref.set(tx, pool, ref.get(tx, pool) + 1);
             }
         }
     }
