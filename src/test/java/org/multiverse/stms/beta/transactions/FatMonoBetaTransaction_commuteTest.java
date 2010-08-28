@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadonlyException;
+import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
@@ -150,9 +151,87 @@ public class FatMonoBetaTransaction_commuteTest {
     }
 
     @Test
-    @Ignore
-    public void testingOfConflictCounter() {
+    public void whenOverflow() {
+        BetaLongRef ref1 = createLongRef(stm);
+        BetaLongRef ref2 = createLongRef(stm);
 
+        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+
+        LongFunction function1 = mock(LongFunction.class);
+        LongFunction function2 = mock(LongFunction.class);
+        tx.commute(ref1, pool, function1);
+
+        try {
+            tx.commute(ref2, pool, function2);
+            fail();
+        } catch (SpeculativeConfigurationError expected) {
+
+        }
+
+        assertAborted(tx);
+        assertEquals(2, tx.getConfiguration().getSpeculativeConfig().getMinimalLength());
+
+        verifyZeroInteractions(function1);
+        assertSurplus(0, ref1);
+        assertUnlocked(ref1);
+
+        verifyZeroInteractions(function2);
+        assertSurplus(0, ref2);
+        assertUnlocked(ref2);
+    }
+
+    @Test
+    public void whenCommuteThenConflictCounterNotSet() {
+        BetaLongRef ref = createLongRef(stm);
+
+        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        long localConflictCount = tx.getLocalConflictCounter().get();
+
+        LongFunction function = mock(LongFunction.class);
+
+        stm.getGlobalConflictCounter().signalConflict(new BetaLongRef());
+
+        tx.commute(ref, pool, function);
+
+        assertEquals(localConflictCount, tx.getLocalConflictCounter().get());
+        assertActive(tx);
+        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        assertNotNull(tranlocal);
+        assertSame(ref, tranlocal.owner);
+        assertTrue(tranlocal.isCommuting);
+        assertFalse(tranlocal.isCommitted);
+        assertNull(tranlocal.read);
+        assertHasCommutingFunctions(tranlocal, function);
+        assertUnlocked(ref);
+        assertNull(ref.___getLockOwner());
+        assertSurplus(0, ref);
+    }
+
+    @Test
+    public void whenMultipleCommutesOnSameReference() {
+        BetaLongRef ref = createLongRef(stm);
+
+        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+
+        LongFunction function1 = mock(LongFunction.class);
+        LongFunction function2 = mock(LongFunction.class);
+        LongFunction function3 = mock(LongFunction.class);
+
+        tx.commute(ref, pool, function1);
+        tx.commute(ref, pool, function2);
+        tx.commute(ref, pool, function3);
+
+        assertActive(tx);
+        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        assertNotNull(tranlocal);
+        assertSame(ref, tranlocal.owner);
+        assertTrue(tranlocal.isCommuting);
+        assertFalse(tranlocal.isCommitted);
+        assertNull(tranlocal.read);
+        assertHasCommutingFunctions(tranlocal, function3, function2, function1);
+        assertUnlocked(ref);
+        assertNull(ref.___getLockOwner());
+        assertSurplus(0, ref);
     }
 
     @Test
@@ -180,7 +259,7 @@ public class FatMonoBetaTransaction_commuteTest {
     }
 
     @Test
-    public void whenReadonlyTransaction() {
+    public void whenReadonlyTransaction_thenReadonlyException() {
         BetaLongRef ref = createLongRef(stm);
 
         LongFunction function = mock(LongFunction.class);
@@ -200,7 +279,7 @@ public class FatMonoBetaTransaction_commuteTest {
     }
 
     @Test
-    public void whenPrepared() {
+    public void whenPrepared_thenPreparedException() {
         BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);

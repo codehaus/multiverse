@@ -365,7 +365,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             array[index]=result;
         }
 
-#if($ref.isReference())
+#if(${ref.isReference})
         result.value = function.call(result.value);
 #else
         throw new TodoException();

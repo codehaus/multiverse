@@ -150,7 +150,14 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             }
 
             //it was opened for reading so we need to open it for writing.
-            result = result.openForWrite(pool);
+            RefTranlocal<E> read = result;
+            result = pool.take(ref);
+            if (result == null) {
+                result = new RefTranlocal<E>(ref);
+            }
+
+            result.value = read.value;
+            result.read = read;
             hasUpdates = true;
             array[index]=result;
             return result;
@@ -219,7 +226,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
-        final RefTranlocal<E> result = ref.___openForConstruction(pool);
+        RefTranlocal<E> result =  pool.take(ref);
+        if(result == null){
+            result = new RefTranlocal<E>(ref);
+        }
         result.isDirty = DIRTY_TRUE;
         attach(ref, result, identityHashCode, pool);
         size++;
@@ -329,7 +339,14 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             }
 
             //it was opened for reading so we need to open it for writing.
-            result = result.openForWrite(pool);
+            IntRefTranlocal read = result;
+            result = pool.take(ref);
+            if (result == null) {
+                result = new IntRefTranlocal(ref);
+            }
+
+            result.value = read.value;
+            result.read = read;
             hasUpdates = true;
             array[index]=result;
             return result;
@@ -398,7 +415,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
-        final IntRefTranlocal result = ref.___openForConstruction(pool);
+        IntRefTranlocal result =  pool.take(ref);
+        if(result == null){
+            result = new IntRefTranlocal(ref);
+        }
         result.isDirty = DIRTY_TRUE;
         attach(ref, result, identityHashCode, pool);
         size++;
@@ -508,7 +528,14 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             }
 
             //it was opened for reading so we need to open it for writing.
-            result = result.openForWrite(pool);
+            LongRefTranlocal read = result;
+            result = pool.take(ref);
+            if (result == null) {
+                result = new LongRefTranlocal(ref);
+            }
+
+            result.value = read.value;
+            result.read = read;
             hasUpdates = true;
             array[index]=result;
             return result;
@@ -577,7 +604,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
-        final LongRefTranlocal result = ref.___openForConstruction(pool);
+        LongRefTranlocal result =  pool.take(ref);
+        if(result == null){
+            result = new LongRefTranlocal(ref);
+        }
         result.isDirty = DIRTY_TRUE;
         attach(ref, result, identityHashCode, pool);
         size++;

@@ -45,12 +45,6 @@ a tranlocal can't be
 
 - expose lock for write.
 
-- expose if lock is free
-
-- expose if lock is owned by current transaction
-
-- expose if lock is owned by other transaction
-
 - read transaction still can be expensive because some read tracking is needed when it hits
 non permanent.
 
@@ -144,13 +138,13 @@ globalconflict counter.
 
 - commute
 
-   - when a commuting function fails, the transaction should be aborted.
+    - overflow of array
+
+    - when a commuting function fails, the transaction should be aborted.
 
     - the nodes for the commute functions need to be pooled.
 
     - commute: commuting functions are executed in reverse order.
-
-    - testing: commute: check if conflict counters are set correctly when an addCommute is done
 
     - when commute function is evaluated, there should be protection against openForXXX on transaction.
 
@@ -185,9 +179,21 @@ the task not being executed at all.
 
 done
 
+ - overflow of mono
+
+- testing: commute: check if conflict counters are set correctly when an addCommute is done
+    
+- benchmark scripts moved to separate directory
+
 - initial support for externalizing the refs added.
 
 - gradle build script
+
+- expose if lock is free
+
+- expose if lock is owned by current transaction
+
+- expose if lock is owned by other transaction
 
 old done
 

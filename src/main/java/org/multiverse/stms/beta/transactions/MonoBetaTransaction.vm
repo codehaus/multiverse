@@ -373,9 +373,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortCommuteWhenNullReference(pool, function);
         }
 
-        boolean contains = (attached != null && attached.owner == ref);
+        final boolean contains = (attached != null && attached.owner == ref);
         if(!contains){
-            if(attached!=null) {
+            if(attached != null) {
                 throw abortOnTooSmallSize(pool, 2);
             }
 

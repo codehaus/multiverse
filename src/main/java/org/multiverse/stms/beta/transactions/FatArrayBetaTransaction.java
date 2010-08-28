@@ -337,7 +337,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             array[index]=result;
         }
 
-        throw new TodoException();
+        result.value = function.call(result.value);
       }
 
 
@@ -632,7 +632,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             array[index]=result;
         }
 
-        throw new TodoException();
+        result.value = function.call(result.value);
       }
 
 
@@ -927,7 +927,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             array[index]=result;
         }
 
-        throw new TodoException();
+        result.value = function.call(result.value);
       }
 
 

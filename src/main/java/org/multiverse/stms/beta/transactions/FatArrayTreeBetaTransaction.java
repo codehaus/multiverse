@@ -197,7 +197,14 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             }
 
             //it was opened for reading so we need to open it for writing.
-            result = result.openForWrite(pool);
+            RefTranlocal<E> read = result;
+            result = pool.take(ref);
+            if (result == null) {
+                result = new RefTranlocal<E>(ref);
+            }
+
+            result.value = read.value;
+            result.read = read;
             hasUpdates = true;
             array[index]=result;
             return result;
@@ -266,7 +273,10 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
-        final RefTranlocal<E> result = ref.___openForConstruction(pool);
+        RefTranlocal<E> result =  pool.take(ref);
+        if(result == null){
+            result = new RefTranlocal<E>(ref);
+        }
         result.isDirty = DIRTY_TRUE;
         attach(ref, result, identityHashCode, pool);
         size++;
@@ -309,12 +319,17 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         if(result.isCommitted){
             final RefTranlocal<E> read = result;
-            result = read.openForWrite(pool);
+            result =  pool.take(ref);
+            if(result == null){
+                result = new RefTranlocal<E>(ref);
+            }
+            result.read = read;
+            result.value = read.value;
             hasUpdates = true;
             array[index]=result;
          }
 
-         throw new TodoException();
+         result.value = function.call(result.value);
      }
 
 
@@ -455,7 +470,14 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             }
 
             //it was opened for reading so we need to open it for writing.
-            result = result.openForWrite(pool);
+            IntRefTranlocal read = result;
+            result = pool.take(ref);
+            if (result == null) {
+                result = new IntRefTranlocal(ref);
+            }
+
+            result.value = read.value;
+            result.read = read;
             hasUpdates = true;
             array[index]=result;
             return result;
@@ -524,7 +546,10 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
-        final IntRefTranlocal result = ref.___openForConstruction(pool);
+        IntRefTranlocal result =  pool.take(ref);
+        if(result == null){
+            result = new IntRefTranlocal(ref);
+        }
         result.isDirty = DIRTY_TRUE;
         attach(ref, result, identityHashCode, pool);
         size++;
@@ -567,12 +592,17 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         if(result.isCommitted){
             final IntRefTranlocal read = result;
-            result = read.openForWrite(pool);
+            result =  pool.take(ref);
+            if(result == null){
+                result = new IntRefTranlocal(ref);
+            }
+            result.read = read;
+            result.value = read.value;
             hasUpdates = true;
             array[index]=result;
          }
 
-         throw new TodoException();
+         result.value = function.call(result.value);
      }
 
 
@@ -713,7 +743,14 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             }
 
             //it was opened for reading so we need to open it for writing.
-            result = result.openForWrite(pool);
+            LongRefTranlocal read = result;
+            result = pool.take(ref);
+            if (result == null) {
+                result = new LongRefTranlocal(ref);
+            }
+
+            result.value = read.value;
+            result.read = read;
             hasUpdates = true;
             array[index]=result;
             return result;
@@ -782,7 +819,10 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             throw abortOpenForConstructionWithBadReference(pool, ref);
         }
 
-        final LongRefTranlocal result = ref.___openForConstruction(pool);
+        LongRefTranlocal result =  pool.take(ref);
+        if(result == null){
+            result = new LongRefTranlocal(ref);
+        }
         result.isDirty = DIRTY_TRUE;
         attach(ref, result, identityHashCode, pool);
         size++;
@@ -825,12 +865,17 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         if(result.isCommitted){
             final LongRefTranlocal read = result;
-            result = read.openForWrite(pool);
+            result =  pool.take(ref);
+            if(result == null){
+                result = new LongRefTranlocal(ref);
+            }
+            result.read = read;
+            result.value = read.value;
             hasUpdates = true;
             array[index]=result;
          }
 
-         throw new TodoException();
+         result.value = function.call(result.value);
      }
 
 
