@@ -1009,8 +1009,11 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         final long listenerEra = listener.getEra();
         final BetaTransactionalObject owner = attached.owner;
 
-        final boolean failure = owner.___registerChangeListener(listener, attached, pool, listenerEra)
-            == REGISTRATION_NONE;
+        boolean failure = true;
+        if(!attached.isCommuting){
+            failure = owner.___registerChangeListener(listener, attached, pool, listenerEra)
+                    == REGISTRATION_NONE;
+        }
         owner.___abort(this, attached, pool);
         status = ABORTED;
 

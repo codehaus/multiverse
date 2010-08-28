@@ -8,6 +8,7 @@ import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.NoRetryPossibleException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaObjectPool;
@@ -60,6 +61,29 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
     }
 
     @Test
+    public void whenOnlyContainsCommute_thenNoRetryPossibleException(){
+        BetaLongRef ref = new BetaLongRef();
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        LongFunction function = mock(LongFunction.class);
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        tx.commute(ref, pool,function);
+
+        Latch listener = new CheapLatch();
+        try {
+            tx.registerChangeListenerAndAbort(listener, pool);
+            fail();
+        } catch (NoRetryPossibleException expected) {
+        }
+
+        assertAborted(tx);
+        assertHasNoListeners(ref);
+        assertUnlocked(ref);
+        assertUpdateBiased(ref);
+        assertSame(committed, ref.___unsafeLoad());
+    }
+
+    @Test
     public void whenContainsConstructed_thenNoRetryPossibleException() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         BetaLongRef ref = new BetaLongRef(tx);
@@ -75,14 +99,9 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         assertAborted(tx);
         assertHasNoListeners(ref);
         assertLocked(ref);
-        //assertNull(ref.getLockOwner());
-        //assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertNull(ref.___unsafeLoad());
         assertNull(constructed.read);
-        //    assertSame(ref, constructed.owner);
-        //    assertFalse(constructed.isCommitted);
-        //    assertFalse(constructed.isPermanent);
     }
 
     @Test

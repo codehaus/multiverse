@@ -146,13 +146,11 @@ globalconflict counter.
 
     - when commute function is evaluated, there should be protection against openForXXX on transaction.
 
-    - registerAndAbort: doesn't deal with commuting values correctly. it sees it as a correct read
-
 - rollbackfor/rollnotbackfor exception configuration
 
 - testing: atomic block & propagation and committed/aborted/prepared/new transaction on threadlocal
 
-- lean mono should not upgrade to array when untracked read is done, but should just attach it to the session.
+- lean mono should not upgrade to array when untracked read is done, but should just attach it to the transaction.
 
 - speculative + register doesn't combine because it can lead to transaction not accepting the task and therefor
 the task not being executed at all.
@@ -175,7 +173,15 @@ the task not being executed at all.
 
 - commit barriers
 
+- get without arguments needs to be exposed in ref
+
+- set with value needs to be exposed in ref.
+
+- alter needs to be exposed in ref.
+
 done
+
+- registerAndAbort: doesn't deal with commuting values correctly. it sees it as a correct read
 
 - deadlock stress test should be modified with different levels of locking.
 

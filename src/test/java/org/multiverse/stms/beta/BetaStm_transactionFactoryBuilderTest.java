@@ -49,6 +49,7 @@ public class BetaStm_transactionFactoryBuilderTest {
         assertSame(TraceLevel.None, config.getTraceLevel());
         assertTrue(config.writeSkewAllowed);
         assertEquals(PropagationLevel.Requires, config.getPropagationLevel());
+        assertTrue(config.getPermanentListeners().isEmpty());
     }
 
     @Test(expected = NullPointerException.class)
@@ -67,9 +68,31 @@ public class BetaStm_transactionFactoryBuilderTest {
     }
 
     @Test
+    public void whenPermanentListenerAdded_thenNoCheckForDuplicates() {
+        BetaTransactionFactoryBuilder oldBuilder = stm.getTransactionFactoryBuilder();
+        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+        BetaTransactionFactoryBuilder newBuilder = oldBuilder.addPermanentListener(listener)
+                .addPermanentListener(listener);
+
+        assertEquals(asList(listener, listener), newBuilder.getTransactionConfiguration().getPermanentListeners());
+    }
+
+    @Test
     public void whenNoPermanentListenersAdded_thenEmptyList() {
         BetaTransactionFactoryBuilder builder = stm.getTransactionFactoryBuilder();
         assertTrue(builder.getTransactionConfiguration().getPermanentListeners().isEmpty());
+    }
+
+    @Test
+    public void whenMultipleListenersAdded_thenTheyAreAddedInOrder() {
+        TransactionLifecycleListener listener1 = mock(TransactionLifecycleListener.class);
+        TransactionLifecycleListener listener2 = mock(TransactionLifecycleListener.class);
+        BetaTransactionFactoryBuilder builder = stm.getTransactionFactoryBuilder()
+                .addPermanentListener(listener1)
+                .addPermanentListener(listener2);
+
+        List<TransactionLifecycleListener> listeners = builder.getTransactionConfiguration().getPermanentListeners();
+        assertEquals(asList(listener1, listener2), listeners);
     }
 
     @Test

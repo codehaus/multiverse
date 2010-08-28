@@ -9,6 +9,7 @@ import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.NoRetryPossibleException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaObjectPool;
@@ -58,6 +59,29 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         }
 
         assertAborted(tx);
+    }
+
+       @Test
+    public void whenOnlyContainsCommute_thenNoRetryPossibleException(){
+        BetaLongRef ref = new BetaLongRef();
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        LongFunction function = mock(LongFunction.class);
+        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        tx.commute(ref, pool,function);
+
+        Latch listener = new CheapLatch();
+        try {
+            tx.registerChangeListenerAndAbort(listener, pool);
+            fail();
+        } catch (NoRetryPossibleException expected) {
+        }
+
+        assertAborted(tx);
+        assertHasNoListeners(ref);
+        assertUnlocked(ref);
+        assertUpdateBiased(ref);
+        assertSame(committed, ref.___unsafeLoad());
     }
 
     @Test

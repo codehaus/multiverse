@@ -285,6 +285,10 @@ public final class BetaObjectPool {
         return tranlocal;
     }
 
+    /**
+     * Puts a Tranlocal in the pool.
+     *
+     */
     public void put(final Tranlocal tranlocal) {
         if (!tranlocalPoolingEnabled || tranlocal == null || tranlocal.isPermanent) {
             return;
@@ -337,6 +341,12 @@ public final class BetaObjectPool {
 
     private Tranlocal[][] tranlocalArrayPool = new Tranlocal[8193][];
 
+    /**
+     * Puts a Tranlocal array in the pool.
+     *
+     * @param array the Tranlocal array to put in the pool.
+     * @throws NullPointerException is array is null.
+     */
     public void putTranlocalArray(final Tranlocal[] array){
         if(array == null){
             throw new NullPointerException();
@@ -365,7 +375,11 @@ public final class BetaObjectPool {
     }
 
     /**
-     * Takes a tranlocal array from the pool
+     * Takes a tranlocal array from the pool with the given size.
+     *
+     * @param size the size of the array to take
+     * @return the Tranlocal array taken from the pool, or null if none available.
+     * @throws IllegalArgumentException if size smaller than 0.
      */
     public Tranlocal[] takeTranlocalArray(final int size){
         if(size<0){
@@ -378,7 +392,7 @@ public final class BetaObjectPool {
 
         int index = size;
 
-        if(index>=tranlocalArrayPool.length){
+        if(index >= tranlocalArrayPool.length){
             return null;
         }
 
@@ -391,6 +405,11 @@ public final class BetaObjectPool {
         return array;
     }
 
+    /**
+     * Takes a CheapLatch from the pool, or null if none is available.
+     *
+     * @return the CheapLatch from the pool, or null if none available.
+     */
     public CheapLatch takeCheapLatch(){
         if(!latchPoolingEnabled || cheapLatchPoolIndex == -1){
             return null;
@@ -402,6 +421,12 @@ public final class BetaObjectPool {
         return latch;
     }
 
+    /**
+     * Puts a CheapLatch in the pool. Before the latch is put in the pool, it is prepared for pooling.
+     *
+     * @param latch the CheapLatch to pool.
+     * @throws NullPointerException if latch is null.
+     */
     public void putCheapLatch(CheapLatch latch){
         if(latch == null){
             throw new NullPointerException();
@@ -416,6 +441,11 @@ public final class BetaObjectPool {
         cheapLatchPool[cheapLatchPoolIndex]=latch;
     }
 
+    /**
+     * Takes a StandardLatch from the pool.
+     *
+     * @return the taken StandardLatch is null if none is available.
+     */
     public StandardLatch takeStandardLatch(){
         if(!latchPoolingEnabled || standardLatchPoolIndex == -1){
             return null;
@@ -427,6 +457,12 @@ public final class BetaObjectPool {
         return latch;
     }
 
+    /**
+     * Puts a StandardLatch in the pool. The latch is prepared for pooling before being placed in the pool.
+     *
+     * @param latch the StandardLatch to pool.
+     * @throws NullPointerException if latch is null.
+     */
     public void putStandardLatch(StandardLatch latch){
         if(latch == null){
             throw new NullPointerException();
@@ -483,6 +519,11 @@ public final class BetaObjectPool {
 
     // ============================ listeners ==================================
 
+    /**
+     * Takes a Listeners object from the pool.
+     *
+     * @return the Listeners object taken from the pool. or null if none is taken.
+     */
     public Listeners takeListeners(){
         if(!listenersPoolingEnabled || listenersPoolIndex == -1){
             return null;
@@ -494,6 +535,13 @@ public final class BetaObjectPool {
         return listeners;
     }
 
+    /**
+     * Puts a Listeners object in the pool. The Listeners object is preparedForPooling before
+     * it is put in the pool. The next Listeners object is ignored (the next field itself is ignored).
+     *
+     * @param listeners the Listeners object to pool.
+     * @throws NullPointerException is listeners is null.
+     */
     public void putListeners(Listeners listeners){
         if(listeners == null){
             throw new NullPointerException();
@@ -516,7 +564,7 @@ public final class BetaObjectPool {
      * Takes a Listeners array from the pool. If an array is returned, it is completely nulled.
      *
      * @param minimalSize the minimalSize of the Listeners array.
-     * @returns the found Listeners array, or null if none is taken from the pool.
+     * @return the found Listeners array, or null if none is taken from the pool.
      * @throws IllegalArgumentException if minimalSize is smaller than 0.
      */
     public Listeners[] takeListenersArray(int minimalSize){
@@ -543,6 +591,7 @@ public final class BetaObjectPool {
      * Listeners array should be nulled before being put in the pool. It is not going to be done by this
      * BetaObjectPool but should be done when the listeners on the listeners array are notified.
      *
+     * @param listenersArray the array to pool.
      * @throws NullPointerException if listenersArray is null.
      */
     public void putListenersArray(Listeners[] listenersArray){
@@ -563,6 +612,11 @@ public final class BetaObjectPool {
 
     // ========================== transactions ==============================
 
+    /**
+     * Takes a LeanMonoBetaTransaction from the pool.
+     *
+     * @return the taken LeanMonoBetaTransaction or null of none available.
+     */
     public LeanMonoBetaTransaction takeLeanMonoBetaTransaction(){
         if(!transactionPoolingEnabled || poolLeanMonoBetaTransactionIndex == -1){
             return null;
@@ -574,6 +628,11 @@ public final class BetaObjectPool {
         return tx;
     }
 
+    /**
+     * Takes a FatMonoBetaTransaction from the pool.
+     *
+     * @return the taken FatMonoBetaTransaction or null of none available.
+     */
     public FatMonoBetaTransaction takeFatMonoBetaTransaction(){
         if(!transactionPoolingEnabled || poolFatMonoBetaTransactionIndex == -1){
             return null;
@@ -585,6 +644,11 @@ public final class BetaObjectPool {
         return tx;
     }
 
+    /**
+     * Takes a LeanArrayBetaTransaction from the pool.
+     *
+     * @return the taken LeanArrayBetaTransaction or null of none available.
+     */
     public LeanArrayBetaTransaction takeLeanArrayBetaTransaction(){
         if(!transactionPoolingEnabled || poolLeanArrayBetaTransactionIndex == -1){
             return null;
@@ -596,6 +660,11 @@ public final class BetaObjectPool {
         return tx;
     }
 
+    /**
+     * Takes a FatArrayBetaTransaction from the pool.
+     *
+     * @return the taken FatArrayBetaTransaction or null of none available.
+     */
     public FatArrayBetaTransaction takeFatArrayBetaTransaction(){
         if(!transactionPoolingEnabled || poolFatArrayBetaTransactionIndex == -1){
             return null;
@@ -607,6 +676,11 @@ public final class BetaObjectPool {
         return tx;
     }
 
+    /**
+     * Takes a LeanArrayTreeBetaTransaction from the pool.
+     *
+     * @return the taken LeanArrayTreeBetaTransaction or null of none available.
+     */
     public LeanArrayTreeBetaTransaction takeLeanArrayTreeBetaTransaction(){
         if(!transactionPoolingEnabled || poolLeanArrayTreeBetaTransactionIndex == -1){
             return null;
@@ -618,6 +692,11 @@ public final class BetaObjectPool {
         return tx;
     }
 
+    /**
+     * Takes a FatArrayTreeBetaTransaction from the pool.
+     *
+     * @return the taken FatArrayTreeBetaTransaction or null of none available.
+     */
     public FatArrayTreeBetaTransaction takeFatArrayTreeBetaTransaction(){
         if(!transactionPoolingEnabled || poolFatArrayTreeBetaTransactionIndex == -1){
             return null;
@@ -630,6 +709,14 @@ public final class BetaObjectPool {
     }
 
 
+    /**
+     * Puts a BetaTransaction in the pool.
+     *
+     * todo: This is where the cleanup of the Transaction should be done..
+     *
+     * @param tx the BetaTransaction to put in the pool.
+     * @throws NullPointerException if tx is null.
+     */
     public void putBetaTransaction(BetaTransaction tx){
         if(tx == null){
             throw new NullPointerException();

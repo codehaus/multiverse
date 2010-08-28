@@ -1187,7 +1187,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             final Tranlocal tranlocal = array[k];
             final BetaTransactionalObject owner = tranlocal.owner;
 
-            if(furtherRegistrationNeeded){
+            if(furtherRegistrationNeeded && !tranlocal.isCommuting){
                 switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
                     case REGISTRATION_DONE:
                         atLeastOneRegistration = true;
