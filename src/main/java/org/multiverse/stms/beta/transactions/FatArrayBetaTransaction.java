@@ -29,6 +29,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
     private boolean hasReads;
     private boolean hasUpdates;
     private boolean hasUntrackedReads;
+    private boolean evaluatingCommute;
 
     public FatArrayBetaTransaction(final BetaStm stm) {
         this(new BetaTransactionConfiguration(stm));
@@ -52,6 +53,10 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(pool, ref);
+        }
+
+        if(evaluatingCommute){
+            throw abortOnOpenForReadWhileEvaluatingCommute(pool, ref);
         }
 
         if (ref == null) {
@@ -141,10 +146,12 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         tranlocal.read = read;
         boolean abort = true;
+        evaluatingCommute = true;
         try{
             tranlocal.evaluateCommutingFunctions(pool);
             abort = false;
         }finally{
+            evaluatingCommute = false;
             if(abort){
                 abort(pool);
             }
@@ -157,6 +164,10 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         if (status != ACTIVE) {
            throw abortOpenForWrite(pool, ref);
+        }
+
+        if(evaluatingCommute){
+            throw abortOnOpenForWriteWhileEvaluatingCommute(pool, ref);
         }
 
         if (config.readonly) {
@@ -241,6 +252,10 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOpenForConstruction(pool, ref);
         }
 
+        if(evaluatingCommute){
+            throw abortOnOpenForConstructionWhileEvaluatingCommute(pool, ref);
+        }
+
         if (config.readonly) {
             throw abortOpenForConstructionWhenReadonly(pool, ref);
         }
@@ -293,7 +308,11 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if (status != ACTIVE) {
             throw abortCommute(pool, ref, function);
         }
-        
+
+        if(evaluatingCommute){
+            throw abortOnCommuteWhileEvaluatingCommute(pool, ref);
+        }
+
         if (config.readonly) {
             throw abortCommuteWhenReadonly(pool, ref, function);
         }
@@ -345,6 +364,10 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(pool, ref);
+        }
+
+        if(evaluatingCommute){
+            throw abortOnOpenForReadWhileEvaluatingCommute(pool, ref);
         }
 
         if (ref == null) {
@@ -434,10 +457,12 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         tranlocal.read = read;
         boolean abort = true;
+        evaluatingCommute = true;
         try{
             tranlocal.evaluateCommutingFunctions(pool);
             abort = false;
         }finally{
+            evaluatingCommute = false;
             if(abort){
                 abort(pool);
             }
@@ -450,6 +475,10 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         if (status != ACTIVE) {
            throw abortOpenForWrite(pool, ref);
+        }
+
+        if(evaluatingCommute){
+            throw abortOnOpenForWriteWhileEvaluatingCommute(pool, ref);
         }
 
         if (config.readonly) {
@@ -534,6 +563,10 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOpenForConstruction(pool, ref);
         }
 
+        if(evaluatingCommute){
+            throw abortOnOpenForConstructionWhileEvaluatingCommute(pool, ref);
+        }
+
         if (config.readonly) {
             throw abortOpenForConstructionWhenReadonly(pool, ref);
         }
@@ -586,7 +619,11 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if (status != ACTIVE) {
             throw abortCommute(pool, ref, function);
         }
-        
+
+        if(evaluatingCommute){
+            throw abortOnCommuteWhileEvaluatingCommute(pool, ref);
+        }
+
         if (config.readonly) {
             throw abortCommuteWhenReadonly(pool, ref, function);
         }
@@ -638,6 +675,10 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(pool, ref);
+        }
+
+        if(evaluatingCommute){
+            throw abortOnOpenForReadWhileEvaluatingCommute(pool, ref);
         }
 
         if (ref == null) {
@@ -727,10 +768,12 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         tranlocal.read = read;
         boolean abort = true;
+        evaluatingCommute = true;
         try{
             tranlocal.evaluateCommutingFunctions(pool);
             abort = false;
         }finally{
+            evaluatingCommute = false;
             if(abort){
                 abort(pool);
             }
@@ -743,6 +786,10 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         if (status != ACTIVE) {
            throw abortOpenForWrite(pool, ref);
+        }
+
+        if(evaluatingCommute){
+            throw abortOnOpenForWriteWhileEvaluatingCommute(pool, ref);
         }
 
         if (config.readonly) {
@@ -827,6 +874,10 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOpenForConstruction(pool, ref);
         }
 
+        if(evaluatingCommute){
+            throw abortOnOpenForConstructionWhileEvaluatingCommute(pool, ref);
+        }
+
         if (config.readonly) {
             throw abortOpenForConstructionWhenReadonly(pool, ref);
         }
@@ -879,7 +930,11 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if (status != ACTIVE) {
             throw abortCommute(pool, ref, function);
         }
-        
+
+        if(evaluatingCommute){
+            throw abortOnCommuteWhileEvaluatingCommute(pool, ref);
+        }
+
         if (config.readonly) {
             throw abortCommuteWhenReadonly(pool, ref, function);
         }
@@ -931,6 +986,10 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(pool, ref);
+        }
+
+        if(evaluatingCommute){
+            throw abortOnOpenForReadWhileEvaluatingCommute(pool, ref);
         }
 
         if (ref == null) {
@@ -1020,10 +1079,12 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         tranlocal.read = read;
         boolean abort = true;
+        evaluatingCommute = true;
         try{
             tranlocal.evaluateCommutingFunctions(pool);
             abort = false;
         }finally{
+            evaluatingCommute = false;
             if(abort){
                 abort(pool);
             }
@@ -1036,6 +1097,10 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         if (status != ACTIVE) {
            throw abortOpenForWrite(pool, ref);
+        }
+
+        if(evaluatingCommute){
+            throw abortOnOpenForWriteWhileEvaluatingCommute(pool, ref);
         }
 
         if (config.readonly) {
@@ -1114,6 +1179,10 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOpenForConstruction(pool, ref);
         }
 
+        if(evaluatingCommute){
+            throw abortOnOpenForConstructionWhileEvaluatingCommute(pool, ref);
+        }
+
         if (config.readonly) {
             throw abortOpenForConstructionWhenReadonly(pool, ref);
         }
@@ -1163,7 +1232,11 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if (status != ACTIVE) {
             throw abortCommute(pool, ref, function);
         }
-        
+
+        if(evaluatingCommute){
+            throw abortOnCommuteWhileEvaluatingCommute(pool, ref);
+        }
+
         if (config.readonly) {
             throw abortCommuteWhenReadonly(pool, ref, function);
         }
@@ -1650,6 +1723,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         hasReads = false;
         hasUntrackedReads = false;
         hasUpdates = false;
+        evaluatingCommute = false;
         if(normalListeners != null){
             normalListeners.clear();
         }
@@ -1674,6 +1748,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         attempt=1;
         firstFreeIndex = 0;
         remainingTimeoutNs = config.timeoutNs;        
+        evaluatingCommute = false;
         if(normalListeners !=null){
             pool.putArrayList(normalListeners);
             normalListeners = null;

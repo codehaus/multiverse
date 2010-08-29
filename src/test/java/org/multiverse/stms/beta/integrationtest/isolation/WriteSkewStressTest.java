@@ -23,6 +23,13 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
+/**
+ * A Test that checks if the writeskew problem is happening. When
+ * pessimisticRead/PessimisticLockLevel.Read/writeskew=false is used, no writeskew is possible. Otherwise
+ * it can happen.
+ * 
+ * @author Peter Veentjer.
+ */
 public class WriteSkewStressTest {
     private volatile boolean stop;
     private User user1;
@@ -80,11 +87,15 @@ public class WriteSkewStressTest {
         assertFalse("writeskew detected", writeSkewEncountered.get());
     }
 
+    /**
+     * If this test fails, the anomaly we are looking for, hasn't occurred yet. Try increasing the
+     * running time.
+     */
     @Test
     public void whenPessimisticWrite_thenWriteSkewPossible() {
         mode = Mode.pessimisticWrite;
         startAll(threads);
-        sleepMs(getStressTestDurationMs(60 * 1000));
+        sleepMs(getStressTestDurationMs(30 * 1000));
         stop = true;
 
         joinAll(threads);
@@ -311,7 +322,7 @@ public class WriteSkewStressTest {
                 tx.openForWrite(toAccount, pessimisticWrite, pool).value += amount;
             }
 
-            sleepRandomUs(1000);
+            sleepRandomUs(20);
         }
     }
 

@@ -111,6 +111,46 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
         }
     }
 
+    public final RuntimeException abortOnOpenForReadWhileEvaluatingCommute(
+        final BetaObjectPool pool,
+        final BetaTransactionalObject ref){
+
+        abort(pool);
+        throw new IllegalTransactionStateException(
+            format("[%s] Can't openForRead '%s' while evaluating a commuting function",
+                config.familyName, toDebugString(ref)));
+    }
+
+    public final RuntimeException abortOnOpenForWriteWhileEvaluatingCommute(
+        final BetaObjectPool pool,
+        final BetaTransactionalObject ref){
+
+        abort(pool);
+        throw new IllegalTransactionStateException(
+            format("[%s] Can't openForWrite '%s' while evaluating a commuting function",
+                config.familyName, toDebugString(ref)));
+    }
+
+    public final RuntimeException abortOnOpenForConstructionWhileEvaluatingCommute(
+        final BetaObjectPool pool,
+        final BetaTransactionalObject ref){
+
+        abort(pool);
+        throw new IllegalTransactionStateException(
+            format("[%s] Can't openForConstruction '%s' while evaluating a commuting function",
+            config.familyName, toDebugString(ref)));
+    }
+
+    public final RuntimeException abortOnCommuteWhileEvaluatingCommute(
+        final BetaObjectPool pool,
+        BetaTransactionalObject ref){
+
+        abort(pool);
+        throw new IllegalTransactionStateException(
+            format("[%s] Can't add a commuting function to '%s' while evaluating a commuting function",
+                config.familyName, toDebugString(ref)));
+    }
+
     public final IllegalArgumentException abortOpenForConstructionWithBadReference(
         final BetaObjectPool pool, final BetaTransactionalObject ref){
 

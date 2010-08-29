@@ -28,6 +28,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     private boolean hasReads;
     private boolean hasUntrackedReads;
     private LocalConflictCounter localConflictCounter;
+    private boolean evaluatingCommute;
 #end
 
     public ${transaction.name}(final BetaStm stm){
@@ -77,10 +78,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         tranlocal.read = read;
         boolean abort = true;
+        evaluatingCommute = true;
         try{
             tranlocal.evaluateCommutingFunctions(pool);
             abort = false;
         }finally{
+            evaluatingCommute = false;
             if(abort){
                 abort(pool);
             }
@@ -95,6 +98,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOpenForRead(pool, ref);
         }
 
+#if(!${transaction.lean})
+        if(evaluatingCommute){
+            throw abortOnOpenForReadWhileEvaluatingCommute(pool, ref);
+        }
+
+#end
         if (ref == null) {
             return null;
         }
@@ -216,6 +225,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOpenForWrite(pool, ref);
         }
 
+#if(!${transaction.lean})
+        if(evaluatingCommute){
+            throw abortOnOpenForWriteWhileEvaluatingCommute(pool, ref);
+        }
+
+#end
         if (ref == null) {
             throw abortOpenForWriteWhenNullReference(pool);
         }
@@ -314,6 +329,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
            throw abortOpenForConstruction(pool, ref);
         }
 
+#if(!${transaction.lean})
+        if(evaluatingCommute){
+            throw abortOnOpenForConstructionWhileEvaluatingCommute(pool, ref);
+        }
+
+#end
         if (ref == null) {
             throw abortOpenForConstructionWhenNullReference(pool);
         }
@@ -366,6 +387,10 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         abort(pool);
         throw SpeculativeConfigurationError.INSTANCE;
 #else
+        if(evaluatingCommute){
+            throw abortOnCommuteWhileEvaluatingCommute(pool, ref);
+        }
+
         if (config.readonly) {
             throw abortCommuteWhenReadonly(pool, ref, function);
         }
@@ -836,6 +861,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         abortOnly = false;
         attached = null;
 #if(!$transaction.lean)
+        evaluatingCommute = false;
         hasReads = false;
         hasUntrackedReads = false;
         if(normalListeners!=null){
@@ -869,6 +895,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         attached = null;
         attempt = 1;
 #if(!$transaction.lean)
+        evaluatingCommute = false;
         hasReads = false;
         hasUntrackedReads = false;
         if(normalListeners !=null){

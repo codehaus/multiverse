@@ -111,42 +111,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         return read;
     }
 
-    private <E> void flattenCommute(
-        final BetaObjectPool pool,
-        final BetaRef<E> ref,
-        final RefTranlocal<E> tranlocal,
-        final boolean lock){
-
-        if(!hasReads){
-            localConflictCounter.reset();
-            hasReads = true;
-        }
-
-        final RefTranlocal<E> read = lock
-            ? ref.___lockAndLoad(config.spinCount, this)
-            : ref.___load(config.spinCount);
-
-        if (read.isLocked) {
-            throw abortOnReadConflict(pool);
-        }
-
-        //make sure that there are no conflicts.
-        if (hasReadConflict()) {
-            ref.___abort(this, read, pool);
-            throw abortOnReadConflict(pool);
-        }
-
-        tranlocal.read = read;
-        boolean abort = true;
-        try{
-            tranlocal.evaluateCommutingFunctions(pool);
-            abort = false;
-        }finally{
-            if(abort){
-                abort(pool);
-            }
-        }
-    }
 
     @Override
     public <E> RefTranlocal<E> openForWrite(
@@ -285,7 +249,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if (status != ACTIVE) {
             throw abortCommute(pool, ref, function);
         }
-        
+
         config.needsCommute();
         abort(pool);
         throw SpeculativeConfigurationError.INSTANCE;
@@ -357,42 +321,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         return read;
     }
 
-    private  void flattenCommute(
-        final BetaObjectPool pool,
-        final BetaIntRef ref,
-        final IntRefTranlocal tranlocal,
-        final boolean lock){
-
-        if(!hasReads){
-            localConflictCounter.reset();
-            hasReads = true;
-        }
-
-        final IntRefTranlocal read = lock
-            ? ref.___lockAndLoad(config.spinCount, this)
-            : ref.___load(config.spinCount);
-
-        if (read.isLocked) {
-            throw abortOnReadConflict(pool);
-        }
-
-        //make sure that there are no conflicts.
-        if (hasReadConflict()) {
-            ref.___abort(this, read, pool);
-            throw abortOnReadConflict(pool);
-        }
-
-        tranlocal.read = read;
-        boolean abort = true;
-        try{
-            tranlocal.evaluateCommutingFunctions(pool);
-            abort = false;
-        }finally{
-            if(abort){
-                abort(pool);
-            }
-        }
-    }
 
     @Override
     public  IntRefTranlocal openForWrite(
@@ -531,7 +459,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if (status != ACTIVE) {
             throw abortCommute(pool, ref, function);
         }
-        
+
         config.needsCommute();
         abort(pool);
         throw SpeculativeConfigurationError.INSTANCE;
@@ -603,42 +531,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         return read;
     }
 
-    private  void flattenCommute(
-        final BetaObjectPool pool,
-        final BetaLongRef ref,
-        final LongRefTranlocal tranlocal,
-        final boolean lock){
-
-        if(!hasReads){
-            localConflictCounter.reset();
-            hasReads = true;
-        }
-
-        final LongRefTranlocal read = lock
-            ? ref.___lockAndLoad(config.spinCount, this)
-            : ref.___load(config.spinCount);
-
-        if (read.isLocked) {
-            throw abortOnReadConflict(pool);
-        }
-
-        //make sure that there are no conflicts.
-        if (hasReadConflict()) {
-            ref.___abort(this, read, pool);
-            throw abortOnReadConflict(pool);
-        }
-
-        tranlocal.read = read;
-        boolean abort = true;
-        try{
-            tranlocal.evaluateCommutingFunctions(pool);
-            abort = false;
-        }finally{
-            if(abort){
-                abort(pool);
-            }
-        }
-    }
 
     @Override
     public  LongRefTranlocal openForWrite(
@@ -777,7 +669,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if (status != ACTIVE) {
             throw abortCommute(pool, ref, function);
         }
-        
+
         config.needsCommute();
         abort(pool);
         throw SpeculativeConfigurationError.INSTANCE;
@@ -849,42 +741,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         return read;
     }
 
-    private  void flattenCommute(
-        final BetaObjectPool pool,
-        final BetaTransactionalObject ref,
-        final Tranlocal tranlocal,
-        final boolean lock){
-
-        if(!hasReads){
-            localConflictCounter.reset();
-            hasReads = true;
-        }
-
-        final Tranlocal read = lock
-            ? ref.___lockAndLoad(config.spinCount, this)
-            : ref.___load(config.spinCount);
-
-        if (read.isLocked) {
-            throw abortOnReadConflict(pool);
-        }
-
-        //make sure that there are no conflicts.
-        if (hasReadConflict()) {
-            ref.___abort(this, read, pool);
-            throw abortOnReadConflict(pool);
-        }
-
-        tranlocal.read = read;
-        boolean abort = true;
-        try{
-            tranlocal.evaluateCommutingFunctions(pool);
-            abort = false;
-        }finally{
-            if(abort){
-                abort(pool);
-            }
-        }
-    }
 
     @Override
     public  Tranlocal openForWrite(
@@ -1014,7 +870,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if (status != ACTIVE) {
             throw abortCommute(pool, ref, function);
         }
-        
+
         config.needsCommute();
         abort(pool);
         throw SpeculativeConfigurationError.INSTANCE;

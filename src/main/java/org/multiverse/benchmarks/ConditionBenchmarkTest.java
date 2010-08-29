@@ -1,6 +1,7 @@
 package org.multiverse.benchmarks;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.locks.Condition;
@@ -24,6 +25,7 @@ public class ConditionBenchmarkTest {
     }
 
     @Test
+    @Ignore
     public void test() throws InterruptedException {
         PingPongThread[] threads = createThreads();
 

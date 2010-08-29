@@ -31,6 +31,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     private boolean hasReads;
     private boolean hasUntrackedReads;
     private LocalConflictCounter localConflictCounter;
+    private boolean evaluatingCommute;
 
     public FatMonoBetaTransaction(final BetaStm stm){
         this(new BetaTransactionConfiguration(stm));
@@ -73,10 +74,12 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         tranlocal.read = read;
         boolean abort = true;
+        evaluatingCommute = true;
         try{
             tranlocal.evaluateCommutingFunctions(pool);
             abort = false;
         }finally{
+            evaluatingCommute = false;
             if(abort){
                 abort(pool);
             }
@@ -88,6 +91,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(pool, ref);
+        }
+
+        if(evaluatingCommute){
+            throw abortOnOpenForReadWhileEvaluatingCommute(pool, ref);
         }
 
         if (ref == null) {
@@ -193,6 +200,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOpenForWrite(pool, ref);
         }
 
+        if(evaluatingCommute){
+            throw abortOnOpenForWriteWhileEvaluatingCommute(pool, ref);
+        }
+
         if (ref == null) {
             throw abortOpenForWriteWhenNullReference(pool);
         }
@@ -277,6 +288,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
            throw abortOpenForConstruction(pool, ref);
         }
 
+        if(evaluatingCommute){
+            throw abortOnOpenForConstructionWhileEvaluatingCommute(pool, ref);
+        }
+
         if (ref == null) {
             throw abortOpenForConstructionWhenNullReference(pool);
         }
@@ -318,6 +333,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         if (status != ACTIVE) {
             throw abortCommute(pool, ref, function);
+        }
+
+        if(evaluatingCommute){
+            throw abortOnCommuteWhileEvaluatingCommute(pool, ref);
         }
 
         if (config.readonly) {
@@ -390,10 +409,12 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         tranlocal.read = read;
         boolean abort = true;
+        evaluatingCommute = true;
         try{
             tranlocal.evaluateCommutingFunctions(pool);
             abort = false;
         }finally{
+            evaluatingCommute = false;
             if(abort){
                 abort(pool);
             }
@@ -405,6 +426,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(pool, ref);
+        }
+
+        if(evaluatingCommute){
+            throw abortOnOpenForReadWhileEvaluatingCommute(pool, ref);
         }
 
         if (ref == null) {
@@ -510,6 +535,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOpenForWrite(pool, ref);
         }
 
+        if(evaluatingCommute){
+            throw abortOnOpenForWriteWhileEvaluatingCommute(pool, ref);
+        }
+
         if (ref == null) {
             throw abortOpenForWriteWhenNullReference(pool);
         }
@@ -594,6 +623,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
            throw abortOpenForConstruction(pool, ref);
         }
 
+        if(evaluatingCommute){
+            throw abortOnOpenForConstructionWhileEvaluatingCommute(pool, ref);
+        }
+
         if (ref == null) {
             throw abortOpenForConstructionWhenNullReference(pool);
         }
@@ -635,6 +668,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         if (status != ACTIVE) {
             throw abortCommute(pool, ref, function);
+        }
+
+        if(evaluatingCommute){
+            throw abortOnCommuteWhileEvaluatingCommute(pool, ref);
         }
 
         if (config.readonly) {
@@ -707,10 +744,12 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         tranlocal.read = read;
         boolean abort = true;
+        evaluatingCommute = true;
         try{
             tranlocal.evaluateCommutingFunctions(pool);
             abort = false;
         }finally{
+            evaluatingCommute = false;
             if(abort){
                 abort(pool);
             }
@@ -722,6 +761,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(pool, ref);
+        }
+
+        if(evaluatingCommute){
+            throw abortOnOpenForReadWhileEvaluatingCommute(pool, ref);
         }
 
         if (ref == null) {
@@ -827,6 +870,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOpenForWrite(pool, ref);
         }
 
+        if(evaluatingCommute){
+            throw abortOnOpenForWriteWhileEvaluatingCommute(pool, ref);
+        }
+
         if (ref == null) {
             throw abortOpenForWriteWhenNullReference(pool);
         }
@@ -911,6 +958,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
            throw abortOpenForConstruction(pool, ref);
         }
 
+        if(evaluatingCommute){
+            throw abortOnOpenForConstructionWhileEvaluatingCommute(pool, ref);
+        }
+
         if (ref == null) {
             throw abortOpenForConstructionWhenNullReference(pool);
         }
@@ -952,6 +1003,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         if (status != ACTIVE) {
             throw abortCommute(pool, ref, function);
+        }
+
+        if(evaluatingCommute){
+            throw abortOnCommuteWhileEvaluatingCommute(pool, ref);
         }
 
         if (config.readonly) {
@@ -1024,10 +1079,12 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         tranlocal.read = read;
         boolean abort = true;
+        evaluatingCommute = true;
         try{
             tranlocal.evaluateCommutingFunctions(pool);
             abort = false;
         }finally{
+            evaluatingCommute = false;
             if(abort){
                 abort(pool);
             }
@@ -1039,6 +1096,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(pool, ref);
+        }
+
+        if(evaluatingCommute){
+            throw abortOnOpenForReadWhileEvaluatingCommute(pool, ref);
         }
 
         if (ref == null) {
@@ -1144,6 +1205,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOpenForWrite(pool, ref);
         }
 
+        if(evaluatingCommute){
+            throw abortOnOpenForWriteWhileEvaluatingCommute(pool, ref);
+        }
+
         if (ref == null) {
             throw abortOpenForWriteWhenNullReference(pool);
         }
@@ -1218,6 +1283,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
            throw abortOpenForConstruction(pool, ref);
         }
 
+        if(evaluatingCommute){
+            throw abortOnOpenForConstructionWhileEvaluatingCommute(pool, ref);
+        }
+
         if (ref == null) {
             throw abortOpenForConstructionWhenNullReference(pool);
         }
@@ -1256,6 +1325,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         if (status != ACTIVE) {
             throw abortCommute(pool, ref, function);
+        }
+
+        if(evaluatingCommute){
+            throw abortOnCommuteWhileEvaluatingCommute(pool, ref);
         }
 
         if (config.readonly) {
@@ -1605,6 +1678,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         attempt++;
         abortOnly = false;
         attached = null;
+        evaluatingCommute = false;
         hasReads = false;
         hasUntrackedReads = false;
         if(normalListeners!=null){
@@ -1630,6 +1704,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         remainingTimeoutNs = config.timeoutNs;
         attached = null;
         attempt = 1;
+        evaluatingCommute = false;
         hasReads = false;
         hasUntrackedReads = false;
         if(normalListeners !=null){

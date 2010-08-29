@@ -142,8 +142,6 @@ globalconflict counter.
 
     - commute: commuting functions are executed in reverse order.
 
-    - when commute function is evaluated, there should be protection against openForXXX on transaction.
-
 - rollbackfor/rollnotbackfor exception configuration
 
 - testing: atomic block & propagation and committed/aborted/prepared/new transaction on threadlocal
@@ -180,7 +178,11 @@ the task not being executed at all.
 - array tree transaction: on commit/abort the array can be nulled. no need to do it when placing in the pool
   or when initializing.
 
+- testing of transaction access while commute 
+
 done
+
+- when commute function is evaluated, there should be protection against openForXXX on transaction.
 
 - openForRead & commute and readconflict
 

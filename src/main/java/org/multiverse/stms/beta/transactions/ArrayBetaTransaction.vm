@@ -25,6 +25,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     private boolean hasReads;
     private boolean hasUpdates;
     private boolean hasUntrackedReads;
+#if(!${transaction.lean})
+    private boolean evaluatingCommute;
+#end
 
     public ${transaction.name}(final BetaStm stm) {
         this(new BetaTransactionConfiguration(stm));
@@ -51,6 +54,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOpenForRead(pool, ref);
         }
 
+#if(!${transaction.lean})
+        if(evaluatingCommute){
+            throw abortOnOpenForReadWhileEvaluatingCommute(pool, ref);
+        }
+
+#end                 
         if (ref == null) {
             return null;
         }
@@ -113,6 +122,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         return read;
     }
 
+#if(!${transaction.lean})
     private ${ref.typeParameter} void flattenCommute(
         final BetaObjectPool pool,
         final ${ref.name}${ref.typeParameter} ref,
@@ -140,15 +150,18 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         tranlocal.read = read;
         boolean abort = true;
+        evaluatingCommute = true;
         try{
             tranlocal.evaluateCommutingFunctions(pool);
             abort = false;
         }finally{
+            evaluatingCommute = false;
             if(abort){
                 abort(pool);
             }
         }
     }
+#end    
 
     @Override
     public ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForWrite(
@@ -158,6 +171,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
            throw abortOpenForWrite(pool, ref);
         }
 
+#if(!${transaction.lean})
+        if(evaluatingCommute){
+            throw abortOnOpenForWriteWhileEvaluatingCommute(pool, ref);
+        }
+
+#end
         if (config.readonly) {
             throw abortOpenForWriteWhenReadonly(pool, ref);
         }
@@ -256,6 +275,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOpenForConstruction(pool, ref);
         }
 
+#if(!${transaction.lean})
+        if(evaluatingCommute){
+            throw abortOnOpenForConstructionWhileEvaluatingCommute(pool, ref);
+        }
+
+#end
         if (config.readonly) {
             throw abortOpenForConstructionWhenReadonly(pool, ref);
         }
@@ -312,12 +337,16 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         if (status != ACTIVE) {
             throw abortCommute(pool, ref, function);
         }
-        
+
 #if($transaction.lean)
         config.needsCommute();
         abort(pool);
         throw SpeculativeConfigurationError.INSTANCE;
-#else    
+#else
+        if(evaluatingCommute){
+            throw abortOnCommuteWhileEvaluatingCommute(pool, ref);
+        }
+
         if (config.readonly) {
             throw abortCommuteWhenReadonly(pool, ref, function);
         }
@@ -913,6 +942,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         hasUntrackedReads = false;
         hasUpdates = false;
 #if(!$transaction.lean)
+        evaluatingCommute = false;
         if(normalListeners != null){
             normalListeners.clear();
         }
@@ -939,6 +969,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         firstFreeIndex = 0;
         remainingTimeoutNs = config.timeoutNs;        
 #if(!$transaction.lean)
+        evaluatingCommute = false;
         if(normalListeners !=null){
             pool.putArrayList(normalListeners);
             normalListeners = null;
