@@ -6,17 +6,21 @@ import org.junit.Test;
 import org.multiverse.TestUtils;
 import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.beta.transactions.FatArrayTreeBetaTransaction;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.getField;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
-public class LongRef_registerRetryLatchTest implements BetaStmConstants {
+public class LongRef_registerChangeListenerTest implements BetaStmConstants {
     private BetaStm stm;
     private BetaObjectPool pool;
 
@@ -24,6 +28,25 @@ public class LongRef_registerRetryLatchTest implements BetaStmConstants {
     public void setUp() {
         stm = new BetaStm();
         pool = new BetaObjectPool();
+    }
+
+    @Test
+    public void whenCommuting() {
+        BetaLongRef ref = createLongRef(stm, 0);
+
+        LongFunction function = mock(LongFunction.class);
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        tx.commute(ref, pool, function);
+
+        Latch latch = new CheapLatch();
+        long listenerEra = latch.getEra();
+        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        int result = ref.___registerChangeListener(latch, tranlocal, pool, listenerEra);
+
+        assertEquals(REGISTRATION_NONE, result);
+        assertNull(getField(ref, "___listeners"));
+        assertFalse(latch.isOpen());
+        verifyZeroInteractions(function);
     }
 
     @Test

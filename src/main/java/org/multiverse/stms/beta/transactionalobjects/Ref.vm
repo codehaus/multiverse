@@ -447,6 +447,10 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final BetaObjectPool pool,
         final long listenerEra){
 
+        if(tranlocal.isCommuting){
+            return REGISTRATION_NONE;
+        }
+
         final Tranlocal read = tranlocal.isCommitted ? tranlocal:tranlocal.read;
 
         if(read == null){

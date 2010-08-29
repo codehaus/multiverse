@@ -1543,11 +1543,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         final long listenerEra = listener.getEra();
         final BetaTransactionalObject owner = attached.owner;
 
-        boolean failure = true;
-        if(!attached.isCommuting){
-            failure = owner.___registerChangeListener(listener, attached, pool, listenerEra)
+        final boolean failure = owner.___registerChangeListener(listener, attached, pool, listenerEra)
                     == REGISTRATION_NONE;
-        }
         owner.___abort(this, attached, pool);
         status = ABORTED;
 
@@ -1640,8 +1637,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             normalListeners = null;
         }
     }
-
-    // ================== orelse ============================
 
     // ================== orelse ============================
 

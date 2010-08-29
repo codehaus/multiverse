@@ -1576,7 +1576,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 if(tranlocal != null){
                     final BetaTransactionalObject owner = tranlocal.owner;
 
-                    if(furtherRegistrationNeeded && !tranlocal.isCommuting){
+                    if(furtherRegistrationNeeded){
                         switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
                             case REGISTRATION_DONE:
                                 atLeastOneRegistration = true;

@@ -180,11 +180,14 @@ the task not being executed at all.
 - array tree transaction: on commit/abort the array can be nulled. no need to do it when placing in the pool
   or when initializing.
 
+done
+
 - openForRead & commute and readconflict
 
 - openForWrite & commute and readconflict
 
-done
+- cleaned up registerChangeListener and abort, logic for what type of registration is now completely
+  in the ref itself.
 
  - when a commuting function fails, the transaction should be aborted.
    

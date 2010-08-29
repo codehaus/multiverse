@@ -540,7 +540,7 @@ public class FatArrayBetaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenHasCommutingFunctions() {
+    public void comute_whenHasCommutingFunctions() {
         BetaLongRef ref = createLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
@@ -566,7 +566,7 @@ public class FatArrayBetaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenHasCommutingFunctionsAndLocked() {
+    public void commute_whenHasCommutingFunctionsAndLocked() {
         BetaLongRef ref = createLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
@@ -593,7 +593,40 @@ public class FatArrayBetaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenCommuteAvailableThatCausesProblems_thenAbort() {
+    public void commute_whenCommuteConflicts_thenAborted() {
+        BetaLongRef ref1 = createLongRef(stm, 10);
+        BetaLongRef ref2 = createLongRef(stm, 10);
+
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        tx.openForRead(ref1, false, pool);
+        LongFunction function = mock(LongFunction.class);
+        tx.commute(ref2, pool, function);
+
+        FatArrayBetaTransaction otherTx = new FatArrayBetaTransaction(stm);
+        otherTx.openForWrite(ref1, true, pool).value++;
+        otherTx.commit();
+
+        try {
+            tx.openForRead(ref2, false, pool);
+            fail();
+        } catch (ReadConflict expected) {
+
+        }
+
+        assertAborted(tx);
+        assertNull(ref1.___getLockOwner());
+        assertUnlocked(ref1);
+        assertSurplus(0, ref1);
+        assertUpdateBiased(ref1);
+
+        assertNull(ref2.___getLockOwner());
+        assertUnlocked(ref2);
+        assertSurplus(0, ref2);
+        assertUpdateBiased(ref2);
+    }
+
+    @Test
+    public void commute_whenCommuteAvailableThatCausesProblems_thenAbort() {
         BetaLongRef ref = createLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
@@ -620,7 +653,7 @@ public class FatArrayBetaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenCommuteAvailableThatCausesProblemsAndLock_thenAbort() {
+    public void commute_whenCommuteAvailableThatCausesProblemsAndLock_thenAbort() {
         BetaLongRef ref = createLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 

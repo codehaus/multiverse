@@ -361,7 +361,7 @@ public class FatMonoBetaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenHasCommutingFunctions() {
+    public void commute_whenHasCommutingFunctions() {
         BetaLongRef ref = createLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
@@ -387,7 +387,7 @@ public class FatMonoBetaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenHasCommutingFunctionsAndLocked_thenReadConflict() {
+    public void commute_whenHasCommutingFunctionsAndLocked_thenReadConflict() {
         BetaLongRef ref = createLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
@@ -414,7 +414,7 @@ public class FatMonoBetaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenCommuteAvailableThatCausesProblems_thenAbort() {
+    public void commute_whenCommuteAvailableThatCausesProblems_thenAbort() {
         BetaLongRef ref = createLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
@@ -441,7 +441,7 @@ public class FatMonoBetaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenCommuteAvailableThatCausesProblemsAndLock_thenAbort() {
+    public void commute_whenCommuteAvailableThatCausesProblemsAndLock_thenAbort() {
         BetaLongRef ref = createLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
