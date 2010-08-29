@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.integrationtest.pessimistic;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.exceptions.ReadConflict;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
@@ -20,6 +21,57 @@ public class PessimisticTest {
     public void setUp() {
         stm = new BetaStm();
         pool = new BetaObjectPool();
+    }
+
+    @Test
+    public void constructedObjectAutomaticallyIsLocked() {
+        BetaTransaction tx = stm.startDefaultTransaction();
+        BetaLongRef ref = new BetaLongRef(tx);
+        tx.openForConstruction(ref,pool);
+
+        assertSame(tx, ref.___getLockOwner());
+    }
+
+    @Test
+    public void pessimisticWriteLevelOverridesOpenForWriteButNotLocked() {
+        BetaLongRef ref = createLongRef(stm);
+
+        BetaTransaction tx = stm.getTransactionFactoryBuilder()
+                .setPessimisticLockLevel(PessimisticLockLevel.Write)
+                .build()
+                .start();
+
+        tx.openForWrite(ref, false, pool);
+
+        assertSame(tx, ref.___getLockOwner());
+    }
+
+    @Test
+    public void whenPessimisticWriteLevelUsed_readIsNotLocked() {
+        BetaLongRef ref = createLongRef(stm);
+
+        BetaTransaction tx = stm.getTransactionFactoryBuilder()
+                .setPessimisticLockLevel(PessimisticLockLevel.Write)
+                .build()
+                .start();
+
+        tx.openForRead(ref, false, pool);
+
+        assertNull(ref.___getLockOwner());
+    }
+
+    @Test
+    public void pessimisticReadLevelOverridesOpenForReadButNotLocked() {
+        BetaLongRef ref = createLongRef(stm);
+
+        BetaTransaction tx = stm.getTransactionFactoryBuilder()
+                .setPessimisticLockLevel(PessimisticLockLevel.Read)
+                .build()
+                .start();
+
+        tx.openForRead(ref, false, pool);
+
+        assertSame(tx, ref.___getLockOwner());
     }
 
     @Test
