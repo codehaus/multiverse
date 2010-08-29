@@ -38,6 +38,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
     }
 
 
+
     @Override
     public final <E> RefTranlocal<E> openForRead(final BetaRef<E> ref,  boolean lock, final BetaObjectPool pool) {
 
@@ -233,6 +234,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         abort(pool);
         throw SpeculativeConfigurationError.INSTANCE;
      }
+
 
     @Override
     public final  IntRefTranlocal openForRead(final BetaIntRef ref,  boolean lock, final BetaObjectPool pool) {
@@ -430,6 +432,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
+
     @Override
     public final  LongRefTranlocal openForRead(final BetaLongRef ref,  boolean lock, final BetaObjectPool pool) {
 
@@ -625,6 +628,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         abort(pool);
         throw SpeculativeConfigurationError.INSTANCE;
      }
+
 
     @Override
     public final  Tranlocal openForRead(final BetaTransactionalObject ref,  boolean lock, final BetaObjectPool pool) {

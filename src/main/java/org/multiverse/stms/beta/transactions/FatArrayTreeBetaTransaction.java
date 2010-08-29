@@ -58,6 +58,43 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
     }
 
 
+    private <E> void flattenCommute(
+        final BetaObjectPool pool,
+        final BetaRef<E> ref,
+        final RefTranlocal<E> tranlocal,
+        final boolean lock){
+
+        if(!hasReads){
+            localConflictCounter.reset();
+            hasReads = true;
+        }
+
+        final RefTranlocal<E> read = lock
+            ? ref.___lockAndLoad(config.spinCount, this)
+            : ref.___load(config.spinCount);
+
+        if (read.isLocked) {
+            throw abortOnReadConflict(pool);
+        }
+
+        //make sure that there are no conflicts.
+        if (hasReadConflict()) {
+            ref.___abort(this, read, pool);
+            throw abortOnReadConflict(pool);
+        }
+
+        tranlocal.read = read;
+        boolean abort = true;
+        try{
+            tranlocal.evaluateCommutingFunctions(pool);
+            abort = false;
+        }finally{
+            if(abort){
+                abort(pool);
+            }
+        }
+    }
+
     @Override
     public <E> RefTranlocal<E> openForRead(
         final BetaRef<E> ref, boolean lock, final BetaObjectPool pool) {
@@ -79,27 +116,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
 
             if(found.isCommuting){
-                if(!hasReads){
-                    localConflictCounter.reset();
-                    hasReads = true;
-                }
-
-                final RefTranlocal<E> read = lock
-                    ? ref.___lockAndLoad(config.spinCount, this)
-                    : ref.___load(config.spinCount);
-
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                //make sure that there are no conflicts.
-                if (hasReadConflict()) {
-                    ref.___abort(this, read, pool);
-                    throw abortOnReadConflict(pool);
-                }
-
-                found.read = read;
-                found.evaluateCommutingFunctions(pool);
+                flattenCommute(pool, ref, found, lock);
             }else
             if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,found)){
                 throw abortOnReadConflict(pool);
@@ -163,26 +180,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             RefTranlocal<E> result = (RefTranlocal<E>)array[index];
 
             if(result.isCommuting){
-                if(!hasReads){
-                    localConflictCounter.reset();
-                    hasReads = true;
-                }
-
-                final RefTranlocal<E> read = lock
-                    ? ref.___lockAndLoad(config.spinCount, this)
-                    : ref.___load(config.spinCount);
-
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                if (hasReadConflict()) {
-                    ref.___abort(this, read, pool);
-                    throw abortOnReadConflict(pool);
-                }
-
-                result.read = read;
-                result.evaluateCommutingFunctions(pool);
+                flattenCommute(pool, ref, result, lock);
                 return result;
             }else
             if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,result)){
@@ -331,6 +329,43 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
 
 
+    private  void flattenCommute(
+        final BetaObjectPool pool,
+        final BetaIntRef ref,
+        final IntRefTranlocal tranlocal,
+        final boolean lock){
+
+        if(!hasReads){
+            localConflictCounter.reset();
+            hasReads = true;
+        }
+
+        final IntRefTranlocal read = lock
+            ? ref.___lockAndLoad(config.spinCount, this)
+            : ref.___load(config.spinCount);
+
+        if (read.isLocked) {
+            throw abortOnReadConflict(pool);
+        }
+
+        //make sure that there are no conflicts.
+        if (hasReadConflict()) {
+            ref.___abort(this, read, pool);
+            throw abortOnReadConflict(pool);
+        }
+
+        tranlocal.read = read;
+        boolean abort = true;
+        try{
+            tranlocal.evaluateCommutingFunctions(pool);
+            abort = false;
+        }finally{
+            if(abort){
+                abort(pool);
+            }
+        }
+    }
+
     @Override
     public  IntRefTranlocal openForRead(
         final BetaIntRef ref, boolean lock, final BetaObjectPool pool) {
@@ -352,27 +387,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
 
             if(found.isCommuting){
-                if(!hasReads){
-                    localConflictCounter.reset();
-                    hasReads = true;
-                }
-
-                final IntRefTranlocal read = lock
-                    ? ref.___lockAndLoad(config.spinCount, this)
-                    : ref.___load(config.spinCount);
-
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                //make sure that there are no conflicts.
-                if (hasReadConflict()) {
-                    ref.___abort(this, read, pool);
-                    throw abortOnReadConflict(pool);
-                }
-
-                found.read = read;
-                found.evaluateCommutingFunctions(pool);
+                flattenCommute(pool, ref, found, lock);
             }else
             if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,found)){
                 throw abortOnReadConflict(pool);
@@ -436,26 +451,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             IntRefTranlocal result = (IntRefTranlocal)array[index];
 
             if(result.isCommuting){
-                if(!hasReads){
-                    localConflictCounter.reset();
-                    hasReads = true;
-                }
-
-                final IntRefTranlocal read = lock
-                    ? ref.___lockAndLoad(config.spinCount, this)
-                    : ref.___load(config.spinCount);
-
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                if (hasReadConflict()) {
-                    ref.___abort(this, read, pool);
-                    throw abortOnReadConflict(pool);
-                }
-
-                result.read = read;
-                result.evaluateCommutingFunctions(pool);
+                flattenCommute(pool, ref, result, lock);
                 return result;
             }else
             if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,result)){
@@ -604,6 +600,43 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
 
 
+    private  void flattenCommute(
+        final BetaObjectPool pool,
+        final BetaLongRef ref,
+        final LongRefTranlocal tranlocal,
+        final boolean lock){
+
+        if(!hasReads){
+            localConflictCounter.reset();
+            hasReads = true;
+        }
+
+        final LongRefTranlocal read = lock
+            ? ref.___lockAndLoad(config.spinCount, this)
+            : ref.___load(config.spinCount);
+
+        if (read.isLocked) {
+            throw abortOnReadConflict(pool);
+        }
+
+        //make sure that there are no conflicts.
+        if (hasReadConflict()) {
+            ref.___abort(this, read, pool);
+            throw abortOnReadConflict(pool);
+        }
+
+        tranlocal.read = read;
+        boolean abort = true;
+        try{
+            tranlocal.evaluateCommutingFunctions(pool);
+            abort = false;
+        }finally{
+            if(abort){
+                abort(pool);
+            }
+        }
+    }
+
     @Override
     public  LongRefTranlocal openForRead(
         final BetaLongRef ref, boolean lock, final BetaObjectPool pool) {
@@ -625,27 +658,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
 
             if(found.isCommuting){
-                if(!hasReads){
-                    localConflictCounter.reset();
-                    hasReads = true;
-                }
-
-                final LongRefTranlocal read = lock
-                    ? ref.___lockAndLoad(config.spinCount, this)
-                    : ref.___load(config.spinCount);
-
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                //make sure that there are no conflicts.
-                if (hasReadConflict()) {
-                    ref.___abort(this, read, pool);
-                    throw abortOnReadConflict(pool);
-                }
-
-                found.read = read;
-                found.evaluateCommutingFunctions(pool);
+                flattenCommute(pool, ref, found, lock);
             }else
             if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,found)){
                 throw abortOnReadConflict(pool);
@@ -709,26 +722,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             LongRefTranlocal result = (LongRefTranlocal)array[index];
 
             if(result.isCommuting){
-                if(!hasReads){
-                    localConflictCounter.reset();
-                    hasReads = true;
-                }
-
-                final LongRefTranlocal read = lock
-                    ? ref.___lockAndLoad(config.spinCount, this)
-                    : ref.___load(config.spinCount);
-
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                if (hasReadConflict()) {
-                    ref.___abort(this, read, pool);
-                    throw abortOnReadConflict(pool);
-                }
-
-                result.read = read;
-                result.evaluateCommutingFunctions(pool);
+                flattenCommute(pool, ref, result, lock);
                 return result;
             }else
             if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,result)){
@@ -877,6 +871,43 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
 
 
+    private  void flattenCommute(
+        final BetaObjectPool pool,
+        final BetaTransactionalObject ref,
+        final Tranlocal tranlocal,
+        final boolean lock){
+
+        if(!hasReads){
+            localConflictCounter.reset();
+            hasReads = true;
+        }
+
+        final Tranlocal read = lock
+            ? ref.___lockAndLoad(config.spinCount, this)
+            : ref.___load(config.spinCount);
+
+        if (read.isLocked) {
+            throw abortOnReadConflict(pool);
+        }
+
+        //make sure that there are no conflicts.
+        if (hasReadConflict()) {
+            ref.___abort(this, read, pool);
+            throw abortOnReadConflict(pool);
+        }
+
+        tranlocal.read = read;
+        boolean abort = true;
+        try{
+            tranlocal.evaluateCommutingFunctions(pool);
+            abort = false;
+        }finally{
+            if(abort){
+                abort(pool);
+            }
+        }
+    }
+
     @Override
     public  Tranlocal openForRead(
         final BetaTransactionalObject ref, boolean lock, final BetaObjectPool pool) {
@@ -898,27 +929,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
 
             if(found.isCommuting){
-                if(!hasReads){
-                    localConflictCounter.reset();
-                    hasReads = true;
-                }
-
-                final Tranlocal read = lock
-                    ? ref.___lockAndLoad(config.spinCount, this)
-                    : ref.___load(config.spinCount);
-
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                //make sure that there are no conflicts.
-                if (hasReadConflict()) {
-                    ref.___abort(this, read, pool);
-                    throw abortOnReadConflict(pool);
-                }
-
-                found.read = read;
-                found.evaluateCommutingFunctions(pool);
+                flattenCommute(pool, ref, found, lock);
             }else
             if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,found)){
                 throw abortOnReadConflict(pool);
@@ -982,26 +993,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             Tranlocal result = (Tranlocal)array[index];
 
             if(result.isCommuting){
-                if(!hasReads){
-                    localConflictCounter.reset();
-                    hasReads = true;
-                }
-
-                final Tranlocal read = lock
-                    ? ref.___lockAndLoad(config.spinCount, this)
-                    : ref.___load(config.spinCount);
-
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                if (hasReadConflict()) {
-                    ref.___abort(this, read, pool);
-                    throw abortOnReadConflict(pool);
-                }
-
-                result.read = read;
-                result.evaluateCommutingFunctions(pool);
+                flattenCommute(pool, ref, result, lock);
                 return result;
             }else
             if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,result)){

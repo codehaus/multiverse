@@ -19,6 +19,8 @@ import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 
 import static junit.framework.Assert.assertSame;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
@@ -446,10 +448,59 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
     }
 
     @Test
-    @Ignore
-    public void whenHasCommutingFunctionAndCommutingFunctionThrowsException() {
+    public void whenCommuteAvailableThatCausesProblems_thenAbort() {
+        BetaLongRef ref = createLongRef(stm, 10);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        LongFunction function = mock(LongFunction.class);
+        RuntimeException exception = new RuntimeException();
+        when(function.call(10)).thenThrow(exception);
+
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        tx.commute(ref, pool, function);
+
+        try {
+            tx.openForWrite(ref, false, pool);
+            fail();
+        } catch (RuntimeException e) {
+            assertSame(exception, e);
+        }
+
+        assertAborted(tx);
+        assertSurplus(0, ref);
+        assertUpdateBiased(ref);
+        assertUnlocked(ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
     }
 
+    @Test
+    public void whenCommuteAvailableThatCausesProblemsAndLock_thenAbort() {
+        BetaLongRef ref = createLongRef(stm, 10);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        LongFunction function = mock(LongFunction.class);
+        RuntimeException exception = new RuntimeException();
+        when(function.call(10)).thenThrow(exception);
+
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        tx.commute(ref, pool, function);
+
+        try {
+            tx.openForWrite(ref, true, pool);
+            fail();
+        } catch (RuntimeException e) {
+            assertSame(exception, e);
+        }
+
+        assertAborted(tx);
+        assertSurplus(0, ref);
+        assertUpdateBiased(ref);
+        assertUnlocked(ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+    }
+    
     @Test
     public void conflictCounterIsSetAtFirstWrite() {
         BetaLongRef ref = createLongRef(stm, 10);

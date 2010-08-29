@@ -49,6 +49,45 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end
 
 #foreach($ref in $transactionalObjects)
+
+#if(!${transaction.lean})
+    private ${ref.typeParameter} void flattenCommute(
+        final BetaObjectPool pool,
+        final ${ref.name}${ref.typeParameter} ref,
+        final ${ref.tranlocal}${ref.typeParameter} tranlocal,
+        final boolean lock){
+
+        if(!hasReads){
+            localConflictCounter.reset();
+            hasReads = true;
+        }
+
+        final ${ref.tranlocal}${ref.typeParameter} read = lock
+            ? ref.___lockAndLoad(config.spinCount, this)
+            : ref.___load(config.spinCount);
+
+        if (read.isLocked) {
+            throw abortOnReadConflict(pool);
+        }
+
+        if (hasReadConflict()) {
+            ref.___abort(this, read, pool);
+            throw abortOnReadConflict(pool);
+        }
+
+        tranlocal.read = read;
+        boolean abort = true;
+        try{
+            tranlocal.evaluateCommutingFunctions(pool);
+            abort = false;
+        }finally{
+            if(abort){
+                abort(pool);
+            }
+        }
+    }
+
+#end
     @Override
     public final ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForRead(final ${ref.name}${ref.typeParameter} ref,  boolean lock, final BetaObjectPool pool) {
 
@@ -123,26 +162,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
 #if(!$transaction.lean)
             if(result.isCommuting){
-                if(!hasReads){
-                    localConflictCounter.reset();
-                    hasReads = true;
-                }
-
-                final ${ref.tranlocal}${ref.typeParameter} read = lock
-                    ? ref.___lockAndLoad(config.spinCount, this)
-                    : ref.___load(config.spinCount);
-
-                if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
-                }
-
-                if (hasReadConflict()) {
-                    ref.___abort(this, read, pool);
-                    throw abortOnReadConflict(pool);
-                }
-
-                result.read = read;
-                result.evaluateCommutingFunctions(pool);
+                flattenCommute(pool, ref, result, lock);
                 return result;
             }else
 #end
@@ -258,26 +278,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
 #if(!$transaction.lean)
         if(result.isCommuting){
-            if(!hasReads){
-                localConflictCounter.reset();
-                hasReads = true;
-            }
-
-            final ${ref.tranlocal}${ref.typeParameter} read = lock
-                ? ref.___lockAndLoad(config.spinCount, this)
-                : ref.___load(config.spinCount);
-
-            if (read.isLocked) {
-                throw abortOnReadConflict(pool);
-            }
-
-            if (hasReadConflict()) {
-                ref.___abort(this, read, pool);
-                throw abortOnReadConflict(pool);
-            }
-
-            result.read = read;
-            result.evaluateCommutingFunctions(pool);
+            flattenCommute(pool, ref, result, lock);
             return result;
         }else
 #end

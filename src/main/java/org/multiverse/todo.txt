@@ -138,8 +138,6 @@ globalconflict counter.
 
 - commute
 
-    - when a commuting function fails, the transaction should be aborted.
-
     - the nodes for the commute functions need to be pooled.
 
     - commute: commuting functions are executed in reverse order.
@@ -169,8 +167,6 @@ the task not being executed at all.
 
 - abort commute on nullpointer function
 
-- problem with PessimisticLock.Write and commitDirty since the dirty flag is not set (and no changes written).
-
 - commit barriers
 
 - get without arguments needs to be exposed in ref
@@ -179,7 +175,26 @@ the task not being executed at all.
 
 - alter needs to be exposed in ref.
 
+- array transaction: on commit/abort the array can be nulled. no need to do it when placing in the pool
+
+- array tree transaction: on commit/abort the array can be nulled. no need to do it when placing in the pool
+  or when initializing.
+
+- openForRead & commute and readconflict
+
+- openForWrite & commute and readconflict
+
 done
+
+ - when a commuting function fails, the transaction should be aborted.
+   
+- mono transaction: simplify openForRead & commute
+
+- array tree transaction: simplified openForRead & commute
+
+- array transaction: simplified openForRead & commute
+
+- problem with PessimisticLock.Write and commitDirty since the dirty flag is not set (and no changes written).
 
 - registerAndAbort: doesn't deal with commuting values correctly. it sees it as a correct read
 
