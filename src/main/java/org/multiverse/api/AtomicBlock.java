@@ -1,5 +1,6 @@
 package org.multiverse.api;
 
+import org.multiverse.MultiverseConstants;
 import org.multiverse.api.closures.*;
 
 /**
@@ -15,7 +16,7 @@ import org.multiverse.api.closures.*;
 *
 * @author Peter Veentjer.
 */
-public interface AtomicBlock {
+public interface AtomicBlock extends MultiverseConstants{
 
    /**
     * Returns the TransactionFactory that is used by this AtomicBlock to create Transactions used inside.

@@ -33,7 +33,7 @@ public class BetaAtomicBlock_integrationTest {
     public void whenRead() {
         final BetaLongRef ref = createLongRef(stm, 10);
 
-        AtomicBlock block = stm.getTransactionFactoryBuilder().buildAtomicBlock();
+        AtomicBlock block = stm.createTransactionFactoryBuilder().buildAtomicBlock();
         long result = block.execute(new AtomicLongClosure() {
             @Override
             public long execute(Transaction tx) throws Exception {
@@ -49,7 +49,7 @@ public class BetaAtomicBlock_integrationTest {
     public void whenUpdate() {
         final BetaLongRef ref = createLongRef(stm, 0);
 
-        AtomicBlock block = stm.getTransactionFactoryBuilder().buildAtomicBlock();
+        AtomicBlock block = stm.createTransactionFactoryBuilder().buildAtomicBlock();
         block.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
@@ -69,7 +69,7 @@ public class BetaAtomicBlock_integrationTest {
         otherTx.openForWrite(ref, true, pool);
 
         try {
-            AtomicBlock block = stm.getTransactionFactoryBuilder()
+            AtomicBlock block = stm.createTransactionFactoryBuilder()
                     .setMaxRetries(100)
                     .buildAtomicBlock();
 
@@ -90,7 +90,7 @@ public class BetaAtomicBlock_integrationTest {
     public void whenMultipleUpdatesDoneInSingleTransaction() {
         final BetaLongRef ref = BetaStmUtils.createLongRef(stm);
 
-        AtomicBlock block = stm.getTransactionFactoryBuilder().buildAtomicBlock();
+        AtomicBlock block = stm.createTransactionFactoryBuilder().buildAtomicBlock();
         block.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {

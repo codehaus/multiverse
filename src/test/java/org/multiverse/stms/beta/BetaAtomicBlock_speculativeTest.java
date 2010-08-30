@@ -42,7 +42,7 @@ public class BetaAtomicBlock_speculativeTest {
         final List<BetaTransaction> transactions = new LinkedList<BetaTransaction>();
         final AtomicInteger attempt = new AtomicInteger(1);
 
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(true)
                 .buildAtomicBlock();
 
@@ -77,7 +77,7 @@ public class BetaAtomicBlock_speculativeTest {
         final AtomicBoolean added = new AtomicBoolean();
         final TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
 
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(true)
                 .buildAtomicBlock();
 
@@ -103,7 +103,7 @@ public class BetaAtomicBlock_speculativeTest {
         final BetaLongRef ref = createLongRef(stm);
         final LongFunction function = mock(LongFunction.class);
 
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(true)
                 .buildAtomicBlock();
 
@@ -127,7 +127,7 @@ public class BetaAtomicBlock_speculativeTest {
         final AtomicBoolean added = new AtomicBoolean();
         final TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
 
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(true)
                 .buildAtomicBlock();
 
@@ -162,7 +162,7 @@ public class BetaAtomicBlock_speculativeTest {
 
         final List<BetaTransaction> transactions = new LinkedList<BetaTransaction>();
 
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setTimeoutNs(1000)
                 .setSpeculativeConfigEnabled(true)
                 .buildAtomicBlock();

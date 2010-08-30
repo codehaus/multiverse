@@ -3,6 +3,7 @@ package org.multiverse.stms.beta;
 import org.multiverse.api.*;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.closures.*;
+import org.multiverse.sensors.*;
 import org.multiverse.stms.beta.transactions.*;
 
 import static java.lang.String.format;
@@ -209,21 +210,23 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
 #end
                     } catch (Retry e) {
                         waitForChange(pool, tx);
-                        abort = false;
                     } catch (SpeculativeConfigurationError e) {
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx, pool);
                         pool.putBetaTransaction(old);
-                        abort = false;
                     } catch (ReadConflict e) {
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                        abort = false;
                     } catch (WriteConflict e) {
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                        abort = false;
                     }
                 } while (tx.softReset(pool));
             } finally {
+                if(___ProfilingEnabled){
+                    SimpleProfiler profiler = transactionConfiguration.simpleProfiler;
+                    TransactionSensor counter = profiler.getTransactionSensor(transactionConfiguration);
+                    counter.signalExecution(tx.getAttempt(), !abort);
+                }
+
                 if (abort) {
                     tx.abort(pool);
                 }

@@ -120,8 +120,8 @@ public class StackWithCapacityStressTest {
     class Stack<E> {
         private final BetaRef<Node<E>> head = createRef(stm);
         private final BetaIntRef size = createIntRef(stm);
-        private final AtomicBlock pushBlock = stm.getTransactionFactoryBuilder().buildAtomicBlock();
-        private final AtomicBlock popBlock = stm.getTransactionFactoryBuilder().buildAtomicBlock();
+        private final AtomicBlock pushBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
+        private final AtomicBlock popBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
 
         public void push(final E item) {
             pushBlock.execute(new AtomicVoidClosure() {

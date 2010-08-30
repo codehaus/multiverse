@@ -73,14 +73,14 @@ public class ConnectionPoolStressTest {
     }
 
     class ConnectionPool {
-        final AtomicBlock takeConnectionBlock = stm.getTransactionFactoryBuilder()
+        final AtomicBlock takeConnectionBlock = stm.createTransactionFactoryBuilder()
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
 
-        final AtomicBlock returnConnectionBlock = stm.getTransactionFactoryBuilder()
+        final AtomicBlock returnConnectionBlock = stm.createTransactionFactoryBuilder()
                 .buildAtomicBlock();
 
-        final AtomicBlock sizeBlock = stm.getTransactionFactoryBuilder().buildAtomicBlock();
+        final AtomicBlock sizeBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
 
         final BetaIntRef size = createIntRef(stm);
         final BetaRef<Node<Connection>> head = createRef(stm);

@@ -112,12 +112,12 @@ public class ReadCommittedStressTest {
                 }
             };
 
-            AtomicBlock readonlyReadtrackingBlock = stm.getTransactionFactoryBuilder()
+            AtomicBlock readonlyReadtrackingBlock = stm.createTransactionFactoryBuilder()
                     .setReadonly(true)
                     .setReadTrackingEnabled(true)
                     .buildAtomicBlock();
 
-            AtomicBlock updateReadtrackingBlock = stm.getTransactionFactoryBuilder()
+            AtomicBlock updateReadtrackingBlock = stm.createTransactionFactoryBuilder()
                     .setReadonly(false)
                     .setReadTrackingEnabled(true)
                     .buildAtomicBlock();

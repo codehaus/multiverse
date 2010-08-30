@@ -75,7 +75,7 @@ public class AntWorldBenchmark {
 
             final BetaObjectPool pool = new BetaObjectPool();
 
-            AtomicBlock block = stm.getTransactionFactoryBuilder()
+            AtomicBlock block = stm.createTransactionFactoryBuilder()
                     .setBlockingAllowed(false)
                     .setReadonly(true)
                     .setReadTrackingEnabled(false)

@@ -140,7 +140,7 @@ public class AccountBenchmark {
 
         @Override
         public void run() {
-            AtomicBlock addInterestBlock = stm.getTransactionFactoryBuilder()
+            AtomicBlock addInterestBlock = stm.createTransactionFactoryBuilder()
                     .buildAtomicBlock();
 
             AtomicVoidClosure addInterestClosure = new AtomicVoidClosure() {
@@ -155,7 +155,7 @@ public class AccountBenchmark {
                 }
             };
 
-            AtomicBlock computeTotalBlock = stm.getTransactionFactoryBuilder()
+            AtomicBlock computeTotalBlock = stm.createTransactionFactoryBuilder()
                     .setReadonly(true)
                     .buildAtomicBlock();
 
@@ -171,7 +171,7 @@ public class AccountBenchmark {
                 }
             };
 
-            AtomicBlock transferBlock = stm.getTransactionFactoryBuilder()
+            AtomicBlock transferBlock = stm.createTransactionFactoryBuilder()
                     .buildAtomicBlock();
 
             AtomicVoidClosure transferClosure = new AtomicVoidClosure() {

@@ -16,9 +16,12 @@ import static java.lang.System.getProperty;
  */
 public interface MultiverseConstants {
 
-    boolean ___BUGSHAKER_ENABLED =
+    boolean ___BugshakerEnabled =
             parseBoolean(getProperty("org.multiverse.bugshaker.enabled", "false"));
 
-    boolean ___TRACING_ENABLED =
+    boolean ___TracingEnabled =
             parseBoolean(getProperty("org.multiverse.tracing.enabled", "false"));
+
+    boolean ___ProfilingEnabled =
+            parseBoolean(getProperty("org.multiverse.profiling.enabled", "false"));
 }

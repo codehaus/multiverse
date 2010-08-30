@@ -17,7 +17,7 @@ public class BetaStm_transactionFactoryValidationTest {
 
     @Test
     public void whenBlockingEnabled_thenAutomaticReadTrackingShouldBeEnabled() {
-        BetaTransactionFactoryBuilder builder = stm.getTransactionFactoryBuilder()
+        BetaTransactionFactoryBuilder builder = stm.createTransactionFactoryBuilder()
                 .setReadTrackingEnabled(false)
                 .setBlockingAllowed(true);
 
@@ -30,7 +30,7 @@ public class BetaStm_transactionFactoryValidationTest {
 
     @Test
     public void whenWriteSkewAllowed_thenAutomaticReadTrackingShouldBeEnabled() {
-        BetaTransactionFactoryBuilder builder = stm.getTransactionFactoryBuilder()
+        BetaTransactionFactoryBuilder builder = stm.createTransactionFactoryBuilder()
                 .setReadonly(false)
                 .setReadTrackingEnabled(false)
                 .setWriteSkewAllowed(false);
@@ -49,7 +49,7 @@ public class BetaStm_transactionFactoryValidationTest {
     }
 
     private void whenWriteSkewAllowedAndReadonly(boolean readTrackingEnabled) {
-        BetaTransactionFactoryBuilder builder = stm.getTransactionFactoryBuilder()
+        BetaTransactionFactoryBuilder builder = stm.createTransactionFactoryBuilder()
                 .setBlockingAllowed(false)
                 .setReadonly(true)
                 .setReadTrackingEnabled(readTrackingEnabled)
@@ -61,7 +61,7 @@ public class BetaStm_transactionFactoryValidationTest {
 
     @Test
     public void whenPessimisticLockLevelIsRead_thenAutomaticReadTrackingShouldBeEnabled() {
-        BetaTransactionFactoryBuilder builder = stm.getTransactionFactoryBuilder()
+        BetaTransactionFactoryBuilder builder = stm.createTransactionFactoryBuilder()
                 .setReadTrackingEnabled(false)
                 .setPessimisticLockLevel(PessimisticLockLevel.Read);
 

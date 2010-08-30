@@ -38,7 +38,7 @@ public class WriteConflictTest {
     public void whenDirtyCheckAndChange_ThenWriteConflict() {
         BetaLongRef ref = createLongRef(stm);
 
-        BetaTransaction tx = stm.getTransactionFactoryBuilder()
+        BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(false)
                 .setDirtyCheckEnabled(true)
                 .build()
@@ -66,7 +66,7 @@ public class WriteConflictTest {
     public void whenDirtyCheckAndNoChange_ThenNoWriteConflict() {
         BetaLongRef ref = createLongRef(stm);
 
-        BetaTransaction tx = stm.getTransactionFactoryBuilder()
+        BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(false)
                 .setDirtyCheckEnabled(true)
                 .build()
@@ -89,7 +89,7 @@ public class WriteConflictTest {
     public void whenNoDirtyCheckAndChange_ThenWriteConflict() {
         BetaLongRef ref = createLongRef(stm);
 
-        BetaTransaction tx = stm.getTransactionFactoryBuilder()
+        BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(false)
                 .setDirtyCheckEnabled(false)
                 .build()
@@ -116,7 +116,7 @@ public class WriteConflictTest {
     public void whenNoDirtyCheckAndNoChange_ThenWriteConflict() {
         BetaLongRef ref = createLongRef(stm);
 
-        BetaTransaction tx = stm.getTransactionFactoryBuilder()
+        BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(false)
                 .setDirtyCheckEnabled(false)
                 .build()

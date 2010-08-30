@@ -137,7 +137,7 @@ public class ReadConsistencyStressTest {
 
         @Override
         public void doRun() throws Exception {
-            AtomicBlock block = stm.getTransactionFactoryBuilder()
+            AtomicBlock block = stm.createTransactionFactoryBuilder()
                     .buildAtomicBlock();
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
@@ -176,7 +176,7 @@ public class ReadConsistencyStressTest {
 
         @Override
         public void doRun() throws Exception {
-            AtomicBlock block = stm.getTransactionFactoryBuilder()
+            AtomicBlock block = stm.createTransactionFactoryBuilder()
                     .setReadTrackingEnabled(readTracking)
                     .setBlockingAllowed(false)
                     .setReadonly(true)

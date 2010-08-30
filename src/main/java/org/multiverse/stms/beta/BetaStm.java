@@ -5,13 +5,12 @@ import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.api.references.ReferenceFactoryBuilder;
 import org.multiverse.durability.SimpleStorage;
 import org.multiverse.durability.Storage;
+import org.multiverse.sensors.SimpleProfiler;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
 import org.multiverse.stms.beta.transactions.*;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
@@ -29,10 +28,8 @@ public final class BetaStm implements Stm {
     private final int spinCount = 8;
     private final BetaTransactionConfiguration config;
     private final SimpleStorage storage;
+    private final SimpleProfiler simpleProfiler = new SimpleProfiler();
 
-    @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection"})
-    private final ConcurrentHashMap<String, BetaTransactionFactory> factoryMap
-            = new ConcurrentHashMap<String, BetaTransactionFactory>();
     private final StmCallback callback;
 
     public BetaStm() {
@@ -45,9 +42,13 @@ public final class BetaStm implements Stm {
         this.config = new BetaTransactionConfiguration(this)
                 .setSpinCount(spinCount);
         this.storage = new SimpleStorage(this);
-        this.atomicBlock = getTransactionFactoryBuilder()
+        this.atomicBlock = createTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(false)
                 .buildAtomicBlock();
+    }
+
+    public SimpleProfiler getSimpleProfiler() {
+        return simpleProfiler;
     }
 
     public StmCallback getCallback() {
@@ -59,7 +60,7 @@ public final class BetaStm implements Stm {
     }
 
     @Override
-    public BetaTransactionFactoryBuilder getTransactionFactoryBuilder() {
+    public BetaTransactionFactoryBuilder createTransactionFactoryBuilder() {
         return new BetaTransactionFactoryBuilderImpl(config);
     }
 
@@ -230,10 +231,6 @@ public final class BetaStm implements Stm {
                 factory = new SpeculativeBetaTransactionFactory(config);
             } else {
                 factory = new NonSpeculativeBetaTransactionFactory(config);
-            }
-
-            if (!config.isAnonymous) {
-                factoryMap.putIfAbsent(config.familyName, factory);
             }
 
             return factory;

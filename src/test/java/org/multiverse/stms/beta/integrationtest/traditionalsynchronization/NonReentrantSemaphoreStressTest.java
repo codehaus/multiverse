@@ -79,8 +79,8 @@ public class NonReentrantSemaphoreStressTest {
     class Semaphore {
 
         private final BetaIntRef ref;
-        private final AtomicBlock upBlock = stm.getTransactionFactoryBuilder().buildAtomicBlock();
-        private final AtomicBlock downBlock = stm.getTransactionFactoryBuilder().buildAtomicBlock();
+        private final AtomicBlock upBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
+        private final AtomicBlock downBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
         private final AtomicVoidClosure upClosure = new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {

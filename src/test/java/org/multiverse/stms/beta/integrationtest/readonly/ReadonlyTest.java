@@ -42,7 +42,7 @@ public class ReadonlyTest {
     }
 
     public void updateInReadonlyMethod(final BetaIntRef ref, final int newValue) {
-         AtomicBlock block = stm.getTransactionFactoryBuilder()
+         AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setReadonly(true)
                 .buildAtomicBlock();
 
@@ -66,7 +66,7 @@ public class ReadonlyTest {
     }
 
     public void readonly_createNewTransactionObject(final int value) {
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setReadonly(true)
                 .buildAtomicBlock();
 
@@ -89,7 +89,7 @@ public class ReadonlyTest {
     }
 
     public Integer readonly_createNormalObject(final int value) {
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setReadonly(true)
                 .buildAtomicBlock();
 
@@ -110,7 +110,7 @@ public class ReadonlyTest {
     }
 
     public int readInReadonlyMethod(final BetaIntRef ref) {
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setReadonly(true)
                 .buildAtomicBlock();
 
@@ -132,7 +132,7 @@ public class ReadonlyTest {
     }
 
     public BetaIntRef update_createNewTransactionObject(final int value) {
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setReadonly(false)
                 .buildAtomicBlock();
 
@@ -156,7 +156,7 @@ public class ReadonlyTest {
     }
 
     public Integer update_createNormalObject(final int value) {
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setReadonly(false)
                 .buildAtomicBlock();
 
@@ -178,7 +178,7 @@ public class ReadonlyTest {
 
 
     public int readInUpdateMethod(final BetaIntRef ref) {
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setReadonly(false)
                 .buildAtomicBlock();
 
@@ -200,7 +200,7 @@ public class ReadonlyTest {
     }
 
     public void updateInUpdateMethod(final BetaIntRef ref, final int newValue) {
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setReadonly(false)
                 .buildAtomicBlock();
 
@@ -225,7 +225,7 @@ public class ReadonlyTest {
 
 
     public void defaultTransactionalMethod(final BetaIntRef ref) {
-        stm.getTransactionFactoryBuilder().buildAtomicBlock().execute(new AtomicVoidClosure() {
+        stm.createTransactionFactoryBuilder().buildAtomicBlock().execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
                 assertFalse(tx.getConfiguration().isReadonly());

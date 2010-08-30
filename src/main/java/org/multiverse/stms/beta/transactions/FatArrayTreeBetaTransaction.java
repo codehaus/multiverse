@@ -346,7 +346,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
      }
 
 
-
     private  void flattenCommute(
         final BetaObjectPool pool,
         final BetaIntRef ref,
@@ -632,7 +631,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
          result.value = function.call(result.value);
      }
-
 
 
     private  void flattenCommute(
@@ -922,7 +920,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
      }
 
 
-
     private  void flattenCommute(
         final BetaObjectPool pool,
         final BetaTransactionalObject ref,
@@ -1193,7 +1190,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
          throw new TodoException();
      }
-
 
  
     @Override

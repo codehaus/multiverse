@@ -37,7 +37,7 @@ public class WriteSkewTest {
         BetaLongRef ref1 = createLongRef(stm);
         BetaLongRef ref2 = createLongRef(stm);
 
-        BetaTransaction tx = stm.getTransactionFactoryBuilder()
+        BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(false)
                 .setWriteSkewAllowed(true)
                 .build()
@@ -59,7 +59,7 @@ public class WriteSkewTest {
         BetaLongRef ref1 = createLongRef(stm);
         BetaLongRef ref2 = createLongRef(stm);
 
-        BetaTransaction tx = stm.getTransactionFactoryBuilder()
+        BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(false)
                 .setWriteSkewAllowed(true)
                 .setPessimisticLockLevel(PessimisticLockLevel.Write)
@@ -82,7 +82,7 @@ public class WriteSkewTest {
         BetaLongRef ref1 = createLongRef(stm);
         BetaLongRef ref2 = createLongRef(stm);
 
-        BetaTransaction tx = stm.getTransactionFactoryBuilder()
+        BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(false)
                 .setWriteSkewAllowed(true)
                 .setPessimisticLockLevel(PessimisticLockLevel.Read)
@@ -108,7 +108,7 @@ public class WriteSkewTest {
         BetaLongRef ref1 = createLongRef(stm);
         BetaLongRef ref2 = createLongRef(stm);
 
-        BetaTransaction tx = stm.getTransactionFactoryBuilder()
+        BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(false)
                 .setWriteSkewAllowed(false)
                 .build()
@@ -133,7 +133,7 @@ public class WriteSkewTest {
         BetaLongRef ref1 = createLongRef(stm);
         BetaLongRef ref2 = createLongRef(stm);
 
-        BetaTransaction tx = stm.getTransactionFactoryBuilder()
+        BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(false)
                 .setWriteSkewAllowed(false)
                 .build()

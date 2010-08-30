@@ -3,6 +3,7 @@ package org.multiverse.stms.beta.transactions;
 import org.multiverse.api.*;
 import org.multiverse.api.exceptions.IllegalTransactionFactoryException;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.sensors.SimpleProfiler;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 
@@ -22,6 +23,7 @@ import static java.lang.String.format;
 public final class BetaTransactionConfiguration implements TransactionConfiguration {
 
     public final static AtomicLong idGenerator = new AtomicLong();
+    public String familyName = "anonymoustransaction-" + idGenerator.incrementAndGet();
 
     public ArrayList<TransactionLifecycleListener> permanentListeners;
     public boolean interruptible = false;
@@ -38,7 +40,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     public boolean trackReads = true;
     public boolean blockingAllowed = true;
     public int maxRetries = 1000;
-    public String familyName = "anonymoustransaction-" + idGenerator.incrementAndGet();
+
     public boolean speculativeConfigEnabled = true;
     public int maxArrayTransactionSize;
     public boolean isAnonymous = true;
@@ -49,7 +51,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     public PropagationLevel propagationLevel = PropagationLevel.Requires;
     private final AtomicReference<SpeculativeBetaConfig> speculativeConfig
             = new AtomicReference<SpeculativeBetaConfig>(new SpeculativeBetaConfig(true));
-    private final StmCallback stmCallback;
+    public final StmCallback stmCallback;
+    public final SimpleProfiler simpleProfiler;
 
     public BetaTransactionConfiguration(BetaStm stm) {
         if (stm == null) {
@@ -59,6 +62,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         this.stmCallback = stm.getCallback();
         this.globalConflictCounter = stm.getGlobalConflictCounter();
         this.maxArrayTransactionSize = stm.getMaxArrayTransactionSize();
+        this.simpleProfiler = stm.getSimpleProfiler();
     }
 
     public BetaTransactionConfiguration(BetaStm stm, int maxArrayTransactionSize) {
@@ -70,6 +74,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         this.globalConflictCounter = stm.getGlobalConflictCounter();
         this.maxArrayTransactionSize = maxArrayTransactionSize;
         this.stmCallback = stm.getCallback();
+        this.simpleProfiler = stm.getSimpleProfiler();
     }
 
     public boolean hasTimeout() {
@@ -727,7 +732,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     @Override
     public String toString() {
         return "BetaTransactionConfiguration{" +
-                "interruptible=" + interruptible +
+                "familyName='" + familyName +                               
+                ", interruptible=" + interruptible +
                 ", durable=" + durable +
                 ", readonly=" + readonly +
                 ", spinCount=" + spinCount +
@@ -741,7 +747,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
                 ", trackReads=" + trackReads +
                 ", blockingAllowed=" + blockingAllowed +
                 ", maxRetries=" + maxRetries +
-                ", familyName='" + familyName + '\'' +
                 ", speculativeConfigEnabled=" + speculativeConfigEnabled +
                 ", maxArrayTransactionSize=" + maxArrayTransactionSize +
                 ", isAnonymous=" + isAnonymous +

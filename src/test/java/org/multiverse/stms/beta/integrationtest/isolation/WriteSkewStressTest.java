@@ -173,20 +173,20 @@ public class WriteSkewStressTest {
 
     public class TransferThread extends TestThread {
 
-        private final AtomicBlock normal = stm.getTransactionFactoryBuilder()
+        private final AtomicBlock normal = stm.createTransactionFactoryBuilder()
                 .setWriteSkewAllowed(true)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
-        private final AtomicBlock noWriteSkew = stm.getTransactionFactoryBuilder()
+        private final AtomicBlock noWriteSkew = stm.createTransactionFactoryBuilder()
                 .setWriteSkewAllowed(false)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
-        private final AtomicBlock pessimisticReadLockLevel = stm.getTransactionFactoryBuilder()
+        private final AtomicBlock pessimisticReadLockLevel = stm.createTransactionFactoryBuilder()
                 .setPessimisticLockLevel(PessimisticLockLevel.Read)
                 .setWriteSkewAllowed(true)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
-        private final AtomicBlock pessimisticWriteLockLevel = stm.getTransactionFactoryBuilder()
+        private final AtomicBlock pessimisticWriteLockLevel = stm.createTransactionFactoryBuilder()
                 .setPessimisticLockLevel(PessimisticLockLevel.Write)
                 .setWriteSkewAllowed(true)
                 .setMaxRetries(10000)
@@ -331,7 +331,7 @@ public class WriteSkewStressTest {
     }
 
     public class User {
-        private AtomicBlock getTotalBlock = stm.getTransactionFactoryBuilder()
+        private AtomicBlock getTotalBlock = stm.createTransactionFactoryBuilder()
                 .setReadonly(true)
                 .buildAtomicBlock();
 
@@ -354,7 +354,7 @@ public class WriteSkewStressTest {
         }
 
         public String toString() {
-            return stm.getTransactionFactoryBuilder().buildAtomicBlock().execute(new AtomicClosure<String>() {
+            return stm.createTransactionFactoryBuilder().buildAtomicBlock().execute(new AtomicClosure<String>() {
                 @Override
                 public String execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;

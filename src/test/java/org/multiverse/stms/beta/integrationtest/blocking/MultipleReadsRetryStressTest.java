@@ -77,7 +77,7 @@ public class MultipleReadsRetryStressTest {
         sleepMs(30 * 1000);
         stop = true;
 
-        stm.getTransactionFactoryBuilder().buildAtomicBlock().execute(
+        stm.createTransactionFactoryBuilder().buildAtomicBlock().execute(
                 new AtomicVoidClosure() {
                     @Override
                     public void execute(Transaction tx) throws Exception {

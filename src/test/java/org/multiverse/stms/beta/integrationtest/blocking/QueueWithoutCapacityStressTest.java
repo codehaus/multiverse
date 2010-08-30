@@ -106,8 +106,8 @@ public class QueueWithoutCapacityStressTest {
     class Queue<E> {
         final Stack<E> pushedStack = new Stack<E>();
         final Stack<E> readyToPopStack = new Stack<E>();
-        final AtomicBlock pushBlock = stm.getTransactionFactoryBuilder().buildAtomicBlock();
-        final AtomicBlock popBlock = stm.getTransactionFactoryBuilder().buildAtomicBlock();
+        final AtomicBlock pushBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
+        final AtomicBlock popBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
 
         public void push(final E item) {
             pushBlock.execute(new AtomicVoidClosure() {

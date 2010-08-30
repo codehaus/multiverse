@@ -40,7 +40,7 @@ public class BetaTransactionTemplate_timeoutTest {
 
     @Test
     public void whenTimeout() {
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setTimeoutNs(timeoutNs)
                 .buildAtomicBlock();
 
@@ -55,7 +55,7 @@ public class BetaTransactionTemplate_timeoutTest {
 
     @Test
     public void whenSuccess() {
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setTimeoutNs(timeoutNs)
                 .buildAtomicBlock();
 
@@ -89,7 +89,7 @@ public class BetaTransactionTemplate_timeoutTest {
             }
         });
 
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setTimeoutNs(0)
                 .buildAtomicBlock();
 

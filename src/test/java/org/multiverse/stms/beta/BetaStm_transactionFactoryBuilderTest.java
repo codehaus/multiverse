@@ -54,12 +54,12 @@ public class BetaStm_transactionFactoryBuilderTest {
 
     @Test(expected = NullPointerException.class)
     public void whenNullPermanentListener_thenNullPointerException() {
-        stm.getTransactionFactoryBuilder().addPermanentListener(null);
+        stm.createTransactionFactoryBuilder().addPermanentListener(null);
     }
 
     @Test
     public void whenPermanentListenerAdded() {
-        BetaTransactionFactoryBuilder oldBuilder = stm.getTransactionFactoryBuilder();
+        BetaTransactionFactoryBuilder oldBuilder = stm.createTransactionFactoryBuilder();
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         BetaTransactionFactoryBuilder newBuilder = oldBuilder.addPermanentListener(listener);
 
@@ -69,7 +69,7 @@ public class BetaStm_transactionFactoryBuilderTest {
 
     @Test
     public void whenPermanentListenerAdded_thenNoCheckForDuplicates() {
-        BetaTransactionFactoryBuilder oldBuilder = stm.getTransactionFactoryBuilder();
+        BetaTransactionFactoryBuilder oldBuilder = stm.createTransactionFactoryBuilder();
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         BetaTransactionFactoryBuilder newBuilder = oldBuilder.addPermanentListener(listener)
                 .addPermanentListener(listener);
@@ -79,7 +79,7 @@ public class BetaStm_transactionFactoryBuilderTest {
 
     @Test
     public void whenNoPermanentListenersAdded_thenEmptyList() {
-        BetaTransactionFactoryBuilder builder = stm.getTransactionFactoryBuilder();
+        BetaTransactionFactoryBuilder builder = stm.createTransactionFactoryBuilder();
         assertTrue(builder.getTransactionConfiguration().getPermanentListeners().isEmpty());
     }
 
@@ -87,7 +87,7 @@ public class BetaStm_transactionFactoryBuilderTest {
     public void whenMultipleListenersAdded_thenTheyAreAddedInOrder() {
         TransactionLifecycleListener listener1 = mock(TransactionLifecycleListener.class);
         TransactionLifecycleListener listener2 = mock(TransactionLifecycleListener.class);
-        BetaTransactionFactoryBuilder builder = stm.getTransactionFactoryBuilder()
+        BetaTransactionFactoryBuilder builder = stm.createTransactionFactoryBuilder()
                 .addPermanentListener(listener1)
                 .addPermanentListener(listener2);
 
@@ -97,7 +97,7 @@ public class BetaStm_transactionFactoryBuilderTest {
 
     @Test
     public void whenGetPermanentListenersCalled_immutableListReturned() {
-        BetaTransactionFactoryBuilder builder = stm.getTransactionFactoryBuilder()
+        BetaTransactionFactoryBuilder builder = stm.createTransactionFactoryBuilder()
                 .addPermanentListener(mock(TransactionLifecycleListener.class))
                 .addPermanentListener(mock(TransactionLifecycleListener.class));
 
@@ -113,7 +113,7 @@ public class BetaStm_transactionFactoryBuilderTest {
 
     @Test
     public void whenReadtrackingDisabled() {
-        BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+        BetaTransactionFactory txFactory = stm.createTransactionFactoryBuilder()
                 .setReadTrackingEnabled(false)
                 .setBlockingAllowed(false)
                 .build();
@@ -123,7 +123,7 @@ public class BetaStm_transactionFactoryBuilderTest {
 
     @Test
     public void whenSpeculativeConfigEnabled() {
-        BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+        BetaTransactionFactory txFactory = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(true)
                 .build();
 
@@ -135,7 +135,7 @@ public class BetaStm_transactionFactoryBuilderTest {
 
     @Test
     public void whenWriteSkewNotAllowed() {
-        BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+        BetaTransactionFactory txFactory = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(true)
                 .setWriteSkewAllowed(false)
                 .build();
@@ -148,7 +148,7 @@ public class BetaStm_transactionFactoryBuilderTest {
 
     @Test
     public void whenWriteSkewNotAllowedThenFatTransaction() {
-        BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+        BetaTransactionFactory txFactory = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(true)
                 .setWriteSkewAllowed(false)
                 .build();
@@ -159,7 +159,7 @@ public class BetaStm_transactionFactoryBuilderTest {
 
     @Test
     public void whenWriteSkewAllowedThenFatTransaction() {
-        BetaTransactionFactory txFactory = stm.getTransactionFactoryBuilder()
+        BetaTransactionFactory txFactory = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(true)
                 .setWriteSkewAllowed(true)
                 .build();

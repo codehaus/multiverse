@@ -24,14 +24,14 @@ public class BetaStm_atomicBlockTest {
 
     @Test
     public void testDefault() {
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .buildAtomicBlock();
         assertTrue(block instanceof LeanBetaAtomicBlock);
     }
 
     @Test
     public void whenMandatory() {
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Mandatory)
                 .buildAtomicBlock();
         assertTrue(block instanceof FatBetaAtomicBlock);
@@ -39,7 +39,7 @@ public class BetaStm_atomicBlockTest {
 
     @Test
     public void whenRequires() {
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Requires)
                 .buildAtomicBlock();
         assertTrue(block instanceof LeanBetaAtomicBlock);
@@ -47,7 +47,7 @@ public class BetaStm_atomicBlockTest {
 
     @Test
     public void whenRequiresNew() {
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.RequiresNew)
                 .buildAtomicBlock();
         assertTrue(block instanceof FatBetaAtomicBlock);
@@ -55,7 +55,7 @@ public class BetaStm_atomicBlockTest {
 
     @Test
     public void whenNever() {
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Never)
                 .buildAtomicBlock();
         assertTrue(block instanceof FatBetaAtomicBlock);
@@ -63,7 +63,7 @@ public class BetaStm_atomicBlockTest {
 
     @Test
     public void whenSupports() {
-        AtomicBlock block = stm.getTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Supports)
                 .buildAtomicBlock();
         assertTrue(block instanceof FatBetaAtomicBlock);

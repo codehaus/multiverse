@@ -1,0 +1,27 @@
+IDEAS
+
+- cheap publishing of information
+
+- how to cheaply add the meters
+
+- sampling: so one in n calls gets profiled
+
+- dynamic activation & deactivation of sensors.
+
+- transaction size
+
+- cheap lookup of sensor.
+
+DONE
+
+- number of failed transactions
+
+- number of completed transactions
+
+- max attempts
+
+- total number of retries
+
+- avg number of retries
+
+- number of started transaction.

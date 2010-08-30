@@ -248,7 +248,6 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
 
 
-
     @Override
     public  IntRefTranlocal openForRead(
         final BetaIntRef ref, boolean lock, final BetaObjectPool pool) {
@@ -435,7 +434,6 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         abort(pool);
         throw SpeculativeConfigurationError.INSTANCE;
      }
-
 
 
 
@@ -628,7 +626,6 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
 
 
-
     @Override
     public  Tranlocal openForRead(
         final BetaTransactionalObject ref, boolean lock, final BetaObjectPool pool) {
@@ -805,7 +802,6 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         abort(pool);
         throw SpeculativeConfigurationError.INSTANCE;
      }
-
 
  
     @Override

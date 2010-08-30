@@ -97,7 +97,7 @@ public class IsolationStressTest {
         public void doRun() {
             final BetaObjectPool pool = new BetaObjectPool();
 
-            AtomicBlock block = stm.getTransactionFactoryBuilder()
+            AtomicBlock block = stm.createTransactionFactoryBuilder()
                     .setDirtyCheckEnabled(dirtyCheckEnabled)
                     .buildAtomicBlock();
 
