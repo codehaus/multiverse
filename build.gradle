@@ -35,7 +35,7 @@ allprojects {
             'http://download.java.net/maven/2/',
             'https://maven.atlassian.com/content/groups/public'])
   }
-
+  
   configurations {
     deployerJars
   }
@@ -65,8 +65,30 @@ allprojects {
   dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.8.1'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.8.2'
-    deployerJars "org.apache.maven.wagon:wagon-ssh:1.0-beta-2"
+    deployerJars group: 'org.apache.maven.wagon', name: 'wagon-webdav-jackrabbit', version: '1.0-beta-6'
   }
+  
+  uploadArchives {
+    repositories.mavenDeployer {
+      configuration = configurations.deployerJars
+      repository(id: 'multiverse-releases', url: 'dav:https://dav.codehaus.org/repository/multiverse/') {
+        authentication(userName: releaseRepoUsername, password: releaseRepoPassword)
+      }
+      snapshotRepository(id: 'multiverse-snapshots', url: 'dav:https://dav.codehaus.org/snapshots.repository/multiverse/') {
+        authentication(userName: snapshotRepoUsername, password: snapshotRepoPassword)
+      }          
+    }
+  }
+    
+  gradle.taskGraph.whenReady {graph ->
+    if (graph.hasTask(uploadArchives)) {
+      snapshotRepoUsername
+      snapshotRepoPassword
+      releaseRepoUsername
+      releaseRepoPassword
+    }
+  }
+
 }
 
 // ------------------------------------------------------------------------------------------------------------------
