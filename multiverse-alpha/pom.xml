@@ -11,12 +11,12 @@
         at all.
     </description>
     <packaging>jar</packaging>
-    <version>0.6.1</version>
+    <version>0.6.2-SNAPSHOT</version>
       
     <parent>
         <groupId>org.multiverse</groupId>
         <artifactId>multiverse</artifactId>
-        <version>0.6.1</version>
+        <version>0.6.2-SNAPSHOT</version>
     </parent>
 
     <properties>
