@@ -10,7 +10,10 @@ IDEAS
 
 - transaction size
 
-- cheap lookup of sensor.
+- cheap lookup of sensor: can be added to the transaction config.. -> independent transactions
+don't cause contention.
+
+- new transaction config needs to be created when transactionfactorybuilder is retrieved.
 
 DONE
 

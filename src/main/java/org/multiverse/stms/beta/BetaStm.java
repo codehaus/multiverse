@@ -91,14 +91,14 @@ public final class BetaStm implements Stm {
         return 20;
     }
 
-    public final class BetaReferenceFactoryBuilderImpl implements BetaReferenceFactoryBuilder{
+    public final class BetaReferenceFactoryBuilderImpl implements BetaReferenceFactoryBuilder {
         @Override
         public BetaReferenceFactory build() {
             return new BetaReferenceFactoryImpl();
         }
     }
 
-    public final class BetaReferenceFactoryImpl implements BetaReferenceFactory{
+    public final class BetaReferenceFactoryImpl implements BetaReferenceFactory {
         @Override
         public BetaIntRef createIntRef(int value) {
             return new BetaIntRef(value);
@@ -135,77 +135,137 @@ public final class BetaStm implements Stm {
 
         @Override
         public BetaTransactionFactoryBuilder setFamilyName(String familyName) {
+            if (familyName == config.familyName) {
+                return this;
+            }
+
             return new BetaTransactionFactoryBuilderImpl(config.setFamilyName(familyName));
         }
 
         @Override
         public BetaTransactionFactoryBuilder setPropagationLevel(final PropagationLevel level) {
+            if (level == config.propagationLevel) {
+                return this;
+            }
+
             return new BetaTransactionFactoryBuilderImpl(config.setPropagationLevel(level));
         }
 
         @Override
         public BetaTransactionFactoryBuilder setBlockingAllowed(final boolean blockingAllowed) {
+            if (blockingAllowed == config.blockingAllowed) {
+                return this;
+            }
+
             return new BetaTransactionFactoryBuilderImpl(config.setBlockingAllowed(blockingAllowed));
         }
 
         @Override
         public BetaTransactionFactoryBuilder setWriteSkewAllowed(final boolean writeSkewAllowed) {
+            if (writeSkewAllowed == config.writeSkewAllowed) {
+                return this;
+            }
+
             return new BetaTransactionFactoryBuilderImpl(config.setWriteSkewAllowed(writeSkewAllowed));
         }
 
         @Override
         public BetaTransactionFactoryBuilder setTraceLevel(final TraceLevel traceLevel) {
+            if (traceLevel == config.traceLevel) {
+                return this;
+            }
+
             return new BetaTransactionFactoryBuilderImpl(config.setTraceLevel(traceLevel));
         }
 
         @Override
         public BetaTransactionFactoryBuilder setTimeoutNs(final long timeoutNs) {
+            if (timeoutNs == config.timeoutNs) {
+                return this;
+            }
+
             return new BetaTransactionFactoryBuilderImpl(config.setTimeoutNs(timeoutNs));
         }
 
         @Override
         public BetaTransactionFactoryBuilder setInterruptible(final boolean interruptible) {
+            if (interruptible == config.interruptible) {
+                return this;
+            }
+
             return new BetaTransactionFactoryBuilderImpl(config.setInterruptible(interruptible));
         }
 
         @Override
         public BetaTransactionFactoryBuilder setBackoffPolicy(final BackoffPolicy backoffPolicy) {
+            if (backoffPolicy == config.backoffPolicy) {
+                return this;
+            }
+
             return new BetaTransactionFactoryBuilderImpl(config.setBackoffPolicy(backoffPolicy));
         }
 
         @Override
         public BetaTransactionFactoryBuilder setPessimisticLockLevel(final PessimisticLockLevel lockLevel) {
+            if (lockLevel == config.pessimisticLockLevel) {
+                return this;
+            }
+
             return new BetaTransactionFactoryBuilderImpl(config.setPessimisticLockLevel(lockLevel));
         }
 
         @Override
         public BetaTransactionFactoryBuilder setDirtyCheckEnabled(final boolean dirtyCheckEnabled) {
+            if (dirtyCheckEnabled == config.dirtyCheck) {
+                return this;
+            }
+
             return new BetaTransactionFactoryBuilderImpl(config.setDirtyCheckEnabled(dirtyCheckEnabled));
         }
 
         @Override
         public BetaTransactionFactoryBuilder setSpinCount(final int spinCount) {
+            if (spinCount == config.spinCount) {
+                return this;
+            }
+
             return new BetaTransactionFactoryBuilderImpl(config.setSpinCount(spinCount));
         }
 
         @Override
         public BetaTransactionFactoryBuilder setSpeculativeConfigEnabled(final boolean enabled) {
+            if (enabled == config.speculativeConfigEnabled) {
+                return this;
+            }
+
             return new BetaTransactionFactoryBuilderImpl(
                     config.setSpeculativeConfigurationEnabled(enabled));
         }
 
         @Override
         public BetaTransactionFactoryBuilder setReadonly(final boolean readonly) {
+            if (readonly == config.readonly) {
+                return this;
+            }
+
             return new BetaTransactionFactoryBuilderImpl(config.setReadonly(readonly));
         }
 
         @Override
         public BetaTransactionFactoryBuilder setReadTrackingEnabled(final boolean enabled) {
+            if (enabled == config.trackReads) {
+                return this;
+            }
+
             return new BetaTransactionFactoryBuilderImpl(config.setReadTrackingEnabled(enabled));
         }
 
         @Override
         public BetaTransactionFactoryBuilder setMaxRetries(final int maxRetries) {
+            if (maxRetries == config.maxRetries) {
+                return this;
+            }
+
             return new BetaTransactionFactoryBuilderImpl(config.setMaxRetries(maxRetries));
         }
 
