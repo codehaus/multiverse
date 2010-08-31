@@ -15,16 +15,6 @@ allprojects {
   scalaVersion = '2.7.7'
   jrubyVersion = '1.5.0'
 
-  //repository(url: 'dav:https://dav.codehaus.org/repository/multiverse/') 
-  //{
-  //	authentication(userName: "${username}", password: "${password}")
-  //}
-
-  //snapshotRepository(url:'dav:https://dav.codehaus.org/snapshots.repository/multiverse/') 
-  //{
-  //	authentication(userName: "${username}", password: "${password}")
-  //} 
-
   def localMavenRepo = 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
 
   repositories {
@@ -49,6 +39,7 @@ allprojects {
   }
 
   task shortintegrationtest(type: Test) {
+    description = "Runs the 'stress*' and 'long*' tests."
     include("**/*StressTest*")
     include("**/*stressTest*")
     include("**/*LongTest*")
@@ -56,6 +47,7 @@ allprojects {
   }
 
   task integrationtest(type: Test) {
+    description = "Runs the 'stress*' and 'long*' tests."
     include("**/*StressTest*")
     include("**/*stressTest*")
     include("**/*LongTest*")
