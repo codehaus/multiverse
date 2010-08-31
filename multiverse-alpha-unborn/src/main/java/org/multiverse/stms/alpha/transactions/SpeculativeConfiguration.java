@@ -143,7 +143,8 @@ public final class SpeculativeConfiguration {
 
     @Override
     public String toString() {
-        return format("SpeculativeConfiguration(size=%s, " +
+        return format("SpeculativeConfiguration(" +
+                "size=%s, " +
                 "isSpeculativeReadonlyEnabled=%s, " +
                 "isSpeculativeNonAutomaticReadTrackingEnabled=%s, " +
                 "isSpeculativeSizeEnabled=%s" +

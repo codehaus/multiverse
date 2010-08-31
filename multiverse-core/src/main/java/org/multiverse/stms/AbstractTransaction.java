@@ -68,7 +68,7 @@ public abstract class AbstractTransaction<C extends AbstractTransactionConfigura
 
     @Override
     public final void setRemainingTimeoutNs(long newTimeoutNs) {
-        if (newTimeoutNs > timeoutNs) {
+        if (newTimeoutNs > config.timeoutNs) {
             throw new IllegalArgumentException();
         }
         this.timeoutNs = newTimeoutNs;
