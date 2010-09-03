@@ -85,6 +85,10 @@ performance.
 
 todo
 
+- benchmarks removed from main src.
+
+- benchmarks scripts update to point to gradle & to test classes
+
 - mono transaction: support for orelse
 
 - array transaction:  support for orelse
@@ -178,7 +182,7 @@ the task not being executed at all.
 - array tree transaction: on commit/abort the array can be nulled. no need to do it when placing in the pool
   or when initializing.
 
-- testing of transaction access while commute 
+- testing of transaction access while commute
 
 done
 
@@ -192,7 +196,7 @@ done
   in the ref itself.
 
  - when a commuting function fails, the transaction should be aborted.
-   
+
 - mono transaction: simplify openForRead & commute
 
 - array tree transaction: simplified openForRead & commute
@@ -210,7 +214,7 @@ done
 - testing: commute & overflow of mono
 
 - testing: commute: check if conflict counters are set correctly when an addCommute is done
-    
+
 - benchmark scripts moved to separate directory
 
 - initial support for externalizing the refs added.

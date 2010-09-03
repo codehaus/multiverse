@@ -8,5 +8,7 @@ And execute the following command
 
 gradle install
 
-Atm there is a dependency on junit on the normal sources in the benchmark directory, but will be removed and there is
-no runtime dependency otherwise on junit.
+The jar will be stored in build/libs
+
+The Multiverse jar has no external dependencies. It uses velocity (pre) compiletime to generate Java sources, but
+there is no runtime dependency on Velocity or any other library.
