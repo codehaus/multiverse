@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Veentjer
  */
-public class LongRef_loadTest {
+public class BetaLongRef_loadTest {
     private BetaStm stm;
 
     @Before

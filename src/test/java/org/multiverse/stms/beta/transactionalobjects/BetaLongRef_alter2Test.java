@@ -20,7 +20,7 @@ import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
  *
  * @author Peter Veentjer.
  */
-public class LongRef_alter2Test {
+public class BetaLongRef_alter2Test {
 
     private BetaStm stm;
 
@@ -84,7 +84,7 @@ public class LongRef_alter2Test {
 
     @Test
     public void whenPreparedTransaction_thenPreparedTransactionException() {
-          BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = createLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -104,7 +104,7 @@ public class LongRef_alter2Test {
 
     @Test
     public void whenAbortedTransaction() {
-          BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = createLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();

@@ -14,7 +14,7 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 /**
  * @author Peter Veentjer
  */
-public class LongRef_tryLockAndCheckConflictTest {
+public class BetaLongRef_tryLockAndCheckConflictTest {
     private BetaStm stm;
 
     @Before

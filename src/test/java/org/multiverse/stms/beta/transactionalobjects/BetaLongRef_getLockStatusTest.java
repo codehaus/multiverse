@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
-public class LongRef_getLockStatusTest {
+public class BetaLongRef_getLockStatusTest {
 
     private BetaStm stm;
     private BetaObjectPool pool;

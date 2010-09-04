@@ -9,7 +9,13 @@ import org.multiverse.api.functions.LongFunction;
  */
 public interface LongRef extends TransactionalObject {
 
-     /**
+    long atomicInc(long amount);
+
+    long inc(long amount);
+
+    long inc(Transaction tx, long amount);
+
+    /**
      * Atomically applies the function to alter the value stored in this ref. This method doesn't care about
      * any running transactions.
      *
@@ -33,7 +39,7 @@ public interface LongRef extends TransactionalObject {
      * Alters the value stored in this Ref using the alter function.
      *
      * @param function the function that alters the value stored in this Ref.
-     * @param tx the Transaction used by this operation.
+     * @param tx       the Transaction used by this operation.
      * @return the new value.
      * @throws NullPointerException if function or transaction is null.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException

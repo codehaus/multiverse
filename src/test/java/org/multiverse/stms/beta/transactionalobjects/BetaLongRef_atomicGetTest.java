@@ -14,7 +14,7 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUpdateBiased;
 /**
  * @author Peter Veentjer
  */
-public class LongRef_atomicGetTest {
+public class BetaLongRef_atomicGetTest {
     private BetaStm stm;
 
     @Before

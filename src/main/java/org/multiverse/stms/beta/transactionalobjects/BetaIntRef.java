@@ -523,6 +523,33 @@ public final class BetaIntRef
         }
     }
 
+    @Override
+    public int atomicInc(final int amount){
+        throw new TodoException();
+    }
+
+    @Override
+    public int inc(final int amount){
+        throw new TodoException();
+    }
+
+    @Override
+    public int inc(final Transaction tx, final int amount){
+        return inc((BetaTransaction)tx, amount);    
+    }
+
+    public int inc(final BetaTransaction tx, final int amount){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        IntRefTranlocal write
+              = (IntRefTranlocal)tx.openForWrite(this, false);
+
+        write.value+=amount;
+        return write.value;
+    }
+
 
     @Override
     public int atomicAlter(

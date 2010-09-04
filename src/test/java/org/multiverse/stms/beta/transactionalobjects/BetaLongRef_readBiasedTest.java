@@ -13,7 +13,7 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
 /**
  * @author Peter Veentjer
  */
-public class LongRef_readBiasedTest {
+public class BetaLongRef_readBiasedTest {
     private BetaStm stm;
 
     @Before

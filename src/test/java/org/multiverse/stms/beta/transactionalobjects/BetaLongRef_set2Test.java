@@ -18,7 +18,7 @@ import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
  *
  * @author Peter Veentjer.
  */
-public class LongRef_set2Test {
+public class BetaLongRef_set2Test {
 
     private BetaStm stm;
 

@@ -10,7 +10,7 @@ import org.multiverse.stms.beta.BetaStmConstants;
 import static org.junit.Assert.*;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
-public class LongRef_openForCommuteTest implements BetaStmConstants{
+public class BetaLongRef_openForCommuteTest implements BetaStmConstants{
     private BetaStm stm;
     private BetaObjectPool pool;
 

@@ -9,6 +9,12 @@ import org.multiverse.api.functions.IntFunction;
  */
 public interface IntRef extends TransactionalObject {
 
+    int atomicInc(int amount);
+
+    int inc(int amount);
+
+    int inc(Transaction tx, int amount);
+    
      /**
      * Atomically applies the function to alter the value stored in this ref. This method doesn't care about
      * any running transactions.

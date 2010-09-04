@@ -16,7 +16,7 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 /**
  * @author Peter Veentjer
  */
-public class LongRef_abortTest {
+public class BetaLongRef_abortTest {
     private BetaStm stm;
     private BetaObjectPool pool;
 

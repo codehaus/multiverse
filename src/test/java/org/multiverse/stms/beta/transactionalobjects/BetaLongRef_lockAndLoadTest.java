@@ -14,7 +14,7 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 /**
  * @author Peter Veentjer
  */
-public class LongRef_lockAndLoadTest {
+public class BetaLongRef_lockAndLoadTest {
     private BetaStm stm;
     private BetaObjectPool pool;
 

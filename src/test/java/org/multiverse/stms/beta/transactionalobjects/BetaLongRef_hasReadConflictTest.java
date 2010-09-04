@@ -12,7 +12,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
-public class LongRef_hasReadConflictTest {
+public class BetaLongRef_hasReadConflictTest {
     private BetaStm stm;
     private BetaObjectPool pool;
 

@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Veentjer
  */
-public class LongRef_tryUpdateLock {
+public class BetaLongRef_tryUpdateLock {
 
     @Test
     public void whenFree() {

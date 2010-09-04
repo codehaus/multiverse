@@ -37,6 +37,7 @@ class TransactionalObject {
   String functionClass//the class of the callable used for commuting operations
   boolean isReference
   String referenceInterface
+  boolean isNumber;
 }
 
 VelocityEngine engine = new VelocityEngine();
@@ -100,19 +101,20 @@ for (def param in refs) {
   generateTransactionalObject(engine, param)
 }
 
- def abstractTransactionalObject = new TransactionalObject(
-          name: 'AbstractBetaTransactionalObject',
-          tranlocal: 'Tranlocal',
-          type: "",
-          typeParameter: '',
-          initialValue: '',
-          classIndex: -1,
-          accessModifier: 'abstract',
-          functionClass: 'Function',
-          isReference : false
+def abstractTransactionalObject = new TransactionalObject(
+        name: 'AbstractBetaTransactionalObject',
+        tranlocal: 'Tranlocal',
+        type: "",
+        typeParameter: '',
+        initialValue: '',
+        classIndex: -1,
+        accessModifier: 'abstract',
+        functionClass: 'Function',
+        isReference: false,
+        isNumber: false
 )
 
-generateTransactionalObject(engine,abstractTransactionalObject)
+generateTransactionalObject(engine, abstractTransactionalObject)
 
 generateBetaTransactionPool(engine, transactions)
 generateBetaObjectPool(engine, refs)
@@ -176,7 +178,8 @@ List<TransactionalObject> createTransactionalObjects() {
           classIndex: 0,
           accessModifier: 'final',
           functionClass: 'Function',
-          isReference: true)
+          isReference: true,
+          isNumber: false)
   result.add new TransactionalObject(
           name: 'BetaIntRef',
           tranlocal: 'IntRefTranlocal',
@@ -188,7 +191,8 @@ List<TransactionalObject> createTransactionalObjects() {
           classIndex: 1,
           accessModifier: 'final',
           functionClass: 'IntFunction',
-          isReference: true)
+          isReference: true,
+          isNumber: true)
   result.add new TransactionalObject(
           name: 'BetaLongRef',
           tranlocal: 'LongRefTranlocal',
@@ -199,7 +203,8 @@ List<TransactionalObject> createTransactionalObjects() {
           classIndex: 2,
           accessModifier: 'final',
           functionClass: 'LongFunction',
-          isReference: true)
+          isReference: true,
+          isNumber: true)
   result.add new TransactionalObject(
           name: 'BetaTransactionalObject',
           tranlocal: 'Tranlocal',
@@ -210,7 +215,8 @@ List<TransactionalObject> createTransactionalObjects() {
           accessModifier: 'abstract',
           functionClass: 'Function',
           referenceInterface: '',
-          isReference: false)
+          isReference: false,
+          isNumber: false)
   result
 }
 

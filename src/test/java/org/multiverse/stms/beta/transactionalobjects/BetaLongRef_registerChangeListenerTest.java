@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.getField;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
-public class LongRef_registerChangeListenerTest implements BetaStmConstants {
+public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants {
     private BetaStm stm;
     private BetaObjectPool pool;
 

@@ -528,6 +528,35 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         }
     }
 
+#if(${transactionalObject.isNumber})
+    @Override
+    public ${transactionalObject.type} atomicInc(final ${transactionalObject.type} amount){
+        throw new TodoException();
+    }
+
+    @Override
+    public ${transactionalObject.type} inc(final ${transactionalObject.type} amount){
+        throw new TodoException();
+    }
+
+    @Override
+    public ${transactionalObject.type} inc(final Transaction tx, final ${transactionalObject.type} amount){
+        return inc((BetaTransaction)tx, amount);    
+    }
+
+    public ${transactionalObject.type} inc(final BetaTransaction tx, final ${transactionalObject.type} amount){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write
+              = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tx.openForWrite(this, false);
+
+        write.value+=amount;
+        return write.value;
+    }
+
+#end
 #if(${transactionalObject.isReference})
 
     @Override

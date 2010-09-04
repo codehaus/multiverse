@@ -523,6 +523,33 @@ public final class BetaLongRef
         }
     }
 
+    @Override
+    public long atomicInc(final long amount){
+        throw new TodoException();
+    }
+
+    @Override
+    public long inc(final long amount){
+        throw new TodoException();
+    }
+
+    @Override
+    public long inc(final Transaction tx, final long amount){
+        return inc((BetaTransaction)tx, amount);    
+    }
+
+    public long inc(final BetaTransaction tx, final long amount){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        LongRefTranlocal write
+              = (LongRefTranlocal)tx.openForWrite(this, false);
+
+        write.value+=amount;
+        return write.value;
+    }
+
 
     @Override
     public long atomicAlter(

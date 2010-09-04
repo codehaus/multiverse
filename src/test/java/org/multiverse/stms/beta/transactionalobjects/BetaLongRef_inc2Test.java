@@ -4,34 +4,34 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
-import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertAborted;
 import static org.multiverse.TestUtils.assertCommitted;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
-public class LongRef_get1Test {
-
+/**
+ * Tests {@link BetaLongRef}
+ *
+ * @author Peter Veentjer.
+ */
+public class BetaLongRef_inc2Test {
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
-    public void whenNullTransaction_thenNullPointerException() {
+    public void whenTransactionNull_thenNullPointerException() {
         BetaLongRef ref = createLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         try {
-            ref.set(null, 20);
+            ref.inc(null, 10);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -40,48 +40,14 @@ public class LongRef_get1Test {
     }
 
     @Test
-    public void whenPreparedTransaction_thenPreparedTransactionException() {
+    public void whenTransactionCommitted_thenDeadTransactionException() {
         BetaLongRef ref = createLongRef(stm, 10);
-        LongRefTranlocal committed = ref.___unsafeLoad();
-
-        BetaTransaction tx = stm.startDefaultTransaction();
-        tx.prepare();
-        try {
-            ref.set(tx, 20);
-            fail();
-        } catch (PreparedTransactionException expected) {
-        }
-
-        assertAborted(tx);
-        assertSame(committed, ref.___unsafeLoad());
-    }
-
-    @Test
-    public void whenAborted_thenDeadTransactionException() {
-        BetaLongRef ref = createLongRef(stm, 10);
-        LongRefTranlocal committed = ref.___unsafeLoad();
-
-        BetaTransaction tx = stm.startDefaultTransaction();
-        tx.abort();
-        try {
-            ref.set(tx, 20);
-            fail();
-        } catch (DeadTransactionException expected) {
-        }
-
-        assertAborted(tx);
-        assertSame(committed, ref.___unsafeLoad());
-    }
-
-    @Test
-    public void whenCommitted_thenDeadTransactionException() {
-          BetaLongRef ref = createLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.commit();
         try {
-            ref.set(tx, 20);
+            ref.inc(tx, 10);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -91,12 +57,64 @@ public class LongRef_get1Test {
     }
 
     @Test
-    public void test() {
+    public void whenTransactionAborted_thenDeadTransactionException() {
         BetaLongRef ref = createLongRef(stm, 10);
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        long value = ref.get(tx);
+        BetaTransaction tx = stm.startDefaultTransaction();
+        tx.abort();
+        try {
+            ref.inc(tx, 10);
+            fail();
+        } catch (DeadTransactionException expected) {
+        }
 
-        assertEquals(10, value);
+        assertAborted(tx);
+        assertSame(committed, ref.___unsafeLoad());
+    }
+
+    @Test
+    public void whenTransactionPrepared_thenPreparedTransactionException() {
+        BetaLongRef ref = createLongRef(stm, 10);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        tx.prepare();
+        try {
+            ref.inc(tx, 10);
+            fail();
+        } catch (PreparedTransactionException expected) {
+        }
+
+        assertAborted(tx);
+        assertSame(committed, ref.___unsafeLoad());
+    }
+
+    @Test
+    public void whenNoChange() {
+        BetaLongRef ref = createLongRef(stm, 10);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.inc(tx, 0);
+        tx.commit();
+
+        assertCommitted(tx);
+        assertSame(committed, ref.___unsafeLoad());
+        assertEquals(10, ref.___unsafeLoad().value);
+    }
+
+    @Test
+    public void whenSuccess() {
+        BetaLongRef ref = createLongRef(stm, 10);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.inc(tx, 20);
+        tx.commit();
+
+        assertCommitted(tx);
+        assertNotSame(committed, ref.___unsafeLoad());
+        assertEquals(30, ref.___unsafeLoad().value);
     }
 }
