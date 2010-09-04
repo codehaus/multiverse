@@ -114,7 +114,8 @@ for (def param in refs) {
 
 generateTransactionalObject(engine,abstractTransactionalObject)
 
-generateObjectPool(engine, refs, transactions)
+generateBetaTransactionPool(engine, transactions)
+generateBetaObjectPool(engine, refs)
 generateTransaction(engine, refs, transactions)
 
 for (def closure in atomicClosures) {
@@ -256,12 +257,25 @@ void generateAtomicBlock(VelocityEngine engine, List<AtomicClosure> closures) {
   file.text = writer.toString()
 }
 
-void generateObjectPool(VelocityEngine engine, List<TransactionalObject> transactionalObjects, List<Transaction> transactions) {
+void generateBetaTransactionPool(VelocityEngine engine, List<Transaction> transactions) {
+  Template t = engine.getTemplate("src/main/java/org/multiverse/stms/beta/BetaTransactionPool.vm")
+
+  VelocityContext context = new VelocityContext()
+  context.put("transactions", transactions)
+
+  StringWriter writer = new StringWriter()
+  t.merge(context, writer)
+
+  File file = new File('src/main/java/org/multiverse/stms/beta/BetaTransactionPool.java')
+  file.createNewFile()
+  file.text = writer.toString()
+}
+
+void generateBetaObjectPool(VelocityEngine engine, List<TransactionalObject> transactionalObjects) {
   Template t = engine.getTemplate("src/main/java/org/multiverse/stms/beta/BetaObjectPool.vm")
 
   VelocityContext context = new VelocityContext()
   context.put("transactionalObjects", transactionalObjects)
-  context.put("transactions", transactions)
 
   StringWriter writer = new StringWriter()
   t.merge(context, writer)
@@ -270,6 +284,7 @@ void generateObjectPool(VelocityEngine engine, List<TransactionalObject> transac
   file.createNewFile()
   file.text = writer.toString()
 }
+
 
 void generateTransaction(VelocityEngine engine, List<TransactionalObject> transactionalObjects, List<Transaction> transactions) {
   Template t = engine.getTemplate("src/main/java/org/multiverse/stms/beta/transactions/BetaTransaction.vm")
@@ -350,7 +365,7 @@ void generateTranlocal(VelocityEngine engine, TransactionalObject transactionalO
 }
 
 void generateTransactionalObject(VelocityEngine engine, TransactionalObject transactionalObject) {
-  if (!transactionalObject.isReference) {
+  if (!transactionalObject.isReference && !transactionalObject.name.equals("AbstractBetaTransactionalObject")) {
     return;
   }
 

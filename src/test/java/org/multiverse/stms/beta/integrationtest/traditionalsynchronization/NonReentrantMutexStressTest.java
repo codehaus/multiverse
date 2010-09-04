@@ -7,7 +7,6 @@ import org.multiverse.TestUtils;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactionalobjects.IntRefTranlocal;
@@ -18,7 +17,6 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
  * A stresstest that checks if the NonReentrantMutex; a traditional synchronization structure, can be build
@@ -136,14 +134,13 @@ public class NonReentrantMutexStressTest {
             @Override
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-                IntRefTranlocal read = btx.openForRead(locked, pessimistic, pool);
+                IntRefTranlocal read = btx.openForRead(locked, pessimistic);
                 if (read.value == 1) {
                     retry();
                 }
 
-                IntRefTranlocal write = btx.openForWrite(locked, pessimistic, pool);
+                IntRefTranlocal write = btx.openForWrite(locked, pessimistic);
                 write.value = 1;
             }
         };
@@ -152,9 +149,8 @@ public class NonReentrantMutexStressTest {
             @Override
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-                IntRefTranlocal write = btx.openForWrite(locked, pessimistic, pool);
+                IntRefTranlocal write = btx.openForWrite(locked, pessimistic);
                 if(write.value == 0){
                     throw new IllegalStateException();
                 }

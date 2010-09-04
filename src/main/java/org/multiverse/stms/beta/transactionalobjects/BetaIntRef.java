@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.api.LockStatus;
+import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.TodoException;
@@ -57,6 +58,8 @@ public final class BetaIntRef
     //controlled JMM problem (just like the hashcode of String).
     private int ___identityHashCode;
 
+    //todo: needs to be make final.
+    private Stm stm;
 
     /**
      * Creates a uncommitted BetaIntRef that should be attached to the transaction (this
@@ -94,6 +97,11 @@ public final class BetaIntRef
         tranlocal.isCommitted = true;
         tranlocal.isDirty = DIRTY_FALSE;
         ___active = tranlocal;
+    }
+
+    @Override
+    public final Stm getStm(){
+        return stm;
     }
 
     @Override
@@ -180,13 +188,16 @@ public final class BetaIntRef
     }
 
     @Override
-    public final IntRefTranlocal ___openForConstruction(final BetaObjectPool pool) {
+    public final IntRefTranlocal ___openForConstruction(
+        final BetaObjectPool pool) {
         IntRefTranlocal tranlocal =  pool.take(this);
         return tranlocal != null ? tranlocal : new IntRefTranlocal(this);
     }
 
     @Override
-    public final IntRefTranlocal ___openForCommute(final BetaObjectPool pool) {
+    public final IntRefTranlocal ___openForCommute(
+        final BetaObjectPool pool) {
+
         IntRefTranlocal tranlocal =  pool.take(this);
 
         if(tranlocal == null){
@@ -512,12 +523,76 @@ public final class BetaIntRef
         }
     }
 
-    /**
-     * Returns the current state of the reference atomically.
-     *
-     * @return the current state.
-     * @throws IllegalStateException if there hasn't been any commit before.
-     */
+
+    @Override
+    public int atomicAlter(
+        final IntFunction function){
+
+        throw new TodoException();
+    }
+
+    @Override
+    public int alter(
+        final IntFunction function){
+
+        throw new TodoException();
+    }
+
+    @Override
+    public int alter(
+        final Transaction tx,
+        final IntFunction function){
+        return alter((BetaTransaction)tx, function);
+    }
+
+    public int alter(
+        final BetaTransaction tx,
+        final IntFunction function){
+
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        if(function == null){
+            tx.abort();
+            throw new NullPointerException();
+        }
+
+        IntRefTranlocal write
+            = (IntRefTranlocal)tx.openForWrite(this, false);
+
+        write.value = function.call(write.value);
+        return write.value;
+    }
+            
+    @Override
+    public boolean atomicCompareAndSet(
+        final int oldValue,
+        final int newValue){
+
+        throw new TodoException();
+    }
+
+    @Override
+    public int set(final int value){
+        throw new TodoException();
+    }
+
+    @Override
+    public int get(){
+        throw new TodoException();
+    }
+
+    @Override
+    public int get(final Transaction tx){
+        return get((BetaTransaction)tx);
+    }
+
+    public final int get(final BetaTransaction transaction){
+        return transaction.openForRead(this, false).value;
+    }
+
+    @Override
     public final int atomicGet(){
         IntRefTranlocal read = ___load(50);
         if(read == null){
@@ -537,7 +612,8 @@ public final class BetaIntRef
         return result;
     }
 
-    public final int atomicSet(int newValue){
+    @Override
+    public final int atomicSet(final int newValue){
         throw new TodoException();
     }
 
@@ -581,57 +657,30 @@ public final class BetaIntRef
         return oldActive.value;
     }
 
-    public final int get(
-        final BetaTransaction transaction,
-        final BetaObjectPool pool){
-
-        return transaction.openForRead(this, false, pool).value;
+    @Override
+    public int set(Transaction tx, int value){
+        return set((BetaTransaction)tx, value);
     }
 
-    public final void set(
+    public final int set(
         final BetaTransaction transaction,
-        final BetaObjectPool pool,
         final int value){
 
-        transaction.openForWrite(this, false, pool).value = value;
+        IntRefTranlocal write = transaction.openForWrite(this, false);
+        int oldValue = write.value;
+        write.value = value;
+        return oldValue;
     }
 
-    public final int lockAndGet(
-        final BetaTransaction transaction,
-        final BetaObjectPool pool){
-
-        return transaction.openForRead(this, true, pool).value;
+    public final int lockAndGet(final BetaTransaction transaction){
+        return transaction.openForRead(this, true).value;
     }
 
     public final void lockAndSet(
         final BetaTransaction transaction,
-        final BetaObjectPool pool,
         final int value){
 
-        transaction.openForWrite(this, true, pool).value = value;
-    }
-
-    /**
-     * Applies the function to the reference and returns the new value.
-     *
-     * @param tx the BetaTransaction used
-     * @param pool the BetaObjectPool used to pool
-     * @param function the function to apply.
-     * @return the new value.
-     */
-    public int alter(
-        final BetaTransaction tx,
-        final BetaObjectPool pool,
-        final IntFunction function){
-
-        if(tx == null || pool == null || function == null){
-            throw new NullPointerException();
-        }
-
-        IntRefTranlocal write = tx.openForWrite(this, false, pool);
-        int value  = function.call(write.value);
-        write.value = value;
-        return value;
+        transaction.openForWrite(this, true).value = value;
     }
 
     @Override

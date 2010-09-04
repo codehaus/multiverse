@@ -7,7 +7,6 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -17,7 +16,6 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 
 /**
@@ -131,10 +129,9 @@ public class DiningPhilosophersStressTest {
             releaseForksBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
                     BetaTransaction btx = (BetaTransaction) tx;
-                    leftFork.set(btx, pool, leftFork.get(btx, pool) - 1);
-                    rightFork.set(btx, pool, rightFork.get(btx, pool) - 1);
+                    leftFork.set(btx, leftFork.get(btx) - 1);
+                    rightFork.set(btx,rightFork.get(btx) - 1);
                 }
             });
         }
@@ -143,19 +140,18 @@ public class DiningPhilosophersStressTest {
             takeForksBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
                     BetaTransaction btx = (BetaTransaction) tx;
 
-                    if (leftFork.get(btx, pool) == 1) {
+                    if (leftFork.get(btx) == 1) {
                         retry();
                     } else {
-                        leftFork.set(btx, pool, leftFork.get(btx, pool) + 1);
+                        leftFork.set(btx, leftFork.get(btx) + 1);
                     }
 
-                    if (rightFork.get(btx, pool) == 1) {
+                    if (rightFork.get(btx) == 1) {
                         retry();
                     } else {
-                        rightFork.set(btx, pool, rightFork.get(btx, pool) + 1);
+                        rightFork.set(btx, rightFork.get(btx) + 1);
                     }
                 }
             });

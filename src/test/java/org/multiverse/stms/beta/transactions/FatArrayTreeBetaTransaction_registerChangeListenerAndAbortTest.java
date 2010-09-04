@@ -11,7 +11,6 @@ import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
@@ -31,12 +30,10 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
  */
 public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
@@ -46,12 +43,12 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         BetaLongRef ref3 = createLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForRead(ref1, false, pool);
-        tx.openForRead(ref2, false, pool);
-        tx.openForRead(ref3, false, pool);
+        tx.openForRead(ref1, false);
+        tx.openForRead(ref2, false);
+        tx.openForRead(ref3, false);
 
         Latch latch = new CheapLatch();
-        tx.registerChangeListenerAndAbort(latch, pool);
+        tx.registerChangeListenerAndAbort(latch);
 
         assertAborted(tx);
         assertFalse(latch.isOpen());
@@ -67,11 +64,11 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
 
         LongFunction function = mock(LongFunction.class);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.commute(ref, pool,function);
+        tx.commute(ref,function);
 
         Latch listener = new CheapLatch();
         try {
-            tx.registerChangeListenerAndAbort(listener, pool);
+            tx.registerChangeListenerAndAbort(listener);
             fail();
         } catch (NoRetryPossibleException expected) {
         }
@@ -87,11 +84,11 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
     public void whenContainsConstructed_thenNoRetryPossibleException() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal constructed = tx.openForConstruction(ref, pool);
+        LongRefTranlocal constructed = tx.openForConstruction(ref);
 
         Latch listener = new CheapLatch();
         try {
-            tx.registerChangeListenerAndAbort(listener, pool);
+            tx.registerChangeListenerAndAbort(listener);
             fail();
         } catch (NoRetryPossibleException expected) {
         }
@@ -113,9 +110,9 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         BetaLongRef ref3 = new BetaLongRef(tx);
-        tx.openForRead(ref1, false, pool);
-        LongRefTranlocal write3 = tx.openForConstruction(ref3, pool);
-        tx.openForWrite(ref2, false, pool);
+        tx.openForRead(ref1, false);
+        LongRefTranlocal write3 = tx.openForConstruction(ref3);
+        tx.openForWrite(ref2, false);
         tx.registerChangeListenerAndAbort(latch);
 
         assertAborted(tx);
@@ -130,7 +127,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         Latch latch = new CheapLatch();
 
         try {
-            tx.registerChangeListenerAndAbort(latch, pool);
+            tx.registerChangeListenerAndAbort(latch);
             fail();
         } catch (NoRetryPossibleException expected) {
         }
@@ -146,12 +143,12 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
                 .setBlockingAllowed(false);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
-        tx.openForRead(ref, false, pool);
+        tx.openForRead(ref, false);
 
         Latch latch = new CheapLatch();
 
         try {
-            tx.registerChangeListenerAndAbort(latch, pool);
+            tx.registerChangeListenerAndAbort(latch);
             fail();
         } catch (NoRetryPossibleException expected) {
         }
@@ -164,10 +161,10 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         BetaLongRef ref = createLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, false, pool);
+        LongRefTranlocal read = tx.openForRead(ref, false);
 
         Latch latch = new CheapLatch();
-        tx.registerChangeListenerAndAbort(latch, pool);
+        tx.registerChangeListenerAndAbort(latch);
 
         assertFalse(latch.isOpen());
         assertAborted(tx);
@@ -180,10 +177,10 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         BetaLongRef ref = createLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, true, pool);
+        LongRefTranlocal read = tx.openForRead(ref, true);
 
         Latch latch = new CheapLatch();
-        tx.registerChangeListenerAndAbort(latch, pool);
+        tx.registerChangeListenerAndAbort(latch);
 
         assertFalse(latch.isOpen());
         assertAborted(tx);
@@ -197,10 +194,10 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         BetaLongRef ref = createLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
 
         Latch latch = new CheapLatch();
-        tx.registerChangeListenerAndAbort(latch, pool);
+        tx.registerChangeListenerAndAbort(latch);
 
         assertFalse(latch.isOpen());
         assertAborted(tx);
@@ -214,10 +211,10 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         BetaLongRef ref = createLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, true, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, true);
 
         Latch latch = new CheapLatch();
-        tx.registerChangeListenerAndAbort(latch, pool);
+        tx.registerChangeListenerAndAbort(latch);
 
         assertFalse(latch.isOpen());
         assertAborted(tx);
@@ -233,10 +230,10 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         Latch latch = new CheapLatch();
-        tx.register(pool, listenerMock);
-        tx.openForRead(ref, false, pool);
+        tx.register(listenerMock);
+        tx.openForRead(ref, false);
 
-        tx.registerChangeListenerAndAbort(latch, pool);
+        tx.registerChangeListenerAndAbort(latch);
 
         assertEquals(1, listenerMock.events.size());
         assertEquals(TransactionLifecycleEvent.PostAbort, listenerMock.events.get(0));
@@ -257,10 +254,10 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
     public void whenPrepared_thenPreparedTransactionException() {
         Latch latch = mock(Latch.class);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.prepare(pool);
+        tx.prepare();
 
         try {
-            tx.registerChangeListenerAndAbort(latch, pool);
+            tx.registerChangeListenerAndAbort(latch);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -273,10 +270,10 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
     public void whenCommitted_thenDeadTransactionException() {
         Latch latch = mock(Latch.class);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.commit(pool);
+        tx.commit();
 
         try {
-            tx.registerChangeListenerAndAbort(latch, pool);
+            tx.registerChangeListenerAndAbort(latch);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -289,10 +286,10 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
     public void whenAborted_thenDeadTransactionException() {
         Latch latch = mock(Latch.class);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.abort(pool);
+        tx.abort();
 
         try {
-            tx.registerChangeListenerAndAbort(latch, pool);
+            tx.registerChangeListenerAndAbort(latch);
             fail();
         } catch (DeadTransactionException expected) {
         }

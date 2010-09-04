@@ -7,7 +7,6 @@ import org.multiverse.TestUtils;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -16,7 +15,6 @@ import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class ReadonlyRepeatableReadStressTest {
 
@@ -67,9 +65,8 @@ public class ReadonlyRepeatableReadStressTest {
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
                     BetaTransaction btx = (BetaTransaction) tx;
-                    ref.set(btx, pool, ref.get(btx, pool));
+                    ref.set(btx, ref.get(btx));
                 }
             };
 
@@ -96,12 +93,11 @@ public class ReadonlyRepeatableReadStressTest {
         private final AtomicVoidClosure closure = new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                BetaObjectPool pool = getThreadLocalBetaObjectPool();
                 BetaTransaction btx = (BetaTransaction) tx;
 
-                int firstTime = ref.get(btx, pool);
+                int firstTime = ref.get(btx);
                 sleepRandomMs(2);
-                int secondTime = ref.get(btx, pool);
+                int secondTime = ref.get(btx);
                 assertEquals(firstTime, secondTime);
             }
         };

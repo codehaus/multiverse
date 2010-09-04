@@ -7,7 +7,6 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicLongClosure;
 import org.multiverse.api.functions.IncLongFunction;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.FatArrayTreeBetaTransactionFactory;
 import org.multiverse.stms.beta.LeanBetaAtomicBlock;
@@ -19,7 +18,6 @@ import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class CommuteStressTest {
      private BetaStm stm;
@@ -89,9 +87,8 @@ public class CommuteStressTest {
                 @Override
                 public long execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
                     for (int k = 0; k < refs.length; k++) {
-                        btx.commute(refs[k], pool, IncLongFunction.INSTANCE);
+                        btx.commute(refs[k],IncLongFunction.INSTANCE);
                     }
                     return refs.length;
                 }
@@ -101,9 +98,8 @@ public class CommuteStressTest {
                 @Override
                 public long execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
                     for (int k = 0; k < refs.length; k++) {
-                        btx.openForWrite(refs[k], false, pool).value++;
+                        btx.openForWrite(refs[k], false).value++;
                     }
                     return refs.length;
                 }

@@ -29,19 +29,19 @@ public abstract class AbstractBetaAtomicBlock implements AtomicBlock {
         this.hasTimeout = transactionConfiguration.hasTimeout();
     }
 
-    protected final void waitForChange(
-            final BetaObjectPool pool, final BetaTransaction tx) throws InterruptedException {
+    protected final void waitForChange(final BetaTransaction tx) throws InterruptedException {
 
         if (hasTimeout) {
-            waitForChangeWithTimeout(pool, tx);
+            waitForChangeWithTimeout(tx);
         } else {
-            waitForChangeWithoutTimeout(pool, tx);
+            waitForChangeWithoutTimeout(tx);
         }
     }
 
     protected final void waitForChangeWithTimeout(
-            final BetaObjectPool pool, final BetaTransaction tx) throws InterruptedException {
+            final BetaTransaction tx) throws InterruptedException {
 
+        BetaObjectPool pool = tx.getPool();
         StandardLatch latch = pool.takeStandardLatch();
         if (latch == null) {
             latch = new StandardLatch();
@@ -50,7 +50,7 @@ public abstract class AbstractBetaAtomicBlock implements AtomicBlock {
         final long lockEra = latch.getEra();
 
         try {
-            tx.registerChangeListenerAndAbort(latch, pool);
+            tx.registerChangeListenerAndAbort(latch);
 
             long timeoutNs = tx.getRemainingTimeoutNs();
 
@@ -72,9 +72,8 @@ public abstract class AbstractBetaAtomicBlock implements AtomicBlock {
         }
     }
 
-    protected final void waitForChangeWithoutTimeout(
-            final BetaObjectPool pool, final BetaTransaction tx) throws InterruptedException {
-
+    protected final void waitForChangeWithoutTimeout(final BetaTransaction tx) throws InterruptedException {
+        BetaObjectPool pool = tx.getPool();
         CheapLatch latch = pool.takeCheapLatch();
         if (latch == null) {
             latch = new CheapLatch();
@@ -83,7 +82,7 @@ public abstract class AbstractBetaAtomicBlock implements AtomicBlock {
         final long lockEra = latch.getEra();
 
         try {
-            tx.registerChangeListenerAndAbort(latch, pool);
+            tx.registerChangeListenerAndAbort(latch);
             if (transactionConfiguration.isInterruptible()) {
                 latch.await(lockEra);
             } else {

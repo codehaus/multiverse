@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.api.functions.*;
-import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.*;
 
 /**
  * The {@link Tranlocal} for the {@link ${transactionalObject.name}).

@@ -1,6 +1,5 @@
 package org.multiverse.benchmarks;
 
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
@@ -109,8 +108,6 @@ public class MultipleWriteScalabilityTest {
                 refs[k] = createReadBiasedLongRef(stm);
             }
 
-            BetaObjectPool pool = new BetaObjectPool();
-
             //AnotherInlinedMonoUpdateTransaction tx = new AnotherInlinedMonoUpdateTransaction(stm);
             //MonoUpdateTransaction tx = new MonoUpdateTransaction(stm);
             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, refs.length);
@@ -122,11 +119,11 @@ public class MultipleWriteScalabilityTest {
 
             for (int iteration = 0; iteration < transactionCount; iteration++) {
                 for (int k = 0; k < refs.length; k++) {
-                    LongRefTranlocal tranlocal = (LongRefTranlocal) tx.openForWrite(refs[0], false, pool);
+                    LongRefTranlocal tranlocal = (LongRefTranlocal) tx.openForWrite(refs[0], false);
                     tranlocal.value++;
                 }
-                tx.commit(pool);
-                tx.hardReset(pool);
+                tx.commit();
+                tx.hardReset();
 
                 //if (k % 100000000 == 0 && k > 0) {
                 //    System.out.printf("%s is at %s\n", getName(), k);

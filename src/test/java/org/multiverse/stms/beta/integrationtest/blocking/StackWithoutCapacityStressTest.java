@@ -21,7 +21,6 @@ import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
  * The test is not very efficient since a lot of temporary objects like the transaction template are created.
@@ -122,7 +121,7 @@ public class StackWithoutCapacityStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, pessimistic, getThreadLocalBetaObjectPool());
+                    RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, pessimistic);
                     headTranlocal.value = new Node<E>(item, headTranlocal.value);
                 }
             });
@@ -133,7 +132,7 @@ public class StackWithoutCapacityStressTest {
                 @Override
                 public E execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, pessimistic, getThreadLocalBetaObjectPool());
+                    RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, pessimistic);
                     if (headTranlocal.value == null) {
                         retry();
                     }

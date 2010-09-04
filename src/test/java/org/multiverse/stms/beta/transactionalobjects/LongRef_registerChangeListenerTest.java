@@ -36,7 +36,7 @@ public class LongRef_registerChangeListenerTest implements BetaStmConstants {
 
         LongFunction function = mock(LongFunction.class);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.commute(ref, pool, function);
+        tx.commute(ref, function);
 
         Latch latch = new CheapLatch();
         long listenerEra = latch.getEra();
@@ -54,12 +54,12 @@ public class LongRef_registerChangeListenerTest implements BetaStmConstants {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal read = tx.openForRead(ref, false, pool);
+        LongRefTranlocal read = tx.openForRead(ref, false);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        LongRefTranlocal write = otherTx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = otherTx.openForWrite(ref, false);
         write.value++;
-        otherTx.commit(pool);
+        otherTx.commit();
 
         Latch latch = new CheapLatch();
         long listenerEra = latch.getEra();
@@ -86,7 +86,7 @@ public class LongRef_registerChangeListenerTest implements BetaStmConstants {
     public void whenConstructed_thenNoRegistration() {
         BetaTransaction tx = stm.startDefaultTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal read = tx.openForConstruction(ref, pool);
+        LongRefTranlocal read = tx.openForConstruction(ref);
 
         Latch latch = new CheapLatch();
         long listenerEra = latch.getEra();
@@ -102,7 +102,7 @@ public class LongRef_registerChangeListenerTest implements BetaStmConstants {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal read = tx.openForRead(ref, false, pool);
+        LongRefTranlocal read = tx.openForRead(ref, false);
 
         Latch latch = new CheapLatch();
         long listenerEra = latch.getEra();
@@ -122,14 +122,14 @@ public class LongRef_registerChangeListenerTest implements BetaStmConstants {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx1 = stm.startDefaultTransaction();
-        LongRefTranlocal read1 = tx1.openForRead(ref, false, pool);
+        LongRefTranlocal read1 = tx1.openForRead(ref, false);
 
         Latch latch1 = new CheapLatch();
         long listenerEra1 = latch1.getEra();
         ref.___registerChangeListener(latch1, read1, pool, listenerEra1);
 
         BetaTransaction tx2 = stm.startDefaultTransaction();
-        LongRefTranlocal read2 = tx2.openForRead(ref, false, pool);
+        LongRefTranlocal read2 = tx2.openForRead(ref, false);
 
         Latch latch2 = new CheapLatch();
         long listenerEra2 = latch2.getEra();

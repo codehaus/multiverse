@@ -24,12 +24,10 @@ import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 public class BetaAtomicBlock_speculativeTest {
 
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
@@ -55,7 +53,7 @@ public class BetaAtomicBlock_speculativeTest {
 
                 transactions.add(btx);
                 for (BetaLongRef ref : refs) {
-                    btx.openForWrite(ref, false, pool).value = 1;
+                    btx.openForWrite(ref, false).value = 1;
                 }
             }
         });
@@ -87,7 +85,7 @@ public class BetaAtomicBlock_speculativeTest {
                 BetaTransaction btx = (BetaTransaction) tx;
                 transactions.add(btx);
                 if (!added.get()) {
-                    btx.registerPermanent(pool, listener);
+                    btx.registerPermanent( listener);
                 }
             }
         });
@@ -112,7 +110,7 @@ public class BetaAtomicBlock_speculativeTest {
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
                 transactions.add(btx);
-                btx.commute(ref, pool, function);
+                btx.commute(ref, function);
             }
         });
 
@@ -138,7 +136,7 @@ public class BetaAtomicBlock_speculativeTest {
                 transactions.add(btx);
 
                 if (!added.get()) {
-                    btx.register(pool, listener);
+                    btx.register(listener);
                 }
 
             }
@@ -179,8 +177,8 @@ public class BetaAtomicBlock_speculativeTest {
                     assertEquals(500, btx.getRemainingTimeoutNs());
                 }
 
-                btx.openForWrite(ref1,false, pool);
-                btx.openForWrite(ref2,false, pool);
+                btx.openForWrite(ref1,false);
+                btx.openForWrite(ref2,false);
             }
         });
     }

@@ -8,7 +8,6 @@ import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.Function;
 import org.multiverse.api.functions.IntFunction;
 import org.multiverse.api.functions.LongFunction;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.conflictcounters.LocalConflictCounter;
@@ -17,7 +16,6 @@ import org.multiverse.stms.beta.transactionalobjects.*;
 import java.util.Arrays;
 
 import static java.lang.String.format;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 
 /**
@@ -61,10 +59,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
     @Override
     public <E> RefTranlocal<E> openForRead(
-        final BetaRef<E> ref, boolean lock, final BetaObjectPool pool) {
+        final BetaRef<E> ref, boolean lock) {
 
         if (status != ACTIVE) {
-            throw abortOpenForRead(pool, ref);
+            throw abortOpenForRead(ref);
         }
 
         if (ref == null) {
@@ -79,7 +77,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             RefTranlocal<E> found = (RefTranlocal<E>)array[index];
 
             if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,found)){
-                throw abortOnReadConflict(pool);
+                throw abortOnReadConflict();
             }
 
             return found;
@@ -96,17 +94,17 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             : ref.___load(config.spinCount);
 
         if (read.isLocked) {
-            throw abortOnReadConflict(pool);
+            throw abortOnReadConflict();
         }
 
         //make sure that there are no conflicts.
         if (hasReadConflict()) {
             ref.___abort(this, read, pool);
-            throw abortOnReadConflict(pool);
+            throw abortOnReadConflict();
         }
 
         if(lock || !read.isPermanent || config.trackReads){
-            attach(ref, read, identityHashCode, pool);
+            attach(ref, read, identityHashCode);
             size++;
         }else{
             hasUntrackedReads = true;
@@ -117,18 +115,18 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
     @Override
     public <E> RefTranlocal<E> openForWrite(
-        final BetaRef<E>  ref, boolean lock, final BetaObjectPool pool) {
+        final BetaRef<E>  ref, boolean lock) {
 
         if (status != ACTIVE) {
-            throw abortOpenForWrite(pool, ref);
+            throw abortOpenForWrite(ref);
         }
 
         if (config.readonly) {
-            throw abortOpenForWriteWhenReadonly(pool, ref);
+            throw abortOpenForWriteWhenReadonly(ref);
         }
 
         if (ref == null) {
-            throw abortOpenForWriteWhenNullReference(pool);
+            throw abortOpenForWriteWhenNullReference();
         }
 
         //lets find the tranlocal
@@ -140,7 +138,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             RefTranlocal<E> result = (RefTranlocal<E>)array[index];
 
             if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,result)){
-                throw abortOnReadConflict(pool);
+                throw abortOnReadConflict();
             }
 
             if(!result.isCommitted){
@@ -174,37 +172,36 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             : ref.___load(config.spinCount);
 
         if(read.isLocked){
-           throw abortOnReadConflict(pool);
+           throw abortOnReadConflict();
         }
 
         if (hasReadConflict()) {
             read.owner.___abort(this, read, pool);
-            throw abortOnReadConflict(pool);
+            throw abortOnReadConflict();
         }
 
         //open the tranlocal for writing.
         RefTranlocal<E> result = read.openForWrite(pool);
         hasUpdates = true;
-        attach(ref, result, identityHashCode, pool);
+        attach(ref, result, identityHashCode);
         size++;        
         return result;
     }
 
     @Override
     public final <E> RefTranlocal<E> openForConstruction(
-        final BetaRef<E> ref, final BetaObjectPool pool) {
-        assert pool!=null;
+        final BetaRef<E> ref) {
 
         if (status != ACTIVE) {
-            throw abortOpenForConstruction(pool, ref);
+            throw abortOpenForConstruction(ref);
         }
 
         if (config.readonly) {
-            throw abortOpenForWriteWhenReadonly(pool, ref);            
+            throw abortOpenForWriteWhenReadonly(ref);
         }
 
         if (ref == null) {
-            throw abortOpenForWriteWhenNullReference(pool);               
+            throw abortOpenForWriteWhenNullReference();
         }
 
         final int identityHashCode = ref.___identityHashCode();
@@ -213,15 +210,14 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if(index >- 1){
             final RefTranlocal<E> result = (RefTranlocal<E>)array[index];
             if(result.isCommitted || result.read!=null){
-                throw abortOpenForConstructionWithBadReference(pool, ref);
+                throw abortOpenForConstructionWithBadReference(ref);
             }
 
             return result;
         }
 
         if(ref.___unsafeLoad()!=null){
-            abort(pool);
-            throw abortOpenForConstructionWithBadReference(pool, ref);
+            throw abortOpenForConstructionWithBadReference(ref);
         }
 
         RefTranlocal<E> result =  pool.take(ref);
@@ -229,20 +225,20 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             result = new RefTranlocal<E>(ref);
         }
         result.isDirty = DIRTY_TRUE;
-        attach(ref, result, identityHashCode, pool);
+        attach(ref, result, identityHashCode);
         size++;
         return result;
     }
 
     public <E> void commute(
-        final BetaRef<E> ref, final BetaObjectPool pool, final Function<E> function){
+        final BetaRef<E> ref, final Function<E> function){
 
         if (status != ACTIVE) {
-            throw abortCommute(pool, ref, function);
+            throw abortCommute(ref, function);
         }
 
         config.needsCommute();
-        abort(pool);
+        abort();
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
@@ -250,10 +246,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
     @Override
     public  IntRefTranlocal openForRead(
-        final BetaIntRef ref, boolean lock, final BetaObjectPool pool) {
+        final BetaIntRef ref, boolean lock) {
 
         if (status != ACTIVE) {
-            throw abortOpenForRead(pool, ref);
+            throw abortOpenForRead(ref);
         }
 
         if (ref == null) {
@@ -268,7 +264,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             IntRefTranlocal found = (IntRefTranlocal)array[index];
 
             if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,found)){
-                throw abortOnReadConflict(pool);
+                throw abortOnReadConflict();
             }
 
             return found;
@@ -285,17 +281,17 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             : ref.___load(config.spinCount);
 
         if (read.isLocked) {
-            throw abortOnReadConflict(pool);
+            throw abortOnReadConflict();
         }
 
         //make sure that there are no conflicts.
         if (hasReadConflict()) {
             ref.___abort(this, read, pool);
-            throw abortOnReadConflict(pool);
+            throw abortOnReadConflict();
         }
 
         if(lock || !read.isPermanent || config.trackReads){
-            attach(ref, read, identityHashCode, pool);
+            attach(ref, read, identityHashCode);
             size++;
         }else{
             hasUntrackedReads = true;
@@ -306,18 +302,18 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
     @Override
     public  IntRefTranlocal openForWrite(
-        final BetaIntRef  ref, boolean lock, final BetaObjectPool pool) {
+        final BetaIntRef  ref, boolean lock) {
 
         if (status != ACTIVE) {
-            throw abortOpenForWrite(pool, ref);
+            throw abortOpenForWrite(ref);
         }
 
         if (config.readonly) {
-            throw abortOpenForWriteWhenReadonly(pool, ref);
+            throw abortOpenForWriteWhenReadonly(ref);
         }
 
         if (ref == null) {
-            throw abortOpenForWriteWhenNullReference(pool);
+            throw abortOpenForWriteWhenNullReference();
         }
 
         //lets find the tranlocal
@@ -329,7 +325,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             IntRefTranlocal result = (IntRefTranlocal)array[index];
 
             if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,result)){
-                throw abortOnReadConflict(pool);
+                throw abortOnReadConflict();
             }
 
             if(!result.isCommitted){
@@ -363,37 +359,36 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             : ref.___load(config.spinCount);
 
         if(read.isLocked){
-           throw abortOnReadConflict(pool);
+           throw abortOnReadConflict();
         }
 
         if (hasReadConflict()) {
             read.owner.___abort(this, read, pool);
-            throw abortOnReadConflict(pool);
+            throw abortOnReadConflict();
         }
 
         //open the tranlocal for writing.
         IntRefTranlocal result = read.openForWrite(pool);
         hasUpdates = true;
-        attach(ref, result, identityHashCode, pool);
+        attach(ref, result, identityHashCode);
         size++;        
         return result;
     }
 
     @Override
     public final  IntRefTranlocal openForConstruction(
-        final BetaIntRef ref, final BetaObjectPool pool) {
-        assert pool!=null;
+        final BetaIntRef ref) {
 
         if (status != ACTIVE) {
-            throw abortOpenForConstruction(pool, ref);
+            throw abortOpenForConstruction(ref);
         }
 
         if (config.readonly) {
-            throw abortOpenForWriteWhenReadonly(pool, ref);            
+            throw abortOpenForWriteWhenReadonly(ref);
         }
 
         if (ref == null) {
-            throw abortOpenForWriteWhenNullReference(pool);               
+            throw abortOpenForWriteWhenNullReference();
         }
 
         final int identityHashCode = ref.___identityHashCode();
@@ -402,15 +397,14 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if(index >- 1){
             final IntRefTranlocal result = (IntRefTranlocal)array[index];
             if(result.isCommitted || result.read!=null){
-                throw abortOpenForConstructionWithBadReference(pool, ref);
+                throw abortOpenForConstructionWithBadReference(ref);
             }
 
             return result;
         }
 
         if(ref.___unsafeLoad()!=null){
-            abort(pool);
-            throw abortOpenForConstructionWithBadReference(pool, ref);
+            throw abortOpenForConstructionWithBadReference(ref);
         }
 
         IntRefTranlocal result =  pool.take(ref);
@@ -418,20 +412,20 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             result = new IntRefTranlocal(ref);
         }
         result.isDirty = DIRTY_TRUE;
-        attach(ref, result, identityHashCode, pool);
+        attach(ref, result, identityHashCode);
         size++;
         return result;
     }
 
     public  void commute(
-        final BetaIntRef ref, final BetaObjectPool pool, final IntFunction function){
+        final BetaIntRef ref, final IntFunction function){
 
         if (status != ACTIVE) {
-            throw abortCommute(pool, ref, function);
+            throw abortCommute(ref, function);
         }
 
         config.needsCommute();
-        abort(pool);
+        abort();
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
@@ -439,10 +433,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
     @Override
     public  LongRefTranlocal openForRead(
-        final BetaLongRef ref, boolean lock, final BetaObjectPool pool) {
+        final BetaLongRef ref, boolean lock) {
 
         if (status != ACTIVE) {
-            throw abortOpenForRead(pool, ref);
+            throw abortOpenForRead(ref);
         }
 
         if (ref == null) {
@@ -457,7 +451,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             LongRefTranlocal found = (LongRefTranlocal)array[index];
 
             if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,found)){
-                throw abortOnReadConflict(pool);
+                throw abortOnReadConflict();
             }
 
             return found;
@@ -474,17 +468,17 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             : ref.___load(config.spinCount);
 
         if (read.isLocked) {
-            throw abortOnReadConflict(pool);
+            throw abortOnReadConflict();
         }
 
         //make sure that there are no conflicts.
         if (hasReadConflict()) {
             ref.___abort(this, read, pool);
-            throw abortOnReadConflict(pool);
+            throw abortOnReadConflict();
         }
 
         if(lock || !read.isPermanent || config.trackReads){
-            attach(ref, read, identityHashCode, pool);
+            attach(ref, read, identityHashCode);
             size++;
         }else{
             hasUntrackedReads = true;
@@ -495,18 +489,18 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
     @Override
     public  LongRefTranlocal openForWrite(
-        final BetaLongRef  ref, boolean lock, final BetaObjectPool pool) {
+        final BetaLongRef  ref, boolean lock) {
 
         if (status != ACTIVE) {
-            throw abortOpenForWrite(pool, ref);
+            throw abortOpenForWrite(ref);
         }
 
         if (config.readonly) {
-            throw abortOpenForWriteWhenReadonly(pool, ref);
+            throw abortOpenForWriteWhenReadonly(ref);
         }
 
         if (ref == null) {
-            throw abortOpenForWriteWhenNullReference(pool);
+            throw abortOpenForWriteWhenNullReference();
         }
 
         //lets find the tranlocal
@@ -518,7 +512,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             LongRefTranlocal result = (LongRefTranlocal)array[index];
 
             if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,result)){
-                throw abortOnReadConflict(pool);
+                throw abortOnReadConflict();
             }
 
             if(!result.isCommitted){
@@ -552,37 +546,36 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             : ref.___load(config.spinCount);
 
         if(read.isLocked){
-           throw abortOnReadConflict(pool);
+           throw abortOnReadConflict();
         }
 
         if (hasReadConflict()) {
             read.owner.___abort(this, read, pool);
-            throw abortOnReadConflict(pool);
+            throw abortOnReadConflict();
         }
 
         //open the tranlocal for writing.
         LongRefTranlocal result = read.openForWrite(pool);
         hasUpdates = true;
-        attach(ref, result, identityHashCode, pool);
+        attach(ref, result, identityHashCode);
         size++;        
         return result;
     }
 
     @Override
     public final  LongRefTranlocal openForConstruction(
-        final BetaLongRef ref, final BetaObjectPool pool) {
-        assert pool!=null;
+        final BetaLongRef ref) {
 
         if (status != ACTIVE) {
-            throw abortOpenForConstruction(pool, ref);
+            throw abortOpenForConstruction(ref);
         }
 
         if (config.readonly) {
-            throw abortOpenForWriteWhenReadonly(pool, ref);            
+            throw abortOpenForWriteWhenReadonly(ref);
         }
 
         if (ref == null) {
-            throw abortOpenForWriteWhenNullReference(pool);               
+            throw abortOpenForWriteWhenNullReference();
         }
 
         final int identityHashCode = ref.___identityHashCode();
@@ -591,15 +584,14 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if(index >- 1){
             final LongRefTranlocal result = (LongRefTranlocal)array[index];
             if(result.isCommitted || result.read!=null){
-                throw abortOpenForConstructionWithBadReference(pool, ref);
+                throw abortOpenForConstructionWithBadReference(ref);
             }
 
             return result;
         }
 
         if(ref.___unsafeLoad()!=null){
-            abort(pool);
-            throw abortOpenForConstructionWithBadReference(pool, ref);
+            throw abortOpenForConstructionWithBadReference(ref);
         }
 
         LongRefTranlocal result =  pool.take(ref);
@@ -607,20 +599,20 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             result = new LongRefTranlocal(ref);
         }
         result.isDirty = DIRTY_TRUE;
-        attach(ref, result, identityHashCode, pool);
+        attach(ref, result, identityHashCode);
         size++;
         return result;
     }
 
     public  void commute(
-        final BetaLongRef ref, final BetaObjectPool pool, final LongFunction function){
+        final BetaLongRef ref, final LongFunction function){
 
         if (status != ACTIVE) {
-            throw abortCommute(pool, ref, function);
+            throw abortCommute(ref, function);
         }
 
         config.needsCommute();
-        abort(pool);
+        abort();
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
@@ -628,10 +620,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
     @Override
     public  Tranlocal openForRead(
-        final BetaTransactionalObject ref, boolean lock, final BetaObjectPool pool) {
+        final BetaTransactionalObject ref, boolean lock) {
 
         if (status != ACTIVE) {
-            throw abortOpenForRead(pool, ref);
+            throw abortOpenForRead(ref);
         }
 
         if (ref == null) {
@@ -646,7 +638,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             Tranlocal found = (Tranlocal)array[index];
 
             if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,found)){
-                throw abortOnReadConflict(pool);
+                throw abortOnReadConflict();
             }
 
             return found;
@@ -663,17 +655,17 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             : ref.___load(config.spinCount);
 
         if (read.isLocked) {
-            throw abortOnReadConflict(pool);
+            throw abortOnReadConflict();
         }
 
         //make sure that there are no conflicts.
         if (hasReadConflict()) {
             ref.___abort(this, read, pool);
-            throw abortOnReadConflict(pool);
+            throw abortOnReadConflict();
         }
 
         if(lock || !read.isPermanent || config.trackReads){
-            attach(ref, read, identityHashCode, pool);
+            attach(ref, read, identityHashCode);
             size++;
         }else{
             hasUntrackedReads = true;
@@ -684,18 +676,18 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
     @Override
     public  Tranlocal openForWrite(
-        final BetaTransactionalObject  ref, boolean lock, final BetaObjectPool pool) {
+        final BetaTransactionalObject  ref, boolean lock) {
 
         if (status != ACTIVE) {
-            throw abortOpenForWrite(pool, ref);
+            throw abortOpenForWrite(ref);
         }
 
         if (config.readonly) {
-            throw abortOpenForWriteWhenReadonly(pool, ref);
+            throw abortOpenForWriteWhenReadonly(ref);
         }
 
         if (ref == null) {
-            throw abortOpenForWriteWhenNullReference(pool);
+            throw abortOpenForWriteWhenNullReference();
         }
 
         //lets find the tranlocal
@@ -707,7 +699,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             Tranlocal result = (Tranlocal)array[index];
 
             if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,result)){
-                throw abortOnReadConflict(pool);
+                throw abortOnReadConflict();
             }
 
             if(!result.isCommitted){
@@ -734,37 +726,36 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             : ref.___load(config.spinCount);
 
         if(read.isLocked){
-           throw abortOnReadConflict(pool);
+           throw abortOnReadConflict();
         }
 
         if (hasReadConflict()) {
             read.owner.___abort(this, read, pool);
-            throw abortOnReadConflict(pool);
+            throw abortOnReadConflict();
         }
 
         //open the tranlocal for writing.
         Tranlocal result = read.openForWrite(pool);
         hasUpdates = true;
-        attach(ref, result, identityHashCode, pool);
+        attach(ref, result, identityHashCode);
         size++;        
         return result;
     }
 
     @Override
     public final  Tranlocal openForConstruction(
-        final BetaTransactionalObject ref, final BetaObjectPool pool) {
-        assert pool!=null;
+        final BetaTransactionalObject ref) {
 
         if (status != ACTIVE) {
-            throw abortOpenForConstruction(pool, ref);
+            throw abortOpenForConstruction(ref);
         }
 
         if (config.readonly) {
-            throw abortOpenForWriteWhenReadonly(pool, ref);            
+            throw abortOpenForWriteWhenReadonly(ref);
         }
 
         if (ref == null) {
-            throw abortOpenForWriteWhenNullReference(pool);               
+            throw abortOpenForWriteWhenNullReference();
         }
 
         final int identityHashCode = ref.___identityHashCode();
@@ -773,33 +764,32 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if(index >- 1){
             final Tranlocal result = (Tranlocal)array[index];
             if(result.isCommitted || result.read!=null){
-                throw abortOpenForConstructionWithBadReference(pool, ref);
+                throw abortOpenForConstructionWithBadReference(ref);
             }
 
             return result;
         }
 
         if(ref.___unsafeLoad()!=null){
-            abort(pool);
-            throw abortOpenForConstructionWithBadReference(pool, ref);
+            throw abortOpenForConstructionWithBadReference(ref);
         }
 
         final Tranlocal result = ref.___openForConstruction(pool);
         result.isDirty = DIRTY_TRUE;
-        attach(ref, result, identityHashCode, pool);
+        attach(ref, result, identityHashCode);
         size++;
         return result;
     }
 
     public  void commute(
-        final BetaTransactionalObject ref, final BetaObjectPool pool, final Function function){
+        final BetaTransactionalObject ref, final Function function){
 
         if (status != ACTIVE) {
-            throw abortCommute(pool, ref, function);
+            throw abortCommute(ref, function);
         }
 
         config.needsCommute();
-        abort(pool);
+        abort();
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
@@ -839,7 +829,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         return -1;
     }
 
-    private void attach(final BetaTransactionalObject ref, final Tranlocal tranlocal, final int hash, final BetaObjectPool pool){
+    private void attach(final BetaTransactionalObject ref, final Tranlocal tranlocal, final int hash){
         int jump = 0;
         boolean goLeft = true;
 
@@ -858,11 +848,11 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             jump = jump == 0?1:jump*2;
         }while(jump < array.length);
 
-        expand(pool);
-        attach(ref, tranlocal, hash, pool);
+        expand();
+        attach(ref, tranlocal, hash);
     }
 
-    private void expand(final BetaObjectPool pool){
+    private void expand(){
         Tranlocal[] oldArray = array;
         int newSize = oldArray.length*2;
         array = pool.takeTranlocalArray(newSize);
@@ -874,7 +864,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             final Tranlocal tranlocal = oldArray[k];
 
             if(tranlocal != null){
-               attach(tranlocal.owner, tranlocal, tranlocal.owner.___identityHashCode(),pool);
+               attach(tranlocal.owner, tranlocal, tranlocal.owner.___identityHashCode());
             }
         }
 
@@ -918,11 +908,6 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
     @Override
     public void abort() {
-        abort(getThreadLocalBetaObjectPool());
-    }
-
-    @Override
-    public void abort(final BetaObjectPool pool) {
         switch (status) {
             case ACTIVE:
                 //fall through
@@ -952,11 +937,6 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
     @Override
     public void commit() {
-        commit(getThreadLocalBetaObjectPool());
-    }
-
-    @Override
-    public void commit(final BetaObjectPool pool) {
         if (status != ACTIVE) {
             switch (status) {
                 case PREPARED:
@@ -972,24 +952,24 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         }
 
         if(abortOnly){
-            throw abortOnWriteConflict(pool);
+            throw abortOnWriteConflict();
         }
 
         Listeners[] listenersArray = null;
         if(size>0){
             final boolean needsPrepare = status == ACTIVE && hasUpdates;
             if(config.dirtyCheck){
-                if(needsPrepare && !doPrepareDirty(pool)){
-                    throw abortOnWriteConflict(pool);
+                if(needsPrepare && !doPrepareDirty()){
+                    throw abortOnWriteConflict();
                 }
 
-                listenersArray = commitDirty(pool);
+                listenersArray = commitDirty();
             }else{
-                if(needsPrepare && !doPrepareAll(pool)){
-                    throw abortOnWriteConflict(pool);
+                if(needsPrepare && !doPrepareAll()){
+                    throw abortOnWriteConflict();
                 }
 
-                listenersArray = commitAll(pool);
+                listenersArray = commitAll();
             }
         }
         status = COMMITTED;
@@ -999,7 +979,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         }
     }
 
-    private Listeners[] commitAll(final BetaObjectPool pool) {
+    private Listeners[] commitAll() {
         Listeners[] listenersArray = null;
 
         int listenersArrayIndex = 0;
@@ -1025,7 +1005,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         return listenersArray;
     }
 
-    private Listeners[] commitDirty(final BetaObjectPool pool) {
+    private Listeners[] commitDirty() {
         Listeners[] listenersArray = null;
 
         int listenersArrayIndex = 0;
@@ -1061,11 +1041,6 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
     @Override
     public void prepare() {
-        prepare(getThreadLocalBetaObjectPool());
-    }
-
-    @Override
-    public void prepare(BetaObjectPool pool) {
         if (status != ACTIVE) {
             switch (status) {
                 case PREPARED:
@@ -1083,17 +1058,17 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         }
 
         if(abortOnly){
-            throw abortOnWriteConflict(pool);
+            throw abortOnWriteConflict();
         }
 
         if(hasUpdates){
             if(config.dirtyCheck){
-                if(!doPrepareDirty(pool)){
-                    throw abortOnWriteConflict(pool);
+                if(!doPrepareDirty()){
+                    throw abortOnWriteConflict();
                 }
             }else{
-                if(!doPrepareAll(pool)){
-                    throw abortOnWriteConflict(pool);
+                if(!doPrepareAll()){
+                    throw abortOnWriteConflict();
                 }
             }
         }
@@ -1101,7 +1076,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         status = PREPARED;
     }
 
-    private boolean doPrepareAll(final BetaObjectPool pool) {
+    private boolean doPrepareAll() {
         if(config.lockWrites){
             return true;
         }
@@ -1123,7 +1098,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         return true;
     }
 
-    private boolean doPrepareDirty(final BetaObjectPool pool) {
+    private boolean doPrepareDirty() {
         if(config.lockWrites){
             return true;
         }
@@ -1150,22 +1125,17 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
     // ============================ registerChangeListener ===============================
 
     @Override
-    public void registerChangeListenerAndAbort(final Latch listener){
-        registerChangeListenerAndAbort(listener, getThreadLocalBetaObjectPool());
-    }
-
-    @Override
-    public void registerChangeListenerAndAbort(final Latch listener, final BetaObjectPool pool) {
+    public void registerChangeListenerAndAbort(final Latch listener) {
         if (status != ACTIVE) {
-            throw abortOnFaultyStatusOfRegisterChangeListenerAndAbort(pool);
+            throw abortOnFaultyStatusOfRegisterChangeListenerAndAbort();
         }
 
         if(!config.blockingAllowed){
-            throw abortOnNoBlockingAllowed(pool);
+            throw abortOnNoBlockingAllowed();
         }
 
         if( size == 0){
-            throw abortOnNoRetryPossible(pool);
+            throw abortOnNoRetryPossible();
         }
 
         final long listenerEra = listener.getEra();
@@ -1201,21 +1171,16 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
         status = ABORTED;
         if(!atLeastOneRegistration){
-            throw abortOnNoRetryPossible(pool);
+            throw abortOnNoRetryPossible();
         }
     }
 
     // ============================== reset ========================================
 
     @Override
-    public boolean softReset(){
-        return softReset(getThreadLocalBetaObjectPool());
-    }
-
-    @Override
-    public boolean softReset(final BetaObjectPool pool) {
+    public boolean softReset() {
         if (status == ACTIVE || status == PREPARED) {
-            abort(pool);
+            abort();
         }
 
         if(attempt>=config.getMaxRetries()){
@@ -1244,13 +1209,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
     @Override
     public void hardReset(){
-        hardReset(getThreadLocalBetaObjectPool());
-    }
-
-    @Override
-    public void hardReset(final BetaObjectPool pool){
         if (status == ACTIVE || status == PREPARED) {
-            abort(pool);
+            abort();
         }
 
         if(array.length>config.minimalArrayTreeSize){
@@ -1277,22 +1237,17 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
     @Override
     public void init(BetaTransactionConfiguration transactionConfig){
-        init(transactionConfig, getThreadLocalBetaObjectPool());
-    }
-
-    @Override
-    public void init(BetaTransactionConfiguration transactionConfig, BetaObjectPool pool){
         if(transactionConfig == null){
-            abort(pool);
+            abort();
             throw new NullPointerException();
         }
 
         if(status == ACTIVE || status == PREPARED){
-            abort(pool);
+            abort();
         }
 
         this.config = transactionConfig;
-        hardReset(pool);
+        hardReset();
     }
 
     // ================== orelse ============================
@@ -1301,35 +1256,20 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
     @Override
     public final void startEitherBranch(){
-        startEitherBranch(getThreadLocalBetaObjectPool());
-    }
-
-    @Override
-    public final void startEitherBranch(BetaObjectPool pool){
         config.needsOrelse();
-        abort(pool);
+        abort();
         throw SpeculativeConfigurationError.INSTANCE;
     }
 
     @Override
     public final void endEitherBranch(){
-        endEitherBranch(getThreadLocalBetaObjectPool());
-    }
-
-    @Override
-    public final void endEitherBranch(BetaObjectPool pool){
-        abort(pool);
+        abort();
         throw new IllegalStateException();
     }
 
     @Override
     public final void startOrElseBranch(){
-        startOrElseBranch(getThreadLocalBetaObjectPool());
-    }
-
-    @Override
-    public final void startOrElseBranch(BetaObjectPool pool){
-        abort(pool);
+        abort();
         throw new IllegalStateException();
     }
 }

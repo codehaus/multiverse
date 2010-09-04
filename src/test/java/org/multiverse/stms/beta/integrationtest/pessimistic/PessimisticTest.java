@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.exceptions.ReadConflict;
 import org.multiverse.api.exceptions.WriteConflict;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -16,19 +15,17 @@ import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class PessimisticTest {
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
     public void constructedObjectAutomaticallyIsLocked() {
         BetaTransaction tx = stm.startDefaultTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
-        tx.openForConstruction(ref, pool);
+        tx.openForConstruction(ref);
 
         assertSame(tx, ref.___getLockOwner());
     }
@@ -38,12 +35,12 @@ public class PessimisticTest {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        tx.openForRead(ref, false, pool);
+        tx.openForRead(ref, false);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForRead(ref, true, pool);
+        otherTx.openForRead(ref, true);
 
-        long value = tx.openForRead(ref, false, pool).value;
+        long value = tx.openForRead(ref, false).value;
 
         assertEquals(0, value);
         assertActive(tx);
@@ -55,10 +52,10 @@ public class PessimisticTest {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        tx.openForWrite(ref, false, pool).value++;
+        tx.openForWrite(ref, false).value++;
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForRead(ref, true, pool);
+        otherTx.openForRead(ref, true);
 
         try {
             tx.commit();
@@ -79,7 +76,7 @@ public class PessimisticTest {
                 .build()
                 .start();
 
-        tx.openForWrite(ref, false, pool);
+        tx.openForWrite(ref, false);
 
         assertSame(tx, ref.___getLockOwner());
     }
@@ -93,7 +90,7 @@ public class PessimisticTest {
                 .build()
                 .start();
 
-        tx.openForRead(ref, false, pool);
+        tx.openForRead(ref, false);
 
         assertNull(ref.___getLockOwner());
     }
@@ -107,7 +104,7 @@ public class PessimisticTest {
                 .build()
                 .start();
 
-        tx.openForRead(ref, false, pool);
+        tx.openForRead(ref, false);
 
         assertSame(tx, ref.___getLockOwner());
     }
@@ -117,8 +114,8 @@ public class PessimisticTest {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        tx.openForRead(ref, true, pool);
-        tx.openForRead(ref, true, pool);
+        tx.openForRead(ref, true);
+        tx.openForRead(ref, true);
 
         assertSame(tx, ref.___getLockOwner());
     }
@@ -128,8 +125,8 @@ public class PessimisticTest {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        tx.openForWrite(ref, true, pool);
-        tx.openForWrite(ref, true, pool);
+        tx.openForWrite(ref, true);
+        tx.openForWrite(ref, true);
 
         assertSame(tx, ref.___getLockOwner());
     }
@@ -139,11 +136,11 @@ public class PessimisticTest {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForRead(ref, true, pool);
+        otherTx.openForRead(ref, true);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         try {
-            tx.openForRead(ref, true, pool);
+            tx.openForRead(ref, true);
             fail();
         } catch (ReadConflict e) {
 
@@ -158,7 +155,7 @@ public class PessimisticTest {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        tx.openForRead(ref, true, pool);
+        tx.openForRead(ref, true);
         tx.abort();
 
         assertAborted(tx);
@@ -170,7 +167,7 @@ public class PessimisticTest {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        tx.openForRead(ref, true, pool);
+        tx.openForRead(ref, true);
         tx.commit();
 
         assertCommitted(tx);

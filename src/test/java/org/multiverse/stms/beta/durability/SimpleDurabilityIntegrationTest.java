@@ -8,7 +8,6 @@ import org.multiverse.durability.DurableObjectSerializer;
 import org.multiverse.durability.SimpleStorage;
 import org.multiverse.durability.UnitOfWrite;
 import org.multiverse.durability.account.SerializeUtils;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
@@ -23,14 +22,12 @@ import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class SimpleDurabilityIntegrationTest {
     private BetaStm stm;
-    private BetaObjectPool pool;
     private SimpleStorage storage;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
-        storage = new SimpleStorage(stm);
+       storage = new SimpleStorage(stm);
         storage.register(BetaLongRef.class, new LongRefSerializer());
         storage.clear();
     }
@@ -65,7 +62,7 @@ public class SimpleDurabilityIntegrationTest {
         BetaLongRef loaded = (BetaLongRef) storage.loadDurableObject(ref.___getStorageId());
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(loaded, false, pool).value++;
+        tx.openForWrite(loaded, false).value++;
         tx.commit();
 
         UnitOfWrite write2 = storage.startUnitOfWrite();

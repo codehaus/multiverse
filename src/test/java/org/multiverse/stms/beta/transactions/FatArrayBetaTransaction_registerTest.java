@@ -5,7 +5,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 
 import static org.junit.Assert.fail;
@@ -15,12 +14,10 @@ import static org.multiverse.TestUtils.*;
 
 public class FatArrayBetaTransaction_registerTest {
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
@@ -73,7 +70,7 @@ public class FatArrayBetaTransaction_registerTest {
     @Test
     public void whenPrepared() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.prepare(pool);
+        tx.prepare();
 
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
 

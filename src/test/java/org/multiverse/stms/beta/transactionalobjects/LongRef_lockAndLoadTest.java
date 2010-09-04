@@ -46,7 +46,7 @@ public class LongRef_lockAndLoadTest {
         Tranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction lockingTx = new FatMonoBetaTransaction(stm);
-        lockingTx.openForRead(ref, true, pool);
+        lockingTx.openForRead(ref, true);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal read = ref.___lockAndLoad(0, tx);
@@ -67,7 +67,7 @@ public class LongRef_lockAndLoadTest {
         Tranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction lockOwner = stm.startDefaultTransaction();
-        Tranlocal read = lockOwner.openForRead(ref, true, pool);
+        Tranlocal read = lockOwner.openForRead(ref, true);
         ref.___tryLockAndCheckConflict(lockOwner, 1, read);
 
         Tranlocal tranlocal = ref.___lockAndLoad(0, lockOwner);

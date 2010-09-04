@@ -3,17 +3,17 @@ package org.multiverse.stms.beta.integrationtest.isolation;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaTransactionPool;
 
 public class ReadConflictTest {
     private BetaStm stm;
-    private BetaObjectPool pool;
+    private BetaTransactionPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
+        pool = new BetaTransactionPool();
     }
 
     @Test

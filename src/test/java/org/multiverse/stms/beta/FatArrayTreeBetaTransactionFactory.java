@@ -4,7 +4,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 import org.multiverse.stms.beta.transactions.FatArrayTreeBetaTransaction;
 
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
+import static org.multiverse.stms.beta.ThreadLocalBetaTransactionPool.getThreadLocalBetaTransactionPool;
 
 public final class FatArrayTreeBetaTransactionFactory implements BetaTransactionFactory {
     private final BetaTransactionConfiguration config;
@@ -24,11 +24,11 @@ public final class FatArrayTreeBetaTransactionFactory implements BetaTransaction
 
     @Override
     public BetaTransaction start() {
-        return start(getThreadLocalBetaObjectPool());
+        return start(getThreadLocalBetaTransactionPool());
     }
 
     @Override
-    public BetaTransaction start(BetaObjectPool pool) {
+    public BetaTransaction start(BetaTransactionPool pool) {
         FatArrayTreeBetaTransaction tx = pool.takeFatArrayTreeBetaTransaction();
         if (tx == null) {
             tx = new FatArrayTreeBetaTransaction(config);
@@ -39,7 +39,7 @@ public final class FatArrayTreeBetaTransactionFactory implements BetaTransaction
     }
 
     @Override
-    public BetaTransaction upgradeAfterSpeculativeFailure(BetaTransaction failingTransaction, BetaObjectPool pool) {
+    public BetaTransaction upgradeAfterSpeculativeFailure(BetaTransaction failingTransaction, BetaTransactionPool pool) {
         throw new UnsupportedOperationException();
     }
 }

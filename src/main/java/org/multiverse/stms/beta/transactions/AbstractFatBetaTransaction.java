@@ -3,12 +3,9 @@ package org.multiverse.stms.beta.transactions;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.BetaObjectPool;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
  * @author Peter Veentjer
@@ -44,12 +41,7 @@ public abstract class AbstractFatBetaTransaction extends BetaTransaction {
     }
 
     @Override
-    public final void register(TransactionLifecycleListener listener) {
-        register(getThreadLocalBetaObjectPool(), listener);
-    }
-
-    @Override
-    public final void register(final BetaObjectPool pool, final TransactionLifecycleListener listener) {
+    public final void register(final TransactionLifecycleListener listener) {
         if (listener == null) {
             abort();
             throw new NullPointerException();

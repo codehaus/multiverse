@@ -8,7 +8,6 @@ import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicIntClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.ReadonlyException;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
@@ -17,7 +16,6 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class ReadonlyTest {
 
@@ -50,8 +48,7 @@ public class ReadonlyTest {
             @Override
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                ref.set(btx, pool, newValue);
+                ref.set(btx, newValue);
             }
         });
     }
@@ -74,9 +71,8 @@ public class ReadonlyTest {
             @Override
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                BetaObjectPool pool = getThreadLocalBetaObjectPool();
                 BetaRef ref = new BetaRef(tx);
-                btx.openForConstruction(ref, pool).value = value;
+                btx.openForConstruction(ref).value = value;
             }
         });
     }
@@ -118,8 +114,7 @@ public class ReadonlyTest {
             @Override
             public int execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                return ref.get(btx, pool);
+                return ref.get(btx);
             }
         });
     }
@@ -140,9 +135,8 @@ public class ReadonlyTest {
             @Override
             public BetaIntRef execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                BetaObjectPool pool = getThreadLocalBetaObjectPool();
                 BetaIntRef ref = new BetaIntRef(btx);
-                btx.openForConstruction(ref, pool).value = value;
+                btx.openForConstruction(ref).value = value;
                 return ref;
             }
         });
@@ -185,9 +179,8 @@ public class ReadonlyTest {
         return block.execute(new AtomicIntClosure() {
             @Override
             public int execute(Transaction tx) throws Exception {
-                BetaObjectPool pool = getThreadLocalBetaObjectPool();
                 BetaTransaction btx = (BetaTransaction) tx;
-                return ref.get(btx, pool);
+                return ref.get(btx);
             }
         });
     }
@@ -209,8 +202,7 @@ public class ReadonlyTest {
             public void execute(Transaction tx) throws Exception {
                 assertFalse(tx.getConfiguration().isReadonly());
                 BetaTransaction btx = (BetaTransaction) tx;
-                BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                ref.set(btx, pool, newValue);
+                ref.set(btx, newValue);
             }
         });
     }
@@ -230,8 +222,7 @@ public class ReadonlyTest {
             public void execute(Transaction tx) throws Exception {
                 assertFalse(tx.getConfiguration().isReadonly());
                 BetaTransaction btx = (BetaTransaction) tx;
-                BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                ref.set(btx, pool, ref.get(btx, pool) + 1);
+                ref.set(btx, ref.get(btx) + 1);
             }
         });
     }

@@ -6,7 +6,6 @@ import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
@@ -114,8 +113,6 @@ public class MoneyTransferStressTest {
 
     private class TransferThread extends TestThread {
 
-        private final BetaObjectPool pool = new BetaObjectPool();
-
         public TransferThread(int id) {
             super("TransferThread-" + id);
         }
@@ -130,11 +127,11 @@ public class MoneyTransferStressTest {
                     BetaLongRef to = accounts[randomInt(accounts.length)];
                     int amount = randomInt(100);
 
-                    btx.openForWrite(to, !optimistic, pool).value += amount;
+                    btx.openForWrite(to, !optimistic).value += amount;
 
                     sleepRandomMs(10);
 
-                    LongRefTranlocal toTranlocal = btx.openForWrite(from, !optimistic, pool);
+                    LongRefTranlocal toTranlocal = btx.openForWrite(from, !optimistic);
                     if(toTranlocal.value<0){
                         throw new NotEnoughMoneyException();
                     }

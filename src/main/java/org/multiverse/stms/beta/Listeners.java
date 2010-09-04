@@ -50,7 +50,7 @@ public final class Listeners {
      *
      * @param pool the BetaObjectPool to store the discarded Listeners in.
      */
-    public void openAll(BetaObjectPool pool) {
+    public void openAll(final BetaObjectPool pool) {
         Listeners current = this;
         do {
             Listeners next = current.next;

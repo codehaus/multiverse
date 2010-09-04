@@ -3,7 +3,6 @@ package org.multiverse.stms.beta.transactions;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
@@ -13,12 +12,10 @@ import static org.multiverse.stms.beta.BetaStmUtils.*;
 public class FatArrayTreeBetaTransaction_typesTest {
 
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
@@ -26,9 +23,9 @@ public class FatArrayTreeBetaTransaction_typesTest {
         BetaIntRef ref = createIntRef(stm, 100);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        IntRefTranlocal read = tx.openForRead(ref, false, pool);
+        IntRefTranlocal read = tx.openForRead(ref, false);
         assertEquals(100, read.value);
-        IntRefTranlocal write = tx.openForWrite(ref, false, pool);
+        IntRefTranlocal write = tx.openForWrite(ref, false);
         write.value++;
         tx.commit();
 
@@ -40,9 +37,9 @@ public class FatArrayTreeBetaTransaction_typesTest {
         BetaLongRef ref = createLongRef(stm, 100);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, false, pool);
+        LongRefTranlocal read = tx.openForRead(ref, false);
         assertEquals(100, read.value);
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         write.value++;
         tx.commit();
 
@@ -54,9 +51,9 @@ public class FatArrayTreeBetaTransaction_typesTest {
         BetaRef<String> ref = createRef(stm, "peter");
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        RefTranlocal read = tx.openForRead(ref, false, pool);
+        RefTranlocal read = tx.openForRead(ref, false);
         assertEquals("peter", read.value);
-        RefTranlocal write = tx.openForWrite(ref, false, pool);
+        RefTranlocal write = tx.openForWrite(ref, false);
         write.value = "john";
         tx.commit();
 

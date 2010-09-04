@@ -7,7 +7,6 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -17,7 +16,6 @@ import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class FailureAtomicityStressTest {
 
@@ -95,10 +93,9 @@ public class FailureAtomicityStressTest {
             atomicBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
                     BetaTransaction btx = (BetaTransaction) tx;
-                    int value = ref.get(btx, pool);
-                    ref.set(btx, pool, value + 1);
+                    int value = ref.get(btx);
+                    ref.set(btx, value + 1);
                 }
             });
         }
@@ -107,11 +104,10 @@ public class FailureAtomicityStressTest {
             atomicBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
                     BetaTransaction btx = (BetaTransaction) tx;
-                    int value = ref.get(btx, pool);
-                    ref.set(btx, pool, value + 1);
-                    btx.abort(pool);
+                    int value = ref.get(btx);
+                    ref.set(btx, value + 1);
+                    btx.abort();
                 }
             });
         }

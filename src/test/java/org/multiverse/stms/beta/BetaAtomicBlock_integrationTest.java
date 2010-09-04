@@ -15,17 +15,14 @@ import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class BetaAtomicBlock_integrationTest {
 
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     
@@ -38,7 +35,7 @@ public class BetaAtomicBlock_integrationTest {
             @Override
             public long execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                return btx.openForRead(ref, false, pool).value;
+                return btx.openForRead(ref, false).value;
             }
         });
 
@@ -54,7 +51,7 @@ public class BetaAtomicBlock_integrationTest {
             @Override
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                btx.openForWrite(ref, false, pool).value++;
+                btx.openForWrite(ref, false).value++;
             }
         });
 
@@ -66,7 +63,7 @@ public class BetaAtomicBlock_integrationTest {
         final BetaLongRef ref = BetaStmUtils.createLongRef(stm);
 
         FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        otherTx.openForWrite(ref, true, pool);
+        otherTx.openForWrite(ref, true);
 
         try {
             AtomicBlock block = stm.createTransactionFactoryBuilder()
@@ -77,7 +74,7 @@ public class BetaAtomicBlock_integrationTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    btx.openForRead(ref, false, pool);
+                    btx.openForRead(ref, false);
                 }
             });
 
@@ -95,9 +92,8 @@ public class BetaAtomicBlock_integrationTest {
             @Override
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                BetaObjectPool pool = getThreadLocalBetaObjectPool();
                 for (int k = 0; k < 10; k++) {
-                    LongRefTranlocal tranlocal = btx.openForWrite(ref, false, pool);
+                    LongRefTranlocal tranlocal = btx.openForWrite(ref, false);
                     tranlocal.value++;
                 }
             }

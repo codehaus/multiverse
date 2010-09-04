@@ -9,7 +9,6 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicIntClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -21,7 +20,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
  * A Test that checks if the writeskew problem is happening. When
@@ -48,13 +46,11 @@ public class WriteSkewStressTest {
     private TransferThread[] threads;
     private AtomicBoolean writeSkewEncountered = new AtomicBoolean();
     private BetaStm stm;
-    private BetaObjectPool pool;
     private int threadCount = 8;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
         clearThreadLocalTransaction();
         user1 = new User();
         user2 = new User();
@@ -68,7 +64,7 @@ public class WriteSkewStressTest {
 
         BetaIntRef account = user1.getRandomAccount();
         BetaTransaction tx = stm.startDefaultTransaction();
-        tx.openForWrite(account, false, pool).value = 1000;
+        tx.openForWrite(account, false).value = 1000;
         tx.commit();
     }
 
@@ -237,8 +233,7 @@ public class WriteSkewStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    doIt(btx, pool, false, false);
+                    doIt(btx, false, false);
                 }
             });
         }
@@ -248,8 +243,7 @@ public class WriteSkewStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    doIt(btx, pool, false, false);
+                    doIt(btx, false, false);
                 }
             });
         }
@@ -259,8 +253,7 @@ public class WriteSkewStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    doIt(btx, pool, false, false);
+                    doIt(btx, false, false);
                 }
             });
         }
@@ -270,8 +263,7 @@ public class WriteSkewStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    doIt(btx, pool, false, false);
+                    doIt(btx, false, false);
                 }
             });
         }
@@ -281,8 +273,7 @@ public class WriteSkewStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    doIt(btx, pool, true, true);
+                    doIt(btx, true, true);
                 }
             });
         }
@@ -292,20 +283,19 @@ public class WriteSkewStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    doIt(btx, pool, false, true);
+                    doIt(btx, false, true);
                 }
             });
         }
 
-        public void doIt(BetaTransaction tx, BetaObjectPool pool, boolean pessimisticRead, boolean pessimisticWrite) {
+        public void doIt(BetaTransaction tx, boolean pessimisticRead, boolean pessimisticWrite) {
             int amount = randomInt(100);
 
             User from = random(user1, user2);
             User to = random(user1, user2);
 
-            int sum = tx.openForRead(from.account1, pessimisticRead, pool).value
-                    + tx.openForRead(from.account2, pessimisticRead, pool).value;
+            int sum = tx.openForRead(from.account1, pessimisticRead).value
+                    + tx.openForRead(from.account2, pessimisticRead).value;
 
             if (sum < 0) {
                 if (!writeSkewEncountered.get()) {
@@ -316,10 +306,10 @@ public class WriteSkewStressTest {
 
             if (sum >= amount) {
                 BetaIntRef fromAccount = from.getRandomAccount();
-                tx.openForWrite(fromAccount, pessimisticWrite, pool).value -= amount;
+                tx.openForWrite(fromAccount, pessimisticWrite).value -= amount;
 
                 BetaIntRef toAccount = to.getRandomAccount();
-                tx.openForWrite(toAccount, pessimisticWrite, pool).value += amount;
+                tx.openForWrite(toAccount, pessimisticWrite).value += amount;
             }
 
             sleepRandomUs(20);
@@ -347,8 +337,7 @@ public class WriteSkewStressTest {
                 @Override
                 public int execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    return account1.get(btx, pool) + account2.get(btx, pool);
+                    return account1.get(btx) + account2.get(btx);
                 }
             });
         }
@@ -358,10 +347,9 @@ public class WriteSkewStressTest {
                 @Override
                 public String execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
                     return format("User(account1 = %s, account2 = %s)",
-                            account1.get(btx, pool), account2.get(btx, pool));
+                            account1.get(btx), account2.get(btx));
                 }
             });
         }

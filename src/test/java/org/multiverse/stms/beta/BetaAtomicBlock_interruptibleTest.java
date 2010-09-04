@@ -90,13 +90,11 @@ public class BetaAtomicBlock_interruptibleTest {
 
         @Override
         public void doRun() throws Exception {
-            final BetaObjectPool pool = new BetaObjectPool();
-
             block.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    LongRefTranlocal write = btx.openForWrite(ref, false, pool);
+                    LongRefTranlocal write = btx.openForWrite(ref, false);
                     if (write.value == 0) {
                         retry();
                     }

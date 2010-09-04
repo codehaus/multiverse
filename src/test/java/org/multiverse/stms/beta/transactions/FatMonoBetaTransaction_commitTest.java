@@ -11,7 +11,6 @@ import org.multiverse.api.exceptions.WriteConflict;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.BetaStmUtils;
@@ -36,18 +35,16 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
  */
 public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
     public void whenUnused() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.commit(pool);
+        tx.commit();
 
         assertCommitted(tx);
     }
@@ -98,12 +95,12 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         BetaLongRef ref = BetaStmUtils.createLongRef(stm);
 
         FatMonoBetaTransaction listeningTx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal read = listeningTx.openForRead(ref, false, pool);
+        LongRefTranlocal read = listeningTx.openForRead(ref, false);
         Latch latch = new CheapLatch();
-        listeningTx.registerChangeListenerAndAbort(latch, pool);
+        listeningTx.registerChangeListenerAndAbort(latch);
 
         FatMonoBetaTransaction updatingTx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = updatingTx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = updatingTx.openForWrite(ref, false);
         write.value++;
         write.isDirty = DIRTY_TRUE;
         updatingTx.commit();
@@ -123,15 +120,15 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         List<Latch> listeners = new LinkedList<Latch>();
         for (int k = 0; k < 10; k++) {
             FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-            tx.openForRead(ref, false, pool);
+            tx.openForRead(ref, false);
             Latch listener = new CheapLatch();
             listeners.add(listener);
             tx.registerChangeListenerAndAbort(listener);
         }
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(ref, false, pool).value++;
-        tx.commit(pool);
+        tx.openForWrite(ref, false).value++;
+        tx.commit();
 
         for (Latch listener : listeners) {
             assertTrue(listener.isOpen());
@@ -146,8 +143,8 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForRead(ref, false, pool);
-        tx.commit(pool);
+        tx.openForRead(ref, false);
+        tx.commit();
 
         assertCommitted(tx);
         assertSame(committed, ref.___unsafeLoad());
@@ -164,8 +161,8 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForRead(ref, false, pool);
-        tx.commit(pool);
+        tx.openForRead(ref, false);
+        tx.commit();
 
         assertSame(committed, ref.___unsafeLoad());
         assertNull(ref.___getLockOwner());
@@ -182,8 +179,8 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForRead(ref, true, pool);
-        tx.commit(pool);
+        tx.openForRead(ref, true);
+        tx.commit();
 
         assertSame(committed, ref.___unsafeLoad());
         assertNull(ref.___getLockOwner());
@@ -200,8 +197,8 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForRead(ref, true, pool);
-        tx.commit(pool);
+        tx.openForRead(ref, true);
+        tx.commit();
 
         assertSame(committed, ref.___unsafeLoad());
         assertNull(ref.___getLockOwner());
@@ -217,9 +214,9 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         BetaLongRef ref = createReadBiasedLongRef(stm, 100);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, true, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, true);
         write.value++;
-        tx.commit(pool);
+        tx.commit();
 
         assertSame(write, ref.___unsafeLoad());
         assertTrue(write.isCommitted);
@@ -239,9 +236,9 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         BetaTransactionalObject ref = BetaStmUtils.createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = (LongRefTranlocal) tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = (LongRefTranlocal) tx.openForWrite(ref, false);
         write.value++;
-        tx.commit(pool);
+        tx.commit();
 
         assertCommitted(tx);
         assertSame(write, ref.___unsafeLoad());
@@ -261,8 +258,8 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(new BetaTransactionConfiguration(stm).setDirtyCheckEnabled(true));
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
-        tx.commit(pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
+        tx.commit();
 
         assertFalse(write.isCommitted);
         assertCommitted(tx);
@@ -278,9 +275,9 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
     public void whenConstructed() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal write = tx.openForConstruction(ref, pool);
+        LongRefTranlocal write = tx.openForConstruction(ref);
         write.value++;
-        tx.commit(pool);
+        tx.commit();
 
         assertCommitted(tx);
         assertSame(write, ref.___unsafeLoad());
@@ -299,16 +296,16 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         BetaLongRef ref = createLongRef(stm, 0);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         write.value++;
 
         BetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false, pool);
+        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false);
         conflictingWrite.value++;
-        otherTx.commit(pool);
+        otherTx.commit();
 
         try {
-            tx.commit(pool);
+            tx.commit();
             fail();
         } catch (WriteConflict e) {
         }
@@ -326,11 +323,11 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         write.value++;
 
         FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        otherTx.openForRead(ref, true, pool);
+        otherTx.openForRead(ref, true);
 
         try {
             tx.commit();
@@ -356,12 +353,12 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         //make almost read biased.
         for (int k = 0; k < ref.___getReadBiasedThreshold() - 1; k++) {
             BetaTransaction tx = new FatMonoBetaTransaction(stm);
-            tx.openForRead(ref, false, pool);
+            tx.openForRead(ref, false);
             tx.commit();
         }
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForRead(ref, false, pool);
+        tx.openForRead(ref, false);
         tx.commit();
 
         assertSame(committed, ref.___unsafeLoad());
@@ -383,7 +380,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         BetaLongRef ref = createReadBiasedLongRef(stm, 10);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         write.value++;
         tx.commit();
 
@@ -405,10 +402,10 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         for (int k = 0; k < 100; k++) {
-            LongRefTranlocal tranlocal = tx.openForWrite(ref, false, pool);
+            LongRefTranlocal tranlocal = tx.openForWrite(ref, false);
             tranlocal.value++;
-            tx.commit(pool);
-            tx.hardReset(pool);
+            tx.commit();
+            tx.hardReset();
         }
 
         assertEquals(100L, ref.___unsafeLoad().value);
@@ -420,7 +417,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         tx.commit();
 
         assertCommitted(tx);
@@ -439,7 +436,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, true, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, true);
         tx.commit();
 
         assertCommitted(tx);
@@ -457,8 +454,8 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         BetaTransactionalObject ref = BetaStmUtils.createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(new BetaTransactionConfiguration(stm).setDirtyCheckEnabled(false));
-        LongRefTranlocal write = (LongRefTranlocal) tx.openForWrite(ref, false, pool);
-        tx.commit(pool);
+        LongRefTranlocal write = (LongRefTranlocal) tx.openForWrite(ref, false);
+        tx.commit();
 
         assertCommitted(tx);
         assertSame(write, ref.___unsafeLoad());
@@ -478,8 +475,8 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.register(pool, listenerMock);
-        tx.openForWrite(ref, false, pool);
+        tx.register(listenerMock);
+        tx.openForWrite(ref, false);
         tx.commit();
 
         assertEquals(2, listenerMock.events.size());
@@ -496,7 +493,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .addPermanentListener(listenerMock);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
-        tx.openForWrite(ref, false, pool);
+        tx.openForWrite(ref, false);
         tx.commit();
 
         assertEquals(2, listenerMock.events.size());
@@ -518,7 +515,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
     @Test
     public void whenPreparedUnused() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.prepare(pool);
+        tx.prepare();
 
         tx.commit();
 
@@ -531,7 +528,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, false, pool);
+        LongRefTranlocal read = tx.openForRead(ref, false);
         tx.prepare();
 
         tx.commit();
@@ -549,9 +546,9 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         write.value++;
-        tx.prepare(pool);
+        tx.prepare();
 
         tx.commit();
 
@@ -574,8 +571,8 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
         BetaLongRef ref = createLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
-        tx.commute(ref, pool, IncLongFunction.INSTANCE);
-        tx.commit(pool);
+        tx.commute(ref, IncLongFunction.INSTANCE);
+        tx.commit();
 
         assertCommitted(tx);
         assertSurplus(0, ref);
@@ -591,8 +588,8 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
         BetaLongRef ref = createLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
-        tx.commute(ref, pool, IncLongFunction.INSTANCE);
-        tx.commit(pool);
+        tx.commute(ref, IncLongFunction.INSTANCE);
+        tx.commit();
 
         assertCommitted(tx);
         assertSurplus(0, ref);
@@ -607,14 +604,14 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         BetaLongRef ref1 = createLongRef(stm);
         BetaLongRef ref2 = createLongRef(stm);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.openForWrite(ref1, false, pool).value++;
+        tx.openForWrite(ref1, false).value++;
 
         FatArrayBetaTransaction otherTx = new FatArrayBetaTransaction(stm);
-        otherTx.openForWrite(ref2, false, pool).value++;
+        otherTx.openForWrite(ref2, false).value++;
         otherTx.commit();
 
-        tx.commute(ref2, pool, IncLongFunction.INSTANCE);
-        tx.commit(pool);
+        tx.commute(ref2, IncLongFunction.INSTANCE);
+        tx.commit();
 
         assertCommitted(tx);
         assertSurplus(0, ref1);
@@ -634,10 +631,10 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
         BetaLongRef ref = createLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
-        tx.commute(ref, pool, IncLongFunction.INSTANCE);
-        tx.commute(ref, pool, IncLongFunction.INSTANCE);
-        tx.commute(ref, pool, IncLongFunction.INSTANCE);
-        tx.commit(pool);
+        tx.commute(ref, IncLongFunction.INSTANCE);
+        tx.commute(ref, IncLongFunction.INSTANCE);
+        tx.commute(ref, IncLongFunction.INSTANCE);
+        tx.commit();
 
         assertCommitted(tx);
         assertSurplus(0, ref);
@@ -650,13 +647,13 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
     public void whenCommuteAndLockedByOtherTransaction_thenWriteConflict() {
         BetaLongRef ref = createLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.commute(ref, pool, IncLongFunction.INSTANCE);
+        tx.commute(ref, IncLongFunction.INSTANCE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForRead(ref, true, pool);
+        otherTx.openForRead(ref, true);
 
         try {
-            tx.commit(pool);
+            tx.commit();
             fail();
         } catch (WriteConflict expected) {
         }
@@ -689,7 +686,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
                 .setPessimisticLockLevel(PessimisticLockLevel.Write)
                 .setDirtyCheckEnabled(true);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
-        tx.openForWrite(ref, false, pool).value++;
+        tx.openForWrite(ref, false).value++;
         tx.commit();
 
         assertEquals(1, ref.___unsafeLoad().value);
@@ -702,7 +699,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
                 .setPessimisticLockLevel(PessimisticLockLevel.Read)
                 .setDirtyCheckEnabled(true);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
-        tx.openForWrite(ref, false, pool).value++;
+        tx.openForWrite(ref, false).value++;
         tx.commit();
 
         assertEquals(1, ref.___unsafeLoad().value);
@@ -711,19 +708,19 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
     @Test
     public void whenCommitted_thenIgnore() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.commit(pool);
+        tx.commit();
 
-        tx.commit(pool);
+        tx.commit();
         assertCommitted(tx);
     }
 
     @Test
     public void whenAborted_thenIllegalStateException() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.abort(pool);
+        tx.abort();
 
         try {
-            tx.commit(pool);
+            tx.commit();
             fail();
         } catch (IllegalStateException expected) {
         }
@@ -754,12 +751,12 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
                             .setDirtyCheckEnabled(dirtyCheck));
 
              if (random.nextInt(3) == 1) {
-                tx.openForWrite(ref, false, pool).value++;
+                tx.openForWrite(ref, false).value++;
                 created++;
             } else {
-                tx.openForWrite(ref, false, pool);
+                tx.openForWrite(ref, false);
             }
-            tx.commit(pool);
+            tx.commit();
             tx.softReset();
         }
 

@@ -1,6 +1,5 @@
 package org.multiverse.benchmarks;
 
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -101,17 +100,15 @@ public class UncontendedLeanReadScalabilityTest {
         public void run() {
             BetaLongRef ref = BetaStmUtils.createReadBiasedLongRef(stm);
 
-            BetaObjectPool pool = new BetaObjectPool();
-
             LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
                     new BetaTransactionConfiguration(stm).setReadonly(true));
 
             long startMs = System.currentTimeMillis();
 
             for (long k = 0; k < transactionCount; k++) {
-                long x = tx.openForRead(ref, false, pool).value;
-                tx.commit(pool);
-                tx.hardReset(pool);
+                long x = tx.openForRead(ref, false).value;
+                tx.commit();
+                tx.hardReset();
             }
 
             durationMs = System.currentTimeMillis() - startMs;

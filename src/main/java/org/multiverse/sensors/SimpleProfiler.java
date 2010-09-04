@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SimpleProfiler implements Profiler {
 
-    private final ConcurrentHashMap<TransactionConfiguration, TransactionSensor> counterMap
+    private final ConcurrentHashMap<TransactionConfiguration, TransactionSensor> sensorMap
             = new ConcurrentHashMap<TransactionConfiguration, TransactionSensor>();
     private final PrintThread printThread = new PrintThread();
 
@@ -17,14 +17,14 @@ public class SimpleProfiler implements Profiler {
             throw new NullPointerException();
         }
 
-        TransactionSensor counter = counterMap.get(configuration);
-        if (counter == null) {
+        TransactionSensor sensor = sensorMap.get(configuration);
+        if (sensor == null) {
             TransactionSensor newCounter = new TransactionSensor(configuration);
-            TransactionSensor existingCounter = counterMap.putIfAbsent(configuration, newCounter);
-            counter = existingCounter != null ? existingCounter : newCounter;
+            TransactionSensor existingCounter = sensorMap.putIfAbsent(configuration, newCounter);
+            sensor = existingCounter != null ? existingCounter : newCounter;
         }
 
-        return counter;
+        return sensor;
     }
 
     @Test
@@ -41,7 +41,7 @@ public class SimpleProfiler implements Profiler {
         public void run() {
             while (true) {
                 System.out.println("------------------ Profiling ----------------------------");
-                for (TransactionSensor sensor : counterMap.values()) {
+                for (TransactionSensor sensor : sensorMap.values()) {
                     System.out.println(sensor);
                 }
 

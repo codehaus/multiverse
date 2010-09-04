@@ -10,8 +10,8 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 
 public class FatArrayTreeTransaction_setAbortOnlyTest {
-    
-      private BetaStm stm;
+
+    private BetaStm stm;
 
     @Before
     public void setUp() {
@@ -19,7 +19,7 @@ public class FatArrayTreeTransaction_setAbortOnlyTest {
     }
 
     @Test
-    public void whenActive(){
+    public void whenActive() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
 
         tx.setAbortOnly();

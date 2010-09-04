@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.api.LockStatus;
+import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.TodoException;
@@ -57,6 +58,8 @@ public final class BetaLongRef
     //controlled JMM problem (just like the hashcode of String).
     private int ___identityHashCode;
 
+    //todo: needs to be make final.
+    private Stm stm;
 
     /**
      * Creates a uncommitted BetaLongRef that should be attached to the transaction (this
@@ -94,6 +97,11 @@ public final class BetaLongRef
         tranlocal.isCommitted = true;
         tranlocal.isDirty = DIRTY_FALSE;
         ___active = tranlocal;
+    }
+
+    @Override
+    public final Stm getStm(){
+        return stm;
     }
 
     @Override
@@ -180,13 +188,16 @@ public final class BetaLongRef
     }
 
     @Override
-    public final LongRefTranlocal ___openForConstruction(final BetaObjectPool pool) {
+    public final LongRefTranlocal ___openForConstruction(
+        final BetaObjectPool pool) {
         LongRefTranlocal tranlocal =  pool.take(this);
         return tranlocal != null ? tranlocal : new LongRefTranlocal(this);
     }
 
     @Override
-    public final LongRefTranlocal ___openForCommute(final BetaObjectPool pool) {
+    public final LongRefTranlocal ___openForCommute(
+        final BetaObjectPool pool) {
+
         LongRefTranlocal tranlocal =  pool.take(this);
 
         if(tranlocal == null){
@@ -512,12 +523,76 @@ public final class BetaLongRef
         }
     }
 
-    /**
-     * Returns the current state of the reference atomically.
-     *
-     * @return the current state.
-     * @throws IllegalStateException if there hasn't been any commit before.
-     */
+
+    @Override
+    public long atomicAlter(
+        final LongFunction function){
+
+        throw new TodoException();
+    }
+
+    @Override
+    public long alter(
+        final LongFunction function){
+
+        throw new TodoException();
+    }
+
+    @Override
+    public long alter(
+        final Transaction tx,
+        final LongFunction function){
+        return alter((BetaTransaction)tx, function);
+    }
+
+    public long alter(
+        final BetaTransaction tx,
+        final LongFunction function){
+
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        if(function == null){
+            tx.abort();
+            throw new NullPointerException();
+        }
+
+        LongRefTranlocal write
+            = (LongRefTranlocal)tx.openForWrite(this, false);
+
+        write.value = function.call(write.value);
+        return write.value;
+    }
+            
+    @Override
+    public boolean atomicCompareAndSet(
+        final long oldValue,
+        final long newValue){
+
+        throw new TodoException();
+    }
+
+    @Override
+    public long set(final long value){
+        throw new TodoException();
+    }
+
+    @Override
+    public long get(){
+        throw new TodoException();
+    }
+
+    @Override
+    public long get(final Transaction tx){
+        return get((BetaTransaction)tx);
+    }
+
+    public final long get(final BetaTransaction transaction){
+        return transaction.openForRead(this, false).value;
+    }
+
+    @Override
     public final long atomicGet(){
         LongRefTranlocal read = ___load(50);
         if(read == null){
@@ -537,7 +612,8 @@ public final class BetaLongRef
         return result;
     }
 
-    public final long atomicSet(long newValue){
+    @Override
+    public final long atomicSet(final long newValue){
         throw new TodoException();
     }
 
@@ -581,57 +657,30 @@ public final class BetaLongRef
         return oldActive.value;
     }
 
-    public final long get(
-        final BetaTransaction transaction,
-        final BetaObjectPool pool){
-
-        return transaction.openForRead(this, false, pool).value;
+    @Override
+    public long set(Transaction tx, long value){
+        return set((BetaTransaction)tx, value);
     }
 
-    public final void set(
+    public final long set(
         final BetaTransaction transaction,
-        final BetaObjectPool pool,
         final long value){
 
-        transaction.openForWrite(this, false, pool).value = value;
+        LongRefTranlocal write = transaction.openForWrite(this, false);
+        long oldValue = write.value;
+        write.value = value;
+        return oldValue;
     }
 
-    public final long lockAndGet(
-        final BetaTransaction transaction,
-        final BetaObjectPool pool){
-
-        return transaction.openForRead(this, true, pool).value;
+    public final long lockAndGet(final BetaTransaction transaction){
+        return transaction.openForRead(this, true).value;
     }
 
     public final void lockAndSet(
         final BetaTransaction transaction,
-        final BetaObjectPool pool,
         final long value){
 
-        transaction.openForWrite(this, true, pool).value = value;
-    }
-
-    /**
-     * Applies the function to the reference and returns the new value.
-     *
-     * @param tx the BetaTransaction used
-     * @param pool the BetaObjectPool used to pool
-     * @param function the function to apply.
-     * @return the new value.
-     */
-    public long alter(
-        final BetaTransaction tx,
-        final BetaObjectPool pool,
-        final LongFunction function){
-
-        if(tx == null || pool == null || function == null){
-            throw new NullPointerException();
-        }
-
-        LongRefTranlocal write = tx.openForWrite(this, false, pool);
-        long value  = function.call(write.value);
-        write.value = value;
-        return value;
+        transaction.openForWrite(this, true).value = value;
     }
 
     @Override

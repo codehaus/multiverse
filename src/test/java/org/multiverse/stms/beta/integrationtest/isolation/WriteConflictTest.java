@@ -4,7 +4,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.WriteConflict;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
@@ -20,13 +19,11 @@ import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 public class WriteConflictTest {
 
     private BetaStm stm;
-    private BetaObjectPool pool;
-
+  
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @After
@@ -43,11 +40,11 @@ public class WriteConflictTest {
                 .setDirtyCheckEnabled(true)
                 .build()
                 .start();
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         write.value++;
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false, pool);
+        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false);
         conflictingWrite.value++;
         otherTx.commit();
 
@@ -71,10 +68,10 @@ public class WriteConflictTest {
                 .setDirtyCheckEnabled(true)
                 .build()
                 .start();
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false, pool);
+        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false);
         conflictingWrite.value++;
         otherTx.commit();
 
@@ -94,11 +91,11 @@ public class WriteConflictTest {
                 .setDirtyCheckEnabled(false)
                 .build()
                 .start();
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         write.value++;
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false, pool);
+        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false);
         conflictingWrite.value++;
         otherTx.commit();
 
@@ -121,11 +118,11 @@ public class WriteConflictTest {
                 .setDirtyCheckEnabled(false)
                 .build()
                 .start();
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         write.value++;
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false, pool);
+        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false);
         conflictingWrite.value++;
         otherTx.commit();
 

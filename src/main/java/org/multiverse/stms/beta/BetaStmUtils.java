@@ -22,17 +22,16 @@ public class BetaStmUtils {
 
     public static void arbitraryUpdate(BetaStm stm, BetaLongRef ref) {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(ref, false, new BetaObjectPool());
+        tx.openForWrite(ref, false);
         tx.commit();
     }
 
     public static <E> BetaRef<E> createRef(BetaStm stm, E value) {
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
-        BetaObjectPool pool = new BetaObjectPool();
         BetaRef<E> ref = new BetaRef<E>(tx);
-        RefTranlocal<E> tranlocal = tx.openForConstruction(ref, pool);
+        RefTranlocal<E> tranlocal = tx.openForConstruction(ref);
         tranlocal.value = value;
-        tx.commit(pool);
+        tx.commit();
         return ref;
     }
 
@@ -46,10 +45,9 @@ public class BetaStmUtils {
 
     public static BetaIntRef createIntRef(BetaStm stm, int value) {
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
-        BetaObjectPool pool = new BetaObjectPool();
         BetaIntRef ref = new BetaIntRef(tx);
-        tx.openForConstruction(ref, pool).value = value;
-        tx.commit(pool);
+        tx.openForConstruction(ref).value = value;
+        tx.commit();
         return ref;
     }
 
@@ -63,8 +61,8 @@ public class BetaStmUtils {
 
         for (int k = 0; k < ref.___getOrec().___getReadBiasedThreshold(); k++) {
             BetaTransaction tx = new FatMonoBetaTransaction(stm);
-            tx.openForRead(ref, false, new BetaObjectPool());
-            tx.commit(new BetaObjectPool());
+            tx.openForRead(ref, false);
+            tx.commit();
         }
 
         return ref;
@@ -76,11 +74,10 @@ public class BetaStmUtils {
 
     public static BetaLongRef createLongRef(BetaStm stm, long value) {
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
-        BetaObjectPool pool = new BetaObjectPool();
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal tranlocal = tx.openForConstruction(ref, pool);
+        LongRefTranlocal tranlocal = tx.openForConstruction(ref);
         tranlocal.value = value;
-        tx.commit(pool);
+        tx.commit();
         return ref;
     }
 

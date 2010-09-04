@@ -7,7 +7,7 @@ import org.multiverse.stms.beta.transactions.*;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
-public class BetaObjectPool_transactionsTest {
+public class BetaTransactionPool_transactionsTest {
 
     private BetaStm stm;
 
@@ -18,7 +18,7 @@ public class BetaObjectPool_transactionsTest {
 
     @Test
     public void testFatTransactions() {
-        BetaObjectPool pool = new BetaObjectPool();
+        BetaTransactionPool pool = new BetaTransactionPool();
 
         FatMonoBetaTransaction monoTx1 = new FatMonoBetaTransaction(stm);
         FatMonoBetaTransaction monoTx2 = new FatMonoBetaTransaction(stm);
@@ -49,7 +49,7 @@ public class BetaObjectPool_transactionsTest {
 
     @Test
     public void testLeanTransactions() {
-        BetaObjectPool pool = new BetaObjectPool();
+        BetaTransactionPool pool = new BetaTransactionPool();
 
         LeanMonoBetaTransaction monoTx1 = new LeanMonoBetaTransaction(stm);
         LeanMonoBetaTransaction monoTx2 = new LeanMonoBetaTransaction(stm);

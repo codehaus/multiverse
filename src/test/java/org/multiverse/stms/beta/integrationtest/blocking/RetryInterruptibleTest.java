@@ -6,7 +6,6 @@ import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -17,7 +16,6 @@ import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class RetryInterruptibleTest {
 
@@ -62,13 +60,11 @@ public class RetryInterruptibleTest {
                     .setInterruptible(true)
                     .buildAtomicBlock();
 
-            final BetaObjectPool pool = getThreadLocalBetaObjectPool();
-
             block.executeChecked(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    if (ref.get(btx, pool) != 1) {
+                    if (ref.get(btx) != 1) {
                         retry();
                     }
                 }

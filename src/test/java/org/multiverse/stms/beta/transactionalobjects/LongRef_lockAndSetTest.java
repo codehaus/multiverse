@@ -3,7 +3,6 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.ReadConflict;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
@@ -13,12 +12,10 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.assertLocked;
 
 public class LongRef_lockAndSetTest {
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
@@ -26,7 +23,7 @@ public class LongRef_lockAndSetTest {
         BetaLongRef ref = createLongRef(stm, 10);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        ref.lockAndSet(tx, pool, 20);
+        ref.lockAndSet(tx, 20);
         assertSame(tx, ref.___getLockOwner());
         assertLocked(ref);
 
@@ -41,8 +38,8 @@ public class LongRef_lockAndSetTest {
         BetaLongRef ref = createLongRef(stm, 10);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        ref.lockAndSet(tx, pool, 10);
-        ref.lockAndSet(tx, pool, 20);
+        ref.lockAndSet(tx, 10);
+        ref.lockAndSet(tx, 20);
         assertSame(tx, ref.___getLockOwner());
         assertLocked(ref);
 
@@ -58,9 +55,9 @@ public class LongRef_lockAndSetTest {
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        ref.lockAndGet(otherTx, pool);
+        ref.lockAndGet(otherTx);
         try {
-            ref.lockAndSet(tx, pool, 20);
+            ref.lockAndSet(tx, 20);
             fail();
         } catch (ReadConflict e) {
 

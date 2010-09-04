@@ -12,7 +12,6 @@ import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
@@ -33,12 +32,10 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
@@ -53,7 +50,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         Latch latch = new CheapLatch();
 
         try {
-            tx.registerChangeListenerAndAbort(latch, pool);
+            tx.registerChangeListenerAndAbort(latch);
             fail();
         } catch (NoRetryPossibleException expected) {
         }
@@ -68,11 +65,11 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
         LongFunction function = mock(LongFunction.class);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.commute(ref, pool,function);
+        tx.commute(ref,function);
 
         Latch listener = new CheapLatch();
         try {
-            tx.registerChangeListenerAndAbort(listener, pool);
+            tx.registerChangeListenerAndAbort(listener);
             fail();
         } catch (NoRetryPossibleException expected) {
         }
@@ -92,12 +89,12 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
                 .setBlockingAllowed(false);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
-        tx.openForRead(ref, false, pool);
+        tx.openForRead(ref, false);
 
         Latch latch = new CheapLatch();
 
         try {
-            tx.registerChangeListenerAndAbort(latch, pool);
+            tx.registerChangeListenerAndAbort(latch);
             fail();
         } catch (NoRetryPossibleException expected) {
         }
@@ -110,10 +107,10 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, false, pool);
+        LongRefTranlocal read = tx.openForRead(ref, false);
 
         Latch latch = new CheapLatch();
-        tx.registerChangeListenerAndAbort(latch, pool);
+        tx.registerChangeListenerAndAbort(latch);
 
         assertFalse(latch.isOpen());
         assertUnlocked(ref);
@@ -127,10 +124,10 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, true, pool);
+        LongRefTranlocal read = tx.openForRead(ref, true);
 
         Latch latch = new CheapLatch();
-        tx.registerChangeListenerAndAbort(latch, pool);
+        tx.registerChangeListenerAndAbort(latch);
 
         assertFalse(latch.isOpen());
         assertSurplus(0, ref);
@@ -144,10 +141,10 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
 
         Latch latch = new CheapLatch();
-        tx.registerChangeListenerAndAbort(latch, pool);
+        tx.registerChangeListenerAndAbort(latch);
 
         assertFalse(latch.isOpen());
         assertSurplus(0, ref);
@@ -159,10 +156,10 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, true, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, true);
 
         Latch latch = new CheapLatch();
-        tx.registerChangeListenerAndAbort(latch, pool);
+        tx.registerChangeListenerAndAbort(latch);
 
         assertFalse(latch.isOpen());
         assertSurplus(0, ref);
@@ -175,11 +172,11 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
     public void whenContainsConstructed_thenNoRetryPossibleException() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal constructed = tx.openForConstruction(ref, pool);
+        LongRefTranlocal constructed = tx.openForConstruction(ref);
 
         Latch listener = new CheapLatch();
         try {
-            tx.registerChangeListenerAndAbort(listener, pool);
+            tx.registerChangeListenerAndAbort(listener);
             fail();
         } catch (NoRetryPossibleException expected) {
         }
@@ -200,10 +197,10 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         Latch latch = new CheapLatch();
-        tx.register(pool, listenerMock);
-        tx.openForRead(ref, false, pool);
+        tx.register(listenerMock);
+        tx.openForRead(ref, false);
 
-        tx.registerChangeListenerAndAbort(latch, pool);
+        tx.registerChangeListenerAndAbort(latch);
 
         assertEquals(1, listenerMock.events.size());
         assertEquals(TransactionLifecycleEvent.PostAbort, listenerMock.events.get(0));
@@ -218,9 +215,9 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
                 .addPermanentListener(listenerMock);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
         Latch latch = new CheapLatch();
-        tx.openForRead(ref, false, pool);
+        tx.openForRead(ref, false);
 
-        tx.registerChangeListenerAndAbort(latch, pool);
+        tx.registerChangeListenerAndAbort(latch);
 
         assertEquals(1, listenerMock.events.size());
         assertEquals(TransactionLifecycleEvent.PostAbort, listenerMock.events.get(0));
@@ -241,10 +238,10 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
     public void whenAlreadyPrepared_thenPreparedTransactionException() {
         Latch latch = mock(Latch.class);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.prepare(pool);
+        tx.prepare();
 
         try {
-            tx.registerChangeListenerAndAbort(latch, pool);
+            tx.registerChangeListenerAndAbort(latch);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -257,10 +254,10 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
     public void whenAlreadyCommitted_thenDeadTransactionException() {
         Latch latch = mock(Latch.class);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.commit(pool);
+        tx.commit();
 
         try {
-            tx.registerChangeListenerAndAbort(latch, pool);
+            tx.registerChangeListenerAndAbort(latch);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -273,10 +270,10 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
     public void whenAlreadyAborted_thenDeadTransactionException() {
         Latch latch = mock(Latch.class);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.abort(pool);
+        tx.abort();
 
         try {
-            tx.registerChangeListenerAndAbort(latch, pool);
+            tx.registerChangeListenerAndAbort(latch);
             fail();
         } catch (DeadTransactionException expected) {
         }

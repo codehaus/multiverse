@@ -2,7 +2,6 @@ package org.multiverse.stms.beta.exampletransactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -12,12 +11,10 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 
 public class LinkedListTest {
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
         clearThreadLocalTransaction();
     }
 
@@ -25,65 +22,64 @@ public class LinkedListTest {
     public void testConstruction() {
         BetaTransaction tx = stm.startDefaultTransaction();
         LinkedList list = new LinkedList(tx);
-        tx.openForConstruction(list, pool);
+        tx.openForConstruction(list);
         tx.commit();
     }
 
-        @Test
+    @Test
     public void addAndRemoveInBack() {
         LinkedList<String> list = createLinkedList();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        list.addInBack(tx, pool, "1");
+        list.addInBack(tx, "1");
         tx.commit();
 
         tx = stm.startDefaultTransaction();
-        list.addInBack(tx, pool, "2");
+        list.addInBack(tx, "2");
         tx.commit();
 
         tx = stm.startDefaultTransaction();
-        assertEquals("2", list.removeFromBack(tx, pool));
+        assertEquals("2", list.removeFromBack(tx));
         tx.commit();
 
         tx = stm.startDefaultTransaction();
-        assertEquals("1", list.removeFromBack(tx, pool));
+        assertEquals("1", list.removeFromBack(tx));
         tx.commit();
 
         tx = stm.startDefaultTransaction();
-        assertNull(list.removeFromBack(tx, pool));
+        assertNull(list.removeFromBack(tx));
         tx.commit();
     }
-
 
     @Test
     public void addAndRemoveInFront() {
         LinkedList<String> list = createLinkedList();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        list.addInFront(tx, pool, "1");
+        list.addInFront(tx, "1");
         tx.commit();
 
         tx = stm.startDefaultTransaction();
-        list.addInFront(tx, pool, "2");
+        list.addInFront(tx, "2");
         tx.commit();
 
         tx = stm.startDefaultTransaction();
-        assertEquals("2", list.removeFromFront(tx, pool));
+        assertEquals("2", list.removeFromFront(tx));
         tx.commit();
 
         tx = stm.startDefaultTransaction();
-        assertEquals("1", list.removeFromFront(tx, pool));
+        assertEquals("1", list.removeFromFront(tx));
         tx.commit();
 
         tx = stm.startDefaultTransaction();
-        assertNull(list.removeFromFront(tx, pool));
+        assertNull(list.removeFromFront(tx));
         tx.commit();
     }
 
     private <E> LinkedList<E> createLinkedList() {
         BetaTransaction tx = stm.startDefaultTransaction();
         LinkedList<E> list = new LinkedList<E>(tx);
-        tx.openForConstruction(list, pool);
+        tx.openForConstruction(list);
         tx.commit();
         return list;
     }

@@ -2,7 +2,6 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
@@ -17,12 +16,10 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
  */
 public class LongRef_tryLockAndCheckConflictTest {
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
@@ -30,7 +27,7 @@ public class LongRef_tryLockAndCheckConflictTest {
         BetaLongRef ref = createLongRef(stm, 0);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal write = tx.openForRead(ref, false, pool);
+        Tranlocal write = tx.openForRead(ref, false);
 
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, write);
 
@@ -45,10 +42,10 @@ public class LongRef_tryLockAndCheckConflictTest {
         BetaLongRef ref = createLongRef(stm, 0);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, false, pool);
+        LongRefTranlocal read = tx.openForRead(ref, false);
 
         BetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = otherTx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = otherTx.openForWrite(ref, false);
         write.value++;
         otherTx.commit();
 
@@ -67,13 +64,13 @@ public class LongRef_tryLockAndCheckConflictTest {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal read = tx.openForRead(ref, false, pool);
+        LongRefTranlocal read = tx.openForRead(ref, false);
 
         arbitraryUpdate(stm, ref);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction lockingTx = stm.startDefaultTransaction();
-        lockingTx.openForWrite(ref, true, pool);
+        lockingTx.openForWrite(ref, true);
 
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, read);
         assertFalse(result);
@@ -90,11 +87,11 @@ public class LongRef_tryLockAndCheckConflictTest {
 
         BetaTransaction tx = stm.startDefaultTransaction();
 
-        Tranlocal read2 = tx.openForRead(ref, false, pool);
+        Tranlocal read2 = tx.openForRead(ref, false);
 
         //lock it by another thread
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForRead(ref, true, pool);
+        otherTx.openForRead(ref, true);
 
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, read2);
 
@@ -111,7 +108,7 @@ public class LongRef_tryLockAndCheckConflictTest {
 
         //lock it by this thread.
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal read = tx.openForRead(ref, true, pool);
+        Tranlocal read = tx.openForRead(ref, true);
 
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, read);
 

@@ -7,7 +7,6 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.benchmarks.BenchmarkUtils;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -95,8 +94,6 @@ public class IsolationStressTest {
 
         @Override
         public void doRun() {
-            final BetaObjectPool pool = new BetaObjectPool();
-
             AtomicBlock block = stm.createTransactionFactoryBuilder()
                     .setDirtyCheckEnabled(dirtyCheckEnabled)
                     .buildAtomicBlock();
@@ -105,7 +102,7 @@ public class IsolationStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    LongRefTranlocal tranlocal = btx.openForWrite(ref, pessimistic, pool);
+                    LongRefTranlocal tranlocal = btx.openForWrite(ref, pessimistic);
                     tranlocal.value++;
                 }
             };

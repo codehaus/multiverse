@@ -7,7 +7,6 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.TooManyRetriesException;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -18,7 +17,6 @@ import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class TooManyRetriesRollbackTest {
     private BetaIntRef modifyRef;
@@ -62,11 +60,9 @@ public class TooManyRetriesRollbackTest {
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
 
-                BetaObjectPool pool = getThreadLocalBetaObjectPool();
+                modifyRef.set(btx, value);
 
-                modifyRef.set(btx, pool, value);
-
-                if (retryRef.get(btx, pool) % 2 == 0) {
+                if (retryRef.get(btx) % 2 == 0) {
                     retry();
                 }
             }
@@ -87,10 +83,9 @@ public class TooManyRetriesRollbackTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-                    int value = retryRef.get(btx, pool);
-                    retryRef.set(btx, pool, value + 2);
+                    int value = retryRef.get(btx);
+                    retryRef.set(btx, value + 2);
                 }
             };
 

@@ -7,7 +7,6 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
 import org.multiverse.stms.beta.transactionalobjects.RefTranlocal;
@@ -21,7 +20,6 @@ import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class QueueWithoutCapacityStressTest {
 
@@ -114,8 +112,7 @@ public class QueueWithoutCapacityStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    pushedStack.push(btx, pool, item);
+                    pushedStack.push(btx, item);
                 }
             });
         }
@@ -124,19 +121,18 @@ public class QueueWithoutCapacityStressTest {
             return popBlock.execute(new AtomicClosure<E>() {
                 @Override
                 public E execute(Transaction tx) throws Exception {
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
                     BetaTransaction btx = (BetaTransaction) tx;
 
-                    if (!readyToPopStack.isEmpty(btx, pool)) {
-                        return readyToPopStack.pop(btx, pool);
+                    if (!readyToPopStack.isEmpty(btx)) {
+                        return readyToPopStack.pop(btx);
                     }
 
-                    while (!pushedStack.isEmpty(btx, pool)) {
-                        E item = pushedStack.pop(btx, pool);
-                        readyToPopStack.push(btx, pool, item);
+                    while (!pushedStack.isEmpty(btx)) {
+                        E item = pushedStack.pop(btx);
+                        readyToPopStack.push(btx, item);
                     }
 
-                    return readyToPopStack.pop(btx, pool);
+                    return readyToPopStack.pop(btx);
                 }
             });
         }
@@ -145,18 +141,18 @@ public class QueueWithoutCapacityStressTest {
     class Stack<E> {
         final BetaRef<Node<E>> head = createRef(stm);
 
-        void push(BetaTransaction tx, BetaObjectPool pool, E item) {
-            RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, pessimistic, getThreadLocalBetaObjectPool());
+        void push(BetaTransaction tx, E item) {
+            RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, pessimistic);
             headTranlocal.value = new Node<E>(item, headTranlocal.value);
         }
 
-        boolean isEmpty(BetaTransaction tx, BetaObjectPool pool) {
-            RefTranlocal<Node<E>> headTranlocal = tx.openForRead(head, pessimistic, pool);
+        boolean isEmpty(BetaTransaction tx) {
+            RefTranlocal<Node<E>> headTranlocal = tx.openForRead(head, pessimistic);
             return headTranlocal.value == null;
         }
 
-        E pop(BetaTransaction tx, BetaObjectPool pool) {
-            RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, pessimistic, pool);
+        E pop(BetaTransaction tx) {
+            RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, pessimistic);
             Node<E> node = headTranlocal.value;
 
             if (node == null) {

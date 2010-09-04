@@ -27,7 +27,7 @@ public class LongRef_hasReadConflictTest {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, false, pool);
+        LongRefTranlocal read = tx.openForRead(ref, false);
 
         boolean hasReadConflict = ref.___hasReadConflict(read, tx);
 
@@ -39,7 +39,7 @@ public class LongRef_hasReadConflictTest {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
 
         boolean hasReadConflict = ref.___hasReadConflict(write, tx);
 
@@ -52,7 +52,7 @@ public class LongRef_hasReadConflictTest {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
-        Tranlocal read = tx.openForRead(ref, true, pool);
+        Tranlocal read = tx.openForRead(ref, true);
 
         boolean hasConflict = ref.___hasReadConflict(read, tx);
 
@@ -64,11 +64,11 @@ public class LongRef_hasReadConflictTest {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
-        Tranlocal read = tx.openForRead(ref, false, pool);
+        Tranlocal read = tx.openForRead(ref, false);
 
         //do the update
         BetaTransaction updatingTx = new FatMonoBetaTransaction(stm);
-        updatingTx.openForWrite(ref, false, pool).value++;
+        updatingTx.openForWrite(ref, false).value++;
         updatingTx.commit();
 
         boolean hasConflict = ref.___hasReadConflict(read, tx);
@@ -86,16 +86,16 @@ public class LongRef_hasReadConflictTest {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
-        Tranlocal read = tx.openForRead(ref, false, pool);
+        Tranlocal read = tx.openForRead(ref, false);
 
         //do the update
         BetaTransaction updatingTx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(ref, false, pool).value++;
+        tx.openForWrite(ref, false).value++;
         updatingTx.commit();
 
         //lock it
         BetaTransaction lockingTx = new FatMonoBetaTransaction(stm);
-        lockingTx.openForRead(ref, true, pool);
+        lockingTx.openForRead(ref, true);
 
         boolean hasConflict = ref.___hasReadConflict(read, tx);
         assertTrue(hasConflict);
@@ -106,10 +106,10 @@ public class LongRef_hasReadConflictTest {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForRead(ref, false, pool);
+        LongRefTranlocal write = tx.openForRead(ref, false);
 
         BetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        otherTx.openForRead(ref, true, pool);
+        otherTx.openForRead(ref, true);
 
         boolean hasReadConflict = ref.___hasReadConflict(write, tx);
 

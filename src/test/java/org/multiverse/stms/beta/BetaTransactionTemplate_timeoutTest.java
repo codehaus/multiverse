@@ -20,12 +20,10 @@ import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.benchmarks.BenchmarkUtils.joinAll;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class BetaTransactionTemplate_timeoutTest {
 
     private BetaStm stm;
-    private BetaObjectPool pool;
     private BetaLongRef ref;
     private long timeoutNs;
 
@@ -33,7 +31,6 @@ public class BetaTransactionTemplate_timeoutTest {
     public void setUp() {
         clearThreadLocalTransaction();
         stm = new BetaStm();
-        pool = new BetaObjectPool();
         ref = createLongRef(stm);
         timeoutNs = TimeUnit.SECONDS.toNanos(2);
     }
@@ -70,7 +67,7 @@ public class BetaTransactionTemplate_timeoutTest {
             @Override
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                btx.openForWrite(ref, false, pool).value = 1;
+                btx.openForWrite(ref, false).value = 1;
             }
         });
 
@@ -85,7 +82,7 @@ public class BetaTransactionTemplate_timeoutTest {
             @Override
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                btx.openForWrite(ref, false, pool).value = 1;
+                btx.openForWrite(ref, false).value = 1;
             }
         });
 
@@ -116,9 +113,8 @@ public class BetaTransactionTemplate_timeoutTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-                    LongRefTranlocal write = btx.openForWrite(ref, false, pool);
+                    LongRefTranlocal write = btx.openForWrite(ref, false);
                     if (write.value == 0) {
                         retry();
                     }

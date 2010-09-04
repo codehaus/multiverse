@@ -7,7 +7,10 @@ import org.multiverse.TestUtils;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.*;
+import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.FatArrayBetaTransactionFactory;
+import org.multiverse.stms.beta.FatArrayTreeBetaTransactionFactory;
+import org.multiverse.stms.beta.LeanBetaAtomicBlock;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
@@ -17,7 +20,6 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class MultipleReadsRetryStressTest {
     private BetaStm stm;
@@ -82,8 +84,7 @@ public class MultipleReadsRetryStressTest {
                     @Override
                     public void execute(Transaction tx) throws Exception {
                         BetaTransaction btx = (BetaTransaction)tx;
-                        BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                        btx.openForWrite(stopRef, false,pool).value = -1;
+                        btx.openForWrite(stopRef, false).value = -1;
                     }
                 }
         );
@@ -127,20 +128,18 @@ public class MultipleReadsRetryStressTest {
 
         @Override
         public void doRun() {
-            final BetaObjectPool pool = new BetaObjectPool();
-
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
 
-                    if (btx.openForRead(stopRef, false, pool).value < 0) {
+                    if (btx.openForRead(stopRef, false).value < 0) {
                         throw new StopException();
                     }
 
                     long sum = 0;
                     for (BetaLongRef ref : refs) {
-                        sum += btx.openForRead(ref, false, pool).value;
+                        sum += btx.openForRead(ref, false).value;
                     }
 
                     if (sum % threadCount != id) {
@@ -148,7 +147,7 @@ public class MultipleReadsRetryStressTest {
                     }
 
                     BetaLongRef ref = refs[TestUtils.randomInt(refs.length)];
-                    btx.openForWrite(ref, false, pool).value++;
+                    btx.openForWrite(ref, false).value++;
                 }
 
             };

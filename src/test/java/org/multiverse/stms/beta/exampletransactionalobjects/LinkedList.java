@@ -14,25 +14,25 @@ public class LinkedList<E> extends AbstractBetaTransactionalObject{
         super(tx);
     }
 
-    public E removeFromFront(BetaTransaction tx, BetaObjectPool pool) {
+    public E removeFromFront(BetaTransaction tx) {
         LinkedListTranlocal<E> tranlocal = (LinkedListTranlocal) tx.openForWrite(
-                this, false, pool);
+                this, false);
         if (tranlocal.head == null) {
             return null;
         }
 
         if (tranlocal.head == tranlocal.tail) {
             LinkedListNodeTranlocal<E> nodeTranlocal = (LinkedListNodeTranlocal<E>) tx.openForRead(
-                    tranlocal.head, false, pool);
+                    tranlocal.head, false);
             tranlocal.head = null;
             tranlocal.tail = null;
             return nodeTranlocal.value;
         } else {
             LinkedListNodeTranlocal<E> headTranlocal = (LinkedListNodeTranlocal<E>)tx.openForWrite(
-                    tranlocal.head, false, pool);
+                    tranlocal.head, false);
 
             LinkedListNodeTranlocal<E> nextHeadTranlocal = (LinkedListNodeTranlocal<E>)tx.openForWrite(
-                    headTranlocal.next, false, pool);
+                    headTranlocal.next, false);
 
             nextHeadTranlocal.prev = null;
             tranlocal.head = (LinkedListNode<E>) nextHeadTranlocal.owner;
@@ -40,24 +40,24 @@ public class LinkedList<E> extends AbstractBetaTransactionalObject{
         }
     }
 
-    public E removeFromBack(BetaTransaction tx, BetaObjectPool pool) {
-        LinkedListTranlocal tranlocal = (LinkedListTranlocal) tx.openForWrite(this, false, pool);
+    public E removeFromBack(BetaTransaction tx) {
+        LinkedListTranlocal tranlocal = (LinkedListTranlocal) tx.openForWrite(this, false);
         if (tranlocal.head == null) {
             return null;
         }
 
         if (tranlocal.head == tranlocal.tail) {
             LinkedListNodeTranlocal<E> nodeTranlocal = (LinkedListNodeTranlocal<E>) tx.openForRead(
-                    tranlocal.head, false, pool);
+                    tranlocal.head, false  );
             tranlocal.head = null;
             tranlocal.tail = null;
             return nodeTranlocal.value;
         } else {
             LinkedListNodeTranlocal<E> tailTranlocal = (LinkedListNodeTranlocal<E>)tx.openForWrite(
-                    tranlocal.tail, false, pool);
+                    tranlocal.tail, false  );
 
             LinkedListNodeTranlocal<E> prevTailTranlocal = (LinkedListNodeTranlocal<E>)tx.openForWrite(
-                    tailTranlocal.prev, false, pool);
+                    tailTranlocal.prev, false  );
 
             prevTailTranlocal.next = null;
             tranlocal.tail = (LinkedListNode) prevTailTranlocal.owner;
@@ -65,10 +65,10 @@ public class LinkedList<E> extends AbstractBetaTransactionalObject{
         }
     }
 
-    public void addInFront(BetaTransaction tx, BetaObjectPool pool, E item) {
-        LinkedListTranlocal tranlocal = (LinkedListTranlocal) tx.openForWrite(this, false, pool);
+    public void addInFront(BetaTransaction tx, E item) {
+        LinkedListTranlocal tranlocal = (LinkedListTranlocal) tx.openForWrite(this, false);
         LinkedListNode newNode = new LinkedListNode(tx);
-        LinkedListNodeTranlocal newNodeTranlocal = (LinkedListNodeTranlocal) tx.openForConstruction(newNode, pool);
+        LinkedListNodeTranlocal newNodeTranlocal = (LinkedListNodeTranlocal) tx.openForConstruction(newNode);
         newNodeTranlocal.value = item;
 
         if (tranlocal.head == null) {
@@ -76,7 +76,7 @@ public class LinkedList<E> extends AbstractBetaTransactionalObject{
             tranlocal.tail = newNode;
         } else {
              LinkedListNodeTranlocal<E> headTranlocal = (LinkedListNodeTranlocal) tx.openForWrite(
-                    tranlocal.head, false, pool);
+                    tranlocal.head, false);
 
             headTranlocal.prev = newNode;
             newNodeTranlocal.next = tranlocal.head;
@@ -84,11 +84,11 @@ public class LinkedList<E> extends AbstractBetaTransactionalObject{
         }
     }
 
-    public void addInBack(BetaTransaction tx, BetaObjectPool pool, E item) {
-        LinkedListTranlocal tranlocal = (LinkedListTranlocal) tx.openForWrite(this, false, pool);
+    public void addInBack(BetaTransaction tx, E item) {
+        LinkedListTranlocal tranlocal = (LinkedListTranlocal) tx.openForWrite(this, false  );
         LinkedListNode newNode = new LinkedListNode(tx);
 
-        LinkedListNodeTranlocal<E> newNodeTranlocal = (LinkedListNodeTranlocal) tx.openForConstruction(newNode, pool);
+        LinkedListNodeTranlocal<E> newNodeTranlocal = (LinkedListNodeTranlocal) tx.openForConstruction(newNode  );
         newNodeTranlocal.value = item;
 
         if (tranlocal.head == null) {
@@ -96,7 +96,7 @@ public class LinkedList<E> extends AbstractBetaTransactionalObject{
             tranlocal.tail = newNode;
         } else {
             LinkedListNodeTranlocal<E> tailTranlocal = (LinkedListNodeTranlocal) tx.openForWrite(
-                    tranlocal.tail, false, pool);
+                    tranlocal.tail, false  );
 
             tailTranlocal.next = newNode;
             newNodeTranlocal.prev = tranlocal.tail;

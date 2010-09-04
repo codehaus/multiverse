@@ -5,7 +5,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
@@ -23,12 +22,10 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
  */
 public class FatArrayTreeBetaTransaction_softResetTest {
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
@@ -60,7 +57,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
     public void whenUnused() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
 
-        boolean result = tx.softReset(pool);
+        boolean result = tx.softReset();
 
         assertTrue(result);
         assertActive(tx);
@@ -72,9 +69,9 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForRead(ref, false, pool);
+        tx.openForRead(ref, false);
 
-        boolean result = tx.softReset(pool);
+        boolean result = tx.softReset();
 
         assertTrue(result);
         assertActive(tx);
@@ -92,7 +89,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForRead(ref, false, pool);
+        tx.openForRead(ref, false);
 
         boolean result = tx.softReset();
 
@@ -112,7 +109,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
 
         boolean result = tx.softReset();
 
@@ -134,7 +131,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, true, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, true);
 
         boolean result = tx.softReset();
 
@@ -153,9 +150,9 @@ public class FatArrayTreeBetaTransaction_softResetTest {
     @Test
     public void whenPreparedAndUnused() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.prepare(pool);
+        tx.prepare();
 
-        boolean result = tx.softReset(pool);
+        boolean result = tx.softReset();
 
         assertTrue(result);
         assertActive(tx);
@@ -167,7 +164,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         tx.prepare();
 
         boolean result = tx.softReset();
@@ -188,7 +185,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
     public void whenContainsConstructed() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal constructed = tx.openForConstruction(ref, pool);
+        LongRefTranlocal constructed = tx.openForConstruction(ref);
 
         boolean result = tx.softReset();
 
@@ -208,7 +205,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         tx.register(listener);
 
-        boolean result = tx.softReset(pool);
+        boolean result = tx.softReset();
 
         assertTrue(result);
         verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
@@ -218,9 +215,9 @@ public class FatArrayTreeBetaTransaction_softResetTest {
     @Test
     public void whenAborted() {
         BetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.abort(pool);
+        tx.abort();
 
-        boolean result = tx.softReset(pool);
+        boolean result = tx.softReset();
 
         assertActive(tx);
         assertTrue(result);
@@ -229,9 +226,9 @@ public class FatArrayTreeBetaTransaction_softResetTest {
     @Test
     public void whenCommitted() {
         BetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.commit(pool);
+        tx.commit();
 
-        boolean result = tx.softReset(pool);
+        boolean result = tx.softReset();
 
         assertTrue(result);
         assertActive(tx);

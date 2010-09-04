@@ -36,7 +36,7 @@ public class LongRef_commitDirtyTest implements BetaStmConstants{
         ref.___registerChangeListener(latch, ref.___unsafeLoad(), pool, listenerEra);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         write.value++;
         write.isDirty = DIRTY_TRUE;
         ref.___tryLockAndCheckConflict(tx, 1, write);
@@ -66,12 +66,12 @@ public class LongRef_commitDirtyTest implements BetaStmConstants{
         Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         write.isDirty = DIRTY_TRUE;
         write.value++;
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        Tranlocal conflictingRead = otherTx.openForRead(ref, false, pool);
+        Tranlocal conflictingRead = otherTx.openForRead(ref, false);
 
         long oldConflictCount = globalConflictCounter.count();
         ref.___tryLockAndCheckConflict(tx, 1, write);
@@ -93,7 +93,7 @@ public class LongRef_commitDirtyTest implements BetaStmConstants{
         Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         write.value++;
         write.isDirty = DIRTY_TRUE;
         ref.___tryLockAndCheckConflict(tx, 1, write);
@@ -118,7 +118,7 @@ public class LongRef_commitDirtyTest implements BetaStmConstants{
         Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         write.isDirty = DIRTY_FALSE;
         ref.___tryLockAndCheckConflict(tx, 1, write);
 
@@ -142,7 +142,7 @@ public class LongRef_commitDirtyTest implements BetaStmConstants{
         assertUnlocked(orec);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         write.value++;
         write.isDirty = DIRTY_TRUE;
         ref.___tryLockAndCheckConflict(tx, 1, write);

@@ -5,7 +5,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.WriteConflict;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
@@ -21,12 +20,11 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 public class FatMonoBetaTransaction_prepareTest {
 
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
+
     }
 
     @Test
@@ -49,14 +47,14 @@ public class FatMonoBetaTransaction_prepareTest {
         BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, false, pool);
+        LongRefTranlocal read = tx.openForRead(ref, false);
 
         FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false, pool);
+        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false);
         conflictingWrite.value++;
         otherTx.commit();
 
-        tx.prepare(pool);
+        tx.prepare();
 
         assertPrepared(tx);
         assertCommitted(otherTx);
@@ -73,12 +71,12 @@ public class FatMonoBetaTransaction_prepareTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, false, pool);
+        LongRefTranlocal read = tx.openForRead(ref, false);
 
         FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        otherTx.openForRead(ref, true, pool);
+        otherTx.openForRead(ref, true);
 
-        tx.prepare(pool);
+        tx.prepare();
 
         assertPrepared(tx);
         assertActive(otherTx);
@@ -95,9 +93,9 @@ public class FatMonoBetaTransaction_prepareTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         write.value++;
-        tx.prepare(pool);
+        tx.prepare();
 
         assertPrepared(tx);
 
@@ -115,8 +113,8 @@ public class FatMonoBetaTransaction_prepareTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, true, pool);
-        tx.prepare(pool);
+        LongRefTranlocal write = tx.openForWrite(ref, true);
+        tx.prepare();
 
         assertPrepared(tx);
 
@@ -134,14 +132,14 @@ public class FatMonoBetaTransaction_prepareTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         write.value++;
 
         FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        otherTx.openForRead(ref, true, pool);
+        otherTx.openForRead(ref, true);
 
         try {
-            tx.prepare(pool);
+            tx.prepare();
             fail();
         } catch (WriteConflict expected) {
         }
@@ -161,7 +159,7 @@ public class FatMonoBetaTransaction_prepareTest {
     public void whenContainsConstructed() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         BetaLongRef ref = new BetaLongRef(tx);
-        tx.openForConstruction(ref, pool);
+        tx.openForConstruction(ref);
         tx.prepare();
 
         assertPrepared(tx);
@@ -177,16 +175,16 @@ public class FatMonoBetaTransaction_prepareTest {
         BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         write.value++;
 
         FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false, pool);
+        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false);
         conflictingWrite.value++;
         otherTx.commit();
 
         try {
-            tx.prepare(pool);
+            tx.prepare();
             fail();
         } catch (WriteConflict expected) {
         }
@@ -222,11 +220,11 @@ public class FatMonoBetaTransaction_prepareTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         write.value++;
-        tx.prepare(pool);
+        tx.prepare();
 
-        tx.prepare(pool);
+        tx.prepare();
         assertPrepared(tx);
 
         assertLocked(ref);
@@ -240,10 +238,10 @@ public class FatMonoBetaTransaction_prepareTest {
     @Test
     public void whenCommitted_thenDeadTransactionException() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.commit(pool);
+        tx.commit();
 
         try {
-            tx.prepare(pool);
+            tx.prepare();
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -254,10 +252,10 @@ public class FatMonoBetaTransaction_prepareTest {
     @Test
     public void whenAborted_thenDeadTransactionException() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.abort(pool);
+        tx.abort();
 
         try {
-            tx.prepare(pool);
+            tx.prepare();
             fail();
         } catch (DeadTransactionException expected) {
         }

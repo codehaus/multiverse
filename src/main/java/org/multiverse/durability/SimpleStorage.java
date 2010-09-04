@@ -14,7 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import static java.lang.String.format;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
  * A very basic implementation of the {@link Storage} interface. The internals are very ugly, and purely
@@ -262,7 +261,7 @@ public class SimpleStorage implements Storage {
         //the object is not there.. so we need to load it        .
         BetaTransaction tx = betaStm.startDefaultTransaction();
         object = loadDurableObject(id, tx);
-        DurableState state = tx.openForConstruction((BetaTransactionalObject) object, getThreadLocalBetaObjectPool());
+        DurableState state = tx.openForConstruction((BetaTransactionalObject) object);
         populate(state);
         tx.commit();
         return object;

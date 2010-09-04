@@ -1,6 +1,5 @@
 package org.multiverse.benchmarks;
 
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
@@ -129,7 +128,6 @@ public class UncontendedMultipleReadScalabilityTest {
         }
 
         public void run1() {
-            BetaObjectPool pool = new BetaObjectPool();
             BetaLongRef ref1 = createReadBiasedLongRef(stm);
 
             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 1)
@@ -139,9 +137,9 @@ public class UncontendedMultipleReadScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionCount; iteration++) {
-                tx.openForRead(ref1, false, pool);
-                tx.commit(pool);
-                tx.hardReset(pool);
+                tx.openForRead(ref1, false);
+                tx.commit();
+                tx.hardReset();
             }
 
             durationMs = System.currentTimeMillis() - startMs;
@@ -152,8 +150,6 @@ public class UncontendedMultipleReadScalabilityTest {
             BetaLongRef ref1 = createReadBiasedLongRef(stm);
             BetaLongRef ref2 = createReadBiasedLongRef(stm);
 
-            BetaObjectPool pool = new BetaObjectPool();
-
             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 2)
                     .setReadonly(true);
             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
@@ -161,10 +157,10 @@ public class UncontendedMultipleReadScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionCount; iteration++) {
-                tx.openForRead(ref1, false, pool);
-                tx.openForRead(ref2, false, pool);
-                tx.commit(pool);
-                tx.hardReset(pool);
+                tx.openForRead(ref1, false);
+                tx.openForRead(ref2, false);
+                tx.commit();
+                tx.hardReset();
 
             }
 
@@ -178,8 +174,6 @@ public class UncontendedMultipleReadScalabilityTest {
             BetaLongRef ref3 = createReadBiasedLongRef(stm);
             BetaLongRef ref4 = createReadBiasedLongRef(stm);
 
-            BetaObjectPool pool = new BetaObjectPool();
-
             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 4)
                     .setReadonly(true);
             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
@@ -187,12 +181,12 @@ public class UncontendedMultipleReadScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionCount; iteration++) {
-                tx.openForRead(ref1, false, pool);
-                tx.openForRead(ref2, false, pool);
-                tx.openForRead(ref3, false, pool);
-                tx.openForRead(ref4, false, pool);
-                tx.commit(pool);
-                tx.hardReset(pool);
+                tx.openForRead(ref1, false);
+                tx.openForRead(ref2, false);
+                tx.openForRead(ref3, false);
+                tx.openForRead(ref4, false);
+                tx.commit();
+                tx.hardReset();
 
             }
 
@@ -210,8 +204,6 @@ public class UncontendedMultipleReadScalabilityTest {
             BetaLongRef ref7 = createReadBiasedLongRef(stm);
             BetaLongRef ref8 = createReadBiasedLongRef(stm);
 
-            BetaObjectPool pool = new BetaObjectPool();
-
             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 8)
                     .setReadonly(true);
             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
@@ -219,17 +211,17 @@ public class UncontendedMultipleReadScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionCount; iteration++) {
-                tx.openForRead(ref1, false, pool);
-                tx.openForRead(ref2, false, pool);
-                tx.openForRead(ref3, false, pool);
-                tx.openForRead(ref4, false, pool);
-                tx.openForRead(ref5, false, pool);
-                tx.openForRead(ref6, false, pool);
-                tx.openForRead(ref7, false, pool);
-                tx.openForRead(ref8, false, pool);
+                tx.openForRead(ref1, false);
+                tx.openForRead(ref2, false);
+                tx.openForRead(ref3, false);
+                tx.openForRead(ref4, false);
+                tx.openForRead(ref5, false);
+                tx.openForRead(ref6, false);
+                tx.openForRead(ref7, false);
+                tx.openForRead(ref8, false);
 
-                tx.commit(pool);
-                tx.hardReset(pool);
+                tx.commit();
+                tx.hardReset();
 
             }
 
@@ -255,9 +247,6 @@ public class UncontendedMultipleReadScalabilityTest {
             BetaLongRef ref15 = createReadBiasedLongRef(stm);
             BetaLongRef ref16 = createReadBiasedLongRef(stm);
 
-
-            BetaObjectPool pool = new BetaObjectPool();
-
             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 16)
                     .setReadonly(true);
             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
@@ -265,26 +254,25 @@ public class UncontendedMultipleReadScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionCount; iteration++) {
-                tx.openForRead(ref1, false, pool);
-                tx.openForRead(ref2, false, pool);
-                tx.openForRead(ref3, false, pool);
-                tx.openForRead(ref4, false, pool);
-                tx.openForRead(ref5, false, pool);
-                tx.openForRead(ref6, false, pool);
-                tx.openForRead(ref7, false, pool);
-                tx.openForRead(ref8, false, pool);
-                tx.openForRead(ref9, false, pool);
-                tx.openForRead(ref10, false, pool);
-                tx.openForRead(ref11, false, pool);
-                tx.openForRead(ref12, false, pool);
-                tx.openForRead(ref13, false, pool);
-                tx.openForRead(ref14, false, pool);
-                tx.openForRead(ref15, false, pool);
-                tx.openForRead(ref16, false, pool);
+                tx.openForRead(ref1, false);
+                tx.openForRead(ref2, false);
+                tx.openForRead(ref3, false);
+                tx.openForRead(ref4, false);
+                tx.openForRead(ref5, false);
+                tx.openForRead(ref6, false);
+                tx.openForRead(ref7, false);
+                tx.openForRead(ref8, false);
+                tx.openForRead(ref9, false);
+                tx.openForRead(ref10, false);
+                tx.openForRead(ref11, false);
+                tx.openForRead(ref12, false);
+                tx.openForRead(ref13, false);
+                tx.openForRead(ref14, false);
+                tx.openForRead(ref15, false);
+                tx.openForRead(ref16, false);
 
-
-                tx.commit(pool);
-                tx.hardReset(pool);
+                tx.commit();
+                tx.hardReset();
 
             }
 
@@ -327,8 +315,6 @@ public class UncontendedMultipleReadScalabilityTest {
             BetaLongRef ref32 = createReadBiasedLongRef(stm);
 
 
-            BetaObjectPool pool = new BetaObjectPool();
-
             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 32)
                     .setReadonly(true);
             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
@@ -336,42 +322,41 @@ public class UncontendedMultipleReadScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionCount; iteration++) {
-                tx.openForRead(ref1, false, pool);
-                tx.openForRead(ref2, false, pool);
-                tx.openForRead(ref3, false, pool);
-                tx.openForRead(ref4, false, pool);
-                tx.openForRead(ref5, false, pool);
-                tx.openForRead(ref6, false, pool);
-                tx.openForRead(ref7, false, pool);
-                tx.openForRead(ref8, false, pool);
-                tx.openForRead(ref9, false, pool);
-                tx.openForRead(ref10, false, pool);
-                tx.openForRead(ref11, false, pool);
-                tx.openForRead(ref12, false, pool);
-                tx.openForRead(ref13, false, pool);
-                tx.openForRead(ref14, false, pool);
-                tx.openForRead(ref15, false, pool);
-                tx.openForRead(ref16, false, pool);
-                tx.openForRead(ref17, false, pool);
-                tx.openForRead(ref18, false, pool);
-                tx.openForRead(ref19, false, pool);
-                tx.openForRead(ref20, false, pool);
-                tx.openForRead(ref21, false, pool);
-                tx.openForRead(ref22, false, pool);
-                tx.openForRead(ref23, false, pool);
-                tx.openForRead(ref24, false, pool);
-                tx.openForRead(ref25, false, pool);
-                tx.openForRead(ref26, false, pool);
-                tx.openForRead(ref27, false, pool);
-                tx.openForRead(ref28, false, pool);
-                tx.openForRead(ref29, false, pool);
-                tx.openForRead(ref30, false, pool);
-                tx.openForRead(ref31, false, pool);
-                tx.openForRead(ref32, false, pool);
+                tx.openForRead(ref1, false);
+                tx.openForRead(ref2, false);
+                tx.openForRead(ref3, false);
+                tx.openForRead(ref4, false);
+                tx.openForRead(ref5, false);
+                tx.openForRead(ref6, false);
+                tx.openForRead(ref7, false);
+                tx.openForRead(ref8, false);
+                tx.openForRead(ref9, false);
+                tx.openForRead(ref10, false);
+                tx.openForRead(ref11, false);
+                tx.openForRead(ref12, false);
+                tx.openForRead(ref13, false);
+                tx.openForRead(ref14, false);
+                tx.openForRead(ref15, false);
+                tx.openForRead(ref16, false);
+                tx.openForRead(ref17, false);
+                tx.openForRead(ref18, false);
+                tx.openForRead(ref19, false);
+                tx.openForRead(ref20, false);
+                tx.openForRead(ref21, false);
+                tx.openForRead(ref22, false);
+                tx.openForRead(ref23, false);
+                tx.openForRead(ref24, false);
+                tx.openForRead(ref25, false);
+                tx.openForRead(ref26, false);
+                tx.openForRead(ref27, false);
+                tx.openForRead(ref28, false);
+                tx.openForRead(ref29, false);
+                tx.openForRead(ref30, false);
+                tx.openForRead(ref31, false);
+                tx.openForRead(ref32, false);
 
-                tx.commit(pool);
-                tx.hardReset(pool);
-
+                tx.commit();
+                tx.hardReset();
             }
 
             durationMs = System.currentTimeMillis() - startMs;

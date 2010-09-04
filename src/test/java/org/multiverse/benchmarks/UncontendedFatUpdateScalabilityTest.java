@@ -1,6 +1,5 @@
 package org.multiverse.benchmarks;
 
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -100,8 +99,6 @@ public class UncontendedFatUpdateScalabilityTest {
         public void run() {
             BetaLongRef ref = BetaStmUtils.createLongRef(stm);
 
-            BetaObjectPool pool = new BetaObjectPool();
-
             //FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
             //FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm,1);
             FatMonoBetaTransaction tx = new FatMonoBetaTransaction(
@@ -109,9 +106,9 @@ public class UncontendedFatUpdateScalabilityTest {
                             .setDirtyCheckEnabled(false));
             long startMs = System.currentTimeMillis();
             for (long k = 0; k < transactionCount; k++) {
-                tx.openForWrite(ref, true, pool).value++;
-                tx.commit(pool);
-                tx.hardReset(pool);
+                tx.openForWrite(ref, true).value++;
+                tx.commit();
+                tx.hardReset();
             }
 
             assertEquals(transactionCount, ref.___unsafeLoad().value);

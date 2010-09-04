@@ -7,7 +7,6 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -15,7 +14,6 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class DeadLockStressTest {
 
@@ -138,8 +136,7 @@ public class DeadLockStressTest {
             normalBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    doIt((BetaTransaction) tx, pool);
+                    doIt((BetaTransaction) tx);
                 }
             });
         }
@@ -148,8 +145,7 @@ public class DeadLockStressTest {
             pessimisticReadLevelBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    doIt((BetaTransaction) tx, pool);
+                    doIt((BetaTransaction) tx);
                 }
             });
         }
@@ -158,14 +154,13 @@ public class DeadLockStressTest {
             pessimisticWriteLevelBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    doIt((BetaTransaction) tx, pool);
+                    doIt((BetaTransaction) tx);
                 }
             });
         }
 
 
-        public void doIt(BetaTransaction tx, BetaObjectPool pool) {
+        public void doIt(BetaTransaction tx) {
             for (int k = 0; k < refs.length; k++) {
                 if (!randomOneOf(10)) {
                     continue;
@@ -173,7 +168,7 @@ public class DeadLockStressTest {
 
                 int index = randomInt(refs.length);
                 BetaIntRef ref = refs[index];
-                ref.set(tx, pool, ref.get(tx, pool) + 1);
+                ref.set(tx, ref.get(tx) + 1);
             }
         }
     }

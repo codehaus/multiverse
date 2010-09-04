@@ -9,7 +9,6 @@ import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
@@ -24,12 +23,10 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 public class FatArrayBetaTransaction_commuteTest {
 
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
@@ -40,7 +37,7 @@ public class FatArrayBetaTransaction_commuteTest {
 
         LongFunction function = mock(LongFunction.class);
 
-        tx.commute(ref, pool, function);
+        tx.commute(ref, function);
 
         assertActive(tx);
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
@@ -66,7 +63,7 @@ public class FatArrayBetaTransaction_commuteTest {
 
         stm.getGlobalConflictCounter().signalConflict(new BetaLongRef());
 
-        tx.commute(ref, pool, function);
+        tx.commute(ref, function);
 
         assertEquals(localConflictCount, tx.getLocalConflictCounter().get());
         assertActive(tx);
@@ -92,9 +89,9 @@ public class FatArrayBetaTransaction_commuteTest {
         LongFunction function2 = mock(LongFunction.class);
         LongFunction function3 = mock(LongFunction.class);
 
-        tx.commute(ref, pool, function1);
-        tx.commute(ref, pool, function2);
-        tx.commute(ref, pool, function3);
+        tx.commute(ref, function1);
+        tx.commute(ref, function2);
+        tx.commute(ref, function3);
 
         assertActive(tx);
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
@@ -119,8 +116,8 @@ public class FatArrayBetaTransaction_commuteTest {
         LongFunction function1 = mock(LongFunction.class);
         LongFunction function2 = mock(LongFunction.class);
 
-        tx.commute(ref1, pool, function1);
-        tx.commute(ref2, pool, function2);
+        tx.commute(ref1, function1);
+        tx.commute(ref2, function2);
 
         assertActive(tx);
         LongRefTranlocal tranlocal1= (LongRefTranlocal) tx.get(ref1);
@@ -140,10 +137,10 @@ public class FatArrayBetaTransaction_commuteTest {
 
         LongFunction function1 = mock(LongFunction.class);
         LongFunction function2 = mock(LongFunction.class);
-        tx.commute(ref1, pool, function1);
+        tx.commute(ref1, function1);
 
         try {
-            tx.commute(ref2, pool, function2);
+            tx.commute(ref2, function2);
             fail();
         } catch (SpeculativeConfigurationError expected) {
 
@@ -171,8 +168,8 @@ public class FatArrayBetaTransaction_commuteTest {
         LongFunction function1 = mock(LongFunction.class);
         LongFunction function2 = mock(LongFunction.class);
 
-        tx.commute(ref, pool, function1);
-        tx.commute(ref, pool, function2);
+        tx.commute(ref, function1);
+        tx.commute(ref, function2);
 
         assertActive(tx);
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
@@ -195,8 +192,8 @@ public class FatArrayBetaTransaction_commuteTest {
         BetaLongRef ref = createLongRef(stm, 100);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, false, pool);
-        tx.commute(ref, pool, new IncLongFunction());
+        LongRefTranlocal read = tx.openForRead(ref, false);
+        tx.commute(ref, new IncLongFunction());
 
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
         assertActive(tx);
@@ -216,8 +213,8 @@ public class FatArrayBetaTransaction_commuteTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal tranlocal = tx.openForWrite(ref, false, pool);
-        tx.commute(ref, pool, new IncLongFunction());
+        LongRefTranlocal tranlocal = tx.openForWrite(ref, false);
+        tx.commute(ref, new IncLongFunction());
 
         assertActive(tx);
         assertSame(ref, tranlocal.owner);
@@ -241,8 +238,8 @@ public class FatArrayBetaTransaction_commuteTest {
     public void whenFreshObject() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         BetaLongRef ref = new BetaLongRef(tx);
-        tx.openForConstruction(ref, pool);
-        tx.commute(ref, pool, new IncLongFunction());
+        tx.openForConstruction(ref);
+        tx.commute(ref, new IncLongFunction());
 
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
 
@@ -263,11 +260,11 @@ public class FatArrayBetaTransaction_commuteTest {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForRead(ref, true, pool);
+        otherTx.openForRead(ref, true);
 
         LongFunction function = mock(LongFunction.class);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.commute(ref, pool, function);
+        tx.commute(ref, function);
 
         LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
 
@@ -293,7 +290,7 @@ public class FatArrayBetaTransaction_commuteTest {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
 
         try {
-            tx.commute(ref, pool, function);
+            tx.commute(ref, function);
             fail();
         } catch (ReadonlyException expected) {
         }
@@ -307,12 +304,12 @@ public class FatArrayBetaTransaction_commuteTest {
         BetaLongRef ref = createLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.prepare(pool);
+        tx.prepare();
 
         LongFunction function = mock(LongFunction.class);
 
         try {
-            tx.commute(ref, pool, function);
+            tx.commute(ref, function);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -325,12 +322,12 @@ public class FatArrayBetaTransaction_commuteTest {
         BetaLongRef ref = createLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.commit(pool);
+        tx.commit();
 
         LongFunction function = mock(LongFunction.class);
 
         try {
-            tx.commute(ref, pool, function);
+            tx.commute(ref, function);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -348,7 +345,7 @@ public class FatArrayBetaTransaction_commuteTest {
         LongFunction function = mock(LongFunction.class);
 
         try {
-            tx.commute(ref, pool, function);
+            tx.commute(ref, function);
             fail();
         } catch (DeadTransactionException expected) {
         }

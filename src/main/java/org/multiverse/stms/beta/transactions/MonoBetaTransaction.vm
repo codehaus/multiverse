@@ -9,8 +9,6 @@ import org.multiverse.stms.beta.*;
 import org.multiverse.stms.beta.transactionalobjects.*;
 import org.multiverse.stms.beta.conflictcounters.*;
 
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.*;
-
 import static java.lang.String.format;
 
 /**
@@ -53,7 +51,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
 #if(!${transaction.lean})
     private ${ref.typeParameter} void flattenCommute(
-        final BetaObjectPool pool,
         final ${ref.name}${ref.typeParameter} ref,
         final ${ref.tranlocal}${ref.typeParameter} tranlocal,
         final boolean lock){
@@ -68,12 +65,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             : ref.___load(config.spinCount);
 
         if (read.isLocked) {
-            throw abortOnReadConflict(pool);
+            throw abortOnReadConflict();
         }
 
         if (hasReadConflict()) {
             ref.___abort(this, read, pool);
-            throw abortOnReadConflict(pool);
+            throw abortOnReadConflict();
         }
 
         tranlocal.read = read;
@@ -85,22 +82,24 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }finally{
             evaluatingCommute = false;
             if(abort){
-                abort(pool);
+                abort();
             }
         }
     }
 
 #end
     @Override
-    public final ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForRead(final ${ref.name}${ref.typeParameter} ref,  boolean lock, final BetaObjectPool pool) {
+    public final ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForRead(
+        final ${ref.name}${ref.typeParameter} ref,
+        boolean lock) {
 
         if (status != ACTIVE) {
-            throw abortOpenForRead(pool, ref);
+            throw abortOpenForRead(ref);
         }
 
 #if(!${transaction.lean})
         if(evaluatingCommute){
-            throw abortOnOpenForReadWhileEvaluatingCommute(pool, ref);
+            throw abortOnOpenForReadWhileEvaluatingCommute(ref);
         }
 
 #end
@@ -124,13 +123,13 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
                 //if it was locked, lets abort.
                 if (read.isLocked) {
-                    throw abortOnReadConflict(pool);
+                    throw abortOnReadConflict();
                 }
 
 #if(!$transaction.lean)
                 if(hasReadConflict()){
                     read.owner.___abort(this, read, pool);
-                    throw abortOnReadConflict(pool);
+                    throw abortOnReadConflict();
                 }
 
 #end
@@ -141,13 +140,13 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             ${ref.tranlocal}${ref.typeParameter} read = ref.___load(config.spinCount);
 
             if (read.isLocked) {
-                throw abortOnReadConflict(pool);
+                throw abortOnReadConflict();
             }
 
 #if(!$transaction.lean)
             if(hasReadConflict()){
                 read.owner.___abort(this, read, pool);
-                throw abortOnReadConflict(pool);
+                throw abortOnReadConflict();
             }
 
 #end
@@ -157,7 +156,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #if(!$transaction.lean)
                 hasUntrackedReads = true;
 #else
-                throw abortOnTooSmallSize(pool, 2);
+                throw abortOnTooSmallSize(2);
 #end
             }
 
@@ -171,19 +170,19 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
 #if(!$transaction.lean)
             if(result.isCommuting){
-                flattenCommute(pool, ref, result, lock);
+                flattenCommute(ref, result, lock);
                 return result;
             }else
 #end
             if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount, result)){
-                throw abortOnReadConflict(pool);
+                throw abortOnReadConflict();
             }
 
             return result;
         }
 
         if(lock || config.trackReads){
-            throw abortOnTooSmallSize(pool, 2);
+            throw abortOnTooSmallSize(2);
         }
 
 #if(!${transaction.lean})
@@ -197,19 +196,19 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         //if it was locked, lets abort.
         if (read.isLocked) {
-            throw abortOnReadConflict(pool);
+            throw abortOnReadConflict();
         }
 
 #if($transaction.lean)
-        throw abortOnTooSmallSize(pool, 2);
+        throw abortOnTooSmallSize(2);
 #else
         if(read.isPermanent){
-            throw abortOnTooSmallSize(pool, 2);
+            throw abortOnTooSmallSize(2);
         }
 
         if(hasReadConflict()){
             read.owner.___abort(this, read, pool);
-            throw abortOnReadConflict(pool);
+            throw abortOnReadConflict();
         }
 
         hasUntrackedReads = true;
@@ -219,24 +218,24 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     @Override
     public final ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForWrite(
-        final ${ref.name}${ref.typeParameter} ref, boolean lock, final BetaObjectPool pool) {
+        final ${ref.name}${ref.typeParameter} ref, boolean lock) {
 
         if (status != ACTIVE) {
-            throw abortOpenForWrite(pool, ref);
+            throw abortOpenForWrite(ref);
         }
 
 #if(!${transaction.lean})
         if(evaluatingCommute){
-            throw abortOnOpenForWriteWhileEvaluatingCommute(pool, ref);
+            throw abortOnOpenForWriteWhileEvaluatingCommute(ref);
         }
 
 #end
         if (ref == null) {
-            throw abortOpenForWriteWhenNullReference(pool);
+            throw abortOpenForWriteWhenNullReference();
         }
 
         if (config.readonly) {
-            throw abortOpenForWriteWhenReadonly(pool, ref);
+            throw abortOpenForWriteWhenReadonly(ref);
         }
 
         lock = lock || config.lockWrites;
@@ -256,13 +255,13 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
             //if it was locked, lets abort.
             if (read.isLocked) {
-                throw abortOnReadConflict(pool);
+                throw abortOnReadConflict();
             }
 
 #if(!${transaction.lean})
             if(hasReadConflict()){
                 read.owner.___abort(this, read, pool);
-                throw abortOnReadConflict(pool);
+                throw abortOnReadConflict();
             }
     
 #end
@@ -285,7 +284,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         //the transaction has a previous attached reference
 
         if(attached.owner != ref){
-            throw abortOnTooSmallSize(pool, 2);
+            throw abortOnTooSmallSize(2);
         }
 
         //the reference is the one we are looking for.
@@ -293,12 +292,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
 #if(!$transaction.lean)
         if(result.isCommuting){
-            flattenCommute(pool, ref, result, lock);
+            flattenCommute(ref, result, lock);
             return result;
         }else
 #end
         if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount, result)){
-            throw abortOnReadConflict(pool);
+            throw abortOnReadConflict();
         }
 
         if(!result.isCommitted){
@@ -323,31 +322,31 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     @Override
     public final ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForConstruction(
-        final ${ref.name}${ref.typeParameter} ref, final BetaObjectPool pool) {
+        final ${ref.name}${ref.typeParameter} ref) {
 
         if (status != ACTIVE) {
-           throw abortOpenForConstruction(pool, ref);
+           throw abortOpenForConstruction(ref);
         }
 
 #if(!${transaction.lean})
         if(evaluatingCommute){
-            throw abortOnOpenForConstructionWhileEvaluatingCommute(pool, ref);
+            throw abortOnOpenForConstructionWhileEvaluatingCommute(ref);
         }
 
 #end
         if (ref == null) {
-            throw abortOpenForConstructionWhenNullReference(pool);
+            throw abortOpenForConstructionWhenNullReference();
         }
 
         if (config.readonly) {
-            throw abortOpenForConstructionWhenReadonly(pool, ref);                        
+            throw abortOpenForConstructionWhenReadonly(ref);
         }
 
         ${ref.tranlocal}${ref.typeParameter} result = (attached == null || attached.owner != ref) ? null : (${ref.tranlocal}${ref.typeParameter})attached;
 
         if(result != null){
             if(result.isCommitted || result.read != null){
-               throw abortOpenForConstructionWithBadReference(pool, ref);
+               throw abortOpenForConstructionWithBadReference(ref);
             }
 
             return result;
@@ -355,11 +354,11 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         //check if there is room
         if (attached != null) {
-            throw abortOnTooSmallSize(pool, 2);
+            throw abortOnTooSmallSize(2);
         }
 
         if(ref.___unsafeLoad()!=null){
-            throw abortOpenForConstructionWithBadReference(pool, ref);
+            throw abortOpenForConstructionWithBadReference(ref);
         }
 
 #if(${ref.isReference})
@@ -376,33 +375,33 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     }
 
     public ${ref.typeParameter} void commute(
-        ${ref.name}${ref.typeParameter} ref, BetaObjectPool pool, ${ref.functionClass}${ref.typeParameter} function){
+        ${ref.name}${ref.typeParameter} ref, ${ref.functionClass}${ref.typeParameter} function){
 
         if (status != ACTIVE) {
-            throw abortCommute(pool, ref, function);
+            throw abortCommute(ref, function);
         }
 
 #if($transaction.lean)
         config.needsCommute();
-        abort(pool);
+        abort();
         throw SpeculativeConfigurationError.INSTANCE;
 #else
         if(evaluatingCommute){
-            throw abortOnCommuteWhileEvaluatingCommute(pool, ref);
+            throw abortOnCommuteWhileEvaluatingCommute(ref);
         }
 
         if (config.readonly) {
-            throw abortCommuteWhenReadonly(pool, ref, function);
+            throw abortCommuteWhenReadonly(ref, function);
         }
 
         if (ref == null) {
-            throw abortCommuteWhenNullReference(pool, function);
+            throw abortCommuteWhenNullReference(function);
         }
 
         final boolean contains = (attached != null && attached.owner == ref);
         if(!contains){
             if(attached != null) {
-                throw abortOnTooSmallSize(pool, 2);
+                throw abortOnTooSmallSize(2);
             }
 
             //todo: call to 'openForCommute' can be inlined.
@@ -484,12 +483,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     // ======================= abort =======================================
 
     @Override
-    public void abort() {
-        abort(getThreadLocalBetaObjectPool());
-    }
-
-    @Override
-    public final void abort(final BetaObjectPool pool) {
+    public final void abort() {
         if (status != ACTIVE && status != PREPARED) {
             switch (status) {
                 case ABORTED:
@@ -521,14 +515,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     // ================== commit ===========================================
 
-    @Override
-    public void commit() {
-        commit(getThreadLocalBetaObjectPool());
-    }
-
 #if(${transaction.lean})
     @Override
-    public final void commit(final BetaObjectPool pool) {
+    public final void commit() {
         if(status == COMMITTED){
             return;
         }
@@ -546,21 +535,21 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         if(abortOnly){
-            throw abortOnWriteConflict(pool);
+            throw abortOnWriteConflict();
         }
             
         Listeners listeners = null;
         if(attached!=null){
             final boolean needsPrepare = status == ACTIVE && hasUpdates;
             if(config.dirtyCheck){
-                if(needsPrepare && !doPrepareDirty(pool)){
-                    throw abortOnWriteConflict(pool);
+                if(needsPrepare && !doPrepareDirty()){
+                    throw abortOnWriteConflict();
                 }
 
                 listeners = attached.owner.___commitDirty(attached, this, pool, config.globalConflictCounter);
             }else{
-                if(needsPrepare && !doPrepareAll(pool)){
-                    throw abortOnWriteConflict(pool);
+                if(needsPrepare && !doPrepareAll()){
+                    throw abortOnWriteConflict();
                 }
 
                 listeners = attached.owner.___commitAll(attached, this, pool, config.globalConflictCounter);
@@ -575,12 +564,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     }
 #else
     @Override
-    public final void commit(final BetaObjectPool pool) {
+    public final void commit() {
         if(status == COMMITTED){
             return;
         }
 
-        prepare(pool);
+        prepare();
         Listeners listeners = null;
         if (attached!=null) {
             if(config.dirtyCheck){
@@ -610,14 +599,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     // ======================= prepare ============================
 
-    @Override
-    public void prepare() {
-        prepare(getThreadLocalBetaObjectPool());
-    }
-
 #if($transaction.lean)
     @Override
-    public final void prepare(final BetaObjectPool pool) {
+    public final void prepare() {
         if(status == PREPARED){
             return;
         }
@@ -638,17 +622,17 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         if(abortOnly){
-            throw abortOnWriteConflict(pool);
+            throw abortOnWriteConflict();
         }
 
         if(hasUpdates){
             if(config.dirtyCheck){
-                if(!doPrepareDirty(pool)){
-                    throw abortOnWriteConflict(pool);
+                if(!doPrepareDirty()){
+                    throw abortOnWriteConflict();
                 }
             }else{
-                if(!doPrepareAll(pool)){
-                    throw abortOnWriteConflict(pool);
+                if(!doPrepareAll()){
+                    throw abortOnWriteConflict();
                 }
             }
         }
@@ -657,7 +641,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     }
 #else
     @Override
-    public final void prepare(final BetaObjectPool pool) {
+    public final void prepare() {
         if(status != ACTIVE){
             switch (status) {
                 case PREPARED:
@@ -684,17 +668,17 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             }
 
             if(abortOnly){
-                throw abortOnWriteConflict(pool);
+                throw abortOnWriteConflict();
             }
           
             if(hasUpdates){
                 if(config.dirtyCheck){
-                    if(!doPrepareDirty(pool)){
-                        throw abortOnWriteConflict(pool);
+                    if(!doPrepareDirty()){
+                        throw abortOnWriteConflict();
                     }
                 }else{
-                    if(!doPrepareAll(pool)){
-                        throw abortOnWriteConflict(pool);
+                    if(!doPrepareAll()){
+                        throw abortOnWriteConflict();
                     }
                 }
             }
@@ -703,13 +687,13 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             abort = false;
         }finally{
             if(abort){
-                abort(pool);
+                abort();
             }
         }
     }
 #end
 
-    private boolean doPrepareDirty(final BetaObjectPool pool){
+    private boolean doPrepareDirty(){
         if(config.lockWrites){
             return true;
         }
@@ -738,7 +722,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         return true;
     }
 
-    private boolean doPrepareAll(final BetaObjectPool pool){
+    private boolean doPrepareAll(){
         if(config.lockWrites){
             return true;
         }
@@ -769,22 +753,17 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     // ============================ registerChangeListenerAndAbort ===================
 
     @Override
-    public void registerChangeListenerAndAbort(final Latch listener){
-        registerChangeListenerAndAbort(listener, getThreadLocalBetaObjectPool());
-    }
-
-    @Override
-    public final void registerChangeListenerAndAbort(final Latch listener, final BetaObjectPool pool) {
+    public final void registerChangeListenerAndAbort(final Latch listener) {
         if (status != ACTIVE) {
-            throw abortOnFaultyStatusOfRegisterChangeListenerAndAbort(pool);
+            throw abortOnFaultyStatusOfRegisterChangeListenerAndAbort();
         }
 
         if(!config.blockingAllowed){
-            throw abortOnNoBlockingAllowed(pool);
+            throw abortOnNoBlockingAllowed();
         }
 
         if( attached == null){
-            throw abortOnNoRetryPossible(pool);
+            throw abortOnNoRetryPossible();
         }
 
         final long listenerEra = listener.getEra();
@@ -806,7 +785,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
 #end
         if(failure){
-            throw abortOnNoRetryPossible(pool);
+            throw abortOnNoRetryPossible();
         }
     }
 
@@ -814,40 +793,30 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     @Override
     public void init(BetaTransactionConfiguration transactionConfig){
-        init(transactionConfig, getThreadLocalBetaObjectPool());
-    }
-
-    @Override
-    public void init(BetaTransactionConfiguration transactionConfig, BetaObjectPool pool){
         if(transactionConfig == null){
             abort();
             throw new NullPointerException();
         }
 
         if(status == ACTIVE || status == PREPARED){
-            abort(pool);
+            abort();
         }
 
         this.config = transactionConfig;
-        hardReset(pool);
+        hardReset();
     }
 
     // ========================= reset ===============================
 
     @Override
-    public boolean softReset(){
-        return softReset(getThreadLocalBetaObjectPool());
-    }
-
-    @Override
-    public boolean softReset(final BetaObjectPool pool) {
+    public boolean softReset() {
         if (status == ACTIVE || status == PREPARED) {
 #if($transaction.lean)
             if(attached!=null){
                 attached.owner.___abort(this, attached, pool);
             }
 #else
-            abort(pool);
+            abort();
 #end
         }
 
@@ -873,18 +842,13 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     @Override
     public void hardReset(){
-        hardReset(getThreadLocalBetaObjectPool());
-    }
-
-    @Override
-    public void hardReset(final BetaObjectPool pool){
         if (status == ACTIVE || status == PREPARED) {
 #if($transaction.lean)
             if(attached!=null){
                 attached.owner.___abort(this, attached, pool);
             }
 #else
-            abort(pool);
+            abort();
 #end
         }
 
@@ -909,14 +873,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     @Override
     public final void startEitherBranch(){
-        startEitherBranch(getThreadLocalBetaObjectPool());
-    }
-
-    @Override
-    public final void startEitherBranch(BetaObjectPool pool){
 #if($transaction.lean)
         config.needsOrelse();
-        abort(pool);
+        abort();
         throw SpeculativeConfigurationError.INSTANCE;
 #else
         throw new TodoException();
@@ -925,13 +884,8 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     @Override
     public final void endEitherBranch(){
-        endEitherBranch(getThreadLocalBetaObjectPool());
-    }
-
-    @Override
-    public final void endEitherBranch(BetaObjectPool pool){
 #if($transaction.lean)
-        abort(pool);
+        abort();
         throw new IllegalStateException();
 #else
         throw new TodoException();
@@ -940,13 +894,8 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     @Override
     public final void startOrElseBranch(){
-        startOrElseBranch(getThreadLocalBetaObjectPool());
-    }
-
-    @Override
-    public final void startOrElseBranch(BetaObjectPool pool){
 #if($transaction.lean)
-        abort(pool);
+        abort();
         throw new IllegalStateException();
 #else
         throw new TodoException();

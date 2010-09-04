@@ -7,7 +7,6 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
@@ -24,7 +23,6 @@ import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
 import static org.multiverse.stms.beta.BetaStmUtils.createRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class QueueWithCapacityStressTest {
 
@@ -119,15 +117,14 @@ public class QueueWithCapacityStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, pessimistic, pool);
+                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, pessimistic);
                     if (sizeTranlocal.value >= maxCapacity) {
                         retry();
                     }
 
                     sizeTranlocal.value++;
-                    pushedStack.push(btx, pool, item);
+                    pushedStack.push(btx, item);
                 }
             });
         }
@@ -137,23 +134,22 @@ public class QueueWithCapacityStressTest {
                 @Override
                 public E execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, pessimistic, pool);
+                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, pessimistic);
 
-                    if (!readyToPopStack.isEmpty(btx, pool)) {
+                    if (!readyToPopStack.isEmpty(btx)) {
                         sizeTranlocal.value--;
-                        return readyToPopStack.pop(btx, pool);
+                        return readyToPopStack.pop(btx);
                     }
 
-                    while (!pushedStack.isEmpty(btx, pool)) {
-                        E item = pushedStack.pop(btx, pool);
-                        readyToPopStack.push(btx, pool, item);
+                    while (!pushedStack.isEmpty(btx)) {
+                        E item = pushedStack.pop(btx);
+                        readyToPopStack.push(btx, item);
                     }
 
-                    if (!readyToPopStack.isEmpty(btx, pool)) {
+                    if (!readyToPopStack.isEmpty(btx)) {
                         sizeTranlocal.value--;
-                        return readyToPopStack.pop(btx, pool);
+                        return readyToPopStack.pop(btx);
                     }
 
                     retry();
@@ -166,18 +162,18 @@ public class QueueWithCapacityStressTest {
     class Stack<E> {
         final BetaRef<Node<E>> head = createRef(stm);
 
-        void push(BetaTransaction tx, BetaObjectPool pool, E item) {
-            RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, pessimistic, getThreadLocalBetaObjectPool());
+        void push(BetaTransaction tx, E item) {
+            RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, pessimistic);
             headTranlocal.value = new Node<E>(item, headTranlocal.value);
         }
 
-        boolean isEmpty(BetaTransaction tx, BetaObjectPool pool) {
-            RefTranlocal<Node<E>> headTranlocal = tx.openForRead(head, pessimistic, pool);
+        boolean isEmpty(BetaTransaction tx) {
+            RefTranlocal<Node<E>> headTranlocal = tx.openForRead(head, pessimistic);
             return headTranlocal.value == null;
         }
 
-        E pop(BetaTransaction tx, BetaObjectPool pool) {
-            RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, pessimistic, pool);
+        E pop(BetaTransaction tx) {
+            RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, pessimistic);
             Node<E> node = headTranlocal.value;
 
             if (node == null) {

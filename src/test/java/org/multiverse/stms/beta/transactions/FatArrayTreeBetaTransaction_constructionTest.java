@@ -2,7 +2,6 @@ package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 
 import java.util.concurrent.TimeUnit;
@@ -12,13 +11,11 @@ import static org.multiverse.TestUtils.assertActive;
 
 public class FatArrayTreeBetaTransaction_constructionTest {
 
-    private BetaObjectPool pool;
     private BetaStm stm;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test

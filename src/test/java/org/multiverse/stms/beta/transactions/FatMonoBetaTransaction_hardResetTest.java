@@ -5,7 +5,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
@@ -19,22 +18,20 @@ import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 public class FatMonoBetaTransaction_hardResetTest {
 
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
     public void testThatAttemptsAreReset() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.softReset(pool);
-        tx.softReset(pool);
-        tx.softReset(pool);
+        tx.softReset();
+        tx.softReset();
+        tx.softReset();
 
-        tx.hardReset(pool);
+        tx.hardReset();
 
         assertWasHardReset(tx);
     }
@@ -43,9 +40,9 @@ public class FatMonoBetaTransaction_hardResetTest {
     public void whenHasConstructed() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         BetaLongRef ref = new BetaLongRef(tx);
-        tx.openForConstruction(ref, pool);
+        tx.openForConstruction(ref);
 
-        tx.hardReset(pool);
+        tx.hardReset();
         assertWasHardReset(tx);
     }
 
@@ -53,9 +50,9 @@ public class FatMonoBetaTransaction_hardResetTest {
     public void whenHasNormalRead() {
         BetaLongRef ref = createLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForRead(ref, false, pool);
+        tx.openForRead(ref, false);
 
-        tx.hardReset(pool);
+        tx.hardReset();
         assertWasHardReset(tx);
     }
 
@@ -63,8 +60,8 @@ public class FatMonoBetaTransaction_hardResetTest {
     public void whenHasPermanentRead() {
         BetaLongRef ref = createReadBiasedLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForRead(ref, false, pool);
-        tx.hardReset(pool);
+        tx.openForRead(ref, false);
+        tx.hardReset();
         assertWasHardReset(tx);
     }
 
@@ -72,8 +69,8 @@ public class FatMonoBetaTransaction_hardResetTest {
     public void whenHasWrite() {
         BetaLongRef ref = createLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(ref, false, pool);
-        tx.hardReset(pool);
+        tx.openForWrite(ref, false);
+        tx.hardReset();
         assertWasHardReset(tx);
     }
 
@@ -97,9 +94,9 @@ public class FatMonoBetaTransaction_hardResetTest {
                 .setTimeoutNs(100);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
         tx.setRemainingTimeoutNs(50);
-        tx.prepare(pool);
+        tx.prepare();
 
-        tx.hardReset(pool);
+        tx.hardReset();
 
         assertWasHardReset(tx);
         assertEquals(100, tx.getRemainingTimeoutNs());
@@ -109,9 +106,9 @@ public class FatMonoBetaTransaction_hardResetTest {
     @Test
     public void whenPrepared() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.prepare(pool);
+        tx.prepare();
 
-        tx.hardReset(pool);
+        tx.hardReset();
 
         assertWasHardReset(tx);
         assertEquals(Long.MAX_VALUE, tx.getRemainingTimeoutNs());
@@ -123,7 +120,7 @@ public class FatMonoBetaTransaction_hardResetTest {
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         tx.register(listener);
 
-        tx.hardReset(pool);
+        tx.hardReset();
 
         assertActive(tx);
         assertEquals(1, tx.getAttempt());
@@ -135,9 +132,9 @@ public class FatMonoBetaTransaction_hardResetTest {
     @Test
     public void whenAborted() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.abort(pool);
+        tx.abort();
 
-        tx.hardReset(pool);
+        tx.hardReset();
         assertEquals(1, tx.getAttempt());
         assertActive(tx);
         assertHasNoNormalListeners(tx);
@@ -147,9 +144,9 @@ public class FatMonoBetaTransaction_hardResetTest {
     @Test
     public void whenCommitted() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.commit(pool);
+        tx.commit();
 
-        tx.hardReset(pool);
+        tx.hardReset();
         assertEquals(1, tx.getAttempt());
         assertActive(tx);
         assertHasNoNormalListeners(tx);

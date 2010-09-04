@@ -2,7 +2,6 @@ package org.multiverse.stms.beta.integrationtest;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
@@ -17,13 +16,11 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 public class ReadBiasedWithPeriodicUpdateTest {
 
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
@@ -33,12 +30,12 @@ public class ReadBiasedWithPeriodicUpdateTest {
 
         for (int l = 0; l < 100; l++) {
             BetaTransaction tx = new FatMonoBetaTransaction(stm);
-            tx.openForWrite(ref, false, pool).value++;
+            tx.openForWrite(ref, false).value++;
             tx.commit();
 
             for (int k = 0; k < 1000; k++) {
                 BetaTransaction readonlyTx = new FatMonoBetaTransaction(stm);
-                readonlyTx.openForRead(ref, false, pool);
+                readonlyTx.openForRead(ref, false);
                 readonlyTx.commit();
             }
         }

@@ -4,7 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
@@ -18,22 +17,20 @@ import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 public class FatArrayTreeBetaTransaction_hardResetTest {
 
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
     public void testThatAttemptsAreReset() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.softReset(pool);
-        tx.softReset(pool);
-        tx.softReset(pool);
+        tx.softReset();
+        tx.softReset();
+        tx.softReset();
 
-        tx.hardReset(pool);
+        tx.hardReset();
 
         assertActive(tx);
         assertEquals(1, tx.getAttempt());
@@ -43,9 +40,9 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
     public void whenHasConstructed() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         BetaLongRef ref = new BetaLongRef(tx);
-        tx.openForConstruction(ref, pool);
+        tx.openForConstruction(ref);
 
-        tx.hardReset(pool);
+        tx.hardReset();
         assertWasHardReset(tx);
     }
 
@@ -53,9 +50,9 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
     public void whenHasNormalRead() {
         BetaLongRef ref = createLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForRead(ref, false, pool);
+        tx.openForRead(ref, false);
 
-        tx.hardReset(pool);
+        tx.hardReset();
         assertWasHardReset(tx);
     }
 
@@ -63,8 +60,8 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
     public void whenHasPermanentRead() {
         BetaLongRef ref = createReadBiasedLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForRead(ref, false, pool);
-        tx.hardReset(pool);
+        tx.openForRead(ref, false);
+        tx.hardReset();
         assertWasHardReset(tx);
     }
 
@@ -72,8 +69,8 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
     public void whenHasWrite() {
         BetaLongRef ref = createLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForWrite(ref, false, pool);
-        tx.hardReset(pool);
+        tx.openForWrite(ref, false);
+        tx.hardReset();
         assertWasHardReset(tx);
     }
 
@@ -92,9 +89,9 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
                 .setTimeoutNs(100);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
         tx.setRemainingTimeoutNs(50);
-        tx.prepare(pool);
+        tx.prepare();
 
-        tx.hardReset(pool);
+        tx.hardReset();
 
         assertActive(tx);
         assertHasNoNormalListeners(tx);
@@ -105,9 +102,9 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
     @Test
     public void whenPrepared() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.prepare(pool);
+        tx.prepare();
 
-        tx.hardReset(pool);
+        tx.hardReset();
 
         assertEquals(1, tx.getAttempt());
         assertActive(tx);
@@ -122,7 +119,7 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
                 .addPermanentListener(listener);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
 
-        tx.hardReset(pool);
+        tx.hardReset();
 
         assertEquals(1, tx.getAttempt());
         assertActive(tx);
@@ -137,7 +134,7 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         tx.register(listener);
 
-        tx.hardReset(pool);
+        tx.hardReset();
 
         assertActive(tx);
         assertEquals(1, tx.getAttempt());
@@ -149,9 +146,9 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
     @Test
     public void whenAborted() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.abort(pool);
+        tx.abort();
 
-        tx.hardReset(pool);
+        tx.hardReset();
         assertEquals(1, tx.getAttempt());
         assertActive(tx);
         assertHasNoNormalListeners(tx);
@@ -161,9 +158,9 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
     @Test
     public void whenCommitted() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.commit(pool);
+        tx.commit();
 
-        tx.hardReset(pool);
+        tx.hardReset();
         assertEquals(1, tx.getAttempt());
         assertActive(tx);
         assertHasNoNormalListeners(tx);

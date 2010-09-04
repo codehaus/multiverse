@@ -12,7 +12,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
 import org.multiverse.stms.beta.transactions.*;
 
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
+import static org.multiverse.stms.beta.ThreadLocalBetaTransactionPool.getThreadLocalBetaTransactionPool;
 
 /**
  * All non anonymous transactionfactories (so transactions with a familyname set explicitly) will
@@ -26,10 +26,9 @@ public final class BetaStm implements Stm {
     private final AtomicBlock atomicBlock;
     private final GlobalConflictCounter globalConflictCounter;
     private final int spinCount = 8;
-    private final BetaTransactionConfiguration config;
+    private final BetaTransactionConfiguration defaultConfig;
     private final SimpleStorage storage;
     private final SimpleProfiler simpleProfiler = new SimpleProfiler();
-
     private final StmCallback callback;
 
     public BetaStm() {
@@ -39,7 +38,7 @@ public final class BetaStm implements Stm {
     public BetaStm(final int conflictCounterWidth, StmCallback callback) {
         this.callback = callback;
         this.globalConflictCounter = new GlobalConflictCounter(conflictCounterWidth);
-        this.config = new BetaTransactionConfiguration(this)
+        this.defaultConfig = new BetaTransactionConfiguration(this)
                 .setSpinCount(spinCount);
         this.storage = new SimpleStorage(this);
         this.atomicBlock = createTransactionFactoryBuilder()
@@ -61,7 +60,7 @@ public final class BetaStm implements Stm {
 
     @Override
     public BetaTransactionFactoryBuilder createTransactionFactoryBuilder() {
-        return new BetaTransactionFactoryBuilderImpl(config);
+        return new BetaTransactionFactoryBuilderImpl(defaultConfig);
     }
 
     @Override
@@ -79,7 +78,7 @@ public final class BetaStm implements Stm {
 
     @Override
     public BetaTransaction startDefaultTransaction() {
-        return new FatArrayTreeBetaTransaction(config);
+        return new FatArrayTreeBetaTransaction(defaultConfig);
     }
 
     @Override
@@ -135,7 +134,7 @@ public final class BetaStm implements Stm {
 
         @Override
         public BetaTransactionFactoryBuilder setFamilyName(String familyName) {
-            if (familyName == config.familyName) {
+            if (config.familyName.equals(familyName)) {
                 return this;
             }
 
@@ -312,17 +311,17 @@ public final class BetaStm implements Stm {
 
         @Override
         public BetaTransaction start() {
-            return start(getThreadLocalBetaObjectPool());
+            return start(getThreadLocalBetaTransactionPool());
         }
 
         @Override
-        public BetaTransaction start(final BetaObjectPool pool) {
+        public BetaTransaction start(final BetaTransactionPool pool) {
             FatArrayTreeBetaTransaction tx = pool.takeFatArrayTreeBetaTransaction();
 
             if (tx == null) {
                 tx = new FatArrayTreeBetaTransaction(config);
             } else {
-                tx.init(config, pool);
+                tx.init(config);
             }
 
             return tx;
@@ -330,7 +329,7 @@ public final class BetaStm implements Stm {
 
         @Override
         public BetaTransaction upgradeAfterSpeculativeFailure(
-                final BetaTransaction failingTransaction, final BetaObjectPool pool) {
+                final BetaTransaction failingTransaction, final BetaTransactionPool pool) {
             throw new UnsupportedOperationException();
         }
     }
@@ -350,19 +349,19 @@ public final class BetaStm implements Stm {
 
         @Override
         public BetaTransaction start() {
-            return start(getThreadLocalBetaObjectPool());
+            return start(getThreadLocalBetaTransactionPool());
         }
 
         @Override
         public BetaTransaction upgradeAfterSpeculativeFailure(
-                final BetaTransaction failingTransaction, final BetaObjectPool pool) {
+                final BetaTransaction failingTransaction, final BetaTransactionPool pool) {
             final BetaTransaction tx = start(pool);
             tx.copyForSpeculativeFailure(failingTransaction);
             return tx;
         }
 
         @Override
-        public BetaTransaction start(final BetaObjectPool pool) {
+        public BetaTransaction start(final BetaTransactionPool pool) {
             final SpeculativeBetaConfig speculativeConfig = config.getSpeculativeConfig();
             final int length = speculativeConfig.getMinimalLength();
 
@@ -372,7 +371,7 @@ public final class BetaStm implements Stm {
                     if (tx == null) {
                         tx = new FatMonoBetaTransaction(config);
                     } else {
-                        tx.init(config, pool);
+                        tx.init(config);
                     }
                     return tx;
                 } else {
@@ -380,7 +379,7 @@ public final class BetaStm implements Stm {
                     if (tx == null) {
                         tx = new LeanMonoBetaTransaction(config);
                     } else {
-                        tx.init(config, pool);
+                        tx.init(config);
                     }
                     return tx;
                 }
@@ -390,7 +389,7 @@ public final class BetaStm implements Stm {
                     if (tx == null) {
                         tx = new FatArrayBetaTransaction(config);
                     } else {
-                        tx.init(config, pool);
+                        tx.init(config);
                     }
                     return tx;
                 } else {
@@ -398,7 +397,7 @@ public final class BetaStm implements Stm {
                     if (tx == null) {
                         tx = new LeanArrayBetaTransaction(config);
                     } else {
-                        tx.init(config, pool);
+                        tx.init(config);
                     }
                     return tx;
                 }
@@ -408,7 +407,7 @@ public final class BetaStm implements Stm {
                     if (tx == null) {
                         tx = new FatArrayTreeBetaTransaction(config);
                     } else {
-                        tx.init(config, pool);
+                        tx.init(config);
                     }
                     return tx;
                 } else {
@@ -416,7 +415,7 @@ public final class BetaStm implements Stm {
                     if (tx == null) {
                         tx = new LeanArrayTreeBetaTransaction(config);
                     } else {
-                        tx.init(config, pool);
+                        tx.init(config);
                     }
                     return tx;
                 }

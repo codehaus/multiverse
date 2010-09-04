@@ -1,11 +1,11 @@
 package org.multiverse.benchmarks;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -38,6 +38,7 @@ public class AntWorldBenchmark {
     }
 
     @Test
+    @Ignore
     public void test() throws InterruptedException {
         SnapshotThread snapshotThread = new SnapshotThread(1, transactionCount);
 
@@ -73,8 +74,6 @@ public class AntWorldBenchmark {
         public void run() {
             long startMs = System.currentTimeMillis();
 
-            final BetaObjectPool pool = new BetaObjectPool();
-
             AtomicBlock block = stm.createTransactionFactoryBuilder()
                     .setBlockingAllowed(false)
                     .setReadonly(true)
@@ -86,7 +85,7 @@ public class AntWorldBenchmark {
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
                     for (int k = 0; k < cells.length; k++) {
-                        btx.openForRead(cells[k], false, pool);
+                        btx.openForRead(cells[k], false);
                     }
                 }
             };

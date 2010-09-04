@@ -3,7 +3,6 @@ package org.multiverse.stms.beta.transactions;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
@@ -15,12 +14,10 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
 
 public class FatMonoBetaTransaction_initTest {
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
@@ -35,7 +32,7 @@ public class FatMonoBetaTransaction_initTest {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setTimeoutNs(100);
 
-        tx.init(config, pool);
+        tx.init(config);
 
         assertEquals(100, tx.getRemainingTimeoutNs());
     }
@@ -43,7 +40,7 @@ public class FatMonoBetaTransaction_initTest {
     @Test
     public void whenNullConfig_thenNullPointerException() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.prepare(pool);
+        tx.prepare();
 
         try {
             tx.init(null);
@@ -72,8 +69,8 @@ public class FatMonoBetaTransaction_initTest {
         BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(ref, true, pool);
-        tx.prepare(pool);
+        tx.openForWrite(ref, true);
+        tx.prepare();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         tx.init(config);
@@ -89,8 +86,8 @@ public class FatMonoBetaTransaction_initTest {
         BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(ref, false, pool).value++;
-        tx.abort(pool);
+        tx.openForWrite(ref, false).value++;
+        tx.abort();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         tx.init(config);
@@ -103,8 +100,8 @@ public class FatMonoBetaTransaction_initTest {
     public void whenCommitted() {
         BetaLongRef ref = createLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(ref, false, pool).value++;
-        tx.commit(pool);
+        tx.openForWrite(ref, false).value++;
+        tx.commit();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         tx.init(config);

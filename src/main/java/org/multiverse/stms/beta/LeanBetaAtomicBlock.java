@@ -9,7 +9,6 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static java.lang.String.format;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactionContainer;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
  * @author Peter Veentjer
@@ -42,8 +41,6 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
             throw new NullPointerException();
         }
 
-        final BetaObjectPool pool = getThreadLocalBetaObjectPool();
-
         ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
         BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
         if(tx == null || !tx.getStatus().isAlive()){
@@ -55,7 +52,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 return closure.execute(tx);
             }
 
-            tx = transactionFactory.start();
+            tx = transactionFactory.start(transactionContainer.transactionPool);
             transactionContainer.transaction=tx;
             boolean abort = true;
 
@@ -63,21 +60,21 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 do {
                     try {
                         E result = closure.execute(tx);
-                        tx.commit(pool);
+                        tx.commit();
                         abort = false;
                         return result;
                     } catch (Retry e) {
-                        waitForChange(pool, tx);
+                        waitForChange(tx);
                     } catch (SpeculativeConfigurationError e) {
                         BetaTransaction old = tx;
-                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx, pool);
-                        pool.putBetaTransaction(old);
+                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
+                        transactionContainer.transactionPool.putBetaTransaction(old);
                     } catch (ReadConflict e) {
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     } catch (WriteConflict e) {
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     }
-                } while (tx.softReset(pool));
+                } while (tx.softReset());
             } finally {
                 if(___ProfilingEnabled){
                     SimpleProfiler profiler = transactionConfiguration.simpleProfiler;
@@ -86,10 +83,10 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 }
 
                 if (abort) {
-                    tx.abort(pool);
+                    tx.abort();
                 }
 
-                pool.putBetaTransaction(tx);
+                transactionContainer.transactionPool.putBetaTransaction(tx);
                 transactionContainer.transaction = null;
             }
         }catch(RuntimeException e){
@@ -121,8 +118,6 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
             throw new NullPointerException();
         }
 
-        final BetaObjectPool pool = getThreadLocalBetaObjectPool();
-
         ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
         BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
         if(tx == null || !tx.getStatus().isAlive()){
@@ -134,7 +129,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 return closure.execute(tx);
             }
 
-            tx = transactionFactory.start();
+            tx = transactionFactory.start(transactionContainer.transactionPool);
             transactionContainer.transaction=tx;
             boolean abort = true;
 
@@ -142,21 +137,21 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 do {
                     try {
                         int result = closure.execute(tx);
-                        tx.commit(pool);
+                        tx.commit();
                         abort = false;
                         return result;
                     } catch (Retry e) {
-                        waitForChange(pool, tx);
+                        waitForChange(tx);
                     } catch (SpeculativeConfigurationError e) {
                         BetaTransaction old = tx;
-                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx, pool);
-                        pool.putBetaTransaction(old);
+                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
+                        transactionContainer.transactionPool.putBetaTransaction(old);
                     } catch (ReadConflict e) {
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     } catch (WriteConflict e) {
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     }
-                } while (tx.softReset(pool));
+                } while (tx.softReset());
             } finally {
                 if(___ProfilingEnabled){
                     SimpleProfiler profiler = transactionConfiguration.simpleProfiler;
@@ -165,10 +160,10 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 }
 
                 if (abort) {
-                    tx.abort(pool);
+                    tx.abort();
                 }
 
-                pool.putBetaTransaction(tx);
+                transactionContainer.transactionPool.putBetaTransaction(tx);
                 transactionContainer.transaction = null;
             }
         }catch(RuntimeException e){
@@ -200,8 +195,6 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
             throw new NullPointerException();
         }
 
-        final BetaObjectPool pool = getThreadLocalBetaObjectPool();
-
         ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
         BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
         if(tx == null || !tx.getStatus().isAlive()){
@@ -213,7 +206,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 return closure.execute(tx);
             }
 
-            tx = transactionFactory.start();
+            tx = transactionFactory.start(transactionContainer.transactionPool);
             transactionContainer.transaction=tx;
             boolean abort = true;
 
@@ -221,21 +214,21 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 do {
                     try {
                         long result = closure.execute(tx);
-                        tx.commit(pool);
+                        tx.commit();
                         abort = false;
                         return result;
                     } catch (Retry e) {
-                        waitForChange(pool, tx);
+                        waitForChange(tx);
                     } catch (SpeculativeConfigurationError e) {
                         BetaTransaction old = tx;
-                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx, pool);
-                        pool.putBetaTransaction(old);
+                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
+                        transactionContainer.transactionPool.putBetaTransaction(old);
                     } catch (ReadConflict e) {
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     } catch (WriteConflict e) {
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     }
-                } while (tx.softReset(pool));
+                } while (tx.softReset());
             } finally {
                 if(___ProfilingEnabled){
                     SimpleProfiler profiler = transactionConfiguration.simpleProfiler;
@@ -244,10 +237,10 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 }
 
                 if (abort) {
-                    tx.abort(pool);
+                    tx.abort();
                 }
 
-                pool.putBetaTransaction(tx);
+                transactionContainer.transactionPool.putBetaTransaction(tx);
                 transactionContainer.transaction = null;
             }
         }catch(RuntimeException e){
@@ -279,8 +272,6 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
             throw new NullPointerException();
         }
 
-        final BetaObjectPool pool = getThreadLocalBetaObjectPool();
-
         ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
         BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
         if(tx == null || !tx.getStatus().isAlive()){
@@ -292,7 +283,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 return closure.execute(tx);
             }
 
-            tx = transactionFactory.start();
+            tx = transactionFactory.start(transactionContainer.transactionPool);
             transactionContainer.transaction=tx;
             boolean abort = true;
 
@@ -300,21 +291,21 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 do {
                     try {
                         double result = closure.execute(tx);
-                        tx.commit(pool);
+                        tx.commit();
                         abort = false;
                         return result;
                     } catch (Retry e) {
-                        waitForChange(pool, tx);
+                        waitForChange(tx);
                     } catch (SpeculativeConfigurationError e) {
                         BetaTransaction old = tx;
-                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx, pool);
-                        pool.putBetaTransaction(old);
+                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
+                        transactionContainer.transactionPool.putBetaTransaction(old);
                     } catch (ReadConflict e) {
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     } catch (WriteConflict e) {
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     }
-                } while (tx.softReset(pool));
+                } while (tx.softReset());
             } finally {
                 if(___ProfilingEnabled){
                     SimpleProfiler profiler = transactionConfiguration.simpleProfiler;
@@ -323,10 +314,10 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 }
 
                 if (abort) {
-                    tx.abort(pool);
+                    tx.abort();
                 }
 
-                pool.putBetaTransaction(tx);
+                transactionContainer.transactionPool.putBetaTransaction(tx);
                 transactionContainer.transaction = null;
             }
         }catch(RuntimeException e){
@@ -358,8 +349,6 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
             throw new NullPointerException();
         }
 
-        final BetaObjectPool pool = getThreadLocalBetaObjectPool();
-
         ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
         BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
         if(tx == null || !tx.getStatus().isAlive()){
@@ -371,7 +360,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 return closure.execute(tx);
             }
 
-            tx = transactionFactory.start();
+            tx = transactionFactory.start(transactionContainer.transactionPool);
             transactionContainer.transaction=tx;
             boolean abort = true;
 
@@ -379,21 +368,21 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 do {
                     try {
                         boolean result = closure.execute(tx);
-                        tx.commit(pool);
+                        tx.commit();
                         abort = false;
                         return result;
                     } catch (Retry e) {
-                        waitForChange(pool, tx);
+                        waitForChange(tx);
                     } catch (SpeculativeConfigurationError e) {
                         BetaTransaction old = tx;
-                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx, pool);
-                        pool.putBetaTransaction(old);
+                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
+                        transactionContainer.transactionPool.putBetaTransaction(old);
                     } catch (ReadConflict e) {
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     } catch (WriteConflict e) {
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     }
-                } while (tx.softReset(pool));
+                } while (tx.softReset());
             } finally {
                 if(___ProfilingEnabled){
                     SimpleProfiler profiler = transactionConfiguration.simpleProfiler;
@@ -402,10 +391,10 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 }
 
                 if (abort) {
-                    tx.abort(pool);
+                    tx.abort();
                 }
 
-                pool.putBetaTransaction(tx);
+                transactionContainer.transactionPool.putBetaTransaction(tx);
                 transactionContainer.transaction = null;
             }
         }catch(RuntimeException e){
@@ -437,8 +426,6 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
             throw new NullPointerException();
         }
 
-        final BetaObjectPool pool = getThreadLocalBetaObjectPool();
-
         ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
         BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
         if(tx == null || !tx.getStatus().isAlive()){
@@ -451,7 +438,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 return;
             }
 
-            tx = transactionFactory.start();
+            tx = transactionFactory.start(transactionContainer.transactionPool);
             transactionContainer.transaction=tx;
             boolean abort = true;
 
@@ -459,21 +446,21 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 do {
                     try {
                         closure.execute(tx);
-                        tx.commit(pool);
+                        tx.commit();
                         abort = false;
                         return;
                     } catch (Retry e) {
-                        waitForChange(pool, tx);
+                        waitForChange(tx);
                     } catch (SpeculativeConfigurationError e) {
                         BetaTransaction old = tx;
-                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx, pool);
-                        pool.putBetaTransaction(old);
+                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
+                        transactionContainer.transactionPool.putBetaTransaction(old);
                     } catch (ReadConflict e) {
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     } catch (WriteConflict e) {
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     }
-                } while (tx.softReset(pool));
+                } while (tx.softReset());
             } finally {
                 if(___ProfilingEnabled){
                     SimpleProfiler profiler = transactionConfiguration.simpleProfiler;
@@ -482,10 +469,10 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 }
 
                 if (abort) {
-                    tx.abort(pool);
+                    tx.abort();
                 }
 
-                pool.putBetaTransaction(tx);
+                transactionContainer.transactionPool.putBetaTransaction(tx);
                 transactionContainer.transaction = null;
             }
         }catch(RuntimeException e){

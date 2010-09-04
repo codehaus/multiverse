@@ -8,7 +8,6 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicIntClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
@@ -24,7 +23,6 @@ import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
 import static org.multiverse.stms.beta.BetaStmUtils.createRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
  * A StressTest that simulates a database connection pool. The code is quite ugly, but that is because
@@ -90,13 +88,12 @@ public class ConnectionPoolStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-                    RefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, pessimistic, pool);
+                    RefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, pessimistic);
 
                     for (int k = 0; k < poolsize; k++) {
                         headTranlocal.value = new Node(headTranlocal.value, new Connection());
-                        btx.openForWrite(size, pessimistic, pool).value++;
+                        btx.openForWrite(size, pessimistic).value++;
                     }
                 }
             });
@@ -107,16 +104,15 @@ public class ConnectionPoolStressTest {
                 @Override
                 public Connection execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, pessimistic, pool);
+                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, pessimistic);
                     if (sizeTranlocal.value == 0) {
                         retry();
                     }
 
                     sizeTranlocal.value--;
 
-                    RefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, pessimistic, pool);
+                    RefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, pessimistic);
                     Node<Connection> oldHead = headTranlocal.value;
                     headTranlocal.value = oldHead.next;
                     return oldHead.item;
@@ -129,11 +125,10 @@ public class ConnectionPoolStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-                    btx.openForWrite(size, pessimistic, pool).value++;
+                    btx.openForWrite(size, pessimistic).value++;
 
-                    RefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, pessimistic, pool);
+                    RefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, pessimistic);
 
                     Node<Connection> oldHead = headTranlocal.value;
                     headTranlocal.value = new Node<Connection>(oldHead, c);
@@ -146,8 +141,7 @@ public class ConnectionPoolStressTest {
                 @Override
                 public int execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    return btx.openForRead(size, false, pool).value;
+                    return btx.openForRead(size, false).value;
                 }
             });
         }

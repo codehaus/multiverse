@@ -43,7 +43,7 @@ public class LongRef_getLockStatusTest {
         BetaLongRef ref = createLongRef(stm);
 
         LeanMonoBetaTransaction otherTx = new LeanMonoBetaTransaction(stm);
-        otherTx.openForRead(ref, true, pool);
+        otherTx.openForRead(ref, true);
 
         Transaction tx = mock(Transaction.class);
 
@@ -56,7 +56,7 @@ public class LongRef_getLockStatusTest {
         BetaLongRef ref = createLongRef(stm);
 
         LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(stm);
-        tx.openForRead(ref, true, pool);
+        tx.openForRead(ref, true);
 
 
         LockStatus result = ref.getLockStatus(tx);

@@ -8,7 +8,6 @@ import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.functions.IncLongFunction;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -17,7 +16,6 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.benchmarks.BenchmarkUtils.transactionsPerSecond;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class UncontendedCommutePerformanceTest {
     private volatile boolean stop;
@@ -73,13 +71,11 @@ public class UncontendedCommutePerformanceTest {
                     .setDirtyCheckEnabled(false)
                     .buildAtomicBlock();
 
-            final BetaObjectPool pool = getThreadLocalBetaObjectPool();
-
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    btx.openForWrite(ref, false, pool).value++;
+                    btx.openForWrite(ref, false).value++;
                 }
             };
 
@@ -103,8 +99,7 @@ public class UncontendedCommutePerformanceTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    btx.commute(ref, pool, IncLongFunction.INSTANCE);
+                    btx.commute(ref, IncLongFunction.INSTANCE);
                 }
             };
 

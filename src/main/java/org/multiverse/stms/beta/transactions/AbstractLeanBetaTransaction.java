@@ -3,11 +3,8 @@ package org.multiverse.stms.beta.transactions;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.BetaObjectPool;
 
 import java.util.ArrayList;
-
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public abstract class AbstractLeanBetaTransaction extends BetaTransaction {
 
@@ -26,19 +23,8 @@ public abstract class AbstractLeanBetaTransaction extends BetaTransaction {
         attempt = tx.getAttempt();
     }
 
-
-    public final void registerPermanent(final BetaObjectPool pool, final TransactionLifecycleListener listener) {
-        //we can forward to the normal register call since a speculative failure is going to be thrown.
-        register(pool, listener);
-    }
-
     @Override
-    public final void register(TransactionLifecycleListener listener) {
-        register(getThreadLocalBetaObjectPool(), listener);
-    }
-
-    @Override
-    public final void register(final BetaObjectPool pool, final TransactionLifecycleListener listener) {
+    public final void register(final TransactionLifecycleListener listener) {
         if (listener == null) {
             abort();
             throw new NullPointerException();

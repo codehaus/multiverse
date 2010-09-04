@@ -4,7 +4,6 @@ import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.Listeners;
@@ -211,8 +210,8 @@ public class TestUtils {
 
         for (int k = 0; k < ref.___getOrec().___getReadBiasedThreshold(); k++) {
             BetaTransaction tx = new FatMonoBetaTransaction(stm);
-            tx.openForRead(ref, false, new BetaObjectPool());
-            tx.commit(new BetaObjectPool());
+            tx.openForRead(ref, false);
+            tx.commit();
             assertUnlocked(ref.___getOrec());
         }
 

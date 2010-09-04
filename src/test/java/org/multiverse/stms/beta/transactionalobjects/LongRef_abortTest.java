@@ -32,7 +32,7 @@ public class LongRef_abortTest {
         Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal tranlocal = tx.openForRead(ref, false, pool);
+        Tranlocal tranlocal = tx.openForRead(ref, false);
 
         ref.___abort(tx, tranlocal, pool);
 
@@ -47,7 +47,7 @@ public class LongRef_abortTest {
         Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal tranlocal = tx.openForWrite(ref, false, pool);
+        Tranlocal tranlocal = tx.openForWrite(ref, false);
 
         ref.___abort(tx, tranlocal, pool);
 
@@ -63,7 +63,7 @@ public class LongRef_abortTest {
         Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal tranlocal = tx.openForRead(ref, false, pool);
+        Tranlocal tranlocal = tx.openForRead(ref, false);
         ref.___tryLockAndCheckConflict(tx, 1, tranlocal);
 
         ref.___abort(tx, tranlocal, pool);
@@ -79,10 +79,10 @@ public class LongRef_abortTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal read2 = tx.openForRead(ref, false, pool);
+        LongRefTranlocal read2 = tx.openForRead(ref, false);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        LongRefTranlocal read1 = otherTx.openForRead(ref, true, pool);
+        LongRefTranlocal read1 = otherTx.openForRead(ref, true);
 
         ref.___abort(tx, read2, pool);
 
@@ -100,7 +100,7 @@ public class LongRef_abortTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, true, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, true);
 
         ref.___abort(tx, write, pool);
 
@@ -118,10 +118,10 @@ public class LongRef_abortTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        LongRefTranlocal read1 = otherTx.openForRead(ref, true, pool);
+        LongRefTranlocal read1 = otherTx.openForRead(ref, true);
 
         ref.___abort(tx, write, pool);
 

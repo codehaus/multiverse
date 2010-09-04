@@ -7,7 +7,6 @@ import org.multiverse.TestUtils;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -16,7 +15,6 @@ import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class ReadConsistencyStressTest {
 
@@ -143,9 +141,8 @@ public class ReadConsistencyStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
                     for (BetaLongRef ref : refs) {
-                        ref.set(btx, pool, ref.get(btx, pool));
+                        ref.set(btx,  ref.get(btx));
                     }
                 }
             };
@@ -186,12 +183,11 @@ public class ReadConsistencyStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-                    long initial = refs[0].get(btx, pool);
+                    long initial = refs[0].get(btx);
 
                     for (int k = 1; k < refs.length; k++) {
-                        if (refs[k].get(btx, pool) != initial) {
+                        if (refs[k].get(btx) != initial) {
                             fail();
                         }
                     }

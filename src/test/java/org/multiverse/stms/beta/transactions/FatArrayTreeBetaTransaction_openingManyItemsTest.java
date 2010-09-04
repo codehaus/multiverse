@@ -2,7 +2,6 @@ package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
@@ -15,12 +14,10 @@ import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class FatArrayTreeBetaTransaction_openingManyItemsTest {
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
@@ -42,7 +39,7 @@ public class FatArrayTreeBetaTransaction_openingManyItemsTest {
         for (int k = 0; k < refCount; k++) {
             BetaLongRef ref = createLongRef(stm);
             refs[k] = ref;
-            tranlocals[k] = reading ? tx.openForWrite(ref, false, pool) : tx.openForWrite(ref, false, pool);
+            tranlocals[k] = reading ? tx.openForWrite(ref, false) : tx.openForWrite(ref, false);
         }
 
         assertEquals(refCount, tx.size());
@@ -52,7 +49,7 @@ public class FatArrayTreeBetaTransaction_openingManyItemsTest {
 
         for (int k = 0; k < refCount; k++) {
             BetaLongRef ref = refs[k];
-            Tranlocal found = reading ? tx.openForWrite(ref, false, pool) : tx.openForWrite(ref, false, pool);
+            Tranlocal found = reading ? tx.openForWrite(ref, false) : tx.openForWrite(ref, false);
             assertSame(ref, found.owner);
             assertSame("tranlocal is incorrect at " + k, tranlocals[k], found);
         }

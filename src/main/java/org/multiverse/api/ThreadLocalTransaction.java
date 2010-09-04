@@ -1,6 +1,7 @@
 package org.multiverse.api;
 
 import org.multiverse.api.exceptions.NoTransactionFoundException;
+import org.multiverse.stms.beta.BetaTransactionPool;
 
 /**
  * A {@link ThreadLocal} that contains the current {@link Transaction}. The {@link Stm} and the {@link Transaction}
@@ -93,5 +94,6 @@ public final class ThreadLocalTransaction {
 
     public static class Container {
         public Transaction transaction;
+        public BetaTransactionPool transactionPool = new BetaTransactionPool();
     }
 }

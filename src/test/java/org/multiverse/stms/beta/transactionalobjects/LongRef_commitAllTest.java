@@ -38,7 +38,7 @@ public class LongRef_commitAllTest implements BetaStmConstants {
         ref.___registerChangeListener(latch, ref.___unsafeLoad(), pool, listenerEra);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         ref.___tryLockAndCheckConflict(tx, 1, write);
 
         long oldConflictCount = globalConflictCounter.count();
@@ -66,10 +66,10 @@ public class LongRef_commitAllTest implements BetaStmConstants {
         Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal tranlocal = tx.openForWrite(ref, false, pool);
+        Tranlocal tranlocal = tx.openForWrite(ref, false);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        Tranlocal read2 = otherTx.openForRead(ref, false, pool);
+        Tranlocal read2 = otherTx.openForRead(ref, false);
 
         ref.___tryLockAndCheckConflict(tx, 1, read2);
 
@@ -92,7 +92,7 @@ public class LongRef_commitAllTest implements BetaStmConstants {
         Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
         write.value++;
         write.isDirty = DIRTY_TRUE;
         ref.___tryLockAndCheckConflict(tx, 1, write);
@@ -116,7 +116,7 @@ public class LongRef_commitAllTest implements BetaStmConstants {
         Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal write = tx.openForWrite(ref, false, pool);
+        Tranlocal write = tx.openForWrite(ref, false);
         ref.___tryLockAndCheckConflict(tx, 1, write);
 
         long oldConflictCount = globalConflictCounter.count();
@@ -140,7 +140,7 @@ public class LongRef_commitAllTest implements BetaStmConstants {
         assertUnlocked(orec);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal tranlocal = tx.openForWrite(ref, false, pool);
+        Tranlocal tranlocal = tx.openForWrite(ref, false);
         ref.___tryLockAndCheckConflict(tx, 1, tranlocal);
 
         long oldConflictCount = globalConflictCounter.count();

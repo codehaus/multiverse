@@ -6,7 +6,6 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -19,12 +18,10 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmConstants {
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
@@ -32,7 +29,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         BetaLongRef ref = new BetaLongRef(tx);
 
-        LongRefTranlocal write = tx.openForConstruction(ref, pool);
+        LongRefTranlocal write = tx.openForConstruction(ref);
 
         assertActive(tx);
         assertNotNull(write);
@@ -55,9 +52,9 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
         BetaLongRef ref1 = new BetaLongRef(tx);
         BetaLongRef ref2 = new BetaLongRef(tx);
 
-        tx.openForConstruction(ref1, pool);
+        tx.openForConstruction(ref1);
         try {
-            tx.openForConstruction(ref2, pool);
+            tx.openForConstruction(ref2);
             fail();
         } catch (SpeculativeConfigurationError expected) {
 
@@ -72,7 +69,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
 
         try {
-            tx.openForConstruction((BetaLongRef) null, pool);
+            tx.openForConstruction((BetaLongRef) null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -88,7 +85,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
 
         try {
-            tx.openForConstruction(ref, pool);
+            tx.openForConstruction(ref);
             fail();
         } catch (IllegalArgumentException expected) {
         }
@@ -107,8 +104,8 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         BetaLongRef ref = new BetaLongRef(tx);
 
-        LongRefTranlocal write1 = tx.openForConstruction(ref, pool);
-        LongRefTranlocal write2 = tx.openForConstruction(ref, pool);
+        LongRefTranlocal write1 = tx.openForConstruction(ref);
+        LongRefTranlocal write2 = tx.openForConstruction(ref);
 
         assertSame(write1, write2);
         assertActive(tx);
@@ -131,10 +128,10 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForRead(ref, false, pool);
+        tx.openForRead(ref, false);
 
         try {
-            tx.openForConstruction(ref, pool);
+            tx.openForConstruction(ref);
             fail();
         } catch (IllegalArgumentException expected) {
         }
@@ -154,10 +151,10 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(ref, false, pool);
+        tx.openForWrite(ref, false);
 
         try {
-            tx.openForConstruction(ref, pool);
+            tx.openForConstruction(ref);
             fail();
         } catch (IllegalArgumentException expected) {
         }
@@ -182,7 +179,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
 
         try {
-            tx.openForConstruction(ref, pool);
+            tx.openForConstruction(ref);
             fail();
         } catch (ReadonlyException expected) {
         }
@@ -203,7 +200,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
 
         stm.getGlobalConflictCounter().signalConflict(ref);
-        LongRefTranlocal read = tx.openForRead(ref, false, pool);
+        LongRefTranlocal read = tx.openForRead(ref, false);
 
         assertEquals(stm.getGlobalConflictCounter().count(), tx.getLocalConflictCounter().get());
         assertActive(tx);
@@ -215,10 +212,10 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
         BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.prepare(pool);
+        tx.prepare();
 
         try {
-            tx.openForConstruction(ref, pool);
+            tx.openForConstruction(ref);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -231,10 +228,10 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
         BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.abort(pool);
+        tx.abort();
 
         try {
-            tx.openForConstruction(ref, pool);
+            tx.openForConstruction(ref);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -247,10 +244,10 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
         BetaLongRef ref = createLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.commit(pool);
+        tx.commit();
 
         try {
-            tx.openForConstruction(ref, pool);
+            tx.openForConstruction(ref);
             fail();
         } catch (DeadTransactionException expected) {
         }

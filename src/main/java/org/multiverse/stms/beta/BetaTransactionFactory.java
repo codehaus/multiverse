@@ -23,7 +23,7 @@ public interface BetaTransactionFactory extends TransactionFactory {
      * @param pool the BetaObjectPool used to get a pooled transaction from if one is available.
      * @return the started BetaTransaction.
      */
-    BetaTransaction start(BetaObjectPool pool);
+    BetaTransaction start(BetaTransactionPool pool);
 
     /**
      * Upgrades the transaction after a speculative failure happened.
@@ -34,5 +34,5 @@ public interface BetaTransactionFactory extends TransactionFactory {
      * @throws UnsupportedOperationException if this BetaTransactionFactory doesn't support speculative
      *                                       behavior.
      */
-    BetaTransaction upgradeAfterSpeculativeFailure(BetaTransaction failingTransaction, BetaObjectPool pool);
+    BetaTransaction upgradeAfterSpeculativeFailure(BetaTransaction failingTransaction, BetaTransactionPool pool);
 }

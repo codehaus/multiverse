@@ -8,7 +8,6 @@ import org.multiverse.stms.beta.transactions.*;
 
 import static java.lang.String.format;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
  * @author Peter Veentjer
@@ -54,8 +53,6 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
             throw new NullPointerException();
         }
 
-        final BetaObjectPool pool = getThreadLocalBetaObjectPool();
-
         ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
         BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
         if(tx == null || !tx.getStatus().isAlive()){
@@ -72,7 +69,7 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
 #end
             }
 
-            tx = transactionFactory.start();
+            tx = transactionFactory.start(transactionContainer.transactionPool);
             transactionContainer.transaction=tx;
 #transactionLogic()
 
@@ -84,8 +81,6 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
             throw new NullPointerException();
         }
 
-        final BetaObjectPool pool = getThreadLocalBetaObjectPool();
-
         ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
         BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
         if(tx == null || !tx.getStatus().isAlive()){
@@ -96,13 +91,13 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
             switch (propagationLevel) {
                 case Requires:
                     if (tx == null) {
-                        tx = transactionFactory.start(pool);
+                        tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
 #if($closure.type eq 'void')
-                        execute(tx,transactionContainer,  pool, closure);
+                        execute(tx, transactionContainer, closure);
                         return;
 #else
-                        return execute(tx,transactionContainer, pool, closure);
+                        return execute(tx, transactionContainer, closure);
 #end
                     } else {
 #if($closure.type eq 'void')
@@ -140,24 +135,24 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
 #end
                 case RequiresNew:
                     if (tx == null) {
-                        tx = transactionFactory.start(pool);
+                        tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
 #if($closure.type eq 'void')
-                        execute(tx, transactionContainer, pool, closure);
+                        execute(tx, transactionContainer, closure);
                         return;
 #else
-                        return execute(tx, transactionContainer, pool, closure);
+                        return execute(tx, transactionContainer, closure);
 #end
                     } else {
                         BetaTransaction suspendedTransaction = tx;
-                        tx = transactionFactory.start();
+                        tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         try {
 #if($closure.type eq 'void')
-                            execute(tx, transactionContainer, pool, closure);
+                            execute(tx, transactionContainer, closure);
                             return;
 #else
-                            return execute(tx, transactionContainer, pool, closure);
+                            return execute(tx, transactionContainer, closure);
 #end
                         } finally {
                             transactionContainer.transaction = suspendedTransaction;
@@ -181,7 +176,7 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
    }
 
    private ${closure.typeParameter} ${closure.type} execute(
-       BetaTransaction tx, final ThreadLocalTransaction.Container transactionContainer, final BetaObjectPool pool, final ${closure.name}${closure.typeParameter} closure)throws Exception{
+       BetaTransaction tx, final ThreadLocalTransaction.Container transactionContainer, final ${closure.name}${closure.typeParameter} closure)throws Exception{
 
        try{
 #transactionLogic()
@@ -201,7 +196,7 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
 #else
                         ${closure.type} result = closure.execute(tx);
 #end
-                        tx.commit(pool);
+                        tx.commit();
                         abort = false;
 #if(${closure.type} eq 'void')
                         return;
@@ -209,17 +204,17 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
                         return result;
 #end
                     } catch (Retry e) {
-                        waitForChange(pool, tx);
+                        waitForChange(tx);
                     } catch (SpeculativeConfigurationError e) {
                         BetaTransaction old = tx;
-                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx, pool);
-                        pool.putBetaTransaction(old);
+                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
+                        transactionContainer.transactionPool.putBetaTransaction(old);
                     } catch (ReadConflict e) {
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     } catch (WriteConflict e) {
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     }
-                } while (tx.softReset(pool));
+                } while (tx.softReset());
             } finally {
                 if(___ProfilingEnabled){
                     SimpleProfiler profiler = transactionConfiguration.simpleProfiler;
@@ -228,10 +223,10 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
                 }
 
                 if (abort) {
-                    tx.abort(pool);
+                    tx.abort();
                 }
 
-                pool.putBetaTransaction(tx);
+                transactionContainer.transactionPool.putBetaTransaction(tx);
                 transactionContainer.transaction = null;
             }
         }catch(RuntimeException e){

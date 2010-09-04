@@ -3,7 +3,6 @@ package org.multiverse.stms.beta.transactions;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.Watch;
-import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.Function;
 import org.multiverse.api.functions.IntFunction;
@@ -42,10 +41,15 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     protected long remainingTimeoutNs;
     protected BetaTransactionConfiguration config;
     protected boolean abortOnly;
+    protected final BetaObjectPool pool = new BetaObjectPool();
 
     public BetaTransaction(int poolTransactionType, BetaTransactionConfiguration config) {
         this.poolTransactionType = poolTransactionType;
         this.config = config;
+    }
+
+    public final BetaObjectPool getPool(){
+        return pool;
     }
 
     public final int getPoolTransactionType() {
@@ -77,24 +81,24 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
         }
     }
 
-    public final NoRetryPossibleException abortOnNoRetryPossible(final BetaObjectPool pool){
-        abort(pool);
+    public final NoRetryPossibleException abortOnNoRetryPossible(){
+        abort();
         throw new NoRetryPossibleException(
             format("[%s] Can't block transaction since there are no tracked reads",
                 config.familyName));
     }
 
-    public final NoRetryPossibleException abortOnNoBlockingAllowed(final BetaObjectPool pool){
-        abort(pool);
+    public final NoRetryPossibleException abortOnNoBlockingAllowed(){
+        abort();
         return new NoRetryPossibleException(
             format("[%s] Can't block transaction since it doesn't allow blocking",
                 config.familyName));
     }
 
-    public final IllegalTransactionStateException abortOnFaultyStatusOfRegisterChangeListenerAndAbort(final BetaObjectPool pool){
+    public final IllegalTransactionStateException abortOnFaultyStatusOfRegisterChangeListenerAndAbort(){
         switch (status) {
             case PREPARED:
-                abort(pool);
+                abort();
                 return new PreparedTransactionException(
                     format("[%s] Can't block on an already prepared transaction",
                         config.familyName));
@@ -112,108 +116,104 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     }
 
     public final RuntimeException abortOnOpenForReadWhileEvaluatingCommute(
-        final BetaObjectPool pool,
         final BetaTransactionalObject ref){
 
-        abort(pool);
+        abort();
         throw new IllegalTransactionStateException(
             format("[%s] Can't openForRead '%s' while evaluating a commuting function",
                 config.familyName, toDebugString(ref)));
     }
 
     public final RuntimeException abortOnOpenForWriteWhileEvaluatingCommute(
-        final BetaObjectPool pool,
         final BetaTransactionalObject ref){
 
-        abort(pool);
+        abort();
         throw new IllegalTransactionStateException(
             format("[%s] Can't openForWrite '%s' while evaluating a commuting function",
                 config.familyName, toDebugString(ref)));
     }
 
     public final RuntimeException abortOnOpenForConstructionWhileEvaluatingCommute(
-        final BetaObjectPool pool,
         final BetaTransactionalObject ref){
 
-        abort(pool);
+        abort();
         throw new IllegalTransactionStateException(
             format("[%s] Can't openForConstruction '%s' while evaluating a commuting function",
             config.familyName, toDebugString(ref)));
     }
 
     public final RuntimeException abortOnCommuteWhileEvaluatingCommute(
-        final BetaObjectPool pool,
         BetaTransactionalObject ref){
 
-        abort(pool);
+        abort();
         throw new IllegalTransactionStateException(
             format("[%s] Can't add a commuting function to '%s' while evaluating a commuting function",
                 config.familyName, toDebugString(ref)));
     }
 
     public final IllegalArgumentException abortOpenForConstructionWithBadReference(
-        final BetaObjectPool pool, final BetaTransactionalObject ref){
+        final BetaTransactionalObject ref){
 
-        abort(pool);
+        abort();
         return new IllegalArgumentException(
             format("[%s] Can't openForConstruction a previous committed object or an object '%s'",
                 config.familyName, toDebugString(ref)));
     }
 
     public final ReadonlyException abortOpenForWriteWhenReadonly(
-        final BetaObjectPool pool, final BetaTransactionalObject object){
+        final BetaTransactionalObject object){
 
-        abort(pool);
+        abort();
         return new ReadonlyException(
             format("[%s] Can't openForWrite '%s' on a readonly transaction",
                 config.familyName, toDebugString(object)));
     }
 
-    public final NullPointerException abortOpenForWriteWhenNullReference(final BetaObjectPool pool){
-        abort(pool);
+    public final NullPointerException abortOpenForWriteWhenNullReference(){
+        abort();
         return new NullPointerException(
             format("[%s] Can't openForWrite a null reference",
                 config.familyName));
     }
 
-    public final NullPointerException abortOpenForConstructionWhenNullReference(final BetaObjectPool pool){
-        abort(pool);
+    public final NullPointerException abortOpenForConstructionWhenNullReference(){
+        abort();
         return new NullPointerException(
             format("[%s] Can't openForConstruction a null reference",
                 config.familyName));
     }
 
     public final NullPointerException abortCommuteWhenNullReference(
-        final BetaObjectPool pool, Function function){
+        final Function function){
 
-        abort(pool);
+        abort();
         return new NullPointerException(
             format("[%s] Can't commute with a null reference and function '%s'",
                 config.familyName, function));
     }
 
     public final ReadonlyException abortOpenForConstructionWhenReadonly(
-        final BetaObjectPool pool, final BetaTransactionalObject object){
+        final BetaTransactionalObject object){
 
-        abort(pool);
+        abort();
         return new ReadonlyException(
             format("[%s] Can't openForConstruction '%s' using a readonly transaction",
                 config.familyName, toDebugString(object)));
     }
 
     public final ReadonlyException abortCommuteWhenReadonly(
-            final BetaObjectPool pool, final BetaTransactionalObject object, final Function function){
+            final BetaTransactionalObject object, final Function function){
 
-        abort(pool);
+        abort();
         return new ReadonlyException(
             format("[%s] Can't commute on '%s' with function '%s' and a readonly transaction ''",
                  config.familyName, toDebugString(object), function));
     }
 
-    public final IllegalTransactionStateException abortOpenForRead(final BetaObjectPool pool, final BetaTransactionalObject object) {
+    public final IllegalTransactionStateException abortOpenForRead(final BetaTransactionalObject object) {
         switch (status) {
             case PREPARED:
-                abort(pool);
+                abort();
                 return new PreparedTransactionException(
                     format("[%s] Can't openForRead '%s' using an already prepared transaction",
                         config.familyName, toDebugString(object)));
@@ -231,11 +231,11 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     }
 
     public final IllegalTransactionStateException abortOpenForWrite(
-        final BetaObjectPool pool, final BetaTransactionalObject object) {
+        final BetaTransactionalObject object) {
 
         switch (status) {
             case PREPARED:
-                abort(pool);
+                abort();
                 return new PreparedTransactionException(
                     format("[%s] Can't openForWrite '%s' using an already prepared transaction",
                         config.familyName, toDebugString(object)));
@@ -253,11 +253,11 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     }
 
     public final IllegalTransactionStateException abortOpenForConstruction(
-        final BetaObjectPool pool, final BetaTransactionalObject object) {
+        final BetaTransactionalObject object) {
 
         switch (status) {
             case PREPARED:
-                abort(pool);
+                abort();
                 return new PreparedTransactionException(
                     format("[%s] Can't openForConstruction '%s' using an already prepared transaction",
                         config.familyName, toDebugString(object)));
@@ -275,11 +275,11 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     }
 
     public final IllegalTransactionStateException abortCommute(
-        final BetaObjectPool pool, final BetaTransactionalObject object, final Function function) {
+        final BetaTransactionalObject object, final Function function) {
 
         switch (status) {
            case PREPARED:
-               abort(pool);
+               abort();
                return new PreparedTransactionException(
                     format("[%s] Can't commuting '%s' with reference '%s' using an already prepared transaction",
                         config.familyName, toDebugString(object), function));
@@ -337,56 +337,21 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
         this.remainingTimeoutNs = timeoutNs;
     }
 
-    protected final ReadConflict abortOnReadConflict(BetaObjectPool pool) {
-        abort(pool);
+    protected final ReadConflict abortOnReadConflict() {
+        abort();
         return ReadConflict.INSTANCE;
     }
 
-    protected final SpeculativeConfigurationError abortOnTooSmallSize(BetaObjectPool pool, int minimalSize) {
+    protected final SpeculativeConfigurationError abortOnTooSmallSize(int minimalSize) {
         config.needsMinimalTransactionLength(minimalSize);
-        abort(pool);
+        abort();
         return SpeculativeConfigurationError.INSTANCE;
     }
 
-    protected final WriteConflict abortOnWriteConflict(BetaObjectPool pool) {
-        abort(pool);
+    protected final WriteConflict abortOnWriteConflict() {
+        abort();
         return WriteConflict.INSTANCE;
     }
-
-    /**
-     * Prepares this BetaTransaction.
-     *
-     * @param pool the BetaObjectPool
-     */
-    public abstract void prepare(BetaObjectPool pool);
-
-    /**
-     * Commits this BetaTransaction.
-     *
-     * @param pool the BetaObjectPool for putting/taking poolable resources.
-     * @throws ControlFlowError e.g. on read or write conflicts.
-     * @throws DeadTransactionException if the transaction already is aborted.
-     */
-    public abstract void commit(BetaObjectPool pool);
-
-    /**
-     * Aborts this BetaTransaction.
-     *
-     * throws DeadTransactionException if the transaction already is committed.
-     */
-    public abstract void abort(BetaObjectPool pool);
-
-    /**
-     * Resets this BetaTransaction.
-     *
-     * @param pool the BetaObjectPool for putting/taking poolable resources.
-     */
-    public abstract boolean softReset(BetaObjectPool pool);
-
-    /**
-     *
-     */
-    public abstract void hardReset(BetaObjectPool pool);
 
     /**
      * Returns the tranlocal that belongs to the given transactional object.
@@ -402,59 +367,46 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
      */
     public abstract ArrayList<TransactionLifecycleListener> getNormalListeners();
 
-    public abstract void register(BetaObjectPool pool, TransactionLifecycleListener listener);
-
     public abstract void copyForSpeculativeFailure(BetaTransaction tx);
 
     /**
      *
      *
      */
-    public abstract void init(BetaTransactionConfiguration transactionConfig, BetaObjectPool pool);
+    public abstract void init(BetaTransactionConfiguration transactionConfig);
 
-    /**
-     * Registers the changeListener and aborts the transaction (so also releasing its acquired resources
-     * like locks.
-     */
-    public abstract void registerChangeListenerAndAbort(Latch changeListener, BetaObjectPool pool);
-
-    public abstract void startEitherBranch(BetaObjectPool pool);
-
-    public abstract void endEitherBranch(BetaObjectPool pool);
-
-    public abstract void startOrElseBranch(BetaObjectPool pool);
 
     public abstract void addWatch(BetaTransactionalObject object, Watch watch);
 
-    public abstract <E> RefTranlocal<E> openForRead(BetaRef<E> ref, boolean lock, BetaObjectPool pool);
+    public abstract <E> RefTranlocal<E> openForRead(BetaRef<E> ref, boolean lock);
 
-    public abstract <E> RefTranlocal<E> openForWrite(BetaRef<E> ref, boolean lock, BetaObjectPool pool);
+    public abstract <E> RefTranlocal<E> openForWrite(BetaRef<E> ref, boolean lock);
 
-    public abstract <E> RefTranlocal<E> openForConstruction(BetaRef<E> ref, BetaObjectPool pool);
+    public abstract <E> RefTranlocal<E> openForConstruction(BetaRef<E> ref);
 
-    public abstract <E> void commute(BetaRef<E> ref, BetaObjectPool pool, Function<E> function);
+    public abstract <E> void commute(BetaRef<E> ref, final Function<E> function);
 
-    public abstract  IntRefTranlocal openForRead(BetaIntRef ref, boolean lock, BetaObjectPool pool);
+    public abstract  IntRefTranlocal openForRead(BetaIntRef ref, boolean lock);
 
-    public abstract  IntRefTranlocal openForWrite(BetaIntRef ref, boolean lock, BetaObjectPool pool);
+    public abstract  IntRefTranlocal openForWrite(BetaIntRef ref, boolean lock);
 
-    public abstract  IntRefTranlocal openForConstruction(BetaIntRef ref, BetaObjectPool pool);
+    public abstract  IntRefTranlocal openForConstruction(BetaIntRef ref);
 
-    public abstract  void commute(BetaIntRef ref, BetaObjectPool pool, IntFunction function);
+    public abstract  void commute(BetaIntRef ref, final IntFunction function);
 
-    public abstract  LongRefTranlocal openForRead(BetaLongRef ref, boolean lock, BetaObjectPool pool);
+    public abstract  LongRefTranlocal openForRead(BetaLongRef ref, boolean lock);
 
-    public abstract  LongRefTranlocal openForWrite(BetaLongRef ref, boolean lock, BetaObjectPool pool);
+    public abstract  LongRefTranlocal openForWrite(BetaLongRef ref, boolean lock);
 
-    public abstract  LongRefTranlocal openForConstruction(BetaLongRef ref, BetaObjectPool pool);
+    public abstract  LongRefTranlocal openForConstruction(BetaLongRef ref);
 
-    public abstract  void commute(BetaLongRef ref, BetaObjectPool pool, LongFunction function);
+    public abstract  void commute(BetaLongRef ref, final LongFunction function);
 
-    public abstract  Tranlocal openForRead(BetaTransactionalObject ref, boolean lock, BetaObjectPool pool);
+    public abstract  Tranlocal openForRead(BetaTransactionalObject ref, boolean lock);
 
-    public abstract  Tranlocal openForWrite(BetaTransactionalObject ref, boolean lock, BetaObjectPool pool);
+    public abstract  Tranlocal openForWrite(BetaTransactionalObject ref, boolean lock);
 
-    public abstract  Tranlocal openForConstruction(BetaTransactionalObject ref, BetaObjectPool pool);
+    public abstract  Tranlocal openForConstruction(BetaTransactionalObject ref);
 
-    public abstract  void commute(BetaTransactionalObject ref, BetaObjectPool pool, Function function);
+    public abstract  void commute(BetaTransactionalObject ref, final Function function);
 }

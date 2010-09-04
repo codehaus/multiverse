@@ -83,6 +83,7 @@ performance.
 
 - create an orec that never become readbiased (useful for performance comparison).
 
+
 todo
 
 - benchmarks removed from main src.
@@ -184,7 +185,17 @@ the task not being executed at all.
 
 - testing of transaction access while commute
 
+- test of boxing vs non boxing.. so ref vs longref.
+
+- stm needs to be integrated in the ref as field.. so each ref has access to the stm it is part of.
+
 done
+
+- place part of the objectpool in the transaction? This prevents it from needing to be retrieved every time.
+
+- BetaObjectPool -> BetaTransactionPool
+
+- BetaTransactionContentPool -> BetaObjectPool
 
 - when commute function is evaluated, there should be protection against openForXXX on transaction.
 

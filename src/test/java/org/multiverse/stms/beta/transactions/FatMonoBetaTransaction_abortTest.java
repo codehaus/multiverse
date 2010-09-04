@@ -6,7 +6,6 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
@@ -24,18 +23,16 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
  */
 public class FatMonoBetaTransaction_abortTest {
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
     public void whenUnused() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.abort(pool);
+        tx.abort();
 
         assertAborted(tx);
     }
@@ -46,8 +43,8 @@ public class FatMonoBetaTransaction_abortTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForRead(ref, false, pool);
-        tx.abort(pool);
+        tx.openForRead(ref, false);
+        tx.abort();
 
         assertAborted(tx);
 
@@ -66,7 +63,7 @@ public class FatMonoBetaTransaction_abortTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForRead(ref, false, pool);
+        tx.openForRead(ref, false);
         tx.abort();
 
         assertAborted(tx);
@@ -84,7 +81,7 @@ public class FatMonoBetaTransaction_abortTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForRead(ref, true, pool);
+        tx.openForRead(ref, true);
         tx.abort();
 
         assertAborted(tx);
@@ -102,7 +99,7 @@ public class FatMonoBetaTransaction_abortTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(ref, false, pool);
+        tx.openForWrite(ref, false);
         tx.abort();
 
         assertAborted(tx);
@@ -120,7 +117,7 @@ public class FatMonoBetaTransaction_abortTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(ref, true, pool);
+        tx.openForWrite(ref, true);
         tx.abort();
 
         assertAborted(tx);
@@ -136,8 +133,8 @@ public class FatMonoBetaTransaction_abortTest {
     public void whenContainsConstructed_thenItemRemainsLocked() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal write = tx.openForConstruction(ref, pool);
-        tx.abort(pool);
+        LongRefTranlocal write = tx.openForConstruction(ref);
+        tx.abort();
 
         assertAborted(tx);
 
@@ -156,8 +153,8 @@ public class FatMonoBetaTransaction_abortTest {
 
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.register(pool, listenerMock);
-        tx.openForWrite(ref, false, pool);
+        tx.register(listenerMock);
+        tx.openForWrite(ref, false);
         tx.abort();
 
         assertEquals(1, listenerMock.events.size());
@@ -172,7 +169,7 @@ public class FatMonoBetaTransaction_abortTest {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .addPermanentListener(listenerMock);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
-        tx.openForWrite(ref, false, pool);
+        tx.openForWrite(ref, false);
         tx.abort();
 
         assertEquals(1, listenerMock.events.size());
@@ -194,28 +191,28 @@ public class FatMonoBetaTransaction_abortTest {
     @Test
     public void whenPrepared() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.prepare(pool);
+        tx.prepare();
 
-        tx.abort(pool);
+        tx.abort();
         assertAborted(tx);
     }
 
     @Test
     public void whenAborted_thenIgnored() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.abort(pool);
+        tx.abort();
 
-        tx.abort(pool);
+        tx.abort();
         assertAborted(tx);
     }
 
     @Test
     public void whenCommitted_DeadTransactionException() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.commit(pool);
+        tx.commit();
 
         try {
-            tx.abort(pool);
+            tx.abort();
             fail();
         } catch (DeadTransactionException expected) {
         }

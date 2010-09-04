@@ -3,7 +3,6 @@ package org.multiverse.stms.beta.transactions;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
@@ -14,13 +13,11 @@ import static org.multiverse.TestUtils.createReadBiasedLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class LeanMonoBetaTransaction_openForReadTest {
-    private BetaObjectPool pool;
     private BetaStm stm;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
@@ -34,7 +31,7 @@ public class LeanMonoBetaTransaction_openForReadTest {
         LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(config);
 
         try {
-            tx.openForRead(ref, false, pool);
+            tx.openForRead(ref, false);
             fail();
         } catch (SpeculativeConfigurationError expected) {
         }

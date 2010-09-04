@@ -2,7 +2,6 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -17,12 +16,10 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUpdateBiased;
  */
 public class LongRef_atomicGetTest {
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -45,7 +42,7 @@ public class LongRef_atomicGetTest {
     public void whenUpdateBiasedAndLocked_thenIllegalStateException() {
         BetaLongRef ref = createLongRef(stm, 100);
         BetaTransaction lockOwner = stm.startDefaultTransaction();
-        lockOwner.openForRead(ref, true, new BetaObjectPool());
+        lockOwner.openForRead(ref, true);
 
         try {
             ref.atomicGet();
@@ -71,7 +68,7 @@ public class LongRef_atomicGetTest {
     public void whenReadBiasedAndLocked() {
         BetaLongRef ref = createReadBiasedLongRef(stm, 100);
         BetaTransaction lockOwner = stm.startDefaultTransaction();
-        lockOwner.openForRead(ref, true, new BetaObjectPool());
+        lockOwner.openForRead(ref, true);
 
         try {
             ref.atomicGet();

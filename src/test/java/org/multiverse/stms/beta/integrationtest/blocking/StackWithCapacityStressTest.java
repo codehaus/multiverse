@@ -7,7 +7,6 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
@@ -25,7 +24,6 @@ import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
 import static org.multiverse.stms.beta.BetaStmUtils.createRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
  * The test is not very efficient since a lot of temporary objects like the transaction template are created.
@@ -127,17 +125,16 @@ public class StackWithCapacityStressTest {
             pushBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaObjectPool objectPool = getThreadLocalBetaObjectPool();
                     BetaTransaction btx = (BetaTransaction) tx;
 
-                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, pessimistic, objectPool);
+                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, pessimistic);
 
                     if (sizeTranlocal.value >= maxCapacity) {
                         retry();
                     }
 
                     sizeTranlocal.value++;
-                    RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, pessimistic, objectPool);
+                    RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, pessimistic);
                     headTranlocal.value = new Node<E>(item, headTranlocal.value);
                 }
             });
@@ -147,16 +144,15 @@ public class StackWithCapacityStressTest {
             return popBlock.execute(new AtomicClosure<E>() {
                 @Override
                 public E execute(Transaction tx) throws Exception {
-                    BetaObjectPool objectPool = getThreadLocalBetaObjectPool();
                     BetaTransaction btx = (BetaTransaction) tx;
 
-                    RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, pessimistic, objectPool);
+                    RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, pessimistic);
 
                     if (headTranlocal.value == null) {
                         retry();
                     }
 
-                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, pessimistic, objectPool);
+                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, pessimistic);
                     sizeTranlocal.value--;
 
                     E value = headTranlocal.value.item;

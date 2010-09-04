@@ -3,7 +3,6 @@ package org.multiverse.stms.beta.transactions;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 
 import static org.junit.Assert.*;
@@ -12,12 +11,10 @@ import static org.multiverse.TestUtils.assertAborted;
 public class LeanArrayBetaTransaction_orelseTest {
     
      private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
@@ -26,7 +23,7 @@ public class LeanArrayBetaTransaction_orelseTest {
         LeanArrayBetaTransaction tx = new LeanArrayBetaTransaction(config);
 
         try {
-            tx.startEitherBranch(pool);
+            tx.startEitherBranch();
             fail();
         } catch (SpeculativeConfigurationError expected) {
 
@@ -42,7 +39,7 @@ public class LeanArrayBetaTransaction_orelseTest {
         LeanArrayBetaTransaction tx = new LeanArrayBetaTransaction(config);
 
         try {
-            tx.startOrElseBranch(pool);
+            tx.startOrElseBranch();
             fail();
         } catch (IllegalStateException expected) {
 
@@ -58,7 +55,7 @@ public class LeanArrayBetaTransaction_orelseTest {
         LeanArrayBetaTransaction tx = new LeanArrayBetaTransaction(config);
 
         try {
-            tx.endEitherBranch(pool);
+            tx.endEitherBranch();
             fail();
         } catch (IllegalStateException expected) {
 

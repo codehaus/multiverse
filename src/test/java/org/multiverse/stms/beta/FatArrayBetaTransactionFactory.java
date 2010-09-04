@@ -4,7 +4,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
 
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
+import static org.multiverse.stms.beta.ThreadLocalBetaTransactionPool.getThreadLocalBetaTransactionPool;
 
 public final class FatArrayBetaTransactionFactory implements BetaTransactionFactory {
 
@@ -24,17 +24,17 @@ public final class FatArrayBetaTransactionFactory implements BetaTransactionFact
     }
 
     @Override
-    public BetaTransaction upgradeAfterSpeculativeFailure(BetaTransaction failingTransaction, BetaObjectPool pool) {
+    public BetaTransaction upgradeAfterSpeculativeFailure(BetaTransaction failingTransaction, BetaTransactionPool pool) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public BetaTransaction start() {
-        return start(getThreadLocalBetaObjectPool());
+        return start(getThreadLocalBetaTransactionPool());
     }
 
     @Override
-    public BetaTransaction start(BetaObjectPool pool) {
+    public BetaTransaction start(BetaTransactionPool pool) {
         FatArrayBetaTransaction tx = pool.takeFatArrayBetaTransaction();
         if (tx == null) {
             tx = new FatArrayBetaTransaction(config);

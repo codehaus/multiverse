@@ -1,6 +1,5 @@
 package org.multiverse.benchmarks;
 
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
@@ -130,7 +129,6 @@ public class UncontendedMultipleUpdateScalabilityTest {
         }
 
         public void run1() {
-            BetaObjectPool pool = new BetaObjectPool();
             BetaLongRef ref1 = createReadBiasedLongRef(stm);
 
             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 1);
@@ -140,9 +138,9 @@ public class UncontendedMultipleUpdateScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionCount; iteration++) {
-                tx.openForWrite(ref1, false, pool);
-                tx.commit(pool);
-                tx.hardReset(pool);
+                tx.openForWrite(ref1, false);
+                tx.commit();
+                tx.hardReset();
             }
 
             durationMs = System.currentTimeMillis() - startMs;
@@ -153,8 +151,6 @@ public class UncontendedMultipleUpdateScalabilityTest {
             BetaLongRef ref1 = createReadBiasedLongRef(stm);
             BetaLongRef ref2 = createReadBiasedLongRef(stm);
 
-            BetaObjectPool pool = new BetaObjectPool();
-
             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 1);
 
             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
@@ -162,10 +158,10 @@ public class UncontendedMultipleUpdateScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionCount; iteration++) {
-                tx.openForWrite(ref1, false, pool);
-                tx.openForWrite(ref2, false, pool);
-                tx.commit(pool);
-                tx.hardReset(pool);
+                tx.openForWrite(ref1, false);
+                tx.openForWrite(ref2, false);
+                tx.commit();
+                tx.hardReset();
 
             }
 
@@ -179,21 +175,18 @@ public class UncontendedMultipleUpdateScalabilityTest {
             BetaLongRef ref3 = createReadBiasedLongRef(stm);
             BetaLongRef ref4 = createReadBiasedLongRef(stm);
 
-            BetaObjectPool pool = new BetaObjectPool();
-
             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
             FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
 
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionCount; iteration++) {
-                tx.openForWrite(ref1, false, pool);
-                tx.openForWrite(ref2, false, pool);
-                tx.openForWrite(ref3, false, pool);
-                tx.openForWrite(ref4, false, pool);
-                tx.commit(pool);
-                tx.hardReset(pool);
-
+                tx.openForWrite(ref1, false);
+                tx.openForWrite(ref2, false);
+                tx.openForWrite(ref3, false);
+                tx.openForWrite(ref4, false);
+                tx.commit();
+                tx.hardReset();
             }
 
             durationMs = System.currentTimeMillis() - startMs;
@@ -210,25 +203,23 @@ public class UncontendedMultipleUpdateScalabilityTest {
             BetaLongRef ref7 = createReadBiasedLongRef(stm);
             BetaLongRef ref8 = createReadBiasedLongRef(stm);
 
-            BetaObjectPool pool = new BetaObjectPool();
-
             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
             FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
 
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionCount; iteration++) {
-                tx.openForWrite(ref1, false, pool);
-                tx.openForWrite(ref2, false, pool);
-                tx.openForWrite(ref3, false, pool);
-                tx.openForWrite(ref4, false, pool);
-                tx.openForWrite(ref5, false, pool);
-                tx.openForWrite(ref6, false, pool);
-                tx.openForWrite(ref7, false, pool);
-                tx.openForWrite(ref8, false, pool);
+                tx.openForWrite(ref1, false);
+                tx.openForWrite(ref2, false);
+                tx.openForWrite(ref3, false);
+                tx.openForWrite(ref4, false);
+                tx.openForWrite(ref5, false);
+                tx.openForWrite(ref6, false);
+                tx.openForWrite(ref7, false);
+                tx.openForWrite(ref8, false);
 
-                tx.commit(pool);
-                tx.hardReset(pool);
+                tx.commit();
+                tx.hardReset();
 
             }
 
@@ -254,35 +245,31 @@ public class UncontendedMultipleUpdateScalabilityTest {
             BetaLongRef ref15 = createReadBiasedLongRef(stm);
             BetaLongRef ref16 = createReadBiasedLongRef(stm);
 
-
-            BetaObjectPool pool = new BetaObjectPool();
-
             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
             FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
 
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionCount; iteration++) {
-                tx.openForWrite(ref1, false, pool);
-                tx.openForWrite(ref2, false, pool);
-                tx.openForWrite(ref3, false, pool);
-                tx.openForWrite(ref4, false, pool);
-                tx.openForWrite(ref5, false, pool);
-                tx.openForWrite(ref6, false, pool);
-                tx.openForWrite(ref7, false, pool);
-                tx.openForWrite(ref8, false, pool);
-                tx.openForWrite(ref9, false, pool);
-                tx.openForWrite(ref10, false, pool);
-                tx.openForWrite(ref11, false, pool);
-                tx.openForWrite(ref12, false, pool);
-                tx.openForWrite(ref13, false, pool);
-                tx.openForWrite(ref14, false, pool);
-                tx.openForWrite(ref15, false, pool);
-                tx.openForWrite(ref16, false, pool);
+                tx.openForWrite(ref1, false);
+                tx.openForWrite(ref2, false);
+                tx.openForWrite(ref3, false);
+                tx.openForWrite(ref4, false);
+                tx.openForWrite(ref5, false);
+                tx.openForWrite(ref6, false);
+                tx.openForWrite(ref7, false);
+                tx.openForWrite(ref8, false);
+                tx.openForWrite(ref9, false);
+                tx.openForWrite(ref10, false);
+                tx.openForWrite(ref11, false);
+                tx.openForWrite(ref12, false);
+                tx.openForWrite(ref13, false);
+                tx.openForWrite(ref14, false);
+                tx.openForWrite(ref15, false);
+                tx.openForWrite(ref16, false);
 
-
-                tx.commit(pool);
-                tx.hardReset(pool);
+                tx.commit();
+                tx.hardReset();
 
             }
 
@@ -324,50 +311,47 @@ public class UncontendedMultipleUpdateScalabilityTest {
             BetaLongRef ref31 = createReadBiasedLongRef(stm);
             BetaLongRef ref32 = createReadBiasedLongRef(stm);
 
-
-            BetaObjectPool pool = new BetaObjectPool();
-
-            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
+             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
             FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
 
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionCount; iteration++) {
-                tx.openForWrite(ref1, false, pool);
-                tx.openForWrite(ref2, false, pool);
-                tx.openForWrite(ref3, false, pool);
-                tx.openForWrite(ref4, false, pool);
-                tx.openForWrite(ref5, false, pool);
-                tx.openForWrite(ref6, false, pool);
-                tx.openForWrite(ref7, false, pool);
-                tx.openForWrite(ref8, false, pool);
-                tx.openForWrite(ref9, false, pool);
-                tx.openForWrite(ref10, false, pool);
-                tx.openForWrite(ref11, false, pool);
-                tx.openForWrite(ref12, false, pool);
-                tx.openForWrite(ref13, false, pool);
-                tx.openForWrite(ref14, false, pool);
-                tx.openForWrite(ref15, false, pool);
-                tx.openForWrite(ref16, false, pool);
-                tx.openForWrite(ref17, false, pool);
-                tx.openForWrite(ref18, false, pool);
-                tx.openForWrite(ref19, false, pool);
-                tx.openForWrite(ref20, false, pool);
-                tx.openForWrite(ref21, false, pool);
-                tx.openForWrite(ref22, false, pool);
-                tx.openForWrite(ref23, false, pool);
-                tx.openForWrite(ref24, false, pool);
-                tx.openForWrite(ref25, false, pool);
-                tx.openForWrite(ref26, false, pool);
-                tx.openForWrite(ref27, false, pool);
-                tx.openForWrite(ref28, false, pool);
-                tx.openForWrite(ref29, false, pool);
-                tx.openForWrite(ref30, false, pool);
-                tx.openForWrite(ref31, false, pool);
-                tx.openForWrite(ref32, false, pool);
+                tx.openForWrite(ref1, false);
+                tx.openForWrite(ref2, false);
+                tx.openForWrite(ref3, false);
+                tx.openForWrite(ref4, false);
+                tx.openForWrite(ref5, false);
+                tx.openForWrite(ref6, false);
+                tx.openForWrite(ref7, false);
+                tx.openForWrite(ref8, false);
+                tx.openForWrite(ref9, false);
+                tx.openForWrite(ref10, false);
+                tx.openForWrite(ref11, false);
+                tx.openForWrite(ref12, false);
+                tx.openForWrite(ref13, false);
+                tx.openForWrite(ref14, false);
+                tx.openForWrite(ref15, false);
+                tx.openForWrite(ref16, false);
+                tx.openForWrite(ref17, false);
+                tx.openForWrite(ref18, false);
+                tx.openForWrite(ref19, false);
+                tx.openForWrite(ref20, false);
+                tx.openForWrite(ref21, false);
+                tx.openForWrite(ref22, false);
+                tx.openForWrite(ref23, false);
+                tx.openForWrite(ref24, false);
+                tx.openForWrite(ref25, false);
+                tx.openForWrite(ref26, false);
+                tx.openForWrite(ref27, false);
+                tx.openForWrite(ref28, false);
+                tx.openForWrite(ref29, false);
+                tx.openForWrite(ref30, false);
+                tx.openForWrite(ref31, false);
+                tx.openForWrite(ref32, false);
 
-                tx.commit(pool);
-                tx.hardReset(pool);
+                tx.commit();
+                tx.hardReset();
 
             }
 
@@ -441,82 +425,79 @@ public class UncontendedMultipleUpdateScalabilityTest {
             BetaLongRef ref63 = createReadBiasedLongRef(stm);
             BetaLongRef ref64 = createReadBiasedLongRef(stm);
 
-
-            BetaObjectPool pool = new BetaObjectPool();
-
             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
             FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
 
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionCount; iteration++) {
-                tx.openForWrite(ref1, false, pool);
-                tx.openForWrite(ref2, false, pool);
-                tx.openForWrite(ref3, false, pool);
-                tx.openForWrite(ref4, false, pool);
-                tx.openForWrite(ref5, false, pool);
-                tx.openForWrite(ref6, false, pool);
-                tx.openForWrite(ref7, false, pool);
-                tx.openForWrite(ref8, false, pool);
-                tx.openForWrite(ref9, false, pool);
-                tx.openForWrite(ref10, false, pool);
-                tx.openForWrite(ref11, false, pool);
-                tx.openForWrite(ref12, false, pool);
-                tx.openForWrite(ref13, false, pool);
-                tx.openForWrite(ref14, false, pool);
-                tx.openForWrite(ref15, false, pool);
-                tx.openForWrite(ref16, false, pool);
-                tx.openForWrite(ref17, false, pool);
-                tx.openForWrite(ref18, false, pool);
-                tx.openForWrite(ref19, false, pool);
-                tx.openForWrite(ref20, false, pool);
-                tx.openForWrite(ref21, false, pool);
-                tx.openForWrite(ref22, false, pool);
-                tx.openForWrite(ref23, false, pool);
-                tx.openForWrite(ref24, false, pool);
-                tx.openForWrite(ref25, false, pool);
-                tx.openForWrite(ref26, false, pool);
-                tx.openForWrite(ref27, false, pool);
-                tx.openForWrite(ref28, false, pool);
-                tx.openForWrite(ref29, false, pool);
-                tx.openForWrite(ref30, false, pool);
-                tx.openForWrite(ref31, false, pool);
-                tx.openForWrite(ref32, false, pool);
-                tx.openForWrite(ref33, false, pool);
-                tx.openForWrite(ref34, false, pool);
-                tx.openForWrite(ref35, false, pool);
-                tx.openForWrite(ref36, false, pool);
-                tx.openForWrite(ref37, false, pool);
-                tx.openForWrite(ref38, false, pool);
-                tx.openForWrite(ref39, false, pool);
-                tx.openForWrite(ref40, false, pool);
-                tx.openForWrite(ref41, false, pool);
-                tx.openForWrite(ref42, false, pool);
-                tx.openForWrite(ref43, false, pool);
-                tx.openForWrite(ref44, false, pool);
-                tx.openForWrite(ref45, false, pool);
-                tx.openForWrite(ref46, false, pool);
-                tx.openForWrite(ref47, false, pool);
-                tx.openForWrite(ref48, false, pool);
-                tx.openForWrite(ref49, false, pool);
-                tx.openForWrite(ref50, false, pool);
-                tx.openForWrite(ref51, false, pool);
-                tx.openForWrite(ref52, false, pool);
-                tx.openForWrite(ref53, false, pool);
-                tx.openForWrite(ref54, false, pool);
-                tx.openForWrite(ref55, false, pool);
-                tx.openForWrite(ref56, false, pool);
-                tx.openForWrite(ref57, false, pool);
-                tx.openForWrite(ref58, false, pool);
-                tx.openForWrite(ref59, false, pool);
-                tx.openForWrite(ref60, false, pool);
-                tx.openForWrite(ref61, false, pool);
-                tx.openForWrite(ref62, false, pool);
-                tx.openForWrite(ref63, false, pool);
-                tx.openForWrite(ref64, false, pool);
+                tx.openForWrite(ref1, false);
+                tx.openForWrite(ref2, false);
+                tx.openForWrite(ref3, false);
+                tx.openForWrite(ref4, false);
+                tx.openForWrite(ref5, false);
+                tx.openForWrite(ref6, false);
+                tx.openForWrite(ref7, false);
+                tx.openForWrite(ref8, false);
+                tx.openForWrite(ref9, false);
+                tx.openForWrite(ref10, false);
+                tx.openForWrite(ref11, false);
+                tx.openForWrite(ref12, false);
+                tx.openForWrite(ref13, false);
+                tx.openForWrite(ref14, false);
+                tx.openForWrite(ref15, false);
+                tx.openForWrite(ref16, false);
+                tx.openForWrite(ref17, false);
+                tx.openForWrite(ref18, false);
+                tx.openForWrite(ref19, false);
+                tx.openForWrite(ref20, false);
+                tx.openForWrite(ref21, false);
+                tx.openForWrite(ref22, false);
+                tx.openForWrite(ref23, false);
+                tx.openForWrite(ref24, false);
+                tx.openForWrite(ref25, false);
+                tx.openForWrite(ref26, false);
+                tx.openForWrite(ref27, false);
+                tx.openForWrite(ref28, false);
+                tx.openForWrite(ref29, false);
+                tx.openForWrite(ref30, false);
+                tx.openForWrite(ref31, false);
+                tx.openForWrite(ref32, false);
+                tx.openForWrite(ref33, false);
+                tx.openForWrite(ref34, false);
+                tx.openForWrite(ref35, false);
+                tx.openForWrite(ref36, false);
+                tx.openForWrite(ref37, false);
+                tx.openForWrite(ref38, false);
+                tx.openForWrite(ref39, false);
+                tx.openForWrite(ref40, false);
+                tx.openForWrite(ref41, false);
+                tx.openForWrite(ref42, false);
+                tx.openForWrite(ref43, false);
+                tx.openForWrite(ref44, false);
+                tx.openForWrite(ref45, false);
+                tx.openForWrite(ref46, false);
+                tx.openForWrite(ref47, false);
+                tx.openForWrite(ref48, false);
+                tx.openForWrite(ref49, false);
+                tx.openForWrite(ref50, false);
+                tx.openForWrite(ref51, false);
+                tx.openForWrite(ref52, false);
+                tx.openForWrite(ref53, false);
+                tx.openForWrite(ref54, false);
+                tx.openForWrite(ref55, false);
+                tx.openForWrite(ref56, false);
+                tx.openForWrite(ref57, false);
+                tx.openForWrite(ref58, false);
+                tx.openForWrite(ref59, false);
+                tx.openForWrite(ref60, false);
+                tx.openForWrite(ref61, false);
+                tx.openForWrite(ref62, false);
+                tx.openForWrite(ref63, false);
+                tx.openForWrite(ref64, false);
 
-                tx.commit(pool);
-                tx.hardReset(pool);
+                tx.commit();
+                tx.hardReset();
 
             }
 

@@ -1,9 +1,9 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.api.LockStatus;
+import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.Latch;
-import org.multiverse.api.exceptions.PanicError;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.Listeners;
@@ -29,7 +29,8 @@ import java.util.UUID;
  * @author Peter Veentjer
  */
 public abstract class AbstractBetaTransactionalObject
-    extends FastOrec implements BetaTransactionalObject, BetaStmConstants {
+    extends FastOrec implements BetaTransactionalObject, BetaStmConstants
+{
 
     private final static long listenersOffset;
 
@@ -53,6 +54,8 @@ public abstract class AbstractBetaTransactionalObject
     //controlled JMM problem (just like the hashcode of String).
     private int ___identityHashCode;
 
+    //todo: needs to be make final.
+    private Stm stm;
 
     /**
      * Creates a uncommitted AbstractBetaTransactionalObject that should be attached to the transaction (this
@@ -68,6 +71,11 @@ public abstract class AbstractBetaTransactionalObject
 
         ___tryLockAndArrive(0);
         this.lockOwner = tx;
+    }
+
+    @Override
+    public final Stm getStm(){
+        return stm;
     }
 
     @Override
@@ -185,22 +193,7 @@ public abstract class AbstractBetaTransactionalObject
             return null;
         }
 
-        //todo: this code needs to go.
-        if(expectedLockOwner!=lockOwner){
-            throw new PanicError();
-        }
-
         lockOwner = null;
-
-        //todo: this code needs to go.
-        if(tranlocal.isDirty == DIRTY_UNKNOWN){
-            System.out.println("called with DIRTY_UKNOWN");
-            try{
-                throw new Exception();
-            }catch(Exception ex){
-                ex.printStackTrace();
-            }
-        }
 
         //it is a full blown update (so locked).
         final Tranlocal newActive = (Tranlocal)tranlocal;
@@ -411,6 +404,10 @@ public abstract class AbstractBetaTransactionalObject
         final Tranlocal tranlocal,
         final BetaObjectPool pool,
         final long listenerEra){
+
+        if(tranlocal.isCommuting){
+            return REGISTRATION_NONE;
+        }
 
         final Tranlocal read = tranlocal.isCommitted ? tranlocal:tranlocal.read;
 

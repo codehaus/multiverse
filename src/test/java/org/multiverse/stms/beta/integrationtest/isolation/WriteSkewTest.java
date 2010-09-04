@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.exceptions.ReadConflict;
 import org.multiverse.api.exceptions.WriteConflict;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -18,13 +17,11 @@ import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class WriteSkewTest {
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @After
@@ -43,14 +40,14 @@ public class WriteSkewTest {
                 .build()
                 .start();
 
-        tx.openForWrite(ref1, false, pool).value++;
-        tx.openForRead(ref2, false, pool);
+        tx.openForWrite(ref1, false).value++;
+        tx.openForRead(ref2, false);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForWrite(ref2, false, pool).value++;
+        otherTx.openForWrite(ref2, false).value++;
         otherTx.commit();
 
-        tx.commit(pool);
+        tx.commit();
         assertEquals(1, ref1.___unsafeLoad().value);
     }
 
@@ -66,14 +63,14 @@ public class WriteSkewTest {
                 .build()
                 .start();
 
-        tx.openForWrite(ref1, false, pool).value++;
-        tx.openForRead(ref2, false, pool);
+        tx.openForWrite(ref1, false).value++;
+        tx.openForRead(ref2, false);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForWrite(ref2, false, pool).value++;
+        otherTx.openForWrite(ref2, false).value++;
         otherTx.commit();
 
-        tx.commit(pool);
+        tx.commit();
         assertEquals(1, ref1.___unsafeLoad().value);
     }
 
@@ -89,18 +86,18 @@ public class WriteSkewTest {
                 .build()
                 .start();
 
-        tx.openForWrite(ref1, true, pool).value++;
-        tx.openForRead(ref2, true, pool);
+        tx.openForWrite(ref1, true).value++;
+        tx.openForRead(ref2, true);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         try {
-            otherTx.openForWrite(ref2, false, pool).value++;
+            otherTx.openForWrite(ref2, false).value++;
             fail();
         } catch (ReadConflict expected) {
 
         }
 
-        tx.commit(pool);
+        tx.commit();
     }
 
     @Test
@@ -114,18 +111,18 @@ public class WriteSkewTest {
                 .build()
                 .start();
 
-        tx.openForWrite(ref1, true, pool).value++;
-        tx.openForRead(ref2, true, pool);
+        tx.openForWrite(ref1, true).value++;
+        tx.openForRead(ref2, true);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         try {
-            otherTx.openForWrite(ref2, false, pool).value++;
+            otherTx.openForWrite(ref2, false).value++;
             fail();
         } catch (ReadConflict expected) {
 
         }
 
-        tx.commit(pool);
+        tx.commit();
     }
 
     @Test
@@ -139,15 +136,15 @@ public class WriteSkewTest {
                 .build()
                 .start();
 
-        tx.openForWrite(ref1, false, pool).value++;
-        tx.openForRead(ref2, false, pool);
+        tx.openForWrite(ref1, false).value++;
+        tx.openForRead(ref2, false);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForWrite(ref2, false, pool).value++;
+        otherTx.openForWrite(ref2, false).value++;
         otherTx.commit();
 
         try {
-            tx.commit(pool);
+            tx.commit();
             fail();
         } catch (WriteConflict expected) {
 

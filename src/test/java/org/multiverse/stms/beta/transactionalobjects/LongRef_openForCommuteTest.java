@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
@@ -17,6 +18,24 @@ public class LongRef_openForCommuteTest implements BetaStmConstants{
     public void setUp(){
         stm = new BetaStm();
         pool = new BetaObjectPool();
+    }
+
+    @Test
+    @Ignore
+    public void whenLocked(){
+
+    }
+
+    @Test
+    @Ignore
+    public void whenLockedBySelf(){
+
+    }
+
+    @Test
+    @Ignore
+    public void whenConstructing(){
+
     }
 
     @Test

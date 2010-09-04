@@ -1,13 +1,13 @@
 package org.multiverse.stms.beta.integrationtest.traditionalsynchronization;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.TestUtils;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactionalobjects.IntRefTranlocal;
@@ -17,7 +17,6 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
  * A StressTest that checks if a the Semaphore; a traditional synchronization structure can be build
@@ -37,11 +36,13 @@ public class NonReentrantSemaphoreStressTest {
     }
 
     @Test
+    @Ignore
     public void testPessimistic() {
         test(true);
     }
 
     @Test
+    @Ignore
     public void testOptimistic() {
         test(false);
     }
@@ -85,9 +86,8 @@ public class NonReentrantSemaphoreStressTest {
             @Override
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-                IntRefTranlocal write = btx.openForWrite(ref, pessimistic, pool);
+                IntRefTranlocal write = btx.openForWrite(ref, pessimistic);
                 write.value++;
             }
         };
@@ -95,9 +95,8 @@ public class NonReentrantSemaphoreStressTest {
             @Override
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-                IntRefTranlocal write = btx.openForWrite(ref, pessimistic, pool);
+                IntRefTranlocal write = btx.openForWrite(ref, pessimistic);
                 if (write.value == 0) {
                     retry();
                 }

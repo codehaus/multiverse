@@ -16,7 +16,6 @@ import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.benchmarks.BenchmarkUtils.joinAll;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class BetaAtomicBlock_blockingTest {
 
@@ -42,8 +41,7 @@ public class BetaAtomicBlock_blockingTest {
             @Override
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                LongRefTranlocal write = btx.openForWrite(ref, false, pool);
+                LongRefTranlocal write = btx.openForWrite(ref, false);
                 write.value = 1;
             }
         });
@@ -65,8 +63,7 @@ public class BetaAtomicBlock_blockingTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    LongRefTranlocal write = btx.openForWrite(ref, false, pool);
+                    LongRefTranlocal write = btx.openForWrite(ref, false);
                     if (write.value == 0) {
                         retry();
                     }

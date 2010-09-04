@@ -12,7 +12,6 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class BetaAtomicBlock_exceptionsTest {
     private BetaStm stm;
@@ -35,8 +34,7 @@ public class BetaAtomicBlock_exceptionsTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    btx.openForWrite(ref, false, pool).value++;
+                    btx.openForWrite(ref, false).value++;
                     throw ex;
                 }
             });
@@ -60,8 +58,7 @@ public class BetaAtomicBlock_exceptionsTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    btx.openForWrite(ref, false, pool).value++;
+                    btx.openForWrite(ref, false).value++;
                     throw ex;
                 }
             });
@@ -86,8 +83,7 @@ public class BetaAtomicBlock_exceptionsTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    btx.openForWrite(ref, false, pool).value++;
+                    btx.openForWrite(ref, false).value++;
                     throw ex;
                 }
             });
@@ -111,8 +107,7 @@ public class BetaAtomicBlock_exceptionsTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    btx.openForWrite(ref, false, pool).value++;
+                    btx.openForWrite(ref, false).value++;
                     throw ex;
                 }
             });
@@ -136,8 +131,7 @@ public class BetaAtomicBlock_exceptionsTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    btx.openForWrite(ref, false, pool).value++;
+                    btx.openForWrite(ref, false).value++;
                     throw ex;
                 }
             });
@@ -162,8 +156,7 @@ public class BetaAtomicBlock_exceptionsTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                    btx.openForWrite(ref, false, pool).value++;
+                    btx.openForWrite(ref, false).value++;
                     throw ex;
                 }
             });

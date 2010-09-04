@@ -6,7 +6,6 @@ import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -27,12 +26,10 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
  */
 public class FatArrayBetaTransaction_openForWriteTest {
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
@@ -43,11 +40,11 @@ public class FatArrayBetaTransaction_openForWriteTest {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         stm.getGlobalConflictCounter().signalConflict(ref1);
 
-        tx.openForWrite(ref1, false, pool);
+        tx.openForWrite(ref1, false);
 
         assertEquals(tx.getLocalConflictCounter().get(), stm.getGlobalConflictCounter().count());
 
-        tx.openForWrite(ref2, false, pool);
+        tx.openForWrite(ref2, false);
 
         assertEquals(tx.getLocalConflictCounter().get(), stm.getGlobalConflictCounter().count());
     }
@@ -57,7 +54,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
 
         try {
-            tx.openForWrite((BetaLongRef) null, false, pool);
+            tx.openForWrite((BetaLongRef) null, false);
             fail();
         } catch (NullPointerException ex) {
         }
@@ -73,7 +70,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm).setReadonly(true);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         try {
-            tx.openForWrite(ref, false, pool);
+            tx.openForWrite(ref, false);
             fail();
         } catch (ReadonlyException expected) {
         }
@@ -88,10 +85,10 @@ public class FatArrayBetaTransaction_openForWriteTest {
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm).setReadonly(true);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
-        LongRefTranlocal read = tx.openForRead(ref, false, pool);
+        LongRefTranlocal read = tx.openForRead(ref, false);
 
         try {
-            tx.openForWrite(ref, false, pool);
+            tx.openForWrite(ref, false);
             fail();
         } catch (ReadonlyException expected) {
         }
@@ -108,11 +105,11 @@ public class FatArrayBetaTransaction_openForWriteTest {
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 3);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
-        tx.openForWrite(ref1, false, pool);
-        tx.openForWrite(ref2, false, pool);
-        tx.openForWrite(ref3, false, pool);
+        tx.openForWrite(ref1, false);
+        tx.openForWrite(ref2, false);
+        tx.openForWrite(ref3, false);
         try {
-            tx.openForWrite(ref4, false, pool);
+            tx.openForWrite(ref4, false);
             fail();
         } catch (SpeculativeConfigurationError expected) {
         }
@@ -128,7 +125,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
 
         assertActive(tx);
         assertNull(ref.___getLockOwner());
@@ -154,7 +151,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, true, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, true);
 
         assertActive(tx);
         assertSame(tx, ref.___getLockOwner());
@@ -179,7 +176,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
 
         assertActive(tx);
         assertNull(ref.___getLockOwner());
@@ -205,7 +202,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, true, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, true);
 
         assertActive(tx);
         assertSame(tx, ref.___getLockOwner());
@@ -229,8 +226,8 @@ public class FatArrayBetaTransaction_openForWriteTest {
         BetaLongRef ref = createLongRef(stm, 100);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, false, pool);
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
 
         assertNotNull(write);
         assertNotSame(read, write);
@@ -253,9 +250,9 @@ public class FatArrayBetaTransaction_openForWriteTest {
     public void whenAlreadyOpenedForConstruction() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal constructed = tx.openForConstruction(ref, pool);
+        LongRefTranlocal constructed = tx.openForConstruction(ref);
         constructed.value = 100;
-        Tranlocal write = tx.openForWrite(ref, false, pool);
+        Tranlocal write = tx.openForWrite(ref, false);
 
         assertActive(tx);
         assertSame(constructed, write);
@@ -275,9 +272,9 @@ public class FatArrayBetaTransaction_openForWriteTest {
     public void whenAlreadyOpenedForConstructionAndLock() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal constructed = tx.openForConstruction(ref, pool);
+        LongRefTranlocal constructed = tx.openForConstruction(ref);
         constructed.value = 100;
-        Tranlocal write = tx.openForWrite(ref, true, pool);
+        Tranlocal write = tx.openForWrite(ref, true);
 
         assertActive(tx);
         assertSame(constructed, write);
@@ -299,15 +296,15 @@ public class FatArrayBetaTransaction_openForWriteTest {
         BetaLongRef ref2 = createLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal read1 = tx.openForRead(ref1, false, pool);
+        LongRefTranlocal read1 = tx.openForRead(ref1, false);
 
         FatArrayBetaTransaction conflictingTx = new FatArrayBetaTransaction(stm);
-        conflictingTx.openForWrite(ref1, false, pool).value++;
-        conflictingTx.openForWrite(ref2, false, pool).value++;
-        conflictingTx.commit(pool);
+        conflictingTx.openForWrite(ref1, false).value++;
+        conflictingTx.openForWrite(ref2, false).value++;
+        conflictingTx.commit();
 
         try {
-            tx.openForWrite(ref2, false, pool);
+            tx.openForWrite(ref2, false);
             fail();
         } catch (ReadConflict expected) {
         }
@@ -338,8 +335,8 @@ public class FatArrayBetaTransaction_openForWriteTest {
         Tranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.openForRead(ref, false, pool);
-        Tranlocal write = tx.openForWrite(ref, false, pool);
+        tx.openForRead(ref, false);
+        Tranlocal write = tx.openForWrite(ref, false);
 
         assertActive(tx);
         assertOpenedForWrite(ref, write);
@@ -353,11 +350,11 @@ public class FatArrayBetaTransaction_openForWriteTest {
         BetaLongRef ref = BetaStmUtils.createLongRef(stm);
 
         BetaTransaction tx1 = stm.startDefaultTransaction();
-        tx1.openForRead(ref, true, pool);
+        tx1.openForRead(ref, true);
 
         FatArrayBetaTransaction tx2 = new FatArrayBetaTransaction(stm);
         try {
-            tx2.openForWrite(ref, false, pool);
+            tx2.openForWrite(ref, false);
             fail();
         } catch (ReadConflict expected) {
         }
@@ -370,8 +367,8 @@ public class FatArrayBetaTransaction_openForWriteTest {
         BetaTransactionalObject ref = BetaStmUtils.createLongRef(stm);
 
         BetaTransaction tx = new FatArrayBetaTransaction(stm);
-        Tranlocal write1 = tx.openForWrite(ref, false, pool);
-        Tranlocal write2 = tx.openForWrite(ref, false, pool);
+        Tranlocal write1 = tx.openForWrite(ref, false);
+        Tranlocal write2 = tx.openForWrite(ref, false);
 
         assertSame(write1, write2);
         assertActive(tx);
@@ -386,9 +383,9 @@ public class FatArrayBetaTransaction_openForWriteTest {
         BetaTransactionalObject ref3 = BetaStmUtils.createLongRef(stm);
 
         BetaTransaction tx = new FatArrayBetaTransaction(stm);
-        Tranlocal write1 = tx.openForWrite(ref1, false, pool);
-        Tranlocal write2 = tx.openForWrite(ref2, false, pool);
-        Tranlocal write3 = tx.openForWrite(ref3, false, pool);
+        Tranlocal write1 = tx.openForWrite(ref1, false);
+        Tranlocal write2 = tx.openForWrite(ref2, false);
+        Tranlocal write3 = tx.openForWrite(ref3, false);
 
         assertActive(tx);
         assertOpenedForWrite(ref1, write1);
@@ -408,7 +405,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.Read);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
 
         assertActive(tx);
         assertNotSame(committed, write);
@@ -431,7 +428,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.Write);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
 
         assertActive(tx);
         assertNotSame(committed, write);
@@ -449,11 +446,11 @@ public class FatArrayBetaTransaction_openForWriteTest {
     @Test
     public void whenPrepared_thenPreparedTransactionException() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.prepare(pool);
+        tx.prepare();
 
         BetaLongRef ref = createLongRef(stm);
         try {
-            tx.openForWrite(ref, false, pool);
+            tx.openForWrite(ref, false);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -467,7 +464,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.openForWrite(ref, false, pool);
+        tx.openForWrite(ref, false);
 
         assertActive(tx);
         assertSame(committed, ref.___unsafeLoad());
@@ -485,7 +482,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
 
         stm.getGlobalConflictCounter().signalConflict(ref);
-        tx.openForWrite(ref, false, pool);
+        tx.openForWrite(ref, false);
 
         assertEquals(stm.getGlobalConflictCounter().count(), tx.getLocalConflictCounter().get());
         assertActive(tx);
@@ -499,11 +496,11 @@ public class FatArrayBetaTransaction_openForWriteTest {
 
         stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
 
-        tx.openForWrite(ref, false, pool);
+        tx.openForWrite(ref, false);
         long localConflictCount = tx.getLocalConflictCounter().get();
         stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
 
-        tx.openForWrite(ref, false, pool);
+        tx.openForWrite(ref, false);
 
         assertEquals(localConflictCount, tx.getLocalConflictCounter().get());
         assertActive(tx);
@@ -519,16 +516,16 @@ public class FatArrayBetaTransaction_openForWriteTest {
 
         stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
 
-        tx.openForWrite(ref1, false, pool);
+        tx.openForWrite(ref1, false);
 
         //do second read
         stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
-        tx.openForWrite(ref2, false, pool);
+        tx.openForWrite(ref2, false);
         assertEquals(stm.getGlobalConflictCounter().count(), tx.getLocalConflictCounter().get());
 
         //do another read
         stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
-        tx.openForWrite(ref3, false, pool);
+        tx.openForWrite(ref3, false);
         assertEquals(stm.getGlobalConflictCounter().count(), tx.getLocalConflictCounter().get());
 
         assertActive(tx);
@@ -543,13 +540,13 @@ public class FatArrayBetaTransaction_openForWriteTest {
                 .setReadTrackingEnabled(false);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
-        tx.openForRead(ref1, false, pool);
+        tx.openForRead(ref1, false);
 
         //an unreal readconflict
         stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
 
         try {
-            tx.openForWrite(ref2, false, pool);
+            tx.openForWrite(ref2, false);
             fail();
         } catch (ReadConflict expected) {
         }
@@ -570,11 +567,11 @@ public class FatArrayBetaTransaction_openForWriteTest {
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         LongFunction function = new IncLongFunction();
-        tx.commute(ref, pool, function);
+        tx.commute(ref, function);
 
         LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
 
-        LongRefTranlocal write = tx.openForWrite(ref, false, pool);
+        LongRefTranlocal write = tx.openForWrite(ref, false);
 
         assertActive(tx);
         assertSame(commuting, write);
@@ -598,14 +595,14 @@ public class FatArrayBetaTransaction_openForWriteTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction otherTx = new FatArrayBetaTransaction(stm);
-        otherTx.openForRead(ref, true, pool);
+        otherTx.openForRead(ref, true);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongFunction function = new IncLongFunction();
-        tx.commute(ref, pool, function);
+        tx.commute(ref, function);
 
         try {
-            tx.openForWrite(ref, false, pool);
+            tx.openForWrite(ref, false);
             fail();
         } catch (ReadConflict expected) {
 
@@ -629,13 +626,13 @@ public class FatArrayBetaTransaction_openForWriteTest {
                 .setPessimisticLockLevel(PessimisticLockLevel.Read);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
-        LongRefTranlocal write1 = tx.openForWrite(ref1, false, pool);
+        LongRefTranlocal write1 = tx.openForWrite(ref1, false);
 
         long oldLocalConflictCount = tx.getLocalConflictCounter().get();
 
         stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
 
-        LongRefTranlocal write2 = tx.openForWrite(ref2, false, pool);
+        LongRefTranlocal write2 = tx.openForWrite(ref2, false);
 
         assertEquals(oldLocalConflictCount, tx.getLocalConflictCounter().get());
         assertActive(tx);
@@ -654,10 +651,10 @@ public class FatArrayBetaTransaction_openForWriteTest {
         when(function.call(10)).thenThrow(exception);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.commute(ref, pool, function);
+        tx.commute(ref, function);
 
         try {
-            tx.openForWrite(ref, false, pool);
+            tx.openForWrite(ref, false);
             fail();
         } catch (RuntimeException e) {
             assertSame(exception, e);
@@ -677,16 +674,16 @@ public class FatArrayBetaTransaction_openForWriteTest {
         BetaLongRef ref2 = createLongRef(stm, 10);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.openForRead(ref1, false, pool);
+        tx.openForRead(ref1, false);
         LongFunction function = mock(LongFunction.class);
-        tx.commute(ref2, pool, function);
+        tx.commute(ref2, function);
 
         FatArrayBetaTransaction otherTx = new FatArrayBetaTransaction(stm);
-        otherTx.openForWrite(ref1, true, pool).value++;
+        otherTx.openForWrite(ref1, true).value++;
         otherTx.commit();
 
         try {
-            tx.openForWrite(ref2, false, pool);
+            tx.openForWrite(ref2, false);
             fail();
         } catch (ReadConflict expected) {
 
@@ -714,10 +711,10 @@ public class FatArrayBetaTransaction_openForWriteTest {
         when(function.call(10)).thenThrow(exception);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.commute(ref, pool, function);
+        tx.commute(ref, function);
 
         try {
-            tx.openForWrite(ref, true, pool);
+            tx.openForWrite(ref, true);
             fail();
         } catch (RuntimeException e) {
             assertSame(exception, e);
@@ -734,12 +731,12 @@ public class FatArrayBetaTransaction_openForWriteTest {
     @Test
     public void whenAborted_thenDeadTransactionException() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.abort(pool);
+        tx.abort();
 
         BetaLongRef ref = createLongRef(stm);
 
         try {
-            tx.openForWrite(ref, true, pool);
+            tx.openForWrite(ref, true);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -750,12 +747,12 @@ public class FatArrayBetaTransaction_openForWriteTest {
     @Test
     public void whenCommitted_thenDeadTransactionException() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.commit(pool);
+        tx.commit();
 
         BetaLongRef ref = createLongRef(stm);
 
         try {
-            tx.openForWrite(ref, true, pool);
+            tx.openForWrite(ref, true);
             fail();
         } catch (DeadTransactionException expected) {
         }

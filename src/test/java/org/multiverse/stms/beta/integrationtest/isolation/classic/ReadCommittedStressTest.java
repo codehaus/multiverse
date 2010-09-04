@@ -7,7 +7,6 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -16,7 +15,6 @@ import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
  * A Stresstest that check if the it is possible that a dirty read is done (this is not allowed).
@@ -72,10 +70,9 @@ public class ReadCommittedStressTest {
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
                     BetaTransaction btx = (BetaTransaction) tx;
-                    ref.set(btx, pool, ref.get(btx, pool));
-                    btx.abort(pool);
+                    ref.set(btx, ref.get(btx));
+                    btx.abort();
                 }
             };
 
@@ -104,9 +101,8 @@ public class ReadCommittedStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    BetaObjectPool pool = getThreadLocalBetaObjectPool();
 
-                    if (ref.get(btx, pool) % 2 != 0) {
+                    if (ref.get(btx) % 2 != 0) {
                         fail();
                     }
                 }

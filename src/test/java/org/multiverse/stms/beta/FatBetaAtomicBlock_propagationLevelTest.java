@@ -19,7 +19,6 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.assertActive;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class FatBetaAtomicBlock_propagationLevelTest {
     private BetaStm stm;
@@ -127,8 +126,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
             public int execute(Transaction tx) throws Exception {
                 assertNotNull(tx);
                 BetaTransaction btx = (BetaTransaction) tx;
-                BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                btx.openForWrite(ref, false, pool).value++;
+                btx.openForWrite(ref, false).value++;
                 return 10;
             }
         };
@@ -156,8 +154,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
             public int execute(Transaction tx) throws Exception {
                 assertSame(existingTx, tx);
                 BetaTransaction btx = (BetaTransaction) tx;
-                BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                btx.openForWrite(ref, false, pool).value++;
+                btx.openForWrite(ref, false).value++;
                 return 10;
             }
         };
@@ -184,8 +181,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
             public int execute(Transaction tx) throws Exception {
                 assertNotNull(tx);
                 BetaTransaction btx = (BetaTransaction) tx;
-                BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                btx.openForWrite(ref, false, pool).value++;
+                btx.openForWrite(ref, false).value++;
                 return 10;
             }
         };
@@ -214,8 +210,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
                 assertNotNull(tx);
                 assertNotSame(otherTx, tx);
                 BetaTransaction btx = (BetaTransaction) tx;
-                BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                btx.openForWrite(ref, false, pool).value++;
+                btx.openForWrite(ref, false).value++;
                 return 1;
             }
         };

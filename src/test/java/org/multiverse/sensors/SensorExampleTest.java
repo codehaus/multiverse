@@ -6,7 +6,6 @@ import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -14,7 +13,6 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 public class SensorExampleTest {
     private BetaStm stm;
@@ -52,13 +50,12 @@ public class SensorExampleTest {
 
             System.out.println(block.getTransactionFactory().getTransactionConfiguration());
 
-            for (int k = 0; k < 100000000; k++) {
+            for (int k = 0; k < 10000; k++) {
                 block.execute(new AtomicVoidClosure() {
                     @Override
                     public void execute(Transaction tx) throws Exception {
                         BetaTransaction btx = (BetaTransaction) tx;
-                        BetaObjectPool pool = getThreadLocalBetaObjectPool();
-                        btx.openForWrite(ref, false, pool).value++;
+                        btx.openForWrite(ref, false).value++;
                     }
                 });
             }
