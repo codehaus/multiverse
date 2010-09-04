@@ -7,7 +7,8 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import static org.multiverse.benchmarks.BenchmarkUtils.*;
+import static org.multiverse.benchmarks.BenchmarkUtils.generateProcessorRange;
+import static org.multiverse.benchmarks.BenchmarkUtils.toGnuplot;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 
 /**
@@ -23,8 +24,6 @@ public class UncontendedAtomicGetScalabilityTest {
     }
 
     public void start(long transactionCount) {
-        loadOtherTransactionalObjectClasses();
-
         int[] processors = generateProcessorRange();
 
         System.out.println("Multiverse> Uncontended atomicGet transaction benchmark");

@@ -1,13 +1,12 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.api.LockStatus;
-import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.Listeners;
-import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 import org.multiverse.stms.beta.orec.FastOrec;
 import org.multiverse.stms.beta.orec.Orec;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -52,10 +51,8 @@ public abstract class AbstractBetaTransactionalObject
     private volatile Listeners ___listeners;
 
     //controlled JMM problem (just like the hashcode of String).
-    private int ___identityHashCode;
-
-    //todo: needs to be make final.
-    private Stm stm;
+    private int ___identityHashCode;    
+    private final BetaStm stm;
 
     /**
      * Creates a uncommitted AbstractBetaTransactionalObject that should be attached to the transaction (this
@@ -69,12 +66,13 @@ public abstract class AbstractBetaTransactionalObject
             throw new NullPointerException();
         }
 
+        stm = tx.getConfiguration().stm;
         ___tryLockAndArrive(0);
         this.lockOwner = tx;
     }
 
     @Override
-    public final Stm getStm(){
+    public final BetaStm getStm(){
         return stm;
     }
 
@@ -165,8 +163,7 @@ public abstract class AbstractBetaTransactionalObject
     public final Listeners ___commitDirty(
             final Tranlocal tranlocal,
             final BetaTransaction expectedLockOwner,
-            final BetaObjectPool pool,
-            final GlobalConflictCounter globalConflictCounter) {
+            final BetaObjectPool pool) {
 
         final boolean notDirty = tranlocal.isDirty == DIRTY_FALSE;
 
@@ -218,7 +215,7 @@ public abstract class AbstractBetaTransactionalObject
             }
         }
 
-        long remainingSurplus = ___departAfterUpdateAndUnlock(globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(stm.globalConflictCounter, this);
 
         //it is important that this call is done after the actual write. This is needed to give the guarantee
        //that we are going to take care of all listeners that are registered before that write. The read is done
@@ -240,8 +237,7 @@ public abstract class AbstractBetaTransactionalObject
     public final Listeners ___commitAll(
             final Tranlocal tranlocal,
             final BetaTransaction expectedLockOwner,
-            final BetaObjectPool pool,
-            final GlobalConflictCounter globalConflictCounter) {
+            final BetaObjectPool pool) {
 
 
         if(expectedLockOwner != lockOwner){
@@ -290,7 +286,7 @@ public abstract class AbstractBetaTransactionalObject
             }
         }
 
-        long remainingSurplus = ___departAfterUpdateAndUnlock(globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(stm.globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
 

@@ -1,34 +1,9 @@
 package org.multiverse.benchmarks;
 
-import org.multiverse.stms.beta.BetaObjectPool;
-import org.multiverse.stms.beta.transactionalobjects.BetaRef;
-
 import java.text.NumberFormat;
 import java.util.*;
 
 public class BenchmarkUtils {
-
-    public static void loadOtherTransactionalObjectClasses() {
-        BetaRef ref = new BetaRef();
-        ref.___openForConstruction(new BetaObjectPool());
-    }
-
-
-    public static void startAll(Thread... threads) {
-        for (Thread thread : threads) {
-            thread.start();
-        }
-    }
-
-    public static void joinAll(Thread... threads) {
-        for (Thread thread : threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
 
     public static int[] generateProcessorRange() {
         return generateProcessorRange(Runtime.getRuntime().availableProcessors());
@@ -96,7 +71,6 @@ public class BenchmarkUtils {
     public static void println(String s, Object... args) {
         System.out.printf(s + "\n", args);
     }
-
 
     public static String transactionsPerSecond(long count, long timeMs) {
         double performance = (1000 * count) / timeMs;

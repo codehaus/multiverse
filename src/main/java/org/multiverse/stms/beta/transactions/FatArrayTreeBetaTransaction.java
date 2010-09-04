@@ -1366,7 +1366,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         for (int k = 0; k < array.length; k++) {
             Tranlocal tranlocal = array[k];
             if(tranlocal != null){
-                final Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool, config.globalConflictCounter);
+                final Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool);
 
                 if(listeners != null){
                     if(listenersArray == null){
@@ -1399,7 +1399,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 tranlocal.calculateIsDirty();
             }
             
-            final Listeners listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool, config.globalConflictCounter);
+            final Listeners listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool);
 
             if(listeners != null){
                 if(listenersArray == null){

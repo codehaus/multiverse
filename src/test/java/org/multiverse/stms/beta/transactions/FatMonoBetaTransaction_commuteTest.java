@@ -186,7 +186,7 @@ public class FatMonoBetaTransaction_commuteTest {
 
         LongFunction function = mock(LongFunction.class);
 
-        stm.getGlobalConflictCounter().signalConflict(new BetaLongRef());
+        stm.getGlobalConflictCounter().signalConflict(new BetaLongRef(stm));
 
         tx.commute(ref, function);
 

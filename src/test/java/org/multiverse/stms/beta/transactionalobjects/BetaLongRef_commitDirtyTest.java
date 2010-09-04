@@ -42,7 +42,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants{
         ref.___tryLockAndCheckConflict(tx, 1, write);
 
         long oldConflictCount = globalConflictCounter.count();
-        Listeners listeners = ref.___commitDirty(write, tx, pool, globalConflictCounter);
+        Listeners listeners = ref.___commitDirty(write, tx, pool);
 
         assertNotNull(listeners);
         assertNull(listeners.next);
@@ -75,7 +75,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants{
 
         long oldConflictCount = globalConflictCounter.count();
         ref.___tryLockAndCheckConflict(tx, 1, write);
-        Listeners listeners = ref.___commitDirty(write, tx, pool, globalConflictCounter);
+        Listeners listeners = ref.___commitDirty(write, tx, pool);
 
         assertNull(listeners);
         assertEquals(oldConflictCount + 1, globalConflictCounter.count());
@@ -99,7 +99,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants{
         ref.___tryLockAndCheckConflict(tx, 1, write);
 
         long oldConflictCount = globalConflictCounter.count();
-        Listeners listeners = ref.___commitDirty(write, tx, pool, globalConflictCounter);
+        Listeners listeners = ref.___commitDirty(write, tx, pool);
 
         assertNull(listeners);
         assertEquals(oldConflictCount, globalConflictCounter.count());
@@ -123,7 +123,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants{
         ref.___tryLockAndCheckConflict(tx, 1, write);
 
         long oldConflictCount = globalConflictCounter.count();
-        Listeners listeners = ref.___commitDirty(write, tx, pool, globalConflictCounter);
+        Listeners listeners = ref.___commitDirty(write, tx, pool);
 
         assertNull(listeners);
         assertEquals(oldConflictCount, globalConflictCounter.count());
@@ -148,7 +148,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants{
         ref.___tryLockAndCheckConflict(tx, 1, write);
 
         long oldConflictCount = globalConflictCounter.count();
-        Listeners listeners = ref.___commitDirty(write, tx, pool, globalConflictCounter);
+        Listeners listeners = ref.___commitDirty(write, tx, pool);
 
         assertNull(listeners);
         assertEquals(oldConflictCount + 1, globalConflictCounter.count());

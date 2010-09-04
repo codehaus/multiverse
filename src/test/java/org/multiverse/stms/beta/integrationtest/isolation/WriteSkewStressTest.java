@@ -325,8 +325,8 @@ public class WriteSkewStressTest {
                 .setReadonly(true)
                 .buildAtomicBlock();
 
-        private BetaIntRef account1 = new BetaIntRef();
-        private BetaIntRef account2 = new BetaIntRef();
+        private BetaIntRef account1 = new BetaIntRef(stm);
+        private BetaIntRef account2 = new BetaIntRef(stm);
 
         public BetaIntRef getRandomAccount() {
             return randomBoolean() ? account1 : account2;

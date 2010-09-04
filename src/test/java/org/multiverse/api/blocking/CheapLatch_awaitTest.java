@@ -6,7 +6,6 @@ import org.multiverse.TestThread;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.benchmarks.BenchmarkUtils.joinAll;
 
 public class CheapLatch_awaitTest {
 

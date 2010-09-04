@@ -217,9 +217,10 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
                 } while (tx.softReset());
             } finally {
                 if(___ProfilingEnabled){
-                    SimpleProfiler profiler = transactionConfiguration.simpleProfiler;
-                    TransactionSensor counter = profiler.getTransactionSensor(transactionConfiguration);
-                    counter.signalExecution(tx.getAttempt(), !abort);
+                    TransactionSensor sensor = transactionConfiguration.transactionSensor;
+                    if(sensor != null){
+                        sensor.signalExecution(tx.getAttempt(), !abort);
+                    }
                 }
 
                 if (abort) {

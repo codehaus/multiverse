@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.orec;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -20,10 +21,12 @@ import static org.multiverse.benchmarks.BenchmarkUtils.transactionsPerSecond;
 public class FastOrec_UncontendedPerformanceTest implements BetaStmConstants {
     private BetaLongRef ref;
     private GlobalConflictCounter globalConflictCounter;
+    private BetaStm stm;
 
     @Before
     public void setUp() {
-        ref = new BetaLongRef();
+        stm = new BetaStm();
+        ref = new BetaLongRef(stm);
         globalConflictCounter = new GlobalConflictCounter();
     }
 

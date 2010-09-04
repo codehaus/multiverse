@@ -1,5 +1,6 @@
 package org.multiverse.benchmarks;
 
+import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
@@ -12,7 +13,9 @@ import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
 
 import java.util.Random;
 
-import static org.multiverse.benchmarks.BenchmarkUtils.*;
+import static org.multiverse.TestUtils.joinAll;
+import static org.multiverse.TestUtils.startAll;
+import static org.multiverse.benchmarks.BenchmarkUtils.transactionsPerSecond;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 /**
@@ -113,7 +116,7 @@ public class AccountBenchmark {
         }
     }
 
-    private class TransferThread extends Thread {
+    private class TransferThread extends TestThread {
         private final Latch startLatch;
         private final Random random = new Random();
         private long durationMs;
@@ -128,7 +131,7 @@ public class AccountBenchmark {
         }
 
         @Override
-        public void run() {
+        public void doRun() {
             AtomicBlock addInterestBlock = stm.createTransactionFactoryBuilder()
                     .buildAtomicBlock();
 

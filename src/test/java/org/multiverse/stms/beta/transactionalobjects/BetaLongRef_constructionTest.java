@@ -25,7 +25,7 @@ public class BetaLongRef_constructionTest implements BetaStmConstants {
         tx.openForConstruction(ref1);
         tx.commit();
 
-        BetaLongRef ref2 = new BetaLongRef();
+        BetaLongRef ref2 = new BetaLongRef(stm);
         assertEquals(ref1.___toOrecString(), ref2.___toOrecString());
 
         assertNull(ref2.___getLockOwner());
@@ -43,7 +43,7 @@ public class BetaLongRef_constructionTest implements BetaStmConstants {
         tx.openForConstruction(ref1).value = 10;
         tx.commit();
 
-        BetaLongRef ref2 = new BetaLongRef(10);
+        BetaLongRef ref2 = new BetaLongRef(stm,10);
         assertEquals(ref1.___toOrecString(), ref2.___toOrecString());
 
         assertNull(ref2.___getLockOwner());

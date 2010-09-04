@@ -1452,9 +1452,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 if(attached.isDirty == DIRTY_UNKNOWN){
                     attached.calculateIsDirty();
                 }
-                listeners = attached.owner.___commitDirty(attached, this, pool, config.globalConflictCounter);
+                listeners = attached.owner.___commitDirty(attached, this, pool);
             }else{
-                listeners = attached.owner.___commitAll(attached, this, pool, config.globalConflictCounter);
+                listeners = attached.owner.___commitAll(attached, this, pool);
             }
         }
         status = COMMITTED;

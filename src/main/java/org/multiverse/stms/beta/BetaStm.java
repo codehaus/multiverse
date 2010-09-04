@@ -15,20 +15,17 @@ import org.multiverse.stms.beta.transactions.*;
 import static org.multiverse.stms.beta.ThreadLocalBetaTransactionPool.getThreadLocalBetaTransactionPool;
 
 /**
- * All non anonymous transactionfactories (so transactions with a familyname getAndSet explicitly) will
- * be stored in the factoryMap. If a transactionfactory with the same name already is stored in the
- * factoryMap, it will not be stored.
  *
  * @author Peter Veentjer
  */
 public final class BetaStm implements Stm {
 
     private final AtomicBlock atomicBlock;
-    private final GlobalConflictCounter globalConflictCounter;
-    private final int spinCount = 8;
+    public final GlobalConflictCounter globalConflictCounter;
+    public final int spinCount = 8;
     private final BetaTransactionConfiguration defaultConfig;
     private final SimpleStorage storage;
-    private final SimpleProfiler simpleProfiler = new SimpleProfiler();
+    public final SimpleProfiler simpleProfiler = new SimpleProfiler();
     private final StmCallback callback;
 
     public BetaStm() {
@@ -100,17 +97,17 @@ public final class BetaStm implements Stm {
     public final class BetaReferenceFactoryImpl implements BetaReferenceFactory {
         @Override
         public BetaIntRef createIntRef(int value) {
-            return new BetaIntRef(value);
+            return new BetaIntRef(BetaStm.this,value);
         }
 
         @Override
         public BetaLongRef createLongRef(long value) {
-            return new BetaLongRef(value);
+            return new BetaLongRef(BetaStm.this,value);
         }
 
         @Override
         public <E> BetaRef<E> createRef(E value) {
-            return new BetaRef<E>(value);
+            return new BetaRef<E>(BetaStm.this,value);
         }
     }
 
@@ -283,16 +280,13 @@ public final class BetaStm implements Stm {
 
         @Override
         public BetaTransactionFactory build() {
-            config.validate();
+            config.init();
 
-            BetaTransactionFactory factory;
             if (config.isSpeculativeConfigEnabled()) {
-                factory = new SpeculativeBetaTransactionFactory(config);
+                return new SpeculativeBetaTransactionFactory(config);
             } else {
-                factory = new NonSpeculativeBetaTransactionFactory(config);
+                return new NonSpeculativeBetaTransactionFactory(config);
             }
-
-            return factory;
         }
     }
 

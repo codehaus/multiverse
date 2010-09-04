@@ -11,7 +11,8 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.benchmarks.BenchmarkUtils.*;
+import static org.multiverse.benchmarks.BenchmarkUtils.generateProcessorRange;
+import static org.multiverse.benchmarks.BenchmarkUtils.toGnuplot;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 
 public class UncontendedLeanUpdateScalabilityTest {
@@ -23,8 +24,6 @@ public class UncontendedLeanUpdateScalabilityTest {
     }
 
     public void start(long transactionCount) {
-        loadOtherTransactionalObjectClasses();
-
         int[] processors = generateProcessorRange();
 
         System.out.printf("Multiverse> Uncontended update lean-transaction benchmark\n");

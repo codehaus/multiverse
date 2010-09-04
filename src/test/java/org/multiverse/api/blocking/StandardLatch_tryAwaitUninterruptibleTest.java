@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.benchmarks.BenchmarkUtils.joinAll;
 
 public class StandardLatch_tryAwaitUninterruptibleTest {
 

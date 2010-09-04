@@ -57,10 +57,8 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     private volatile Listeners ___listeners;
 
     //controlled JMM problem (just like the hashcode of String).
-    private int ___identityHashCode;
-
-    //todo: needs to be make final.
-    private Stm stm;
+    private int ___identityHashCode;    
+    private final BetaStm stm;
 
     /**
      * Creates a uncommitted ${transactionalObject.name} that should be attached to the transaction (this
@@ -74,6 +72,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             throw new NullPointerException();
         }
 
+        stm = tx.getConfiguration().stm;
         ___tryLockAndArrive(0);
         this.lockOwner = tx;
     }
@@ -82,8 +81,8 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     /**
      * Creates a committed ${transactionalObject.name} with ${transactionalObject.initialValue} as initial value.
      */
-    public ${transactionalObject.name}(){
-        this((${transactionalObject.type})${transactionalObject.initialValue});
+    public ${transactionalObject.name}(BetaStm stm){
+        this(stm, (${transactionalObject.type})${transactionalObject.initialValue});
     }
 
     /**
@@ -91,10 +90,15 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
      *
      * @param initialValue the initial value
      */
-    public ${transactionalObject.name}(final ${transactionalObject.type} initialValue){
+    public ${transactionalObject.name}(BetaStm stm, final ${transactionalObject.type} initialValue){
         ${transactionalObject.tranlocal}${transactionalObject.typeParameter} tranlocal =
             new ${transactionalObject.tranlocal}${transactionalObject.typeParameter}(this);
 
+        if(stm == null){
+            throw new NullPointerException();
+        }
+
+        this.stm = stm;
         tranlocal.value = initialValue;
         tranlocal.isCommitted = true;
         tranlocal.isDirty = DIRTY_FALSE;
@@ -103,7 +107,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
 #end
     @Override
-    public final Stm getStm(){
+    public final BetaStm getStm(){
         return stm;
     }
 
@@ -217,8 +221,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public final Listeners ___commitDirty(
             final Tranlocal tranlocal,
             final BetaTransaction expectedLockOwner,
-            final BetaObjectPool pool,
-            final GlobalConflictCounter globalConflictCounter) {
+            final BetaObjectPool pool) {
 
         final boolean notDirty = tranlocal.isDirty == DIRTY_FALSE;
 
@@ -270,7 +273,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             }
         }
 
-        long remainingSurplus = ___departAfterUpdateAndUnlock(globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(stm.globalConflictCounter, this);
 
         //it is important that this call is done after the actual write. This is needed to give the guarantee
        //that we are going to take care of all listeners that are registered before that write. The read is done
@@ -292,9 +295,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public final Listeners ___commitAll(
             final Tranlocal tranlocal,
             final BetaTransaction expectedLockOwner,
-            final BetaObjectPool pool,
-            final GlobalConflictCounter globalConflictCounter) {
-
+            final BetaObjectPool pool) {
 
         if(expectedLockOwner != lockOwner){
             //it can't be an update, otherwise the lock would have been acquired.
@@ -342,7 +343,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             }
         }
 
-        long remainingSurplus = ___departAfterUpdateAndUnlock(globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(stm.globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
 
@@ -755,11 +756,9 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
     public final ${transactionalObject.type} atomicGetAndSet(
         final ${transactionalObject.type} newValue,
-        final BetaObjectPool pool,
-        final int spinCount,
-        final GlobalConflictCounter globalConflictCounter){
+        final BetaObjectPool pool){
 
-        final int arriveStatus = ___tryLockAndArrive(spinCount);
+        final int arriveStatus = ___tryLockAndArrive(stm.spinCount);
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
             throw new WriteConflict();
         }
@@ -784,7 +783,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         update.value = newValue;
         update.prepareForCommit();
         ___active = update;
-        long remainingSurplus = ___departAfterUpdateAndUnlock(globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(stm.globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);

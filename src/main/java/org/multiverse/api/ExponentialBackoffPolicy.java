@@ -16,7 +16,7 @@ import static java.util.concurrent.locks.LockSupport.parkNanos;
  */
 public final class ExponentialBackoffPolicy implements BackoffPolicy {
 
-    public final static BackoffPolicy INSTANCE_100_MS_MAX = new ExponentialBackoffPolicy();
+    public final static BackoffPolicy MAX_100_MS = new ExponentialBackoffPolicy();
 
     private final long maxDelayNs;
     private final long minDelayNs;

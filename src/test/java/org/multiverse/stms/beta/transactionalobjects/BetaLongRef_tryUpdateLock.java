@@ -1,6 +1,8 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.orec.OrecTestUtils;
 
 import static org.junit.Assert.*;
@@ -9,10 +11,16 @@ import static org.junit.Assert.*;
  * @author Peter Veentjer
  */
 public class BetaLongRef_tryUpdateLock {
+    private BetaStm stm;
+
+    @Before
+    public void setUp(){
+           stm = new BetaStm();
+    }
 
     @Test
     public void whenFree() {
-        BetaRef orec = new BetaRef();
+        BetaRef orec = new BetaRef(stm);
         orec.___arrive(1);
 
         boolean result = orec.___tryLockAfterNormalArrive(1);
@@ -24,7 +32,7 @@ public class BetaLongRef_tryUpdateLock {
 
     @Test
     public void whenFreeAndSurplus() {
-        BetaRef orec = new BetaRef();
+        BetaRef orec = new BetaRef(stm);
         orec.___arrive(1);
         orec.___arrive(1);
 
@@ -37,7 +45,7 @@ public class BetaLongRef_tryUpdateLock {
 
     @Test
     public void whenLocked() {
-        BetaRef orec = new BetaRef();
+        BetaRef orec = new BetaRef(stm);
         orec.___arrive(1);
         orec.___tryLockAfterNormalArrive(1);
 
@@ -50,7 +58,7 @@ public class BetaLongRef_tryUpdateLock {
 
     @Test
     public void whenReadBiasedMode() {
-        BetaRef orec = OrecTestUtils.makeReadBiased(new BetaRef());
+        BetaRef orec = OrecTestUtils.makeReadBiased(new BetaRef(stm));
 
         orec.___arrive(1);
         boolean result = orec.___tryLockAfterNormalArrive(1);

@@ -66,7 +66,7 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
 
       @Test
     public void whenOnlyContainsCommute_thenNoRetryPossibleException(){
-        BetaLongRef ref = new BetaLongRef();
+        BetaLongRef ref = new BetaLongRef(stm,0);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         LongFunction function = mock(LongFunction.class);

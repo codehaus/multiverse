@@ -3,14 +3,14 @@ package org.multiverse.benchmarks;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
-import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.benchmarks.BenchmarkUtils.*;
+import static org.multiverse.benchmarks.BenchmarkUtils.generateProcessorRange;
+import static org.multiverse.benchmarks.BenchmarkUtils.toGnuplot;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 
 /**
@@ -25,8 +25,6 @@ public class UncontendedAtomicSetScalabilityTest {
     }
 
     public void start(long transactionCount) {
-        loadOtherTransactionalObjectClasses();
-
         int[] processors = generateProcessorRange();
 
         System.out.println("Multiverse> Uncontended atomicSet transaction benchmark");
@@ -101,10 +99,9 @@ public class UncontendedAtomicSetScalabilityTest {
 
             BetaObjectPool pool = new BetaObjectPool();
 
-            GlobalConflictCounter globalConflictCounter = stm.getGlobalConflictCounter();
             long startMs = System.currentTimeMillis();
             for (long k = 0; k < transactionCount; k++) {
-                ref.atomicGetAndSet(k, pool, 8, globalConflictCounter);
+                ref.atomicGetAndSet(k, pool);
             }
 
             assertEquals(transactionCount, ref.___unsafeLoad().value + 1);

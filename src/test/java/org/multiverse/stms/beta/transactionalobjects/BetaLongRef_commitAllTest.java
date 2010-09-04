@@ -42,7 +42,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         ref.___tryLockAndCheckConflict(tx, 1, write);
 
         long oldConflictCount = globalConflictCounter.count();
-        Listeners listeners = ref.___commitAll(write, tx, pool, globalConflictCounter);
+        Listeners listeners = ref.___commitAll(write, tx, pool);
 
         assertNotNull(listeners);
         assertNull(listeners.next);
@@ -74,7 +74,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         ref.___tryLockAndCheckConflict(tx, 1, read2);
 
         long oldConflictCount = globalConflictCounter.count();
-        Listeners listeners = ref.___commitAll(tranlocal, tx, pool, globalConflictCounter);
+        Listeners listeners = ref.___commitAll(tranlocal, tx, pool);
 
         assertNull(listeners);
         assertEquals(oldConflictCount + 1, globalConflictCounter.count());
@@ -98,7 +98,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         ref.___tryLockAndCheckConflict(tx, 1, write);
 
         long oldConflictCount = globalConflictCounter.count();
-        Listeners result = ref.___commitAll(write, tx, pool, globalConflictCounter);
+        Listeners result = ref.___commitAll(write, tx, pool);
 
         assertNull(result);
         assertEquals(oldConflictCount, globalConflictCounter.count());
@@ -120,7 +120,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         ref.___tryLockAndCheckConflict(tx, 1, write);
 
         long oldConflictCount = globalConflictCounter.count();
-        Listeners result = ref.___commitAll(write, tx, pool, globalConflictCounter);
+        Listeners result = ref.___commitAll(write, tx, pool);
 
         assertNull(result);
         assertEquals(oldConflictCount, globalConflictCounter.count());
@@ -144,7 +144,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         ref.___tryLockAndCheckConflict(tx, 1, tranlocal);
 
         long oldConflictCount = globalConflictCounter.count();
-        Listeners listeners = ref.___commitAll(tranlocal, tx, pool, globalConflictCounter);
+        Listeners listeners = ref.___commitAll(tranlocal, tx, pool);
 
         assertNull(listeners);
         assertEquals(oldConflictCount + 1, globalConflictCounter.count());

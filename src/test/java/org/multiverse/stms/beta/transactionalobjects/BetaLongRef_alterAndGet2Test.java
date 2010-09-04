@@ -22,7 +22,7 @@ import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
  */
 public class BetaLongRef_alterAndGet2Test {
 
-     private BetaStm stm;
+    private BetaStm stm;
 
     @Before
     public void setUp() {
@@ -124,7 +124,7 @@ public class BetaLongRef_alterAndGet2Test {
 
     @Test
     @Ignore
-    public void whenAlterFunctionCausesProblems(){
+    public void whenAlterFunctionCausesProblems() {
 
     }
 

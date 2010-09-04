@@ -29,7 +29,7 @@ public class BetaStm_transactionFactoryBuilderTest {
     @Test
     public void whenDefaultTransactionFactory() {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
-        config.validate();
+        config.init();
 
         assertFalse(config.isInterruptible());
         assertFalse(config.isReadonly());
@@ -44,7 +44,7 @@ public class BetaStm_transactionFactoryBuilderTest {
         assertEquals(1000, config.maxRetries);
         assertTrue(config.isSpeculativeConfigEnabled());
         assertTrue(config.isAnonymous);
-        assertSame(ExponentialBackoffPolicy.INSTANCE_100_MS_MAX, config.getBackoffPolicy());
+        assertSame(ExponentialBackoffPolicy.MAX_100_MS, config.getBackoffPolicy());
         assertEquals(Long.MAX_VALUE, config.getTimeoutNs());
         assertSame(TraceLevel.None, config.getTraceLevel());
         assertTrue(config.writeSkewAllowed);

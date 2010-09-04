@@ -3,7 +3,6 @@ package org.multiverse.stms.beta;
 import org.multiverse.api.ThreadLocalTransaction;
 import org.multiverse.api.closures.*;
 import org.multiverse.api.exceptions.*;
-import org.multiverse.sensors.SimpleProfiler;
 import org.multiverse.sensors.TransactionSensor;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -77,9 +76,10 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 } while (tx.softReset());
             } finally {
                 if(___ProfilingEnabled){
-                    SimpleProfiler profiler = transactionConfiguration.simpleProfiler;
-                    TransactionSensor counter = profiler.getTransactionSensor(transactionConfiguration);
-                    counter.signalExecution(tx.getAttempt(), !abort);
+                    TransactionSensor sensor = transactionConfiguration.transactionSensor;
+                    if(sensor != null){
+                        sensor.signalExecution(tx.getAttempt(), !abort);
+                    }
                 }
 
                 if (abort) {
@@ -154,9 +154,10 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 } while (tx.softReset());
             } finally {
                 if(___ProfilingEnabled){
-                    SimpleProfiler profiler = transactionConfiguration.simpleProfiler;
-                    TransactionSensor counter = profiler.getTransactionSensor(transactionConfiguration);
-                    counter.signalExecution(tx.getAttempt(), !abort);
+                    TransactionSensor sensor = transactionConfiguration.transactionSensor;
+                    if(sensor != null){
+                        sensor.signalExecution(tx.getAttempt(), !abort);
+                    }
                 }
 
                 if (abort) {
@@ -231,9 +232,10 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 } while (tx.softReset());
             } finally {
                 if(___ProfilingEnabled){
-                    SimpleProfiler profiler = transactionConfiguration.simpleProfiler;
-                    TransactionSensor counter = profiler.getTransactionSensor(transactionConfiguration);
-                    counter.signalExecution(tx.getAttempt(), !abort);
+                    TransactionSensor sensor = transactionConfiguration.transactionSensor;
+                    if(sensor != null){
+                        sensor.signalExecution(tx.getAttempt(), !abort);
+                    }
                 }
 
                 if (abort) {
@@ -308,9 +310,10 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 } while (tx.softReset());
             } finally {
                 if(___ProfilingEnabled){
-                    SimpleProfiler profiler = transactionConfiguration.simpleProfiler;
-                    TransactionSensor counter = profiler.getTransactionSensor(transactionConfiguration);
-                    counter.signalExecution(tx.getAttempt(), !abort);
+                    TransactionSensor sensor = transactionConfiguration.transactionSensor;
+                    if(sensor != null){
+                        sensor.signalExecution(tx.getAttempt(), !abort);
+                    }
                 }
 
                 if (abort) {
@@ -385,9 +388,10 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 } while (tx.softReset());
             } finally {
                 if(___ProfilingEnabled){
-                    SimpleProfiler profiler = transactionConfiguration.simpleProfiler;
-                    TransactionSensor counter = profiler.getTransactionSensor(transactionConfiguration);
-                    counter.signalExecution(tx.getAttempt(), !abort);
+                    TransactionSensor sensor = transactionConfiguration.transactionSensor;
+                    if(sensor != null){
+                        sensor.signalExecution(tx.getAttempt(), !abort);
+                    }
                 }
 
                 if (abort) {
@@ -463,9 +467,10 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 } while (tx.softReset());
             } finally {
                 if(___ProfilingEnabled){
-                    SimpleProfiler profiler = transactionConfiguration.simpleProfiler;
-                    TransactionSensor counter = profiler.getTransactionSensor(transactionConfiguration);
-                    counter.signalExecution(tx.getAttempt(), !abort);
+                    TransactionSensor sensor = transactionConfiguration.transactionSensor;
+                    if(sensor != null){
+                        sensor.signalExecution(tx.getAttempt(), !abort);
+                    }
                 }
 
                 if (abort) {

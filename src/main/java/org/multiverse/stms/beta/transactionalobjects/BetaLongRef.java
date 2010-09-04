@@ -1,7 +1,6 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.api.LockStatus;
-import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.TodoException;
@@ -9,9 +8,9 @@ import org.multiverse.api.exceptions.WriteConflict;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.references.LongRef;
 import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.Listeners;
-import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 import org.multiverse.stms.beta.orec.FastOrec;
 import org.multiverse.stms.beta.orec.Orec;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -56,10 +55,8 @@ public final class BetaLongRef
     private volatile Listeners ___listeners;
 
     //controlled JMM problem (just like the hashcode of String).
-    private int ___identityHashCode;
-
-    //todo: needs to be make final.
-    private Stm stm;
+    private int ___identityHashCode;    
+    private final BetaStm stm;
 
     /**
      * Creates a uncommitted BetaLongRef that should be attached to the transaction (this
@@ -73,6 +70,7 @@ public final class BetaLongRef
             throw new NullPointerException();
         }
 
+        stm = tx.getConfiguration().stm;
         ___tryLockAndArrive(0);
         this.lockOwner = tx;
     }
@@ -80,8 +78,8 @@ public final class BetaLongRef
     /**
      * Creates a committed BetaLongRef with 0 as initial value.
      */
-    public BetaLongRef(){
-        this((long)0);
+    public BetaLongRef(BetaStm stm){
+        this(stm, (long)0);
     }
 
     /**
@@ -89,10 +87,15 @@ public final class BetaLongRef
      *
      * @param initialValue the initial value
      */
-    public BetaLongRef(final long initialValue){
+    public BetaLongRef(BetaStm stm, final long initialValue){
         LongRefTranlocal tranlocal =
             new LongRefTranlocal(this);
 
+        if(stm == null){
+            throw new NullPointerException();
+        }
+
+        this.stm = stm;
         tranlocal.value = initialValue;
         tranlocal.isCommitted = true;
         tranlocal.isDirty = DIRTY_FALSE;
@@ -100,7 +103,7 @@ public final class BetaLongRef
     }
 
     @Override
-    public final Stm getStm(){
+    public final BetaStm getStm(){
         return stm;
     }
 
@@ -212,8 +215,7 @@ public final class BetaLongRef
     public final Listeners ___commitDirty(
             final Tranlocal tranlocal,
             final BetaTransaction expectedLockOwner,
-            final BetaObjectPool pool,
-            final GlobalConflictCounter globalConflictCounter) {
+            final BetaObjectPool pool) {
 
         final boolean notDirty = tranlocal.isDirty == DIRTY_FALSE;
 
@@ -265,7 +267,7 @@ public final class BetaLongRef
             }
         }
 
-        long remainingSurplus = ___departAfterUpdateAndUnlock(globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(stm.globalConflictCounter, this);
 
         //it is important that this call is done after the actual write. This is needed to give the guarantee
        //that we are going to take care of all listeners that are registered before that write. The read is done
@@ -287,8 +289,7 @@ public final class BetaLongRef
     public final Listeners ___commitAll(
             final Tranlocal tranlocal,
             final BetaTransaction expectedLockOwner,
-            final BetaObjectPool pool,
-            final GlobalConflictCounter globalConflictCounter) {
+            final BetaObjectPool pool) {
 
 
         if(expectedLockOwner != lockOwner){
@@ -337,7 +338,7 @@ public final class BetaLongRef
             }
         }
 
-        long remainingSurplus = ___departAfterUpdateAndUnlock(globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(stm.globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
 
@@ -726,11 +727,9 @@ public final class BetaLongRef
 
     public final long atomicGetAndSet(
         final long newValue,
-        final BetaObjectPool pool,
-        final int spinCount,
-        final GlobalConflictCounter globalConflictCounter){
+        final BetaObjectPool pool){
 
-        final int arriveStatus = ___tryLockAndArrive(spinCount);
+        final int arriveStatus = ___tryLockAndArrive(stm.spinCount);
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
             throw new WriteConflict();
         }
@@ -755,7 +754,7 @@ public final class BetaLongRef
         update.value = newValue;
         update.prepareForCommit();
         ___active = update;
-        long remainingSurplus = ___departAfterUpdateAndUnlock(globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(stm.globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);

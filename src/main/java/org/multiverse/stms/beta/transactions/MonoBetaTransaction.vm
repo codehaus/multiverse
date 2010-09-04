@@ -546,13 +546,13 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                     throw abortOnWriteConflict();
                 }
 
-                listeners = attached.owner.___commitDirty(attached, this, pool, config.globalConflictCounter);
+                listeners = attached.owner.___commitDirty(attached, this, pool);
             }else{
                 if(needsPrepare && !doPrepareAll()){
                     throw abortOnWriteConflict();
                 }
 
-                listeners = attached.owner.___commitAll(attached, this, pool, config.globalConflictCounter);
+                listeners = attached.owner.___commitAll(attached, this, pool);
             }
         }
 
@@ -576,9 +576,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 if(attached.isDirty == DIRTY_UNKNOWN){
                     attached.calculateIsDirty();
                 }
-                listeners = attached.owner.___commitDirty(attached, this, pool, config.globalConflictCounter);
+                listeners = attached.owner.___commitDirty(attached, this, pool);
             }else{
-                listeners = attached.owner.___commitAll(attached, this, pool, config.globalConflictCounter);
+                listeners = attached.owner.___commitAll(attached, this, pool);
             }
         }
         status = COMMITTED;

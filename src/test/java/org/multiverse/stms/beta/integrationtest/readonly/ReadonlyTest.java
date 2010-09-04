@@ -71,7 +71,7 @@ public class ReadonlyTest {
             @Override
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                BetaRef ref = new BetaRef(tx);
+                BetaRef ref = new BetaRef(btx);
                 btx.openForConstruction(ref).value = value;
             }
         });

@@ -10,11 +10,9 @@ import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.TestUtils.assertAlive;
-import static org.multiverse.TestUtils.sleepMs;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.benchmarks.BenchmarkUtils.joinAll;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class BetaAtomicBlock_blockingTest {

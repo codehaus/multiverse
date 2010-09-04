@@ -155,7 +155,7 @@ public class FatArrayTreeBetaTransaction_commuteTest {
 
           LongFunction function = mock(LongFunction.class);
 
-          stm.getGlobalConflictCounter().signalConflict(new BetaLongRef());
+          stm.getGlobalConflictCounter().signalConflict(new BetaLongRef(stm,0));
 
           tx.commute(ref, function);
 

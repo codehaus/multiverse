@@ -5,7 +5,6 @@ import org.multiverse.api.blocking.Latch;
 import org.multiverse.durability.DurableObject;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.Listeners;
-import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 import org.multiverse.stms.beta.orec.Orec;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -117,12 +116,11 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      *                              version, since it still may have a lock or
      * @param tx                    transaction that does the commit
      * @param pool                  the BetaObjectPool to use to pool the replaced tranlocal if possible.
-     * @param globalConflictCounter the GlobalConflictCounter that is used to signal that a conflict happened.
      * @return the listeners that should be notified after the transaction completes. Value could be null,
      *         if no listeners need to be notified.
      */
     Listeners ___commitDirty(
-            Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool, GlobalConflictCounter globalConflictCounter);
+            Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool);
 
     /**
      * Commits the all updates. The call also needs to be done when the tranlocal is readonly and
@@ -132,12 +130,11 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      *                              version, since it still may have a lock or
      * @param tx                    transaction that does the commit
      * @param pool                  the BetaObjectPool to use to pool the replaced tranlocal if possible.
-     * @param globalConflictCounter the GlobalConflictCounter that is used to signal that a conflict happened.
      * @return the listeners that should be notified after the transaction completes. Value could be null,
      *         if no listeners need to be notified.
      */
     Listeners ___commitAll(
-            Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool, GlobalConflictCounter globalConflictCounter);
+            Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool);
 
     /**
      * Aborts this BetaTransactionalObject (so releases the lock if acquired, does departs etc).

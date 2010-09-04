@@ -1010,7 +1010,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         int storeIndex = 0;
         for (int k = 0; k < firstFreeIndex; k++) {
             final Tranlocal tranlocal = array[k];
-            final Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool, config.globalConflictCounter);
+            final Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool);
 
             if(listeners != null){
                 if(listenersArray == null){
@@ -1039,8 +1039,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 tranlocal.calculateIsDirty();
             }
 
-            final Listeners listeners = tranlocal.owner.___commitDirty(
-                tranlocal, this, pool, config.globalConflictCounter);
+            final Listeners listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool);
 
             if(listeners != null){
                 if(listenersArray == null){

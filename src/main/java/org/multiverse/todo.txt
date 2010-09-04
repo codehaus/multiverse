@@ -83,12 +83,7 @@ performance.
 
 - create an orec that never become readbiased (useful for performance comparison).
 
-
 todo
-
-- benchmarks removed from main src.
-
-- benchmarks scripts update to point to gradle & to test classes
 
 - mono transaction: support for orelse
 
@@ -101,8 +96,6 @@ todo
 - array transaction and unstarted state
 
 - map transaction and unstarted state
-
-- atomic inc on refs for values
 
 - unshared atomicget, with periodic atomicset.
 
@@ -156,8 +149,6 @@ globalconflict counter.
 - speculative + register doesn't combine because it can lead to transaction not accepting the task and therefor
 the task not being executed at all.
 
-- expose the ref
-
 - when all reads/writes are pessimistic, cheap conflict detection and cheap prepare.
 
 - openForConstruction on generic transactional object should return current type of tranlocal
@@ -172,12 +163,6 @@ the task not being executed at all.
 
 - commit barriers
 
-- get without arguments needs to be exposed in ref
-
-- set with value needs to be exposed in ref.
-
-- alter needs to be exposed in ref.
-
 - array transaction: on commit/abort the array can be nulled. no need to do it when placing in the pool
 
 - array tree transaction: on commit/abort the array can be nulled. no need to do it when placing in the pool
@@ -185,11 +170,21 @@ the task not being executed at all.
 
 - testing of transaction access while commute
 
-- test of boxing vs non boxing.. so ref vs longref.
+done
+
+- getAndAlter & alterAndGet.
 
 - stm needs to be integrated in the ref as field.. so each ref has access to the stm it is part of.
 
-done
+- test of boxing vs non boxing.. so ref vs longref.
+
+- get without arguments needs to be exposed in ref
+
+- set with value needs to be exposed in ref.
+
+- alter needs to be exposed in ref.
+
+- expose the ref
 
 - place part of the objectpool in the transaction? This prevents it from needing to be retrieved every time.
 
@@ -238,5 +233,13 @@ done
 
 - expose if lock is owned by other transaction
 
+- atomic inc on refs for values
+
+- benchmarks removed from main src.
+
+- benchmarks scripts update to point to gradle & to test classes
+
+
 old done
+
 

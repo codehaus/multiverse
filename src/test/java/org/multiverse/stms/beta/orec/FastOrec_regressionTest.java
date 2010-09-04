@@ -3,6 +3,7 @@ package org.multiverse.stms.beta.orec;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.PanicError;
+import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
@@ -13,11 +14,13 @@ public class FastOrec_regressionTest {
 
     private GlobalConflictCounter globalConflictCounter;
     private BetaLongRef dummyRef;
+    private BetaStm stm;
 
     @Before
     public void setUp() {
         globalConflictCounter = new GlobalConflictCounter(1);
-        dummyRef = new BetaLongRef();
+        stm = new BetaStm();
+        dummyRef = new BetaLongRef(stm);
     }
 
     @Test

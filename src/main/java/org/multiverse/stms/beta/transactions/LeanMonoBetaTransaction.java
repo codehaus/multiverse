@@ -888,13 +888,13 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
                     throw abortOnWriteConflict();
                 }
 
-                listeners = attached.owner.___commitDirty(attached, this, pool, config.globalConflictCounter);
+                listeners = attached.owner.___commitDirty(attached, this, pool);
             }else{
                 if(needsPrepare && !doPrepareAll()){
                     throw abortOnWriteConflict();
                 }
 
-                listeners = attached.owner.___commitAll(attached, this, pool, config.globalConflictCounter);
+                listeners = attached.owner.___commitAll(attached, this, pool);
             }
         }
 

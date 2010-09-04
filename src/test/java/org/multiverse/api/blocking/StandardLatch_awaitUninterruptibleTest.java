@@ -5,7 +5,6 @@ import org.multiverse.TestThread;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.benchmarks.BenchmarkUtils.joinAll;
 
 public class StandardLatch_awaitUninterruptibleTest {
 

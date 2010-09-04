@@ -30,7 +30,7 @@ public class AtomicReadBiasedWithPeriodicUpdateTest {
 
         for (int l = 0; l < 100; l++) {
             long value = ref.atomicGet() + 1;
-            ref.atomicGetAndSet(value, pool, 1, stm.getGlobalConflictCounter());
+            ref.atomicGetAndSet(value, pool);
 
             for (int k = 0; k < 1000; k++) {
                 long result = ref.atomicGet();
