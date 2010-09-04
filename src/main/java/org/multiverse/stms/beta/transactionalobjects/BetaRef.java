@@ -545,27 +545,27 @@ public final class BetaRef<E>
 
 
     @Override
-    public E atomicAlter(
+    public E atomicAlterAndGet(
         final Function<E> function){
 
         throw new TodoException();
     }
 
     @Override
-    public E alter(
+    public E alterAndGet(
         final Function<E> function){
 
         throw new TodoException();
     }
 
     @Override
-    public E alter(
+    public E alterAndGet(
         final Transaction tx,
         final Function<E> function){
-        return alter((BetaTransaction)tx, function);
+        return alterAndGet((BetaTransaction)tx, function);
     }
 
-    public E alter(
+    public E alterAndGet(
         final BetaTransaction tx,
         final Function<E> function){
 
@@ -583,6 +583,48 @@ public final class BetaRef<E>
 
         write.value = function.call(write.value);
         return write.value;
+    }
+
+     @Override
+    public E atomicGetAndAlter(
+        final Function<E> function){
+
+        throw new TodoException();
+    }
+
+    @Override
+    public E getAndAlter(
+        final Function<E> function){
+
+        throw new TodoException();
+    }
+
+    @Override
+    public E getAndAlter(
+        final Transaction tx,
+        final Function<E> function){
+        return getAndAlter((BetaTransaction)tx, function);
+    }
+
+    public E getAndAlter(
+        final BetaTransaction tx,
+        final Function<E> function){
+
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        if(function == null){
+            tx.abort();
+            throw new NullPointerException();
+        }
+
+        RefTranlocal<E> write
+            = (RefTranlocal<E>)tx.openForWrite(this, false);
+
+        E oldValue = write.value;
+        write.value = function.call(write.value);
+        return oldValue;
     }
 
     @Override

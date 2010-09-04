@@ -19,7 +19,7 @@ public final class IncLongFunction extends LongFunction {
     }
 
     /**
-     * Creates an IncLongFunction that increments with the given inc.
+     * Creates an IncLongFunction that increments with the given getAndIncrement.
      *
      * @param inc the number to increment with.
      */

@@ -6,47 +6,138 @@ import org.multiverse.api.functions.LongFunction;
 
 /**
  * A transactional reference for a long.
+ *
+ * @author Peter Veentjer.
  */
 public interface LongRef extends TransactionalObject {
 
-    long atomicInc(long amount);
-
-    long inc(long amount);
-
-    long inc(Transaction tx, long amount);
-
-      /**
-     * Atomically applies the function to alter the value stored in this ref. This method doesn't care about
+    /**
+     * Atomically increments the value and returns the old value. This method doesn't care about
      * any running transactions.
      *
-     * @param function the Function responsible to alter the function.
+     * @param amount the amount to increase with.
+     * @return the old value.
+     */
+    long atomicGetAndIncrement(long amount);
+
+    /**
+     * Increments the value and returns the old value. If a transaction already is available, it
+     * will be used. Else it will be run under its own transaction.
+     *
+     * @param amount the amount to increment with.
+     * @return the old value.
+     */
+    long getAndIncrement(long amount);
+
+    /**
+     * Increments the value and returns the old value.
+     *
+     * @param tx     the transaction used for this operation.
+     * @param amount the amount to increment with.
+     * @return the old value.
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.DeadTransactionException
+     *                              if tx is not in the correct state
+     *                              for this operation.
+     */
+    long getAndIncrement(Transaction tx, long amount);
+
+    /**
+     * Atomically increments the value and returns the old value. This method doesn't care about any
+     * running transactions.
+     *
+     * @param amount the amount to increment with.
+     * @return the new value.
+     */
+    long atomicIncrementAndGet(long amount);
+
+    /**
+     * Increments and gets the new value. If a transaction is available, it will lift on that transaction, else
+     * it will be run under its own transaction (so executed atomically).
+     *
+     * @param amount the amount to increment with.
+     * @return the new value.
+     */
+    long incrementAndGet(long amount);
+
+    /**
+     * Increments and gets the new value.
+     *
+     * @param tx     the Transaction used for this operation.
+     * @param amount the amount to increment with.
+     * @return the new value.
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if the transaction is not in the
+     *                              correct state for this operation.
+     */
+    long incrementAndGet(Transaction tx, long amount);
+
+    /**
+     * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
+     * any running transactions.
+     *
+     * @param function the Function responsible to alterAndGet the function.
      * @return the new value.
      * @throws NullPointerException if function is null.
      */
-    long atomicAlter(LongFunction function);
+    long atomicAlterAndGet(LongFunction function);
 
     /**
-     * Alters the value stored in this Ref using the alter function. If a transaction is available it will
+     * Alters the value stored in this Ref using the alterAndGet function. If a transaction is available it will
      * lift on that transaction, else it will be run under its own transaction.
      *
      * @param function the function that alters the value stored in this Ref.
      * @return the new value.
      * @throws NullPointerException if function is null.
      */
-    long alter(LongFunction function);
+    long alterAndGet(LongFunction function);
 
     /**
-     * Alters the value stored in this Ref using the alter function.
+     * Alters the value stored in this Ref using the alterAndGet function.
      *
      * @param function the function that alters the value stored in this Ref.
-     * @param tx the Transaction used by this operation.
+     * @param tx       the Transaction used by this operation.
      * @return the new value.
      * @throws NullPointerException if function or transaction is null.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the
      *                              correct state.
      */
-    long alter(Transaction tx, LongFunction function);
+    long alterAndGet(Transaction tx, LongFunction function);
+
+    /**
+     * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
+     * any running transactions.
+     *
+     * @param function the Function responsible to alterAndGet the function.
+     * @return the old value.
+     * @throws NullPointerException if function is null.
+     */
+    long atomicGetAndAlter(LongFunction function);
+
+    /**
+     * Alters the value stored in this Ref using the alterAndGet function. If a transaction is available it will
+     * lift on that transaction, else it will be run under its own transaction.
+     *
+     * @param function the function that alters the value stored in this Ref.
+     * @return the old value.
+     * @throws NullPointerException if function is null.
+     */
+    long getAndAlter(LongFunction function);
+
+    /**
+     * Alters the value stored in this Ref using the alterAndGet function.
+     *
+     * @param function the function that alters the value stored in this Ref.
+     * @param tx       the Transaction used by this operation.
+     * @return the old value
+     * @throws NullPointerException if function or transaction is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if the transaction is not in the
+     *                              correct state.
+     */
+    long getAndAlter(Transaction tx, LongFunction function);
 
     /**
      * Atomically. This method doesn't care about any running transactions.
@@ -109,12 +200,13 @@ public interface LongRef extends TransactionalObject {
     /**
      * Sets the new value using the provided transaction.
      *
-     * @param tx the transaction used to do the set.
+     * @param tx    the transaction used to do the set.
      * @param value the new value
      * @return the old value
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException if the transaction is not in the correct
-     * state for this operation.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if the transaction is not in the correct
+     *                              state for this operation.
      */
     long set(Transaction tx, long value);
 

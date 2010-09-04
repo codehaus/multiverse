@@ -530,21 +530,49 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
 #if(${transactionalObject.isNumber})
     @Override
-    public ${transactionalObject.type} atomicInc(final ${transactionalObject.type} amount){
+    public ${transactionalObject.type} atomicGetAndIncrement(final ${transactionalObject.type} amount){
         throw new TodoException();
     }
 
     @Override
-    public ${transactionalObject.type} inc(final ${transactionalObject.type} amount){
+    public ${transactionalObject.type} getAndIncrement(final ${transactionalObject.type} amount){
         throw new TodoException();
     }
 
     @Override
-    public ${transactionalObject.type} inc(final Transaction tx, final ${transactionalObject.type} amount){
-        return inc((BetaTransaction)tx, amount);
+    public ${transactionalObject.type} getAndIncrement(final Transaction tx, final ${transactionalObject.type} amount){
+        return getAndIncrement((BetaTransaction)tx, amount);
     }
 
-    public ${transactionalObject.type} inc(final BetaTransaction tx, final ${transactionalObject.type} amount){
+    public ${transactionalObject.type} getAndIncrement(final BetaTransaction tx, final ${transactionalObject.type} amount){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write
+              = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tx.openForWrite(this, false);
+
+         ${transactionalObject.type} oldValue = write.value;
+        write.value+=amount;
+        return oldValue;
+    }
+
+    @Override
+    public ${transactionalObject.type} atomicIncrementAndGet(final ${transactionalObject.type} amount){
+        throw new TodoException();
+    }
+
+    @Override
+    public ${transactionalObject.type} incrementAndGet(final ${transactionalObject.type} amount){
+        throw new TodoException();
+    }
+
+    @Override
+    public ${transactionalObject.type} incrementAndGet(final Transaction tx, final ${transactionalObject.type} amount){
+        return incrementAndGet((BetaTransaction)tx, amount);
+    }
+
+    public ${transactionalObject.type} incrementAndGet(final BetaTransaction tx, final ${transactionalObject.type} amount){
         if(tx == null){
             throw new NullPointerException();
         }
@@ -581,27 +609,27 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 #if(${transactionalObject.isReference})
 
     @Override
-    public ${transactionalObject.type} atomicAlter(
+    public ${transactionalObject.type} atomicAlterAndGet(
         final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
 
         throw new TodoException();
     }
 
     @Override
-    public ${transactionalObject.type} alter(
+    public ${transactionalObject.type} alterAndGet(
         final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
 
         throw new TodoException();
     }
 
     @Override
-    public ${transactionalObject.type} alter(
+    public ${transactionalObject.type} alterAndGet(
         final Transaction tx,
         final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-        return alter((BetaTransaction)tx, function);
+        return alterAndGet((BetaTransaction)tx, function);
     }
 
-    public ${transactionalObject.type} alter(
+    public ${transactionalObject.type} alterAndGet(
         final BetaTransaction tx,
         final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
 
@@ -619,6 +647,48 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
         write.value = function.call(write.value);
         return write.value;
+    }
+
+     @Override
+    public ${transactionalObject.type} atomicGetAndAlter(
+        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
+
+        throw new TodoException();
+    }
+
+    @Override
+    public ${transactionalObject.type} getAndAlter(
+        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
+
+        throw new TodoException();
+    }
+
+    @Override
+    public ${transactionalObject.type} getAndAlter(
+        final Transaction tx,
+        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
+        return getAndAlter((BetaTransaction)tx, function);
+    }
+
+    public ${transactionalObject.type} getAndAlter(
+        final BetaTransaction tx,
+        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
+
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        if(function == null){
+            tx.abort();
+            throw new NullPointerException();
+        }
+
+        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write
+            = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tx.openForWrite(this, false);
+
+        ${transactionalObject.type} oldValue = write.value;
+        write.value = function.call(write.value);
+        return oldValue;
     }
 
     @Override

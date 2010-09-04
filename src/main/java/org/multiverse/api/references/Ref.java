@@ -39,27 +39,27 @@ public interface Ref<E> extends TransactionalObject {
     boolean atomicIsNull();
 
     /**
-     * Atomically applies the function to alter the value stored in this ref. This method doesn't care about
+     * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
      * any running transactions.
      *
-     * @param function the Function responsible to alter the function.
+     * @param function the Function responsible to alterAndGet the function.
      * @return the new value.
      * @throws NullPointerException if function is null.
      */
-    E atomicAlter(Function<E> function);
+    E atomicAlterAndGet(Function<E> function);
 
     /**
-     * Alters the value stored in this Ref using the alter function. If a transaction is available it will
+     * Alters the value stored in this Ref using the alterAndGet function. If a transaction is available it will
      * lift on that transaction, else it will be run under its own transaction.
      *
      * @param function the function that alters the value stored in this Ref.
      * @return the new value.
      * @throws NullPointerException if function is null.
      */
-    E alter(Function<E> function);
+    E alterAndGet(Function<E> function);
 
     /**
-     * Alters the value stored in this Ref using the alter function.
+     * Alters the value stored in this Ref using the alterAndGet function.
      *
      * @param function the function that alters the value stored in this Ref.
      * @param tx       the Transaction used by this operation.
@@ -69,7 +69,40 @@ public interface Ref<E> extends TransactionalObject {
      *                              if the transaction is not in the
      *                              correct state.
      */
-    E alter(Transaction tx, Function<E> function);
+    E alterAndGet(Transaction tx, Function<E> function);
+
+    /**
+     * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
+     * any running transactions.
+     *
+     * @param function the Function responsible to alterAndGet the function.
+     * @return the old value.
+     * @throws NullPointerException if function is null.
+     */
+    E atomicGetAndAlter(Function<E> function);
+
+    /**
+     * Alters the value stored in this Ref using the alterAndGet function. If a transaction is available it will
+     * lift on that transaction, else it will be run under its own transaction.
+     *
+     * @param function the function that alters the value stored in this Ref.
+     * @return the old value.
+     * @throws NullPointerException if function is null.
+     */
+    E getAndAlter(Function<E> function);
+
+    /**
+     * Alters the value stored in this Ref using the alterAndGet function.
+     *
+     * @param function the function that alters the value stored in this Ref.
+     * @param tx       the Transaction used by this operation.
+     * @return the old value
+     * @throws NullPointerException if function or transaction is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if the transaction is not in the
+     *                              correct state.
+     */
+    E getAndAlter(Transaction tx, Function<E> function);
 
     /**
      * Atomically. This method doesn't care about any running transactions.

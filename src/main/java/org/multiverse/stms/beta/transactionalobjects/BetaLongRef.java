@@ -524,21 +524,49 @@ public final class BetaLongRef
     }
 
     @Override
-    public long atomicInc(final long amount){
+    public long atomicGetAndIncrement(final long amount){
         throw new TodoException();
     }
 
     @Override
-    public long inc(final long amount){
+    public long getAndIncrement(final long amount){
         throw new TodoException();
     }
 
     @Override
-    public long inc(final Transaction tx, final long amount){
-        return inc((BetaTransaction)tx, amount);
+    public long getAndIncrement(final Transaction tx, final long amount){
+        return getAndIncrement((BetaTransaction)tx, amount);
     }
 
-    public long inc(final BetaTransaction tx, final long amount){
+    public long getAndIncrement(final BetaTransaction tx, final long amount){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        LongRefTranlocal write
+              = (LongRefTranlocal)tx.openForWrite(this, false);
+
+         long oldValue = write.value;
+        write.value+=amount;
+        return oldValue;
+    }
+
+    @Override
+    public long atomicIncrementAndGet(final long amount){
+        throw new TodoException();
+    }
+
+    @Override
+    public long incrementAndGet(final long amount){
+        throw new TodoException();
+    }
+
+    @Override
+    public long incrementAndGet(final Transaction tx, final long amount){
+        return incrementAndGet((BetaTransaction)tx, amount);
+    }
+
+    public long incrementAndGet(final BetaTransaction tx, final long amount){
         if(tx == null){
             throw new NullPointerException();
         }
@@ -552,27 +580,27 @@ public final class BetaLongRef
 
 
     @Override
-    public long atomicAlter(
+    public long atomicAlterAndGet(
         final LongFunction function){
 
         throw new TodoException();
     }
 
     @Override
-    public long alter(
+    public long alterAndGet(
         final LongFunction function){
 
         throw new TodoException();
     }
 
     @Override
-    public long alter(
+    public long alterAndGet(
         final Transaction tx,
         final LongFunction function){
-        return alter((BetaTransaction)tx, function);
+        return alterAndGet((BetaTransaction)tx, function);
     }
 
-    public long alter(
+    public long alterAndGet(
         final BetaTransaction tx,
         final LongFunction function){
 
@@ -590,6 +618,48 @@ public final class BetaLongRef
 
         write.value = function.call(write.value);
         return write.value;
+    }
+
+     @Override
+    public long atomicGetAndAlter(
+        final LongFunction function){
+
+        throw new TodoException();
+    }
+
+    @Override
+    public long getAndAlter(
+        final LongFunction function){
+
+        throw new TodoException();
+    }
+
+    @Override
+    public long getAndAlter(
+        final Transaction tx,
+        final LongFunction function){
+        return getAndAlter((BetaTransaction)tx, function);
+    }
+
+    public long getAndAlter(
+        final BetaTransaction tx,
+        final LongFunction function){
+
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        if(function == null){
+            tx.abort();
+            throw new NullPointerException();
+        }
+
+        LongRefTranlocal write
+            = (LongRefTranlocal)tx.openForWrite(this, false);
+
+        long oldValue = write.value;
+        write.value = function.call(write.value);
+        return oldValue;
     }
 
     @Override

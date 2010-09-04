@@ -5,48 +5,140 @@ import org.multiverse.api.TransactionalObject;
 import org.multiverse.api.functions.IntFunction;
 
 /**
- * A Transactional reference for managing an int.
+ * A Transactional reference for managing an int. No boxing is needed when this reference is used (unlike
+ * using a Ref<Integer>.
+ *
+ * @author Peter Veentjer.
  */
 public interface IntRef extends TransactionalObject {
 
-    int atomicInc(int amount);
-
-    int inc(int amount);
-
-    int inc(Transaction tx, int amount);
-    
-     /**
-     * Atomically applies the function to alter the value stored in this ref. This method doesn't care about
+    /**
+     * Atomically increments the value and returns the old value. This method doesn't care about
      * any running transactions.
      *
-     * @param function the Function responsible to alter the function.
+     * @param amount the amount to increase with.
+     * @return the old value.
+     */
+    int atomicGetAndIncrement(int amount);
+
+    /**
+     * Increments the value and returns the old value. If a transaction already is available, it
+     * will be used. Else it will be run under its own transaction.
+     *
+     * @param amount the amount to increment with.
+     * @return the old value.
+     */
+    int getAndIncrement(int amount);
+
+    /**
+     * Increments the value and returns the old value.
+     *
+     * @param tx     the transaction used for this operation.
+     * @param amount the amount to increment with.
+     * @return the old value.
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.DeadTransactionException
+     *                              if tx is not in the correct state
+     *                              for this operation.
+     */
+    int getAndIncrement(Transaction tx, int amount);
+
+    /**
+     * Atomically increments the value and returns the old value. This method doesn't care about any
+     * running transactions.
+     *
+     * @param amount the amount to increment with.
+     * @return the new value.
+     */
+    int atomicIncrementAndGet(int amount);
+
+    /**
+     * Increments and gets the new value. If a transaction is available, it will lift on that transaction, else
+     * it will be run under its own transaction (so executed atomically).
+     *
+     * @param amount the amount to increment with.
+     * @return the new value.
+     */
+    int incrementAndGet(int amount);
+
+    /**
+     * Increments and gets the new value.
+     *
+     * @param tx     the Transaction used for this operation.
+     * @param amount the amount to increment with.
+     * @return the new value.
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if the transaction is not in the
+     *                              correct state for this operation.
+     */
+    int incrementAndGet(Transaction tx, int amount);
+
+    /**
+     * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
+     * any running transactions.
+     *
+     * @param function the Function responsible to alterAndGet the function.
      * @return the new value.
      * @throws NullPointerException if function is null.
      */
-    int atomicAlter(IntFunction function);
+    int atomicAlterAndGet(IntFunction function);
 
     /**
-     * Alters the value stored in this Ref using the alter function. If a transaction is available it will
+     * Alters the value stored in this Ref using the alterAndGet function. If a transaction is available it will
      * lift on that transaction, else it will be run under its own transaction.
      *
      * @param function the function that alters the value stored in this Ref.
      * @return the new value.
      * @throws NullPointerException if function is null.
      */
-    int alter(IntFunction function);
+    int alterAndGet(IntFunction function);
 
     /**
-     * Alters the value stored in this Ref using the alter function.
+     * Alters the value stored in this Ref using the alterAndGet function.
      *
      * @param function the function that alters the value stored in this Ref.
-     * @param tx the Transaction used by this operation.
+     * @param tx       the Transaction used by this operation.
      * @return the new value.
      * @throws NullPointerException if function or transaction is null.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the
      *                              correct state.
      */
-    int alter(Transaction tx, IntFunction function);
+    int alterAndGet(Transaction tx, IntFunction function);
+
+    /**
+     * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
+     * any running transactions.
+     *
+     * @param function the Function responsible to alterAndGet the function.
+     * @return the old value.
+     * @throws NullPointerException if function is null.
+     */
+    int atomicGetAndAlter(IntFunction function);
+
+    /**
+     * Alters the value stored in this Ref using the alterAndGet function. If a transaction is available it will
+     * lift on that transaction, else it will be run under its own transaction.
+     *
+     * @param function the function that alters the value stored in this Ref.
+     * @return the old value.
+     * @throws NullPointerException if function is null.
+     */
+    int getAndAlter(IntFunction function);
+
+    /**
+     * Alters the value stored in this Ref using the alterAndGet function.
+     *
+     * @param function the function that alters the value stored in this Ref.
+     * @param tx       the Transaction used by this operation.
+     * @return the old value
+     * @throws NullPointerException if function or transaction is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if the transaction is not in the
+     *                              correct state.
+     */
+    int getAndAlter(Transaction tx, IntFunction function);
 
     /**
      * Atomically. This method doesn't care about any running transactions.
@@ -109,12 +201,13 @@ public interface IntRef extends TransactionalObject {
     /**
      * Sets the new value using the provided transaction.
      *
-     * @param tx the transaction used to do the set.
+     * @param tx    the transaction used to do the set.
      * @param value the new value
      * @return the old value
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException if the transaction is not in the correct
-     * state for this operation.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if the transaction is not in the correct
+     *                              state for this operation.
      */
     int set(Transaction tx, int value);
 

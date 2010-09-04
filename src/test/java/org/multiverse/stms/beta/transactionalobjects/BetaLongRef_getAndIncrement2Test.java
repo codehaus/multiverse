@@ -17,7 +17,7 @@ import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
  *
  * @author Peter Veentjer.
  */
-public class BetaLongRef_inc2Test {
+public class BetaLongRef_getAndIncrement2Test {
     private BetaStm stm;
 
     @Before
@@ -31,7 +31,7 @@ public class BetaLongRef_inc2Test {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         try {
-            ref.inc(null, 10);
+            ref.getAndIncrement(null, 10);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -47,7 +47,7 @@ public class BetaLongRef_inc2Test {
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.commit();
         try {
-            ref.inc(tx, 10);
+            ref.getAndIncrement(tx, 10);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -64,7 +64,7 @@ public class BetaLongRef_inc2Test {
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.abort();
         try {
-            ref.inc(tx, 10);
+            ref.getAndIncrement(tx, 10);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -81,7 +81,7 @@ public class BetaLongRef_inc2Test {
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.prepare();
         try {
-            ref.inc(tx, 10);
+            ref.getAndIncrement(tx, 10);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -96,9 +96,10 @@ public class BetaLongRef_inc2Test {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.inc(tx, 0);
+        long result = ref.getAndIncrement(tx, 0);
         tx.commit();
 
+        assertEquals(10, result);
         assertCommitted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertEquals(10, ref.___unsafeLoad().value);
@@ -110,10 +111,11 @@ public class BetaLongRef_inc2Test {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.inc(tx, 20);
+        long result = ref.getAndIncrement(tx, 20);
         tx.commit();
 
         assertCommitted(tx);
+        assertEquals(10, result);
         assertNotSame(committed, ref.___unsafeLoad());
         assertEquals(30, ref.___unsafeLoad().value);
     }

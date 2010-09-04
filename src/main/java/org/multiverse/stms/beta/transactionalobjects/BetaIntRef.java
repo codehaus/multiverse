@@ -524,21 +524,49 @@ public final class BetaIntRef
     }
 
     @Override
-    public int atomicInc(final int amount){
+    public int atomicGetAndIncrement(final int amount){
         throw new TodoException();
     }
 
     @Override
-    public int inc(final int amount){
+    public int getAndIncrement(final int amount){
         throw new TodoException();
     }
 
     @Override
-    public int inc(final Transaction tx, final int amount){
-        return inc((BetaTransaction)tx, amount);
+    public int getAndIncrement(final Transaction tx, final int amount){
+        return getAndIncrement((BetaTransaction)tx, amount);
     }
 
-    public int inc(final BetaTransaction tx, final int amount){
+    public int getAndIncrement(final BetaTransaction tx, final int amount){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        IntRefTranlocal write
+              = (IntRefTranlocal)tx.openForWrite(this, false);
+
+         int oldValue = write.value;
+        write.value+=amount;
+        return oldValue;
+    }
+
+    @Override
+    public int atomicIncrementAndGet(final int amount){
+        throw new TodoException();
+    }
+
+    @Override
+    public int incrementAndGet(final int amount){
+        throw new TodoException();
+    }
+
+    @Override
+    public int incrementAndGet(final Transaction tx, final int amount){
+        return incrementAndGet((BetaTransaction)tx, amount);
+    }
+
+    public int incrementAndGet(final BetaTransaction tx, final int amount){
         if(tx == null){
             throw new NullPointerException();
         }
@@ -552,27 +580,27 @@ public final class BetaIntRef
 
 
     @Override
-    public int atomicAlter(
+    public int atomicAlterAndGet(
         final IntFunction function){
 
         throw new TodoException();
     }
 
     @Override
-    public int alter(
+    public int alterAndGet(
         final IntFunction function){
 
         throw new TodoException();
     }
 
     @Override
-    public int alter(
+    public int alterAndGet(
         final Transaction tx,
         final IntFunction function){
-        return alter((BetaTransaction)tx, function);
+        return alterAndGet((BetaTransaction)tx, function);
     }
 
-    public int alter(
+    public int alterAndGet(
         final BetaTransaction tx,
         final IntFunction function){
 
@@ -590,6 +618,48 @@ public final class BetaIntRef
 
         write.value = function.call(write.value);
         return write.value;
+    }
+
+     @Override
+    public int atomicGetAndAlter(
+        final IntFunction function){
+
+        throw new TodoException();
+    }
+
+    @Override
+    public int getAndAlter(
+        final IntFunction function){
+
+        throw new TodoException();
+    }
+
+    @Override
+    public int getAndAlter(
+        final Transaction tx,
+        final IntFunction function){
+        return getAndAlter((BetaTransaction)tx, function);
+    }
+
+    public int getAndAlter(
+        final BetaTransaction tx,
+        final IntFunction function){
+
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        if(function == null){
+            tx.abort();
+            throw new NullPointerException();
+        }
+
+        IntRefTranlocal write
+            = (IntRefTranlocal)tx.openForWrite(this, false);
+
+        int oldValue = write.value;
+        write.value = function.call(write.value);
+        return oldValue;
     }
 
     @Override
