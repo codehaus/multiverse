@@ -168,7 +168,7 @@ public class DeadLockStressTest {
 
                 int index = randomInt(refs.length);
                 BetaIntRef ref = refs[index];
-                ref.set(tx, ref.get(tx) + 1);
+                ref.getAndSet(tx, ref.get(tx) + 1);
             }
         }
     }

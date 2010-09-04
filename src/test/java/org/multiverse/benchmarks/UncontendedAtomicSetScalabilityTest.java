@@ -104,7 +104,7 @@ public class UncontendedAtomicSetScalabilityTest {
             GlobalConflictCounter globalConflictCounter = stm.getGlobalConflictCounter();
             long startMs = System.currentTimeMillis();
             for (long k = 0; k < transactionCount; k++) {
-                ref.atomicSet(k, pool, 8, globalConflictCounter);
+                ref.atomicGetAndSet(k, pool, 8, globalConflictCounter);
             }
 
             assertEquals(transactionCount, ref.___unsafeLoad().value + 1);

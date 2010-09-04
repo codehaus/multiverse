@@ -47,7 +47,7 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
 
     /**
      * Loads the active value. If the value already is locked, by another this call will return a tranlocal
-     * with the locked flag set. This call can safely be done if already locked by self. It will never return
+     * with the locked flag getAndSet. This call can safely be done if already locked by self. It will never return
      * null.
      *
      * @param spinCount the number of times to spin when locked.
@@ -58,7 +58,7 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
 
     /**
      * Loads and locks the value. If the value already is locked, by another this call will return a tranlocal
-     * with the locked flag set. This call can safely be done if already locked by self. Null will never be
+     * with the locked flag getAndSet. This call can safely be done if already locked by self. Null will never be
      * returned.
      *
      * @param spinCount    the maximum number of times to spin

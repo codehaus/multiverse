@@ -95,7 +95,7 @@ public class FailureAtomicityStressTest {
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
                     int value = ref.get(btx);
-                    ref.set(btx, value + 1);
+                    ref.getAndSet(btx, value + 1);
                 }
             });
         }
@@ -106,7 +106,7 @@ public class FailureAtomicityStressTest {
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
                     int value = ref.get(btx);
-                    ref.set(btx, value + 1);
+                    ref.getAndSet(btx, value + 1);
                     btx.abort();
                 }
             });

@@ -163,7 +163,7 @@ public interface TransactionConfiguration {
 
     /**
      * Returns the maximum number of times this Transaction be retried before failing. The returned value will
-     * always be equal or larger than 0. If the value is set high and you are encountering a lot of
+     * always be equal or larger than 0. If the value is getAndSet high and you are encountering a lot of
      * TooManyRetryExceptions it could be that the objects are just not concurrent enough.
      *
      * @return the maxRetries.

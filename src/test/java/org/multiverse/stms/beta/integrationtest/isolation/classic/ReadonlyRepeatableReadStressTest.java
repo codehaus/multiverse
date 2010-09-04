@@ -66,7 +66,7 @@ public class ReadonlyRepeatableReadStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    ref.set(btx, ref.get(btx));
+                    ref.getAndSet(btx, ref.get(btx));
                 }
             };
 

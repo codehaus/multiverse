@@ -51,7 +51,7 @@ public class TimeoutRollbackTest {
             @Override
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                modifyRef.set(btx, 1);
+                modifyRef.getAndSet(btx, 1);
 
                 if (awaitRef.get(btx) != 1000) {
                     retry();

@@ -15,7 +15,7 @@ import org.multiverse.stms.beta.transactions.*;
 import static org.multiverse.stms.beta.ThreadLocalBetaTransactionPool.getThreadLocalBetaTransactionPool;
 
 /**
- * All non anonymous transactionfactories (so transactions with a familyname set explicitly) will
+ * All non anonymous transactionfactories (so transactions with a familyname getAndSet explicitly) will
  * be stored in the factoryMap. If a transactionfactory with the same name already is stored in the
  * factoryMap, it will not be stored.
  *

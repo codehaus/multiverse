@@ -523,6 +523,26 @@ public final class BetaRef<E>
         }
     }
 
+    @Override
+    public boolean isNull(){
+        throw new TodoException();
+    }
+
+    @Override
+    public boolean isNull(final Transaction tx){
+        return isNull((BetaTransaction)tx);
+    }
+
+    public boolean isNull(final BetaTransaction tx){
+        E value = get(tx);
+        return value == null;
+    }
+
+    @Override
+    public boolean atomicIsNull(){
+        throw new TodoException();
+    }
+
 
     @Override
     public E atomicAlter(
@@ -564,7 +584,7 @@ public final class BetaRef<E>
         write.value = function.call(write.value);
         return write.value;
     }
-            
+
     @Override
     public boolean atomicCompareAndSet(
         final E oldValue,
@@ -574,9 +594,14 @@ public final class BetaRef<E>
     }
 
     @Override
+    public E getAndSet(final E value){
+        throw new TodoException();
+    }
+
     public E set(final E value){
         throw new TodoException();
     }
+
 
     @Override
     public E get(){
@@ -617,7 +642,12 @@ public final class BetaRef<E>
         throw new TodoException();
     }
 
-    public final E atomicSet(
+    @Override
+    public final E atomicGetAndSet(final E newValue){
+        throw new TodoException();
+    }
+
+    public final E atomicGetAndSet(
         final E newValue,
         final BetaObjectPool pool,
         final int spinCount,
@@ -663,6 +693,21 @@ public final class BetaRef<E>
     }
 
     public final E set(
+        final BetaTransaction transaction,
+        final E value){
+
+        RefTranlocal<E> write = transaction.openForWrite(this, false);
+        E oldValue = write.value;
+        write.value = value;
+        return value;
+    }
+
+    @Override
+    public E getAndSet(Transaction tx, E value){
+        return getAndSet((BetaTransaction)tx, value);
+    }
+
+    public final E getAndSet(
         final BetaTransaction transaction,
         final E value){
 

@@ -15,11 +15,11 @@ import static org.multiverse.TestUtils.assertCommitted;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 /**
- * Tests {@link BetaLongRef#set(BetaTransaction, long)}.
+ * Tests {@link BetaLongRef#getAndSet(org.multiverse.api.Transaction, long)}.
  *
  * @author Peter Veentjer.
  */
-public class BetaLongRef_set2Test {
+public class BetaLongRef_getAndSet2Test {
 
     private BetaStm stm;
 
@@ -34,7 +34,7 @@ public class BetaLongRef_set2Test {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         try {
-            ref.set(null, 11);
+            ref.getAndSet(null, 11);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -50,7 +50,7 @@ public class BetaLongRef_set2Test {
         tx.prepare();
 
         try {
-            ref.set(tx, 11);
+            ref.getAndSet(tx, 11);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -67,7 +67,7 @@ public class BetaLongRef_set2Test {
         tx.abort();
 
         try {
-            ref.set(tx, 11);
+            ref.getAndSet(tx, 11);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -84,7 +84,7 @@ public class BetaLongRef_set2Test {
         tx.commit();
 
         try {
-            ref.set(tx, 11);
+            ref.getAndSet(tx, 11);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -98,22 +98,22 @@ public class BetaLongRef_set2Test {
         BetaLongRef ref = createLongRef(stm, 10);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        long result = ref.set(tx, 20);
+        long result = ref.getAndSet(tx, 20);
         tx.commit();
 
-        assertEquals(20, result);
+        assertEquals(10, result);
         assertEquals(20, ref.___unsafeLoad().value);
     }
 
     @Test
-    public void whenNormalTransactionMethodCalled() {
+    public void whenNormalTransactionUsed() {
         BetaLongRef ref = createLongRef(stm, 10);
 
         Transaction tx = new FatMonoBetaTransaction(stm);
-        long result = ref.set(tx, 20);
+        long result = ref.getAndSet(tx, 20);
         tx.commit();
 
-        assertEquals(20, result);
+        assertEquals(10, result);
         assertEquals(20, ref.___unsafeLoad().value);
     }
 }

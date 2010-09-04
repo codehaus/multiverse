@@ -1,5 +1,6 @@
 package org.multiverse;
 
+import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.functions.LongFunction;
@@ -164,23 +165,23 @@ public class TestUtils {
         assertFalse(format("both values are %s, but should not be equal", l2), l1 == l2);
     }
 
-    public static void assertNew(BetaTransaction tx) {
+    public static void assertNew(Transaction tx) {
         assertEquals(TransactionStatus.Unstarted, tx.getStatus());
     }
 
-    public static void assertPrepared(BetaTransaction tx) {
+    public static void assertPrepared(Transaction tx) {
         assertEquals(TransactionStatus.Prepared, tx.getStatus());
     }
 
-    public static void assertAborted(BetaTransaction tx) {
+    public static void assertAborted(Transaction tx) {
         assertEquals(TransactionStatus.Aborted, tx.getStatus());
     }
 
-    public static void assertCommitted(BetaTransaction tx) {
+    public static void assertCommitted(Transaction tx) {
         assertEquals(TransactionStatus.Committed, tx.getStatus());
     }
 
-    public static void assertActive(BetaTransaction tx) {
+    public static void assertActive(Transaction tx) {
         assertEquals(TransactionStatus.Active, tx.getStatus());
     }
 

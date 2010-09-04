@@ -535,7 +535,7 @@ public final class BetaLongRef
 
     @Override
     public long inc(final Transaction tx, final long amount){
-        return inc((BetaTransaction)tx, amount);    
+        return inc((BetaTransaction)tx, amount);
     }
 
     public long inc(final BetaTransaction tx, final long amount){
@@ -591,7 +591,7 @@ public final class BetaLongRef
         write.value = function.call(write.value);
         return write.value;
     }
-            
+
     @Override
     public boolean atomicCompareAndSet(
         final long oldValue,
@@ -601,9 +601,14 @@ public final class BetaLongRef
     }
 
     @Override
+    public long getAndSet(final long value){
+        throw new TodoException();
+    }
+
     public long set(final long value){
         throw new TodoException();
     }
+
 
     @Override
     public long get(){
@@ -644,7 +649,12 @@ public final class BetaLongRef
         throw new TodoException();
     }
 
-    public final long atomicSet(
+    @Override
+    public final long atomicGetAndSet(final long newValue){
+        throw new TodoException();
+    }
+
+    public final long atomicGetAndSet(
         final long newValue,
         final BetaObjectPool pool,
         final int spinCount,
@@ -690,6 +700,21 @@ public final class BetaLongRef
     }
 
     public final long set(
+        final BetaTransaction transaction,
+        final long value){
+
+        LongRefTranlocal write = transaction.openForWrite(this, false);
+        long oldValue = write.value;
+        write.value = value;
+        return value;
+    }
+
+    @Override
+    public long getAndSet(Transaction tx, long value){
+        return getAndSet((BetaTransaction)tx, value);
+    }
+
+    public final long getAndSet(
         final BetaTransaction transaction,
         final long value){
 

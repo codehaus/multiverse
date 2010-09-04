@@ -127,7 +127,7 @@ public interface TransactionFactoryBuilder {
     /**
      * Sets the readonly property on a transaction. Readonly transactions are always cheaper than update transactions.
      * <p/>
-     * If this property is set, the stm will not speculate on this property anymore.
+     * If this property is getAndSet, the stm will not speculate on this property anymore.
      *
      * @param readonly true if the transaction should be readonly, false otherwise.
      * @return the updated TransactionFactoryBuilder
@@ -138,7 +138,7 @@ public interface TransactionFactoryBuilder {
      * Sets if the transaction should automatically track all reads that have been done. This is needed for blocking
      * operations, but also for other features like writeskew detection.
      * <p/>
-     * If this property is set, the stm will not speculate on this property anymore.
+     * If this property is getAndSet, the stm will not speculate on this property anymore.
      *
      * @param enabled true if read tracking enabled, false otherwise.
      * @return the updated TransactionFactoryBuilder
@@ -168,7 +168,7 @@ public interface TransactionFactoryBuilder {
 
     /**
      * If writeskew problem is allowed to happen. Defaults to true and can have a big impact on performance (the
-     * complete read set needs to be validated and not just the writes). So disallow it wisely.
+     * complete read getAndSet needs to be validated and not just the writes). So disallow it wisely.
      *
      * @param writeSkewAllowed indicates if writeSkew problem is allowed.
      * @return the updated TransactionFactoryBuilder

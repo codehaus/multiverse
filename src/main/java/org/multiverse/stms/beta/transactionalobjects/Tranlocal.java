@@ -68,8 +68,8 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
     public abstract void prepareForPooling(BetaObjectPool pool);
 
     /**
-     * Prepares this Tranlocal for committing. If there is a read, the read is set to null (to prevent
-     * retaining an uncontrollable number of objects). Also the isDirty field is set to false and the isCommitted
+     * Prepares this Tranlocal for committing. If there is a read, the read is getAndSet to null (to prevent
+     * retaining an uncontrollable number of objects). Also the isDirty field is getAndSet to false and the isCommitted
      * field to false.
      *
      * No checks are done if the Tranlocal is in the committed state, so make sure that this is done from
@@ -117,7 +117,7 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
     /**
      * Evaluates the commuting functions that are applied to this Tranlocal. This call is made under the
      * assumption that the Tranlocal is not committed, is in the 'isCommuting' mode and that the read
-     * field has been set. If there is a change, the isDirty field also is set.
+     * field has been getAndSet. If there is a change, the isDirty field also is getAndSet.
      *
      * @param pool the BetaObjectPool used to pool resources.
      */

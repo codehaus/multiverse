@@ -130,8 +130,8 @@ public class DiningPhilosophersStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    leftFork.set(btx, leftFork.get(btx) - 1);
-                    rightFork.set(btx,rightFork.get(btx) - 1);
+                    leftFork.getAndSet(btx, leftFork.get(btx) - 1);
+                    rightFork.getAndSet(btx,rightFork.get(btx) - 1);
                 }
             });
         }
@@ -145,13 +145,13 @@ public class DiningPhilosophersStressTest {
                     if (leftFork.get(btx) == 1) {
                         retry();
                     } else {
-                        leftFork.set(btx, leftFork.get(btx) + 1);
+                        leftFork.getAndSet(btx, leftFork.get(btx) + 1);
                     }
 
                     if (rightFork.get(btx) == 1) {
                         retry();
                     } else {
-                        rightFork.set(btx, rightFork.get(btx) + 1);
+                        rightFork.getAndSet(btx, rightFork.get(btx) + 1);
                     }
                 }
             });

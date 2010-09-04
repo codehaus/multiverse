@@ -15,7 +15,7 @@ public interface LongRef extends TransactionalObject {
 
     long inc(Transaction tx, long amount);
 
-    /**
+      /**
      * Atomically applies the function to alter the value stored in this ref. This method doesn't care about
      * any running transactions.
      *
@@ -39,7 +39,7 @@ public interface LongRef extends TransactionalObject {
      * Alters the value stored in this Ref using the alter function.
      *
      * @param function the function that alters the value stored in this Ref.
-     * @param tx       the Transaction used by this operation.
+     * @param tx the Transaction used by this operation.
      * @return the new value.
      * @throws NullPointerException if function or transaction is null.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
@@ -64,6 +64,15 @@ public interface LongRef extends TransactionalObject {
      * @param value the new value.
      * @return the old value.
      */
+    long atomicGetAndSet(long value);
+
+    /**
+     * Atomically sets the value and returns the new value. This method doesn't care about any
+     * running transactions.
+     *
+     * @param value the new value.
+     * @return the new value.
+     */
     long atomicSet(long value);
 
     /**
@@ -73,18 +82,39 @@ public interface LongRef extends TransactionalObject {
      * @param value the new value.
      * @return the old value.
      */
+    long getAndSet(long value);
+
+    /**
+     * Sets the new value. If a transaction is running, it will lift on that transaction, else it will
+     * be executed atomically (so executed under its own transaction).
+     *
+     * @param value the new value.
+     * @return the new value.
+     */
     long set(long value);
 
     /**
      * Sets the value using the provided transaction.
      *
      * @param value the new value.
-     * @param tx    the transaction used to do the set.
+     * @param tx    the transaction used to do the getAndSet.
      * @return the old value.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not
      *                              in the correct state for this operation.
+     */
+    long getAndSet(Transaction tx, long value);
+
+    /**
+     * Sets the new value using the provided transaction.
+     *
+     * @param tx the transaction used to do the set.
+     * @param value the new value
+     * @return the old value
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException if the transaction is not in the correct
+     * state for this operation.
      */
     long set(Transaction tx, long value);
 

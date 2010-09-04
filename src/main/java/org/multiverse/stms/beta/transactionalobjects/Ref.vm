@@ -541,7 +541,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
     @Override
     public ${transactionalObject.type} inc(final Transaction tx, final ${transactionalObject.type} amount){
-        return inc((BetaTransaction)tx, amount);    
+        return inc((BetaTransaction)tx, amount);
     }
 
     public ${transactionalObject.type} inc(final BetaTransaction tx, final ${transactionalObject.type} amount){
@@ -554,6 +554,27 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
         write.value+=amount;
         return write.value;
+    }
+
+#elseif(${transactionalObject.isReference})
+    @Override
+    public boolean isNull(){
+        throw new TodoException();
+    }
+
+    @Override
+    public boolean isNull(final Transaction tx){
+        return isNull((BetaTransaction)tx);
+    }
+
+    public boolean isNull(final BetaTransaction tx){
+        ${transactionalObject.type} value = get(tx);
+        return value == null;
+    }
+
+    @Override
+    public boolean atomicIsNull(){
+        throw new TodoException();
     }
 
 #end
@@ -599,7 +620,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         write.value = function.call(write.value);
         return write.value;
     }
-            
+
     @Override
     public boolean atomicCompareAndSet(
         final ${transactionalObject.type} oldValue,
@@ -609,9 +630,14 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
     @Override
+    public ${transactionalObject.type} getAndSet(final ${transactionalObject.type} value){
+        throw new TodoException();
+    }
+
     public ${transactionalObject.type} set(final ${transactionalObject.type} value){
         throw new TodoException();
     }
+
 
     @Override
     public ${transactionalObject.type} get(){
@@ -652,7 +678,12 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         throw new TodoException();
     }
 
-    public final ${transactionalObject.type} atomicSet(
+    @Override
+    public final ${transactionalObject.type} atomicGetAndSet(final ${transactionalObject.type} newValue){
+        throw new TodoException();
+    }
+
+    public final ${transactionalObject.type} atomicGetAndSet(
         final ${transactionalObject.type} newValue,
         final BetaObjectPool pool,
         final int spinCount,
@@ -698,6 +729,21 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
     public final ${transactionalObject.type} set(
+        final BetaTransaction transaction,
+        final ${transactionalObject.type} value){
+
+        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write = transaction.openForWrite(this, false);
+        ${transactionalObject.type} oldValue = write.value;
+        write.value = value;
+        return value;
+    }
+
+    @Override
+    public ${transactionalObject.type} getAndSet(Transaction tx, ${transactionalObject.type} value){
+        return getAndSet((BetaTransaction)tx, value);
+    }
+
+    public final ${transactionalObject.type} getAndSet(
         final BetaTransaction transaction,
         final ${transactionalObject.type} value){
 

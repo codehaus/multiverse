@@ -60,7 +60,7 @@ public class TooManyRetriesRollbackTest {
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
 
-                modifyRef.set(btx, value);
+                modifyRef.getAndSet(btx, value);
 
                 if (retryRef.get(btx) % 2 == 0) {
                     retry();
@@ -85,7 +85,7 @@ public class TooManyRetriesRollbackTest {
                     BetaTransaction btx = (BetaTransaction) tx;
 
                     int value = retryRef.get(btx);
-                    retryRef.set(btx, value + 2);
+                    retryRef.getAndSet(btx, value + 2);
                 }
             };
 

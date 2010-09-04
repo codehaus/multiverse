@@ -64,6 +64,15 @@ public interface IntRef extends TransactionalObject {
      * @param value the new value.
      * @return the old value.
      */
+    int atomicGetAndSet(int value);
+
+    /**
+     * Atomically sets the value and returns the new value. This method doesn't care about any
+     * running transactions.
+     *
+     * @param value the new value.
+     * @return the new value.
+     */
     int atomicSet(int value);
 
     /**
@@ -73,18 +82,39 @@ public interface IntRef extends TransactionalObject {
      * @param value the new value.
      * @return the old value.
      */
+    int getAndSet(int value);
+
+    /**
+     * Sets the new value. If a transaction is running, it will lift on that transaction, else it will
+     * be executed atomically (so executed under its own transaction).
+     *
+     * @param value the new value.
+     * @return the new value.
+     */
     int set(int value);
 
     /**
      * Sets the value using the provided transaction.
      *
      * @param value the new value.
-     * @param tx    the transaction used to do the set.
+     * @param tx    the transaction used to do the getAndSet.
      * @return the old value.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not
      *                              in the correct state for this operation.
+     */
+    int getAndSet(Transaction tx, int value);
+
+    /**
+     * Sets the new value using the provided transaction.
+     *
+     * @param tx the transaction used to do the set.
+     * @param value the new value
+     * @return the old value
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException if the transaction is not in the correct
+     * state for this operation.
      */
     int set(Transaction tx, int value);
 

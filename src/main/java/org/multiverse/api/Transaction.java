@@ -194,7 +194,7 @@ public interface Transaction {
 
     /**
      * Sets the remaining timeout in nanoseconds. Long.MAX_VALUE indicates that no timeout should be used. When
-     * the Transaction is used for the first attempt, the remaining timeout is set to the
+     * the Transaction is used for the first attempt, the remaining timeout is getAndSet to the
      * {@link org.multiverse.api.TransactionConfiguration#getTimeoutNs()}.
      * <p/>
      * This normally isn't called from the user code, it is task of the stm internals and the

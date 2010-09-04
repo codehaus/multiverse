@@ -167,7 +167,7 @@ public final class StandardThreadFactory implements ThreadFactory {
 
     /**
      * Sets the priority of the threads. This will only effect newly created Threads. A value must
-     * be set ranging from Thread.MIN_PRIORITY and Thread.MAX_PRIORITY.
+     * be getAndSet ranging from Thread.MIN_PRIORITY and Thread.MAX_PRIORITY.
      * <p/>
      * This call is not completely threadsafe, the following scenario could happen:
      * <ol>
@@ -177,7 +177,7 @@ public final class StandardThreadFactory implements ThreadFactory {
      * </ol>
      * The consequence is that the priority of this StandardThreadFactory is higher than the maximum
      * priority of the ThreadGroup and this means that thread creation could fail because threads are
-     * created with a too high priority. This race problem is very hard to prevent because the check/set
+     * created with a too high priority. This race problem is very hard to prevent because the check/getAndSet
      * can't be done atomic because the ThreadGroup is exposed.
      *
      * @param priority the new priority.

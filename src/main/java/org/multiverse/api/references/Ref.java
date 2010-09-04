@@ -12,6 +12,33 @@ import org.multiverse.api.functions.Function;
 public interface Ref<E> extends TransactionalObject {
 
     /**
+     * Checks if the current value is null. If a transaction is available, it will lift on that transaction,
+     * else it will be run under its own transaction.
+     *
+     * @return true if null, false otherwise.
+     */
+    boolean isNull();
+
+    /**
+     * Checks if the current value is null.
+     *
+     * @param tx the transaction used for this operation.
+     * @return true if the value is null, false otherwise.
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if the transaction is not in the
+     *                              correct state for this operation.
+     */
+    boolean isNull(Transaction tx);
+
+    /**
+     * Atomically check if the current value is null. This method doesn't care about any running transactions.
+     *
+     * @return true if null, false otherwise.
+     */
+    boolean atomicIsNull();
+
+    /**
      * Atomically applies the function to alter the value stored in this ref. This method doesn't care about
      * any running transactions.
      *
@@ -60,6 +87,15 @@ public interface Ref<E> extends TransactionalObject {
      * @param value the new value.
      * @return the old value.
      */
+    E atomicGetAndSet(E value);
+
+    /**
+     * Atomically sets the value and returns the new value. This method doesn't care about any
+     * running transactions.
+     *
+     * @param value the new value.
+     * @return the new value.
+     */
     E atomicSet(E value);
 
     /**
@@ -69,18 +105,40 @@ public interface Ref<E> extends TransactionalObject {
      * @param value the new value.
      * @return the old value.
      */
+    E getAndSet(E value);
+
+    /**
+     * Sets the new value. If a transaction is running, it will lift on that transaction, else it will
+     * be executed atomically (so executed under its own transaction).
+     *
+     * @param value the new value.
+     * @return the new value.
+     */
     E set(E value);
 
     /**
      * Sets the value using the provided transaction.
      *
      * @param value the new value.
-     * @param tx    the transaction used to do the set.
+     * @param tx    the transaction used to do the getAndSet.
      * @return the old value.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not
      *                              in the correct state for this operation.
+     */
+    E getAndSet(Transaction tx, E value);
+
+    /**
+     * Sets the new value using the provided transaction.
+     *
+     * @param tx    the transaction used to do the set.
+     * @param value the new value
+     * @return the old value
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if the transaction is not in the correct
+     *                              state for this operation.
      */
     E set(Transaction tx, E value);
 

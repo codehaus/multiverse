@@ -7,7 +7,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
 /**
  * The problem with the traditional approach of this Orec, is that even if the transaction only
  * reads data, it still needs to call the acquire and release. The optimization is that after a
- * set of n arrive/departs that were only used for reading (you know when someone wants to do
+ * getAndSet of n arrive/departs that were only used for reading (you know when someone wants to do
  * an update if he acquires the lock), that the Orec goes to readonly mode. So each Orec tracks
  * how many readonly operations have been done on it. Once the orec has become read biased, it
  * is very important the no depart is called (only the {@link #___} can be

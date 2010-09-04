@@ -11,7 +11,7 @@ import org.multiverse.api.blocking.Latch;
  * that it can be pooled.
  * <p/>
  * Setting the Listeners and removing the it should provide the happens before relation so that all changes made
- * to the Listener before it is set, are visible when it is removed.
+ * to the Listener before it is getAndSet, are visible when it is removed.
  *
  * @author Peter Veentjer
  */

@@ -48,7 +48,7 @@ public class ReadonlyTest {
             @Override
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                ref.set(btx, newValue);
+                ref.getAndSet(btx, newValue);
             }
         });
     }
@@ -202,7 +202,7 @@ public class ReadonlyTest {
             public void execute(Transaction tx) throws Exception {
                 assertFalse(tx.getConfiguration().isReadonly());
                 BetaTransaction btx = (BetaTransaction) tx;
-                ref.set(btx, newValue);
+                ref.getAndSet(btx, newValue);
             }
         });
     }
@@ -222,7 +222,7 @@ public class ReadonlyTest {
             public void execute(Transaction tx) throws Exception {
                 assertFalse(tx.getConfiguration().isReadonly());
                 BetaTransaction btx = (BetaTransaction) tx;
-                ref.set(btx, ref.get(btx) + 1);
+                ref.getAndSet(btx, ref.get(btx) + 1);
             }
         });
     }

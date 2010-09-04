@@ -1,7 +1,7 @@
 package org.multiverse.durability;
 
 /**
- * A set containing all potential changes that need to be written. The idea is that persistent roots are used,
+ * A getAndSet containing all potential changes that need to be written. The idea is that persistent roots are used,
  * and all DurableObjects reachable from a persistent root is going to be persisted. It is the tasks of the
  * Storage implementation to figure out what and what not to persist.
  * <p/>

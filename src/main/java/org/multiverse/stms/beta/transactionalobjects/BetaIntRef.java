@@ -535,7 +535,7 @@ public final class BetaIntRef
 
     @Override
     public int inc(final Transaction tx, final int amount){
-        return inc((BetaTransaction)tx, amount);    
+        return inc((BetaTransaction)tx, amount);
     }
 
     public int inc(final BetaTransaction tx, final int amount){
@@ -591,7 +591,7 @@ public final class BetaIntRef
         write.value = function.call(write.value);
         return write.value;
     }
-            
+
     @Override
     public boolean atomicCompareAndSet(
         final int oldValue,
@@ -601,9 +601,14 @@ public final class BetaIntRef
     }
 
     @Override
+    public int getAndSet(final int value){
+        throw new TodoException();
+    }
+
     public int set(final int value){
         throw new TodoException();
     }
+
 
     @Override
     public int get(){
@@ -644,7 +649,12 @@ public final class BetaIntRef
         throw new TodoException();
     }
 
-    public final int atomicSet(
+    @Override
+    public final int atomicGetAndSet(final int newValue){
+        throw new TodoException();
+    }
+
+    public final int atomicGetAndSet(
         final int newValue,
         final BetaObjectPool pool,
         final int spinCount,
@@ -690,6 +700,21 @@ public final class BetaIntRef
     }
 
     public final int set(
+        final BetaTransaction transaction,
+        final int value){
+
+        IntRefTranlocal write = transaction.openForWrite(this, false);
+        int oldValue = write.value;
+        write.value = value;
+        return value;
+    }
+
+    @Override
+    public int getAndSet(Transaction tx, int value){
+        return getAndSet((BetaTransaction)tx, value);
+    }
+
+    public final int getAndSet(
         final BetaTransaction transaction,
         final int value){
 

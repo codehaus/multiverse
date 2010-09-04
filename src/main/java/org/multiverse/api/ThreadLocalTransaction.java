@@ -12,7 +12,7 @@ import org.multiverse.stms.beta.BetaTransactionPool;
  * The Container wraps the Transaction, so if a Thread gets a reference to that container and holds it, it
  * can modify the current transaction with a direct field access instead of another threadlocal access. It should
  * be used with extreme care, because the Container can't leak to another thread. It is very useful for the
- * AtomicBlock for example because a get/set/clear needs to be called otherwise.
+ * AtomicBlock for example because a get/getAndSet/clear needs to be called otherwise.
  *
  * @author Peter Veentjer.
  */
@@ -25,7 +25,7 @@ public final class ThreadLocalTransaction {
     };
 
     /**
-     * Gets the threadlocal transaction. If no transaction is set, null is returned.
+     * Gets the threadlocal transaction. If no transaction is getAndSet, null is returned.
      * <p/>
      * No checks are done on the state of the transaction (so it could be that an aborted or committed transaction is
      * returned).

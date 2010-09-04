@@ -66,7 +66,7 @@ public class StmUtils {
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
      * @throws org.multiverse.api.exceptions.NoTransactionFoundException
-     *                              if no Transaction is set at the
+     *                              if no Transaction is getAndSet at the
      *                              {@link org.multiverse.api.ThreadLocalTransaction}.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the
@@ -98,7 +98,7 @@ public class StmUtils {
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
      * @throws org.multiverse.api.exceptions.NoTransactionFoundException
-     *                              if no Transaction is set at the
+     *                              if no Transaction is getAndSet at the
      *                              {@link org.multiverse.api.ThreadLocalTransaction}.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the
@@ -129,7 +129,7 @@ public class StmUtils {
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
      * @throws org.multiverse.api.exceptions.NoTransactionFoundException
-     *                              if no Transaction is set at the
+     *                              if no Transaction is getAndSet at the
      *                              {@link org.multiverse.api.ThreadLocalTransaction}.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the
