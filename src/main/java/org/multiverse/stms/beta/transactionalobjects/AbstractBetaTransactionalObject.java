@@ -52,7 +52,7 @@ public abstract class AbstractBetaTransactionalObject
 
     //controlled JMM problem (just like the hashcode of String).
     private int ___identityHashCode;    
-    private final BetaStm stm;
+    private final BetaStm ___stm;
 
     /**
      * Creates a uncommitted AbstractBetaTransactionalObject that should be attached to the transaction (this
@@ -62,18 +62,14 @@ public abstract class AbstractBetaTransactionalObject
      * @throws NullPointerException if tx is null.
      */
     public AbstractBetaTransactionalObject(BetaTransaction tx){
-        if(tx == null){
-            throw new NullPointerException();
-        }
-
-        stm = tx.getConfiguration().stm;
+        ___stm = tx.getConfiguration().stm;
         ___tryLockAndArrive(0);
         this.lockOwner = tx;
     }
 
     @Override
     public final BetaStm getStm(){
-        return stm;
+        return ___stm;
     }
 
     @Override
@@ -215,7 +211,7 @@ public abstract class AbstractBetaTransactionalObject
             }
         }
 
-        long remainingSurplus = ___departAfterUpdateAndUnlock(stm.globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
 
         //it is important that this call is done after the actual write. This is needed to give the guarantee
        //that we are going to take care of all listeners that are registered before that write. The read is done
@@ -285,7 +281,7 @@ public abstract class AbstractBetaTransactionalObject
             }
         }
 
-        long remainingSurplus = ___departAfterUpdateAndUnlock(stm.globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
 
@@ -471,9 +467,8 @@ public abstract class AbstractBetaTransactionalObject
         }
     }
 
-
     @Override
-    public LockStatus getLockStatus(final Transaction tx) {
+    public final LockStatus getLockStatus(final Transaction tx) {
         if(tx == null){
             throw new NullPointerException();
         }

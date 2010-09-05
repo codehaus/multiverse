@@ -318,4 +318,16 @@ public interface LongRef extends TransactionalObject {
      *                              correct state for this operation.
      */
     long get(Transaction tx);
+
+     /**
+     *
+     * @param value
+     */
+    void await(long value);
+
+    /**
+     *
+     * @param value
+     */
+    void await(Transaction tx, long value);
 }

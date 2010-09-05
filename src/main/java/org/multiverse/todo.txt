@@ -1,5 +1,9 @@
 ideas:
 
+- selective notifies in transaction, instead of always waking up.. one could provide a function that only wakes
+ up under certain conditions.
+
+
 - actor atomic block, doesn't look at an existing transaction. Automatically exposes the onAbort/onCommit
 
 - non repeatable read?
@@ -138,6 +142,8 @@ globalconflict counter.
 
     - the nodes for the commute functions need to be pooled.
 
+    - testing of transaction access while commute
+
     - commute: commuting functions are executed in reverse order.
 
 - rollbackfor/rollnotbackfor exception configuration
@@ -168,7 +174,9 @@ the task not being executed at all.
 - array tree transaction: on commit/abort the array can be nulled. no need to do it when placing in the pool
   or when initializing.
 
-- testing of transaction access while commute
+- ref and await
+
+- generate the refs/reffactory instead of writing them manually.
 
 done
 

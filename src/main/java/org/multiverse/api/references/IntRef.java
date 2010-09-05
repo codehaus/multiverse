@@ -317,4 +317,16 @@ public interface IntRef extends TransactionalObject {
      *                              correct state for this operation.
      */
     int get(Transaction tx);
+
+     /**
+     *
+     * @param value
+     */
+    void await(int value);
+
+    /**
+     *
+     * @param value
+     */
+    void await(Transaction tx, int value);
 }

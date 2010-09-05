@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.api.LockStatus;
+import org.multiverse.api.StmUtils;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.TodoException;
@@ -56,7 +57,7 @@ public final class BetaIntRef
 
     //controlled JMM problem (just like the hashcode of String).
     private int ___identityHashCode;    
-    private final BetaStm stm;
+    private final BetaStm ___stm;
 
     /**
      * Creates a uncommitted BetaIntRef that should be attached to the transaction (this
@@ -66,11 +67,7 @@ public final class BetaIntRef
      * @throws NullPointerException if tx is null.
      */
     public BetaIntRef(BetaTransaction tx){
-        if(tx == null){
-            throw new NullPointerException();
-        }
-
-        stm = tx.getConfiguration().stm;
+        ___stm = tx.getConfiguration().stm;
         ___tryLockAndArrive(0);
         this.lockOwner = tx;
     }
@@ -95,7 +92,7 @@ public final class BetaIntRef
             throw new NullPointerException();
         }
 
-        this.stm = stm;
+        this.___stm = stm;
         tranlocal.value = initialValue;
         tranlocal.isCommitted = true;
         tranlocal.isDirty = DIRTY_FALSE;
@@ -104,7 +101,7 @@ public final class BetaIntRef
 
     @Override
     public final BetaStm getStm(){
-        return stm;
+        return ___stm;
     }
 
     @Override
@@ -267,7 +264,7 @@ public final class BetaIntRef
             }
         }
 
-        long remainingSurplus = ___departAfterUpdateAndUnlock(stm.globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
 
         //it is important that this call is done after the actual write. This is needed to give the guarantee
        //that we are going to take care of all listeners that are registered before that write. The read is done
@@ -337,7 +334,7 @@ public final class BetaIntRef
             }
         }
 
-        long remainingSurplus = ___departAfterUpdateAndUnlock(stm.globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
 
@@ -524,91 +521,88 @@ public final class BetaIntRef
     }
 
     @Override
-    public int atomicGetAndIncrement(final int amount){
+    public final int atomicGetAndIncrement(final int amount){
         throw new TodoException();
     }
 
     @Override
-    public int getAndIncrement(final int amount){
+    public final int getAndIncrement(final int amount){
         throw new TodoException();
     }
 
     @Override
-    public int getAndIncrement(final Transaction tx, final int amount){
+    public final int getAndIncrement(final Transaction tx, final int amount){
         return getAndIncrement((BetaTransaction)tx, amount);
     }
 
-    public int getAndIncrement(final BetaTransaction tx, final int amount){
-        if(tx == null){
-            throw new NullPointerException();
-        }
-
+    public final int getAndIncrement(final BetaTransaction tx, final int amount){
         IntRefTranlocal write
-              = (IntRefTranlocal)tx.openForWrite(this, false);
+            = (IntRefTranlocal)tx.openForWrite(this, false);
 
-         int oldValue = write.value;
+        int oldValue = write.value;
         write.value+=amount;
         return oldValue;
     }
 
     @Override
-    public int atomicIncrementAndGet(final int amount){
+    public final int atomicIncrementAndGet(final int amount){
         throw new TodoException();
     }
 
     @Override
-    public int incrementAndGet(final int amount){
+    public final int incrementAndGet(final int amount){
         throw new TodoException();
     }
 
     @Override
-    public int incrementAndGet(final Transaction tx, final int amount){
+    public final int incrementAndGet(
+        final Transaction tx,
+        final int amount){
+
         return incrementAndGet((BetaTransaction)tx, amount);
     }
 
-    public int incrementAndGet(final BetaTransaction tx, final int amount){
-        if(tx == null){
-            throw new NullPointerException();
-        }
+    public final int incrementAndGet(
+        final BetaTransaction tx,
+        final int amount){
 
         IntRefTranlocal write
-              = (IntRefTranlocal)tx.openForWrite(this, false);
+            = (IntRefTranlocal)tx.openForWrite(this, false);
 
         write.value+=amount;
         return write.value;
     }
 
-
     @Override
-    public void ensure(){
+    public final void ensure(){
         throw new TodoException();
     }
 
     @Override
-    public void ensure(Transaction tx){
+    public final void ensure(Transaction tx){
         ensure((BetaTransaction)tx);
     }
 
-    public void ensure(BetaTransaction tx){
+    public final void ensure(BetaTransaction tx){
         tx.openForRead(this, true);
     }
 
     @Override
-    public void commute(
+    public final void commute(
         IntFunction function){
 
         throw new TodoException();
     }
 
     @Override
-    public void commute(
+    public final void commute(
         final Transaction tx,
         final IntFunction function){
 
         commute((BetaTransaction)tx, function);
     }
 
-    public void commute(
+    public final void commute(
         BetaTransaction tx,
         IntFunction function){
 
@@ -616,33 +610,29 @@ public final class BetaIntRef
     }
 
     @Override
-    public int atomicAlterAndGet(
+    public final int atomicAlterAndGet(
         final IntFunction function){
 
         throw new TodoException();
     }
 
     @Override
-    public int alterAndGet(
+    public final int alterAndGet(
         final IntFunction function){
 
         throw new TodoException();
     }
 
     @Override
-    public int alterAndGet(
+    public final int alterAndGet(
         final Transaction tx,
         final IntFunction function){
         return alterAndGet((BetaTransaction)tx, function);
     }
 
-    public int alterAndGet(
+    public final int alterAndGet(
         final BetaTransaction tx,
         final IntFunction function){
-
-        if(tx == null){
-            throw new NullPointerException();
-        }
 
         if(function == null){
             tx.abort();
@@ -657,33 +647,28 @@ public final class BetaIntRef
     }
 
      @Override
-    public int atomicGetAndAlter(
+    public final int atomicGetAndAlter(
         final IntFunction function){
 
         throw new TodoException();
     }
 
     @Override
-    public int getAndAlter(
+    public final int getAndAlter(
         final IntFunction function){
-
         throw new TodoException();
     }
 
     @Override
-    public int getAndAlter(
+    public final int getAndAlter(
         final Transaction tx,
         final IntFunction function){
         return getAndAlter((BetaTransaction)tx, function);
     }
 
-    public int getAndAlter(
+    public final int getAndAlter(
         final BetaTransaction tx,
         final IntFunction function){
-
-        if(tx == null){
-            throw new NullPointerException();
-        }
 
         if(function == null){
             tx.abort();
@@ -699,7 +684,7 @@ public final class BetaIntRef
     }
 
     @Override
-    public boolean atomicCompareAndSet(
+    public final boolean atomicCompareAndSet(
         final int oldValue,
         final int newValue){
 
@@ -707,22 +692,21 @@ public final class BetaIntRef
     }
 
     @Override
-    public int getAndSet(final int value){
+    public final int getAndSet(final int value){
         throw new TodoException();
     }
 
-    public int set(final int value){
-        throw new TodoException();
-    }
-
-
-    @Override
-    public int get(){
+    public final int set(final int value){
         throw new TodoException();
     }
 
     @Override
-    public int get(final Transaction tx){
+    public final int get(){
+        throw new TodoException();
+    }
+
+    @Override
+    public final int get(final Transaction tx){
         return get((BetaTransaction)tx);
     }
 
@@ -732,7 +716,8 @@ public final class BetaIntRef
 
     @Override
     public final int atomicGet(){
-        IntRefTranlocal read = ___load(50);
+        IntRefTranlocal read = ___load(___stm.spinCount);
+
         if(read == null){
             throw new IllegalStateException();
         }
@@ -764,7 +749,7 @@ public final class BetaIntRef
         final int newValue,
         final BetaObjectPool pool){
 
-        final int arriveStatus = ___tryLockAndArrive(stm.spinCount);
+        final int arriveStatus = ___tryLockAndArrive(___stm.spinCount);
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
             throw new WriteConflict();
         }
@@ -789,7 +774,7 @@ public final class BetaIntRef
         update.value = newValue;
         update.prepareForCommit();
         ___active = update;
-        long remainingSurplus = ___departAfterUpdateAndUnlock(stm.globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);
@@ -799,30 +784,30 @@ public final class BetaIntRef
     }
 
     @Override
-    public int set(Transaction tx, int value){
+    public final int set(Transaction tx, int value){
         return set((BetaTransaction)tx, value);
     }
 
     public final int set(
-        final BetaTransaction transaction,
+        final BetaTransaction tx,
         final int value){
 
-        IntRefTranlocal write = transaction.openForWrite(this, false);
+        IntRefTranlocal write = tx.openForWrite(this, false);
         int oldValue = write.value;
         write.value = value;
         return value;
     }
 
     @Override
-    public int getAndSet(Transaction tx, int value){
+    public final int getAndSet(Transaction tx, int value){
         return getAndSet((BetaTransaction)tx, value);
     }
 
     public final int getAndSet(
-        final BetaTransaction transaction,
+        final BetaTransaction tx,
         final int value){
 
-        IntRefTranlocal write = transaction.openForWrite(this, false);
+        IntRefTranlocal write = tx.openForWrite(this, false);
         int oldValue = write.value;
         write.value = value;
         return oldValue;
@@ -840,7 +825,24 @@ public final class BetaIntRef
     }
 
     @Override
-    public LockStatus getLockStatus(final Transaction tx) {
+    public final void await(int value){
+        throw new TodoException();
+    }
+
+    @Override
+    public final void await(Transaction tx, int value){
+        await((BetaTransaction)tx, value);
+    }
+
+    public final void await(BetaTransaction tx, int value){
+        IntRefTranlocal read = tx.openForRead(this,false);
+        if(read.value!=value){
+            StmUtils.retry();
+        }        
+    }
+
+    @Override
+    public final LockStatus getLockStatus(final Transaction tx) {
         if(tx == null){
             throw new NullPointerException();
         }

@@ -2,8 +2,10 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.api.exceptions.WriteConflict;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -87,8 +89,43 @@ public class BetaLongRef_ensureTest {
     }
 
     @Test
-    public void whenSuccess(){
+    public void whenSuccess() {
+        BetaLongRef ref = createLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaTransaction tx = stm.startDefaultTransaction();
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.set(otherTx, 10);
 
+        ref.ensure(tx);
+
+        try {
+            otherTx.commit();
+            fail();
+        } catch (WriteConflict conflict) {
+        }
+
+        assertAborted(otherTx);
+        assertSame(committed, ref.___unsafeLoad());
+    }
+    
+     @Test
+    public void whenNormalTransactionUsed() {
+        BetaLongRef ref = createLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+        Transaction tx = stm.startDefaultTransaction();
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.set(otherTx, 10);
+
+        ref.ensure(tx);
+
+        try {
+            otherTx.commit();
+            fail();
+        } catch (WriteConflict conflict) {
+        }
+
+        assertAborted(otherTx);
+        assertSame(committed, ref.___unsafeLoad());
     }
 
 }

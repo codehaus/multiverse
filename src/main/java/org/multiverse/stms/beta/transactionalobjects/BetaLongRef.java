@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.api.LockStatus;
+import org.multiverse.api.StmUtils;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.TodoException;
@@ -56,7 +57,7 @@ public final class BetaLongRef
 
     //controlled JMM problem (just like the hashcode of String).
     private int ___identityHashCode;    
-    private final BetaStm stm;
+    private final BetaStm ___stm;
 
     /**
      * Creates a uncommitted BetaLongRef that should be attached to the transaction (this
@@ -66,11 +67,7 @@ public final class BetaLongRef
      * @throws NullPointerException if tx is null.
      */
     public BetaLongRef(BetaTransaction tx){
-        if(tx == null){
-            throw new NullPointerException();
-        }
-
-        stm = tx.getConfiguration().stm;
+        ___stm = tx.getConfiguration().stm;
         ___tryLockAndArrive(0);
         this.lockOwner = tx;
     }
@@ -95,7 +92,7 @@ public final class BetaLongRef
             throw new NullPointerException();
         }
 
-        this.stm = stm;
+        this.___stm = stm;
         tranlocal.value = initialValue;
         tranlocal.isCommitted = true;
         tranlocal.isDirty = DIRTY_FALSE;
@@ -104,7 +101,7 @@ public final class BetaLongRef
 
     @Override
     public final BetaStm getStm(){
-        return stm;
+        return ___stm;
     }
 
     @Override
@@ -267,7 +264,7 @@ public final class BetaLongRef
             }
         }
 
-        long remainingSurplus = ___departAfterUpdateAndUnlock(stm.globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
 
         //it is important that this call is done after the actual write. This is needed to give the guarantee
        //that we are going to take care of all listeners that are registered before that write. The read is done
@@ -337,7 +334,7 @@ public final class BetaLongRef
             }
         }
 
-        long remainingSurplus = ___departAfterUpdateAndUnlock(stm.globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
 
@@ -524,91 +521,88 @@ public final class BetaLongRef
     }
 
     @Override
-    public long atomicGetAndIncrement(final long amount){
+    public final long atomicGetAndIncrement(final long amount){
         throw new TodoException();
     }
 
     @Override
-    public long getAndIncrement(final long amount){
+    public final long getAndIncrement(final long amount){
         throw new TodoException();
     }
 
     @Override
-    public long getAndIncrement(final Transaction tx, final long amount){
+    public final long getAndIncrement(final Transaction tx, final long amount){
         return getAndIncrement((BetaTransaction)tx, amount);
     }
 
-    public long getAndIncrement(final BetaTransaction tx, final long amount){
-        if(tx == null){
-            throw new NullPointerException();
-        }
-
+    public final long getAndIncrement(final BetaTransaction tx, final long amount){
         LongRefTranlocal write
-              = (LongRefTranlocal)tx.openForWrite(this, false);
+            = (LongRefTranlocal)tx.openForWrite(this, false);
 
-         long oldValue = write.value;
+        long oldValue = write.value;
         write.value+=amount;
         return oldValue;
     }
 
     @Override
-    public long atomicIncrementAndGet(final long amount){
+    public final long atomicIncrementAndGet(final long amount){
         throw new TodoException();
     }
 
     @Override
-    public long incrementAndGet(final long amount){
+    public final long incrementAndGet(final long amount){
         throw new TodoException();
     }
 
     @Override
-    public long incrementAndGet(final Transaction tx, final long amount){
+    public final long incrementAndGet(
+        final Transaction tx,
+        final long amount){
+
         return incrementAndGet((BetaTransaction)tx, amount);
     }
 
-    public long incrementAndGet(final BetaTransaction tx, final long amount){
-        if(tx == null){
-            throw new NullPointerException();
-        }
+    public final long incrementAndGet(
+        final BetaTransaction tx,
+        final long amount){
 
         LongRefTranlocal write
-              = (LongRefTranlocal)tx.openForWrite(this, false);
+            = (LongRefTranlocal)tx.openForWrite(this, false);
 
         write.value+=amount;
         return write.value;
     }
 
-
     @Override
-    public void ensure(){
+    public final void ensure(){
         throw new TodoException();
     }
 
     @Override
-    public void ensure(Transaction tx){
+    public final void ensure(Transaction tx){
         ensure((BetaTransaction)tx);
     }
 
-    public void ensure(BetaTransaction tx){
+    public final void ensure(BetaTransaction tx){
         tx.openForRead(this, true);
     }
 
     @Override
-    public void commute(
+    public final void commute(
         LongFunction function){
 
         throw new TodoException();
     }
 
     @Override
-    public void commute(
+    public final void commute(
         final Transaction tx,
         final LongFunction function){
 
         commute((BetaTransaction)tx, function);
     }
 
-    public void commute(
+    public final void commute(
         BetaTransaction tx,
         LongFunction function){
 
@@ -616,33 +610,29 @@ public final class BetaLongRef
     }
 
     @Override
-    public long atomicAlterAndGet(
+    public final long atomicAlterAndGet(
         final LongFunction function){
 
         throw new TodoException();
     }
 
     @Override
-    public long alterAndGet(
+    public final long alterAndGet(
         final LongFunction function){
 
         throw new TodoException();
     }
 
     @Override
-    public long alterAndGet(
+    public final long alterAndGet(
         final Transaction tx,
         final LongFunction function){
         return alterAndGet((BetaTransaction)tx, function);
     }
 
-    public long alterAndGet(
+    public final long alterAndGet(
         final BetaTransaction tx,
         final LongFunction function){
-
-        if(tx == null){
-            throw new NullPointerException();
-        }
 
         if(function == null){
             tx.abort();
@@ -657,33 +647,28 @@ public final class BetaLongRef
     }
 
      @Override
-    public long atomicGetAndAlter(
+    public final long atomicGetAndAlter(
         final LongFunction function){
 
         throw new TodoException();
     }
 
     @Override
-    public long getAndAlter(
+    public final long getAndAlter(
         final LongFunction function){
-
         throw new TodoException();
     }
 
     @Override
-    public long getAndAlter(
+    public final long getAndAlter(
         final Transaction tx,
         final LongFunction function){
         return getAndAlter((BetaTransaction)tx, function);
     }
 
-    public long getAndAlter(
+    public final long getAndAlter(
         final BetaTransaction tx,
         final LongFunction function){
-
-        if(tx == null){
-            throw new NullPointerException();
-        }
 
         if(function == null){
             tx.abort();
@@ -699,7 +684,7 @@ public final class BetaLongRef
     }
 
     @Override
-    public boolean atomicCompareAndSet(
+    public final boolean atomicCompareAndSet(
         final long oldValue,
         final long newValue){
 
@@ -707,22 +692,21 @@ public final class BetaLongRef
     }
 
     @Override
-    public long getAndSet(final long value){
+    public final long getAndSet(final long value){
         throw new TodoException();
     }
 
-    public long set(final long value){
-        throw new TodoException();
-    }
-
-
-    @Override
-    public long get(){
+    public final long set(final long value){
         throw new TodoException();
     }
 
     @Override
-    public long get(final Transaction tx){
+    public final long get(){
+        throw new TodoException();
+    }
+
+    @Override
+    public final long get(final Transaction tx){
         return get((BetaTransaction)tx);
     }
 
@@ -732,7 +716,8 @@ public final class BetaLongRef
 
     @Override
     public final long atomicGet(){
-        LongRefTranlocal read = ___load(50);
+        LongRefTranlocal read = ___load(___stm.spinCount);
+
         if(read == null){
             throw new IllegalStateException();
         }
@@ -764,7 +749,7 @@ public final class BetaLongRef
         final long newValue,
         final BetaObjectPool pool){
 
-        final int arriveStatus = ___tryLockAndArrive(stm.spinCount);
+        final int arriveStatus = ___tryLockAndArrive(___stm.spinCount);
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
             throw new WriteConflict();
         }
@@ -789,7 +774,7 @@ public final class BetaLongRef
         update.value = newValue;
         update.prepareForCommit();
         ___active = update;
-        long remainingSurplus = ___departAfterUpdateAndUnlock(stm.globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);
@@ -799,30 +784,30 @@ public final class BetaLongRef
     }
 
     @Override
-    public long set(Transaction tx, long value){
+    public final long set(Transaction tx, long value){
         return set((BetaTransaction)tx, value);
     }
 
     public final long set(
-        final BetaTransaction transaction,
+        final BetaTransaction tx,
         final long value){
 
-        LongRefTranlocal write = transaction.openForWrite(this, false);
+        LongRefTranlocal write = tx.openForWrite(this, false);
         long oldValue = write.value;
         write.value = value;
         return value;
     }
 
     @Override
-    public long getAndSet(Transaction tx, long value){
+    public final long getAndSet(Transaction tx, long value){
         return getAndSet((BetaTransaction)tx, value);
     }
 
     public final long getAndSet(
-        final BetaTransaction transaction,
+        final BetaTransaction tx,
         final long value){
 
-        LongRefTranlocal write = transaction.openForWrite(this, false);
+        LongRefTranlocal write = tx.openForWrite(this, false);
         long oldValue = write.value;
         write.value = value;
         return oldValue;
@@ -840,7 +825,24 @@ public final class BetaLongRef
     }
 
     @Override
-    public LockStatus getLockStatus(final Transaction tx) {
+    public final void await(long value){
+        throw new TodoException();
+    }
+
+    @Override
+    public final void await(Transaction tx, long value){
+        await((BetaTransaction)tx, value);
+    }
+
+    public final void await(BetaTransaction tx, long value){
+        LongRefTranlocal read = tx.openForRead(this,false);
+        if(read.value!=value){
+            StmUtils.retry();
+        }        
+    }
+
+    @Override
+    public final LockStatus getLockStatus(final Transaction tx) {
         if(tx == null){
             throw new NullPointerException();
         }

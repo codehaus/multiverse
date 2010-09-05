@@ -158,11 +158,11 @@ public interface TransactionFactoryBuilder {
 
     /**
      * Sets the the maximum count a transaction can be retried. The default is 1000. Setting it to a very low value
-     * could mean that a transaction can't complete.
+     * could mean that a transaction can't complete. Setting it to a very high value could lead to livelocking.
      *
      * @param maxRetries the maximum number of times a transaction can be tried.
      * @return the updated TransactionFactoryBuilder
-     * @throws IllegalArgumentException if retryCount smaller than 0.
+     * @throws IllegalArgumentException if maxRetries smaller than 0.
      */
     TransactionFactoryBuilder setMaxRetries(int maxRetries);
 

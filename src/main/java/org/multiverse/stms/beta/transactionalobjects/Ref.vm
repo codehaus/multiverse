@@ -56,9 +56,9 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
     private volatile Listeners ___listeners;
 
-    //controlled JMM problem (just like the hashcode of String).
+    //This field has a controlled JMM problem (just like the hashcode of String).
     private int ___identityHashCode;    
-    private final BetaStm stm;
+    private final BetaStm ___stm;
 
     /**
      * Creates a uncommitted ${transactionalObject.name} that should be attached to the transaction (this
@@ -68,11 +68,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
      * @throws NullPointerException if tx is null.
      */
     public ${transactionalObject.name}(BetaTransaction tx){
-        if(tx == null){
-            throw new NullPointerException();
-        }
-
-        stm = tx.getConfiguration().stm;
+        ___stm = tx.getConfiguration().stm;
         ___tryLockAndArrive(0);
         this.lockOwner = tx;
     }
@@ -98,7 +94,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             throw new NullPointerException();
         }
 
-        this.stm = stm;
+        this.___stm = stm;
         tranlocal.value = initialValue;
         tranlocal.isCommitted = true;
         tranlocal.isDirty = DIRTY_FALSE;
@@ -108,7 +104,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 #end
     @Override
     public final BetaStm getStm(){
-        return stm;
+        return ___stm;
     }
 
     @Override
@@ -273,7 +269,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             }
         }
 
-        long remainingSurplus = ___departAfterUpdateAndUnlock(stm.globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
 
         //it is important that this call is done after the actual write. This is needed to give the guarantee
        //that we are going to take care of all listeners that are registered before that write. The read is done
@@ -343,7 +339,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             }
         }
 
-        long remainingSurplus = ___departAfterUpdateAndUnlock(stm.globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
 
@@ -529,116 +525,113 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         }
     }
 
+#if(${transactionalObject.isReference})
 #if(${transactionalObject.isNumber})
     @Override
-    public ${transactionalObject.type} atomicGetAndIncrement(final ${transactionalObject.type} amount){
+    public final ${transactionalObject.type} atomicGetAndIncrement(final ${transactionalObject.type} amount){
         throw new TodoException();
     }
 
     @Override
-    public ${transactionalObject.type} getAndIncrement(final ${transactionalObject.type} amount){
+    public final ${transactionalObject.type} getAndIncrement(final ${transactionalObject.type} amount){
         throw new TodoException();
     }
 
     @Override
-    public ${transactionalObject.type} getAndIncrement(final Transaction tx, final ${transactionalObject.type} amount){
+    public final ${transactionalObject.type} getAndIncrement(final Transaction tx, final ${transactionalObject.type} amount){
         return getAndIncrement((BetaTransaction)tx, amount);
     }
 
-    public ${transactionalObject.type} getAndIncrement(final BetaTransaction tx, final ${transactionalObject.type} amount){
-        if(tx == null){
-            throw new NullPointerException();
-        }
-
+    public final ${transactionalObject.type} getAndIncrement(final BetaTransaction tx, final ${transactionalObject.type} amount){
         ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write
-              = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tx.openForWrite(this, false);
+            = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tx.openForWrite(this, false);
 
-         ${transactionalObject.type} oldValue = write.value;
+        ${transactionalObject.type} oldValue = write.value;
         write.value+=amount;
         return oldValue;
     }
 
     @Override
-    public ${transactionalObject.type} atomicIncrementAndGet(final ${transactionalObject.type} amount){
+    public final ${transactionalObject.type} atomicIncrementAndGet(final ${transactionalObject.type} amount){
         throw new TodoException();
     }
 
     @Override
-    public ${transactionalObject.type} incrementAndGet(final ${transactionalObject.type} amount){
+    public final ${transactionalObject.type} incrementAndGet(final ${transactionalObject.type} amount){
         throw new TodoException();
     }
 
     @Override
-    public ${transactionalObject.type} incrementAndGet(final Transaction tx, final ${transactionalObject.type} amount){
+    public final ${transactionalObject.type} incrementAndGet(
+        final Transaction tx,
+        final ${transactionalObject.type} amount){
+
         return incrementAndGet((BetaTransaction)tx, amount);
     }
 
-    public ${transactionalObject.type} incrementAndGet(final BetaTransaction tx, final ${transactionalObject.type} amount){
-        if(tx == null){
-            throw new NullPointerException();
-        }
+    public final ${transactionalObject.type} incrementAndGet(
+        final BetaTransaction tx,
+        final ${transactionalObject.type} amount){
 
         ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write
-              = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tx.openForWrite(this, false);
+            = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tx.openForWrite(this, false);
 
         write.value+=amount;
         return write.value;
     }
 
-#elseif(${transactionalObject.isReference})
+#elseif(${transactionalObject.name} eq "BetaRef")
     @Override
-    public boolean isNull(){
+    public final boolean isNull(){
         throw new TodoException();
     }
 
     @Override
-    public boolean isNull(final Transaction tx){
+    public final boolean isNull(final Transaction tx){
         return isNull((BetaTransaction)tx);
     }
 
-    public boolean isNull(final BetaTransaction tx){
+    public final boolean isNull(final BetaTransaction tx){
         ${transactionalObject.type} value = get(tx);
         return value == null;
     }
 
     @Override
-    public boolean atomicIsNull(){
+    public final boolean atomicIsNull(){
         throw new TodoException();
     }
 
 #end
-#if(${transactionalObject.isReference})
-
     @Override
-    public void ensure(){
+    public final void ensure(){
         throw new TodoException();
     }
 
     @Override
-    public void ensure(Transaction tx){
+    public final void ensure(Transaction tx){
         ensure((BetaTransaction)tx);
     }
 
-    public void ensure(BetaTransaction tx){
+    public final void ensure(BetaTransaction tx){
         tx.openForRead(this, true);
     }
 
     @Override
-    public void commute(
+    public final void commute(
         ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
 
         throw new TodoException();
     }
 
     @Override
-    public void commute(
+    public final void commute(
         final Transaction tx,
         final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
 
         commute((BetaTransaction)tx, function);
     }
 
-    public void commute(
+    public final void commute(
         BetaTransaction tx,
         ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
 
@@ -646,33 +639,29 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
     @Override
-    public ${transactionalObject.type} atomicAlterAndGet(
+    public final ${transactionalObject.type} atomicAlterAndGet(
         final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
 
         throw new TodoException();
     }
 
     @Override
-    public ${transactionalObject.type} alterAndGet(
+    public final ${transactionalObject.type} alterAndGet(
         final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
 
         throw new TodoException();
     }
 
     @Override
-    public ${transactionalObject.type} alterAndGet(
+    public final ${transactionalObject.type} alterAndGet(
         final Transaction tx,
         final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
         return alterAndGet((BetaTransaction)tx, function);
     }
 
-    public ${transactionalObject.type} alterAndGet(
+    public final ${transactionalObject.type} alterAndGet(
         final BetaTransaction tx,
         final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-
-        if(tx == null){
-            throw new NullPointerException();
-        }
 
         if(function == null){
             tx.abort();
@@ -687,33 +676,28 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
      @Override
-    public ${transactionalObject.type} atomicGetAndAlter(
+    public final ${transactionalObject.type} atomicGetAndAlter(
         final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
 
         throw new TodoException();
     }
 
     @Override
-    public ${transactionalObject.type} getAndAlter(
+    public final ${transactionalObject.type} getAndAlter(
         final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-
         throw new TodoException();
     }
 
     @Override
-    public ${transactionalObject.type} getAndAlter(
+    public final ${transactionalObject.type} getAndAlter(
         final Transaction tx,
         final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
         return getAndAlter((BetaTransaction)tx, function);
     }
 
-    public ${transactionalObject.type} getAndAlter(
+    public final ${transactionalObject.type} getAndAlter(
         final BetaTransaction tx,
         final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-
-        if(tx == null){
-            throw new NullPointerException();
-        }
 
         if(function == null){
             tx.abort();
@@ -729,7 +713,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
     @Override
-    public boolean atomicCompareAndSet(
+    public final boolean atomicCompareAndSet(
         final ${transactionalObject.type} oldValue,
         final ${transactionalObject.type} newValue){
 
@@ -737,22 +721,21 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
     @Override
-    public ${transactionalObject.type} getAndSet(final ${transactionalObject.type} value){
+    public final ${transactionalObject.type} getAndSet(final ${transactionalObject.type} value){
         throw new TodoException();
     }
 
-    public ${transactionalObject.type} set(final ${transactionalObject.type} value){
-        throw new TodoException();
-    }
-
-
-    @Override
-    public ${transactionalObject.type} get(){
+    public final ${transactionalObject.type} set(final ${transactionalObject.type} value){
         throw new TodoException();
     }
 
     @Override
-    public ${transactionalObject.type} get(final Transaction tx){
+    public final ${transactionalObject.type} get(){
+        throw new TodoException();
+    }
+
+    @Override
+    public final ${transactionalObject.type} get(final Transaction tx){
         return get((BetaTransaction)tx);
     }
 
@@ -762,7 +745,8 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
     @Override
     public final ${transactionalObject.type} atomicGet(){
-        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} read = ___load(50);
+        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} read = ___load(___stm.spinCount);
+
         if(read == null){
             throw new IllegalStateException();
         }
@@ -794,7 +778,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final ${transactionalObject.type} newValue,
         final BetaObjectPool pool){
 
-        final int arriveStatus = ___tryLockAndArrive(stm.spinCount);
+        final int arriveStatus = ___tryLockAndArrive(___stm.spinCount);
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
             throw new WriteConflict();
         }
@@ -819,7 +803,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         update.value = newValue;
         update.prepareForCommit();
         ___active = update;
-        long remainingSurplus = ___departAfterUpdateAndUnlock(stm.globalConflictCounter, this);
+        long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);
@@ -829,30 +813,30 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
     @Override
-    public ${transactionalObject.type} set(Transaction tx, ${transactionalObject.type} value){
+    public final ${transactionalObject.type} set(Transaction tx, ${transactionalObject.type} value){
         return set((BetaTransaction)tx, value);
     }
 
     public final ${transactionalObject.type} set(
-        final BetaTransaction transaction,
+        final BetaTransaction tx,
         final ${transactionalObject.type} value){
 
-        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write = transaction.openForWrite(this, false);
+        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write = tx.openForWrite(this, false);
         ${transactionalObject.type} oldValue = write.value;
         write.value = value;
         return value;
     }
 
     @Override
-    public ${transactionalObject.type} getAndSet(Transaction tx, ${transactionalObject.type} value){
+    public final ${transactionalObject.type} getAndSet(Transaction tx, ${transactionalObject.type} value){
         return getAndSet((BetaTransaction)tx, value);
     }
 
     public final ${transactionalObject.type} getAndSet(
-        final BetaTransaction transaction,
+        final BetaTransaction tx,
         final ${transactionalObject.type} value){
 
-        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write = transaction.openForWrite(this, false);
+        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write = tx.openForWrite(this, false);
         ${transactionalObject.type} oldValue = write.value;
         write.value = value;
         return oldValue;
@@ -868,10 +852,27 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
         transaction.openForWrite(this, true).value = value;
     }
-#end
 
     @Override
-    public LockStatus getLockStatus(final Transaction tx) {
+    public final void await(${transactionalObject.type} value){
+        throw new TodoException();
+    }
+
+    @Override
+    public final void await(Transaction tx, ${transactionalObject.type} value){
+        await((BetaTransaction)tx, value);
+    }
+
+    public final void await(BetaTransaction tx, ${transactionalObject.type} value){
+        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} read = tx.openForRead(this,false);
+        if(read.value!=value){
+            StmUtils.retry();
+        }        
+    }
+
+#end
+    @Override
+    public final LockStatus getLockStatus(final Transaction tx) {
         if(tx == null){
             throw new NullPointerException();
         }
