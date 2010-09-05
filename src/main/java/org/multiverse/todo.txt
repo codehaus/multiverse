@@ -176,6 +176,10 @@ the task not being executed at all.
 
 - generate the refs/reffactory instead of writing them manually.
 
+- refs & atomic methods
+
+- refs & transaction required methods.
+
 done
 
 - abort commute on nullpointer function
