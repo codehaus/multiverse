@@ -14,7 +14,8 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.TestUtils.*;
+import static org.multiverse.TestUtils.assertAlive;
+import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
@@ -30,7 +31,7 @@ public class BetaAtomicBlock_interruptibleTest {
     }
 
     @Test
-    public void whenNoTimeoutAndInterruptible() {
+    public void whenNoTimeoutAndInterruptible() throws InterruptedException {
         final BetaLongRef ref = createLongRef(stm);
 
         AtomicBlock block = stm.createTransactionFactoryBuilder()
@@ -46,14 +47,14 @@ public class BetaAtomicBlock_interruptibleTest {
 
         t.interrupt();
 
-        joinAll(t);
+        t.join();
 
         t.assertFailedWithException(InvisibleCheckedException.class);
         assertEquals(0, ref.___unsafeLoad().value);
     }
 
     @Test
-    public void whenTimeoutAndInterruptible() {
+    public void whenTimeoutAndInterruptible() throws InterruptedException {
         final BetaLongRef ref = createLongRef(stm);
 
         AtomicBlock block = stm.createTransactionFactoryBuilder()
@@ -70,7 +71,7 @@ public class BetaAtomicBlock_interruptibleTest {
 
         t.interrupt();
 
-        joinAll(t);
+        t.join();
 
         t.assertFailedWithException(InvisibleCheckedException.class);
         assertEquals(0, ref.___unsafeLoad().value);

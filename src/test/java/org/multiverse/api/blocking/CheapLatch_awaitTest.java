@@ -82,7 +82,7 @@ public class CheapLatch_awaitTest {
     }
 
     @Test
-    public void whenInterruptedWhileWaiting() {
+    public void whenInterruptedWhileWaiting() throws InterruptedException {
         CheapLatch latch = new CheapLatch();
         long era = latch.getEra();
 
@@ -95,7 +95,7 @@ public class CheapLatch_awaitTest {
         assertAlive(t);
         t.interrupt();
 
-        joinAll(t);
+        t.join();
         assertClosed(latch);
         assertEra(latch, era);
         t.assertInterrupted();

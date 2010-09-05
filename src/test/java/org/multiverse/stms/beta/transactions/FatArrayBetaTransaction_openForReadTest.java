@@ -78,6 +78,7 @@ public class FatArrayBetaTransaction_openForReadTest {
         BetaLongRef ref4 = createLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 3);
+        config.init();
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         tx.openForRead(ref1, false);
         tx.openForRead(ref2, false);

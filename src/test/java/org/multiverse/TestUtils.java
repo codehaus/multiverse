@@ -262,6 +262,9 @@ public class TestUtils {
         Bugshaker.sleepUs((long) randomInt(maxUs));
     }
 
+    public static void assertInstanceof(Class expected, Object o){
+        assertTrue(o.getClass().getName(),expected.isAssignableFrom(o.getClass()));
+    }
 
     /**
      * Joins all threads. If this can't be done within 5 minutes, an assertion failure is thrown.
@@ -280,13 +283,13 @@ public class TestUtils {
 
         List<TestThread> uncompleted = new LinkedList(Arrays.asList(threads));
 
-        long maxTimeMillis = System.currentTimeMillis() + maxJoinTimeMillis;
+        long maxTimeMs = System.currentTimeMillis() + maxJoinTimeMillis;
 
         while (!uncompleted.isEmpty()) {
             for (Iterator<TestThread> it = uncompleted.iterator(); it.hasNext();) {
                 TestThread thread = it.next();
                 try {
-                    if (System.currentTimeMillis() > maxTimeMillis) {
+                    if (System.currentTimeMillis() > maxTimeMs) {
                         fail(String.format(
                                 "Failed to join all threads in %s ms, remaining threads %s",
                                 maxJoinTimeMillis, uncompleted));

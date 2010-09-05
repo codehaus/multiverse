@@ -29,7 +29,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     private boolean hasUntrackedReads;
 
     public LeanArrayBetaTransaction(final BetaStm stm) {
-        this(new BetaTransactionConfiguration(stm));
+        this(new BetaTransactionConfiguration(stm).init());
     }
 
     public LeanArrayBetaTransaction(final BetaTransactionConfiguration config) {

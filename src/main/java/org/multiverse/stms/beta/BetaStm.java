@@ -267,6 +267,8 @@ public final class BetaStm implements Stm {
 
         @Override
         public AtomicBlock buildAtomicBlock() {
+            config.init();
+
             if (leanAtomicBlock()) {
                 return new LeanBetaAtomicBlock(build());
             } else {

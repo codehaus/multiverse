@@ -34,7 +34,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
     private boolean evaluatingCommute;
 
     public FatArrayTreeBetaTransaction(BetaStm stm) {
-        this(new BetaTransactionConfiguration(stm));
+        this(new BetaTransactionConfiguration(stm).init());
     }
 
     public FatArrayTreeBetaTransaction(BetaTransactionConfiguration config) {

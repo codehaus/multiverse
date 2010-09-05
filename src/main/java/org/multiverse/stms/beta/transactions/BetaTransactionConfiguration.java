@@ -27,7 +27,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     public final BetaStm stm;
     public final GlobalConflictCounter globalConflictCounter;
     private final AtomicReference<SpeculativeBetaConfig> speculativeConfig
-            = new AtomicReference<SpeculativeBetaConfig>(new SpeculativeBetaConfig(true));
+            = new AtomicReference<SpeculativeBetaConfig>();
     public final TransactionSensor transactionSensor;
     public final StmCallback stmCallback;
     public final String familyName;
@@ -68,7 +68,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         this.stmCallback = stm.getCallback();
         this.globalConflictCounter = stm.getGlobalConflictCounter();
         this.maxArrayTransactionSize = stm.getMaxArrayTransactionSize();
-        this.transactionSensor = stm.getSimpleProfiler().getTransactionSensor(this);
+        this.transactionSensor = stm.getSimpleProfiler().getTransactionSensor(this);        
     }
 
     public BetaTransactionConfiguration(BetaStm stm, int maxArrayTransactionSize) {
@@ -230,7 +230,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         }
     }
 
-    public void init() {
+    public BetaTransactionConfiguration init() {
         if (!writeSkewAllowed && !trackReads && !readonly) {
             String msg = format("'[%s] If no writeskew is allowed, read tracking should be enabled", familyName);
             throw new IllegalTransactionFactoryException(msg);
@@ -254,6 +254,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
                 speculativeConfig.compareAndSet(null, newSpeculativeConfig);
             }
         }
+
+        return this;
     }
 
     public BetaTransactionConfiguration setTimeoutNs(long timeoutNs) {

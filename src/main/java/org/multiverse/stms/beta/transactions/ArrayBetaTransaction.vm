@@ -29,7 +29,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end
 
     public ${transaction.name}(final BetaStm stm) {
-        this(new BetaTransactionConfiguration(stm));
+        this(new BetaTransactionConfiguration(stm).init());
     }
 
     public ${transaction.name}(final BetaTransactionConfiguration config) {

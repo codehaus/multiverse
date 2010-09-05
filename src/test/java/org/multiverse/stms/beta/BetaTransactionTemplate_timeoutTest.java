@@ -34,7 +34,7 @@ public class BetaTransactionTemplate_timeoutTest {
     }
 
     @Test
-    public void whenTimeout() {
+    public void whenTimeout() throws InterruptedException {
         AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setTimeoutNs(timeoutNs)
                 .buildAtomicBlock();
@@ -43,7 +43,7 @@ public class BetaTransactionTemplate_timeoutTest {
         t.setPrintStackTrace(false);
         t.start();
 
-        joinAll(t);
+        t.join();
         t.assertFailedWithException(RetryTimeoutException.class);
         assertEquals(0, ref.___unsafeLoad().value);
     }

@@ -33,7 +33,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
     private boolean hasUpdates;
 
     public LeanArrayTreeBetaTransaction(BetaStm stm) {
-        this(new BetaTransactionConfiguration(stm));
+        this(new BetaTransactionConfiguration(stm).init());
     }
 
     public LeanArrayTreeBetaTransaction(BetaTransactionConfiguration config) {

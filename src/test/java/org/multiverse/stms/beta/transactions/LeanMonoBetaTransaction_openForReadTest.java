@@ -26,7 +26,8 @@ public class LeanMonoBetaTransaction_openForReadTest {
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setBlockingAllowed(false)
-                .setReadTrackingEnabled(false);
+                .setReadTrackingEnabled(false)
+                .init();
 
         LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(config);
 

@@ -48,6 +48,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
     @Test
     public void whenOverflowing() {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
+        config.init();
         BetaTransaction tx = new FatMonoBetaTransaction(config);
         BetaLongRef ref1 = new BetaLongRef(tx);
         BetaLongRef ref2 = new BetaLongRef(tx);

@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.multiverse.TestUtils.assertInstanceof;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class BetaAtomicBlock_speculativeTest {
@@ -63,9 +64,9 @@ public class BetaAtomicBlock_speculativeTest {
         }
 
         assertEquals(3, transactions.size());
-        assertTrue(transactions.get(0) instanceof LeanMonoBetaTransaction);
-        assertTrue(transactions.get(1) instanceof LeanArrayBetaTransaction);
-        assertTrue(transactions.get(2) instanceof LeanArrayTreeBetaTransaction);
+        assertInstanceof(LeanMonoBetaTransaction.class,transactions.get(0));
+        assertInstanceof(LeanArrayBetaTransaction.class,transactions.get(1));
+        assertInstanceof(LeanArrayTreeBetaTransaction.class,transactions.get(2));
     }
 
     /*

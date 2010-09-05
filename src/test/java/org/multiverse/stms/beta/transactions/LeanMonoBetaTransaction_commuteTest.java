@@ -26,7 +26,7 @@ public class LeanMonoBetaTransaction_commuteTest {
     @Test
     public void whenCalled_thenSpeculativeConfigurationError() {
         BetaLongRef ref = createLongRef(stm);
-        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm).init();
         LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(config);
         LongFunction function = mock(LongFunction.class);
 

@@ -78,7 +78,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         BetaLongRef ref1 = BetaStmUtils.createLongRef(stm);
         BetaLongRef ref2 = BetaStmUtils.createLongRef(stm);
 
-        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm).init();
         BetaTransaction tx = new FatMonoBetaTransaction(config);
         tx.openForRead(ref1, false);
         try {

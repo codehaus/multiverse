@@ -7,7 +7,6 @@ import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaLongRef_constructionTest implements BetaStmConstants {
@@ -57,7 +56,7 @@ public class BetaLongRef_constructionTest implements BetaStmConstants {
 
     @Test
     public void test() {
-        BetaTransaction tx = mock(BetaTransaction.class);
+        BetaTransaction tx = stm.startDefaultTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
 
         assertSurplus(1, ref);

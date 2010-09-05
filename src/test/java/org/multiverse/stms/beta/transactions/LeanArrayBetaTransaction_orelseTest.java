@@ -19,7 +19,7 @@ public class LeanArrayBetaTransaction_orelseTest {
 
     @Test
     public void whenStartEitherBranch_thenSpeculativeConfigurationError() {
-        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm).init();
         LeanArrayBetaTransaction tx = new LeanArrayBetaTransaction(config);
 
         try {
@@ -35,7 +35,7 @@ public class LeanArrayBetaTransaction_orelseTest {
 
     @Test
     public void whenStartOrElseBranchBranchCalled_thenIllegalStateException(){
-        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm).init();
         LeanArrayBetaTransaction tx = new LeanArrayBetaTransaction(config);
 
         try {
@@ -51,7 +51,7 @@ public class LeanArrayBetaTransaction_orelseTest {
 
      @Test
     public void whenEndEitherBranchCalled_thenIllegalStateException(){
-        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm).init();
         LeanArrayBetaTransaction tx = new LeanArrayBetaTransaction(config);
 
         try {

@@ -18,7 +18,7 @@ public class LeanArrayTreeBetaTransaction_orelseTest {
 
     @Test
     public void whenStartEitherBranch_thenSpeculativeConfigurationError() {
-        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm).init();
         LeanArrayTreeBetaTransaction tx = new LeanArrayTreeBetaTransaction(config);
 
         try {
@@ -34,7 +34,7 @@ public class LeanArrayTreeBetaTransaction_orelseTest {
 
     @Test
     public void whenStartOrElseBranchBranchCalled_thenIllegalStateException(){
-        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm).init();
         LeanArrayTreeBetaTransaction tx = new LeanArrayTreeBetaTransaction(config);
 
         try {
@@ -50,7 +50,7 @@ public class LeanArrayTreeBetaTransaction_orelseTest {
 
      @Test
     public void whenEndEitherBranchCalled_thenIllegalStateException(){
-        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm).init();
         LeanArrayTreeBetaTransaction tx = new LeanArrayTreeBetaTransaction(config);
 
         try {

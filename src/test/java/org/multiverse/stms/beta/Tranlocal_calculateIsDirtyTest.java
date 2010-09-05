@@ -9,7 +9,6 @@ import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
 
 /**
  * @author Peter Veentjer
@@ -24,7 +23,7 @@ public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants {
 
     @Test
     public void whenConstructed() {
-        BetaTransaction tx = mock(BetaTransaction.class);
+        BetaTransaction tx = stm.startDefaultTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
         Tranlocal tranlocal = new LongRefTranlocal(ref);
 

@@ -133,6 +133,7 @@ public class FatArrayBetaTransaction_commuteTest {
         BetaLongRef ref2 = createLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 1);
+        config.init();
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
 
         LongFunction function1 = mock(LongFunction.class);

@@ -5,10 +5,8 @@ import org.junit.Test;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
 
 /**
  * @author Peter Veentjer
@@ -25,7 +23,7 @@ public class BetaObjectPool_tranlocalsTest {
 
     @Test
     public void putUpdate() {
-        BetaLongRef ref = new BetaLongRef(mock(BetaTransaction.class));
+        BetaLongRef ref = new BetaLongRef(stm.startDefaultTransaction());
         LongRefTranlocal put = new LongRefTranlocal(ref);
         pool.put(put);
 
@@ -38,7 +36,7 @@ public class BetaObjectPool_tranlocalsTest {
 
     @Test
     public void putCommitted() {
-        BetaLongRef ref = new BetaLongRef(mock(BetaTransaction.class));
+        BetaLongRef ref = new BetaLongRef(stm.startDefaultTransaction());
         LongRefTranlocal put = new LongRefTranlocal(ref);
         put.isCommitted = true;
         pool.put(put);
@@ -52,7 +50,7 @@ public class BetaObjectPool_tranlocalsTest {
 
     @Test
     public void take() {
-        BetaLongRef ref = new BetaLongRef(mock(BetaTransaction.class));
+        BetaLongRef ref = new BetaLongRef(stm.startDefaultTransaction());
         LongRefTranlocal put = new LongRefTranlocal(ref);
         pool.put(put);
 
@@ -68,7 +66,7 @@ public class BetaObjectPool_tranlocalsTest {
 
     @Test
     public void takeFromEmptyPool() {
-        BetaLongRef ref = new BetaLongRef(mock(BetaTransaction.class));
+        BetaLongRef ref = new BetaLongRef(stm.startDefaultTransaction());
 
         Tranlocal result = pool.take(ref);
         assertNull(result);
@@ -76,7 +74,7 @@ public class BetaObjectPool_tranlocalsTest {
 
     @Test
     public void test() {
-        BetaLongRef ref = new BetaLongRef(mock(BetaTransaction.class));
+        BetaLongRef ref = new BetaLongRef(stm.startDefaultTransaction());
         LongRefTranlocal put1 = new LongRefTranlocal(ref);
         LongRefTranlocal put2 = new LongRefTranlocal(ref);
         LongRefTranlocal put3 = new LongRefTranlocal(ref);

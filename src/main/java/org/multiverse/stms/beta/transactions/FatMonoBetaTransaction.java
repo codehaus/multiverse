@@ -32,7 +32,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     private boolean evaluatingCommute;
 
     public FatMonoBetaTransaction(final BetaStm stm){
-        this(new BetaTransactionConfiguration(stm));
+        this(new BetaTransactionConfiguration(stm).init());
     }
 
     public FatMonoBetaTransaction(final BetaTransactionConfiguration config) {

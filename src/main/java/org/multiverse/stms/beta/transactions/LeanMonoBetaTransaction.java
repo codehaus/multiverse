@@ -27,7 +27,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
     private boolean hasUpdates;
 
     public LeanMonoBetaTransaction(final BetaStm stm){
-        this(new BetaTransactionConfiguration(stm));
+        this(new BetaTransactionConfiguration(stm).init());
     }
 
     public LeanMonoBetaTransaction(final BetaTransactionConfiguration config) {

@@ -239,7 +239,6 @@ public abstract class AbstractBetaTransactionalObject
             final BetaTransaction expectedLockOwner,
             final BetaObjectPool pool) {
 
-
         if(expectedLockOwner != lockOwner){
             //it can't be an update, otherwise the lock would have been acquired.
 

@@ -166,7 +166,7 @@ public class StandardLatch_tryAwaitTest {
     }
 
     @Test
-    public void whenInterruptedWhileWaiting() {
+    public void whenInterruptedWhileWaiting() throws InterruptedException {
         StandardLatch latch = new StandardLatch();
         long era = latch.getEra();
 
@@ -179,7 +179,7 @@ public class StandardLatch_tryAwaitTest {
         assertAlive(t);
         t.interrupt();
 
-        joinAll(t);
+        t.join();
         assertClosed(latch);
         assertEra(latch, era);
         t.assertInterrupted();
