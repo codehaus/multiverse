@@ -29,6 +29,27 @@ public class FatMonoBetaTransaction_commuteTest {
     }
 
     @Test
+    public void whenNullFunction_thenNullPointerException() {
+        BetaLongRef ref = createLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+
+        try {
+            tx.commute(ref, null);
+            fail();
+        } catch (NullPointerException expected) {
+
+        }
+
+        assertAborted(tx);
+        assertUnlocked(ref);
+        assertSurplus(0, ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+    }
+
+    @Test
     public void whenNotOpenedBefore() {
         BetaLongRef ref = createLongRef(stm);
 

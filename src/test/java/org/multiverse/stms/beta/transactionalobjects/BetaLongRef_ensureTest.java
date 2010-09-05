@@ -107,8 +107,8 @@ public class BetaLongRef_ensureTest {
         assertAborted(otherTx);
         assertSame(committed, ref.___unsafeLoad());
     }
-    
-     @Test
+
+    @Test
     public void whenNormalTransactionUsed() {
         BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();

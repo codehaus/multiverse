@@ -28,6 +28,27 @@ public class FatArrayTreeBetaTransaction_commuteTest {
     }
 
     @Test
+    public void whenNullFunction_thenNullPointerException() {
+        BetaLongRef ref = createLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+
+        try {
+            tx.commute(ref, null);
+            fail();
+        } catch (NullPointerException expected) {
+
+        }
+
+        assertAborted(tx);
+        assertUnlocked(ref);
+        assertSurplus(0, ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+    }
+
+    @Test
     public void whenNotOpenedBefore() {
         BetaLongRef ref = createLongRef(stm);
 
@@ -147,78 +168,78 @@ public class FatArrayTreeBetaTransaction_commuteTest {
     }
 
     @Test
-      public void whenCommuteThenConflictCounterNotSet() {
-          BetaLongRef ref = createLongRef(stm);
+    public void whenCommuteThenConflictCounterNotSet() {
+        BetaLongRef ref = createLongRef(stm);
 
-          FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-          long localConflictCount = tx.getLocalConflictCounter().get();
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        long localConflictCount = tx.getLocalConflictCounter().get();
 
-          LongFunction function = mock(LongFunction.class);
+        LongFunction function = mock(LongFunction.class);
 
-          stm.getGlobalConflictCounter().signalConflict(new BetaLongRef(stm,0));
+        stm.getGlobalConflictCounter().signalConflict(new BetaLongRef(stm, 0));
 
-          tx.commute(ref, function);
+        tx.commute(ref, function);
 
-          assertEquals(localConflictCount, tx.getLocalConflictCounter().get());
-          assertActive(tx);
-          LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
-          assertNotNull(tranlocal);
-          assertSame(ref, tranlocal.owner);
-          assertTrue(tranlocal.isCommuting);
-          assertFalse(tranlocal.isCommitted);
-          assertNull(tranlocal.read);
-          assertHasCommutingFunctions(tranlocal, function);
-          assertUnlocked(ref);
-          assertNull(ref.___getLockOwner());
-          assertSurplus(0, ref);
-      }
+        assertEquals(localConflictCount, tx.getLocalConflictCounter().get());
+        assertActive(tx);
+        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        assertNotNull(tranlocal);
+        assertSame(ref, tranlocal.owner);
+        assertTrue(tranlocal.isCommuting);
+        assertFalse(tranlocal.isCommitted);
+        assertNull(tranlocal.read);
+        assertHasCommutingFunctions(tranlocal, function);
+        assertUnlocked(ref);
+        assertNull(ref.___getLockOwner());
+        assertSurplus(0, ref);
+    }
 
-      @Test
-      public void whenMultipleCommutesOnSameReference() {
-          BetaLongRef ref = createLongRef(stm);
+    @Test
+    public void whenMultipleCommutesOnSameReference() {
+        BetaLongRef ref = createLongRef(stm);
 
-          FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
 
-          LongFunction function1 = mock(LongFunction.class);
-          LongFunction function2 = mock(LongFunction.class);
-          LongFunction function3 = mock(LongFunction.class);
+        LongFunction function1 = mock(LongFunction.class);
+        LongFunction function2 = mock(LongFunction.class);
+        LongFunction function3 = mock(LongFunction.class);
 
-          tx.commute(ref, function1);
-          tx.commute(ref, function2);
-          tx.commute(ref, function3);
+        tx.commute(ref, function1);
+        tx.commute(ref, function2);
+        tx.commute(ref, function3);
 
-          assertActive(tx);
-          LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
-          assertNotNull(tranlocal);
-          assertSame(ref, tranlocal.owner);
-          assertTrue(tranlocal.isCommuting);
-          assertFalse(tranlocal.isCommitted);
-          assertNull(tranlocal.read);
-          assertHasCommutingFunctions(tranlocal, function3, function2, function1);
-          assertUnlocked(ref);
-          assertNull(ref.___getLockOwner());
-          assertSurplus(0, ref);
-      }
+        assertActive(tx);
+        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        assertNotNull(tranlocal);
+        assertSame(ref, tranlocal.owner);
+        assertTrue(tranlocal.isCommuting);
+        assertFalse(tranlocal.isCommitted);
+        assertNull(tranlocal.read);
+        assertHasCommutingFunctions(tranlocal, function3, function2, function1);
+        assertUnlocked(ref);
+        assertNull(ref.___getLockOwner());
+        assertSurplus(0, ref);
+    }
 
-      @Test
-      public void whenMultipleCommutesInTransaction() {
-          BetaLongRef ref1 = createLongRef(stm);
-          BetaLongRef ref2 = createLongRef(stm);
+    @Test
+    public void whenMultipleCommutesInTransaction() {
+        BetaLongRef ref1 = createLongRef(stm);
+        BetaLongRef ref2 = createLongRef(stm);
 
-          FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
 
-          LongFunction function1 = mock(LongFunction.class);
-          LongFunction function2 = mock(LongFunction.class);
+        LongFunction function1 = mock(LongFunction.class);
+        LongFunction function2 = mock(LongFunction.class);
 
-          tx.commute(ref1, function1);
-          tx.commute(ref2, function2);
+        tx.commute(ref1, function1);
+        tx.commute(ref2, function2);
 
-          assertActive(tx);
-          LongRefTranlocal tranlocal1= (LongRefTranlocal) tx.get(ref1);
-          assertHasCommutingFunctions(tranlocal1, function1);
-          LongRefTranlocal tranlocal2= (LongRefTranlocal) tx.get(ref2);
-          assertHasCommutingFunctions(tranlocal2, function2);
-      }
+        assertActive(tx);
+        LongRefTranlocal tranlocal1 = (LongRefTranlocal) tx.get(ref1);
+        assertHasCommutingFunctions(tranlocal1, function1);
+        LongRefTranlocal tranlocal2 = (LongRefTranlocal) tx.get(ref2);
+        assertHasCommutingFunctions(tranlocal2, function2);
+    }
 
 
     @Test

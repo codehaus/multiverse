@@ -165,8 +165,6 @@ the task not being executed at all.
 
 - pooling for generic transactional object tranlocals.
 
-- abort commute on nullpointer function
-
 - commit barriers
 
 - array transaction: on commit/abort the array can be nulled. no need to do it when placing in the pool
@@ -179,6 +177,8 @@ the task not being executed at all.
 - generate the refs/reffactory instead of writing them manually.
 
 done
+
+- abort commute on nullpointer function
 
 - getAndAlter & alterAndGet.
 

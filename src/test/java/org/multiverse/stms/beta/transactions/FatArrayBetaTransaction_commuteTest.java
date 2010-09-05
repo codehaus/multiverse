@@ -30,6 +30,27 @@ public class FatArrayBetaTransaction_commuteTest {
     }
 
     @Test
+    public void whenNullFunction_thenNullPointerException() {
+        BetaLongRef ref = createLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+
+        try {
+            tx.commute(ref, null);
+            fail();
+        } catch (NullPointerException expected) {
+
+        }
+
+        assertAborted(tx);
+        assertUnlocked(ref);
+        assertSurplus(0, ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+    }
+
+    @Test
     public void whenNotOpenedBefore() {
         BetaLongRef ref = createLongRef(stm);
 
@@ -120,9 +141,9 @@ public class FatArrayBetaTransaction_commuteTest {
         tx.commute(ref2, function2);
 
         assertActive(tx);
-        LongRefTranlocal tranlocal1= (LongRefTranlocal) tx.get(ref1);
+        LongRefTranlocal tranlocal1 = (LongRefTranlocal) tx.get(ref1);
         assertHasCommutingFunctions(tranlocal1, function1);
-        LongRefTranlocal tranlocal2= (LongRefTranlocal) tx.get(ref2);
+        LongRefTranlocal tranlocal2 = (LongRefTranlocal) tx.get(ref2);
         assertHasCommutingFunctions(tranlocal2, function2);
     }
 
