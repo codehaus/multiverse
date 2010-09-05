@@ -172,15 +172,27 @@ the task not being executed at all.
 - array tree transaction: on commit/abort the array can be nulled. no need to do it when placing in the pool
   or when initializing.
 
-- ref and await
-
 - generate the refs/reffactory instead of writing them manually.
 
 - refs & atomic methods
 
 - refs & transaction required methods.
 
+- should the retry by added to the transaction? Makes it easier to figure out when a retry is done when
+and not allowed. So not throw the retry error immediately..
+
+- support for a doubleref
+
+- support for a booleanref (can be based on the int-ref functionality since a boolean internally is represented
+as a int).
+
+- transactional linked list
+
+- transactional array
+
 done
+
+- ref and await
 
 - abort commute on nullpointer function
 

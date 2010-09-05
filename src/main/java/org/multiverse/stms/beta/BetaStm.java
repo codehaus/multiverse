@@ -1,21 +1,19 @@
 package org.multiverse.stms.beta;
 
 import org.multiverse.api.*;
+import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.api.references.RefFactoryBuilder;
 import org.multiverse.durability.SimpleStorage;
 import org.multiverse.durability.Storage;
 import org.multiverse.sensors.SimpleProfiler;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.BetaRef;
+import org.multiverse.stms.beta.transactionalobjects.*;
 import org.multiverse.stms.beta.transactions.*;
 
 import static org.multiverse.stms.beta.ThreadLocalBetaTransactionPool.getThreadLocalBetaTransactionPool;
 
 /**
- *
  * @author Peter Veentjer
  */
 public final class BetaStm implements Stm {
@@ -97,17 +95,41 @@ public final class BetaStm implements Stm {
     public final class BetaRefFactoryImpl implements BetaRefFactory {
         @Override
         public BetaIntRef createIntRef(int value) {
-            return new BetaIntRef(BetaStm.this,value);
+            return new BetaIntRef(BetaStm.this, value);
+        }
+
+        @Override
+        public BetaIntRefArray createIntRefArray(int length) {
+            if(length<0){
+                throw new IllegalArgumentException();
+            }
+            throw new TodoException();
         }
 
         @Override
         public BetaLongRef createLongRef(long value) {
-            return new BetaLongRef(BetaStm.this,value);
+            return new BetaLongRef(BetaStm.this, value);
+        }
+
+        @Override
+        public BetaLongRefArray createLongRefArray(int length) {
+            if(length<0){
+                throw new IllegalArgumentException();
+            }
+            throw new TodoException();
         }
 
         @Override
         public <E> BetaRef<E> createRef(E value) {
-            return new BetaRef<E>(BetaStm.this,value);
+            return new BetaRef<E>(BetaStm.this, value);
+        }
+
+        @Override
+        public <E> BetaRefArray<E> createRefArray(int length) {
+            if(length<0){
+                throw new IllegalArgumentException();
+            }
+            throw new TodoException();
         }
     }
 

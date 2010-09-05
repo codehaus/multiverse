@@ -50,7 +50,7 @@ public abstract class AbstractBetaTransactionalObject
 
     private volatile Listeners ___listeners;
 
-    //controlled JMM problem (just like the hashcode of String).
+    //This field has a controlled JMM problem (just like the hashcode of String).
     private int ___identityHashCode;    
     private final BetaStm ___stm;
 

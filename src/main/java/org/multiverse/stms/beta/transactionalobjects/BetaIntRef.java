@@ -32,7 +32,7 @@ import java.util.UUID;
  *
  * @author Peter Veentjer
  */
-public final class BetaIntRef
+public  class BetaIntRef
     extends FastOrec implements BetaTransactionalObject, BetaStmConstants, IntRef
 {
 
@@ -55,7 +55,7 @@ public final class BetaIntRef
 
     private volatile Listeners ___listeners;
 
-    //controlled JMM problem (just like the hashcode of String).
+    //This field has a controlled JMM problem (just like the hashcode of String).
     private int ___identityHashCode;    
     private final BetaStm ___stm;
 

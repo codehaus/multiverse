@@ -189,7 +189,7 @@ List<TransactionalObject> createTransactionalObjects() {
           typeParameter: '',
           initialValue: '0',
           classIndex: 1,
-          accessModifier: 'final',
+          accessModifier: '',
           functionClass: 'IntFunction',
           isReference: true,
           isNumber: true)
