@@ -74,6 +74,13 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
         }
     }
 
+    public final NullPointerException abortCommuteOnNullFunction(final TransactionalObject ref) {
+        abort();
+        throw new NullPointerException(
+            format("[%s] Commute function can't be null",
+                config.familyName));
+    }
+
     public final NoRetryPossibleException abortOnNoRetryPossible(){
         abort();
         throw new NoRetryPossibleException(

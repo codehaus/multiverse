@@ -580,6 +580,42 @@ public final class BetaLongRef
 
 
     @Override
+    public void ensure(){
+        throw new TodoException();
+    }
+
+    @Override
+    public void ensure(Transaction tx){
+        ensure((BetaTransaction)tx);
+    }
+
+    public void ensure(BetaTransaction tx){
+        tx.openForRead(this, true);
+    }
+
+    @Override
+    public void commute(
+        LongFunction function){
+
+        throw new TodoException();
+    }
+
+    @Override
+    public void commute(
+        final Transaction tx,
+        final LongFunction function){
+
+        commute((BetaTransaction)tx, function);
+    }
+
+    public void commute(
+        BetaTransaction tx,
+        LongFunction function){
+
+        tx.commute(this, function);
+    }
+
+    @Override
     public long atomicAlterAndGet(
         final LongFunction function){
 

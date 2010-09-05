@@ -237,6 +237,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortCommute(ref, function);
         }
 
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+                    
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
@@ -424,6 +428,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortCommute(ref, function);
         }
 
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+                    
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
@@ -611,6 +619,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortCommute(ref, function);
         }
 
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+                    
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
@@ -788,6 +800,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortCommute(ref, function);
         }
 
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+                    
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;

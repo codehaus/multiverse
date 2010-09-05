@@ -1,16 +1,16 @@
 package org.multiverse.stms.beta;
 
-import org.multiverse.api.references.ReferenceFactory;
+import org.multiverse.api.references.RefFactory;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
 
 /**
- * A {@link org.multiverse.api.references.ReferenceFactory} tailored for the BetaStm.
+ * A {@link org.multiverse.api.references.RefFactory} tailored for the BetaStm.
  *
  * @author Peter Veentjer.
  */
-public interface BetaReferenceFactory extends ReferenceFactory {
+public interface BetaRefFactory extends RefFactory {
 
     BetaIntRef createIntRef(int value);
 

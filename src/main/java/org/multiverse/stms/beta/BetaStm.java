@@ -2,7 +2,7 @@ package org.multiverse.stms.beta;
 
 import org.multiverse.api.*;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.api.references.ReferenceFactoryBuilder;
+import org.multiverse.api.references.RefFactoryBuilder;
 import org.multiverse.durability.SimpleStorage;
 import org.multiverse.durability.Storage;
 import org.multiverse.sensors.SimpleProfiler;
@@ -61,8 +61,8 @@ public final class BetaStm implements Stm {
     }
 
     @Override
-    public ReferenceFactoryBuilder getReferenceFactoryBuilder() {
-        return new BetaReferenceFactoryBuilderImpl();
+    public RefFactoryBuilder getReferenceFactoryBuilder() {
+        return new BetaRefFactoryBuilderImpl();
     }
 
     public int getSpinCount() {
@@ -87,14 +87,14 @@ public final class BetaStm implements Stm {
         return 20;
     }
 
-    public final class BetaReferenceFactoryBuilderImpl implements BetaReferenceFactoryBuilder {
+    public final class BetaRefFactoryBuilderImpl implements BetaRefFactoryBuilder {
         @Override
-        public BetaReferenceFactory build() {
-            return new BetaReferenceFactoryImpl();
+        public BetaRefFactory build() {
+            return new BetaRefFactoryImpl();
         }
     }
 
-    public final class BetaReferenceFactoryImpl implements BetaReferenceFactory {
+    public final class BetaRefFactoryImpl implements BetaRefFactory {
         @Override
         public BetaIntRef createIntRef(int value) {
             return new BetaIntRef(BetaStm.this,value);

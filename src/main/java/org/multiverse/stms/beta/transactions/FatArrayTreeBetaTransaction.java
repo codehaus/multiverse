@@ -295,6 +295,10 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             throw abortCommute(ref, function);
         }
 
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+                    
         if(evaluatingCommute){
             throw abortOnCommuteWhileEvaluatingCommute(ref);
         }    
@@ -579,6 +583,10 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             throw abortCommute(ref, function);
         }
 
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+                    
         if(evaluatingCommute){
             throw abortOnCommuteWhileEvaluatingCommute(ref);
         }    
@@ -863,6 +871,10 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             throw abortCommute(ref, function);
         }
 
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+                    
         if(evaluatingCommute){
             throw abortOnCommuteWhileEvaluatingCommute(ref);
         }    
@@ -1137,6 +1149,10 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             throw abortCommute(ref, function);
         }
 
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+                    
         if(evaluatingCommute){
             throw abortOnCommuteWhileEvaluatingCommute(ref);
         }    

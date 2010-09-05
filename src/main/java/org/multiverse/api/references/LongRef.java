@@ -5,11 +5,70 @@ import org.multiverse.api.TransactionalObject;
 import org.multiverse.api.functions.LongFunction;
 
 /**
- * A transactional reference for a long.
+ * A transactional reference for a long. No boxing is needed when this reference is used (unlike
+ * using a Ref<Long>.
  *
  * @author Peter Veentjer.
+ * @see org.multiverse.api.references.Ref
  */
 public interface LongRef extends TransactionalObject {
+
+    /**
+     * Ensures that when this ref is read in a transaction, no other transaction is able to write to this
+     * reference. This call expects a running transaction.
+     *
+     * @throws IllegalStateException
+     */
+    void ensure();
+
+    /**
+     * Ensures that when this ref is read in a transaction, no other transaction is able to write to this
+     * reference. This call expects a running transaction.
+     *
+     * @param tx the Transaction used for this operation.
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if the transaction is
+     *                              not in the correct state for this operation.
+     */
+    void ensure(Transaction tx);
+
+    /**
+     * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
+     * will commute. If somehow there already is a dependency or a dependency is formed on the result of
+     * the commuting function, the function will not commute and will be exactly the same as an alter.
+     * <p/>
+     * This is different than the behavior in Clojure where the commute will be re-applied at the end
+     * of the transaction, even though some dependency is introduced, which can lead to inconsistencies.
+     * <p/>
+     * This call lifts on an existing transaction if available, else it will be run under its own transaction.
+     * <p/>
+     *
+     * @param function the function to apply to this reference.
+     * @throws NullPointerException if function is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if tx is not in the correct state
+     *                              for this operation.
+     */
+    void commute(LongFunction function);
+
+    /**
+     * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
+     * will commute. If somehow there already is a dependency or a dependency is formed on the result of
+     * the commuting function, the function will not commute and will be exactly the same as an alter.
+     * <p/>
+     * This is different than the behavior in Clojure where the commute will be re-applied at the end
+     * of the transaction, even though some dependency is introduced, which can lead to inconsistencies.
+     * <p/>
+     * This call lifts on an existing transaction if available, else it will be run under its own transaction.
+     * <p/>
+     *
+     * @param tx       the transaction used for this operation.
+     * @param function the function to apply to this reference.
+     * @throws NullPointerException  if function is null.
+     * @throws IllegalStateException if the transaction is not in the correct state for this operation.
+     */
+    void commute(Transaction tx, LongFunction function);
 
     /**
      * Atomically increments the value and returns the old value. This method doesn't care about
@@ -26,6 +85,9 @@ public interface LongRef extends TransactionalObject {
      *
      * @param amount the amount to increment with.
      * @return the old value.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if tx is not in the correct state
+     *          for this operation.
      */
     long getAndIncrement(long amount);
 
@@ -36,7 +98,7 @@ public interface LongRef extends TransactionalObject {
      * @param amount the amount to increment with.
      * @return the old value.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.DeadTransactionException
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if tx is not in the correct state
      *                              for this operation.
      */
@@ -57,6 +119,9 @@ public interface LongRef extends TransactionalObject {
      *
      * @param amount the amount to increment with.
      * @return the new value.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if tx is not in the correct state
+     *          for this operation.
      */
     long incrementAndGet(long amount);
 
@@ -90,6 +155,9 @@ public interface LongRef extends TransactionalObject {
      * @param function the function that alters the value stored in this Ref.
      * @return the new value.
      * @throws NullPointerException if function is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if tx is not in the correct state
+     *                              for this operation.
      */
     long alterAndGet(LongFunction function);
 
@@ -123,6 +191,9 @@ public interface LongRef extends TransactionalObject {
      * @param function the function that alters the value stored in this Ref.
      * @return the old value.
      * @throws NullPointerException if function is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if tx is not in the correct state
+     *                              for this operation.
      */
     long getAndAlter(LongFunction function);
 
@@ -172,6 +243,9 @@ public interface LongRef extends TransactionalObject {
      *
      * @param value the new value.
      * @return the old value.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if tx is not in the correct state
+     *          for this operation.
      */
     long getAndSet(long value);
 
@@ -181,6 +255,9 @@ public interface LongRef extends TransactionalObject {
      *
      * @param value the new value.
      * @return the new value.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if tx is not in the correct state
+     *          for this operation.
      */
     long set(long value);
 
@@ -223,6 +300,9 @@ public interface LongRef extends TransactionalObject {
      * Transaction is running, it will be run under its own transaction (so executed atomically).
      *
      * @return the current value.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if tx is not in the correct state
+     *          for this operation.
      * @see #atomicGet()
      */
     long get();

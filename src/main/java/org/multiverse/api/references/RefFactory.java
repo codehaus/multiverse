@@ -5,7 +5,7 @@ package org.multiverse.api.references;
  *
  * @author Peter Veentjer.
  */
-public interface ReferenceFactory {
+public interface RefFactory {
 
     /**
      * Creates a committed BetaIntRef.

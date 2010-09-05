@@ -334,6 +334,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortCommute(ref, function);
         }
 
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+    
         if(evaluatingCommute){
             throw abortOnCommuteWhileEvaluatingCommute(ref);
         }
@@ -670,6 +674,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortCommute(ref, function);
         }
 
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+    
         if(evaluatingCommute){
             throw abortOnCommuteWhileEvaluatingCommute(ref);
         }
@@ -1006,6 +1014,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortCommute(ref, function);
         }
 
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+    
         if(evaluatingCommute){
             throw abortOnCommuteWhileEvaluatingCommute(ref);
         }
@@ -1329,6 +1341,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortCommute(ref, function);
         }
 
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+    
         if(evaluatingCommute){
             throw abortOnCommuteWhileEvaluatingCommute(ref);
         }

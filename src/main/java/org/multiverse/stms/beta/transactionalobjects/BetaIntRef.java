@@ -580,6 +580,42 @@ public final class BetaIntRef
 
 
     @Override
+    public void ensure(){
+        throw new TodoException();
+    }
+
+    @Override
+    public void ensure(Transaction tx){
+        ensure((BetaTransaction)tx);
+    }
+
+    public void ensure(BetaTransaction tx){
+        tx.openForRead(this, true);
+    }
+
+    @Override
+    public void commute(
+        IntFunction function){
+
+        throw new TodoException();
+    }
+
+    @Override
+    public void commute(
+        final Transaction tx,
+        final IntFunction function){
+
+        commute((BetaTransaction)tx, function);
+    }
+
+    public void commute(
+        BetaTransaction tx,
+        IntFunction function){
+
+        tx.commute(this, function);
+    }
+
+    @Override
     public int atomicAlterAndGet(
         final IntFunction function){
 

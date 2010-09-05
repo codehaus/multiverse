@@ -324,6 +324,10 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortCommute(ref, function);
         }
 
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+                    
 #if($transaction.lean)
         config.needsCommute();
         abort();

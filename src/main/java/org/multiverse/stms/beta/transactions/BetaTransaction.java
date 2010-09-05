@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionStatus;
+import org.multiverse.api.TransactionalObject;
 import org.multiverse.api.Watch;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.Function;
@@ -79,6 +80,13 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
             default:
                 throw new IllegalStateException();
         }
+    }
+
+    public final NullPointerException abortCommuteOnNullFunction(final TransactionalObject ref) {
+        abort();
+        throw new NullPointerException(
+            format("[%s] Commute function can't be null",
+                config.familyName));
     }
 
     public final NoRetryPossibleException abortOnNoRetryPossible(){

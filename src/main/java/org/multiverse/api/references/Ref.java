@@ -5,17 +5,74 @@ import org.multiverse.api.TransactionalObject;
 import org.multiverse.api.functions.Function;
 
 /**
- * A Transactional Reference.
+ * A Transactional Reference comparable to the <a href="http://clojure.org/refs">Clojure Ref</a>.
  *
  * @param <E>
  */
 public interface Ref<E> extends TransactionalObject {
 
     /**
+     * Ensures that when this ref is read in a transaction, no other transaction is able to write to this
+     * reference. This call expects a running transaction.
+     *
+     * @throws IllegalStateException
+     */
+    void ensure();
+
+    /**
+     * Ensures that when this ref is read in a transaction, no other transaction is able to write to this
+     * reference. This call expects a running transaction.
+     *
+     * @param tx the Transaction used for this operation.
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if the transaction is
+     *                              not in the correct state for this operation.
+     */
+    void ensure(Transaction tx);
+
+    /**
+     * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
+     * will commute. If somehow there already is a dependency or a dependency is formed on the result of
+     * the commuting function, the function will not commute and will be exactly the same as an alter.
+     * <p/>
+     * This is different than the behavior in Clojure where the commute will be re-applied at the end
+     * of the transaction, even though some dependency is introduced, which can lead to inconsistencies.
+     * <p/>
+     * This call lifts on an existing transaction if available, else it will be run under its own transaction.
+     * <p/>
+     *
+     * @param function the function to apply to this reference.
+     * @throws NullPointerException if function is null.
+     */
+    void commute(Function<E> function);
+
+    /**
+     * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
+     * will commute. If somehow there already is a dependency or a dependency is formed on the result of
+     * the commuting function, the function will not commute and will be exactly the same as an alter.
+     * <p/>
+     * This is different than the behavior in Clojure where the commute will be re-applied at the end
+     * of the transaction, even though some dependency is introduced, which can lead to inconsistencies.
+     * <p/>
+     * This call lifts on an existing transaction if available, else it will be run under its own transaction.
+     * <p/>
+     *
+     * @param tx       the transaction used for this operation.
+     * @param function the function to apply to this reference.
+     * @throws NullPointerException  if function is null.
+     * @throws IllegalStateException if the transaction is not in the correct state for this operation.
+     */
+    void commute(Transaction tx, Function<E> function);
+
+    /**
      * Checks if the current value is null. If a transaction is available, it will lift on that transaction,
      * else it will be run under its own transaction.
      *
      * @return true if null, false otherwise.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if tx is not in the correct state
+     *          for this operation.
      */
     boolean isNull();
 
@@ -55,6 +112,9 @@ public interface Ref<E> extends TransactionalObject {
      * @param function the function that alters the value stored in this Ref.
      * @return the new value.
      * @throws NullPointerException if function is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if tx is not in the correct state
+     *                              for this operation.
      */
     E alterAndGet(Function<E> function);
 
@@ -88,6 +148,9 @@ public interface Ref<E> extends TransactionalObject {
      * @param function the function that alters the value stored in this Ref.
      * @return the old value.
      * @throws NullPointerException if function is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if tx is not in the correct state
+     *                              for this operation.
      */
     E getAndAlter(Function<E> function);
 
@@ -128,6 +191,9 @@ public interface Ref<E> extends TransactionalObject {
      *
      * @param value the new value.
      * @return the new value.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if tx is not in the correct state
+     *          for this operation.
      */
     E atomicSet(E value);
 
@@ -137,6 +203,9 @@ public interface Ref<E> extends TransactionalObject {
      *
      * @param value the new value.
      * @return the old value.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if tx is not in the correct state
+     *          for this operation.
      */
     E getAndSet(E value);
 
@@ -146,6 +215,9 @@ public interface Ref<E> extends TransactionalObject {
      *
      * @param value the new value.
      * @return the new value.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if tx is not in the correct state
+     *          for this operation.
      */
     E set(E value);
 
@@ -188,6 +260,9 @@ public interface Ref<E> extends TransactionalObject {
      * Transaction is running, it will be run under its own transaction (so executed atomically).
      *
      * @return the current value.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if tx is not in the correct state
+     *          for this operation.
      * @see #atomicGet()
      */
     E get();

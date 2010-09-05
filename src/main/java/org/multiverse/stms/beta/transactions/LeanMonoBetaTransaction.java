@@ -230,6 +230,10 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortCommute(ref, function);
         }
 
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+    
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
@@ -429,6 +433,10 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortCommute(ref, function);
         }
 
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+    
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
@@ -628,6 +636,10 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortCommute(ref, function);
         }
 
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+    
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
@@ -814,6 +826,10 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortCommute(ref, function);
         }
 
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+    
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
