@@ -1,4 +1,4 @@
-package org.multiverse.stms.beta;
+package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.api.references.RefFactoryBuilder;
 

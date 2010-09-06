@@ -7,6 +7,8 @@ package org.multiverse.api.references;
  */
 public interface RefFactory {
 
+    DoubleRef createDoubleRef(double value);
+
     /**
      * Creates a committed BetaIntRef.
      *

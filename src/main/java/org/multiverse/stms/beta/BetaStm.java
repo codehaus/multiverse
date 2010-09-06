@@ -93,6 +93,12 @@ public final class BetaStm implements Stm {
     }
 
     public final class BetaRefFactoryImpl implements BetaRefFactory {
+
+        @Override
+        public BetaDoubleRef createDoubleRef(double value) {
+            return new BetaDoubleRef(BetaStm.this, value);
+        }
+
         @Override
         public BetaIntRef createIntRef(int value) {
             return new BetaIntRef(BetaStm.this, value);
@@ -100,7 +106,7 @@ public final class BetaStm implements Stm {
 
         @Override
         public BetaIntRefArray createIntRefArray(int length) {
-            if(length<0){
+            if (length < 0) {
                 throw new IllegalArgumentException();
             }
             throw new TodoException();
@@ -113,7 +119,7 @@ public final class BetaStm implements Stm {
 
         @Override
         public BetaLongRefArray createLongRefArray(int length) {
-            if(length<0){
+            if (length < 0) {
                 throw new IllegalArgumentException();
             }
             throw new TodoException();
@@ -126,7 +132,7 @@ public final class BetaStm implements Stm {
 
         @Override
         public <E> BetaRefArray<E> createRefArray(int length) {
-            if(length<0){
+            if (length < 0) {
                 throw new IllegalArgumentException();
             }
             throw new TodoException();

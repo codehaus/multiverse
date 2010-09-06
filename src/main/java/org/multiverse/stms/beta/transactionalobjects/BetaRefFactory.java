@@ -1,7 +1,6 @@
-package org.multiverse.stms.beta;
+package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.api.references.RefFactory;
-import org.multiverse.stms.beta.transactionalobjects.*;
 
 /**
  * A {@link org.multiverse.api.references.RefFactory} tailored for the BetaStm.
@@ -9,6 +8,9 @@ import org.multiverse.stms.beta.transactionalobjects.*;
  * @author Peter Veentjer.
  */
 public interface BetaRefFactory extends RefFactory {
+
+    @Override
+    BetaDoubleRef createDoubleRef(double value);
 
     @Override
     BetaIntRef createIntRef(int value);
