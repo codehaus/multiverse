@@ -8,7 +8,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.multiverse.TestUtils.assertAborted;
+import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.createReadBiasedLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
@@ -38,7 +38,7 @@ public class LeanMonoBetaTransaction_openForReadTest {
         }
 
         assertEquals(2, config.getSpeculativeConfig().getMinimalLength());
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSurplus(1, ref);
         assertReadBiased(ref);
         assertUnlocked(ref);

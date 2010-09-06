@@ -72,7 +72,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         verify(listener).notify(tx, TransactionLifecycleEvent.PostCommit);
     }
 
@@ -83,7 +83,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         tx.register(listener);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         verify(listener).notify(tx, TransactionLifecycleEvent.PostCommit);
     }
 
@@ -97,7 +97,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         tx.register(normalListener);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
 
         InOrder inOrder = inOrder(permanentListener, normalListener);
 
@@ -111,7 +111,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 
     @Test
@@ -175,7 +175,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         tx.commit();
 
         assertFalse(write.isCommitted);
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertNull(ref.___getLockOwner());
         assertUnlocked(ref.___getOrec());
@@ -224,7 +224,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         } catch (WriteConflict expected) {
         }
 
-        assertAborted(tx2);
+        assertIsAborted(tx2);
     }
 
     @Test
@@ -302,7 +302,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 
     @Test
@@ -315,7 +315,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         tx.prepare();
 
         tx.commit();
-        assertCommitted(tx);
+        assertIsCommitted(tx);
 
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
@@ -335,7 +335,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
 
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
@@ -402,7 +402,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         tx.commute(ref, IncLongFunction.INSTANCE);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -419,7 +419,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         tx.commute(ref, IncLongFunction.INSTANCE);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -435,7 +435,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         tx.commute(ref2, IncLongFunction.INSTANCE);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSurplus(0, ref1);
         assertUpdateBiased(ref1);
         assertReadonlyCount(0, ref1);
@@ -458,7 +458,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         tx.commute(ref, IncLongFunction.INSTANCE);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -479,7 +479,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         tx.commute(ref2, IncLongFunction.INSTANCE);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSurplus(0, ref1);
         assertUpdateBiased(ref1);
         assertReadonlyCount(0, ref1);
@@ -505,7 +505,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         } catch (WriteConflict expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -549,7 +549,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         } catch (WriteConflict conflict) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -558,7 +558,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         tx.commit();
 
         tx.commit();
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 
     @Test
@@ -572,6 +572,6 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         } catch (IllegalStateException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 }

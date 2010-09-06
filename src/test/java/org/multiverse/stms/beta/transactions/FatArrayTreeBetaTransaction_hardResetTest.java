@@ -32,7 +32,7 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
 
         tx.hardReset();
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertEquals(1, tx.getAttempt());
     }
 
@@ -75,7 +75,7 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
     }
 
     private static void assertWasHardReset(FatArrayTreeBetaTransaction tx) {
-        assertActive(tx);
+        assertIsActive(tx);
         assertHasNoNormalListeners(tx);
         assertEquals(1, tx.getAttempt());
         assertFalse((Boolean) getField(tx, "hasReads"));
@@ -93,7 +93,7 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
 
         tx.hardReset();
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertHasNoNormalListeners(tx);
         assertEquals(1, tx.getAttempt());
         assertEquals(100, tx.getRemainingTimeoutNs());
@@ -107,7 +107,7 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
         tx.hardReset();
 
         assertEquals(1, tx.getAttempt());
-        assertActive(tx);
+        assertIsActive(tx);
         assertHasNoNormalListeners(tx);
         assertEquals(Long.MAX_VALUE, tx.getRemainingTimeoutNs());
     }
@@ -122,7 +122,7 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
         tx.hardReset();
 
         assertEquals(1, tx.getAttempt());
-        assertActive(tx);
+        assertIsActive(tx);
         verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
         assertHasNoNormalListeners(tx);
         assertEquals(Long.MAX_VALUE, tx.getRemainingTimeoutNs());
@@ -136,7 +136,7 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
 
         tx.hardReset();
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertEquals(1, tx.getAttempt());
         verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
         assertHasNoNormalListeners(tx);
@@ -150,7 +150,7 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
 
         tx.hardReset();
         assertEquals(1, tx.getAttempt());
-        assertActive(tx);
+        assertIsActive(tx);
         assertHasNoNormalListeners(tx);
         assertEquals(Long.MAX_VALUE, tx.getRemainingTimeoutNs());
     }
@@ -162,7 +162,7 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
 
         tx.hardReset();
         assertEquals(1, tx.getAttempt());
-        assertActive(tx);
+        assertIsActive(tx);
         assertHasNoNormalListeners(tx);
         assertEquals(Long.MAX_VALUE, tx.getRemainingTimeoutNs());
     }

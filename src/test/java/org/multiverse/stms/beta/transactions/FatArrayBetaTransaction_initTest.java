@@ -49,7 +49,7 @@ public class FatArrayBetaTransaction_initTest {
         } catch (NullPointerException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -112,7 +112,7 @@ public class FatArrayBetaTransaction_initTest {
     }
 
     private void assertInitialized(FatArrayBetaTransaction tx) {
-        assertActive(tx);
+        assertIsActive(tx);
         assertHasNoNormalListeners(tx);
         assertEquals(0, getField(tx, "firstFreeIndex"));
         assertEquals(1, tx.getAttempt());

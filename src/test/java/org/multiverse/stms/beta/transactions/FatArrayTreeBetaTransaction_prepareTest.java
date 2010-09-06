@@ -51,7 +51,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
         tx.prepare();
 
         assertPrepared(tx);
-        assertCommitted(otherTx);
+        assertIsCommitted(otherTx);
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
         assertSame(conflictingWrite, ref.___unsafeLoad());
@@ -73,7 +73,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
         tx.prepare();
 
         assertPrepared(tx);
-        assertActive(otherTx);
+        assertIsActive(otherTx);
         assertLocked(ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
@@ -138,8 +138,8 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
         } catch (WriteConflict expected) {
         }
 
-        assertAborted(tx);
-        assertActive(otherTx);
+        assertIsAborted(tx);
+        assertIsActive(otherTx);
 
         assertLocked(ref);
         assertSame(otherTx, ref.___getLockOwner());
@@ -184,8 +184,8 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
         } catch (WriteConflict expected) {
         }
 
-        assertAborted(tx);
-        assertCommitted(otherTx);
+        assertIsAborted(tx);
+        assertIsCommitted(otherTx);
 
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
@@ -336,7 +336,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
         } catch (WriteConflict expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
 
         assertLocked(ref);
         assertSame(otherTx, ref.___getLockOwner());
@@ -416,7 +416,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
          } catch (WriteConflict expected) {
          }
 
-         assertAborted(tx2);
+         assertIsAborted(tx2);
      }
 
 
@@ -431,7 +431,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
         } catch (WriteConflict conflict) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -445,7 +445,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
         } catch (DeadTransactionException expected) {
         }
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 
     @Test
@@ -459,6 +459,6 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
         } catch (DeadTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 }

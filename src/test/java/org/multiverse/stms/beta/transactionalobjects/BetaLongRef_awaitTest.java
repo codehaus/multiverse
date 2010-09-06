@@ -9,8 +9,8 @@ import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.fail;
-import static org.multiverse.TestUtils.assertAborted;
-import static org.multiverse.TestUtils.assertActive;
+import static org.multiverse.TestUtils.assertIsAborted;
+import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class BetaLongRef_awaitTest {
@@ -44,7 +44,7 @@ public class BetaLongRef_awaitTest {
         } catch (PreparedTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class BetaLongRef_awaitTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -74,7 +74,7 @@ public class BetaLongRef_awaitTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -88,6 +88,6 @@ public class BetaLongRef_awaitTest {
         } catch (Retry expected) {
         }
 
-        assertActive(tx);
+        assertIsActive(tx);
     }
 }

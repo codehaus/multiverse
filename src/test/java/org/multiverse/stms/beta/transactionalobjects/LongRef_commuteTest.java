@@ -35,7 +35,7 @@ public class LongRef_commuteTest {
         } catch (NullPointerException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSame(committed, ref.___unsafeLoad());
     }
 
@@ -69,7 +69,7 @@ public class LongRef_commuteTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         verifyZeroInteractions(function);
         assertSame(committed, ref.___unsafeLoad());
     }
@@ -88,7 +88,7 @@ public class LongRef_commuteTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         verifyZeroInteractions(function);
         assertSame(committed, ref.___unsafeLoad());
     }
@@ -107,7 +107,7 @@ public class LongRef_commuteTest {
         } catch (PreparedTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         verifyZeroInteractions(function);
         assertSame(committed, ref.___unsafeLoad());
     }
@@ -122,7 +122,7 @@ public class LongRef_commuteTest {
         assertHasCommutingFunctions((LongRefTranlocal) tx.get(ref), function);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertEquals(11, ref.___unsafeLoad().value);
     }
 
@@ -141,7 +141,7 @@ public class LongRef_commuteTest {
 
         tx1.commit();
 
-        assertCommitted(tx1);
+        assertIsCommitted(tx1);
         assertEquals(11, ref1.___unsafeLoad().value);
         assertEquals(12, ref2.___unsafeLoad().value);
     }

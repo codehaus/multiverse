@@ -35,7 +35,7 @@ public class FatArrayBetaTransaction_abortTest {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.abort();
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -49,7 +49,7 @@ public class FatArrayBetaTransaction_abortTest {
 
         tx.abort();
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertUnlocked(ref);
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(0, ref);
@@ -69,7 +69,7 @@ public class FatArrayBetaTransaction_abortTest {
 
         tx.abort();
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertUnlocked(ref);
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(0, ref);
@@ -89,7 +89,7 @@ public class FatArrayBetaTransaction_abortTest {
 
         tx.abort();
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertUnlocked(ref);
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(0, ref);
@@ -109,7 +109,7 @@ public class FatArrayBetaTransaction_abortTest {
 
         tx.abort();
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertUnlocked(ref);
         assertReadBiased(ref);
         assertReadonlyCount(oldReadonlyCount, ref);
@@ -125,7 +125,7 @@ public class FatArrayBetaTransaction_abortTest {
         LongRefTranlocal write = tx.openForConstruction(ref);
         tx.abort();
 
-        assertAborted(tx);
+        assertIsAborted(tx);
 
         assertSame(tx, ref.___getLockOwner());
         assertLocked(ref);
@@ -188,7 +188,7 @@ public class FatArrayBetaTransaction_abortTest {
         tx.prepare();
 
         tx.abort();
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
 
@@ -198,7 +198,7 @@ public class FatArrayBetaTransaction_abortTest {
         tx.abort();
 
         tx.abort();
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -212,6 +212,6 @@ public class FatArrayBetaTransaction_abortTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 }

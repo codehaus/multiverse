@@ -31,7 +31,11 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
  */
 public class TestUtils {
 
-    public static void assertEqualsDouble(double expected, double found){
+    public static void clearCurrentThreadInterruptedStatus() {
+        Thread.interrupted();
+    }
+
+    public static void assertEqualsDouble(double expected, double found) {
         assertEquals(Double.doubleToLongBits(expected), Double.doubleToLongBits(found));
     }
 
@@ -177,15 +181,15 @@ public class TestUtils {
         assertEquals(TransactionStatus.Prepared, tx.getStatus());
     }
 
-    public static void assertAborted(Transaction tx) {
+    public static void assertIsAborted(Transaction tx) {
         assertEquals(TransactionStatus.Aborted, tx.getStatus());
     }
 
-    public static void assertCommitted(Transaction tx) {
+    public static void assertIsCommitted(Transaction tx) {
         assertEquals(TransactionStatus.Committed, tx.getStatus());
     }
 
-    public static void assertActive(Transaction tx) {
+    public static void assertIsActive(Transaction tx) {
         assertEquals(TransactionStatus.Active, tx.getStatus());
     }
 
@@ -205,7 +209,7 @@ public class TestUtils {
         Bugshaker.sleepUs((long) randomInt((int) TimeUnit.MILLISECONDS.toMicros(maxMs)));
     }
 
-     public static void sleepMs(long ms) {
+    public static void sleepMs(long ms) {
         long us = TimeUnit.MILLISECONDS.toMicros(ms);
         Bugshaker.sleepUs(us);
     }
@@ -266,8 +270,8 @@ public class TestUtils {
         Bugshaker.sleepUs((long) randomInt(maxUs));
     }
 
-    public static void assertInstanceof(Class expected, Object o){
-        assertTrue(o.getClass().getName(),expected.isAssignableFrom(o.getClass()));
+    public static void assertInstanceof(Class expected, Object o) {
+        assertTrue(o.getClass().getName(), expected.isAssignableFrom(o.getClass()));
     }
 
     /**
@@ -304,7 +308,7 @@ public class TestUtils {
 
                     if (!thread.isAlive()) {
                         it.remove();
-                        durationMs+=thread.getDurationMs();
+                        durationMs += thread.getDurationMs();
 
                         if (thread.getThrowable() == null) {
                             System.out.printf("%s completed successfully\n", thread.getName());

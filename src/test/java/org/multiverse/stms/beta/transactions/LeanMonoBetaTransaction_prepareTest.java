@@ -6,7 +6,7 @@ import org.multiverse.api.exceptions.WriteConflict;
 import org.multiverse.stms.beta.BetaStm;
 
 import static org.junit.Assert.fail;
-import static org.multiverse.TestUtils.assertAborted;
+import static org.multiverse.TestUtils.assertIsAborted;
 
 public class LeanMonoBetaTransaction_prepareTest {
     private BetaStm stm;
@@ -27,7 +27,7 @@ public class LeanMonoBetaTransaction_prepareTest {
         } catch (WriteConflict conflict) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
 }

@@ -57,7 +57,7 @@ public class FatMonoBetaTransaction_prepareTest {
         tx.prepare();
 
         assertPrepared(tx);
-        assertCommitted(otherTx);
+        assertIsCommitted(otherTx);
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
         assertSame(conflictingWrite, ref.___unsafeLoad());
@@ -79,7 +79,7 @@ public class FatMonoBetaTransaction_prepareTest {
         tx.prepare();
 
         assertPrepared(tx);
-        assertActive(otherTx);
+        assertIsActive(otherTx);
         assertLocked(ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
@@ -144,8 +144,8 @@ public class FatMonoBetaTransaction_prepareTest {
         } catch (WriteConflict expected) {
         }
 
-        assertAborted(tx);
-        assertActive(otherTx);
+        assertIsAborted(tx);
+        assertIsActive(otherTx);
 
         assertLocked(ref);
         assertSame(otherTx, ref.___getLockOwner());
@@ -189,8 +189,8 @@ public class FatMonoBetaTransaction_prepareTest {
         } catch (WriteConflict expected) {
         }
 
-        assertAborted(tx);
-        assertCommitted(otherTx);
+        assertIsAborted(tx);
+        assertIsCommitted(otherTx);
 
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
@@ -211,7 +211,7 @@ public class FatMonoBetaTransaction_prepareTest {
         } catch (WriteConflict conflict) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -246,7 +246,7 @@ public class FatMonoBetaTransaction_prepareTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 
     @Test
@@ -260,6 +260,6 @@ public class FatMonoBetaTransaction_prepareTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 }

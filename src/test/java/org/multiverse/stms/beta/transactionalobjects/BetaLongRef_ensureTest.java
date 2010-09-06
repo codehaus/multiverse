@@ -11,8 +11,8 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
-import static org.multiverse.TestUtils.assertAborted;
-import static org.multiverse.TestUtils.assertCommitted;
+import static org.multiverse.TestUtils.assertIsAborted;
+import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class BetaLongRef_ensureTest {
@@ -50,7 +50,7 @@ public class BetaLongRef_ensureTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSame(committed, ref.___unsafeLoad());
     }
 
@@ -67,7 +67,7 @@ public class BetaLongRef_ensureTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSame(committed, ref.___unsafeLoad());
     }
 
@@ -84,7 +84,7 @@ public class BetaLongRef_ensureTest {
         } catch (PreparedTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSame(committed, ref.___unsafeLoad());
     }
 
@@ -104,7 +104,7 @@ public class BetaLongRef_ensureTest {
         } catch (WriteConflict conflict) {
         }
 
-        assertAborted(otherTx);
+        assertIsAborted(otherTx);
         assertSame(committed, ref.___unsafeLoad());
     }
 
@@ -124,7 +124,7 @@ public class BetaLongRef_ensureTest {
         } catch (WriteConflict conflict) {
         }
 
-        assertAborted(otherTx);
+        assertIsAborted(otherTx);
         assertSame(committed, ref.___unsafeLoad());
     }
 

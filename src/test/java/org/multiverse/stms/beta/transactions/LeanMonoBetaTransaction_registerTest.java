@@ -9,7 +9,7 @@ import org.multiverse.stms.beta.BetaStm;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import static org.multiverse.TestUtils.assertAborted;
+import static org.multiverse.TestUtils.assertIsAborted;
 
 public class LeanMonoBetaTransaction_registerTest {
 
@@ -32,7 +32,7 @@ public class LeanMonoBetaTransaction_registerTest {
         } catch (SpeculativeConfigurationError error) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertTrue(tx.getConfiguration().getSpeculativeConfig().isListenerRequired());
     }
 }

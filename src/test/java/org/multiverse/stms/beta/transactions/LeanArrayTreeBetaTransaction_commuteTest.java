@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.multiverse.TestUtils.assertAborted;
+import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class LeanArrayTreeBetaTransaction_commuteTest {
@@ -35,7 +35,7 @@ public class LeanArrayTreeBetaTransaction_commuteTest {
         } catch (SpeculativeConfigurationError expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         verifyZeroInteractions(function);
         assertTrue(config.getSpeculativeConfig().isCommuteRequired());
     }

@@ -8,8 +8,8 @@ import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.assertAborted;
-import static org.multiverse.TestUtils.assertCommitted;
+import static org.multiverse.TestUtils.assertIsAborted;
+import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 /**
@@ -52,7 +52,7 @@ public class BetaLongRef_getAndIncrement2Test {
         } catch (DeadTransactionException expected) {
         }
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSame(committed, ref.___unsafeLoad());
     }
 
@@ -69,7 +69,7 @@ public class BetaLongRef_getAndIncrement2Test {
         } catch (DeadTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSame(committed, ref.___unsafeLoad());
     }
 
@@ -86,7 +86,7 @@ public class BetaLongRef_getAndIncrement2Test {
         } catch (PreparedTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSame(committed, ref.___unsafeLoad());
     }
 
@@ -100,7 +100,7 @@ public class BetaLongRef_getAndIncrement2Test {
         tx.commit();
 
         assertEquals(10, result);
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertEquals(10, ref.___unsafeLoad().value);
     }
@@ -114,7 +114,7 @@ public class BetaLongRef_getAndIncrement2Test {
         long result = ref.getAndIncrement(tx, 20);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertEquals(10, result);
         assertNotSame(committed, ref.___unsafeLoad());
         assertEquals(30, ref.___unsafeLoad().value);

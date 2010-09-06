@@ -41,7 +41,7 @@ public class FatArrayTreeBetaTransaction_commuteTest {
 
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertUnlocked(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
@@ -58,7 +58,7 @@ public class FatArrayTreeBetaTransaction_commuteTest {
 
         tx.commute(ref, function);
 
-        assertActive(tx);
+        assertIsActive(tx);
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
         assertNotNull(tranlocal);
         assertSame(ref, tranlocal.owner);
@@ -83,7 +83,7 @@ public class FatArrayTreeBetaTransaction_commuteTest {
         tx.commute(ref, function1);
         tx.commute(ref, function2);
 
-        assertActive(tx);
+        assertIsActive(tx);
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
 
         assertNotNull(tranlocal);
@@ -108,7 +108,7 @@ public class FatArrayTreeBetaTransaction_commuteTest {
         tx.commute(ref, new IncLongFunction());
 
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
-        assertActive(tx);
+        assertIsActive(tx);
         assertFalse(tranlocal.isCommuting);
         assertFalse(tranlocal.isCommitted);
         assertSame(read, tranlocal.read);
@@ -128,7 +128,7 @@ public class FatArrayTreeBetaTransaction_commuteTest {
         LongRefTranlocal tranlocal = tx.openForWrite(ref, false);
         tx.commute(ref, new IncLongFunction());
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertSame(ref, tranlocal.owner);
         assertFalse(tranlocal.isCommuting);
         assertFalse(tranlocal.isCommitted);
@@ -155,7 +155,7 @@ public class FatArrayTreeBetaTransaction_commuteTest {
 
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertSame(ref, tranlocal.owner);
         assertFalse(tranlocal.isCommuting);
         assertFalse(tranlocal.isCommitted);
@@ -181,7 +181,7 @@ public class FatArrayTreeBetaTransaction_commuteTest {
         tx.commute(ref, function);
 
         assertEquals(localConflictCount, tx.getLocalConflictCounter().get());
-        assertActive(tx);
+        assertIsActive(tx);
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
         assertNotNull(tranlocal);
         assertSame(ref, tranlocal.owner);
@@ -208,7 +208,7 @@ public class FatArrayTreeBetaTransaction_commuteTest {
         tx.commute(ref, function2);
         tx.commute(ref, function3);
 
-        assertActive(tx);
+        assertIsActive(tx);
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
         assertNotNull(tranlocal);
         assertSame(ref, tranlocal.owner);
@@ -234,7 +234,7 @@ public class FatArrayTreeBetaTransaction_commuteTest {
         tx.commute(ref1, function1);
         tx.commute(ref2, function2);
 
-        assertActive(tx);
+        assertIsActive(tx);
         LongRefTranlocal tranlocal1 = (LongRefTranlocal) tx.get(ref1);
         assertHasCommutingFunctions(tranlocal1, function1);
         LongRefTranlocal tranlocal2 = (LongRefTranlocal) tx.get(ref2);
@@ -255,7 +255,7 @@ public class FatArrayTreeBetaTransaction_commuteTest {
 
         LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertTrue(commuting.isCommuting);
         assertFalse(commuting.isCommitted);
         assertNull(commuting.read);
@@ -282,7 +282,7 @@ public class FatArrayTreeBetaTransaction_commuteTest {
         } catch (ReadonlyException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         verifyZeroInteractions(function);
     }
 
@@ -301,7 +301,7 @@ public class FatArrayTreeBetaTransaction_commuteTest {
         } catch (PreparedTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -319,7 +319,7 @@ public class FatArrayTreeBetaTransaction_commuteTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 
     @Test
@@ -337,6 +337,6 @@ public class FatArrayTreeBetaTransaction_commuteTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 }

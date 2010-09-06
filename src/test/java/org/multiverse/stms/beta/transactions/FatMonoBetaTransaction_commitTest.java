@@ -46,7 +46,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 
     /*
@@ -57,7 +57,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         tx.registerPermanent(listener);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         verify(listener).notify(tx, TransactionLifecycleEvent.PostCommit);
     } */
 
@@ -68,7 +68,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         tx.register(listener);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         verify(listener).notify(tx, TransactionLifecycleEvent.PostCommit);
     }
 
@@ -82,7 +82,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         tx.registerPermanent(permanentListener);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
 
         InOrder inOrder = inOrder(permanentListener, normalListener);
 
@@ -146,7 +146,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         tx.openForRead(ref, false);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(0, ref.___getOrec());
         assertEquals(0, committed.value);
@@ -170,7 +170,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         assertSurplus(1, ref);
         assertReadBiased(ref);
         assertReadonlyCount(0, ref);
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 
     @Test
@@ -188,7 +188,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(1, ref);
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 
     @Test
@@ -206,7 +206,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         assertSurplus(1, ref);
         assertReadBiased(ref);
         assertReadonlyCount(0, ref);
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 
     @Test
@@ -228,7 +228,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 
     @Test
@@ -240,7 +240,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         write.value++;
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSame(write, ref.___unsafeLoad());
         assertTrue(write.isCommitted);
         assertNull(write.read);
@@ -262,7 +262,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         tx.commit();
 
         assertFalse(write.isCommitted);
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertNull(ref.___getLockOwner());
         assertUnlocked(ref.___getOrec());
@@ -279,7 +279,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         write.value++;
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSame(write, ref.___unsafeLoad());
         assertTrue(write.isCommitted);
         assertNull(write.read);
@@ -362,7 +362,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         tx.commit();
 
         assertSame(committed, ref.___unsafeLoad());
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertTrue(committed.isCommitted);
         assertFalse(committed.isPermanent);
@@ -384,7 +384,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         write.value++;
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSame(write, ref.___unsafeLoad());
         assertTrue(write.isCommitted);
         assertNull(write.read);
@@ -420,7 +420,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         LongRefTranlocal write = tx.openForWrite(ref, false);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertNull(ref.___getLockOwner());
         assertUnlocked(ref);
@@ -439,7 +439,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         LongRefTranlocal write = tx.openForWrite(ref, true);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertNull(ref.___getLockOwner());
         assertUnlocked(ref);
@@ -457,7 +457,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         LongRefTranlocal write = (LongRefTranlocal) tx.openForWrite(ref, false);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSame(write, ref.___unsafeLoad());
         assertTrue(write.isCommitted);
         assertNull(write.read);
@@ -519,7 +519,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 
     @Test
@@ -532,7 +532,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         tx.prepare();
 
         tx.commit();
-        assertCommitted(tx);
+        assertIsCommitted(tx);
 
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
@@ -552,7 +552,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
 
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
@@ -574,7 +574,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         tx.commute(ref, IncLongFunction.INSTANCE);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -591,7 +591,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         tx.commute(ref, IncLongFunction.INSTANCE);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -613,7 +613,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         tx.commute(ref2, IncLongFunction.INSTANCE);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSurplus(0, ref1);
         assertUpdateBiased(ref1);
         assertReadonlyCount(0, ref1);
@@ -636,7 +636,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         tx.commute(ref, IncLongFunction.INSTANCE);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -658,7 +658,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         } catch (WriteConflict expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -676,7 +676,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         } catch (WriteConflict conflict) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -711,7 +711,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         tx.commit();
 
         tx.commit();
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 
     @Test
@@ -725,7 +725,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         } catch (IllegalStateException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test

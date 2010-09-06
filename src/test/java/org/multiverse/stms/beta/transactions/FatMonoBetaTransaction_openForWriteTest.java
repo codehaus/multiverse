@@ -52,7 +52,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         } catch (ReadConflict expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -70,7 +70,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertEquals(2, config.getSpeculativeConfig().getMinimalLength());
     }
 
@@ -83,7 +83,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertNull(ref.___getLockOwner());
         assertReadBiased(ref);
         assertSurplus(1, ref);
@@ -109,7 +109,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, true);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertSame(tx, ref.___getLockOwner());
         assertReadBiased(ref);
         assertSurplus(1, ref);
@@ -134,7 +134,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertNull(ref.___getLockOwner());
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
@@ -160,7 +160,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, true);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertSame(tx, ref.___getLockOwner());
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
@@ -197,7 +197,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertActive(tx);
+        assertIsActive(tx);
         assertAttached(tx, write);
         assertHasUpdates(tx);
     }
@@ -222,7 +222,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertActive(tx);
+        assertIsActive(tx);
         assertAttached(tx, write);
         assertHasNoUpdates(tx);
     }
@@ -247,7 +247,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertActive(tx);
+        assertIsActive(tx);
         assertAttached(tx, write);
         assertHasNoUpdates(tx);
     }
@@ -270,7 +270,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertActive(tx);
+        assertIsActive(tx);
         assertAttached(tx, write2);
         assertHasUpdates(tx);
     }
@@ -292,7 +292,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertActive(tx);
+        assertIsActive(tx);
         assertAttached(tx, write);
         assertHasUpdates(tx);
     }
@@ -315,7 +315,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertActive(tx);
+        assertIsActive(tx);
         assertAttached(tx, write1);
         assertHasUpdates(tx);
     }
@@ -339,7 +339,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertActive(tx);
+        assertIsActive(tx);
         assertAttached(tx, write);
         assertHasUpdates(tx);
     }
@@ -362,7 +362,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertActive(tx);
+        assertIsActive(tx);
         assertAttached(tx, write2);
         assertHasUpdates(tx);
     }
@@ -385,7 +385,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertActive(tx);
+        assertIsActive(tx);
         assertAttached(tx, write2);
         assertHasUpdates(tx);
     }
@@ -412,7 +412,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -443,7 +443,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -466,7 +466,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         } catch (ReadConflict expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSurplus(1, ref1);
         assertUnlocked(ref1);
         assertNull(ref1.___getLockOwner());
@@ -487,7 +487,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         } catch (ReadonlyException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSame(committed, ref.___unsafeLoad());
     }
 
@@ -504,7 +504,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         } catch (ReadonlyException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -517,7 +517,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         } catch (NullPointerException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -530,7 +530,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         BetaTransaction tx = new FatMonoBetaTransaction(config);
         LongRefTranlocal write = tx.openForWrite(ref, false);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertNotSame(committed, write);
         assertFalse(write.isCommitted);
         assertFalse(write.isPermanent);
@@ -552,7 +552,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         BetaTransaction tx = new FatMonoBetaTransaction(config);
         LongRefTranlocal write = tx.openForWrite(ref, false);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertNotSame(committed, write);
         assertFalse(write.isCommitted);
         assertFalse(write.isPermanent);
@@ -577,7 +577,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
         LongRefTranlocal write = tx.openForWrite(ref, false);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertSame(commuting, write);
         assertSame(committed, write.read);
         assertFalse(write.isCommuting);
@@ -611,7 +611,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
 
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSame(otherTx, ref.___getLockOwner());
         assertLocked(ref);
         assertSurplus(1, ref);
@@ -638,7 +638,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
             assertSame(exception, e);
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertUnlocked(ref);
@@ -665,7 +665,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
             assertSame(exception, e);
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertUnlocked(ref);
@@ -687,7 +687,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         } catch (PreparedTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
         assertUnlocked(ref);
@@ -707,7 +707,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -723,6 +723,6 @@ public class FatMonoBetaTransaction_openForWriteTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 }

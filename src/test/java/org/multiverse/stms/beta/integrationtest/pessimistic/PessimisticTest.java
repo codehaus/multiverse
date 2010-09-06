@@ -43,7 +43,7 @@ public class PessimisticTest {
         long value = tx.openForRead(ref, false).value;
 
         assertEquals(0, value);
-        assertActive(tx);
+        assertIsActive(tx);
         assertEquals(0, ref.___unsafeLoad().value);
     }
 
@@ -63,7 +63,7 @@ public class PessimisticTest {
         } catch (WriteConflict expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertEquals(0, ref.___unsafeLoad().value);
     }
 
@@ -146,7 +146,7 @@ public class PessimisticTest {
 
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSame(otherTx, ref.___getLockOwner());
     }
 
@@ -158,7 +158,7 @@ public class PessimisticTest {
         tx.openForRead(ref, true);
         tx.abort();
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertNull(ref.___getLockOwner());
     }
 
@@ -170,7 +170,7 @@ public class PessimisticTest {
         tx.openForRead(ref, true);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertNull(ref.___getLockOwner());
     }
 }

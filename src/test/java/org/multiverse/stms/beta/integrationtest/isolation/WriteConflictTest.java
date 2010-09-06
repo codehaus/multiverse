@@ -11,8 +11,8 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
-import static org.multiverse.TestUtils.assertAborted;
-import static org.multiverse.TestUtils.assertCommitted;
+import static org.multiverse.TestUtils.assertIsAborted;
+import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
@@ -36,7 +36,7 @@ public class WriteConflictTest {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
-                .setSpeculativeConfigEnabled(false)
+                .setSpeculativeConfigurationEnabled(false)
                 .setDirtyCheckEnabled(true)
                 .build()
                 .start();
@@ -55,7 +55,7 @@ public class WriteConflictTest {
 
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSame(conflictingWrite, ref.___unsafeLoad());
     }
 
@@ -64,7 +64,7 @@ public class WriteConflictTest {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
-                .setSpeculativeConfigEnabled(false)
+                .setSpeculativeConfigurationEnabled(false)
                 .setDirtyCheckEnabled(true)
                 .build()
                 .start();
@@ -77,7 +77,7 @@ public class WriteConflictTest {
 
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSame(conflictingWrite, ref.___unsafeLoad());
     }
 
@@ -87,7 +87,7 @@ public class WriteConflictTest {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
-                .setSpeculativeConfigEnabled(false)
+                .setSpeculativeConfigurationEnabled(false)
                 .setDirtyCheckEnabled(false)
                 .build()
                 .start();
@@ -105,7 +105,7 @@ public class WriteConflictTest {
         } catch (WriteConflict expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSame(conflictingWrite, ref.___unsafeLoad());
     }
 
@@ -114,7 +114,7 @@ public class WriteConflictTest {
         BetaLongRef ref = createLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
-                .setSpeculativeConfigEnabled(false)
+                .setSpeculativeConfigurationEnabled(false)
                 .setDirtyCheckEnabled(false)
                 .build()
                 .start();
@@ -132,7 +132,7 @@ public class WriteConflictTest {
         } catch (WriteConflict expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSame(conflictingWrite, ref.___unsafeLoad());
     }
 }

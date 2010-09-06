@@ -124,7 +124,7 @@ public class BetaStm_transactionFactoryBuilderTest {
     @Test
     public void whenSpeculativeConfigEnabled() {
         BetaTransactionFactory txFactory = stm.createTransactionFactoryBuilder()
-                .setSpeculativeConfigEnabled(true)
+                .setSpeculativeConfigurationEnabled(true)
                 .build();
 
         BetaTransactionConfiguration configuration = txFactory.getTransactionConfiguration();
@@ -135,7 +135,7 @@ public class BetaStm_transactionFactoryBuilderTest {
     @Test
     public void whenWriteSkewNotAllowed() {
         BetaTransactionFactory txFactory = stm.createTransactionFactoryBuilder()
-                .setSpeculativeConfigEnabled(true)
+                .setSpeculativeConfigurationEnabled(true)
                 .setWriteSkewAllowed(false)
                 .build();
 
@@ -148,7 +148,7 @@ public class BetaStm_transactionFactoryBuilderTest {
     @Test
     public void whenWriteSkewNotAllowedThenFatTransaction() {
         BetaTransactionFactory txFactory = stm.createTransactionFactoryBuilder()
-                .setSpeculativeConfigEnabled(true)
+                .setSpeculativeConfigurationEnabled(true)
                 .setWriteSkewAllowed(false)
                 .build();
 
@@ -159,7 +159,7 @@ public class BetaStm_transactionFactoryBuilderTest {
     @Test
     public void whenWriteSkewAllowedThenFatTransaction() {
         BetaTransactionFactory txFactory = stm.createTransactionFactoryBuilder()
-                .setSpeculativeConfigEnabled(true)
+                .setSpeculativeConfigurationEnabled(true)
                 .setWriteSkewAllowed(true)
                 .build();
 

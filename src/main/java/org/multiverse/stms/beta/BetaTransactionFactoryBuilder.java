@@ -51,7 +51,7 @@ public interface BetaTransactionFactoryBuilder extends TransactionFactoryBuilder
     BetaTransactionFactoryBuilder setSpinCount(int spinCount);
 
     @Override
-    BetaTransactionFactoryBuilder setSpeculativeConfigEnabled(boolean enabled);
+    BetaTransactionFactoryBuilder setSpeculativeConfigurationEnabled(boolean enabled);
 
     @Override
     BetaTransactionFactoryBuilder setReadonly(boolean readonly);

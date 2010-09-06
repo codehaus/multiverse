@@ -42,15 +42,15 @@ public class FatMonoBetaTransaction_softResetTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
         assertTrue(tx.softReset());
         assertEquals(2, tx.getAttempt());
-        assertActive(tx);
+        assertIsActive(tx);
 
         assertTrue(tx.softReset());
         assertEquals(3, tx.getAttempt());
-        assertActive(tx);
+        assertIsActive(tx);
 
         assertFalse(tx.softReset());
         assertEquals(3, tx.getAttempt());
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -60,7 +60,7 @@ public class FatMonoBetaTransaction_softResetTest {
         boolean result = tx.softReset();
 
         assertTrue(result);
-        assertActive(tx);
+        assertIsActive(tx);
     }
 
     @Test
@@ -74,7 +74,7 @@ public class FatMonoBetaTransaction_softResetTest {
         boolean result = tx.softReset();
 
         assertTrue(result);
-        assertActive(tx);
+        assertIsActive(tx);
         assertReadonlyCount(0, ref);
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
@@ -94,7 +94,7 @@ public class FatMonoBetaTransaction_softResetTest {
         boolean result = tx.softReset();
 
         assertTrue(result);
-        assertActive(tx);
+        assertIsActive(tx);
         assertReadonlyCount(0, ref);
         assertReadBiased(ref);
         assertSurplus(1, ref);
@@ -114,7 +114,7 @@ public class FatMonoBetaTransaction_softResetTest {
         boolean result = tx.softReset();
 
         assertTrue(result);
-        assertActive(tx);
+        assertIsActive(tx);
         assertReadonlyCount(0, ref);
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
@@ -136,7 +136,7 @@ public class FatMonoBetaTransaction_softResetTest {
         boolean result = tx.softReset();
 
         assertTrue(result);
-        assertActive(tx);
+        assertIsActive(tx);
         assertReadonlyCount(0, ref);
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
@@ -155,7 +155,7 @@ public class FatMonoBetaTransaction_softResetTest {
         boolean result = tx.softReset();
 
         assertTrue(result);
-        assertActive(tx);
+        assertIsActive(tx);
         assertHasNoUpdates(tx);
     }
 
@@ -171,7 +171,7 @@ public class FatMonoBetaTransaction_softResetTest {
         boolean result = tx.softReset();
 
         assertTrue(result);
-        assertActive(tx);
+        assertIsActive(tx);
         assertReadonlyCount(0, ref);
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
@@ -191,7 +191,7 @@ public class FatMonoBetaTransaction_softResetTest {
         boolean result = tx.softReset();
 
         assertTrue(result);
-        assertActive(tx);
+        assertIsActive(tx);
         assertFalse(constructed.isCommitted);
         assertFalse(constructed.isPermanent);
         assertLocked(ref);
@@ -220,7 +220,7 @@ public class FatMonoBetaTransaction_softResetTest {
 
         boolean result = tx.softReset();
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertTrue(result);
     }
 
@@ -232,6 +232,6 @@ public class FatMonoBetaTransaction_softResetTest {
         boolean result = tx.softReset();
 
         assertTrue(result);
-        assertActive(tx);
+        assertIsActive(tx);
     }
 }

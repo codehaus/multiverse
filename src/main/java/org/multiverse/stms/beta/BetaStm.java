@@ -37,7 +37,7 @@ public final class BetaStm implements Stm {
                 .setSpinCount(spinCount);
         this.storage = new SimpleStorage(this);
         this.defaultAtomicBlock = createTransactionFactoryBuilder()
-                .setSpeculativeConfigEnabled(false)
+                .setSpeculativeConfigurationEnabled(false)
                 .buildAtomicBlock();
     }
 
@@ -257,7 +257,7 @@ public final class BetaStm implements Stm {
         }
 
         @Override
-        public BetaTransactionFactoryBuilder setSpeculativeConfigEnabled(final boolean enabled) {
+        public BetaTransactionFactoryBuilder setSpeculativeConfigurationEnabled(final boolean enabled) {
             if (enabled == config.speculativeConfigEnabled) {
                 return this;
             }

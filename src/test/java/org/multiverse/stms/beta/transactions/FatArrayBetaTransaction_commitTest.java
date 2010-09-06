@@ -57,7 +57,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         LongRefTranlocal constructed2 = tx.openForConstruction(ref2);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSame(constructed1, ref1.___unsafeLoad());
         assertTrue(constructed1.isCommitted);
         assertFalse(constructed1.isPermanent);
@@ -86,7 +86,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         verify(listener).notify(tx, TransactionLifecycleEvent.PostCommit);
     }
 
@@ -97,7 +97,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         tx.register(listener);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         verify(listener).notify(tx, TransactionLifecycleEvent.PostCommit);
     }
 
@@ -112,7 +112,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         tx.register(normalListener);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
 
         InOrder inOrder = inOrder(permanentListener, normalListener);
 
@@ -131,7 +131,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         tx.openForRead(ref, false);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(0, ref.___getOrec());
         assertEquals(0, committed.value);
@@ -216,7 +216,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         tranlocal.value++;
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSame(tranlocal, ref.___unsafeLoad());
         assertTrue(tranlocal.isCommitted);
         assertNull(tranlocal.read);
@@ -238,7 +238,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         tx.commit();
 
         assertFalse(write.isCommitted);
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertNull(ref.___getLockOwner());
         assertUnlocked(ref.___getOrec());
@@ -302,7 +302,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         tranlocal.value++;
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSame(tranlocal, ref.___unsafeLoad());
         assertTrue(tranlocal.isCommitted);
         assertNull(tranlocal.read);
@@ -387,7 +387,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 
     @Test
@@ -442,7 +442,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         tx.commute(ref, IncLongFunction.INSTANCE);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -459,7 +459,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         tx.commute(ref, IncLongFunction.INSTANCE);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -475,7 +475,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         tx.commute(ref2, IncLongFunction.INSTANCE);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSurplus(0, ref1);
         assertUpdateBiased(ref1);
         assertReadonlyCount(0, ref1);
@@ -500,7 +500,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         tx.commute(ref2, IncLongFunction.INSTANCE);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSurplus(0, ref1);
         assertUpdateBiased(ref1);
         assertReadonlyCount(0, ref1);
@@ -523,7 +523,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         tx.commute(ref, IncLongFunction.INSTANCE);
         tx.commit();
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -545,7 +545,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         } catch (WriteConflict expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -618,7 +618,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         } catch (WriteConflict expected) {
         }
 
-        assertAborted(tx2);
+        assertIsAborted(tx2);
     }
 
   
@@ -633,7 +633,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         } catch (WriteConflict conflict) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -642,7 +642,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         tx.commit();
 
         tx.commit();
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 
     @Test
@@ -656,6 +656,6 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         } catch (DeadTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 }

@@ -34,7 +34,7 @@ public class FatMonoBetaTransaction_abortTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.abort();
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -46,7 +46,7 @@ public class FatMonoBetaTransaction_abortTest {
         tx.openForRead(ref, false);
         tx.abort();
 
-        assertAborted(tx);
+        assertIsAborted(tx);
 
         assertNull(ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
@@ -66,7 +66,7 @@ public class FatMonoBetaTransaction_abortTest {
         tx.openForRead(ref, false);
         tx.abort();
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertUnlocked(ref.___getOrec());
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
@@ -84,7 +84,7 @@ public class FatMonoBetaTransaction_abortTest {
         tx.openForRead(ref, true);
         tx.abort();
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertUnlocked(ref.___getOrec());
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
@@ -102,7 +102,7 @@ public class FatMonoBetaTransaction_abortTest {
         tx.openForWrite(ref, false);
         tx.abort();
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertUnlocked(ref.___getOrec());
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
@@ -120,7 +120,7 @@ public class FatMonoBetaTransaction_abortTest {
         tx.openForWrite(ref, true);
         tx.abort();
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertUnlocked(ref.___getOrec());
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
@@ -136,7 +136,7 @@ public class FatMonoBetaTransaction_abortTest {
         LongRefTranlocal write = tx.openForConstruction(ref);
         tx.abort();
 
-        assertAborted(tx);
+        assertIsAborted(tx);
 
         assertSame(tx, ref.___getLockOwner());
         assertLocked(ref);
@@ -194,7 +194,7 @@ public class FatMonoBetaTransaction_abortTest {
         tx.prepare();
 
         tx.abort();
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -203,7 +203,7 @@ public class FatMonoBetaTransaction_abortTest {
         tx.abort();
 
         tx.abort();
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -217,6 +217,6 @@ public class FatMonoBetaTransaction_abortTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 }

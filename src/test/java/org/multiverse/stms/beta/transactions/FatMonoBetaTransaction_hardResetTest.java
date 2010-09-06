@@ -75,7 +75,7 @@ public class FatMonoBetaTransaction_hardResetTest {
     }
 
     private static void assertWasHardReset(FatMonoBetaTransaction tx) {
-        assertActive(tx);
+        assertIsActive(tx);
         assertHasNoNormalListeners(tx);
         assertEquals(1, tx.getAttempt());
         assertFalse((Boolean) getField(tx, "hasReads"));
@@ -122,7 +122,7 @@ public class FatMonoBetaTransaction_hardResetTest {
 
         tx.hardReset();
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertEquals(1, tx.getAttempt());
         verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
         assertHasNoNormalListeners(tx);
@@ -136,7 +136,7 @@ public class FatMonoBetaTransaction_hardResetTest {
 
         tx.hardReset();
         assertEquals(1, tx.getAttempt());
-        assertActive(tx);
+        assertIsActive(tx);
         assertHasNoNormalListeners(tx);
         assertEquals(Long.MAX_VALUE, tx.getRemainingTimeoutNs());
     }
@@ -148,7 +148,7 @@ public class FatMonoBetaTransaction_hardResetTest {
 
         tx.hardReset();
         assertEquals(1, tx.getAttempt());
-        assertActive(tx);
+        assertIsActive(tx);
         assertHasNoNormalListeners(tx);
         assertEquals(Long.MAX_VALUE, tx.getRemainingTimeoutNs());
     }

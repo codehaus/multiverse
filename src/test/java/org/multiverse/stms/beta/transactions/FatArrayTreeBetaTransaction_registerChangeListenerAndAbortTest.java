@@ -50,7 +50,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         Latch latch = new CheapLatch();
         tx.registerChangeListenerAndAbort(latch);
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertFalse(latch.isOpen());
         assertHasListeners(ref1, latch);
         assertHasListeners(ref2, latch);
@@ -73,7 +73,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         } catch (NoRetryPossibleException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertHasNoListeners(ref);
         assertUnlocked(ref);
         assertUpdateBiased(ref);
@@ -93,7 +93,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         } catch (NoRetryPossibleException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertHasNoListeners(ref);
         assertLocked(ref);
         assertUpdateBiased(ref);
@@ -115,7 +115,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         tx.openForWrite(ref2, false);
         tx.registerChangeListenerAndAbort(latch);
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertHasNoListeners(ref3);
         assertHasListeners(ref1, latch);
         assertHasListeners(ref2, latch);
@@ -132,7 +132,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         } catch (NoRetryPossibleException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -153,7 +153,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         } catch (NoRetryPossibleException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -167,7 +167,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         tx.registerChangeListenerAndAbort(latch);
 
         assertFalse(latch.isOpen());
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSurplus(0, ref);
         assertUnlocked(ref);
     }
@@ -183,7 +183,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         tx.registerChangeListenerAndAbort(latch);
 
         assertFalse(latch.isOpen());
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertNull(ref.___getLockOwner());
         assertUnlocked(ref);
         assertSurplus(0, ref);
@@ -200,7 +200,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         tx.registerChangeListenerAndAbort(latch);
 
         assertFalse(latch.isOpen());
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
         assertUnlocked(ref);
@@ -217,7 +217,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         tx.registerChangeListenerAndAbort(latch);
 
         assertFalse(latch.isOpen());
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         assertUnlocked(ref);
@@ -262,7 +262,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         } catch (PreparedTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         verifyZeroInteractions(latch);
     }
 
@@ -278,7 +278,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         verifyZeroInteractions(latch);
     }
 
@@ -294,7 +294,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         verifyZeroInteractions(latch);
     }
 }

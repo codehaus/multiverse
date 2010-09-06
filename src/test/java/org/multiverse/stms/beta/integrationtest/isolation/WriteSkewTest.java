@@ -35,7 +35,7 @@ public class WriteSkewTest {
         BetaLongRef ref2 = createLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
-                .setSpeculativeConfigEnabled(false)
+                .setSpeculativeConfigurationEnabled(false)
                 .setWriteSkewAllowed(true)
                 .build()
                 .start();
@@ -57,7 +57,7 @@ public class WriteSkewTest {
         BetaLongRef ref2 = createLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
-                .setSpeculativeConfigEnabled(false)
+                .setSpeculativeConfigurationEnabled(false)
                 .setWriteSkewAllowed(true)
                 .setPessimisticLockLevel(PessimisticLockLevel.Write)
                 .build()
@@ -80,7 +80,7 @@ public class WriteSkewTest {
         BetaLongRef ref2 = createLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
-                .setSpeculativeConfigEnabled(false)
+                .setSpeculativeConfigurationEnabled(false)
                 .setWriteSkewAllowed(true)
                 .setPessimisticLockLevel(PessimisticLockLevel.Read)
                 .build()
@@ -106,7 +106,7 @@ public class WriteSkewTest {
         BetaLongRef ref2 = createLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
-                .setSpeculativeConfigEnabled(false)
+                .setSpeculativeConfigurationEnabled(false)
                 .setWriteSkewAllowed(false)
                 .build()
                 .start();
@@ -131,7 +131,7 @@ public class WriteSkewTest {
         BetaLongRef ref2 = createLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
-                .setSpeculativeConfigEnabled(false)
+                .setSpeculativeConfigurationEnabled(false)
                 .setWriteSkewAllowed(false)
                 .build()
                 .start();

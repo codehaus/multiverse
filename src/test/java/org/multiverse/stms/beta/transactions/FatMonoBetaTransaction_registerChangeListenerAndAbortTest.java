@@ -55,7 +55,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         } catch (NoRetryPossibleException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
        @Test
@@ -74,7 +74,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         } catch (NoRetryPossibleException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertHasNoListeners(ref);
         assertUnlocked(ref);
         assertUpdateBiased(ref);
@@ -99,7 +99,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         } catch (NoRetryPossibleException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -116,7 +116,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -131,7 +131,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
         assertFalse(latch.isOpen());
         assertSurplus(0, ref);
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertNull(ref.___getLockOwner());
         assertUnlocked(ref);
     }
@@ -148,7 +148,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
         assertFalse(latch.isOpen());
         assertSurplus(0, ref);
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -163,7 +163,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
         assertFalse(latch.isOpen());
         assertSurplus(0, ref);
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertNull(ref.___getLockOwner());
         assertUnlocked(ref);
     }
@@ -181,7 +181,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         } catch (NoRetryPossibleException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertHasNoListeners(ref);
         assertLocked(ref);
         assertSame(tx, ref.___getLockOwner());
@@ -246,7 +246,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         } catch (PreparedTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         verifyZeroInteractions(latch);
     }
 
@@ -262,7 +262,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         verifyZeroInteractions(latch);
     }
 
@@ -278,7 +278,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         verifyZeroInteractions(latch);
     }
 }

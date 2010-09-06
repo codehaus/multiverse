@@ -7,7 +7,7 @@ import org.multiverse.stms.beta.BetaStm;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.TestUtils.assertActive;
+import static org.multiverse.TestUtils.assertIsActive;
 
 public class FatArrayBetaTransaction_constructionTest {
     private BetaStm stm;
@@ -21,7 +21,7 @@ public class FatArrayBetaTransaction_constructionTest {
     public void test() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertEquals(1, tx.getAttempt());
     }
 

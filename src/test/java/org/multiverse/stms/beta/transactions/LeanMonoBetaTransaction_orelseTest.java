@@ -6,7 +6,7 @@ import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.stms.beta.BetaStm;
 
 import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.assertAborted;
+import static org.multiverse.TestUtils.assertIsAborted;
 
 public class LeanMonoBetaTransaction_orelseTest {
 
@@ -29,7 +29,7 @@ public class LeanMonoBetaTransaction_orelseTest {
 
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertTrue(config.getSpeculativeConfig().isOrelseRequired());
     }
 
@@ -45,7 +45,7 @@ public class LeanMonoBetaTransaction_orelseTest {
 
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertFalse(config.getSpeculativeConfig().isOrelseRequired());
     }
 
@@ -61,7 +61,7 @@ public class LeanMonoBetaTransaction_orelseTest {
 
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertFalse(config.getSpeculativeConfig().isOrelseRequired());
     }
 }

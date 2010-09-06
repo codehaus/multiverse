@@ -9,7 +9,7 @@ import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 
 import static junit.framework.Assert.assertSame;
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.TestUtils.assertActive;
+import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class FatArrayTreeBetaTransaction_openingManyItemsTest {
@@ -54,6 +54,6 @@ public class FatArrayTreeBetaTransaction_openingManyItemsTest {
             assertSame("tranlocal is incorrect at " + k, tranlocals[k], found);
         }
 
-        assertActive(tx);
+        assertIsActive(tx);
     }
 }

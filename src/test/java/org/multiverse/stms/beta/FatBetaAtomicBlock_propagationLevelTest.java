@@ -16,7 +16,7 @@ import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.multiverse.TestUtils.assertActive;
+import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
@@ -47,7 +47,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
         }
 
         verifyZeroInteractions(closure);
-        assertActive(otherTx);
+        assertIsActive(otherTx);
         assertSame(otherTx, getThreadLocalTransaction());
     }
 
@@ -109,7 +109,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
         int result = block.execute(closure);
 
         assertEquals(10, result);
-        assertActive(otherTx);
+        assertIsActive(otherTx);
         assertSame(otherTx, getThreadLocalTransaction());
     }
 
@@ -163,7 +163,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
 
         assertEquals(10, result);
         assertSame(existingTx, getThreadLocalTransaction());
-        assertActive(existingTx);
+        assertIsActive(existingTx);
         //since the value hasn't committed yet, it still is zero (the value before the transaction began).
         assertEquals(0, ref.___unsafeLoad().value);
     }
@@ -220,7 +220,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
         assertEquals(1, result);
         assertEquals(11, ref.___unsafeLoad().value);
         assertSame(otherTx, getThreadLocalTransaction());
-        assertActive(otherTx);
+        assertIsActive(otherTx);
     }
 
     @Test
@@ -243,7 +243,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
         int result = block.execute(closure);
 
         assertEquals(10, result);
-        assertActive(otherTx);
+        assertIsActive(otherTx);
         assertSame(otherTx, getThreadLocalTransaction());
     }
 

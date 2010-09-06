@@ -53,7 +53,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
         LongRefTranlocal read = tx.openForRead(ref, false);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertSame(committed, read);
         assertNull(tx.get(ref));
         assertTrue((Boolean) getField(tx, "hasReads"));
@@ -70,7 +70,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         Tranlocal result = tx.openForRead((BetaLongRef) null, true);
 
         assertNull(result);
-        assertActive(tx);
+        assertIsActive(tx);
     }
 
     @Test
@@ -88,7 +88,7 @@ public class FatMonoBetaTransaction_openForReadTest {
 
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertEquals(2, config.getSpeculativeConfig().getMinimalLength());
     }
 
@@ -100,7 +100,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, false);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertSame(committed, read);
         assertSurplus(1, ref.___getOrec());
         assertUnlocked(ref.___getOrec());
@@ -121,7 +121,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, false);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertSame(committed, read);
         assertSurplus(1, ref);
         assertUnlocked(ref);
@@ -141,7 +141,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         LongRefTranlocal read1 = tx.openForRead(ref, false);
         LongRefTranlocal read2 = tx.openForRead(ref, false);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertSame(read1, read2);
         assertUnlocked(ref.___getOrec());
         assertUpdateBiased(ref.___getOrec());
@@ -158,7 +158,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         LongRefTranlocal write = tx.openForWrite(ref, false);
         LongRefTranlocal read = tx.openForRead(ref, false);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertSame(write, read);
         assertUnlocked(ref);
         assertUpdateBiased(ref);
@@ -174,7 +174,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         LongRefTranlocal construction = tx.openForConstruction(ref);
         LongRefTranlocal read = tx.openForRead(ref, false);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertSame(construction, read);
         assertLocked(ref);
         assertUpdateBiased(ref);
@@ -192,7 +192,7 @@ public class FatMonoBetaTransaction_openForReadTest {
 
         LongRefTranlocal read = tx.openForRead(ref, true);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertSame(construction, read);
         assertNull(ref.___unsafeLoad());
         assertLocked(ref);
@@ -217,7 +217,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         } catch (ReadConflict expected) {
         }
 
-        assertAborted(tx2);
+        assertIsAborted(tx2);
         assertSame(committed, ref.___unsafeLoad());
         assertLocked(ref.___getOrec());
         assertReadonlyCount(0, ref.___getOrec());
@@ -234,7 +234,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, true);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertSame(committed, read);
         assertLocked(ref);
         assertSame(tx, ref.___getLockOwner());
@@ -252,7 +252,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         LongRefTranlocal read1 = tx.openForRead(ref, true);
         LongRefTranlocal read2 = tx.openForRead(ref, true);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertSame(read1, read2);
         assertSame(committed, read2);
         assertLocked(ref);
@@ -273,7 +273,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
         LongRefTranlocal read = tx.openForRead(ref, true);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertSame(committed, read);
         assertSurplus(1, ref);
         assertLocked(ref);
@@ -306,7 +306,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         } catch (ReadConflict expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSurplus(1, ref1);
         assertUnlocked(ref1);
         assertNull(ref1.___getLockOwner());
@@ -325,7 +325,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         BetaTransaction tx = new FatMonoBetaTransaction(config);
         LongRefTranlocal read = tx.openForRead(ref, false);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertSame(committed, read);
         assertLocked(ref);
         assertSame(tx, ref.___getLockOwner());
@@ -346,7 +346,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         BetaTransaction tx = new FatMonoBetaTransaction(config);
         LongRefTranlocal read = tx.openForRead(ref, false);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertSame(committed, read);
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
@@ -370,7 +370,7 @@ public class FatMonoBetaTransaction_openForReadTest {
 
         LongRefTranlocal read = tx.openForWrite(ref, false);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertSame(commuting, read);
         assertSame(committed, read.read);
         assertFalse(read.isCommuting);
@@ -402,7 +402,7 @@ public class FatMonoBetaTransaction_openForReadTest {
 
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSame(otherTx, ref.___getLockOwner());
         assertLocked(ref);
         assertSurplus(1, ref);
@@ -429,7 +429,7 @@ public class FatMonoBetaTransaction_openForReadTest {
             assertSame(exception, e);
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertUnlocked(ref);
@@ -456,7 +456,7 @@ public class FatMonoBetaTransaction_openForReadTest {
             assertSame(exception, e);
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertUnlocked(ref);
@@ -478,7 +478,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         } catch (PreparedTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertUnlocked(ref);
         assertSurplus(0, ref);
         assertSame(committed, ref.___unsafeLoad());
@@ -498,7 +498,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -514,6 +514,6 @@ public class FatMonoBetaTransaction_openForReadTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 }

@@ -42,7 +42,7 @@ public class BetaAtomicBlock_speculativeTest {
         final AtomicInteger attempt = new AtomicInteger(1);
 
         AtomicBlock block = stm.createTransactionFactoryBuilder()
-                .setSpeculativeConfigEnabled(true)
+                .setSpeculativeConfigurationEnabled(true)
                 .buildAtomicBlock();
 
         block.execute(new AtomicVoidClosure() {
@@ -77,7 +77,7 @@ public class BetaAtomicBlock_speculativeTest {
         final TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
 
         AtomicBlock block = stm.createTransactionFactoryBuilder()
-                .setSpeculativeConfigEnabled(true)
+                .setSpeculativeConfigurationEnabled(true)
                 .buildAtomicBlock();
 
         block.execute(new AtomicVoidClosure() {
@@ -103,7 +103,7 @@ public class BetaAtomicBlock_speculativeTest {
         final LongFunction function = mock(LongFunction.class);
 
         AtomicBlock block = stm.createTransactionFactoryBuilder()
-                .setSpeculativeConfigEnabled(true)
+                .setSpeculativeConfigurationEnabled(true)
                 .buildAtomicBlock();
 
         block.execute(new AtomicVoidClosure() {
@@ -127,7 +127,7 @@ public class BetaAtomicBlock_speculativeTest {
         final TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
 
         AtomicBlock block = stm.createTransactionFactoryBuilder()
-                .setSpeculativeConfigEnabled(true)
+                .setSpeculativeConfigurationEnabled(true)
                 .buildAtomicBlock();
 
         block.execute(new AtomicVoidClosure() {
@@ -163,7 +163,7 @@ public class BetaAtomicBlock_speculativeTest {
 
         AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setTimeoutNs(1000)
-                .setSpeculativeConfigEnabled(true)
+                .setSpeculativeConfigurationEnabled(true)
                 .buildAtomicBlock();
 
         block.execute(new AtomicVoidClosure() {

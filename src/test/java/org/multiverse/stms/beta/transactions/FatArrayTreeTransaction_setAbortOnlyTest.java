@@ -24,7 +24,7 @@ public class FatArrayTreeTransaction_setAbortOnlyTest {
 
         tx.setAbortOnly();
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertTrue((Boolean) getField(tx, "abortOnly"));
     }
 
@@ -54,7 +54,7 @@ public class FatArrayTreeTransaction_setAbortOnlyTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertFalse((Boolean) getField(tx, "abortOnly"));
     }
 
@@ -69,7 +69,7 @@ public class FatArrayTreeTransaction_setAbortOnlyTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertFalse((Boolean) getField(tx, "abortOnly"));
     }
 }

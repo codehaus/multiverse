@@ -8,7 +8,7 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.assertActive;
+import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
@@ -29,7 +29,7 @@ public class LeanBetaAtomicBlock_integrationTest {
             @Override
             public void execute(Transaction tx) throws Exception {
                 assertNotNull(tx);
-                assertActive((BetaTransaction) tx);
+                assertIsActive((BetaTransaction) tx);
                 assertSame(tx, getThreadLocalTransaction());
             }
         });

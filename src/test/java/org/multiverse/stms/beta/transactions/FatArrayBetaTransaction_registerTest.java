@@ -30,7 +30,7 @@ public class FatArrayBetaTransaction_registerTest {
         } catch (NullPointerException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -47,7 +47,7 @@ public class FatArrayBetaTransaction_registerTest {
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         tx.register(listener);
 
-        assertActive(tx);
+        assertIsActive(tx);
         verifyZeroInteractions(listener);
         assertHasNormalListeners(tx, listener);
     }
@@ -62,7 +62,7 @@ public class FatArrayBetaTransaction_registerTest {
         tx.register(listener1);
         tx.register(listener2);
 
-        assertActive(tx);
+        assertIsActive(tx);
         verifyZeroInteractions(listener1);
         assertHasNormalListeners(tx, listener1, listener2);
     }
@@ -94,7 +94,7 @@ public class FatArrayBetaTransaction_registerTest {
 
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertHasNoNormalListeners(tx);
         verifyZeroInteractions(listener);
     }
@@ -111,7 +111,7 @@ public class FatArrayBetaTransaction_registerTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
         assertHasNoNormalListeners(tx);
         verifyZeroInteractions(listener);
     }

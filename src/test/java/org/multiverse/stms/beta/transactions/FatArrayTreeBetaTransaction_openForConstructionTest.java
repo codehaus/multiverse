@@ -32,7 +32,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
 
         LongRefTranlocal write = tx.openForConstruction(ref);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertNotNull(write);
         assertEquals(0, write.value);
         assertSame(ref, write.owner);
@@ -56,7 +56,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
         } catch (NullPointerException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -72,7 +72,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
         } catch (IllegalArgumentException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
@@ -90,7 +90,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
         LongRefTranlocal write2 = tx.openForConstruction(ref);
 
         assertSame(write1, write2);
-        assertActive(tx);
+        assertIsActive(tx);
         assertNotNull(write2);
         assertEquals(0, write2.value);
         assertSame(ref, write2.owner);
@@ -118,7 +118,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
         } catch (IllegalArgumentException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
@@ -141,7 +141,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
         } catch (IllegalArgumentException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
@@ -166,7 +166,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
         } catch (ReadonlyException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertUnlocked(ref);
         assertSame(committed, ref.___unsafeLoad());
         assertNull(ref.___getLockOwner());
@@ -193,7 +193,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
 
         assertEquals(oldLocalConflictCount, tx.getLocalConflictCounter().get());
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertAttached(tx, read1);
         assertAttached(tx, constructed2);
     }
@@ -208,7 +208,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
         LongRefTranlocal constructed = tx.openForConstruction(ref);
 
         assertEquals(oldConflictCount, tx.getLocalConflictCounter().get());
-        assertActive(tx);
+        assertIsActive(tx);
         assertAttached(tx, constructed);
     }
 
@@ -225,7 +225,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
         } catch (PreparedTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -241,7 +241,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
         } catch (DeadTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -257,6 +257,6 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
         } catch (DeadTransactionException expected) {
         }
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 }

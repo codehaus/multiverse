@@ -9,7 +9,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.multiverse.TestUtils.assertAborted;
+import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class DeadLockTest {
@@ -37,7 +37,7 @@ public class DeadLockTest {
         }catch(ReadConflict expected){
         }
 
-        assertAborted(tx1);
+        assertIsAborted(tx1);
 
         tx2.openForWrite(ref1, true).value++;
         tx2.commit();

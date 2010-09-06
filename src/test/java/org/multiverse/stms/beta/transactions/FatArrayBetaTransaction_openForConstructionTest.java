@@ -53,7 +53,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
         } catch (SpeculativeConfigurationError expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertEquals(4, config.getSpeculativeConfig().getMinimalLength());
     }
 
@@ -63,7 +63,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
         BetaLongRef ref = new BetaLongRef(tx);
         LongRefTranlocal write = tx.openForConstruction(ref);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertAttached(tx, write);
         assertNotNull(write);
         assertEquals(0, write.value);
@@ -84,7 +84,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
         LongRefTranlocal construction1 = tx.openForConstruction(ref);
         LongRefTranlocal construction2 = tx.openForConstruction(ref);
 
-        assertActive(tx);
+        assertIsActive(tx);
         assertAttached(tx,construction1);
         assertSame(construction1, construction2);
         assertNotNull(construction1);
@@ -109,7 +109,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
         } catch (NullPointerException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -125,7 +125,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
         } catch (IllegalArgumentException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
@@ -148,7 +148,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
         } catch (IllegalArgumentException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
@@ -171,7 +171,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
         } catch (IllegalArgumentException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
@@ -196,7 +196,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
         } catch (ReadonlyException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
         assertUnlocked(ref);
         assertSame(committed, ref.___unsafeLoad());
         assertNull(ref.___getLockOwner());
@@ -234,7 +234,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
         tx.openForConstruction(ref);
 
         assertEquals(oldConflictCount, tx.getLocalConflictCounter().get());
-        assertActive(tx);
+        assertIsActive(tx);
     }
 
     @Test
@@ -250,7 +250,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
         } catch (PreparedTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -266,7 +266,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
         } catch (DeadTransactionException expected) {
         }
 
-        assertAborted(tx);
+        assertIsAborted(tx);
     }
 
     @Test
@@ -282,6 +282,6 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
         } catch (DeadTransactionException expected) {
         }
 
-        assertCommitted(tx);
+        assertIsCommitted(tx);
     }
 }
