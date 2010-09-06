@@ -2,15 +2,13 @@ package org.multiverse.benchmarks;
 
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import static org.multiverse.benchmarks.BenchmarkUtils.generateProcessorRange;
-import static org.multiverse.benchmarks.BenchmarkUtils.toGnuplot;
+import static org.multiverse.benchmarks.BenchmarkUtils.*;
 import static org.multiverse.stms.beta.BetaStmUtils.createReadBiasedLongRef;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 
@@ -20,7 +18,7 @@ import static org.multiverse.stms.beta.BetaStmUtils.format;
 public class MultipleWriteScalabilityTest {
 
     private BetaStm stm;
-    private final long transactionCount = 100 * 1000 * 1000;
+    private final long transactionsPerThread = 100 * 1000 * 1000;
 
 
     public static void main(String[] args) {
@@ -36,7 +34,7 @@ public class MultipleWriteScalabilityTest {
         System.out.printf("Multiverse> Unshared update transaction benchmark\n");
         System.out.printf("Multiverse> Running with the following processor range %s\n", Arrays.toString(processors));
         System.out.printf("Multiverse> Running with %s transactionalobjects per transaction\n", refCount);
-        System.out.printf("Multiverse> %s Transactions per thread\n", format(transactionCount));
+        System.out.printf("Multiverse> %s Transactions per thread\n", format(transactionsPerThread));
         Result[] result = new Result[processors.length];
 
         System.out.printf("Multiverse> Starting warmup run\n");
@@ -59,6 +57,7 @@ public class MultipleWriteScalabilityTest {
 
 
     private double test(int threadCount, int refCount) {
+        System.out.printf("Multiverse> ----------------------------------------------\n");
         System.out.printf("Multiverse> Running with %s processors\n", threadCount);
 
         stm = new BetaStm();
@@ -86,10 +85,14 @@ public class MultipleWriteScalabilityTest {
             totalDurationMs += t.durationMs;
         }
 
-        double transactionsPerSecond = BenchmarkUtils.perSecond(transactionCount, totalDurationMs, threadCount);
+        double transactionsPerSecondPerThread = BenchmarkUtils.transactionsPerSecondPerThread(
+                transactionsPerThread, totalDurationMs, threadCount);
         System.out.printf("Multiverse> Performance %s transactions/second with %s threads\n",
-                format(transactionsPerSecond), threadCount);
-        return transactionsPerSecond;
+                format(transactionsPerSecondPerThread), threadCount);
+        System.out.printf("Multiverse> Performance %s transactions/second\n",
+                transactionsPerSecondAsString(transactionsPerThread, totalDurationMs, threadCount));
+
+        return transactionsPerSecondPerThread;
     }
 
     class ReadThread extends Thread {
@@ -117,10 +120,9 @@ public class MultipleWriteScalabilityTest {
             long startMs = System.currentTimeMillis();
 
 
-            for (int iteration = 0; iteration < transactionCount; iteration++) {
+            for (int iteration = 0; iteration < transactionsPerThread; iteration++) {
                 for (int k = 0; k < refs.length; k++) {
-                    LongRefTranlocal tranlocal = (LongRefTranlocal) tx.openForWrite(refs[0], false);
-                    tranlocal.value++;
+                    tx.openForWrite(refs[0], false).value++;
                 }
                 tx.commit();
                 tx.hardReset();

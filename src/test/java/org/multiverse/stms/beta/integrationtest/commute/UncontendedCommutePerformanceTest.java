@@ -14,7 +14,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.benchmarks.BenchmarkUtils.transactionsPerSecond;
+import static org.multiverse.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class UncontendedCommutePerformanceTest {
@@ -40,7 +40,7 @@ public class UncontendedCommutePerformanceTest {
         joinAll(thread);
 
         long transactionCount = ref.___unsafeLoad().value;
-        String performance = transactionsPerSecond(transactionCount, durationMs);
+        String performance = transactionsPerSecondAsString(transactionCount, durationMs);
         System.out.println(performance + " Transactions/second");
     }
 
@@ -55,7 +55,7 @@ public class UncontendedCommutePerformanceTest {
         joinAll(thread);
 
         long transactionCount = ref.___unsafeLoad().value;
-        String performance = transactionsPerSecond(transactionCount, durationMs);
+        String performance = transactionsPerSecondAsString(transactionCount, durationMs);
         System.out.println(performance + " Transactions/second");
     }
 

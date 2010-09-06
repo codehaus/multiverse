@@ -10,13 +10,14 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import static org.multiverse.benchmarks.BenchmarkUtils.toGnuplot;
+import static org.multiverse.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
 import static org.multiverse.stms.beta.BetaStmUtils.createReadBiasedLongRef;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 
 public class UncontendedMultipleUpdateScalabilityTest {
 
     private BetaStm stm;
-    private final long transactionCount = 100 * 1000 * 1000;
+    private final long transactionsPerThread = 100 * 1000 * 1000;
 
 
     public static void main(String[] args) {
@@ -33,7 +34,7 @@ public class UncontendedMultipleUpdateScalabilityTest {
         System.out.printf("Multiverse> Uncontended multiple write transaction benchmark\n");
         System.out.printf("Multiverse> Running with the following processor range %s\n", Arrays.toString(processors));
         System.out.printf("Multiverse> Running with %s transactionalobjects per transaction\n", refCount);
-        System.out.printf("Multiverse> %s Transactions per thread\n", format(transactionCount));
+        System.out.printf("Multiverse> %s Transactions per thread\n", format(transactionsPerThread));
         Result[] result = new Result[processors.length];
 
         System.out.printf("Multiverse> Starting warmup run\n");
@@ -82,12 +83,16 @@ public class UncontendedMultipleUpdateScalabilityTest {
             totalDurationMs += t.durationMs;
         }
 
-        double readsPerSecond = BenchmarkUtils.perSecond(
-                transactionCount * refCount, totalDurationMs, threadCount);
+        double readsPerSecondPerThread = BenchmarkUtils.transactionsPerSecondPerThread(
+                transactionsPerThread * refCount, totalDurationMs, threadCount);
 
+        System.out.printf("Multiverse> Performance %s writes/second/thread with %s threads\n",
+                format(readsPerSecondPerThread), threadCount);
         System.out.printf("Multiverse> Performance %s writes/second with %s threads\n",
-                format(readsPerSecond), threadCount);
-        return readsPerSecond;
+                transactionsPerSecondAsString(transactionsPerThread * refCount, totalDurationMs, threadCount),
+                threadCount);
+
+        return readsPerSecondPerThread;
     }
 
     class ReadThread extends Thread {
@@ -131,13 +136,13 @@ public class UncontendedMultipleUpdateScalabilityTest {
         public void run1() {
             BetaLongRef ref1 = createReadBiasedLongRef(stm);
 
-            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 1);
+            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 1).init();;
 
             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
 
             long startMs = System.currentTimeMillis();
 
-            for (long iteration = 0; iteration < transactionCount; iteration++) {
+            for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
                 tx.openForWrite(ref1, false);
                 tx.commit();
                 tx.hardReset();
@@ -151,13 +156,13 @@ public class UncontendedMultipleUpdateScalabilityTest {
             BetaLongRef ref1 = createReadBiasedLongRef(stm);
             BetaLongRef ref2 = createReadBiasedLongRef(stm);
 
-            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 1);
+            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 2).init();
 
             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
 
             long startMs = System.currentTimeMillis();
 
-            for (long iteration = 0; iteration < transactionCount; iteration++) {
+            for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
                 tx.openForWrite(ref1, false);
                 tx.openForWrite(ref2, false);
                 tx.commit();
@@ -175,12 +180,12 @@ public class UncontendedMultipleUpdateScalabilityTest {
             BetaLongRef ref3 = createReadBiasedLongRef(stm);
             BetaLongRef ref4 = createReadBiasedLongRef(stm);
 
-            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
+            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm,4).init();
             FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
 
             long startMs = System.currentTimeMillis();
 
-            for (long iteration = 0; iteration < transactionCount; iteration++) {
+            for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
                 tx.openForWrite(ref1, false);
                 tx.openForWrite(ref2, false);
                 tx.openForWrite(ref3, false);
@@ -203,12 +208,12 @@ public class UncontendedMultipleUpdateScalabilityTest {
             BetaLongRef ref7 = createReadBiasedLongRef(stm);
             BetaLongRef ref8 = createReadBiasedLongRef(stm);
 
-            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
+            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm,8).init();
             FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
 
             long startMs = System.currentTimeMillis();
 
-            for (long iteration = 0; iteration < transactionCount; iteration++) {
+            for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
                 tx.openForWrite(ref1, false);
                 tx.openForWrite(ref2, false);
                 tx.openForWrite(ref3, false);
@@ -245,12 +250,12 @@ public class UncontendedMultipleUpdateScalabilityTest {
             BetaLongRef ref15 = createReadBiasedLongRef(stm);
             BetaLongRef ref16 = createReadBiasedLongRef(stm);
 
-            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
+            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm,16);
             FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
 
             long startMs = System.currentTimeMillis();
 
-            for (long iteration = 0; iteration < transactionCount; iteration++) {
+            for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
                 tx.openForWrite(ref1, false);
                 tx.openForWrite(ref2, false);
                 tx.openForWrite(ref3, false);
@@ -311,12 +316,12 @@ public class UncontendedMultipleUpdateScalabilityTest {
             BetaLongRef ref31 = createReadBiasedLongRef(stm);
             BetaLongRef ref32 = createReadBiasedLongRef(stm);
 
-             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
+            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm,32).init();
             FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
 
             long startMs = System.currentTimeMillis();
 
-            for (long iteration = 0; iteration < transactionCount; iteration++) {
+            for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
                 tx.openForWrite(ref1, false);
                 tx.openForWrite(ref2, false);
                 tx.openForWrite(ref3, false);
@@ -425,12 +430,12 @@ public class UncontendedMultipleUpdateScalabilityTest {
             BetaLongRef ref63 = createReadBiasedLongRef(stm);
             BetaLongRef ref64 = createReadBiasedLongRef(stm);
 
-            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
+            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm,64).init();
             FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
 
             long startMs = System.currentTimeMillis();
 
-            for (long iteration = 0; iteration < transactionCount; iteration++) {
+            for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
                 tx.openForWrite(ref1, false);
                 tx.openForWrite(ref2, false);
                 tx.openForWrite(ref3, false);

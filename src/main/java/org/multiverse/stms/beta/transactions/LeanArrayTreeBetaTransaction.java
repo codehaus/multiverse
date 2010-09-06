@@ -5,6 +5,7 @@ import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.functions.DoubleFunction;
 import org.multiverse.api.functions.Function;
 import org.multiverse.api.functions.IntFunction;
 import org.multiverse.api.functions.LongFunction;
@@ -423,6 +424,197 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
     public  void commute(
         final BetaIntRef ref, final IntFunction function){
+
+        if (status != ACTIVE) {
+            throw abortCommute(ref, function);
+        }
+
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+                    
+        config.needsCommute();
+        abort();
+        throw SpeculativeConfigurationError.INSTANCE;
+     }
+
+
+
+    @Override
+    public  DoubleRefTranlocal openForRead(
+        final BetaDoubleRef ref, boolean lock) {
+
+        if (status != ACTIVE) {
+            throw abortOpenForRead(ref);
+        }
+
+        if (ref == null) {
+            return null;
+        }
+
+        lock = lock || config.lockReads;
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = findAttachedIndex(ref, identityHashCode);
+        if (index > -1) {
+            //we are lucky, at already is attached to the session
+            DoubleRefTranlocal found = (DoubleRefTranlocal)array[index];
+
+            if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,found)){
+                throw abortOnReadConflict();
+            }
+
+            return found;
+        }
+
+        if(!hasReads){
+            localConflictCounter.reset();
+            hasReads = true;
+        }
+
+        //none is found in this transaction, lets load it.
+        final DoubleRefTranlocal read = lock
+            ? ref.___lockAndLoad(config.spinCount, this)
+            : ref.___load(config.spinCount);
+
+        if (read.isLocked) {
+            throw abortOnReadConflict();
+        }
+
+        //make sure that there are no conflicts.
+        if (hasReadConflict()) {
+            ref.___abort(this, read, pool);
+            throw abortOnReadConflict();
+        }
+
+        if(lock || !read.isPermanent || config.trackReads){
+            attach(ref, read, identityHashCode);
+            size++;
+        }else{
+            hasUntrackedReads = true;
+        }
+
+        return read;
+    }
+
+    @Override
+    public  DoubleRefTranlocal openForWrite(
+        final BetaDoubleRef  ref, boolean lock) {
+
+        if (status != ACTIVE) {
+            throw abortOpenForWrite(ref);
+        }
+
+        if (config.readonly) {
+            throw abortOpenForWriteWhenReadonly(ref);
+        }
+
+        if (ref == null) {
+            throw abortOpenForWriteWhenNullReference();
+        }
+
+        //lets find the tranlocal
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = findAttachedIndex(ref, identityHashCode);
+        lock = lock || config.lockWrites;
+
+        if(index >- 1){
+            DoubleRefTranlocal result = (DoubleRefTranlocal)array[index];
+
+            if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,result)){
+                throw abortOnReadConflict();
+            }
+
+            if(!result.isCommitted){
+                return result;
+            }
+
+            //it was opened for reading so we need to open it for writing.
+            DoubleRefTranlocal read = result;
+            result = pool.take(ref);
+            if (result == null) {
+                result = new DoubleRefTranlocal(ref);
+            }
+
+            result.value = read.value;
+            result.read = read;
+            hasUpdates = true;
+            array[index]=result;
+            return result;
+        }
+
+        //it was not previously attached to this transaction
+
+        if(!hasReads){
+            localConflictCounter.reset();
+            hasReads = true;
+        }
+
+        //the tranlocal was not loaded before in this transaction, now load it.
+        final DoubleRefTranlocal read = lock
+            ? ref.___lockAndLoad(config.spinCount, this)
+            : ref.___load(config.spinCount);
+
+        if(read.isLocked){
+           throw abortOnReadConflict();
+        }
+
+        if (hasReadConflict()) {
+            read.owner.___abort(this, read, pool);
+            throw abortOnReadConflict();
+        }
+
+        //open the tranlocal for writing.
+        DoubleRefTranlocal result = read.openForWrite(pool);
+        hasUpdates = true;
+        attach(ref, result, identityHashCode);
+        size++;        
+        return result;
+    }
+
+    @Override
+    public final  DoubleRefTranlocal openForConstruction(
+        final BetaDoubleRef ref) {
+
+        if (status != ACTIVE) {
+            throw abortOpenForConstruction(ref);
+        }
+
+        if (config.readonly) {
+            throw abortOpenForWriteWhenReadonly(ref);
+        }
+
+        if (ref == null) {
+            throw abortOpenForWriteWhenNullReference();
+        }
+
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = findAttachedIndex(ref, identityHashCode);
+
+        if(index >- 1){
+            final DoubleRefTranlocal result = (DoubleRefTranlocal)array[index];
+            if(result.isCommitted || result.read!=null){
+                throw abortOpenForConstructionWithBadReference(ref);
+            }
+
+            return result;
+        }
+
+        if(ref.___unsafeLoad()!=null){
+            throw abortOpenForConstructionWithBadReference(ref);
+        }
+
+        DoubleRefTranlocal result =  pool.take(ref);
+        if(result == null){
+            result = new DoubleRefTranlocal(ref);
+        }
+        result.isDirty = DIRTY_TRUE;
+        attach(ref, result, identityHashCode);
+        size++;
+        return result;
+    }
+
+    public  void commute(
+        final BetaDoubleRef ref, final DoubleFunction function){
 
         if (status != ACTIVE) {
             throw abortCommute(ref, function);

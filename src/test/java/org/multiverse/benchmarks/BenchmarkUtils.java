@@ -72,14 +72,28 @@ public class BenchmarkUtils {
         System.out.printf(s + "\n", args);
     }
 
-    public static String transactionsPerSecond(long count, long timeMs) {
+    public static String transactionsPerSecondAsString(long count, long timeMs) {
         double performance = (1000 * count) / timeMs;
         return format(performance);
     }
 
-    public static double perSecond(long transactionsPerThread, long totalTimeMs, int threads) {
-        long transactionCount = transactionsPerThread * threads * threads;
+    public static String transactionsPerSecondPerThreadAsString(long transactionsPerThread, long totalTimeMs, int threads) {
+        return format(transactionsPerSecondPerThread(transactionsPerThread, totalTimeMs, threads));
+    }
+
+    public static double transactionsPerSecondPerThread(long transactionsPerThread, long totalTimeMs, int threads) {
+        long transactionCount = transactionsPerThread * threads;
         return (1000d * transactionCount) / totalTimeMs;
+    }
+
+    public static double transactionsPerSecond(long transactionsPerThread, long totalTimeMs, int threads) {
+        long transactionCount = transactionsPerThread * threads;
+
+        return (threads * 1000d * transactionCount) / totalTimeMs;
+    }
+
+    public static String transactionsPerSecondAsString(long transactionsPerThread, long totalTimeMs, int threads) {
+        return format(transactionsPerSecond(transactionsPerThread, totalTimeMs, threads));
     }
 
     public static String format(double value) {

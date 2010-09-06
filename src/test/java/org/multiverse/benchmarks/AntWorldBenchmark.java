@@ -13,7 +13,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.multiverse.benchmarks.BenchmarkUtils.format;
+import static org.multiverse.benchmarks.BenchmarkUtils.*;
 
 /**
  * @author Peter Veentjer
@@ -22,13 +22,13 @@ public class AntWorldBenchmark {
 
     private BetaStm stm;
     private BetaLongRef[] cells;
-    private long transactionCount;
+    private long transactionsPerThread;
     private int worldSize = 1600;
 
 
     @Before
     public void setUp() {
-        transactionCount = 2000 * 1000;
+        transactionsPerThread = 2000 * 1000;
         stm = new BetaStm();
         cells = new BetaLongRef[worldSize];
 
@@ -40,7 +40,7 @@ public class AntWorldBenchmark {
     @Test
     @Ignore
     public void test() throws InterruptedException {
-        SnapshotThread snapshotThread = new SnapshotThread(1, transactionCount);
+        SnapshotThread snapshotThread = new SnapshotThread(1, transactionsPerThread);
 
         snapshotThread.start();
         snapshotThread.join();
@@ -54,10 +54,12 @@ public class AntWorldBenchmark {
             //assertReadBiased(ref);
         }
 
-        double transactionsPerSecond = BenchmarkUtils.perSecond(transactionCount, durationMs, 1);
+        double transactionsPerSecondPerThread = transactionsPerSecondPerThread(transactionsPerThread, durationMs, 1);
         System.out.printf("Benchmark took %s ms\n", TimeUnit.NANOSECONDS.toMillis(durationMs));
-        System.out.printf("Performance %s snapshots/second\n", format(transactionsPerSecond));
-        System.out.printf("Performance %s reads/second\n", format(worldSize * transactionsPerSecond));
+        System.out.printf("Performance %s snapshots/second/thread\n", format(transactionsPerSecondPerThread));
+        System.out.printf("Performance %s snapshots/second\n",
+                transactionsPerSecondAsString(transactionsPerThread, durationMs, 1));
+        System.out.printf("Performance %s reads/second\n", format(worldSize * transactionsPerSecondPerThread));
     }
 
     class SnapshotThread extends Thread {

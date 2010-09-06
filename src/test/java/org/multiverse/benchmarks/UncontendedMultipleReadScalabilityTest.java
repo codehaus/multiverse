@@ -8,8 +8,7 @@ import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import static org.multiverse.benchmarks.BenchmarkUtils.generateProcessorRange;
-import static org.multiverse.benchmarks.BenchmarkUtils.toGnuplot;
+import static org.multiverse.benchmarks.BenchmarkUtils.*;
 import static org.multiverse.stms.beta.BetaStmUtils.createReadBiasedLongRef;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 
@@ -84,7 +83,7 @@ public class UncontendedMultipleReadScalabilityTest {
             totalDurationMs += t.durationMs;
         }
 
-        double readsPerSecond = BenchmarkUtils.perSecond(
+        double readsPerSecond = transactionsPerSecondPerThread(
                 transactionCount * refCount, totalDurationMs, threadCount);
 
         System.out.printf("Multiverse> Performance %s reads/second with %s threads\n",

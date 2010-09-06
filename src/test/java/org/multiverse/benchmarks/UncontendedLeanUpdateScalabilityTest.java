@@ -1,5 +1,6 @@
 package org.multiverse.benchmarks;
 
+import org.multiverse.TestThread;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
@@ -11,8 +12,7 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.benchmarks.BenchmarkUtils.generateProcessorRange;
-import static org.multiverse.benchmarks.BenchmarkUtils.toGnuplot;
+import static org.multiverse.benchmarks.BenchmarkUtils.*;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 
 public class UncontendedLeanUpdateScalabilityTest {
@@ -50,15 +50,16 @@ public class UncontendedLeanUpdateScalabilityTest {
         toGnuplot(result);
     }
 
-    private double test(int threadCount, long transactionCount) {
-        System.out.printf("Multiverse> Running with %s processors\n", threadCount);
+    private double test(int threadCount, long transactionsPerThread) {
+        System.out.printf("Multiverse> ----------------------------------------------\n");
+        System.out.printf("Multiverse> Running with %s thread(s)\n", threadCount);
 
         stm = new BetaStm();
 
         UpdateThread[] threads = new UpdateThread[threadCount];
 
         for (int k = 0; k < threads.length; k++) {
-            threads[k] = new UpdateThread(k, transactionCount);
+            threads[k] = new UpdateThread(k, transactionsPerThread);
         }
 
         for (UpdateThread thread : threads) {
@@ -78,12 +79,17 @@ public class UncontendedLeanUpdateScalabilityTest {
             totalDurationMs += t.durationMs;
         }
 
-        double transactionsPerSecond = BenchmarkUtils.perSecond(transactionCount, totalDurationMs, threadCount);
-        System.out.printf("Multiverse> Performance %s transactions/second with %s thread(s)\n", BetaStmUtils.format(transactionsPerSecond), threadCount);
+        double transactionsPerSecond = transactionsPerSecondPerThread(
+                transactionsPerThread, totalDurationMs, threadCount);
+        System.out.printf("Multiverse> Threadcount %s\n", threadCount);
+        System.out.printf("Multiverse> Performance %s transactions/second/thread\n",
+                BetaStmUtils.format(transactionsPerSecond));
+        System.out.printf("Multiverse> Performance %s transactions/second\n",
+                transactionsPerSecondAsString(transactionsPerThread, totalDurationMs, threadCount));
         return transactionsPerSecond;
     }
 
-    class UpdateThread extends Thread {
+    class UpdateThread extends TestThread {
         private final long transactionCount;
         private long durationMs;
 
@@ -93,7 +99,7 @@ public class UncontendedLeanUpdateScalabilityTest {
             this.transactionCount = transactionCount;
         }
 
-        public void run() {
+        public void doRun() {
             BetaLongRef ref = BetaStmUtils.createLongRef(stm);
 
             //FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);

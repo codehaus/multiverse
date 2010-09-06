@@ -9,7 +9,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.multiverse.benchmarks.BenchmarkUtils.transactionsPerSecond;
+import static org.multiverse.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
 
 /**
  * A Performance test to help to figure out if overhead can be removed from the FastOrec.
@@ -47,7 +47,7 @@ public class FastOrec_UncontendedPerformanceTest implements BetaStmConstants {
         }
 
         long durationNs = System.nanoTime() - startNs;
-        String performance = transactionsPerSecond(cycles, TimeUnit.NANOSECONDS.toMillis(durationNs));
+        String performance = transactionsPerSecondAsString(cycles, TimeUnit.NANOSECONDS.toMillis(durationNs));
 
         System.out.printf("Update cycles benchmark\n");
         System.out.printf("Duration    : %s ms\n", TimeUnit.NANOSECONDS.toMillis(durationNs));
@@ -71,7 +71,7 @@ public class FastOrec_UncontendedPerformanceTest implements BetaStmConstants {
         }
 
         long durationNs = System.nanoTime() - startNs;
-        String performance = transactionsPerSecond(cycles, TimeUnit.NANOSECONDS.toMillis(durationNs));
+        String performance = transactionsPerSecondAsString(cycles, TimeUnit.NANOSECONDS.toMillis(durationNs));
 
         System.out.printf("Pessimistic Update cycles benchmark\n");
         System.out.printf("Duration    : %s ms\n", TimeUnit.NANOSECONDS.toMillis(durationNs));
@@ -101,7 +101,7 @@ public class FastOrec_UncontendedPerformanceTest implements BetaStmConstants {
         }
 
         long durationNs = System.nanoTime() - startNs;
-        String performance = transactionsPerSecond(cycles, TimeUnit.NANOSECONDS.toMillis(durationNs));
+        String performance = transactionsPerSecondAsString(cycles, TimeUnit.NANOSECONDS.toMillis(durationNs));
 
         System.out.printf("Readheavy cycles benchmark\n");
         System.out.printf("Duration    : %s ms\n", TimeUnit.NANOSECONDS.toMillis(durationNs));
@@ -124,7 +124,7 @@ public class FastOrec_UncontendedPerformanceTest implements BetaStmConstants {
         }
 
         long durationNs = System.nanoTime() - startNs;
-        String performance = transactionsPerSecond(cycles, TimeUnit.NANOSECONDS.toMillis(durationNs));
+        String performance = transactionsPerSecondAsString(cycles, TimeUnit.NANOSECONDS.toMillis(durationNs));
 
         System.out.printf("Readbiased cycles benchmark\n");
         System.out.printf("Duration    : %s ms\n", TimeUnit.NANOSECONDS.toMillis(durationNs));

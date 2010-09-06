@@ -31,6 +31,10 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
  */
 public class TestUtils {
 
+    public static void assertEqualsDouble(double expected, double found){
+        assertEquals(Double.doubleToLongBits(expected), Double.doubleToLongBits(found));
+    }
+
     public static int processorCount() {
         return Runtime.getRuntime().availableProcessors();
     }
@@ -271,12 +275,12 @@ public class TestUtils {
      *
      * @param threads
      */
-    public static void joinAll(TestThread... threads) {
-        joinAll(5 * 60 * 1000, threads);
+    public static long joinAll(TestThread... threads) {
+        return joinAll(5 * 60 * 1000, threads);
     }
 
     @SuppressWarnings({"ThrowableResultOfMethodCallIgnored"})
-    public static void joinAll(long maxJoinTimeMillis, TestThread... threads) {
+    public static long joinAll(long maxJoinTimeMillis, TestThread... threads) {
         if (maxJoinTimeMillis < 0) {
             throw new IllegalArgumentException();
         }
@@ -284,6 +288,8 @@ public class TestUtils {
         List<TestThread> uncompleted = new LinkedList(Arrays.asList(threads));
 
         long maxTimeMs = System.currentTimeMillis() + maxJoinTimeMillis;
+
+        long durationMs = 0;
 
         while (!uncompleted.isEmpty()) {
             for (Iterator<TestThread> it = uncompleted.iterator(); it.hasNext();) {
@@ -295,8 +301,10 @@ public class TestUtils {
                                 maxJoinTimeMillis, uncompleted));
                     }
                     thread.join(100);
+
                     if (!thread.isAlive()) {
                         it.remove();
+                        durationMs+=thread.getDurationMs();
 
                         if (thread.getThrowable() == null) {
                             System.out.printf("%s completed successfully\n", thread.getName());
@@ -312,6 +320,8 @@ public class TestUtils {
                 }
             }
         }
+
+        return durationMs;
     }
 
 }

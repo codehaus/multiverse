@@ -15,7 +15,7 @@ import java.util.Random;
 
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
-import static org.multiverse.benchmarks.BenchmarkUtils.transactionsPerSecond;
+import static org.multiverse.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 /**
@@ -85,9 +85,9 @@ public class AccountBenchmark {
 
         System.out.printf("Multiverse> Finished in %s ms\n", durationMs);
         System.out.printf("Multiverse> Average %s Transactions/second\n",
-                transactionsPerSecond(transactionCount * threadCount, durationMs));
+                transactionsPerSecondAsString(transactionCount * threadCount, durationMs));
         System.out.printf("Multiverse> Average Individual %s Transactions/second\n",
-                transactionsPerSecond(transactionCount * threadCount, individualDurationMs / threadCount));
+                transactionsPerSecondAsString(transactionCount * threadCount, individualDurationMs / threadCount));
 
         System.out.println("conflictscans: " + FatArrayBetaTransaction.conflictScan);
 

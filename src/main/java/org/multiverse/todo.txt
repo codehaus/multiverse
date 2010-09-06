@@ -181,8 +181,6 @@ the task not being executed at all.
 - should the retry by added to the transaction? Makes it easier to figure out when a retry is done when
 and not allowed. So not throw the retry error immediately..
 
-- support for a doubleref
-
 - support for a booleanref (can be based on the int-ref functionality since a boolean internally is represented
 as a int).
 
@@ -191,6 +189,8 @@ as a int).
 - transactional array
 
 done
+
+- support for a doubleref
 
 - ref and await
 

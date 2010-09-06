@@ -193,6 +193,19 @@ List<TransactionalObject> createTransactionalObjects() {
           functionClass: 'IntFunction',
           isReference: true,
           isNumber: true)
+   result.add new TransactionalObject(
+          name: 'BetaDoubleRef',
+          tranlocal: 'DoubleRefTranlocal',
+//          parametrizedTranlocal: 'IntRefTranlocal',
+          type: 'double',
+          referenceInterface: 'DoubleRef',
+          typeParameter: '',
+          initialValue: '0',
+          classIndex: 2,
+          accessModifier: '',
+          functionClass: 'DoubleFunction',
+          isReference: true,
+          isNumber: true)
   result.add new TransactionalObject(
           name: 'BetaLongRef',
           tranlocal: 'LongRefTranlocal',
@@ -200,7 +213,7 @@ List<TransactionalObject> createTransactionalObjects() {
           type: 'long',
           typeParameter: '',
           initialValue: '0',
-          classIndex: 2,
+          classIndex: 3,
           accessModifier: 'final',
           functionClass: 'LongFunction',
           isReference: true,

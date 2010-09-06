@@ -12,10 +12,10 @@ import java.util.Locale;
  */
 public class BetaStmUtils {
 
-    public static String toDebugString(BetaTransactionalObject o){
-        if(o == null){
+    public static String toDebugString(BetaTransactionalObject o) {
+        if (o == null) {
             return "null";
-        }else{
+        } else {
             return o.getClass().getName();
         }
     }
@@ -34,6 +34,16 @@ public class BetaStmUtils {
         tx.commit();
         return ref;
     }
+
+    public static BetaDoubleRef createDoubleRef(BetaStm stm, double value) {
+        BetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaDoubleRef ref = new BetaDoubleRef(tx);
+        DoubleRefTranlocal tranlocal = tx.openForConstruction(ref);
+        tranlocal.value = value;
+        tx.commit();
+        return ref;
+    }
+
 
     public static BetaRef createRef(BetaStm stm) {
         return createRef(stm, null);

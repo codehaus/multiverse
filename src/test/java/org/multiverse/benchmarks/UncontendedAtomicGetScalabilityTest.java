@@ -7,8 +7,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import static org.multiverse.benchmarks.BenchmarkUtils.generateProcessorRange;
-import static org.multiverse.benchmarks.BenchmarkUtils.toGnuplot;
+import static org.multiverse.benchmarks.BenchmarkUtils.*;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 
 /**
@@ -26,15 +25,15 @@ public class UncontendedAtomicGetScalabilityTest {
     public void start(long transactionCount) {
         int[] processors = generateProcessorRange();
 
-        System.out.println("Multiverse> Uncontended atomicGet transaction benchmark");
-        System.out.println("Multiverse> 1 BetaRef per transaction");
+        System.out.printf("Multiverse> Uncontended atomicGet transaction benchmark\n");
+        System.out.printf("Multiverse> 1 BetaRef per transaction\n");
         System.out.printf("Multiverse> Running with the following processor range %s\n", Arrays.toString(processors));
         System.out.printf("Multiverse> %s Transactions per thread\n", format(transactionCount));
         Result[] result = new Result[processors.length];
 
-        System.out.println("Multiverse> Starting warmup run");
+        System.out.printf("Multiverse> Starting warmup run\n");
         test(1, transactionCount);
-        System.out.println("Multiverse> Finished warmup run");
+        System.out.printf("Multiverse> Finished warmup run\n");
 
 
         long startNs = System.nanoTime();
@@ -51,7 +50,7 @@ public class UncontendedAtomicGetScalabilityTest {
         toGnuplot(result);
     }
 
-    private double test(int threadCount, long transactionCount) {
+    private double test(int threadCount, long transactionsPerThread) {
         System.out.printf("Multiverse> Running with %s processors\n", threadCount);
 
         stm = new BetaStm();
@@ -59,7 +58,7 @@ public class UncontendedAtomicGetScalabilityTest {
         ReadThread[] threads = new ReadThread[threadCount];
 
         for (int k = 0; k < threads.length; k++) {
-            threads[k] = new ReadThread(k, transactionCount);
+            threads[k] = new ReadThread(k, transactionsPerThread);
         }
 
         for (ReadThread thread : threads) {
@@ -79,11 +78,14 @@ public class UncontendedAtomicGetScalabilityTest {
             totalDurationMs += t.durationMs;
         }
 
-        double transactionsPerSecond = BenchmarkUtils.perSecond(
-                transactionCount, totalDurationMs, threadCount);
+        double transactionsPerSecondPerThread = transactionsPerSecondPerThread(
+                transactionsPerThread, totalDurationMs, threadCount);
         System.out.printf("Multiverse> Performance %s transactions/second with %s threads\n",
-                format(transactionsPerSecond), threadCount);
-        return transactionsPerSecond;
+                format(transactionsPerSecondPerThread), threadCount);
+        System.out.printf("Multiverse> Performance %s transactions/second\n",
+                transactionsPerSecondAsString(transactionsPerThread, totalDurationMs, threadCount));
+
+        return transactionsPerSecondPerThread;
     }
 
     class ReadThread extends Thread {

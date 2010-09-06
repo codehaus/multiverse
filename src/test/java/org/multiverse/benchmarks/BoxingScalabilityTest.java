@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.benchmarks.BenchmarkUtils.generateProcessorRange;
+import static org.multiverse.benchmarks.BenchmarkUtils.*;
 import static org.multiverse.stms.beta.BetaStmUtils.createRef;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 
@@ -25,42 +25,47 @@ public class BoxingScalabilityTest {
         test.start(Long.parseLong(args[0]));
     }
 
-    public void start(long transactionCount) {
+    public void start(long transactionsPerThread) {
         int[] processors = generateProcessorRange();
 
         System.out.printf("Multiverse> Boxing scalability benchmark\n");
         System.out.printf("Multiverse> 1 BetaRef per transaction\n");
-        System.out.printf("Multiverse> %s Transactions per thread\n", format(transactionCount));
+        System.out.printf("Multiverse> %s Transactions per thread\n", format(transactionsPerThread));
         System.out.printf("Multiverse> Running with the following processor range %s\n", Arrays.toString(processors));
 
+        System.out.printf("========================================================\n");
         System.out.println("Multiverse> Starting warmup run");
-        testWithPrimitives(1, transactionCount);
-        testWithBoxing(1, transactionCount);
+        testWithPrimitives(1, transactionsPerThread);
+        testWithBoxing(1, transactionsPerThread);
+        System.out.printf("========================================================\n");
         System.out.println("Multiverse> Finished warmup run");
 
         long startNs = System.nanoTime();
 
         for (int k = 0; k < processors.length; k++) {
             int processorCount = processors[k];
-            double primitivePerformance = testWithPrimitives(processorCount, transactionCount);
-            double boxingPerformance = testWithBoxing(processorCount, transactionCount);
+            double primitivePerformance = testWithPrimitives(processorCount, transactionsPerThread);
+            double boxingPerformance = testWithBoxing(processorCount, transactionsPerThread);
 
-            System.out.println(k+" Primitive times faster = "+primitivePerformance/boxingPerformance);
+            System.out.printf("========================================================\n");
+            System.out.printf("Multiverse> With %s threads the primitive/boxing performance = %s\n",
+                    (k + 1), primitivePerformance / boxingPerformance);
         }
 
         long durationNs = System.nanoTime() - startNs;
         System.out.printf("Multiverse> Benchmark took %s seconds\n", TimeUnit.NANOSECONDS.toSeconds(durationNs));
     }
 
-    private double testWithPrimitives(int threadCount, long transactionCount) {
-        System.out.printf("Multiverse> Primitive running with %s processors\n", threadCount);
+    private double testWithPrimitives(int threadCount, long transactionsPerThread) {
+        System.out.printf("Multiverse> ----------------------------------------------\n");
+        System.out.printf("Multiverse> Primitive running with %s thread(s)\n", threadCount);
 
         stm = new BetaStm();
 
         PrimitiveThread[] threads = new PrimitiveThread[threadCount];
 
         for (int k = 0; k < threads.length; k++) {
-            threads[k] = new PrimitiveThread(k, transactionCount);
+            threads[k] = new PrimitiveThread(k, transactionsPerThread);
         }
 
         for (PrimitiveThread thread : threads) {
@@ -80,20 +85,28 @@ public class BoxingScalabilityTest {
             totalDurationMs += t.durationMs;
         }
 
-        double transactionsPerSecond = BenchmarkUtils.perSecond(transactionCount, totalDurationMs, threadCount);
-        System.out.printf("Multiverse> Performance %s transactions/second with %s thread(s)\n", BetaStmUtils.format(transactionsPerSecond), threadCount);
-        return transactionsPerSecond;
+        double transactionsPerSecondPerThread = transactionsPerSecondPerThread(
+                transactionsPerThread, totalDurationMs, threadCount);
+
+        System.out.printf("Multiverse> Threadcount %s\n", threadCount);
+        System.out.printf("Multiverse> Primitive performance %s transactions/second/thread\n",
+                BenchmarkUtils.format(transactionsPerSecondPerThread));
+        System.out.printf("Multiverse> Primitive Performance %s transactions/second\n",
+                transactionsPerSecondAsString(transactionsPerThread, totalDurationMs, threadCount));
+
+        return transactionsPerSecondPerThread;
     }
 
-    private double testWithBoxing(int threadCount, long transactionCount) {
-        System.out.printf("Multiverse> Boxing running with %s processors\n", threadCount);
+    private double testWithBoxing(int threadCount, long transactionsPerThread) {
+        System.out.printf("Multiverse> ----------------------------------------------\n");
+        System.out.printf("Multiverse> Boxing running with %s thread(s)\n", threadCount);
 
         stm = new BetaStm();
 
         BoxingThread[] threads = new BoxingThread[threadCount];
 
         for (int k = 0; k < threads.length; k++) {
-            threads[k] = new BoxingThread(k, transactionCount);
+            threads[k] = new BoxingThread(k, transactionsPerThread);
         }
 
         for (BoxingThread thread : threads) {
@@ -113,9 +126,16 @@ public class BoxingScalabilityTest {
             totalDurationMs += t.durationMs;
         }
 
-        double transactionsPerSecond = BenchmarkUtils.perSecond(transactionCount, totalDurationMs, threadCount);
-        System.out.printf("Multiverse> Performance %s transactions/second with %s thread(s)\n", BetaStmUtils.format(transactionsPerSecond), threadCount);
-        return transactionsPerSecond;
+        double transactionsPerSecondPerThread = transactionsPerSecondPerThread(
+                transactionsPerThread, totalDurationMs, threadCount);
+
+        System.out.printf("Multiverse> Threadcount %s\n", threadCount);
+        System.out.printf("Multiverse> Boxing performance %s transactions/second/thread\n",
+                BenchmarkUtils.format(transactionsPerSecondPerThread));
+        System.out.printf("Multiverse> Boxing Performance %s transactions/second\n",
+                transactionsPerSecondAsString(transactionsPerThread, totalDurationMs, threadCount));
+
+        return transactionsPerSecondPerThread;
     }
 
     class PrimitiveThread extends Thread {
@@ -149,7 +169,7 @@ public class BoxingScalabilityTest {
         }
     }
 
-      class BoxingThread extends Thread {
+    class BoxingThread extends Thread {
         private final long transactionCount;
         private long durationMs;
 
@@ -173,7 +193,7 @@ public class BoxingScalabilityTest {
                 tx.hardReset();
             }
 
-            assertEquals(transactionCount, (long)ref.___unsafeLoad().value);
+            assertEquals(transactionCount, (long) ref.___unsafeLoad().value);
 
             durationMs = System.currentTimeMillis() - startMs;
             System.out.printf("Multiverse> %s is finished in %s ms\n", getName(), durationMs);

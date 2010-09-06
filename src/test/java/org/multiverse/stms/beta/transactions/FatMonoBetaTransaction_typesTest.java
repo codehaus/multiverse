@@ -7,6 +7,7 @@ import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.multiverse.TestUtils.assertEqualsDouble;
 import static org.multiverse.stms.beta.BetaStmUtils.*;
 
 public class FatMonoBetaTransaction_typesTest {
@@ -61,6 +62,21 @@ public class FatMonoBetaTransaction_typesTest {
     }
 
     @Test
+    public void whenDoubleUsed() {
+        BetaDoubleRef ref = createDoubleRef(stm, 10);
+
+        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        DoubleRefTranlocal read = tx.openForRead(ref, false);
+        assertEqualsDouble(10, read.value);
+        DoubleRefTranlocal write = tx.openForWrite(ref, false);
+        write.value = 20;
+        tx.commit();
+
+        assertEqualsDouble(20, ref.___unsafeLoad().value);
+    }
+
+    @Test
     @Ignore
-    public void whenCustomTransactionalObjectUsed(){}
+    public void whenCustomTransactionalObjectUsed() {
+    }
 }

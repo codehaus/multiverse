@@ -10,8 +10,7 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.benchmarks.BenchmarkUtils.generateProcessorRange;
-import static org.multiverse.benchmarks.BenchmarkUtils.toGnuplot;
+import static org.multiverse.benchmarks.BenchmarkUtils.*;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 
 /**
@@ -52,7 +51,8 @@ public class UncontendedFatUpdateScalabilityTest {
         toGnuplot(result);
     }
 
-    private double test(int threadCount, long transactionCount) {
+    private double test(int threadCount, long transactionsPerThread) {
+        System.out.printf("Multiverse> ----------------------------------------------\n");
         System.out.printf("Multiverse> Running with %s processors\n", threadCount);
 
         stm = new BetaStm();
@@ -60,7 +60,7 @@ public class UncontendedFatUpdateScalabilityTest {
         UpdateThread[] threads = new UpdateThread[threadCount];
 
         for (int k = 0; k < threads.length; k++) {
-            threads[k] = new UpdateThread(k, transactionCount);
+            threads[k] = new UpdateThread(k, transactionsPerThread);
         }
 
         for (UpdateThread thread : threads) {
@@ -80,9 +80,14 @@ public class UncontendedFatUpdateScalabilityTest {
             totalDurationMs += t.durationMs;
         }
 
-        double transactionsPerSecond = BenchmarkUtils.perSecond(transactionCount, totalDurationMs, threadCount);
-        System.out.printf("Multiverse> Performance %s transactions/second with %s thread(s)\n", BetaStmUtils.format(transactionsPerSecond), threadCount);
-        return transactionsPerSecond;
+        double transactionsPerSecondPerThread = BenchmarkUtils.transactionsPerSecondPerThread(
+                transactionsPerThread, totalDurationMs, threadCount);
+        System.out.printf("Multiverse> Threadcount %s\n", threadCount);
+        System.out.printf("Multiverse> Performance %s transactions/second/thread\n",
+                BetaStmUtils.format(transactionsPerSecondPerThread));
+        System.out.printf("Multiverse> Performance %s transactions/second\n",
+                transactionsPerSecondAsString(transactionsPerThread, totalDurationMs, threadCount));
+        return transactionsPerSecondPerThread;
     }
 
     class UpdateThread extends Thread {

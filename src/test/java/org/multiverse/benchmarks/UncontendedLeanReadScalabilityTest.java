@@ -9,8 +9,7 @@ import org.multiverse.stms.beta.transactions.LeanMonoBetaTransaction;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import static org.multiverse.benchmarks.BenchmarkUtils.generateProcessorRange;
-import static org.multiverse.benchmarks.BenchmarkUtils.toGnuplot;
+import static org.multiverse.benchmarks.BenchmarkUtils.*;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 
 public class UncontendedLeanReadScalabilityTest {
@@ -50,7 +49,8 @@ public class UncontendedLeanReadScalabilityTest {
         toGnuplot(result);
     }
 
-    private double test(int threadCount, long transactionCount) {
+    private double test(int threadCount, long transactionsPerThread) {
+        System.out.printf("Multiverse> ----------------------------------------------\n");
         System.out.printf("Multiverse> Running with %s processors\n", threadCount);
 
         stm = new BetaStm();
@@ -58,7 +58,7 @@ public class UncontendedLeanReadScalabilityTest {
         ReadThread[] threads = new ReadThread[threadCount];
 
         for (int k = 0; k < threads.length; k++) {
-            threads[k] = new ReadThread(k, transactionCount);
+            threads[k] = new ReadThread(k, transactionsPerThread);
         }
 
         for (ReadThread thread : threads) {
@@ -78,11 +78,14 @@ public class UncontendedLeanReadScalabilityTest {
             totalDurationMs += t.durationMs;
         }
 
-        double transactionsPerSecond = BenchmarkUtils.perSecond(
-                transactionCount, totalDurationMs, threadCount);
-        System.out.printf("Multiverse> Performance %s transactions/second with %s threads\n",
-                format(transactionsPerSecond), threadCount);
-        return transactionsPerSecond;
+        double transactionsPerSecondPerThread = BenchmarkUtils.transactionsPerSecondPerThread(
+                transactionsPerThread, totalDurationMs, threadCount);
+        System.out.printf("Multiverse> Threadcount %s\n",threadCount);
+        System.out.printf("Multiverse> Performance %s transactions/second/thread\n",
+                format(transactionsPerSecondPerThread));
+        System.out.printf("Multiverse> Performance %s transactions/second\n",
+                transactionsPerSecondAsString(transactionsPerThread,totalDurationMs, threadCount));
+        return transactionsPerSecondPerThread;
     }
 
     @SuppressWarnings({"UnusedAssignment"})

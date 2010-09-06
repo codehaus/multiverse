@@ -13,6 +13,7 @@ public abstract class TestThread extends Thread {
     private volatile Boolean endedWithInterruptStatus;
     private volatile boolean startInterrupted;
     private volatile boolean printStackTrace = true;
+    private long durationMs = -1;
 
 
     public TestThread() {
@@ -44,13 +45,19 @@ public abstract class TestThread extends Thread {
         return endedWithInterruptStatus;
     }
 
+    public long getDurationMs(){
+        return durationMs;
+    }
+
     @Override
     public final void run() {
         if (startInterrupted) {
             interrupt();
         }
 
+        long startMs = System.currentTimeMillis();
         try {
+
             doRun();
         } catch (Throwable ex) {
             if (printStackTrace) {
@@ -60,6 +67,7 @@ public abstract class TestThread extends Thread {
             this.throwable = ex;
         } finally {
             endedWithInterruptStatus = isInterrupted();
+            durationMs = System.currentTimeMillis() - startMs;
         }
     }
 

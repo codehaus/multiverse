@@ -1,71 +1,114 @@
 package org.multiverse.sensors;
 
-import java.util.concurrent.atomic.AtomicLong;
+import org.multiverse.utils.ToolUnsafe;
+import sun.misc.Unsafe;
 
-/**
- * A striped counter that can be used as a scalable counter. The stripe is fixed, so doesn't grow if contended,
- * so make sure that the stripe is big enough.
- *
- * @author Peter Veentjer.
- */
+import static java.lang.String.format;
+
 public final class StripedCounter {
 
-    private final AtomicLong[] stripe;
+    private static final long serialVersionUID = -2308431214976778248L;
 
-    /**
-     * Creates a new StripedCounter.
-     *
-     * @param stripeLength the length of the stripe.
-     * @throws IllegalArgumentException if stripeLength smaller or equal than 0.
-     */
-    public StripedCounter(int stripeLength) {
-        if (stripeLength <= 0) {
-            throw new IllegalArgumentException();
-        }
+    // setup to use Unsafe.compareAndSwapInt for updates
+    private static final Unsafe unsafe = ToolUnsafe.getUnsafe();
+    private static final int base = unsafe.arrayBaseOffset(long[].class);
+    private static final int scale = unsafe.arrayIndexScale(long[].class);
+    private final long[] array;
 
-        this.stripe = new AtomicLong[stripeLength];
-        for (int k = 0; k < stripe.length; k++) {
-            stripe[k] = new AtomicLong();
-        }
+    public long rawIndex(int i) {
+        if (i < 0 || i >= array.length)
+            throw new IndexOutOfBoundsException("index " + i);
+        return base + (long) i * scale;
     }
 
     /**
-     * Returns the current count. It doesn't provide any form of read consistency, in most cases for a
-     * performance counter this is not needed.
+     * Creates a new AtomicLongArray of given length.
      *
-     * @return the current count.
+     * @param length the length of the array
      */
-    public long sum() {
-        long sum = 0;
-        for (int k = 0; k < stripe.length; k++) {
-            sum += stripe[k].get();
-        }
-        return sum;
+    public StripedCounter(int length) {
+        array = new long[length];
+        // must perform at least one volatile write to conform to JMM
+        if (length > 0)
+            unsafe.putLongVolatile(array, rawIndex(0), 0);
     }
 
-    /**
-     * Resets the counter. No consistency is provided.
-     */
-    public void reset() {
-        for (int k = 0; k < stripe.length; k++) {
-            stripe[k].set(0);
+    public long get() {
+        long result = 0;
+
+        for (int k = 0; k < array.length; k++) {
+            result += unsafe.getLongVolatile(array, rawIndex(k));
         }
+        return result;
     }
 
-    /**
-     * Increments the counter.
-     * <p/>
-     * If counter is 0, the call is ignored.
-     *
-     * @param randomFactor the random factor is needed to select a element of the stripe.
-     * @param count        the number to increase the counter with.
-     */
-    public void inc(final int randomFactor, final long count) {
+    public void inc(int random, long count) {
         if (count == 0) {
             return;
         }
 
-        int index = randomFactor % stripe.length;
-        stripe[index].addAndGet(count);
+        int index = (int) ((Math.abs(random+count)) % array.length);
+
+        while (true) {
+            final long rawIndex = rawIndex(index);
+            final long current = unsafe.getLongVolatile(array, rawIndex);
+            final long next = current + count;
+
+            if (unsafe.compareAndSwapLong(array, rawIndex, current, next)) {
+                return;
+            }
+
+            index = (int) (Math.abs(random + index + next) % array.length);
+
+            if (index < 0) {
+                throw new RuntimeException();
+            }
+        }
+    }
+
+    public void inc(long count) {
+        if (count == 0) {
+            return;
+        }
+
+        int index = (int) ((Math.abs(count)) % array.length);
+
+        while (true) {
+            final long rawIndex = rawIndex(index);
+            final long current = unsafe.getLongVolatile(array, rawIndex);
+            final long next = current + count;
+
+            if (unsafe.compareAndSwapLong(array, rawIndex, current, next)) {
+                return;
+            }
+
+            index = (int) (Math.abs(index + next) % array.length);
+
+            if (index < 0) {
+                throw new RuntimeException();
+            }
+        }
+    }
+
+    public void incAtIndex(int index, long count) {
+           if (count == 0) {
+               return;
+           }
+
+           while (true) {
+               final long rawIndex = rawIndex(index);
+               final long current = unsafe.getLongVolatile(array, rawIndex);
+               final long next = current + count;
+
+               if (unsafe.compareAndSwapLong(array, rawIndex, current, next)) {
+                   return;
+               }
+           }
+       }
+
+
+    @Override
+    public String toString() {
+        return format("StripedCounter(value=%s, width=%s)", get(), array.length);
     }
 }
