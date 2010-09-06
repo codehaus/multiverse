@@ -15,15 +15,21 @@ public interface IntRef extends TransactionalObject {
 
     /**
      * Ensures that when this ref is read in a transaction, no other transaction is able to write to this
-     * reference. This call expects a running transaction.
+     * reference. Once it is ensured, it is guaranteed to commit (unless the transaction aborts otherwise).
+     * <p/>
+     * This call expects a running transaction.
      *
      * @throws IllegalStateException
+     * @throws org.multiverse.api.exceptions.ReadConflict
+     *
      */
     void ensure();
 
     /**
      * Ensures that when this ref is read in a transaction, no other transaction is able to write to this
-     * reference. This call expects a running transaction.
+     * reference. Once it is ensured, it is guaranteed to commit (unless the transaction aborts otherwise).
+     * <p/>
+     * This call expects a running transaction.
      *
      * @param tx the Transaction used for this operation.
      * @throws NullPointerException if tx is null.
@@ -35,15 +41,15 @@ public interface IntRef extends TransactionalObject {
 
     /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
-       * will commute. If somehow there already is a dependency or a dependency is formed on the result of
-       * the commuting function, the function will not commute and will be exactly the same as an alter.
-       * <p/>
-       * This is different than the behavior in Clojure where the commute will be re-applied at the end
-       * of the transaction, even though some dependency is introduced, which can lead to inconsistencies.
-       * <p/>
-       * This call lifts on an existing transaction if available, else it will be run under its own transaction.
-       * <p/>
-       *
+     * will commute. If somehow there already is a dependency or a dependency is formed on the result of
+     * the commuting function, the function will not commute and will be exactly the same as an alter.
+     * <p/>
+     * This is different than the behavior in Clojure where the commute will be re-applied at the end
+     * of the transaction, even though some dependency is introduced, which can lead to inconsistencies.
+     * <p/>
+     * This call lifts on an existing transaction if available, else it will be run under its own transaction.
+     * <p/>
+     *
      * @param function the function to apply to this reference.
      * @throws NullPointerException if function is null.
      * @throws org.multiverse.api.exceptions.PreparedTransactionException
@@ -53,15 +59,15 @@ public interface IntRef extends TransactionalObject {
 
     /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
-       * will commute. If somehow there already is a dependency or a dependency is formed on the result of
-       * the commuting function, the function will not commute and will be exactly the same as an alter.
-       * <p/>
-       * This is different than the behavior in Clojure where the commute will be re-applied at the end
-       * of the transaction, even though some dependency is introduced, which can lead to inconsistencies.
-       * <p/>
-       * This call lifts on an existing transaction if available, else it will be run under its own transaction.
-       * <p/>
-       *
+     * will commute. If somehow there already is a dependency or a dependency is formed on the result of
+     * the commuting function, the function will not commute and will be exactly the same as an alter.
+     * <p/>
+     * This is different than the behavior in Clojure where the commute will be re-applied at the end
+     * of the transaction, even though some dependency is introduced, which can lead to inconsistencies.
+     * <p/>
+     * This call lifts on an existing transaction if available, else it will be run under its own transaction.
+     * <p/>
+     *
      * @param tx       the transaction used for this operation.
      * @param function the function to apply to this reference.
      * @throws NullPointerException  if function is null.
@@ -318,14 +324,12 @@ public interface IntRef extends TransactionalObject {
      */
     int get(Transaction tx);
 
-     /**
-     *
+    /**
      * @param value
      */
     void await(int value);
 
     /**
-     *
      * @param value
      */
     void await(Transaction tx, int value);

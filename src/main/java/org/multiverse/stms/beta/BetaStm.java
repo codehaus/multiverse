@@ -18,7 +18,7 @@ import static org.multiverse.stms.beta.ThreadLocalBetaTransactionPool.getThreadL
  */
 public final class BetaStm implements Stm {
 
-    private final AtomicBlock atomicBlock;
+    private final AtomicBlock defaultAtomicBlock;
     public final GlobalConflictCounter globalConflictCounter;
     public final int spinCount = 8;
     private final BetaTransactionConfiguration defaultConfig;
@@ -36,7 +36,7 @@ public final class BetaStm implements Stm {
         this.defaultConfig = new BetaTransactionConfiguration(this)
                 .setSpinCount(spinCount);
         this.storage = new SimpleStorage(this);
-        this.atomicBlock = createTransactionFactoryBuilder()
+        this.defaultAtomicBlock = createTransactionFactoryBuilder()
                 .setSpeculativeConfigEnabled(false)
                 .buildAtomicBlock();
     }
@@ -78,7 +78,7 @@ public final class BetaStm implements Stm {
 
     @Override
     public AtomicBlock getDefaultAtomicBlock() {
-        return atomicBlock;
+        return defaultAtomicBlock;
     }
 
     public int getMaxArrayTransactionSize() {

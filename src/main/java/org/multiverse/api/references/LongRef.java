@@ -15,15 +15,21 @@ public interface LongRef extends TransactionalObject {
 
     /**
      * Ensures that when this ref is read in a transaction, no other transaction is able to write to this
-     * reference. This call expects a running transaction.
+     * reference. Once it is ensured, it is guaranteed to commit (unless the transaction aborts otherwise).
+     * <p/>
+     * This call expects a running transaction.
      *
      * @throws IllegalStateException
+     * @throws org.multiverse.api.exceptions.ReadConflict
+     *
      */
     void ensure();
 
     /**
      * Ensures that when this ref is read in a transaction, no other transaction is able to write to this
-     * reference. This call expects a running transaction.
+     * reference. Once it is ensured, it is guaranteed to commit (unless the transaction aborts otherwise).
+     * <p/>
+     * This call expects a running transaction.
      *
      * @param tx the Transaction used for this operation.
      * @throws NullPointerException if tx is null.
@@ -319,14 +325,12 @@ public interface LongRef extends TransactionalObject {
      */
     long get(Transaction tx);
 
-     /**
-     *
+    /**
      * @param value
      */
     void await(long value);
 
     /**
-     *
      * @param value
      */
     void await(Transaction tx, long value);
