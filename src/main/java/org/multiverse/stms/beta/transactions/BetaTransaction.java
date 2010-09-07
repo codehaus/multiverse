@@ -5,10 +5,7 @@ import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.TransactionalObject;
 import org.multiverse.api.Watch;
 import org.multiverse.api.exceptions.*;
-import org.multiverse.api.functions.DoubleFunction;
-import org.multiverse.api.functions.Function;
-import org.multiverse.api.functions.IntFunction;
-import org.multiverse.api.functions.LongFunction;
+import org.multiverse.api.functions.*;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStmConstants;
@@ -402,6 +399,14 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     public abstract  IntRefTranlocal openForConstruction(BetaIntRef ref);
 
     public abstract  void commute(BetaIntRef ref, final IntFunction function);
+
+    public abstract  BooleanRefTranlocal openForRead(BetaBooleanRef ref, boolean lock);
+
+    public abstract  BooleanRefTranlocal openForWrite(BetaBooleanRef ref, boolean lock);
+
+    public abstract  BooleanRefTranlocal openForConstruction(BetaBooleanRef ref);
+
+    public abstract  void commute(BetaBooleanRef ref, final BooleanFunction function);
 
     public abstract  DoubleRefTranlocal openForRead(BetaDoubleRef ref, boolean lock);
 

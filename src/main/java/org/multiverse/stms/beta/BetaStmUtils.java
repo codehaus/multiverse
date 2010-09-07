@@ -91,6 +91,7 @@ public class BetaStmUtils {
         return ref;
     }
 
+   
     public static String format(double value) {
         return NumberFormat.getInstance(Locale.ENGLISH).format(value);
     }

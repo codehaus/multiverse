@@ -7,7 +7,21 @@ package org.multiverse.api.references;
  */
 public interface RefFactory {
 
+    /**
+     * Creates a committed DoubleRef.
+     *
+     * @param value the initial value.
+     * @return the created DoubleRef.
+     */
     DoubleRef createDoubleRef(double value);
+
+    /**
+     * Creates a committed BooleanRef.
+     *
+     * @param value the initial value.
+     * @return the created BooleanRef.
+     */
+    BooleanRef createBooleanRef(boolean value);
 
     /**
      * Creates a committed BetaIntRef.
@@ -46,7 +60,7 @@ public interface RefFactory {
      * Creates a committed BetaRef.
      *
      * @param value the initial value
-     * @param <E> the type of the value.
+     * @param <E>   the type of the value.
      * @return the created BetaRef.
      */
     <E> Ref<E> createRef(E value);
@@ -55,7 +69,7 @@ public interface RefFactory {
      * Creates a RefArray.
      *
      * @param length the array.
-     * @param <E>  the type of the elements in the array.
+     * @param <E>    the type of the elements in the array.
      * @return the created RefArray.
      * @throws IllegalArgumentException if length smaller than 0.
      */

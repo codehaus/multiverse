@@ -5,10 +5,7 @@ import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.api.functions.DoubleFunction;
-import org.multiverse.api.functions.Function;
-import org.multiverse.api.functions.IntFunction;
-import org.multiverse.api.functions.LongFunction;
+import org.multiverse.api.functions.*;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.transactionalobjects.*;
@@ -429,6 +426,209 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     public  void commute(
         BetaIntRef ref, IntFunction function){
+
+        if (status != ACTIVE) {
+            throw abortCommute(ref, function);
+        }
+
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+    
+        config.needsCommute();
+        abort();
+        throw SpeculativeConfigurationError.INSTANCE;
+     }
+
+
+    @Override
+    public final  BooleanRefTranlocal openForRead(
+        final BetaBooleanRef ref,
+        boolean lock) {
+
+        if (status != ACTIVE) {
+            throw abortOpenForRead(ref);
+        }
+
+        if (ref == null) {
+            return null;
+        }
+
+        lock = lock || config.lockReads;
+
+        if(attached == null){
+            //the transaction has no previous attached references.
+
+            if(lock){
+                BooleanRefTranlocal read = ref.___lockAndLoad(config.spinCount, this);
+
+                //if it was locked, lets abort.
+                if (read.isLocked) {
+                    throw abortOnReadConflict();
+                }
+
+                attached = read;
+                return read;
+            }
+
+            BooleanRefTranlocal read = ref.___load(config.spinCount);
+
+            if (read.isLocked) {
+                throw abortOnReadConflict();
+            }
+
+            if(!read.isPermanent || config.trackReads){
+                attached = read;
+            }else{
+                throw abortOnTooSmallSize(2);
+            }
+
+            return read;
+        }
+
+        //the transaction has a previous attached reference
+        if(attached.owner == ref){
+            //the reference is the one we are looking for.
+            BooleanRefTranlocal result = (BooleanRefTranlocal)attached;
+
+            if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount, result)){
+                throw abortOnReadConflict();
+            }
+
+            return result;
+        }
+
+        if(lock || config.trackReads){
+            throw abortOnTooSmallSize(2);
+        }
+
+        BooleanRefTranlocal read = ref.___load(config.spinCount);
+
+        //if it was locked, lets abort.
+        if (read.isLocked) {
+            throw abortOnReadConflict();
+        }
+
+        throw abortOnTooSmallSize(2);
+    }
+
+    @Override
+    public final  BooleanRefTranlocal openForWrite(
+        final BetaBooleanRef ref, boolean lock) {
+
+        if (status != ACTIVE) {
+            throw abortOpenForWrite(ref);
+        }
+
+        if (ref == null) {
+            throw abortOpenForWriteWhenNullReference();
+        }
+
+        if (config.readonly) {
+            throw abortOpenForWriteWhenReadonly(ref);
+        }
+
+        lock = lock || config.lockWrites;
+
+        if(attached == null){
+            //the transaction has no previous attached references.
+
+            BooleanRefTranlocal read = lock
+                ? ref.___lockAndLoad(config.spinCount, this)
+                : ref.___load(config.spinCount);
+
+            //if it was locked, lets abort.
+            if (read.isLocked) {
+                throw abortOnReadConflict();
+            }
+
+            BooleanRefTranlocal result = pool.take(ref);
+            if (result == null) {
+                result = new BooleanRefTranlocal(ref);
+            }
+            result.value = read.value;
+            result.read = read;
+
+            hasUpdates = true;
+            attached = result;
+            return result;
+        }
+
+        //the transaction has a previous attached reference
+
+        if(attached.owner != ref){
+            throw abortOnTooSmallSize(2);
+        }
+
+        //the reference is the one we are looking for.
+        BooleanRefTranlocal result = (BooleanRefTranlocal)attached;
+
+        if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount, result)){
+            throw abortOnReadConflict();
+        }
+
+        if(!result.isCommitted){
+            return result;
+        }
+
+        final BooleanRefTranlocal read = result;
+        result = pool.take(ref);
+        if (result == null) {
+            result = new BooleanRefTranlocal(ref);
+        }
+        result.value = read.value;
+        result.read = read;
+        hasUpdates = true;    
+        attached = result;
+        return result;
+    }
+
+    @Override
+    public final  BooleanRefTranlocal openForConstruction(
+        final BetaBooleanRef ref) {
+
+        if (status != ACTIVE) {
+           throw abortOpenForConstruction(ref);
+        }
+
+        if (ref == null) {
+            throw abortOpenForConstructionWhenNullReference();
+        }
+
+        if (config.readonly) {
+            throw abortOpenForConstructionWhenReadonly(ref);
+        }
+
+        BooleanRefTranlocal result = (attached == null || attached.owner != ref) ? null : (BooleanRefTranlocal)attached;
+
+        if(result != null){
+            if(result.isCommitted || result.read != null){
+               throw abortOpenForConstructionWithBadReference(ref);
+            }
+
+            return result;
+        }
+
+        //check if there is room
+        if (attached != null) {
+            throw abortOnTooSmallSize(2);
+        }
+
+        if(ref.___unsafeLoad()!=null){
+            throw abortOpenForConstructionWithBadReference(ref);
+        }
+
+        result =  pool.take(ref);
+        if(result == null){
+            result = new BooleanRefTranlocal(ref);
+        }
+        result.isDirty = DIRTY_TRUE;
+        attached = result;
+        return result;
+    }
+
+    public  void commute(
+        BetaBooleanRef ref, BooleanFunction function){
 
         if (status != ACTIVE) {
             throw abortCommute(ref, function);

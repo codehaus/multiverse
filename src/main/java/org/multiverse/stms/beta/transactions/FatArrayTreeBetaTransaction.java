@@ -4,10 +4,7 @@ import org.multiverse.api.Watch;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.api.functions.DoubleFunction;
-import org.multiverse.api.functions.Function;
-import org.multiverse.api.functions.IntFunction;
-import org.multiverse.api.functions.LongFunction;
+import org.multiverse.api.functions.*;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.Listeners;
@@ -623,6 +620,294 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             result =  pool.take(ref);
             if(result == null){
                 result = new IntRefTranlocal(ref);
+            }
+            result.read = read;
+            result.value = read.value;
+            hasUpdates = true;
+            array[index]=result;
+         }
+
+         result.value = function.call(result.value);
+     }
+
+
+    private  void flattenCommute(
+        final BetaBooleanRef ref,
+        final BooleanRefTranlocal tranlocal,
+        final boolean lock){
+
+        if(!hasReads){
+            localConflictCounter.reset();
+            hasReads = true;
+        }
+
+        final BooleanRefTranlocal read = lock
+            ? ref.___lockAndLoad(config.spinCount, this)
+            : ref.___load(config.spinCount);
+
+        if (read.isLocked) {
+            throw abortOnReadConflict();
+        }
+
+        //make sure that there are no conflicts.
+        if (hasReadConflict()) {
+            ref.___abort(this, read, pool);
+            throw abortOnReadConflict();
+        }
+
+        tranlocal.read = read;
+        boolean abort = true;
+        evaluatingCommute = true;
+        try{
+            tranlocal.evaluateCommutingFunctions(pool);
+            abort = false;
+        }finally{
+            evaluatingCommute = false;
+            if(abort){
+                abort();
+            }
+        }
+    }
+
+    @Override
+    public  BooleanRefTranlocal openForRead(
+        final BetaBooleanRef ref, boolean lock) {
+
+        if (status != ACTIVE) {
+            throw abortOpenForRead(ref);
+        }
+
+        if(evaluatingCommute){
+            throw abortOnOpenForReadWhileEvaluatingCommute(ref);
+        }
+
+        if (ref == null) {
+            return null;
+        }
+
+        lock = lock || config.lockReads;
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = findAttachedIndex(ref, identityHashCode);
+        if (index > -1) {
+            //we are lucky, at already is attached to the session
+            BooleanRefTranlocal found = (BooleanRefTranlocal)array[index];
+
+
+            if(found.isCommuting){
+                flattenCommute(ref, found, lock);
+            }else
+            if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,found)){
+                throw abortOnReadConflict();
+            }
+
+            return found;
+        }
+
+        if(!hasReads){
+            localConflictCounter.reset();
+            hasReads = true;
+        }
+
+        //none is found in this transaction, lets load it.
+        final BooleanRefTranlocal read = lock
+            ? ref.___lockAndLoad(config.spinCount, this)
+            : ref.___load(config.spinCount);
+
+        if (read.isLocked) {
+            throw abortOnReadConflict();
+        }
+
+        //make sure that there are no conflicts.
+        if (hasReadConflict()) {
+            ref.___abort(this, read, pool);
+            throw abortOnReadConflict();
+        }
+
+        if(lock || !read.isPermanent || config.trackReads){
+            attach(ref, read, identityHashCode);
+            size++;
+        }else{
+            hasUntrackedReads = true;
+        }
+
+        return read;
+    }
+
+    @Override
+    public  BooleanRefTranlocal openForWrite(
+        final BetaBooleanRef  ref, boolean lock) {
+
+        if (status != ACTIVE) {
+            throw abortOpenForWrite(ref);
+        }
+
+        if(evaluatingCommute){
+            throw abortOnOpenForWriteWhileEvaluatingCommute(ref);
+        }
+
+        if (config.readonly) {
+            throw abortOpenForWriteWhenReadonly(ref);
+        }
+
+        if (ref == null) {
+            throw abortOpenForWriteWhenNullReference();
+        }
+
+        //lets find the tranlocal
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = findAttachedIndex(ref, identityHashCode);
+        lock = lock || config.lockWrites;
+
+        if(index >- 1){
+            BooleanRefTranlocal result = (BooleanRefTranlocal)array[index];
+
+            if(result.isCommuting){
+                flattenCommute(ref, result, lock);
+                return result;
+            }else
+            if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount,result)){
+                throw abortOnReadConflict();
+            }
+
+            if(!result.isCommitted){
+                return result;
+            }
+
+            //it was opened for reading so we need to open it for writing.
+            BooleanRefTranlocal read = result;
+            result = pool.take(ref);
+            if (result == null) {
+                result = new BooleanRefTranlocal(ref);
+            }
+
+            result.value = read.value;
+            result.read = read;
+            hasUpdates = true;
+            array[index]=result;
+            return result;
+        }
+
+        //it was not previously attached to this transaction
+
+        if(!hasReads){
+            localConflictCounter.reset();
+            hasReads = true;
+        }
+
+        //the tranlocal was not loaded before in this transaction, now load it.
+        final BooleanRefTranlocal read = lock
+            ? ref.___lockAndLoad(config.spinCount, this)
+            : ref.___load(config.spinCount);
+
+        if(read.isLocked){
+           throw abortOnReadConflict();
+        }
+
+        if (hasReadConflict()) {
+            read.owner.___abort(this, read, pool);
+            throw abortOnReadConflict();
+        }
+
+        //open the tranlocal for writing.
+        BooleanRefTranlocal result = read.openForWrite(pool);
+        hasUpdates = true;
+        attach(ref, result, identityHashCode);
+        size++;        
+        return result;
+    }
+
+    @Override
+    public final  BooleanRefTranlocal openForConstruction(
+        final BetaBooleanRef ref) {
+
+        if (status != ACTIVE) {
+            throw abortOpenForConstruction(ref);
+        }
+
+        if(evaluatingCommute){
+            throw abortOnOpenForConstructionWhileEvaluatingCommute(ref);
+        }
+
+        if (config.readonly) {
+            throw abortOpenForWriteWhenReadonly(ref);
+        }
+
+        if (ref == null) {
+            throw abortOpenForWriteWhenNullReference();
+        }
+
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = findAttachedIndex(ref, identityHashCode);
+
+        if(index >- 1){
+            final BooleanRefTranlocal result = (BooleanRefTranlocal)array[index];
+            if(result.isCommitted || result.read!=null){
+                throw abortOpenForConstructionWithBadReference(ref);
+            }
+
+            return result;
+        }
+
+        if(ref.___unsafeLoad()!=null){
+            throw abortOpenForConstructionWithBadReference(ref);
+        }
+
+        BooleanRefTranlocal result =  pool.take(ref);
+        if(result == null){
+            result = new BooleanRefTranlocal(ref);
+        }
+        result.isDirty = DIRTY_TRUE;
+        attach(ref, result, identityHashCode);
+        size++;
+        return result;
+    }
+
+    public  void commute(
+        final BetaBooleanRef ref, final BooleanFunction function){
+
+        if (status != ACTIVE) {
+            throw abortCommute(ref, function);
+        }
+
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+                    
+        if(evaluatingCommute){
+            throw abortOnCommuteWhileEvaluatingCommute(ref);
+        }    
+
+        if (config.readonly) {
+            throw abortCommuteWhenReadonly(ref, function);
+        }
+
+        if (ref == null) {
+            throw abortCommuteWhenNullReference(function);
+        }
+
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = findAttachedIndex(ref, identityHashCode);
+        if(index == -1){
+            //todo: call to 'openForCommute' can be inlined.
+            BooleanRefTranlocal result = ref.___openForCommute(pool);
+            attach(ref, result, identityHashCode);
+            result.addCommutingFunction(function, pool);
+            hasUpdates = true;
+            size++;
+            return;
+        }
+
+        BooleanRefTranlocal result = (BooleanRefTranlocal)array[index];
+        if(result.isCommuting){
+            result.addCommutingFunction(function, pool);
+            return;
+        }
+
+        if(result.isCommitted){
+            final BooleanRefTranlocal read = result;
+            result =  pool.take(ref);
+            if(result == null){
+                result = new BooleanRefTranlocal(ref);
             }
             result.read = read;
             result.value = read.value;

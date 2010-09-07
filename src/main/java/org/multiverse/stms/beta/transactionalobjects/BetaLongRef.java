@@ -111,7 +111,7 @@ public final class BetaLongRef
 
     @Override
     public final int ___getClassIndex(){
-        return 3;
+        return 4;
     }
 
     @Override

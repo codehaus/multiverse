@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertEqualsDouble;
 import static org.multiverse.stms.beta.BetaStmUtils.*;
 
@@ -73,6 +73,21 @@ public class FatArrayTreeBetaTransaction_typesTest {
         tx.commit();
 
         assertEqualsDouble(20, ref.___unsafeLoad().value);
+    }
+
+
+    @Test
+    public void whenBooleanRefUsed() {
+        BetaBooleanRef ref = new BetaBooleanRef(stm, false);
+
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        BooleanRefTranlocal read = tx.openForRead(ref, false);
+        assertFalse(read.value);
+        BooleanRefTranlocal write = tx.openForWrite(ref, false);
+        write.value = true;
+        tx.commit();
+
+        assertTrue(ref.___unsafeLoad().value);
     }
 
     @Test

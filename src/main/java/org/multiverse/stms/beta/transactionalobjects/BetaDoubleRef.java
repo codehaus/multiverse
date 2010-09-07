@@ -111,7 +111,7 @@ public  class BetaDoubleRef
 
     @Override
     public final int ___getClassIndex(){
-        return 2;
+        return 3;
     }
 
     @Override

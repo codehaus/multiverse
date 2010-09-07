@@ -56,6 +56,8 @@ public final class BetaObjectPool {
     private int lastUsedBetaRef = -1;
     private final IntRefTranlocal[] tranlocalsBetaIntRef = new IntRefTranlocal[100];
     private int lastUsedBetaIntRef = -1;
+    private final BooleanRefTranlocal[] tranlocalsBetaBooleanRef = new BooleanRefTranlocal[100];
+    private int lastUsedBetaBooleanRef = -1;
     private final DoubleRefTranlocal[] tranlocalsBetaDoubleRef = new DoubleRefTranlocal[100];
     private int lastUsedBetaDoubleRef = -1;
     private final LongRefTranlocal[] tranlocalsBetaLongRef = new LongRefTranlocal[100];
@@ -180,6 +182,54 @@ public final class BetaObjectPool {
     }
 
     /**
+     * Takes a BooleanRefTranlocal from the pool for the specified BetaBooleanRef.
+     *
+     * @param owner the BetaBooleanRef to get the BooleanRefTranlocal for.
+     * @return the pooled tranlocal, or null if none is found.
+     * @throws NullPointerException if owner is null.
+     */
+    public BooleanRefTranlocal take(final BetaBooleanRef owner) {
+        if (owner == null) {
+            throw new NullPointerException();
+        }
+
+        if (!tranlocalPoolingEnabled) {
+            return null;
+        }
+
+        if (lastUsedBetaBooleanRef == -1) {
+            return null;
+        }
+
+        BooleanRefTranlocal tranlocal = tranlocalsBetaBooleanRef[lastUsedBetaBooleanRef];
+        tranlocal.owner = owner;
+        tranlocalsBetaBooleanRef[lastUsedBetaBooleanRef] = null;
+        lastUsedBetaBooleanRef--;
+        return tranlocal;
+    }
+
+    /**
+     * Puts an old BooleanRefTranlocal in this pool. If the tranlocal is allowed to be null,
+     * the call is ignored. The same goes for when the tranlocal is permanent, since you
+     * can't now how many transactions are still using it.
+     *
+     * @param tranlocal the BooleanRefTranlocal to pool.
+     */
+    public void put(final BooleanRefTranlocal tranlocal) {
+        if (!tranlocalPoolingEnabled || tranlocal == null||tranlocal.isPermanent) {
+            return;
+        }
+
+        if (lastUsedBetaBooleanRef == tranlocalsBetaBooleanRef.length - 1) {
+            return;
+        }
+
+        tranlocal.prepareForPooling(this);
+        lastUsedBetaBooleanRef++;
+        tranlocalsBetaBooleanRef[lastUsedBetaBooleanRef] = tranlocal;
+    }
+
+    /**
      * Takes a DoubleRefTranlocal from the pool for the specified BetaDoubleRef.
      *
      * @param owner the BetaDoubleRef to get the DoubleRefTranlocal for.
@@ -296,8 +346,10 @@ public final class BetaObjectPool {
             case 1:
                 return take((BetaIntRef)owner);
             case 2:
-                return take((BetaDoubleRef)owner);
+                return take((BetaBooleanRef)owner);
             case 3:
+                return take((BetaDoubleRef)owner);
+            case 4:
                 return take((BetaLongRef)owner);
         }
 
@@ -341,9 +393,12 @@ public final class BetaObjectPool {
                 put((IntRefTranlocal)tranlocal);
                 return;
             case 2:
-                put((DoubleRefTranlocal)tranlocal);
+                put((BooleanRefTranlocal)tranlocal);
                 return;
             case 3:
+                put((DoubleRefTranlocal)tranlocal);
+                return;
+            case 4:
                 put((LongRefTranlocal)tranlocal);
                 return;
         }

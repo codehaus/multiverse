@@ -21,7 +21,6 @@ import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.*;
@@ -247,53 +246,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         assertReadonlyCount(1, ref.___getOrec());
     }
 
-    @Test
-    public void integrationTest_whenMultipleUpdatesAndDirtyCheckEnabled() {
-        integrationTest_whenMultipleUpdatesAndDirtyCheck(true);
-    }
-
-    @Test
-    public void integrationTest_whenMultipleUpdatesAndDirtyCheckDisabled() {
-        integrationTest_whenMultipleUpdatesAndDirtyCheck(false);
-    }
-
-    public void integrationTest_whenMultipleUpdatesAndDirtyCheck(final boolean dirtyCheck) {
-        BetaLongRef[] refs = new BetaLongRef[30];
-        long created = 0;
-
-        //create the references
-        for (int k = 0; k < refs.length; k++) {
-            refs[k] = createLongRef(stm);
-        }
-
-        //execute all transactions
-        Random random = new Random();
-        int transactionCount = 100000;
-        for (int transaction = 0; transaction < transactionCount; transaction++) {
-            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, refs.length)
-                    .setDirtyCheckEnabled(dirtyCheck);
-            FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
-
-            for (int k = 0; k < refs.length; k++) {
-                if (random.nextInt(3) == 1) {
-                    tx.openForWrite(refs[k], false).value++;
-                    created++;
-                } else {
-                    tx.openForWrite(refs[k], false);
-                }
-            }
-            tx.commit();
-            tx.softReset();
-        }
-
-        long sum = 0;
-        for (int k = 0; k < refs.length; k++) {
-            sum += refs[k].___unsafeLoad().value;
-        }
-
-        assertEquals(created, sum);
-    }
-
+  
     @Test
     public void whenConstructed() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);

@@ -95,6 +95,11 @@ public final class BetaStm implements Stm {
     public final class BetaRefFactoryImpl implements BetaRefFactory {
 
         @Override
+        public BetaBooleanRef createBooleanRef(boolean value) {
+            return new BetaBooleanRef(BetaStm.this,value);
+        }
+
+        @Override
         public BetaDoubleRef createDoubleRef(double value) {
             return new BetaDoubleRef(BetaStm.this, value);
         }

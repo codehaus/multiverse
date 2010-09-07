@@ -19,7 +19,6 @@ import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.*;
@@ -347,51 +346,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         assertNull(write.read);
     }
 
-    @Test
-    public void integrationTest_whenMultipleUpdatesAndDirtyCheckEnabled() {
-        integrationTest_whenMultipleUpdatesAndDirtyCheck(true);
-    }
-
-    @Test
-    public void integrationTest_whenMultipleUpdatesAndDirtyCheckDisabled() {
-        integrationTest_whenMultipleUpdatesAndDirtyCheck(false);
-    }
-
-    public void integrationTest_whenMultipleUpdatesAndDirtyCheck(final boolean dirtyCheck) {
-        BetaLongRef[] refs = new BetaLongRef[30];
-        long created = 0;
-
-        //create the references
-        for (int k = 0; k < refs.length; k++) {
-            refs[k] = createLongRef(stm);
-        }
-
-        //execute all transactions
-        Random random = new Random();
-        int transactionCount = 10000;
-        for (int transaction = 0; transaction < transactionCount; transaction++) {
-            FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(
-                    new BetaTransactionConfiguration(stm).setDirtyCheckEnabled(dirtyCheck));
-            for (int k = 0; k < refs.length; k++) {
-                if (random.nextInt(3) == 1) {
-                    tx.openForWrite(refs[k], false).value++;
-                    created++;
-                } else {
-                    tx.openForWrite(refs[k], false);
-                }
-            }
-            tx.commit();
-            tx.softReset();
-        }
-
-        long sum = 0;
-        for (int k = 0; k < refs.length; k++) {
-            sum += refs[k].___unsafeLoad().value;
-        }
-
-        assertEquals(created, sum);
-    }
-
+ 
     @Test
     public void whenNoDirtyCheckAndCommute() {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)

@@ -10,6 +10,9 @@ import org.multiverse.api.references.RefFactory;
 public interface BetaRefFactory extends RefFactory {
 
     @Override
+    BetaBooleanRef createBooleanRef(boolean value);
+
+    @Override
     BetaDoubleRef createDoubleRef(double value);
 
     @Override
