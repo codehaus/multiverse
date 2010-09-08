@@ -38,6 +38,6 @@ public class LeanMonoBetaTransaction_commuteTest {
 
         assertIsAborted(tx);
         verifyZeroInteractions(function);
-        assertTrue(config.getSpeculativeConfig().isCommuteRequired());
+        assertTrue(config.getSpeculativeConfiguration().isCommuteRequired);
     }
 }

@@ -33,6 +33,6 @@ public class LeanArrayTreeBetaTransaction_registerTest {
         }
 
         assertIsAborted(tx);
-        assertTrue(tx.getConfiguration().getSpeculativeConfig().isListenerRequired());
+        assertTrue(tx.getConfiguration().getSpeculativeConfiguration().areListenersRequired);
     }
 }

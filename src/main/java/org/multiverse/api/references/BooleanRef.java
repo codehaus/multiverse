@@ -215,7 +215,7 @@ public interface BooleanRef extends TransactionalObject {
      *
      * @param tx    the transaction used to do the set.
      * @param value the new value
-     * @return the old value
+     * @return the new value
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the correct

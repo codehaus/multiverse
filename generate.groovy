@@ -290,7 +290,7 @@ void generateAtomicBlock(VelocityEngine engine, List<AtomicClosure> closures) {
 }
 
 void generateBetaTransactionPool(VelocityEngine engine, List<Transaction> transactions) {
-  Template t = engine.getTemplate("src/main/java/org/multiverse/stms/beta/BetaTransactionPool.vm")
+  Template t = engine.getTemplate("src/main/java/org/multiverse/stms/beta/transactions/BetaTransactionPool.vm")
 
   VelocityContext context = new VelocityContext()
   context.put("transactions", transactions)
@@ -298,7 +298,7 @@ void generateBetaTransactionPool(VelocityEngine engine, List<Transaction> transa
   StringWriter writer = new StringWriter()
   t.merge(context, writer)
 
-  File file = new File('src/main/java/org/multiverse/stms/beta/BetaTransactionPool.java')
+  File file = new File('src/main/java/org/multiverse/stms/beta/transactions/BetaTransactionPool.java')
   file.createNewFile()
   file.text = writer.toString()
 }

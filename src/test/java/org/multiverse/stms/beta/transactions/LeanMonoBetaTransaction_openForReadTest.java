@@ -37,7 +37,7 @@ public class LeanMonoBetaTransaction_openForReadTest {
         } catch (SpeculativeConfigurationError expected) {
         }
 
-        assertEquals(2, config.getSpeculativeConfig().getMinimalLength());
+        assertEquals(2, config.getSpeculativeConfiguration().minimalLength);
         assertIsAborted(tx);
         assertSurplus(1, ref);
         assertReadBiased(ref);

@@ -606,10 +606,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #if($transaction.lean)
     @Override
     public final void prepare() {
-        if(status == PREPARED){
-            return;
-        }
-
         if(status != ACTIVE){
             switch (status) {
                 case PREPARED:

@@ -32,7 +32,7 @@ import java.util.UUID;
  *
  * @author Peter Veentjer
  */
-public  class BetaIntRef
+public final class BetaIntRef
     extends FastOrec implements BetaTransactionalObject, BetaStmConstants, IntRef
 {
 

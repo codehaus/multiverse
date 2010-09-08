@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaTransactionPool;
+import org.multiverse.stms.beta.transactions.BetaTransactionPool;
 
 /**
  * @author Peter Veentjer

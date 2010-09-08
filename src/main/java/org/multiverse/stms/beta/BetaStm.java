@@ -96,7 +96,7 @@ public final class BetaStm implements Stm {
 
         @Override
         public BetaBooleanRef createBooleanRef(boolean value) {
-            return new BetaBooleanRef(BetaStm.this,value);
+            return new BetaBooleanRef(BetaStm.this, value);
         }
 
         @Override
@@ -391,61 +391,61 @@ public final class BetaStm implements Stm {
 
         @Override
         public BetaTransaction start(final BetaTransactionPool pool) {
-            final SpeculativeBetaConfig speculativeConfig = config.getSpeculativeConfig();
-            final int length = speculativeConfig.getMinimalLength();
+            final SpeculativeBetaConfiguration speculativeConfiguration = config.speculativeConfiguration.get();
+            final int length = speculativeConfiguration.minimalLength;
 
             if (length <= 1) {
-                if (speculativeConfig.isFat()) {
-                    FatMonoBetaTransaction tx = pool.takeFatMonoBetaTransaction();
+                if (speculativeConfiguration.isFat) {
+                    final FatMonoBetaTransaction tx = pool.takeFatMonoBetaTransaction();
                     if (tx == null) {
-                        tx = new FatMonoBetaTransaction(config);
-                    } else {
-                        tx.init(config);
+                        return new FatMonoBetaTransaction(config);
                     }
+
+                    tx.init(config);
                     return tx;
                 } else {
                     LeanMonoBetaTransaction tx = pool.takeLeanMonoBetaTransaction();
                     if (tx == null) {
-                        tx = new LeanMonoBetaTransaction(config);
-                    } else {
-                        tx.init(config);
+                        return new LeanMonoBetaTransaction(config);
                     }
+
+                    tx.init(config);
                     return tx;
                 }
-            } else if (length <= config.getMaxArrayTransactionSize()) {
-                if (speculativeConfig.isFat()) {
-                    FatArrayBetaTransaction tx = pool.takeFatArrayBetaTransaction();
+            } else if (length <= config.maxArrayTransactionSize) {
+                if (speculativeConfiguration.isFat) {
+                    final FatArrayBetaTransaction tx = pool.takeFatArrayBetaTransaction();
                     if (tx == null) {
-                        tx = new FatArrayBetaTransaction(config);
-                    } else {
-                        tx.init(config);
+                        return new FatArrayBetaTransaction(config);
                     }
+
+                    tx.init(config);
                     return tx;
                 } else {
-                    LeanArrayBetaTransaction tx = pool.takeLeanArrayBetaTransaction();
+                    final LeanArrayBetaTransaction tx = pool.takeLeanArrayBetaTransaction();
                     if (tx == null) {
-                        tx = new LeanArrayBetaTransaction(config);
-                    } else {
-                        tx.init(config);
+                        return new LeanArrayBetaTransaction(config);
                     }
+
+                    tx.init(config);
                     return tx;
                 }
             } else {
-                if (speculativeConfig.isFat()) {
-                    FatArrayTreeBetaTransaction tx = pool.takeFatArrayTreeBetaTransaction();
+                if (speculativeConfiguration.isFat) {
+                    final FatArrayTreeBetaTransaction tx = pool.takeFatArrayTreeBetaTransaction();
                     if (tx == null) {
-                        tx = new FatArrayTreeBetaTransaction(config);
-                    } else {
-                        tx.init(config);
+                        return new FatArrayTreeBetaTransaction(config);
                     }
+
+                    tx.init(config);
                     return tx;
                 } else {
-                    LeanArrayTreeBetaTransaction tx = pool.takeLeanArrayTreeBetaTransaction();
+                    final LeanArrayTreeBetaTransaction tx = pool.takeLeanArrayTreeBetaTransaction();
                     if (tx == null) {
-                        tx = new LeanArrayTreeBetaTransaction(config);
-                    } else {
-                        tx.init(config);
+                        return new LeanArrayTreeBetaTransaction(config);
                     }
+
+                    tx.init(config);
                     return tx;
                 }
             }

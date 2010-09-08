@@ -54,7 +54,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
         }
 
         assertIsAborted(tx);
-        assertEquals(4, config.getSpeculativeConfig().getMinimalLength());
+        assertEquals(4, config.getSpeculativeConfiguration().minimalLength);
     }
 
     @Test

@@ -1329,10 +1329,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     @Override
     public final void prepare() {
-        if(status == PREPARED){
-            return;
-        }
-
         if(status != ACTIVE){
             switch (status) {
                 case PREPARED:

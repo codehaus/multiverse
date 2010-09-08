@@ -1,5 +1,7 @@
 package org.multiverse.stms.beta;
 
+import org.multiverse.stms.beta.transactions.BetaTransactionPool;
+
 /**
  * A ThreadLocal containing the BetaObjectPool. BetaObjectPool is not threadsafe and storing it in a threadlocal
  * is the safest way to get a reference to it.

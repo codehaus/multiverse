@@ -128,7 +128,7 @@ public class BetaStm_transactionFactoryBuilderTest {
                 .build();
 
         BetaTransactionConfiguration configuration = txFactory.getTransactionConfiguration();
-        assertFalse(configuration.getSpeculativeConfig().isFat());
+        assertFalse(configuration.getSpeculativeConfiguration().isFat);
         assertTrue(configuration.isSpeculativeConfigEnabled());
     }
 
@@ -141,7 +141,7 @@ public class BetaStm_transactionFactoryBuilderTest {
 
 
         BetaTransactionConfiguration configuration = txFactory.getTransactionConfiguration();
-        assertTrue(configuration.getSpeculativeConfig().isFat());
+        assertTrue(configuration.getSpeculativeConfiguration().isFat);
         assertTrue(configuration.isSpeculativeConfigEnabled());
     }
 

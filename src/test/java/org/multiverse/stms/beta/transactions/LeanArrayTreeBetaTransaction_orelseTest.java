@@ -29,7 +29,7 @@ public class LeanArrayTreeBetaTransaction_orelseTest {
         }
 
         assertIsAborted(tx);
-        assertTrue(config.getSpeculativeConfig().isOrelseRequired());
+        assertTrue(config.getSpeculativeConfiguration().isOrelseRequired);
     }
 
     @Test
@@ -45,7 +45,7 @@ public class LeanArrayTreeBetaTransaction_orelseTest {
         }
 
         assertIsAborted(tx);
-        assertFalse(config.getSpeculativeConfig().isOrelseRequired());
+        assertFalse(config.getSpeculativeConfiguration().isOrelseRequired);
     }
 
      @Test
@@ -61,6 +61,6 @@ public class LeanArrayTreeBetaTransaction_orelseTest {
         }
 
         assertIsAborted(tx);
-        assertFalse(config.getSpeculativeConfig().isOrelseRequired());
+        assertFalse(config.getSpeculativeConfiguration().isOrelseRequired);
     }
 }

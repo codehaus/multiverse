@@ -187,7 +187,7 @@ public class FatMonoBetaTransaction_commuteTest {
         }
 
         assertIsAborted(tx);
-        assertEquals(2, tx.getConfiguration().getSpeculativeConfig().getMinimalLength());
+        assertEquals(2, tx.getConfiguration().getSpeculativeConfiguration().minimalLength);
 
         verifyZeroInteractions(function1);
         assertSurplus(0, ref1);

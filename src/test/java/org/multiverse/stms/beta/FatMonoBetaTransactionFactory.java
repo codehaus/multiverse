@@ -2,6 +2,7 @@ package org.multiverse.stms.beta;
 
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
+import org.multiverse.stms.beta.transactions.BetaTransactionPool;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
 import static org.multiverse.stms.beta.ThreadLocalBetaTransactionPool.getThreadLocalBetaTransactionPool;

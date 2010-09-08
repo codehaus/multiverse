@@ -3,6 +3,7 @@ package org.multiverse.stms.beta;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
+import org.multiverse.stms.beta.transactions.BetaTransactionPool;
 
 /**
  * A {@link TransactionFactory} specific for the BetaStm.

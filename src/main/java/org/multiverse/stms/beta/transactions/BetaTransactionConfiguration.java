@@ -26,8 +26,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
 
     public final BetaStm stm;
     public final GlobalConflictCounter globalConflictCounter;
-    private final AtomicReference<SpeculativeBetaConfig> speculativeConfig
-            = new AtomicReference<SpeculativeBetaConfig>();
+    public final AtomicReference<SpeculativeBetaConfiguration> speculativeConfiguration
+            = new AtomicReference<SpeculativeBetaConfiguration>();
     public final TransactionSensor transactionSensor;
     public final StmCallback stmCallback;
     public final String familyName;
@@ -89,8 +89,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         return timeoutNs != Long.MAX_VALUE;
     }
 
-    public SpeculativeBetaConfig getSpeculativeConfig() {
-        return speculativeConfig.get();
+    public SpeculativeBetaConfiguration getSpeculativeConfiguration() {
+        return speculativeConfiguration.get();
     }
 
     @Override
@@ -191,9 +191,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
 
     public void needsOrelse() {
         while (true) {
-            SpeculativeBetaConfig current = speculativeConfig.get();
-            SpeculativeBetaConfig update = current.createWithOrElseRequired();
-            if (speculativeConfig.compareAndSet(current, update)) {
+            SpeculativeBetaConfiguration current = speculativeConfiguration.get();
+            SpeculativeBetaConfiguration update = current.createWithOrElseRequired();
+            if (speculativeConfiguration.compareAndSet(current, update)) {
                 return;
             }
         }
@@ -201,9 +201,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
 
     public void needsListeners() {
         while (true) {
-            SpeculativeBetaConfig current = speculativeConfig.get();
-            SpeculativeBetaConfig update = current.createWithListenersRequired();
-            if (speculativeConfig.compareAndSet(current, update)) {
+            SpeculativeBetaConfiguration current = speculativeConfiguration.get();
+            SpeculativeBetaConfiguration update = current.createWithListenersRequired();
+            if (speculativeConfiguration.compareAndSet(current, update)) {
                 return;
             }
         }
@@ -211,9 +211,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
 
     public void needsCommute() {
         while (true) {
-            SpeculativeBetaConfig current = speculativeConfig.get();
-            SpeculativeBetaConfig update = current.createWithCommuteRequired();
-            if (speculativeConfig.compareAndSet(current, update)) {
+            SpeculativeBetaConfiguration current = speculativeConfiguration.get();
+            SpeculativeBetaConfiguration update = current.createWithCommuteRequired();
+            if (speculativeConfiguration.compareAndSet(current, update)) {
                 return;
             }
         }
@@ -221,10 +221,10 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
 
     public void needsMinimalTransactionLength(int newLength) {
         while (true) {
-            SpeculativeBetaConfig current = speculativeConfig.get();
-            SpeculativeBetaConfig next = current.createWithMinimalLength(newLength);
+            SpeculativeBetaConfiguration current = speculativeConfiguration.get();
+            SpeculativeBetaConfiguration next = current.createWithMinimalLength(newLength);
 
-            if (speculativeConfig.compareAndSet(current, next)) {
+            if (speculativeConfiguration.compareAndSet(current, next)) {
                 return;
             }
         }
@@ -249,9 +249,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         if (speculativeConfigEnabled) {
             boolean isFat = !writeSkewAllowed;
 
-            if (speculativeConfig.get() == null) {
-                SpeculativeBetaConfig newSpeculativeConfig = new SpeculativeBetaConfig(isFat);
-                speculativeConfig.compareAndSet(null, newSpeculativeConfig);
+            if (speculativeConfiguration.get() == null) {
+                SpeculativeBetaConfiguration newSpeculativeConfiguration = new SpeculativeBetaConfiguration(isFat);
+                speculativeConfiguration.compareAndSet(null, newSpeculativeConfiguration);
             }
         }
 
@@ -711,7 +711,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
                 ", traceLevel=" + traceLevel +
                 ", writeSkewAllowed=" + writeSkewAllowed +
                 ", propagationLevel=" + propagationLevel +
-                ", speculativeConfig=" + speculativeConfig +
+                ", speculativeConfiguration=" + speculativeConfiguration +
                 ", permanentListeners=" + permanentListeners +
                 '}';
     }

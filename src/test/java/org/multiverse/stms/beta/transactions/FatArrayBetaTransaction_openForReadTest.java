@@ -90,7 +90,7 @@ public class FatArrayBetaTransaction_openForReadTest {
         }
 
         assertIsAborted(tx);
-        assertEquals(4, config.getSpeculativeConfig().getMinimalLength());
+        assertEquals(4, config.getSpeculativeConfiguration().minimalLength);
     }
 
     @Test

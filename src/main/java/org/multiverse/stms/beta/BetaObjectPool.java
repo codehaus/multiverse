@@ -62,7 +62,7 @@ public final class BetaObjectPool {
     private int lastUsedBetaDoubleRef = -1;
     private final LongRefTranlocal[] tranlocalsBetaLongRef = new LongRefTranlocal[100];
     private int lastUsedBetaLongRef = -1;
-    private TranlocalPool[] pools = new TranlocalPool[1000];
+    private TranlocalPool[] pools = new TranlocalPool[100];
 
     private CheapLatch[] cheapLatchPool = new CheapLatch[10];
     private int cheapLatchPoolIndex = -1;
@@ -70,7 +70,7 @@ public final class BetaObjectPool {
     private StandardLatch[] standardLatchPool = new StandardLatch[10];
     private int standardLatchPoolIndex = -1;
 
-    private Listeners[] listenersPool = new Listeners[1000];
+    private Listeners[] listenersPool = new Listeners[100];
     private int listenersPoolIndex = -1;
 
     private ArrayList[] arrayListPool = new ArrayList[10];

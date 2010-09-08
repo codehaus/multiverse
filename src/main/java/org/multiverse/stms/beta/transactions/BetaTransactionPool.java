@@ -1,18 +1,12 @@
-package org.multiverse.stms.beta;
-
-import org.multiverse.stms.beta.transactions.*;
+package org.multiverse.stms.beta.transactions;
 
 /**
- * A pool for tranlocals. The pool is not threadsafe and should be connected to a thread (can
+ * A pool for Transactions. This is only meant to reduce the performance overhead of creating and garbage collecting
+ * transactions, it should not be compared to a connection pool of a database for example. 
+ *
+ * The pool is not threadsafe and should be connected to a thread (can
  * be stored in a threadlocal). Eventually the performance of the stm will be limited to the rate
  * of cleanup, and using a pool seriously improves scalability.
- * <p/>
- * Improvement: atm there is only one single type of tranlocal. If there are more types of tranlocals,
- * each class needs to have an index. This index can be used to determine the type of ref. If the pool
- * contains an array of arrays, where the first array is index based on the type of the ref, finding the
- * second array (that contains pooled tranlocals) can be found easily.
- * <p/>
- * ObjectPool is not thread safe and should not be shared between threads.
  *
  * This class is generated.
  *
@@ -21,9 +15,9 @@ import org.multiverse.stms.beta.transactions.*;
 public final class BetaTransactionPool {
 
     private final static boolean ENABLED = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm,beta.BetaObjectPool.enabled","true"));
+        System.getProperty("org.multiverse.stm,beta.transactions.BetaTransactionPool.enabled","true"));
 
-    private final boolean transactionPoolingEnabled;
+    private final boolean enabled;
 
     private final LeanMonoBetaTransaction[] poolLeanMonoBetaTransaction = new LeanMonoBetaTransaction[10];
     private int poolLeanMonoBetaTransactionIndex = -1;
@@ -39,7 +33,7 @@ public final class BetaTransactionPool {
     private int poolFatArrayTreeBetaTransactionIndex = -1;
 
     public BetaTransactionPool() {
-        transactionPoolingEnabled = ENABLED;
+        enabled = ENABLED;
     }
 
     /**
@@ -48,7 +42,7 @@ public final class BetaTransactionPool {
      * @return the taken LeanMonoBetaTransaction or null of none available.
      */
     public LeanMonoBetaTransaction takeLeanMonoBetaTransaction(){
-        if(!transactionPoolingEnabled || poolLeanMonoBetaTransactionIndex == -1){
+        if(!enabled || poolLeanMonoBetaTransactionIndex == -1){
             return null;
         }
 
@@ -64,7 +58,7 @@ public final class BetaTransactionPool {
      * @return the taken FatMonoBetaTransaction or null of none available.
      */
     public FatMonoBetaTransaction takeFatMonoBetaTransaction(){
-        if(!transactionPoolingEnabled || poolFatMonoBetaTransactionIndex == -1){
+        if(!enabled || poolFatMonoBetaTransactionIndex == -1){
             return null;
         }
 
@@ -80,7 +74,7 @@ public final class BetaTransactionPool {
      * @return the taken LeanArrayBetaTransaction or null of none available.
      */
     public LeanArrayBetaTransaction takeLeanArrayBetaTransaction(){
-        if(!transactionPoolingEnabled || poolLeanArrayBetaTransactionIndex == -1){
+        if(!enabled || poolLeanArrayBetaTransactionIndex == -1){
             return null;
         }
 
@@ -96,7 +90,7 @@ public final class BetaTransactionPool {
      * @return the taken FatArrayBetaTransaction or null of none available.
      */
     public FatArrayBetaTransaction takeFatArrayBetaTransaction(){
-        if(!transactionPoolingEnabled || poolFatArrayBetaTransactionIndex == -1){
+        if(!enabled || poolFatArrayBetaTransactionIndex == -1){
             return null;
         }
 
@@ -112,7 +106,7 @@ public final class BetaTransactionPool {
      * @return the taken LeanArrayTreeBetaTransaction or null of none available.
      */
     public LeanArrayTreeBetaTransaction takeLeanArrayTreeBetaTransaction(){
-        if(!transactionPoolingEnabled || poolLeanArrayTreeBetaTransactionIndex == -1){
+        if(!enabled || poolLeanArrayTreeBetaTransactionIndex == -1){
             return null;
         }
 
@@ -128,7 +122,7 @@ public final class BetaTransactionPool {
      * @return the taken FatArrayTreeBetaTransaction or null of none available.
      */
     public FatArrayTreeBetaTransaction takeFatArrayTreeBetaTransaction(){
-        if(!transactionPoolingEnabled || poolFatArrayTreeBetaTransactionIndex == -1){
+        if(!enabled || poolFatArrayTreeBetaTransactionIndex == -1){
             return null;
         }
 
@@ -137,7 +131,6 @@ public final class BetaTransactionPool {
         poolFatArrayTreeBetaTransactionIndex--;
         return tx;
     }
-
 
     /**
      * Puts a BetaTransaction in the pool.
@@ -148,75 +141,63 @@ public final class BetaTransactionPool {
      * @throws NullPointerException if tx is null.
      */
     public void putBetaTransaction(BetaTransaction tx){
+        if(!enabled){
+            return;
+        }
+
         if(tx == null){
             throw new NullPointerException();
         }
 
-        if(!transactionPoolingEnabled){
-            return;
-        }
-
         switch(tx.getPoolTransactionType()){
             case BetaTransaction.POOL_TRANSACTIONTYPE_LEAN_MONO:
-            {
                 if(poolLeanMonoBetaTransactionIndex == poolLeanMonoBetaTransaction.length - 1){
                     return;
                 }
 
                 poolLeanMonoBetaTransactionIndex++;
-                poolLeanMonoBetaTransaction[poolLeanMonoBetaTransactionIndex] = (LeanMonoBetaTransaction)tx;
-            }
-            break;
+                poolLeanMonoBetaTransaction[poolLeanMonoBetaTransactionIndex] = (LeanMonoBetaTransaction)tx;            
+                break;
             case BetaTransaction.POOL_TRANSACTIONTYPE_FAT_MONO:
-            {
                 if(poolFatMonoBetaTransactionIndex == poolFatMonoBetaTransaction.length - 1){
                     return;
                 }
 
                 poolFatMonoBetaTransactionIndex++;
-                poolFatMonoBetaTransaction[poolFatMonoBetaTransactionIndex] = (FatMonoBetaTransaction)tx;
-            }
-            break;
+                poolFatMonoBetaTransaction[poolFatMonoBetaTransactionIndex] = (FatMonoBetaTransaction)tx;            
+                break;
             case BetaTransaction.POOL_TRANSACTIONTYPE_LEAN_ARRAY:
-            {
                 if(poolLeanArrayBetaTransactionIndex == poolLeanArrayBetaTransaction.length - 1){
                     return;
                 }
 
                 poolLeanArrayBetaTransactionIndex++;
-                poolLeanArrayBetaTransaction[poolLeanArrayBetaTransactionIndex] = (LeanArrayBetaTransaction)tx;
-            }
-            break;
+                poolLeanArrayBetaTransaction[poolLeanArrayBetaTransactionIndex] = (LeanArrayBetaTransaction)tx;            
+                break;
             case BetaTransaction.POOL_TRANSACTIONTYPE_FAT_ARRAY:
-            {
                 if(poolFatArrayBetaTransactionIndex == poolFatArrayBetaTransaction.length - 1){
                     return;
                 }
 
                 poolFatArrayBetaTransactionIndex++;
-                poolFatArrayBetaTransaction[poolFatArrayBetaTransactionIndex] = (FatArrayBetaTransaction)tx;
-            }
-            break;
+                poolFatArrayBetaTransaction[poolFatArrayBetaTransactionIndex] = (FatArrayBetaTransaction)tx;            
+                break;
             case BetaTransaction.POOL_TRANSACTIONTYPE_LEAN_ARRAYTREE:
-            {
                 if(poolLeanArrayTreeBetaTransactionIndex == poolLeanArrayTreeBetaTransaction.length - 1){
                     return;
                 }
 
                 poolLeanArrayTreeBetaTransactionIndex++;
-                poolLeanArrayTreeBetaTransaction[poolLeanArrayTreeBetaTransactionIndex] = (LeanArrayTreeBetaTransaction)tx;
-            }
-            break;
+                poolLeanArrayTreeBetaTransaction[poolLeanArrayTreeBetaTransactionIndex] = (LeanArrayTreeBetaTransaction)tx;            
+                break;
             case BetaTransaction.POOL_TRANSACTIONTYPE_FAT_ARRAYTREE:
-            {
                 if(poolFatArrayTreeBetaTransactionIndex == poolFatArrayTreeBetaTransaction.length - 1){
                     return;
                 }
 
                 poolFatArrayTreeBetaTransactionIndex++;
-                poolFatArrayTreeBetaTransaction[poolFatArrayTreeBetaTransactionIndex] = (FatArrayTreeBetaTransaction)tx;
-            }
-            break;
+                poolFatArrayTreeBetaTransaction[poolFatArrayTreeBetaTransactionIndex] = (FatArrayTreeBetaTransaction)tx;            
+                break;
             default:
                 throw new IllegalArgumentException();
         }

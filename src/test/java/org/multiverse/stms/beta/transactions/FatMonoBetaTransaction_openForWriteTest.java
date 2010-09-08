@@ -71,7 +71,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         }
 
         assertIsAborted(tx);
-        assertEquals(2, config.getSpeculativeConfig().getMinimalLength());
+        assertEquals(2, config.getSpeculativeConfiguration().minimalLength);
     }
 
     @Test
