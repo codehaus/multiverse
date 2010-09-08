@@ -110,8 +110,6 @@ todo
 
 - integratie into the main multiverse branch
 
-- integratie multiverse api
-
 - tracing
 
 - when hard reset is done, no new local conflict counter is created, so still attached to the old
@@ -127,16 +125,10 @@ globalconflict counter.
 
 - blocking and speculative readtracking?
 
-- transaction.prepareForPooling & add it to objectpool.
-   - make sure that the object that are pooled, are not a potential source of memory leaks. E.g. transactions
-   still holding references to old data.
+- readonly transactions are getting slow, they were 100M and dropped to 40M. So need to be put back to 100M.
 
 - clojure: add watch. Basic functionality already is there, but atm it is done to all
      reads and not specific ones.
-
-- testing: mono transaction and conflict counter setting
-
-- testing: array transaction and conflict counter setting`
 
 - commute
 
@@ -181,14 +173,20 @@ the task not being executed at all.
 - should the retry by added to the transaction? Makes it easier to figure out when a retry is done when
 and not allowed. So not throw the retry error immediately..
 
-- support for a booleanref (can be based on the int-ref functionality since a boolean internally is represented
-as a int).
-
 - transactional linked list
 
 - transactional array
 
+- listeners are not cleaned after abort/commit, so still a potential memory leak
+
 done
+
+- testing: mono transaction and conflict counter setting
+
+- testing: array transaction and conflict counter setting
+
+- support for a booleanref (can be based on the int-ref functionality since a boolean internally is represented
+as a int).
 
 - support for a doubleref
 
@@ -263,6 +261,11 @@ done
 
 - benchmarks scripts update to point to gradle & to test classes
 
+- transaction.prepareForPooling & add it to objectpool.
+   - make sure that the object that are pooled, are not a potential source of memory leaks. E.g. transactions
+   still holding references to old data.
+
+- reftranlocal is now guaranteed not to contain any state.
 
 old done
 

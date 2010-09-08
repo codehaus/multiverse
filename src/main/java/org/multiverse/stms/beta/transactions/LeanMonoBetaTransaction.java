@@ -1270,6 +1270,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
         if (attached != null) {
             attached.owner.___abort(this, attached, pool);
+            attached = null;
         }
 
         status = ABORTED;
@@ -1280,10 +1281,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     @Override
     public final void commit() {
-        if(status == COMMITTED){
-            return;
-        }
-
         if (status != ACTIVE && status != PREPARED) {
             switch (status) {
                 case ABORTED:
@@ -1301,7 +1298,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
             
         Listeners listeners = null;
-        if(attached!=null){
+        if(attached != null){
             final boolean needsPrepare = status == ACTIVE && hasUpdates;
             if(config.dirtyCheck){
                 if(needsPrepare && !doPrepareDirty()){
@@ -1316,6 +1313,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
                 listeners = attached.owner.___commitAll(attached, this, pool);
             }
+            attached = null;
         }
 
         status = COMMITTED;
@@ -1418,6 +1416,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         final boolean failure = owner.___registerChangeListener(listener, attached, pool, listenerEra)
                     == REGISTRATION_NONE;
         owner.___abort(this, attached, pool);
+        attached = null;
         status = ABORTED;
 
         if(failure){
@@ -1460,7 +1459,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         hasUpdates = false;
         attempt++;
         abortOnly = false;
-        attached = null;
         return true;
     }
 
@@ -1476,7 +1474,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         status = ACTIVE;
         abortOnly = false;        
         remainingTimeoutNs = config.timeoutNs;
-        attached = null;
         attempt = 1;
     }
 

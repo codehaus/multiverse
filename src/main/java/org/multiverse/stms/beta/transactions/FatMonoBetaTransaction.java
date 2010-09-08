@@ -2118,6 +2118,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         if (attached != null) {
             attached.owner.___abort(this, attached, pool);
+            attached = null;
         }
 
         status = ABORTED;
@@ -2141,7 +2142,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         prepare();
         Listeners listeners = null;
-        if (attached!=null) {
+        if (attached != null) {
             if(config.dirtyCheck){
                 if(attached.isDirty == DIRTY_UNKNOWN){
                     attached.calculateIsDirty();
@@ -2150,6 +2151,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }else{
                 listeners = attached.owner.___commitAll(attached, this, pool);
             }
+            attached = null;
         }
         status = COMMITTED;
 
@@ -2295,6 +2297,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         final boolean failure = owner.___registerChangeListener(listener, attached, pool, listenerEra)
                     == REGISTRATION_NONE;
         owner.___abort(this, attached, pool);
+        attached = null;
         status = ABORTED;
 
         if(config.permanentListeners != null){
@@ -2343,7 +2346,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         hasUpdates = false;
         attempt++;
         abortOnly = false;
-        attached = null;
         evaluatingCommute = false;
         hasReads = false;
         hasUntrackedReads = false;
@@ -2363,7 +2365,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         status = ACTIVE;
         abortOnly = false;        
         remainingTimeoutNs = config.timeoutNs;
-        attached = null;
         attempt = 1;
         evaluatingCommute = false;
         hasReads = false;

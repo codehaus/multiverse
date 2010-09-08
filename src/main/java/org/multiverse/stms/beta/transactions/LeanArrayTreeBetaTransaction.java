@@ -11,8 +11,6 @@ import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.conflictcounters.LocalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
-import java.util.Arrays;
-
 import static java.lang.String.format;
 
 
@@ -1312,9 +1310,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
                 if(size>0){
                     for (int k = 0; k < array.length; k++) {
                         final Tranlocal tranlocal = array[k];
+                        array[k]=null;
                         if(tranlocal != null){
                             tranlocal.owner.___abort(this, tranlocal, pool);
-                        }
+                        }                        
                     }
                 }
 
@@ -1381,20 +1380,24 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         int listenersArrayIndex = 0;
         for (int k = 0; k < array.length; k++) {
             Tranlocal tranlocal = array[k];
-            if(tranlocal != null){
-                final Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool);
+            array[k]=null;
 
-                if(listeners != null){
+            if(tranlocal == null){
+                continue;
+            }
+
+            final Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool);
+
+            if(listeners != null){
+                if(listenersArray == null){
+                    int length = array.length - k;
+                    listenersArray = pool.takeListenersArray(length);
                     if(listenersArray == null){
-                        int length = array.length - k;
-                        listenersArray = pool.takeListenersArray(length);
-                        if(listenersArray == null){
-                            listenersArray = new Listeners[length];
-                        }
+                        listenersArray = new Listeners[length];
                     }
-                    listenersArray[listenersArrayIndex]=listeners;
-                    listenersArrayIndex++;
                 }
+                listenersArray[listenersArrayIndex]=listeners;
+                listenersArrayIndex++;
             }
         }
 
@@ -1407,6 +1410,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         int listenersArrayIndex = 0;
         for (int k = 0; k < array.length; k++) {
             Tranlocal tranlocal = array[k];
+            array[k]=null;
+
             if(tranlocal == null){
                 continue;
             }
@@ -1541,23 +1546,27 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             for(int k=0; k < array.length; k++){
                 final Tranlocal tranlocal = array[k];
 
-                if(tranlocal != null){
-                    final BetaTransactionalObject owner = tranlocal.owner;
+                if(tranlocal == null){
+                    continue;
+                }
 
-                    if(furtherRegistrationNeeded){
-                        switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
-                            case REGISTRATION_DONE:
-                                atLeastOneRegistration = true;
-                                break;
-                            case REGISTRATION_NOT_NEEDED:
-                                furtherRegistrationNeeded = false;
-                                atLeastOneRegistration = true;
-                                break;
-                            case REGISTRATION_NONE:
-                                break;
-                            default:
-                                throw new IllegalStateException();
-                        }
+                array[k]=null;
+
+                final BetaTransactionalObject owner = tranlocal.owner;
+
+                if(furtherRegistrationNeeded){
+                    switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
+                        case REGISTRATION_DONE:
+                            atLeastOneRegistration = true;
+                            break;
+                        case REGISTRATION_NOT_NEEDED:
+                            furtherRegistrationNeeded = false;
+                            atLeastOneRegistration = true;
+                            break;
+                        case REGISTRATION_NONE:
+                            break;
+                        default:
+                            throw new IllegalStateException();
                     }
 
                     owner.___abort(this, tranlocal, pool);
@@ -1583,14 +1592,12 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             return false;
         }
 
-        if(array.length>config.minimalArrayTreeSize){
+        if(array.length > config.minimalArrayTreeSize){
             pool.putTranlocalArray(array);
             array = pool.takeTranlocalArray(config.minimalArrayTreeSize);
             if(array == null){
                 array = new Tranlocal[config.minimalArrayTreeSize];
             }
-        }else{
-            Arrays.fill(array, null);
         }
 
         status = ACTIVE;
@@ -1615,8 +1622,6 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             if(array == null){
                 array = new Tranlocal[config.minimalArrayTreeSize];
             }
-        }else{
-            Arrays.fill(array, null);
         }
 
         status = ACTIVE;

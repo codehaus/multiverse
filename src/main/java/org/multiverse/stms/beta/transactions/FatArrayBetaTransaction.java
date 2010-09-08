@@ -1983,6 +1983,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 status = ABORTED;                
                 for (int k = 0; k < firstFreeIndex; k++) {
                     final Tranlocal tranlocal = array[k];
+                    array[k]=null;
                     tranlocal.owner.___abort(this, tranlocal, pool);
                 }
                 if(config.permanentListeners != null){
@@ -2044,8 +2045,9 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         int storeIndex = 0;
         for (int k = 0; k < firstFreeIndex; k++) {
             final Tranlocal tranlocal = array[k];
-            final Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool);
+            array[k]=null;
 
+            final Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool);
             if(listeners != null){
                 if(listenersArray == null){
                     final int length = firstFreeIndex - k;
@@ -2068,6 +2070,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         int storeIndex = 0;
         for (int k = 0; k < firstFreeIndex; k++) {
             final Tranlocal tranlocal = array[k];
+            array[k]=null;
 
             if(tranlocal.isDirty == DIRTY_UNKNOWN){
                 tranlocal.calculateIsDirty();
@@ -2299,6 +2302,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             }
 
             owner.___abort(this, tranlocal, pool);
+            array[k]=null;
         }
 
         status = ABORTED;
