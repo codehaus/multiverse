@@ -18,8 +18,7 @@ public interface Ref<E> extends TransactionalObject {
      * This call expects a running transaction.
      *
      * @throws IllegalStateException
-     * @throws org.multiverse.api.exceptions.ReadConflict
-     *
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void ensure();
 
@@ -34,6 +33,7 @@ public interface Ref<E> extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is
      *                              not in the correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void ensure(Transaction tx);
 
@@ -50,6 +50,7 @@ public interface Ref<E> extends TransactionalObject {
      *
      * @param function the function to apply to this reference.
      * @throws NullPointerException if function is null.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void commute(Function<E> function);
 
@@ -68,6 +69,7 @@ public interface Ref<E> extends TransactionalObject {
      * @param function the function to apply to this reference.
      * @throws NullPointerException  if function is null.
      * @throws IllegalStateException if the transaction is not in the correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void commute(Transaction tx, Function<E> function);
 
@@ -79,6 +81,7 @@ public interface Ref<E> extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if tx is not in the correct state
      *          for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean isNull();
 
@@ -91,6 +94,7 @@ public interface Ref<E> extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the
      *                              correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean isNull(Transaction tx);
 
@@ -98,6 +102,7 @@ public interface Ref<E> extends TransactionalObject {
      * Atomically check if the current value is null. This method doesn't care about any running transactions.
      *
      * @return true if null, false otherwise.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean atomicIsNull();
 
@@ -108,6 +113,7 @@ public interface Ref<E> extends TransactionalObject {
      * @param function the Function responsible to alterAndGet the function.
      * @return the new value.
      * @throws NullPointerException if function is null.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E atomicAlterAndGet(Function<E> function);
 
@@ -121,6 +127,7 @@ public interface Ref<E> extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if tx is not in the correct state
      *                              for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E alterAndGet(Function<E> function);
 
@@ -134,6 +141,7 @@ public interface Ref<E> extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the
      *                              correct state.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E alterAndGet(Transaction tx, Function<E> function);
 
@@ -144,6 +152,7 @@ public interface Ref<E> extends TransactionalObject {
      * @param function the Function responsible to alterAndGet the function.
      * @return the old value.
      * @throws NullPointerException if function is null.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E atomicGetAndAlter(Function<E> function);
 
@@ -157,6 +166,7 @@ public interface Ref<E> extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if tx is not in the correct state
      *                              for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E getAndAlter(Function<E> function);
 
@@ -170,6 +180,7 @@ public interface Ref<E> extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the
      *                              correct state.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E getAndAlter(Transaction tx, Function<E> function);
 
@@ -179,6 +190,7 @@ public interface Ref<E> extends TransactionalObject {
      * @param oldValue the old value.
      * @param newValue the new value.
      * @return true if the compareAndSwap was a success, false otherwise.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean atomicCompareAndSet(E oldValue, E newValue);
 
@@ -188,6 +200,7 @@ public interface Ref<E> extends TransactionalObject {
      *
      * @param value the new value.
      * @return the old value.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E atomicGetAndSet(E value);
 
@@ -200,6 +213,7 @@ public interface Ref<E> extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if tx is not in the correct state
      *          for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E atomicSet(E value);
 
@@ -212,6 +226,7 @@ public interface Ref<E> extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if tx is not in the correct state
      *          for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E getAndSet(E value);
 
@@ -224,6 +239,7 @@ public interface Ref<E> extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if tx is not in the correct state
      *          for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E set(E value);
 
@@ -237,6 +253,7 @@ public interface Ref<E> extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not
      *                              in the correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E getAndSet(Transaction tx, E value);
 
@@ -250,6 +267,7 @@ public interface Ref<E> extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the correct
      *                              state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E set(Transaction tx, E value);
 
@@ -258,6 +276,7 @@ public interface Ref<E> extends TransactionalObject {
      * method doesn't care about any running transactions.
      *
      * @return the current value.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E atomicGet();
 
@@ -270,6 +289,7 @@ public interface Ref<E> extends TransactionalObject {
      *          if tx is not in the correct state
      *          for this operation.
      * @see #atomicGet()
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E get();
 
@@ -282,16 +302,19 @@ public interface Ref<E> extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the
      *                              correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E get(Transaction tx);
 
     /**
      * @param value
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(E value);
 
     /**
      * @param value
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(Transaction tx, E value);
 }

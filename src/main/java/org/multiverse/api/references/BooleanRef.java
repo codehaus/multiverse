@@ -18,7 +18,7 @@ public interface BooleanRef extends TransactionalObject {
      * This call expects a running transaction.
      *
      * @throws IllegalStateException
-     * @throws org.multiverse.api.exceptions.ReadConflict
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      *
      */
     void ensure();
@@ -34,6 +34,7 @@ public interface BooleanRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is
      *                              not in the correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void ensure(Transaction tx);
 
@@ -50,6 +51,7 @@ public interface BooleanRef extends TransactionalObject {
      *
      * @param function the function to apply to this reference.
      * @throws NullPointerException if function is null.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void commute(BooleanFunction function);
 
@@ -68,16 +70,18 @@ public interface BooleanRef extends TransactionalObject {
      * @param function the function to apply to this reference.
      * @throws NullPointerException  if function is null.
      * @throws IllegalStateException if the transaction is not in the correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void commute(Transaction tx, BooleanFunction function);
 
-     /**
+    /**
      * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
      * any running transactions.
      *
      * @param function the Function responsible to alterAndGet the function.
      * @return the new value.
      * @throws NullPointerException if function is null.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean atomicAlterAndGet(BooleanFunction function);
 
@@ -91,6 +95,7 @@ public interface BooleanRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if tx is not in the correct state
      *                              for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean alterAndGet(BooleanFunction function);
 
@@ -104,6 +109,7 @@ public interface BooleanRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the
      *                              correct state.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean alterAndGet(Transaction tx, BooleanFunction function);
 
@@ -114,6 +120,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param function the Function responsible to alterAndGet the function.
      * @return the old value.
      * @throws NullPointerException if function is null.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean atomicGetAndAlter(BooleanFunction function);
 
@@ -127,6 +134,7 @@ public interface BooleanRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if tx is not in the correct state
      *                              for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean getAndAlter(BooleanFunction function);
 
@@ -140,6 +148,7 @@ public interface BooleanRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the
      *                              correct state.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean getAndAlter(Transaction tx, BooleanFunction function);
 
@@ -149,6 +158,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param oldValue the old value.
      * @param newValue the new value.
      * @return true if the compareAndSwap was a success, false otherwise.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean atomicCompareAndSet(boolean oldValue, boolean newValue);
 
@@ -158,6 +168,7 @@ public interface BooleanRef extends TransactionalObject {
      *
      * @param value the new value.
      * @return the old value.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean atomicGetAndSet(boolean value);
 
@@ -170,6 +181,7 @@ public interface BooleanRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if tx is not in the correct state
      *          for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean atomicSet(boolean value);
 
@@ -182,6 +194,7 @@ public interface BooleanRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if tx is not in the correct state
      *          for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean getAndSet(boolean value);
 
@@ -194,6 +207,7 @@ public interface BooleanRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if tx is not in the correct state
      *          for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean set(boolean value);
 
@@ -207,6 +221,7 @@ public interface BooleanRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not
      *                              in the correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean getAndSet(Transaction tx, boolean value);
 
@@ -220,6 +235,7 @@ public interface BooleanRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the correct
      *                              state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean set(Transaction tx, boolean value);
 
@@ -228,6 +244,7 @@ public interface BooleanRef extends TransactionalObject {
      * method doesn't care about any running transactions.
      *
      * @return the current value.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean atomicGet();
 
@@ -240,6 +257,7 @@ public interface BooleanRef extends TransactionalObject {
      *          if tx is not in the correct state
      *          for this operation.
      * @see #atomicGet()
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean get();
 
@@ -257,11 +275,13 @@ public interface BooleanRef extends TransactionalObject {
 
     /**
      * @param value
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(boolean value);
 
     /**
      * @param value
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(Transaction tx, boolean value);
 }

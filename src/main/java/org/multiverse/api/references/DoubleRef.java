@@ -20,7 +20,7 @@ public interface DoubleRef extends TransactionalObject {
      * This call expects a running transaction.
      *
      * @throws IllegalStateException
-     * @throws org.multiverse.api.exceptions.ReadConflict
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      *
      */
     void ensure();
@@ -36,6 +36,8 @@ public interface DoubleRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is
      *                              not in the correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     void ensure(Transaction tx);
 
@@ -54,6 +56,8 @@ public interface DoubleRef extends TransactionalObject {
      * @throws NullPointerException if function is null.
      * @throws org.multiverse.api.exceptions.PreparedTransactionException
      *                              if the available transaction is prepared.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     void commute(DoubleFunction function);
 
@@ -72,6 +76,8 @@ public interface DoubleRef extends TransactionalObject {
      * @param function the function to apply to this reference.
      * @throws NullPointerException  if function is null.
      * @throws IllegalStateException if the transaction is not in the correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     void commute(Transaction tx, DoubleFunction function);
 
@@ -81,6 +87,8 @@ public interface DoubleRef extends TransactionalObject {
      *
      * @param amount the amount to increase with.
      * @return the old value.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     double atomicGetAndIncrement(double amount);
 
@@ -93,6 +101,8 @@ public interface DoubleRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if tx is not in the correct state
      *          for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     double getAndIncrement(double amount);
 
@@ -106,6 +116,8 @@ public interface DoubleRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if tx is not in the correct state
      *                              for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     double getAndIncrement(Transaction tx, double amount);
 
@@ -115,6 +127,8 @@ public interface DoubleRef extends TransactionalObject {
      *
      * @param amount the amount to increment with.
      * @return the new value.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     double atomicIncrementAndGet(double amount);
 
@@ -127,6 +141,8 @@ public interface DoubleRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if tx is not in the correct state
      *          for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     double incrementAndGet(double amount);
 
@@ -140,6 +156,8 @@ public interface DoubleRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the
      *                              correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     double incrementAndGet(Transaction tx, double amount);
 
@@ -150,6 +168,8 @@ public interface DoubleRef extends TransactionalObject {
      * @param function the Function responsible to alterAndGet the function.
      * @return the new value.
      * @throws NullPointerException if function is null.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     double atomicAlterAndGet(DoubleFunction function);
 
@@ -163,6 +183,8 @@ public interface DoubleRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if tx is not in the correct state
      *                              for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     double alterAndGet(DoubleFunction function);
 
@@ -176,6 +198,8 @@ public interface DoubleRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the
      *                              correct state.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     double alterAndGet(Transaction tx, DoubleFunction function);
 
@@ -186,6 +210,8 @@ public interface DoubleRef extends TransactionalObject {
      * @param function the Function responsible to alterAndGet the function.
      * @return the old value.
      * @throws NullPointerException if function is null.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     double atomicGetAndAlter(DoubleFunction function);
 
@@ -199,6 +225,8 @@ public interface DoubleRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if tx is not in the correct state
      *                              for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     double getAndAlter(DoubleFunction function);
 
@@ -212,6 +240,7 @@ public interface DoubleRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the
      *                              correct state.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double getAndAlter(Transaction tx, DoubleFunction function);
 
@@ -221,6 +250,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param oldValue the old value.
      * @param newValue the new value.
      * @return true if the compareAndSwap was a success, false otherwise.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean atomicCompareAndSet(double oldValue, double newValue);
 
@@ -230,6 +260,7 @@ public interface DoubleRef extends TransactionalObject {
      *
      * @param value the new value.
      * @return the old value.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double atomicGetAndSet(double value);
 
@@ -239,6 +270,7 @@ public interface DoubleRef extends TransactionalObject {
      *
      * @param value the new value.
      * @return the new value.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double atomicSet(double value);
 
@@ -251,6 +283,7 @@ public interface DoubleRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if tx is not in the correct state
      *          for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double getAndSet(double value);
 
@@ -263,6 +296,7 @@ public interface DoubleRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if tx is not in the correct state
      *          for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double set(double value);
 
@@ -276,6 +310,7 @@ public interface DoubleRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not
      *                              in the correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double getAndSet(Transaction tx, double value);
 
@@ -289,6 +324,7 @@ public interface DoubleRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the correct
      *                              state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double set(Transaction tx, double value);
 
@@ -297,6 +333,7 @@ public interface DoubleRef extends TransactionalObject {
      * method doesn't care about any running transactions.
      *
      * @return the current value.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double atomicGet();
 
@@ -309,6 +346,7 @@ public interface DoubleRef extends TransactionalObject {
      *          if tx is not in the correct state
      *          for this operation.
      * @see #atomicGet()
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double get();
 
@@ -321,16 +359,19 @@ public interface DoubleRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the
      *                              correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double get(Transaction tx);
 
     /**
      * @param value
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(double value);
 
     /**
      * @param value
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(Transaction tx, double value);
 }
