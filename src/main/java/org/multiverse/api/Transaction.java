@@ -28,9 +28,12 @@ import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
  * <dt>TransactionLifecycle</dt>
  * <dd>
  * It is possible to listen to a Transaction when it aborts, or commits. This can be done with the
- * {@link #register(TransactionLifecycleListener)}.
+ * {@link #register(TransactionLifecycleListener)}.* You can also register permanent lifecycle listeners (useful for a
+ * product that uses Multiverse as lower level stm, look for the
+ * {@link TransactionFactoryBuilder#addPermanentListener(TransactionLifecycleListener)}.
  * <p/>
- * When the Transaction is reset, the lifecycle tasks are dropped. So the lifecycle task need to be registered again.
+ * When the Transaction is reset, the normal lifecycle tasks are dropped and the permanent are not. So the lifecycle
+ * task need to be registered again (this is easy because the transaction is executed again).
  * </dd>
  * <p/>
  * <dt>Blocking</dt>
@@ -112,8 +115,8 @@ public interface Transaction {
     /**
      * Prepares this transaction to be committed. It can lock resources to make sure that no conflicting changes are
      * made after the transaction has been prepared. If the transaction already is prepared, the call is ignored.  If
-     * the prepare fails, the transaction automatically is aborted. Once a transaction is prepared, it will always
-     * succeed with the commit.
+     * the prepare fails, the transaction automatically is aborted. Once a transaction is prepared, the commit will
+     * always succeed.
      * <p/>
      * It is very important that the transaction eventually commits or aborts, if it doesn't no other transaction
      * reading/writing the committed resources, can't commit.
