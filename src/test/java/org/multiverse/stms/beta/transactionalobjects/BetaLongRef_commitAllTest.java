@@ -11,6 +11,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.createReadBiasedLongRef;
 import static org.multiverse.TestUtils.getField;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
@@ -26,6 +27,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         stm = new BetaStm();
         globalConflictCounter = stm.getGlobalConflictCounter();
         pool = new BetaObjectPool();
+        clearThreadLocalTransaction();
     }
 
     @Test

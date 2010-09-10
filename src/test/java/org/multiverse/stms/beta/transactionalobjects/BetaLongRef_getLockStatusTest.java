@@ -10,6 +10,7 @@ import org.multiverse.stms.beta.transactions.LeanMonoBetaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class BetaLongRef_getLockStatusTest {
@@ -21,6 +22,7 @@ public class BetaLongRef_getLockStatusTest {
     public void setUp() {
         stm = new BetaStm();
         pool = new BetaObjectPool();
+        clearThreadLocalTransaction();
     }
 
     @Test(expected = NullPointerException.class)

@@ -7,6 +7,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
 import static org.junit.Assert.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.arbitraryUpdate;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
@@ -20,6 +21,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest {
     @Before
     public void setUp() {
         stm = new BetaStm();
+        clearThreadLocalTransaction();
     }
 
     @Test

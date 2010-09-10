@@ -68,6 +68,14 @@ public interface Transaction {
     TransactionStatus getStatus();
 
     /**
+     * Checks if this Transaction is alive. The same information can be retrieved by calling the getStatus,
+     * but this is a bit better performing.
+     *
+     * @return true if alive (so active or prepared), false otherwise.
+     */
+    boolean isAlive();
+
+    /**
      * Gets the current attempt (so the number of tries this transaction already had). Value will
      * always be equal or larger than 1.
      *
@@ -78,10 +86,11 @@ public interface Transaction {
     /**
      * Commits this Transaction. If the Transaction is:
      * <ol>
-     * <li>new: is is started and following the same flow as an active transaction. This is done so that
+     * <li>new: is is activated and following the same flow as an active transaction. This is done so that
      * the lifecyclelisteners work.</li>
      * <li>active: it is prepared for commit and then committed</li>
-     * <li>prepared: it is committed (so changes persisted)</li>
+     * <li>prepared: it is committed (so changes persisted). Once it is prepared, the commit is guaranteed to
+     * succeed.</li>
      * <li>aborted: a DeadTransactionException is thrown</li>
      * <li>committed: a DeadTransactionException is thrown</li>
      * </ol> So it is safe to call while active
@@ -134,7 +143,7 @@ public interface Transaction {
      * transaction is executed inside an AtomicBlock, it is automatically retried.
      * <p/>
      * The abortOnly marker is reset when a {@link #softReset()} or {@link #hardReset()} is done.
-     *
+     * <p/>
      * This method is not threadsafe, so can only be called by the thread that used the transaction.
      *
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
@@ -163,7 +172,7 @@ public interface Transaction {
 
     /**
      * todo: this operation should only be allowed when it is in the new state?
-     *
+     * <p/>
      * todo: instead of accepting a BetaTransactionConfiguration, TransactionConfiguration should be used.
      *
      * @param transactionConfiguration the TransactionConfiguration to initialize the Transaction with.

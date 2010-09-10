@@ -1,9 +1,9 @@
 package org.multiverse.stms.beta;
 
-import org.multiverse.api.blocking.*;
-import org.multiverse.api.exceptions.*;
+import org.multiverse.api.blocking.CheapLatch;
+import org.multiverse.api.blocking.StandardLatch;
 import org.multiverse.stms.beta.transactionalobjects.*;
-import org.multiverse.stms.beta.transactions.*;
+
 import java.util.ArrayList;
 
 /**
@@ -45,12 +45,16 @@ public final class BetaObjectPool {
     private final static boolean ARRAYLIST_POOLING_ENABLED = Boolean.parseBoolean(
         System.getProperty("org.multiverse.stm.beta.BetaObjectPool.arrayListPooling",""+ENABLED));
 
+    private final static boolean CALLABLENODE_POOLING_ENABLED = Boolean.parseBoolean(
+        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.callableNodePooling",""+ENABLED));
+
     private final boolean tranlocalPoolingEnabled;
     private final boolean tranlocalArrayPoolingEnabled;
     private final boolean latchPoolingEnabled;
     private final boolean listenersPoolingEnabled;
     private final boolean listenersArrayPoolingEnabled;
     private final boolean arrayListPoolingEnabled;
+    private final boolean callableNodePoolingEnabled;
 
     private final RefTranlocal[] tranlocalsBetaRef = new RefTranlocal[100];
     private int lastUsedBetaRef = -1;
@@ -76,6 +80,9 @@ public final class BetaObjectPool {
     private ArrayList[] arrayListPool = new ArrayList[10];
     private int arrayListPoolIndex = -1;
 
+    private CallableNode[] callableNodePool = new CallableNode[10];
+    private int callableNodePoolIndex = -1;
+
     public BetaObjectPool() {
         arrayListPoolingEnabled = ARRAYLIST_POOLING_ENABLED;
         tranlocalArrayPoolingEnabled = TRANLOCALARRAY_POOLING_ENABLED;
@@ -83,6 +90,7 @@ public final class BetaObjectPool {
         latchPoolingEnabled = LATCH_POOLING_ENABLED;
         listenersPoolingEnabled = LISTENER_POOLING_ENABLED;
         listenersArrayPoolingEnabled = LISTENERSARRAY_POOLING_ENABLED;
+        callableNodePoolingEnabled = CALLABLENODE_POOLING_ENABLED;
     }
 
     /**
@@ -120,7 +128,7 @@ public final class BetaObjectPool {
      * @param tranlocal the RefTranlocal to pool.
      */
     public void put(final RefTranlocal tranlocal) {
-        if (!tranlocalPoolingEnabled || tranlocal == null||tranlocal.isPermanent) {
+        if (tranlocal.isPermanent || !tranlocalPoolingEnabled) {
             return;
         }
 
@@ -168,7 +176,7 @@ public final class BetaObjectPool {
      * @param tranlocal the IntRefTranlocal to pool.
      */
     public void put(final IntRefTranlocal tranlocal) {
-        if (!tranlocalPoolingEnabled || tranlocal == null||tranlocal.isPermanent) {
+        if (tranlocal.isPermanent || !tranlocalPoolingEnabled) {
             return;
         }
 
@@ -216,7 +224,7 @@ public final class BetaObjectPool {
      * @param tranlocal the BooleanRefTranlocal to pool.
      */
     public void put(final BooleanRefTranlocal tranlocal) {
-        if (!tranlocalPoolingEnabled || tranlocal == null||tranlocal.isPermanent) {
+        if (tranlocal.isPermanent || !tranlocalPoolingEnabled) {
             return;
         }
 
@@ -264,7 +272,7 @@ public final class BetaObjectPool {
      * @param tranlocal the DoubleRefTranlocal to pool.
      */
     public void put(final DoubleRefTranlocal tranlocal) {
-        if (!tranlocalPoolingEnabled || tranlocal == null||tranlocal.isPermanent) {
+        if (tranlocal.isPermanent || !tranlocalPoolingEnabled) {
             return;
         }
 
@@ -312,7 +320,7 @@ public final class BetaObjectPool {
      * @param tranlocal the LongRefTranlocal to pool.
      */
     public void put(final LongRefTranlocal tranlocal) {
-        if (!tranlocalPoolingEnabled || tranlocal == null||tranlocal.isPermanent) {
+        if (tranlocal.isPermanent || !tranlocalPoolingEnabled) {
             return;
         }
 
@@ -493,6 +501,42 @@ public final class BetaObjectPool {
         Tranlocal[] array = tranlocalArrayPool[index];
         tranlocalArrayPool[index]=null;
         return array;
+    }
+
+  /**
+     * Takes a CallableNode from the pool, or null if none is available.
+     *
+     * @return the CallableNode from the pool, or null if none available.
+     */
+    public CallableNode takeCallableNode(){
+        if(!callableNodePoolingEnabled || callableNodePoolIndex == -1){
+            return null;
+        }
+
+        CallableNode node = callableNodePool[callableNodePoolIndex];
+        callableNodePool[callableNodePoolIndex]=null;
+        callableNodePoolIndex--;
+        return node;
+    }
+
+    /**
+     * Puts a CallableNode in the pool.
+     *
+     * @param node the CallableNode to pool.
+     * @throws NullPointerException if node is null.
+     */
+    public void putCallableNode(CallableNode node){
+        if(node == null){
+            throw new NullPointerException();
+        }
+
+        if(!callableNodePoolingEnabled || callableNodePoolIndex == callableNodePool.length-1){
+            return;
+        }
+
+        node.prepareForPooling();
+        callableNodePoolIndex++;
+        callableNodePool[callableNodePoolIndex]=node;
     }
 
     /**

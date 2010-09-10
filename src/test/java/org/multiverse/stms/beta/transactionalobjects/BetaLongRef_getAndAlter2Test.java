@@ -14,20 +14,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+
 
 /**
  * Tests {@link BetaLongRef#alterAndGet(BetaTransaction, LongFunction)}.
- *
- * @author Peter Veentjer.
  */
-public class BetaLongRef_alterAndGetTest {
+public class BetaLongRef_getAndAlter2Test {
 
     private BetaStm stm;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
+        clearThreadLocalTransaction();
     }
 
     @Test
@@ -37,7 +38,7 @@ public class BetaLongRef_alterAndGetTest {
         LongFunction function = mock(LongFunction.class);
 
         try {
-            ref.alterAndGet(null, function);
+            ref.getAndAlter(null, function);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -54,7 +55,7 @@ public class BetaLongRef_alterAndGetTest {
         BetaTransaction tx = stm.startDefaultTransaction();
 
         try {
-            ref.alterAndGet(tx, null);
+            ref.getAndAlter(tx, null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -74,7 +75,7 @@ public class BetaLongRef_alterAndGetTest {
         LongFunction function = mock(LongFunction.class);
 
         try {
-            ref.alterAndGet(tx, function);
+            ref.getAndAlter(tx, function);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -94,7 +95,7 @@ public class BetaLongRef_alterAndGetTest {
         LongFunction function = mock(LongFunction.class);
 
         try {
-            ref.alterAndGet(tx, function);
+            ref.getAndAlter(tx, function);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -114,7 +115,7 @@ public class BetaLongRef_alterAndGetTest {
         LongFunction function = mock(LongFunction.class);
 
         try {
-            ref.alterAndGet(tx, function);
+            ref.getAndAlter(tx, function);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -125,7 +126,7 @@ public class BetaLongRef_alterAndGetTest {
 
     @Test
     @Ignore
-    public void whenAlterFunctionCausesProblems(){
+    public void whenAlterFunctionCausesProblems() {
 
     }
 
@@ -140,10 +141,10 @@ public class BetaLongRef_alterAndGetTest {
 
         BetaLongRef ref = createLongRef(stm, 100);
         BetaTransaction tx = stm.startDefaultTransaction();
-        long result = ref.alterAndGet(tx, function);
+        long result = ref.getAndAlter(tx, function);
         tx.commit();
 
         assertEquals(101, ref.___unsafeLoad().value);
-        assertEquals(101, result);
+        assertEquals(100, result);
     }
 }

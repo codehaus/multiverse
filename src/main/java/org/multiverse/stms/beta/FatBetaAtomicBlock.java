@@ -1,13 +1,14 @@
 package org.multiverse.stms.beta;
 
-import org.multiverse.api.*;
-import org.multiverse.api.exceptions.*;
+import org.multiverse.api.PropagationLevel;
+import org.multiverse.api.ThreadLocalTransaction;
 import org.multiverse.api.closures.*;
-import org.multiverse.sensors.*;
-import org.multiverse.stms.beta.transactions.*;
+import org.multiverse.api.exceptions.*;
+import org.multiverse.sensors.TransactionSensor;
+import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static java.lang.String.format;
-import static org.multiverse.api.ThreadLocalTransaction.*;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactionContainer;
 
 /**
  * @author Peter Veentjer
@@ -44,7 +45,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
         ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
         BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
-        if(tx == null || !tx.getStatus().isAlive()){
+        if(tx == null || !tx.isAlive()){
             tx = null;
         }
 
@@ -172,7 +173,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
         ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
         BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
-        if(tx == null || !tx.getStatus().isAlive()){
+        if(tx == null || !tx.isAlive()){
             tx = null;
         }
 
@@ -300,7 +301,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
         ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
         BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
-        if(tx == null || !tx.getStatus().isAlive()){
+        if(tx == null || !tx.isAlive()){
             tx = null;
         }
 
@@ -428,7 +429,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
         ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
         BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
-        if(tx == null || !tx.getStatus().isAlive()){
+        if(tx == null || !tx.isAlive()){
             tx = null;
         }
 
@@ -556,7 +557,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
         ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
         BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
-        if(tx == null || !tx.getStatus().isAlive()){
+        if(tx == null || !tx.isAlive()){
             tx = null;
         }
 
@@ -684,7 +685,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
 
         ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
         BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
-        if(tx == null || !tx.getStatus().isAlive()){
+        if(tx == null || !tx.isAlive()){
             tx = null;
         }
 

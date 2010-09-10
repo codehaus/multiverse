@@ -6,6 +6,7 @@ import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
+import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 import static org.multiverse.stms.beta.BetaStmUtils.createReadBiasedLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertReadBiased;
@@ -20,6 +21,7 @@ public class BetaLongRef_atomicGetTest {
     @Before
     public void setUp() {
         stm = new BetaStm();
+        clearThreadLocalTransaction();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -27,6 +29,19 @@ public class BetaLongRef_atomicGetTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
         ref.atomicGet();
+    }
+
+    @Test
+    public void whenActiveTransactionAvailable_thenIgnored(){
+        BetaLongRef ref = createLongRef(stm, 100);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        setThreadLocalTransaction(tx);
+        ref.set(10);
+
+        assertEquals(100, ref.atomicGet());
+
+        assertSame(tx, getThreadLocalTransaction());
     }
 
     @Test

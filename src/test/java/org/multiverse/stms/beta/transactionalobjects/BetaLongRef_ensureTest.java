@@ -13,6 +13,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class BetaLongRef_ensureTest {
@@ -21,6 +22,7 @@ public class BetaLongRef_ensureTest {
     @Before
     public void setUp() {
         stm = new BetaStm();
+        clearThreadLocalTransaction();
     }
 
     @Test
@@ -127,5 +129,4 @@ public class BetaLongRef_ensureTest {
         assertIsAborted(otherTx);
         assertSame(committed, ref.___unsafeLoad());
     }
-
 }

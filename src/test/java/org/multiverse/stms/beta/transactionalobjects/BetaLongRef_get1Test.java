@@ -11,6 +11,7 @@ import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 /**
@@ -25,6 +26,7 @@ public class BetaLongRef_get1Test {
     @Before
     public void setUp() {
         stm = new BetaStm();
+        clearThreadLocalTransaction();
     }
 
     @Test

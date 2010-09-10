@@ -6,6 +6,7 @@ import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.orec.OrecTestUtils;
 
 import static org.junit.Assert.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * @author Peter Veentjer
@@ -14,8 +15,9 @@ public class BetaLongRef_tryUpdateLock {
     private BetaStm stm;
 
     @Before
-    public void setUp(){
-           stm = new BetaStm();
+    public void setUp() {
+        stm = new BetaStm();
+        clearThreadLocalTransaction();
     }
 
     @Test

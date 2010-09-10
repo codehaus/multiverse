@@ -1,25 +1,23 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class BetaLongRef_hasReadConflictTest {
     private BetaStm stm;
-    private BetaObjectPool pool;
-
+   
     @Before
     public void setUp() {
         stm = new BetaStm();
-        pool = new BetaObjectPool();
+         clearThreadLocalTransaction();
     }
 
     @Test
@@ -45,7 +43,6 @@ public class BetaLongRef_hasReadConflictTest {
 
         assertFalse(hasReadConflict);
     }
-
 
     @Test
     public void whenLockedBySelf() {
@@ -76,9 +73,13 @@ public class BetaLongRef_hasReadConflictTest {
     }
 
     @Test
-    @Ignore
     public void whenFresh() {
+        BetaTransaction tx = stm.startDefaultTransaction();
+        BetaLongRef ref = new BetaLongRef(tx);
+        LongRefTranlocal tranlocal =tx.openForConstruction(ref);
 
+        boolean conflict = ref.___hasReadConflict(tranlocal, tx);
+        assertFalse(conflict);
     }
 
     @Test

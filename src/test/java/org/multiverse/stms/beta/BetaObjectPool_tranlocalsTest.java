@@ -21,6 +21,11 @@ public class BetaObjectPool_tranlocalsTest {
         pool = new BetaObjectPool();
     }
 
+    @Test(expected = NullPointerException.class)
+    public void putNullInPoolInSpecializedPool_thenNullPointerException(){
+        pool.put((LongRefTranlocal)null);
+    }
+
     @Test
     public void putUpdate() {
         BetaLongRef ref = new BetaLongRef(stm.startDefaultTransaction());

@@ -1,19 +1,24 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.*;
-import org.multiverse.api.*;
-import org.multiverse.api.references.*;
-import org.multiverse.api.blocking.*;
-import org.multiverse.api.exceptions.*;
-import org.multiverse.api.functions.*;
-import org.multiverse.stms.beta.*;
-import org.multiverse.stms.beta.conflictcounters.*;
-import org.multiverse.stms.beta.orec.*;
-import org.multiverse.stms.beta.transactions.*;
+import org.multiverse.api.LockStatus;
+import org.multiverse.api.StmUtils;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.exceptions.WriteConflict;
+import org.multiverse.api.functions.BooleanFunction;
+import org.multiverse.api.references.BooleanRef;
+import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
+import org.multiverse.stms.beta.Listeners;
+import org.multiverse.stms.beta.orec.FastOrec;
+import org.multiverse.stms.beta.orec.Orec;
+import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
+
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 /**
  * The transactional object. Atm it is just a reference for an int, more complex stuff will be added again
@@ -271,7 +276,7 @@ public final class BetaBooleanRef
         //and it is not possible that the read jump over the release of the lock.
 
 
-       if (remainingSurplus == 0) {
+       if (remainingSurplus == 0 && oldActive!=null) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);
         }
@@ -332,7 +337,7 @@ public final class BetaBooleanRef
         }
 
         long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
-        if (remainingSurplus == 0) {
+        if (remainingSurplus == 0 && oldActive != null) {
             //nobody is using the tranlocal anymore, so pool it.
 
             //todo: permanent tranlocals also are pooled, but could this cause problems with less
@@ -519,6 +524,14 @@ public final class BetaBooleanRef
 
     @Override
     public final void ensure(){
+        Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            ensure((BetaTransaction)tx);
+            return;
+        }
+
+        //todo:
         throw new TodoException();
     }
 
@@ -535,7 +548,14 @@ public final class BetaBooleanRef
     public final void commute(
         BooleanFunction function){
 
-        throw new TodoException();
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            commute((BetaTransaction)tx, function);
+            return;
+        }
+
+        atomicAlterAndGet(function);
     }
 
     @Override
@@ -564,7 +584,13 @@ public final class BetaBooleanRef
     public final boolean alterAndGet(
         final BooleanFunction function){
 
-        throw new TodoException();
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            return alterAndGet((BetaTransaction)tx, function);
+        }
+
+        return atomicAlterAndGet(function);
     }
 
     @Override
@@ -600,13 +626,21 @@ public final class BetaBooleanRef
     @Override
     public final boolean getAndAlter(
         final BooleanFunction function){
-        throw new TodoException();
+
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            return getAndAlter((BetaTransaction)tx, function);
+        }
+
+        return atomicGetAndAlter(function);
     }
 
     @Override
     public final boolean getAndAlter(
         final Transaction tx,
         final BooleanFunction function){
+
         return getAndAlter((BetaTransaction)tx, function);
     }
 
@@ -637,16 +671,35 @@ public final class BetaBooleanRef
 
     @Override
     public final boolean getAndSet(final boolean value){
-        throw new TodoException();
+
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            return getAndSet((BetaTransaction)tx, value);
+        }
+
+        return atomicGetAndSet(value);
     }
 
     public final boolean set(final boolean value){
-        throw new TodoException();
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            return set((BetaTransaction)tx, value);
+        }
+
+        return atomicSet(value);
     }
 
     @Override
     public final boolean get(){
-        throw new TodoException();
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            return get((BetaTransaction)tx);
+        }
+
+        return atomicGet();
     }
 
     @Override
@@ -770,6 +823,13 @@ public final class BetaBooleanRef
 
     @Override
     public final void await(boolean value){
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            await((BetaTransaction)tx, value);
+            return;
+        }
+
         throw new TodoException();
     }
 

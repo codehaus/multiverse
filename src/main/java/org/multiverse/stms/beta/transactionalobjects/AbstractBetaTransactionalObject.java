@@ -1,19 +1,17 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.*;
-import org.multiverse.api.*;
-import org.multiverse.api.references.*;
-import org.multiverse.api.blocking.*;
-import org.multiverse.api.exceptions.*;
-import org.multiverse.api.functions.*;
-import org.multiverse.stms.beta.*;
-import org.multiverse.stms.beta.conflictcounters.*;
-import org.multiverse.stms.beta.orec.*;
-import org.multiverse.stms.beta.transactions.*;
+import org.multiverse.api.LockStatus;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.blocking.Latch;
+import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
+import org.multiverse.stms.beta.Listeners;
+import org.multiverse.stms.beta.orec.FastOrec;
+import org.multiverse.stms.beta.orec.Orec;
+import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * The transactional object. Atm it is just a reference for an int, more complex stuff will be added again
@@ -223,7 +221,7 @@ public abstract class AbstractBetaTransactionalObject
         //and it is not possible that the read jump over the release of the lock.
 
 
-       if (remainingSurplus == 0) {
+       if (remainingSurplus == 0 && oldActive!=null) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);
         }
@@ -284,7 +282,7 @@ public abstract class AbstractBetaTransactionalObject
         }
 
         long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
-        if (remainingSurplus == 0) {
+        if (remainingSurplus == 0 && oldActive != null) {
             //nobody is using the tranlocal anymore, so pool it.
 
             //todo: permanent tranlocals also are pooled, but could this cause problems with less

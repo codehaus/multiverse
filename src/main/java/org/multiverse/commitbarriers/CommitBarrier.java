@@ -1,7 +1,6 @@
 package org.multiverse.commitbarriers;
 
 import org.multiverse.api.Transaction;
-import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.utils.StandardThreadFactory;
@@ -493,8 +492,7 @@ public abstract class CommitBarrier {
             throw new NullPointerException();
         }
 
-        TransactionStatus status = tx.getStatus();
-        if (!status.isAlive()) {
+        if (!tx.isAlive()) {
             throw new DeadTransactionException();
         }
     }

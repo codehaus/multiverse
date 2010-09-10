@@ -1,9 +1,9 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.functions.IncLongFunction;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
@@ -23,9 +23,28 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
     }
 
     @Test
-    @Ignore
-    public void whenCommutingFunctionDoesntChangeValue(){
+    public void whenCommutingFunctionDoesntChangeValue() {
+        BetaLongRef ref = createLongRef(stm, 100);
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
+        LongRefTranlocal tranlocal = ref.___openForCommute(pool);
+        tranlocal.addCommutingFunction(new IdentityLongFunction(), pool);
+        tranlocal.read = committed;
+        tranlocal.evaluateCommutingFunctions(pool);
+
+        assertFalse(tranlocal.isCommitted);
+        assertFalse(tranlocal.isCommuting);
+        assertEquals(DIRTY_FALSE, tranlocal.isDirty);
+        assertSame(ref, tranlocal.owner);
+        assertSame(committed, tranlocal.read);
+        assertEquals(100, tranlocal.value);
+    }
+
+    class IdentityLongFunction extends LongFunction {
+        @Override
+        public long call(long current) {
+            return current;
+        }
     }
 
     @Test

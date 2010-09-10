@@ -132,8 +132,6 @@ globalconflict counter.
 
 - commute
 
-    - the nodes for the commute functions need to be pooled.
-
     - testing of transaction access while commute
 
     - commute: commuting functions are executed in reverse order.
@@ -178,6 +176,8 @@ and not allowed. So not throw the retry error immediately..
 - listeners are not cleaned after abort/commit, so still a potential memory leak
 
 done
+
+- the nodes for the commute functions need to be pooled.
 
 - testing: mono transaction and conflict counter setting
 

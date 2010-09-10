@@ -15,6 +15,8 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static org.multiverse.api.ThreadLocalTransaction.*;
+
 /**
  * The transactional object. Atm it is just a reference for an int, more complex stuff will be added again
  * once this project leaves the prototype stage.
@@ -279,7 +281,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         //and it is not possible that the read jump over the release of the lock.
 
 
-       if (remainingSurplus == 0) {
+       if (remainingSurplus == 0 && oldActive!=null) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);
         }
@@ -340,7 +342,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         }
 
         long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
-        if (remainingSurplus == 0) {
+        if (remainingSurplus == 0 && oldActive != null) {
             //nobody is using the tranlocal anymore, so pool it.
 
             //todo: permanent tranlocals also are pooled, but could this cause problems with less
@@ -534,7 +536,13 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
     @Override
     public final ${transactionalObject.type} getAndIncrement(final ${transactionalObject.type} amount){
-        throw new TodoException();
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            return getAndIncrement((BetaTransaction)tx, amount);
+        }
+
+        return atomicGetAndIncrement(amount);
     }
 
     @Override
@@ -558,7 +566,13 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
     @Override
     public final ${transactionalObject.type} incrementAndGet(final ${transactionalObject.type} amount){
-        throw new TodoException();
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            return incrementAndGet((BetaTransaction)tx, amount);
+        }
+
+        return atomicIncrementAndGet(amount);
     }
 
     @Override
@@ -583,7 +597,13 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 #elseif(${transactionalObject.name} eq "BetaRef")
     @Override
     public final boolean isNull(){
-        throw new TodoException();
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            return isNull((BetaTransaction)tx);
+        }
+
+        return atomicIsNull();
     }
 
     @Override
@@ -598,12 +618,20 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
     @Override
     public final boolean atomicIsNull(){
-        throw new TodoException();
+        return atomicGet()==null;
     }
 
 #end
     @Override
     public final void ensure(){
+        Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            ensure((BetaTransaction)tx);
+            return;
+        }
+
+        //todo:
         throw new TodoException();
     }
 
@@ -620,7 +648,14 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public final void commute(
         ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
 
-        throw new TodoException();
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            commute((BetaTransaction)tx, function);
+            return;
+        }
+
+        atomicAlterAndGet(function);
     }
 
     @Override
@@ -649,7 +684,13 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public final ${transactionalObject.type} alterAndGet(
         final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
 
-        throw new TodoException();
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            return alterAndGet((BetaTransaction)tx, function);
+        }
+
+        return atomicAlterAndGet(function);
     }
 
     @Override
@@ -685,13 +726,21 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     @Override
     public final ${transactionalObject.type} getAndAlter(
         final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-        throw new TodoException();
+
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            return getAndAlter((BetaTransaction)tx, function);
+        }
+
+        return atomicGetAndAlter(function);
     }
 
     @Override
     public final ${transactionalObject.type} getAndAlter(
         final Transaction tx,
         final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
+
         return getAndAlter((BetaTransaction)tx, function);
     }
 
@@ -722,16 +771,35 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
     @Override
     public final ${transactionalObject.type} getAndSet(final ${transactionalObject.type} value){
-        throw new TodoException();
+
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            return getAndSet((BetaTransaction)tx, value);
+        }
+
+        return atomicGetAndSet(value);
     }
 
     public final ${transactionalObject.type} set(final ${transactionalObject.type} value){
-        throw new TodoException();
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            return set((BetaTransaction)tx, value);
+        }
+
+        return atomicSet(value);
     }
 
     @Override
     public final ${transactionalObject.type} get(){
-        throw new TodoException();
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            return get((BetaTransaction)tx);
+        }
+
+        return atomicGet();
     }
 
     @Override
@@ -855,6 +923,13 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
     @Override
     public final void await(${transactionalObject.type} value){
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            await((BetaTransaction)tx, value);
+            return;
+        }
+
         throw new TodoException();
     }
 

@@ -7,6 +7,7 @@ import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaLongRef_constructionTest implements BetaStmConstants {
@@ -15,6 +16,7 @@ public class BetaLongRef_constructionTest implements BetaStmConstants {
     @Before
     public void setUp() {
         stm = new BetaStm();
+        clearThreadLocalTransaction();
     }
 
     @Test
@@ -52,7 +54,6 @@ public class BetaLongRef_constructionTest implements BetaStmConstants {
         assertEquals(DIRTY_FALSE, ref2.___unsafeLoad().isDirty);
         assertEquals(10, ref2.___unsafeLoad().value);
     }
-
 
     @Test
     public void test() {

@@ -1,16 +1,26 @@
 package org.multiverse.stms.beta;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.blocking.CheapLatch;
 
 import static org.junit.Assert.*;
 
 public class BetaObjectPool_listenersTest {
+    private BetaObjectPool pool;
+
+    @Before
+    public void setUp(){
+        pool = new BetaObjectPool();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void whenNullPutInPool_thenNullPointerException(){
+        pool.putListeners(null);
+    }
 
     @Test
     public void whenPutInPool_thenPreparedForPooling() {
-        BetaObjectPool pool = new BetaObjectPool();
-
         CheapLatch latch = new CheapLatch();
         latch.prepareForPooling();
 
@@ -30,7 +40,6 @@ public class BetaObjectPool_listenersTest {
 
     @Test
     public void test() {
-        BetaObjectPool pool = new BetaObjectPool();
         Listeners listeners1 = new Listeners();
         Listeners listeners2 = new Listeners();
         Listeners listeners3 = new Listeners();

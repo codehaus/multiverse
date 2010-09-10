@@ -41,6 +41,10 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
         this.config = config;
     }
 
+    public final boolean isAlive(){
+        return status == ACTIVE || status == PREPARED;
+    }
+
     public final BetaObjectPool getPool(){
         return pool;
     }

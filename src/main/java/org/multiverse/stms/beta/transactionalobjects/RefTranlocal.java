@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.api.functions.*;
-import org.multiverse.stms.beta.*;
+import org.multiverse.api.functions.Function;
+import org.multiverse.stms.beta.BetaObjectPool;
 
 /**
  * The {@link Tranlocal} for the {@link BetaRef).
@@ -51,7 +51,9 @@ public final class RefTranlocal<E> extends Tranlocal{
             Function<E> function =
                 (Function<E>)current.function;
             value = function.call(value);
+            CallableNode old = current;
             current = current.next;
+            pool.putCallableNode(old);
         }while(current != null);
 
         isDirty = tranlocal.value != value ? DIRTY_TRUE : DIRTY_FALSE;
@@ -62,8 +64,14 @@ public final class RefTranlocal<E> extends Tranlocal{
     public void addCommutingFunction(final Function function, final BetaObjectPool pool){
         assert isCommuting;
 
-        //todo: callable node should be taken from the pool
-        headCallable = new CallableNode(function, headCallable);
+        CallableNode node = pool.takeCallableNode();
+        if(node == null){
+            headCallable = new CallableNode(function, headCallable);
+        }else{
+            node.function = function;
+            node.next = headCallable;
+            headCallable = node;
+        }
     }
 
     public RefTranlocal openForCommute(final BetaObjectPool pool) {
@@ -88,8 +96,15 @@ public final class RefTranlocal<E> extends Tranlocal{
         isCommitted = false;
         isDirty = DIRTY_UNKNOWN;
         isCommuting = false;
-        //todo: this should be pooled.
-        headCallable = null;
+        CallableNode current = headCallable;
+        if(current!=null){
+            headCallable = null;
+            do{
+                CallableNode next = current.next;
+                pool.putCallableNode(current);
+                current = next;
+            }while(current!=null);
+        }
     }
 
     public boolean calculateIsDirty() {

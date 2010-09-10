@@ -1,8 +1,8 @@
-package org.multiverse.stms.beta;
+package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.stms.beta.transactions.*;
+import org.multiverse.stms.beta.BetaStm;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;

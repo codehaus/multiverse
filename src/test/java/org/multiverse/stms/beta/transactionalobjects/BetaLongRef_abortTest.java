@@ -10,6 +10,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
@@ -24,6 +25,7 @@ public class BetaLongRef_abortTest {
     public void setUp() {
         stm = new BetaStm();
         pool = new BetaObjectPool();
+        clearThreadLocalTransaction();
     }
 
     @Test

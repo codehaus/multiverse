@@ -8,6 +8,7 @@ import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class BetaLongRef_openForConstructionTest implements BetaStmConstants{
     private BetaStm stm;
@@ -17,6 +18,7 @@ public class BetaLongRef_openForConstructionTest implements BetaStmConstants{
     public void setUp() {
         stm = new BetaStm();
         pool = new BetaObjectPool();
+        clearThreadLocalTransaction();
     }
 
     @Test
