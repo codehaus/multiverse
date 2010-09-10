@@ -2,7 +2,6 @@ package org.multiverse.stms.beta.integrationtest;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
@@ -15,13 +14,11 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 public class AtomicReadBiasedWithPeriodicUpdateTest {
 
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
         stm = new BetaStm();
-        pool = new BetaObjectPool();
     }
 
     @Test
@@ -30,7 +27,7 @@ public class AtomicReadBiasedWithPeriodicUpdateTest {
 
         for (int l = 0; l < 100; l++) {
             long value = ref.atomicGet() + 1;
-            ref.atomicGetAndSet(value, pool);
+            ref.atomicGetAndSet(value);
 
             for (int k = 0; k < 1000; k++) {
                 long result = ref.atomicGet();

@@ -87,7 +87,13 @@ performance.
 
 - create an orec that never become readbiased (useful for performance comparison).
 
+
+
 todo
+
+- atomic change methods on ref should call the backoff policy
+
+- atomic change methods on ref should deal with listeners
 
 - mono transaction: support for orelse
 

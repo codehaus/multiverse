@@ -19,6 +19,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import java.util.UUID;
 
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
+import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
  * The transactional object. Atm it is just a reference for an int, more complex stuff will be added again
@@ -524,7 +525,8 @@ public  class BetaDoubleRef
 
     @Override
     public final double atomicGetAndIncrement(final double amount){
-        throw new TodoException();
+        double result = atomicIncrementAndGet(amount);
+        return result - amount;
     }
 
     @Override
@@ -544,8 +546,7 @@ public  class BetaDoubleRef
     }
 
     public final double getAndIncrement(final BetaTransaction tx, final double amount){
-        DoubleRefTranlocal write
-            = (DoubleRefTranlocal)tx.openForWrite(this, false);
+        DoubleRefTranlocal write= tx.openForWrite(this, false);
 
         double oldValue = write.value;
         write.value+=amount;
@@ -580,8 +581,7 @@ public  class BetaDoubleRef
         final BetaTransaction tx,
         final double amount){
 
-        DoubleRefTranlocal write
-            = (DoubleRefTranlocal)tx.openForWrite(this, false);
+        DoubleRefTranlocal write= tx.openForWrite(this, false);
 
         write.value+=amount;
         return write.value;
@@ -681,7 +681,7 @@ public  class BetaDoubleRef
         return write.value;
     }
 
-     @Override
+    @Override
     public final double atomicGetAndAlter(
         final DoubleFunction function){
 
@@ -739,7 +739,7 @@ public  class BetaDoubleRef
 
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
+        if(tx != null && tx.isAlive()){
             return getAndSet((BetaTransaction)tx, value);
         }
 
@@ -749,7 +749,7 @@ public  class BetaDoubleRef
     public final double set(final double value){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
+        if(tx != null && tx.isAlive()){
             return set((BetaTransaction)tx, value);
         }
 
@@ -760,7 +760,7 @@ public  class BetaDoubleRef
     public final double get(){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
+        if(tx != null && tx.isAlive()){
             return get((BetaTransaction)tx);
         }
 
@@ -799,23 +799,21 @@ public  class BetaDoubleRef
 
     @Override
     public final double atomicSet(final double newValue){
-        throw new TodoException();
+        atomicGetAndSet(newValue);
+        return newValue;
     }
 
     @Override
     public final double atomicGetAndSet(final double newValue){
-        throw new TodoException();
-    }
-
-    public final double atomicGetAndSet(
-        final double newValue,
-        final BetaObjectPool pool){
-
         final int arriveStatus = ___tryLockAndArrive(___stm.spinCount);
+
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
+            //a new instance is thrown because there probably is no transactional block surrounding it
+            //that does a retry.
             throw new WriteConflict();
         }
 
+        final BetaObjectPool pool = getThreadLocalBetaObjectPool();
         final DoubleRefTranlocal oldActive = ___active;
 
         if(oldActive.value== newValue){
@@ -824,6 +822,8 @@ public  class BetaDoubleRef
             } else{
                 ___departAfterReadingAndUnlock();
             }
+
+            return newValue;
         }
 
         //lets create a tranlocal for the update.
@@ -861,7 +861,10 @@ public  class BetaDoubleRef
     }
 
     @Override
-    public final double getAndSet(Transaction tx, double value){
+    public final double getAndSet(
+        final Transaction tx,
+        final double value){
+
         return getAndSet((BetaTransaction)tx, value);
     }
 
@@ -899,11 +902,17 @@ public  class BetaDoubleRef
     }
 
     @Override
-    public final void await(Transaction tx, double value){
+    public final void await(
+        final Transaction tx,
+        final double value){
+
         await((BetaTransaction)tx, value);
     }
 
-    public final void await(BetaTransaction tx, double value){
+    public final void await(
+        final BetaTransaction tx,
+        final double value){
+
         DoubleRefTranlocal read = tx.openForRead(this,false);
         if(read.value!=value){
             StmUtils.retry();

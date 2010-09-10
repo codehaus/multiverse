@@ -19,6 +19,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import java.util.UUID;
 
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
+import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
  * The transactional object. Atm it is just a reference for an int, more complex stuff will be added again
@@ -616,7 +617,7 @@ public final class BetaBooleanRef
         return write.value;
     }
 
-     @Override
+    @Override
     public final boolean atomicGetAndAlter(
         final BooleanFunction function){
 
@@ -674,7 +675,7 @@ public final class BetaBooleanRef
 
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
+        if(tx != null && tx.isAlive()){
             return getAndSet((BetaTransaction)tx, value);
         }
 
@@ -684,7 +685,7 @@ public final class BetaBooleanRef
     public final boolean set(final boolean value){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
+        if(tx != null && tx.isAlive()){
             return set((BetaTransaction)tx, value);
         }
 
@@ -695,7 +696,7 @@ public final class BetaBooleanRef
     public final boolean get(){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
+        if(tx != null && tx.isAlive()){
             return get((BetaTransaction)tx);
         }
 
@@ -734,23 +735,21 @@ public final class BetaBooleanRef
 
     @Override
     public final boolean atomicSet(final boolean newValue){
-        throw new TodoException();
+        atomicGetAndSet(newValue);
+        return newValue;
     }
 
     @Override
     public final boolean atomicGetAndSet(final boolean newValue){
-        throw new TodoException();
-    }
-
-    public final boolean atomicGetAndSet(
-        final boolean newValue,
-        final BetaObjectPool pool){
-
         final int arriveStatus = ___tryLockAndArrive(___stm.spinCount);
+
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
+            //a new instance is thrown because there probably is no transactional block surrounding it
+            //that does a retry.
             throw new WriteConflict();
         }
 
+        final BetaObjectPool pool = getThreadLocalBetaObjectPool();
         final BooleanRefTranlocal oldActive = ___active;
 
         if(oldActive.value== newValue){
@@ -759,6 +758,8 @@ public final class BetaBooleanRef
             } else{
                 ___departAfterReadingAndUnlock();
             }
+
+            return newValue;
         }
 
         //lets create a tranlocal for the update.
@@ -796,7 +797,10 @@ public final class BetaBooleanRef
     }
 
     @Override
-    public final boolean getAndSet(Transaction tx, boolean value){
+    public final boolean getAndSet(
+        final Transaction tx,
+        final boolean value){
+
         return getAndSet((BetaTransaction)tx, value);
     }
 
@@ -834,11 +838,17 @@ public final class BetaBooleanRef
     }
 
     @Override
-    public final void await(Transaction tx, boolean value){
+    public final void await(
+        final Transaction tx,
+        final boolean value){
+
         await((BetaTransaction)tx, value);
     }
 
-    public final void await(BetaTransaction tx, boolean value){
+    public final void await(
+        final BetaTransaction tx,
+        final boolean value){
+
         BooleanRefTranlocal read = tx.openForRead(this,false);
         if(read.value!=value){
             StmUtils.retry();

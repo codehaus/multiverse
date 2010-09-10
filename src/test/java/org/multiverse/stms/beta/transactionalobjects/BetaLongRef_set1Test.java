@@ -13,6 +13,7 @@ import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaLongRef_set1Test {
 
@@ -56,29 +57,45 @@ public class BetaLongRef_set1Test {
 
         assertEquals(20, value);
         assertIsCommitted(tx);
-        assertEquals(20,ref.atomicGet());
+        assertEquals(20, ref.atomicGet());
         assertSame(tx, getThreadLocalTransaction());
     }
 
     @Test
     @Ignore
-    public void whenNoTransactionAvailable(){
+    public void whenLocked() {
 
     }
 
     @Test
     @Ignore
-    public void whenCommittedTransactionAvailable(){
+    public void whenNoChange() {
+    }
+
+    @Test
+    public void whenSuccess() {
+        BetaLongRef ref = createLongRef(stm, 10);
+
+        long result = ref.set(20);
+
+        assertEquals(10, result);
+        assertUnlocked(ref);
+        assertNull(ref.___getLockOwner());
+        assertSurplus(0, ref);
+        assertUpdateBiased(ref);
+        assertEquals(20, ref.atomicGet());
+    }
+
+    @Test
+    @Ignore
+    public void whenCommittedTransactionAvailable() {
 
     }
 
     @Test
     @Ignore
-    public void whenAbortedTransactionAvailable(){
+    public void whenAbortedTransactionAvailable() {
 
     }
-            
-    @Test
-    @Ignore
-    public void test(){}
+
 }

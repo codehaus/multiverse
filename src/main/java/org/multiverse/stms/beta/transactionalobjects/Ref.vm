@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.multiverse.api.ThreadLocalTransaction.*;
+import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.*;
 
 /**
  * The transactional object. Atm it is just a reference for an int, more complex stuff will be added again
@@ -531,14 +532,15 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 #if(${transactionalObject.isNumber})
     @Override
     public final ${transactionalObject.type} atomicGetAndIncrement(final ${transactionalObject.type} amount){
-        throw new TodoException();
+        ${transactionalObject.type} result = atomicIncrementAndGet(amount);
+        return result - amount;
     }
 
     @Override
     public final ${transactionalObject.type} getAndIncrement(final ${transactionalObject.type} amount){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
+        if(tx != null && tx.isAlive()){
             return getAndIncrement((BetaTransaction)tx, amount);
         }
 
@@ -551,8 +553,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
     public final ${transactionalObject.type} getAndIncrement(final BetaTransaction tx, final ${transactionalObject.type} amount){
-        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write
-            = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tx.openForWrite(this, false);
+        ${transactionalObject.tranlocal} write= tx.openForWrite(this, false);
 
         ${transactionalObject.type} oldValue = write.value;
         write.value+=amount;
@@ -568,7 +569,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public final ${transactionalObject.type} incrementAndGet(final ${transactionalObject.type} amount){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
+        if(tx != null && tx.isAlive()){
             return incrementAndGet((BetaTransaction)tx, amount);
         }
 
@@ -587,8 +588,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final BetaTransaction tx,
         final ${transactionalObject.type} amount){
 
-        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write
-            = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tx.openForWrite(this, false);
+        ${transactionalObject.tranlocal} write= tx.openForWrite(this, false);
 
         write.value+=amount;
         return write.value;
@@ -618,7 +618,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
     @Override
     public final boolean atomicIsNull(){
-        return atomicGet()==null;
+        return atomicGet() == null;
     }
 
 #end
@@ -716,7 +716,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         return write.value;
     }
 
-     @Override
+    @Override
     public final ${transactionalObject.type} atomicGetAndAlter(
         final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
 
@@ -774,7 +774,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
+        if(tx != null && tx.isAlive()){
             return getAndSet((BetaTransaction)tx, value);
         }
 
@@ -784,7 +784,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public final ${transactionalObject.type} set(final ${transactionalObject.type} value){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
+        if(tx != null && tx.isAlive()){
             return set((BetaTransaction)tx, value);
         }
 
@@ -795,7 +795,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public final ${transactionalObject.type} get(){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
+        if(tx != null && tx.isAlive()){
             return get((BetaTransaction)tx);
         }
 
@@ -834,34 +834,34 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
     @Override
     public final ${transactionalObject.type} atomicSet(final ${transactionalObject.type} newValue){
-        throw new TodoException();
+        atomicGetAndSet(newValue);
+        return newValue;
     }
 
     @Override
     public final ${transactionalObject.type} atomicGetAndSet(final ${transactionalObject.type} newValue){
-        throw new TodoException();
-    }
-
-    public final ${transactionalObject.type} atomicGetAndSet(
-        final ${transactionalObject.type} newValue,
-        final BetaObjectPool pool){
-
         final int arriveStatus = ___tryLockAndArrive(___stm.spinCount);
+
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
+            //a new instance is thrown because there probably is no transactional block surrounding it
+            //that does a retry.
             throw new WriteConflict();
         }
 
         final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} oldActive = ___active;
 
-        if(oldActive.value== newValue){
+        if(oldActive.value == newValue){
             if(arriveStatus == ARRIVE_READBIASED){
                 ___unlockByReadBiased();
             } else{
                 ___departAfterReadingAndUnlock();
             }
+
+            return newValue;
         }
 
         //lets create a tranlocal for the update.
+        final BetaObjectPool pool = getThreadLocalBetaObjectPool();               
         ${transactionalObject.tranlocal}${transactionalObject.typeParameter} update = pool.take(this);
         if(update == null){
             update = new ${transactionalObject.tranlocal}(this);
@@ -896,7 +896,10 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
     @Override
-    public final ${transactionalObject.type} getAndSet(Transaction tx, ${transactionalObject.type} value){
+    public final ${transactionalObject.type} getAndSet(
+        final Transaction tx,
+        final ${transactionalObject.type} value){
+
         return getAndSet((BetaTransaction)tx, value);
     }
 
@@ -934,13 +937,19 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
     @Override
-    public final void await(Transaction tx, ${transactionalObject.type} value){
+    public final void await(
+        final Transaction tx,
+        final ${transactionalObject.type} value){
+
         await((BetaTransaction)tx, value);
     }
 
-    public final void await(BetaTransaction tx, ${transactionalObject.type} value){
+    public final void await(
+        final BetaTransaction tx,
+        final ${transactionalObject.type} value){
+
         ${transactionalObject.tranlocal}${transactionalObject.typeParameter} read = tx.openForRead(this,false);
-        if(read.value!=value){
+        if(read.value != value){
             StmUtils.retry();
         }        
     }

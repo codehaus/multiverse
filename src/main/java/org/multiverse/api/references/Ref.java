@@ -242,6 +242,20 @@ public interface Ref<E> extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E set(E value);
+    
+    /**
+      * Sets the new value using the provided transaction.
+      *
+      * @param tx    the transaction used to do the set.
+      * @param value the new value
+      * @return the old value
+      * @throws NullPointerException if tx is null.
+      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+      *                              if the transaction is not in the correct
+      *                              state for this operation.
+      * @throws org.multiverse.api.exceptions.ControlFlowError
+      */
+     E set(Transaction tx, E value);
 
     /**
      * Sets the value using the provided transaction.
@@ -256,20 +270,6 @@ public interface Ref<E> extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E getAndSet(Transaction tx, E value);
-
-    /**
-     * Sets the new value using the provided transaction.
-     *
-     * @param tx    the transaction used to do the set.
-     * @param value the new value
-     * @return the old value
-     * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is not in the correct
-     *                              state for this operation.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     */
-    E set(Transaction tx, E value);
 
     /**
      * Atomically gets the value. The value could be stale as soon as it is returned. This

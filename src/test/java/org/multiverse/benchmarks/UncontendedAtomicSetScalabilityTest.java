@@ -1,6 +1,5 @@
 package org.multiverse.benchmarks;
 
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -102,11 +101,9 @@ public class UncontendedAtomicSetScalabilityTest {
         public void run() {
             BetaLongRef ref = BetaStmUtils.createReadBiasedLongRef(stm, -1);
 
-            BetaObjectPool pool = new BetaObjectPool();
-
             long startMs = System.currentTimeMillis();
             for (long k = 0; k < transactionCount; k++) {
-                ref.atomicGetAndSet(k, pool);
+                ref.atomicGetAndSet(k);
             }
 
             assertEquals(transactionCount, ref.___unsafeLoad().value + 1);
