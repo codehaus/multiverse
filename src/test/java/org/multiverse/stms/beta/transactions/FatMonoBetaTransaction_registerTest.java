@@ -76,7 +76,7 @@ public class FatMonoBetaTransaction_registerTest {
 
         tx.register(listener);
 
-        assertPrepared(tx);
+        assertIsPrepared(tx);
         verifyZeroInteractions(listener);
         assertHasNormalListeners(tx, listener);
     }

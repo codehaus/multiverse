@@ -1,5 +1,11 @@
 package org.multiverse.stms.beta.transactions;
 
+import org.multiverse.api.blocking.*;
+import org.multiverse.api.exceptions.*;
+import org.multiverse.stms.beta.transactionalobjects.*;
+import org.multiverse.stms.beta.transactions.*;
+import java.util.ArrayList;
+
 /**
  * A pool for Transactions. This is only meant to reduce the performance overhead of creating and garbage collecting
  * transactions, it should not be compared to a connection pool of a database for example. 

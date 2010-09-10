@@ -157,8 +157,6 @@ the task not being executed at all.
 
 - pooling for generic transactional object tranlocals.
 
-- commit barriers
-
 - array transaction: on commit/abort the array can be nulled. no need to do it when placing in the pool
 
 - array tree transaction: on commit/abort the array can be nulled. no need to do it when placing in the pool

@@ -1,8 +1,7 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.api.functions.DoubleFunction;
-import org.multiverse.api.functions.Function;
-import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.api.functions.*;
+import org.multiverse.stms.beta.*;
 
 /**
  * The {@link Tranlocal} for the {@link BetaDoubleRef).
@@ -43,32 +42,38 @@ public final class DoubleRefTranlocal extends Tranlocal{
     public void evaluateCommutingFunctions(final BetaObjectPool  pool){
         assert isCommuting;
 
-        DoubleRefTranlocal tranlocal = (DoubleRefTranlocal)read;
+        DoubleRefTranlocal tranlocal
+            = (DoubleRefTranlocal)read;
         value = tranlocal.value;
 
         CallableNode current = headCallable;
         do{
-            value = current.callable.call(value);
+            DoubleFunction function =
+                (DoubleFunction)current.function;
+            value = function.call(value);
             current = current.next;
-        }while(current!=null);
+        }while(current != null);
 
-        isDirty = tranlocal.value != value?DIRTY_TRUE : DIRTY_FALSE;
+        isDirty = tranlocal.value != value ? DIRTY_TRUE : DIRTY_FALSE;
         isCommuting = false;
         headCallable = null;
     }
 
-    public void addCommutingFunction(final DoubleFunction function, final BetaObjectPool pool){
+    public void addCommutingFunction(
+        final DoubleFunction function,
+        final BetaObjectPool pool){
+
         assert isCommuting;
 
+        //todo: callable node should be taken from the pool
         headCallable = new CallableNode(function, headCallable);
     }
 
     public void addCommutingFunction(final Function function, final BetaObjectPool pool){
         assert isCommuting;
 
-        headCallable = new CallableNode(
-            (DoubleFunction)function,
-            headCallable);
+        //todo: callable node should be taken from the pool
+        headCallable = new CallableNode(function, headCallable);
     }
 
     public DoubleRefTranlocal openForCommute(final BetaObjectPool pool) {
@@ -119,15 +124,5 @@ public final class DoubleRefTranlocal extends Tranlocal{
         isDirty = value != _read.value? DIRTY_TRUE: DIRTY_FALSE;
 
         return isDirty == DIRTY_TRUE;
-    }
-
-    public static class CallableNode{
-        public DoubleFunction callable;
-        public CallableNode next;
-
-        CallableNode(DoubleFunction callable, CallableNode next){
-            this.callable = callable;
-            this.next = next;
-        }
     }
 }

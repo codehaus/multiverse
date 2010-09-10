@@ -1,5 +1,6 @@
 package org.multiverse.api;
 
+import org.multiverse.api.references.RefFactory;
 import org.multiverse.api.references.RefFactoryBuilder;
 
 /**
@@ -24,7 +25,7 @@ public interface Stm {
      * Transactions returned by this method are not speculative.
      *
      * @return the started default Transaction.
-     */    
+     */
     Transaction startDefaultTransaction();
 
     /**
@@ -37,6 +38,14 @@ public interface Stm {
      * @return the default AtomicBlock.
      */
     AtomicBlock getDefaultAtomicBlock();
+
+    /**
+     * Returns the default reference factory that can be used for easy and cheap access to a reference factory
+     * instead of setting one up through the RefFactoryBuilder.
+     *
+     * @return
+     */
+    RefFactory getDefaultRefFactory();
 
     /**
      * Gets the {@link TransactionFactoryBuilder} that needs to be used to execute transactions on this Stm. See the

@@ -15,7 +15,7 @@ public final class ${transactionalObject.tranlocal}${transactionalObject.typePar
     public final static ${transactionalObject.tranlocal} LOCKED = new ${transactionalObject.tranlocal}(null,true);
 
     public ${transactionalObject.type} value;
-    public CallableNode${transactionalObject.typeParameter} headCallable;
+    public CallableNode headCallable;
 
     public ${transactionalObject.tranlocal}(${transactionalObject.name} ref){
         super(ref, false);
@@ -42,34 +42,40 @@ public final class ${transactionalObject.tranlocal}${transactionalObject.typePar
     public void evaluateCommutingFunctions(final BetaObjectPool  pool){
         assert isCommuting;
 
-        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} tranlocal = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})read;
+        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} tranlocal
+            = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})read;
         value = tranlocal.value;
 
-        CallableNode${transactionalObject.typeParameter} current = headCallable;
+        CallableNode current = headCallable;
         do{
-            value = current.callable.call(value);
+            ${transactionalObject.functionClass}${transactionalObject.typeParameter} function =
+                (${transactionalObject.functionClass}${transactionalObject.typeParameter})current.function;
+            value = function.call(value);
             current = current.next;
-        }while(current!=null);
+        }while(current != null);
 
-        isDirty = tranlocal.value != value?DIRTY_TRUE : DIRTY_FALSE;
+        isDirty = tranlocal.value != value ? DIRTY_TRUE : DIRTY_FALSE;
         isCommuting = false;
         headCallable = null;
     }
 
 #if(${transactionalObject.name} ne 'BetaRef')
-    public void addCommutingFunction(final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function, final BetaObjectPool pool){
+    public void addCommutingFunction(
+        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function,
+        final BetaObjectPool pool){
+
         assert isCommuting;
 
-        headCallable = new CallableNode${transactionalObject.typeParameter}(function, headCallable);
+        //todo: callable node should be taken from the pool
+        headCallable = new CallableNode(function, headCallable);
     }
 
 #end
     public void addCommutingFunction(final Function function, final BetaObjectPool pool){
         assert isCommuting;
 
-        headCallable = new CallableNode${transactionalObject.typeParameter}(
-            (${transactionalObject.functionClass})function,
-            headCallable);
+        //todo: callable node should be taken from the pool
+        headCallable = new CallableNode(function, headCallable);
     }
 
     public ${transactionalObject.tranlocal} openForCommute(final BetaObjectPool pool) {
@@ -120,15 +126,5 @@ public final class ${transactionalObject.tranlocal}${transactionalObject.typePar
         isDirty = value != _read.value? DIRTY_TRUE: DIRTY_FALSE;
 
         return isDirty == DIRTY_TRUE;
-    }
-
-    public static class CallableNode${transactionalObject.typeParameter}{
-        public ${transactionalObject.functionClass}${transactionalObject.typeParameter} callable;
-        public CallableNode${transactionalObject.typeParameter} next;
-
-        CallableNode(${transactionalObject.functionClass}${transactionalObject.typeParameter} callable, CallableNode${transactionalObject.typeParameter} next){
-            this.callable = callable;
-            this.next = next;
-        }
     }
 }

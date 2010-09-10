@@ -3,6 +3,7 @@ package org.multiverse;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.functions.Function;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
@@ -10,6 +11,7 @@ import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
+import org.multiverse.stms.beta.transactionalobjects.CallableNode;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -18,7 +20,12 @@ import org.multiverse.utils.Bugshaker;
 import org.multiverse.utils.ThreadLocalRandom;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
@@ -65,11 +72,11 @@ public class TestUtils {
         assertFalse((Boolean) getField(tx, "hasUpdates"));
     }
 
-    public static void assertHasCommutingFunctions(LongRefTranlocal tranlocal, LongFunction... expected) {
-        LongRefTranlocal.CallableNode current = tranlocal.headCallable;
-        List<LongFunction> functions = new LinkedList<LongFunction>();
+    public static void assertHasCommutingFunctions(LongRefTranlocal tranlocal, Function... expected) {
+        CallableNode current = tranlocal.headCallable;
+        List<Function> functions = new LinkedList<Function>();
         while (current != null) {
-            functions.add(current.callable);
+            functions.add(current.function);
             current = current.next;
         }
 
@@ -173,24 +180,34 @@ public class TestUtils {
         assertFalse(format("both values are %s, but should not be equal", l2), l1 == l2);
     }
 
-    public static void assertNew(Transaction tx) {
-        assertEquals(TransactionStatus.Unstarted, tx.getStatus());
+    public static void assertIsNew(Transaction... transactions) {
+        for (Transaction tx : transactions) {
+            assertEquals(TransactionStatus.Unstarted, tx.getStatus());
+        }
     }
 
-    public static void assertPrepared(Transaction tx) {
-        assertEquals(TransactionStatus.Prepared, tx.getStatus());
+    public static void assertIsPrepared(Transaction... transactions) {
+        for (Transaction tx : transactions) {
+            assertEquals(TransactionStatus.Prepared, tx.getStatus());
+        }
     }
 
-    public static void assertIsAborted(Transaction tx) {
-        assertEquals(TransactionStatus.Aborted, tx.getStatus());
+    public static void assertIsAborted(Transaction... transactions) {
+        for (Transaction tx : transactions) {
+            assertEquals(TransactionStatus.Aborted, tx.getStatus());
+        }
     }
 
-    public static void assertIsCommitted(Transaction tx) {
-        assertEquals(TransactionStatus.Committed, tx.getStatus());
+    public static void assertIsCommitted(Transaction... transactions) {
+        for (Transaction tx : transactions) {
+            assertEquals(TransactionStatus.Committed, tx.getStatus());
+        }
     }
 
-    public static void assertIsActive(Transaction tx) {
-        assertEquals(TransactionStatus.Active, tx.getStatus());
+    public static void assertIsActive(Transaction... transactions) {
+        for (Transaction tx : transactions) {
+            assertEquals(TransactionStatus.Active, tx.getStatus());
+        }
     }
 
     public static BetaLongRef createReadBiasedLongRef(BetaStm stm) {
@@ -250,7 +267,7 @@ public class TestUtils {
 
     public static void assertAlive(Thread... threads) {
         for (Thread thread : threads) {
-            assertTrue(thread.isAlive());
+            assertTrue(thread.getState().toString(), thread.isAlive());
         }
     }
 
@@ -284,14 +301,14 @@ public class TestUtils {
     }
 
     @SuppressWarnings({"ThrowableResultOfMethodCallIgnored"})
-    public static long joinAll(long maxJoinTimeMillis, TestThread... threads) {
-        if (maxJoinTimeMillis < 0) {
+    public static long joinAll(long joinTimeoutMs, TestThread... threads) {
+        if (joinTimeoutMs < 0) {
             throw new IllegalArgumentException();
         }
 
         List<TestThread> uncompleted = new LinkedList(Arrays.asList(threads));
 
-        long maxTimeMs = System.currentTimeMillis() + maxJoinTimeMillis;
+        long maxTimeMs = System.currentTimeMillis() + joinTimeoutMs;
 
         long durationMs = 0;
 
@@ -302,7 +319,7 @@ public class TestUtils {
                     if (System.currentTimeMillis() > maxTimeMs) {
                         fail(String.format(
                                 "Failed to join all threads in %s ms, remaining threads %s",
-                                maxJoinTimeMillis, uncompleted));
+                                joinTimeoutMs, uncompleted));
                     }
                     thread.join(100);
 

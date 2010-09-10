@@ -1,13 +1,13 @@
 package org.multiverse.stms.beta;
 
-import org.multiverse.api.ThreadLocalTransaction;
-import org.multiverse.api.closures.*;
+import org.multiverse.api.*;
 import org.multiverse.api.exceptions.*;
-import org.multiverse.sensors.TransactionSensor;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.api.closures.*;
+import org.multiverse.sensors.*;
+import org.multiverse.stms.beta.transactions.*;
 
 import static java.lang.String.format;
-import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactionContainer;
+import static org.multiverse.api.ThreadLocalTransaction.*;
 
 /**
  * @author Peter Veentjer

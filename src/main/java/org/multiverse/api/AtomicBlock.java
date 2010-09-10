@@ -1,6 +1,6 @@
 package org.multiverse.api;
 
-import org.multiverse.MultiverseConstants;
+import org.multiverse.*;
 import org.multiverse.api.closures.*;
 
 /**

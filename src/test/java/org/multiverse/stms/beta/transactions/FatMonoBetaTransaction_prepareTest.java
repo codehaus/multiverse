@@ -39,7 +39,7 @@ public class FatMonoBetaTransaction_prepareTest {
 
         tx.prepare();
 
-        assertPrepared(tx);
+        assertIsPrepared(tx);
     }
 
     @Test
@@ -56,7 +56,7 @@ public class FatMonoBetaTransaction_prepareTest {
 
         tx.prepare();
 
-        assertPrepared(tx);
+        assertIsPrepared(tx);
         assertIsCommitted(otherTx);
         assertUnlocked(ref);
         assertNull(ref.___getLockOwner());
@@ -78,7 +78,7 @@ public class FatMonoBetaTransaction_prepareTest {
 
         tx.prepare();
 
-        assertPrepared(tx);
+        assertIsPrepared(tx);
         assertIsActive(otherTx);
         assertLocked(ref);
         assertSame(otherTx, ref.___getLockOwner());
@@ -97,7 +97,7 @@ public class FatMonoBetaTransaction_prepareTest {
         write.value++;
         tx.prepare();
 
-        assertPrepared(tx);
+        assertIsPrepared(tx);
 
         assertLocked(ref);
         assertSame(tx, ref.___getLockOwner());
@@ -116,7 +116,7 @@ public class FatMonoBetaTransaction_prepareTest {
         LongRefTranlocal write = tx.openForWrite(ref, true);
         tx.prepare();
 
-        assertPrepared(tx);
+        assertIsPrepared(tx);
 
         assertLocked(ref);
         assertSame(tx, ref.___getLockOwner());
@@ -162,7 +162,7 @@ public class FatMonoBetaTransaction_prepareTest {
         tx.openForConstruction(ref);
         tx.prepare();
 
-        assertPrepared(tx);
+        assertIsPrepared(tx);
         assertSame(tx, ref.___getLockOwner());
         assertLocked(ref);
         assertSurplus(1, ref);
@@ -225,7 +225,7 @@ public class FatMonoBetaTransaction_prepareTest {
         tx.prepare();
 
         tx.prepare();
-        assertPrepared(tx);
+        assertIsPrepared(tx);
 
         assertLocked(ref);
         assertSame(tx, ref.___getLockOwner());

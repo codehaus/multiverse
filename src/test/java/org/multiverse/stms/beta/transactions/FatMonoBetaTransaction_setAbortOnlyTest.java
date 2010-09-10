@@ -38,7 +38,7 @@ public class FatMonoBetaTransaction_setAbortOnlyTest {
         } catch (PreparedTransactionException expected) {
         }
 
-        assertPrepared(tx);
+        assertIsPrepared(tx);
         assertFalse((Boolean) getField(tx, "abortOnly"));
     }
 

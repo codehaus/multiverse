@@ -3,6 +3,7 @@ package org.multiverse.stms.beta;
 import org.multiverse.api.*;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.references.RefFactory;
 import org.multiverse.api.references.RefFactoryBuilder;
 import org.multiverse.durability.SimpleStorage;
 import org.multiverse.durability.Storage;
@@ -25,6 +26,7 @@ public final class BetaStm implements Stm {
     private final SimpleStorage storage;
     public final SimpleProfiler simpleProfiler = new SimpleProfiler();
     private final StmCallback callback;
+    public final BetaRefFactoryImpl defaultRefFactory = new BetaRefFactoryImpl();
 
     public BetaStm() {
         this(1, null);
@@ -59,7 +61,7 @@ public final class BetaStm implements Stm {
     }
 
     @Override
-    public RefFactoryBuilder getReferenceFactoryBuilder() {
+    public BetaRefFactoryBuilder getReferenceFactoryBuilder() {
         return new BetaRefFactoryBuilderImpl();
     }
 
@@ -90,6 +92,11 @@ public final class BetaStm implements Stm {
         public BetaRefFactory build() {
             return new BetaRefFactoryImpl();
         }
+    }
+
+    @Override
+    public BetaRefFactory getDefaultRefFactory() {
+        return defaultRefFactory;
     }
 
     public final class BetaRefFactoryImpl implements BetaRefFactory {
