@@ -717,8 +717,15 @@ public final class BetaLongRef
         LongRefTranlocal write
             = (LongRefTranlocal)tx.openForWrite(this, false);
 
-        //todo: transaction abort.
-        write.value = function.call(write.value);
+        boolean abort = true;
+        try{
+            write.value = function.call(write.value);
+            abort = false;
+        }finally{
+            if(abort){
+                tx.abort();
+            }
+        }
         return write.value;
     }
 
@@ -819,7 +826,15 @@ public final class BetaLongRef
             = (LongRefTranlocal)tx.openForWrite(this, false);
 
         final long oldValue = write.value;
-        write.value = function.call(write.value);
+        boolean abort = true;
+        try{
+            write.value = function.call(write.value);
+            abort  = false;
+        }finally{
+            if(abort){
+                tx.abort();
+            }
+        }
         return oldValue;
     }
 

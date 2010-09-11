@@ -750,8 +750,15 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write
             = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tx.openForWrite(this, false);
 
-        //todo: transaction abort.
-        write.value = function.call(write.value);
+        boolean abort = true;
+        try{
+            write.value = function.call(write.value);
+            abort = false;
+        }finally{
+            if(abort){
+                tx.abort();
+            }
+        }
         return write.value;
     }
 
@@ -852,7 +859,15 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tx.openForWrite(this, false);
 
         final ${transactionalObject.type} oldValue = write.value;
-        write.value = function.call(write.value);
+        boolean abort = true;
+        try{
+            write.value = function.call(write.value);
+            abort  = false;
+        }finally{
+            if(abort){
+                tx.abort();
+            }
+        }
         return oldValue;
     }
 

@@ -717,8 +717,15 @@ public final class BetaIntRef
         IntRefTranlocal write
             = (IntRefTranlocal)tx.openForWrite(this, false);
 
-        //todo: transaction abort.
-        write.value = function.call(write.value);
+        boolean abort = true;
+        try{
+            write.value = function.call(write.value);
+            abort = false;
+        }finally{
+            if(abort){
+                tx.abort();
+            }
+        }
         return write.value;
     }
 
@@ -819,7 +826,15 @@ public final class BetaIntRef
             = (IntRefTranlocal)tx.openForWrite(this, false);
 
         final int oldValue = write.value;
-        write.value = function.call(write.value);
+        boolean abort = true;
+        try{
+            write.value = function.call(write.value);
+            abort  = false;
+        }finally{
+            if(abort){
+                tx.abort();
+            }
+        }
         return oldValue;
     }
 

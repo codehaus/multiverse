@@ -717,8 +717,15 @@ public  class BetaDoubleRef
         DoubleRefTranlocal write
             = (DoubleRefTranlocal)tx.openForWrite(this, false);
 
-        //todo: transaction abort.
-        write.value = function.call(write.value);
+        boolean abort = true;
+        try{
+            write.value = function.call(write.value);
+            abort = false;
+        }finally{
+            if(abort){
+                tx.abort();
+            }
+        }
         return write.value;
     }
 
@@ -819,7 +826,15 @@ public  class BetaDoubleRef
             = (DoubleRefTranlocal)tx.openForWrite(this, false);
 
         final double oldValue = write.value;
-        write.value = function.call(write.value);
+        boolean abort = true;
+        try{
+            write.value = function.call(write.value);
+            abort  = false;
+        }finally{
+            if(abort){
+                tx.abort();
+            }
+        }
         return oldValue;
     }
 

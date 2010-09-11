@@ -618,8 +618,15 @@ public final class BetaBooleanRef
         BooleanRefTranlocal write
             = (BooleanRefTranlocal)tx.openForWrite(this, false);
 
-        //todo: transaction abort.
-        write.value = function.call(write.value);
+        boolean abort = true;
+        try{
+            write.value = function.call(write.value);
+            abort = false;
+        }finally{
+            if(abort){
+                tx.abort();
+            }
+        }
         return write.value;
     }
 
@@ -720,7 +727,15 @@ public final class BetaBooleanRef
             = (BooleanRefTranlocal)tx.openForWrite(this, false);
 
         final boolean oldValue = write.value;
-        write.value = function.call(write.value);
+        boolean abort = true;
+        try{
+            write.value = function.call(write.value);
+            abort  = false;
+        }finally{
+            if(abort){
+                tx.abort();
+            }
+        }
         return oldValue;
     }
 
