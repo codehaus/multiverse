@@ -125,6 +125,7 @@ for (def closure in atomicClosures) {
 }
 
 generateAtomicBlock(engine, atomicClosures)
+generateStmUtils(engine, atomicClosures)
 
 for (def atomicBlock in atomicBlocks) {
   generateBetaAtomicBlock(engine, atomicBlock, atomicClosures)
@@ -285,6 +286,20 @@ void generateAtomicBlock(VelocityEngine engine, List<AtomicClosure> closures) {
   t.merge(context, writer)
 
   File file = new File('src/main/java/org/multiverse/api/AtomicBlock.java')
+  file.createNewFile()
+  file.text = writer.toString()
+}
+
+void generateStmUtils(VelocityEngine engine, List<AtomicClosure> closures) {
+  Template t = engine.getTemplate("src/main/java/org/multiverse/api/StmUtils.vm")
+
+  VelocityContext context = new VelocityContext()
+  context.put("closures", closures)
+
+  StringWriter writer = new StringWriter()
+  t.merge(context, writer)
+
+  File file = new File('src/main/java/org/multiverse/api/StmUtils.java')
   file.createNewFile()
   file.text = writer.toString()
 }

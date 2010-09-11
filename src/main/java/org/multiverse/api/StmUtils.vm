@@ -1,7 +1,7 @@
 package org.multiverse.api;
 
-import org.multiverse.api.closures.*;
 import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.closures.*;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.api.references.*;
@@ -21,6 +21,7 @@ public class StmUtils {
     private final static RefFactory refFactory = getGlobalStmInstance().getDefaultRefFactory();
     private final static AtomicBlock defaultAtomicBlock = getGlobalStmInstance().getDefaultAtomicBlock();
 
+#foreach($closure in $closures)
     /**
      * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
      * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
@@ -29,173 +30,20 @@ public class StmUtils {
      * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
      * InvisibleCheckedException.
      *
-     * @param closure The {AtomicClosure} to execute.
+     * @param closure The {$closure.name} to execute.
+#if(${closure.type} ne 'void')
      * @return the result of the execution
+#end
      * @throws NullPointerException if closure is null.
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
      *                                  if the closure throws a checked exception.
      */
-    public <E> E execute(AtomicClosure<E> closure){
-        return defaultAtomicBlock.execute(closure);
-    }
-
-   /**
-    * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-    * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-    * transaction (so the propagation level is Requires) and will not commit this transaction.
-    *
-    * @param closure The {AtomicClosure} to execute.
-    * @return the result of the execution
-    * @throws NullPointerException if closure is null.
-    * @throws Exception is the closure throws an Exception
-    */
-   public <E> E executeChecked(AtomicClosure<E> closure) throws Exception{
-       return defaultAtomicBlock.executeChecked(closure);
-   }
-    
-    /**
-     * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-     * transaction (so the propagation level is Requires) and will not commit this transaction.
-     *
-     * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
-     * InvisibleCheckedException.
-     *
-     * @param closure The {AtomicIntClosure} to execute.
-     * @return the result of the execution
-     * @throws NullPointerException if closure is null.
-     * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                                  if the closure throws a checked exception.
-     */
-    public  int execute(AtomicIntClosure closure){
-        return defaultAtomicBlock.execute(closure);
-    }
-
-   /**
-    * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-    * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-    * transaction (so the propagation level is Requires) and will not commit this transaction.
-    *
-    * @param closure The {AtomicIntClosure} to execute.
-    * @return the result of the execution
-    * @throws NullPointerException if closure is null.
-    * @throws Exception is the closure throws an Exception
-    */
-   public  int executeChecked(AtomicIntClosure closure) throws Exception{
-       return defaultAtomicBlock.executeChecked(closure);
-   }
-    
-    /**
-     * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-     * transaction (so the propagation level is Requires) and will not commit this transaction.
-     *
-     * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
-     * InvisibleCheckedException.
-     *
-     * @param closure The {AtomicLongClosure} to execute.
-     * @return the result of the execution
-     * @throws NullPointerException if closure is null.
-     * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                                  if the closure throws a checked exception.
-     */
-    public  long execute(AtomicLongClosure closure){
-        return defaultAtomicBlock.execute(closure);
-    }
-
-   /**
-    * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-    * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-    * transaction (so the propagation level is Requires) and will not commit this transaction.
-    *
-    * @param closure The {AtomicLongClosure} to execute.
-    * @return the result of the execution
-    * @throws NullPointerException if closure is null.
-    * @throws Exception is the closure throws an Exception
-    */
-   public  long executeChecked(AtomicLongClosure closure) throws Exception{
-       return defaultAtomicBlock.executeChecked(closure);
-   }
-    
-    /**
-     * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-     * transaction (so the propagation level is Requires) and will not commit this transaction.
-     *
-     * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
-     * InvisibleCheckedException.
-     *
-     * @param closure The {AtomicDoubleClosure} to execute.
-     * @return the result of the execution
-     * @throws NullPointerException if closure is null.
-     * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                                  if the closure throws a checked exception.
-     */
-    public  double execute(AtomicDoubleClosure closure){
-        return defaultAtomicBlock.execute(closure);
-    }
-
-   /**
-    * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-    * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-    * transaction (so the propagation level is Requires) and will not commit this transaction.
-    *
-    * @param closure The {AtomicDoubleClosure} to execute.
-    * @return the result of the execution
-    * @throws NullPointerException if closure is null.
-    * @throws Exception is the closure throws an Exception
-    */
-   public  double executeChecked(AtomicDoubleClosure closure) throws Exception{
-       return defaultAtomicBlock.executeChecked(closure);
-   }
-    
-    /**
-     * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-     * transaction (so the propagation level is Requires) and will not commit this transaction.
-     *
-     * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
-     * InvisibleCheckedException.
-     *
-     * @param closure The {AtomicBooleanClosure} to execute.
-     * @return the result of the execution
-     * @throws NullPointerException if closure is null.
-     * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                                  if the closure throws a checked exception.
-     */
-    public  boolean execute(AtomicBooleanClosure closure){
-        return defaultAtomicBlock.execute(closure);
-    }
-
-   /**
-    * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-    * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-    * transaction (so the propagation level is Requires) and will not commit this transaction.
-    *
-    * @param closure The {AtomicBooleanClosure} to execute.
-    * @return the result of the execution
-    * @throws NullPointerException if closure is null.
-    * @throws Exception is the closure throws an Exception
-    */
-   public  boolean executeChecked(AtomicBooleanClosure closure) throws Exception{
-       return defaultAtomicBlock.executeChecked(closure);
-   }
-    
-    /**
-     * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-     * transaction (so the propagation level is Requires) and will not commit this transaction.
-     *
-     * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
-     * InvisibleCheckedException.
-     *
-     * @param closure The {AtomicVoidClosure} to execute.
-     * @throws NullPointerException if closure is null.
-     * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                                  if the closure throws a checked exception.
-     */
-    public  void execute(AtomicVoidClosure closure){
+    public ${closure.typeParameter} ${closure.type} execute(${closure.name}${closure.typeParameter} closure){
+#if(${closure.type} eq 'void')
         defaultAtomicBlock.execute(closure);
+#else
+        return defaultAtomicBlock.execute(closure);
+#end
     }
 
    /**
@@ -203,14 +51,22 @@ public class StmUtils {
     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
     * transaction (so the propagation level is Requires) and will not commit this transaction.
     *
-    * @param closure The {AtomicVoidClosure} to execute.
+    * @param closure The {$closure.name} to execute.
+#if(${closure.type} ne 'void')
+    * @return the result of the execution
+#end
     * @throws NullPointerException if closure is null.
     * @throws Exception is the closure throws an Exception
     */
-   public  void executeChecked(AtomicVoidClosure closure) throws Exception{
+   public ${closure.typeParameter} ${closure.type} executeChecked(${closure.name}${closure.typeParameter} closure) throws Exception{
+#if(${closure.type} eq 'void')
        defaultAtomicBlock.executeChecked(closure);
+#else
+       return defaultAtomicBlock.executeChecked(closure);
+#end
    }
     
+#end
     /**
      * Creates a committed IntRef with the provided value using the GlobalStmInstance.
      *
