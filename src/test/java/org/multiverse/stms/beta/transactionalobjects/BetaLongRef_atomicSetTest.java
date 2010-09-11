@@ -3,7 +3,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.multiverse.api.exceptions.WriteConflict;
+import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -64,7 +64,7 @@ public class BetaLongRef_atomicSetTest {
     }
 
     @Test
-    public void whenLocked_thenWriteConflict() {
+    public void whenLocked_thenLockedException() {
         BetaLongRef ref = createLongRef(stm, 2);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
@@ -74,7 +74,7 @@ public class BetaLongRef_atomicSetTest {
         try {
             ref.atomicSet(10);
             fail();
-        } catch (WriteConflict e) {
+        } catch (LockedException e) {
 
         }
 

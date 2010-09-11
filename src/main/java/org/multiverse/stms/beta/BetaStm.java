@@ -3,8 +3,6 @@ package org.multiverse.stms.beta;
 import org.multiverse.api.*;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.api.references.RefFactory;
-import org.multiverse.api.references.RefFactoryBuilder;
 import org.multiverse.durability.SimpleStorage;
 import org.multiverse.durability.Storage;
 import org.multiverse.sensors.SimpleProfiler;
@@ -25,6 +23,8 @@ public final class BetaStm implements Stm {
     private final BetaTransactionConfiguration defaultConfig;
     private final SimpleStorage storage;
     public final SimpleProfiler simpleProfiler = new SimpleProfiler();
+    public final BackoffPolicy defaultBackoffPolicy = ExponentialBackoffPolicy.MAX_100_MS;
+    public final int defaultMaxRetries = 1000;
     private final StmCallback callback;
     public final BetaRefFactoryImpl defaultRefFactory = new BetaRefFactoryImpl();
 

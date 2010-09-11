@@ -51,8 +51,6 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         return (size * 1.0f)/array.length;
     }
 
-
-
     @Override
     public <E> RefTranlocal<E> openForRead(
         final BetaRef<E> ref, boolean lock) {
@@ -241,8 +239,6 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
      }
-
-
 
     @Override
     public  IntRefTranlocal openForRead(
@@ -433,8 +429,6 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
-
-
     @Override
     public  BooleanRefTranlocal openForRead(
         final BetaBooleanRef ref, boolean lock) {
@@ -623,8 +617,6 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
      }
-
-
 
     @Override
     public  DoubleRefTranlocal openForRead(
@@ -815,8 +807,6 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
-
-
     @Override
     public  LongRefTranlocal openForRead(
         final BetaLongRef ref, boolean lock) {
@@ -1005,8 +995,6 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
      }
-
-
 
     @Override
     public  Tranlocal openForRead(
@@ -1542,35 +1530,32 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         final long listenerEra = listener.getEra();
         boolean furtherRegistrationNeeded = true;
         boolean atLeastOneRegistration = false;
-        if(size>0){
-            for(int k=0; k < array.length; k++){
-                final Tranlocal tranlocal = array[k];
+        for(int k=0; k < array.length; k++){
+            final Tranlocal tranlocal = array[k];
 
-                if(tranlocal == null){
-                    continue;
+            if(tranlocal == null){
+                continue;
+            }
+
+            array[k]=null;
+            final BetaTransactionalObject owner = tranlocal.owner;
+
+            if(furtherRegistrationNeeded){
+                switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
+                    case REGISTRATION_DONE:
+                        atLeastOneRegistration = true;
+                        break;
+                    case REGISTRATION_NOT_NEEDED:
+                        furtherRegistrationNeeded = false;
+                        atLeastOneRegistration = true;
+                        break;
+                    case REGISTRATION_NONE:
+                        break;
+                    default:
+                        throw new IllegalStateException();
                 }
 
-                array[k]=null;
-
-                final BetaTransactionalObject owner = tranlocal.owner;
-
-                if(furtherRegistrationNeeded){
-                    switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
-                        case REGISTRATION_DONE:
-                            atLeastOneRegistration = true;
-                            break;
-                        case REGISTRATION_NOT_NEEDED:
-                            furtherRegistrationNeeded = false;
-                            atLeastOneRegistration = true;
-                            break;
-                        case REGISTRATION_NONE:
-                            break;
-                        default:
-                            throw new IllegalStateException();
-                    }
-
-                    owner.___abort(this, tranlocal, pool);
-                }
+                owner.___abort(this, tranlocal, pool);
             }
         }
 

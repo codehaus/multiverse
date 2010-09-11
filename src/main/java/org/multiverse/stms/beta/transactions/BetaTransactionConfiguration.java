@@ -43,10 +43,10 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     public int minimalArrayTreeSize = 4;
     public boolean trackReads = true;
     public boolean blockingAllowed = true;
-    public int maxRetries = 1000;
+    public int maxRetries;
     public boolean speculativeConfigEnabled = true;
     public int maxArrayTransactionSize;
-    public BackoffPolicy backoffPolicy = ExponentialBackoffPolicy.MAX_100_MS;
+    public BackoffPolicy backoffPolicy;
     public long timeoutNs = Long.MAX_VALUE;
     public TraceLevel traceLevel = TraceLevel.None;
     public boolean writeSkewAllowed = true;
@@ -63,6 +63,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
             throw new NullPointerException();
         }
         this.stm = stm;
+        this.backoffPolicy = ExponentialBackoffPolicy.MAX_100_MS;
+        this.maxRetries = stm.defaultMaxRetries;
         this.familyName = familyName;
         this.isAnonymous = isAnonymous;
         this.stmCallback = stm.getCallback();
@@ -77,6 +79,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         }
 
         this.stm = stm;
+        this.maxRetries = stm.defaultMaxRetries;
+        this.backoffPolicy = ExponentialBackoffPolicy.MAX_100_MS;
         this.familyName = "anonymoustransaction-" + idGenerator.incrementAndGet();
         this.isAnonymous = true;
         this.globalConflictCounter = stm.getGlobalConflictCounter();

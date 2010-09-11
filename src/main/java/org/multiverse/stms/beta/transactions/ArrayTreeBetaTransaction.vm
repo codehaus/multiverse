@@ -56,7 +56,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     }
 
 #foreach($ref in $transactionalObjects)
-
 #if(!${transaction.lean})
     private ${ref.typeParameter} void flattenCommute(
         final ${ref.name}${ref.typeParameter} ref,
@@ -95,8 +94,8 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             }
         }
     }
-#end
 
+#end
     @Override
     public ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForRead(
         final ${ref.name}${ref.typeParameter} ref, boolean lock) {
@@ -909,35 +908,32 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         final long listenerEra = listener.getEra();
         boolean furtherRegistrationNeeded = true;
         boolean atLeastOneRegistration = false;
-        if(size>0){
-            for(int k=0; k < array.length; k++){
-                final Tranlocal tranlocal = array[k];
+        for(int k=0; k < array.length; k++){
+            final Tranlocal tranlocal = array[k];
 
-                if(tranlocal == null){
-                    continue;
+            if(tranlocal == null){
+                continue;
+            }
+
+            array[k]=null;
+            final BetaTransactionalObject owner = tranlocal.owner;
+
+            if(furtherRegistrationNeeded){
+                switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
+                    case REGISTRATION_DONE:
+                        atLeastOneRegistration = true;
+                        break;
+                    case REGISTRATION_NOT_NEEDED:
+                        furtherRegistrationNeeded = false;
+                        atLeastOneRegistration = true;
+                        break;
+                    case REGISTRATION_NONE:
+                        break;
+                    default:
+                        throw new IllegalStateException();
                 }
 
-                array[k]=null;
-
-                final BetaTransactionalObject owner = tranlocal.owner;
-
-                if(furtherRegistrationNeeded){
-                    switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
-                        case REGISTRATION_DONE:
-                            atLeastOneRegistration = true;
-                            break;
-                        case REGISTRATION_NOT_NEEDED:
-                            furtherRegistrationNeeded = false;
-                            atLeastOneRegistration = true;
-                            break;
-                        case REGISTRATION_NONE:
-                            break;
-                        default:
-                            throw new IllegalStateException();
-                    }
-
-                    owner.___abort(this, tranlocal, pool);
-                }
+                owner.___abort(this, tranlocal, pool);
             }
         }
 

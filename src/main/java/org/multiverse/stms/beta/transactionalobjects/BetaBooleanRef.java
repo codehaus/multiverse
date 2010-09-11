@@ -4,8 +4,9 @@ import org.multiverse.api.LockStatus;
 import org.multiverse.api.StmUtils;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.exceptions.AtomicOperationException;
+import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.api.exceptions.WriteConflict;
 import org.multiverse.api.functions.BooleanFunction;
 import org.multiverse.api.references.BooleanRef;
 import org.multiverse.stms.beta.BetaObjectPool;
@@ -92,7 +93,7 @@ public final class BetaBooleanRef
             new BooleanRefTranlocal(this);
 
         if(stm == null){
-            throw new NullPointerException();
+            throw new NullPointerException("Stm can't be null");
         }
 
         this.___stm = stm;
@@ -175,7 +176,7 @@ public final class BetaBooleanRef
             return ___active;
         }
 
-        final int arriveStatus = ___tryLockAndArrive(spinCount);
+        final int arriveStatus = ___tryLockAndArrive(___stm.spinCount);
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
             return  BooleanRefTranlocal.LOCKED;
         }
@@ -560,7 +561,7 @@ public final class BetaBooleanRef
             return;
         }
 
-        atomicAlterAndGet(function);
+        atomicAlter(function, false);
     }
 
     @Override
@@ -582,7 +583,7 @@ public final class BetaBooleanRef
     public final boolean atomicAlterAndGet(
         final BooleanFunction function){
 
-        throw new TodoException();
+        return atomicAlter(function, false);
     }
 
     @Override
@@ -611,12 +612,13 @@ public final class BetaBooleanRef
 
         if(function == null){
             tx.abort();
-            throw new NullPointerException();
+            throw new NullPointerException("Function can't be null");
         }
 
         BooleanRefTranlocal write
             = (BooleanRefTranlocal)tx.openForWrite(this, false);
 
+        //todo: transaction abort.
         write.value = function.call(write.value);
         return write.value;
     }
@@ -625,7 +627,63 @@ public final class BetaBooleanRef
     public final boolean atomicGetAndAlter(
         final BooleanFunction function){
 
-        throw new TodoException();
+        return atomicAlter(function,true);
+    }
+
+    private final boolean atomicAlter(
+        final BooleanFunction function,
+        final boolean returnOld){
+
+        if(function == null){
+            throw new NullPointerException("Function can't be null");
+        }
+
+        final int arriveStatus = ___arriveAndLockOrBackoff();
+
+        if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
+            throw new LockedException();
+        }
+
+        final BooleanRefTranlocal oldActive = ___active;
+
+        final boolean oldValue = oldActive.value;
+        boolean newValue;
+        boolean abort = true;
+        try{
+            newValue = function.call(oldValue);
+            abort = false;
+        }finally{
+            if(abort){
+                ___departAfterFailureAndUnlock();
+            }
+        }
+
+        if(oldValue == newValue){
+            if(arriveStatus == ARRIVE_READBIASED){
+                ___unlockByReadBiased();
+            } else{
+                ___departAfterReadingAndUnlock();
+            }
+
+            return oldValue;
+        }
+
+        final BetaObjectPool pool = getThreadLocalBetaObjectPool();
+        BooleanRefTranlocal update = pool.take(this);
+        if(update == null){
+            update = new BooleanRefTranlocal(this);
+        }
+
+        update.value = newValue;
+        update.prepareForCommit();
+        ___active = update;
+        long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
+        if (remainingSurplus == 0) {
+            //nobody is using the tranlocal anymore, so pool it.
+            pool.put(oldActive);
+        }
+
+        return returnOld ? oldValue : newValue;
     }
 
     @Override
@@ -634,7 +692,7 @@ public final class BetaBooleanRef
 
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
+        if(tx != null && tx.isAlive()){
             return getAndAlter((BetaTransaction)tx, function);
         }
 
@@ -655,13 +713,13 @@ public final class BetaBooleanRef
 
         if(function == null){
             tx.abort();
-            throw new NullPointerException();
+            throw new NullPointerException("Function can't be null");
         }
 
         BooleanRefTranlocal write
             = (BooleanRefTranlocal)tx.openForWrite(this, false);
 
-        boolean oldValue = write.value;
+        final boolean oldValue = write.value;
         write.value = function.call(write.value);
         return oldValue;
     }
@@ -671,7 +729,36 @@ public final class BetaBooleanRef
         final boolean oldValue,
         final boolean newValue){
 
-        throw new TodoException();
+        final int arriveStatus = ___arriveAndLockOrBackoff();
+
+        if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
+            throw new LockedException();
+        }
+
+        final BooleanRefTranlocal oldActive = ___active;
+
+        if(oldActive.value != newValue){
+            ___departAfterFailureAndUnlock();
+            return false;
+        }
+
+        //lets create a tranlocal for the update.
+        final BetaObjectPool pool = getThreadLocalBetaObjectPool();
+        BooleanRefTranlocal update = pool.take(this);
+        if(update == null){
+            update = new BooleanRefTranlocal(this);
+        }
+
+        update.value = newValue;
+        update.prepareForCommit();
+        ___active = update;
+        long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
+        if (remainingSurplus == 0) {
+            //nobody is using the tranlocal anymore, so pool it.
+            pool.put(oldActive);
+        }
+
+        return true;
     }
 
     @Override
@@ -721,11 +808,11 @@ public final class BetaBooleanRef
         BooleanRefTranlocal read = ___load(___stm.spinCount);
 
         if(read == null){
-            throw new IllegalStateException();
+            throw new AtomicOperationException();
         }
 
         if(read.isLocked){
-            throw new IllegalStateException("Can't read locked reference");
+            throw new LockedException("Can't read locked reference");
         }
 
         boolean result = read.value;
@@ -745,17 +832,15 @@ public final class BetaBooleanRef
 
     @Override
     public final boolean atomicGetAndSet(final boolean newValue){
-        final int arriveStatus = ___tryLockAndArrive(___stm.spinCount);
+        final int arriveStatus = ___arriveAndLockOrBackoff();
 
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
-            //a new instance is thrown because there probably is no transactional block surrounding it
-            //that does a retry.
-            throw new WriteConflict();
+            throw new LockedException();
         }
 
         final BooleanRefTranlocal oldActive = ___active;
-
-        if(oldActive.value == newValue){
+        final boolean oldValue = oldActive.value;
+        if(oldValue == newValue){
             if(arriveStatus == ARRIVE_READBIASED){
                 ___unlockByReadBiased();
             } else{
@@ -782,7 +867,7 @@ public final class BetaBooleanRef
             pool.put(oldActive);
         }
 
-        return oldActive.value;
+        return oldValue;
     }
 
     @Override
@@ -794,9 +879,7 @@ public final class BetaBooleanRef
         final BetaTransaction tx,
         final boolean value){
 
-        BooleanRefTranlocal write = tx.openForWrite(this, false);
-        boolean oldValue = write.value;
-        write.value = value;
+        tx.openForWrite(this, false).value = value;
         return value;
     }
 
@@ -859,10 +942,23 @@ public final class BetaBooleanRef
         }        
     }
 
+    private int ___arriveAndLockOrBackoff(){
+        for(int k=0;k<=___stm.defaultMaxRetries;k++){
+            final int arriveStatus = ___tryLockAndArrive(___stm.spinCount);
+            if(arriveStatus != ARRIVE_LOCK_NOT_FREE){
+                return arriveStatus;
+            }
+
+            ___stm.defaultBackoffPolicy.delayedUninterruptible(k+1);
+        }
+
+        return ARRIVE_LOCK_NOT_FREE;
+    }
+
     @Override
     public final LockStatus getLockStatus(final Transaction tx) {
         if(tx == null){
-            throw new NullPointerException();
+            throw new NullPointerException("Transaction can't be null");
         }
 
         BetaTransaction currentLockOwner = lockOwner;

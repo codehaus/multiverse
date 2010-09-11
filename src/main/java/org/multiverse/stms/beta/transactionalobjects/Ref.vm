@@ -94,7 +94,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             new ${transactionalObject.tranlocal}${transactionalObject.typeParameter}(this);
 
         if(stm == null){
-            throw new NullPointerException();
+            throw new NullPointerException("Stm can't be null");
         }
 
         this.___stm = stm;
@@ -178,7 +178,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             return ___active;
         }
 
-        final int arriveStatus = ___tryLockAndArrive(spinCount);
+        final int arriveStatus = ___tryLockAndArrive(___stm.spinCount);
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
             return  ${transactionalObject.tranlocal}.LOCKED;
         }
@@ -566,7 +566,42 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
     @Override
     public final ${transactionalObject.type} atomicIncrementAndGet(final ${transactionalObject.type} amount){
-        throw new TodoException();
+        final int arriveStatus = ___arriveAndLockOrBackoff();
+
+        if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
+            throw new LockedException();
+        }
+
+        final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} oldActive = ___active;
+        final ${transactionalObject.type} oldValue = oldActive.value;
+
+        if(amount == 0){
+            if(arriveStatus == ARRIVE_READBIASED){
+                ___unlockByReadBiased();
+            } else{
+                ___departAfterReadingAndUnlock();
+            }
+
+            return oldValue;
+        }
+
+       final BetaObjectPool pool = getThreadLocalBetaObjectPool();
+        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} update = pool.take(this);
+        if(update == null){
+            update = new ${transactionalObject.tranlocal}(this);
+        }
+
+        final ${transactionalObject.type} newValue = oldValue + amount;
+        update.value  = newValue;
+        update.prepareForCommit();
+        ___active = update;
+        long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
+        if (remainingSurplus == 0) {
+            //nobody is using the tranlocal anymore, so pool it.
+            pool.put(oldActive);
+        }
+
+        return newValue; 
     }
 
     @Override
@@ -616,8 +651,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
     public final boolean isNull(final BetaTransaction tx){
-        ${transactionalObject.type} value = get(tx);
-        return value == null;
+        return get(tx) == null;
     }
 
     @Override
@@ -659,7 +693,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             return;
         }
 
-        atomicAlterAndGet(function);
+        atomicAlter(function, false);
     }
 
     @Override
@@ -681,7 +715,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public final ${transactionalObject.type} atomicAlterAndGet(
         final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
 
-        throw new TodoException();
+        return atomicAlter(function, false);
     }
 
     @Override
@@ -710,12 +744,13 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
         if(function == null){
             tx.abort();
-            throw new NullPointerException();
+            throw new NullPointerException("Function can't be null");
         }
 
         ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write
             = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tx.openForWrite(this, false);
 
+        //todo: transaction abort.
         write.value = function.call(write.value);
         return write.value;
     }
@@ -724,7 +759,63 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public final ${transactionalObject.type} atomicGetAndAlter(
         final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
 
-        throw new TodoException();
+        return atomicAlter(function,true);
+    }
+
+    private final ${transactionalObject.type} atomicAlter(
+        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function,
+        final boolean returnOld){
+
+        if(function == null){
+            throw new NullPointerException("Function can't be null");
+        }
+
+        final int arriveStatus = ___arriveAndLockOrBackoff();
+
+        if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
+            throw new LockedException();
+        }
+
+        final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} oldActive = ___active;
+
+        final ${transactionalObject.type} oldValue = oldActive.value;
+        ${transactionalObject.type} newValue;
+        boolean abort = true;
+        try{
+            newValue = function.call(oldValue);
+            abort = false;
+        }finally{
+            if(abort){
+                ___departAfterFailureAndUnlock();
+            }
+        }
+
+        if(oldValue == newValue){
+            if(arriveStatus == ARRIVE_READBIASED){
+                ___unlockByReadBiased();
+            } else{
+                ___departAfterReadingAndUnlock();
+            }
+
+            return oldValue;
+        }
+
+        final BetaObjectPool pool = getThreadLocalBetaObjectPool();
+        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} update = pool.take(this);
+        if(update == null){
+            update = new ${transactionalObject.tranlocal}(this);
+        }
+
+        update.value = newValue;
+        update.prepareForCommit();
+        ___active = update;
+        long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
+        if (remainingSurplus == 0) {
+            //nobody is using the tranlocal anymore, so pool it.
+            pool.put(oldActive);
+        }
+
+        return returnOld ? oldValue : newValue;
     }
 
     @Override
@@ -733,7 +824,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
+        if(tx != null && tx.isAlive()){
             return getAndAlter((BetaTransaction)tx, function);
         }
 
@@ -754,13 +845,13 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
         if(function == null){
             tx.abort();
-            throw new NullPointerException();
+            throw new NullPointerException("Function can't be null");
         }
 
         ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write
             = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tx.openForWrite(this, false);
 
-        ${transactionalObject.type} oldValue = write.value;
+        final ${transactionalObject.type} oldValue = write.value;
         write.value = function.call(write.value);
         return oldValue;
     }
@@ -770,7 +861,36 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final ${transactionalObject.type} oldValue,
         final ${transactionalObject.type} newValue){
 
-        throw new TodoException();
+        final int arriveStatus = ___arriveAndLockOrBackoff();
+
+        if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
+            throw new LockedException();
+        }
+
+        final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} oldActive = ___active;
+
+        if(oldActive.value != newValue){
+            ___departAfterFailureAndUnlock();
+            return false;
+        }
+
+        //lets create a tranlocal for the update.
+        final BetaObjectPool pool = getThreadLocalBetaObjectPool();
+        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} update = pool.take(this);
+        if(update == null){
+            update = new ${transactionalObject.tranlocal}(this);
+        }
+
+        update.value = newValue;
+        update.prepareForCommit();
+        ___active = update;
+        long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
+        if (remainingSurplus == 0) {
+            //nobody is using the tranlocal anymore, so pool it.
+            pool.put(oldActive);
+        }
+
+        return true;
     }
 
     @Override
@@ -820,11 +940,11 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         ${transactionalObject.tranlocal}${transactionalObject.typeParameter} read = ___load(___stm.spinCount);
 
         if(read == null){
-            throw new IllegalStateException();
+            throw new AtomicOperationException();
         }
 
         if(read.isLocked){
-            throw new IllegalStateException("Can't read locked reference");
+            throw new LockedException("Can't read locked reference");
         }
 
         ${transactionalObject.type} result = read.value;
@@ -844,17 +964,15 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
     @Override
     public final ${transactionalObject.type} atomicGetAndSet(final ${transactionalObject.type} newValue){
-        final int arriveStatus = ___tryLockAndArrive(___stm.spinCount);
+        final int arriveStatus = ___arriveAndLockOrBackoff();
 
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
-            //a new instance is thrown because there probably is no transactional block surrounding it
-            //that does a retry.
-            throw new WriteConflict();
+            throw new LockedException();
         }
 
         final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} oldActive = ___active;
-
-        if(oldActive.value == newValue){
+        final ${transactionalObject.type} oldValue = oldActive.value;
+        if(oldValue == newValue){
             if(arriveStatus == ARRIVE_READBIASED){
                 ___unlockByReadBiased();
             } else{
@@ -881,7 +999,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             pool.put(oldActive);
         }
 
-        return oldActive.value;
+        return oldValue;
     }
 
     @Override
@@ -893,9 +1011,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final BetaTransaction tx,
         final ${transactionalObject.type} value){
 
-        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write = tx.openForWrite(this, false);
-        ${transactionalObject.type} oldValue = write.value;
-        write.value = value;
+        tx.openForWrite(this, false).value = value;
         return value;
     }
 
@@ -959,10 +1075,23 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
 #end
+    private int ___arriveAndLockOrBackoff(){
+        for(int k=0;k<=___stm.defaultMaxRetries;k++){
+            final int arriveStatus = ___tryLockAndArrive(___stm.spinCount);
+            if(arriveStatus != ARRIVE_LOCK_NOT_FREE){
+                return arriveStatus;
+            }
+
+            ___stm.defaultBackoffPolicy.delayedUninterruptible(k+1);
+        }
+
+        return ARRIVE_LOCK_NOT_FREE;
+    }
+
     @Override
     public final LockStatus getLockStatus(final Transaction tx) {
         if(tx == null){
-            throw new NullPointerException();
+            throw new NullPointerException("Transaction can't be null");
         }
 
         BetaTransaction currentLockOwner = lockOwner;

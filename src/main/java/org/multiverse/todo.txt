@@ -87,8 +87,6 @@ performance.
 
 - create an orec that never become readbiased (useful for performance comparison).
 
-
-
 todo
 
 - can it be that there is an isolation problem on the load in combination with pooling? because a tranlocal
@@ -172,9 +170,13 @@ the task not being executed at all.
 
 - generate the refs/reffactory instead of writing them manually.
 
-- refs & atomic methods
+- ref atomic-compareand swap
 
-- refs & transaction required methods.
+- ref atomic getandalter
+
+- ref atomic alter and get
+
+- ref atomic inc
 
 - should the retry by added to the transaction? Makes it easier to figure out when a retry is done when
 and not allowed. So not throw the retry error immediately..
@@ -186,95 +188,5 @@ and not allowed. So not throw the retry error immediately..
 - listeners are not cleaned after abort/commit, so still a potential memory leak
 
 done
-
-- the nodes for the commute functions need to be pooled.
-
-- testing: mono transaction and conflict counter setting
-
-- testing: array transaction and conflict counter setting
-
-- support for a booleanref (can be based on the int-ref functionality since a boolean internally is represented
-as a int).
-
-- support for a doubleref
-
-- ref and await
-
-- abort commute on nullpointer function
-
-- getAndAlter & alterAndGet.
-
-- stm needs to be integrated in the ref as field.. so each ref has access to the stm it is part of.
-
-- test of boxing vs non boxing.. so ref vs longref.
-
-- get without arguments needs to be exposed in ref
-
-- set with value needs to be exposed in ref.
-
-- alter needs to be exposed in ref.
-
-- expose the ref
-
-- place part of the objectpool in the transaction? This prevents it from needing to be retrieved every time.
-
-- BetaObjectPool -> BetaTransactionPool
-
-- BetaTransactionContentPool -> BetaObjectPool
-
-- when commute function is evaluated, there should be protection against openForXXX on transaction.
-
-- openForRead & commute and readconflict
-
-- openForWrite & commute and readconflict
-
-- cleaned up registerChangeListener and abort, logic for what type of registration is now completely
-  in the ref itself.
-
- - when a commuting function fails, the transaction should be aborted.
-
-- mono transaction: simplify openForRead & commute
-
-- array tree transaction: simplified openForRead & commute
-
-- array transaction: simplified openForRead & commute
-
-- problem with PessimisticLock.Write and commitDirty since the dirty flag is not set (and no changes written).
-
-- registerAndAbort: doesn't deal with commuting values correctly. it sees it as a correct read
-
-- deadlock stress test should be modified with different levels of locking.
-
-- testing: commute & overflow of array
-
-- testing: commute & overflow of mono
-
-- testing: commute: check if conflict counters are set correctly when an addCommute is done
-
-- benchmark scripts moved to separate directory
-
-- initial support for externalizing the refs added.
-
-- gradle build script
-
-- expose if lock is free
-
-- expose if lock is owned by current transaction
-
-- expose if lock is owned by other transaction
-
-- atomic inc on refs for values
-
-- benchmarks removed from main src.
-
-- benchmarks scripts update to point to gradle & to test classes
-
-- transaction.prepareForPooling & add it to objectpool.
-   - make sure that the object that are pooled, are not a potential source of memory leaks. E.g. transactions
-   still holding references to old data.
-
-- reftranlocal is now guaranteed not to contain any state.
-
-old done
 
 

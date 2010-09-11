@@ -98,7 +98,7 @@ public interface Orec extends BetaStmConstants {
      *
      * @return the remaining surplus
      * @throws org.multiverse.api.exceptions.PanicError
-     *          if surplus is 0, or readbiased, or not locked.
+     *          if not locked, or when there is no surplus
      */
     long ___departAfterFailureAndUnlock();
 

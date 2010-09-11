@@ -52,7 +52,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         return (size * 1.0f)/array.length;
     }
 
-
     private <E> void flattenCommute(
         final BetaRef<E> ref,
         final RefTranlocal<E> tranlocal,
@@ -339,7 +338,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
          result.value = function.call(result.value);
      }
-
 
     private  void flattenCommute(
         final BetaIntRef ref,
@@ -628,7 +626,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
          result.value = function.call(result.value);
      }
 
-
     private  void flattenCommute(
         final BetaBooleanRef ref,
         final BooleanRefTranlocal tranlocal,
@@ -915,7 +912,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
          result.value = function.call(result.value);
      }
-
 
     private  void flattenCommute(
         final BetaDoubleRef ref,
@@ -1204,7 +1200,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
          result.value = function.call(result.value);
      }
 
-
     private  void flattenCommute(
         final BetaLongRef ref,
         final LongRefTranlocal tranlocal,
@@ -1491,7 +1486,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
          result.value = function.call(result.value);
      }
-
 
     private  void flattenCommute(
         final BetaTransactionalObject ref,
@@ -2195,35 +2189,32 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         final long listenerEra = listener.getEra();
         boolean furtherRegistrationNeeded = true;
         boolean atLeastOneRegistration = false;
-        if(size>0){
-            for(int k=0; k < array.length; k++){
-                final Tranlocal tranlocal = array[k];
+        for(int k=0; k < array.length; k++){
+            final Tranlocal tranlocal = array[k];
 
-                if(tranlocal == null){
-                    continue;
+            if(tranlocal == null){
+                continue;
+            }
+
+            array[k]=null;
+            final BetaTransactionalObject owner = tranlocal.owner;
+
+            if(furtherRegistrationNeeded){
+                switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
+                    case REGISTRATION_DONE:
+                        atLeastOneRegistration = true;
+                        break;
+                    case REGISTRATION_NOT_NEEDED:
+                        furtherRegistrationNeeded = false;
+                        atLeastOneRegistration = true;
+                        break;
+                    case REGISTRATION_NONE:
+                        break;
+                    default:
+                        throw new IllegalStateException();
                 }
 
-                array[k]=null;
-
-                final BetaTransactionalObject owner = tranlocal.owner;
-
-                if(furtherRegistrationNeeded){
-                    switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
-                        case REGISTRATION_DONE:
-                            atLeastOneRegistration = true;
-                            break;
-                        case REGISTRATION_NOT_NEEDED:
-                            furtherRegistrationNeeded = false;
-                            atLeastOneRegistration = true;
-                            break;
-                        case REGISTRATION_NONE:
-                            break;
-                        default:
-                            throw new IllegalStateException();
-                    }
-
-                    owner.___abort(this, tranlocal, pool);
-                }
+                owner.___abort(this, tranlocal, pool);
             }
         }
 

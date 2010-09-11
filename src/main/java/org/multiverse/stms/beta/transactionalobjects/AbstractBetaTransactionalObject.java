@@ -140,7 +140,7 @@ public abstract class AbstractBetaTransactionalObject
             return ___active;
         }
 
-        final int arriveStatus = ___tryLockAndArrive(spinCount);
+        final int arriveStatus = ___tryLockAndArrive(___stm.spinCount);
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
             return  Tranlocal.LOCKED;
         }
@@ -471,10 +471,23 @@ public abstract class AbstractBetaTransactionalObject
         }
     }
 
+    private int ___arriveAndLockOrBackoff(){
+        for(int k=0;k<=___stm.defaultMaxRetries;k++){
+            final int arriveStatus = ___tryLockAndArrive(___stm.spinCount);
+            if(arriveStatus != ARRIVE_LOCK_NOT_FREE){
+                return arriveStatus;
+            }
+
+            ___stm.defaultBackoffPolicy.delayedUninterruptible(k+1);
+        }
+
+        return ARRIVE_LOCK_NOT_FREE;
+    }
+
     @Override
     public final LockStatus getLockStatus(final Transaction tx) {
         if(tx == null){
-            throw new NullPointerException();
+            throw new NullPointerException("Transaction can't be null");
         }
 
         BetaTransaction currentLockOwner = lockOwner;
