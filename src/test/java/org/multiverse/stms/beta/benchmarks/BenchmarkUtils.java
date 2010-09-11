@@ -1,4 +1,4 @@
-package org.multiverse.benchmarks;
+package org.multiverse.stms.beta.benchmarks;
 
 import java.text.NumberFormat;
 import java.util.*;

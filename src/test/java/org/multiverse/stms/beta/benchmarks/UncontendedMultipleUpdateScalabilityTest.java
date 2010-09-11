@@ -1,4 +1,4 @@
-package org.multiverse.benchmarks;
+package org.multiverse.stms.beta.benchmarks;
 
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -9,10 +9,10 @@ import org.multiverse.stms.beta.transactions.FatArrayTreeBetaTransaction;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import static org.multiverse.benchmarks.BenchmarkUtils.toGnuplot;
-import static org.multiverse.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
 import static org.multiverse.stms.beta.BetaStmUtils.createReadBiasedLongRef;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
+import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.toGnuplot;
+import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
 
 public class UncontendedMultipleUpdateScalabilityTest {
 

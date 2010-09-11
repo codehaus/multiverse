@@ -7,7 +7,7 @@ package org.multiverse.api.functions;
  */
 public final class IncLongFunction extends LongFunction {
 
-    public final static IncLongFunction INSTANCE = new IncLongFunction();
+    public final static IncLongFunction INSTANCE_INC_ONE = new IncLongFunction();
 
     private final long inc;
 

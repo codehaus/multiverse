@@ -354,7 +354,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
         BetaLongRef ref = createLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
-        tx.commute(ref, IncLongFunction.INSTANCE);
+        tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
         tx.commit();
 
         assertIsCommitted(tx);
@@ -371,7 +371,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
         BetaLongRef ref = createLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
-        tx.commute(ref, IncLongFunction.INSTANCE);
+        tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
         tx.commit();
 
         assertIsCommitted(tx);
@@ -386,8 +386,8 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         BetaLongRef ref1 = createLongRef(stm);
         BetaLongRef ref2 = createLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.commute(ref1, IncLongFunction.INSTANCE);
-        tx.commute(ref2, IncLongFunction.INSTANCE);
+        tx.commute(ref1, IncLongFunction.INSTANCE_INC_ONE);
+        tx.commute(ref2, IncLongFunction.INSTANCE_INC_ONE);
         tx.commit();
 
         assertIsCommitted(tx);
@@ -408,9 +408,9 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
         BetaLongRef ref = createLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
-        tx.commute(ref, IncLongFunction.INSTANCE);
-        tx.commute(ref, IncLongFunction.INSTANCE);
-        tx.commute(ref, IncLongFunction.INSTANCE);
+        tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
+        tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
+        tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
         tx.commit();
 
         assertIsCommitted(tx);
@@ -431,7 +431,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         otherTx.openForWrite(ref2, false).value++;
         otherTx.commit();
 
-        tx.commute(ref2, IncLongFunction.INSTANCE);
+        tx.commute(ref2, IncLongFunction.INSTANCE_INC_ONE);
         tx.commit();
 
         assertIsCommitted(tx);
@@ -449,7 +449,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
     public void whenCommuteAndLockedByOtherTransaction_thenWriteConflict() {
         BetaLongRef ref = createLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.commute(ref, IncLongFunction.INSTANCE);
+        tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, true);

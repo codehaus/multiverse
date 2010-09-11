@@ -6,7 +6,7 @@ import org.multiverse.TestThread;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
-import static org.multiverse.benchmarks.BenchmarkUtils.*;
+import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
 /**
  * IterationCount is set to a low value because the counter still isn't scalable.

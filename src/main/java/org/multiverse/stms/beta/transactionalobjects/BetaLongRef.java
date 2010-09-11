@@ -128,15 +128,19 @@ public final class BetaLongRef
         //because an arrive is done, and as long as there is at least 1 arive, the orec never can become readbiased.
 
         while (true) {
-            //JMM: nothing can jump over the following statement.
+            //JMM: nothing can jump behind the following statement
             LongRefTranlocal read = ___active;
 
-            //JMM:
+            //JMM: the read for the arrive can't jump over the read of the active.
             final int arriveStatus = ___arrive(spinCount);
 
             if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
                 return LongRefTranlocal.LOCKED;
             }
+
+            //as long as there are readers (done after the arrive), the read tranlocal can't be pooled.
+            //So after the arrive is done, we don't need to worry about the tranlocal to re-appear as reused
+            //tranlocal. This means that the read/arrive/read mechanism doesn't cause problems with pooling.
 
             //JMM safety:
             //The volatile read of active can't be reordered so that it jump in front of the volatile read of
@@ -533,7 +537,7 @@ public final class BetaLongRef
     public final long getAndIncrement(final long amount){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
+        if(tx != null && tx.isAlive()){
             return getAndIncrement((BetaTransaction)tx, amount);
         }
 
@@ -562,7 +566,7 @@ public final class BetaLongRef
     public final long incrementAndGet(final long amount){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
+        if(tx != null && tx.isAlive()){
             return incrementAndGet((BetaTransaction)tx, amount);
         }
 
@@ -813,10 +817,9 @@ public final class BetaLongRef
             throw new WriteConflict();
         }
 
-        final BetaObjectPool pool = getThreadLocalBetaObjectPool();
         final LongRefTranlocal oldActive = ___active;
 
-        if(oldActive.value== newValue){
+        if(oldActive.value == newValue){
             if(arriveStatus == ARRIVE_READBIASED){
                 ___unlockByReadBiased();
             } else{
@@ -827,6 +830,7 @@ public final class BetaLongRef
         }
 
         //lets create a tranlocal for the update.
+        final BetaObjectPool pool = getThreadLocalBetaObjectPool();               
         LongRefTranlocal update = pool.take(this);
         if(update == null){
             update = new LongRefTranlocal(this);
@@ -914,7 +918,7 @@ public final class BetaLongRef
         final long value){
 
         LongRefTranlocal read = tx.openForRead(this,false);
-        if(read.value!=value){
+        if(read.value != value){
             StmUtils.retry();
         }        
     }

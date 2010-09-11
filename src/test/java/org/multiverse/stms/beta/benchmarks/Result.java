@@ -1,4 +1,4 @@
-package org.multiverse.benchmarks;
+package org.multiverse.stms.beta.benchmarks;
 
 /**
  * @author Peter Veentjer

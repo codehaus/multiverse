@@ -258,9 +258,9 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.commute(ref, IncLongFunction.INSTANCE);
-        tx.commute(ref, IncLongFunction.INSTANCE);
-        tx.commute(ref, IncLongFunction.INSTANCE);
+        tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
+        tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
+        tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
         tx.prepare();
 
         LongRefTranlocal commute = (LongRefTranlocal) tx.get(ref);
@@ -286,9 +286,9 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
         BetaLongRef ref3 = createLongRef(stm, 30);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.commute(ref1, IncLongFunction.INSTANCE);
-        tx.commute(ref2, IncLongFunction.INSTANCE);
-        tx.commute(ref3, IncLongFunction.INSTANCE);
+        tx.commute(ref1, IncLongFunction.INSTANCE_INC_ONE);
+        tx.commute(ref2, IncLongFunction.INSTANCE_INC_ONE);
+        tx.commute(ref3, IncLongFunction.INSTANCE_INC_ONE);
         tx.prepare();
 
         LongRefTranlocal commute1 = (LongRefTranlocal) tx.get(ref1);
@@ -311,7 +311,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setDirtyCheckEnabled(false);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
-        tx.commute(ref, IncLongFunction.INSTANCE);
+        tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
         tx.prepare();
 
         LongRefTranlocal commute = (LongRefTranlocal) tx.get(ref);
@@ -337,7 +337,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setDirtyCheckEnabled(true);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
-        tx.commute(ref, IncLongFunction.INSTANCE);
+        tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
         tx.prepare();
 
         LongRefTranlocal commute = (LongRefTranlocal) tx.get(ref);
@@ -361,7 +361,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.commute(ref, IncLongFunction.INSTANCE);
+        tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, true);
@@ -386,7 +386,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
         BetaLongRef ref = createLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.commute(ref, IncLongFunction.INSTANCE);
+        tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForWrite(ref, false).value++;

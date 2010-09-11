@@ -46,7 +46,7 @@ public class BetaLongRef_alterAndGet1Test {
     public void whenActiveTransactionAvailable() {
         BetaLongRef ref = createLongRef(stm);
 
-        LongFunction function = IncLongFunction.INSTANCE;
+        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 

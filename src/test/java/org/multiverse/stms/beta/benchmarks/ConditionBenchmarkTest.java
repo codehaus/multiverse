@@ -1,24 +1,31 @@
-package org.multiverse.benchmarks;
+package org.multiverse.stms.beta.benchmarks;
 
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
 import static org.junit.Assert.assertEquals;
 
-public class IntrinsicLockBenchmark {
+public class ConditionBenchmarkTest {
 
     private volatile boolean stop = false;
     private final int threadCount = 2;
     private volatile long value;
+    private ReentrantLock lock;
+    private Condition condition;
 
     @Before
     public void setUp() {
         stop = false;
+        lock = new ReentrantLock();
+        condition = lock.newCondition();
     }
 
-    @Ignore
     @Test
+    @Ignore
     public void test() throws InterruptedException {
         PingPongThread[] threads = createThreads();
 
@@ -35,13 +42,14 @@ public class IntrinsicLockBenchmark {
         }
 
         assertEquals(sum(threads), value);
+
     }
 
     private PingPongThread[] createThreads() {
         PingPongThread[] threads = new PingPongThread[threadCount];
-        Object lock = new Object();
+
         for (int k = 0; k < threads.length; k++) {
-            threads[k] = new PingPongThread(k, lock);
+            threads[k] = new PingPongThread(k);
         }
         return threads;
     }
@@ -58,12 +66,10 @@ public class IntrinsicLockBenchmark {
         private final int id;
         private long count;
         private int expected;
-        private final Object lock;
 
-        public PingPongThread(int id, Object lock) {
+        public PingPongThread(int id) {
             super("PingPongThread-" + id);
             this.id = id;
-            this.lock = lock;
         }
 
         @Override
@@ -73,16 +79,19 @@ public class IntrinsicLockBenchmark {
                     System.out.println(getName() + " " + count);
                 }
 
-                synchronized (lock) {
+                lock.lock();
+                try {
                     while (value % threadCount != id) {
                         try {
-                            lock.wait();
+                            condition.await();
                         } catch (InterruptedException ignore) {
                         }
                     }
                     value++;
 
-                    lock.notifyAll();
+                    condition.signalAll();
+                } finally {
+                    lock.unlock();
                 }
 
                 expected += threadCount;
@@ -90,5 +99,4 @@ public class IntrinsicLockBenchmark {
             }
         }
     }
-
 }

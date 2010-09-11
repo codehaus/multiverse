@@ -117,7 +117,7 @@ public class LongRef_commute2Test {
     @Test
     public void whenSuccess() {
         BetaLongRef ref = createLongRef(stm, 10);
-        LongFunction function = IncLongFunction.INSTANCE;
+        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
         BetaTransaction tx = stm.startDefaultTransaction();
 
         ref.commute(tx, function);
@@ -135,7 +135,7 @@ public class LongRef_commute2Test {
 
         BetaTransaction tx1 = stm.startDefaultTransaction();
         tx1.openForWrite(ref1, false).value++;
-        tx1.commute(ref2, IncLongFunction.INSTANCE);
+        tx1.commute(ref2, IncLongFunction.INSTANCE_INC_ONE);
 
         BetaTransaction tx2 = stm.startDefaultTransaction();
         tx2.openForWrite(ref2,false).value++;

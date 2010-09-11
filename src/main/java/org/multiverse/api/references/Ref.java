@@ -185,7 +185,7 @@ public interface Ref<E> extends TransactionalObject {
     E getAndAlter(Transaction tx, Function<E> function);
 
     /**
-     * Atomically. This method doesn't care about any running transactions.
+     * Executes a compare and set atomically. This method doesn't care about any running transactions.
      *
      * @param oldValue the old value.
      * @param newValue the new value.

@@ -14,8 +14,8 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
 import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
 
 public class UncontendedCommutePerformanceTest {
     private volatile boolean stop;
@@ -99,7 +99,7 @@ public class UncontendedCommutePerformanceTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    btx.commute(ref, IncLongFunction.INSTANCE);
+                    btx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
                 }
             };
 

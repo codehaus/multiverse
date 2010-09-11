@@ -91,6 +91,10 @@ performance.
 
 todo
 
+- can it be that there is an isolation problem on the load in combination with pooling? because a tranlocal
+can be pooled, the same tranlocal for different commits could be used, so the load could mistake to read an unlocked
+value even though it is locked.
+
 - atomic change methods on ref should call the backoff policy
 
 - atomic change methods on ref should deal with listeners

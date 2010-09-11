@@ -27,13 +27,13 @@ public class LongRefTranlocal_addCommutingFunctionTest {
     public void whenFirstAddition() {
         BetaLongRef ref = createLongRef(stm);
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
-        tranlocal.addCommutingFunction(IncLongFunction.INSTANCE, pool);
+        tranlocal.addCommutingFunction(IncLongFunction.INSTANCE_INC_ONE, pool);
 
         assertFalse(tranlocal.isCommitted);
         assertTrue(tranlocal.isCommuting);
         assertEquals(0, tranlocal.value);
         assertNull(tranlocal.read);
-        assertHasCommutingFunctions(tranlocal, IncLongFunction.INSTANCE);
+        assertHasCommutingFunctions(tranlocal, IncLongFunction.INSTANCE_INC_ONE);
     }
 
     @Test

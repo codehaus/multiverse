@@ -1,4 +1,4 @@
-package org.multiverse.benchmarks;
+package org.multiverse.stms.beta.benchmarks;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -13,7 +13,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.multiverse.benchmarks.BenchmarkUtils.*;
+import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
 /**
  * @author Peter Veentjer

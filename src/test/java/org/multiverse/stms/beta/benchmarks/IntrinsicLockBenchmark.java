@@ -1,31 +1,24 @@
-package org.multiverse.benchmarks;
+package org.multiverse.stms.beta.benchmarks;
 
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
-
 import static org.junit.Assert.assertEquals;
 
-public class ConditionBenchmarkTest {
+public class IntrinsicLockBenchmark {
 
     private volatile boolean stop = false;
     private final int threadCount = 2;
     private volatile long value;
-    private ReentrantLock lock;
-    private Condition condition;
 
     @Before
     public void setUp() {
         stop = false;
-        lock = new ReentrantLock();
-        condition = lock.newCondition();
     }
 
-    @Test
     @Ignore
+    @Test
     public void test() throws InterruptedException {
         PingPongThread[] threads = createThreads();
 
@@ -42,14 +35,13 @@ public class ConditionBenchmarkTest {
         }
 
         assertEquals(sum(threads), value);
-
     }
 
     private PingPongThread[] createThreads() {
         PingPongThread[] threads = new PingPongThread[threadCount];
-
+        Object lock = new Object();
         for (int k = 0; k < threads.length; k++) {
-            threads[k] = new PingPongThread(k);
+            threads[k] = new PingPongThread(k, lock);
         }
         return threads;
     }
@@ -66,10 +58,12 @@ public class ConditionBenchmarkTest {
         private final int id;
         private long count;
         private int expected;
+        private final Object lock;
 
-        public PingPongThread(int id) {
+        public PingPongThread(int id, Object lock) {
             super("PingPongThread-" + id);
             this.id = id;
+            this.lock = lock;
         }
 
         @Override
@@ -79,19 +73,16 @@ public class ConditionBenchmarkTest {
                     System.out.println(getName() + " " + count);
                 }
 
-                lock.lock();
-                try {
+                synchronized (lock) {
                     while (value % threadCount != id) {
                         try {
-                            condition.await();
+                            lock.wait();
                         } catch (InterruptedException ignore) {
                         }
                     }
                     value++;
 
-                    condition.signalAll();
-                } finally {
-                    lock.unlock();
+                    lock.notifyAll();
                 }
 
                 expected += threadCount;
@@ -99,4 +90,5 @@ public class ConditionBenchmarkTest {
             }
         }
     }
+
 }

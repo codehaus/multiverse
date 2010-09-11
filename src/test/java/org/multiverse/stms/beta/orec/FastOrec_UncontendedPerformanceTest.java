@@ -9,7 +9,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.multiverse.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
+import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
 
 /**
  * A Performance test to help to figure out if overhead can be removed from the FastOrec.

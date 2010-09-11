@@ -3,7 +3,6 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.functions.IncLongFunction;
-import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
@@ -40,20 +39,14 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
         assertEquals(100, tranlocal.value);
     }
 
-    class IdentityLongFunction extends LongFunction {
-        @Override
-        public long call(long current) {
-            return current;
-        }
-    }
-
+  
     @Test
     public void whenSingleCommutingFunction() {
         BetaLongRef ref = createLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
-        tranlocal.addCommutingFunction(IncLongFunction.INSTANCE, pool);
+        tranlocal.addCommutingFunction(IncLongFunction.INSTANCE_INC_ONE, pool);
         tranlocal.read = committed;
         tranlocal.evaluateCommutingFunctions(pool);
 
@@ -71,9 +64,9 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
-        tranlocal.addCommutingFunction(IncLongFunction.INSTANCE, pool);
-        tranlocal.addCommutingFunction(IncLongFunction.INSTANCE, pool);
-        tranlocal.addCommutingFunction(IncLongFunction.INSTANCE, pool);
+        tranlocal.addCommutingFunction(IncLongFunction.INSTANCE_INC_ONE, pool);
+        tranlocal.addCommutingFunction(IncLongFunction.INSTANCE_INC_ONE, pool);
+        tranlocal.addCommutingFunction(IncLongFunction.INSTANCE_INC_ONE, pool);
         tranlocal.read = committed;
         tranlocal.evaluateCommutingFunctions(pool);
 
