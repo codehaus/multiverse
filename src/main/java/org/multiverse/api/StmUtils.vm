@@ -38,7 +38,7 @@ public class StmUtils {
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
      *                                  if the closure throws a checked exception.
      */
-    public ${closure.typeParameter} ${closure.type} execute(${closure.name}${closure.typeParameter} closure){
+    public static ${closure.typeParameter} ${closure.type} execute(${closure.name}${closure.typeParameter} closure){
 #if(${closure.type} eq 'void')
         defaultAtomicBlock.execute(closure);
 #else
@@ -58,7 +58,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws Exception is the closure throws an Exception
     */
-   public ${closure.typeParameter} ${closure.type} executeChecked(${closure.name}${closure.typeParameter} closure) throws Exception{
+   public static ${closure.typeParameter} ${closure.type} executeChecked(${closure.name}${closure.typeParameter} closure) throws Exception{
 #if(${closure.type} eq 'void')
        defaultAtomicBlock.executeChecked(closure);
 #else

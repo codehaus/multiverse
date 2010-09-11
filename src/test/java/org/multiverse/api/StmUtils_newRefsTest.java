@@ -56,9 +56,9 @@ public class StmUtils_newRefsTest {
 
     @Test
     public void whenNewBooleanRefWithDefaultValue() {
-        LongRef ref = newLongRef();
+        BooleanRef ref = newBooleanRef();
         assertNotNull(ref);
-        assertEquals(0, ref.atomicGet());
+        assertFalse(ref.atomicGet());
     }
 
     @Test

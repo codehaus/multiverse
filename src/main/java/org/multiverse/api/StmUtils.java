@@ -35,7 +35,7 @@ public class StmUtils {
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
      *                                  if the closure throws a checked exception.
      */
-    public <E> E execute(AtomicClosure<E> closure){
+    public static <E> E execute(AtomicClosure<E> closure){
         return defaultAtomicBlock.execute(closure);
     }
 
@@ -49,7 +49,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws Exception is the closure throws an Exception
     */
-   public <E> E executeChecked(AtomicClosure<E> closure) throws Exception{
+   public static <E> E executeChecked(AtomicClosure<E> closure) throws Exception{
        return defaultAtomicBlock.executeChecked(closure);
    }
     
@@ -67,7 +67,7 @@ public class StmUtils {
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
      *                                  if the closure throws a checked exception.
      */
-    public  int execute(AtomicIntClosure closure){
+    public static  int execute(AtomicIntClosure closure){
         return defaultAtomicBlock.execute(closure);
     }
 
@@ -81,7 +81,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws Exception is the closure throws an Exception
     */
-   public  int executeChecked(AtomicIntClosure closure) throws Exception{
+   public static  int executeChecked(AtomicIntClosure closure) throws Exception{
        return defaultAtomicBlock.executeChecked(closure);
    }
     
@@ -99,7 +99,7 @@ public class StmUtils {
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
      *                                  if the closure throws a checked exception.
      */
-    public  long execute(AtomicLongClosure closure){
+    public static  long execute(AtomicLongClosure closure){
         return defaultAtomicBlock.execute(closure);
     }
 
@@ -113,7 +113,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws Exception is the closure throws an Exception
     */
-   public  long executeChecked(AtomicLongClosure closure) throws Exception{
+   public static  long executeChecked(AtomicLongClosure closure) throws Exception{
        return defaultAtomicBlock.executeChecked(closure);
    }
     
@@ -131,7 +131,7 @@ public class StmUtils {
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
      *                                  if the closure throws a checked exception.
      */
-    public  double execute(AtomicDoubleClosure closure){
+    public static  double execute(AtomicDoubleClosure closure){
         return defaultAtomicBlock.execute(closure);
     }
 
@@ -145,7 +145,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws Exception is the closure throws an Exception
     */
-   public  double executeChecked(AtomicDoubleClosure closure) throws Exception{
+   public static  double executeChecked(AtomicDoubleClosure closure) throws Exception{
        return defaultAtomicBlock.executeChecked(closure);
    }
     
@@ -163,7 +163,7 @@ public class StmUtils {
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
      *                                  if the closure throws a checked exception.
      */
-    public  boolean execute(AtomicBooleanClosure closure){
+    public static  boolean execute(AtomicBooleanClosure closure){
         return defaultAtomicBlock.execute(closure);
     }
 
@@ -177,7 +177,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws Exception is the closure throws an Exception
     */
-   public  boolean executeChecked(AtomicBooleanClosure closure) throws Exception{
+   public static  boolean executeChecked(AtomicBooleanClosure closure) throws Exception{
        return defaultAtomicBlock.executeChecked(closure);
    }
     
@@ -194,7 +194,7 @@ public class StmUtils {
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
      *                                  if the closure throws a checked exception.
      */
-    public  void execute(AtomicVoidClosure closure){
+    public static  void execute(AtomicVoidClosure closure){
         defaultAtomicBlock.execute(closure);
     }
 
@@ -207,7 +207,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws Exception is the closure throws an Exception
     */
-   public  void executeChecked(AtomicVoidClosure closure) throws Exception{
+   public static  void executeChecked(AtomicVoidClosure closure) throws Exception{
        defaultAtomicBlock.executeChecked(closure);
    }
     
