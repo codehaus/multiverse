@@ -3,7 +3,9 @@ package org.multiverse.api;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.references.*;
 
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.getRequiredThreadLocalTransaction;
 
 /**
@@ -14,6 +16,105 @@ import static org.multiverse.api.ThreadLocalTransaction.getRequiredThreadLocalTr
  * @author Peter Veentjer.
  */
 public class StmUtils {
+
+    private final static RefFactory refFactory = getGlobalStmInstance().getDefaultRefFactory();
+
+    /**
+     * Creates a committed IntRef with the provided value.
+     *
+     * @param value the initial value of the IntRef
+     * @return the created IntRef.
+     */
+    public static IntRef newIntRef(int value) {
+        return refFactory.newIntRef(value);
+    }
+
+    /**
+     * Creates a committed IntRef with 0 as initial value.
+     *
+     * @return the created IntRef.
+     */
+    public static IntRef newIntRef() {
+        return refFactory.newIntRef(0);
+    }
+
+    /**
+     * Creates a committed LongRef with 0 as initial value.
+     *
+     * @return the created LongRef.
+     */
+    public static LongRef newLongRef() {
+        return refFactory.newLongRef(0);
+    }
+
+    /**
+     * Creates a committed LongRef with the provided value.
+     *
+     * @param value the initial value of the LongRef.
+     * @return the created LongRef.
+     */
+    public static LongRef newLongRef(long value) {
+        return refFactory.newLongRef(value);
+    }
+
+    /**
+     * Creates a committed DoubleRef with 0 as initial value.
+     *
+     * @return the created DoubleRef.
+     */
+    public static DoubleRef newDoubleRef() {
+        return refFactory.newDoubleRef(0);
+    }
+
+    /**
+     * Creates a committed DoubleRef with the provided value.
+     *
+     * @param value the initial value.
+     * @return the created DoubleRef.
+     */
+    public static DoubleRef newDoubleRef(double value) {
+        return refFactory.newDoubleRef(value);
+    }
+
+    /**
+     * Creates a committed BooleanRef with false as initial value.
+     *
+     * @return the created BooleanRef.
+     */
+    public static BooleanRef newBooleanRef() {
+        return refFactory.newBooleanRef(false);
+    }
+
+    /**
+     * Creates a committed BooleanRef with the provided value.
+     *
+     * @param value the initial value
+     * @return the created BooleanRef.
+     */
+    public static BooleanRef newBooleanRef(boolean value) {
+        return refFactory.newBooleanRef(value);
+    }
+
+    /**
+     * Creates a committed Ref with null as initial value.
+     *
+     * @param <E> the type of the Ref.
+     * @return the created Ref.
+     */
+    public static <E> Ref<E> newRef() {
+        return refFactory.newRef(null);
+    }
+
+    /**
+     * Creates a committed Ref with the provided value.
+     *
+     * @param value the initial value of the Ref.
+     * @param <E>   the type of the Ref.
+     * @return the created Ref.
+     */
+    public static <E> Ref<E> newRef(E value) {
+        return refFactory.newRef(value);
+    }
 
     /**
      * Does a retry. This behavior is needed for blocking transactions; transaction that wait for a state change

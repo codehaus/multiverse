@@ -10,26 +10,26 @@ import org.multiverse.api.references.RefFactory;
 public interface BetaRefFactory extends RefFactory {
 
     @Override
-    BetaBooleanRef createBooleanRef(boolean value);
+    BetaBooleanRef newBooleanRef(boolean value);
 
     @Override
-    BetaDoubleRef createDoubleRef(double value);
+    BetaDoubleRef newDoubleRef(double value);
 
     @Override
-    BetaIntRef createIntRef(int value);
+    BetaIntRef newIntRef(int value);
 
     @Override
-    BetaIntRefArray createIntRefArray(int length);
+    BetaIntRefArray newIntRefArray(int length);
 
     @Override
-    BetaLongRef createLongRef(long value);
+    BetaLongRef newLongRef(long value);
 
     @Override
-    BetaLongRefArray createLongRefArray(int length);
+    BetaLongRefArray newLongRefArray(int length);
 
     @Override
-    <E> BetaRef<E> createRef(E value);
+    <E> BetaRef<E> newRef(E value);
 
     @Override
-    <E> BetaRefArray<E> createRefArray(int length);
+    <E> BetaRefArray<E> newRefArray(int length);
 }

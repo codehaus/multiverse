@@ -17,6 +17,10 @@ import static org.multiverse.stms.beta.ThreadLocalBetaTransactionPool.getThreadL
  */
 public final class BetaStm implements Stm {
 
+    public static BetaStm createFast(){
+        return new BetaStm();
+    }
+
     private final AtomicBlock defaultAtomicBlock;
     public final GlobalConflictCounter globalConflictCounter;
     public final int spinCount = 8;
@@ -102,22 +106,22 @@ public final class BetaStm implements Stm {
     public final class BetaRefFactoryImpl implements BetaRefFactory {
 
         @Override
-        public BetaBooleanRef createBooleanRef(boolean value) {
+        public BetaBooleanRef newBooleanRef(boolean value) {
             return new BetaBooleanRef(BetaStm.this, value);
         }
 
         @Override
-        public BetaDoubleRef createDoubleRef(double value) {
+        public BetaDoubleRef newDoubleRef(double value) {
             return new BetaDoubleRef(BetaStm.this, value);
         }
 
         @Override
-        public BetaIntRef createIntRef(int value) {
+        public BetaIntRef newIntRef(int value) {
             return new BetaIntRef(BetaStm.this, value);
         }
 
         @Override
-        public BetaIntRefArray createIntRefArray(int length) {
+        public BetaIntRefArray newIntRefArray(int length) {
             if (length < 0) {
                 throw new IllegalArgumentException();
             }
@@ -125,12 +129,12 @@ public final class BetaStm implements Stm {
         }
 
         @Override
-        public BetaLongRef createLongRef(long value) {
+        public BetaLongRef newLongRef(long value) {
             return new BetaLongRef(BetaStm.this, value);
         }
 
         @Override
-        public BetaLongRefArray createLongRefArray(int length) {
+        public BetaLongRefArray newLongRefArray(int length) {
             if (length < 0) {
                 throw new IllegalArgumentException();
             }
@@ -138,12 +142,12 @@ public final class BetaStm implements Stm {
         }
 
         @Override
-        public <E> BetaRef<E> createRef(E value) {
+        public <E> BetaRef<E> newRef(E value) {
             return new BetaRef<E>(BetaStm.this, value);
         }
 
         @Override
-        public <E> BetaRefArray<E> createRefArray(int length) {
+        public <E> BetaRefArray<E> newRefArray(int length) {
             if (length < 0) {
                 throw new IllegalArgumentException();
             }

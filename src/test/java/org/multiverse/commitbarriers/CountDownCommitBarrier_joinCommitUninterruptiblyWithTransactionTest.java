@@ -108,7 +108,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
     public void whenInterruptedWhileWaiting_thenNoInterruption() throws InterruptedException {
         barrier = new CountDownCommitBarrier(2);
 
-        final IntRef ref = stm.getDefaultRefFactory().createIntRef(10);
+        final IntRef ref = stm.getDefaultRefFactory().newIntRef(10);
 
         TestThread t = new TestThread() {
             @Override
@@ -140,7 +140,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
     public void whenCommittedWhileWaiting() throws InterruptedException {
         barrier = new CountDownCommitBarrier(2);
 
-        final BetaIntRef ref = stm.getDefaultRefFactory().createIntRef(0);
+        final BetaIntRef ref = stm.getDefaultRefFactory().newIntRef(0);
 
         TestThread t = new TestThread() {
             @Override
@@ -173,7 +173,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
     public void whenAbortedWhileWaiting_() throws InterruptedException {
         barrier = new CountDownCommitBarrier(2);
 
-        final BetaIntRef ref = stm.getDefaultRefFactory().createIntRef(0);
+        final BetaIntRef ref = stm.getDefaultRefFactory().newIntRef(0);
 
         TestThread t = new TestThread() {
             @Override

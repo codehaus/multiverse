@@ -93,10 +93,6 @@ todo
 can be pooled, the same tranlocal for different commits could be used, so the load could mistake to read an unlocked
 value even though it is locked.
 
-- atomic change methods on ref should call the backoff policy
-
-- atomic change methods on ref should deal with listeners
-
 - mono transaction: support for orelse
 
 - array transaction:  support for orelse
@@ -170,14 +166,6 @@ the task not being executed at all.
 
 - generate the refs/reffactory instead of writing them manually.
 
-- ref atomic-compareand swap
-
-- ref atomic getandalter
-
-- ref atomic alter and get
-
-- ref atomic inc
-
 - should the retry by added to the transaction? Makes it easier to figure out when a retry is done when
 and not allowed. So not throw the retry error immediately..
 
@@ -187,6 +175,21 @@ and not allowed. So not throw the retry error immediately..
 
 - listeners are not cleaned after abort/commit, so still a potential memory leak
 
+- atomic change methods on ref should deal with listeners
+
 done
 
+- added the isolation test for atomicincrement for ref.
+
+- added the backoff policy to the refs.
+
+- added the global stm instance
+
+- ref atomic-compareand swap
+
+- ref atomic getandalter
+
+- ref atomic alter and get
+
+- ref atomic inc
 

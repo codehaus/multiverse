@@ -90,7 +90,7 @@ public class CountDownCommitBarrier_tryJoinCommitWithTimeoutTest {
     public void whenCommittedWhileWaiting() throws InterruptedException {
         barrier = new CountDownCommitBarrier(2);
 
-        final BetaIntRef ref = stm.getDefaultRefFactory().createIntRef(0);
+        final BetaIntRef ref = stm.getDefaultRefFactory().newIntRef(0);
 
         TestThread t = new TestThread() {
             @Override

@@ -13,7 +13,7 @@ public interface RefFactory {
      * @param value the initial value.
      * @return the created DoubleRef.
      */
-    DoubleRef createDoubleRef(double value);
+    DoubleRef newDoubleRef(double value);
 
     /**
      * Creates a committed BooleanRef.
@@ -21,7 +21,7 @@ public interface RefFactory {
      * @param value the initial value.
      * @return the created BooleanRef.
      */
-    BooleanRef createBooleanRef(boolean value);
+    BooleanRef newBooleanRef(boolean value);
 
     /**
      * Creates a committed BetaIntRef.
@@ -29,7 +29,7 @@ public interface RefFactory {
      * @param value the initial value.
      * @return the created BetaIntRef.
      */
-    IntRef createIntRef(int value);
+    IntRef newIntRef(int value);
 
     /**
      * Creates a IntRefArray.
@@ -38,7 +38,7 @@ public interface RefFactory {
      * @return the created IntRefArray.
      * @throws IllegalArgumentException is size smaller than 0.
      */
-    IntRefArray createIntRefArray(int length);
+    IntRefArray newIntRefArray(int length);
 
     /**
      * Creates a committed BetaLongRef.
@@ -46,7 +46,7 @@ public interface RefFactory {
      * @param value the initial value.
      * @return the created BetaLongRef.
      */
-    LongRef createLongRef(long value);
+    LongRef newLongRef(long value);
 
     /**
      * Creates a LongRefArray.
@@ -54,7 +54,7 @@ public interface RefFactory {
      * @param length the length of the array.
      * @return the create LongRefArray.
      */
-    LongRefArray createLongRefArray(int length);
+    LongRefArray newLongRefArray(int length);
 
     /**
      * Creates a committed BetaRef.
@@ -63,7 +63,7 @@ public interface RefFactory {
      * @param <E>   the type of the value.
      * @return the created BetaRef.
      */
-    <E> Ref<E> createRef(E value);
+    <E> Ref<E> newRef(E value);
 
     /**
      * Creates a RefArray.
@@ -73,5 +73,5 @@ public interface RefFactory {
      * @return the created RefArray.
      * @throws IllegalArgumentException if length smaller than 0.
      */
-    <E> RefArray<E> createRefArray(int length);
+    <E> RefArray<E> newRefArray(int length);
 }

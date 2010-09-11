@@ -825,7 +825,7 @@ public final class BetaIntRef
 
     @Override
     public final boolean atomicCompareAndSet(
-        final int oldValue,
+        final int expectedValue,
         final int newValue){
 
         final int arriveStatus = ___arriveAndLockOrBackoff();
@@ -836,9 +836,19 @@ public final class BetaIntRef
 
         final IntRefTranlocal oldActive = ___active;
 
-        if(oldActive.value != newValue){
+        if(oldActive.value != expectedValue){
             ___departAfterFailureAndUnlock();
             return false;
+        }
+
+        if(expectedValue == newValue){
+            if(arriveStatus == ARRIVE_READBIASED){
+                ___unlockByReadBiased();
+            } else{
+                ___departAfterReadingAndUnlock();
+            }
+
+            return true;
         }
 
         //lets create a tranlocal for the update.

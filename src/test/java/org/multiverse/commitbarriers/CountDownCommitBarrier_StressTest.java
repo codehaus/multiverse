@@ -4,7 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.api.references.IntRef;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 
@@ -19,7 +18,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 public class CountDownCommitBarrier_StressTest {
 
@@ -47,7 +45,7 @@ public class CountDownCommitBarrier_StressTest {
         totalInc = new AtomicLong();
         refs = new BetaIntRef[refCount];
         for (int k = 0; k < refCount; k++) {
-            refs[k] = stm.getDefaultRefFactory().createIntRef(0);
+            refs[k] = stm.getDefaultRefFactory().newIntRef(0);
         }
     }
 

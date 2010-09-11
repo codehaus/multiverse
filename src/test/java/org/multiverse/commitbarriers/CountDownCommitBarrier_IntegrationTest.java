@@ -72,7 +72,7 @@ public class CountDownCommitBarrier_IntegrationTest {
 
         @Override
         public void doRun() throws Exception {
-            final LongRef ref = stm.getDefaultRefFactory().createLongRef(1);
+            final LongRef ref = stm.getDefaultRefFactory().newLongRef(1);
 
             stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
                 @Override
