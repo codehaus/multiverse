@@ -86,6 +86,10 @@ public class BetaLongRef_getAndIncrement1Test {
     }
 
     @Test
+    @Ignore
+    public void whenLocked(){}
+
+    @Test
     public void whenNoTransactionAvailable_thenExecutedAtomically() {
         BetaLongRef ref = createLongRef(stm, 10);
 

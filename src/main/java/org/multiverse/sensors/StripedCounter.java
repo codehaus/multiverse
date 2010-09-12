@@ -47,7 +47,7 @@ public final class StripedCounter {
             return;
         }
 
-        int index = (int) ((Math.abs(random+count)) % array.length);
+        int index = (int) ((Math.abs(random + count)) % array.length);
 
         while (true) {
             final long rawIndex = rawIndex(index);
@@ -91,20 +91,21 @@ public final class StripedCounter {
     }
 
     public void incAtIndex(int index, long count) {
-           if (count == 0) {
-               return;
-           }
+        if (count == 0) {
+            return;
+        }
 
-           while (true) {
-               final long rawIndex = rawIndex(index);
-               final long current = unsafe.getLongVolatile(array, rawIndex);
-               final long next = current + count;
+        index = index * 128;                
+        final long rawIndex = rawIndex(index);
+        while (true) {
+            final long current = unsafe.getLongVolatile(array, rawIndex);
+            final long next = current + count;
 
-               if (unsafe.compareAndSwapLong(array, rawIndex, current, next)) {
-                   return;
-               }
-           }
-       }
+            if (unsafe.compareAndSwapLong(array, rawIndex, current, next)) {
+                return;
+            }
+        }
+    }
 
 
     @Override

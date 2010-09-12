@@ -285,13 +285,27 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         //to prevent a JMM problem where the read of the listeners, could jump in front of the write to the value
         //and it is not possible that the read jump over the release of the lock.
 
-
-       if (remainingSurplus == 0 && oldActive!=null) {
+        if (remainingSurplus == 0 && oldActive!=null) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);
         }
 
         return listenersAfterWrite;
+    }
+
+    private Listeners ___removeListenersAfterWrite(){
+        if(___listeners == null){
+            return null;
+        }
+
+        //at this point it could have happened that the listener has changed.. it could also
+        Listeners result;
+        while(true){
+            result = ___listeners;
+            if(___unsafe.compareAndSwapObject(this, listenersOffset, result, null)){
+                return result;
+            }
+        }
     }
 
     @Override
@@ -479,9 +493,8 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         }
 
         //we are going to register the listener since the current value still matches with is active.
-        //But it could be that the registration completes after the
+        //But it could be that the registration completes after the write has happened.
 
-        //lets create us an update
         Listeners newListeners = pool.takeListeners();
         if(newListeners == null){
             newListeners = new Listeners();
@@ -498,37 +511,33 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
             newListeners.next = oldListeners;
 
-            //if(oldListeners!=null && oldListeners
-
             //lets try to register our listeners.
-            if(___unsafe.compareAndSwapObject(this, listenersOffset, oldListeners, newListeners)){
-                //the registration was a success. We need to make sure that the active hasn't changed.
-
-                //the registration was a success.
-
-                //JMM: the volatile read can't jump in front of the unsafe.compareAndSwap.
-                if(read == ___active){
-                    //we are lucky, the registration was done successfully and we managed to cas the listener
-                    //before the update (since the update hasn't happened yet). This means that the updating thread
-                    //is now responsible for notifying the listeners.
-                    return REGISTRATION_DONE;
-                }
-
-                //JMM: the unsafe.compareAndSwap can't jump over the volatile read this.active.
-                //the update has taken place, we need to check if our listeners still is in place.
-                //if it is, it should be removed and the listeners notified. If the listeners already has changed,
-                //it is the task for the other to do the listener cleanup and notify them
-                if(___unsafe.compareAndSwapObject(this, listenersOffset, newListeners, null)){
-                    newListeners.openAll(pool);
-                }else{
-                    latch.open(listenerEra);
-                }
-
-                return REGISTRATION_NOT_NEEDED;
+            if(!___unsafe.compareAndSwapObject(this, listenersOffset, oldListeners, newListeners)){
+                //so we are contending with another register thread, so lets try it again. Since the compareAndSwap
+                //didn't succeed, we know that the current thread still has exclusive ownership on the Listeners object.
+                continue;
             }
 
-            //so we are contending with another register thread, so lets try it again. Since the compareAndSwap
-            //didn't succeed, we know that the current thread still has exclusive ownership on the Listeners object.
+            //the registration was a success. We need to make sure that the active hasn't changed.
+            //JMM: the volatile read can't jump in front of the unsafe.compareAndSwap.
+            if(read == ___active){
+                //we are lucky, the registration was done successfully and we managed to cas the listener
+                //before the update (since the update hasn't happened yet). This means that the updating thread
+                //is now responsible for notifying the listeners.
+                return REGISTRATION_DONE;
+            }
+
+            //JMM: the unsafe.compareAndSwap can't jump over the volatile read this.active.
+            //the update has taken place, we need to check if our listeners still is in place.
+            //if it is, it should be removed and the listeners notified. If the listeners already has changed,
+            //it is the task for the other to do the listener cleanup and notify them
+            if(___unsafe.compareAndSwapObject(this, listenersOffset, newListeners, null)){
+                newListeners.openAll(pool);
+            }else{
+                latch.open(listenerEra);
+            }
+
+            return REGISTRATION_NOT_NEEDED;
         }
     }
 
@@ -595,10 +604,17 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         update.value  = newValue;
         update.prepareForCommit();
         ___active = update;
+
+        Listeners listeners = ___removeListenersAfterWrite();
+
         long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);
+        }
+
+        if(listeners!=null){
+            listeners.openAll(pool);
         }
 
         return newValue; 
@@ -816,10 +832,17 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         update.value = newValue;
         update.prepareForCommit();
         ___active = update;
+
+        Listeners listeners = ___removeListenersAfterWrite();
+
         long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);
+        }
+
+        if(listeners!=null){
+            listeners.openAll(pool);
         }
 
         return returnOld ? oldValue : newValue;
@@ -909,10 +932,17 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         update.value = newValue;
         update.prepareForCommit();
         ___active = update;
+
+        Listeners listeners = ___removeListenersAfterWrite();
+
         long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);
+        }
+
+        if(listeners!=null){
+            listeners.openAll(pool);
         }
 
         return true;
@@ -1018,10 +1048,17 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         update.value = newValue;
         update.prepareForCommit();
         ___active = update;
+
+        Listeners listeners = ___removeListenersAfterWrite();
+
         long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);
+        }
+
+        if(listeners!=null){
+            listeners.openAll(pool);
         }
 
         return oldValue;

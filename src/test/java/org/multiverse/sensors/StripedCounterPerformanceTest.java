@@ -10,11 +10,12 @@ import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
 /**
  * IterationCount is set to a low value because the counter still isn't scalable.
+ * Still work in progress
  */
 public class StripedCounterPerformanceTest {
 
     private long iterationCount = 1000 * 1000;
-    private static final int STRIPE_LENGTH = 16;
+    private static final int STRIPE_LENGTH = 8000;
 
     @Test
     public void when1Thread() {
@@ -45,7 +46,9 @@ public class StripedCounterPerformanceTest {
         System.out.println("=======================================================");
         StripedCounter counter = new StripedCounter(stripeLength);
 
+
         StressThread[] threads = new StressThread[threadCount];
+        Object[] counters = new Object[threadCount];
         for (int k = 0; k < threadCount; k++) {
             threads[k] = new StressThread(k, counter);
         }

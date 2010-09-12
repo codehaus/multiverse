@@ -233,6 +233,23 @@ public abstract class AbstractBetaTransactionalObject
         return listenersAfterWrite;
     }
 
+    private Listeners ___removeListenersAfterWrite(){
+        Listeners listenersAfterWrite = null;
+
+        if(___listeners != null){
+            //at this point it could have happened that the listener has changed.. it could also
+
+            while(true){
+                listenersAfterWrite = ___listeners;
+                if(___unsafe.compareAndSwapObject(this, listenersOffset, listenersAfterWrite, null)){
+                    break;
+                }
+            }
+        }
+
+        return listenersAfterWrite;
+    }
+
     @Override
     public final Listeners ___commitAll(
             final Tranlocal tranlocal,
@@ -420,7 +437,6 @@ public abstract class AbstractBetaTransactionalObject
         //we are going to register the listener since the current value still matches with is active.
         //But it could be that the registration completes after the
 
-        //lets create us an update
         Listeners newListeners = pool.takeListeners();
         if(newListeners == null){
             newListeners = new Listeners();

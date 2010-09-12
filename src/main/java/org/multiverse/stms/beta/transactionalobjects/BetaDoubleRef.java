@@ -290,6 +290,23 @@ public  class BetaDoubleRef
         return listenersAfterWrite;
     }
 
+    private Listeners ___removeListenersAfterWrite(){
+        Listeners listenersAfterWrite = null;
+
+        if(___listeners != null){
+            //at this point it could have happened that the listener has changed.. it could also
+
+            while(true){
+                listenersAfterWrite = ___listeners;
+                if(___unsafe.compareAndSwapObject(this, listenersOffset, listenersAfterWrite, null)){
+                    break;
+                }
+            }
+        }
+
+        return listenersAfterWrite;
+    }
+
     @Override
     public final Listeners ___commitAll(
             final Tranlocal tranlocal,
@@ -477,7 +494,6 @@ public  class BetaDoubleRef
         //we are going to register the listener since the current value still matches with is active.
         //But it could be that the registration completes after the
 
-        //lets create us an update
         Listeners newListeners = pool.takeListeners();
         if(newListeners == null){
             newListeners = new Listeners();
@@ -589,10 +605,17 @@ public  class BetaDoubleRef
         update.value  = newValue;
         update.prepareForCommit();
         ___active = update;
+
+        Listeners listeners = ___removeListenersAfterWrite();
+
         long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);
+        }
+
+        if(listeners!=null){
+            listeners.openAll(pool);
         }
 
         return newValue; 
@@ -783,10 +806,17 @@ public  class BetaDoubleRef
         update.value = newValue;
         update.prepareForCommit();
         ___active = update;
+
+        Listeners listeners = ___removeListenersAfterWrite();
+
         long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);
+        }
+
+        if(listeners!=null){
+            listeners.openAll(pool);
         }
 
         return returnOld ? oldValue : newValue;
@@ -876,10 +906,17 @@ public  class BetaDoubleRef
         update.value = newValue;
         update.prepareForCommit();
         ___active = update;
+
+        Listeners listeners = ___removeListenersAfterWrite();
+
         long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);
+        }
+
+        if(listeners!=null){
+            listeners.openAll(pool);
         }
 
         return true;
@@ -985,10 +1022,17 @@ public  class BetaDoubleRef
         update.value = newValue;
         update.prepareForCommit();
         ___active = update;
+
+        Listeners listeners = ___removeListenersAfterWrite();
+
         long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
         if (remainingSurplus == 0) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);
+        }
+
+        if(listeners!=null){
+            listeners.openAll(pool);
         }
 
         return oldValue;
