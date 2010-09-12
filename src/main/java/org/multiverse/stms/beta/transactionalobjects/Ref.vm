@@ -263,6 +263,14 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         //to this.active. This means that we could break the contract we have: an update is responsible for all
         //listeners that have registered before the actual write happens. So it needs to remove the listeners
         //after the actual write happens.
+
+        //it is important that this call is done after the actual write. This is needed to give the guarantee
+        //that we are going to take care of all listeners that are registered before that write. The read is done
+        //after the unlock because that requires a volatile read. It could be that a listener is notified that
+        //already has registered for the following read, so there could be a spurious wakeup. This was done
+        //to prevent a JMM problem where the read of the listeners, could jump in front of the write to the value
+        //and it is not possible that the read jump over the release of the lock.
+             
         Listeners listenersAfterWrite = null;
 
         if(___listeners != null){
@@ -277,14 +285,6 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         }
 
         long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
-
-        //it is important that this call is done after the actual write. This is needed to give the guarantee
-       //that we are going to take care of all listeners that are registered before that write. The read is done
-        //after the unlock because that requires a volatile read. It could be that a listener is notified that
-        //already has registered for the following read, so there could be a spurious wakeup. This was done
-        //to prevent a JMM problem where the read of the listeners, could jump in front of the write to the value
-        //and it is not possible that the read jump over the release of the lock.
-
         if (remainingSurplus == 0 && oldActive!=null) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);

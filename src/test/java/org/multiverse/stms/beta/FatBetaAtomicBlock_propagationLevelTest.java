@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class FatBetaAtomicBlock_propagationLevelTest {
     private BetaStm stm;
@@ -119,7 +119,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
                 .setPropagationLevel(PropagationLevel.Requires)
                 .build();
 
-        final BetaLongRef ref = createLongRef(stm);
+        final BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         AtomicIntClosure closure = new AtomicIntClosure() {
             @Override
@@ -147,7 +147,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
         final BetaTransaction existingTx = stm.startDefaultTransaction();
         setThreadLocalTransaction(existingTx);
 
-        final BetaLongRef ref = createLongRef(stm);
+        final BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         AtomicIntClosure closure = new AtomicIntClosure() {
             @Override
@@ -174,7 +174,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
                 .setPropagationLevel(PropagationLevel.RequiresNew)
                 .buildAtomicBlock();
 
-        final BetaLongRef ref = createLongRef(stm, 0);
+        final BetaLongRef ref = newLongRef(stm, 0);
 
         AtomicIntClosure closure = new AtomicIntClosure() {
             @Override
@@ -202,7 +202,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
         final BetaTransaction otherTx = stm.startDefaultTransaction();
         setThreadLocalTransaction(otherTx);
 
-        final BetaLongRef ref = createLongRef(stm, 10);
+        final BetaLongRef ref = newLongRef(stm, 10);
 
         AtomicIntClosure closure = new AtomicIntClosure() {
             @Override

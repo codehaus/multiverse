@@ -13,6 +13,7 @@ import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
@@ -23,7 +24,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
@@ -45,9 +46,9 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenMultipleReads_thenMultipleRegisters() {
-        BetaLongRef ref1 = createLongRef(stm);
-        BetaLongRef ref2 = createLongRef(stm);
-        BetaLongRef ref3 = createLongRef(stm);
+        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref3 = BetaStmUtils.newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.openForRead(ref1, false);
@@ -103,7 +104,7 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenExplicitRetryNotAllowed_thenNoRetryPossibleException() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setBlockingAllowed(false);
@@ -124,7 +125,7 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenContainsRead_thenSuccess() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, false);
@@ -141,7 +142,7 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenLockedRead_thenSuccessAndLockReleased() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, true);
@@ -158,7 +159,7 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenContainsWrite_thenSuccess() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false);
@@ -175,7 +176,7 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenLockedWrite_thenSuccessAndLockReleased() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, true);
@@ -218,8 +219,8 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenOneOfThemItemsIsConstructed() {
-        BetaLongRef ref1 = createLongRef(stm);
-        BetaLongRef ref2 = createLongRef(stm);
+        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
 
         Latch latch = new CheapLatch();
 
@@ -238,7 +239,7 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenNormalListenerAvailable() {
-        BetaLongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = newLongRef(stm, 0);
 
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -254,7 +255,7 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenPermanentListenerAvailable() {
-        BetaLongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = newLongRef(stm, 0);
 
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)

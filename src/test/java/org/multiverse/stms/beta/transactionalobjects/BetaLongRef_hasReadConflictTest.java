@@ -3,13 +3,13 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class BetaLongRef_hasReadConflictTest {
     private BetaStm stm;
@@ -22,7 +22,7 @@ public class BetaLongRef_hasReadConflictTest {
 
     @Test
     public void whenReadAndNoConflict() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, false);
@@ -34,7 +34,7 @@ public class BetaLongRef_hasReadConflictTest {
 
     @Test
     public void whenWriteAndNoConflict() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false);
@@ -46,7 +46,7 @@ public class BetaLongRef_hasReadConflictTest {
 
     @Test
     public void whenLockedBySelf() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         Tranlocal read = tx.openForRead(ref, true);
@@ -58,7 +58,7 @@ public class BetaLongRef_hasReadConflictTest {
 
     @Test
     public void whenUpdatedByOther() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         Tranlocal read = tx.openForRead(ref, false);
@@ -84,7 +84,7 @@ public class BetaLongRef_hasReadConflictTest {
 
     @Test
     public void whenValueChangedByOtherAndLocked() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         Tranlocal read = tx.openForRead(ref, false);
@@ -104,7 +104,7 @@ public class BetaLongRef_hasReadConflictTest {
 
     @Test
     public void whenUpdateInProgressBecauseLockedByOther() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForRead(ref, false);

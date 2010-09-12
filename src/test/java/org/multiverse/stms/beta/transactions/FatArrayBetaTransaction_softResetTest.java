@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
@@ -13,8 +14,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
-import static org.multiverse.stms.beta.BetaStmUtils.createReadBiasedLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newReadBiasedLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
@@ -65,7 +65,7 @@ public class FatArrayBetaTransaction_softResetTest {
 
     @Test
     public void whenContainsUnlockedNonPermanentRead() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -85,7 +85,7 @@ public class FatArrayBetaTransaction_softResetTest {
 
     @Test
     public void whenContainsUnlockedPermanent() {
-        BetaLongRef ref = createReadBiasedLongRef(stm);
+        BetaLongRef ref = newReadBiasedLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -105,7 +105,7 @@ public class FatArrayBetaTransaction_softResetTest {
 
     @Test
     public void whenNormalUpdate() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -127,7 +127,7 @@ public class FatArrayBetaTransaction_softResetTest {
 
     @Test
     public void whendLockedWrites() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -160,7 +160,7 @@ public class FatArrayBetaTransaction_softResetTest {
 
     @Test
     public void whenPreparedResourcesNeedRelease() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);

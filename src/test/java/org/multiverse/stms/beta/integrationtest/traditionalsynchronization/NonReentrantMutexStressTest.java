@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newIntRef;
 
 /**
  * A stresstest that checks if the NonReentrantMutex; a traditional synchronization structure, can be build
@@ -124,7 +124,7 @@ public class NonReentrantMutexStressTest {
     }
 
     class NonReentrantMutex {
-        final BetaIntRef locked = createIntRef(stm, 0);
+        final BetaIntRef locked = newIntRef(stm, 0);
         final AtomicBlock lockBlock = stm.createTransactionFactoryBuilder()
                 .buildAtomicBlock();
         final AtomicBlock unlockBlock = stm.createTransactionFactoryBuilder()

@@ -19,7 +19,7 @@ import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newRef;
 
 public class QueueWithoutCapacityStressTest {
 
@@ -139,7 +139,7 @@ public class QueueWithoutCapacityStressTest {
     }
 
     class Stack<E> {
-        final BetaRef<Node<E>> head = createRef(stm);
+        final BetaRef<Node<E>> head = newRef(stm);
 
         void push(BetaTransaction tx, E item) {
             RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, pessimistic);

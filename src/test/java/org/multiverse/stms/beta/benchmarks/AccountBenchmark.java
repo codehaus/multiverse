@@ -15,7 +15,7 @@ import java.util.Random;
 
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
 
 /**
@@ -105,7 +105,7 @@ public class AccountBenchmark {
         BetaLongRef[] accounts = new BetaLongRef[accountCount];
 
         for (int k = 0; k < accounts.length; k++) {
-            accounts[k] = createLongRef(stm, initialAmount);
+            accounts[k] = newLongRef(stm, initialAmount);
         }
         return accounts;
     }

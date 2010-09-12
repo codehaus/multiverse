@@ -8,10 +8,11 @@ import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
+import org.multiverse.stms.beta.BetaStmUtils;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants {
 
@@ -26,7 +27,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
 
     @Test
     public void whenConstructed() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         LongRefTranlocal tranlocal = ref.___openForConstruction(pool);
         tranlocal.value = 200;
@@ -56,7 +57,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
 
     @Test
     public void whenIsCommuting() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
         tranlocal.addCommutingFunction(IncLongFunction.INSTANCE_INC_ONE, pool);
@@ -68,7 +69,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
 
     @Test
     public void whenUpdate() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal tranlocal = ref.___unsafeLoad().openForWrite(pool);
         tranlocal.value = 200;
 
@@ -79,7 +80,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
 
     @Test
     public void whenCommuting() {
-        BetaLongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = newLongRef(stm, 100);
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
 
         LongFunction function = mock(LongFunction.class);

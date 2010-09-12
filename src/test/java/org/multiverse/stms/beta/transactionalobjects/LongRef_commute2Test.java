@@ -7,6 +7,7 @@ import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
@@ -14,7 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class LongRef_commute2Test {
     private BetaStm stm;
@@ -27,7 +28,7 @@ public class LongRef_commute2Test {
 
     @Test
     public void whenNullFunction_thenNullPointerException() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         BetaTransaction tx = stm.startDefaultTransaction();
 
@@ -43,7 +44,7 @@ public class LongRef_commute2Test {
 
     @Test
     public void whenNullTransaction_thenNullPointerException() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         LongFunction function = mock(LongFunction.class);
 
@@ -59,7 +60,7 @@ public class LongRef_commute2Test {
 
     @Test
     public void whenTransactionAborted_thenDeadTransactionException() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         LongFunction function = mock(LongFunction.class);
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -78,7 +79,7 @@ public class LongRef_commute2Test {
 
     @Test
     public void whenTransactionCommitted_thenDeadTransactionException() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         LongFunction function = mock(LongFunction.class);
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -97,7 +98,7 @@ public class LongRef_commute2Test {
 
     @Test
     public void whenTransactionPrepared_thenPreparedTransactionException() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         LongFunction function = mock(LongFunction.class);
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -116,7 +117,7 @@ public class LongRef_commute2Test {
 
     @Test
     public void whenSuccess() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
         BetaTransaction tx = stm.startDefaultTransaction();
 
@@ -130,8 +131,8 @@ public class LongRef_commute2Test {
 
     @Test
     public void fullExample() {
-        BetaLongRef ref1 = createLongRef(stm, 10);
-        BetaLongRef ref2 = createLongRef(stm, 10);
+        BetaLongRef ref1 = newLongRef(stm, 10);
+        BetaLongRef ref2 = newLongRef(stm, 10);
 
         BetaTransaction tx1 = stm.startDefaultTransaction();
         tx1.openForWrite(ref1, false).value++;

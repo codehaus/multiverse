@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class SimpleDurabilityIntegrationTest {
     private BetaStm stm;
@@ -34,7 +34,7 @@ public class SimpleDurabilityIntegrationTest {
 
     @Test
     public void whenSingleItemWritten() {
-        BetaLongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = newLongRef(stm, 100);
 
         UnitOfWrite unitOfWrite = storage.startUnitOfWrite();
         unitOfWrite.addChange(ref.___unsafeLoad());
@@ -50,7 +50,7 @@ public class SimpleDurabilityIntegrationTest {
 
     @Test
     public void whenUpdated() {
-        BetaLongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = newLongRef(stm, 100);
 
         UnitOfWrite write1 = storage.startUnitOfWrite();
         write1.addChange(ref.___unsafeLoad());
@@ -75,8 +75,8 @@ public class SimpleDurabilityIntegrationTest {
 
     @Test
     public void whenMultipleItemsWritten() {
-        BetaLongRef ref1 = createLongRef(stm, 100);
-        BetaLongRef ref2 = createLongRef(stm, 200);
+        BetaLongRef ref1 = newLongRef(stm, 100);
+        BetaLongRef ref2 = newLongRef(stm, 200);
 
 
         UnitOfWrite unitOfWrite = storage.startUnitOfWrite();

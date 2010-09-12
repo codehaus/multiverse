@@ -14,7 +14,7 @@ import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class BetaAtomicBlock_integrationTest {
 
@@ -28,7 +28,7 @@ public class BetaAtomicBlock_integrationTest {
     
     @Test
     public void whenRead() {
-        final BetaLongRef ref = createLongRef(stm, 10);
+        final BetaLongRef ref = newLongRef(stm, 10);
 
         AtomicBlock block = stm.createTransactionFactoryBuilder().buildAtomicBlock();
         long result = block.execute(new AtomicLongClosure() {
@@ -44,7 +44,7 @@ public class BetaAtomicBlock_integrationTest {
 
     @Test
     public void whenUpdate() {
-        final BetaLongRef ref = createLongRef(stm, 0);
+        final BetaLongRef ref = newLongRef(stm, 0);
 
         AtomicBlock block = stm.createTransactionFactoryBuilder().buildAtomicBlock();
         block.execute(new AtomicVoidClosure() {
@@ -60,7 +60,7 @@ public class BetaAtomicBlock_integrationTest {
 
     @Test
     public void whenTooManyRetries() {
-        final BetaLongRef ref = BetaStmUtils.createLongRef(stm);
+        final BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
         otherTx.openForWrite(ref, true);
@@ -85,7 +85,7 @@ public class BetaAtomicBlock_integrationTest {
 
     @Test
     public void whenMultipleUpdatesDoneInSingleTransaction() {
-        final BetaLongRef ref = BetaStmUtils.createLongRef(stm);
+        final BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         AtomicBlock block = stm.createTransactionFactoryBuilder().buildAtomicBlock();
         block.execute(new AtomicVoidClosure() {

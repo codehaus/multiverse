@@ -4,13 +4,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.ReadConflict;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.assertIsAborted;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class DeadLockTest {
     private BetaStm stm;
@@ -22,8 +22,8 @@ public class DeadLockTest {
 
     @Test
     public void test() {
-        BetaLongRef ref1 = createLongRef(stm);
-        BetaLongRef ref2 = createLongRef(stm);
+        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
 
         BetaTransaction tx1 = stm.startDefaultTransaction();
         BetaTransaction tx2 = stm.startDefaultTransaction();

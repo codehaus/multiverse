@@ -8,12 +8,12 @@ import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
 
 public class DeadLockStressTest {
 
@@ -61,7 +61,7 @@ public class DeadLockStressTest {
 
         refs = new BetaIntRef[refCount];
         for (int k = 0; k < refCount; k++) {
-            refs[k] = createIntRef(stm);
+            refs[k] = BetaStmUtils.newIntRef(stm);
         }
 
         threads = new ChangeThread[threadCount];

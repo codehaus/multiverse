@@ -11,7 +11,6 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
@@ -30,7 +29,7 @@ public class BetaLongRef_abortTest {
 
     @Test
     public void whenOpenedForRead() {
-        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -45,7 +44,7 @@ public class BetaLongRef_abortTest {
 
     @Test
     public void whenOpenedForWrite() {
-        BetaTransactionalObject ref = BetaStmUtils.createLongRef(stm);
+        BetaTransactionalObject ref = BetaStmUtils.newLongRef(stm);
         Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -60,7 +59,7 @@ public class BetaLongRef_abortTest {
 
     @Test
     public void whenLockedBySelfAndOpenedForRead() {
-        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         Orec orec = ref.___getOrec();
 
@@ -77,7 +76,7 @@ public class BetaLongRef_abortTest {
 
     @Test
     public void whenLockedByOtherAndOpenedForRead() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -98,7 +97,7 @@ public class BetaLongRef_abortTest {
 
     @Test
     public void whenLockedBySelfAndOpenedForWrite() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -116,7 +115,7 @@ public class BetaLongRef_abortTest {
 
     @Test
     public void whenLockedByOtherAndOpenedForWrite() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();

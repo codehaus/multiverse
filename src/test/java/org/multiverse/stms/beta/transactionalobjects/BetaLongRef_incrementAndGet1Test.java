@@ -12,7 +12,9 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
 
 public class BetaLongRef_incrementAndGet1Test {
 
@@ -26,7 +28,7 @@ public class BetaLongRef_incrementAndGet1Test {
 
     @Test
     public void whenPreparedTransactionAvailable_thenPreparedTransactionException() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -46,8 +48,8 @@ public class BetaLongRef_incrementAndGet1Test {
     }
 
     @Test
-    public void whenActiveTransactionAvailable_thenPreparedTransactionException() {
-        LongRef ref = createLongRef(stm, 10);
+    public void whenActiveTransactionAvailable() {
+        LongRef ref = newLongRef(stm, 10);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -61,21 +63,57 @@ public class BetaLongRef_incrementAndGet1Test {
     }
 
     @Test
-    @Ignore
-    public void whenNoTransactionAvailable() {
+    public void whenNoTransactionAvailable_thenExecutedAtomically() {
+        BetaLongRef ref = newLongRef(stm, 10);
 
+        long value = ref.incrementAndGet(20);
+
+        assertEquals(30, value);
+        assertEquals(30, ref.atomicGet());
+        assertNull(getThreadLocalTransaction());
+        assertSurplus(0, ref);
+        assertUnlocked(ref);
+    }
+
+    @Test
+    public void whenCommittedTransactionAvailable_thenExecutedAtomically() {
+        BetaLongRef ref = newLongRef(stm, 10);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        setThreadLocalTransaction(tx);
+        tx.commit();
+
+        long value = ref.incrementAndGet(20);
+
+        assertEquals(30, value);
+        assertIsCommitted(tx);
+        assertEquals(30, ref.atomicGet());
+        assertSame(tx, getThreadLocalTransaction());
+        assertSurplus(0, ref);
+        assertUnlocked(ref);
+    }
+
+    @Test
+    public void whenAbortedTransactionAvailable_thenExecutedAtomically() {
+        BetaLongRef ref = newLongRef(stm, 10);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        setThreadLocalTransaction(tx);
+        tx.abort();
+
+        long value = ref.incrementAndGet(20);
+
+        assertEquals(30, value);
+        assertIsCommitted(tx);
+        assertEquals(30, ref.atomicGet());
+        assertSame(tx, getThreadLocalTransaction());
+        assertSurplus(0, ref);
+        assertUnlocked(ref);
     }
 
     @Test
     @Ignore
-    public void whenCommittedTransactionAvailable() {
-
-    }
-
-    @Test
-    @Ignore
-    public void whenAbortedTransactionAvailable() {
-
-    }
+    public void whenLocked(){}
+    
 
 }

@@ -26,7 +26,7 @@ public class BetaStmUtils {
         tx.commit();
     }
 
-    public static <E> BetaRef<E> createRef(BetaStm stm, E value) {
+    public static <E> BetaRef<E> newRef(BetaStm stm, E value) {
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         BetaRef<E> ref = new BetaRef<E>(tx);
         RefTranlocal<E> tranlocal = tx.openForConstruction(ref);
@@ -35,7 +35,7 @@ public class BetaStmUtils {
         return ref;
     }
 
-    public static BetaDoubleRef createDoubleRef(BetaStm stm, double value) {
+    public static BetaDoubleRef newDoubleRef(BetaStm stm, double value) {
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         BetaDoubleRef ref = new BetaDoubleRef(tx);
         DoubleRefTranlocal tranlocal = tx.openForConstruction(ref);
@@ -45,15 +45,15 @@ public class BetaStmUtils {
     }
 
 
-    public static BetaRef createRef(BetaStm stm) {
-        return createRef(stm, null);
+    public static BetaRef newRef(BetaStm stm) {
+        return newRef(stm, null);
     }
 
-    public static BetaIntRef createIntRef(BetaStm stm) {
-        return createIntRef(stm, 0);
+    public static BetaIntRef newIntRef(BetaStm stm) {
+        return newIntRef(stm, 0);
     }
 
-    public static BetaIntRef createIntRef(BetaStm stm, int value) {
+    public static BetaIntRef newIntRef(BetaStm stm, int value) {
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         BetaIntRef ref = new BetaIntRef(tx);
         tx.openForConstruction(ref).value = value;
@@ -62,12 +62,12 @@ public class BetaStmUtils {
     }
 
 
-    public static BetaLongRef createLongRef(BetaStm stm) {
-        return createLongRef(stm, 0);
+    public static BetaLongRef newLongRef(BetaStm stm) {
+        return newLongRef(stm, 0);
     }
 
-    public static BetaLongRef createReadBiasedLongRef(BetaStm stm, long value) {
-        BetaLongRef ref = createLongRef(stm, value);
+    public static BetaLongRef newReadBiasedLongRef(BetaStm stm, long value) {
+        BetaLongRef ref = newLongRef(stm, value);
 
         for (int k = 0; k < ref.___getOrec().___getReadBiasedThreshold(); k++) {
             BetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -78,11 +78,11 @@ public class BetaStmUtils {
         return ref;
     }
 
-    public static BetaLongRef createReadBiasedLongRef(BetaStm stm) {
-        return createReadBiasedLongRef(stm, 0);
+    public static BetaLongRef newReadBiasedLongRef(BetaStm stm) {
+        return newReadBiasedLongRef(stm, 0);
     }
 
-    public static BetaLongRef createLongRef(BetaStm stm, long value) {
+    public static BetaLongRef newLongRef(BetaStm stm, long value) {
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         BetaLongRef ref = new BetaLongRef(tx);
         LongRefTranlocal tranlocal = tx.openForConstruction(ref);

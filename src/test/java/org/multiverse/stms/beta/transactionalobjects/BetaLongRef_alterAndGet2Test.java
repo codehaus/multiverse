@@ -5,17 +5,21 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.api.exceptions.ReadConflict;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.multiverse.TestUtils.assertIsAborted;
-import static org.multiverse.TestUtils.assertIsCommitted;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.*;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertLocked;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 
 /**
  * Tests {@link BetaLongRef#alterAndGet(BetaTransaction, LongFunction)}.
@@ -34,7 +38,7 @@ public class BetaLongRef_alterAndGet2Test {
 
     @Test
     public void whenNullTransaction_thenNullPointerException() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
         LongFunction function = mock(LongFunction.class);
 
@@ -43,14 +47,14 @@ public class BetaLongRef_alterAndGet2Test {
             fail();
         } catch (NullPointerException expected) {
         }
-        
+
         verifyZeroInteractions(function);
         assertSame(committed, ref.___unsafeLoad());
     }
 
     @Test
     public void whenNullFunction_thenNullPointerException() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -67,7 +71,7 @@ public class BetaLongRef_alterAndGet2Test {
 
     @Test
     public void whenCommittedTransaction_thenDeadTransactionException() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -87,7 +91,7 @@ public class BetaLongRef_alterAndGet2Test {
 
     @Test
     public void whenPreparedTransaction_thenPreparedTransactionException() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -107,7 +111,7 @@ public class BetaLongRef_alterAndGet2Test {
 
     @Test
     public void whenAbortedTransaction() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -126,9 +130,54 @@ public class BetaLongRef_alterAndGet2Test {
     }
 
     @Test
-    @Ignore
-    public void whenAlterFunctionCausesProblems(){
+    public void whenFunctionCausesException() {
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
+        LongFunction function = mock(LongFunction.class);
+        RuntimeException ex = new RuntimeException();
+        when(function.call(anyLong())).thenThrow(ex);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+
+        try {
+            ref.alterAndGet(tx, function);
+            fail();
+        } catch (RuntimeException found) {
+            assertSame(ex, found);
+        }
+
+        assertIsAborted(tx);
+        assertNull(getThreadLocalTransaction());
+    }
+
+    @Test
+    public void whenLockedByOther() {
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        otherTx.openForRead(ref, true);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        LongFunction function = mock(LongFunction.class);
+
+        try {
+            ref.alterAndGet(tx, function);
+            fail();
+        } catch (ReadConflict expected) {
+        }
+
+        assertLocked(ref);
+        assertSurplus(1, ref);
+        assertIsActive(otherTx);
+        assertIsAborted(tx);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+    }
+
+    @Test
+    @Ignore
+    public void whenListenersAvailable() {
     }
 
     @Test
@@ -140,7 +189,7 @@ public class BetaLongRef_alterAndGet2Test {
             }
         };
 
-        BetaLongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = newLongRef(stm, 100);
         BetaTransaction tx = stm.startDefaultTransaction();
         long result = ref.alterAndGet(tx, function);
         tx.commit();

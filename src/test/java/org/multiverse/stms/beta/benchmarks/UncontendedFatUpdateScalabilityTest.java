@@ -101,7 +101,7 @@ public class UncontendedFatUpdateScalabilityTest {
         }
 
         public void run() {
-            BetaLongRef ref = BetaStmUtils.createLongRef(stm);
+            BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
             //FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
             //FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm,1);

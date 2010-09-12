@@ -10,7 +10,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class BetaLongRef_get0Test {
     private BetaStm stm;
@@ -23,7 +23,7 @@ public class BetaLongRef_get0Test {
 
     @Test
     public void whenPreparedTransactionAvailable_thenPreparedTransactionException() {
-        LongRef ref = createLongRef(stm, 10);
+        LongRef ref = newLongRef(stm, 10);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.prepare();
@@ -39,7 +39,7 @@ public class BetaLongRef_get0Test {
 
     @Test
     public void whenActiveTransactionAvailable_thenPreparedTransactionException() {
-        LongRef ref = createLongRef(stm, 10);
+        LongRef ref = newLongRef(stm, 10);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -53,7 +53,7 @@ public class BetaLongRef_get0Test {
 
     @Test
     public void whenNoTransactionAvailable_thenExecutedAtomically() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
 
         long result = ref.get();
 
@@ -63,7 +63,7 @@ public class BetaLongRef_get0Test {
 
     @Test
     public void whenCommittedTransactionAvailable_thenExecutedAtomically() {
-        LongRef ref = createLongRef(stm, 10);
+        LongRef ref = newLongRef(stm, 10);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.commit();
@@ -78,7 +78,7 @@ public class BetaLongRef_get0Test {
 
     @Test
     public void whenAbortedTransactionAvailable_thenExecutedAtomically() {
-        LongRef ref = createLongRef(stm, 10);
+        LongRef ref = newLongRef(stm, 10);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.abort();

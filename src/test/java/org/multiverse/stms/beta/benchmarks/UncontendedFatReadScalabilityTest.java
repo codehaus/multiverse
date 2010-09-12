@@ -102,7 +102,7 @@ public class UncontendedFatReadScalabilityTest {
         }
 
         public void run() {
-            BetaLongRef ref = BetaStmUtils.createReadBiasedLongRef(stm);
+            BetaLongRef ref = BetaStmUtils.newReadBiasedLongRef(stm);
 
             FatMonoBetaTransaction tx = new FatMonoBetaTransaction(new BetaTransactionConfiguration(stm).setReadonly(true));
             long startMs = System.currentTimeMillis();

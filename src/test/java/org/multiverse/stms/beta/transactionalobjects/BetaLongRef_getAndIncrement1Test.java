@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
 
@@ -28,7 +28,7 @@ public class BetaLongRef_getAndIncrement1Test {
 
     @Test
     public void whenPreparedTransactionAvailable_thenPreparedTransactionException() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -49,7 +49,7 @@ public class BetaLongRef_getAndIncrement1Test {
 
     @Test
     public void whenActiveTransactionAvailable() {
-        LongRef ref = createLongRef(stm, 10);
+        LongRef ref = newLongRef(stm, 10);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -64,7 +64,7 @@ public class BetaLongRef_getAndIncrement1Test {
 
     @Test
     public void whenNoChange() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -91,7 +91,7 @@ public class BetaLongRef_getAndIncrement1Test {
 
     @Test
     public void whenNoTransactionAvailable_thenExecutedAtomically() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
 
         long result = ref.getAndIncrement(10);
 
@@ -104,7 +104,7 @@ public class BetaLongRef_getAndIncrement1Test {
 
     @Test
     public void whenCommittedTransactionAvailable() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
         tx.commit();
@@ -121,7 +121,7 @@ public class BetaLongRef_getAndIncrement1Test {
 
     @Test
     public void whenAbortedTransactionAvailable() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
         tx.abort();

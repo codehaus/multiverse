@@ -8,6 +8,7 @@ import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -15,7 +16,6 @@ import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
 
 
 /**
@@ -81,7 +81,7 @@ public class DiningPhilosophersStressTest {
     public void createForks() {
         forks = new BetaIntRef[philosopherCount];
         for (int k = 0; k < forks.length; k++) {
-            forks[k] = createIntRef(stm);
+            forks[k] = BetaStmUtils.newIntRef(stm);
         }
     }
 

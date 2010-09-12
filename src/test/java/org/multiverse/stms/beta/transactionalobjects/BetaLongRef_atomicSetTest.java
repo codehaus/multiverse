@@ -10,7 +10,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaLongRef_atomicSetTest {
@@ -24,7 +24,7 @@ public class BetaLongRef_atomicSetTest {
 
     @Test
     public void whenSuccess() {
-        BetaLongRef ref = createLongRef(stm, 2);
+        BetaLongRef ref = newLongRef(stm, 2);
 
         long result = ref.atomicSet(10);
 
@@ -39,7 +39,7 @@ public class BetaLongRef_atomicSetTest {
 
     @Test
     public void whenActiveTransactionAvailable_thenIgnored() {
-        BetaLongRef ref = createLongRef(stm, 2);
+        BetaLongRef ref = newLongRef(stm, 2);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -65,7 +65,7 @@ public class BetaLongRef_atomicSetTest {
 
     @Test
     public void whenLocked_thenLockedException() {
-        BetaLongRef ref = createLongRef(stm, 2);
+        BetaLongRef ref = newLongRef(stm, 2);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -88,7 +88,7 @@ public class BetaLongRef_atomicSetTest {
 
     @Test
     public void whenNoChange_thenNoCommit() {
-        BetaLongRef ref = createLongRef(stm, 2);
+        BetaLongRef ref = newLongRef(stm, 2);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         long result = ref.atomicSet(2);

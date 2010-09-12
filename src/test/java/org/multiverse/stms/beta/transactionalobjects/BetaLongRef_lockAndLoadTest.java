@@ -29,7 +29,7 @@ public class BetaLongRef_lockAndLoadTest {
     @Test
     public void whenFresh() {
         BetaTransaction lockOwner = stm.startDefaultTransaction();
-        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         Tranlocal committed = ref.___unsafeLoad();
 
         Tranlocal tranlocal = ref.___lockAndLoad(0, lockOwner);
@@ -44,7 +44,7 @@ public class BetaLongRef_lockAndLoadTest {
 
     @Test
     public void whenAlreadyLockedByOtherTransaction() {
-        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         Tranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction lockingTx = new FatMonoBetaTransaction(stm);
@@ -65,7 +65,7 @@ public class BetaLongRef_lockAndLoadTest {
 
     @Test
     public void whenAlreadyLockedBySelf() {
-        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         Tranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction lockOwner = stm.startDefaultTransaction();

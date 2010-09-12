@@ -7,7 +7,7 @@ import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 
 import static org.junit.Assert.*;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class LongRefTranlocal_openForWriteTest implements BetaStmConstants {
     private BetaStm stm;
@@ -21,7 +21,7 @@ public class LongRefTranlocal_openForWriteTest implements BetaStmConstants {
 
     @Test
     public void test(){
-        BetaLongRef ref = createLongRef(stm, 200);
+        BetaLongRef ref = newLongRef(stm, 200);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         LongRefTranlocal write = committed.openForWrite(pool);

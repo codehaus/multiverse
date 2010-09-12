@@ -6,11 +6,11 @@ import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.assertHasCommutingFunctions;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class LongRefTranlocal_addCommutingFunctionTest {
 
@@ -25,7 +25,7 @@ public class LongRefTranlocal_addCommutingFunctionTest {
 
     @Test
     public void whenFirstAddition() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
         tranlocal.addCommutingFunction(IncLongFunction.INSTANCE_INC_ONE, pool);
 
@@ -38,7 +38,7 @@ public class LongRefTranlocal_addCommutingFunctionTest {
 
     @Test
     public void whenMultipleAdditions(){
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
 
         LongFunction function1 = mock(LongFunction.class);

@@ -9,13 +9,14 @@ import org.multiverse.api.closures.AtomicIntClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newIntRef;
 
 public class ReadonlyTest {
 
@@ -29,7 +30,7 @@ public class ReadonlyTest {
 
     @Test
     public void whenReadonly_thenUpdateFails() {
-        BetaIntRef ref = createIntRef(stm);
+        BetaIntRef ref = BetaStmUtils.newIntRef(stm);
         try {
             updateInReadonlyMethod(ref, 10);
             fail();
@@ -99,7 +100,7 @@ public class ReadonlyTest {
 
     @Test
     public void whenReadonly_thenReadAllowed() {
-        BetaIntRef ref = createIntRef(stm, 10);
+        BetaIntRef ref = newIntRef(stm, 10);
         int result = readInReadonlyMethod(ref);
         assertEquals(10, result);
         assertEquals(10, ref.___unsafeLoad().value);
@@ -164,7 +165,7 @@ public class ReadonlyTest {
 
     @Test
     public void whenUpdate_thenReadSucceeds() {
-        BetaIntRef ref = createIntRef(stm, 10);
+        BetaIntRef ref = newIntRef(stm, 10);
         int result = readInUpdateMethod(ref);
         assertEquals(10, result);
         assertEquals(10, ref.___unsafeLoad().value);
@@ -187,7 +188,7 @@ public class ReadonlyTest {
 
     @Test
     public void whenUpdate_thenUpdateSucceeds() {
-        BetaIntRef ref = createIntRef(stm);
+        BetaIntRef ref = BetaStmUtils.newIntRef(stm);
         updateInUpdateMethod(ref, 10);
         assertEquals(10, ref.___unsafeLoad().value);
     }
@@ -209,7 +210,7 @@ public class ReadonlyTest {
 
     @Test
     public void whenDefault_thenUpdateSuccess() {
-        BetaIntRef ref = createIntRef(stm);
+        BetaIntRef ref = BetaStmUtils.newIntRef(stm);
         defaultTransactionalMethod(ref);
 
         assertEquals(1, ref.___unsafeLoad().value);

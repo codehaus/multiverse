@@ -7,6 +7,7 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
@@ -15,7 +16,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
@@ -60,7 +61,7 @@ public class FatArrayTreeBetaTransaction_abortTest {
 
     @Test
     public void whenContainsNormalRead() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
@@ -78,7 +79,7 @@ public class FatArrayTreeBetaTransaction_abortTest {
 
     @Test
     public void whenContainsLockedNormalRead() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
@@ -96,7 +97,7 @@ public class FatArrayTreeBetaTransaction_abortTest {
 
     @Test
     public void whenContainsUnlockedWrite() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
@@ -114,7 +115,7 @@ public class FatArrayTreeBetaTransaction_abortTest {
 
     @Test
     public void whenContainsLockedWrite() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
@@ -150,7 +151,7 @@ public class FatArrayTreeBetaTransaction_abortTest {
 
     @Test
     public void whenNormalListenerAvailable() {
-        BetaLongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = newLongRef(stm, 0);
 
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
@@ -164,7 +165,7 @@ public class FatArrayTreeBetaTransaction_abortTest {
 
     @Test
     public void whenPermanentListenerAvailable() {
-        BetaLongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = newLongRef(stm, 0);
 
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)

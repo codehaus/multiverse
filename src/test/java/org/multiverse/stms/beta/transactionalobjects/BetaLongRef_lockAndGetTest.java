@@ -8,7 +8,7 @@ import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertLocked;
 
 public class BetaLongRef_lockAndGetTest {
@@ -23,7 +23,7 @@ public class BetaLongRef_lockAndGetTest {
 
     @Test
     public void whenUnlocked() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         long value = ref.lockAndGet(tx);
@@ -37,7 +37,7 @@ public class BetaLongRef_lockAndGetTest {
 
     @Test
     public void whenAlreadyLockedBySelf() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         ref.lockAndGet(tx);
@@ -51,7 +51,7 @@ public class BetaLongRef_lockAndGetTest {
 
     @Test
     public void whenAlreadyLockedByOther() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);

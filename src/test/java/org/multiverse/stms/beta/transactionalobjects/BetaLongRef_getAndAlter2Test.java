@@ -15,7 +15,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 
 /**
@@ -33,7 +33,7 @@ public class BetaLongRef_getAndAlter2Test {
 
     @Test
     public void whenNullTransaction_thenNullPointerException() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
         LongFunction function = mock(LongFunction.class);
 
@@ -49,7 +49,7 @@ public class BetaLongRef_getAndAlter2Test {
 
     @Test
     public void whenNullFunction_thenNullPointerException() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -66,7 +66,7 @@ public class BetaLongRef_getAndAlter2Test {
 
     @Test
     public void whenCommittedTransaction_thenDeadTransactionException() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -86,7 +86,7 @@ public class BetaLongRef_getAndAlter2Test {
 
     @Test
     public void whenPreparedTransaction_thenPreparedTransactionException() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -106,7 +106,7 @@ public class BetaLongRef_getAndAlter2Test {
 
     @Test
     public void whenAbortedTransaction() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -139,7 +139,7 @@ public class BetaLongRef_getAndAlter2Test {
             }
         };
 
-        BetaLongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = newLongRef(stm, 100);
         BetaTransaction tx = stm.startDefaultTransaction();
         long result = ref.getAndAlter(tx, function);
         tx.commit();

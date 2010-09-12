@@ -4,9 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 
 import static org.junit.Assert.assertNull;
-import static org.multiverse.stms.beta.BetaStmUtils.createRef;
 
 public class RefTranlocal_prepareForPoolingTest {
     private BetaStm stm;
@@ -20,7 +20,7 @@ public class RefTranlocal_prepareForPoolingTest {
 
     @Test
     public void test() {
-        BetaRef<String> ref = createRef(stm, "peter");
+        BetaRef<String> ref = BetaStmUtils.newRef(stm, "peter");
         RefTranlocal tranlocal = ref.___unsafeLoad();
         tranlocal.prepareForPooling(pool);
 

@@ -9,7 +9,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class BetaLongRef_openForCommuteTest implements BetaStmConstants {
     private BetaStm stm;
@@ -24,7 +24,7 @@ public class BetaLongRef_openForCommuteTest implements BetaStmConstants {
 
     @Test
     public void whenLocked_thenOpenForCommuteNoProblem() {
-        BetaLongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = newLongRef(stm, 100);
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.openForRead(ref, true);
 
@@ -42,7 +42,7 @@ public class BetaLongRef_openForCommuteTest implements BetaStmConstants {
 
     @Test
     public void whenUnlocked_thenOpenForCommuteNoProblem() {
-        BetaLongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = newLongRef(stm, 100);
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
 
         assertNotNull(tranlocal);

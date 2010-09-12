@@ -9,8 +9,8 @@ import org.multiverse.stms.beta.transactions.FatArrayTreeBetaTransaction;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import static org.multiverse.stms.beta.BetaStmUtils.createReadBiasedLongRef;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
+import static org.multiverse.stms.beta.BetaStmUtils.newReadBiasedLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.toGnuplot;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
 
@@ -134,7 +134,7 @@ public class UncontendedMultipleUpdateScalabilityTest {
         }
 
         public void run1() {
-            BetaLongRef ref1 = createReadBiasedLongRef(stm);
+            BetaLongRef ref1 = newReadBiasedLongRef(stm);
 
             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 1).init();;
 
@@ -153,8 +153,8 @@ public class UncontendedMultipleUpdateScalabilityTest {
         }
 
         public void run2() {
-            BetaLongRef ref1 = createReadBiasedLongRef(stm);
-            BetaLongRef ref2 = createReadBiasedLongRef(stm);
+            BetaLongRef ref1 = newReadBiasedLongRef(stm);
+            BetaLongRef ref2 = newReadBiasedLongRef(stm);
 
             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 2).init();
 
@@ -175,10 +175,10 @@ public class UncontendedMultipleUpdateScalabilityTest {
         }
 
         public void run4() {
-            BetaLongRef ref1 = createReadBiasedLongRef(stm);
-            BetaLongRef ref2 = createReadBiasedLongRef(stm);
-            BetaLongRef ref3 = createReadBiasedLongRef(stm);
-            BetaLongRef ref4 = createReadBiasedLongRef(stm);
+            BetaLongRef ref1 = newReadBiasedLongRef(stm);
+            BetaLongRef ref2 = newReadBiasedLongRef(stm);
+            BetaLongRef ref3 = newReadBiasedLongRef(stm);
+            BetaLongRef ref4 = newReadBiasedLongRef(stm);
 
             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm,4).init();
             FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
@@ -199,14 +199,14 @@ public class UncontendedMultipleUpdateScalabilityTest {
         }
 
         public void run8() {
-            BetaLongRef ref1 = createReadBiasedLongRef(stm);
-            BetaLongRef ref2 = createReadBiasedLongRef(stm);
-            BetaLongRef ref3 = createReadBiasedLongRef(stm);
-            BetaLongRef ref4 = createReadBiasedLongRef(stm);
-            BetaLongRef ref5 = createReadBiasedLongRef(stm);
-            BetaLongRef ref6 = createReadBiasedLongRef(stm);
-            BetaLongRef ref7 = createReadBiasedLongRef(stm);
-            BetaLongRef ref8 = createReadBiasedLongRef(stm);
+            BetaLongRef ref1 = newReadBiasedLongRef(stm);
+            BetaLongRef ref2 = newReadBiasedLongRef(stm);
+            BetaLongRef ref3 = newReadBiasedLongRef(stm);
+            BetaLongRef ref4 = newReadBiasedLongRef(stm);
+            BetaLongRef ref5 = newReadBiasedLongRef(stm);
+            BetaLongRef ref6 = newReadBiasedLongRef(stm);
+            BetaLongRef ref7 = newReadBiasedLongRef(stm);
+            BetaLongRef ref8 = newReadBiasedLongRef(stm);
 
             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm,8).init();
             FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
@@ -233,22 +233,22 @@ public class UncontendedMultipleUpdateScalabilityTest {
         }
 
         public void run16() {
-            BetaLongRef ref1 = createReadBiasedLongRef(stm);
-            BetaLongRef ref2 = createReadBiasedLongRef(stm);
-            BetaLongRef ref3 = createReadBiasedLongRef(stm);
-            BetaLongRef ref4 = createReadBiasedLongRef(stm);
-            BetaLongRef ref5 = createReadBiasedLongRef(stm);
-            BetaLongRef ref6 = createReadBiasedLongRef(stm);
-            BetaLongRef ref7 = createReadBiasedLongRef(stm);
-            BetaLongRef ref8 = createReadBiasedLongRef(stm);
-            BetaLongRef ref9 = createReadBiasedLongRef(stm);
-            BetaLongRef ref10 = createReadBiasedLongRef(stm);
-            BetaLongRef ref11 = createReadBiasedLongRef(stm);
-            BetaLongRef ref12 = createReadBiasedLongRef(stm);
-            BetaLongRef ref13 = createReadBiasedLongRef(stm);
-            BetaLongRef ref14 = createReadBiasedLongRef(stm);
-            BetaLongRef ref15 = createReadBiasedLongRef(stm);
-            BetaLongRef ref16 = createReadBiasedLongRef(stm);
+            BetaLongRef ref1 = newReadBiasedLongRef(stm);
+            BetaLongRef ref2 = newReadBiasedLongRef(stm);
+            BetaLongRef ref3 = newReadBiasedLongRef(stm);
+            BetaLongRef ref4 = newReadBiasedLongRef(stm);
+            BetaLongRef ref5 = newReadBiasedLongRef(stm);
+            BetaLongRef ref6 = newReadBiasedLongRef(stm);
+            BetaLongRef ref7 = newReadBiasedLongRef(stm);
+            BetaLongRef ref8 = newReadBiasedLongRef(stm);
+            BetaLongRef ref9 = newReadBiasedLongRef(stm);
+            BetaLongRef ref10 = newReadBiasedLongRef(stm);
+            BetaLongRef ref11 = newReadBiasedLongRef(stm);
+            BetaLongRef ref12 = newReadBiasedLongRef(stm);
+            BetaLongRef ref13 = newReadBiasedLongRef(stm);
+            BetaLongRef ref14 = newReadBiasedLongRef(stm);
+            BetaLongRef ref15 = newReadBiasedLongRef(stm);
+            BetaLongRef ref16 = newReadBiasedLongRef(stm);
 
             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm,16);
             FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
@@ -283,38 +283,38 @@ public class UncontendedMultipleUpdateScalabilityTest {
         }
 
         public void run32() {
-            BetaLongRef ref1 = createReadBiasedLongRef(stm);
-            BetaLongRef ref2 = createReadBiasedLongRef(stm);
-            BetaLongRef ref3 = createReadBiasedLongRef(stm);
-            BetaLongRef ref4 = createReadBiasedLongRef(stm);
-            BetaLongRef ref5 = createReadBiasedLongRef(stm);
-            BetaLongRef ref6 = createReadBiasedLongRef(stm);
-            BetaLongRef ref7 = createReadBiasedLongRef(stm);
-            BetaLongRef ref8 = createReadBiasedLongRef(stm);
-            BetaLongRef ref9 = createReadBiasedLongRef(stm);
-            BetaLongRef ref10 = createReadBiasedLongRef(stm);
-            BetaLongRef ref11 = createReadBiasedLongRef(stm);
-            BetaLongRef ref12 = createReadBiasedLongRef(stm);
-            BetaLongRef ref13 = createReadBiasedLongRef(stm);
-            BetaLongRef ref14 = createReadBiasedLongRef(stm);
-            BetaLongRef ref15 = createReadBiasedLongRef(stm);
-            BetaLongRef ref16 = createReadBiasedLongRef(stm);
-            BetaLongRef ref17 = createReadBiasedLongRef(stm);
-            BetaLongRef ref18 = createReadBiasedLongRef(stm);
-            BetaLongRef ref19 = createReadBiasedLongRef(stm);
-            BetaLongRef ref20 = createReadBiasedLongRef(stm);
-            BetaLongRef ref21 = createReadBiasedLongRef(stm);
-            BetaLongRef ref22 = createReadBiasedLongRef(stm);
-            BetaLongRef ref23 = createReadBiasedLongRef(stm);
-            BetaLongRef ref24 = createReadBiasedLongRef(stm);
-            BetaLongRef ref25 = createReadBiasedLongRef(stm);
-            BetaLongRef ref26 = createReadBiasedLongRef(stm);
-            BetaLongRef ref27 = createReadBiasedLongRef(stm);
-            BetaLongRef ref28 = createReadBiasedLongRef(stm);
-            BetaLongRef ref29 = createReadBiasedLongRef(stm);
-            BetaLongRef ref30 = createReadBiasedLongRef(stm);
-            BetaLongRef ref31 = createReadBiasedLongRef(stm);
-            BetaLongRef ref32 = createReadBiasedLongRef(stm);
+            BetaLongRef ref1 = newReadBiasedLongRef(stm);
+            BetaLongRef ref2 = newReadBiasedLongRef(stm);
+            BetaLongRef ref3 = newReadBiasedLongRef(stm);
+            BetaLongRef ref4 = newReadBiasedLongRef(stm);
+            BetaLongRef ref5 = newReadBiasedLongRef(stm);
+            BetaLongRef ref6 = newReadBiasedLongRef(stm);
+            BetaLongRef ref7 = newReadBiasedLongRef(stm);
+            BetaLongRef ref8 = newReadBiasedLongRef(stm);
+            BetaLongRef ref9 = newReadBiasedLongRef(stm);
+            BetaLongRef ref10 = newReadBiasedLongRef(stm);
+            BetaLongRef ref11 = newReadBiasedLongRef(stm);
+            BetaLongRef ref12 = newReadBiasedLongRef(stm);
+            BetaLongRef ref13 = newReadBiasedLongRef(stm);
+            BetaLongRef ref14 = newReadBiasedLongRef(stm);
+            BetaLongRef ref15 = newReadBiasedLongRef(stm);
+            BetaLongRef ref16 = newReadBiasedLongRef(stm);
+            BetaLongRef ref17 = newReadBiasedLongRef(stm);
+            BetaLongRef ref18 = newReadBiasedLongRef(stm);
+            BetaLongRef ref19 = newReadBiasedLongRef(stm);
+            BetaLongRef ref20 = newReadBiasedLongRef(stm);
+            BetaLongRef ref21 = newReadBiasedLongRef(stm);
+            BetaLongRef ref22 = newReadBiasedLongRef(stm);
+            BetaLongRef ref23 = newReadBiasedLongRef(stm);
+            BetaLongRef ref24 = newReadBiasedLongRef(stm);
+            BetaLongRef ref25 = newReadBiasedLongRef(stm);
+            BetaLongRef ref26 = newReadBiasedLongRef(stm);
+            BetaLongRef ref27 = newReadBiasedLongRef(stm);
+            BetaLongRef ref28 = newReadBiasedLongRef(stm);
+            BetaLongRef ref29 = newReadBiasedLongRef(stm);
+            BetaLongRef ref30 = newReadBiasedLongRef(stm);
+            BetaLongRef ref31 = newReadBiasedLongRef(stm);
+            BetaLongRef ref32 = newReadBiasedLongRef(stm);
 
             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm,32).init();
             FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
@@ -365,70 +365,70 @@ public class UncontendedMultipleUpdateScalabilityTest {
         }
 
         public void run64() {
-            BetaLongRef ref1 = createReadBiasedLongRef(stm);
-            BetaLongRef ref2 = createReadBiasedLongRef(stm);
-            BetaLongRef ref3 = createReadBiasedLongRef(stm);
-            BetaLongRef ref4 = createReadBiasedLongRef(stm);
-            BetaLongRef ref5 = createReadBiasedLongRef(stm);
-            BetaLongRef ref6 = createReadBiasedLongRef(stm);
-            BetaLongRef ref7 = createReadBiasedLongRef(stm);
-            BetaLongRef ref8 = createReadBiasedLongRef(stm);
-            BetaLongRef ref9 = createReadBiasedLongRef(stm);
-            BetaLongRef ref10 = createReadBiasedLongRef(stm);
-            BetaLongRef ref11 = createReadBiasedLongRef(stm);
-            BetaLongRef ref12 = createReadBiasedLongRef(stm);
-            BetaLongRef ref13 = createReadBiasedLongRef(stm);
-            BetaLongRef ref14 = createReadBiasedLongRef(stm);
-            BetaLongRef ref15 = createReadBiasedLongRef(stm);
-            BetaLongRef ref16 = createReadBiasedLongRef(stm);
-            BetaLongRef ref17 = createReadBiasedLongRef(stm);
-            BetaLongRef ref18 = createReadBiasedLongRef(stm);
-            BetaLongRef ref19 = createReadBiasedLongRef(stm);
-            BetaLongRef ref20 = createReadBiasedLongRef(stm);
-            BetaLongRef ref21 = createReadBiasedLongRef(stm);
-            BetaLongRef ref22 = createReadBiasedLongRef(stm);
-            BetaLongRef ref23 = createReadBiasedLongRef(stm);
-            BetaLongRef ref24 = createReadBiasedLongRef(stm);
-            BetaLongRef ref25 = createReadBiasedLongRef(stm);
-            BetaLongRef ref26 = createReadBiasedLongRef(stm);
-            BetaLongRef ref27 = createReadBiasedLongRef(stm);
-            BetaLongRef ref28 = createReadBiasedLongRef(stm);
-            BetaLongRef ref29 = createReadBiasedLongRef(stm);
-            BetaLongRef ref30 = createReadBiasedLongRef(stm);
-            BetaLongRef ref31 = createReadBiasedLongRef(stm);
-            BetaLongRef ref32 = createReadBiasedLongRef(stm);
-            BetaLongRef ref33 = createReadBiasedLongRef(stm);
-            BetaLongRef ref34 = createReadBiasedLongRef(stm);
-            BetaLongRef ref35 = createReadBiasedLongRef(stm);
-            BetaLongRef ref36 = createReadBiasedLongRef(stm);
-            BetaLongRef ref37 = createReadBiasedLongRef(stm);
-            BetaLongRef ref38 = createReadBiasedLongRef(stm);
-            BetaLongRef ref39 = createReadBiasedLongRef(stm);
-            BetaLongRef ref40 = createReadBiasedLongRef(stm);
-            BetaLongRef ref41 = createReadBiasedLongRef(stm);
-            BetaLongRef ref42 = createReadBiasedLongRef(stm);
-            BetaLongRef ref43 = createReadBiasedLongRef(stm);
-            BetaLongRef ref44 = createReadBiasedLongRef(stm);
-            BetaLongRef ref45 = createReadBiasedLongRef(stm);
-            BetaLongRef ref46 = createReadBiasedLongRef(stm);
-            BetaLongRef ref47 = createReadBiasedLongRef(stm);
-            BetaLongRef ref48 = createReadBiasedLongRef(stm);
-            BetaLongRef ref49 = createReadBiasedLongRef(stm);
-            BetaLongRef ref50 = createReadBiasedLongRef(stm);
-            BetaLongRef ref51 = createReadBiasedLongRef(stm);
-            BetaLongRef ref52 = createReadBiasedLongRef(stm);
-            BetaLongRef ref53 = createReadBiasedLongRef(stm);
-            BetaLongRef ref54 = createReadBiasedLongRef(stm);
-            BetaLongRef ref55 = createReadBiasedLongRef(stm);
-            BetaLongRef ref56 = createReadBiasedLongRef(stm);
-            BetaLongRef ref57 = createReadBiasedLongRef(stm);
-            BetaLongRef ref58 = createReadBiasedLongRef(stm);
-            BetaLongRef ref59 = createReadBiasedLongRef(stm);
-            BetaLongRef ref60 = createReadBiasedLongRef(stm);
-            BetaLongRef ref61 = createReadBiasedLongRef(stm);
-            BetaLongRef ref62 = createReadBiasedLongRef(stm);
-            BetaLongRef ref63 = createReadBiasedLongRef(stm);
-            BetaLongRef ref64 = createReadBiasedLongRef(stm);
+            BetaLongRef ref1 = newReadBiasedLongRef(stm);
+            BetaLongRef ref2 = newReadBiasedLongRef(stm);
+            BetaLongRef ref3 = newReadBiasedLongRef(stm);
+            BetaLongRef ref4 = newReadBiasedLongRef(stm);
+            BetaLongRef ref5 = newReadBiasedLongRef(stm);
+            BetaLongRef ref6 = newReadBiasedLongRef(stm);
+            BetaLongRef ref7 = newReadBiasedLongRef(stm);
+            BetaLongRef ref8 = newReadBiasedLongRef(stm);
+            BetaLongRef ref9 = newReadBiasedLongRef(stm);
+            BetaLongRef ref10 = newReadBiasedLongRef(stm);
+            BetaLongRef ref11 = newReadBiasedLongRef(stm);
+            BetaLongRef ref12 = newReadBiasedLongRef(stm);
+            BetaLongRef ref13 = newReadBiasedLongRef(stm);
+            BetaLongRef ref14 = newReadBiasedLongRef(stm);
+            BetaLongRef ref15 = newReadBiasedLongRef(stm);
+            BetaLongRef ref16 = newReadBiasedLongRef(stm);
+            BetaLongRef ref17 = newReadBiasedLongRef(stm);
+            BetaLongRef ref18 = newReadBiasedLongRef(stm);
+            BetaLongRef ref19 = newReadBiasedLongRef(stm);
+            BetaLongRef ref20 = newReadBiasedLongRef(stm);
+            BetaLongRef ref21 = newReadBiasedLongRef(stm);
+            BetaLongRef ref22 = newReadBiasedLongRef(stm);
+            BetaLongRef ref23 = newReadBiasedLongRef(stm);
+            BetaLongRef ref24 = newReadBiasedLongRef(stm);
+            BetaLongRef ref25 = newReadBiasedLongRef(stm);
+            BetaLongRef ref26 = newReadBiasedLongRef(stm);
+            BetaLongRef ref27 = newReadBiasedLongRef(stm);
+            BetaLongRef ref28 = newReadBiasedLongRef(stm);
+            BetaLongRef ref29 = newReadBiasedLongRef(stm);
+            BetaLongRef ref30 = newReadBiasedLongRef(stm);
+            BetaLongRef ref31 = newReadBiasedLongRef(stm);
+            BetaLongRef ref32 = newReadBiasedLongRef(stm);
+            BetaLongRef ref33 = newReadBiasedLongRef(stm);
+            BetaLongRef ref34 = newReadBiasedLongRef(stm);
+            BetaLongRef ref35 = newReadBiasedLongRef(stm);
+            BetaLongRef ref36 = newReadBiasedLongRef(stm);
+            BetaLongRef ref37 = newReadBiasedLongRef(stm);
+            BetaLongRef ref38 = newReadBiasedLongRef(stm);
+            BetaLongRef ref39 = newReadBiasedLongRef(stm);
+            BetaLongRef ref40 = newReadBiasedLongRef(stm);
+            BetaLongRef ref41 = newReadBiasedLongRef(stm);
+            BetaLongRef ref42 = newReadBiasedLongRef(stm);
+            BetaLongRef ref43 = newReadBiasedLongRef(stm);
+            BetaLongRef ref44 = newReadBiasedLongRef(stm);
+            BetaLongRef ref45 = newReadBiasedLongRef(stm);
+            BetaLongRef ref46 = newReadBiasedLongRef(stm);
+            BetaLongRef ref47 = newReadBiasedLongRef(stm);
+            BetaLongRef ref48 = newReadBiasedLongRef(stm);
+            BetaLongRef ref49 = newReadBiasedLongRef(stm);
+            BetaLongRef ref50 = newReadBiasedLongRef(stm);
+            BetaLongRef ref51 = newReadBiasedLongRef(stm);
+            BetaLongRef ref52 = newReadBiasedLongRef(stm);
+            BetaLongRef ref53 = newReadBiasedLongRef(stm);
+            BetaLongRef ref54 = newReadBiasedLongRef(stm);
+            BetaLongRef ref55 = newReadBiasedLongRef(stm);
+            BetaLongRef ref56 = newReadBiasedLongRef(stm);
+            BetaLongRef ref57 = newReadBiasedLongRef(stm);
+            BetaLongRef ref58 = newReadBiasedLongRef(stm);
+            BetaLongRef ref59 = newReadBiasedLongRef(stm);
+            BetaLongRef ref60 = newReadBiasedLongRef(stm);
+            BetaLongRef ref61 = newReadBiasedLongRef(stm);
+            BetaLongRef ref62 = newReadBiasedLongRef(stm);
+            BetaLongRef ref63 = newReadBiasedLongRef(stm);
+            BetaLongRef ref64 = newReadBiasedLongRef(stm);
 
             BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm,64).init();
             FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);

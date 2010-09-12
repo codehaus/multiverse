@@ -16,7 +16,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newIntRef;
 
 /**
  * A StressTest that checks if a the Semaphore; a traditional synchronization structure can be build
@@ -106,7 +106,7 @@ public class NonReentrantSemaphoreStressTest {
         };
 
         public Semaphore(int initial) {
-            ref = createIntRef(stm, initial);
+            ref = newIntRef(stm, initial);
         }
 
         public void up() {

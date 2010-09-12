@@ -8,6 +8,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -16,7 +17,6 @@ import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
 
 public class TooManyRetriesRollbackTest {
     private BetaIntRef modifyRef;
@@ -28,8 +28,8 @@ public class TooManyRetriesRollbackTest {
     public void setUp() {
         clearThreadLocalTransaction();
         stm = new BetaStm();
-        modifyRef = createIntRef(stm);
-        retryRef = createIntRef(stm);
+        modifyRef = BetaStmUtils.newIntRef(stm);
+        retryRef = BetaStmUtils.newIntRef(stm);
         finished = false;
     }
 

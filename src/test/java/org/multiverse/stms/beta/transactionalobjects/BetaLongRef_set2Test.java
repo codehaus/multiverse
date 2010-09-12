@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 /**
  * Tests {@link BetaLongRef#set(BetaTransaction, long)}.
@@ -32,7 +32,7 @@ public class BetaLongRef_set2Test {
 
     @Test
     public void whenNullTransaction() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         try {
@@ -46,7 +46,7 @@ public class BetaLongRef_set2Test {
 
     @Test
     public void whenPreparedTransaction_thenPreparedTransactionException() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.prepare();
@@ -63,7 +63,7 @@ public class BetaLongRef_set2Test {
 
     @Test
     public void whenAbortedTransaction_thenDeadTransactionException() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.abort();
@@ -80,7 +80,7 @@ public class BetaLongRef_set2Test {
 
     @Test
     public void whenCommittedTransaction_thenCommittedTransactionException() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.commit();
@@ -97,7 +97,7 @@ public class BetaLongRef_set2Test {
 
     @Test
     public void whenSuccess() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         long result = ref.set(tx, 20);
@@ -109,7 +109,7 @@ public class BetaLongRef_set2Test {
 
     @Test
     public void whenNormalTransactionMethodCalled() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
 
         Transaction tx = new FatMonoBetaTransaction(stm);
         long result = ref.set(tx, 20);

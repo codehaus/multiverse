@@ -6,12 +6,12 @@ import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.exceptions.ReadConflict;
 import org.multiverse.api.exceptions.WriteConflict;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class PessimisticTest {
     private BetaStm stm;
@@ -32,7 +32,7 @@ public class PessimisticTest {
 
     @Test
     public void whenValueAlreadyRead_thenLockDoesntMatter() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.openForRead(ref, false);
@@ -49,7 +49,7 @@ public class PessimisticTest {
 
     @Test
     public void whenCantComitedWhenLocked() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.openForWrite(ref, false).value++;
@@ -69,7 +69,7 @@ public class PessimisticTest {
 
     @Test
     public void pessimisticWriteLevelOverridesOpenForWriteButNotLocked() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setPessimisticLockLevel(PessimisticLockLevel.Write)
@@ -83,7 +83,7 @@ public class PessimisticTest {
 
     @Test
     public void whenPessimisticWriteLevelUsed_readIsNotLocked() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setPessimisticLockLevel(PessimisticLockLevel.Write)
@@ -97,7 +97,7 @@ public class PessimisticTest {
 
     @Test
     public void pessimisticReadLevelOverridesOpenForReadButNotLocked() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setPessimisticLockLevel(PessimisticLockLevel.Read)
@@ -111,7 +111,7 @@ public class PessimisticTest {
 
     @Test
     public void lockAcquiredWhileDoingOpenForReadIsReentrant() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.openForRead(ref, true);
@@ -122,7 +122,7 @@ public class PessimisticTest {
 
     @Test
     public void lockAcquiredWhileDoingOpenForWriteIsReentrant() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.openForWrite(ref, true);
@@ -133,7 +133,7 @@ public class PessimisticTest {
 
     @Test
     public void whenLockCantBeAcquired_thenTransactionAborted() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, true);
@@ -152,7 +152,7 @@ public class PessimisticTest {
 
     @Test
     public void whenTransactionAborted_thenLockReleased() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.openForRead(ref, true);
@@ -164,7 +164,7 @@ public class PessimisticTest {
 
     @Test
     public void whenTransactionCommitted_thenLockReleased() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.openForRead(ref, true);

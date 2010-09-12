@@ -4,12 +4,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.BetaStmUtils.createRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newRef;
 
 public class BetaRef_isNull0Test {
     private BetaStm stm;
@@ -22,19 +23,19 @@ public class BetaRef_isNull0Test {
 
     @Test
     public void whenNoTransactionAvailableAndNoValue() {
-        BetaRef ref = createRef(stm);
+        BetaRef ref = newRef(stm);
         assertTrue(ref.isNull());
     }
 
     @Test
     public void whenNoTransactionAvailableAndValue() {
-        BetaRef ref = createRef(stm, "foo");
+        BetaRef ref = BetaStmUtils.newRef(stm, "foo");
         assertFalse(ref.isNull());
     }
 
     @Test
     public void whenActiveTransactionAvailable() {
-        BetaRef ref = createRef(stm, "foo");
+        BetaRef ref = BetaStmUtils.newRef(stm, "foo");
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -47,7 +48,7 @@ public class BetaRef_isNull0Test {
 
     @Test
     public void whenPreparedTransactionAvailable_thenPreparedTransactionException() {
-        BetaRef ref = createRef(stm);
+        BetaRef ref = newRef(stm);
         RefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -67,7 +68,7 @@ public class BetaRef_isNull0Test {
 
     @Test
     public void whenCommittedTransactionAvailable_thenCallExecutedAtomically() {
-        BetaRef ref = createRef(stm);
+        BetaRef ref = newRef(stm);
         RefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -84,7 +85,7 @@ public class BetaRef_isNull0Test {
 
     @Test
     public void whenAbortedTransactionAvailable() {
-        BetaRef ref = createRef(stm);
+        BetaRef ref = newRef(stm);
         RefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();

@@ -17,7 +17,6 @@ import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class BetaTransactionTemplate_timeoutTest {
 
@@ -29,7 +28,7 @@ public class BetaTransactionTemplate_timeoutTest {
     public void setUp() {
         clearThreadLocalTransaction();
         stm = new BetaStm();
-        ref = createLongRef(stm);
+        ref = BetaStmUtils.newLongRef(stm);
         timeoutNs = TimeUnit.SECONDS.toNanos(2);
     }
 

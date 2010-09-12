@@ -100,7 +100,7 @@ public class UncontendedLeanUpdateScalabilityTest {
         }
 
         public void doRun() {
-            BetaLongRef ref = BetaStmUtils.createLongRef(stm);
+            BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
             //FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
             //FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm,1);

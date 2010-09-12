@@ -14,7 +14,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class MoneyTransferStressTest {
 
@@ -79,7 +79,7 @@ public class MoneyTransferStressTest {
         for (int k = 0; k < accountCount; k++) {
             long amount = randomInt(1000);
             initialAmount += amount;
-            accounts[k] = createLongRef(stm, amount);
+            accounts[k] = newLongRef(stm, amount);
         }
 
         TransferThread[] threads = createThreads(threadCount);

@@ -100,7 +100,7 @@ public class UncontendedLeanReadScalabilityTest {
         }
 
         public void run() {
-            BetaLongRef ref = BetaStmUtils.createReadBiasedLongRef(stm);
+            BetaLongRef ref = BetaStmUtils.newReadBiasedLongRef(stm);
 
             LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
                     new BetaTransactionConfiguration(stm).setReadonly(true));

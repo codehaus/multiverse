@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
@@ -52,8 +52,8 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void conflictCounterIsOnlySetOnFirstRead() {
-        BetaLongRef ref1 = createLongRef(stm);
-        BetaLongRef ref2 = createLongRef(stm);
+        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         stm.getGlobalConflictCounter().signalConflict(ref1);
@@ -72,10 +72,10 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void whenOverflowing() {
-        BetaLongRef ref1 = createLongRef(stm);
-        BetaLongRef ref2 = createLongRef(stm);
-        BetaLongRef ref3 = createLongRef(stm);
-        BetaLongRef ref4 = createLongRef(stm);
+        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref3 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref4 = BetaStmUtils.newLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 3);
         config.init();
@@ -160,7 +160,7 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void whenUpdateBiased() {
-        BetaLongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = newLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -202,7 +202,7 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void whenUpdateBiasedAndLock() {
-        BetaLongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = newLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -223,7 +223,7 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void whenAlreadyOpenedForWrite() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -246,7 +246,7 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void whenAlreadyOpenedForWrite_thenNoReadConflict() {
-        BetaLongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = newLongRef(stm, 100);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false);
@@ -273,7 +273,7 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void whenAlreadyOpenedForRead_thenNoReadConflict() {
-        BetaLongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = newLongRef(stm, 100);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         LongRefTranlocal read1 = tx.openForRead(ref, false);
@@ -339,7 +339,7 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void whenLockedByOther_thenReadConflict() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction other = new FatArrayBetaTransaction(stm);
@@ -365,8 +365,8 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void whenReadConflict() {
-        BetaLongRef ref1 = createLongRef(stm);
-        BetaLongRef ref2 = createLongRef(stm);
+        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         LongRefTranlocal read1 = tx.openForRead(ref1, false);
@@ -395,7 +395,7 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void conflictCounterIsSetAtFirstRead() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
 
@@ -408,15 +408,15 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void conflictCounterIsNotSetWhenAlreadyRead() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
 
-        stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
+        stm.getGlobalConflictCounter().signalConflict(BetaStmUtils.newLongRef(stm));
 
         tx.openForRead(ref, false);
         long localConflictCount = tx.getLocalConflictCounter().get();
-        stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
+        stm.getGlobalConflictCounter().signalConflict(BetaStmUtils.newLongRef(stm));
 
         tx.openForRead(ref, false);
 
@@ -427,7 +427,7 @@ public class FatArrayBetaTransaction_openForReadTest {
     @Test
     public void whenContainsUntrackedRead_thenCantRecoverFromUnrealReadConflict() {
         BetaLongRef ref1 = createReadBiasedLongRef(stm, 100);
-        BetaLongRef ref2 = createLongRef(stm);
+        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setReadTrackingEnabled(false);
@@ -436,7 +436,7 @@ public class FatArrayBetaTransaction_openForReadTest {
         tx.openForRead(ref1, false);
 
         //an unreal readconflict
-        stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
+        stm.getGlobalConflictCounter().signalConflict(BetaStmUtils.newLongRef(stm));
 
         try {
             tx.openForRead(ref2, false);
@@ -455,23 +455,23 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void whenUnrealConflictThenConflictCounterUpdated() {
-        BetaLongRef ref1 = createLongRef(stm);
-        BetaLongRef ref2 = createLongRef(stm);
-        BetaLongRef ref3 = createLongRef(stm);
+        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref3 = BetaStmUtils.newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
 
-        stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
+        stm.getGlobalConflictCounter().signalConflict(BetaStmUtils.newLongRef(stm));
 
         tx.openForRead(ref1, false);
 
         //do second read
-        stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
+        stm.getGlobalConflictCounter().signalConflict(BetaStmUtils.newLongRef(stm));
         tx.openForRead(ref2, false);
         assertEquals(stm.getGlobalConflictCounter().count(), tx.getLocalConflictCounter().get());
 
         //do another read
-        stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
+        stm.getGlobalConflictCounter().signalConflict(BetaStmUtils.newLongRef(stm));
         tx.openForRead(ref3, false);
         assertEquals(stm.getGlobalConflictCounter().count(), tx.getLocalConflictCounter().get());
 
@@ -480,9 +480,9 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void whenMultipleOpenForReads() {
-        BetaLongRef ref1 = BetaStmUtils.createLongRef(stm);
-        BetaLongRef ref2 = BetaStmUtils.createLongRef(stm);
-        BetaLongRef ref3 = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref3 = BetaStmUtils.newLongRef(stm);
 
         BetaTransaction tx = new FatArrayBetaTransaction(stm);
         Tranlocal read1 = tx.openForRead(ref1, false);
@@ -500,7 +500,7 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void whenPessimisticRead() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
@@ -520,8 +520,8 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void whenPessimisticThenNoConflictDetectionNeeded() {
-        BetaLongRef ref1 = createLongRef(stm);
-        BetaLongRef ref2 = createLongRef(stm);
+        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.Read);
@@ -531,7 +531,7 @@ public class FatArrayBetaTransaction_openForReadTest {
 
         long oldLocalConflictCount = tx.getLocalConflictCounter().get();
 
-        stm.getGlobalConflictCounter().signalConflict(createLongRef(stm));
+        stm.getGlobalConflictCounter().signalConflict(BetaStmUtils.newLongRef(stm));
 
         tx.openForRead(ref2, false);
         assertEquals(oldLocalConflictCount, tx.getLocalConflictCounter().get());
@@ -539,7 +539,7 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void comute_whenHasCommutingFunctions() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -565,7 +565,7 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void commute_whenHasCommutingFunctionsAndLocked() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction otherTx = new FatArrayBetaTransaction(stm);
@@ -592,8 +592,8 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void commute_whenCommuteConflicts_thenAborted() {
-        BetaLongRef ref1 = createLongRef(stm, 10);
-        BetaLongRef ref2 = createLongRef(stm, 10);
+        BetaLongRef ref1 = newLongRef(stm, 10);
+        BetaLongRef ref2 = newLongRef(stm, 10);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.openForRead(ref1, false);
@@ -625,7 +625,7 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void commute_whenCommuteAvailableThatCausesProblems_thenAbort() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         LongFunction function = mock(LongFunction.class);
@@ -652,7 +652,7 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void commute_whenCommuteAvailableThatCausesProblemsAndLock_thenAbort() {
-        BetaLongRef ref = createLongRef(stm, 10);
+        BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         LongFunction function = mock(LongFunction.class);
@@ -679,7 +679,7 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void whenPrepared_thenPreparedException() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.prepare();
@@ -695,7 +695,7 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void whenAborted_thenDeadTransactionException() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.abort();
@@ -711,7 +711,7 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     public void whenCommitted_thenDeadTransactionException() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.commit();

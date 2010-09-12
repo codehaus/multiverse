@@ -18,7 +18,6 @@ import static org.multiverse.TestUtils.assertAlive;
 import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class BetaAtomicBlock_interruptibleTest {
 
@@ -32,7 +31,7 @@ public class BetaAtomicBlock_interruptibleTest {
 
     @Test
     public void whenNoTimeoutAndInterruptible() throws InterruptedException {
-        final BetaLongRef ref = createLongRef(stm);
+        final BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setInterruptible(true)
@@ -55,7 +54,7 @@ public class BetaAtomicBlock_interruptibleTest {
 
     @Test
     public void whenTimeoutAndInterruptible() throws InterruptedException {
-        final BetaLongRef ref = createLongRef(stm);
+        final BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setTimeoutNs(TimeUnit.SECONDS.toNanos(10))

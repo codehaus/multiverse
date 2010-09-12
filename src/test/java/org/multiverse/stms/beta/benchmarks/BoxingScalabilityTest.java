@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.stms.beta.BetaStmUtils.createRef;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
@@ -149,7 +148,7 @@ public class BoxingScalabilityTest {
         }
 
         public void run() {
-            BetaLongRef ref = BetaStmUtils.createLongRef(stm);
+            BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
             LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
                     new BetaTransactionConfiguration(stm)
@@ -180,7 +179,7 @@ public class BoxingScalabilityTest {
         }
 
         public void run() {
-            BetaRef<Long> ref = createRef(stm, new Long(0));
+            BetaRef<Long> ref = BetaStmUtils.newRef(stm, new Long(0));
 
             LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
                     new BetaTransactionConfiguration(stm)

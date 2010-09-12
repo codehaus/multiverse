@@ -20,7 +20,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.assertInstanceof;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 
 public class BetaAtomicBlock_speculativeTest {
 
@@ -35,7 +34,7 @@ public class BetaAtomicBlock_speculativeTest {
     public void whenTransactionGrowing() {
         final BetaLongRef[] refs = new BetaLongRef[1000];
         for (int k = 0; k < refs.length; k++) {
-            refs[k] = createLongRef(stm);
+            refs[k] = BetaStmUtils.newLongRef(stm);
         }
 
         final List<BetaTransaction> transactions = new LinkedList<BetaTransaction>();
@@ -99,7 +98,7 @@ public class BetaAtomicBlock_speculativeTest {
     @Test
     public void whenCommute() {
         final List<BetaTransaction> transactions = new LinkedList<BetaTransaction>();
-        final BetaLongRef ref = createLongRef(stm);
+        final BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         final LongFunction function = mock(LongFunction.class);
 
         AtomicBlock block = stm.createTransactionFactoryBuilder()
@@ -156,8 +155,8 @@ public class BetaAtomicBlock_speculativeTest {
 
     @Test
     public void whenTimeoutAvailable_thenCopied() {
-        final BetaLongRef ref1 = createLongRef(stm);
-        final BetaLongRef ref2 = createLongRef(stm);
+        final BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
+        final BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
 
         final List<BetaTransaction> transactions = new LinkedList<BetaTransaction>();
 

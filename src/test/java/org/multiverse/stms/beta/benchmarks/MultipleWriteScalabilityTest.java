@@ -8,8 +8,8 @@ import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import static org.multiverse.stms.beta.BetaStmUtils.createReadBiasedLongRef;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
+import static org.multiverse.stms.beta.BetaStmUtils.newReadBiasedLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
 /**
@@ -108,7 +108,7 @@ public class MultipleWriteScalabilityTest {
         public void run() {
             BetaLongRef[] refs = new BetaLongRef[refCount];
             for (int k = 0; k < refCount; k++) {
-                refs[k] = createReadBiasedLongRef(stm);
+                refs[k] = newReadBiasedLongRef(stm);
             }
 
             //AnotherInlinedMonoUpdateTransaction tx = new AnotherInlinedMonoUpdateTransaction(stm);

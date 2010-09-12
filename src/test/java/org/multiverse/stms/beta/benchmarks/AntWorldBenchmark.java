@@ -33,7 +33,7 @@ public class AntWorldBenchmark {
         cells = new BetaLongRef[worldSize];
 
         for (int k = 0; k < cells.length; k++) {
-            cells[k] = BetaStmUtils.createLongRef(stm);
+            cells[k] = BetaStmUtils.newLongRef(stm);
         }
     }
 

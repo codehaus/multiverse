@@ -7,8 +7,8 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
 /**
@@ -99,7 +99,7 @@ public class UncontendedAtomicSetScalabilityTest {
         }
 
         public void run() {
-            BetaLongRef ref = createLongRef(stm, -1);
+            BetaLongRef ref = newLongRef(stm, -1);
 
             long startMs = System.currentTimeMillis();
             for (long k = 0; k < transactionCount; k++) {

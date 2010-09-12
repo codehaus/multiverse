@@ -23,7 +23,7 @@ public class BetaLongRef_loadTest {
 
     @Test
     public void whenLockedByOther_thenLockedException() {
-        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         BetaTransaction other = stm.startDefaultTransaction();
         Tranlocal read1 = other.openForRead(ref, false);
@@ -37,7 +37,7 @@ public class BetaLongRef_loadTest {
 
     @Test
     public void whenSuccess() {
-        BetaTransactionalObject ref = BetaStmUtils.createLongRef(stm);
+        BetaTransactionalObject ref = BetaStmUtils.newLongRef(stm);
         Tranlocal committed = ref.___unsafeLoad();
 
         Tranlocal tranlocal = ref.___load(1);

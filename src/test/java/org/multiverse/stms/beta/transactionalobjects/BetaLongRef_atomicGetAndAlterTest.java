@@ -6,6 +6,7 @@ import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
@@ -13,7 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaLongRef_atomicGetAndAlterTest {
@@ -27,7 +28,7 @@ public class BetaLongRef_atomicGetAndAlterTest {
 
     @Test
     public void whenSuccess() {
-        BetaLongRef ref = createLongRef(stm, 2);
+        BetaLongRef ref = newLongRef(stm, 2);
 
         LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
         long result = ref.atomicGetAndAlter(function);
@@ -42,7 +43,7 @@ public class BetaLongRef_atomicGetAndAlterTest {
 
     @Test
     public void whenNullFunction_thenNullPointerException() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         try {
@@ -61,7 +62,7 @@ public class BetaLongRef_atomicGetAndAlterTest {
 
     @Test
     public void whenActiveTransactionAvailable_thenIgnored() {
-        BetaLongRef ref = createLongRef(stm, 2);
+        BetaLongRef ref = newLongRef(stm, 2);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -82,7 +83,7 @@ public class BetaLongRef_atomicGetAndAlterTest {
 
     @Test
     public void whenLocked() {
-        BetaLongRef ref = createLongRef(stm, 2);
+        BetaLongRef ref = newLongRef(stm, 2);
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.openForRead(ref, true);
 

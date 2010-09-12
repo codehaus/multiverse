@@ -99,7 +99,7 @@ public class UncontendedAtomicGetScalabilityTest {
         }
 
         public void run() {
-            BetaLongRef ref = BetaStmUtils.createReadBiasedLongRef(stm);
+            BetaLongRef ref = BetaStmUtils.newReadBiasedLongRef(stm);
 
             long startMs = System.currentTimeMillis();
 

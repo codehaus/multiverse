@@ -3,13 +3,14 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.arbitraryUpdate;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
@@ -26,7 +27,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest {
 
     @Test
     public void whenFree() {
-        BetaLongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal write = tx.openForRead(ref, false);
@@ -41,7 +42,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest {
 
     @Test
     public void whenConflict() {
-        BetaLongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, false);
@@ -63,7 +64,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest {
 
     @Test
     public void whenLockedByOtherAndUpdated() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal read = tx.openForRead(ref, false);
@@ -85,7 +86,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest {
 
     @Test
     public void whenPendingUpdate() {
-        BetaLongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = stm.startDefaultTransaction();
 
@@ -106,7 +107,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest {
 
     @Test
     public void whenAlreadyLockedBySelf() {
-        BetaLongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = newLongRef(stm, 0);
 
         //lock it by this thread.
         BetaTransaction tx = stm.startDefaultTransaction();

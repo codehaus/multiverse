@@ -8,7 +8,7 @@ import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 
 import static org.junit.Assert.*;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmConstants {
 
@@ -23,7 +23,7 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
 
     @Test
     public void whenCommutingFunctionDoesntChangeValue() {
-        BetaLongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = newLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
@@ -42,7 +42,7 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
   
     @Test
     public void whenSingleCommutingFunction() {
-        BetaLongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = newLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
@@ -60,7 +60,7 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
 
     @Test
     public void whenMultipleCommutingFunctions() {
-        BetaLongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = newLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);

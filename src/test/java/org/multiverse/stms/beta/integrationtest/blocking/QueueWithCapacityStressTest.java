@@ -8,6 +8,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
 import org.multiverse.stms.beta.transactionalobjects.IntRefTranlocal;
@@ -21,8 +22,7 @@ import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
-import static org.multiverse.stms.beta.BetaStmUtils.createRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newRef;
 
 public class QueueWithCapacityStressTest {
 
@@ -110,7 +110,7 @@ public class QueueWithCapacityStressTest {
         final Stack<E> readyToPopStack = new Stack<E>();
         final AtomicBlock pushBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
         final AtomicBlock popBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
-        final BetaIntRef size = createIntRef(stm);
+        final BetaIntRef size = BetaStmUtils.newIntRef(stm);
 
         public void push(final E item) {
             pushBlock.execute(new AtomicVoidClosure() {
@@ -160,7 +160,7 @@ public class QueueWithCapacityStressTest {
     }
 
     class Stack<E> {
-        final BetaRef<Node<E>> head = createRef(stm);
+        final BetaRef<Node<E>> head = newRef(stm);
 
         void push(BetaTransaction tx, E item) {
             RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, pessimistic);

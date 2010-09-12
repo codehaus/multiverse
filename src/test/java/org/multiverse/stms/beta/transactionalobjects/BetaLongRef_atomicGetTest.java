@@ -3,12 +3,12 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
-import static org.multiverse.stms.beta.BetaStmUtils.createReadBiasedLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertReadBiased;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUpdateBiased;
 
@@ -33,7 +33,7 @@ public class BetaLongRef_atomicGetTest {
 
     @Test
     public void whenActiveTransactionAvailable_thenIgnored(){
-        BetaLongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = newLongRef(stm, 100);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -46,7 +46,7 @@ public class BetaLongRef_atomicGetTest {
 
     @Test
     public void whenUpdatedBiasedOnUnlocked() {
-        BetaLongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = newLongRef(stm, 100);
 
         long result = ref.atomicGet();
         assertEquals(100, result);
@@ -55,7 +55,7 @@ public class BetaLongRef_atomicGetTest {
 
     @Test
     public void whenUpdateBiasedAndLocked_thenIllegalStateException() {
-        BetaLongRef ref = createLongRef(stm, 100);
+        BetaLongRef ref = newLongRef(stm, 100);
         BetaTransaction lockOwner = stm.startDefaultTransaction();
         lockOwner.openForRead(ref, true);
 
@@ -72,7 +72,7 @@ public class BetaLongRef_atomicGetTest {
 
     @Test
     public void whenReadBiasedAndUnlocked() {
-        BetaLongRef ref = createReadBiasedLongRef(stm, 100);
+        BetaLongRef ref = BetaStmUtils.newReadBiasedLongRef(stm, 100);
 
         long result = ref.atomicGet();
         assertEquals(100, result);
@@ -81,7 +81,7 @@ public class BetaLongRef_atomicGetTest {
 
     @Test
     public void whenReadBiasedAndLocked() {
-        BetaLongRef ref = createReadBiasedLongRef(stm, 100);
+        BetaLongRef ref = BetaStmUtils.newReadBiasedLongRef(stm, 100);
         BetaTransaction lockOwner = stm.startDefaultTransaction();
         lockOwner.openForRead(ref, true);
 

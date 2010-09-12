@@ -9,6 +9,7 @@ import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicIntClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
 import org.multiverse.stms.beta.transactionalobjects.IntRefTranlocal;
@@ -21,8 +22,7 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
-import static org.multiverse.stms.beta.BetaStmUtils.createRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newRef;
 
 /**
  * A StressTest that simulates a database connection pool. The code is quite ugly, but that is because
@@ -80,8 +80,8 @@ public class ConnectionPoolStressTest {
 
         final AtomicBlock sizeBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
 
-        final BetaIntRef size = createIntRef(stm);
-        final BetaRef<Node<Connection>> head = createRef(stm);
+        final BetaIntRef size = BetaStmUtils.newIntRef(stm);
+        final BetaRef<Node<Connection>> head = newRef(stm);
 
         ConnectionPool(final int poolsize) {
             stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {

@@ -9,7 +9,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
 
@@ -30,7 +30,7 @@ public class BetaLongRef_atomicCompareAndSetTest {
 
     @Test
     public void whenActiveTransactionAvailable_thenIgnored() {
-        BetaLongRef ref = createLongRef(stm, 1);
+        BetaLongRef ref = newLongRef(stm, 1);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -48,7 +48,7 @@ public class BetaLongRef_atomicCompareAndSetTest {
 
     @Test
     public void whenExpectedValueFoundAndUpdateIsSame() {
-        BetaLongRef ref = createLongRef(stm, 1);
+        BetaLongRef ref = newLongRef(stm, 1);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         boolean result = ref.atomicCompareAndSet(1, 1);
@@ -62,7 +62,7 @@ public class BetaLongRef_atomicCompareAndSetTest {
 
     @Test
     public void whenExpectedValueFound() {
-        BetaLongRef ref = createLongRef(stm, 1);
+        BetaLongRef ref = newLongRef(stm, 1);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         boolean result = ref.atomicCompareAndSet(1, 2);
@@ -76,7 +76,7 @@ public class BetaLongRef_atomicCompareAndSetTest {
 
     @Test
     public void whenExpectedValueNotFound() {
-        BetaLongRef ref = createLongRef(stm, 2);
+        BetaLongRef ref = newLongRef(stm, 2);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         boolean result = ref.atomicCompareAndSet(1, 3);

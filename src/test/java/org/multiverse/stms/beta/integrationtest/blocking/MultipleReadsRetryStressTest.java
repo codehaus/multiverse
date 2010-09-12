@@ -7,10 +7,7 @@ import org.multiverse.TestUtils;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.FatArrayBetaTransactionFactory;
-import org.multiverse.stms.beta.FatArrayTreeBetaTransactionFactory;
-import org.multiverse.stms.beta.LeanBetaAtomicBlock;
+import org.multiverse.stms.beta.*;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
@@ -19,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class MultipleReadsRetryStressTest {
     private BetaStm stm;
@@ -32,7 +29,7 @@ public class MultipleReadsRetryStressTest {
         clearThreadLocalTransaction();
         stm = new BetaStm();
         stop = false;
-        stopRef = createLongRef(stm, 0);
+        stopRef = newLongRef(stm, 0);
     }
 
     @Test
@@ -66,7 +63,7 @@ public class MultipleReadsRetryStressTest {
     public void test(AtomicBlock atomicBlock, int refCount, int threadCount) throws InterruptedException {
         refs = new BetaLongRef[refCount];
         for (int k = 0; k < refs.length; k++) {
-            refs[k] = createLongRef(stm);
+            refs[k] = BetaStmUtils.newLongRef(stm);
         }
 
         UpdateThread[] threads = new UpdateThread[threadCount];

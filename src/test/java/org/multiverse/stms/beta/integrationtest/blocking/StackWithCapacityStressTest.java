@@ -8,6 +8,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
 import org.multiverse.stms.beta.transactionalobjects.IntRefTranlocal;
@@ -22,8 +23,7 @@ import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createIntRef;
-import static org.multiverse.stms.beta.BetaStmUtils.createRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newRef;
 
 /**
  * The test is not very efficient since a lot of temporary objects like the transaction template are created.
@@ -116,8 +116,8 @@ public class StackWithCapacityStressTest {
     }
 
     class Stack<E> {
-        private final BetaRef<Node<E>> head = createRef(stm);
-        private final BetaIntRef size = createIntRef(stm);
+        private final BetaRef<Node<E>> head = newRef(stm);
+        private final BetaIntRef size = BetaStmUtils.newIntRef(stm);
         private final AtomicBlock pushBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
         private final AtomicBlock popBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
 

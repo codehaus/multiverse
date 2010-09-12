@@ -28,7 +28,7 @@ public class AtomicIncrementIsolationStressTest {
     public void test() {
         int threadCount = 2;
         UpdateThread[] threads = new UpdateThread[threadCount];
-        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         long transactionsPerThread = 100 * 1000 * 1000;
 
         for (int k = 0; k < threads.length; k++) {

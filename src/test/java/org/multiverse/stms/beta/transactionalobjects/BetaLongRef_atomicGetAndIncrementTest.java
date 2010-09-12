@@ -3,15 +3,16 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaLongRef_atomicGetAndIncrementTest {
     private BetaStm stm;
@@ -24,7 +25,7 @@ public class BetaLongRef_atomicGetAndIncrementTest {
 
     @Test
     public void whenSuccess() {
-        BetaLongRef ref = createLongRef(stm, 2);
+        BetaLongRef ref = newLongRef(stm, 2);
 
         long result = ref.atomicGetAndIncrement(1);
         assertEquals(2, result);
@@ -36,7 +37,7 @@ public class BetaLongRef_atomicGetAndIncrementTest {
 
     @Test
     public void whenNoChange() {
-        BetaLongRef ref = createLongRef(stm, 2);
+        BetaLongRef ref = newLongRef(stm, 2);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         long result = ref.atomicGetAndIncrement(0);
@@ -51,7 +52,7 @@ public class BetaLongRef_atomicGetAndIncrementTest {
 
     @Test
     public void whenActiveTransactionAvailable_thenIgnored() {
-        BetaLongRef ref = createLongRef(stm, 2);
+        BetaLongRef ref = newLongRef(stm, 2);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -74,8 +75,22 @@ public class BetaLongRef_atomicGetAndIncrementTest {
     }
 
     @Test
-    @Ignore
     public void whenLocked() {
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        otherTx.openForRead(ref, true);
+
+        try {
+            ref.atomicCompareAndSet(0, 1);
+            fail();
+        } catch (LockedException expected) {
+        }
+
+        assertSurplus(1, ref);
+        assertLocked(ref);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
     }
 }

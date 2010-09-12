@@ -24,7 +24,7 @@ import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
@@ -42,7 +42,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
     @Test
     public void whenMultipleChangeListeners_thenAllNotified() {
-        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         List<Latch> listeners = new LinkedList<Latch>();
         for (int k = 0; k < 10; k++) {
@@ -115,7 +115,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
     @Test
     public void whenOnlyReads() {
-        BetaLongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = newLongRef(stm, 0);
         Tranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -127,7 +127,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
     @Test
     public void whenListenerAvailableForUpdate_thenListenerNotified() {
-        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         FatArrayTreeBetaTransaction listeningTx = new FatArrayTreeBetaTransaction(stm);
         LongRefTranlocal read = listeningTx.openForRead(ref, false);
@@ -150,7 +150,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
     @Test
     public void whenUpdates() {
-        BetaLongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = newLongRef(stm, 0);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongRefTranlocal tranlocal = tx.openForWrite(ref, false);
@@ -166,7 +166,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
     @Test
     public void whenNormalUpdateButNotChange() {
-        BetaLongRef ref = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(new BetaTransactionConfiguration(stm));
@@ -185,8 +185,8 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
     @Test
     public void whenWriteSkewStillPossibleWithWriteSkewEnabled() {
-        BetaLongRef ref1 = createLongRef(stm, 0);
-        BetaLongRef ref2 = createLongRef(stm, 0);
+        BetaLongRef ref1 = newLongRef(stm, 0);
+        BetaLongRef ref2 = newLongRef(stm, 0);
 
         BetaTransaction tx1 = new FatArrayTreeBetaTransaction(stm);
         tx1.openForWrite(ref1, false).value++;
@@ -202,8 +202,8 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
     @Test
     public void whenWriteSkewNotPossibleWithoutWriteSkewDisabled() {
-        BetaLongRef ref1 = createLongRef(stm, 0);
-        BetaLongRef ref2 = createLongRef(stm, 0);
+        BetaLongRef ref1 = newLongRef(stm, 0);
+        BetaLongRef ref2 = newLongRef(stm, 0);
 
         BetaTransaction tx1 = new FatArrayTreeBetaTransaction(stm);
         tx1.openForWrite(ref1, false).value++;
@@ -228,7 +228,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
     @Test
     public void whenWriteConflict() {
-        BetaLongRef ref = createLongRef(stm, 0);
+        BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false);
@@ -259,7 +259,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         BetaLongRef[] refs = new BetaLongRef[refCount];
 
         for (int k = 0; k < refs.length; k++) {
-            refs[k] = BetaStmUtils.createLongRef(stm);
+            refs[k] = BetaStmUtils.newLongRef(stm);
         }
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
@@ -277,8 +277,8 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
     @Test
     public void repeatedCommits() {
-        BetaLongRef ref1 = BetaStmUtils.createLongRef(stm);
-        BetaLongRef ref2 = BetaStmUtils.createLongRef(stm);
+        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         for (int k = 0; k < 100; k++) {
@@ -306,7 +306,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
     @Test
     public void whenPreparedAndContainsRead() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
@@ -325,7 +325,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
     @Test
     public void whenPreparedAndContainsUpdate() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false);
@@ -352,7 +352,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setDirtyCheckEnabled(false);
 
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
         tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
         tx.commit();
@@ -369,7 +369,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setDirtyCheckEnabled(true);
 
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
         tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
         tx.commit();
@@ -383,8 +383,8 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
     @Test
     public void whenMultipleReferencesWithCommute() {
-        BetaLongRef ref1 = createLongRef(stm);
-        BetaLongRef ref2 = createLongRef(stm);
+        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.commute(ref1, IncLongFunction.INSTANCE_INC_ONE);
         tx.commute(ref2, IncLongFunction.INSTANCE_INC_ONE);
@@ -406,7 +406,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setDirtyCheckEnabled(true);
 
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
         tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
         tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
@@ -422,8 +422,8 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
     @Test
     public void whenInterleavingPossibleWithCommute() {
-        BetaLongRef ref1 = createLongRef(stm);
-        BetaLongRef ref2 = createLongRef(stm);
+        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.openForWrite(ref1, false).value++;
 
@@ -447,7 +447,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
     @Test
     public void whenCommuteAndLockedByOtherTransaction_thenWriteConflict() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
 
@@ -469,7 +469,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
     @Test
     public void whenPessimisticLockLevelWriteAndDirtyCheck() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.Write)
                 .setDirtyCheckEnabled(true);
@@ -482,7 +482,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
     @Test
     public void whenPessimisticLockLevelReadAndDirtyCheck() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.Read)
                 .setDirtyCheckEnabled(true);

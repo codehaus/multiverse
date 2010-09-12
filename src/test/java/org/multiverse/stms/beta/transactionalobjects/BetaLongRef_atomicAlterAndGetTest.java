@@ -6,13 +6,14 @@ import org.junit.Test;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmUtils;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.createLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
 
@@ -26,7 +27,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
 
     @Test
     public void whenFunctionCausesException() {
-        BetaLongRef ref = createLongRef(stm);
+        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 
         LongFunction function = mock(LongFunction.class);
         RuntimeException ex = new RuntimeException();
@@ -47,7 +48,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
 
     @Test
     public void whenNullFunction_thenNullPointerException() {
-        BetaLongRef ref = createLongRef(stm, 5);
+        BetaLongRef ref = newLongRef(stm, 5);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         try {
@@ -64,7 +65,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
 
     @Test
     public void whenSuccess() {
-        BetaLongRef ref = createLongRef(stm, 5);
+        BetaLongRef ref = newLongRef(stm, 5);
         LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
 
         long result = ref.atomicAlterAndGet(function);
@@ -84,7 +85,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
 
     @Test
     public void whenNoChange() {
-        BetaLongRef ref = createLongRef(stm, 5);
+        BetaLongRef ref = newLongRef(stm, 5);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         LongFunction function = new IdentityLongFunction();
