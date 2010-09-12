@@ -35,7 +35,7 @@ public class BetaRef_isNull0Test {
 
     @Test
     public void whenActiveTransactionAvailable() {
-        BetaRef ref = BetaStmUtils.newRef(stm, "foo");
+        BetaRef<String> ref = BetaStmUtils.newRef(stm, "foo");
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);

@@ -3,6 +3,7 @@ package org.multiverse.stms.beta;
 import org.multiverse.stms.beta.transactionalobjects.*;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
+import org.multiverse.stms.beta.transactions.LeanMonoBetaTransaction;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -27,7 +28,7 @@ public class BetaStmUtils {
     }
 
     public static <E> BetaRef<E> newRef(BetaStm stm, E value) {
-        BetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = new LeanMonoBetaTransaction(stm);
         BetaRef<E> ref = new BetaRef<E>(tx);
         RefTranlocal<E> tranlocal = tx.openForConstruction(ref);
         tranlocal.value = value;
@@ -49,7 +50,7 @@ public class BetaStmUtils {
         return newRef(stm, null);
     }
 
-    public static BetaIntRef newIntRef(BetaStm stm) {
+     public static BetaIntRef newIntRef(BetaStm stm) {
         return newIntRef(stm, 0);
     }
 

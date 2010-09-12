@@ -104,7 +104,7 @@ public class BetaLongRef_incrementAndGet1Test {
         long value = ref.incrementAndGet(20);
 
         assertEquals(30, value);
-        assertIsCommitted(tx);
+        assertIsAborted(tx);
         assertEquals(30, ref.atomicGet());
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(0, ref);
