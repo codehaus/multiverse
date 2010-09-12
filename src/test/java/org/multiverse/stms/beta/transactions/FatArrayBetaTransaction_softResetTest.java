@@ -30,7 +30,7 @@ public class FatArrayBetaTransaction_softResetTest {
 
     @Test
     @Ignore
-    public void whenNew() {
+    public void whenUndefined() {
 
     }
 

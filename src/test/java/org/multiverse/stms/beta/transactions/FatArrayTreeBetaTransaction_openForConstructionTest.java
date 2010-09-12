@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.exceptions.DeadTransactionException;
@@ -228,6 +229,10 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
 
         assertIsAborted(tx);
     }
+
+    @Test
+    @Ignore
+    public void whenUndefined(){}
 
     @Test
     public void whenAborted_thenDeadTransactionException() {

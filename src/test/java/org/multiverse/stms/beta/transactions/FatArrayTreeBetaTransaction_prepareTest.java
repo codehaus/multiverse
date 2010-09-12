@@ -420,6 +420,9 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
          assertIsAborted(tx2);
      }
 
+    @Test
+    @Ignore
+    public void whenUndefined(){}
 
     @Test
     public void whenAbortOnly() {

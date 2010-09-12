@@ -39,12 +39,6 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
     }
 
     @Test
-    @Ignore
-    public void whenUnstarted() {
-
-    }
-
-    @Test
     public void whenMultipleReads_thenMultipleRegisters() {
         BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
         BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
@@ -65,14 +59,14 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
         assertHasListeners(ref3, latch);
     }
 
-      @Test
-    public void whenOnlyContainsCommute_thenNoRetryPossibleException(){
-        BetaLongRef ref = new BetaLongRef(stm,0);
+    @Test
+    public void whenOnlyContainsCommute_thenNoRetryPossibleException() {
+        BetaLongRef ref = new BetaLongRef(stm, 0);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         LongFunction function = mock(LongFunction.class);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.commute(ref,function);
+        tx.commute(ref, function);
 
         Latch listener = new CheapLatch();
         try {
@@ -296,6 +290,12 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
 
         assertIsAborted(tx);
         verifyZeroInteractions(latch);
+    }
+
+    @Test
+    @Ignore
+    public void whenUndefined() {
+
     }
 
     @Test

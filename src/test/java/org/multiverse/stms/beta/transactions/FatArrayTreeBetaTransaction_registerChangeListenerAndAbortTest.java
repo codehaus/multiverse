@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.CheapLatch;
@@ -266,6 +267,10 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         assertIsAborted(tx);
         verifyZeroInteractions(latch);
     }
+
+    @Test
+    @Ignore
+    public void whenUndefined(){}
 
     @Test
     public void whenCommitted_thenDeadTransactionException() {

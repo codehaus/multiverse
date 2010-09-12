@@ -99,6 +99,4 @@ public class BetaRef_isNull0Test {
         assertSame(tx, getThreadLocalTransaction());
         assertSame(committed, ref.___unsafeLoad());
     }
-
-
 }

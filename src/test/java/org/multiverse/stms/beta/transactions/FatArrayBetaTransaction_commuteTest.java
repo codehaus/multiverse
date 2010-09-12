@@ -31,6 +31,12 @@ public class FatArrayBetaTransaction_commuteTest {
     }
 
     @Test
+    @Ignore
+    public void whenUndefined(){
+
+    }
+
+    @Test
     public void whenNullFunction_thenNullPointerException() {
         BetaLongRef ref = BetaStmUtils.newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();

@@ -34,15 +34,8 @@ public class FatArrayBetaTransaction_registerTest {
     }
 
     @Test
-    @Ignore
-    public void whenNew() {
-
-    }
-
-    @Test
     public void whenFirst() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        //todo: tx.start()
 
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         tx.register(listener);
@@ -55,7 +48,6 @@ public class FatArrayBetaTransaction_registerTest {
     @Test
     public void whenMultipleRegisters() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        //todo: tx.start()
 
         TransactionLifecycleListener listener1 = mock(TransactionLifecycleListener.class);
         TransactionLifecycleListener listener2 = mock(TransactionLifecycleListener.class);
@@ -114,5 +106,11 @@ public class FatArrayBetaTransaction_registerTest {
         assertIsCommitted(tx);
         assertHasNoNormalListeners(tx);
         verifyZeroInteractions(listener);
+    }
+
+    @Test
+    @Ignore
+    public void whenUndefined() {
+
     }
 }

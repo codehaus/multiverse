@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
@@ -19,11 +20,6 @@ public class FatArrayTreeBetaTransaction_initTest {
     @Before
     public void setUp() {
         stm = new BetaStm();
-    }
-
-    @Test
-    public void whenUnstarted() {
-
     }
 
     @Test
@@ -80,6 +76,12 @@ public class FatArrayTreeBetaTransaction_initTest {
         assertInitialized(tx);
 
         assertUnlocked(ref);
+    }
+
+    @Test
+    @Ignore
+    public void whenUndefined() {
+
     }
 
     @Test

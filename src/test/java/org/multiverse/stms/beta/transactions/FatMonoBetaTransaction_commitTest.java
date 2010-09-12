@@ -7,6 +7,7 @@ import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.WriteConflict;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
@@ -715,14 +716,18 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenAborted_thenIllegalStateException() {
+    @Ignore
+    public void whenUndefined(){}
+
+    @Test
+    public void whenAborted_thenDeadTransactionException() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.abort();
 
         try {
             tx.commit();
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (DeadTransactionException expected) {
         }
 
         assertIsAborted(tx);

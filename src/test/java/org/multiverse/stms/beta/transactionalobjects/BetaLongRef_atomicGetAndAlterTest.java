@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.functions.IncLongFunction;
@@ -25,6 +26,10 @@ public class BetaLongRef_atomicGetAndAlterTest {
         stm = new BetaStm();
         clearThreadLocalTransaction();
     }
+
+    @Test
+    @Ignore
+    public void whenListenersAvailable(){}
 
     @Test
     public void whenSuccess() {

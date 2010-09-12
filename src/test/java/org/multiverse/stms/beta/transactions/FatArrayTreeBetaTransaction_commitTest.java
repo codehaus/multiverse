@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.multiverse.api.PessimisticLockLevel;
@@ -506,6 +507,10 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
 
         assertIsAborted(tx);
     }
+
+    @Test
+    @Ignore
+    public void whenUndefined(){}
 
     @Test
     public void whenCommitted_thenIgnore() {

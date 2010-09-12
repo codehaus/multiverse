@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
@@ -21,7 +22,8 @@ public class FatMonoBetaTransaction_initTest {
     }
 
     @Test
-    public void whenUnstarted() {
+    @Ignore
+    public void whenUndefined() {
 
     }
 

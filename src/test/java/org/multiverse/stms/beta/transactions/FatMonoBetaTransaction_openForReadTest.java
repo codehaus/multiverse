@@ -37,7 +37,7 @@ public class FatMonoBetaTransaction_openForReadTest {
 
     @Test
     @Ignore
-    public void whenNew() {
+    public void whenUndefined() {
 
     }
 

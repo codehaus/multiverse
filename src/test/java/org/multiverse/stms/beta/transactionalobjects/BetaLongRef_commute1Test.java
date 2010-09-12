@@ -1,17 +1,17 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaLongRef_commute1Test {
@@ -25,7 +25,7 @@ public class BetaLongRef_commute1Test {
 
     @Test
     public void whenActiveTransactionAvailable() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -53,7 +53,7 @@ public class BetaLongRef_commute1Test {
 
     @Test
     public void whenActiveTransactionAvailableAndNoChange() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -82,7 +82,7 @@ public class BetaLongRef_commute1Test {
 
     @Test
     public void whenActiveTransactionAvailableAndNullFunction_thenNullPointerException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -102,27 +102,84 @@ public class BetaLongRef_commute1Test {
     }
 
     @Test
-    @Ignore
-    public void whenNoTransactionAvailable() {
+    public void whenNoTransactionAvailable_thenExecutedAtomically() {
+        BetaLongRef ref = newLongRef(stm, 2);
 
+        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        ref.commute(function);
+
+        assertSurplus(0, ref);
+        assertUpdateBiased(ref);
+        assertUnlocked(ref);
+        assertNull(ref.___getLockOwner());
+        assertEquals(3, ref.atomicGet());
     }
 
     @Test
-    @Ignore
     public void whenCommittedTransactionAvailable_thenExecuteAtomically() {
+        BetaLongRef ref = newLongRef(stm, 2);
 
+        BetaTransaction tx = stm.startDefaultTransaction();
+        setThreadLocalTransaction(tx);
+        tx.commit();
+
+        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        ref.commute(function);
+
+        assertIsCommitted(tx);
+        assertSame(tx, getThreadLocalTransaction());
+        assertSurplus(0, ref);
+        assertUpdateBiased(ref);
+        assertUnlocked(ref);
+        assertNull(ref.___getLockOwner());
+        assertEquals(3, ref.atomicGet());
     }
 
     @Test
-    @Ignore
     public void whenAbortedTransactionAvailable_thenExecuteAtomically() {
+        BetaLongRef ref = newLongRef(stm, 2);
 
+        BetaTransaction tx = stm.startDefaultTransaction();
+        setThreadLocalTransaction(tx);
+        tx.abort();
+
+        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        ref.commute(function);
+
+        assertIsAborted(tx);
+        assertSame(tx, getThreadLocalTransaction());
+        assertSurplus(0, ref);
+        assertUpdateBiased(ref);
+        assertUnlocked(ref);
+        assertNull(ref.___getLockOwner());
+        assertEquals(3, ref.atomicGet());
     }
 
     @Test
-    @Ignore
     public void whenPreparedTransactionAvailable_thenPreparedTransactionException() {
+        BetaLongRef ref = newLongRef(stm, 2);
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
+        BetaTransaction tx = stm.startDefaultTransaction();
+        setThreadLocalTransaction(tx);
+        tx.prepare();
+
+        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        try {
+            ref.commute(function);
+            fail();
+        } catch (PreparedTransactionException expected) {
+
+        }
+
+        assertIsAborted(tx);
+        assertSame(tx, getThreadLocalTransaction());
+        assertSurplus(0, ref);
+        assertUpdateBiased(ref);
+        assertUnlocked(ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertEquals(2, ref.atomicGet());
     }
 
 }

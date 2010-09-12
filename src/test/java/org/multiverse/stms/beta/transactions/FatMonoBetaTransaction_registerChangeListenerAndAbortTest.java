@@ -41,7 +41,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     @Ignore
-    public void whenUnstarted() {
+    public void whenUndefined() {
 
     }
 

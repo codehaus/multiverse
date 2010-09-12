@@ -316,6 +316,10 @@ public class FatMonoBetaTransaction_commuteTest {
     }
 
     @Test
+    @Ignore
+    public void whenUndefined(){}
+
+    @Test
     public void whenAlreadyCommitted_thenDeadTransactionException() {
         BetaLongRef ref = BetaStmUtils.newLongRef(stm);
 

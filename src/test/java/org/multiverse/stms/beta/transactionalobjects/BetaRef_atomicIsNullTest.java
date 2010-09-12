@@ -1,16 +1,17 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
+import static org.multiverse.TestUtils.assertIsActive;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.newRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaRef_atomicIsNullTest {
     private BetaStm stm;
@@ -18,11 +19,12 @@ public class BetaRef_atomicIsNullTest {
     @Before
     public void setUp() {
         stm = new BetaStm();
+        clearThreadLocalTransaction();
     }
 
     @Test
     public void whenNull() {
-        BetaRef<String> ref = newRef(stm,null);
+        BetaRef<String> ref = newRef(stm, null);
         RefTranlocal committed = ref.___unsafeLoad();
 
         boolean result = ref.atomicIsNull();
@@ -34,7 +36,7 @@ public class BetaRef_atomicIsNullTest {
         assertSame(committed, ref.___unsafeLoad());
     }
 
-    public void whenActiveTransactionAvailable_thenIgnored(){
+    public void whenActiveTransactionAvailable_thenIgnored() {
         BetaRef<String> ref = newRef(stm, "foo");
         RefTranlocal committed = ref.___unsafeLoad();
 
@@ -66,7 +68,21 @@ public class BetaRef_atomicIsNullTest {
     }
 
     @Test
-    @Ignore
     public void whenLocked() {
+        BetaRef<String> ref = newRef(stm, "foo");
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        tx.openForRead(ref, true);
+
+        try {
+            ref.atomicIsNull();
+            fail();
+        } catch (LockedException expected) {
+        }
+
+        assertSurplus(1, ref);
+        assertLocked(ref);
+        assertSame(tx, ref.___getLockOwner());
+        assertIsActive(tx);
     }
 }

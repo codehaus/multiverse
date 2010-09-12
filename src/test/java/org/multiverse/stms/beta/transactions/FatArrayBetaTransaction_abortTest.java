@@ -32,7 +32,7 @@ public class FatArrayBetaTransaction_abortTest {
     }
 
     @Test
-    public void whenUnused() {
+    public void whenUndefined() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.abort();
 

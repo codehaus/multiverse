@@ -3,6 +3,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -10,8 +11,7 @@ import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaLongRef_atomicCompareAndSetTest {
     private BetaStm stm;
@@ -23,9 +23,23 @@ public class BetaLongRef_atomicCompareAndSetTest {
     }
 
     @Test
-    @Ignore
     public void whenLocked() {
+        BetaLongRef ref = newLongRef(stm, 1);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaTransaction tx = stm.startDefaultTransaction();
+        tx.openForRead(ref, true);
 
+        try {
+            ref.atomicCompareAndSet(1, 2);
+            fail();
+        } catch (LockedException expected) {
+
+        }
+
+        assertSurplus(1, ref);
+        assertLocked(ref);
+        assertSame(tx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
     }
 
     @Test

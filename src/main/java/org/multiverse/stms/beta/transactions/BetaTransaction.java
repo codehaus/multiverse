@@ -320,7 +320,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     public final TransactionStatus getStatus() {
         switch (status) {
             case NEW:
-                return TransactionStatus.Unstarted;
+                return TransactionStatus.Undefined;
             case ACTIVE:
                 return TransactionStatus.Active;
             case ABORTED:

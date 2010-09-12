@@ -9,7 +9,7 @@ public enum TransactionStatus {
 
     /**
      */
-    Unstarted(false),
+    Undefined(false),
 
     /**
      * When a Transaction is running.

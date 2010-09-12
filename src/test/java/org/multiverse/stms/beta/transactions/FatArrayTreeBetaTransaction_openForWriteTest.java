@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.exceptions.PreparedTransactionException;
@@ -634,6 +635,10 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         assertUnlocked(ref2);
         assertNull(ref2.___getLockOwner());
     }
+
+    @Test
+    @Ignore
+    public void whenUndefined(){}
 
     @Test
     public void whenAborted_thenIllegalStateException() {

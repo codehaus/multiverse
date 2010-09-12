@@ -77,8 +77,8 @@ public class UncontendedAtomicAlterTest {
 
         double transactionsPerSecondPerThread = transactionsPerSecondPerThread(
                 transactionsPerThread, totalDurationMs, threadCount);
-        System.out.printf("Multiverse> Performance %s transactions/second/thread with %s threads\n",
-                format(transactionsPerSecondPerThread), threadCount);
+        System.out.printf("Multiverse> Performance %s transactions/second/thread\n",
+                format(transactionsPerSecondPerThread));
         System.out.printf("Multiverse> Performance %s transactions/second\n",
                 transactionsPerSecondAsString(transactionsPerThread, totalDurationMs, threadCount));
 

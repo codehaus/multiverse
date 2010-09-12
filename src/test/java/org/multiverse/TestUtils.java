@@ -172,7 +172,7 @@ public class TestUtils {
 
     public static void assertIsNew(Transaction... transactions) {
         for (Transaction tx : transactions) {
-            assertEquals(TransactionStatus.Unstarted, tx.getStatus());
+            assertEquals(TransactionStatus.Undefined, tx.getStatus());
         }
     }
 

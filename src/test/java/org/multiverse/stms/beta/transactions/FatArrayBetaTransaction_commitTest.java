@@ -43,7 +43,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     @Ignore
-    public void whenUnstarted() {
+    public void whenUndefined() {
 
     }
 

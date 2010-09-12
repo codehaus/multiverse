@@ -3,6 +3,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.references.LongRef;
 import org.multiverse.stms.beta.BetaStm;
@@ -13,8 +14,7 @@ import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaLongRef_getAndIncrement1Test {
 
@@ -86,19 +86,34 @@ public class BetaLongRef_getAndIncrement1Test {
     }
 
     @Test
-    @Ignore
-    public void whenLocked(){}
+    public void whenLocked_thenLockedException() {
+        BetaLongRef ref = newLongRef(stm, 10);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaTransaction tx = stm.startDefaultTransaction();
+        tx.openForRead(ref, true);
+
+        try {
+            ref.getAndIncrement(1);
+            fail();
+        } catch (LockedException expected) {
+        }
+
+        assertSame(tx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertSurplus(1, ref);
+        assertLocked(ref);
+    }
 
     @Test
     public void whenNoTransactionAvailable_thenExecutedAtomically() {
         BetaLongRef ref = newLongRef(stm, 10);
 
-        long result = ref.getAndIncrement(10);
+        long result = ref.getAndIncrement(1);
 
         assertSurplus(0, ref);
         assertUnlocked(ref);
         assertEquals(result, 10);
-        assertEquals(20, ref.atomicGet());
+        assertEquals(11, ref.atomicGet());
         assertNull(getThreadLocalTransaction());
     }
 

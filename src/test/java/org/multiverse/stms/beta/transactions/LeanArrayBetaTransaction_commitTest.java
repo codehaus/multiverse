@@ -10,7 +10,7 @@ import static org.multiverse.TestUtils.assertIsAborted;
 
 public class LeanArrayBetaTransaction_commitTest {
 
-     private BetaStm stm;
+    private BetaStm stm;
 
     @Before
     public void setUp() {

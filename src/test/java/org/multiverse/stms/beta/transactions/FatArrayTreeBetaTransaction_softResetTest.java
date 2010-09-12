@@ -29,12 +29,6 @@ public class FatArrayTreeBetaTransaction_softResetTest {
     }
 
     @Test
-    @Ignore
-    public void whenNew() {
-
-    }
-
-    @Test
     public void whenMaximumNumberOfRetriesReached() {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setMaxRetries(3);
@@ -210,6 +204,12 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         assertTrue(result);
         verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
         assertHasNoNormalListeners(tx);
+    }
+
+    @Test
+    @Ignore
+    public void whenUndefined() {
+
     }
 
     @Test

@@ -30,7 +30,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
 
     @Test
     @Ignore
-    public void whenFresh() {
+    public void whenUndefined() {
 
     }
 

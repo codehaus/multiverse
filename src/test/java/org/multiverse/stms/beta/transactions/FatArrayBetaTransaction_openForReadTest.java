@@ -37,7 +37,7 @@ public class FatArrayBetaTransaction_openForReadTest {
 
     @Test
     @Ignore
-    public void whenUnstarted() {
+    public void whenUndefined() {
 
     }
 

@@ -7,12 +7,14 @@ import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
+import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
+import static org.multiverse.TestUtils.assertIsActive;
+import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
@@ -23,6 +25,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
     @Before
     public void setUp() {
         stm = new BetaStm();
+        clearThreadLocalTransaction();
     }
 
     @Test
@@ -101,9 +104,23 @@ public class BetaLongRef_atomicAlterAndGetTest {
     }
 
     @Test
-    @Ignore
     public void whenActiveTransactionAvailable_thenIgnored() {
+        BetaLongRef ref = newLongRef(stm, 5);
+        BetaTransaction tx = stm.startDefaultTransaction();
+        setThreadLocalTransaction(tx);
+        ref.set(tx, 100);
 
+        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+
+        long result = ref.atomicAlterAndGet(function);
+
+        assertEquals(6, result);
+        assertUnlocked(ref);
+        assertSurplus(1, ref);
+        assertNull(ref.___getLockOwner());
+        assertEquals(6, ref.atomicGet());
+        assertIsActive(tx);
+        assertSame(tx,getThreadLocalTransaction());
     }
 
     @Test

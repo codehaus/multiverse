@@ -29,12 +29,6 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
     }
 
     @Test
-    @Ignore
-    public void whenUnstarted() {
-
-    }
-
-    @Test
     public void whenUnused() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
 
@@ -411,7 +405,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
         assertUpdateBiased(ref);
     }
 
-     @Test
+    @Test
     public void whenWriteSkewStillPossibleWithWriteSkewEnabled() {
         BetaLongRef ref1 = newLongRef(stm, 0);
         BetaLongRef ref2 = newLongRef(stm, 0);
@@ -473,6 +467,12 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertFalse(write.isCommitted);
+    }
+
+    @Test
+    @Ignore
+    public void whenUndefined() {
+
     }
 
     @Test

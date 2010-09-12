@@ -22,7 +22,7 @@ public class FatArrayBetaTransaction_initTest {
     }
 
     @Test
-    public void whenUnstarted() {
+    public void whenUndefined() {
 
     }
 

@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
@@ -224,6 +225,10 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
 
         assertIsAborted(tx);
     }
+
+    @Test
+    @Ignore
+    public void whenUndefined(){}
 
     @Test
     public void whenAborted_thenDeadTransactionException() {

@@ -104,6 +104,10 @@ public class FatMonoBetaTransaction_hardResetTest {
 
 
     @Test
+    @Ignore
+    public void whenUndefined(){}
+
+    @Test
     public void whenPrepared() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.prepare();

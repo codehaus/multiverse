@@ -29,7 +29,7 @@ public class FatMonoBetaTransaction_prepareTest {
 
     @Test
     @Ignore
-    public void whenNew() {
+    public void whenUndefined() {
 
     }
 

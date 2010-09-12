@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.exceptions.*;
@@ -728,6 +729,10 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertNull(ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
     }
+
+    @Test
+    @Ignore
+    public void whenUndefined(){}
 
     @Test
     public void whenAborted_thenDeadTransactionException() {
