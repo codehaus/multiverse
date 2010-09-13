@@ -2,10 +2,13 @@ package org.multiverse.stms.beta;
 
 import org.multiverse.api.PropagationLevel;
 import org.multiverse.api.ThreadLocalTransaction;
+import org.multiverse.api.TraceLevel;
 import org.multiverse.api.closures.*;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.sensors.TransactionSensor;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
+
+import java.util.logging.Logger;
 
 import static java.lang.String.format;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactionContainer;
@@ -14,6 +17,9 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
  * @author Peter Veentjer
  */
 public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
+    private static final Logger logger = Logger.getLogger(FatBetaAtomicBlock.class.getName());
+
+
 
     private final PropagationLevel propagationLevel;
 
@@ -53,34 +59,99 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
             switch (propagationLevel) {
                 case Requires:
                     if (tx == null) {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Requires' propagation level and no transaction found, starting a new transaction",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         return execute(tx, transactionContainer, closure);
                     } else {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Requires' propagation level, and existing transaction [%s] found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }
+
                         return closure.execute(tx);
                     }
                 case Mandatory:
                     if (tx == null) {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Mandatory' propagation level, and no transaction is found",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
                         throw new NoTransactionFoundException(
                             format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
                                 transactionConfiguration.familyName));
                     }
+
+                    if (___TracingEnabled) {
+                        if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                            logger.info(
+                                format("[%s] Has 'Mandatory' propagation level and transaction [%s] found",
+                                    transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                        }
+                    }
+                                            
                     return closure.execute(tx);
                 case Never:
                     if (tx != null) {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Never' propagation level, but transaction [%s] is found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }
+
                         throw new NoTransactionAllowedException(
                             format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
                                 ", but transaction '%s' was found",
                                 transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
                         );
                     }
+
+                    if (___TracingEnabled) {
+                        if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                            logger.info(
+                                format("[%s] Has 'Never' propagation level and no transaction is found",
+                                    transactionConfiguration.familyName));
+                        }
+                    }
+
                     return closure.execute(null);
                 case RequiresNew:
                     if (tx == null) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagation level and no transaction is found, starting new transaction",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         return execute(tx, transactionContainer, closure);
                     } else {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }
+
                         BetaTransaction suspendedTransaction = tx;
                         tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
@@ -91,6 +162,22 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         }
                     }
                 case Supports:
+                    if(___TracingEnabled){
+                        if(tx!=null){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }else{
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }                                
+                        }
+                    }
+
                     return closure.execute(tx);
                 default:
                     throw new IllegalStateException();
@@ -181,34 +268,99 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
             switch (propagationLevel) {
                 case Requires:
                     if (tx == null) {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Requires' propagation level and no transaction found, starting a new transaction",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         return execute(tx, transactionContainer, closure);
                     } else {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Requires' propagation level, and existing transaction [%s] found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }
+
                         return closure.execute(tx);
                     }
                 case Mandatory:
                     if (tx == null) {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Mandatory' propagation level, and no transaction is found",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
                         throw new NoTransactionFoundException(
                             format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
                                 transactionConfiguration.familyName));
                     }
+
+                    if (___TracingEnabled) {
+                        if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                            logger.info(
+                                format("[%s] Has 'Mandatory' propagation level and transaction [%s] found",
+                                    transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                        }
+                    }
+                                            
                     return closure.execute(tx);
                 case Never:
                     if (tx != null) {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Never' propagation level, but transaction [%s] is found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }
+
                         throw new NoTransactionAllowedException(
                             format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
                                 ", but transaction '%s' was found",
                                 transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
                         );
                     }
+
+                    if (___TracingEnabled) {
+                        if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                            logger.info(
+                                format("[%s] Has 'Never' propagation level and no transaction is found",
+                                    transactionConfiguration.familyName));
+                        }
+                    }
+
                     return closure.execute(null);
                 case RequiresNew:
                     if (tx == null) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagation level and no transaction is found, starting new transaction",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         return execute(tx, transactionContainer, closure);
                     } else {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }
+
                         BetaTransaction suspendedTransaction = tx;
                         tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
@@ -219,6 +371,22 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         }
                     }
                 case Supports:
+                    if(___TracingEnabled){
+                        if(tx!=null){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }else{
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }                                
+                        }
+                    }
+
                     return closure.execute(tx);
                 default:
                     throw new IllegalStateException();
@@ -309,34 +477,99 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
             switch (propagationLevel) {
                 case Requires:
                     if (tx == null) {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Requires' propagation level and no transaction found, starting a new transaction",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         return execute(tx, transactionContainer, closure);
                     } else {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Requires' propagation level, and existing transaction [%s] found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }
+
                         return closure.execute(tx);
                     }
                 case Mandatory:
                     if (tx == null) {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Mandatory' propagation level, and no transaction is found",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
                         throw new NoTransactionFoundException(
                             format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
                                 transactionConfiguration.familyName));
                     }
+
+                    if (___TracingEnabled) {
+                        if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                            logger.info(
+                                format("[%s] Has 'Mandatory' propagation level and transaction [%s] found",
+                                    transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                        }
+                    }
+                                            
                     return closure.execute(tx);
                 case Never:
                     if (tx != null) {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Never' propagation level, but transaction [%s] is found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }
+
                         throw new NoTransactionAllowedException(
                             format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
                                 ", but transaction '%s' was found",
                                 transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
                         );
                     }
+
+                    if (___TracingEnabled) {
+                        if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                            logger.info(
+                                format("[%s] Has 'Never' propagation level and no transaction is found",
+                                    transactionConfiguration.familyName));
+                        }
+                    }
+
                     return closure.execute(null);
                 case RequiresNew:
                     if (tx == null) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagation level and no transaction is found, starting new transaction",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         return execute(tx, transactionContainer, closure);
                     } else {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }
+
                         BetaTransaction suspendedTransaction = tx;
                         tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
@@ -347,6 +580,22 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         }
                     }
                 case Supports:
+                    if(___TracingEnabled){
+                        if(tx!=null){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }else{
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }                                
+                        }
+                    }
+
                     return closure.execute(tx);
                 default:
                     throw new IllegalStateException();
@@ -437,34 +686,99 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
             switch (propagationLevel) {
                 case Requires:
                     if (tx == null) {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Requires' propagation level and no transaction found, starting a new transaction",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         return execute(tx, transactionContainer, closure);
                     } else {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Requires' propagation level, and existing transaction [%s] found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }
+
                         return closure.execute(tx);
                     }
                 case Mandatory:
                     if (tx == null) {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Mandatory' propagation level, and no transaction is found",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
                         throw new NoTransactionFoundException(
                             format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
                                 transactionConfiguration.familyName));
                     }
+
+                    if (___TracingEnabled) {
+                        if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                            logger.info(
+                                format("[%s] Has 'Mandatory' propagation level and transaction [%s] found",
+                                    transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                        }
+                    }
+                                            
                     return closure.execute(tx);
                 case Never:
                     if (tx != null) {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Never' propagation level, but transaction [%s] is found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }
+
                         throw new NoTransactionAllowedException(
                             format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
                                 ", but transaction '%s' was found",
                                 transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
                         );
                     }
+
+                    if (___TracingEnabled) {
+                        if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                            logger.info(
+                                format("[%s] Has 'Never' propagation level and no transaction is found",
+                                    transactionConfiguration.familyName));
+                        }
+                    }
+
                     return closure.execute(null);
                 case RequiresNew:
                     if (tx == null) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagation level and no transaction is found, starting new transaction",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         return execute(tx, transactionContainer, closure);
                     } else {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }
+
                         BetaTransaction suspendedTransaction = tx;
                         tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
@@ -475,6 +789,22 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         }
                     }
                 case Supports:
+                    if(___TracingEnabled){
+                        if(tx!=null){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }else{
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }                                
+                        }
+                    }
+
                     return closure.execute(tx);
                 default:
                     throw new IllegalStateException();
@@ -565,34 +895,99 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
             switch (propagationLevel) {
                 case Requires:
                     if (tx == null) {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Requires' propagation level and no transaction found, starting a new transaction",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         return execute(tx, transactionContainer, closure);
                     } else {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Requires' propagation level, and existing transaction [%s] found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }
+
                         return closure.execute(tx);
                     }
                 case Mandatory:
                     if (tx == null) {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Mandatory' propagation level, and no transaction is found",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
                         throw new NoTransactionFoundException(
                             format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
                                 transactionConfiguration.familyName));
                     }
+
+                    if (___TracingEnabled) {
+                        if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                            logger.info(
+                                format("[%s] Has 'Mandatory' propagation level and transaction [%s] found",
+                                    transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                        }
+                    }
+                                            
                     return closure.execute(tx);
                 case Never:
                     if (tx != null) {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Never' propagation level, but transaction [%s] is found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }
+
                         throw new NoTransactionAllowedException(
                             format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
                                 ", but transaction '%s' was found",
                                 transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
                         );
                     }
+
+                    if (___TracingEnabled) {
+                        if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                            logger.info(
+                                format("[%s] Has 'Never' propagation level and no transaction is found",
+                                    transactionConfiguration.familyName));
+                        }
+                    }
+
                     return closure.execute(null);
                 case RequiresNew:
                     if (tx == null) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagation level and no transaction is found, starting new transaction",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         return execute(tx, transactionContainer, closure);
                     } else {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }
+
                         BetaTransaction suspendedTransaction = tx;
                         tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
@@ -603,6 +998,22 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         }
                     }
                 case Supports:
+                    if(___TracingEnabled){
+                        if(tx!=null){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }else{
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }                                
+                        }
+                    }
+
                     return closure.execute(tx);
                 default:
                     throw new IllegalStateException();
@@ -693,39 +1104,104 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
             switch (propagationLevel) {
                 case Requires:
                     if (tx == null) {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Requires' propagation level and no transaction found, starting a new transaction",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         execute(tx, transactionContainer, closure);
                         return;
                     } else {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Requires' propagation level, and existing transaction [%s] found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }
+
                         closure.execute(tx);
                         return;
                     }
                 case Mandatory:
                     if (tx == null) {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Mandatory' propagation level, and no transaction is found",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
                         throw new NoTransactionFoundException(
                             format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
                                 transactionConfiguration.familyName));
                     }
+
+                    if (___TracingEnabled) {
+                        if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                            logger.info(
+                                format("[%s] Has 'Mandatory' propagation level and transaction [%s] found",
+                                    transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                        }
+                    }
+                                            
                     closure.execute(tx);
                     return;
                 case Never:
                     if (tx != null) {
+                        if (___TracingEnabled) {
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'Never' propagation level, but transaction [%s] is found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }
+
                         throw new NoTransactionAllowedException(
                             format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
                                 ", but transaction '%s' was found",
                                 transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
                         );
                     }
+
+                    if (___TracingEnabled) {
+                        if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                            logger.info(
+                                format("[%s] Has 'Never' propagation level and no transaction is found",
+                                    transactionConfiguration.familyName));
+                        }
+                    }
+
                     closure.execute(null);
                     return;
                 case RequiresNew:
                     if (tx == null) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagation level and no transaction is found, starting new transaction",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         execute(tx, transactionContainer, closure);
                         return;
                     } else {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }
+
                         BetaTransaction suspendedTransaction = tx;
                         tx = transactionFactory.start(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
@@ -737,6 +1213,22 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         }
                     }
                 case Supports:
+                    if(___TracingEnabled){
+                        if(tx!=null){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }
+                        }else{
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+                            }                                
+                        }
+                    }
+
                     closure.execute(tx);
                     return;
                 default:

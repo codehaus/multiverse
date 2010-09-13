@@ -259,6 +259,14 @@ public final class BetaRef<E>
         //to this.active. This means that we could break the contract we have: an update is responsible for all
         //listeners that have registered before the actual write happens. So it needs to remove the listeners
         //after the actual write happens.
+
+        //it is important that this call is done after the actual write. This is needed to give the guarantee
+        //that we are going to take care of all listeners that are registered before that write. The read is done
+        //after the unlock because that requires a volatile read. It could be that a listener is notified that
+        //already has registered for the following read, so there could be a spurious wakeup. This was done
+        //to prevent a JMM problem where the read of the listeners, could jump in front of the write to the value
+        //and it is not possible that the read jump over the release of the lock.
+             
         Listeners listenersAfterWrite = null;
 
         if(___listeners != null){
@@ -273,16 +281,7 @@ public final class BetaRef<E>
         }
 
         long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
-
-        //it is important that this call is done after the actual write. This is needed to give the guarantee
-       //that we are going to take care of all listeners that are registered before that write. The read is done
-        //after the unlock because that requires a volatile read. It could be that a listener is notified that
-        //already has registered for the following read, so there could be a spurious wakeup. This was done
-        //to prevent a JMM problem where the read of the listeners, could jump in front of the write to the value
-        //and it is not possible that the read jump over the release of the lock.
-
-
-       if (remainingSurplus == 0 && oldActive!=null) {
+        if (remainingSurplus == 0 && oldActive!=null) {
             //nobody is using the tranlocal anymore, so pool it.
             pool.put(oldActive);
         }
@@ -291,20 +290,18 @@ public final class BetaRef<E>
     }
 
     private Listeners ___removeListenersAfterWrite(){
-        Listeners listenersAfterWrite = null;
-
-        if(___listeners != null){
-            //at this point it could have happened that the listener has changed.. it could also
-
-            while(true){
-                listenersAfterWrite = ___listeners;
-                if(___unsafe.compareAndSwapObject(this, listenersOffset, listenersAfterWrite, null)){
-                    break;
-                }
-            }
+        if(___listeners == null){
+            return null;
         }
 
-        return listenersAfterWrite;
+        //at this point it could have happened that the listener has changed.. it could also
+        Listeners result;
+        while(true){
+            result = ___listeners;
+            if(___unsafe.compareAndSwapObject(this, listenersOffset, result, null)){
+                return result;
+            }
+        }
     }
 
     @Override
@@ -492,7 +489,7 @@ public final class BetaRef<E>
         }
 
         //we are going to register the listener since the current value still matches with is active.
-        //But it could be that the registration completes after the
+        //But it could be that the registration completes after the write has happened.
 
         Listeners newListeners = pool.takeListeners();
         if(newListeners == null){
@@ -510,37 +507,33 @@ public final class BetaRef<E>
 
             newListeners.next = oldListeners;
 
-            //if(oldListeners!=null && oldListeners
-
             //lets try to register our listeners.
-            if(___unsafe.compareAndSwapObject(this, listenersOffset, oldListeners, newListeners)){
-                //the registration was a success. We need to make sure that the active hasn't changed.
-
-                //the registration was a success.
-
-                //JMM: the volatile read can't jump in front of the unsafe.compareAndSwap.
-                if(read == ___active){
-                    //we are lucky, the registration was done successfully and we managed to cas the listener
-                    //before the update (since the update hasn't happened yet). This means that the updating thread
-                    //is now responsible for notifying the listeners.
-                    return REGISTRATION_DONE;
-                }
-
-                //JMM: the unsafe.compareAndSwap can't jump over the volatile read this.active.
-                //the update has taken place, we need to check if our listeners still is in place.
-                //if it is, it should be removed and the listeners notified. If the listeners already has changed,
-                //it is the task for the other to do the listener cleanup and notify them
-                if(___unsafe.compareAndSwapObject(this, listenersOffset, newListeners, null)){
-                    newListeners.openAll(pool);
-                }else{
-                    latch.open(listenerEra);
-                }
-
-                return REGISTRATION_NOT_NEEDED;
+            if(!___unsafe.compareAndSwapObject(this, listenersOffset, oldListeners, newListeners)){
+                //so we are contending with another register thread, so lets try it again. Since the compareAndSwap
+                //didn't succeed, we know that the current thread still has exclusive ownership on the Listeners object.
+                continue;
             }
 
-            //so we are contending with another register thread, so lets try it again. Since the compareAndSwap
-            //didn't succeed, we know that the current thread still has exclusive ownership on the Listeners object.
+            //the registration was a success. We need to make sure that the active hasn't changed.
+            //JMM: the volatile read can't jump in front of the unsafe.compareAndSwap.
+            if(read == ___active){
+                //we are lucky, the registration was done successfully and we managed to cas the listener
+                //before the update (since the update hasn't happened yet). This means that the updating thread
+                //is now responsible for notifying the listeners.
+                return REGISTRATION_DONE;
+            }
+
+            //JMM: the unsafe.compareAndSwap can't jump over the volatile read this.active.
+            //the update has taken place, we need to check if our listeners still is in place.
+            //if it is, it should be removed and the listeners notified. If the listeners already has changed,
+            //it is the task for the other to do the listener cleanup and notify them
+            if(___unsafe.compareAndSwapObject(this, listenersOffset, newListeners, null)){
+                newListeners.openAll(pool);
+            }else{
+                latch.open(listenerEra);
+            }
+
+            return REGISTRATION_NOT_NEEDED;
         }
     }
 

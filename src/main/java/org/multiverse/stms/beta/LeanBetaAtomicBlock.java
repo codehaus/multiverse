@@ -6,6 +6,8 @@ import org.multiverse.api.exceptions.*;
 import org.multiverse.sensors.TransactionSensor;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
+import java.util.logging.Logger;
+
 import static java.lang.String.format;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactionContainer;
 
@@ -13,6 +15,9 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
  * @author Peter Veentjer
  */
 public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
+    private static final Logger logger = Logger.getLogger(LeanBetaAtomicBlock.class.getName());
+
+
 
     public LeanBetaAtomicBlock(final BetaTransactionFactory transactionFactory) {
         super(transactionFactory);

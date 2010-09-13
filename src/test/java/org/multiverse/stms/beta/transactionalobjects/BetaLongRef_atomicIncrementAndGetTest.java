@@ -53,11 +53,23 @@ public class BetaLongRef_atomicIncrementAndGetTest {
 
     @Test
     @Ignore
-    public void whenListenersAvailable(){}
+    public void whenListenersAvailable() {
+    }
 
     @Test
-    @Ignore
     public void whenNoChange() {
+        BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        long result = ref.atomicIncrementAndGet(0);
+
+        assertEquals(0, result);
+        assertUnlocked(ref);
+        assertSurplus(0, ref);
+        assertNull(ref.___getLockOwner());
+        assertNull(getThreadLocalTransaction());
+        assertEquals(0, ref.atomicGet());
+        assertSame(committed, ref.___unsafeLoad());
     }
 
     @Test
