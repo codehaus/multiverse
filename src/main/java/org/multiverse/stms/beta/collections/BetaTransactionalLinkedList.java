@@ -721,7 +721,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalDeque<E>, Tr
 
     @Override
     public List<E> subList(final int fromIndex, final int toIndex) {
-         final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
         final Transaction tx = container.transaction;
         if (tx == null || !tx.isAlive()) {
             return atomicSubList(fromIndex, toIndex);
@@ -732,7 +732,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalDeque<E>, Tr
 
     @Override
     public List<E> subList(final Transaction tx, final int fromIndex, final int toIndex) {
-        return subList((BetaTransaction)tx, fromIndex, toIndex);
+        return subList((BetaTransaction) tx, fromIndex, toIndex);
     }
 
     public List<E> subList(final BetaTransaction tx, final int fromIndex, final int toIndex) {
@@ -747,27 +747,49 @@ public class BetaTransactionalLinkedList<E> implements TransactionalDeque<E>, Tr
     // ============= offer ================
 
     @Override
-    public boolean offer(E e) {
+    public boolean offer(final E e) {
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            return atomicOffer(e);
+        } else {
+            return offer((BetaTransaction) tx, e);
+        }
+    }
+
+    @Override
+    public boolean offer(final Transaction tx, final E e) {
+        return offer((BetaTransaction) tx, e);
+    }
+
+    public boolean offer(final BetaTransaction tx, final E e) {
         throw new TodoException();
     }
 
     @Override
-    public boolean offer(Transaction tx, E e) {
+    public boolean atomicOffer(final E e) {
         throw new TodoException();
     }
 
-    @Override
-    public boolean atomicOffer(E e) {
-        throw new TodoException();
-    }
+    // ============= remove ================
 
     @Override
     public E remove() {
-        throw new TodoException();
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            return atomicRemove();
+        } else {
+            return remove((BetaTransaction) tx);
+        }
     }
 
     @Override
-    public E remove(Transaction tx) {
+    public E remove(final Transaction tx) {
+        return remove((BetaTransaction) tx);
+    }
+
+    public E remove(final BetaTransaction tx) {
         throw new TodoException();
     }
 
@@ -776,13 +798,26 @@ public class BetaTransactionalLinkedList<E> implements TransactionalDeque<E>, Tr
         throw new TodoException();
     }
 
+    // ============= poll ================
+
+
     @Override
     public E poll() {
-        throw new TodoException();
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            return atomicPoll();
+        } else {
+            return poll((BetaTransaction) tx);
+        }
     }
 
     @Override
     public E poll(Transaction tx) {
+        return poll((BetaTransaction) tx);
+    }
+
+    public E poll(BetaTransaction tx) {
         throw new TodoException();
     }
 
@@ -791,13 +826,25 @@ public class BetaTransactionalLinkedList<E> implements TransactionalDeque<E>, Tr
         throw new TodoException();
     }
 
+    // ============= element ================
+
     @Override
     public E element() {
-        throw new TodoException();
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            return atomicPoll();
+        } else {
+            return poll((BetaTransaction) tx);
+        }
     }
 
     @Override
-    public E element(Transaction tx) {
+    public E element(final Transaction tx) {
+        return element((BetaTransaction) tx);
+    }
+
+    public E element(final BetaTransaction tx) {
         throw new TodoException();
     }
 
@@ -806,28 +853,53 @@ public class BetaTransactionalLinkedList<E> implements TransactionalDeque<E>, Tr
         throw new TodoException();
     }
 
+    // ============= peek ================
+
     @Override
     public E peek() {
-        throw new TodoException();
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            return atomicPeek();
+        } else {
+            return peek((BetaTransaction) tx);
+        }
     }
 
     @Override
-    public E peek(Transaction tx) {
+    public E peek(final Transaction tx) {
+        return peek((BetaTransaction) tx);
+    }
+
+    public E peek(final BetaTransaction tx) {
         throw new TodoException();
     }
+
 
     @Override
     public E atomicPeek() {
         throw new TodoException();
     }
 
+    // ============= size ================
+
     @Override
     public int size() {
-        throw new TodoException();
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            return atomicSize();
+        } else {
+            return size((BetaTransaction) tx);
+        }
     }
 
     @Override
     public int size(Transaction tx) {
+        return size((BetaTransaction) tx);
+    }
+
+    public int size(BetaTransaction tx) {
         throw new TodoException();
     }
 
@@ -836,43 +908,80 @@ public class BetaTransactionalLinkedList<E> implements TransactionalDeque<E>, Tr
         throw new TodoException();
     }
 
+    // ============= isEmpty ================
+
     @Override
     public boolean isEmpty() {
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            return atomicIsEmpty();
+        } else {
+            return isEmpty((BetaTransaction) tx);
+        }
+    }
+
+    @Override
+    public boolean isEmpty(final Transaction tx) {
+        return isEmpty((BetaTransaction) tx);
+    }
+
+    public boolean isEmpty(final BetaTransaction tx) {
         throw new TodoException();
     }
 
     @Override
-    public boolean isEmpty(Transaction tx) {
+    public boolean atomicIsEmpty() {
+        return atomicSize() == 0;
+    }
+
+
+    // ============= contains ================
+
+    @Override
+    public boolean contains(final Object o) {
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            return atomicContains(o);
+        } else {
+            return contains((BetaTransaction) tx, o);
+        }
+    }
+
+    @Override
+    public boolean contains(final Transaction tx, Object o) {
+        return contains((BetaTransaction) tx, o);
+    }
+
+    public boolean contains(final BetaTransaction tx, Object o) {
         throw new TodoException();
     }
 
     @Override
-    public boolean atomicIsEmpty(Transaction tx) {
+    public boolean atomicContains(Object o) {
         throw new TodoException();
     }
 
-    @Override
-    public boolean contains(Object o) {
-        throw new TodoException();
-    }
-
-    @Override
-    public boolean contains(Transaction tx) {
-        throw new TodoException();
-    }
-
-    @Override
-    public boolean atomicContains(Transaction tx, Object o) {
-        throw new TodoException();
-    }
+    // ============= iterator ================
 
     @Override
     public Iterator<E> iterator() {
-        throw new TodoException();
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            return atomicIterator();
+        } else {
+            return iterator((BetaTransaction) tx);
+        }
     }
 
     @Override
-    public Iterator<E> iterator(Transaction tx) {
+    public Iterator<E> iterator(final Transaction tx) {
+        return iterator((BetaTransaction) tx);
+    }
+
+    public Iterator<E> iterator(final BetaTransaction tx) {
         throw new TodoException();
     }
 
@@ -881,13 +990,25 @@ public class BetaTransactionalLinkedList<E> implements TransactionalDeque<E>, Tr
         throw new TodoException();
     }
 
+    // ============= toArray ================
+
     @Override
     public Object[] toArray() {
-        throw new TodoException();
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            return atomicToArray();
+        } else {
+            return toArray((BetaTransaction) tx);
+        }
     }
 
     @Override
-    public Object[] toArray(Transaction tx) {
+    public Object[] toArray(final Transaction tx) {
+        return toArray((BetaTransaction) tx);
+    }
+
+    public Object[] toArray(final BetaTransaction tx) {
         throw new TodoException();
     }
 
@@ -897,12 +1018,22 @@ public class BetaTransactionalLinkedList<E> implements TransactionalDeque<E>, Tr
     }
 
     @Override
-    public <T> T[] toArray(T[] a) {
-        throw new TodoException();
+    public <T> T[] toArray(final T[] a) {
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            return atomicToArray(a);
+        } else {
+            return toArray((BetaTransaction) tx, a);
+        }
     }
 
     @Override
-    public <T> T[] toArray(Transaction tx, T[] a) {
+    public <T> T[] toArray(final Transaction tx, final T[] a) {
+        return toArray((BetaTransaction) tx, a);
+    }
+
+    public <T> T[] toArray(final BetaTransaction tx, final T[] a) {
         throw new TodoException();
     }
 
@@ -911,28 +1042,52 @@ public class BetaTransactionalLinkedList<E> implements TransactionalDeque<E>, Tr
         throw new TodoException();
     }
 
+    // ============= add ================
+
     @Override
-    public boolean add(E e) {
+    public boolean add(final E e) {
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            return atomicAdd(e);
+        } else {
+            return add((BetaTransaction) tx, e);
+        }
+    }
+
+    @Override
+    public boolean add(final Transaction tx, final E e) {
+        return add((BetaTransaction) tx, e);
+    }
+
+    public boolean add(final BetaTransaction tx, final E e) {
         throw new TodoException();
     }
 
     @Override
-    public boolean add(Transaction tx, E e) {
+    public boolean atomicAdd(final E e) {
         throw new TodoException();
     }
 
+    // ============= remove ================
+
     @Override
-    public boolean atomicAdd(E e) {
-        throw new TodoException();
+    public boolean remove(final Object o) {
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            return atomicRemove(o);
+        } else {
+            return remove((BetaTransaction) tx, o);
+        }
     }
 
     @Override
-    public boolean remove(Object o) {
-        throw new TodoException();
+    public boolean remove(final Transaction tx, final Object o) {
+        return remove((BetaTransaction) tx, o);
     }
 
-    @Override
-    public boolean remove(Transaction tx, Object o) {
+    public boolean remove(final BetaTransaction tx, final Object o) {
         throw new TodoException();
     }
 
@@ -941,28 +1096,52 @@ public class BetaTransactionalLinkedList<E> implements TransactionalDeque<E>, Tr
         throw new TodoException();
     }
 
+    // ============= containsAll ================
+
     @Override
-    public boolean containsAll(Collection<?> c) {
+    public boolean containsAll(final Collection<?> c) {
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            return atomicContainsAll(c);
+        } else {
+            return containsAll((BetaTransaction) tx, c);
+        }
+    }
+
+    @Override
+    public boolean containsAll(final Transaction tx, final Collection<?> c) {
+        return containsAll((BetaTransaction) tx, c);
+    }
+
+    public boolean containsAll(final BetaTransaction tx, final Collection<?> c) {
         throw new TodoException();
     }
 
     @Override
-    public boolean containsAll(Transaction tx, Collection<?> c) {
+    public boolean atomicContainsAll(final Collection<?> c) {
         throw new TodoException();
     }
 
-    @Override
-    public boolean atomicContainsAll(Collection<?> c) {
-        throw new TodoException();
-    }
+    // ============= addAll ================
 
     @Override
-    public boolean addAll(Collection<? extends E> c) {
-        throw new TodoException();
+    public boolean addAll(final Collection<? extends E> c) {
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            return atomicAddAll(c);
+        } else {
+            return addAll((BetaTransaction) tx, c);
+        }
     }
 
     @Override
     public boolean addAll(Transaction tx, Collection<? extends E> c) {
+        return addAll((BetaTransaction) tx, c);
+    }
+
+    public boolean addAll(BetaTransaction tx, Collection<? extends E> c) {
         throw new TodoException();
     }
 
@@ -971,13 +1150,25 @@ public class BetaTransactionalLinkedList<E> implements TransactionalDeque<E>, Tr
         throw new TodoException();
     }
 
+    // ============= removeAll ================
+
     @Override
     public boolean removeAll(Collection<?> c) {
-        throw new TodoException();
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            return atomicRemoveAll(c);
+        } else {
+            return removeAll((BetaTransaction) tx, c);
+        }
     }
 
     @Override
     public boolean removeAll(Transaction tx, Collection<?> c) {
+        return removeAll((BetaTransaction) tx, c);
+    }
+
+    public boolean removeAll(BetaTransaction tx, Collection<?> c) {
         throw new TodoException();
     }
 
@@ -986,28 +1177,52 @@ public class BetaTransactionalLinkedList<E> implements TransactionalDeque<E>, Tr
         throw new TodoException();
     }
 
+    // ============= retainAll ================
+
     @Override
-    public boolean retainAll(Collection<?> c) {
+    public boolean retainAll(final Collection<?> c) {
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            return atomicRetainAll(c);
+        } else {
+            return retainAll((BetaTransaction) tx, c);
+        }
+    }
+
+    @Override
+    public boolean retainAll(final Transaction tx, final Collection<?> c) {
+        return retainAll((BetaTransaction) tx, c);
+    }
+
+    public boolean retainAll(final BetaTransaction tx, final Collection<?> c) {
         throw new TodoException();
     }
 
     @Override
-    public boolean retainAll(Transaction tx, Collection<?> c) {
+    public boolean atomicRetainAll(final Collection<?> c) {
         throw new TodoException();
     }
 
-    @Override
-    public boolean atomicRetainAll(Collection<?> c) {
-        throw new TodoException();
-    }
+    // ============= clear ================
 
     @Override
     public void clear() {
-        throw new TodoException();
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            atomicClear();
+        } else {
+            clear((BetaTransaction) tx);
+        }
     }
 
     @Override
-    public void clear(Transaction tx) {
+    public void clear(final Transaction tx) {
+        clear((BetaTransaction) tx);
+    }
+
+    public void clear(final BetaTransaction tx) {
         throw new TodoException();
     }
 
@@ -1016,28 +1231,52 @@ public class BetaTransactionalLinkedList<E> implements TransactionalDeque<E>, Tr
         throw new TodoException();
     }
 
+    // ============= equals ================
+
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            return atomicEquals(o);
+        } else {
+            return equals((BetaTransaction) tx, o);
+        }
+    }
+
+    @Override
+    public boolean equals(final Transaction tx, final Object o) {
+        return equals((BetaTransaction) tx, o);
+    }
+
+    public boolean equals(final BetaTransaction tx, final Object o) {
         throw new TodoException();
     }
 
     @Override
-    public boolean equals(Transaction tx, Object o) {
+    public boolean atomicEquals(final Object o) {
         throw new TodoException();
     }
 
-    @Override
-    public boolean atomicEquals(Object o) {
-        throw new TodoException();
-    }
+    // ============= hashCode ================
 
     @Override
     public int hashCode() {
-        throw new TodoException();
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            return atomicHashCode();
+        } else {
+            return hashCode((BetaTransaction) tx);
+        }
     }
 
     @Override
-    public int hashCode(Transaction tx) {
+    public int hashCode(final Transaction tx) {
+        return hashCode((BetaTransaction) tx);
+    }
+
+    public int hashCode(final BetaTransaction tx) {
         throw new TodoException();
     }
 
@@ -1046,12 +1285,24 @@ public class BetaTransactionalLinkedList<E> implements TransactionalDeque<E>, Tr
         throw new TodoException();
     }
 
+    // ============= toString ================
+
     public String toString() {
-        throw new TodoException();
+        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
+        final Transaction tx = container.transaction;
+        if (tx == null || !tx.isAlive()) {
+            return atomicToString();
+        } else {
+            return toString((BetaTransaction) tx);
+        }
     }
 
     @Override
-    public String toString(Transaction tx) {
+    public String toString(final Transaction tx) {
+        return toString((BetaTransaction)tx);
+    }
+
+    public String toString(final BetaTransaction tx) {
         throw new TodoException();
     }
 

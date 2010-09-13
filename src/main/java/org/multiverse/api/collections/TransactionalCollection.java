@@ -19,14 +19,14 @@ public interface TransactionalCollection<E> extends Collection<E> {
 
     boolean isEmpty(Transaction tx);
 
-    boolean atomicIsEmpty(Transaction tx);
+    boolean atomicIsEmpty();
 
     @Override
     boolean contains(Object o);
 
-    boolean contains(Transaction tx);
+    boolean contains(Transaction tx, Object o);
 
-    boolean atomicContains(Transaction tx, Object o);
+    boolean atomicContains(Object o);
 
     @Override
     Iterator<E> iterator();
