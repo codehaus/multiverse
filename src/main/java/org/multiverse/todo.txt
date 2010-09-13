@@ -168,6 +168,16 @@ and not allowed. So not throw the retry error immediately..
 
 - transactional array
 
+- transactional treemap
+
+- transactional treeset
+
+- transactional hashset
+
+- transactional treeset
+
+- 'size' structure to help with an approximate size for collections
+
 - listeners are not cleaned after abort/commit, so still a potential memory leak
 
 - atomic change methods on ref should deal with listeners
