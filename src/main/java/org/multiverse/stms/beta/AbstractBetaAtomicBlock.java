@@ -30,7 +30,6 @@ public abstract class AbstractBetaAtomicBlock implements AtomicBlock {
     }
 
     protected final void waitForChange(final BetaTransaction tx) throws InterruptedException {
-
         if (hasTimeout) {
             waitForChangeWithTimeout(tx);
         } else {
@@ -38,9 +37,7 @@ public abstract class AbstractBetaAtomicBlock implements AtomicBlock {
         }
     }
 
-    protected final void waitForChangeWithTimeout(
-            final BetaTransaction tx) throws InterruptedException {
-
+    protected final void waitForChangeWithTimeout(final BetaTransaction tx) throws InterruptedException {
         BetaObjectPool pool = tx.getPool();
         StandardLatch latch = pool.takeStandardLatch();
         if (latch == null) {
@@ -63,7 +60,7 @@ public abstract class AbstractBetaAtomicBlock implements AtomicBlock {
             tx.setRemainingTimeoutNs(timeoutNs);
             if (timeoutNs < 0) {
                 throw new RetryTimeoutException(
-                        format("Transaction %s has timed with a total timeout of %s ns",
+                        format("[%s] Transaction has timed with a total timeout of %s ns",
                                 transactionConfiguration.getFamilyName(),
                                 transactionConfiguration.getTimeoutNs()));
             }

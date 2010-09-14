@@ -18,8 +18,6 @@ import org.multiverse.api.references.RefFactoryBuilder;
  */
 public interface Stm {
 
-    CollectionsFactory getCollectionsFactory();
-
     /**
      * Starts a default Transaction that is useful for testing/experimentation purposes. This method is purely
      * for easy to use access, but doesn't provide any configuration options. See the
@@ -46,7 +44,7 @@ public interface Stm {
      * Returns the default reference factory that can be used for easy and cheap access to a reference factory
      * instead of setting one up through the RefFactoryBuilder.
      *
-     * @return
+     * @return the default RefFactory.
      */
     RefFactory getDefaultRefFactory();
 
@@ -64,4 +62,13 @@ public interface Stm {
      * @return the RefFactoryBuilder.
      */
     RefFactoryBuilder getReferenceFactoryBuilder();
+
+    /**
+     * Returns the {@link CollectionsFactory} that is part of this Stm. Using a factory for creating
+     * collection provides a lot of freedom to the Stm implementation to return a stm specific implementation
+     * and reduces the need to provide instrumentation.
+     *
+     * @return the CollectionFactory.
+     */
+    CollectionsFactory getCollectionsFactory();
 }
