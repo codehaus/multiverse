@@ -29,10 +29,11 @@ import static java.lang.String.format;
  * <p/>
  * Layout:
  * In total 64 bits
- * 0: bit contains lock
- * 1: bit contains readbiased.
- * 3-54: contains surplus
- * 54-63 contains readonly count
+ * bit 0      : contains lock
+ * bit 1      : contains readbiased.
+ * bit 2      : contains protected against update
+ * bit 3-53   : contains surplus
+ * bit 54-63  : contains readonly count
  * <p/>
  * <p/>
  *
@@ -58,6 +59,11 @@ public class FastOrec implements Orec {
     private volatile long value;
 
     @Override
+    public boolean ___isProtectedAgainstUpdate() {
+        return isProtectedAgainstUpdate(value);
+    }
+
+    @Override
     public final int ___getReadBiasedThreshold() {
         return ___READBIASED_THRESHOLD;
     }
@@ -80,11 +86,6 @@ public class FastOrec implements Orec {
     @Override
     public final int ___getReadonlyCount() {
         return getReadonlyCount(value);
-    }
-
-    @Override
-    public final boolean ___query() {
-        return getSurplus(value) > 0;
     }
 
     @Override
@@ -423,12 +424,20 @@ public class FastOrec implements Orec {
         return (value & 0x8000000000000000L) != 0;
     }
 
+    public static boolean isReadBiased(final long value) {
+        return (value & 0x4000000000000000L) != 0;
+    }
+
     public static long setIsReadBiased(final long value, final boolean isReadBiased) {
         return (value & ~0x4000000000000000L) | ((isReadBiased ? 1L : 0L) << 62);
     }
 
-    public static boolean isReadBiased(final long value) {
-        return (value & 0x4000000000000000L) != 0;
+    public static boolean isProtectedAgainstUpdate(final long value) {
+        return (value & 0x2000000000000000L) != 0;
+    }
+
+    public static long setProtectedAgainstUpdate(final long value, final boolean protectedAgainstUpdate) {
+        return (value & ~0x2000000000000000L) | ((protectedAgainstUpdate ? 1L : 0L) << 61);
     }
 
     public static int getReadonlyCount(final long value) {
@@ -440,16 +449,21 @@ public class FastOrec implements Orec {
     }
 
     public static long setSurplus(final long value, final long surplus) {
-        return (value & ~0x3FFFFFFFFFFFFC00L) | (surplus << 10);
+        return (value & ~0x1FFFFFFFFFFFFE00L) | (surplus << 10);
     }
 
     public static long getSurplus(final long value) {
-        return (value & 0x3FFFFFFFFFFFFC00L) >> 10;
+        return (value & 0x1FFFFFFFFFFFFE00L) >> 10;
     }
 
     private static String ___toOrecString(long value) {
-        return format("FastOrec(isLocked=%s, surplus=%s, isReadBiased=%s, readonlyCount=%s)",
-                isLocked(value), getSurplus(value), isReadBiased(value), getReadonlyCount(value));
+        return format(
+                "FastOrec(isLocked=%s, isProtectedAgainstUpdate=%s, surplus=%s, isReadBiased=%s, readonlyCount=%s)",
+                isLocked(value),
+                isProtectedAgainstUpdate(value),
+                getSurplus(value),
+                isReadBiased(value),
+                getReadonlyCount(value));
     }
 
     public final String ___toOrecString() {

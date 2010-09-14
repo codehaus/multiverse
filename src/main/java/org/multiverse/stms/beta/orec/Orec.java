@@ -22,15 +22,11 @@ import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
 public interface Orec extends BetaStmConstants {
 
     /**
-     * Returns true if there is a surplus, false otherwise. When there is a surplus, there are transactions
-     * that have read the transactional object (so have arrived), but have not left. If the Orec is read
-     * biased, the surplus doesn't need to match the actual number of transactions that currently are reading
-     * since the arrive and depart operations don't lead to a change in the surplus. This is done to prevent
-     * unwanted contention on the Orec.
+     * Checks if the Orec is owned for writing.
      *
-     * @return true if there is a surplus, false otherwise.
+     * @return true if owned for writing, false otherwise.
      */
-    boolean ___query();
+    boolean ___isProtectedAgainstUpdate();
 
     /**
      * Returns the current number of surplus. Value is unspecified if Orec is biased to reading.
@@ -154,5 +150,10 @@ public interface Orec extends BetaStmConstants {
      */
     int ___getReadonlyCount();
 
+    /**
+     * Returns a String representation of the orec useful for debugging purposes.
+     *
+     * @return a String representation useful for debugging purposes.
+     */
     String ___toOrecString();
 }

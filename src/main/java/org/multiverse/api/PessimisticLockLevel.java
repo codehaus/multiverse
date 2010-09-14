@@ -23,7 +23,12 @@ public enum PessimisticLockLevel {
     /**
      * A PessimisticLockLevel that doesn't require any locking.
      */
-    None(false, false);
+    None(false, false),
+
+    /**
+     * Exclusively locks (so a read is not possible when a write is done).
+     */
+    Exclusive(true, true);
 
     private final boolean lockReads;
     private final boolean lockWrites;

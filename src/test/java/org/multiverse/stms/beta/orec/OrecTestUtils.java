@@ -1,12 +1,21 @@
 package org.multiverse.stms.beta.orec;
 
+import org.junit.Test;
+
 import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Veentjer
  */
 public class OrecTestUtils {
+
+    @Test
+    public void test(){
+        System.out.println(Long.toBinaryString(0x1FFFFFFFFFFFFE00L));
+        System.out.printf("%o8s\n",0x1FFFFFFFFFFFFE00L);
+    }
 
     public static void assertLocked(Orec orec) {
         assertTrue(orec.___isLocked());

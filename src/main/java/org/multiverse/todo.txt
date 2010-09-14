@@ -99,11 +99,11 @@ value even though it is locked.
 
 - array tree transaction: support for orelse
 
-- mono transaction and unstarted state
+- mono transaction and undefined state
 
-- array transaction and unstarted state
+- array transaction and undefined state
 
-- map transaction and unstarted state
+- map transaction and undefined state
 
 - unshared atomicget, with periodic atomicset.
 
