@@ -1,5 +1,6 @@
 package org.multiverse.api;
 
+import org.multiverse.api.collections.CollectionsFactory;
 import org.multiverse.api.references.RefFactory;
 import org.multiverse.api.references.RefFactoryBuilder;
 
@@ -16,6 +17,8 @@ import org.multiverse.api.references.RefFactoryBuilder;
  * @author Peter Veentjer.
  */
 public interface Stm {
+
+    CollectionsFactory getCollectionsFactory();
 
     /**
      * Starts a default Transaction that is useful for testing/experimentation purposes. This method is purely

@@ -6,9 +6,12 @@ import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.durability.SimpleStorage;
 import org.multiverse.durability.Storage;
 import org.multiverse.sensors.SimpleProfiler;
+import org.multiverse.stms.beta.collections.BetaTransactionalLinkedList;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.*;
 import org.multiverse.stms.beta.transactions.*;
+
+import java.util.Collection;
 
 import static org.multiverse.stms.beta.ThreadLocalBetaTransactionPool.getThreadLocalBetaTransactionPool;
 
@@ -17,10 +20,11 @@ import static org.multiverse.stms.beta.ThreadLocalBetaTransactionPool.getThreadL
  */
 public final class BetaStm implements Stm {
 
-    public static BetaStm createFast(){
+    public static BetaStm createFast() {
         return new BetaStm();
     }
 
+    private final BetaCollectionsFactoryImpl collectionsFactory = new BetaCollectionsFactoryImpl();
     private final AtomicBlock defaultAtomicBlock;
     public final GlobalConflictCounter globalConflictCounter;
     public final int spinCount = 8;
@@ -103,6 +107,73 @@ public final class BetaStm implements Stm {
         return defaultRefFactory;
     }
 
+    @Override
+    public BetaCollectionsFactory getCollectionsFactory() {
+        return collectionsFactory;
+    }
+
+    public final class BetaCollectionsFactoryImpl implements BetaCollectionsFactory{
+        @Override
+        public <E> BetaTransactionalLinkedList<E> newLinkedList() {
+            throw new TodoException();
+        }
+
+        @Override
+        public <E> BetaTransactionalLinkedList<E> newLinkedList(Collection<? extends E> c) {
+            throw new TodoException();
+        }
+
+        @Override
+        public <E> BetaTransactionalLinkedList<E> newLinkedDeque() {
+            throw new TodoException();
+        }
+
+        @Override
+        public <E> BetaTransactionalLinkedList<E> newLinkedDeque(Collection<? extends E> c) {
+            throw new TodoException();
+        }
+
+        @Override
+        public <E> BetaTransactionalLinkedList<E> newLinkedBlockingDeque() {
+            throw new TodoException();
+        }
+
+        @Override
+        public <E> BetaTransactionalLinkedList<E> newLinkedBlockingDeque(int capacity) {
+            throw new TodoException();
+        }
+
+        @Override
+        public <E> BetaTransactionalLinkedList<E> newLinkedBlockingDeque(Collection<? extends E> c) {
+            throw new TodoException();
+        }
+
+        @Override
+        public <E> BetaTransactionalLinkedList<E> newLinkedQueue() {
+            throw new TodoException();
+        }
+
+        @Override
+        public <E> BetaTransactionalLinkedList<E> newLinkedQueue(Collection<? extends E> c) {
+            throw new TodoException();
+        }
+
+        @Override
+        public <E> BetaTransactionalLinkedList<E> newLinkedBlockingQueue() {
+            throw new TodoException();
+        }
+
+        @Override
+        public <E> BetaTransactionalLinkedList<E> newLinkedBlockingQueue(int capacity) {
+            throw new TodoException();
+        }
+
+        @Override
+        public <E> BetaTransactionalLinkedList<E> newLinkedBlockingQueue(Collection<? extends E> c) {
+            throw new TodoException();
+        }
+    }
+    
     public final class BetaRefFactoryImpl implements BetaRefFactory {
 
         @Override

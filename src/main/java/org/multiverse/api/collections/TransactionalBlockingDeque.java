@@ -4,7 +4,7 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.TimeUnit;
 
 //todo: extra methods need to be added.
-public interface TransactionalBlockingDeque<E> extends TransactionalBlockingQueue<E>, BlockingDeque<E> {
+public interface TransactionalBlockingDeque<E> extends TransactionalBlockingQueue<E>, TransactionalDeque<E>, BlockingDeque<E> {
 
     @Override
     void addFirst(E e);

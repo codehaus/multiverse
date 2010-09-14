@@ -2,7 +2,7 @@ package org.multiverse.stms.beta.collections;
 
 import org.multiverse.api.ThreadLocalTransaction;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.collections.TransactionalDeque;
+import org.multiverse.api.collections.TransactionalBlockingDeque;
 import org.multiverse.api.collections.TransactionalList;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -11,10 +11,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.concurrent.TimeUnit;
 
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactionContainer;
 
-public class BetaTransactionalLinkedList<E> implements TransactionalDeque<E>, TransactionalList<E> {
+public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDeque<E>, TransactionalList<E> {
 
     // ================= addFirst ============
 
@@ -27,6 +28,91 @@ public class BetaTransactionalLinkedList<E> implements TransactionalDeque<E>, Tr
         } else {
             addFirst((BetaTransaction) tx, e);
         }
+    }
+
+    @Override
+    public void putFirst(E e) throws InterruptedException {
+        throw new TodoException();
+    }
+
+    @Override
+    public void putLast(E e) throws InterruptedException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean offerFirst(E e, long timeout, TimeUnit unit) throws InterruptedException {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean offerLast(E e, long timeout, TimeUnit unit) throws InterruptedException {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public E takeFirst() throws InterruptedException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public E takeLast() throws InterruptedException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public E pollFirst(long timeout, TimeUnit unit) throws InterruptedException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public E pollLast(long timeout, TimeUnit unit) throws InterruptedException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void put(E e) throws InterruptedException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void put(Transaction tx, E e) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void atomicPut() throws InterruptedException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public E take() throws InterruptedException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public E poll(long timeout, TimeUnit unit) throws InterruptedException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public int remainingCapacity() {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public int drainTo(Collection<? super E> c) {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public int drainTo(Collection<? super E> c, int maxElements) {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -1310,4 +1396,5 @@ public class BetaTransactionalLinkedList<E> implements TransactionalDeque<E>, Tr
     public String atomicToString() {
         throw new TodoException();
     }
+    
 }
