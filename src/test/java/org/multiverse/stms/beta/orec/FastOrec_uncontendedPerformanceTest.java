@@ -18,7 +18,7 @@ import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPer
  *
  * @author Peter Veentjer.
  */
-public class FastOrec_UncontendedPerformanceTest implements BetaStmConstants {
+public class FastOrec_uncontendedPerformanceTest implements BetaStmConstants {
     private BetaLongRef ref;
     private GlobalConflictCounter globalConflictCounter;
     private BetaStm stm;

@@ -5,11 +5,12 @@ import org.multiverse.api.exceptions.PanicError;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
  * @author Peter Veentjer
  */
-public class FastOrec_departAfterFailureAndReleaseLockTest {
+public class FastOrec_departAfterFailureAndUnlockTest {
 
     @Test
     public void whenUpdateBiasedNotLocked_thenPanicError() {
@@ -20,10 +21,11 @@ public class FastOrec_departAfterFailureAndReleaseLockTest {
         } catch (PanicError ex) {
         }
 
-        OrecTestUtils.assertUnlocked(orec);
-        OrecTestUtils.assertSurplus(0, orec);
-        OrecTestUtils.assertReadonlyCount(0, orec);
-        OrecTestUtils.assertUpdateBiased(orec);
+        assertUnlocked(orec);
+        assertSurplus(0, orec);
+        assertReadonlyCount(0, orec);
+        assertUpdateBiased(orec);
+        assertNotProtectedAgainstUpdate(orec);
     }
 
     @Test
@@ -36,10 +38,11 @@ public class FastOrec_departAfterFailureAndReleaseLockTest {
         } catch (PanicError expected) {
         }
 
-        OrecTestUtils.assertUnlocked(orec);
-        OrecTestUtils.assertSurplus(0, orec);
-        OrecTestUtils.assertReadonlyCount(0, orec);
-        OrecTestUtils.assertReadBiased(orec);
+        assertUnlocked(orec);
+        assertSurplus(0, orec);
+        assertReadonlyCount(0, orec);
+        assertReadBiased(orec);
+        assertNotProtectedAgainstUpdate(orec);
     }
 
     @Test
@@ -50,10 +53,11 @@ public class FastOrec_departAfterFailureAndReleaseLockTest {
 
         long result = orec.___departAfterFailureAndUnlock();
         assertEquals(0, result);
-        OrecTestUtils.assertUnlocked(orec);
-        OrecTestUtils.assertSurplus(0, orec);
-        OrecTestUtils.assertReadonlyCount(0, orec);
-        OrecTestUtils.assertUpdateBiased(orec);
+        assertUnlocked(orec);
+        assertSurplus(0, orec);
+        assertReadonlyCount(0, orec);
+        assertUpdateBiased(orec);
+        assertNotProtectedAgainstUpdate(orec);
     }
 
     @Test
@@ -64,9 +68,10 @@ public class FastOrec_departAfterFailureAndReleaseLockTest {
 
         long result = orec.___departAfterFailureAndUnlock();
         assertEquals(1, result);
-        OrecTestUtils.assertUnlocked(orec);
-        OrecTestUtils.assertSurplus(1, orec);
-        OrecTestUtils.assertReadonlyCount(0, orec);
-        OrecTestUtils.assertReadBiased(orec);
+        assertUnlocked(orec);
+        assertSurplus(1, orec);
+        assertReadonlyCount(0, orec);
+        assertReadBiased(orec);
+        assertNotProtectedAgainstUpdate(orec);
     }
 }

@@ -7,11 +7,12 @@ import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
  * @author Peter Veentjer
  */
-public class FastOrec_departAfterUpdateAndReleaseLock {
+public class FastOrec_departAfterUpdateAndUnlock {
 
     private GlobalConflictCounter globalConflictCounter;
 
@@ -33,10 +34,11 @@ public class FastOrec_departAfterUpdateAndReleaseLock {
         }
 
         assertEquals(oldConflictCount, globalConflictCounter.count());
-        OrecTestUtils.assertUnlocked(orec);
-        OrecTestUtils.assertSurplus(0, orec);
-        OrecTestUtils.assertReadonlyCount(0, orec);
-        OrecTestUtils.assertUpdateBiased(orec);
+        assertUnlocked(orec);
+        assertSurplus(0, orec);
+        assertReadonlyCount(0, orec);
+        assertUpdateBiased(orec);
+        assertNotProtectedAgainstUpdate(orec);
     }
 
     @Test
@@ -53,10 +55,11 @@ public class FastOrec_departAfterUpdateAndReleaseLock {
         }
 
         assertEquals(oldConflictCount, globalConflictCounter.count());
-        OrecTestUtils.assertUnlocked(orec);
-        OrecTestUtils.assertSurplus(2, orec);
-        OrecTestUtils.assertUpdateBiased(orec);
-        OrecTestUtils.assertReadonlyCount(0, orec);
+        assertUnlocked(orec);
+        assertSurplus(2, orec);
+        assertUpdateBiased(orec);
+        assertReadonlyCount(0, orec);
+        assertNotProtectedAgainstUpdate(orec);
     }
 
     @Test
@@ -71,10 +74,11 @@ public class FastOrec_departAfterUpdateAndReleaseLock {
 
         assertEquals(0, result);
         assertEquals(oldConflictCount, globalConflictCounter.count());
-        OrecTestUtils.assertUnlocked(orec);
-        OrecTestUtils.assertSurplus(0, orec);
-        OrecTestUtils.assertUpdateBiased(orec);
-        OrecTestUtils.assertReadonlyCount(0, orec);
+        assertUnlocked(orec);
+        assertSurplus(0, orec);
+        assertUpdateBiased(orec);
+        assertReadonlyCount(0, orec);
+        assertNotProtectedAgainstUpdate(orec);
     }
 
     @Test
@@ -91,9 +95,10 @@ public class FastOrec_departAfterUpdateAndReleaseLock {
 
         assertEquals(oldConflictCount + 1, globalConflictCounter.count());
         assertEquals(2, result);
-        OrecTestUtils.assertUnlocked(orec);
-        OrecTestUtils.assertSurplus(2, orec);
-        OrecTestUtils.assertUpdateBiased(orec);
-        OrecTestUtils.assertReadonlyCount(0, orec);
+        assertUnlocked(orec);
+        assertSurplus(2, orec);
+        assertUpdateBiased(orec);
+        assertReadonlyCount(0, orec);
+        assertNotProtectedAgainstUpdate(orec);
     }
 }

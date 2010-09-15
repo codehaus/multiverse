@@ -1,7 +1,5 @@
 package org.multiverse.stms.beta.orec;
 
-import org.junit.Test;
-
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -11,10 +9,12 @@ import static org.junit.Assert.assertTrue;
  */
 public class OrecTestUtils {
 
-    @Test
-    public void test(){
-        System.out.println(Long.toBinaryString(0x1FFFFFFFFFFFFE00L));
-        System.out.printf("%o8s\n",0x1FFFFFFFFFFFFE00L);
+    public static void assertProtectedAgainstUpdate(Orec orec) {
+        assertTrue(orec.___isProtectedAgainstUpdate());
+    }
+
+    public static void assertNotProtectedAgainstUpdate(Orec orec) {
+        assertFalse(orec.___isProtectedAgainstUpdate());
     }
 
     public static void assertLocked(Orec orec) {
@@ -47,7 +47,7 @@ public class OrecTestUtils {
         }
 
         int x = orec.___getReadonlyCount();
-        for (int k = x; k < orec.___getReadBiasedThreshold() ; k++) {
+        for (int k = x; k < orec.___getReadBiasedThreshold(); k++) {
             orec.___arrive(1);
             orec.___departAfterReading();
         }

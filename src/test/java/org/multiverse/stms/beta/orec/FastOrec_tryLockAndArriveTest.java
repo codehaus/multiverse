@@ -4,8 +4,6 @@ import org.junit.Test;
 import org.multiverse.stms.beta.BetaStmConstants;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
@@ -26,6 +24,7 @@ public class FastOrec_tryLockAndArriveTest implements BetaStmConstants {
         assertSurplus(1, orec);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
+        assertNotProtectedAgainstUpdate(orec);
     }
 
     @Test
@@ -39,6 +38,7 @@ public class FastOrec_tryLockAndArriveTest implements BetaStmConstants {
         assertSurplus(1, orec);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
+        assertNotProtectedAgainstUpdate(orec);
     }
 
     @Test
@@ -54,6 +54,7 @@ public class FastOrec_tryLockAndArriveTest implements BetaStmConstants {
         assertSurplus(1, orec);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);
+        assertNotProtectedAgainstUpdate(orec);
     }
 
     @Test
@@ -67,5 +68,6 @@ public class FastOrec_tryLockAndArriveTest implements BetaStmConstants {
         assertSurplus(1, orec);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);
+        assertNotProtectedAgainstUpdate(orec);
     }
 }

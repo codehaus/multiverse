@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.multiverse.api.exceptions.PanicError;
 
 import static org.junit.Assert.fail;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
  * @author Peter Veentjer
@@ -20,10 +21,11 @@ public class FastOrec_departAfterFailureTest {
         } catch (PanicError expected) {
         }
 
-        OrecTestUtils.assertSurplus(0, orec);
-        OrecTestUtils.assertUpdateBiased(orec);
-        OrecTestUtils.assertUnlocked(orec);
-        OrecTestUtils.assertReadonlyCount(0, orec);
+        assertSurplus(0, orec);
+        assertUpdateBiased(orec);
+        assertUnlocked(orec);
+        assertReadonlyCount(0, orec);
+        assertNotProtectedAgainstUpdate(orec);
     }
 
     @Test
@@ -33,10 +35,11 @@ public class FastOrec_departAfterFailureTest {
 
         orec.___departAfterFailure();
 
-        OrecTestUtils.assertSurplus(0, orec);
-        OrecTestUtils.assertUpdateBiased(orec);
-        OrecTestUtils.assertUnlocked(orec);
-        OrecTestUtils.assertReadonlyCount(0, orec);
+        assertSurplus(0, orec);
+        assertUpdateBiased(orec);
+        assertUnlocked(orec);
+        assertReadonlyCount(0, orec);
+        assertNotProtectedAgainstUpdate(orec);
     }
 
     @Test
@@ -48,10 +51,11 @@ public class FastOrec_departAfterFailureTest {
 
         orec.___departAfterFailure();
 
-        OrecTestUtils.assertSurplus(1, orec);
-        OrecTestUtils.assertUpdateBiased(orec);
-        OrecTestUtils.assertLocked(orec);
-        OrecTestUtils.assertReadonlyCount(0, orec);
+        assertSurplus(1, orec);
+        assertUpdateBiased(orec);
+        assertLocked(orec);
+        assertReadonlyCount(0, orec);
+        assertNotProtectedAgainstUpdate(orec);
     }
 
     @Test
@@ -67,10 +71,11 @@ public class FastOrec_departAfterFailureTest {
         } catch (PanicError expected) {
         }
 
-        OrecTestUtils.assertLocked(orec);
-        OrecTestUtils.assertSurplus(1, orec);
-        OrecTestUtils.assertReadBiased(orec);
-        OrecTestUtils.assertReadonlyCount(0, orec);
+        assertLocked(orec);
+        assertSurplus(1, orec);
+        assertReadBiased(orec);
+        assertReadonlyCount(0, orec);
+        assertNotProtectedAgainstUpdate(orec);
     }
 
     @Test
@@ -83,9 +88,10 @@ public class FastOrec_departAfterFailureTest {
         } catch (PanicError expected) {
         }
 
-        OrecTestUtils.assertUnlocked(orec);
-        OrecTestUtils.assertSurplus(0, orec);
-        OrecTestUtils.assertReadBiased(orec);
-        OrecTestUtils.assertReadonlyCount(0, orec);
+        assertUnlocked(orec);
+        assertSurplus(0, orec);
+        assertReadBiased(orec);
+        assertReadonlyCount(0, orec);
+        assertNotProtectedAgainstUpdate(orec);
     }
 }

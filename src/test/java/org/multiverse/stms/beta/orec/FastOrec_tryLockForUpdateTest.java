@@ -3,6 +3,7 @@ package org.multiverse.stms.beta.orec;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
  * @author Peter Veentjer
@@ -16,9 +17,10 @@ public class FastOrec_tryLockForUpdateTest {
 
         boolean result = orec.___tryLockAfterNormalArrive(1);
         assertTrue(result);
-        OrecTestUtils.assertLocked(orec);
-        OrecTestUtils.assertSurplus(1, orec);
-        OrecTestUtils.assertUpdateBiased(orec);
+        assertLocked(orec);
+        assertSurplus(1, orec);
+        assertUpdateBiased(orec);
+        assertNotProtectedAgainstUpdate(orec);
     }
 
     @Test
@@ -29,9 +31,10 @@ public class FastOrec_tryLockForUpdateTest {
 
         boolean result = orec.___tryLockAfterNormalArrive(1);
         assertTrue(result);
-        OrecTestUtils.assertLocked(orec);
-        OrecTestUtils.assertSurplus(2, orec);
-        OrecTestUtils.assertUpdateBiased(orec);
+        assertLocked(orec);
+        assertSurplus(2, orec);
+        assertUpdateBiased(orec);
+        assertNotProtectedAgainstUpdate(orec);
     }
 
     @Test
@@ -42,9 +45,10 @@ public class FastOrec_tryLockForUpdateTest {
 
         boolean result = orec.___tryLockAfterNormalArrive(1);
         assertFalse(result);
-        OrecTestUtils.assertLocked(orec);
+        assertLocked(orec);
         assertEquals(1, orec.___getSurplus());
         assertFalse(orec.___isReadBiased());
+        assertNotProtectedAgainstUpdate(orec);        
     }
 
     @Test
@@ -55,8 +59,9 @@ public class FastOrec_tryLockForUpdateTest {
         boolean result = orec.___tryLockAfterNormalArrive(1);
 
         assertTrue(result);
-        OrecTestUtils.assertReadBiased(orec);
-        OrecTestUtils.assertLocked(orec);
-        OrecTestUtils.assertSurplus(1, orec);
+        assertReadBiased(orec);
+        assertLocked(orec);
+        assertSurplus(1, orec);
+        assertNotProtectedAgainstUpdate(orec);
     }
 }
