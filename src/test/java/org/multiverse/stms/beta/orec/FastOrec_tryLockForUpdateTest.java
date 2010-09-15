@@ -53,7 +53,7 @@ public class FastOrec_tryLockForUpdateTest {
 
     @Test
     public void whenReadBiasedMode() {
-        FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
+        FastOrec orec = makeReadBiased(new FastOrec());
 
         orec.___arrive(1);
         boolean result = orec.___tryLockAfterNormalArrive(1);

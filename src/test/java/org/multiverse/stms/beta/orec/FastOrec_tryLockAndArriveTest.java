@@ -43,7 +43,7 @@ public class FastOrec_tryLockAndArriveTest implements BetaStmConstants {
 
     @Test
     public void whenReadBiasedAndLocked() {
-        FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
+        FastOrec orec = makeReadBiased(new FastOrec());
         orec.___arrive(1);
         orec.___tryLockAfterNormalArrive(1);
 
@@ -59,7 +59,7 @@ public class FastOrec_tryLockAndArriveTest implements BetaStmConstants {
 
     @Test
     public void whenReadBiasedAndUnlocked() {
-        FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
+        FastOrec orec = makeReadBiased(new FastOrec());
 
         int result = orec.___tryLockAndArrive(1);
 
