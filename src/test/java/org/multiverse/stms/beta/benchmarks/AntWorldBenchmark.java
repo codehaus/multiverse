@@ -50,7 +50,7 @@ public class AntWorldBenchmark {
         for (int k = 0; k < worldSize; k++) {
             BetaLongRef ref = cells[k];
             //assertSurplus(1, ref);
-            //assertUnlocked(ref);
+            //assertHasNoCommitLock(ref);
             //assertReadBiased(ref);
         }
 

@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
 
 /**
  * @author Peter Veentjer
@@ -228,7 +228,7 @@ public class TestUtils {
             BetaTransaction tx = new FatMonoBetaTransaction(stm);
             tx.openForRead(ref, false);
             tx.commit();
-            assertUnlocked(ref.___getOrec());
+            assertHasNoCommitLock(ref.___getOrec());
         }
 
         assertTrue(ref.___getOrec().___isReadBiased());

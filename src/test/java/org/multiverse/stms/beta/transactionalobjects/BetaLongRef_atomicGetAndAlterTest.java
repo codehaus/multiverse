@@ -39,7 +39,7 @@ public class BetaLongRef_atomicGetAndAlterTest {
         long result = ref.atomicGetAndAlter(function);
 
         assertEquals(2, result);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
@@ -58,7 +58,7 @@ public class BetaLongRef_atomicGetAndAlterTest {
         }
 
         assertSame(committed, ref.___unsafeLoad());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertNull(ref.___getLockOwner());
@@ -79,7 +79,7 @@ public class BetaLongRef_atomicGetAndAlterTest {
         tx.abort();
 
         assertEquals(2, result);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
@@ -101,7 +101,7 @@ public class BetaLongRef_atomicGetAndAlterTest {
         }
 
         verifyZeroInteractions(function);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertUpdateBiased(ref);
         assertSurplus(1, ref);

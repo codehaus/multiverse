@@ -72,7 +72,7 @@ public final class BetaRef<E>
      */
     public BetaRef(BetaTransaction tx){
         ___stm = tx.getConfiguration().stm;
-        ___tryLockAndArrive(0);
+        ___tryLockAndArrive(0, false);
         this.lockOwner = tx;
     }
 
@@ -176,7 +176,7 @@ public final class BetaRef<E>
             return ___active;
         }
 
-        final int arriveStatus = ___tryLockAndArrive(___stm.spinCount);
+        final int arriveStatus = ___tryLockAndArrive(___stm.spinCount, false);
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
             return  RefTranlocal.LOCKED;
         }
@@ -386,7 +386,7 @@ public final class BetaRef<E>
         //another transaction currently has the lock, and chances are that the transaction
         //is going to update the value. We can't assume that even though the current active value
         //is still the same, that the transaction isn't going to overwrite it and cause a read conflict.
-        return ___isLocked();
+        return ___hasCommitLock();
     }
 
     @Override
@@ -404,7 +404,7 @@ public final class BetaRef<E>
         final Tranlocal read = tranlocal.isCommitted ? tranlocal : tranlocal.read;
         if(read.isPermanent){
             //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
-            final int arriveStatus = ___tryLockAndArrive(spinCount);
+            final int arriveStatus = ___tryLockAndArrive(spinCount, false);
             if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
                 return false;
             }
@@ -414,7 +414,7 @@ public final class BetaRef<E>
             return read == ___active;
         }
 
-        if (!___tryLockAfterNormalArrive(spinCount)) {
+        if (!___tryLockAfterNormalArrive(spinCount, false)) {
             return false;
         }
 
@@ -1024,7 +1024,7 @@ public final class BetaRef<E>
 
     private int ___arriveAndLockOrBackoff(){
         for(int k=0;k<=___stm.defaultMaxRetries;k++){
-            final int arriveStatus = ___tryLockAndArrive(___stm.spinCount);
+            final int arriveStatus = ___tryLockAndArrive(___stm.spinCount, false);
             if(arriveStatus != ARRIVE_LOCK_NOT_FREE){
                 return arriveStatus;
             }

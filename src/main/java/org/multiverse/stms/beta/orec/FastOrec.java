@@ -59,8 +59,13 @@ public class FastOrec implements Orec {
     private volatile long value;
 
     @Override
-    public boolean ___isProtectedAgainstUpdate() {
-        return isProtectedAgainstUpdate(value);
+    public boolean ___hasUpdateLock() {
+        return hasUpdateLock(value);
+    }
+
+    @Override
+    public final boolean ___hasCommitLock() {
+        return hasCommitLock(value);
     }
 
     @Override
@@ -79,11 +84,6 @@ public class FastOrec implements Orec {
     }
 
     @Override
-    public final boolean ___isLocked() {
-        return isLocked(value);
-    }
-
-    @Override
     public final int ___getReadonlyCount() {
         return getReadonlyCount(value);
     }
@@ -93,7 +93,7 @@ public class FastOrec implements Orec {
         do {
             long current = value;
 
-            if (isLocked(current)) {
+            if (hasCommitLock(current)) {
                 spinCount--;
                 continue;
             }
@@ -125,11 +125,12 @@ public class FastOrec implements Orec {
     }
 
     @Override
-    public final int ___tryLockAndArrive(int spinCount) {
+    public final int ___tryLockAndArrive(int spinCount, final boolean updateLock) {
         do {
             long current = value;
 
-            if (isLocked(current)) {
+            //todo: updateLock is not used.
+            if (hasCommitLock(current)) {
                 spinCount--;
                 continue;
             }
@@ -149,7 +150,7 @@ public class FastOrec implements Orec {
             }
 
             long next = setSurplus(current, surplus);
-            next = setLocked(next, true);
+            next = setCommitLock(next, true);
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
                 return isReadBiased ? ARRIVE_READBIASED : ARRIVE_NORMAL;
@@ -160,11 +161,11 @@ public class FastOrec implements Orec {
     }
 
     @Override
-    public final boolean ___tryLockAfterNormalArrive(int spinCount) {
+    public final boolean ___tryLockAfterNormalArrive(int spinCount, final boolean updateLock) {
         do {
             long current = value;
 
-            if (isLocked(current)) {
+            if (hasCommitLock(current)) {
                 spinCount--;
                 continue;
             }
@@ -175,7 +176,7 @@ public class FastOrec implements Orec {
                                 ___toOrecString(current));
             }
 
-            long next = setLocked(current, true);
+            long next = setCommitLock(current, true);
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
                 return true;
@@ -184,7 +185,6 @@ public class FastOrec implements Orec {
 
         return false;
     }
-
 
     @Override
     public final void ___departAfterReading() {
@@ -207,8 +207,8 @@ public class FastOrec implements Orec {
             }
 
             surplus--;
-            final boolean isLocked = isLocked(current);
-            if (!isLocked && surplus == 0 && readonlyCount == ___READBIASED_THRESHOLD) {
+            final boolean hasCommitLock = hasCommitLock(current);
+            if (!hasCommitLock && surplus == 0 && readonlyCount == ___READBIASED_THRESHOLD) {
                 isReadBiased = true;
                 readonlyCount = 0;
             }
@@ -233,8 +233,7 @@ public class FastOrec implements Orec {
                         "Can't ___departAfterReadingAndUnlock if there is no surplus: " + ___toOrecString(current));
             }
 
-            final boolean isLocked = isLocked(current);
-            if (!isLocked) {
+            if (!hasCommitLock(current) && !hasUpdateLock(current)) {
                 throw new PanicError(
                         "Can't ___departAfterReadingAndUnlock if the lock is not acquired " + ___toOrecString(current));
             }
@@ -258,7 +257,8 @@ public class FastOrec implements Orec {
                 readonlyCount = 0;
             }
 
-            long next = setLocked(current, false);
+            long next = setCommitLock(current, false);
+            next = setUpdateLock(next, false);
             next = setIsReadBiased(next, isReadBiased);
             next = setReadonlyCount(next, readonlyCount);
             next = setSurplus(next, surplus);
@@ -275,9 +275,9 @@ public class FastOrec implements Orec {
         while (true) {
             long current = value;
 
-            if (!isLocked(current)) {
+            if (!hasCommitLock(current) && !hasUpdateLock(current)) {
                 throw new PanicError(
-                        "Can't ___departAfterUpdateAndUnlock is the lock is not acquired " + ___toOrecString(current));
+                        "Can't ___departAfterUpdateAndUnlock is the update/commit lock is not acquired " + ___toOrecString(current));
             }
 
             long surplus = getSurplus(current);
@@ -308,7 +308,8 @@ public class FastOrec implements Orec {
                 globalConflictCounter.signalConflict(transactionalObject);
             }
 
-            long next = setLocked(current, false);
+            long next = setCommitLock(current, false);
+            next = setUpdateLock(next, false);
             next = setReadonlyCount(next, 0);
             next = setIsReadBiased(next, false);
             next = setSurplus(next, surplus);
@@ -323,7 +324,7 @@ public class FastOrec implements Orec {
         while (true) {
             long current = value;
 
-            if (!isLocked(current)) {
+            if (!hasCommitLock(current) && !hasUpdateLock(current)) {
                 throw new PanicError(
                         "Can't ___departAfterFailureAndUnlock if the lock was not acquired " + ___toOrecString(current));
             }
@@ -346,7 +347,8 @@ public class FastOrec implements Orec {
                 surplus--;
             }
 
-            long next = setLocked(current, false);
+            long next = setCommitLock(current, false);
+            next = setUpdateLock(next, false);
             next = setSurplus(next, surplus);
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
                 return surplus;
@@ -365,7 +367,7 @@ public class FastOrec implements Orec {
 
             long surplus = getSurplus(current);
 
-            if (isLocked(current)) {
+            if (hasCommitLock(current)) {
                 if (surplus < 2) {
                     throw new PanicError(
                             "there must be at least 2 readers, the thread that acquired the lock, " +
@@ -387,9 +389,7 @@ public class FastOrec implements Orec {
         }
     }
 
-
-//    @Override
-
+    @Override
     public final void ___unlockByReadBiased() {
         while (true) {
             long current = value;
@@ -399,7 +399,7 @@ public class FastOrec implements Orec {
                         "Can't ___unlockByReadBiased when it is not readbiased " + ___toOrecString(current));
             }
 
-            if (!isLocked(current)) {
+            if (!hasCommitLock(current) && !hasUpdateLock(current)) {
                 throw new PanicError(
                         "Can't ___unlockByReadBiased if it isn't locked " + ___toOrecString(current));
             }
@@ -409,18 +409,23 @@ public class FastOrec implements Orec {
                         "Surplus for a readbiased orec never can be larger than 1 " + ___toOrecString(current));
             }
 
-            long next = setLocked(current, false);
+            long next = setCommitLock(current, false);
+            next = setUpdateLock(next, false);
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
                 return;
             }
         }
     }
 
-    public static long setLocked(final long value, final boolean isLocked) {
-        return (value & ~0x8000000000000000L) | ((isLocked ? 1L : 0L) << 63);
+    public final String ___toOrecString() {
+        return ___toOrecString(value);
     }
 
-    public static boolean isLocked(final long value) {
+    public static long setCommitLock(final long value, final boolean isLockedForCommit) {
+        return (value & ~0x8000000000000000L) | ((isLockedForCommit ? 1L : 0L) << 63);
+    }
+
+    public static boolean hasCommitLock(final long value) {
         return (value & 0x8000000000000000L) != 0;
     }
 
@@ -432,11 +437,11 @@ public class FastOrec implements Orec {
         return (value & ~0x4000000000000000L) | ((isReadBiased ? 1L : 0L) << 62);
     }
 
-    public static boolean isProtectedAgainstUpdate(final long value) {
+    public static boolean hasUpdateLock(final long value) {
         return (value & 0x2000000000000000L) != 0;
     }
 
-    public static long setProtectedAgainstUpdate(final long value, final boolean protectedAgainstUpdate) {
+    public static long setUpdateLock(final long value, final boolean protectedAgainstUpdate) {
         return (value & ~0x2000000000000000L) | ((protectedAgainstUpdate ? 1L : 0L) << 61);
     }
 
@@ -458,15 +463,12 @@ public class FastOrec implements Orec {
 
     private static String ___toOrecString(long value) {
         return format(
-                "FastOrec(isLocked=%s, isProtectedAgainstUpdate=%s, surplus=%s, isReadBiased=%s, readonlyCount=%s)",
-                isLocked(value),
-                isProtectedAgainstUpdate(value),
+                "FastOrec(hasCommitLock=%s, hasUpdateLock=%s, surplus=%s, isReadBiased=%s, readonlyCount=%s)",
+                hasCommitLock(value),
+                hasUpdateLock(value),
                 getSurplus(value),
                 isReadBiased(value),
                 getReadonlyCount(value));
     }
 
-    public final String ___toOrecString() {
-        return ___toOrecString(value);
-    }
 }

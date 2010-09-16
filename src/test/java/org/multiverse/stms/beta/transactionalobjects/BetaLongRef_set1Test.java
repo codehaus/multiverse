@@ -79,7 +79,7 @@ public class BetaLongRef_set1Test {
         assertEquals(10, ref.atomicGet());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertNull(getThreadLocalTransaction());
     }
@@ -92,7 +92,7 @@ public class BetaLongRef_set1Test {
         long result = ref.set(10);
 
         assertEquals(10, result);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
@@ -107,7 +107,7 @@ public class BetaLongRef_set1Test {
         long result = ref.set(20);
 
         assertEquals(20, result);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
@@ -129,7 +129,7 @@ public class BetaLongRef_set1Test {
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
     }
 
@@ -147,7 +147,7 @@ public class BetaLongRef_set1Test {
         assertEquals(20, ref.atomicGet());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSame(tx, getThreadLocalTransaction());
     }

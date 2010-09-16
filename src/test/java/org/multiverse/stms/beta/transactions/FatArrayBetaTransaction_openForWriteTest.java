@@ -134,7 +134,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertReadBiased(ref);
         assertSurplus(1, ref);
         assertReadonlyCount(oldReadonlyCount, ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNotNull(write);
         assertEquals(100, write.value);
         assertSame(committed, write.read);
@@ -160,7 +160,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertReadBiased(ref);
         assertSurplus(1, ref);
         assertReadonlyCount(oldReadonlyCount, ref);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertNotNull(write);
         assertEquals(100, write.value);
         assertSame(committed, write.read);
@@ -185,7 +185,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
         assertReadonlyCount(0, ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNotNull(write);
         assertEquals(100, write.value);
         assertSame(committed, write.read);
@@ -211,7 +211,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
         assertReadonlyCount(oldReadonlyCount, ref);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertNotNull(write);
         assertEquals(100, write.value);
         assertSame(committed, write.read);
@@ -239,7 +239,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertFalse(write.isCommitted);
         assertFalse(write.isPermanent);
         assertNull(ref.___getLockOwner());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -261,7 +261,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertEquals(100, constructed.value);
         assertFalse(constructed.isCommitted);
         assertFalse(constructed.isPermanent);
-        assertLocked(ref.___getOrec());
+        assertHasCommitLock(ref.___getOrec());
         assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref.___getOrec());
         assertUpdateBiased(ref.___getOrec());
@@ -283,7 +283,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertEquals(100, constructed.value);
         assertFalse(constructed.isCommitted);
         assertFalse(constructed.isPermanent);
-        assertLocked(ref.___getOrec());
+        assertHasCommitLock(ref.___getOrec());
         assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref.___getOrec());
         assertUpdateBiased(ref.___getOrec());
@@ -313,12 +313,12 @@ public class FatArrayBetaTransaction_openForWriteTest {
 
         assertIsAborted(tx);
 
-        assertUnlocked(ref1);
+        assertHasNoCommitLock(ref1);
         assertNull(ref1.___getLockOwner());
         assertSurplus(0, ref1);
         assertUpdateBiased(ref1);
 
-        assertUnlocked(ref2);
+        assertHasNoCommitLock(ref2);
         assertNull(ref2.___getLockOwner());
         assertSurplus(0, ref2);
         assertUpdateBiased(ref2);
@@ -342,7 +342,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
 
         assertIsActive(tx);
         assertOpenedForWrite(ref, write);
-        assertFalse(ref.___getOrec().___isLocked());
+        assertFalse(ref.___getOrec().___hasCommitLock());
         assertAttached(tx, write);
         assertHasUpdates(tx);
     }
@@ -414,7 +414,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertFalse(write.isCommitted);
         assertFalse(write.isPermanent);
         assertSame(committed, write.read);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -437,7 +437,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertFalse(write.isCommitted);
         assertFalse(write.isPermanent);
         assertSame(committed, write.read);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -472,7 +472,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertSame(committed, ref.___unsafeLoad());
         assertReadBiased(ref);
         assertSurplus(1, ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertHasUpdates(tx);
     }
@@ -555,10 +555,10 @@ public class FatArrayBetaTransaction_openForWriteTest {
 
         assertIsAborted(tx);
         assertSurplus(1, ref1);
-        assertUnlocked(ref1);
+        assertHasNoCommitLock(ref1);
         assertNull(ref1.___getLockOwner());
         assertSurplus(0, ref2);
-        assertUnlocked(ref2);
+        assertHasNoCommitLock(ref2);
         assertNull(ref2.___getLockOwner());
     }
 
@@ -583,7 +583,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertEquals(11, write.value);
         assertNull(ref.___getLockOwner());
         assertHasNoCommutingFunctions(write);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -612,7 +612,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
 
         assertIsAborted(tx);
         assertSame(otherTx, ref.___getLockOwner());
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertSame(committed, ref.___unsafeLoad());
@@ -665,7 +665,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertIsAborted(tx);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
     }
@@ -693,12 +693,12 @@ public class FatArrayBetaTransaction_openForWriteTest {
 
         assertIsAborted(tx);
         assertNull(ref1.___getLockOwner());
-        assertUnlocked(ref1);
+        assertHasNoCommitLock(ref1);
         assertSurplus(0, ref1);
         assertUpdateBiased(ref1);
 
         assertNull(ref2.___getLockOwner());
-        assertUnlocked(ref2);
+        assertHasNoCommitLock(ref2);
         assertSurplus(0, ref2);
         assertUpdateBiased(ref2);
     }
@@ -725,7 +725,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         assertIsAborted(tx);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
     }

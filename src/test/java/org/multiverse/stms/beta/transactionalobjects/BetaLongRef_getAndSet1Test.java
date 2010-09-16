@@ -13,8 +13,8 @@ import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
 
 public class BetaLongRef_getAndSet1Test {
 
@@ -88,7 +88,7 @@ public class BetaLongRef_getAndSet1Test {
 
         assertEquals(10, result);
         assertSurplus(0, ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertEquals(20, ref.atomicGet());
     }

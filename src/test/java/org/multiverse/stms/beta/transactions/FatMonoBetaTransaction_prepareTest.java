@@ -58,7 +58,7 @@ public class FatMonoBetaTransaction_prepareTest {
 
         assertIsPrepared(tx);
         assertIsCommitted(otherTx);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSame(conflictingWrite, ref.___unsafeLoad());
         assertSurplus(1, ref);
@@ -80,7 +80,7 @@ public class FatMonoBetaTransaction_prepareTest {
 
         assertIsPrepared(tx);
         assertIsActive(otherTx);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(2, ref);
@@ -99,7 +99,7 @@ public class FatMonoBetaTransaction_prepareTest {
 
         assertIsPrepared(tx);
 
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(1, ref);
@@ -118,7 +118,7 @@ public class FatMonoBetaTransaction_prepareTest {
 
         assertIsPrepared(tx);
 
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(1, ref);
@@ -147,7 +147,7 @@ public class FatMonoBetaTransaction_prepareTest {
         assertIsAborted(tx);
         assertIsActive(otherTx);
 
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(1, ref);
@@ -164,7 +164,7 @@ public class FatMonoBetaTransaction_prepareTest {
 
         assertIsPrepared(tx);
         assertSame(tx, ref.___getLockOwner());
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertNull(ref.___unsafeLoad());
@@ -192,7 +192,7 @@ public class FatMonoBetaTransaction_prepareTest {
         assertIsAborted(tx);
         assertIsCommitted(otherTx);
 
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSame(conflictingWrite, ref.___unsafeLoad());
         assertSurplus(0, ref);
@@ -227,7 +227,7 @@ public class FatMonoBetaTransaction_prepareTest {
         tx.prepare();
         assertIsPrepared(tx);
 
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(1, ref);

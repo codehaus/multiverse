@@ -44,7 +44,7 @@ public class FatMonoBetaTransaction_commuteTest {
         }
 
         assertIsAborted(tx);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
@@ -68,7 +68,7 @@ public class FatMonoBetaTransaction_commuteTest {
         assertFalse(tranlocal.isCommitted);
         assertNull(tranlocal.read);
         assertHasCommutingFunctions(tranlocal, function);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
     }
@@ -94,7 +94,7 @@ public class FatMonoBetaTransaction_commuteTest {
         assertFalse(tranlocal.isCommitted);
         assertNull(tranlocal.read);
         assertHasCommutingFunctions(tranlocal, function2, function1);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         verifyZeroInteractions(function1);
@@ -116,7 +116,7 @@ public class FatMonoBetaTransaction_commuteTest {
         assertSame(read, tranlocal.read);
         assertEquals(101, tranlocal.value);
         assertHasNoCommutingFunctions(tranlocal);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(1, ref);
     }
@@ -137,7 +137,7 @@ public class FatMonoBetaTransaction_commuteTest {
         assertSame(committed, tranlocal.read);
         assertEquals(101, tranlocal.value);
         assertHasNoCommutingFunctions(tranlocal);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(1, ref);
     }
@@ -164,7 +164,7 @@ public class FatMonoBetaTransaction_commuteTest {
         assertNull(tranlocal.read);
         assertEquals(1, tranlocal.value);
         assertHasNoCommutingFunctions(tranlocal);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
     }
@@ -192,11 +192,11 @@ public class FatMonoBetaTransaction_commuteTest {
 
         verifyZeroInteractions(function1);
         assertSurplus(0, ref1);
-        assertUnlocked(ref1);
+        assertHasNoCommitLock(ref1);
 
         verifyZeroInteractions(function2);
         assertSurplus(0, ref2);
-        assertUnlocked(ref2);
+        assertHasNoCommitLock(ref2);
     }
 
     @Test
@@ -221,7 +221,7 @@ public class FatMonoBetaTransaction_commuteTest {
         assertFalse(tranlocal.isCommitted);
         assertNull(tranlocal.read);
         assertHasCommutingFunctions(tranlocal, function);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
     }
@@ -248,7 +248,7 @@ public class FatMonoBetaTransaction_commuteTest {
         assertFalse(tranlocal.isCommitted);
         assertNull(tranlocal.read);
         assertHasCommutingFunctions(tranlocal, function3, function2, function1);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
     }
@@ -271,7 +271,7 @@ public class FatMonoBetaTransaction_commuteTest {
         assertFalse(commuting.isCommitted);
         assertNull(commuting.read);
         assertHasCommutingFunctions(commuting, function);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);

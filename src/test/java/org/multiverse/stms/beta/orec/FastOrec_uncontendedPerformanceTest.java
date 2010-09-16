@@ -27,7 +27,7 @@ public class FastOrec_uncontendedPerformanceTest implements BetaStmConstants {
     public void setUp() {
         stm = new BetaStm();
         ref = new BetaLongRef(stm);
-        globalConflictCounter = new GlobalConflictCounter();
+        globalConflictCounter = stm.getGlobalConflictCounter();
     }
 
     @Test
@@ -39,9 +39,9 @@ public class FastOrec_uncontendedPerformanceTest implements BetaStmConstants {
         for (long k = 0; k < cycles; k++) {
             int arriveStatus = orec.___arrive(0);
             if (arriveStatus == ARRIVE_NORMAL) {
-                orec.___tryLockAfterNormalArrive(0);
+                orec.___tryLockAfterNormalArrive(0, false);
             } else {
-                orec.___tryLockAndArrive(0);
+                orec.___tryLockAndArrive(0,false);
             }
             orec.___departAfterUpdateAndUnlock(globalConflictCounter, ref);
         }
@@ -63,9 +63,9 @@ public class FastOrec_uncontendedPerformanceTest implements BetaStmConstants {
         long startNs = System.nanoTime();
 
         for (long k = 0; k < cycles; k++) {
-            int arriveStatus = orec.___tryLockAndArrive(0);
+            int arriveStatus = orec.___tryLockAndArrive(0,false);
             if (arriveStatus != ARRIVE_NORMAL) {
-                orec.___tryLockAndArrive(0);
+                orec.___tryLockAndArrive(0,false);
             }
             orec.___departAfterUpdateAndUnlock(globalConflictCounter, ref);
         }
@@ -95,7 +95,7 @@ public class FastOrec_uncontendedPerformanceTest implements BetaStmConstants {
             if (arriveStatus == ARRIVE_NORMAL) {
                 orec.___departAfterReading();
             } else {
-                orec.___tryLockAndArrive(0);
+                orec.___tryLockAndArrive(0,false);
                 orec.___departAfterUpdateAndUnlock(globalConflictCounter, ref);
             }
         }

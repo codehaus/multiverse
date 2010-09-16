@@ -37,7 +37,7 @@ public class BetaLongRef_abortTest {
 
         ref.___abort(tx, tranlocal, pool);
 
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertSurplus(0, orec);
         assertNull(ref.___getLockOwner());
     }
@@ -52,7 +52,7 @@ public class BetaLongRef_abortTest {
 
         ref.___abort(tx, tranlocal, pool);
 
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertSurplus(0, orec);
         assertNull(ref.___getLockOwner());
     }
@@ -69,7 +69,7 @@ public class BetaLongRef_abortTest {
 
         ref.___abort(tx, tranlocal, pool);
 
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertSurplus(0, orec);
         assertNull(ref.___getLockOwner());
     }
@@ -88,7 +88,7 @@ public class BetaLongRef_abortTest {
         ref.___abort(tx, read2, pool);
 
         assertSame(committed, ref.___unsafeLoad());
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertReadonlyCount(0, ref);
@@ -106,7 +106,7 @@ public class BetaLongRef_abortTest {
         ref.___abort(tx, write, pool);
 
         assertSame(committed, ref.___unsafeLoad());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         assertReadonlyCount(0, ref);
@@ -127,7 +127,7 @@ public class BetaLongRef_abortTest {
         ref.___abort(tx, write, pool);
 
         assertSame(committed, ref.___unsafeLoad());
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertReadonlyCount(0, ref);

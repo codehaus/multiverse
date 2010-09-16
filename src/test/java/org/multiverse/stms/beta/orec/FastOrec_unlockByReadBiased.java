@@ -9,15 +9,15 @@ public class FastOrec_unlockByReadBiased {
     @Test
     public void whenSurplusAndReadBiasedAndLocked(){
         FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
-        orec.___tryLockAndArrive(1);
+        orec.___tryLockAndArrive(1,false);
 
         orec.___unlockByReadBiased();
 
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertReadBiased(orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
         assertSurplus(1, orec);
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
     }
 
     @Test

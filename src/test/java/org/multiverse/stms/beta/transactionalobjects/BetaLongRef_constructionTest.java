@@ -61,7 +61,7 @@ public class BetaLongRef_constructionTest implements BetaStmConstants {
         BetaLongRef ref = new BetaLongRef(tx);
 
         assertSurplus(1, ref);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertReadonlyCount(0, ref);
         assertUpdateBiased(ref);
         assertNull(ref.___unsafeLoad());

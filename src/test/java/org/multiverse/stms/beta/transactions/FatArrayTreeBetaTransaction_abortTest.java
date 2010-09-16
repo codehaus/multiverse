@@ -53,7 +53,7 @@ public class FatArrayTreeBetaTransaction_abortTest {
 
         assertNull(ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
-        assertUnlocked(ref.___getOrec());
+        assertHasNoCommitLock(ref.___getOrec());
         assertReadBiased(ref.___getOrec());
         assertReadonlyCount(0, ref.___getOrec());
         //once arrived, a depart will not be called on a readbiased tranlocal
@@ -70,7 +70,7 @@ public class FatArrayTreeBetaTransaction_abortTest {
         tx.abort();
 
         assertIsAborted(tx);
-        assertUnlocked(ref.___getOrec());
+        assertHasNoCommitLock(ref.___getOrec());
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
@@ -88,7 +88,7 @@ public class FatArrayTreeBetaTransaction_abortTest {
         tx.abort();
 
         assertIsAborted(tx);
-        assertUnlocked(ref.___getOrec());
+        assertHasNoCommitLock(ref.___getOrec());
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
@@ -106,7 +106,7 @@ public class FatArrayTreeBetaTransaction_abortTest {
         tx.abort();
 
         assertIsAborted(tx);
-        assertUnlocked(ref.___getOrec());
+        assertHasNoCommitLock(ref.___getOrec());
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
@@ -124,7 +124,7 @@ public class FatArrayTreeBetaTransaction_abortTest {
         tx.abort();
 
         assertIsAborted(tx);
-        assertUnlocked(ref.___getOrec());
+        assertHasNoCommitLock(ref.___getOrec());
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
@@ -142,7 +142,7 @@ public class FatArrayTreeBetaTransaction_abortTest {
         assertIsAborted(tx);
 
         assertSame(tx, ref.___getLockOwner());
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertNull(ref.___unsafeLoad());

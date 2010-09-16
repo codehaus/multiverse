@@ -37,7 +37,7 @@ public class BetaLongRef_commute1Test {
         assertTrue(commuting.isCommuting);
         assertFalse(commuting.isCommitted);
         assertSurplus(0, ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertEquals(0, commuting.value);
         assertIsActive(tx);
@@ -47,7 +47,7 @@ public class BetaLongRef_commute1Test {
         assertEquals(1, ref.get());
         assertIsCommitted(tx);
         assertSurplus(0, ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertUpdateBiased(ref);
     }
 
@@ -65,7 +65,7 @@ public class BetaLongRef_commute1Test {
         assertTrue(commuting.isCommuting);
         assertFalse(commuting.isCommitted);
         assertSurplus(0, ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertEquals(0, commuting.value);
         assertIsActive(tx);
@@ -76,7 +76,7 @@ public class BetaLongRef_commute1Test {
         assertSame(committed, ref.___unsafeLoad());
         assertIsCommitted(tx);
         assertSurplus(0, ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertUpdateBiased(ref);
     }
 
@@ -97,7 +97,7 @@ public class BetaLongRef_commute1Test {
         assertIsAborted(tx);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertEquals(0, ref.get());
     }
 
@@ -110,7 +110,7 @@ public class BetaLongRef_commute1Test {
 
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertEquals(3, ref.atomicGet());
     }
@@ -130,7 +130,7 @@ public class BetaLongRef_commute1Test {
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertEquals(3, ref.atomicGet());
     }
@@ -150,7 +150,7 @@ public class BetaLongRef_commute1Test {
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertEquals(3, ref.atomicGet());
     }
@@ -176,7 +176,7 @@ public class BetaLongRef_commute1Test {
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
         assertEquals(2, ref.atomicGet());

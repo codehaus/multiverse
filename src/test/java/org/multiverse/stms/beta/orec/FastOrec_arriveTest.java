@@ -19,10 +19,10 @@ public class FastOrec_arriveTest implements BetaStmConstants{
 
         assertEquals(ARRIVE_NORMAL, result);
         assertSurplus(1, orec);
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertReadonlyCount(0, orec);
         assertUpdateBiased(orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 
     @Test
@@ -36,41 +36,41 @@ public class FastOrec_arriveTest implements BetaStmConstants{
         assertEquals(ARRIVE_NORMAL, result);
         assertSurplus(3, orec);
         assertReadonlyCount(0, orec);
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertUpdateBiased(orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 
     @Test
     public void whenUpdateBiasedAndLocked() {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1);
+        orec.___tryLockAfterNormalArrive(1,false);
 
         int result = orec.___arrive(1);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE,result);
         assertSurplus(1, orec);
-        assertLocked(orec);
+        assertHasCommitLock(orec);
         assertReadonlyCount(0, orec);
         assertUpdateBiased(orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 
     @Test
     public void whenReadBiasedAndLocked() {
         FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1);
+        orec.___tryLockAfterNormalArrive(1,false);
 
         int result = orec.___arrive(1);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE,result);
         assertSurplus(1, orec);
         assertReadonlyCount(0, orec);
-        assertLocked(orec);
+        assertHasCommitLock(orec);
         assertReadBiased(orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 
     @Test
@@ -80,11 +80,11 @@ public class FastOrec_arriveTest implements BetaStmConstants{
         int result = orec.___arrive(1);
 
         assertEquals(ARRIVE_READBIASED,result);
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertSurplus(1, orec);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 
     @Test
@@ -95,10 +95,10 @@ public class FastOrec_arriveTest implements BetaStmConstants{
         int result = orec.___arrive(1);
 
         assertEquals(ARRIVE_READBIASED,result);
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertSurplus(1, orec);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 }

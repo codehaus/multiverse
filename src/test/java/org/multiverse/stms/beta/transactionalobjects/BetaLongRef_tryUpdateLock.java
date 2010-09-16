@@ -25,9 +25,9 @@ public class BetaLongRef_tryUpdateLock {
         BetaRef orec = new BetaRef(stm);
         orec.___arrive(1);
 
-        boolean result = orec.___tryLockAfterNormalArrive(1);
+        boolean result = orec.___tryLockAfterNormalArrive(1,false);
         assertTrue(result);
-        OrecTestUtils.assertLocked(orec);
+        OrecTestUtils.assertHasCommitLock(orec);
         OrecTestUtils.assertSurplus(1, orec);
         OrecTestUtils.assertUpdateBiased(orec);
     }
@@ -38,9 +38,9 @@ public class BetaLongRef_tryUpdateLock {
         orec.___arrive(1);
         orec.___arrive(1);
 
-        boolean result = orec.___tryLockAfterNormalArrive(1);
+        boolean result = orec.___tryLockAfterNormalArrive(1,false);
         assertTrue(result);
-        OrecTestUtils.assertLocked(orec);
+        OrecTestUtils.assertHasCommitLock(orec);
         OrecTestUtils.assertSurplus(2, orec);
         OrecTestUtils.assertUpdateBiased(orec);
     }
@@ -49,11 +49,11 @@ public class BetaLongRef_tryUpdateLock {
     public void whenLocked() {
         BetaRef orec = new BetaRef(stm);
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1);
+        orec.___tryLockAfterNormalArrive(1,false);
 
-        boolean result = orec.___tryLockAfterNormalArrive(1);
+        boolean result = orec.___tryLockAfterNormalArrive(1,false);
         assertFalse(result);
-        OrecTestUtils.assertLocked(orec);
+        OrecTestUtils.assertHasCommitLock(orec);
         assertEquals(1, orec.___getSurplus());
         assertFalse(orec.___isReadBiased());
     }
@@ -63,11 +63,11 @@ public class BetaLongRef_tryUpdateLock {
         BetaRef orec = OrecTestUtils.makeReadBiased(new BetaRef(stm));
 
         orec.___arrive(1);
-        boolean result = orec.___tryLockAfterNormalArrive(1);
+        boolean result = orec.___tryLockAfterNormalArrive(1,false);
 
         assertTrue(result);
         OrecTestUtils.assertReadBiased(orec);
-        OrecTestUtils.assertLocked(orec);
+        OrecTestUtils.assertHasCommitLock(orec);
         OrecTestUtils.assertSurplus(1, orec);
     }
 

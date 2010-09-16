@@ -9,7 +9,7 @@ import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertLocked;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasCommitLock;
 
 public class BetaLongRef_lockAndSetTest {
     private BetaStm stm;
@@ -27,7 +27,7 @@ public class BetaLongRef_lockAndSetTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         ref.lockAndSet(tx, 20);
         assertSame(tx, ref.___getLockOwner());
-        assertLocked(ref);
+        assertHasCommitLock(ref);
 
         tx.commit();
 
@@ -43,7 +43,7 @@ public class BetaLongRef_lockAndSetTest {
         ref.lockAndSet(tx, 10);
         ref.lockAndSet(tx, 20);
         assertSame(tx, ref.___getLockOwner());
-        assertLocked(ref);
+        assertHasCommitLock(ref);
 
         tx.commit();
 
@@ -66,6 +66,6 @@ public class BetaLongRef_lockAndSetTest {
         }
 
         assertSame(otherTx, ref.___getLockOwner());
-        assertLocked(ref);
+        assertHasCommitLock(ref);
     }
 }

@@ -62,7 +62,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         assertFalse(constructed1.isPermanent);
         assertEquals(DIRTY_FALSE, constructed1.isDirty);
         assertNull(ref1.___getLockOwner());
-        assertUnlocked(ref1);
+        assertHasNoCommitLock(ref1);
         assertSurplus(0, ref1);
         assertUpdateBiased(ref1);
 
@@ -71,7 +71,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         assertFalse(constructed2.isPermanent);
         assertEquals(DIRTY_FALSE, constructed1.isDirty);
         assertNull(ref2.___getLockOwner());
-        assertUnlocked(ref2);
+        assertHasNoCommitLock(ref2);
         assertSurplus(0, ref2);
         assertUpdateBiased(ref2);
     }
@@ -135,7 +135,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         assertSurplus(0, ref.___getOrec());
         assertEquals(0, committed.value);
         assertUpdateBiased(ref.___getOrec());
-        assertUnlocked(ref.___getOrec());
+        assertHasNoCommitLock(ref.___getOrec());
         assertReadonlyCount(readonlyCount + 1, ref.___getOrec());
     }
 
@@ -156,7 +156,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
 
         assertTrue(latch.isOpen());
         assertHasNoListeners(ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
@@ -178,7 +178,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
 
         assertFalse(latch.isOpen());
         assertHasListeners(ref, latch);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
@@ -221,7 +221,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         assertNull(tranlocal.read);
         assertSame(ref, tranlocal.owner);
         assertEquals(1, tranlocal.value);
-        assertUnlocked(ref.___getOrec());
+        assertHasNoCommitLock(ref.___getOrec());
         assertUpdateBiased(ref.___getOrec());
         assertSurplus(0, ref.___getOrec());
         assertReadonlyCount(0, ref.___getOrec());
@@ -240,7 +240,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         assertIsCommitted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertNull(ref.___getLockOwner());
-        assertUnlocked(ref.___getOrec());
+        assertHasNoCommitLock(ref.___getOrec());
         assertUpdateBiased(ref.___getOrec());
         assertSurplus(0, ref.___getOrec());
         assertReadonlyCount(1, ref.___getOrec());
@@ -261,7 +261,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         assertNull(tranlocal.read);
         assertSame(ref, tranlocal.owner);
         assertEquals(1, tranlocal.value);
-        assertUnlocked(ref.___getOrec());
+        assertHasNoCommitLock(ref.___getOrec());
         assertUpdateBiased(ref.___getOrec());
         assertSurplus(0, ref.___getOrec());
         assertReadonlyCount(0, ref.___getOrec());
@@ -332,7 +332,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         assertSurplus(0, ref.___getOrec());
         assertReadonlyCount(0, ref.___getOrec());
         assertUpdateBiased(ref.___getOrec());
-        assertUnlocked(ref.___getOrec());
+        assertHasNoCommitLock(ref.___getOrec());
     }
 
     @Test

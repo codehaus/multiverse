@@ -30,7 +30,7 @@ public class BetaLongRef_atomicGetAndIncrementTest {
         long result = ref.atomicGetAndIncrement(1);
         assertEquals(2, result);
         assertEquals(3, ref.atomicGet());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
         assertNull(getThreadLocalTransaction());
     }
@@ -44,7 +44,7 @@ public class BetaLongRef_atomicGetAndIncrementTest {
 
         assertEquals(2, result);
         assertEquals(2, ref.atomicGet());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
         assertNull(getThreadLocalTransaction());
         assertSame(committed, ref.___unsafeLoad());
@@ -62,7 +62,7 @@ public class BetaLongRef_atomicGetAndIncrementTest {
 
         assertEquals(2, result);
         assertEquals(3, ref.atomicGet());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(1, ref);
         assertSame(tx, getThreadLocalTransaction());
         assertIsActive(tx);
@@ -89,7 +89,7 @@ public class BetaLongRef_atomicGetAndIncrementTest {
         }
 
         assertSurplus(1, ref);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
     }

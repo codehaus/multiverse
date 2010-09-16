@@ -33,7 +33,7 @@ public class FastOrec_regressionTest {
         orec.___arrive(1);
 
         //transaction 1
-        orec.___tryLockAfterNormalArrive(1);
+        orec.___tryLockAfterNormalArrive(1,false);
         //transaction 1
         orec.___departAfterUpdateAndUnlock(globalConflictCounter, dummyRef);
 
@@ -56,11 +56,11 @@ public class FastOrec_regressionTest {
         orec.___arrive(1);
 
         //transaction 1 does the update
-        orec.___tryLockAfterNormalArrive(1);
+        orec.___tryLockAfterNormalArrive(1,false);
         orec.___departAfterUpdateAndUnlock(globalConflictCounter, dummyRef);
 
         //transaction 2 now does the update.
-        orec.___tryLockAndArrive(1);
+        orec.___tryLockAndArrive(1,false);
         orec.___departAfterUpdateAndUnlock(globalConflictCounter, dummyRef);
 
         System.out.println("orec: "+orec.___toOrecString());

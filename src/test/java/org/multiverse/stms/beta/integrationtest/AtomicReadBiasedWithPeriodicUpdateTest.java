@@ -39,7 +39,7 @@ public class AtomicReadBiasedWithPeriodicUpdateTest {
         //since no arrive/depart is done, the orec doesn't become read biased based on the
         //atomicget.
         assertReadBiased(ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
 
         System.out.println("orec: " + ref.___toOrecString());

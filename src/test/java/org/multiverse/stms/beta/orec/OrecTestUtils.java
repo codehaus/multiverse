@@ -9,20 +9,20 @@ import static org.junit.Assert.assertTrue;
  */
 public class OrecTestUtils {
 
-    public static void assertProtectedAgainstUpdate(Orec orec) {
-        assertTrue(orec.___isProtectedAgainstUpdate());
+    public static void assertHasUpdateLock(Orec orec) {
+        assertTrue(orec.___hasUpdateLock());
     }
 
-    public static void assertNotProtectedAgainstUpdate(Orec orec) {
-        assertFalse(orec.___isProtectedAgainstUpdate());
+    public static void assertHasNoUpdateLock(Orec orec) {
+        assertFalse(orec.___hasUpdateLock());
     }
 
-    public static void assertLocked(Orec orec) {
-        assertTrue(orec.___isLocked());
+    public static void assertHasCommitLock(Orec orec) {
+        assertTrue(orec.___hasCommitLock());
     }
 
-    public static void assertUnlocked(Orec orec) {
-        assertFalse(orec.___isLocked());
+    public static void assertHasNoCommitLock(Orec orec) {
+        assertFalse(orec.___hasCommitLock());
     }
 
     public static void assertSurplus(int expectedSurplus, Orec orec) {
@@ -53,7 +53,7 @@ public class OrecTestUtils {
         }
 
         assertReadBiased(orec);
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
 
         return orec;
     }

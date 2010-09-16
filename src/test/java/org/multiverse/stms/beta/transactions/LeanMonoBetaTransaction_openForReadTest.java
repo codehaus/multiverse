@@ -41,6 +41,6 @@ public class LeanMonoBetaTransaction_openForReadTest {
         assertIsAborted(tx);
         assertSurplus(1, ref);
         assertReadBiased(ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
     }
 }

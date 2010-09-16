@@ -16,8 +16,8 @@ import static org.mockito.Mockito.when;
 import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
 
 public class BetaLongRef_atomicAlterAndGetTest {
     private BetaStm stm;
@@ -44,7 +44,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
         }
 
         assertEquals(0, ref.atomicGet());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
         assertNull(getThreadLocalTransaction());
     }
@@ -60,7 +60,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
         } catch (NullPointerException expected) {
         }
 
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
         assertEquals(5, ref.atomicGet());
         assertSame(committed, ref.___unsafeLoad());
@@ -74,7 +74,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
         long result = ref.atomicAlterAndGet(function);
 
         assertEquals(6, result);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
         assertEquals(6, ref.atomicGet());
@@ -96,7 +96,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
         long result = ref.atomicAlterAndGet(function);
 
         assertEquals(5, result);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
         assertEquals(5, ref.atomicGet());
@@ -115,7 +115,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
         long result = ref.atomicAlterAndGet(function);
 
         assertEquals(6, result);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(1, ref);
         assertNull(ref.___getLockOwner());
         assertEquals(6, ref.atomicGet());

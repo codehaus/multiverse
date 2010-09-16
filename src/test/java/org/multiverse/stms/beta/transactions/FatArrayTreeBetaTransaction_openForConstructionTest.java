@@ -42,7 +42,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
         assertFalse(write.isCommitted);
         assertFalse(write.isPermanent);
         assertSame(tx, ref.___getLockOwner());
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSurplus(1, ref);
         assertAttached(tx, write);
         assertEquals(DIRTY_TRUE, write.isDirty);
@@ -76,7 +76,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
 
         assertIsAborted(tx);
         assertSame(committed, ref.___unsafeLoad());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
@@ -100,7 +100,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
         assertFalse(write2.isCommitted);
         assertFalse(write2.isPermanent);
         assertSame(tx, ref.___getLockOwner());
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSurplus(1, ref);
         assertAttached(tx, write1);
         assertEquals(DIRTY_TRUE, write1.isDirty);
@@ -122,7 +122,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
 
         assertIsAborted(tx);
         assertSame(committed, ref.___unsafeLoad());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
@@ -145,7 +145,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
 
         assertIsAborted(tx);
         assertSame(committed, ref.___unsafeLoad());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
@@ -169,7 +169,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
         }
 
         assertIsAborted(tx);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSame(committed, ref.___unsafeLoad());
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);

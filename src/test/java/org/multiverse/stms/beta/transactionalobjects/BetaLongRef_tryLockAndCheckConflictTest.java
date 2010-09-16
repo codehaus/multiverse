@@ -36,7 +36,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest {
 
         assertTrue(result);
         assertSame(tx, ref.___getLockOwner());
-        assertLocked(ref.___getOrec());
+        assertHasCommitLock(ref.___getOrec());
         assertUpdateBiased(ref.___getOrec());
     }
 
@@ -56,7 +56,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest {
 
         assertFalse(result);
         assertSame(tx, ref.___getLockOwner());
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertUpdateBiased(ref.___getOrec());
         assertReadonlyCount(0, ref);
         assertSame(write, ref.___unsafeLoad());
@@ -78,7 +78,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest {
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, read);
         assertFalse(result);
         assertSame(lockingTx, ref.___getLockOwner());
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertUpdateBiased(ref.___getOrec());
         assertReadonlyCount(1, ref);
         assertSame(committed, ref.___unsafeLoad());
@@ -99,7 +99,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest {
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, read2);
 
         assertFalse(result);
-        assertLocked(ref.___getOrec());
+        assertHasCommitLock(ref.___getOrec());
         assertSurplus(2, ref.___getOrec());
         assertUpdateBiased(ref.___getOrec());
         assertSame(otherTx, ref.___getLockOwner());
@@ -116,7 +116,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest {
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, read);
 
         assertTrue(result);
-        assertLocked(ref.___getOrec());
+        assertHasCommitLock(ref.___getOrec());
         assertUpdateBiased(ref.___getOrec());
         assertSame(tx, ref.___getLockOwner());
     }

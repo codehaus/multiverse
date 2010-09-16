@@ -11,7 +11,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
 
 public class FatMonoBetaTransaction_initTest {
     private BetaStm stm;
@@ -80,7 +80,7 @@ public class FatMonoBetaTransaction_initTest {
         assertSame(config, tx.getConfiguration());
         assertInitialized(tx);
 
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
     }
 
     @Test

@@ -15,12 +15,12 @@ public class FastOrec_tryLockForUpdateTest {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
 
-        boolean result = orec.___tryLockAfterNormalArrive(1);
+        boolean result = orec.___tryLockAfterNormalArrive(1,false);
         assertTrue(result);
-        assertLocked(orec);
+        assertHasCommitLock(orec);
         assertSurplus(1, orec);
         assertUpdateBiased(orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 
     @Test
@@ -29,26 +29,26 @@ public class FastOrec_tryLockForUpdateTest {
         orec.___arrive(1);
         orec.___arrive(1);
 
-        boolean result = orec.___tryLockAfterNormalArrive(1);
+        boolean result = orec.___tryLockAfterNormalArrive(1,false);
         assertTrue(result);
-        assertLocked(orec);
+        assertHasCommitLock(orec);
         assertSurplus(2, orec);
         assertUpdateBiased(orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 
     @Test
     public void whenLocked() {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1);
+        orec.___tryLockAfterNormalArrive(1,false);
 
-        boolean result = orec.___tryLockAfterNormalArrive(1);
+        boolean result = orec.___tryLockAfterNormalArrive(1,false);
         assertFalse(result);
-        assertLocked(orec);
+        assertHasCommitLock(orec);
         assertEquals(1, orec.___getSurplus());
         assertFalse(orec.___isReadBiased());
-        assertNotProtectedAgainstUpdate(orec);        
+        assertHasNoUpdateLock(orec);
     }
 
     @Test
@@ -56,12 +56,12 @@ public class FastOrec_tryLockForUpdateTest {
         FastOrec orec = makeReadBiased(new FastOrec());
 
         orec.___arrive(1);
-        boolean result = orec.___tryLockAfterNormalArrive(1);
+        boolean result = orec.___tryLockAfterNormalArrive(1,false);
 
         assertTrue(result);
         assertReadBiased(orec);
-        assertLocked(orec);
+        assertHasCommitLock(orec);
         assertSurplus(1, orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 }

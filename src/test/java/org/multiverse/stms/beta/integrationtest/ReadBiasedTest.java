@@ -36,7 +36,7 @@ public class ReadBiasedTest {
 
         assertSurplus(1, ref);
         assertReadBiased(ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
 

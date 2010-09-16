@@ -42,7 +42,7 @@ public class ReadBiasedWithPeriodicUpdateTest {
 
         assertSurplus(1, ref);
         assertReadBiased(ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
 
         System.out.println("orec: " + ref.___toOrecString());

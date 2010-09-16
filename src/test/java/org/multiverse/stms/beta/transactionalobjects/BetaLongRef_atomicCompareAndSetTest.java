@@ -37,7 +37,7 @@ public class BetaLongRef_atomicCompareAndSetTest {
         }
 
         assertSurplus(1, ref);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
     }
@@ -55,7 +55,7 @@ public class BetaLongRef_atomicCompareAndSetTest {
 
         assertTrue(result);
         assertEquals(2, ref.atomicGet());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(1, ref);
         assertNotSame(committed, ref.___unsafeLoad());
     }
@@ -70,7 +70,7 @@ public class BetaLongRef_atomicCompareAndSetTest {
         assertTrue(result);
         assertEquals(1, ref.atomicGet());
         assertSame(committed, ref.___unsafeLoad());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
     }
 
@@ -83,7 +83,7 @@ public class BetaLongRef_atomicCompareAndSetTest {
 
         assertTrue(result);
         assertEquals(2, ref.atomicGet());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
         assertNotSame(committed, ref.___unsafeLoad());
     }
@@ -98,7 +98,7 @@ public class BetaLongRef_atomicCompareAndSetTest {
         assertFalse(result);
         assertEquals(2, ref.atomicGet());
         assertSame(committed, ref.___unsafeLoad());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
     }
 

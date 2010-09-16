@@ -14,12 +14,12 @@ public class FastOrec_departAfterReadingAndUnlockTest {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
         orec.___arrive(2);
-        orec.___tryLockAndArrive(1);
+        orec.___tryLockAndArrive(1,false);
 
         orec.___departAfterReadingAndUnlock();
         assertSurplus(2, orec);
-        assertUnlocked(orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoCommitLock(orec);
+        assertHasNoUpdateLock(orec);
         assertUpdateBiased(orec);
         assertReadonlyCount(1, orec);
     }
@@ -27,12 +27,12 @@ public class FastOrec_departAfterReadingAndUnlockTest {
     @Test
     public void whenSuccess() {
         FastOrec orec = new FastOrec();
-        orec.___tryLockAndArrive(1);
+        orec.___tryLockAndArrive(1,false);
 
         orec.___departAfterReadingAndUnlock();
         assertSurplus(0, orec);
-        assertUnlocked(orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoCommitLock(orec);
+        assertHasNoUpdateLock(orec);
         assertUpdateBiased(orec);
         assertReadonlyCount(1, orec);
     }
@@ -54,8 +54,8 @@ public class FastOrec_departAfterReadingAndUnlockTest {
         }
 
         assertSurplus(0, orec);
-        assertUnlocked(orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoCommitLock(orec);
+        assertHasNoUpdateLock(orec);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
     }
@@ -72,8 +72,8 @@ public class FastOrec_departAfterReadingAndUnlockTest {
         }
 
         assertSurplus(1, orec);
-        assertUnlocked(orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoCommitLock(orec);
+        assertHasNoUpdateLock(orec);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
     }

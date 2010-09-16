@@ -31,7 +31,7 @@ public class BetaRef_atomicIsNullTest {
 
         assertTrue(result);
         assertSurplus(0, ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
     }
@@ -48,7 +48,7 @@ public class BetaRef_atomicIsNullTest {
 
         assertFalse(result);
         assertSurplus(1, ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
     }
@@ -62,7 +62,7 @@ public class BetaRef_atomicIsNullTest {
 
         assertFalse(result);
         assertSurplus(0, ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
     }
@@ -81,7 +81,7 @@ public class BetaRef_atomicIsNullTest {
         }
 
         assertSurplus(1, ref);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertIsActive(tx);
     }

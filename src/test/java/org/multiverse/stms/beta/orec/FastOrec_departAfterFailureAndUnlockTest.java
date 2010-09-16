@@ -21,11 +21,11 @@ public class FastOrec_departAfterFailureAndUnlockTest {
         } catch (PanicError ex) {
         }
 
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertSurplus(0, orec);
         assertReadonlyCount(0, orec);
         assertUpdateBiased(orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 
     @Test
@@ -38,40 +38,40 @@ public class FastOrec_departAfterFailureAndUnlockTest {
         } catch (PanicError expected) {
         }
 
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertSurplus(0, orec);
         assertReadonlyCount(0, orec);
         assertReadBiased(orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 
     @Test
     public void whenUpdateBiasedAndLocked() {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1);
+        orec.___tryLockAfterNormalArrive(1,false);
 
         long result = orec.___departAfterFailureAndUnlock();
         assertEquals(0, result);
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertSurplus(0, orec);
         assertReadonlyCount(0, orec);
         assertUpdateBiased(orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 
     @Test
     public void whenReadBiasedAndLocked() {
         FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1);
+        orec.___tryLockAfterNormalArrive(1,false);
 
         long result = orec.___departAfterFailureAndUnlock();
         assertEquals(1, result);
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertSurplus(1, orec);
         assertReadonlyCount(0, orec);
         assertReadBiased(orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 }

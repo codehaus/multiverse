@@ -77,7 +77,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
 
         assertIsAborted(tx);
         assertHasNoListeners(ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertUpdateBiased(ref);
         assertSame(committed, ref.___unsafeLoad());
     }
@@ -97,7 +97,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
 
         assertIsAborted(tx);
         assertHasNoListeners(ref);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertUpdateBiased(ref);
         assertNull(ref.___unsafeLoad());
         assertNull(constructed.read);
@@ -171,7 +171,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         assertFalse(latch.isOpen());
         assertIsAborted(tx);
         assertSurplus(0, ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
     }
 
     @Test
@@ -187,7 +187,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         assertFalse(latch.isOpen());
         assertIsAborted(tx);
         assertNull(ref.___getLockOwner());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
     }
 
@@ -205,7 +205,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         assertIsAborted(tx);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
     }
 
     @Test
@@ -222,7 +222,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
         assertIsAborted(tx);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
     }
 
     @Test

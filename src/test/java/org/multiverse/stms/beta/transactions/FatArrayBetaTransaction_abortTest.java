@@ -51,7 +51,7 @@ public class FatArrayBetaTransaction_abortTest {
         tx.abort();
 
         assertIsAborted(tx);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
@@ -71,7 +71,7 @@ public class FatArrayBetaTransaction_abortTest {
         tx.abort();
 
         assertIsAborted(tx);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
@@ -91,7 +91,7 @@ public class FatArrayBetaTransaction_abortTest {
         tx.abort();
 
         assertIsAborted(tx);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
@@ -111,7 +111,7 @@ public class FatArrayBetaTransaction_abortTest {
         tx.abort();
 
         assertIsAborted(tx);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertReadBiased(ref);
         assertReadonlyCount(oldReadonlyCount, ref);
         assertSurplus(1, ref);
@@ -129,7 +129,7 @@ public class FatArrayBetaTransaction_abortTest {
         assertIsAborted(tx);
 
         assertSame(tx, ref.___getLockOwner());
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertNull(ref.___unsafeLoad());

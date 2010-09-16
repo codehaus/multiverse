@@ -193,7 +193,7 @@ public class FatArrayBetaTransaction_softResetTest {
         assertIsActive(tx);
         assertFalse(constructed.isCommitted);
         assertFalse(constructed.isPermanent);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertHasNoUpdates(tx);

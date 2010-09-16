@@ -101,7 +101,7 @@ public class BetaLongRef_getAndIncrement1Test {
         assertSame(tx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(1, ref);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
     }
 
     @Test
@@ -111,7 +111,7 @@ public class BetaLongRef_getAndIncrement1Test {
         long result = ref.getAndIncrement(1);
 
         assertSurplus(0, ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertEquals(result, 10);
         assertEquals(11, ref.atomicGet());
         assertNull(getThreadLocalTransaction());
@@ -127,7 +127,7 @@ public class BetaLongRef_getAndIncrement1Test {
         long result = ref.getAndIncrement(10);
 
         assertSurplus(0, ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertEquals(result, 10);
         assertEquals(20, ref.atomicGet());
         assertSame(tx, getThreadLocalTransaction());
@@ -144,7 +144,7 @@ public class BetaLongRef_getAndIncrement1Test {
         long result = ref.getAndIncrement(10);
 
         assertSurplus(0, ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertEquals(result, 10);
         assertEquals(20, ref.atomicGet());
         assertSame(tx, getThreadLocalTransaction());

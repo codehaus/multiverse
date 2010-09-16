@@ -15,8 +15,8 @@ import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.*;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
 
 public class BetaLongRef_alterAndGet1Test {
     private BetaStm stm;
@@ -114,7 +114,7 @@ public class BetaLongRef_alterAndGet1Test {
         assertEquals(1, ref.atomicGet());
         assertNull(getThreadLocalTransaction());
         assertSurplus(0, ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
     }
 
@@ -134,7 +134,7 @@ public class BetaLongRef_alterAndGet1Test {
         assertEquals(1, ref.atomicGet());
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(0, ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
     }
 
@@ -154,7 +154,7 @@ public class BetaLongRef_alterAndGet1Test {
         assertEquals(1, ref.atomicGet());
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(0, ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
     }
 

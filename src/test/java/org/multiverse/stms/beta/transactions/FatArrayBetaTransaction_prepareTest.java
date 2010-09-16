@@ -53,7 +53,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
 
         assertIsPrepared(tx);
         assertIsCommitted(otherTx);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSame(conflictingWrite, ref.___unsafeLoad());
         assertSurplus(1, ref);
@@ -75,7 +75,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
 
         assertIsPrepared(tx);
         assertIsActive(otherTx);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(2, ref);
@@ -94,7 +94,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
 
         assertIsPrepared(tx);
 
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(1, ref);
@@ -113,7 +113,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
 
         assertIsPrepared(tx);
 
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(1, ref);
@@ -142,7 +142,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
         assertIsAborted(tx);
         assertIsActive(otherTx);
 
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(1, ref);
@@ -161,7 +161,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
         assertFalse(constructed.isPermanent);
         assertIsPrepared(tx);
         assertSame(tx, ref.___getLockOwner());
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertNull(ref.___unsafeLoad());
@@ -190,7 +190,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
         assertIsAborted(tx);
         assertIsCommitted(otherTx);
 
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSame(conflictingWrite, ref.___unsafeLoad());
         assertSurplus(0, ref);
@@ -216,9 +216,9 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
         assertSame(tx, ref1.___getLockOwner());
         assertSame(tx, ref2.___getLockOwner());
         assertSame(tx, ref3.___getLockOwner());
-        assertLocked(ref1);
-        assertLocked(ref2);
-        assertLocked(ref3);
+        assertHasCommitLock(ref1);
+        assertHasCommitLock(ref2);
+        assertHasCommitLock(ref3);
         assertSurplus(1, ref1);
         assertSurplus(1, ref2);
         assertSurplus(1, ref3);
@@ -267,7 +267,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
         assertSame(committed, commute.read);
         assertEquals(3, commute.value);
         assertEquals(DIRTY_TRUE, commute.isDirty);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -318,7 +318,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
         assertSame(committed, commute.read);
         assertEquals(1, commute.value);
         assertEquals(DIRTY_TRUE, commute.isDirty);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -344,7 +344,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
         assertSame(committed, commute.read);
         assertEquals(1, commute.value);
         assertEquals(DIRTY_TRUE, commute.isDirty);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -369,7 +369,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
 
         assertIsAborted(tx);
 
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -399,7 +399,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
         assertSame(committed, commute.read);
         assertEquals(2, commute.value);
         assertEquals(DIRTY_TRUE, commute.isDirty);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -461,7 +461,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
         tx.prepare();
         assertIsPrepared(tx);
 
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(1, ref);

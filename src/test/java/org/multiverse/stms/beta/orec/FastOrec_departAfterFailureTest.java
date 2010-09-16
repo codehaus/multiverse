@@ -23,9 +23,9 @@ public class FastOrec_departAfterFailureTest {
 
         assertSurplus(0, orec);
         assertUpdateBiased(orec);
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertReadonlyCount(0, orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 
     @Test
@@ -37,9 +37,9 @@ public class FastOrec_departAfterFailureTest {
 
         assertSurplus(0, orec);
         assertUpdateBiased(orec);
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertReadonlyCount(0, orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 
     @Test
@@ -47,15 +47,15 @@ public class FastOrec_departAfterFailureTest {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1);
+        orec.___tryLockAfterNormalArrive(1,false);
 
         orec.___departAfterFailure();
 
         assertSurplus(1, orec);
         assertUpdateBiased(orec);
-        assertLocked(orec);
+        assertHasCommitLock(orec);
         assertReadonlyCount(0, orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 
     @Test
@@ -63,7 +63,7 @@ public class FastOrec_departAfterFailureTest {
         FastOrec orec = makeReadBiased(new FastOrec());
 
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1);
+        orec.___tryLockAfterNormalArrive(1,false);
 
         try {
             orec.___departAfterFailure();
@@ -71,11 +71,11 @@ public class FastOrec_departAfterFailureTest {
         } catch (PanicError expected) {
         }
 
-        assertLocked(orec);
+        assertHasCommitLock(orec);
         assertSurplus(1, orec);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 
     @Test
@@ -88,10 +88,10 @@ public class FastOrec_departAfterFailureTest {
         } catch (PanicError expected) {
         }
 
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertSurplus(0, orec);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 }

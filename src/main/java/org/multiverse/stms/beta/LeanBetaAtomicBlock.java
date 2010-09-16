@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta;
 
 import org.multiverse.api.ThreadLocalTransaction;
+import org.multiverse.api.TraceLevel;
 import org.multiverse.api.closures.*;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.sensors.TransactionSensor;
@@ -68,14 +69,45 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         abort = false;
                         return result;
                     } catch (Retry e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a retry",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
                         waitForChange(tx);
                     } catch (SpeculativeConfigurationError e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a speculative configuration error",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
                     } catch (ReadConflict e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a readconflict",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     } catch (WriteConflict e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a writeconflict",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     }
                 } while (tx.softReset());
@@ -99,6 +131,14 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
         }catch(Exception e){
             throw new InvisibleCheckedException(e);
         }
+
+            if(___TracingEnabled){
+                if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                    logger.info(
+                        format("[%s] Too many retries, a maximum of %s is allowed",
+                            transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
+                }
+            }
 
         throw new TooManyRetriesException(
             format("[%s] Maximum number of %s retries has been reached",
@@ -146,14 +186,45 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         abort = false;
                         return result;
                     } catch (Retry e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a retry",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
                         waitForChange(tx);
                     } catch (SpeculativeConfigurationError e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a speculative configuration error",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
                     } catch (ReadConflict e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a readconflict",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     } catch (WriteConflict e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a writeconflict",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     }
                 } while (tx.softReset());
@@ -177,6 +248,14 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
         }catch(Exception e){
             throw new InvisibleCheckedException(e);
         }
+
+            if(___TracingEnabled){
+                if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                    logger.info(
+                        format("[%s] Too many retries, a maximum of %s is allowed",
+                            transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
+                }
+            }
 
         throw new TooManyRetriesException(
             format("[%s] Maximum number of %s retries has been reached",
@@ -224,14 +303,45 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         abort = false;
                         return result;
                     } catch (Retry e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a retry",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
                         waitForChange(tx);
                     } catch (SpeculativeConfigurationError e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a speculative configuration error",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
                     } catch (ReadConflict e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a readconflict",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     } catch (WriteConflict e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a writeconflict",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     }
                 } while (tx.softReset());
@@ -255,6 +365,14 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
         }catch(Exception e){
             throw new InvisibleCheckedException(e);
         }
+
+            if(___TracingEnabled){
+                if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                    logger.info(
+                        format("[%s] Too many retries, a maximum of %s is allowed",
+                            transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
+                }
+            }
 
         throw new TooManyRetriesException(
             format("[%s] Maximum number of %s retries has been reached",
@@ -302,14 +420,45 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         abort = false;
                         return result;
                     } catch (Retry e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a retry",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
                         waitForChange(tx);
                     } catch (SpeculativeConfigurationError e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a speculative configuration error",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
                     } catch (ReadConflict e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a readconflict",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     } catch (WriteConflict e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a writeconflict",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     }
                 } while (tx.softReset());
@@ -333,6 +482,14 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
         }catch(Exception e){
             throw new InvisibleCheckedException(e);
         }
+
+            if(___TracingEnabled){
+                if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                    logger.info(
+                        format("[%s] Too many retries, a maximum of %s is allowed",
+                            transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
+                }
+            }
 
         throw new TooManyRetriesException(
             format("[%s] Maximum number of %s retries has been reached",
@@ -380,14 +537,45 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         abort = false;
                         return result;
                     } catch (Retry e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a retry",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
                         waitForChange(tx);
                     } catch (SpeculativeConfigurationError e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a speculative configuration error",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
                     } catch (ReadConflict e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a readconflict",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     } catch (WriteConflict e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a writeconflict",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     }
                 } while (tx.softReset());
@@ -411,6 +599,14 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
         }catch(Exception e){
             throw new InvisibleCheckedException(e);
         }
+
+            if(___TracingEnabled){
+                if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                    logger.info(
+                        format("[%s] Too many retries, a maximum of %s is allowed",
+                            transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
+                }
+            }
 
         throw new TooManyRetriesException(
             format("[%s] Maximum number of %s retries has been reached",
@@ -459,14 +655,45 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         abort = false;
                         return;
                     } catch (Retry e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a retry",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
                         waitForChange(tx);
                     } catch (SpeculativeConfigurationError e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a speculative configuration error",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
                     } catch (ReadConflict e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a readconflict",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     } catch (WriteConflict e) {
+                        if(___TracingEnabled){
+                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                                logger.info(
+                                    format("[%s] Encountered a writeconflict",
+                                        transactionConfiguration.familyName));
+                            }
+                        }
+
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
                     }
                 } while (tx.softReset());
@@ -490,6 +717,14 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
         }catch(Exception e){
             throw new InvisibleCheckedException(e);
         }
+
+            if(___TracingEnabled){
+                if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+                    logger.info(
+                        format("[%s] Too many retries, a maximum of %s is allowed",
+                            transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
+                }
+            }
 
         throw new TooManyRetriesException(
             format("[%s] Maximum number of %s retries has been reached",

@@ -55,7 +55,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         assertSame(write, ref.___unsafeLoad());
         assertNull(write.read);
         assertSame(ref, write.owner);
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertSurplus(0, orec);
         assertReadonlyCount(0, orec);
         assertFalse(latch.isOpen());
@@ -83,7 +83,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         assertSame(tranlocal, ref.___unsafeLoad());
         assertNull(tranlocal.read);
         assertSame(ref, tranlocal.owner);
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertSurplus(1, orec);
         assertReadonlyCount(0, orec);
     }
@@ -107,7 +107,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         assertSame(write, ref.___unsafeLoad());
         assertNull(write.read);
         assertSame(ref, write.owner);
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertSurplus(0, orec);
         assertReadonlyCount(0, orec);
     }
@@ -129,7 +129,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         assertSame(write, ref.___unsafeLoad());
         assertNull(write.read);
         assertSame(ref, write.owner);
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertSurplus(0, orec);
         assertReadonlyCount(0, orec);
     }
@@ -139,7 +139,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         BetaLongRef ref = createReadBiasedLongRef(stm);
 
         Orec orec = ref.___getOrec();
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal tranlocal = tx.openForWrite(ref, false);
@@ -153,7 +153,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         assertSame(tranlocal, ref.___unsafeLoad());
         assertNull(tranlocal.read);
         assertSame(ref, tranlocal.owner);
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertUpdateBiased(orec);
         assertSurplus(0, orec);
         assertReadonlyCount(0, orec);

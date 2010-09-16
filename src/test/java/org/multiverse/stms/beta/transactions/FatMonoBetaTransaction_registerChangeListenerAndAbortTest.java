@@ -77,7 +77,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
         assertIsAborted(tx);
         assertHasNoListeners(ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertUpdateBiased(ref);
         assertSame(committed, ref.___unsafeLoad());
     }
@@ -114,7 +114,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         tx.registerChangeListenerAndAbort(latch);
 
         assertFalse(latch.isOpen());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         assertIsAborted(tx);
@@ -134,7 +134,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         assertSurplus(0, ref);
         assertIsAborted(tx);
         assertNull(ref.___getLockOwner());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
     }
 
     @Test
@@ -166,7 +166,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         assertSurplus(0, ref);
         assertIsAborted(tx);
         assertNull(ref.___getLockOwner());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
     }
 
     @Test
@@ -184,7 +184,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
         assertIsAborted(tx);
         assertHasNoListeners(ref);
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);

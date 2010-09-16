@@ -55,7 +55,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants{
         assertSame(write, ref.___unsafeLoad());
         assertNull(write.read);
         assertSame(ref, write.owner);
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertSurplus(0, orec);
         assertReadonlyCount(0, orec);
         assertFalse(latch.isOpen());
@@ -84,7 +84,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants{
         assertSame(write, ref.___unsafeLoad());
         assertNull(write.read);
         assertSame(ref, write.owner);
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertSurplus(1, orec);
         assertReadonlyCount(0, orec);
     }
@@ -108,7 +108,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants{
         assertSame(write, ref.___unsafeLoad());
         assertNull(write.read);
         assertSame(ref, write.owner);
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertSurplus(0, orec);
         assertReadonlyCount(0, orec);
     }
@@ -131,7 +131,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants{
         assertEquals(oldConflictCount, globalConflictCounter.count());
         assertSame(committed, ref.___unsafeLoad());
         assertFalse(write.isCommitted);
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertSurplus(0, orec);
         assertReadonlyCount(1, orec);
     }
@@ -141,7 +141,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants{
         BetaLongRef ref = createReadBiasedLongRef(stm);
 
         Orec orec = ref.___getOrec();
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, false);
@@ -157,7 +157,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants{
         assertSame(write, ref.___unsafeLoad());
         assertNull(write.read);
         assertSame(ref, write.owner);
-        assertUnlocked(orec);
+        assertHasNoCommitLock(orec);
         assertUpdateBiased(orec);
         assertSurplus(0, orec);
         assertReadonlyCount(0, orec);

@@ -35,7 +35,7 @@ public class BetaLongRef_lockAndLoadTest {
         Tranlocal tranlocal = ref.___lockAndLoad(0, lockOwner);
 
         assertSame(committed, tranlocal);
-        assertLocked(ref.___getOrec());
+        assertHasCommitLock(ref.___getOrec());
         assertUpdateBiased(ref.___getOrec());
         assertReadonlyCount(0, ref.___getOrec());
         assertSame(lockOwner, ref.___getLockOwner());
@@ -56,7 +56,7 @@ public class BetaLongRef_lockAndLoadTest {
         assertNotNull(read);
         assertTrue(read.isLocked);
         assertSame(committed, ref.___unsafeLoad());
-        assertLocked(ref.___getOrec());
+        assertHasCommitLock(ref.___getOrec());
         assertUpdateBiased(ref.___getOrec());
         assertReadonlyCount(0, ref.___getOrec());
         assertSame(lockingTx, ref.___getLockOwner());
@@ -75,7 +75,7 @@ public class BetaLongRef_lockAndLoadTest {
         Tranlocal tranlocal = ref.___lockAndLoad(0, lockOwner);
 
         assertSame(committed, tranlocal);
-        assertLocked(ref.___getOrec());
+        assertHasCommitLock(ref.___getOrec());
         assertUpdateBiased(ref.___getOrec());
         assertReadonlyCount(0, ref.___getOrec());
         assertSame(lockOwner, ref.___getLockOwner());

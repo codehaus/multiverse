@@ -15,59 +15,59 @@ public class FastOrec_tryLockAndArriveTest implements BetaStmConstants {
     public void whenUpdateBiasedAndAlreadyLocked() {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1);
+        orec.___tryLockAfterNormalArrive(1,false);
 
-        int result = orec.___tryLockAndArrive(1);
+        int result = orec.___tryLockAndArrive(1,false);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
-        assertLocked(orec);
+        assertHasCommitLock(orec);
         assertSurplus(1, orec);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 
     @Test
     public void whenUpdateBiasedAndUnlocked() {
         FastOrec orec = new FastOrec();
 
-        int result = orec.___tryLockAndArrive(1);
+        int result = orec.___tryLockAndArrive(1,false);
 
         assertEquals(ARRIVE_NORMAL, result);
-        assertLocked(orec);
+        assertHasCommitLock(orec);
         assertSurplus(1, orec);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 
     @Test
     public void whenReadBiasedAndLocked() {
         FastOrec orec = makeReadBiased(new FastOrec());
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1);
+        orec.___tryLockAfterNormalArrive(1,false);
 
-        int result = orec.___tryLockAndArrive(1);
+        int result = orec.___tryLockAndArrive(1,false);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
-        assertLocked(orec);
+        assertHasCommitLock(orec);
         assertSurplus(1, orec);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 
     @Test
     public void whenReadBiasedAndUnlocked() {
         FastOrec orec = makeReadBiased(new FastOrec());
 
-        int result = orec.___tryLockAndArrive(1);
+        int result = orec.___tryLockAndArrive(1,false);
 
         assertEquals(ARRIVE_READBIASED, result);
-        assertLocked(orec);
+        assertHasCommitLock(orec);
         assertSurplus(1, orec);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);
-        assertNotProtectedAgainstUpdate(orec);
+        assertHasNoUpdateLock(orec);
     }
 }

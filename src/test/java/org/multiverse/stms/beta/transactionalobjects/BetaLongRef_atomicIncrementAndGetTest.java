@@ -9,8 +9,8 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUnlocked;
 
 public class BetaLongRef_atomicIncrementAndGetTest {
     private BetaStm stm;
@@ -27,7 +27,7 @@ public class BetaLongRef_atomicIncrementAndGetTest {
         long result = ref.atomicIncrementAndGet(10);
 
         assertEquals(12, result);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         assertNull(getThreadLocalTransaction());
@@ -44,7 +44,7 @@ public class BetaLongRef_atomicIncrementAndGetTest {
         long result = ref.atomicIncrementAndGet(1);
 
         assertEquals(1, result);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(1, ref);
         assertNull(ref.___getLockOwner());
         assertSame(tx, getThreadLocalTransaction());
@@ -64,7 +64,7 @@ public class BetaLongRef_atomicIncrementAndGetTest {
         long result = ref.atomicIncrementAndGet(0);
 
         assertEquals(0, result);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
         assertNull(getThreadLocalTransaction());

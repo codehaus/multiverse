@@ -18,7 +18,7 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertLocked;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasCommitLock;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 
 /**
@@ -167,7 +167,7 @@ public class BetaLongRef_alterAndGet2Test {
         } catch (ReadConflict expected) {
         }
 
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSurplus(1, ref);
         assertIsActive(otherTx);
         assertIsAborted(tx);

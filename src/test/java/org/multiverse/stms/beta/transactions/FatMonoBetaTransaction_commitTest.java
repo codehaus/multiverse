@@ -108,7 +108,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
         assertTrue(latch.isOpen());
         assertHasNoListeners(ref);
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
@@ -152,7 +152,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         assertSurplus(0, ref.___getOrec());
         assertEquals(0, committed.value);
         assertUpdateBiased(ref.___getOrec());
-        assertUnlocked(ref.___getOrec());
+        assertHasNoCommitLock(ref.___getOrec());
         assertReadonlyCount(oldReadonlyCount + 1, ref.___getOrec());
     }
 
@@ -167,7 +167,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
         assertSame(committed, ref.___unsafeLoad());
         assertNull(ref.___getLockOwner());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(1, ref);
         assertReadBiased(ref);
         assertReadonlyCount(0, ref);
@@ -185,7 +185,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
         assertSame(committed, ref.___unsafeLoad());
         assertNull(ref.___getLockOwner());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(1, ref);
@@ -203,7 +203,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
         assertSame(committed, ref.___unsafeLoad());
         assertNull(ref.___getLockOwner());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(1, ref);
         assertReadBiased(ref);
         assertReadonlyCount(0, ref);
@@ -225,7 +225,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         assertSame(ref, write.owner);
         assertNull(write.read);
         assertNull(ref.___getLockOwner());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -247,7 +247,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         assertNull(write.read);
         assertSame(ref, write.owner);
         assertEquals(1, write.value);
-        assertUnlocked(ref.___getOrec());
+        assertHasNoCommitLock(ref.___getOrec());
         assertUpdateBiased(ref.___getOrec());
         assertSurplus(0, ref.___getOrec());
         assertReadonlyCount(0, ref.___getOrec());
@@ -266,7 +266,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         assertIsCommitted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertNull(ref.___getLockOwner());
-        assertUnlocked(ref.___getOrec());
+        assertHasNoCommitLock(ref.___getOrec());
         assertUpdateBiased(ref.___getOrec());
         assertSurplus(0, ref.___getOrec());
         assertReadonlyCount(1, ref.___getOrec());
@@ -286,7 +286,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         assertNull(write.read);
         assertSame(ref, write.owner);
         assertEquals(1, write.value);
-        assertUnlocked(ref.___getOrec());
+        assertHasNoCommitLock(ref.___getOrec());
         assertUpdateBiased(ref.___getOrec());
         assertSurplus(0, ref.___getOrec());
         assertReadonlyCount(0, ref.___getOrec());
@@ -315,7 +315,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         assertSurplus(0, ref.___getOrec());
         assertReadonlyCount(0, ref.___getOrec());
         assertUpdateBiased(ref.___getOrec());
-        assertUnlocked(ref.___getOrec());
+        assertHasNoCommitLock(ref.___getOrec());
     }
 
     @Test
@@ -336,7 +336,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         } catch (WriteConflict expected) {
         }
 
-        assertLocked(ref);
+        assertHasCommitLock(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -370,7 +370,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         assertNull(committed.read);
         assertSame(ref, committed.owner);
         assertEquals(10, committed.value);
-        assertUnlocked(ref.___getOrec());
+        assertHasNoCommitLock(ref.___getOrec());
         assertReadBiased(ref.___getOrec());
         assertSurplus(0, ref.___getOrec());
         assertReadonlyCount(0, ref.___getOrec());
@@ -391,7 +391,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         assertNull(write.read);
         assertSame(ref, write.owner);
         assertEquals(11, write.value);
-        assertUnlocked(ref.___getOrec());
+        assertHasNoCommitLock(ref.___getOrec());
         assertUpdateBiased(ref.___getOrec());
         assertSurplus(0, ref.___getOrec());
         assertReadonlyCount(0, ref.___getOrec());
@@ -424,7 +424,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         assertIsCommitted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertNull(ref.___getLockOwner());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(1, ref);
@@ -443,7 +443,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         assertIsCommitted(tx);
         assertSame(committed, ref.___unsafeLoad());
         assertNull(ref.___getLockOwner());
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(1, ref);
@@ -464,7 +464,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         assertNull(write.read);
         assertSame(ref, write.owner);
         assertEquals(0, write.value);
-        assertUnlocked(ref.___getOrec());
+        assertHasNoCommitLock(ref.___getOrec());
         assertUpdateBiased(ref.___getOrec());
         assertSurplus(0, ref.___getOrec());
         assertReadonlyCount(0, ref.___getOrec());
@@ -535,7 +535,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         tx.commit();
         assertIsCommitted(tx);
 
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(0, ref);
@@ -555,7 +555,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
         assertIsCommitted(tx);
 
-        assertUnlocked(ref);
+        assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSame(write, ref.___unsafeLoad());
         assertSurplus(0, ref);

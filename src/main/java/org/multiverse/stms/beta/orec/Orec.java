@@ -22,11 +22,20 @@ import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
 public interface Orec extends BetaStmConstants {
 
     /**
-     * Checks if the Orec is owned for writing.
+     * Checks if the Orec is locked for update. While it is locked for update, it still is readable (so arrives)
+     * are allowed). The update lock can be acquired to prevent other threads from updating this orec.
      *
      * @return true if owned for writing, false otherwise.
      */
-    boolean ___isProtectedAgainstUpdate();
+    boolean ___hasUpdateLock();
+
+    /**
+     * Checks if the Orec is locked for committing. Once it is locked, no arrives are allowed.  The commit
+     * lock normally is acquired when the transaction is about to commit.
+     *
+     * @return true if the Orec is locked.
+     */
+    boolean ___hasCommitLock();
 
     /**
      * Returns the current number of surplus. Value is unspecified if Orec is biased to reading.
@@ -36,7 +45,8 @@ public interface Orec extends BetaStmConstants {
     long ___getSurplus();
 
     /**
-     * Arrive: when the arrive is called.
+     * Tries to do an arrive. If the orec is locked for commit, arrive is not possible. But if it is locked
+     * for update, an arrive is still possible.
      * <p/>
      * This call will also act as a barrier. So all changed made after a depart successfully is executed,
      * will be visible after this arrive is done.
@@ -51,13 +61,15 @@ public interface Orec extends BetaStmConstants {
      * <p/>
      * This call also acts as a barrier.
      *
-     * @param spinCount the maximum number of spins when locked.
+     * @param spinCount  the maximum number of spins when locked.
+     * @param updateLock true if the updateLock should be acquired, false for the commit lock.
      * @return the arrive status (see BetaStmConstants).
      */
-    int ___tryLockAndArrive(int spinCount);
+    int ___tryLockAndArrive(int spinCount, boolean updateLock);
 
     /**
-     * Lowers the amount of surplus.
+     * Lowers the amount of surplus (so called when a reading transaction stops using a transactional
+     * object).
      * <p/>
      * If there is no surplus, and the orec becomes biased towards
      * readonly, the orec is locked and true is returned. This means that no other transactions are able to
@@ -90,7 +102,7 @@ public interface Orec extends BetaStmConstants {
     void ___departAfterFailure();
 
     /**
-     * Departs after failure and releases the lock.
+     * Departs after failure and releases the locks (so the commit locks and the update lock).
      *
      * @return the remaining surplus
      * @throws org.multiverse.api.exceptions.PanicError
@@ -98,33 +110,35 @@ public interface Orec extends BetaStmConstants {
      */
     long ___departAfterFailureAndUnlock();
 
+    /**
+     * Unlocks the update lock and or commit lock. This call should be done by a transaction that did an arrive
+     * an a readbiased orec.
+     */
     void ___unlockByReadBiased();
 
 
     /**
-     * Departs
+     * Departs after a transaction has successfully read an orec and acquired the commit or update lock.
+     *
+     * @throws org.multiverse.api.exceptions.PanicError
+     *          if no locks are acquired or if the orec is readbiased or if
+     *          there is no surplus.
      */
     void ___departAfterReadingAndUnlock();
 
 
     /**
-     * Checks if the Orec is locked.
-     *
-     * @return true if the Orec is locked.
-     */
-    boolean ___isLocked();
-
-    /**
      * Tries to lock this Orec for update purposes. This automatically resets the biased to reading
      * behavior since an expected update is going to be done.
      *
-     * @param spinCount the maximum number of times to spin on the lock.
+     * @param spinCount  the maximum number of times to spin on the lock.
+     * @param updateLock if the updateLock or commit lock should be acquired.
      * @return true if the lock was acquired successfully, false otherwise.
      * @throws org.multiverse.api.exceptions.PanicError
      *          if the surplus is 0 (a tryUpdateLock only can be done if the current
      *          transaction did an arrive).
      */
-    boolean ___tryLockAfterNormalArrive(int spinCount);
+    boolean ___tryLockAfterNormalArrive(int spinCount, boolean updateLock);
 
     /**
      * Checks if this Orec is biased towards reading.
