@@ -20,7 +20,7 @@ public class FastOrec_tryLockForUpdateTest {
         assertHasCommitLock(orec);
         assertSurplus(1, orec);
         assertUpdateBiased(orec);
-        assertHasNoUpdateLock(orec);
+        assertHasUpdateLock(orec);
     }
 
     @Test
@@ -32,9 +32,9 @@ public class FastOrec_tryLockForUpdateTest {
         boolean result = orec.___tryLockAfterNormalArrive(1,true);
         assertTrue(result);
         assertHasCommitLock(orec);
+        assertHasUpdateLock(orec);
         assertSurplus(2, orec);
         assertUpdateBiased(orec);
-        assertHasNoUpdateLock(orec);
     }
 
     @Test
@@ -46,9 +46,9 @@ public class FastOrec_tryLockForUpdateTest {
         boolean result = orec.___tryLockAfterNormalArrive(1,true);
         assertFalse(result);
         assertHasCommitLock(orec);
+        assertHasUpdateLock(orec);
         assertEquals(1, orec.___getSurplus());
         assertFalse(orec.___isReadBiased());
-        assertHasNoUpdateLock(orec);
     }
 
     @Test
@@ -61,7 +61,7 @@ public class FastOrec_tryLockForUpdateTest {
         assertTrue(result);
         assertReadBiased(orec);
         assertHasCommitLock(orec);
-        assertSurplus(1, orec);
-        assertHasNoUpdateLock(orec);
+        assertHasUpdateLock(orec);
+        assertSurplus(1, orec);        
     }
 }

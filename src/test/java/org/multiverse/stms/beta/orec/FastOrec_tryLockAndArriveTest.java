@@ -24,7 +24,7 @@ public class FastOrec_tryLockAndArriveTest implements BetaStmConstants {
         assertSurplus(1, orec);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
-        assertHasNoUpdateLock(orec);
+        assertHasUpdateLock(orec);
     }
 
     @Test
@@ -38,7 +38,7 @@ public class FastOrec_tryLockAndArriveTest implements BetaStmConstants {
         assertSurplus(1, orec);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
-        assertHasNoUpdateLock(orec);
+        assertHasUpdateLock(orec);
     }
 
     @Test
@@ -54,7 +54,7 @@ public class FastOrec_tryLockAndArriveTest implements BetaStmConstants {
         assertSurplus(1, orec);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);
-        assertHasNoUpdateLock(orec);
+        assertHasUpdateLock(orec);
     }
 
     @Test
@@ -68,6 +68,6 @@ public class FastOrec_tryLockAndArriveTest implements BetaStmConstants {
         assertSurplus(1, orec);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);
-        assertHasNoUpdateLock(orec);
+        assertHasUpdateLock(orec);
     }
 }

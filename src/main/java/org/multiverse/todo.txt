@@ -186,8 +186,6 @@ and not allowed. So not throw the retry error immediately..
 
 - removal of the locking methods in the betatransaction (were added for backwards compatibility)
 
-- tryLockAndCheck conflict needs to make use of lockLevel
-
 - Collection: map
 
 - Collection: filter
@@ -205,6 +203,8 @@ and not allowed. So not throw the retry error immediately..
 - yield and spinning.
 
 done
+
+- tryLockAndCheck conflict needs to make use of lockLevel
 
 - array transaction: on commit/abort the array can be nulled. no need to do it when placing in the pool
 

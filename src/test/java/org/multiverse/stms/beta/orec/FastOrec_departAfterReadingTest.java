@@ -56,7 +56,7 @@ public class FastOrec_departAfterReadingTest {
         assertSurplus(1, orec);
         assertUpdateBiased(orec);
         assertReadonlyCount(1, orec);
-        assertHasNoUpdateLock(orec);
+        assertHasUpdateLock(orec);
     }
 
     @Test
@@ -76,7 +76,7 @@ public class FastOrec_departAfterReadingTest {
         assertSurplus(1, orec);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);
-        assertHasNoUpdateLock(orec);
+        assertHasUpdateLock(orec);
     }
 
     @Test

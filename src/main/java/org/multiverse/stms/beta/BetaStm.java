@@ -21,29 +21,34 @@ import static org.multiverse.stms.beta.ThreadLocalBetaTransactionPool.getThreadL
 public final class BetaStm implements Stm {
 
     public static BetaStm createFast() {
-        return new BetaStm();
+        return new BetaStm(new BetaStmConfiguration());
     }
 
     private final BetaCollectionsFactoryImpl collectionsFactory = new BetaCollectionsFactoryImpl();
     private final AtomicBlock defaultAtomicBlock;
     public final GlobalConflictCounter globalConflictCounter;
-    public final int spinCount = 8;
+    public final int spinCount;
     private final BetaTransactionConfiguration defaultConfig;
     private final SimpleStorage storage;
     public final SimpleProfiler simpleProfiler = new SimpleProfiler();
-    public final BackoffPolicy defaultBackoffPolicy = ExponentialBackoffPolicy.MAX_100_MS;
-    public final int defaultMaxRetries = 1000;
+    public final BackoffPolicy defaultBackoffPolicy;
+    public final int defaultMaxRetries;
     private final StmCallback callback;
     public final BetaRefFactoryImpl defaultRefFactory = new BetaRefFactoryImpl();
 
     public BetaStm() {
-        this(1, null);
+        this(new BetaStmConfiguration());
     }
 
-    public BetaStm(final int conflictCounterWidth, StmCallback callback) {
-        this.callback = callback;
-        this.globalConflictCounter = new GlobalConflictCounter(conflictCounterWidth);
-        this.defaultConfig = new BetaTransactionConfiguration(this)
+    public BetaStm(BetaStmConfiguration configuration) {
+        configuration.validate();
+
+        this.spinCount = configuration.spinCount;
+        this.defaultMaxRetries = configuration.maxRetries;
+        this.defaultBackoffPolicy = configuration.backoffPolicy;
+        this.callback = configuration.stmCallback;
+        this.globalConflictCounter = new GlobalConflictCounter(1);
+        this.defaultConfig = new BetaTransactionConfiguration(this, configuration)
                 .setSpinCount(spinCount);
         this.storage = new SimpleStorage(this);
         this.defaultAtomicBlock = createTransactionFactoryBuilder()
@@ -115,7 +120,7 @@ public final class BetaStm implements Stm {
     public final class BetaCollectionsFactoryImpl implements BetaCollectionsFactory{
         @Override
         public <E> BetaTransactionalLinkedList<E> newLinkedList() {
-            throw new TodoException();
+             throw new TodoException();
         }
 
         @Override

@@ -5,6 +5,7 @@ import org.multiverse.api.exceptions.IllegalTransactionFactoryException;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.sensors.TransactionSensor;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConfiguration;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 
@@ -30,7 +31,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     public final AtomicReference<SpeculativeBetaConfiguration> speculativeConfiguration
             = new AtomicReference<SpeculativeBetaConfiguration>();
     public final TransactionSensor transactionSensor;
-    public final StmCallback stmCallback;
+    public StmCallback stmCallback;
     public final String familyName;
     public final boolean isAnonymous;
     public boolean interruptible = false;
@@ -56,38 +57,57 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     public ArrayList<TransactionLifecycleListener> permanentListeners;
 
     public BetaTransactionConfiguration(BetaStm stm) {
-        this(stm, stm.getMaxArrayTransactionSize());
+        this(stm, new BetaStmConfiguration());
     }
 
     public BetaTransactionConfiguration(BetaStm stm, String familyName, boolean isAnonymous) {
         if (stm == null) {
             throw new NullPointerException();
         }
+
         this.stm = stm;
-        this.backoffPolicy = ExponentialBackoffPolicy.MAX_100_MS;
-        this.maxRetries = stm.defaultMaxRetries;
         this.familyName = familyName;
         this.isAnonymous = isAnonymous;
-        this.stmCallback = stm.getCallback();
         this.globalConflictCounter = stm.getGlobalConflictCounter();
-        this.maxArrayTransactionSize = stm.getMaxArrayTransactionSize();
-        this.transactionSensor = stm.getSimpleProfiler().getTransactionSensor(this);
+        if (!isAnonymous) {
+            this.transactionSensor = stm.getSimpleProfiler().getTransactionSensor(this);
+        } else {
+            this.transactionSensor = null;
+        }
     }
 
-    public BetaTransactionConfiguration(BetaStm stm, int maxArrayTransactionSize) {
+    public BetaTransactionConfiguration(BetaStm stm, BetaStmConfiguration configuration) {
         if (stm == null) {
             throw new NullPointerException();
         }
 
         this.stm = stm;
-        this.maxRetries = stm.defaultMaxRetries;
-        this.backoffPolicy = ExponentialBackoffPolicy.MAX_100_MS;
+        this.stmCallback = configuration.stmCallback;
+        this.interruptible = configuration.interruptible;
+        this.readonly = configuration.readonly;
+        this.spinCount = configuration.spinCount;
+        this.pessimisticLockLevel = configuration.pessimisticLockLevel;
+        this.dirtyCheck = configuration.dirtyCheck;
+        this.minimalArrayTreeSize = configuration.minimalArrayTreeSize;
+        this.trackReads = configuration.trackReads;
+        this.blockingAllowed = configuration.blockingAllowed;
+        this.maxRetries = configuration.maxRetries;
+        this.speculativeConfigEnabled = configuration.speculativeConfigEnabled;
+        this.maxArrayTransactionSize = configuration.maxArrayTransactionSize;
+        this.backoffPolicy = configuration.backoffPolicy;
+        this.timeoutNs = configuration.timeoutNs;
+        this.traceLevel = configuration.traceLevel;
+        this.writeSkewAllowed = configuration.writeSkewAllowed;
+        this.propagationLevel = configuration.propagationLevel;
         this.familyName = "anonymoustransaction-" + idGenerator.incrementAndGet();
         this.isAnonymous = true;
         this.globalConflictCounter = stm.getGlobalConflictCounter();
-        this.maxArrayTransactionSize = maxArrayTransactionSize;
-        this.stmCallback = stm.getCallback();
         this.transactionSensor = null;
+    }
+
+    public BetaTransactionConfiguration(BetaStm stm, int maxArrayTransactionSize) {
+        this(stm);
+        this.maxArrayTransactionSize = maxArrayTransactionSize;
     }
 
     public boolean hasTimeout() {
@@ -288,6 +308,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
+        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -316,6 +337,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
+        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -344,6 +366,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
+        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -368,6 +391,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
+        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -392,6 +416,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
+        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -416,6 +441,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
+        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -440,6 +466,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
+        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -464,6 +491,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
+        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -488,6 +516,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
+        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -516,6 +545,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
+        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -544,6 +574,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.propagationLevel = propagationLevel;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.permanentListeners = permanentListeners;
+        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -572,6 +603,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
+        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -600,6 +632,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
+        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -624,6 +657,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
+        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -652,6 +686,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
+        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -687,6 +722,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
         config.permanentListeners = newPermanentListeners;
+        config.stmCallback = stmCallback;
         return config;
     }
 
