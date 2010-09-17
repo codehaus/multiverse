@@ -667,7 +667,6 @@ public final class BetaIntRef
             return;
         }
 
-        //todo:
         throw new TodoException();
     }
 
@@ -678,6 +677,47 @@ public final class BetaIntRef
 
     public final void ensure(BetaTransaction tx){
         tx.openForRead(this, LOCKMODE_UPDATE);
+    }
+
+    @Override
+    public final void privatize(){
+        Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            privatize((BetaTransaction)tx);
+            return;
+        }
+
+        throw new TodoException();
+    }
+
+    @Override
+    public final void privatize(Transaction tx){
+        privatize((BetaTransaction)tx);
+    }
+
+    public final void privatize(BetaTransaction tx){
+        tx.openForRead(this, LOCKMODE_COMMIT);
+    }
+
+    @Override
+    public final boolean tryPrivatize(){
+        Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            return tryPrivatize((BetaTransaction)tx);
+        }
+
+        throw new TodoException();
+    }
+
+    @Override
+    public final boolean tryPrivatize(Transaction tx){
+        return tryPrivatize((BetaTransaction)tx);
+    }
+    
+    public final boolean tryPrivatize(BetaTransaction tx){
+        throw new TodoException();
     }
 
     @Override

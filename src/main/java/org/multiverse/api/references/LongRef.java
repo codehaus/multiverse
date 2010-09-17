@@ -44,10 +44,18 @@ public interface LongRef extends TransactionalObject {
     boolean tryEnsure();
 
     boolean tryEnsure(Transaction tx);
-        
+
     void ensureOptimistic();
 
     void ensureOptimistic(Transaction tx);
+
+    void privatize();
+
+    void privatize(Transaction tx);
+
+    boolean tryPrivatize();
+
+    boolean tryPrivatize(Transaction tx);
 
     /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function

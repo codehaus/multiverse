@@ -49,6 +49,15 @@ public interface DoubleRef extends TransactionalObject {
 
     void ensureOptimistic(Transaction tx);
 
+    void privatize();
+
+    void privatize(Transaction tx);
+
+    boolean tryPrivatize();
+
+    boolean tryPrivatize(Transaction tx);
+
+
     /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
      * will commute. If somehow there already is a dependency or a dependency is formed on the result of
