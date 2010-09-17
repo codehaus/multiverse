@@ -13,7 +13,6 @@ import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
@@ -40,9 +39,9 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenMultipleReads_thenMultipleRegisters() {
-        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
-        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
-        BetaLongRef ref3 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref1 = newLongRef(stm);
+        BetaLongRef ref2 = newLongRef(stm);
+        BetaLongRef ref3 = newLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.openForRead(ref1, false);
@@ -105,8 +104,8 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenOneOfThemItemsIsConstructed() {
-        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
-        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref1 = newLongRef(stm);
+        BetaLongRef ref2 = newLongRef(stm);
 
         Latch latch = new CheapLatch();
 
@@ -139,7 +138,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenExplicitRetryNotAllowed_thenNoRetryPossibleException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setBlockingAllowed(false);
@@ -160,7 +159,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenContainsRead_thenSuccess() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, false);
@@ -176,7 +175,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenLockedRead_thenSuccessAndLockReleased() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, true);
@@ -193,7 +192,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenContainsWrite_thenSuccess() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false);
@@ -210,7 +209,7 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenLockedWrite_thenSuccessAndLockReleased() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, true);

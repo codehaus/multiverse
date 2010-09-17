@@ -39,6 +39,15 @@ public interface BooleanRef extends TransactionalObject {
      */
     void ensure(Transaction tx);
 
+    boolean tryEnsure();
+
+    boolean tryEnsure(Transaction tx);
+        
+    void ensureOptimistic();
+
+    void ensureOptimistic(Transaction tx);
+
+
     /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
      * will commute. If somehow there already is a dependency or a dependency is formed on the result of
@@ -53,7 +62,9 @@ public interface BooleanRef extends TransactionalObject {
      * @param function the function to apply to this reference.
      * @throws NullPointerException if function is null.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      * @throws org.multiverse.api.exceptions.AtomicOperationException
+     *
      */
     void commute(BooleanFunction function);
 
@@ -73,6 +84,7 @@ public interface BooleanRef extends TransactionalObject {
      * @throws NullPointerException  if function is null.
      * @throws IllegalStateException if the transaction is not in the correct state for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     void commute(Transaction tx, BooleanFunction function);
 
@@ -84,7 +96,9 @@ public interface BooleanRef extends TransactionalObject {
      * @return the new value.
      * @throws NullPointerException if function is null.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      * @throws org.multiverse.api.exceptions.AtomicOperationException
+     *
      */
     boolean atomicAlterAndGet(BooleanFunction function);
 
@@ -99,7 +113,9 @@ public interface BooleanRef extends TransactionalObject {
      *                              if tx is not in the correct state
      *                              for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     * @throws org.multiverse.api.exceptions.AtomicOperationException     
+     *
+     * @throws org.multiverse.api.exceptions.AtomicOperationException
+     *
      */
     boolean alterAndGet(BooleanFunction function);
 

@@ -9,7 +9,7 @@ public class FastOrec_unlockByReadBiased {
     @Test
     public void whenSurplusAndReadBiasedAndLocked(){
         FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
-        orec.___tryLockAndArrive(1,false);
+        orec.___tryLockAndArrive(1,true);
 
         orec.___unlockByReadBiased();
 

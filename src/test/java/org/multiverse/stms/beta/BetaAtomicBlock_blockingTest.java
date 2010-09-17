@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class BetaAtomicBlock_blockingTest {
 
@@ -26,7 +27,7 @@ public class BetaAtomicBlock_blockingTest {
 
     @Test
     public void test() {
-        final BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        final BetaLongRef ref = newLongRef(stm);
 
         WaitThread t = new WaitThread(ref);
         t.start();

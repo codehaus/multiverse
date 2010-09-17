@@ -9,7 +9,6 @@ import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
@@ -180,7 +179,7 @@ public class BetaLongRef_commute2Test {
 
     @Test
     public void whenNullFunction_thenNullPointerException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -198,7 +197,7 @@ public class BetaLongRef_commute2Test {
 
     @Test
     public void whenNullTransaction_thenNullPointerException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         LongFunction function = mock(LongFunction.class);
 
@@ -214,7 +213,7 @@ public class BetaLongRef_commute2Test {
 
     @Test
     public void whenTransactionAborted_thenDeadTransactionException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         LongFunction function = mock(LongFunction.class);
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -233,7 +232,7 @@ public class BetaLongRef_commute2Test {
 
     @Test
     public void whenTransactionCommitted_thenDeadTransactionException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         LongFunction function = mock(LongFunction.class);
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -252,7 +251,7 @@ public class BetaLongRef_commute2Test {
 
     @Test
     public void whenTransactionPrepared_thenPreparedTransactionException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         LongFunction function = mock(LongFunction.class);
         BetaTransaction tx = stm.startDefaultTransaction();

@@ -1,5 +1,7 @@
 package org.multiverse.api;
 
+import org.multiverse.MultiverseConstants;
+
 /**
  * With the PessimisticLockLevel one can influence various levels of pessimistic behavior in the Stm.
  * For more information on configuration see
@@ -7,33 +9,32 @@ package org.multiverse.api;
  *
  * @author Peter Veentjer.
  */
-public enum PessimisticLockLevel {
+public enum PessimisticLockLevel implements MultiverseConstants{
 
     /**
      * A PessimisticLockLevel that requires the locks of all writes.
      */
-    Write(false, true),
+    PrivatizeWrites(LOCKMODE_NONE,LOCKMODE_COMMIT),
 
     /**
      * A PessimisticLockLevel that requires the locks of all reads (and therefor all writes). It is the most
      * strict PessimisticLockLevel.
      */
-    Read(true, true),
+    PrivatizeReads(LOCKMODE_COMMIT, LOCKMODE_COMMIT),
+
+    LockWrites(LOCKMODE_NONE, LOCKMODE_UPDATE),
+
+    LockReads(LOCKMODE_UPDATE, LOCKMODE_UPDATE),
 
     /**
      * A PessimisticLockLevel that doesn't require any locking.
      */
-    None(false, false),
+    LockNone(LOCKMODE_NONE, LOCKMODE_NONE);
 
-    /**
-     * Exclusively locks (so a read is not possible when a write is done).
-     */
-    Exclusive(true, true);
+    private final int lockReads;
+    private final int lockWrites;
 
-    private final boolean lockReads;
-    private final boolean lockWrites;
-
-    private PessimisticLockLevel(boolean lockReads, boolean lockWrites) {
+    private PessimisticLockLevel(int lockReads, int lockWrites) {
         this.lockReads = lockReads;
         this.lockWrites = lockWrites;
     }
@@ -43,7 +44,7 @@ public enum PessimisticLockLevel {
      *
      * @return true if it requires the lock of a write.
      */
-    public final boolean lockWrites() {
+    public final int getWriteLockMode() {
         return lockWrites;
     }
 
@@ -53,7 +54,7 @@ public enum PessimisticLockLevel {
      *
      * @return true if it requires the lock of a read.
      */
-    public final boolean lockReads() {
+    public final int getReadLockMode() {
         return lockReads;
     }
 }

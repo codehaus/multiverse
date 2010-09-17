@@ -3,12 +3,12 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newReadBiasedLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertReadBiased;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUpdateBiased;
 
@@ -72,7 +72,7 @@ public class BetaLongRef_atomicGetTest {
 
     @Test
     public void whenReadBiasedAndUnlocked() {
-        BetaLongRef ref = BetaStmUtils.newReadBiasedLongRef(stm, 100);
+        BetaLongRef ref = newReadBiasedLongRef(stm, 100);
 
         long result = ref.atomicGet();
         assertEquals(100, result);
@@ -81,7 +81,7 @@ public class BetaLongRef_atomicGetTest {
 
     @Test
     public void whenReadBiasedAndLocked() {
-        BetaLongRef ref = BetaStmUtils.newReadBiasedLongRef(stm, 100);
+        BetaLongRef ref = newReadBiasedLongRef(stm, 100);
         BetaTransaction lockOwner = stm.startDefaultTransaction();
         lockOwner.openForRead(ref, true);
 

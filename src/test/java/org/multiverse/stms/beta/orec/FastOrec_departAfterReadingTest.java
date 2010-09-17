@@ -48,7 +48,7 @@ public class FastOrec_departAfterReadingTest {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1,false);
+        orec.___tryLockAfterNormalArrive(1,true);
 
         orec.___departAfterReading();
 
@@ -63,7 +63,7 @@ public class FastOrec_departAfterReadingTest {
     public void whenReadBiasedAndLocked_thenPanicError() {
         FastOrec orec = makeReadBiased(new FastOrec());
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1,false);
+        orec.___tryLockAfterNormalArrive(1,true);
 
         try {
             orec.___departAfterReading();

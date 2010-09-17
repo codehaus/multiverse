@@ -18,7 +18,7 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
-public class BetaStm_transactionFactoryBuilderTest {
+public class BetaStm_transactionFactoryBuilderTest implements BetaStmConstants{
     private BetaStm stm;
 
     @Before
@@ -33,9 +33,9 @@ public class BetaStm_transactionFactoryBuilderTest {
 
         assertFalse(config.isInterruptible());
         assertFalse(config.isReadonly());
-        assertFalse(config.lockReads);
-        assertFalse(config.lockWrites);
-        assertEquals(PessimisticLockLevel.None, config.getPessimisticLockLevel());
+        assertEquals(LOCKMODE_NONE,config.readLockMode);
+        assertEquals(LOCKMODE_NONE,config.writeLockMode);
+        assertEquals(PessimisticLockLevel.LockNone, config.getPessimisticLockLevel());
         assertTrue(config.dirtyCheck);
         assertSame(stm, config.getStm());
         assertSame(stm.getGlobalConflictCounter(), config.getGlobalConflictCounter());

@@ -63,7 +63,7 @@ public class BetaStm_transactionFactoryValidationTest {
     public void whenPessimisticLockLevelIsRead_thenAutomaticReadTrackingShouldBeEnabled() {
         BetaTransactionFactoryBuilder builder = stm.createTransactionFactoryBuilder()
                 .setReadTrackingEnabled(false)
-                .setPessimisticLockLevel(PessimisticLockLevel.Read);
+                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
 
         try {
             builder.build();

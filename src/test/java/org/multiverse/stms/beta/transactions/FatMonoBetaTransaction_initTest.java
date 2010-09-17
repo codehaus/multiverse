@@ -5,12 +5,12 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
 
 public class FatMonoBetaTransaction_initTest {
@@ -68,7 +68,7 @@ public class FatMonoBetaTransaction_initTest {
 
     @Test
     public void whenPrepared_thenAborted() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.openForWrite(ref, true);
@@ -85,7 +85,7 @@ public class FatMonoBetaTransaction_initTest {
 
     @Test
     public void whenAborted() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.openForWrite(ref, false).value++;
@@ -100,7 +100,7 @@ public class FatMonoBetaTransaction_initTest {
 
     @Test
     public void whenCommitted() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.openForWrite(ref, false).value++;
         tx.commit();

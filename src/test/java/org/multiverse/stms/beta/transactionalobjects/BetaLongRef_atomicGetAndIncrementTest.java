@@ -5,7 +5,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
@@ -76,7 +75,7 @@ public class BetaLongRef_atomicGetAndIncrementTest {
 
     @Test
     public void whenLocked() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();

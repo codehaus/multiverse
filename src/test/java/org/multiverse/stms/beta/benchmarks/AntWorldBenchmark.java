@@ -7,12 +7,12 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import java.util.concurrent.TimeUnit;
 
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
 /**
@@ -33,7 +33,7 @@ public class AntWorldBenchmark {
         cells = new BetaLongRef[worldSize];
 
         for (int k = 0; k < cells.length; k++) {
-            cells[k] = BetaStmUtils.newLongRef(stm);
+            cells[k] = newLongRef(stm);
         }
     }
 

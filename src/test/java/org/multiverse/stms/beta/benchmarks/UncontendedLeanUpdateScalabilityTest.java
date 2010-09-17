@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
 public class UncontendedLeanUpdateScalabilityTest {
@@ -100,13 +101,13 @@ public class UncontendedLeanUpdateScalabilityTest {
         }
 
         public void doRun() {
-            BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+            BetaLongRef ref = newLongRef(stm);
 
             //FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
             //FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm,1);
             LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
                     new BetaTransactionConfiguration(stm)
-                            .setPessimisticLockLevel(PessimisticLockLevel.Read)
+                            .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
                             .setDirtyCheckEnabled(false));
             long startMs = System.currentTimeMillis();
             for (long k = 0; k < transactionCount; k++) {

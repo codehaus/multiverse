@@ -10,7 +10,6 @@ import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
@@ -183,7 +182,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
 
     @Test
     public void whenReadonly_thenReadonlyException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
@@ -208,17 +207,17 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
 
     @Test
     public void whenPessimisticThenNoConflictDetectionNeeded() {
-        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref1 = newLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setPessimisticLockLevel(PessimisticLockLevel.Read);
+                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         tx.openForRead(ref1, false);
 
         long oldLocalConflictCount = tx.getLocalConflictCounter().get();
 
-        stm.getGlobalConflictCounter().signalConflict(BetaStmUtils.newLongRef(stm));
+        stm.getGlobalConflictCounter().signalConflict(newLongRef(stm));
         BetaLongRef ref2 = new BetaLongRef(tx);
         tx.openForConstruction(ref2);
 
@@ -231,7 +230,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
         long oldConflictCount = tx.getLocalConflictCounter().get();
         BetaLongRef ref = new BetaLongRef(tx);
 
-        stm.getGlobalConflictCounter().signalConflict(BetaStmUtils.newLongRef(stm));
+        stm.getGlobalConflictCounter().signalConflict(newLongRef(stm));
         tx.openForConstruction(ref);
 
         assertEquals(oldConflictCount, tx.getLocalConflictCounter().get());
@@ -240,7 +239,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
 
     @Test
     public void whenPrepared_thenPreparedTransactionException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.prepare();
@@ -256,7 +255,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
 
     @Test
     public void whenAborted_thenDeadTransactionException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.abort();
@@ -272,7 +271,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
 
     @Test
     public void whenCommitted_thenDeadTransactionException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.commit();

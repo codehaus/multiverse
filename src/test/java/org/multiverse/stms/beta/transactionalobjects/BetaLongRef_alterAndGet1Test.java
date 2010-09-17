@@ -6,7 +6,6 @@ import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
@@ -15,6 +14,7 @@ import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.*;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 
@@ -29,7 +29,7 @@ public class BetaLongRef_alterAndGet1Test {
 
     @Test
     public void whenActiveTransactionAvailableAndNullFunction_thenNullPointerException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -46,7 +46,7 @@ public class BetaLongRef_alterAndGet1Test {
 
     @Test
     public void whenFunctionCausesException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         LongFunction function = mock(LongFunction.class);
         RuntimeException ex = new RuntimeException();
@@ -68,7 +68,7 @@ public class BetaLongRef_alterAndGet1Test {
 
     @Test
     public void whenActiveTransactionAvailable() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -84,7 +84,7 @@ public class BetaLongRef_alterAndGet1Test {
 
     @Test
     public void whenPreparedTransactionAvailable_thenPreparedTransactionException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         LongFunction function = mock(LongFunction.class);
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -105,7 +105,7 @@ public class BetaLongRef_alterAndGet1Test {
 
     @Test
     public void whenNoTransactionAvailable_thenExecutedAtomically() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
 
         long result = ref.alterAndGet(function);
@@ -124,7 +124,7 @@ public class BetaLongRef_alterAndGet1Test {
         setThreadLocalTransaction(tx);
         tx.commit();
 
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
 
         long result = ref.alterAndGet(function);
@@ -144,7 +144,7 @@ public class BetaLongRef_alterAndGet1Test {
         setThreadLocalTransaction(tx);
         tx.abort();
 
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
 
         long result = ref.alterAndGet(function);

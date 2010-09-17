@@ -11,7 +11,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 /**
  * Basic interface each transactional object for the BetaStm needs to implement. When instrumentation is used,
  * this interface will be mixed in.
- *
+ * <p/>
  * All methods in this class are prefixed with '___' to prevent nameclashes when this class is mixed into
  * existing classes using instrumentation.
  *
@@ -53,21 +53,9 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      * @return the loaded tranlocal. It could be that a locked tranlocal is returned, the value itself is only
      *         used as a marked to indicate that it is locked. The value should not be used.
      */
-    Tranlocal ___load(int spinCount);
+    Tranlocal ___load(int spinCount, BetaTransaction newLockOwner, int lockMode);
 
-    /**
-     * Loads and locks the value. If the value already is locked, by another this call will return a tranlocal
-     * with the locked flag getAndSet. This call can safely be done if already locked by self. Null will never be
-     * returned.
-     *
-     * @param spinCount    the maximum number of times to spin
-     * @param newLockOwner the transaction that wants to own the lock (not allowed to be null).
-     * @return the loaded tranlocal. It could be that a locked tranlocal is returned, the value itself is only
-     *         used as a marked to indicate that it is locked. The value should not be used.
-     */
-    Tranlocal ___lockAndLoad(int spinCount, BetaTransaction newLockOwner);
-
-    /**
+       /**
      * Loads the current stored Tranlocal without any form of consistency guarantees. This method is purely
      * meant for testing/debugging purposes.
      *
@@ -85,9 +73,11 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      * @param newLockOwner the transaction that want to become the lock owner.
      * @param spinCount    the maximum number of times to spin on the lock when it is locked.
      * @param tranlocal    the tranlocal used for conflict detection.
+     * @param commitLock   true if the commitLock should be acquired, false if the updatelock should be acquired
      * @return true if locking was a success, false otherwise.
      */
-    boolean ___tryLockAndCheckConflict(BetaTransaction newLockOwner, int spinCount, Tranlocal tranlocal);
+    boolean ___tryLockAndCheckConflict(
+            BetaTransaction newLockOwner, int spinCount, Tranlocal tranlocal, boolean commitLock);
 
     /**
      * Returns the transaction that currently owns the lock. If no transaction owns the lock, null
@@ -112,10 +102,10 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      * Commits the all the dirty changes. The call also needs to be done when the tranlocal is readonly and
      * not permanent and locked; so that the lock is released and the departs are done.
      *
-     * @param tranlocal             the Tranlocal to commit. It doesn't matter if this is just a readonly
-     *                              version, since it still may have a lock or
-     * @param tx                    transaction that does the commit
-     * @param pool                  the BetaObjectPool to use to pool the replaced tranlocal if possible.
+     * @param tranlocal the Tranlocal to commit. It doesn't matter if this is just a readonly
+     *                  version, since it still may have a lock or
+     * @param tx        transaction that does the commit
+     * @param pool      the BetaObjectPool to use to pool the replaced tranlocal if possible.
      * @return the listeners that should be notified after the transaction completes. Value could be null,
      *         if no listeners need to be notified.
      */
@@ -126,10 +116,10 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      * Commits the all updates. The call also needs to be done when the tranlocal is readonly and
      * not permanent and locked; so that the lock is released and the departs are done.
      *
-     * @param tranlocal             the Tranlocal to commit. It doesn't matter if this is just a readonly
-     *                              version, since it still may have a lock or
-     * @param tx                    transaction that does the commit
-     * @param pool                  the BetaObjectPool to use to pool the replaced tranlocal if possible.
+     * @param tranlocal the Tranlocal to commit. It doesn't matter if this is just a readonly
+     *                  version, since it still may have a lock or
+     * @param tx        transaction that does the commit
+     * @param pool      the BetaObjectPool to use to pool the replaced tranlocal if possible.
      * @return the listeners that should be notified after the transaction completes. Value could be null,
      *         if no listeners need to be notified.
      */

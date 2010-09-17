@@ -6,7 +6,6 @@ import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.functions.Function;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.transactionalobjects.*;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -21,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
 
 /**
@@ -222,7 +222,7 @@ public class TestUtils {
     }
 
     public static BetaLongRef createReadBiasedLongRef(BetaStm stm, long value) {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm, value);
+        BetaLongRef ref = newLongRef(stm, value);
 
         for (int k = 0; k < ref.___getOrec().___getReadBiasedThreshold(); k++) {
             BetaTransaction tx = new FatMonoBetaTransaction(stm);

@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import static org.junit.Assert.assertTrue;
@@ -13,6 +12,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.assertIsAborted;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class LeanMonoBetaTransaction_commuteTest {
 
@@ -25,7 +25,7 @@ public class LeanMonoBetaTransaction_commuteTest {
 
     @Test
     public void whenCalled_thenSpeculativeConfigurationError() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm).init();
         LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(config);
         LongFunction function = mock(LongFunction.class);

@@ -60,7 +60,7 @@ public class BetaAtomicBlock_integrationTest {
 
     @Test
     public void whenTooManyRetries() {
-        final BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        final BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
         otherTx.openForWrite(ref, true);
@@ -85,7 +85,7 @@ public class BetaAtomicBlock_integrationTest {
 
     @Test
     public void whenMultipleUpdatesDoneInSingleTransaction() {
-        final BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        final BetaLongRef ref = newLongRef(stm);
 
         AtomicBlock block = stm.createTransactionFactoryBuilder().buildAtomicBlock();
         block.execute(new AtomicVoidClosure() {

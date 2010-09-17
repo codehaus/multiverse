@@ -6,7 +6,6 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
@@ -104,7 +103,7 @@ public class BetaRef_isNull1Test {
 
     @Test
     public void whenNotNull() {
-        BetaRef ref = BetaStmUtils.newRef(stm, "foo");
+        BetaRef ref = newRef(stm, "foo");
         RefTranlocal committed = ref.___unsafeLoad();
         BetaTransaction tx = stm.startDefaultTransaction();
         boolean result = ref.isNull(tx);

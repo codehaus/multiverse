@@ -63,7 +63,7 @@ public abstract class AbstractBetaTransactionalObject
      */
     public AbstractBetaTransactionalObject(BetaTransaction tx){
         ___stm = tx.getConfiguration().stm;
-        ___tryLockAndArrive(0, false);
+        ___tryLockAndArrive(0, true);
         this.lockOwner = tx;
     }
 
@@ -88,75 +88,140 @@ public abstract class AbstractBetaTransactionalObject
     }
 
     @Override
-    public final Tranlocal ___load(final int spinCount) {
+    public final Tranlocal ___load(
+        final int spinCount,
+        final BetaTransaction newLockOwner,
+        final int lockMode) {
         //it can't happen that the isPermanent status of a tranlocal is changed while it is being used. This is
         //because an arrive is done, and as long as there is at least 1 arive, the orec never can become readbiased.
 
-        while (true) {
-            //JMM: nothing can jump behind the following statement
-            Tranlocal read = ___active;
+        if(lockMode == LOCKMODE_NONE){
+            while (true) {
+                //JMM: nothing can jump behind the following statement
+                Tranlocal read = ___active;
 
-            //JMM: the read for the arrive can't jump over the read of the active.
-            final int arriveStatus = ___arrive(spinCount);
+                //JMM: the read for the arrive can't jump over the read of the active.
+                final int arriveStatus = ___arrive(spinCount);
 
-            if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
-                return Tranlocal.LOCKED;
-            }
-
-            //as long as there are readers (done after the arrive), the read tranlocal can't be pooled.
-            //So after the arrive is done, we don't need to worry about the tranlocal to re-appear as reused
-            //tranlocal. This means that the read/arrive/read mechanism doesn't cause problems with pooling.
-
-            //JMM safety:
-            //The volatile read of active can't be reordered so that it jump in front of the volatile read of
-            //the orec-value when the arrive method is called.
-            //An instruction is allowed to jump in front of the write of orec-value, but it is not allowed to
-            //jump in front of the read or orec-value (volatile read happens before rule).
-            //This means that it isn't possible that a locked value illegally is seen as unlocked.
-            if (___active == read) {
-                //at this point we are sure that the read was unlocked.
-
-                if(arriveStatus == ARRIVE_READBIASED){
-                    read.isPermanent = true;
+                if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+                    return Tranlocal.LOCKED;
                 }
-                return read;
+
+                //as long as there are readers (done after the arrive), the read tranlocal can't be pooled.
+                //So after the arrive is done, we don't need to worry about the tranlocal to re-appear as reused
+                //tranlocal. This means that the read/arrive/read mechanism doesn't cause problems with pooling.
+
+                //JMM safety:
+                //The volatile read of active can't be reordered so that it jump in front of the volatile read of
+                //the orec-value when the arrive method is called.
+                //An instruction is allowed to jump in front of the write of orec-value, but it is not allowed to
+                //jump in front of the read or orec-value (volatile read happens before rule).
+                //This means that it isn't possible that a locked value illegally is seen as unlocked.
+
+                if (___active == read) {
+                    //at this point we are sure that the read was unlocked.
+
+                    if(arriveStatus == ARRIVE_UNREGISTERED){
+                        read.isPermanent = true;
+                    }
+                    return read;
+                }
+
+                //we are not lucky, the value has changed. But before retrying, we need to depart if the arrive was
+                //not permanent.
+                if (read != null && arriveStatus == ARRIVE_NORMAL) {
+                    ___departAfterFailure();
+                }
+            }
+        }else{
+            final boolean commitLock = lockMode == LOCKMODE_COMMIT;
+
+            if(newLockOwner == null){
+                throw new NullPointerException();
             }
 
-            //we are not lucky, the value has changed. But before retrying, we need to depart if the arrive was
-            //not permanent.
-            if (read != null && arriveStatus == ARRIVE_NORMAL) {
-                ___departAfterFailure();
+            //JMM: no instructions will jump in front of a volatile read. So this stays on top.
+            final int arriveStatus = ___tryLockAndArrive(___stm.spinCount, commitLock);
+            if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
+                return  Tranlocal.LOCKED;
             }
+
+            lockOwner = newLockOwner;
+
+            Tranlocal read = ___active;
+            if(arriveStatus == ARRIVE_UNREGISTERED){
+                read.isPermanent = true;
+            }
+
+            return read;
         }
-    }
-
-    @Override
-    public final Tranlocal ___lockAndLoad(
-            final int spinCount,
-            final BetaTransaction newLockOwner){
-
-       //JMM: no instructions will jump in front of a volatile read. So this stays on top.
-        if (lockOwner == newLockOwner) {
-            return ___active;
-        }
-
-        final int arriveStatus = ___tryLockAndArrive(___stm.spinCount, false);
-        if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
-            return  Tranlocal.LOCKED;
-        }
-        lockOwner = newLockOwner;
-
-        Tranlocal read = ___active;
-        if(arriveStatus == ARRIVE_READBIASED){
-            read.isPermanent = true;
-        }
-
-        return read;
     }
 
     @Override
     public final Tranlocal ___unsafeLoad() {
         return ___active;
+    }
+
+    @Override
+    public final boolean ___hasReadConflict(
+        final Tranlocal tranlocal,
+        final BetaTransaction tx) {
+
+        //if the current transaction owns the lock, there is no conflict...
+        //todo: only going to work when the acquire lock also does a conflict check.
+        if(lockOwner == tx){
+            return false;
+        }
+
+        final Tranlocal read = tranlocal.isCommitted ? tranlocal: tranlocal.read;
+
+        //if the active value is different, we are certain of a conflict
+        if(___active != read){
+            return true;
+        }
+
+        //another transaction currently has the lock, and chances are that the transaction
+        //is going to update the value. We can't assume that even though the current active value
+        //is still the same, that the transaction isn't going to overwrite it and cause a read conflict.
+        return ___hasCommitLock();
+    }
+
+    @Override
+    public final boolean ___tryLockAndCheckConflict(
+        final BetaTransaction newLockOwner,
+        final int spinCount,
+        final Tranlocal tranlocal,
+        final boolean commitLock) {
+
+        //If it already is locked by the current transaction, we are done.
+        //Fresh constructed objects always have the tx set.
+        if (lockOwner == newLockOwner) {
+            if(commitLock){
+                ___upgradeToCommitLock();
+            }
+            return true;
+        }
+
+        final Tranlocal read = tranlocal.isCommitted ? tranlocal : tranlocal.read;
+        if(read.isPermanent){
+            //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
+            final int arriveStatus = ___tryLockAndArrive(spinCount, commitLock);
+            if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
+                return false;
+            }
+
+            //we have successfully acquired the lock
+            lockOwner = newLockOwner;
+            return read == ___active;
+        }
+
+        if (!___tryLockAfterNormalArrive(spinCount, commitLock)) {
+            return false;
+        }
+
+        //we have successfully acquired the lock
+        lockOwner = newLockOwner;
+        return read == ___active;
     }
 
     @Override
@@ -312,61 +377,6 @@ public abstract class AbstractBetaTransactionalObject
     }
 
     @Override
-    public final boolean ___hasReadConflict(final Tranlocal tranlocal, final BetaTransaction tx) {
-        //if the current transaction owns the lock, there is no conflict...
-        //todo: only going to work when the acquire lock also does a conflict check.
-        if(lockOwner == tx){
-            return false;
-        }
-
-        final Tranlocal read = tranlocal.isCommitted ? tranlocal: tranlocal.read;
-
-        //if the active value is different, we are certain of a conflict
-        if(___active != read){
-            return true;
-        }
-
-        //another transaction currently has the lock, and chances are that the transaction
-        //is going to update the value. We can't assume that even though the current active value
-        //is still the same, that the transaction isn't going to overwrite it and cause a read conflict.
-        return ___hasCommitLock();
-    }
-
-    @Override
-    public final boolean ___tryLockAndCheckConflict(
-        final BetaTransaction newLockOwner,
-        final int spinCount,
-        final Tranlocal tranlocal) {
-
-        //If it already is locked by the current transaction, we are done.
-        //Fresh constructed objects always have the tx set.
-        if (lockOwner == newLockOwner) {
-            return true;
-        }
-
-        final Tranlocal read = tranlocal.isCommitted ? tranlocal : tranlocal.read;
-        if(read.isPermanent){
-            //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
-            final int arriveStatus = ___tryLockAndArrive(spinCount, false);
-            if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
-                return false;
-            }
-
-            //we have successfully acquired the lock
-            lockOwner = newLockOwner;
-            return read == ___active;
-        }
-
-        if (!___tryLockAfterNormalArrive(spinCount, false)) {
-            return false;
-        }
-
-        //we have successfully acquired the lock
-        lockOwner = newLockOwner;
-        return read == ___active;
-    }
-
-    @Override
     public final void ___abort(
         final BetaTransaction transaction,
         final Tranlocal tranlocal,
@@ -482,7 +492,7 @@ public abstract class AbstractBetaTransactionalObject
 
     private int ___arriveAndLockOrBackoff(){
         for(int k=0;k<=___stm.defaultMaxRetries;k++){
-            final int arriveStatus = ___tryLockAndArrive(___stm.spinCount, false);
+            final int arriveStatus = ___tryLockAndArrive(___stm.spinCount, true);
             if(arriveStatus != ARRIVE_LOCK_NOT_FREE){
                 return arriveStatus;
             }

@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
 /**
@@ -101,7 +102,7 @@ public class UncontendedFatUpdateScalabilityTest {
         }
 
         public void run() {
-            BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+            BetaLongRef ref = newLongRef(stm);
 
             //FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
             //FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm,1);

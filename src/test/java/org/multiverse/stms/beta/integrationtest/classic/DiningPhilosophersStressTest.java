@@ -89,10 +89,10 @@ public class DiningPhilosophersStressTest {
         private final BetaIntRef leftFork;
         private final BetaIntRef rightFork;
         private final AtomicBlock releaseForksBlock = stm.createTransactionFactoryBuilder()
-                .setPessimisticLockLevel(pessimistic ? PessimisticLockLevel.Read : PessimisticLockLevel.None)
+                .setPessimisticLockLevel(pessimistic ? PessimisticLockLevel.PrivatizeReads : PessimisticLockLevel.LockNone)
                 .buildAtomicBlock();
         private final AtomicBlock takeForksBlock = stm.createTransactionFactoryBuilder()
-                .setPessimisticLockLevel(pessimistic ? PessimisticLockLevel.Read : PessimisticLockLevel.None)
+                .setPessimisticLockLevel(pessimistic ? PessimisticLockLevel.PrivatizeReads : PessimisticLockLevel.LockNone)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
 

@@ -7,12 +7,12 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class SensorExampleTest {
     private BetaStm stm;
@@ -22,7 +22,7 @@ public class SensorExampleTest {
     public void setUp() {
         stm = new BetaStm();
         stm.getSimpleProfiler().startPrintingDaemon();
-        ref = BetaStmUtils.newLongRef(stm);
+        ref = newLongRef(stm);
     }
 
     @Test

@@ -6,12 +6,12 @@ import org.multiverse.api.LockStatus;
 import org.multiverse.api.Transaction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactions.LeanMonoBetaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class BetaLongRef_getLockStatusTest {
 
@@ -27,13 +27,13 @@ public class BetaLongRef_getLockStatusTest {
 
     @Test(expected = NullPointerException.class)
     public void whenNull_thenNullPointerException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         ref.getLockStatus(null);
     }
 
     @Test
     public void whenFree() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         Transaction tx = mock(Transaction.class);
         LockStatus result = ref.getLockStatus(tx);
@@ -42,7 +42,7 @@ public class BetaLongRef_getLockStatusTest {
 
     @Test
     public void whenLockedByOther() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         LeanMonoBetaTransaction otherTx = new LeanMonoBetaTransaction(stm);
         otherTx.openForRead(ref, true);
@@ -55,7 +55,7 @@ public class BetaLongRef_getLockStatusTest {
 
     @Test
     public void whenLockedBySelf() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(stm);
         tx.openForRead(ref, true);

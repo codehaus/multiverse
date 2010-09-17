@@ -3,10 +3,10 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.orec.OrecTestUtils;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
  * @author Peter Veentjer
@@ -25,11 +25,11 @@ public class BetaLongRef_tryUpdateLock {
         BetaRef orec = new BetaRef(stm);
         orec.___arrive(1);
 
-        boolean result = orec.___tryLockAfterNormalArrive(1,false);
+        boolean result = orec.___tryLockAfterNormalArrive(1,true);
         assertTrue(result);
-        OrecTestUtils.assertHasCommitLock(orec);
-        OrecTestUtils.assertSurplus(1, orec);
-        OrecTestUtils.assertUpdateBiased(orec);
+        assertHasCommitLock(orec);
+        assertSurplus(1, orec);
+        assertUpdateBiased(orec);
     }
 
     @Test
@@ -38,37 +38,37 @@ public class BetaLongRef_tryUpdateLock {
         orec.___arrive(1);
         orec.___arrive(1);
 
-        boolean result = orec.___tryLockAfterNormalArrive(1,false);
+        boolean result = orec.___tryLockAfterNormalArrive(1,true);
         assertTrue(result);
-        OrecTestUtils.assertHasCommitLock(orec);
-        OrecTestUtils.assertSurplus(2, orec);
-        OrecTestUtils.assertUpdateBiased(orec);
+        assertHasCommitLock(orec);
+        assertSurplus(2, orec);
+        assertUpdateBiased(orec);
     }
 
     @Test
     public void whenLocked() {
         BetaRef orec = new BetaRef(stm);
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1,false);
+        orec.___tryLockAfterNormalArrive(1,true);
 
-        boolean result = orec.___tryLockAfterNormalArrive(1,false);
+        boolean result = orec.___tryLockAfterNormalArrive(1,true);
         assertFalse(result);
-        OrecTestUtils.assertHasCommitLock(orec);
+        assertHasCommitLock(orec);
         assertEquals(1, orec.___getSurplus());
         assertFalse(orec.___isReadBiased());
     }
 
     @Test
     public void whenReadBiasedMode() {
-        BetaRef orec = OrecTestUtils.makeReadBiased(new BetaRef(stm));
+        BetaRef orec = makeReadBiased(new BetaRef(stm));
 
         orec.___arrive(1);
-        boolean result = orec.___tryLockAfterNormalArrive(1,false);
+        boolean result = orec.___tryLockAfterNormalArrive(1,true);
 
         assertTrue(result);
-        OrecTestUtils.assertReadBiased(orec);
-        OrecTestUtils.assertHasCommitLock(orec);
-        OrecTestUtils.assertSurplus(1, orec);
+        assertReadBiased(orec);
+        assertHasCommitLock(orec);
+        assertSurplus(1, orec);
     }
 
 }

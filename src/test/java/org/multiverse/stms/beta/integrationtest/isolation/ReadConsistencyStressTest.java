@@ -8,13 +8,13 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class ReadConsistencyStressTest {
 
@@ -106,7 +106,7 @@ public class ReadConsistencyStressTest {
 
         refs = new BetaLongRef[refCount];
         for (int k = 0; k < refs.length; k++) {
-            refs[k] = BetaStmUtils.newLongRef(stm);
+            refs[k] = newLongRef(stm);
         }
 
         ReadThread[] readerThreads = new ReadThread[readerCount];

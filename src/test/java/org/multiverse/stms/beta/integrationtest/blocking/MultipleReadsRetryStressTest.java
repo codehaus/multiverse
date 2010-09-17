@@ -7,7 +7,10 @@ import org.multiverse.TestUtils;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.*;
+import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.FatArrayBetaTransactionFactory;
+import org.multiverse.stms.beta.FatArrayTreeBetaTransactionFactory;
+import org.multiverse.stms.beta.LeanBetaAtomicBlock;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
@@ -63,7 +66,7 @@ public class MultipleReadsRetryStressTest {
     public void test(AtomicBlock atomicBlock, int refCount, int threadCount) throws InterruptedException {
         refs = new BetaLongRef[refCount];
         for (int k = 0; k < refs.length; k++) {
-            refs[k] = BetaStmUtils.newLongRef(stm);
+            refs[k] = newLongRef(stm);
         }
 
         UpdateThread[] threads = new UpdateThread[threadCount];

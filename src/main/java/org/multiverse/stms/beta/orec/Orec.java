@@ -62,10 +62,10 @@ public interface Orec extends BetaStmConstants {
      * This call also acts as a barrier.
      *
      * @param spinCount  the maximum number of spins when locked.
-     * @param updateLock true if the updateLock should be acquired, false for the commit lock.
+     * @param commitLock true if the commitLock should be acquired, false for the update lock.
      * @return the arrive status (see BetaStmConstants).
      */
-    int ___tryLockAndArrive(int spinCount, boolean updateLock);
+    int ___tryLockAndArrive(int spinCount, boolean commitLock);
 
     /**
      * Lowers the amount of surplus (so called when a reading transaction stops using a transactional
@@ -81,6 +81,7 @@ public interface Orec extends BetaStmConstants {
      * @throws org.multiverse.api.exceptions.PanicError
      *          if read biased.
      */
+    @Deprecated
     void ___departAfterReading();
 
     /**
@@ -93,12 +94,14 @@ public interface Orec extends BetaStmConstants {
      * @return the current surplus (so transactionalobject the depart is done)
      * @throws IllegalStateException if the orec is not locked.
      */
+    @Deprecated
     long ___departAfterUpdateAndUnlock(
             GlobalConflictCounter globalConflictCounter, BetaTransactionalObject transactionalObject);
 
     /**
      *
      */
+    @Deprecated
     void ___departAfterFailure();
 
     /**
@@ -108,14 +111,8 @@ public interface Orec extends BetaStmConstants {
      * @throws org.multiverse.api.exceptions.PanicError
      *          if not locked, or when there is no surplus
      */
+    @Deprecated
     long ___departAfterFailureAndUnlock();
-
-    /**
-     * Unlocks the update lock and or commit lock. This call should be done by a transaction that did an arrive
-     * an a readbiased orec.
-     */
-    void ___unlockByReadBiased();
-
 
     /**
      * Departs after a transaction has successfully read an orec and acquired the commit or update lock.
@@ -124,8 +121,23 @@ public interface Orec extends BetaStmConstants {
      *          if no locks are acquired or if the orec is readbiased or if
      *          there is no surplus.
      */
+    @Deprecated
     void ___departAfterReadingAndUnlock();
 
+    /**
+     * Unlocks the update lock and or commit lock. This call should be done by a transaction that did an arrive
+     * an a readbiased orec.
+     */
+    @Deprecated
+    void ___unlockByReadBiased();
+
+   /**
+     * Upgrades the updatelock to a commit lock. The call safely can be made if the commit lock
+     * already is acquired.
+     *
+     * @throws org.multiverse.api.exceptions.PanicError if the updateLock and commitLock is not acquired 
+     */
+    void ___upgradeToCommitLock();
 
     /**
      * Tries to lock this Orec for update purposes. This automatically resets the biased to reading

@@ -14,7 +14,7 @@ public class FastOrec_departAfterReadingAndUnlockTest {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
         orec.___arrive(2);
-        orec.___tryLockAndArrive(1,false);
+        orec.___tryLockAndArrive(1,true);
 
         orec.___departAfterReadingAndUnlock();
         assertSurplus(2, orec);
@@ -27,7 +27,7 @@ public class FastOrec_departAfterReadingAndUnlockTest {
     @Test
     public void whenSuccess() {
         FastOrec orec = new FastOrec();
-        orec.___tryLockAndArrive(1,false);
+        orec.___tryLockAndArrive(1,true);
 
         orec.___departAfterReadingAndUnlock();
         assertSurplus(0, orec);

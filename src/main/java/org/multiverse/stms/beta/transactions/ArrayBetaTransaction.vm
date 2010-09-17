@@ -47,7 +47,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     @Override
     public ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForRead(
-        final ${ref.name}${ref.typeParameter} ref, boolean lock) {
+        final ${ref.name}${ref.typeParameter} ref, int lockMode) {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(ref);
@@ -63,7 +63,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             return null;
         }
 
-        lock = lock || config.lockReads;
+        lockMode = lockMode>=config.readLockMode?lockMode:config.readLockMode;
         final int index = indexOf(ref);
         if(index > -1){
             //we are lucky, at already is attached to the session
@@ -71,10 +71,10 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
 #if(!$transaction.lean)
             if(found.isCommuting){
-                flattenCommute(ref, found, lock);
+                flattenCommute(ref, found, lockMode);
             }else
 #end
-            if (lock && !ref.___tryLockAndCheckConflict(this, config.spinCount, found)){
+            if (lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, found, true)){
                 throw abortOnReadConflict();
             }
 
@@ -97,10 +97,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             hasReads = true;
         }
 
-        //none is found in this transaction, lets load it.
-        ${ref.tranlocal}${ref.typeParameter} read = lock
-            ? ref.___lockAndLoad(config.spinCount, this)
-            : ref.___load(config.spinCount);
+        ${ref.tranlocal}${ref.typeParameter} read = ref.___load(config.spinCount, this, lockMode);
 
         if (read.isLocked) {
             throw abortOnReadConflict();
@@ -111,7 +108,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOnReadConflict();
         }
 
-        if( lock || config.trackReads || !read.isPermanent){
+        if( lockMode != LOCKMODE_NONE || config.trackReads || !read.isPermanent){
             array[firstFreeIndex] = read;
             firstFreeIndex++;
         }else{
@@ -125,16 +122,14 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     private ${ref.typeParameter} void flattenCommute(
         final ${ref.name}${ref.typeParameter} ref,
         final ${ref.tranlocal}${ref.typeParameter} tranlocal,
-        final boolean lock){
+        final int lockMode){
 
         if(!hasReads){
             localConflictCounter.reset();
             hasReads = true;
         }
 
-        final ${ref.tranlocal}${ref.typeParameter} read = lock
-            ? ref.___lockAndLoad(config.spinCount, this)
-            : ref.___load(config.spinCount);
+        final ${ref.tranlocal}${ref.typeParameter} read = ref.___load(config.spinCount, this, lockMode);
 
         if (read.isLocked) {
             throw abortOnReadConflict();
@@ -163,7 +158,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     @Override
     public ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForWrite(
-        final ${ref.name}${ref.typeParameter}  ref, boolean lock) {
+        final ${ref.name}${ref.typeParameter}  ref, int lockMode) {
 
         if (status != ACTIVE) {
            throw abortOpenForWrite(ref);
@@ -183,18 +178,18 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOpenForWriteWhenNullReference();
         }
 
-        lock = lock || config.lockWrites;
+        lockMode = lockMode>=config.writeLockMode?lockMode:config.writeLockMode;
         final int index = indexOf(ref);
         if(index != -1){
             ${ref.tranlocal}${ref.typeParameter} result = (${ref.tranlocal}${ref.typeParameter})array[index];
 #if(!$transaction.lean)
 
             if(result.isCommuting){
-                flattenCommute(ref, result, lock);
+                flattenCommute(ref, result, lockMode);
                 return result;
             }else
 #end
-            if(lock && !ref.___tryLockAndCheckConflict(this, config.spinCount, result)){
+            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
                 throw abortOnReadConflict();
             }else if(!result.isCommitted){
                 return result;
@@ -233,10 +228,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             hasReads = true;
         }
 
-        //the tranlocal was not loaded before in this transaction, now load it.
-        final ${ref.tranlocal}${ref.typeParameter} read = lock
-            ? ref.___lockAndLoad(config.spinCount, this) 
-            : ref.___load(config.spinCount);
+        final ${ref.tranlocal}${ref.typeParameter} read = ref.___load(config.spinCount, this, lockMode);
 
         if(read.isLocked){
            throw abortOnReadConflict();
@@ -430,7 +422,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     }
 
     private boolean hasReadConflict() {
-        if (config.lockReads) {
+        if (config.readLockMode!=LOCKMODE_NONE) {
             return false;
         }
 
@@ -732,7 +724,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     }
 
     private boolean doPrepareWithWriteSkewPrevention() {
-        if(config.lockReads){
+        if(config.readLockMode==LOCKMODE_COMMIT){
             return true;
         }
 
@@ -742,11 +734,11 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             final Tranlocal tranlocal = array[k];
 
             if(tranlocal.isCommitted){
-                if(!tranlocal.owner.___tryLockAndCheckConflict(this, config.spinCount, tranlocal)){
+                if(!tranlocal.owner.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, true)){
                     return false;
                 }
             }else if(tranlocal.isCommuting){
-                final Tranlocal read = tranlocal.owner.___lockAndLoad(spinCount, this);
+                final Tranlocal read = tranlocal.owner.___load(spinCount, this, LOCKMODE_COMMIT);
 
                 if(read.isLocked){
                     return false;
@@ -759,7 +751,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                     tranlocal.calculateIsDirty();
                 }
 
-                if(!tranlocal.owner.___tryLockAndCheckConflict(this, spinCount, tranlocal)){
+                if(!tranlocal.owner.___tryLockAndCheckConflict(this, spinCount, tranlocal, true)){
                     return false;
                 }
             }
@@ -770,7 +762,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end
 
     private boolean doPrepareAll() {
-        if(config.lockWrites){
+        if(config.writeLockMode == LOCKMODE_COMMIT){
             return true;
         }
 
@@ -785,7 +777,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #if(!$transaction.lean)
 
             if(tranlocal.isCommuting){
-                final Tranlocal read = tranlocal.owner.___lockAndLoad(spinCount, this);
+                final Tranlocal read = tranlocal.owner.___load(spinCount, this, LOCKMODE_COMMIT);
 
                 if(read.isLocked){
                     return false;
@@ -796,7 +788,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             }else
 #end
 
-            if(!tranlocal.owner.___tryLockAndCheckConflict(this, spinCount, tranlocal)){
+            if(!tranlocal.owner.___tryLockAndCheckConflict(this, spinCount, tranlocal, true)){
                 return false;
             }
         }
@@ -805,7 +797,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     }
 
     private boolean doPrepareDirty() {
-        if(config.lockWrites){
+        if(config.writeLockMode==LOCKMODE_COMMIT){
             return true;
         }
 
@@ -821,7 +813,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #if(!$transaction.lean)
 
             if(tranlocal.isCommuting){
-                final Tranlocal read = tranlocal.owner.___lockAndLoad(spinCount, this);
+                final Tranlocal read = tranlocal.owner.___load(spinCount, this, LOCKMODE_COMMIT);
 
                 if(read.isLocked){
                     return false;
@@ -832,7 +824,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             }else
 #end
             if (tranlocal.calculateIsDirty()) {
-                if(!tranlocal.owner.___tryLockAndCheckConflict(this, spinCount, tranlocal)){
+                if(!tranlocal.owner.___tryLockAndCheckConflict(this, spinCount, tranlocal, true)){
                     return false;
                 }
             }

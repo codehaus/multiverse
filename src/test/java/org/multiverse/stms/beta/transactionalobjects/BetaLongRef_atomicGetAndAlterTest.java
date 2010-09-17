@@ -7,7 +7,6 @@ import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
@@ -48,7 +47,7 @@ public class BetaLongRef_atomicGetAndAlterTest {
 
     @Test
     public void whenNullFunction_thenNullPointerException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         try {

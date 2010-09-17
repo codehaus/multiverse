@@ -388,49 +388,115 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract void addWatch(BetaTransactionalObject object, Watch watch);
 
-    public abstract <E> RefTranlocal<E> openForRead(BetaRef<E> ref, boolean lock);
+    public abstract <E> RefTranlocal<E> openForRead(BetaRef<E> ref, int lockMode);
 
-    public abstract <E> RefTranlocal<E> openForWrite(BetaRef<E> ref, boolean lock);
+    public abstract <E> RefTranlocal<E> openForWrite(BetaRef<E> ref, int lockMode);
+
+    //todo: methods need to go
+    public  <E> RefTranlocal<E> openForRead(BetaRef<E> ref, boolean lock){
+        return openForRead(ref, lock?LOCKMODE_COMMIT:LOCKMODE_NONE);
+    }
+
+    //todo: methods need to go
+    public  <E> RefTranlocal<E> openForWrite(BetaRef<E> ref, boolean lock){
+        return openForWrite(ref, lock?LOCKMODE_COMMIT:LOCKMODE_NONE);
+    }
+
 
     public abstract <E> RefTranlocal<E> openForConstruction(BetaRef<E> ref);
 
     public abstract <E> void commute(BetaRef<E> ref, final Function<E> function);
 
-    public abstract  IntRefTranlocal openForRead(BetaIntRef ref, boolean lock);
+    public abstract  IntRefTranlocal openForRead(BetaIntRef ref, int lockMode);
 
-    public abstract  IntRefTranlocal openForWrite(BetaIntRef ref, boolean lock);
+    public abstract  IntRefTranlocal openForWrite(BetaIntRef ref, int lockMode);
+
+    //todo: methods need to go
+    public   IntRefTranlocal openForRead(BetaIntRef ref, boolean lock){
+        return openForRead(ref, lock?LOCKMODE_COMMIT:LOCKMODE_NONE);
+    }
+
+    //todo: methods need to go
+    public   IntRefTranlocal openForWrite(BetaIntRef ref, boolean lock){
+        return openForWrite(ref, lock?LOCKMODE_COMMIT:LOCKMODE_NONE);
+    }
+
 
     public abstract  IntRefTranlocal openForConstruction(BetaIntRef ref);
 
     public abstract  void commute(BetaIntRef ref, final IntFunction function);
 
-    public abstract  BooleanRefTranlocal openForRead(BetaBooleanRef ref, boolean lock);
+    public abstract  BooleanRefTranlocal openForRead(BetaBooleanRef ref, int lockMode);
 
-    public abstract  BooleanRefTranlocal openForWrite(BetaBooleanRef ref, boolean lock);
+    public abstract  BooleanRefTranlocal openForWrite(BetaBooleanRef ref, int lockMode);
+
+    //todo: methods need to go
+    public   BooleanRefTranlocal openForRead(BetaBooleanRef ref, boolean lock){
+        return openForRead(ref, lock?LOCKMODE_COMMIT:LOCKMODE_NONE);
+    }
+
+    //todo: methods need to go
+    public   BooleanRefTranlocal openForWrite(BetaBooleanRef ref, boolean lock){
+        return openForWrite(ref, lock?LOCKMODE_COMMIT:LOCKMODE_NONE);
+    }
+
 
     public abstract  BooleanRefTranlocal openForConstruction(BetaBooleanRef ref);
 
     public abstract  void commute(BetaBooleanRef ref, final BooleanFunction function);
 
-    public abstract  DoubleRefTranlocal openForRead(BetaDoubleRef ref, boolean lock);
+    public abstract  DoubleRefTranlocal openForRead(BetaDoubleRef ref, int lockMode);
 
-    public abstract  DoubleRefTranlocal openForWrite(BetaDoubleRef ref, boolean lock);
+    public abstract  DoubleRefTranlocal openForWrite(BetaDoubleRef ref, int lockMode);
+
+    //todo: methods need to go
+    public   DoubleRefTranlocal openForRead(BetaDoubleRef ref, boolean lock){
+        return openForRead(ref, lock?LOCKMODE_COMMIT:LOCKMODE_NONE);
+    }
+
+    //todo: methods need to go
+    public   DoubleRefTranlocal openForWrite(BetaDoubleRef ref, boolean lock){
+        return openForWrite(ref, lock?LOCKMODE_COMMIT:LOCKMODE_NONE);
+    }
+
 
     public abstract  DoubleRefTranlocal openForConstruction(BetaDoubleRef ref);
 
     public abstract  void commute(BetaDoubleRef ref, final DoubleFunction function);
 
-    public abstract  LongRefTranlocal openForRead(BetaLongRef ref, boolean lock);
+    public abstract  LongRefTranlocal openForRead(BetaLongRef ref, int lockMode);
 
-    public abstract  LongRefTranlocal openForWrite(BetaLongRef ref, boolean lock);
+    public abstract  LongRefTranlocal openForWrite(BetaLongRef ref, int lockMode);
+
+    //todo: methods need to go
+    public   LongRefTranlocal openForRead(BetaLongRef ref, boolean lock){
+        return openForRead(ref, lock?LOCKMODE_COMMIT:LOCKMODE_NONE);
+    }
+
+    //todo: methods need to go
+    public   LongRefTranlocal openForWrite(BetaLongRef ref, boolean lock){
+        return openForWrite(ref, lock?LOCKMODE_COMMIT:LOCKMODE_NONE);
+    }
+
 
     public abstract  LongRefTranlocal openForConstruction(BetaLongRef ref);
 
     public abstract  void commute(BetaLongRef ref, final LongFunction function);
 
-    public abstract  Tranlocal openForRead(BetaTransactionalObject ref, boolean lock);
+    public abstract  Tranlocal openForRead(BetaTransactionalObject ref, int lockMode);
 
-    public abstract  Tranlocal openForWrite(BetaTransactionalObject ref, boolean lock);
+    public abstract  Tranlocal openForWrite(BetaTransactionalObject ref, int lockMode);
+
+    //todo: methods need to go
+    public   Tranlocal openForRead(BetaTransactionalObject ref, boolean lock){
+        return openForRead(ref, lock?LOCKMODE_COMMIT:LOCKMODE_NONE);
+    }
+
+    //todo: methods need to go
+    public   Tranlocal openForWrite(BetaTransactionalObject ref, boolean lock){
+        return openForWrite(ref, lock?LOCKMODE_COMMIT:LOCKMODE_NONE);
+    }
+
 
     public abstract  Tranlocal openForConstruction(BetaTransactionalObject ref);
 

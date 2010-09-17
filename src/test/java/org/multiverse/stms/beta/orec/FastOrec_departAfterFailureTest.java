@@ -47,7 +47,7 @@ public class FastOrec_departAfterFailureTest {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1,false);
+        orec.___tryLockAfterNormalArrive(1,true);
 
         orec.___departAfterFailure();
 
@@ -63,7 +63,7 @@ public class FastOrec_departAfterFailureTest {
         FastOrec orec = makeReadBiased(new FastOrec());
 
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1,false);
+        orec.___tryLockAfterNormalArrive(1,true);
 
         try {
             orec.___departAfterFailure();

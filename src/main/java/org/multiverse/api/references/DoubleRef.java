@@ -41,6 +41,14 @@ public interface DoubleRef extends TransactionalObject {
      */
     void ensure(Transaction tx);
 
+    boolean tryEnsure();
+
+    boolean tryEnsure(Transaction tx);
+
+    void ensureOptimistic();
+
+    void ensureOptimistic(Transaction tx);
+
     /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
      * will commute. If somehow there already is a dependency or a dependency is formed on the result of
@@ -241,6 +249,7 @@ public interface DoubleRef extends TransactionalObject {
      *                              if the transaction is not in the
      *                              correct state.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     double getAndAlter(Transaction tx, DoubleFunction function);
 
@@ -251,6 +260,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param newValue the new value.
      * @return true if the compareAndSwap was a success, false otherwise.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     boolean atomicCompareAndSet(double oldValue, double newValue);
 
@@ -261,6 +271,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param value the new value.
      * @return the old value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     double atomicGetAndSet(double value);
 
@@ -271,6 +282,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param value the new value.
      * @return the new value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     double atomicSet(double value);
 
@@ -284,6 +296,7 @@ public interface DoubleRef extends TransactionalObject {
      *          if tx is not in the correct state
      *          for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     double getAndSet(double value);
 
@@ -297,6 +310,7 @@ public interface DoubleRef extends TransactionalObject {
      *          if tx is not in the correct state
      *          for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     double set(double value);
 
@@ -311,6 +325,7 @@ public interface DoubleRef extends TransactionalObject {
      *                              if the transaction is not
      *                              in the correct state for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     double getAndSet(Transaction tx, double value);
 
@@ -325,6 +340,7 @@ public interface DoubleRef extends TransactionalObject {
      *                              if the transaction is not in the correct
      *                              state for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     double set(Transaction tx, double value);
 
@@ -334,6 +350,7 @@ public interface DoubleRef extends TransactionalObject {
      *
      * @return the current value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     double atomicGet();
 
@@ -345,8 +362,9 @@ public interface DoubleRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if tx is not in the correct state
      *          for this operation.
-     * @see #atomicGet()
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
+     * @see #atomicGet()
      */
     double get();
 
@@ -360,18 +378,21 @@ public interface DoubleRef extends TransactionalObject {
      *                              if the transaction is not in the
      *                              correct state for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     double get(Transaction tx);
 
     /**
      * @param value
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     void await(double value);
 
     /**
      * @param value
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     void await(Transaction tx, double value);
 }

@@ -3,12 +3,12 @@ package org.multiverse.stms.beta.transactions;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class FatArrayBetaTransaction_stressTest {
     private BetaStm stm;
@@ -34,7 +34,7 @@ public class FatArrayBetaTransaction_stressTest {
 
         //create the references
         for (int k = 0; k < refs.length; k++) {
-            refs[k] = BetaStmUtils.newLongRef(stm);
+            refs[k] = newLongRef(stm);
         }
 
         //execute all transactions

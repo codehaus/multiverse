@@ -7,13 +7,13 @@ import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.exceptions.ReadConflict;
 import org.multiverse.api.exceptions.WriteConflict;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class WriteSkewTest {
     private BetaStm stm;
@@ -31,8 +31,8 @@ public class WriteSkewTest {
 
     @Test
     public void whenWriteSkewAllowed_thenNotDetected() {
-        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
-        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref1 = newLongRef(stm);
+        BetaLongRef ref2 = newLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
@@ -53,13 +53,13 @@ public class WriteSkewTest {
 
     @Test
     public void whenLockReadsPessimisticLockLevel_thenWriteSkewNotDetected() {
-        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
-        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref1 = newLongRef(stm);
+        BetaLongRef ref2 = newLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setWriteSkewAllowed(true)
-                .setPessimisticLockLevel(PessimisticLockLevel.Write)
+                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeWrites)
                 .build()
                 .start();
 
@@ -76,13 +76,13 @@ public class WriteSkewTest {
 
     @Test
     public void whenLockReadsPessimisticLockLevel_thenWriteSkewNotPossible() {
-        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
-        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref1 = newLongRef(stm);
+        BetaLongRef ref2 = newLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setWriteSkewAllowed(true)
-                .setPessimisticLockLevel(PessimisticLockLevel.Read)
+                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
                 .build()
                 .start();
 
@@ -102,8 +102,8 @@ public class WriteSkewTest {
 
     @Test
     public void whenPessimisticLockingUsed_thenWriteSkewNotPossible() {
-        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
-        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref1 = newLongRef(stm);
+        BetaLongRef ref2 = newLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
@@ -127,8 +127,8 @@ public class WriteSkewTest {
 
     @Test
     public void whenWriteSkewNotAllowed_thenDetected() {
-        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
-        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref1 = newLongRef(stm);
+        BetaLongRef ref2 = newLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)

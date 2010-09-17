@@ -21,6 +21,7 @@ public interface LongRef extends TransactionalObject {
      *
      * @throws IllegalStateException
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     void ensure();
 
@@ -36,8 +37,17 @@ public interface LongRef extends TransactionalObject {
      *                              if the transaction is
      *                              not in the correct state for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     void ensure(Transaction tx);
+
+    boolean tryEnsure();
+
+    boolean tryEnsure(Transaction tx);
+        
+    void ensureOptimistic();
+
+    void ensureOptimistic(Transaction tx);
 
     /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
@@ -56,6 +66,7 @@ public interface LongRef extends TransactionalObject {
      *                              if tx is not in the correct state
      *                              for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     void commute(LongFunction function);
 
@@ -75,6 +86,7 @@ public interface LongRef extends TransactionalObject {
      * @throws NullPointerException  if function is null.
      * @throws IllegalStateException if the transaction is not in the correct state for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     void commute(Transaction tx, LongFunction function);
 
@@ -85,6 +97,7 @@ public interface LongRef extends TransactionalObject {
      * @param amount the amount to increase with.
      * @return the old value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long atomicGetAndIncrement(long amount);
 
@@ -98,6 +111,7 @@ public interface LongRef extends TransactionalObject {
      *          if tx is not in the correct state
      *          for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long getAndIncrement(long amount);
 
@@ -112,6 +126,7 @@ public interface LongRef extends TransactionalObject {
      *                              if tx is not in the correct state
      *                              for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long getAndIncrement(Transaction tx, long amount);
 
@@ -122,6 +137,7 @@ public interface LongRef extends TransactionalObject {
      * @param amount the amount to increment with.
      * @return the new value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long atomicIncrementAndGet(long amount);
 
@@ -135,6 +151,7 @@ public interface LongRef extends TransactionalObject {
      *          if tx is not in the correct state
      *          for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long incrementAndGet(long amount);
 
@@ -149,6 +166,7 @@ public interface LongRef extends TransactionalObject {
      *                              if the transaction is not in the
      *                              correct state for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long incrementAndGet(Transaction tx, long amount);
 
@@ -160,6 +178,7 @@ public interface LongRef extends TransactionalObject {
      * @return the new value.
      * @throws NullPointerException if function is null.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long atomicAlterAndGet(LongFunction function);
 
@@ -174,6 +193,7 @@ public interface LongRef extends TransactionalObject {
      *                              if tx is not in the correct state
      *                              for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long alterAndGet(LongFunction function);
 
@@ -188,6 +208,7 @@ public interface LongRef extends TransactionalObject {
      *                              if the transaction is not in the
      *                              correct state.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long alterAndGet(Transaction tx, LongFunction function);
 
@@ -199,6 +220,7 @@ public interface LongRef extends TransactionalObject {
      * @return the old value.
      * @throws NullPointerException if function is null.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long atomicGetAndAlter(LongFunction function);
 
@@ -213,6 +235,7 @@ public interface LongRef extends TransactionalObject {
      *                              if tx is not in the correct state
      *                              for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long getAndAlter(LongFunction function);
 
@@ -227,6 +250,7 @@ public interface LongRef extends TransactionalObject {
      *                              if the transaction is not in the
      *                              correct state.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long getAndAlter(Transaction tx, LongFunction function);
 
@@ -237,6 +261,7 @@ public interface LongRef extends TransactionalObject {
      * @param newValue the new value.
      * @return true if the compareAndSwap was a success, false otherwise.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     boolean atomicCompareAndSet(long oldValue, long newValue);
 
@@ -247,6 +272,7 @@ public interface LongRef extends TransactionalObject {
      * @param value the new value.
      * @return the old value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long atomicGetAndSet(long value);
 
@@ -257,6 +283,7 @@ public interface LongRef extends TransactionalObject {
      * @param value the new value.
      * @return the new value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long atomicSet(long value);
 
@@ -270,6 +297,7 @@ public interface LongRef extends TransactionalObject {
      *          if tx is not in the correct state
      *          for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long getAndSet(long value);
 
@@ -283,6 +311,7 @@ public interface LongRef extends TransactionalObject {
      *          if tx is not in the correct state
      *          for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long set(long value);
 
@@ -297,6 +326,7 @@ public interface LongRef extends TransactionalObject {
      *                              if the transaction is not
      *                              in the correct state for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long getAndSet(Transaction tx, long value);
 
@@ -311,6 +341,7 @@ public interface LongRef extends TransactionalObject {
      *                              if the transaction is not in the correct
      *                              state for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long set(Transaction tx, long value);
 
@@ -320,6 +351,7 @@ public interface LongRef extends TransactionalObject {
      *
      * @return the current value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long atomicGet();
 
@@ -331,8 +363,9 @@ public interface LongRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if tx is not in the correct state
      *          for this operation.
-     * @see #atomicGet()
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
+     * @see #atomicGet()
      */
     long get();
 
@@ -346,18 +379,21 @@ public interface LongRef extends TransactionalObject {
      *                              if the transaction is not in the
      *                              correct state for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long get(Transaction tx);
 
     /**
      * @param value
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     void await(long value);
 
     /**
      * @param value
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     void await(Transaction tx, long value);
 }

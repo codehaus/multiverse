@@ -5,13 +5,13 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
 
 public class FatArrayTreeBetaTransaction_initTest {
@@ -63,7 +63,7 @@ public class FatArrayTreeBetaTransaction_initTest {
 
     @Test
     public void whenPrepared_thenAborted() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.openForWrite(ref, true);
@@ -86,7 +86,7 @@ public class FatArrayTreeBetaTransaction_initTest {
 
     @Test
     public void whenAborted() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.openForWrite(ref, false).value++;
@@ -101,7 +101,7 @@ public class FatArrayTreeBetaTransaction_initTest {
 
     @Test
     public void whenCommitted() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.openForWrite(ref, false).value++;
         tx.commit();

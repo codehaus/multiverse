@@ -119,7 +119,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
                 .setPropagationLevel(PropagationLevel.Requires)
                 .build();
 
-        final BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        final BetaLongRef ref = newLongRef(stm);
 
         AtomicIntClosure closure = new AtomicIntClosure() {
             @Override
@@ -147,7 +147,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
         final BetaTransaction existingTx = stm.startDefaultTransaction();
         setThreadLocalTransaction(existingTx);
 
-        final BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        final BetaLongRef ref = newLongRef(stm);
 
         AtomicIntClosure closure = new AtomicIntClosure() {
             @Override

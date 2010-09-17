@@ -15,7 +15,7 @@ public class FastOrec_tryLockForUpdateTest {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
 
-        boolean result = orec.___tryLockAfterNormalArrive(1,false);
+        boolean result = orec.___tryLockAfterNormalArrive(1,true);
         assertTrue(result);
         assertHasCommitLock(orec);
         assertSurplus(1, orec);
@@ -29,7 +29,7 @@ public class FastOrec_tryLockForUpdateTest {
         orec.___arrive(1);
         orec.___arrive(1);
 
-        boolean result = orec.___tryLockAfterNormalArrive(1,false);
+        boolean result = orec.___tryLockAfterNormalArrive(1,true);
         assertTrue(result);
         assertHasCommitLock(orec);
         assertSurplus(2, orec);
@@ -41,9 +41,9 @@ public class FastOrec_tryLockForUpdateTest {
     public void whenLocked() {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1,false);
+        orec.___tryLockAfterNormalArrive(1,true);
 
-        boolean result = orec.___tryLockAfterNormalArrive(1,false);
+        boolean result = orec.___tryLockAfterNormalArrive(1,true);
         assertFalse(result);
         assertHasCommitLock(orec);
         assertEquals(1, orec.___getSurplus());
@@ -56,7 +56,7 @@ public class FastOrec_tryLockForUpdateTest {
         FastOrec orec = makeReadBiased(new FastOrec());
 
         orec.___arrive(1);
-        boolean result = orec.___tryLockAfterNormalArrive(1,false);
+        boolean result = orec.___tryLockAfterNormalArrive(1,true);
 
         assertTrue(result);
         assertReadBiased(orec);

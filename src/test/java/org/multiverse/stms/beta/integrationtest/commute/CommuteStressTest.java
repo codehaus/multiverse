@@ -8,7 +8,6 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicLongClosure;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.FatArrayTreeBetaTransactionFactory;
 import org.multiverse.stms.beta.LeanBetaAtomicBlock;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -18,6 +17,7 @@ import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class CommuteStressTest {
      private BetaStm stm;
@@ -37,7 +37,7 @@ public class CommuteStressTest {
     public void test() {
         refs = new BetaLongRef[refCount];
         for (int k = 0; k < refCount; k++) {
-            refs[k] = BetaStmUtils.newLongRef(stm);
+            refs[k] = newLongRef(stm);
         }
 
         WorkerThread[] workers = new WorkerThread[workerCount];

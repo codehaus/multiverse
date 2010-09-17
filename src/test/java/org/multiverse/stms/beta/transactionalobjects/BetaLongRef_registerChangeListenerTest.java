@@ -7,7 +7,10 @@ import org.multiverse.TestUtils;
 import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.functions.LongFunction;
-import org.multiverse.stms.beta.*;
+import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
+import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatArrayTreeBetaTransaction;
 
@@ -50,7 +53,7 @@ public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants 
 
     @Test
     public void whenInterestingWriteAlreadyHappened_thenLatchOpenedAndNoRegistration() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal read = tx.openForRead(ref, false);
@@ -98,7 +101,7 @@ public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants 
 
     @Test
     public void whenFirstOne_thenRegistrationSuccessful() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal read = tx.openForRead(ref, false);
@@ -118,7 +121,7 @@ public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants 
 
     @Test
     public void whenSecondOne_thenListenerAddedToChain() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx1 = stm.startDefaultTransaction();
         LongRefTranlocal read1 = tx1.openForRead(ref, false);

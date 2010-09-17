@@ -13,7 +13,6 @@ import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
@@ -84,7 +83,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenExplicitRetryNotAllowed_thenNoRetryPossibleException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setBlockingAllowed(false);
@@ -105,7 +104,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenContainsRead_thenSuccess() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, false);
@@ -122,7 +121,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenLockedRead_thenSuccessAndLockReleased() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, true);
@@ -139,7 +138,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenContainsWrite_thenSuccess() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, false);
@@ -154,7 +153,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
 
     @Test
     public void whenLockedWrite_thenSuccessAndLockReleased() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, true);

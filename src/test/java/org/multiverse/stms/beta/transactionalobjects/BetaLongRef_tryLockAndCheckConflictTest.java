@@ -3,7 +3,6 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
@@ -32,7 +31,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal write = tx.openForRead(ref, false);
 
-        boolean result = ref.___tryLockAndCheckConflict(tx, 1, write);
+        boolean result = ref.___tryLockAndCheckConflict(tx, 1, write, true);
 
         assertTrue(result);
         assertSame(tx, ref.___getLockOwner());
@@ -52,7 +51,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest {
         write.value++;
         otherTx.commit();
 
-        boolean result = ref.___tryLockAndCheckConflict(tx, 1, read);
+        boolean result = ref.___tryLockAndCheckConflict(tx, 1, read, true);
 
         assertFalse(result);
         assertSame(tx, ref.___getLockOwner());
@@ -64,7 +63,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest {
 
     @Test
     public void whenLockedByOtherAndUpdated() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal read = tx.openForRead(ref, false);
@@ -75,7 +74,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest {
         BetaTransaction lockingTx = stm.startDefaultTransaction();
         lockingTx.openForWrite(ref, true);
 
-        boolean result = ref.___tryLockAndCheckConflict(tx, 1, read);
+        boolean result = ref.___tryLockAndCheckConflict(tx, 1, read, true);
         assertFalse(result);
         assertSame(lockingTx, ref.___getLockOwner());
         assertHasCommitLock(ref);
@@ -96,7 +95,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest {
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, true);
 
-        boolean result = ref.___tryLockAndCheckConflict(tx, 1, read2);
+        boolean result = ref.___tryLockAndCheckConflict(tx, 1, read2, true);
 
         assertFalse(result);
         assertHasCommitLock(ref.___getOrec());
@@ -113,7 +112,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal read = tx.openForRead(ref, true);
 
-        boolean result = ref.___tryLockAndCheckConflict(tx, 1, read);
+        boolean result = ref.___tryLockAndCheckConflict(tx, 1, read, true);
 
         assertTrue(result);
         assertHasCommitLock(ref.___getOrec());

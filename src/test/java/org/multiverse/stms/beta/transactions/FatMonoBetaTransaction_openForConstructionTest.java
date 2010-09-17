@@ -9,7 +9,6 @@ import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
@@ -173,7 +172,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
 
     @Test
     public void whenReadonly_thenReadonlyException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
@@ -212,7 +211,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
 
     @Test
     public void whenPrepared_thenPreparedTransactionException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.prepare();
@@ -232,7 +231,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
 
     @Test
     public void whenAborted_thenDeadTransactionException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.abort();
@@ -248,7 +247,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
 
     @Test
     public void whenCommitted_thenDeadTransactionException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         tx.commit();

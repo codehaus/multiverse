@@ -17,6 +17,8 @@ public interface Ref<E> extends TransactionalObject {
      * <p/>
      * This call expects a running transaction.
      *
+     * This call is pessimistic.
+     *
      * @throws IllegalStateException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
@@ -28,6 +30,8 @@ public interface Ref<E> extends TransactionalObject {
      * <p/>
      * This call expects a running transaction.
      *
+     * This call is pessimistic.
+     *
      * @param tx the Transaction used for this operation.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
@@ -37,6 +41,21 @@ public interface Ref<E> extends TransactionalObject {
      */
     void ensure(Transaction tx);
 
+    boolean tryEnsure();
+
+    boolean tryEnsure(Transaction tx);
+    
+    /**
+     *
+     */
+    void ensureOptimistic();
+
+    /**
+     *
+     * @param tx
+     */
+    void ensureOptimistic(Transaction tx);
+    
     /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
      * will commute. If somehow there already is a dependency or a dependency is formed on the result of

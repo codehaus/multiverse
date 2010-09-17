@@ -7,7 +7,6 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.WriteConflict;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertSame;
@@ -15,6 +14,7 @@ import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class BetaLongRef_ensureTest {
     private BetaStm stm;
@@ -27,7 +27,7 @@ public class BetaLongRef_ensureTest {
 
     @Test
     public void whenNullTransaction_thenNullPointerException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         try {
@@ -41,7 +41,7 @@ public class BetaLongRef_ensureTest {
 
     @Test
     public void whenCommittedTransaction_thenDeadTransactionException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.commit();
@@ -58,7 +58,7 @@ public class BetaLongRef_ensureTest {
 
     @Test
     public void whenAbortedTransaction_thenDeadTransactionException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.abort();
@@ -75,7 +75,7 @@ public class BetaLongRef_ensureTest {
 
     @Test
     public void whenPreparedTransaction_thenPreparedTransactionException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.prepare();
@@ -92,7 +92,7 @@ public class BetaLongRef_ensureTest {
 
     @Test
     public void whenSuccess() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         BetaTransaction tx = stm.startDefaultTransaction();
         BetaTransaction otherTx = stm.startDefaultTransaction();
@@ -112,7 +112,7 @@ public class BetaLongRef_ensureTest {
 
     @Test
     public void whenNormalTransactionUsed() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
         Transaction tx = stm.startDefaultTransaction();
         BetaTransaction otherTx = stm.startDefaultTransaction();

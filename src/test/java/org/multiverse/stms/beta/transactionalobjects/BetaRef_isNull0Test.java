@@ -4,7 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
@@ -29,13 +28,13 @@ public class BetaRef_isNull0Test {
 
     @Test
     public void whenNoTransactionAvailableAndValue() {
-        BetaRef ref = BetaStmUtils.newRef(stm, "foo");
+        BetaRef ref = newRef(stm, "foo");
         assertFalse(ref.isNull());
     }
 
     @Test
     public void whenActiveTransactionAvailable() {
-        BetaRef<String> ref = BetaStmUtils.newRef(stm, "foo");
+        BetaRef<String> ref = newRef(stm, "foo");
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);

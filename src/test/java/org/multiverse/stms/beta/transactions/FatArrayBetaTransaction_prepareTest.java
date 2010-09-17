@@ -8,7 +8,6 @@ import org.multiverse.api.exceptions.WriteConflict;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
@@ -39,7 +38,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
 
     @Test
     public void whenReadIsConflictedByWrite() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, false);
@@ -62,7 +61,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
 
     @Test
     public void whenReadIsConflictedByLock_thenPrepareSuccess() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -84,7 +83,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
 
     @Test
     public void whenUpdate() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -104,7 +103,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
 
     @Test
     public void whenUpdateAlreadyLockedBySelf() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -123,7 +122,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
 
     @Test
     public void whenUpdateAndLockedByOther_thenWriteConflict() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -169,7 +168,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
 
     @Test
     public void whenConflictingWrite() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -200,9 +199,9 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
 
     @Test
     public void whenMultipleItems() {
-        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
-        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
-        BetaLongRef ref3 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref1 = newLongRef(stm);
+        BetaLongRef ref2 = newLongRef(stm);
+        BetaLongRef ref3 = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         LongRefTranlocal write1 = tx.openForWrite(ref1, false);
@@ -249,7 +248,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
 
     @Test
     public void whenReferenceHasMultipleCommutes() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -300,7 +299,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
 
     @Test
     public void whenHasCommuteAndNoDirtyCheck() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
@@ -326,7 +325,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
 
     @Test
     public void whenHasCommuteAndDirtyCheck() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
@@ -352,7 +351,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
 
     @Test
     public void whenHasCommuteButLockedByOtherTransaction_thenWriteConflict() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -378,7 +377,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
 
     @Test
     public void whenHasCommuteThatConflicts() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
@@ -450,7 +449,7 @@ public class FatArrayBetaTransaction_prepareTest implements BetaStmConstants {
 
     @Test
     public void whenPreparedAlreadyPrepared() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);

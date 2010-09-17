@@ -81,11 +81,11 @@ public class DeadLockStressTest {
                 .buildAtomicBlock();
 
         private final AtomicBlock pessimisticReadLevelBlock = stm.createTransactionFactoryBuilder()
-                .setPessimisticLockLevel(PessimisticLockLevel.Read)
+                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
                 .buildAtomicBlock();
 
         private final AtomicBlock pessimisticWriteLevelBlock = stm.createTransactionFactoryBuilder()
-                .setPessimisticLockLevel(PessimisticLockLevel.Write)
+                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeWrites)
                 .buildAtomicBlock();
 
         public ChangeThread(int id) {

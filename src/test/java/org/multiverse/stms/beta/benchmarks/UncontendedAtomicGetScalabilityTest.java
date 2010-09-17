@@ -1,13 +1,13 @@
 package org.multiverse.stms.beta.benchmarks;
 
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import static org.multiverse.stms.beta.BetaStmUtils.format;
+import static org.multiverse.stms.beta.BetaStmUtils.newReadBiasedLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
 /**
@@ -99,7 +99,7 @@ public class UncontendedAtomicGetScalabilityTest {
         }
 
         public void run() {
-            BetaLongRef ref = BetaStmUtils.newReadBiasedLongRef(stm);
+            BetaLongRef ref = newReadBiasedLongRef(stm);
 
             long startMs = System.currentTimeMillis();
 

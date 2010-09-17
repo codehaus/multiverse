@@ -2,7 +2,6 @@ package org.multiverse.stms.beta.benchmarks;
 
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
@@ -13,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
+import static org.multiverse.stms.beta.BetaStmUtils.*;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
 public class BoxingScalabilityTest {
@@ -148,11 +148,11 @@ public class BoxingScalabilityTest {
         }
 
         public void run() {
-            BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+            BetaLongRef ref = newLongRef(stm);
 
             LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
                     new BetaTransactionConfiguration(stm)
-                            .setPessimisticLockLevel(PessimisticLockLevel.Read)
+                            .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
                             .setDirtyCheckEnabled(false));
             long startMs = System.currentTimeMillis();
             for (long k = 0; k < transactionCount; k++) {
@@ -179,11 +179,11 @@ public class BoxingScalabilityTest {
         }
 
         public void run() {
-            BetaRef<Long> ref = BetaStmUtils.newRef(stm, new Long(0));
+            BetaRef<Long> ref = newRef(stm, new Long(0));
 
             LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
                     new BetaTransactionConfiguration(stm)
-                            .setPessimisticLockLevel(PessimisticLockLevel.Read)
+                            .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
                             .setDirtyCheckEnabled(false));
             long startMs = System.currentTimeMillis();
             for (long k = 0; k < transactionCount; k++) {

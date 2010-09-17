@@ -10,7 +10,7 @@ import org.multiverse.MultiverseConstants;
 public interface BetaStmConstants extends MultiverseConstants {
 
     int ARRIVE_NORMAL = 0;
-    int ARRIVE_READBIASED = 1;
+    int ARRIVE_UNREGISTERED = 1;
     int ARRIVE_LOCK_NOT_FREE = 2;
 
     int REGISTRATION_DONE = 0;
@@ -20,4 +20,5 @@ public interface BetaStmConstants extends MultiverseConstants {
     int DIRTY_FALSE = 0;
     int DIRTY_TRUE = 1;
     int DIRTY_UNKNOWN = 2;
+
 }

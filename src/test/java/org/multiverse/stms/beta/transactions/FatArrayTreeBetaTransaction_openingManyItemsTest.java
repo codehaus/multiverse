@@ -3,7 +3,6 @@ package org.multiverse.stms.beta.transactions;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
@@ -11,6 +10,7 @@ import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 import static junit.framework.Assert.assertSame;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.assertIsActive;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class FatArrayTreeBetaTransaction_openingManyItemsTest {
     private BetaStm stm;
@@ -37,7 +37,7 @@ public class FatArrayTreeBetaTransaction_openingManyItemsTest {
         BetaLongRef[] refs = new BetaLongRef[refCount];
         LongRefTranlocal[] tranlocals = new LongRefTranlocal[refCount];
         for (int k = 0; k < refCount; k++) {
-            BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+            BetaLongRef ref = newLongRef(stm);
             refs[k] = ref;
             tranlocals[k] = reading ? tx.openForWrite(ref, false) : tx.openForWrite(ref, false);
         }

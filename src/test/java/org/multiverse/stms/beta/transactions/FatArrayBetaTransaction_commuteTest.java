@@ -10,7 +10,6 @@ import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
@@ -38,7 +37,7 @@ public class FatArrayBetaTransaction_commuteTest {
 
     @Test
     public void whenNullFunction_thenNullPointerException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -59,7 +58,7 @@ public class FatArrayBetaTransaction_commuteTest {
 
     @Test
     public void whenNotOpenedBefore() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
 
@@ -82,7 +81,7 @@ public class FatArrayBetaTransaction_commuteTest {
 
     @Test
     public void whenCommuteThenConflictCounterNotSet() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         long localConflictCount = tx.getLocalConflictCounter().get();
@@ -109,7 +108,7 @@ public class FatArrayBetaTransaction_commuteTest {
 
     @Test
     public void whenMultipleCommutesOnSameReference() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
 
@@ -136,8 +135,8 @@ public class FatArrayBetaTransaction_commuteTest {
 
     @Test
     public void whenMultipleCommutesInTransaction() {
-        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
-        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref1 = newLongRef(stm);
+        BetaLongRef ref2 = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
 
@@ -157,8 +156,8 @@ public class FatArrayBetaTransaction_commuteTest {
 
     @Test
     public void whenOverflow() {
-        BetaLongRef ref1 = BetaStmUtils.newLongRef(stm);
-        BetaLongRef ref2 = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref1 = newLongRef(stm);
+        BetaLongRef ref2 = newLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 1);
         config.init();
@@ -190,7 +189,7 @@ public class FatArrayBetaTransaction_commuteTest {
 
     @Test
     public void whenAlreadyOpenedForCommute() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
 
@@ -286,7 +285,7 @@ public class FatArrayBetaTransaction_commuteTest {
 
     @Test
     public void whenLocked_thenNoProblem() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, true);
@@ -310,7 +309,7 @@ public class FatArrayBetaTransaction_commuteTest {
 
     @Test
     public void whenReadonlyTransaction() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         LongFunction function = mock(LongFunction.class);
 
@@ -330,7 +329,7 @@ public class FatArrayBetaTransaction_commuteTest {
 
     @Test
     public void whenPrepared() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.prepare();
@@ -348,7 +347,7 @@ public class FatArrayBetaTransaction_commuteTest {
 
     @Test
     public void whenAlreadyCommitted_thenDeadTransactionException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.commit();
@@ -366,7 +365,7 @@ public class FatArrayBetaTransaction_commuteTest {
 
     @Test
     public void whenAlreadyAborted_thenDeadTransactionException() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.abort();

@@ -24,4 +24,8 @@ public interface MultiverseConstants {
 
     boolean ___ProfilingEnabled =
             parseBoolean(getProperty("org.multiverse.profiling.enabled", "false"));
+        
+    int LOCKMODE_NONE = 0;
+    int LOCKMODE_UPDATE = 1;
+    int LOCKMODE_COMMIT = 2;
 }

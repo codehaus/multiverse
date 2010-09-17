@@ -8,7 +8,6 @@ import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.BetaStmUtils;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -27,7 +26,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
 
     @Test
     public void whenConstructed() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         LongRefTranlocal tranlocal = ref.___openForConstruction(pool);
         tranlocal.value = 200;
@@ -57,7 +56,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
 
     @Test
     public void whenIsCommuting() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
 
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
         tranlocal.addCommutingFunction(IncLongFunction.INSTANCE_INC_ONE, pool);
@@ -69,7 +68,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
 
     @Test
     public void whenUpdate() {
-        BetaLongRef ref = BetaStmUtils.newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal tranlocal = ref.___unsafeLoad().openForWrite(pool);
         tranlocal.value = 200;
 

@@ -178,12 +178,12 @@ public class WriteSkewStressTest {
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
         private final AtomicBlock pessimisticReadLockLevel = stm.createTransactionFactoryBuilder()
-                .setPessimisticLockLevel(PessimisticLockLevel.Read)
+                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
                 .setWriteSkewAllowed(true)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
         private final AtomicBlock pessimisticWriteLockLevel = stm.createTransactionFactoryBuilder()
-                .setPessimisticLockLevel(PessimisticLockLevel.Write)
+                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeWrites)
                 .setWriteSkewAllowed(true)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
