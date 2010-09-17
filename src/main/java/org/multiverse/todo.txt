@@ -200,6 +200,10 @@ and not allowed. So not throw the retry error immediately..
 
 - Collection: foreach
 
+- reading and backoff? Atm only spinning is used.
+
+- yield and spinning.
+
 done
 
 - array transaction: on commit/abort the array can be nulled. no need to do it when placing in the pool

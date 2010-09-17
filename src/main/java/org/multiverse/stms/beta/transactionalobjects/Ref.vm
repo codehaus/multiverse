@@ -721,7 +721,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             return;
         }
 
-        throw new TodoException();
+        throw new NoTransactionFoundException("No transaction is found for the tryPrivatize operation");
     }
 
     @Override
@@ -741,7 +741,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             return tryPrivatize((BetaTransaction)tx);
         }
 
-        throw new TodoException();
+        throw new NoTransactionFoundException("No transaction is found for the tryPrivatize operation");
     }
 
     @Override

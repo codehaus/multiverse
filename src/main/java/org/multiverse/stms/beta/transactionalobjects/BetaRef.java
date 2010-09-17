@@ -6,6 +6,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.AtomicOperationException;
 import org.multiverse.api.exceptions.LockedException;
+import org.multiverse.api.exceptions.NoTransactionFoundException;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.Function;
 import org.multiverse.api.references.Ref;
@@ -607,7 +608,7 @@ public final class BetaRef<E>
             return;
         }
 
-        throw new TodoException();
+        throw new NoTransactionFoundException("No transaction is found for the tryPrivatize operation");
     }
 
     @Override
@@ -627,7 +628,7 @@ public final class BetaRef<E>
             return tryPrivatize((BetaTransaction)tx);
         }
 
-        throw new TodoException();
+        throw new NoTransactionFoundException("No transaction is found for the tryPrivatize operation");
     }
 
     @Override
@@ -636,11 +637,6 @@ public final class BetaRef<E>
     }
     
     public final boolean tryPrivatize(BetaTransaction tx){
-        throw new TodoException();
-    }
-
-    @Override
-    public final void ensureOptimistic(){
         throw new TodoException();
     }
 
@@ -656,6 +652,11 @@ public final class BetaRef<E>
 
     public final boolean tryEnsure(BetaTransaction tx){
         throw new TodoException();    
+    }
+
+    @Override
+    public final void ensureOptimistic(){
+        throw new TodoException();
     }
 
     @Override
