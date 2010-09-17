@@ -134,7 +134,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 flattenCommute(ref, result, lockMode);
                 return result;
             }else
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE &&
+                !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -236,7 +237,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             flattenCommute(ref, result, lockMode);
             return result;
         }else
-        if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+        if(lockMode!=LOCKMODE_NONE
+            && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
 
@@ -453,7 +455,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 flattenCommute(ref, result, lockMode);
                 return result;
             }else
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE &&
+                !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -555,7 +558,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             flattenCommute(ref, result, lockMode);
             return result;
         }else
-        if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+        if(lockMode!=LOCKMODE_NONE
+            && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
 
@@ -772,7 +776,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 flattenCommute(ref, result, lockMode);
                 return result;
             }else
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE &&
+                !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -874,7 +879,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             flattenCommute(ref, result, lockMode);
             return result;
         }else
-        if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+        if(lockMode!=LOCKMODE_NONE
+            && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
 
@@ -1091,7 +1097,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 flattenCommute(ref, result, lockMode);
                 return result;
             }else
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE &&
+                !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -1193,7 +1200,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             flattenCommute(ref, result, lockMode);
             return result;
         }else
-        if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+        if(lockMode!=LOCKMODE_NONE
+            && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
 
@@ -1410,7 +1418,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 flattenCommute(ref, result, lockMode);
                 return result;
             }else
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE &&
+                !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -1512,7 +1521,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             flattenCommute(ref, result, lockMode);
             return result;
         }else
-        if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+        if(lockMode!=LOCKMODE_NONE
+            && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
 
@@ -1729,7 +1739,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 flattenCommute(ref, result, lockMode);
                 return result;
             }else
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE &&
+                !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -1826,7 +1837,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             flattenCommute(ref, result, lockMode);
             return result;
         }else
-        if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+        if(lockMode!=LOCKMODE_NONE
+            && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
 

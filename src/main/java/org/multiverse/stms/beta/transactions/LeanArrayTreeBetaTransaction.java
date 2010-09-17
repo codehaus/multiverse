@@ -70,7 +70,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             //we are lucky, at already is attached to the session
             RefTranlocal<E> found = (RefTranlocal<E>)array[index];
 
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount,found, true)){
+            if(lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount,found, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -129,7 +130,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if(index >- 1){
             RefTranlocal<E> result = (RefTranlocal<E>)array[index];
 
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -254,7 +256,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             //we are lucky, at already is attached to the session
             IntRefTranlocal found = (IntRefTranlocal)array[index];
 
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount,found, true)){
+            if(lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount,found, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -313,7 +316,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if(index >- 1){
             IntRefTranlocal result = (IntRefTranlocal)array[index];
 
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -438,7 +442,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             //we are lucky, at already is attached to the session
             BooleanRefTranlocal found = (BooleanRefTranlocal)array[index];
 
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount,found, true)){
+            if(lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount,found, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -497,7 +502,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if(index >- 1){
             BooleanRefTranlocal result = (BooleanRefTranlocal)array[index];
 
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -622,7 +628,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             //we are lucky, at already is attached to the session
             DoubleRefTranlocal found = (DoubleRefTranlocal)array[index];
 
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount,found, true)){
+            if(lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount,found, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -681,7 +688,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if(index >- 1){
             DoubleRefTranlocal result = (DoubleRefTranlocal)array[index];
 
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -806,7 +814,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             //we are lucky, at already is attached to the session
             LongRefTranlocal found = (LongRefTranlocal)array[index];
 
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount,found, true)){
+            if(lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount,found, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -865,7 +874,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if(index >- 1){
             LongRefTranlocal result = (LongRefTranlocal)array[index];
 
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -990,7 +1000,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             //we are lucky, at already is attached to the session
             Tranlocal found = (Tranlocal)array[index];
 
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount,found, true)){
+            if(lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount,found, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -1049,7 +1060,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if(index >- 1){
             Tranlocal result = (Tranlocal)array[index];
 
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 

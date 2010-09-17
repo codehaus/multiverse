@@ -668,7 +668,7 @@ public  class BetaDoubleRef
             return;
         }
 
-        throw new TodoException();
+        throw new NoTransactionFoundException("No transaction is found for the ensure operation");
     }
 
     @Override
@@ -689,7 +689,7 @@ public  class BetaDoubleRef
             return;
         }
 
-        throw new NoTransactionFoundException("No transaction is found for the tryPrivatize operation");
+        throw new NoTransactionFoundException("No transaction is found for the privatize operation");
     }
 
     @Override

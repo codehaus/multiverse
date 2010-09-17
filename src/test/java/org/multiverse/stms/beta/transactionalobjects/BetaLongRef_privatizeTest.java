@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.NoTransactionFoundException;
@@ -151,7 +152,7 @@ public class BetaLongRef_privatizeTest {
         assertUpdateBiased(ref);
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertHasUpdateLock(ref);
         assertSame(tx, getThreadLocalTransaction());
         assertIsActive(tx);
 
@@ -179,7 +180,7 @@ public class BetaLongRef_privatizeTest {
         assertUpdateBiased(ref);
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertHasUpdateLock(ref);
         assertSame(tx, getThreadLocalTransaction());
         assertIsActive(tx);
 
@@ -238,7 +239,7 @@ public class BetaLongRef_privatizeTest {
         assertUpdateBiased(ref);
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertHasUpdateLock(ref);
         assertSame(tx, getThreadLocalTransaction());
         assertIsActive(tx);
 
@@ -266,7 +267,7 @@ public class BetaLongRef_privatizeTest {
         assertUpdateBiased(ref);
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertHasUpdateLock(ref);
         assertSame(tx, getThreadLocalTransaction());
         assertIsActive(tx);
 
@@ -278,6 +279,12 @@ public class BetaLongRef_privatizeTest {
         assertHasNoUpdateLock(ref);
         assertNull(ref.___getLockOwner());
         assertIsCommitted(tx);
+    }
+
+    @Test
+    @Ignore
+    public void whenReadBiased(){
+
     }
 
     @Test
@@ -329,7 +336,7 @@ public class BetaLongRef_privatizeTest {
         assertUpdateBiased(ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertHasUpdateLock(ref);
         assertSame(tx, getThreadLocalTransaction());
         assertIsAborted(tx);
     }

@@ -149,7 +149,11 @@ public class FastOrec implements Orec {
             }
 
             long next = setSurplus(current, surplus);
-            next = commitLock ? setCommitLock(next, true) : setUpdateLock(next, true);
+            next = setUpdateLock(next, true);
+
+            if (commitLock) {
+                next = setCommitLock(next, true);
+            }
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
                 return isReadBiased ? ARRIVE_UNREGISTERED : ARRIVE_NORMAL;
@@ -175,7 +179,11 @@ public class FastOrec implements Orec {
                                 ___toOrecString(current));
             }
 
-            long next = commitLock ? setCommitLock(current, true) : setUpdateLock(current, true);
+            long next = setUpdateLock(current, true);
+
+            if (commitLock) {
+                next = setCommitLock(next, true);
+            }
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
                 return true;

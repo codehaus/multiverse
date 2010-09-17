@@ -68,7 +68,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             if(found.isCommuting){
                 flattenCommute(ref, found, lockMode);
             }else
-            if (lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, found, true)){
+            if (lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, found, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -177,7 +178,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 flattenCommute(ref, result, lockMode);
                 return result;
             }else
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, result,lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }else if(!result.isCommitted){
                 return result;
@@ -374,7 +376,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             if(found.isCommuting){
                 flattenCommute(ref, found, lockMode);
             }else
-            if (lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, found, true)){
+            if (lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, found, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -483,7 +486,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 flattenCommute(ref, result, lockMode);
                 return result;
             }else
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, result,lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }else if(!result.isCommitted){
                 return result;
@@ -680,7 +684,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             if(found.isCommuting){
                 flattenCommute(ref, found, lockMode);
             }else
-            if (lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, found, true)){
+            if (lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, found, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -789,7 +794,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 flattenCommute(ref, result, lockMode);
                 return result;
             }else
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, result,lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }else if(!result.isCommitted){
                 return result;
@@ -986,7 +992,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             if(found.isCommuting){
                 flattenCommute(ref, found, lockMode);
             }else
-            if (lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, found, true)){
+            if (lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, found, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -1095,7 +1102,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 flattenCommute(ref, result, lockMode);
                 return result;
             }else
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, result,lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }else if(!result.isCommitted){
                 return result;
@@ -1292,7 +1300,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             if(found.isCommuting){
                 flattenCommute(ref, found, lockMode);
             }else
-            if (lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, found, true)){
+            if (lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, found, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -1401,7 +1410,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 flattenCommute(ref, result, lockMode);
                 return result;
             }else
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, result,lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }else if(!result.isCommitted){
                 return result;
@@ -1598,7 +1608,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             if(found.isCommuting){
                 flattenCommute(ref, found, lockMode);
             }else
-            if (lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, found, true)){
+            if (lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, found, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -1707,7 +1718,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 flattenCommute(ref, result, lockMode);
                 return result;
             }else
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, result,lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }else if(!result.isCommitted){
                 return result;

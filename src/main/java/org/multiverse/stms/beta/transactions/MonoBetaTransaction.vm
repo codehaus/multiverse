@@ -153,7 +153,8 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 return result;
             }else
 #end
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE &&
+                !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -273,7 +274,8 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             return result;
         }else
 #end
-        if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+        if(lockMode!=LOCKMODE_NONE
+            && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
 

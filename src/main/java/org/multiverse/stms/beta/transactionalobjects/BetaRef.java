@@ -587,7 +587,7 @@ public final class BetaRef<E>
             return;
         }
 
-        throw new TodoException();
+        throw new NoTransactionFoundException("No transaction is found for the ensure operation");
     }
 
     @Override
@@ -608,7 +608,7 @@ public final class BetaRef<E>
             return;
         }
 
-        throw new NoTransactionFoundException("No transaction is found for the tryPrivatize operation");
+        throw new NoTransactionFoundException("No transaction is found for the privatize operation");
     }
 
     @Override

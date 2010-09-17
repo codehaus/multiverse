@@ -73,7 +73,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             //the reference is the one we are looking for.
             RefTranlocal<E> result = (RefTranlocal<E>)attached;
 
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE &&
+                !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -143,7 +144,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         //the reference is the one we are looking for.
         RefTranlocal<E> result = (RefTranlocal<E>)attached;
 
-        if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+        if(lockMode!=LOCKMODE_NONE
+            && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
 
@@ -262,7 +264,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             //the reference is the one we are looking for.
             IntRefTranlocal result = (IntRefTranlocal)attached;
 
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE &&
+                !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -332,7 +335,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         //the reference is the one we are looking for.
         IntRefTranlocal result = (IntRefTranlocal)attached;
 
-        if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+        if(lockMode!=LOCKMODE_NONE
+            && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
 
@@ -451,7 +455,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             //the reference is the one we are looking for.
             BooleanRefTranlocal result = (BooleanRefTranlocal)attached;
 
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE &&
+                !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -521,7 +526,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         //the reference is the one we are looking for.
         BooleanRefTranlocal result = (BooleanRefTranlocal)attached;
 
-        if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+        if(lockMode!=LOCKMODE_NONE
+            && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
 
@@ -640,7 +646,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             //the reference is the one we are looking for.
             DoubleRefTranlocal result = (DoubleRefTranlocal)attached;
 
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE &&
+                !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -710,7 +717,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         //the reference is the one we are looking for.
         DoubleRefTranlocal result = (DoubleRefTranlocal)attached;
 
-        if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+        if(lockMode!=LOCKMODE_NONE
+            && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
 
@@ -829,7 +837,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             //the reference is the one we are looking for.
             LongRefTranlocal result = (LongRefTranlocal)attached;
 
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE &&
+                !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -899,7 +908,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         //the reference is the one we are looking for.
         LongRefTranlocal result = (LongRefTranlocal)attached;
 
-        if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+        if(lockMode!=LOCKMODE_NONE
+            && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
 
@@ -1018,7 +1028,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             //the reference is the one we are looking for.
             Tranlocal result = (Tranlocal)attached;
 
-            if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+            if(lockMode!=LOCKMODE_NONE &&
+                !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
@@ -1083,7 +1094,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         //the reference is the one we are looking for.
         Tranlocal result = (Tranlocal)attached;
 
-        if(lockMode!=LOCKMODE_NONE && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, true)){
+        if(lockMode!=LOCKMODE_NONE
+            && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
 
