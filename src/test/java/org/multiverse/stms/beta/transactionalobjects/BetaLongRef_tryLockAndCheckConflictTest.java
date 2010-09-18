@@ -36,9 +36,9 @@ public class BetaLongRef_tryLockAndCheckConflictTest implements BetaStmConstants
         assertTrue(result);
         assertSame(tx, ref.___getLockOwner());
 
-        assertHasCommitLock(ref);
         assertSurplus(1, ref);
         assertHasUpdateLock(ref);
+        assertHasCommitLock(ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
     }

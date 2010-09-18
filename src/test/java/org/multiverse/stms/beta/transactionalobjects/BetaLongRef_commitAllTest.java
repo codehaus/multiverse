@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.stms.beta.BetaObjectPool;
@@ -162,4 +163,41 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         assertSurplus(0, orec);
         assertReadonlyCount(0, orec);
     }
+
+    @Test
+    @Ignore
+    public void whenPrivatizedBySelfAndOnlyRead() {
+
+    }
+
+    @Test
+    @Ignore
+    public void whenPrivatizedBySelfAndDirtyWrite() {
+
+    }
+
+    @Test
+    @Ignore
+    public void whenPrivatizedBySelfAndNoDirtyWrite() {
+
+    }
+
+    @Test
+    @Ignore
+    public void whenEnsuredBySelfAndOnlyRead() {
+
+    }
+
+    @Test
+    @Ignore
+    public void whenEnsuredBySelfAndDirtyWrite() {
+
+    }
+
+    @Test
+    @Ignore
+    public void whenEnsuredBySelfAndNoDirtyWrite() {
+
+    }
+
 }

@@ -3,6 +3,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.api.exceptions.WriteConflict;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
@@ -182,4 +183,147 @@ public class BetaLongRef_commute1Test {
         assertEquals(2, ref.atomicGet());
     }
 
+    @Test
+    public void whenAlreadyEnsuredBySelf_thenNoCommute() {
+        BetaLongRef ref = newLongRef(stm, 2);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        setThreadLocalTransaction(tx);
+
+        ref.ensure();
+        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        ref.commute(function);
+
+        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        assertNotNull(tranlocal);
+        assertFalse(tranlocal.isCommuting);
+        assertEquals(3, tranlocal.value);
+        assertIsActive(tx);
+        assertHasUpdateLock(ref);
+        assertHasNoCommitLock(ref);
+        assertSurplus(1, ref);
+        assertUpdateBiased(ref);
+        assertSame(tx, ref.___getLockOwner());
+
+        tx.commit();
+
+        assertSurplus(0, ref);
+        assertIsCommitted(tx);
+        assertNull(ref.___getLockOwner());
+        assertHasNoUpdateLock(ref);
+        assertHasNoCommitLock(ref);
+        assertSame(tx, getThreadLocalTransaction());
+        assertEquals(3, ref.atomicGet());
+    }
+
+    @Test
+    public void whenAlreadyPrivatizedBySelf_thenNoCommute() {
+        BetaLongRef ref = newLongRef(stm, 2);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        setThreadLocalTransaction(tx);
+
+        ref.privatize();
+        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        ref.commute(function);
+
+        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        assertNotNull(tranlocal);
+        assertFalse(tranlocal.isCommuting);
+        assertEquals(3, tranlocal.value);
+        assertIsActive(tx);
+        assertHasUpdateLock(ref);
+        assertHasCommitLock(ref);
+        assertSurplus(1, ref);
+        assertUpdateBiased(ref);
+        assertSame(tx, ref.___getLockOwner());
+
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertNull(ref.___getLockOwner());
+        assertHasNoUpdateLock(ref);
+        assertHasNoCommitLock(ref);
+        assertSame(tx, getThreadLocalTransaction());
+        assertEquals(3, ref.atomicGet());
+        assertSurplus(0, ref);
+    }
+
+    @Test
+    public void whenEnsuredByOther_thenCommuteSucceedsButCommitFails() {
+        BetaLongRef ref = newLongRef(stm, 2);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        setThreadLocalTransaction(tx);
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.ensure(otherTx);
+
+        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        ref.commute(function);
+
+        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        assertNotNull(tranlocal);
+        assertTrue(tranlocal.isCommuting);
+        assertHasCommutingFunctions(tranlocal, function);
+        assertIsActive(tx);
+        assertHasUpdateLock(ref);
+        assertHasNoCommitLock(ref);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSurplus(1, ref);
+
+        try {
+            tx.commit();
+            fail();
+        } catch (WriteConflict expected) {
+        }
+
+        assertIsAborted(tx);
+        assertSame(tx, getThreadLocalTransaction());
+        assertHasUpdateLock(ref);
+        assertHasNoCommitLock(ref);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertSurplus(1, ref);
+    }
+
+    @Test
+    public void whenPrivatizedByOther_thenCommuteSucceedsButCommitFails() {
+         BetaLongRef ref = newLongRef(stm, 2);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        setThreadLocalTransaction(tx);
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.privatize(otherTx);
+
+        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        ref.commute(function);
+
+        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        assertNotNull(tranlocal);
+        assertTrue(tranlocal.isCommuting);
+        assertHasCommutingFunctions(tranlocal, function);
+        assertIsActive(tx);
+        assertHasUpdateLock(ref);
+        assertHasCommitLock(ref);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSurplus(1, ref);
+
+        try {
+            tx.commit();
+            fail();
+        } catch (WriteConflict expected) {
+        }
+
+        assertIsAborted(tx);
+        assertSame(tx, getThreadLocalTransaction());
+        assertHasUpdateLock(ref);
+        assertHasCommitLock(ref);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertSurplus(1, ref);
+    }
 }

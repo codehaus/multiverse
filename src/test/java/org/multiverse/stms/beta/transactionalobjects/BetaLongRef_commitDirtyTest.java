@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.stms.beta.BetaObjectPool;
@@ -18,7 +19,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
-public class BetaLongRef_commitDirtyTest implements BetaStmConstants{
+public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
 
     private BetaStm stm;
     private BetaObjectPool pool;
@@ -64,6 +65,42 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants{
         assertReadonlyCount(0, orec);
         assertFalse(latch.isOpen());
         assertEquals(listenerEra, latch.getEra());
+    }
+
+    @Test
+    @Ignore
+    public void whenPrivatizedBySelfAndOnlyRead() {
+
+    }
+
+    @Test
+    @Ignore
+    public void whenPrivatizedBySelfAndDirtyWrite() {
+
+    }
+
+    @Test
+    @Ignore
+    public void whenPrivatizedBySelfAndNoDirtyWrite() {
+
+    }
+
+    @Test
+    @Ignore
+    public void whenEnsuredBySelfAndOnlyRead() {
+
+    }
+
+    @Test
+    @Ignore
+    public void whenEnsuredBySelfAndDirtyWrite() {
+
+    }
+
+    @Test
+    @Ignore
+    public void whenEnsuredBySelfAndNoDirtyWrite() {
+
     }
 
     @Test

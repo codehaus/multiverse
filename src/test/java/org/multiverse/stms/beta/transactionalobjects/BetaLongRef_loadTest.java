@@ -184,4 +184,16 @@ public class BetaLongRef_loadTest implements BetaStmConstants {
         assertReadonlyCount(0, ref);
         assertSame(otherTx, ref.___getLockOwner());
     }
+
+    @Test
+    @Ignore
+    public void whenReadByOther(){
+
+    }
+
+    @Test
+    @Ignore
+    public void whenPendingUpdateByOther(){
+
+    }
 }
