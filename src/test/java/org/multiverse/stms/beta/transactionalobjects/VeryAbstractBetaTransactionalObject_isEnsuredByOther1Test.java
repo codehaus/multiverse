@@ -1,10 +1,12 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.transactions.BetaTransaction;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
@@ -25,32 +27,60 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredByOther1Test {
     }
 
     @Test
-    @Ignore
     public void whenFree(){
+        BetaLongRef ref = newLongRef(stm);
 
+        BetaTransaction tx = stm.startDefaultTransaction();
+        boolean result = ref.isEnsuredByOther(tx);
+
+        assertFalse(result);
     }
 
     @Test
-    @Ignore
     public void whenPrivatizedBySelf(){
+        BetaLongRef ref = newLongRef(stm);
 
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.privatize(tx);
+        boolean result = ref.isEnsuredByOther(tx);
+
+        assertFalse(result);
     }
 
     @Test
-    @Ignore
     public void whenEnsuredBySelf(){
+        BetaLongRef ref = newLongRef(stm);
 
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.ensure(tx);
+        boolean result = ref.isEnsuredByOther(tx);
+
+        assertFalse(result);
     }
 
     @Test
-    @Ignore
     public void whenPrivatizedByOther(){
+        BetaLongRef ref = newLongRef(stm);
 
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.privatize(otherTx);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        boolean result = ref.isEnsuredByOther(tx);
+
+        assertTrue(result);
     }
     
     @Test
-    @Ignore
     public void whenEnsuredByOther(){
+        BetaLongRef ref = newLongRef(stm);
 
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.ensure(otherTx);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        boolean result = ref.isEnsuredByOther(tx);
+
+        assertTrue(result);
     }
 }
