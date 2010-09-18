@@ -204,7 +204,35 @@ and not allowed. So not throw the retry error immediately..
 
 - a reference that always causes a privatization.
 
+- VeryAbstractBetaTransactionalObject_isEnsuredByOther1Test
+
+- VeryAbstractBetaTransactionalObject_isEnsuredByOtherf0Test
+
+- VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test
+
+- VeryAbstractBetaTransactionalObject_isEnsuredBySelf1Test
+
+- VeryAbstractBetaTransactionalObject_isEnsuredTest
+
+- VeryAbstractBetaTransactionalObject_isPrivatizedByOther0Test
+
+- VeryAbstractBetaTransactionalObject_isPrivatizedByOther1Test
+
+- VeryAbstractBetaTransactionalObject_isPrivatizedBySelf0Test
+
+- VeryAbstractBetaTransactionalObject_isPrivatizedBySelf1Test
+
+- VeryAbstractBetaTransactionalObject_isPrivatizedTest
+
+- once a transactional object is privatized, it should not be ensured anymore.
+
 done
+
+- VeryAbstractBetaTransactionalObject_isFreeTest
+
+- added an very abstract betatransactional object where a lot of duplicate logic can be moved. 
+
+- arrays are removed
 
 - isolation test that is primary read biased.
 

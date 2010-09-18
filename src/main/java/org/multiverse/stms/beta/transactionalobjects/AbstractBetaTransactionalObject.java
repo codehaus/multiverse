@@ -1,17 +1,9 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.api.LockStatus;
-import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.stms.beta.BetaObjectPool;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.Listeners;
-import org.multiverse.stms.beta.orec.FastOrec;
-import org.multiverse.stms.beta.orec.Orec;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
-
-import java.util.UUID;
 
 /**
  * The transactional object. Atm it is just a reference for an int, more complex stuff will be added again
@@ -28,33 +20,14 @@ import java.util.UUID;
  * @author Peter Veentjer
  */
 public abstract class AbstractBetaTransactionalObject
-    extends FastOrec implements BetaTransactionalObject, BetaStmConstants
+    extends VeryAbstractBetaTransactionalObject
 {
-
-    private final static long listenersOffset;
-
-    static {
-        try {
-            listenersOffset = ___unsafe.objectFieldOffset(
-                AbstractBetaTransactionalObject.class.getDeclaredField("___listeners"));
-        } catch (Exception ex) {
-            throw new Error(ex);
-        }
-    }
-
-    private BetaTransaction lockOwner;
 
     //Active needs to be volatile. If not, the both load statements in the load function, can be reordered
     //(the instruction above can jump below the orec.arrive if no write is done)
     private volatile Tranlocal ___active;
 
-    private volatile Listeners ___listeners;
-
-    //This field has a controlled JMM problem (just like the hashcode of String).
-    private int ___identityHashCode;    
-    private final BetaStm ___stm;
-
-    /**
+     /**
      * Creates a uncommitted AbstractBetaTransactionalObject that should be attached to the transaction (this
      * is not done)
      *
@@ -62,32 +35,17 @@ public abstract class AbstractBetaTransactionalObject
      * @throws NullPointerException if tx is null.
      */
     public AbstractBetaTransactionalObject(BetaTransaction tx){
-        ___stm = tx.getConfiguration().stm;
+        super(tx.getConfiguration().stm);
         ___tryLockAndArrive(0, true);
-        this.lockOwner = tx;
+        this.___lockOwner = tx;
     }
 
-    @Override
-    public final BetaStm getStm(){
-        return ___stm;
-    }
-
-    @Override
-    public final BetaTransaction ___getLockOwner() {
-        return lockOwner;
-    }
-
-    @Override
+     @Override
     public final int ___getClassIndex(){
         return -1;
     }
 
-    @Override
-    public final Orec ___getOrec() {
-        return this;
-    }
-
-    @Override
+   @Override
     public final Tranlocal ___load(
         final int spinCount,
         final BetaTransaction newLockOwner,
@@ -146,7 +104,7 @@ public abstract class AbstractBetaTransactionalObject
                 return  Tranlocal.LOCKED;
             }
 
-            lockOwner = newLockOwner;
+            ___lockOwner = newLockOwner;
 
             Tranlocal read = ___active;
             if(arriveStatus == ARRIVE_UNREGISTERED){
@@ -169,7 +127,7 @@ public abstract class AbstractBetaTransactionalObject
 
         //if the current transaction owns the lock, there is no conflict...
         //todo: only going to work when the acquire lock also does a conflict check.
-        if(lockOwner == tx){
+        if(___lockOwner == tx){
             return false;
         }
 
@@ -195,7 +153,7 @@ public abstract class AbstractBetaTransactionalObject
 
         //If it already is locked by the current transaction, we are done.
         //Fresh constructed objects always have the tx set.
-        if (lockOwner == newLockOwner) {
+        if (___lockOwner == newLockOwner) {
             if(commitLock){
                 ___upgradeToCommitLock();
             }
@@ -211,7 +169,7 @@ public abstract class AbstractBetaTransactionalObject
             }
 
             //we have successfully acquired the lock
-            lockOwner = newLockOwner;
+            ___lockOwner = newLockOwner;
             return read == ___active;
         }
 
@@ -220,7 +178,7 @@ public abstract class AbstractBetaTransactionalObject
         }
 
         //we have successfully acquired the lock
-        lockOwner = newLockOwner;
+        ___lockOwner = newLockOwner;
         return read == ___active;
     }
 
@@ -233,13 +191,13 @@ public abstract class AbstractBetaTransactionalObject
         final boolean notDirty = tranlocal.isDirty == DIRTY_FALSE;
 
         if(notDirty){
-            final boolean ownsLock = expectedLockOwner == lockOwner;
+            final boolean ownsLock = expectedLockOwner == ___lockOwner;
             final Tranlocal read = (Tranlocal)(tranlocal.isCommitted
                 ?tranlocal
                 :tranlocal.read);
 
             if(ownsLock){
-                lockOwner = null;
+                ___lockOwner = null;
 
                 if(read.isPermanent){
                     ___unlockByReadBiased();
@@ -255,7 +213,7 @@ public abstract class AbstractBetaTransactionalObject
             return null;
         }
 
-        lockOwner = null;
+        ___lockOwner = null;
 
         //it is a full blown update (so locked).
         final Tranlocal newActive = (Tranlocal)tranlocal;
@@ -318,7 +276,7 @@ public abstract class AbstractBetaTransactionalObject
             final BetaTransaction expectedLockOwner,
             final BetaObjectPool pool) {
 
-        if(expectedLockOwner != lockOwner){
+        if(expectedLockOwner != ___lockOwner){
             //it can't be an update, otherwise the lock would have been acquired.
 
             if(!tranlocal.isPermanent){
@@ -327,7 +285,7 @@ public abstract class AbstractBetaTransactionalObject
             return null;
         }
 
-        lockOwner = null;
+        ___lockOwner = null;
 
         if(tranlocal.isCommitted){
             if(tranlocal.isPermanent){
@@ -398,7 +356,7 @@ public abstract class AbstractBetaTransactionalObject
             }
         }
 
-        if (lockOwner != transaction) {
+        if (___lockOwner != transaction) {
             //the current transaction didn't own the lock.
             if (!read.isPermanent) {
                 //it is important that the depart is not called when the read isReadBiased. It could
@@ -411,7 +369,7 @@ public abstract class AbstractBetaTransactionalObject
         }
 
         //the current transaction owns the lock.. so lets release it
-        lockOwner = null;
+        ___lockOwner = null;
 
         //depart and release the lock. This call is able to deal with readbiased and normal reads.
         ___departAfterFailureAndUnlock();
@@ -490,68 +448,5 @@ public abstract class AbstractBetaTransactionalObject
         }
     }
 
-    private int ___arriveAndLockOrBackoff(){
-        for(int k=0;k<=___stm.defaultMaxRetries;k++){
-            final int arriveStatus = ___tryLockAndArrive(___stm.spinCount, true);
-            if(arriveStatus != ARRIVE_LOCK_NOT_FREE){
-                return arriveStatus;
-            }
 
-            ___stm.defaultBackoffPolicy.delayedUninterruptible(k+1);
-        }
-
-        return ARRIVE_LOCK_NOT_FREE;
-    }
-
-    @Override
-    public final LockStatus getLockStatus(final Transaction tx) {
-        if(tx == null){
-            throw new NullPointerException("Transaction can't be null");
-        }
-
-        BetaTransaction currentLockOwner = lockOwner;
-        if (currentLockOwner == null) {
-            return LockStatus.Free;
-        }
-
-        return currentLockOwner == tx ? LockStatus.LockedBySelf : LockStatus.LockedByOther;
-    }
-
-    //a controlled jmm problem here since identityHashCode is not synchronized/volatile/final.
-    //this is the same as with the hashcode and String.
-    @Override
-    public final int ___identityHashCode(){
-        int tmp = ___identityHashCode;
-        if(tmp != 0){
-            return tmp;
-        }
-
-        tmp = System.identityHashCode(this);
-        ___identityHashCode = tmp;
-        return tmp;
-    }
-
-    private String storageId = UUID.randomUUID().toString();
-
-    private volatile boolean durable = false;
-
-    @Override
-    public final String ___getStorageId() {
-        return storageId;
-    }
-
-    @Override
-    public final void ___setStorageId(final String id) {
-        this.storageId = id;
-    }
-
-    @Override
-    public final void ___markAsDurable(){
-        durable = true;
-    }
-
-    @Override
-    public  final boolean ___isDurable(){
-        return durable;
-    }
 }

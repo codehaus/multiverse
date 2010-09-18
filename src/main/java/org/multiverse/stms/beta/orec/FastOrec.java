@@ -59,6 +59,12 @@ public class FastOrec implements Orec {
     private volatile long value;
 
     @Override
+    public boolean ___hasLock() {
+        final long current = value;
+        return hasUpdateLock(current) || hasCommitLock(value);
+    }
+
+    @Override
     public boolean ___hasUpdateLock() {
         return hasUpdateLock(value);
     }

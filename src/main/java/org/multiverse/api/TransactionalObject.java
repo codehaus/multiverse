@@ -7,18 +7,59 @@ package org.multiverse.api;
  */
 public interface TransactionalObject {
 
-    /*
+    /**
+     * Checks if the TransactionalObject has not been ensured or privatized.
+     * <p/>
+     * The value could be stale as soon as it is returned.
+     *
+     * @return true if the TransactionalObject has not been ensured or privatized.
+     */
     boolean isFree();
 
-    boolean isFree(Transaction tx);
+    /**
+     * Checks if the TransactionalObject is privatized. It could be that it is privatized by the active
+     * transaction or by another transaction.
+     *
+     * The value could be stale as soon as it is returned.
+     *
+     * @return true if privatized, false otherwise.
+     */
+    boolean isPrivatized();
 
+    /**
+     * Checks if the TransactionalObject is privatized by another transaction.
+     *
+     * The value could be stale as soon as it is returned.
+     *
+     * @return true if the TransactionalObject has been privatized by another transaction than the
+     *         active transaction.
+     * @throws org.multiverse.api.exceptions.NoTransactionFoundException
+     *          if no alive transaction is found.
+     */
+    boolean isPrivatizedByOther();
+
+    /**
+     * Checks if the TransactionalObject is privatized by another transaction than the provided transaction.
+     *
+     * @param tx the transaction to compare with.
+     * @return true if the TransactionalObject is privatized by another transaction.
+     * @throws NullPointerException if tx is null.
+     */
+    boolean isPrivatizedByOther(Transaction tx);
+
+    /**
+     * Checks if the TransactionalObject is privatized by the active transaction.
+     *
+     * The value could be stale as soon as it is returned.
+     *
+     * @return
+     * @throws org.multiverse.api.exceptions.NoTransactionFoundException if no alive transaction is found.
+     */
     boolean isPrivatizedBySelf();
 
     boolean isPrivatizedBySelf(Transaction tx);
 
-    boolean isPrivatizedByOther();
-
-    boolean isPrivatizedByOther(Transaction tx);
+    boolean isEnsured();
 
     boolean isEnsuredBySelf();
 
@@ -26,7 +67,7 @@ public interface TransactionalObject {
 
     boolean isEnsuredByOther();
 
-    boolean isEnsuredByOther(Transaction tx);*/
+    boolean isEnsuredByOther(Transaction tx);
 
     /**
      * Returns the Stm this TransactionalObject is part of.
@@ -34,14 +75,6 @@ public interface TransactionalObject {
      * @return the Stm this TransactionalObject is part of.
      */
     Stm getStm();
-
-    /**
-     * Gets the LockStatus.
-     *
-     * @param tx
-     * @return
-     */
-    LockStatus getLockStatus(Transaction tx);
 
     /**
      * Ensures that when this ref is read in a transaction, no other transaction is able to write to this

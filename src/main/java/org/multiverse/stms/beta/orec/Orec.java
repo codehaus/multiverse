@@ -21,6 +21,8 @@ import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
  */
 public interface Orec extends BetaStmConstants {
 
+    boolean ___hasLock();
+
     /**
      * Checks if the Orec is locked for update. While it is locked for update, it still is readable (so arrives)
      * are allowed). The update lock can be acquired to prevent other threads from updating this orec.

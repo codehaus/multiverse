@@ -65,6 +65,8 @@ public class LinkedList<E> extends AbstractBetaTransactionalObject{
         throw new TodoException();
     }
 
+    
+
     public E removeFromFront(BetaTransaction tx) {
         LinkedListTranlocal<E> tranlocal = (LinkedListTranlocal) tx.openForWrite(
                 this, false);

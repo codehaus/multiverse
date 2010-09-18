@@ -1,6 +1,7 @@
 package org.multiverse.sensors;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
@@ -14,6 +15,7 @@ import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
+@Ignore
 public class SensorExampleTest {
     private BetaStm stm;
     private BetaLongRef ref;
