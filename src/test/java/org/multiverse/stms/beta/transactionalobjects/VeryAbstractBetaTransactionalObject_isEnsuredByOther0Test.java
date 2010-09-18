@@ -12,8 +12,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
-public class VeryAbstractBetaTransactionalObject_isPrivatizedByOther0Test {
-
+public class VeryAbstractBetaTransactionalObject_isEnsuredByOther0Test {
     private BetaStm stm;
 
     @Before
@@ -26,7 +25,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedByOther0Test {
     public void whenNoTransactionFound() {
         BetaLongRef ref = newLongRef(stm);
 
-        ref.isPrivatizedByOther();
+        ref.isEnsuredByOther();
     }
 
     @Test
@@ -36,7 +35,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedByOther0Test {
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        boolean result = ref.isPrivatizedByOther();
+        boolean result = ref.isEnsuredByOther();
 
         assertFalse(result);
     }
@@ -48,7 +47,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedByOther0Test {
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
         ref.privatize();
-        boolean result = ref.isPrivatizedByOther();
+        boolean result = ref.isEnsuredByOther();
 
         assertFalse(result);
     }
@@ -60,7 +59,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedByOther0Test {
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
         ref.ensure();
-        boolean result = ref.isPrivatizedByOther();
+        boolean result = ref.isEnsuredByOther();
 
         assertFalse(result);
     }
@@ -74,7 +73,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedByOther0Test {
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
-        boolean result = ref.isPrivatizedByOther();
+        boolean result = ref.isEnsuredByOther();
 
         assertTrue(result);
     }
@@ -88,8 +87,8 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedByOther0Test {
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
-        boolean result = ref.isPrivatizedByOther();
+        boolean result = ref.isEnsuredByOther();
 
-        assertFalse(result);
+        assertTrue(result);
     }
 }

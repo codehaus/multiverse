@@ -7,6 +7,7 @@ import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadConflict;
 import org.multiverse.api.exceptions.WriteConflict;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConfiguration;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
@@ -21,7 +22,9 @@ public class BetaLongRef_set1Test {
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        BetaStmConfiguration configuration = new BetaStmConfiguration();
+        configuration.maxRetries = 10;
+        stm = new BetaStm(configuration);
         clearThreadLocalTransaction();
     }
 

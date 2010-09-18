@@ -5,6 +5,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConfiguration;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
@@ -18,7 +19,9 @@ public class BetaLongRef_atomicGetAndIncrementTest {
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        BetaStmConfiguration config = new BetaStmConfiguration();
+        config.maxRetries = 10; 
+        stm = new BetaStm(config);
         clearThreadLocalTransaction();
     }
 

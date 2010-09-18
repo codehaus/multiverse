@@ -204,6 +204,10 @@ and not allowed. So not throw the retry error immediately..
 
 - a reference that always causes a privatization.
 
+- once a transactional object is privatized, it should not be ensured anymore.
+
+done
+
 - VeryAbstractBetaTransactionalObject_isEnsuredByOtherf0Test
 
 - VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test
@@ -211,10 +215,6 @@ and not allowed. So not throw the retry error immediately..
 - VeryAbstractBetaTransactionalObject_isPrivatizedByOther0Test
 
 - VeryAbstractBetaTransactionalObject_isPrivatizedBySelf0Test
-
-- once a transactional object is privatized, it should not be ensured anymore.
-
-done
 
 - VeryAbstractBetaTransactionalObject_isPrivatizedBySelf1Test
 
