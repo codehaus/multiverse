@@ -34,6 +34,10 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
     }
 
 
+    public final boolean tryLock(BetaTransactionalObject ref, int lockMode){
+        throw new TodoException();
+    }
+    
 
     @Override
     public final <E> RefTranlocal<E> openForRead(

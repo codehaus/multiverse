@@ -52,6 +52,10 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         return (size * 1.0f)/array.length;
     }
 
+    public final boolean tryLock(BetaTransactionalObject ref, int lockMode){
+        throw new TodoException();
+    }
+
     private <E> void flattenCommute(
         final BetaRef<E> ref,
         final RefTranlocal<E> tranlocal,

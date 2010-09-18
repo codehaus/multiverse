@@ -385,6 +385,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
      */
     public abstract void init(BetaTransactionConfiguration transactionConfig);
 
+    public abstract boolean tryLock(BetaTransactionalObject ref, int lockMode);
 
     public abstract void addWatch(BetaTransactionalObject object, Watch watch);
 

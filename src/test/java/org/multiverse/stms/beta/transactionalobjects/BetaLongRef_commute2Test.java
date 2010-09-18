@@ -284,7 +284,7 @@ public class BetaLongRef_commute2Test {
         tx1.commit();
 
         assertIsCommitted(tx1);
-        assertEquals(11, ref1.___unsafeLoad().value);
-        assertEquals(12, ref2.___unsafeLoad().value);
+        assertEquals(11, ref1.atomicGet());
+        assertEquals(12, ref2.atomicGet());
     }
 }

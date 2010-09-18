@@ -144,7 +144,7 @@ public class BetaLongRef_getAndAlter2Test {
         long result = ref.getAndAlter(tx, function);
         tx.commit();
 
-        assertEquals(101, ref.___unsafeLoad().value);
+        assertEquals(101, ref.atomicGet());
         assertEquals(100, result);
     }
 }

@@ -207,7 +207,7 @@ public class BetaLongRef_set1Test {
     }
 
     @Test
-    public void whenEnsuredByother_thenSetPossibleButCommitFails() {
+    public void whenEnsuredByOther_thenSetPossibleButCommitFails() {
         BetaLongRef ref = newLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
 

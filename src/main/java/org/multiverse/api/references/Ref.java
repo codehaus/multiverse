@@ -11,59 +11,6 @@ import org.multiverse.api.functions.Function;
  */
 public interface Ref<E> extends TransactionalObject {
 
-    /**
-     * Ensures that when this ref is read in a transaction, no other transaction is able to write to this
-     * reference. Once it is ensured, it is guaranteed to commit (unless the transaction aborts otherwise).
-     * <p/>
-     * This call expects a running transaction.
-     * <p/>
-     * This call is pessimistic.
-     *
-     * @throws IllegalStateException
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     */
-    void ensure();
-
-    /**
-     * Ensures that when this ref is read in a transaction, no other transaction is able to write to this
-     * reference. Once it is ensured, it is guaranteed to commit (unless the transaction aborts otherwise).
-     * <p/>
-     * This call expects a running transaction.
-     * <p/>
-     * This call is pessimistic.
-     *
-     * @param tx the Transaction used for this operation.
-     * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is
-     *                              not in the correct state for this operation.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     */
-    void ensure(Transaction tx);
-
-    void privatize();
-
-    void privatize(Transaction tx);
-
-    boolean tryPrivatize();
-
-    boolean tryPrivatize(Transaction tx);
-
-    boolean tryEnsure();
-
-    boolean tryEnsure(Transaction tx);
-
-    /**
-     *
-     */
-    void ensureOptimistic();
-
-    /**
-     * @param tx
-     */
-    void ensureOptimistic(Transaction tx);
 
     /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function

@@ -48,7 +48,7 @@ public class WriteSkewTest {
         otherTx.commit();
 
         tx.commit();
-        assertEquals(1, ref1.___unsafeLoad().value);
+        assertEquals(1, ref1.atomicGet());
     }
 
     @Test
@@ -71,7 +71,7 @@ public class WriteSkewTest {
         otherTx.commit();
 
         tx.commit();
-        assertEquals(1, ref1.___unsafeLoad().value);
+        assertEquals(1, ref1.atomicGet());
     }
 
     @Test

@@ -99,7 +99,7 @@ public class MultipleReadsRetryStressTest {
     private long sumRefs() {
         long result = 0;
         for (BetaLongRef ref : refs) {
-            result += ref.___unsafeLoad().value;
+            result += ref.atomicGet();
         }
         return result;
     }

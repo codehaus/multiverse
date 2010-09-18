@@ -1,5 +1,6 @@
 package org.multiverse.stms.beta.exampletransactionalobjects;
 
+import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.Function;
 import org.multiverse.stms.beta.BetaObjectPool;
@@ -12,6 +13,56 @@ public class LinkedList<E> extends AbstractBetaTransactionalObject{
 
     public LinkedList(BetaTransaction tx) {
         super(tx);
+    }
+
+    @Override
+    public void ensure() {
+        throw new TodoException();
+    }
+
+    @Override
+    public void ensure(Transaction tx) {
+        throw new TodoException();
+    }
+
+    @Override
+    public void privatize() {
+        throw new TodoException();
+    }
+
+    @Override
+    public void privatize(Transaction tx) {
+        throw new TodoException();
+    }
+
+    @Override
+    public boolean tryPrivatize() {
+        throw new TodoException();
+    }
+
+    @Override
+    public boolean tryPrivatize(Transaction tx) {
+        throw new TodoException();
+    }
+
+    @Override
+    public boolean tryEnsure() {
+        throw new TodoException();
+    }
+
+    @Override
+    public boolean tryEnsure(Transaction tx) {
+        throw new TodoException();
+    }
+
+    @Override
+    public void ensureOptimistic() {
+        throw new TodoException();
+    }
+
+    @Override
+    public void ensureOptimistic(Transaction tx) {
+        throw new TodoException();
     }
 
     public E removeFromFront(BetaTransaction tx) {
@@ -198,6 +249,56 @@ class LinkedListNode<E> extends AbstractBetaTransactionalObject{
         LinkedListNodeTranlocal<E> tranlocal = new LinkedListNodeTranlocal<E>(this);
         tranlocal.isCommuting = true;
         return tranlocal;
+    }
+
+    @Override
+    public void ensure() {
+        throw new TodoException();
+    }
+
+    @Override
+    public void ensure(Transaction tx) {
+        throw new TodoException();
+    }
+
+    @Override
+    public void privatize() {
+        throw new TodoException();
+    }
+
+    @Override
+    public void privatize(Transaction tx) {
+        throw new TodoException();
+    }
+
+    @Override
+    public boolean tryPrivatize() {
+        throw new TodoException();
+    }
+
+    @Override
+    public boolean tryPrivatize(Transaction tx) {
+        throw new TodoException();
+    }
+
+    @Override
+    public boolean tryEnsure() {
+        throw new TodoException();
+    }
+
+    @Override
+    public boolean tryEnsure(Transaction tx) {
+        throw new TodoException();
+    }
+
+    @Override
+    public void ensureOptimistic() {
+        throw new TodoException();
+    }
+
+    @Override
+    public void ensureOptimistic(Transaction tx) {
+        throw new TodoException();
     }
 }
 

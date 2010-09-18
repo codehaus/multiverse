@@ -47,6 +47,10 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     }
 #end
 
+    public final boolean tryLock(BetaTransactionalObject ref, int lockMode){
+        throw new TodoException();
+    }
+    
 #foreach($ref in $transactionalObjects)
 
 #if(!${transaction.lean})

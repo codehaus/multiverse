@@ -98,7 +98,7 @@ public class MoneyTransferStressTest {
     private long getTotal() {
         long sum = 0;
         for (BetaLongRef account : accounts) {
-            sum += account.___unsafeLoad().value;
+            sum += account.atomicGet();
         }
         return sum;
     }

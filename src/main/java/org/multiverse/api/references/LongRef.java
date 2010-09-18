@@ -12,51 +12,7 @@ import org.multiverse.api.functions.LongFunction;
  * @see org.multiverse.api.references.Ref
  */
 public interface LongRef extends TransactionalObject {
-
-    /**
-     * Ensures that when this ref is read in a transaction, no other transaction is able to write to this
-     * reference. Once it is ensured, it is guaranteed to commit (unless the transaction aborts otherwise).
-     * <p/>
-     * This call expects a running transaction.
-     *
-     * @throws IllegalStateException
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     */
-    void ensure();
-
-    /**
-     * Ensures that when this ref is read in a transaction, no other transaction is able to write to this
-     * reference. Once it is ensured, it is guaranteed to commit (unless the transaction aborts otherwise).
-     * <p/>
-     * This call expects a running transaction.
-     *
-     * @param tx the Transaction used for this operation.
-     * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is
-     *                              not in the correct state for this operation.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     */
-    void ensure(Transaction tx);
-
-    boolean tryEnsure();
-
-    boolean tryEnsure(Transaction tx);
-
-    void ensureOptimistic();
-
-    void ensureOptimistic(Transaction tx);
-
-    void privatize();
-
-    void privatize(Transaction tx);
-
-    boolean tryPrivatize();
-
-    boolean tryPrivatize(Transaction tx);
-
+  
     /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
      * will commute. If somehow there already is a dependency or a dependency is formed on the result of
@@ -208,6 +164,8 @@ public interface LongRef extends TransactionalObject {
     /**
      * Alters the value stored in this Ref using the alterAndGet function.
      *
+     * No dirty check is done, so a write will always be done.O
+     *
      * @param function the function that alters the value stored in this Ref.
      * @param tx       the Transaction used by this operation.
      * @return the new value.
@@ -224,6 +182,8 @@ public interface LongRef extends TransactionalObject {
      * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
      * any running transactions.
      *
+     * No dirty check is done, so a write will always be done.
+     *
      * @param function the Function responsible to alterAndGet the function.
      * @return the old value.
      * @throws NullPointerException if function is null.
@@ -235,6 +195,8 @@ public interface LongRef extends TransactionalObject {
     /**
      * Alters the value stored in this Ref using the alterAndGet function. If a transaction is available it will
      * lift on that transaction, else it will be run under its own transaction.
+     *
+     * No dirty check is done, so a write will always be done.
      *
      * @param function the function that alters the value stored in this Ref.
      * @return the old value.

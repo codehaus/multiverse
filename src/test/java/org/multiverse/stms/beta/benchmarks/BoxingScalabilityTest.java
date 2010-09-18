@@ -161,7 +161,7 @@ public class BoxingScalabilityTest {
                 tx.hardReset();
             }
 
-            assertEquals(transactionCount, ref.___unsafeLoad().value);
+            assertEquals(transactionCount, ref.atomicGet());
 
             durationMs = System.currentTimeMillis() - startMs;
             System.out.printf("Multiverse> %s is finished in %s ms\n", getName(), durationMs);
@@ -192,7 +192,7 @@ public class BoxingScalabilityTest {
                 tx.hardReset();
             }
 
-            assertEquals(transactionCount, (long) ref.___unsafeLoad().value);
+            assertEquals(transactionCount, (long) ref.atomicGet());
 
             durationMs = System.currentTimeMillis() - startMs;
             System.out.printf("Multiverse> %s is finished in %s ms\n", getName(), durationMs);

@@ -1,0 +1,31 @@
+package org.multiverse.api.predicates;
+
+/**
+ * A predicate that checks if some value leads to true or false.
+ *
+ * @author Peter Veentjer.
+ */
+public interface ${transactionalObject.predicateClass}${transactionalObject.typeParameter}{
+
+#if(${transactionalObject.referenceInterface} eq 'Ref')
+    ${transactionalObject.predicateClass} IS_NOT_NULL_PREDICATE = new ${transactionalObject.predicateClass}(){
+        public boolean evaluate(Object value){
+            return value != null;
+        }
+    };
+
+    ${transactionalObject.predicateClass} IS_NULL_PREDICATE = new ${transactionalObject.predicateClass}(){
+        public boolean evaluate(Object value){
+            return value == null;
+        }
+    };
+
+#end
+    /**
+     * Evaluates the predicate.
+     *
+     * @param value the value to evaluate.
+     * @return true or false.
+     */
+    boolean evaluate(${transactionalObject.type} value);
+}

@@ -120,7 +120,7 @@ public class UncontendedLeanUpdateScalabilityTest {
                 //}
             }
 
-            assertEquals(transactionCount, ref.___unsafeLoad().value);
+            assertEquals(transactionCount, ref.atomicGet());
 
             durationMs = System.currentTimeMillis() - startMs;
             System.out.printf("Multiverse> %s is finished in %s ms\n", getName(), durationMs);

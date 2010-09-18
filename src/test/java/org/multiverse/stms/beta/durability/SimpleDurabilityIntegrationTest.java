@@ -44,7 +44,7 @@ public class SimpleDurabilityIntegrationTest {
         storage.clearEntities();
 
         BetaLongRef loaded = (BetaLongRef) storage.loadDurableObject(ref.___getStorageId());
-        assertEquals(100, loaded.___unsafeLoad().value);
+        assertEquals(100, loaded.atomicGet());
     }
 
 
@@ -70,7 +70,7 @@ public class SimpleDurabilityIntegrationTest {
         write2.commit();
 
         BetaLongRef loaded2 = (BetaLongRef) storage.loadDurableObject(loaded.___getStorageId());
-        assertEquals(101, loaded2.___unsafeLoad().value);
+        assertEquals(101, loaded2.atomicGet());
     }
 
     @Test
@@ -89,9 +89,9 @@ public class SimpleDurabilityIntegrationTest {
         storage.clearEntities();
 
         BetaLongRef loaded1 = (BetaLongRef) storage.loadDurableObject(ref1.___getStorageId());
-        assertEquals(100, loaded1.___unsafeLoad().value);
+        assertEquals(100, loaded1.atomicGet());
         BetaLongRef loaded2 = (BetaLongRef) storage.loadDurableObject(ref2.___getStorageId());
-        assertEquals(200, loaded2.___unsafeLoad().value);
+        assertEquals(200, loaded2.atomicGet());
     }
 
 

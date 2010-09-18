@@ -81,7 +81,7 @@ public class IsolationStressTest {
         System.out.printf("Performance:       %s transactions/second\n",
                 transactionsPerSecondAsString(transactionsPerThread, totalDurationMs, threadCount));
 
-        assertEquals(threadCount * transactionsPerThread, ref.___unsafeLoad().value);
+        assertEquals(threadCount * transactionsPerThread, ref.atomicGet());
         System.out.println("ref.orec: " + ref.___toOrecString());
     }
 

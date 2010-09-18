@@ -56,7 +56,7 @@ public class CommuteStressTest {
     public long count(BetaLongRef[] refs) {
         long result = 0;
         for (BetaLongRef ref : refs) {
-            result += ref.___unsafeLoad().value;
+            result += ref.atomicGet();
         }
         return result;
     }

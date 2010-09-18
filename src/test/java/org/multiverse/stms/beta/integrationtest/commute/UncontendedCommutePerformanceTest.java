@@ -39,7 +39,7 @@ public class UncontendedCommutePerformanceTest {
         stop = true;
         joinAll(thread);
 
-        long transactionCount = ref.___unsafeLoad().value;
+        long transactionCount = ref.atomicGet();
         String performance = transactionsPerSecondAsString(transactionCount, durationMs);
         System.out.println(performance + " Transactions/second");
     }
@@ -54,7 +54,7 @@ public class UncontendedCommutePerformanceTest {
         stop = true;
         joinAll(thread);
 
-        long transactionCount = ref.___unsafeLoad().value;
+        long transactionCount = ref.atomicGet();
         String performance = transactionsPerSecondAsString(transactionCount, durationMs);
         System.out.println(performance + " Transactions/second");
     }

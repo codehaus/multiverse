@@ -713,6 +713,34 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
     @Override
+    public final boolean tryEnsure(){
+         throw new TodoException();
+    }
+
+    @Override
+    public final boolean tryEnsure(final Transaction tx){
+        return tryEnsure((BetaTransaction)tx);
+    }
+
+    public final boolean tryEnsure(BetaTransaction tx){
+        return tx.tryLock(this, LOCKMODE_UPDATE);
+    }
+
+    @Override
+    public final void ensureOptimistic(){
+        throw new TodoException();
+    }
+
+    @Override
+    public final void ensureOptimistic(final Transaction tx){
+        ensureOptimistic((BetaTransaction)tx);
+    }
+
+    public final void ensureOptimistic(final BetaTransaction tx){
+        throw new TodoException();
+    }
+
+    @Override
     public final void privatize(){
         Transaction tx = getThreadLocalTransaction();
 
@@ -750,35 +778,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
     
     public final boolean tryPrivatize(BetaTransaction tx){
-        throw new TodoException();
-    }
-
-    @Override
-    public final boolean tryEnsure(){
-        throw new TodoException();
-    }
-
-    @Override
-    public final boolean tryEnsure(final Transaction tx){
-        return tryEnsure((BetaTransaction)tx);
-    }
-
-    public final boolean tryEnsure(BetaTransaction tx){
-        throw new TodoException();    
-    }
-
-    @Override
-    public final void ensureOptimistic(){
-        throw new TodoException();
-    }
-
-    @Override
-    public final void ensureOptimistic(final Transaction tx){
-        ensureOptimistic((BetaTransaction)tx);
-    }
-
-    public final void ensureOptimistic(final BetaTransaction tx){
-        throw new TodoException();
+        return tx.tryLock(this, LOCKMODE_COMMIT);
     }
 
     @Override
@@ -1221,6 +1221,28 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
 #end
+
+    /*
+    boolean isFree();
+
+    boolean isFree(Transaction tx);
+
+    boolean isPrivatizedBySelf();
+
+    boolean isPrivatizedBySelf(Transaction tx);
+
+    boolean isPrivatizedByOther();
+
+    boolean isPrivatizedByOther(Transaction tx);
+
+    boolean isEnsuredBySelf();
+
+    boolean isEnsuredBySelf(Transaction tx);
+
+    boolean isEnsuredByOther();
+
+    boolean isEnsuredByOther(Transaction tx);
+    */
     private int ___arriveAndLockOrBackoff(){
         for(int k=0;k<=___stm.defaultMaxRetries;k++){
             final int arriveStatus = ___tryLockAndArrive(___stm.spinCount, true);

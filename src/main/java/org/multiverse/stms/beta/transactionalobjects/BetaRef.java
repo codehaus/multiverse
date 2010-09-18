@@ -600,6 +600,34 @@ public final class BetaRef<E>
     }
 
     @Override
+    public final boolean tryEnsure(){
+         throw new TodoException();
+    }
+
+    @Override
+    public final boolean tryEnsure(final Transaction tx){
+        return tryEnsure((BetaTransaction)tx);
+    }
+
+    public final boolean tryEnsure(BetaTransaction tx){
+        return tx.tryLock(this, LOCKMODE_UPDATE);
+    }
+
+    @Override
+    public final void ensureOptimistic(){
+        throw new TodoException();
+    }
+
+    @Override
+    public final void ensureOptimistic(final Transaction tx){
+        ensureOptimistic((BetaTransaction)tx);
+    }
+
+    public final void ensureOptimistic(final BetaTransaction tx){
+        throw new TodoException();
+    }
+
+    @Override
     public final void privatize(){
         Transaction tx = getThreadLocalTransaction();
 
@@ -637,35 +665,7 @@ public final class BetaRef<E>
     }
     
     public final boolean tryPrivatize(BetaTransaction tx){
-        throw new TodoException();
-    }
-
-    @Override
-    public final boolean tryEnsure(){
-        throw new TodoException();
-    }
-
-    @Override
-    public final boolean tryEnsure(final Transaction tx){
-        return tryEnsure((BetaTransaction)tx);
-    }
-
-    public final boolean tryEnsure(BetaTransaction tx){
-        throw new TodoException();    
-    }
-
-    @Override
-    public final void ensureOptimistic(){
-        throw new TodoException();
-    }
-
-    @Override
-    public final void ensureOptimistic(final Transaction tx){
-        ensureOptimistic((BetaTransaction)tx);
-    }
-
-    public final void ensureOptimistic(final BetaTransaction tx){
-        throw new TodoException();
+        return tx.tryLock(this, LOCKMODE_COMMIT);
     }
 
     @Override

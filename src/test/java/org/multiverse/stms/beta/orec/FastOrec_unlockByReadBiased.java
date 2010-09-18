@@ -1,5 +1,6 @@
 package org.multiverse.stms.beta.orec;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
@@ -21,18 +22,20 @@ public class FastOrec_unlockByReadBiased {
     }
 
     @Test
+    @Ignore
     public void whenSurplusAndUpdateBiasedAndLocked_thenPanicError(){
 
     }
 
     @Test
+    @Ignore
     public void whenNoSurplusAndReadBiasedAndUnlocked_thenPanicError(){
 
     }
 
     @Test
+    @Ignore
     public void whenNoSurplusAndUpdateBiasedAndUnlocked_thenPanicError(){
 
     }
-
 }

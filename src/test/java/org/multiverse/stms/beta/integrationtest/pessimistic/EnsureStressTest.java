@@ -6,7 +6,7 @@ import org.multiverse.stms.beta.BetaStm;
 
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class PessimisticStressTest {
+public class EnsureStressTest {
     private BetaStm stm;
 
     public void setUp(){

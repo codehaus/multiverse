@@ -84,7 +84,7 @@ public class PingPongStressTest {
         System.out.println("Waiting for joining threads");
         joinAll(threads);
 
-        assertEquals(sum(threads), -ref.___unsafeLoad().value);
+        assertEquals(sum(threads), -ref.atomicGet());
     }
 
     private PingPongThread[] createThreads(AtomicBlock block, int threadCount) {

@@ -43,6 +43,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         return localConflictCounter;
     }
 
+    public final boolean tryLock(BetaTransactionalObject ref, int lockMode){
+        throw new TodoException();
+    }
+    
 
     private <E> void flattenCommute(
         final BetaRef<E> ref,

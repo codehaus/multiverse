@@ -47,7 +47,7 @@ public class FailureAtomicityStressTest {
         joinAll(modifyThreads);
         //since half of the transactions are going to be aborted we need to divide it by 2
 
-        assertEquals(sum(modifyThreads), ref.___unsafeLoad().value);
+        assertEquals(sum(modifyThreads), ref.atomicGet());
     }
 
     public long sum(ModifyThread[] threads) {

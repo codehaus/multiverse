@@ -37,7 +37,8 @@ class TransactionalObject {
   String functionClass//the class of the callable used for commuting operations
   boolean isReference
   String referenceInterface
-  boolean isNumber;
+  boolean isNumber
+  String predicateClass
 }
 
 VelocityEngine engine = new VelocityEngine();
@@ -99,6 +100,7 @@ generateArrayTreeTransaction(engine, refs, fatArrayTreeTransaction)
 for (def param in refs) {
   generateTranlocal(engine, param)
   generateTransactionalObject(engine, param)
+  generatePredicate(engine, param)
 }
 
 def abstractTransactionalObject = new TransactionalObject(
@@ -130,6 +132,7 @@ generateStmUtils(engine, atomicClosures)
 for (def atomicBlock in atomicBlocks) {
   generateBetaAtomicBlock(engine, atomicBlock, atomicClosures)
 }
+
 
 List<AtomicClosure> createClosures() {
   def result = []
@@ -180,7 +183,8 @@ List<TransactionalObject> createTransactionalObjects() {
           accessModifier: 'final',
           functionClass: 'Function',
           isReference: true,
-          isNumber: false)
+          isNumber: false,
+          predicateClass: "Predicate")
   result.add new TransactionalObject(
           name: 'BetaIntRef',
           tranlocal: 'IntRefTranlocal',
@@ -193,7 +197,8 @@ List<TransactionalObject> createTransactionalObjects() {
           accessModifier: 'final',
           functionClass: 'IntFunction',
           isReference: true,
-          isNumber: true)
+          isNumber: true,
+          predicateClass: "IntPredicate")
   result.add new TransactionalObject(
           name: 'BetaBooleanRef',
           tranlocal: 'BooleanRefTranlocal',
@@ -206,7 +211,8 @@ List<TransactionalObject> createTransactionalObjects() {
           accessModifier: 'final',
           functionClass: 'BooleanFunction',
           isReference: true,
-          isNumber: false)
+          isNumber: false,
+          predicateClass: "BooleanPredicate")
    result.add new TransactionalObject(
           name: 'BetaDoubleRef',
           tranlocal: 'DoubleRefTranlocal',
@@ -219,7 +225,8 @@ List<TransactionalObject> createTransactionalObjects() {
           accessModifier: '',
           functionClass: 'DoubleFunction',
           isReference: true,
-          isNumber: true)
+          isNumber: true,
+          predicateClass: "DoublePredicate")
   result.add new TransactionalObject(
           name: 'BetaLongRef',
           tranlocal: 'LongRefTranlocal',
@@ -231,7 +238,8 @@ List<TransactionalObject> createTransactionalObjects() {
           accessModifier: 'final',
           functionClass: 'LongFunction',
           isReference: true,
-          isNumber: true)
+          isNumber: true,
+          predicateClass: "LongPredicate")
   result.add new TransactionalObject(
           name: 'BetaTransactionalObject',
           tranlocal: 'Tranlocal',
@@ -243,7 +251,8 @@ List<TransactionalObject> createTransactionalObjects() {
           functionClass: 'Function',
           referenceInterface: '',
           isReference: false,
-          isNumber: false)
+          isNumber: false,
+          predicateClass: "")
   result
 }
 
@@ -410,6 +419,25 @@ void generateTranlocal(VelocityEngine engine, TransactionalObject transactionalO
   file.createNewFile()
   file.text = writer.toString()
 }
+
+void generatePredicate(VelocityEngine engine, TransactionalObject transactionalObject) {
+  if (!transactionalObject.isReference) {
+    return
+  }
+
+  Template t = engine.getTemplate('src/main/java/org/multiverse/api/predicates/Predicate.vm')
+
+  VelocityContext context = new VelocityContext()
+  context.put("transactionalObject", transactionalObject)
+
+  StringWriter writer = new StringWriter()
+  t.merge(context, writer)
+
+  File file = new File('src/main/java/org/multiverse/api/predicates/', "${transactionalObject.predicateClass}.java")
+  file.createNewFile()
+  file.text = writer.toString()
+}
+
 
 void generateTransactionalObject(VelocityEngine engine, TransactionalObject transactionalObject) {
   if (!transactionalObject.isReference && !transactionalObject.name.equals("AbstractBetaTransactionalObject")) {

@@ -55,6 +55,10 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         return (size * 1.0f)/array.length;
     }
 
+    public final boolean tryLock(BetaTransactionalObject ref, int lockMode){
+        throw new TodoException();
+    }
+
 #foreach($ref in $transactionalObjects)
 #if(!${transaction.lean})
     private ${ref.typeParameter} void flattenCommute(

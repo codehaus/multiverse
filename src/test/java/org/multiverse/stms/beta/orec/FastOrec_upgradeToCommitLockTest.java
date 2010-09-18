@@ -77,7 +77,6 @@ public class FastOrec_upgradeToCommitLockTest {
             orec.___upgradeToCommitLock();
             fail();
         } catch (PanicError expected) {
-
         }
 
         assertHasNoUpdateLock(orec);
@@ -95,7 +94,6 @@ public class FastOrec_upgradeToCommitLockTest {
             orec.___upgradeToCommitLock();
             fail();
         } catch (PanicError expected) {
-
         }
 
         assertHasNoUpdateLock(orec);

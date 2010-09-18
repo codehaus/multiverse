@@ -197,37 +197,13 @@ public final class BetaStm implements Stm {
         }
 
         @Override
-        public BetaIntRefArray newIntRefArray(int length) {
-            if (length < 0) {
-                throw new IllegalArgumentException();
-            }
-            throw new TodoException();
-        }
-
-        @Override
         public BetaLongRef newLongRef(long value) {
             return new BetaLongRef(BetaStm.this, value);
         }
 
         @Override
-        public BetaLongRefArray newLongRefArray(int length) {
-            if (length < 0) {
-                throw new IllegalArgumentException();
-            }
-            throw new TodoException();
-        }
-
-        @Override
         public <E> BetaRef<E> newRef(E value) {
             return new BetaRef<E>(BetaStm.this, value);
-        }
-
-        @Override
-        public <E> BetaRefArray<E> newRefArray(int length) {
-            if (length < 0) {
-                throw new IllegalArgumentException();
-            }
-            throw new TodoException();
         }
     }
 

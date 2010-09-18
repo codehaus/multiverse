@@ -32,29 +32,12 @@ public interface RefFactory {
     IntRef newIntRef(int value);
 
     /**
-     * Creates a IntRefArray.
-     *
-     * @param length the length of the array.
-     * @return the created IntRefArray.
-     * @throws IllegalArgumentException is size smaller than 0.
-     */
-    IntRefArray newIntRefArray(int length);
-
-    /**
      * Creates a committed BetaLongRef.
      *
      * @param value the initial value.
      * @return the created BetaLongRef.
      */
     LongRef newLongRef(long value);
-
-    /**
-     * Creates a LongRefArray.
-     *
-     * @param length the length of the array.
-     * @return the create LongRefArray.
-     */
-    LongRefArray newLongRefArray(int length);
 
     /**
      * Creates a committed BetaRef.
@@ -64,14 +47,4 @@ public interface RefFactory {
      * @return the created BetaRef.
      */
     <E> Ref<E> newRef(E value);
-
-    /**
-     * Creates a RefArray.
-     *
-     * @param length the array.
-     * @param <E>    the type of the elements in the array.
-     * @return the created RefArray.
-     * @throws IllegalArgumentException if length smaller than 0.
-     */
-    <E> RefArray<E> newRefArray(int length);
 }

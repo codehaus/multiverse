@@ -12,26 +12,6 @@ import org.multiverse.api.functions.Function;
 public interface Ref<E> extends TransactionalObject {
 
     /**
-     * Ensures that when this ref is read in a transaction, no other transaction is able to write to this
-     * reference. This call expects a running transaction.
-     *
-     * @throws IllegalStateException
-     */
-    void ensure();
-
-    /**
-     * Ensures that when this ref is read in a transaction, no other transaction is able to write to this
-     * reference. This call expects a running transaction.
-     *
-     * @param tx the Transaction used for this operation.
-     * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is
-     *                              not in the correct state for this operation.
-     */
-    void ensure(Transaction tx);
-
-    /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
      * will commute. If somehow there already is a dependency or a dependency is formed on the result of
      * the commuting function, the function will not commute and will be exactly the same as an alter.

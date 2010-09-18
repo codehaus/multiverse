@@ -43,7 +43,7 @@ public class BetaAtomicBlock_exceptionsTest {
             assertSame(ex, expected);
         }
 
-        assertEquals(10, ref.___unsafeLoad().value);
+        assertEquals(10, ref.atomicGet());
     }
 
     @Test
@@ -67,7 +67,7 @@ public class BetaAtomicBlock_exceptionsTest {
             assertSame(ex, expected);
         }
 
-        assertEquals(10, ref.___unsafeLoad().value);
+        assertEquals(10, ref.atomicGet());
     }
 
 
@@ -92,7 +92,7 @@ public class BetaAtomicBlock_exceptionsTest {
             assertSame(ex, expected);
         }
 
-        assertEquals(10, ref.___unsafeLoad().value);
+        assertEquals(10, ref.atomicGet());
     }
 
      @Test
@@ -116,7 +116,7 @@ public class BetaAtomicBlock_exceptionsTest {
             assertSame(ex, expected.getCause());
         }
 
-        assertEquals(10, ref.___unsafeLoad().value);
+        assertEquals(10, ref.atomicGet());
     }
 
     @Test
@@ -140,7 +140,7 @@ public class BetaAtomicBlock_exceptionsTest {
             assertSame(ex, expected);
         }
 
-        assertEquals(10, ref.___unsafeLoad().value);
+        assertEquals(10, ref.atomicGet());
     }
 
 
@@ -165,7 +165,7 @@ public class BetaAtomicBlock_exceptionsTest {
             assertSame(ex, expected);
         }
 
-        assertEquals(10, ref.___unsafeLoad().value);
+        assertEquals(10, ref.atomicGet());
     }
 
 

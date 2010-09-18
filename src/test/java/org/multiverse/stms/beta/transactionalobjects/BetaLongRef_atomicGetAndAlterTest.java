@@ -7,6 +7,7 @@ import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConfiguration;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
@@ -22,13 +23,16 @@ public class BetaLongRef_atomicGetAndAlterTest {
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        BetaStmConfiguration config = new BetaStmConfiguration();
+        config.maxRetries = 10;
+        stm = new BetaStm(config);
         clearThreadLocalTransaction();
     }
 
     @Test
     @Ignore
-    public void whenListenersAvailable(){}
+    public void whenListenersAvailable() {
+    }
 
     @Test
     public void whenSuccess() {
@@ -86,10 +90,10 @@ public class BetaLongRef_atomicGetAndAlterTest {
     }
 
     @Test
-    public void whenLocked() {
+    public void whenPrivatizedByOther_thenLockedException() {
         BetaLongRef ref = newLongRef(stm, 2);
         BetaTransaction tx = stm.startDefaultTransaction();
-        tx.openForRead(ref, true);
+        ref.privatize(tx);
 
         LongFunction function = mock(LongFunction.class);
         try {
@@ -100,7 +104,45 @@ public class BetaLongRef_atomicGetAndAlterTest {
         }
 
         verifyZeroInteractions(function);
+        assertHasUpdateLock(ref);
         assertHasCommitLock(ref);
+        assertSame(tx, ref.___getLockOwner());
+        assertUpdateBiased(ref);
+        assertSurplus(1, ref);
+    }
+
+    @Test
+    public void whenEnsuredByOtherAndNothingDirty() {
+        BetaLongRef ref = newLongRef(stm, 2);
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.ensure(tx);
+
+        long result = ref.atomicGetAndAlter(new IdentityLongFunction());
+
+        assertEquals(2, result);
+        assertHasNoUpdateLock(ref);
+        assertHasNoCommitLock(ref);
+        assertSurplus(0, ref);
+        assertUpdateBiased(ref);
+        assertReadonlyCount(1, ref);
+    }
+
+    @Test
+    public void whenEnsuredByOther_thenLockedException() {
+        BetaLongRef ref = newLongRef(stm, 2);
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.ensure(tx);
+
+        LongFunction function = mock(LongFunction.class);
+        try {
+            ref.atomicGetAndAlter(function);
+            fail();
+        } catch (LockedException expected) {
+        }
+
+        verifyZeroInteractions(function);
+        assertHasUpdateLock(ref);
+        assertHasNoCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertUpdateBiased(ref);
         assertSurplus(1, ref);

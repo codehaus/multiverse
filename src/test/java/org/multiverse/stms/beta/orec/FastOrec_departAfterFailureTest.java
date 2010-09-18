@@ -43,11 +43,11 @@ public class FastOrec_departAfterFailureTest {
     }
 
     @Test
-    public void whenUpdateBiasedAndSurplusAndLocked() {
+    public void whenUpdateBiasedAndSurplusAndLockedForCommit() {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1,true);
+        orec.___tryLockAfterNormalArrive(1, true);
 
         orec.___departAfterFailure();
 
@@ -59,11 +59,28 @@ public class FastOrec_departAfterFailureTest {
     }
 
     @Test
+    public void whenUpdateBiasedAndSurplusAndLockedForUpdate() {
+        FastOrec orec = new FastOrec();
+        orec.___arrive(1);
+        orec.___arrive(1);
+        orec.___tryLockAfterNormalArrive(1, false);
+
+        orec.___departAfterFailure();
+
+        assertSurplus(1, orec);
+        assertUpdateBiased(orec);
+        assertHasUpdateLock(orec);
+        assertHasNoCommitLock(orec);
+        assertReadonlyCount(0, orec);
+    }
+
+
+    @Test
     public void whenReadBiasedAndLocked_thenPanicError() {
         FastOrec orec = makeReadBiased(new FastOrec());
 
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1,true);
+        orec.___tryLockAfterNormalArrive(1, true);
 
         try {
             orec.___departAfterFailure();

@@ -19,17 +19,8 @@ public interface BetaRefFactory extends RefFactory {
     BetaIntRef newIntRef(int value);
 
     @Override
-    BetaIntRefArray newIntRefArray(int length);
-
-    @Override
     BetaLongRef newLongRef(long value);
 
     @Override
-    BetaLongRefArray newLongRefArray(int length);
-
-    @Override
     <E> BetaRef<E> newRef(E value);
-
-    @Override
-    <E> BetaRefArray<E> newRefArray(int length);
 }

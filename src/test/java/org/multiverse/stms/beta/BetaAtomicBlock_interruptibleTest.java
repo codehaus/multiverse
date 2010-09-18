@@ -50,7 +50,7 @@ public class BetaAtomicBlock_interruptibleTest {
         t.join();
 
         t.assertFailedWithException(InvisibleCheckedException.class);
-        assertEquals(0, ref.___unsafeLoad().value);
+        assertEquals(0, ref.atomicGet());
     }
 
     @Test
@@ -74,7 +74,7 @@ public class BetaAtomicBlock_interruptibleTest {
         t.join();
 
         t.assertFailedWithException(InvisibleCheckedException.class);
-        assertEquals(0, ref.___unsafeLoad().value);
+        assertEquals(0, ref.atomicGet());
     }
 
 

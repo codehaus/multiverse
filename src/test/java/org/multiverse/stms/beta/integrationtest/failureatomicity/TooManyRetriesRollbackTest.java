@@ -45,7 +45,7 @@ public class TooManyRetriesRollbackTest {
         }
 
         finished = true;
-        assertEquals(0, modifyRef.___unsafeLoad().value);
+        assertEquals(0, modifyRef.atomicGet());
         joinAll(notifyThread);
     }
 

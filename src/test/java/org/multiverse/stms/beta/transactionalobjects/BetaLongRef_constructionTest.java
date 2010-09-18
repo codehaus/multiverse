@@ -34,7 +34,7 @@ public class BetaLongRef_constructionTest implements BetaStmConstants {
         assertTrue(ref2.___unsafeLoad().isCommitted);
         assertFalse(ref2.___unsafeLoad().isCommuting);
         assertEquals(DIRTY_FALSE, ref2.___unsafeLoad().isDirty);
-        assertEquals(0, ref2.___unsafeLoad().value);
+        assertEquals(0, ref2.atomicGet());
     }
 
     @Test
@@ -52,7 +52,7 @@ public class BetaLongRef_constructionTest implements BetaStmConstants {
         assertTrue(ref2.___unsafeLoad().isCommitted);
         assertFalse(ref2.___unsafeLoad().isCommuting);
         assertEquals(DIRTY_FALSE, ref2.___unsafeLoad().isDirty);
-        assertEquals(10, ref2.___unsafeLoad().value);
+        assertEquals(10, ref2.atomicGet());
     }
 
     @Test

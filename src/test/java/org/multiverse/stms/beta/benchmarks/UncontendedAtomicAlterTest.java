@@ -104,7 +104,7 @@ public class UncontendedAtomicAlterTest {
                 ref.atomicAlterAndGet(function);
             }
 
-            assertEquals(transactionCount, ref.___unsafeLoad().value + 1);
+            assertEquals(transactionCount, ref.atomicGet() + 1);
 
             durationMs = System.currentTimeMillis() - startMs;
             System.out.printf("Multiverse> %s is finished in %s ms\n", getName(), durationMs);

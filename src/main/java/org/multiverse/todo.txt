@@ -202,7 +202,13 @@ and not allowed. So not throw the retry error immediately..
 
 - yield and spinning.
 
+- a reference that always causes a privatization.
+
 done
+
+- isolation test that is primary read biased.
+
+- predicates are now generated.
 
 - tryLockAndCheck conflict needs to make use of lockLevel
 

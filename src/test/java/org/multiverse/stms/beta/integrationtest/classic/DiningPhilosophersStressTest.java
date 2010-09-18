@@ -64,7 +64,7 @@ public class DiningPhilosophersStressTest {
 
     public void assertAllForksHaveReturned() {
         for (BetaIntRef fork : forks) {
-            assertEquals(0, fork.___unsafeLoad().value);
+            assertEquals(0, fork.atomicGet());
         }
     }
 

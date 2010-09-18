@@ -55,7 +55,7 @@ public class BetaAtomicBlock_integrationTest {
             }
         });
 
-        assertEquals(1, ref.___unsafeLoad().value);
+        assertEquals(1, ref.atomicGet());
     }
 
     @Test
@@ -99,6 +99,6 @@ public class BetaAtomicBlock_integrationTest {
             }
         });
 
-        assertEquals(10, ref.___unsafeLoad().value);
+        assertEquals(10, ref.atomicGet());
     }
 }

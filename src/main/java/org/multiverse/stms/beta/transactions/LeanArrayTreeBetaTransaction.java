@@ -51,6 +51,10 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         return (size * 1.0f)/array.length;
     }
 
+    public final boolean tryLock(BetaTransactionalObject ref, int lockMode){
+        throw new TodoException();
+    }
+
     @Override
     public <E> RefTranlocal<E> openForRead(
         final BetaRef<E> ref, int lockMode) {

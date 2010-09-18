@@ -135,7 +135,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
 
         assertEquals(10, result);
         assertNull(getThreadLocalTransaction());
-        assertEquals(1, ref.___unsafeLoad().value);
+        assertEquals(1, ref.atomicGet());
     }
 
     @Test
@@ -165,7 +165,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
         assertSame(existingTx, getThreadLocalTransaction());
         assertIsActive(existingTx);
         //since the value hasn't committed yet, it still is zero (the value before the transaction began).
-        assertEquals(0, ref.___unsafeLoad().value);
+        assertEquals(0, ref.atomicGet());
     }
 
     @Test
@@ -189,7 +189,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
         int result = block.execute(closure);
 
         assertEquals(10, result);
-        assertEquals(1, ref.___unsafeLoad().value);
+        assertEquals(1, ref.atomicGet());
         assertNull(getThreadLocalTransaction());
     }
 
@@ -218,7 +218,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
         int result = block.execute(closure);
 
         assertEquals(1, result);
-        assertEquals(11, ref.___unsafeLoad().value);
+        assertEquals(11, ref.atomicGet());
         assertSame(otherTx, getThreadLocalTransaction());
         assertIsActive(otherTx);
     }

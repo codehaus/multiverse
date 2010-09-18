@@ -42,6 +42,10 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         return localConflictCounter;
     }
 
+    public final boolean tryLock(BetaTransactionalObject ref, int lockMode){
+        throw new TodoException();
+    }
+
 
     @Override
     public <E> RefTranlocal<E> openForRead(
