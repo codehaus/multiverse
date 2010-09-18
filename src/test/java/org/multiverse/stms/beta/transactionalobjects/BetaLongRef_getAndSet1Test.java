@@ -163,7 +163,6 @@ public class BetaLongRef_getAndSet1Test {
             tx.commit();
             fail();
         } catch (WriteConflict expected) {
-
         }
 
         assertIsAborted(tx);
@@ -177,7 +176,7 @@ public class BetaLongRef_getAndSet1Test {
     }
 
     @Test
-    public void whenPrivatizedByOther() {
+    public void whenPrivatizedByOther_thenReadConflict() {
         BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
@@ -185,13 +184,12 @@ public class BetaLongRef_getAndSet1Test {
         setThreadLocalTransaction(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-
         ref.privatize(otherTx);
 
         try {
             ref.getAndSet(20);
+            fail();
         } catch (ReadConflict expected) {
-
         }
 
         assertIsAborted(tx);
