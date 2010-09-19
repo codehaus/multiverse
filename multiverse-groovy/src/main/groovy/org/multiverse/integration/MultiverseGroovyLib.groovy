@@ -11,7 +11,7 @@ import org.multiverse.api.StmUtils;
 public class MultiverseGroovyLibrary {
 
 
-  public static void atomic(Map configuration, Closure block) {
+  static atomic(Map configuration = [:], Closure block) {
     TransactionFactory txFactory = build_transaction_factory_with(configuration)
 
     new TransactionTemplate(txFactory) {
@@ -24,11 +24,7 @@ public class MultiverseGroovyLibrary {
 
   }
 
-  public static void atomic(Closure block) {
-    atomic([:], block)
-  }
-
-  public static void orElseTransaction(Map configuration, Closure either, Closure or) {
+  static void orElseTransaction(Map configuration, Closure either, Closure or) {
     TransactionFactory txFactory = build_transaction_factory_with(configuration)
     Transaction transaction = txFactory.create()
 
@@ -47,7 +43,7 @@ public class MultiverseGroovyLibrary {
     }.execute()
   }
 
-  public static void retry() {
+  static void retry() {
     StmUtils.retry();
   }
 
