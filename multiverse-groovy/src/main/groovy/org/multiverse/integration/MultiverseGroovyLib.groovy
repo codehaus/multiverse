@@ -6,7 +6,7 @@ import org.multiverse.templates.TransactionTemplate
 import org.multiverse.api.GlobalStmInstance
 import org.multiverse.templates.OrElseTemplate
 import static org.multiverse.api.ThreadLocalTransaction.*
-import static org.multiverse.api.StmUtils.*;
+import org.multiverse.api.StmUtils;
 
 public class MultiverseGroovyLibrary {
 
@@ -45,6 +45,10 @@ public class MultiverseGroovyLibrary {
         return null;
       }
     }.execute()
+  }
+
+  public static void retry() {
+    StmUtils.retry();
   }
 
   private static TransactionFactory build_transaction_factory_with(Map configuration) {

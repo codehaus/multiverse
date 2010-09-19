@@ -13,7 +13,6 @@ import org.multiverse.transactional.refs.LongRef
 import org.multiverse.api.exceptions.OldVersionNotFoundReadConflict
 
 import org.multiverse.api.exceptions.TooManyRetriesException
-import static org.multiverse.api.StmUtils.*
 import org.multiverse.api.exceptions.RetryTimeoutException
 
 public class MultiverseGroovyLibraryTest extends GroovyTestCase {
