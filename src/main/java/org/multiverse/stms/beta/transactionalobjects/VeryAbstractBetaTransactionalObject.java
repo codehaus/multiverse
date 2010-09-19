@@ -3,7 +3,6 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.NoTransactionFoundException;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.orec.FastOrec;
 import org.multiverse.stms.beta.orec.Orec;
@@ -15,7 +14,7 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
 
 public abstract class VeryAbstractBetaTransactionalObject
         extends FastOrec
-        implements BetaStmConstants, BetaTransactionalObject {
+        implements BetaTransactionalObject {
 
     protected final static long listenersOffset;
 

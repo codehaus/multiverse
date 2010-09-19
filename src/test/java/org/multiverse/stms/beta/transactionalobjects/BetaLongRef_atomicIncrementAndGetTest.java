@@ -3,21 +3,24 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConfiguration;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaLongRef_atomicIncrementAndGetTest {
     private BetaStm stm;
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        BetaStmConfiguration config = new BetaStmConfiguration();
+        config.maxRetries = 10;
+        stm = new BetaStm(config);
         clearThreadLocalTransaction();
     }
 
@@ -52,11 +55,6 @@ public class BetaLongRef_atomicIncrementAndGetTest {
     }
 
     @Test
-    @Ignore
-    public void whenListenersAvailable() {
-    }
-
-    @Test
     public void whenNoChange() {
         BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
@@ -73,8 +71,49 @@ public class BetaLongRef_atomicIncrementAndGetTest {
     }
 
     @Test
-    @Ignore
-    public void whenLocked() {
+    public void whenPrivatizedByOther_thenLockedException() {
+        BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.privatize(otherTx);
+
+        try {
+            ref.atomicIncrementAndGet(1);
+            fail();
+        } catch (LockedException expected) {
+        }
+
+        assertSurplus(1, ref);
+        assertHasCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+    }
+
+    @Test
+    public void whenEnsuredByOtherAndChange_thenLockedException() {
+        BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.ensure(otherTx);
+
+        try {
+            ref.atomicIncrementAndGet(1);
+            fail();
+        } catch (LockedException expected) {
+        }
+
+        assertSurplus(1, ref);
+        assertHasNoCommitLock(ref);
+        assertHasUpdateLock(ref);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+    }
+
+    @Test
+    @Ignore
+    public void whenListenersAvailable() {
     }
 }

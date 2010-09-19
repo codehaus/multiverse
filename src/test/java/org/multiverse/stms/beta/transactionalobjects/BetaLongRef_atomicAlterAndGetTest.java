@@ -3,27 +3,29 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConfiguration;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaLongRef_atomicAlterAndGetTest {
     private BetaStm stm;
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        BetaStmConfiguration config = new BetaStmConfiguration();
+        config.maxRetries = 10;
+        stm = new BetaStm(config);
         clearThreadLocalTransaction();
     }
 
@@ -80,12 +82,6 @@ public class BetaLongRef_atomicAlterAndGetTest {
     }
 
     @Test
-    @Ignore
-    public void whenListenersAvailable() {
-
-    }
-
-    @Test
     public void whenNoChange() {
         BetaLongRef ref = newLongRef(stm, 5);
         LongRefTranlocal committed = ref.___unsafeLoad();
@@ -119,12 +115,58 @@ public class BetaLongRef_atomicAlterAndGetTest {
         assertNull(ref.___getLockOwner());
         assertEquals(6, ref.atomicGet());
         assertIsActive(tx);
-        assertSame(tx,getThreadLocalTransaction());
+        assertSame(tx, getThreadLocalTransaction());
+    }
+
+    @Test
+    public void whenEnsuredByOther_thenLockedException() {
+        BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.ensure(otherTx);
+
+        LongFunction function = mock(LongFunction.class);
+        try {
+            ref.atomicAlterAndGet(function);
+            fail();
+        } catch (LockedException expected) {
+        }
+
+        verifyZeroInteractions(function);
+        assertSurplus(1, ref);
+        assertHasUpdateLock(ref);
+        assertHasNoCommitLock(ref);
+        assertUpdateBiased(ref);
+        assertSame(committed, ref.___unsafeLoad());
+    }
+
+    @Test
+    public void whenPrivatizedByOther() {
+         BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.privatize(otherTx);
+
+        LongFunction function = mock(LongFunction.class);
+        try {
+            ref.atomicAlterAndGet(function);
+            fail();
+        } catch (LockedException expected) {
+        }
+
+        verifyZeroInteractions(function);
+        assertSurplus(1, ref);
+        assertHasNoUpdateLock(ref);
+        assertHasCommitLock(ref);
+        assertUpdateBiased(ref);
+        assertSame(committed, ref.___unsafeLoad());
     }
 
     @Test
     @Ignore
-    public void whenLocked() {
+    public void whenListenersAvailable() {
 
     }
 

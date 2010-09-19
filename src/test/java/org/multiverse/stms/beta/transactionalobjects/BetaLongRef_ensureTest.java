@@ -83,7 +83,6 @@ public class BetaLongRef_ensureTest {
         assertSame(committed, ref.___unsafeLoad());
     }
 
-
     @Test
     public void whenCommittedTransactionProvided_thenDeadTransactionException() {
         BetaLongRef ref = newLongRef(stm);

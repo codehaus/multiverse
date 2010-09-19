@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -9,8 +10,7 @@ import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.BetaStmUtils.newReadBiasedLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertReadBiased;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUpdateBiased;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
  * @author Peter Veentjer
@@ -32,7 +32,7 @@ public class BetaLongRef_atomicGetTest {
     }
 
     @Test
-    public void whenActiveTransactionAvailable_thenIgnored(){
+    public void whenActiveTransactionAvailable_thenIgnored() {
         BetaLongRef ref = newLongRef(stm, 100);
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -54,20 +54,44 @@ public class BetaLongRef_atomicGetTest {
     }
 
     @Test
-    public void whenUpdateBiasedAndLocked_thenIllegalStateException() {
+    public void whenUpdateBiasedAndPrivatizedByOther_thenLockedException() {
         BetaLongRef ref = newLongRef(stm, 100);
-        BetaTransaction lockOwner = stm.startDefaultTransaction();
-        lockOwner.openForRead(ref, true);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.privatize(otherTx);
 
         try {
             ref.atomicGet();
             fail();
-        } catch (IllegalStateException ex) {
-
+        } catch (LockedException ex) {
         }
 
-        assertSame(lockOwner, ref.___getLockOwner());
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSurplus(1, ref);
         assertUpdateBiased(ref);
+        assertHasNoUpdateLock(ref);
+        assertHasCommitLock(ref);
+        assertSame(committed, ref.___unsafeLoad());
+    }
+
+    @Test
+    public void whenUpdateBiasedAndEnsuredByOther_thenLockedException() {
+        BetaLongRef ref = newLongRef(stm, 100);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.ensure(otherTx);
+
+        long result = ref.atomicGet();
+
+        assertEquals(100, result);
+        assertSurplus(1, ref);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertUpdateBiased(ref);
+        assertHasUpdateLock(ref);
+        assertHasNoCommitLock(ref);
+        assertSame(committed, ref.___unsafeLoad());
     }
 
     @Test
@@ -79,20 +103,44 @@ public class BetaLongRef_atomicGetTest {
         assertReadBiased(ref);
     }
 
-    @Test
-    public void whenReadBiasedAndLocked() {
-        BetaLongRef ref = newReadBiasedLongRef(stm, 100);
-        BetaTransaction lockOwner = stm.startDefaultTransaction();
-        lockOwner.openForRead(ref, true);
+      @Test
+    public void whenReadBiasedAndPrivatizedByOther_thenLockedException() {
+        BetaLongRef ref = makeReadBiased(newLongRef(stm, 100));
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.privatize(otherTx);
 
         try {
             ref.atomicGet();
             fail();
-        } catch (IllegalStateException expected) {
-
+        } catch (LockedException ex) {
         }
 
-        assertSame(lockOwner, ref.___getLockOwner());
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSurplus(1, ref);
         assertReadBiased(ref);
+        assertHasNoUpdateLock(ref);
+        assertHasCommitLock(ref);
+        assertSame(committed, ref.___unsafeLoad());
+    }
+
+    @Test
+    public void whenReadBiasedAndEnsuredByOther_thenLockedException() {
+        BetaLongRef ref = makeReadBiased(newLongRef(stm, 100));
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.ensure(otherTx);
+
+        long result = ref.atomicGet();
+
+        assertEquals(100, result);
+        assertSurplus(1, ref);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertReadBiased(ref);
+        assertHasUpdateLock(ref);
+        assertHasNoCommitLock(ref);
+        assertSame(committed, ref.___unsafeLoad());
     }
 }

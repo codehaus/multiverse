@@ -20,7 +20,7 @@ public class BetaLongRef_atomicSetTest {
     @Before
     public void setUp() {
         BetaStmConfiguration config = new BetaStmConfiguration();
-        config.maxRetries= 10;
+        config.maxRetries = 10;
         stm = new BetaStm(config);
         clearThreadLocalTransaction();
     }
@@ -61,32 +61,45 @@ public class BetaLongRef_atomicSetTest {
     }
 
     @Test
-    @Ignore
-    public void whenListenersAvailable() {
+    public void whenPrivatizedByOther_thenLockedException() {
+        BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.privatize(otherTx);
+
+        try {
+            ref.atomicSet(1);
+            fail();
+        } catch (LockedException expected) {
+        }
+
+        assertSurplus(1, ref);
+        assertHasCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
     }
 
     @Test
-    public void whenLocked_thenLockedException() {
-        BetaLongRef ref = newLongRef(stm, 2);
+    public void whenEnsuredByOtherAndChange_thenLockedException() {
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
-        tx.openForRead(ref, true);
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.ensure(otherTx);
 
         try {
-            ref.atomicSet(10);
+            ref.atomicSet(1);
             fail();
-        } catch (LockedException e) {
-
+        } catch (LockedException expected) {
         }
 
-        assertSame(committed, ref.___unsafeLoad());
-        assertNull(getThreadLocalTransaction());
         assertSurplus(1, ref);
-        assertHasCommitLock(ref);
-        assertSame(tx,ref.___getLockOwner());
-        assertUpdateBiased(ref);
+        assertHasNoCommitLock(ref);
+        assertHasUpdateLock(ref);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
     }
 
     @Test
@@ -104,5 +117,11 @@ public class BetaLongRef_atomicSetTest {
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertUpdateBiased(ref);
+    }
+
+    @Test
+    @Ignore
+    public void whenListenersAvailable() {
+
     }
 }

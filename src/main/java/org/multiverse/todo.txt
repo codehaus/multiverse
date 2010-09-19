@@ -1,5 +1,7 @@
 ideas:
 
+- http://iamchrislewis.tumblr.com/post/239967776/a-look-at-how-scala-compiles-to-java
+
 - selective notifies in transaction, instead of always waking up.. one could provide a function that only wakes
  up under certain conditions.
 
@@ -94,6 +96,8 @@ performance.
 - transactional hashset
 
 - transactional treeset
+
+- a reference that always causes a privatization.
 
 todo
 
@@ -200,11 +204,9 @@ and not allowed. So not throw the retry error immediately..
 
 - reading and backoff? Atm only spinning is used.
 
-- yield and spinning.
-
-- a reference that always causes a privatization.
-
 done
+
+- yield and spinning.
 
 - once a transactional object is privatized, it should not be ensured anymore.
 

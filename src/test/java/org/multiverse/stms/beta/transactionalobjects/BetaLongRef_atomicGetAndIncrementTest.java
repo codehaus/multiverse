@@ -20,7 +20,7 @@ public class BetaLongRef_atomicGetAndIncrementTest {
     @Before
     public void setUp() {
         BetaStmConfiguration config = new BetaStmConfiguration();
-        config.maxRetries = 10; 
+        config.maxRetries = 10;
         stm = new BetaStm(config);
         clearThreadLocalTransaction();
     }
@@ -71,18 +71,12 @@ public class BetaLongRef_atomicGetAndIncrementTest {
     }
 
     @Test
-    @Ignore
-    public void whenListenersAvailable() {
-
-    }
-
-    @Test
-    public void whenLocked() {
+    public void whenPrivatizedByOther_thenLockedException() {
         BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForRead(ref, true);
+        ref.privatize(otherTx);
 
         try {
             ref.atomicCompareAndSet(0, 1);
@@ -92,7 +86,37 @@ public class BetaLongRef_atomicGetAndIncrementTest {
 
         assertSurplus(1, ref);
         assertHasCommitLock(ref);
+        assertHasNoUpdateLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
     }
+
+    @Test
+    public void whenEnsuredByOther_thenLockedException() {
+        BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.ensure(otherTx);
+
+        try {
+            ref.atomicCompareAndSet(0, 1);
+            fail();
+        } catch (LockedException expected) {
+        }
+
+        assertSurplus(1, ref);
+        assertHasNoCommitLock(ref);
+        assertHasUpdateLock(ref);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+    }
+
+    @Test
+    @Ignore
+    public void whenListenersAvailable() {
+
+    }
+
+
 }

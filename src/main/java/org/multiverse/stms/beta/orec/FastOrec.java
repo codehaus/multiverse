@@ -101,6 +101,9 @@ public class FastOrec implements Orec {
 
             if (hasCommitLock(current)) {
                 spinCount--;
+                if (spinCount % ___SpinYield == 0) {
+                    Thread.yield();
+                }
                 continue;
             }
 
@@ -137,6 +140,9 @@ public class FastOrec implements Orec {
 
             if (hasCommitLock(current) || hasUpdateLock(current)) {
                 spinCount--;
+                if (spinCount % ___SpinYield == 0) {
+                    Thread.yield();
+                }
                 continue;
             }
 
@@ -178,6 +184,9 @@ public class FastOrec implements Orec {
 
             if (hasCommitLock(current) || hasUpdateLock(current)) {
                 spinCount--;
+                if (spinCount % ___SpinYield == 0) {
+                    Thread.yield();
+                }
                 continue;
             }
 

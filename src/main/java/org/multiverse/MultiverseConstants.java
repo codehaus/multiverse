@@ -1,6 +1,7 @@
 package org.multiverse;
 
 import static java.lang.Boolean.parseBoolean;
+import static java.lang.Integer.parseInt;
 import static java.lang.System.getProperty;
 
 /**
@@ -24,7 +25,14 @@ public interface MultiverseConstants {
 
     boolean ___ProfilingEnabled =
             parseBoolean(getProperty("org.multiverse.profiling.enabled", "false"));
-        
+
+    /**
+     * Indicates how often the system should yield when it is spinning. When a thread is
+     * yielded, it gives the opportunity to another thread to make progress.
+     */
+    int ___SpinYield =
+            parseInt(getProperty("org.multiverse.spinYield", "32"));
+
     int LOCKMODE_NONE = 0;
     int LOCKMODE_UPDATE = 1;
     int LOCKMODE_COMMIT = 2;

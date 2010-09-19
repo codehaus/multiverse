@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.functions.IncLongFunction;
@@ -156,6 +157,12 @@ public class BetaLongRef_alterAndGet1Test {
         assertSurplus(0, ref);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
+    }
+
+    @Test
+    @Ignore
+    public void whenListenersAvailable(){
+
     }
 
 }

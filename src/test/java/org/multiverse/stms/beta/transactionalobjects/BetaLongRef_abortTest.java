@@ -1,8 +1,8 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.api.blocking.Latch;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
@@ -10,6 +10,9 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.mock;
+import static org.multiverse.TestUtils.assertHasListeners;
+import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
@@ -179,16 +182,15 @@ public class BetaLongRef_abortTest implements BetaStmConstants {
     }
 
     @Test
-    @Ignore
     public void whenLockedByOtherAndOpenedForWrite() {
         BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        LongRefTranlocal read1 = otherTx.openForRead(ref, true);
+        ref.privatize(otherTx);
 
         ref.___abort(tx, write, pool);
 
@@ -201,8 +203,19 @@ public class BetaLongRef_abortTest implements BetaStmConstants {
     }
 
     @Test
-    @Ignore
     public void whenListenersAvailable_theyRemain(){
+        BetaLongRef ref = newLongRef(stm);
 
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.get(otherTx);
+        Latch listener = mock(Latch.class);
+        otherTx.registerChangeListenerAndAbort(listener);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.get(tx);
+        tx.abort();
+
+        assertIsAborted(tx);
+        assertHasListeners(ref, listener);
     }
 }

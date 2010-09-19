@@ -26,22 +26,43 @@ public class BetaLongRef_atomicCompareAndSetTest {
     }
 
     @Test
-    public void whenLocked() {
+    public void whenPrivatizedByOther_thenLockedException() {
         BetaLongRef ref = newLongRef(stm, 1);
         LongRefTranlocal committed = ref.___unsafeLoad();
-        BetaTransaction tx = stm.startDefaultTransaction();
-        tx.openForRead(ref, true);
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.privatize(otherTx);
 
         try {
             ref.atomicCompareAndSet(1, 2);
             fail();
         } catch (LockedException expected) {
-
         }
 
         assertSurplus(1, ref);
         assertHasCommitLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertHasNoUpdateLock(ref);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+    }
+
+    @Test
+    public void whenEnsuredByOther_thenlockedException() {
+        BetaLongRef ref = newLongRef(stm, 1);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.ensure(otherTx);
+
+        try {
+            ref.atomicCompareAndSet(1, 2);
+            fail();
+        } catch (LockedException expected) {
+        }
+
+        assertSurplus(1, ref);
+        assertHasNoCommitLock(ref);
+        assertHasUpdateLock(ref);
+        assertSame(otherTx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
     }
 

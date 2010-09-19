@@ -1,7 +1,6 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.stms.beta.BetaObjectPool;
@@ -165,39 +164,120 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
     }
 
     @Test
-    @Ignore
     public void whenPrivatizedBySelfAndOnlyRead() {
+        BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.privatize(tx);
+        ref.get(tx);
+        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        ref.___commitAll(tranlocal, tx, pool);
+
+        assertHasNoUpdateLock(ref);
+        assertHasNoCommitLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertSurplus(0, ref);
+        assertReadonlyCount(1, ref);
+        assertUpdateBiased(ref);
     }
 
     @Test
-    @Ignore
     public void whenPrivatizedBySelfAndDirtyWrite() {
+        BetaLongRef ref = newLongRef(stm);
 
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.privatize(tx);
+        ref.set(tx, 1);
+        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        ref.___commitAll(tranlocal, tx, pool);
+
+        assertHasNoUpdateLock(ref);
+        assertHasNoCommitLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(tranlocal, ref.___unsafeLoad());
+        assertSurplus(0, ref);
+        assertReadonlyCount(0, ref);
+        assertUpdateBiased(ref);
+        assertTrue(tranlocal.isCommitted);
     }
 
     @Test
-    @Ignore
     public void whenPrivatizedBySelfAndNoDirtyWrite() {
+        BetaLongRef ref = newLongRef(stm);
 
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.privatize(tx);
+        ref.set(tx, 0);
+        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        ref.___commitAll(tranlocal, tx, pool);
+
+        assertHasNoUpdateLock(ref);
+        assertHasNoCommitLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(tranlocal, ref.___unsafeLoad());
+        assertSurplus(0, ref);
+        assertReadonlyCount(0, ref);
+        assertUpdateBiased(ref);
     }
 
     @Test
-    @Ignore
     public void whenEnsuredBySelfAndOnlyRead() {
+        BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.ensure(tx);
+        ref.get(tx);
+        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        ref.___commitAll(tranlocal, tx, pool);
+
+        assertHasNoUpdateLock(ref);
+        assertHasNoCommitLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertSurplus(0, ref);
+        assertReadonlyCount(1, ref);
+        assertUpdateBiased(ref);
     }
 
     @Test
-    @Ignore
     public void whenEnsuredBySelfAndDirtyWrite() {
+        BetaLongRef ref = newLongRef(stm);
 
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.ensure(tx);
+        ref.set(tx, 1);
+        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        ref.___commitAll(tranlocal, tx, pool);
+
+        assertHasNoUpdateLock(ref);
+        assertHasNoCommitLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(tranlocal, ref.___unsafeLoad());
+        assertSurplus(0, ref);
+        assertReadonlyCount(0, ref);
+        assertUpdateBiased(ref);
+        assertTrue(tranlocal.isCommitted);
     }
 
     @Test
-    @Ignore
     public void whenEnsuredBySelfAndNoDirtyWrite() {
+        BetaLongRef ref = newLongRef(stm);
 
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.ensure(tx);
+        ref.set(tx, 0);
+        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        ref.___commitAll(tranlocal, tx, pool);
+
+        assertHasNoUpdateLock(ref);
+        assertHasNoCommitLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(tranlocal, ref.___unsafeLoad());
+        assertSurplus(0, ref);
+        assertReadonlyCount(0, ref);
+        assertUpdateBiased(ref);
     }
-
 }
