@@ -15,7 +15,7 @@ public class FastOrec_upgradeToCommitLockTest {
 
         orec.___upgradeToCommitLock();
 
-        assertHasUpdateLock(orec);
+        assertHasNoUpdateLock(orec);
         assertHasCommitLock(orec);
         assertSurplus(1, orec);
         assertUpdateBiased(orec);
@@ -29,7 +29,7 @@ public class FastOrec_upgradeToCommitLockTest {
 
         orec.___upgradeToCommitLock();
 
-        assertHasUpdateLock(orec);
+        assertHasNoUpdateLock(orec);
         assertHasCommitLock(orec);
         assertSurplus(1, orec);
         assertUpdateBiased(orec);
@@ -45,7 +45,7 @@ public class FastOrec_upgradeToCommitLockTest {
 
         orec.___upgradeToCommitLock();
 
-        assertHasUpdateLock(orec);
+        assertHasNoUpdateLock(orec);
         assertHasCommitLock(orec);
         assertSurplus(3, orec);
         assertUpdateBiased(orec);
@@ -61,7 +61,7 @@ public class FastOrec_upgradeToCommitLockTest {
 
         orec.___upgradeToCommitLock();
 
-        assertHasUpdateLock(orec);
+        assertHasNoUpdateLock(orec);
         assertHasCommitLock(orec);
         assertSurplus(3, orec);
         assertUpdateBiased(orec);
@@ -127,7 +127,7 @@ public class FastOrec_upgradeToCommitLockTest {
 
         orec.___upgradeToCommitLock();
 
-        assertHasUpdateLock(orec);
+        assertHasNoUpdateLock(orec);
         assertHasCommitLock(orec);
         assertSurplus(1, orec);
         assertReadBiased(orec);
@@ -141,7 +141,7 @@ public class FastOrec_upgradeToCommitLockTest {
 
         orec.___upgradeToCommitLock();
 
-        assertHasUpdateLock(orec);
+        assertHasNoUpdateLock(orec);
         assertHasCommitLock(orec);
         assertSurplus(1, orec);
         assertReadBiased(orec);

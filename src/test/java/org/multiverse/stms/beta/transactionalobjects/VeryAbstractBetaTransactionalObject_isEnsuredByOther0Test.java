@@ -75,7 +75,7 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredByOther0Test {
         setThreadLocalTransaction(tx);
         boolean result = ref.isEnsuredByOther();
 
-        assertTrue(result);
+        assertFalse(result);
     }
 
     @Test

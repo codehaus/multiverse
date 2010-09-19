@@ -39,7 +39,7 @@ public class PrivatizeTest {
         }
 
         assertIsAborted(tx);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
     }
@@ -114,7 +114,7 @@ public class PrivatizeTest {
 
         assertIsAborted(tx);
         assertHasCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertSame(ensureTx, ref.___getLockOwner());
     }
 
@@ -134,7 +134,7 @@ public class PrivatizeTest {
 
         assertIsAborted(tx);
         assertHasCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
     }
 
@@ -148,7 +148,7 @@ public class PrivatizeTest {
 
         assertIsActive(tx);
         assertHasCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertSame(tx, ref.___getLockOwner());
     }
 
@@ -175,7 +175,7 @@ public class PrivatizeTest {
         tx.prepare();
 
         assertIsPrepared(tx);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
     }
@@ -205,7 +205,7 @@ public class PrivatizeTest {
         assertIsActive(tx);
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
     }
 
     @Test

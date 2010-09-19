@@ -66,7 +66,7 @@ public class BetaLongRef_hasReadConflictTest implements BetaStmConstants {
         assertFalse(hasConflict);
         assertSurplus(1, ref);
         assertHasCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertSame(tx, ref.___getLockOwner());
     }
 
@@ -115,7 +115,7 @@ public class BetaLongRef_hasReadConflictTest implements BetaStmConstants {
         assertFalse(conflict);
         assertSurplus(1, ref);
         assertHasCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertSame(tx, ref.___getLockOwner());
     }
 
@@ -138,7 +138,7 @@ public class BetaLongRef_hasReadConflictTest implements BetaStmConstants {
         assertTrue(hasConflict);
         assertSurplus(2, ref);
         assertHasCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
     }
 

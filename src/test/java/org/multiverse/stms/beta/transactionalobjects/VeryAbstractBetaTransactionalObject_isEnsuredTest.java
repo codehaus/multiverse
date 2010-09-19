@@ -30,7 +30,7 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredTest {
         BetaLongRef ref = newLongRef(stm);
         ref.privatize(stm.startDefaultTransaction());
 
-        assertTrue(ref.isEnsured());
+        assertFalse(ref.isEnsured());
     }
 
     @Test

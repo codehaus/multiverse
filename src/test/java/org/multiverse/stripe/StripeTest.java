@@ -1,10 +1,12 @@
 package org.multiverse.stripe;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.references.Ref;
 
 import static org.multiverse.api.StmUtils.newRef;
 
+@Ignore
 public class StripeTest {
 
     @Test

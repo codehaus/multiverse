@@ -54,7 +54,7 @@ public class BetaLongRef_loadTest implements BetaStmConstants {
 
         assertNotNull(read);
         assertTrue(read.isLocked);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -157,7 +157,7 @@ public class BetaLongRef_loadTest implements BetaStmConstants {
 
         assertNotNull(read);
         assertTrue(read.isLocked);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -177,7 +177,7 @@ public class BetaLongRef_loadTest implements BetaStmConstants {
 
         assertNotNull(read);
         assertTrue(read.isLocked);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);

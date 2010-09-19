@@ -152,7 +152,7 @@ public class BetaLongRef_privatizeTest {
         assertUpdateBiased(ref);
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertSame(tx, getThreadLocalTransaction());
         assertIsActive(tx);
 
@@ -180,7 +180,7 @@ public class BetaLongRef_privatizeTest {
         assertUpdateBiased(ref);
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertSame(tx, getThreadLocalTransaction());
         assertIsActive(tx);
 
@@ -239,7 +239,7 @@ public class BetaLongRef_privatizeTest {
         assertUpdateBiased(ref);
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertSame(tx, getThreadLocalTransaction());
         assertIsActive(tx);
 
@@ -267,7 +267,7 @@ public class BetaLongRef_privatizeTest {
         assertUpdateBiased(ref);
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertSame(tx, getThreadLocalTransaction());
         assertIsActive(tx);
 
@@ -301,7 +301,7 @@ public class BetaLongRef_privatizeTest {
         assertUpdateBiased(ref);
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertSame(tx, getThreadLocalTransaction());
         assertIsActive(tx);
 
@@ -336,7 +336,7 @@ public class BetaLongRef_privatizeTest {
         assertUpdateBiased(ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertHasCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertSame(tx, getThreadLocalTransaction());
         assertIsAborted(tx);
     }

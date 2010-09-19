@@ -155,10 +155,12 @@ public class FastOrec implements Orec {
             }
 
             long next = setSurplus(current, surplus);
-            next = setUpdateLock(next, true);
+
 
             if (commitLock) {
                 next = setCommitLock(next, true);
+            } else {
+                next = setUpdateLock(next, true);
             }
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
@@ -185,10 +187,12 @@ public class FastOrec implements Orec {
                                 ___toOrecString(current));
             }
 
-            long next = setUpdateLock(current, true);
 
+            long next = current;
             if (commitLock) {
                 next = setCommitLock(next, true);
+            } else {
+                next = setUpdateLock(current, true);
             }
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
@@ -213,6 +217,7 @@ public class FastOrec implements Orec {
             }
 
             long next = setCommitLock(current, true);
+            next = setUpdateLock(next, false);
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
                 return;

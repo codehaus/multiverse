@@ -37,7 +37,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest implements BetaStmConstants
         assertSame(tx, ref.___getLockOwner());
 
         assertSurplus(1, ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -75,7 +75,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest implements BetaStmConstants
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
     }
@@ -93,7 +93,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest implements BetaStmConstants
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
     }
@@ -111,7 +111,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest implements BetaStmConstants
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
     }
@@ -191,7 +191,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest implements BetaStmConstants
         assertFalse(result);
         assertSame(otherTx, ref.___getLockOwner());
         assertHasCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertSurplus(2, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -212,7 +212,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest implements BetaStmConstants
         assertFalse(result);
         assertSame(otherTx, ref.___getLockOwner());
         assertHasCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertSurplus(2, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);

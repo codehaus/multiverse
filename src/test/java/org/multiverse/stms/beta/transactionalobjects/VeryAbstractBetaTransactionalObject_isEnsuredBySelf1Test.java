@@ -45,7 +45,7 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredBySelf1Test {
         ref.privatize(tx);
         boolean result = ref.isEnsuredBySelf(tx);
 
-        assertTrue(result);
+        assertFalse(result);
     }
 
     @Test

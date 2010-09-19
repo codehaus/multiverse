@@ -180,7 +180,7 @@ public class BetaLongRef_ensureTest {
 
         assertUpdateBiased(ref);
         assertHasCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertSurplus(1, ref);
         assertSame(tx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
@@ -241,7 +241,7 @@ public class BetaLongRef_ensureTest {
         assertIsAborted(tx);
         assertUpdateBiased(ref);
         assertHasCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertSurplus(1, ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertIsActive(otherTx);

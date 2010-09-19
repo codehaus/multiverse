@@ -128,7 +128,7 @@ public class BetaLongRef_getAndSet1Test {
 
         assertEquals(10, result);
         assertIsActive(tx);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
         assertSame(tx, ref.___getLockOwner());
@@ -193,7 +193,7 @@ public class BetaLongRef_getAndSet1Test {
         }
 
         assertIsAborted(tx);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
         assertSame(otherTx, ref.___getLockOwner());

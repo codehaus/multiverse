@@ -68,7 +68,7 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredByOther1Test {
         BetaTransaction tx = stm.startDefaultTransaction();
         boolean result = ref.isEnsuredByOther(tx);
 
-        assertTrue(result);
+        assertFalse(result);
     }
     
     @Test

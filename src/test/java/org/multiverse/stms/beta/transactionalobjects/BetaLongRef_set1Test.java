@@ -149,7 +149,7 @@ public class BetaLongRef_set1Test {
         long value = ref.set(200);
 
         assertEquals(200, value);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -198,7 +198,7 @@ public class BetaLongRef_set1Test {
         } catch (ReadConflict expected) {
         }
 
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);

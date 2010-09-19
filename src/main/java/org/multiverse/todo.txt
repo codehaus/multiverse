@@ -204,9 +204,15 @@ and not allowed. So not throw the retry error immediately..
 
 - a reference that always causes a privatization.
 
+done
+
 - once a transactional object is privatized, it should not be ensured anymore.
 
-done
+- added deadlock test for Ensure
+
+- added deadlock test for privatize
+
+- tests in stm.beta.transactionalobject are now fast again (low maxRetries count)
 
 - VeryAbstractBetaTransactionalObject_isEnsuredByOtherf0Test
 

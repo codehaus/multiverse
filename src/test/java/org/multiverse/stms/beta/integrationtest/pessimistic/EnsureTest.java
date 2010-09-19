@@ -40,7 +40,7 @@ public class EnsureTest {
         }
 
         assertIsAborted(tx);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
     }
@@ -159,7 +159,7 @@ public class EnsureTest {
 
         assertIsActive(tx);
         assertHasCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertSame(tx, ref.___getLockOwner());
     }
 

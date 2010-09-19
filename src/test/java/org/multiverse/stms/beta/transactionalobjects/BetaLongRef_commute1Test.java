@@ -232,7 +232,7 @@ public class BetaLongRef_commute1Test {
         assertFalse(tranlocal.isCommuting);
         assertEquals(3, tranlocal.value);
         assertIsActive(tx);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -307,7 +307,7 @@ public class BetaLongRef_commute1Test {
         assertTrue(tranlocal.isCommuting);
         assertHasCommutingFunctions(tranlocal, function);
         assertIsActive(tx);
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertSurplus(1, ref);
@@ -320,7 +320,7 @@ public class BetaLongRef_commute1Test {
 
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());

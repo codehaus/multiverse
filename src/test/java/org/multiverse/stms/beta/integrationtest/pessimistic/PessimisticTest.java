@@ -8,7 +8,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertSame;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasCommitLock;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasUpdateLock;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoUpdateLock;
 
 public class PessimisticTest {
     private BetaStm stm;
@@ -24,7 +24,7 @@ public class PessimisticTest {
         BetaLongRef ref = new BetaLongRef(tx);
         tx.openForConstruction(ref);
 
-        assertHasUpdateLock(ref);
+        assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
     }
