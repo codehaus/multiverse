@@ -72,7 +72,7 @@ public class BetaStmUtils {
 
         for (int k = 0; k < ref.___getOrec().___getReadBiasedThreshold(); k++) {
             BetaTransaction tx = new FatMonoBetaTransaction(stm);
-            tx.openForRead(ref, false);
+            ref.get(tx);            
             tx.commit();
         }
 

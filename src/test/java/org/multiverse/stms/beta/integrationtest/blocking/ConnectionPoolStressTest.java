@@ -9,6 +9,7 @@ import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicIntClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
@@ -30,14 +31,14 @@ import static org.multiverse.stms.beta.BetaStmUtils.newRef;
  *
  * @author Peter Veentjer.
  */
-public class ConnectionPoolStressTest {
+public class ConnectionPoolStressTest implements BetaStmConstants {
     private int poolsize = processorCount();
     private int threadCount = processorCount() * 2;
     private volatile boolean stop;
 
     private ConnectionPool pool;
     private BetaStm stm;
-    private boolean pessimistic;
+    private int lockMode;
 
     @Before
     public void setUp() {
@@ -48,17 +49,22 @@ public class ConnectionPoolStressTest {
     }
 
     @Test
-    public void testPessimistic() {
-        test(true);
+    public void testEnsured() {
+        test(LOCKMODE_UPDATE);
     }
 
     @Test
-    public void testOptimistic() {
-        test(false);
+    public void testPrivatized(){
+        test(LOCKMODE_COMMIT);
     }
 
-    public void test(boolean pessimistic) {
-        this.pessimistic = pessimistic;
+    @Test
+    public void testNoLocking() {
+        test(LOCKMODE_NONE);
+    }
+
+    public void test(int lockMode) {
+        this.lockMode = lockMode;
         WorkerThread[] threads = createThreads();
 
         startAll(threads);
@@ -89,11 +95,11 @@ public class ConnectionPoolStressTest {
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
 
-                    RefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, pessimistic);
+                    RefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, lockMode);
 
                     for (int k = 0; k < poolsize; k++) {
                         headTranlocal.value = new Node(headTranlocal.value, new Connection());
-                        btx.openForWrite(size, pessimistic).value++;
+                        btx.openForWrite(size, lockMode).value++;
                     }
                 }
             });
@@ -105,14 +111,14 @@ public class ConnectionPoolStressTest {
                 public Connection execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
 
-                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, pessimistic);
+                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, lockMode);
                     if (sizeTranlocal.value == 0) {
                         retry();
                     }
 
                     sizeTranlocal.value--;
 
-                    RefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, pessimistic);
+                    RefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, lockMode);
                     Node<Connection> oldHead = headTranlocal.value;
                     headTranlocal.value = oldHead.next;
                     return oldHead.item;
@@ -126,9 +132,9 @@ public class ConnectionPoolStressTest {
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
 
-                    btx.openForWrite(size, pessimistic).value++;
+                    btx.openForWrite(size, lockMode).value++;
 
-                    RefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, pessimistic);
+                    RefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, lockMode);
 
                     Node<Connection> oldHead = headTranlocal.value;
                     headTranlocal.value = new Node<Connection>(oldHead, c);

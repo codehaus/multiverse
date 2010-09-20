@@ -8,6 +8,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
@@ -31,13 +32,13 @@ import static org.multiverse.stms.beta.BetaStmUtils.newRef;
  *
  * @author Peter Veentjer.
  */
-public class StackWithCapacityStressTest {
+public class StackWithCapacityStressTest implements BetaStmConstants {
 
     private BetaStm stm;
     private int itemCount = 2 * 1000 * 1000;
     private Stack<Integer> stack;
     private int maxCapacity = 1000;
-    private boolean pessimistic;
+    private int lockMode;
 
     @Before
     public void setUp() {
@@ -47,17 +48,23 @@ public class StackWithCapacityStressTest {
     }
 
     @Test
-    public void testPessimistic() {
-        test(false);
-    }
+      public void testPrivatized() {
+          test(LOCKMODE_COMMIT);
+      }
 
-    @Test
-    public void testOptimistic() {
-        test(true);
-    }
+      @Test
+      public void testEnsured() {
+          test(LOCKMODE_UPDATE);
+      }
 
-    public void test(boolean pessimistic) {
-        this.pessimistic = pessimistic;
+      @Test
+      public void testOptimistic(){
+          test(LOCKMODE_NONE);
+      }
+
+
+    public void test(int lockMode) {
+        this.lockMode = lockMode;
 
         ProduceThread produceThread = new ProduceThread();
         ConsumeThread consumeThread = new ConsumeThread();
@@ -127,14 +134,14 @@ public class StackWithCapacityStressTest {
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
 
-                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, pessimistic);
+                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, lockMode);
 
                     if (sizeTranlocal.value >= maxCapacity) {
                         retry();
                     }
 
                     sizeTranlocal.value++;
-                    RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, pessimistic);
+                    RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, lockMode);
                     headTranlocal.value = new Node<E>(item, headTranlocal.value);
                 }
             });
@@ -146,13 +153,13 @@ public class StackWithCapacityStressTest {
                 public E execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
 
-                    RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, pessimistic);
+                    RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, lockMode);
 
                     if (headTranlocal.value == null) {
                         retry();
                     }
 
-                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, pessimistic);
+                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, lockMode);
                     sizeTranlocal.value--;
 
                     E value = headTranlocal.value.item;

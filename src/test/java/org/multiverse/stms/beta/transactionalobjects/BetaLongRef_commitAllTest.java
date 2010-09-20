@@ -72,10 +72,10 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal tranlocal = tx.openForWrite(ref, false);
+        Tranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        Tranlocal read2 = otherTx.openForRead(ref, false);
+        Tranlocal read2 = otherTx.openForRead(ref, LOCKMODE_NONE);
 
         ref.___tryLockAndCheckConflict(tx, 1, read2, true);
 

@@ -116,14 +116,12 @@ public class QueueWithCapacityStressTest {
             pushBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-
-                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, pessimistic);
-                    if (sizeTranlocal.value >= maxCapacity) {
+                    if(size.get()>=maxCapacity){
                         retry();
                     }
 
-                    sizeTranlocal.value++;
+                    BetaTransaction btx = (BetaTransaction) tx;
+                    size.incrementAndGet(1);
                     pushedStack.push(btx, item);
                 }
             });

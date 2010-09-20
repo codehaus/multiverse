@@ -1,6 +1,6 @@
 package org.multiverse.api;
 
-import org.multiverse.*;
+import org.multiverse.MultiverseConstants;
 import org.multiverse.api.closures.*;
 
 /**
@@ -27,7 +27,7 @@ public interface AtomicBlock extends MultiverseConstants{
 
    /**
     * Executes the closure. If in the execution of the closure a checked exception is thrown, the exception
-    * is wrappend in a InvisibleCheckedException. The original exception can be retrieved by calling the
+    * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
     * getCause method.
     *
     * @param closure the closure to execute.

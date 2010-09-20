@@ -204,6 +204,16 @@ and not allowed. So not throw the retry error immediately..
 
 - reading and backoff? Atm only spinning is used.
 
+- tryEnsure
+
+- tryPrivatize
+
+- tryEnsureWhen
+
+- tryPrivatizeWhen
+
+- ensureOptimistic
+
 done
 
 - yield and spinning.

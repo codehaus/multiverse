@@ -26,7 +26,7 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
 /**
  * @author Peter Veentjer
  */
-public class TestUtils {
+public class TestUtils implements MultiverseConstants{
 
     public static void clearCurrentThreadInterruptedStatus() {
         Thread.interrupted();
@@ -226,7 +226,7 @@ public class TestUtils {
 
         for (int k = 0; k < ref.___getOrec().___getReadBiasedThreshold(); k++) {
             BetaTransaction tx = new FatMonoBetaTransaction(stm);
-            tx.openForRead(ref, false);
+            tx.openForRead(ref, LOCKMODE_NONE);
             tx.commit();
             assertHasNoCommitLock(ref.___getOrec());
         }

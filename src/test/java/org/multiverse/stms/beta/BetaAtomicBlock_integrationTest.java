@@ -8,7 +8,6 @@ import org.multiverse.api.closures.AtomicLongClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
@@ -34,8 +33,7 @@ public class BetaAtomicBlock_integrationTest {
         long result = block.execute(new AtomicLongClosure() {
             @Override
             public long execute(Transaction tx) throws Exception {
-                BetaTransaction btx = (BetaTransaction) tx;
-                return btx.openForRead(ref, false).value;
+                return ref.get(tx);
             }
         });
 
@@ -50,8 +48,7 @@ public class BetaAtomicBlock_integrationTest {
         block.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                BetaTransaction btx = (BetaTransaction) tx;
-                btx.openForWrite(ref, false).value++;
+                ref.incrementAndGet(tx,1);
             }
         });
 
@@ -73,8 +70,7 @@ public class BetaAtomicBlock_integrationTest {
             block.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-                    btx.openForRead(ref, false);
+                    ref.get(tx);
                 }
             });
 
@@ -93,8 +89,7 @@ public class BetaAtomicBlock_integrationTest {
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
                 for (int k = 0; k < 10; k++) {
-                    LongRefTranlocal tranlocal = btx.openForWrite(ref, false);
-                    tranlocal.value++;
+                    ref.set(ref.get()+1);
                 }
             }
         });

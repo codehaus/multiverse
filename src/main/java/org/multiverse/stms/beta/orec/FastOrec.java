@@ -101,9 +101,7 @@ public class FastOrec implements Orec {
 
             if (hasCommitLock(current)) {
                 spinCount--;
-                if (spinCount % ___SpinYield == 0) {
-                    Thread.yield();
-                }
+                yieldIfNeeded(spinCount);
                 continue;
             }
 
@@ -133,6 +131,12 @@ public class FastOrec implements Orec {
         return ARRIVE_LOCK_NOT_FREE;
     }
 
+    private void yieldIfNeeded(int remainingSpins) {
+        if (remainingSpins % ___SpinYield == 0 && remainingSpins > 0) {
+            Thread.yield();
+        }
+    }
+
     @Override
     public final int ___tryLockAndArrive(int spinCount, final boolean commitLock) {
         do {
@@ -140,9 +144,7 @@ public class FastOrec implements Orec {
 
             if (hasCommitLock(current) || hasUpdateLock(current)) {
                 spinCount--;
-                if (spinCount % ___SpinYield == 0) {
-                    Thread.yield();
-                }
+                yieldIfNeeded(spinCount);
                 continue;
             }
 
@@ -184,9 +186,7 @@ public class FastOrec implements Orec {
 
             if (hasCommitLock(current) || hasUpdateLock(current)) {
                 spinCount--;
-                if (spinCount % ___SpinYield == 0) {
-                    Thread.yield();
-                }
+                yieldIfNeeded(spinCount);
                 continue;
             }
 

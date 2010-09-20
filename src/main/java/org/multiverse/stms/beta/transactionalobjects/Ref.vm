@@ -1168,7 +1168,5 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             StmUtils.retry();
         }        
     }
-
 #end
-
 }

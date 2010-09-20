@@ -40,19 +40,17 @@ public class WriteSkewTest {
                 .build()
                 .start();
 
-        tx.openForWrite(ref1, false).value++;
-        tx.openForRead(ref2, false);
+        ref1.incrementAndGet(tx, 1);
+        ref2.get(tx);
 
-        BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForWrite(ref2, false).value++;
-        otherTx.commit();
+        ref2.atomicIncrementAndGet(1);
 
         tx.commit();
         assertEquals(1, ref1.atomicGet());
     }
 
     @Test
-    public void whenLockReadsPessimisticLockLevel_thenWriteSkewNotDetected() {
+    public void whenPrivatizeWritesPessimisticLockLevel_thenWriteSkewNotDetected() {
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
 
@@ -63,19 +61,65 @@ public class WriteSkewTest {
                 .build()
                 .start();
 
-        tx.openForWrite(ref1, false).value++;
-        tx.openForRead(ref2, false);
+        ref1.incrementAndGet(tx, 1);
+        ref2.get(tx);
 
-        BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForWrite(ref2, false).value++;
-        otherTx.commit();
+        ref2.atomicIncrementAndGet(1);
 
         tx.commit();
         assertEquals(1, ref1.atomicGet());
     }
 
     @Test
-    public void whenLockReadsPessimisticLockLevel_thenWriteSkewNotPossible() {
+    public void whenEnsureWritesPessimisticLockLevel_thenWriteSkewNotDetected() {
+        BetaLongRef ref1 = newLongRef(stm);
+        BetaLongRef ref2 = newLongRef(stm);
+
+        BetaTransaction tx = stm.createTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .setWriteSkewAllowed(true)
+                .setPessimisticLockLevel(PessimisticLockLevel.EnsureWrites)
+                .build()
+                .start();
+
+        ref1.incrementAndGet(tx, 1);
+        ref2.get(tx);
+
+        ref2.atomicIncrementAndGet(1);
+
+        tx.commit();
+        assertEquals(1, ref1.atomicGet());
+    }
+
+     @Test
+    public void whenEnsureReadsPessimisticLockLevel_thenWriteSkewNotPossible() {
+        BetaLongRef ref1 = newLongRef(stm);
+        BetaLongRef ref2 = newLongRef(stm);
+
+        BetaTransaction tx = stm.createTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .setWriteSkewAllowed(true)
+                .setPessimisticLockLevel(PessimisticLockLevel.EnsureReads)
+                .build()
+                .start();
+
+        ref1.incrementAndGet(tx, 1);
+        ref2.get(tx);
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+         ref2.incrementAndGet(otherTx, 1);
+
+        try {
+            otherTx.commit();
+            fail();
+        } catch (WriteConflict expected) {
+        }
+
+        tx.commit();
+    }
+
+    @Test
+    public void whenPrivatizedReadsLockLevel_thenWriteSkewNotPossible() {
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
 
@@ -86,22 +130,21 @@ public class WriteSkewTest {
                 .build()
                 .start();
 
-        tx.openForWrite(ref1, true).value++;
-        tx.openForRead(ref2, true);
+        ref1.incrementAndGet(tx, 1);
+        ref2.get(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         try {
-            otherTx.openForWrite(ref2, false).value++;
+            ref2.incrementAndGet(otherTx, 1);
             fail();
         } catch (ReadConflict expected) {
-
         }
 
         tx.commit();
     }
 
     @Test
-    public void whenPessimisticLockingUsed_thenWriteSkewNotPossible() {
+    public void whenPrivatized_thenWriteSkewNotPossible() {
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
 
@@ -111,12 +154,13 @@ public class WriteSkewTest {
                 .build()
                 .start();
 
-        tx.openForWrite(ref1, true).value++;
-        tx.openForRead(ref2, true);
+        ref1.incrementAndGet(tx, 1);
+        ref2.privatize(tx);
+        ref2.get(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         try {
-            otherTx.openForWrite(ref2, false).value++;
+            ref2.incrementAndGet(otherTx, 1);
             fail();
         } catch (ReadConflict expected) {
 
@@ -124,6 +168,34 @@ public class WriteSkewTest {
 
         tx.commit();
     }
+
+    @Test
+     public void whenEnsured_thenWriteSkewNotPossible() {
+         BetaLongRef ref1 = newLongRef(stm);
+         BetaLongRef ref2 = newLongRef(stm);
+
+         BetaTransaction tx = stm.createTransactionFactoryBuilder()
+                 .setSpeculativeConfigurationEnabled(false)
+                 .setWriteSkewAllowed(false)
+                 .build()
+                 .start();
+
+         ref1.incrementAndGet(tx, 1);
+         ref2.ensure(tx);
+         ref2.get(tx);
+
+         BetaTransaction otherTx = stm.startDefaultTransaction();
+         ref2.incrementAndGet(otherTx, 1);
+
+         try {
+             otherTx.commit();
+             fail();
+         } catch (WriteConflict expected) {
+         }
+
+         tx.commit();
+     }
+
 
     @Test
     public void whenWriteSkewNotAllowed_thenDetected() {
@@ -135,19 +207,15 @@ public class WriteSkewTest {
                 .setWriteSkewAllowed(false)
                 .build()
                 .start();
+        ref1.incrementAndGet(tx, 1);
+        ref2.get(tx);
 
-        tx.openForWrite(ref1, false).value++;
-        tx.openForRead(ref2, false);
-
-        BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForWrite(ref2, false).value++;
-        otherTx.commit();
+        ref2.atomicIncrementAndGet(1);
 
         try {
             tx.commit();
             fail();
         } catch (WriteConflict expected) {
-
         }
     }
 }

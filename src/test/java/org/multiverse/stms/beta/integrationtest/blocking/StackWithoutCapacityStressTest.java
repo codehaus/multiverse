@@ -8,6 +8,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
 import org.multiverse.stms.beta.transactionalobjects.RefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -28,12 +29,12 @@ import static org.multiverse.stms.beta.BetaStmUtils.newRef;
  *
  * @author Peter Veentjer.
  */
-public class StackWithoutCapacityStressTest {
+public class StackWithoutCapacityStressTest implements BetaStmConstants {
 
     private BetaStm stm;
-    private int itemCount = 2 * 1000 * 1000;
+    private int itemCount = 5 * 1000 * 1000;
     private Stack<Integer> stack;
-    private boolean pessimistic;
+    private int lockMode;
 
     @Before
     public void setUp() {
@@ -43,17 +44,22 @@ public class StackWithoutCapacityStressTest {
     }
 
     @Test
-    public void testPessimistic() {
-        test(true);
+    public void testPrivatized() {
+        test(LOCKMODE_COMMIT);
     }
 
     @Test
-    public void testOptimistic() {
-        test(false);
+    public void testEnsured() {
+        test(LOCKMODE_UPDATE);
     }
 
-    public void test(boolean pessimistic) {
-        this.pessimistic = pessimistic;
+    @Test
+    public void testOptimistic(){
+        test(LOCKMODE_NONE);
+    }
+
+    public void test(int lockMode) {
+        this.lockMode = lockMode;
 
         ProduceThread produceThread = new ProduceThread();
         ConsumeThread consumeThread = new ConsumeThread();
@@ -121,7 +127,7 @@ public class StackWithoutCapacityStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, pessimistic);
+                    RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, lockMode);
                     headTranlocal.value = new Node<E>(item, headTranlocal.value);
                 }
             });
@@ -132,7 +138,7 @@ public class StackWithoutCapacityStressTest {
                 @Override
                 public E execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, pessimistic);
+                    RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, lockMode);
                     if (headTranlocal.value == null) {
                         retry();
                     }

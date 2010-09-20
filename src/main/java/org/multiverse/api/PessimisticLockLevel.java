@@ -22,9 +22,9 @@ public enum PessimisticLockLevel implements MultiverseConstants{
      */
     PrivatizeReads(LOCKMODE_COMMIT, LOCKMODE_COMMIT),
 
-    LockWrites(LOCKMODE_NONE, LOCKMODE_UPDATE),
+    EnsureWrites(LOCKMODE_NONE, LOCKMODE_UPDATE),
 
-    LockReads(LOCKMODE_UPDATE, LOCKMODE_UPDATE),
+    EnsureReads(LOCKMODE_UPDATE, LOCKMODE_UPDATE),
 
     /**
      * A PessimisticLockLevel that doesn't require any locking.
@@ -34,9 +34,9 @@ public enum PessimisticLockLevel implements MultiverseConstants{
     private final int lockReads;
     private final int lockWrites;
 
-    private PessimisticLockLevel(int lockReads, int lockWrites) {
-        this.lockReads = lockReads;
-        this.lockWrites = lockWrites;
+    private PessimisticLockLevel(int ensureReads, int ensureWrites) {
+        this.lockReads = ensureReads;
+        this.lockWrites = ensureWrites;
     }
 
     /**

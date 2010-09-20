@@ -8,6 +8,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
 import org.multiverse.stms.beta.transactionalobjects.RefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -15,19 +16,18 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import java.util.LinkedList;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.TestUtils.joinAll;
-import static org.multiverse.TestUtils.startAll;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.newRef;
 
-public class QueueWithoutCapacityStressTest {
+public class QueueWithoutCapacityStressTest implements BetaStmConstants {
 
-    private boolean pessimistic;
+    private int lockMode;
 
     private BetaStm stm;
     private Queue<Integer> queue;
-    private int itemCount = 2 * 1000 * 1000;
+    private int itemCount = 10 * 1000 * 1000;
 
     @Before
     public void setUp() {
@@ -37,17 +37,22 @@ public class QueueWithoutCapacityStressTest {
     }
 
     @Test
-    public void testPessimistic() {
-        test(true);
+    public void testPrivatized() {
+        test(LOCKMODE_COMMIT);
+    }
+
+    @Test
+    public void testEnsured() {
+        test(LOCKMODE_UPDATE);
     }
 
     @Test
     public void testOptimistic() {
-        test(false);
+        test(LOCKMODE_NONE);
     }
 
-    public void test(boolean pessimistic) {
-        this.pessimistic = pessimistic;
+    public void test(int lockMode) {
+        this.lockMode = lockMode;
 
         ProduceThread produceThread = new ProduceThread();
         ConsumeThread consumeThread = new ConsumeThread();
@@ -95,6 +100,7 @@ public class QueueWithoutCapacityStressTest {
                 producedItems.add(k);
 
                 if (k % 100000 == 0) {
+                    sleepMs(100);
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
             }
@@ -142,17 +148,17 @@ public class QueueWithoutCapacityStressTest {
         final BetaRef<Node<E>> head = newRef(stm);
 
         void push(BetaTransaction tx, E item) {
-            RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, pessimistic);
+            RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, lockMode);
             headTranlocal.value = new Node<E>(item, headTranlocal.value);
         }
 
         boolean isEmpty(BetaTransaction tx) {
-            RefTranlocal<Node<E>> headTranlocal = tx.openForRead(head, pessimistic);
+            RefTranlocal<Node<E>> headTranlocal = tx.openForRead(head, lockMode);
             return headTranlocal.value == null;
         }
 
         E pop(BetaTransaction tx) {
-            RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, pessimistic);
+            RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, lockMode);
             Node<E> node = headTranlocal.value;
 
             if (node == null) {
