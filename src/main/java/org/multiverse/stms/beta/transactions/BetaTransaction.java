@@ -347,9 +347,9 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
         this.remainingTimeoutNs = timeoutNs;
     }
 
-    protected final ReadConflict abortOnReadConflict() {
+    protected final ReadWriteConflict abortOnReadConflict() {
         abort();
-        return ReadConflict.INSTANCE;
+        return ReadWriteConflict.INSTANCE;
     }
 
     protected final SpeculativeConfigurationError abortOnTooSmallSize(int minimalSize) {
@@ -358,9 +358,9 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
         return SpeculativeConfigurationError.INSTANCE;
     }
 
-    protected final WriteConflict abortOnWriteConflict() {
+    protected final ReadWriteConflict abortOnWriteConflict() {
         abort();
-        return WriteConflict.INSTANCE;
+        return ReadWriteConflict.INSTANCE;
     }
 
     /**

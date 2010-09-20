@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.WriteConflict;
+import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
@@ -141,7 +141,7 @@ public class FatMonoBetaTransaction_prepareTest {
         try {
             tx.prepare();
             fail();
-        } catch (WriteConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -186,7 +186,7 @@ public class FatMonoBetaTransaction_prepareTest {
         try {
             tx.prepare();
             fail();
-        } catch (WriteConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -208,7 +208,7 @@ public class FatMonoBetaTransaction_prepareTest {
         try {
             tx.prepare();
             fail();
-        } catch (WriteConflict conflict) {
+        } catch (ReadWriteConflict conflict) {
         }
 
         assertIsAborted(tx);

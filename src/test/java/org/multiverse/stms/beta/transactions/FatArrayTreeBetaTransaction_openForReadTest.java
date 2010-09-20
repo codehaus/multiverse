@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.ReadConflict;
+import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
@@ -177,7 +177,7 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         try {
             tx2.openForRead(ref, false);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx2);
@@ -261,7 +261,7 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         try {
             tx.openForRead(ref2, false);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -349,7 +349,7 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         try {
             tx.openForRead(ref2, false);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -444,7 +444,7 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         try {
             tx.openForRead(ref, false);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -527,7 +527,7 @@ public class FatArrayTreeBetaTransaction_openForReadTest {
         try {
             tx.openForRead(ref2, false);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
 
         }
 

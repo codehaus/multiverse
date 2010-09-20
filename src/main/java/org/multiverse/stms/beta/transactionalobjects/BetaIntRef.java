@@ -1132,6 +1132,4 @@ public final class BetaIntRef
             StmUtils.retry();
         }        
     }
-
-
 }

@@ -11,8 +11,8 @@ package org.multiverse.api.exceptions;
  * So you should not catch these exceptions unless you really know what you are doing.
  * <p/>
  * It is an Error instead of a RuntimeException, to prevent users trying to catch the error
- * inside a try/catch(RuntimeException) block and consuming important events like a ReadConflict
- * or a WriteConflict. In most cases these events can be solved by retrying the transaction.
+ * inside a try/catch(RuntimeException) block and consuming important events like a ReadWriteConflict.
+ * In most cases these events can be solved by retrying the transaction.
  *
  * @author Peter Veentjer
  */

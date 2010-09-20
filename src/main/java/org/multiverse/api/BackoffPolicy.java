@@ -1,7 +1,7 @@
 package org.multiverse.api;
 
 /**
- * A policy to be used when the system can't make any progress, e.g. caused by a writeconflict, and it is better
+ * A policy to be used when the system can't make any progress, e.g. caused by a ReadWriteConflict, and it is better
  * to wait some time.
  *
  * @author Peter Veentjer.

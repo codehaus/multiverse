@@ -4,8 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.PessimisticLockLevel;
-import org.multiverse.api.exceptions.ReadConflict;
-import org.multiverse.api.exceptions.WriteConflict;
+import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -112,7 +111,7 @@ public class WriteSkewTest {
         try {
             otherTx.commit();
             fail();
-        } catch (WriteConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         tx.commit();
@@ -137,7 +136,7 @@ public class WriteSkewTest {
         try {
             ref2.incrementAndGet(otherTx, 1);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         tx.commit();
@@ -162,7 +161,7 @@ public class WriteSkewTest {
         try {
             ref2.incrementAndGet(otherTx, 1);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
 
         }
 
@@ -190,12 +189,11 @@ public class WriteSkewTest {
          try {
              otherTx.commit();
              fail();
-         } catch (WriteConflict expected) {
+         } catch (ReadWriteConflict expected) {
          }
 
          tx.commit();
      }
-
 
     @Test
     public void whenWriteSkewNotAllowed_thenDetected() {
@@ -215,7 +213,7 @@ public class WriteSkewTest {
         try {
             tx.commit();
             fail();
-        } catch (WriteConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
     }
 }

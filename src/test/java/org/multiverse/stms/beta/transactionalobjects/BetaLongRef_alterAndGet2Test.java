@@ -5,7 +5,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.ReadConflict;
+import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -163,7 +163,7 @@ public class BetaLongRef_alterAndGet2Test {
         try {
             ref.alterAndGet(tx, function);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertHasCommitLock(ref);

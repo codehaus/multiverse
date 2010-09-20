@@ -448,5 +448,4 @@ public abstract class AbstractBetaTransactionalObject
         }
     }
 
-
 }

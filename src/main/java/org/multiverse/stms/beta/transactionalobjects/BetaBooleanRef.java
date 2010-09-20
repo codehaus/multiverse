@@ -1026,6 +1026,4 @@ public final class BetaBooleanRef
             StmUtils.retry();
         }        
     }
-
-
 }

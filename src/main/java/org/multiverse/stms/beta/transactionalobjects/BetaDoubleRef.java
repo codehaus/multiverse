@@ -1132,6 +1132,4 @@ public  class BetaDoubleRef
             StmUtils.retry();
         }        
     }
-
-
 }

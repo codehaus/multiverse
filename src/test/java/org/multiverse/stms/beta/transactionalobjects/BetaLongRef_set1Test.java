@@ -4,8 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.ReadConflict;
-import org.multiverse.api.exceptions.WriteConflict;
+import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConfiguration;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -195,7 +194,7 @@ public class BetaLongRef_set1Test {
         try {
             ref.set(200);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertHasNoUpdateLock(ref);
@@ -235,7 +234,7 @@ public class BetaLongRef_set1Test {
         try {
             tx.commit();
             fail();
-        } catch (WriteConflict e) {
+        } catch (ReadWriteConflict e) {
 
         }
 

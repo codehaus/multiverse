@@ -3,7 +3,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.ReadConflict;
+import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.references.LongRef;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -97,7 +97,7 @@ public class BetaLongRef_get0Test {
         try {
             ref.get();
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
 

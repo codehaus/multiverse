@@ -48,7 +48,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         try {
             tx.openForWrite(ref, false);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -402,7 +402,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         try {
             tx.openForWrite(ref, true);
             fail();
-        } catch (ReadConflict e) {
+        } catch (ReadWriteConflict e) {
 
         }
 
@@ -434,7 +434,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         try {
             tx.openForWrite(ref, lockNeeded);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertSame(otherTx, ref.___getLockOwner());
@@ -462,7 +462,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         try {
             tx.openForWrite(ref2, false);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -606,7 +606,7 @@ public class FatMonoBetaTransaction_openForWriteTest {
         try {
             tx.openForWrite(ref, false);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
 
         }
 

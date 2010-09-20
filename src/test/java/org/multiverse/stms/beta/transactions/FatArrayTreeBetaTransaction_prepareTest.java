@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.WriteConflict;
+import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
@@ -135,7 +135,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
         try {
             tx.prepare();
             fail();
-        } catch (WriteConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -181,7 +181,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
         try {
             tx.prepare();
             fail();
-        } catch (WriteConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -333,7 +333,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
         try {
             tx.prepare();
             fail();
-        } catch (WriteConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -413,7 +413,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
          try {
              tx2.prepare();
              fail();
-         } catch (WriteConflict expected) {
+         } catch (ReadWriteConflict expected) {
          }
 
          assertIsAborted(tx2);
@@ -431,7 +431,7 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
         try {
             tx.prepare();
             fail();
-        } catch (WriteConflict conflict) {
+        } catch (ReadWriteConflict conflict) {
         }
 
         assertIsAborted(tx);

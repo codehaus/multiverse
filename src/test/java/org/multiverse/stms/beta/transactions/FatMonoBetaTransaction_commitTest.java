@@ -8,7 +8,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.WriteConflict;
+import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
@@ -307,7 +307,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         try {
             tx.commit();
             fail();
-        } catch (WriteConflict e) {
+        } catch (ReadWriteConflict e) {
         }
 
         assertSame(conflictingWrite, ref.___unsafeLoad());
@@ -332,7 +332,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         try {
             tx.commit();
             fail();
-        } catch (WriteConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertHasCommitLock(ref);
@@ -655,7 +655,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         try {
             tx.commit();
             fail();
-        } catch (WriteConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -673,7 +673,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         try {
             tx.commit();
             fail();
-        } catch (WriteConflict conflict) {
+        } catch (ReadWriteConflict conflict) {
         }
 
         assertIsAborted(tx);

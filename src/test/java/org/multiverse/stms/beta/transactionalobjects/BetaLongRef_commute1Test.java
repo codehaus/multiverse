@@ -3,7 +3,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.WriteConflict;
+import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
@@ -276,7 +276,7 @@ public class BetaLongRef_commute1Test {
         try {
             tx.commit();
             fail();
-        } catch (WriteConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -315,7 +315,7 @@ public class BetaLongRef_commute1Test {
         try {
             tx.commit();
             fail();
-        } catch (WriteConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);

@@ -3,8 +3,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.ReadConflict;
-import org.multiverse.api.exceptions.WriteConflict;
+import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -170,7 +169,7 @@ public class BetaLongRef_incrementAndGet1Test {
         try {
             ref.incrementAndGet(1);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
 
         }
 
@@ -209,7 +208,7 @@ public class BetaLongRef_incrementAndGet1Test {
         try {
             tx.commit();
             fail();
-        } catch (WriteConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);

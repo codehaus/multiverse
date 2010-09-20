@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.NoTransactionFoundException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.ReadConflict;
+import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -209,7 +209,7 @@ public class BetaLongRef_privatizeTest {
         try {
             ref.privatize();
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
 
         }
 
@@ -328,7 +328,7 @@ public class BetaLongRef_privatizeTest {
         try {
             ref.privatize();
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
 
         }
 
@@ -354,7 +354,7 @@ public class BetaLongRef_privatizeTest {
         try {
             ref.privatize();
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
 
         }
 

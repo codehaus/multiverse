@@ -2,8 +2,7 @@ package org.multiverse.stms.beta.integrationtest.pessimistic;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.exceptions.ReadConflict;
-import org.multiverse.api.exceptions.WriteConflict;
+import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -34,7 +33,7 @@ public class PrivatizeTest {
         try {
             ref.privatize(tx);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
 
         }
 
@@ -55,7 +54,7 @@ public class PrivatizeTest {
         try {
             ref.privatize(tx);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
 
         }
 
@@ -76,7 +75,7 @@ public class PrivatizeTest {
         try {
             ref.get(otherTx);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
     }
 
@@ -109,7 +108,7 @@ public class PrivatizeTest {
         try {
             tx.commit();
             fail();
-        } catch (WriteConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -129,7 +128,7 @@ public class PrivatizeTest {
         try {
             ref.set(tx, 100);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -220,7 +219,7 @@ public class PrivatizeTest {
         try {
             ref.privatize(tx);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertNull(ref.___getLockOwner());

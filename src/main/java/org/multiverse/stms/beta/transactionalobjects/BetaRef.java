@@ -1051,6 +1051,4 @@ public final class BetaRef<E>
             StmUtils.retry();
         }        
     }
-
-
 }

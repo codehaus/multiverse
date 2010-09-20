@@ -2,7 +2,7 @@ package org.multiverse.stms.beta.integrationtest.isolation;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.exceptions.ReadConflict;
+import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -56,7 +56,7 @@ public class ReadConflictTest {
         try {
             ref2.get(tx);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);

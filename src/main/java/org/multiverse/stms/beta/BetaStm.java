@@ -24,16 +24,15 @@ public final class BetaStm implements Stm {
         return new BetaStm(new BetaStmConfiguration());
     }
 
-    private final BetaCollectionsFactoryImpl collectionsFactory = new BetaCollectionsFactoryImpl();
-    private final AtomicBlock defaultAtomicBlock;
+    public final BetaCollectionsFactoryImpl collectionsFactory = new BetaCollectionsFactoryImpl();
+    public final AtomicBlock defaultAtomicBlock;
     public final GlobalConflictCounter globalConflictCounter;
     public final int spinCount;
-    private final BetaTransactionConfiguration defaultConfig;
-    private final SimpleStorage storage;
+    public final BetaTransactionConfiguration defaultConfig;
+    public final SimpleStorage storage;
     public final SimpleProfiler simpleProfiler = new SimpleProfiler();
     public final BackoffPolicy defaultBackoffPolicy;
     public final int defaultMaxRetries;
-    private final StmCallback callback;
     public final BetaRefFactoryImpl defaultRefFactory = new BetaRefFactoryImpl();
 
     public BetaStm() {
@@ -46,7 +45,6 @@ public final class BetaStm implements Stm {
         this.spinCount = configuration.spinCount;
         this.defaultMaxRetries = configuration.maxRetries;
         this.defaultBackoffPolicy = configuration.backoffPolicy;
-        this.callback = configuration.stmCallback;
         this.globalConflictCounter = new GlobalConflictCounter(1);
         this.defaultConfig = new BetaTransactionConfiguration(this, configuration)
                 .setSpinCount(spinCount);
@@ -58,10 +56,6 @@ public final class BetaStm implements Stm {
 
     public SimpleProfiler getSimpleProfiler() {
         return simpleProfiler;
-    }
-
-    public StmCallback getCallback() {
-        return callback;
     }
 
     public Storage getStorage() {
@@ -78,10 +72,6 @@ public final class BetaStm implements Stm {
         return new BetaRefFactoryBuilderImpl();
     }
 
-    public int getSpinCount() {
-        return spinCount;
-    }
-
     public GlobalConflictCounter getGlobalConflictCounter() {
         return globalConflictCounter;
     }
@@ -94,10 +84,6 @@ public final class BetaStm implements Stm {
     @Override
     public AtomicBlock getDefaultAtomicBlock() {
         return defaultAtomicBlock;
-    }
-
-    public int getMaxArrayTransactionSize() {
-        return 20;
     }
 
     public final class BetaRefFactoryBuilderImpl implements BetaRefFactoryBuilder {

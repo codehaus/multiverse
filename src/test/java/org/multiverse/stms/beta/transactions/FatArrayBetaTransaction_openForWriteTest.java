@@ -307,7 +307,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         try {
             tx.openForWrite(ref2, false);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -357,7 +357,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         try {
             tx2.openForWrite(ref, false);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx2);
@@ -549,7 +549,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         try {
             tx.openForWrite(ref2, false);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -605,7 +605,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         try {
             tx.openForWrite(ref, false);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
 
         }
 
@@ -686,7 +686,7 @@ public class FatArrayBetaTransaction_openForWriteTest {
         try {
             tx.openForWrite(ref2, false);
             fail();
-        } catch (ReadConflict expected) {
+        } catch (ReadWriteConflict expected) {
 
         }
 

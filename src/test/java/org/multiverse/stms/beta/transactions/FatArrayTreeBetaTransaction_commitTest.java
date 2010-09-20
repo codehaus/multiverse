@@ -7,7 +7,7 @@ import org.mockito.InOrder;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.api.blocking.Latch;
-import org.multiverse.api.exceptions.WriteConflict;
+import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
@@ -220,7 +220,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         try {
             tx2.commit();
             fail();
-        } catch (WriteConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx2);
@@ -242,7 +242,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         try {
             tx.commit();
             fail();
-        } catch (WriteConflict e) {
+        } catch (ReadWriteConflict e) {
         }
 
         assertNull(ref.___getLockOwner());
@@ -457,7 +457,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         try {
             tx.commit();
             fail();
-        } catch (WriteConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -501,7 +501,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         try {
             tx.commit();
             fail();
-        } catch (WriteConflict conflict) {
+        } catch (ReadWriteConflict conflict) {
         }
 
         assertIsAborted(tx);

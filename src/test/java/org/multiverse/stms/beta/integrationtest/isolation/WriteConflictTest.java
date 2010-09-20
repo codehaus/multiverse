@@ -3,7 +3,7 @@ package org.multiverse.stms.beta.integrationtest.isolation;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.exceptions.WriteConflict;
+import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
@@ -51,7 +51,7 @@ public class WriteConflictTest {
         try {
             tx.commit();
             fail();
-        } catch (WriteConflict expected) {
+        } catch (ReadWriteConflict expected) {
 
         }
 
@@ -102,7 +102,7 @@ public class WriteConflictTest {
         try {
             tx.commit();
             fail();
-        } catch (WriteConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -129,7 +129,7 @@ public class WriteConflictTest {
         try {
             tx.commit();
             fail();
-        } catch (WriteConflict expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);

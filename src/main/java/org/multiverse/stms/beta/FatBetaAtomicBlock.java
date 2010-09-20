@@ -223,27 +223,17 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
-                    } catch (ReadConflict e) {
+                    } catch (ReadWriteConflict e) {
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
-                                    format("[%s] Encountered a readconflict",
+                                    format("[%s] Encountered a read or write conflict",
                                         transactionConfiguration.familyName));
                             }
                         }
 
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                    } catch (WriteConflict e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(
-                                    format("[%s] Encountered a writeconflict",
-                                        transactionConfiguration.familyName));
-                            }
-                        }
-
-                        backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                    }
+                    } 
                 } while (tx.softReset());
             } finally {
                 if(___ProfilingEnabled){
@@ -471,27 +461,17 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
-                    } catch (ReadConflict e) {
+                    } catch (ReadWriteConflict e) {
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
-                                    format("[%s] Encountered a readconflict",
+                                    format("[%s] Encountered a read or write conflict",
                                         transactionConfiguration.familyName));
                             }
                         }
 
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                    } catch (WriteConflict e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(
-                                    format("[%s] Encountered a writeconflict",
-                                        transactionConfiguration.familyName));
-                            }
-                        }
-
-                        backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                    }
+                    } 
                 } while (tx.softReset());
             } finally {
                 if(___ProfilingEnabled){
@@ -719,27 +699,17 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
-                    } catch (ReadConflict e) {
+                    } catch (ReadWriteConflict e) {
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
-                                    format("[%s] Encountered a readconflict",
+                                    format("[%s] Encountered a read or write conflict",
                                         transactionConfiguration.familyName));
                             }
                         }
 
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                    } catch (WriteConflict e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(
-                                    format("[%s] Encountered a writeconflict",
-                                        transactionConfiguration.familyName));
-                            }
-                        }
-
-                        backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                    }
+                    } 
                 } while (tx.softReset());
             } finally {
                 if(___ProfilingEnabled){
@@ -967,27 +937,17 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
-                    } catch (ReadConflict e) {
+                    } catch (ReadWriteConflict e) {
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
-                                    format("[%s] Encountered a readconflict",
+                                    format("[%s] Encountered a read or write conflict",
                                         transactionConfiguration.familyName));
                             }
                         }
 
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                    } catch (WriteConflict e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(
-                                    format("[%s] Encountered a writeconflict",
-                                        transactionConfiguration.familyName));
-                            }
-                        }
-
-                        backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                    }
+                    } 
                 } while (tx.softReset());
             } finally {
                 if(___ProfilingEnabled){
@@ -1215,27 +1175,17 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
-                    } catch (ReadConflict e) {
+                    } catch (ReadWriteConflict e) {
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
-                                    format("[%s] Encountered a readconflict",
+                                    format("[%s] Encountered a read or write conflict",
                                         transactionConfiguration.familyName));
                             }
                         }
 
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                    } catch (WriteConflict e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(
-                                    format("[%s] Encountered a writeconflict",
-                                        transactionConfiguration.familyName));
-                            }
-                        }
-
-                        backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                    }
+                    } 
                 } while (tx.softReset());
             } finally {
                 if(___ProfilingEnabled){
@@ -1470,27 +1420,17 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
-                    } catch (ReadConflict e) {
+                    } catch (ReadWriteConflict e) {
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
-                                    format("[%s] Encountered a readconflict",
+                                    format("[%s] Encountered a read or write conflict",
                                         transactionConfiguration.familyName));
                             }
                         }
 
                         backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                    } catch (WriteConflict e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(
-                                    format("[%s] Encountered a writeconflict",
-                                        transactionConfiguration.familyName));
-                            }
-                        }
-
-                        backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                    }
+                    } 
                 } while (tx.softReset());
             } finally {
                 if(___ProfilingEnabled){
