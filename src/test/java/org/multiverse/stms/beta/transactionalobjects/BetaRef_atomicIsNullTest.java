@@ -22,6 +22,27 @@ public class BetaRef_atomicIsNullTest {
         clearThreadLocalTransaction();
     }
 
+    @Test(expected = LockedException.class)
+    public void whenPrivatized_thenLockedException() {
+        BetaRef<String> ref = newRef(stm, null);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.privatize(tx);
+
+        ref.atomicIsNull();
+    }
+
+    @Test
+    public void whenEnsured_thenSuccess() {
+        BetaRef<String> ref = newRef(stm, null);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.ensure(tx);
+
+        boolean result = ref.atomicIsNull();
+        assertTrue(result);
+    }
+
     @Test
     public void whenNull() {
         BetaRef<String> ref = newRef(stm, null);
@@ -36,6 +57,7 @@ public class BetaRef_atomicIsNullTest {
         assertSame(committed, ref.___unsafeLoad());
     }
 
+    @Test
     public void whenActiveTransactionAvailable_thenIgnored() {
         BetaRef<String> ref = newRef(stm, "foo");
         RefTranlocal committed = ref.___unsafeLoad();

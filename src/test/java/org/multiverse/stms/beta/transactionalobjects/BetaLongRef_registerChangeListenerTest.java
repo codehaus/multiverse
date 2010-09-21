@@ -1,9 +1,7 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.multiverse.TestUtils;
 import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.functions.LongFunction;
@@ -17,9 +15,10 @@ import org.multiverse.stms.beta.transactions.FatArrayTreeBetaTransaction;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.multiverse.TestUtils.getField;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants {
     private BetaStm stm;
@@ -73,15 +72,107 @@ public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants 
     }
 
     @Test
-    @Ignore
-    public void whenLockedAndNoConflict_thenRegistered() {
+    public void whenPrivatizedAndNoConflict_thenRegistered() {
+        BetaLongRef ref = newLongRef(stm);
 
+        BetaTransaction tx = stm.startDefaultTransaction();
+        LongRefTranlocal read = tx.openForRead(ref, false);
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.privatize(otherTx);
+
+        Latch latch = new CheapLatch();
+        long listenerEra = latch.getEra();
+        int result = ref.___registerChangeListener(latch, read, pool, listenerEra);
+
+        assertEquals(REGISTRATION_DONE, result);
+        assertSurplus(2, ref);
+        assertHasListeners(ref, latch);
+        assertHasNoUpdateLock(ref);
+        assertHasCommitLock(ref);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSame(read, ref.___unsafeLoad());
+        assertFalse(latch.isOpen());
     }
 
     @Test
-    @Ignore
-    public void whenLockedAndConflict() {
+    public void whenEnsuredAndNoConflict_thenRegistered() {
+        BetaLongRef ref = newLongRef(stm);
 
+        BetaTransaction tx = stm.startDefaultTransaction();
+        LongRefTranlocal read = tx.openForRead(ref, false);
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.ensure(otherTx);
+
+        Latch latch = new CheapLatch();
+        long listenerEra = latch.getEra();
+        int result = ref.___registerChangeListener(latch, read, pool, listenerEra);
+
+        assertEquals(REGISTRATION_DONE, result);
+        assertSurplus(2, ref);
+        assertHasListeners(ref, latch);
+        assertHasUpdateLock(ref);
+        assertHasNoCommitLock(ref);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSame(read, ref.___unsafeLoad());
+        assertFalse(latch.isOpen());
+    }
+
+    @Test
+    public void whenPrivatizedAndInterestingChangeAlreadyHappened() {
+        BetaLongRef ref = newLongRef(stm);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        LongRefTranlocal read = tx.openForRead(ref, false);
+
+        ref.atomicIncrementAndGet(1);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.privatize(otherTx);
+
+        Latch latch = new CheapLatch();
+        long listenerEra = latch.getEra();
+        int result = ref.___registerChangeListener(latch, read, pool, listenerEra);
+
+        assertEquals(REGISTRATION_NOT_NEEDED, result);
+        assertNull(getField(ref, "___listeners"));
+        assertTrue(latch.isOpen());
+        assertSurplus(2, ref);
+        assertHasNoListeners(ref);
+        assertHasNoUpdateLock(ref);
+        assertHasCommitLock(ref);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+    }
+
+    @Test
+    public void wheEnsuredAndInterestingChangeAlreadyHappened() {
+        BetaLongRef ref = newLongRef(stm);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        LongRefTranlocal read = tx.openForRead(ref, false);
+
+        ref.atomicIncrementAndGet(1);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.ensure(otherTx);
+
+        Latch latch = new CheapLatch();
+        long listenerEra = latch.getEra();
+        int result = ref.___registerChangeListener(latch, read, pool, listenerEra);
+
+        assertEquals(REGISTRATION_NOT_NEEDED, result);
+        assertNull(getField(ref, "___listeners"));
+        assertTrue(latch.isOpen());
+        assertSurplus(2, ref);
+        assertHasNoListeners(ref);
+        assertHasUpdateLock(ref);
+        assertHasNoCommitLock(ref);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
     }
 
     @Test
@@ -95,7 +186,7 @@ public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants 
         int result = ref.___registerChangeListener(latch, read, pool, listenerEra);
 
         assertEquals(REGISTRATION_NONE, result);
-        TestUtils.assertHasNoListeners(ref);
+        assertHasNoListeners(ref);
         assertFalse(latch.isOpen());
     }
 

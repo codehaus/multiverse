@@ -23,10 +23,28 @@ public class BetaLongRef_openForCommuteTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenLocked_thenOpenForCommuteNoProblem() {
+    public void whenPrepared_thenOpenForCommuteNoProblem() {
         BetaLongRef ref = newLongRef(stm, 100);
         BetaTransaction tx = stm.startDefaultTransaction();
-        tx.openForRead(ref, true);
+        ref.ensure(tx);
+
+        LongRefTranlocal tranlocal = ref.___openForCommute(pool);
+
+        assertNotNull(tranlocal);
+        assertFalse(tranlocal.isCommitted);
+        assertTrue(tranlocal.isCommuting);
+        assertEquals(DIRTY_UNKNOWN, tranlocal.isDirty);
+        assertEquals(0, tranlocal.value);
+        assertNull(tranlocal.read);
+        assertNull(tranlocal.headCallable);
+        assertFalse(tranlocal.isPermanent);
+    }
+
+      @Test
+    public void whenPrivatized_thenOpenForCommuteNoProblem() {
+        BetaLongRef ref = newLongRef(stm, 100);
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.privatize(tx);
 
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
 
