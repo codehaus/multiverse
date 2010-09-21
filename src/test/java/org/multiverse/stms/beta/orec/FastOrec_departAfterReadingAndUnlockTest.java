@@ -10,13 +10,14 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 public class FastOrec_departAfterReadingAndUnlockTest {
 
     @Test
-    public void whenMultipleArrivesAndLocked(){
+    public void whenMultipleArrivesAndLockedForCommit() {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
         orec.___arrive(2);
-        orec.___tryLockAndArrive(1,true);
+        orec.___tryLockAndArrive(1, true);
 
         orec.___departAfterReadingAndUnlock();
+
         assertSurplus(2, orec);
         assertHasNoCommitLock(orec);
         assertHasNoUpdateLock(orec);
@@ -25,9 +26,25 @@ public class FastOrec_departAfterReadingAndUnlockTest {
     }
 
     @Test
+    public void whenMultipleArrivesAndLockedForUpdate() {
+        FastOrec orec = new FastOrec();
+        orec.___arrive(1);
+        orec.___arrive(2);
+        orec.___tryLockAndArrive(1, false);
+
+        orec.___departAfterReadingAndUnlock();
+
+        assertSurplus(2, orec);
+        assertHasNoCommitLock(orec);
+        assertHasNoUpdateLock(orec);
+        assertUpdateBiased(orec);
+        assertReadonlyCount(1, orec);
+    }
+   
+    @Test
     public void whenSuccess() {
         FastOrec orec = new FastOrec();
-        orec.___tryLockAndArrive(1,true);
+        orec.___tryLockAndArrive(1, true);
 
         orec.___departAfterReadingAndUnlock();
         assertSurplus(0, orec);
@@ -39,7 +56,7 @@ public class FastOrec_departAfterReadingAndUnlockTest {
 
     @Test
     @Ignore
-    public void whenLockedAndReadBiased(){
+    public void whenLockedAndReadBiased() {
 
     }
 

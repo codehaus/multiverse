@@ -18,7 +18,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 public class DeadLockStressTest {
 
     enum Mode {
-        Normal, Mix, PessimisticReadLevelMode, PessimisticWriteLevelMode
+        Normal, Mix, PrivatizeReadLevelMode, PrivatizeWriteLevelMode
     }
 
     private volatile boolean stop;
@@ -48,12 +48,12 @@ public class DeadLockStressTest {
 
     @Test
     public void whenPessimisticReadLevel() {
-        test(Mode.PessimisticReadLevelMode);
+        test(Mode.PrivatizeReadLevelMode);
     }
 
     @Test
     public void whenPessimisticWriteLevel() {
-        test(Mode.PessimisticWriteLevelMode);
+        test(Mode.PrivatizeWriteLevelMode);
     }
 
     public void test(Mode mode) {
@@ -100,11 +100,11 @@ public class DeadLockStressTest {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
                 switch (mode) {
-                    case PessimisticReadLevelMode:
-                        pessimisticReadLevel();
+                    case PrivatizeReadLevelMode:
+                        privatizeReadLevel();
                         break;
-                    case PessimisticWriteLevelMode:
-                        pessimisticWriteLevel();
+                    case PrivatizeWriteLevelMode:
+                        privatizeWriteLevel();
                         break;
                     case Normal:
                         normal();
@@ -112,10 +112,10 @@ public class DeadLockStressTest {
                     case Mix:
                         switch (randomInt(3)) {
                             case 0:
-                                pessimisticReadLevel();
+                                privatizeReadLevel();
                                 break;
                             case 1:
-                                pessimisticWriteLevel();
+                                privatizeWriteLevel();
                                 break;
                             case 2:
                                 normal();
@@ -141,7 +141,7 @@ public class DeadLockStressTest {
             });
         }
 
-        public void pessimisticReadLevel() {
+        public void privatizeReadLevel() {
             pessimisticReadLevelBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
@@ -150,7 +150,7 @@ public class DeadLockStressTest {
             });
         }
 
-        public void pessimisticWriteLevel() {
+        public void privatizeWriteLevel() {
             pessimisticWriteLevelBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
