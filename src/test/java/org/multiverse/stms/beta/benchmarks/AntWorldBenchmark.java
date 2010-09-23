@@ -3,6 +3,7 @@ package org.multiverse.stms.beta.benchmarks;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
@@ -62,7 +63,7 @@ public class AntWorldBenchmark {
         System.out.printf("Performance %s reads/second\n", format(worldSize * transactionsPerSecondPerThread));
     }
 
-    class SnapshotThread extends Thread {
+    class SnapshotThread extends TestThread {
 
         private final long transactionCount;
         private long durationMs;
@@ -73,7 +74,7 @@ public class AntWorldBenchmark {
         }
 
         @Override
-        public void run() {
+        public void doRun() {
             long startMs = System.currentTimeMillis();
 
             AtomicBlock block = stm.createTransactionFactoryBuilder()

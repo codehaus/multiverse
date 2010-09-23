@@ -19,7 +19,7 @@ import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 public class WriteConflictTest {
 
     private BetaStm stm;
-  
+
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
@@ -43,10 +43,8 @@ public class WriteConflictTest {
         LongRefTranlocal write = tx.openForWrite(ref, false);
         write.value++;
 
-        BetaTransaction otherTx = stm.startDefaultTransaction();
-        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false);
-        conflictingWrite.value++;
-        otherTx.commit();
+        ref.atomicIncrementAndGet(1);
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         try {
             tx.commit();
@@ -56,7 +54,7 @@ public class WriteConflictTest {
         }
 
         assertIsAborted(tx);
-        assertSame(conflictingWrite, ref.___unsafeLoad());
+        assertSame(committed, ref.___unsafeLoad());
     }
 
     @Test
@@ -68,17 +66,16 @@ public class WriteConflictTest {
                 .setDirtyCheckEnabled(true)
                 .build()
                 .start();
-        LongRefTranlocal write = tx.openForWrite(ref, false);
 
-        BetaTransaction otherTx = stm.startDefaultTransaction();
-        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false);
-        conflictingWrite.value++;
-        otherTx.commit();
+        tx.openForWrite(ref, false);
+
+        ref.atomicIncrementAndGet(1);
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         tx.commit();
 
         assertIsCommitted(tx);
-        assertSame(conflictingWrite, ref.___unsafeLoad());
+        assertSame(committed, ref.___unsafeLoad());
     }
 
 
@@ -94,10 +91,8 @@ public class WriteConflictTest {
         LongRefTranlocal write = tx.openForWrite(ref, false);
         write.value++;
 
-        BetaTransaction otherTx = stm.startDefaultTransaction();
-        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false);
-        conflictingWrite.value++;
-        otherTx.commit();
+        ref.atomicIncrementAndGet(1);
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         try {
             tx.commit();
@@ -106,7 +101,7 @@ public class WriteConflictTest {
         }
 
         assertIsAborted(tx);
-        assertSame(conflictingWrite, ref.___unsafeLoad());
+        assertSame(committed, ref.___unsafeLoad());
     }
 
     @Test
@@ -121,10 +116,8 @@ public class WriteConflictTest {
         LongRefTranlocal write = tx.openForWrite(ref, false);
         write.value++;
 
-        BetaTransaction otherTx = stm.startDefaultTransaction();
-        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false);
-        conflictingWrite.value++;
-        otherTx.commit();
+        ref.atomicIncrementAndGet(1);
+        LongRefTranlocal committed = ref.___unsafeLoad();
 
         try {
             tx.commit();
@@ -133,6 +126,6 @@ public class WriteConflictTest {
         }
 
         assertIsAborted(tx);
-        assertSame(conflictingWrite, ref.___unsafeLoad());
+        assertSame(committed, ref.___unsafeLoad());
     }
 }

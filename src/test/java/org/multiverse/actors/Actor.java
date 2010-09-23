@@ -1,14 +1,11 @@
 package org.multiverse.actors;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-
 /**
  * @author Peter Veentjer
  */
 public abstract class Actor {
 
-    private final BlockingQueue mailbox = new ArrayBlockingQueue(1000, false);
+    private final ImprovedBlockingQueue mailbox = new ImprovedBlockingQueue(1000);
     private final Thread thread = new WorkerThread();
     private final String SHUTDOWN = "shutdown";
 
@@ -19,6 +16,14 @@ public abstract class Actor {
     public final void send(Object item) throws InterruptedException {
         mailbox.put(item);
     }
+
+    ImprovedBlockingQueue.PutClosure putClosure = mailbox.createPutClosure();
+
+    public final void sendHack(Object item) throws InterruptedException {
+        putClosure.item = item;
+        mailbox.put(putClosure);
+    }
+
 
     public final void shutdown() throws InterruptedException {
         mailbox.put(SHUTDOWN);

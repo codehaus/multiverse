@@ -1,23 +1,25 @@
 package org.multiverse.stms.beta.benchmarks;
 
+import org.multiverse.TestThread;
+import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
-import org.multiverse.stms.beta.transactions.FatArrayTreeBetaTransaction;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import static org.multiverse.TestUtils.joinAll;
+import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 import static org.multiverse.stms.beta.BetaStmUtils.newReadBiasedLongRef;
-import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.toGnuplot;
-import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
+import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
 public class UncontendedMultipleUpdateScalabilityTest {
 
     private BetaStm stm;
-    private final long transactionsPerThread = 100 * 1000 * 1000;
+    private final long transactionsPerThread = 400 * 1000 * 1000;
 
 
     public static void main(String[] args) {
@@ -37,7 +39,7 @@ public class UncontendedMultipleUpdateScalabilityTest {
         System.out.printf("Multiverse> %s Transactions per thread\n", format(transactionsPerThread));
         Result[] result = new Result[processors.length];
 
-        System.out.printf("Multiverse> Starting warmup run\n");
+        System.out.printf("Multiverse> Starting warmup run (1 ref per transaction and 1 thread)\n");
         test(1, 1);
         System.out.printf("Multiverse> Finished warmup run\n");
 
@@ -63,20 +65,17 @@ public class UncontendedMultipleUpdateScalabilityTest {
 
         ReadThread[] threads = new ReadThread[threadCount];
 
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .setDirtyCheckEnabled(false)
+                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
+        config.maxArrayTransactionSize = refCount;
+
         for (int k = 0; k < threads.length; k++) {
-            threads[k] = new ReadThread(k, refCount);
-        }
-        for (ReadThread thread : threads) {
-            thread.start();
+            threads[k] = new ReadThread(k, refCount, config);
         }
 
-        for (ReadThread thread : threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        startAll(threads);
+        joinAll(threads);
 
         long totalDurationMs = 0;
         for (ReadThread t : threads) {
@@ -85,7 +84,10 @@ public class UncontendedMultipleUpdateScalabilityTest {
 
         double readsPerSecondPerThread = BenchmarkUtils.transactionsPerSecondPerThread(
                 transactionsPerThread * refCount, totalDurationMs, threadCount);
-
+        System.out.printf("Multiverse> Performance %s transactions/second with %s threads\n",
+                transactionsPerSecondAsString(transactionsPerThread, totalDurationMs, threadCount), threadCount);
+        System.out.printf("Multiverse> Performance %s transactions/second/thread with %s threads\n",
+                transactionsPerSecondPerThreadAsString(transactionsPerThread, totalDurationMs, threadCount), threadCount);
         System.out.printf("Multiverse> Performance %s writes/second/thread with %s threads\n",
                 format(readsPerSecondPerThread), threadCount);
         System.out.printf("Multiverse> Performance %s writes/second with %s threads\n",
@@ -95,23 +97,28 @@ public class UncontendedMultipleUpdateScalabilityTest {
         return readsPerSecondPerThread;
     }
 
-    class ReadThread extends Thread {
+    class ReadThread extends TestThread {
         private final int refCount;
         private long durationMs;
+        private BetaTransactionConfiguration betaTransactionConfiguration;
 
-        public ReadThread(int id, int refCount) {
+        public ReadThread(int id, int refCount, BetaTransactionConfiguration betaTransactionConfiguration) {
             super("ReadThread-" + id);
             setPriority(Thread.MAX_PRIORITY);
             this.refCount = refCount;
+            this.betaTransactionConfiguration = betaTransactionConfiguration;
         }
 
-        public void run() {
+        public void doRun() {
             switch (refCount) {
                 case 1:
                     run1();
                     break;
                 case 2:
                     run2();
+                    break;
+                case 3:
+                    run3();
                     break;
                 case 4:
                     run4();
@@ -135,10 +142,7 @@ public class UncontendedMultipleUpdateScalabilityTest {
 
         public void run1() {
             BetaLongRef ref1 = newReadBiasedLongRef(stm);
-
-            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 1).init();;
-
-            FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
+            FatArrayBetaTransaction tx = new FatArrayBetaTransaction(betaTransactionConfiguration);
 
             long startMs = System.currentTimeMillis();
 
@@ -156,18 +160,37 @@ public class UncontendedMultipleUpdateScalabilityTest {
             BetaLongRef ref1 = newReadBiasedLongRef(stm);
             BetaLongRef ref2 = newReadBiasedLongRef(stm);
 
-            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 2).init();
-
-            FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
+            FatArrayBetaTransaction tx = new FatArrayBetaTransaction(betaTransactionConfiguration);
 
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
-                tx.openForWrite(ref1, false);
-                tx.openForWrite(ref2, false);
+                tx.openForWrite(ref1, false).value++;
+                tx.openForWrite(ref2, false).value++;
                 tx.commit();
                 tx.hardReset();
 
+            }
+
+            durationMs = System.currentTimeMillis() - startMs;
+            System.out.printf("Multiverse> %s is finished in %s ms\n", getName(), durationMs);
+        }
+
+        public void run3() {
+            BetaLongRef ref1 = newReadBiasedLongRef(stm);
+            BetaLongRef ref2 = newReadBiasedLongRef(stm);
+            BetaLongRef ref3 = newReadBiasedLongRef(stm);
+
+             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(betaTransactionConfiguration);
+
+            long startMs = System.currentTimeMillis();
+
+            for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
+                tx.openForWrite(ref1, false).value++;
+                tx.openForWrite(ref2, false).value++;
+                tx.openForWrite(ref3, false).value++;
+                tx.commit();
+                tx.hardReset();
             }
 
             durationMs = System.currentTimeMillis() - startMs;
@@ -180,16 +203,15 @@ public class UncontendedMultipleUpdateScalabilityTest {
             BetaLongRef ref3 = newReadBiasedLongRef(stm);
             BetaLongRef ref4 = newReadBiasedLongRef(stm);
 
-            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm,4).init();
-            FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
+            FatArrayBetaTransaction tx = new FatArrayBetaTransaction(betaTransactionConfiguration);
 
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
-                tx.openForWrite(ref1, false);
-                tx.openForWrite(ref2, false);
-                tx.openForWrite(ref3, false);
-                tx.openForWrite(ref4, false);
+                tx.openForWrite(ref1, false).value++;
+                tx.openForWrite(ref2, false).value++;
+                tx.openForWrite(ref3, false).value++;
+                tx.openForWrite(ref4, false).value++;
                 tx.commit();
                 tx.hardReset();
             }
@@ -208,20 +230,19 @@ public class UncontendedMultipleUpdateScalabilityTest {
             BetaLongRef ref7 = newReadBiasedLongRef(stm);
             BetaLongRef ref8 = newReadBiasedLongRef(stm);
 
-            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm,8).init();
-            FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
+            FatArrayBetaTransaction tx = new FatArrayBetaTransaction(betaTransactionConfiguration);
 
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
-                tx.openForWrite(ref1, false);
-                tx.openForWrite(ref2, false);
-                tx.openForWrite(ref3, false);
-                tx.openForWrite(ref4, false);
-                tx.openForWrite(ref5, false);
-                tx.openForWrite(ref6, false);
-                tx.openForWrite(ref7, false);
-                tx.openForWrite(ref8, false);
+                tx.openForWrite(ref1, false).value++;
+                tx.openForWrite(ref2, false).value++;
+                tx.openForWrite(ref3, false).value++;
+                tx.openForWrite(ref4, false).value++;
+                tx.openForWrite(ref5, false).value++;
+                tx.openForWrite(ref6, false).value++;
+                tx.openForWrite(ref7, false).value++;
+                tx.openForWrite(ref8, false).value++;
 
                 tx.commit();
                 tx.hardReset();
@@ -250,28 +271,27 @@ public class UncontendedMultipleUpdateScalabilityTest {
             BetaLongRef ref15 = newReadBiasedLongRef(stm);
             BetaLongRef ref16 = newReadBiasedLongRef(stm);
 
-            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm,16);
-            FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
+            FatArrayBetaTransaction tx = new FatArrayBetaTransaction(betaTransactionConfiguration);
 
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
-                tx.openForWrite(ref1, false);
-                tx.openForWrite(ref2, false);
-                tx.openForWrite(ref3, false);
-                tx.openForWrite(ref4, false);
-                tx.openForWrite(ref5, false);
-                tx.openForWrite(ref6, false);
-                tx.openForWrite(ref7, false);
-                tx.openForWrite(ref8, false);
-                tx.openForWrite(ref9, false);
-                tx.openForWrite(ref10, false);
-                tx.openForWrite(ref11, false);
-                tx.openForWrite(ref12, false);
-                tx.openForWrite(ref13, false);
-                tx.openForWrite(ref14, false);
-                tx.openForWrite(ref15, false);
-                tx.openForWrite(ref16, false);
+                tx.openForWrite(ref1, false).value++;
+                tx.openForWrite(ref2, false).value++;
+                tx.openForWrite(ref3, false).value++;
+                tx.openForWrite(ref4, false).value++;
+                tx.openForWrite(ref5, false).value++;
+                tx.openForWrite(ref6, false).value++;
+                tx.openForWrite(ref7, false).value++;
+                tx.openForWrite(ref8, false).value++;
+                tx.openForWrite(ref9, false).value++;
+                tx.openForWrite(ref10, false).value++;
+                tx.openForWrite(ref11, false).value++;
+                tx.openForWrite(ref12, false).value++;
+                tx.openForWrite(ref13, false).value++;
+                tx.openForWrite(ref14, false).value++;
+                tx.openForWrite(ref15, false).value++;
+                tx.openForWrite(ref16, false).value++;
 
                 tx.commit();
                 tx.hardReset();
@@ -316,44 +336,43 @@ public class UncontendedMultipleUpdateScalabilityTest {
             BetaLongRef ref31 = newReadBiasedLongRef(stm);
             BetaLongRef ref32 = newReadBiasedLongRef(stm);
 
-            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm,32).init();
-            FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
+            FatArrayBetaTransaction tx = new FatArrayBetaTransaction(betaTransactionConfiguration);
 
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
-                tx.openForWrite(ref1, false);
-                tx.openForWrite(ref2, false);
-                tx.openForWrite(ref3, false);
-                tx.openForWrite(ref4, false);
-                tx.openForWrite(ref5, false);
-                tx.openForWrite(ref6, false);
-                tx.openForWrite(ref7, false);
-                tx.openForWrite(ref8, false);
-                tx.openForWrite(ref9, false);
-                tx.openForWrite(ref10, false);
-                tx.openForWrite(ref11, false);
-                tx.openForWrite(ref12, false);
-                tx.openForWrite(ref13, false);
-                tx.openForWrite(ref14, false);
-                tx.openForWrite(ref15, false);
-                tx.openForWrite(ref16, false);
-                tx.openForWrite(ref17, false);
-                tx.openForWrite(ref18, false);
-                tx.openForWrite(ref19, false);
-                tx.openForWrite(ref20, false);
-                tx.openForWrite(ref21, false);
-                tx.openForWrite(ref22, false);
-                tx.openForWrite(ref23, false);
-                tx.openForWrite(ref24, false);
-                tx.openForWrite(ref25, false);
-                tx.openForWrite(ref26, false);
-                tx.openForWrite(ref27, false);
-                tx.openForWrite(ref28, false);
-                tx.openForWrite(ref29, false);
-                tx.openForWrite(ref30, false);
-                tx.openForWrite(ref31, false);
-                tx.openForWrite(ref32, false);
+                tx.openForWrite(ref1, false).value++;
+                tx.openForWrite(ref2, false).value++;
+                tx.openForWrite(ref3, false).value++;
+                tx.openForWrite(ref4, false).value++;
+                tx.openForWrite(ref5, false).value++;
+                tx.openForWrite(ref6, false).value++;
+                tx.openForWrite(ref7, false).value++;
+                tx.openForWrite(ref8, false).value++;
+                tx.openForWrite(ref9, false).value++;
+                tx.openForWrite(ref10, false).value++;
+                tx.openForWrite(ref11, false).value++;
+                tx.openForWrite(ref12, false).value++;
+                tx.openForWrite(ref13, false).value++;
+                tx.openForWrite(ref14, false).value++;
+                tx.openForWrite(ref15, false).value++;
+                tx.openForWrite(ref16, false).value++;
+                tx.openForWrite(ref17, false).value++;
+                tx.openForWrite(ref18, false).value++;
+                tx.openForWrite(ref19, false).value++;
+                tx.openForWrite(ref20, false).value++;
+                tx.openForWrite(ref21, false).value++;
+                tx.openForWrite(ref22, false).value++;
+                tx.openForWrite(ref23, false).value++;
+                tx.openForWrite(ref24, false).value++;
+                tx.openForWrite(ref25, false).value++;
+                tx.openForWrite(ref26, false).value++;
+                tx.openForWrite(ref27, false).value++;
+                tx.openForWrite(ref28, false).value++;
+                tx.openForWrite(ref29, false).value++;
+                tx.openForWrite(ref30, false).value++;
+                tx.openForWrite(ref31, false).value++;
+                tx.openForWrite(ref32, false).value++;
 
                 tx.commit();
                 tx.hardReset();
@@ -430,76 +449,75 @@ public class UncontendedMultipleUpdateScalabilityTest {
             BetaLongRef ref63 = newReadBiasedLongRef(stm);
             BetaLongRef ref64 = newReadBiasedLongRef(stm);
 
-            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm,64).init();
-            FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
+            FatArrayBetaTransaction tx = new FatArrayBetaTransaction(betaTransactionConfiguration);
 
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
-                tx.openForWrite(ref1, false);
-                tx.openForWrite(ref2, false);
-                tx.openForWrite(ref3, false);
-                tx.openForWrite(ref4, false);
-                tx.openForWrite(ref5, false);
-                tx.openForWrite(ref6, false);
-                tx.openForWrite(ref7, false);
-                tx.openForWrite(ref8, false);
-                tx.openForWrite(ref9, false);
-                tx.openForWrite(ref10, false);
-                tx.openForWrite(ref11, false);
-                tx.openForWrite(ref12, false);
-                tx.openForWrite(ref13, false);
-                tx.openForWrite(ref14, false);
-                tx.openForWrite(ref15, false);
-                tx.openForWrite(ref16, false);
-                tx.openForWrite(ref17, false);
-                tx.openForWrite(ref18, false);
-                tx.openForWrite(ref19, false);
-                tx.openForWrite(ref20, false);
-                tx.openForWrite(ref21, false);
-                tx.openForWrite(ref22, false);
-                tx.openForWrite(ref23, false);
-                tx.openForWrite(ref24, false);
-                tx.openForWrite(ref25, false);
-                tx.openForWrite(ref26, false);
-                tx.openForWrite(ref27, false);
-                tx.openForWrite(ref28, false);
-                tx.openForWrite(ref29, false);
-                tx.openForWrite(ref30, false);
-                tx.openForWrite(ref31, false);
-                tx.openForWrite(ref32, false);
-                tx.openForWrite(ref33, false);
-                tx.openForWrite(ref34, false);
-                tx.openForWrite(ref35, false);
-                tx.openForWrite(ref36, false);
-                tx.openForWrite(ref37, false);
-                tx.openForWrite(ref38, false);
-                tx.openForWrite(ref39, false);
-                tx.openForWrite(ref40, false);
-                tx.openForWrite(ref41, false);
-                tx.openForWrite(ref42, false);
-                tx.openForWrite(ref43, false);
-                tx.openForWrite(ref44, false);
-                tx.openForWrite(ref45, false);
-                tx.openForWrite(ref46, false);
-                tx.openForWrite(ref47, false);
-                tx.openForWrite(ref48, false);
-                tx.openForWrite(ref49, false);
-                tx.openForWrite(ref50, false);
-                tx.openForWrite(ref51, false);
-                tx.openForWrite(ref52, false);
-                tx.openForWrite(ref53, false);
-                tx.openForWrite(ref54, false);
-                tx.openForWrite(ref55, false);
-                tx.openForWrite(ref56, false);
-                tx.openForWrite(ref57, false);
-                tx.openForWrite(ref58, false);
-                tx.openForWrite(ref59, false);
-                tx.openForWrite(ref60, false);
-                tx.openForWrite(ref61, false);
-                tx.openForWrite(ref62, false);
-                tx.openForWrite(ref63, false);
-                tx.openForWrite(ref64, false);
+                tx.openForWrite(ref1, false).value++;
+                tx.openForWrite(ref2, false).value++;
+                tx.openForWrite(ref3, false).value++;
+                tx.openForWrite(ref4, false).value++;
+                tx.openForWrite(ref5, false).value++;
+                tx.openForWrite(ref6, false).value++;
+                tx.openForWrite(ref7, false).value++;
+                tx.openForWrite(ref8, false).value++;
+                tx.openForWrite(ref9, false).value++;
+                tx.openForWrite(ref10, false).value++;
+                tx.openForWrite(ref11, false).value++;
+                tx.openForWrite(ref12, false).value++;
+                tx.openForWrite(ref13, false).value++;
+                tx.openForWrite(ref14, false).value++;
+                tx.openForWrite(ref15, false).value++;
+                tx.openForWrite(ref16, false).value++;
+                tx.openForWrite(ref17, false).value++;
+                tx.openForWrite(ref18, false).value++;
+                tx.openForWrite(ref19, false).value++;
+                tx.openForWrite(ref20, false).value++;
+                tx.openForWrite(ref21, false).value++;
+                tx.openForWrite(ref22, false).value++;
+                tx.openForWrite(ref23, false).value++;
+                tx.openForWrite(ref24, false).value++;
+                tx.openForWrite(ref25, false).value++;
+                tx.openForWrite(ref26, false).value++;
+                tx.openForWrite(ref27, false).value++;
+                tx.openForWrite(ref28, false).value++;
+                tx.openForWrite(ref29, false).value++;
+                tx.openForWrite(ref30, false).value++;
+                tx.openForWrite(ref31, false).value++;
+                tx.openForWrite(ref32, false).value++;
+                tx.openForWrite(ref33, false).value++;
+                tx.openForWrite(ref34, false).value++;
+                tx.openForWrite(ref35, false).value++;
+                tx.openForWrite(ref36, false).value++;
+                tx.openForWrite(ref37, false).value++;
+                tx.openForWrite(ref38, false).value++;
+                tx.openForWrite(ref39, false).value++;
+                tx.openForWrite(ref40, false).value++;
+                tx.openForWrite(ref41, false).value++;
+                tx.openForWrite(ref42, false).value++;
+                tx.openForWrite(ref43, false).value++;
+                tx.openForWrite(ref44, false).value++;
+                tx.openForWrite(ref45, false).value++;
+                tx.openForWrite(ref46, false).value++;
+                tx.openForWrite(ref47, false).value++;
+                tx.openForWrite(ref48, false).value++;
+                tx.openForWrite(ref49, false).value++;
+                tx.openForWrite(ref50, false).value++;
+                tx.openForWrite(ref51, false).value++;
+                tx.openForWrite(ref52, false).value++;
+                tx.openForWrite(ref53, false).value++;
+                tx.openForWrite(ref54, false).value++;
+                tx.openForWrite(ref55, false).value++;
+                tx.openForWrite(ref56, false).value++;
+                tx.openForWrite(ref57, false).value++;
+                tx.openForWrite(ref58, false).value++;
+                tx.openForWrite(ref59, false).value++;
+                tx.openForWrite(ref60, false).value++;
+                tx.openForWrite(ref61, false).value++;
+                tx.openForWrite(ref62, false).value++;
+                tx.openForWrite(ref63, false).value++;
+                tx.openForWrite(ref64, false).value++;
 
                 tx.commit();
                 tx.hardReset();

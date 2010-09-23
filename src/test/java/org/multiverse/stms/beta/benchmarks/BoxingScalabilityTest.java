@@ -1,5 +1,6 @@
 package org.multiverse.stms.beta.benchmarks;
 
+import org.multiverse.TestThread;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -11,6 +12,8 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
+import static org.multiverse.TestUtils.joinAll;
+import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 import static org.multiverse.stms.beta.BetaStmUtils.*;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
@@ -67,17 +70,8 @@ public class BoxingScalabilityTest {
             threads[k] = new PrimitiveThread(k, transactionsPerThread);
         }
 
-        for (PrimitiveThread thread : threads) {
-            thread.start();
-        }
-
-        for (PrimitiveThread thread : threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        startAll(threads);
+        joinAll(threads);
 
         long totalDurationMs = 0;
         for (PrimitiveThread t : threads) {
@@ -108,17 +102,8 @@ public class BoxingScalabilityTest {
             threads[k] = new BoxingThread(k, transactionsPerThread);
         }
 
-        for (BoxingThread thread : threads) {
-            thread.start();
-        }
-
-        for (BoxingThread thread : threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        startAll(threads);
+        joinAll(threads);
 
         long totalDurationMs = 0;
         for (BoxingThread t : threads) {
@@ -137,7 +122,7 @@ public class BoxingScalabilityTest {
         return transactionsPerSecondPerThread;
     }
 
-    class PrimitiveThread extends Thread {
+    class PrimitiveThread extends TestThread {
         private final long transactionCount;
         private long durationMs;
 
@@ -147,7 +132,7 @@ public class BoxingScalabilityTest {
             this.transactionCount = transactionCount;
         }
 
-        public void run() {
+        public void doRun() {
             BetaLongRef ref = newLongRef(stm);
 
             LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
@@ -168,7 +153,7 @@ public class BoxingScalabilityTest {
         }
     }
 
-    class BoxingThread extends Thread {
+    class BoxingThread extends TestThread {
         private final long transactionCount;
         private long durationMs;
 
@@ -178,7 +163,7 @@ public class BoxingScalabilityTest {
             this.transactionCount = transactionCount;
         }
 
-        public void run() {
+        public void doRun() {
             BetaRef<Long> ref = newRef(stm, new Long(0));
 
             LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(

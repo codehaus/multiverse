@@ -1,5 +1,6 @@
 package org.multiverse.stms.beta.benchmarks;
 
+import org.multiverse.TestThread;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
@@ -8,6 +9,8 @@ import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import static org.multiverse.TestUtils.joinAll;
+import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 import static org.multiverse.stms.beta.BetaStmUtils.newReadBiasedLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
@@ -66,17 +69,9 @@ public class UncontendedMultipleReadScalabilityTest {
         for (int k = 0; k < threads.length; k++) {
             threads[k] = new ReadThread(k, refCount);
         }
-        for (ReadThread thread : threads) {
-            thread.start();
-        }
 
-        for (ReadThread thread : threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        startAll(threads);
+        joinAll(threads);
 
         long totalDurationMs = 0;
         for (ReadThread t : threads) {
@@ -91,7 +86,7 @@ public class UncontendedMultipleReadScalabilityTest {
         return readsPerSecond;
     }
 
-    class ReadThread extends Thread {
+    class ReadThread extends TestThread {
         private final int refCount;
         private long durationMs;
 
@@ -101,7 +96,7 @@ public class UncontendedMultipleReadScalabilityTest {
             this.refCount = refCount;
         }
 
-        public void run() {
+        public void doRun() {
             switch (refCount) {
                 case 1:
                     run1();

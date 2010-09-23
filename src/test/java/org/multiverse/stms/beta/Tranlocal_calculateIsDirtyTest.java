@@ -1,7 +1,6 @@
 package org.multiverse.stms.beta;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
@@ -15,9 +14,11 @@ import static org.junit.Assert.*;
  */
 public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants {
     private BetaStm stm;
+    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
+        pool = new BetaObjectPool();
         stm = new BetaStm();
     }
 
@@ -32,14 +33,17 @@ public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants {
     }
 
     @Test
-    @Ignore
     public void whenCommuting() {
+        BetaLongRef ref = new BetaLongRef(stm, 0);
+        Tranlocal tranlocal = ref.___openForCommute(pool);
 
+        assertFalse(tranlocal.calculateIsDirty());
+        assertEquals(DIRTY_FALSE, tranlocal.isDirty);
     }
 
     @Test
     public void whenCommitted() {
-        BetaLongRef ref = new BetaLongRef(stm,0);
+        BetaLongRef ref = new BetaLongRef(stm, 0);
         Tranlocal tranlocal = new LongRefTranlocal(ref);
         tranlocal.prepareForCommit();
 
@@ -60,7 +64,7 @@ public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants {
 
     @Test
     public void whenDirty() {
-        BetaLongRef ref = new BetaLongRef(stm,0);
+        BetaLongRef ref = new BetaLongRef(stm, 0);
         LongRefTranlocal tranlocal = new LongRefTranlocal(ref);
         tranlocal.prepareForCommit();
 

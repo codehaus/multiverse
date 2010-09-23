@@ -21,8 +21,14 @@ import static java.lang.String.format;
  */
 public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
+    public final static int BITMASK_HAS_UPDATES = 0x1;
+    public final static int BITMASK_HAS_READS = 0x2;
+    public final static int BITMASK_HAS_UNTRACKED_READS = 0x4;
+    public final static int BITMASK_EVALUATING_COMMUTE = 0x8;
+
+    private int state = 0;
     private Tranlocal attached;
-    private boolean hasUpdates;
+//    private boolean hasUpdates;
 
     public LeanMonoBetaTransaction(final BetaStm stm){
         this(new BetaTransactionConfiguration(stm).init());
@@ -134,7 +140,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             result.value = read.value;
             result.read = read;
 
-            hasUpdates = true;
+            state = BITMASK_HAS_UPDATES | state;
+//            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -164,7 +171,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
         result.value = read.value;
         result.read = read;
-        hasUpdates = true;    
+        state = state | BITMASK_HAS_UPDATES;
+//        hasUpdates = true;
         attached = result;
         return result;
     }
@@ -325,7 +333,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             result.value = read.value;
             result.read = read;
 
-            hasUpdates = true;
+            state = BITMASK_HAS_UPDATES | state;
+//            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -355,7 +364,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
         result.value = read.value;
         result.read = read;
-        hasUpdates = true;    
+        state = state | BITMASK_HAS_UPDATES;
+//        hasUpdates = true;
         attached = result;
         return result;
     }
@@ -516,7 +526,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             result.value = read.value;
             result.read = read;
 
-            hasUpdates = true;
+            state = BITMASK_HAS_UPDATES | state;
+//            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -546,7 +557,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
         result.value = read.value;
         result.read = read;
-        hasUpdates = true;    
+        state = state | BITMASK_HAS_UPDATES;
+//        hasUpdates = true;
         attached = result;
         return result;
     }
@@ -707,7 +719,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             result.value = read.value;
             result.read = read;
 
-            hasUpdates = true;
+            state = BITMASK_HAS_UPDATES | state;
+//            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -737,7 +750,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
         result.value = read.value;
         result.read = read;
-        hasUpdates = true;    
+        state = state | BITMASK_HAS_UPDATES;
+//        hasUpdates = true;
         attached = result;
         return result;
     }
@@ -898,7 +912,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             result.value = read.value;
             result.read = read;
 
-            hasUpdates = true;
+            state = BITMASK_HAS_UPDATES | state;
+//            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -928,7 +943,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
         result.value = read.value;
         result.read = read;
-        hasUpdates = true;    
+        state = state | BITMASK_HAS_UPDATES;
+//        hasUpdates = true;
         attached = result;
         return result;
     }
@@ -1084,7 +1100,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
             Tranlocal result = read.openForWrite(pool);
 
-            hasUpdates = true;
+            state = BITMASK_HAS_UPDATES | state;
+//            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -1109,7 +1126,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
         final Tranlocal read = result;
         result = read.openForWrite(pool);
-        hasUpdates = true;    
+        state = state | BITMASK_HAS_UPDATES;
+//        hasUpdates = true;
         attached = result;
         return result;
     }
@@ -1231,7 +1249,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             
         Listeners listeners = null;
         if(attached != null){
-            final boolean needsPrepare = status == ACTIVE && hasUpdates;
+            final boolean needsPrepare = status == ACTIVE && (state & BITMASK_HAS_UPDATES) > 0;
             if(config.dirtyCheck){
                 if(needsPrepare && !doPrepareDirty()){
                     throw abortOnWriteConflict();
@@ -1278,7 +1296,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOnWriteConflict();
         }
 
-        if(hasUpdates){
+        if((state & BITMASK_HAS_UPDATES) > 0){
             if(config.dirtyCheck){
                 if(!doPrepareDirty()){
                     throw abortOnWriteConflict();
@@ -1388,7 +1406,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         status = ACTIVE;
-        hasUpdates = false;
+        status = 0;
+//        hasUpdates = false;
         attempt++;
         abortOnly = false;
         return true;
@@ -1402,7 +1421,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             }
         }
 
-        hasUpdates = false;
+        state = 0;
+//        hasUpdates = false;
         status = ACTIVE;
         abortOnly = false;        
         remainingTimeoutNs = config.timeoutNs;

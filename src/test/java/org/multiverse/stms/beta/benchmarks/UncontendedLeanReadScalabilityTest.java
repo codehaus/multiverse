@@ -1,5 +1,6 @@
 package org.multiverse.stms.beta.benchmarks;
 
+import org.multiverse.TestThread;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -9,6 +10,8 @@ import org.multiverse.stms.beta.transactions.LeanMonoBetaTransaction;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import static org.multiverse.TestUtils.joinAll;
+import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
@@ -61,17 +64,8 @@ public class UncontendedLeanReadScalabilityTest {
             threads[k] = new ReadThread(k, transactionsPerThread);
         }
 
-        for (ReadThread thread : threads) {
-            thread.start();
-        }
-
-        for (ReadThread thread : threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        startAll(threads);
+        joinAll(threads);
 
         long totalDurationMs = 0;
         for (ReadThread t : threads) {
@@ -89,7 +83,7 @@ public class UncontendedLeanReadScalabilityTest {
     }
 
     @SuppressWarnings({"UnusedAssignment"})
-    class ReadThread extends Thread {
+    class ReadThread extends TestThread {
         private final long transactionCount;
         private long durationMs;
 
@@ -99,7 +93,7 @@ public class UncontendedLeanReadScalabilityTest {
             this.transactionCount = transactionCount;
         }
 
-        public void run() {
+        public void doRun() {
             BetaLongRef ref = BetaStmUtils.newReadBiasedLongRef(stm);
 
             LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(

@@ -1,5 +1,6 @@
 package org.multiverse.stms.beta.benchmarks;
 
+import org.multiverse.TestThread;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
@@ -7,6 +8,8 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
+import static org.multiverse.TestUtils.joinAll;
+import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
@@ -61,17 +64,8 @@ public class UncontendedAtomicSetScalabilityTest {
             threads[k] = new UpdateThread(k, transactionsPerThread);
         }
 
-        for (UpdateThread thread : threads) {
-            thread.start();
-        }
-
-        for (UpdateThread thread : threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        startAll(threads);
+        joinAll(threads);
 
         long totalDurationMs = 0;
         for (UpdateThread t : threads) {
@@ -88,7 +82,7 @@ public class UncontendedAtomicSetScalabilityTest {
         return transactionsPerSecondPerThread;
     }
 
-    class UpdateThread extends Thread {
+    class UpdateThread extends TestThread {
         private final long transactionCount;
         private long durationMs;
 
@@ -98,7 +92,7 @@ public class UncontendedAtomicSetScalabilityTest {
             this.transactionCount = transactionCount;
         }
 
-        public void run() {
+        public void doRun() {
             BetaLongRef ref = newLongRef(stm, -1);
 
             long startMs = System.currentTimeMillis();

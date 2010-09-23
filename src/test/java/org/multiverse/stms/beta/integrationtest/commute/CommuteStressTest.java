@@ -20,7 +20,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class CommuteStressTest {
-     private BetaStm stm;
+    private BetaStm stm;
     private volatile boolean stop;
     private BetaLongRef[] refs;
     private int refCount = 10;
@@ -88,7 +88,7 @@ public class CommuteStressTest {
                 public long execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
                     for (int k = 0; k < refs.length; k++) {
-                        btx.commute(refs[k],IncLongFunction.INSTANCE_INC_ONE);
+                        btx.commute(refs[k], IncLongFunction.INSTANCE_INC_ONE);
                     }
                     return refs.length;
                 }

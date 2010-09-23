@@ -3,11 +3,14 @@ package org.multiverse.stms.beta.benchmarks;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.TestThread;
 
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static org.junit.Assert.assertEquals;
+import static org.multiverse.TestUtils.joinAll;
+import static org.multiverse.TestUtils.startAll;
 
 public class ConditionBenchmarkTest {
 
@@ -29,17 +32,13 @@ public class ConditionBenchmarkTest {
     public void test() throws InterruptedException {
         PingPongThread[] threads = createThreads();
 
-        for (PingPongThread thread : threads) {
-            thread.start();
-        }
+        startAll(threads);
 
         Thread.sleep(30 * 1000);
         stop = true;
 
         System.out.println("Waiting for joining threads");
-        for (PingPongThread thread : threads) {
-            thread.join();
-        }
+        joinAll(threads);
 
         assertEquals(sum(threads), value);
 
@@ -62,7 +61,7 @@ public class ConditionBenchmarkTest {
         return result;
     }
 
-    private class PingPongThread extends Thread {
+    private class PingPongThread extends TestThread {
         private final int id;
         private long count;
         private int expected;
@@ -73,7 +72,7 @@ public class ConditionBenchmarkTest {
         }
 
         @Override
-        public void run() {
+        public void doRun() {
             while (!stop) {
                 if (count % (100 * 1000) == 0) {
                     System.out.println(getName() + " " + count);
