@@ -31,7 +31,7 @@ public class VetoCommitBarrier_vetoCommitTest {
     @Test
     public void whenNoPendingTransactions() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
-        barrier.vetoCommit();
+        barrier.atomicVetoCommit();
 
         assertTrue(barrier.isCommitted());
     }
@@ -51,7 +51,7 @@ public class VetoCommitBarrier_vetoCommitTest {
         startAll(thread1, thread2, thread3);
 
         sleepMs(500);
-        barrier.vetoCommit();
+        barrier.atomicVetoCommit();
         joinAll(thread1, thread2, thread3);
 
         assertIsCommitted(thread1.tx);
@@ -66,9 +66,9 @@ public class VetoCommitBarrier_vetoCommitTest {
     @Test
     public void whenBarrierCommitted_thenIgnored() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
-        barrier.vetoCommit();
+        barrier.atomicVetoCommit();
 
-        barrier.vetoCommit();
+        barrier.atomicVetoCommit();
         assertTrue(barrier.isCommitted());
     }
 
@@ -78,7 +78,7 @@ public class VetoCommitBarrier_vetoCommitTest {
         barrier.abort();
 
         try {
-            barrier.vetoCommit();
+            barrier.atomicVetoCommit();
             fail();
         } catch (CommitBarrierOpenException expected) {
         }

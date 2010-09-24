@@ -38,7 +38,7 @@ public class VetoCommitBarrier_registerOnAbortTaskTest {
         Runnable task = mock(Runnable.class);
 
         barrier.registerOnAbortTask(task);
-        barrier.vetoCommit();
+        barrier.atomicVetoCommit();
 
         verify(task, never()).run();
     }
@@ -69,7 +69,7 @@ public class VetoCommitBarrier_registerOnAbortTaskTest {
     @Test
     public void whenCommitted_thenCommitBarrierOpenException() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
-        barrier.vetoCommit();
+        barrier.atomicVetoCommit();
 
         Runnable task = mock(Runnable.class);
         try {

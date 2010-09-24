@@ -2,7 +2,7 @@ package org.multiverse.commitbarriers;
 
 /**
  * An IllegalStateException that indicates that an operation was executed on the CommitBarrier while it
- * already
+ * already is opened.
  *
  * @author Peter Veentjer.
  */

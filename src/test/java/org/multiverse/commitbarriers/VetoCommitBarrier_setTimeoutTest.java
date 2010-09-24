@@ -38,7 +38,7 @@ public class VetoCommitBarrier_setTimeoutTest {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
 
         barrier.setTimeout(500, TimeUnit.MILLISECONDS);
-        barrier.vetoCommit();
+        barrier.atomicVetoCommit();
 
         sleepMs(1000);
         assertTrue(barrier.isCommitted());
@@ -58,7 +58,7 @@ public class VetoCommitBarrier_setTimeoutTest {
     @Test
     public void whenCommitted_thenCommitBarrierOpenException() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
-        barrier.vetoCommit();
+        barrier.atomicVetoCommit();
 
         try {
             barrier.setTimeout(10, TimeUnit.SECONDS);

@@ -83,7 +83,7 @@ public class VetoCommitBarrier_vetoCommitWithTransactionTest {
         assertAlive(t);
         assertTrue(barrier.isClosed());
 
-        barrier.vetoCommit();
+        barrier.atomicVetoCommit();
         t.join();
         t.assertNothingThrown();
         assertTrue(barrier.isCommitted());
@@ -155,7 +155,7 @@ public class VetoCommitBarrier_vetoCommitWithTransactionTest {
     @Test
     public void whenBarrierCommitted_thenCommitBarrierOpenException() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
-        barrier.vetoCommit();
+        barrier.atomicVetoCommit();
 
         Transaction tx = stm.startDefaultTransaction();
         try {

@@ -70,7 +70,7 @@ public class VetoCommitBarrier_abortTest {
     @Test
     public void whenBarrierCommitted_thenCommitBarrierOpenException() {
         barrier = new VetoCommitBarrier();
-        barrier.vetoCommit();
+        barrier.atomicVetoCommit();
 
         try {
             barrier.abort();

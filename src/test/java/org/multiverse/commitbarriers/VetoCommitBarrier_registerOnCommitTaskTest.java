@@ -38,7 +38,7 @@ public class VetoCommitBarrier_registerOnCommitTaskTest {
         Runnable task = mock(Runnable.class);
 
         barrier.registerOnCommitTask(task);
-        barrier.vetoCommit();
+        barrier.atomicVetoCommit();
 
         verify(task, times(1)).run();
     }
@@ -54,7 +54,7 @@ public class VetoCommitBarrier_registerOnCommitTaskTest {
         barrier.registerOnCommitTask(task2);
 
         try {
-            barrier.vetoCommit();
+            barrier.atomicVetoCommit();
             fail();
         } catch (FakeException expected) {
         }
@@ -68,7 +68,7 @@ public class VetoCommitBarrier_registerOnCommitTaskTest {
     @Test
     public void whenCommitted_thenCommitBarrierOpenException() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
-        barrier.vetoCommit();
+        barrier.atomicVetoCommit();
 
         Runnable task = mock(Runnable.class);
         try {

@@ -182,7 +182,7 @@ public class VetoCommitBarrier_joinCommitTest {
     @Test
     public void whenCommitted_thenCommitBarrierOpenException() throws InterruptedException {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
-        barrier.vetoCommit();
+        barrier.atomicVetoCommit();
 
         Transaction tx = txFactory.start();
         try {

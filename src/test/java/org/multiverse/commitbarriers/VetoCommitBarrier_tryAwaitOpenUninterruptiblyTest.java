@@ -80,7 +80,7 @@ public class VetoCommitBarrier_tryAwaitOpenUninterruptiblyTest {
         sleepMs(500);
         assertAlive(t);
 
-        barrier.vetoCommit();
+        barrier.atomicVetoCommit();
 
         t.join();
         t.assertNothingThrown();
@@ -130,7 +130,7 @@ public class VetoCommitBarrier_tryAwaitOpenUninterruptiblyTest {
     @Test
     public void whenCommitted() {
         barrier = new VetoCommitBarrier();
-        barrier.vetoCommit();
+        barrier.atomicVetoCommit();
 
         boolean result = barrier.tryAwaitOpenUninterruptibly(1, TimeUnit.DAYS);
 

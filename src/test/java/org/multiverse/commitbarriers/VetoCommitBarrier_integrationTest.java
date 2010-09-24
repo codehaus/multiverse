@@ -44,7 +44,7 @@ public class VetoCommitBarrier_integrationTest {
         startAll(t1, t2);
         sleepMs(1000);
 
-        barrier.vetoCommit();
+        barrier.atomicVetoCommit();
 
         joinAll(t1, t2);
 

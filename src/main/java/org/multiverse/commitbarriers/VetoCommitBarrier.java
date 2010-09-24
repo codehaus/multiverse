@@ -4,6 +4,8 @@ import org.multiverse.api.Transaction;
 
 import java.util.List;
 
+import static java.lang.String.format;
+
 /**
  * The VetoCommitBarrier is a synchronization primitive that makes it possible to execute a 2 phase commit;
  * so all transaction within a VetoCommitBarrier commit, or they all abort. The VetoCommitBarrier is useful if
@@ -51,7 +53,7 @@ public final class VetoCommitBarrier extends CommitBarrier {
      *
      * @throws CommitBarrierOpenException if the VetoCommitBarrier already is aborted.
      */
-    public void vetoCommit() {
+    public void atomicVetoCommit() {
         List<Runnable> postCommitTasks = null;
         lock.lock();
         try {
@@ -89,12 +91,12 @@ public final class VetoCommitBarrier extends CommitBarrier {
      * @throws NullPointerException       if tx is null.
      * @throws org.multiverse.api.exceptions.DeadTransactionException
      *                                    if the Transaction already is aborted or committed.
-     * @throws org.multiverse.api.exceptions.WriteConflict
+     * @throws org.multiverse.api.exceptions.ReadWriteConflict
      *                                    if the commit was not executed successfully.
      * @throws CommitBarrierOpenException if the VetoCommitBarrier already is open.
      */
     public void vetoCommit(Transaction tx) {
-        ensureNotDead(tx);
+        ensureNotDead(tx, "vetoCommit");
 
         List<Runnable> postCommitTasks = null;
         lock.lock();
@@ -105,10 +107,14 @@ public final class VetoCommitBarrier extends CommitBarrier {
                     postCommitTasks = signalCommit();
                     break;
                 case Aborted:
-                    String abortMsg = "Can't veto commit on already aborted VetoCommitBarrier";
+                    String abortMsg = format(
+                            "[%s] Can't veto commit on already aborted VetoCommitBarrier",
+                            tx.getConfiguration().getFamilyName());
                     throw new CommitBarrierOpenException(abortMsg);
                 case Committed:
-                    String commitMsg = "Can't veto commit on already committed VetoCommitBarrier";
+                    String commitMsg = format(
+                            "[%s] Can't veto commit on already committed VetoCommitBarrier",
+                            tx.getConfiguration().getFamilyName());
                     throw new CommitBarrierOpenException(commitMsg);
                 default:
                     throw new IllegalStateException();

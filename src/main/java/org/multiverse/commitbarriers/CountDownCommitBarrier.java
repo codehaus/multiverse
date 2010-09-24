@@ -116,14 +116,14 @@ public final class CountDownCommitBarrier extends CommitBarrier {
      * Adds 1 additional party to this CountDownCommitBarrier.
      *
      * @throws CommitBarrierOpenException if this CountDownCommitBarrier already is committed or aborted.
-     * @see #incParties(int)
+     * @see #atomicIncParties(int)
      */
     public void incParties() {
-        incParties(1);
+        atomicIncParties(1);
     }
 
     /**
-     * Adds additional parties to this CountDownCommitBarrier.
+     * Atomically adds additional parties to this CountDownCommitBarrier.
      * <p/>
      * Call is ignored when extra is 0.
      * <p/>
@@ -135,7 +135,7 @@ public final class CountDownCommitBarrier extends CommitBarrier {
      * @throws IllegalArgumentException   if extra smaller than 0.
      * @throws CommitBarrierOpenException if this CountDownCommitBarrier already is open.
      */
-    public void incParties(int extra) {
+    public void atomicIncParties(int extra) {
         if (extra < 0) {
             throw new IllegalArgumentException();
         }
@@ -191,7 +191,7 @@ public final class CountDownCommitBarrier extends CommitBarrier {
         }
 
         if (!tx.isAlive()) {
-            String msg = format("Can't call incParties on dead transaction '%s' because it is %s",
+            String msg = format("[%s] Can't call incParties on dead transaction because it is %s",
                     tx.getConfiguration().getFamilyName(),
                     tx.getStatus());
             throw new DeadTransactionException(msg);
@@ -209,10 +209,12 @@ public final class CountDownCommitBarrier extends CommitBarrier {
                     tx.register(new RestorePartiesCompensatingTask(extra));
                     break;
                 case Aborted:
-                    String abortMsg = "Can't call countDown on already aborted CountDownCommitBarrier";
+                    String abortMsg = format("[%s] Can't call incParties on already aborted CountDownCommitBarrier",
+                            tx.getConfiguration().getFamilyName());
                     throw new CommitBarrierOpenException(abortMsg);
                 case Committed:
-                    String commitMsg = "Can't call countDown on already committed CountDownCommitBarrier";
+                    String commitMsg = format("[%s] Can't call incParties on already committed CountDownCommitBarrier",
+                           tx.getConfiguration().getFamilyName());
                     throw new CommitBarrierOpenException(commitMsg);
                 default:
                     throw new IllegalStateException();

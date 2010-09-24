@@ -473,8 +473,9 @@ public abstract class CommitBarrier {
             tx.commit();
         } else if (isAborted()) {
             tx.abort();
-            //todo: better message
-            throw new IllegalStateException();
+            throw new IllegalStateException(
+                    format("[%s] Didn't expect to encounter an aborted transaction",
+                            tx.getConfiguration().getFamilyName()));
         }
     }
 
@@ -487,13 +488,16 @@ public abstract class CommitBarrier {
      * @throws DeadTransactionException if tx is dead.
      * @throws NullPointerException     if tx is null.
      */
-    protected final void ensureNotDead(Transaction tx) {
+    protected final void ensureNotDead(Transaction tx, String operation) {
         if (tx == null) {
             throw new NullPointerException();
         }
 
         if (!tx.isAlive()) {
-            throw new DeadTransactionException();
+            throw new DeadTransactionException(
+                    format("[%s] Transaction can't be used for %s since it isn't alive",
+                            tx.getConfiguration().getFamilyName(), operation)
+            );
         }
     }
 
@@ -513,7 +517,7 @@ public abstract class CommitBarrier {
      * @throws CommitBarrierOpenException if this VetoCommitBarrier is committed or aborted.
      */
     public void joinCommit(Transaction tx) throws InterruptedException {
-        ensureNotDead(tx);
+        ensureNotDead(tx, "joinCommit");
 
         List<Runnable> tasks = null;
 
@@ -570,7 +574,7 @@ public abstract class CommitBarrier {
      * @throws CommitBarrierOpenException if this VetoCommitBarrier is committed or aborted.
      */
     public void joinCommitUninterruptibly(Transaction tx) {
-        ensureNotDead(tx);
+        ensureNotDead(tx, "joinCommitUninterruptibly");
 
         List<Runnable> postCommitTasks = new ArrayList<Runnable>();
         lock.lock();
@@ -623,7 +627,7 @@ public abstract class CommitBarrier {
      * @throws NullPointerException       if tx is null.
      */
     public boolean tryJoinCommit(Transaction tx) {
-        ensureNotDead(tx);
+        ensureNotDead(tx,"tryJoinCommit");
 
         List<Runnable> postCommitTasks = null;
         boolean abort = true;
@@ -643,12 +647,12 @@ public abstract class CommitBarrier {
                         }
                         break;
                     case Aborted:
-                        String abortMsg = format("Can't call tryJoinCommit on already aborted " +
-                                "CountDownCommitBarrier with transaction %s ", tx.getConfiguration().getFamilyName());
+                        String abortMsg = format("[%s] Can't call tryJoinCommit on already aborted " +
+                                "CountDownCommitBarrier", tx.getConfiguration().getFamilyName());
                         throw new CommitBarrierOpenException(abortMsg);
                     case Committed:
-                        String commitMsg = format("Can't call tryJoinCommit on already committed " +
-                                "CountDownCommitBarrier with transaction %s ", tx.getConfiguration().getFamilyName());
+                        String commitMsg = format("[%s] Can't call tryJoinCommit on already committed " +
+                                "CountDownCommitBarrier", tx.getConfiguration().getFamilyName());
                         throw new CommitBarrierOpenException(commitMsg);
                     default:
                         throw new IllegalStateException();
@@ -692,7 +696,7 @@ public abstract class CommitBarrier {
      * @throws InterruptedException       if the calling thread is interrupted while waiting.
      */
     public boolean tryJoinCommit(Transaction tx, long timeout, TimeUnit unit) throws InterruptedException {
-        ensureNotDead(tx);
+        ensureNotDead(tx, "tryJoinCommit");
 
         long timeoutNs = unit.toNanos(timeout);
 
@@ -763,7 +767,7 @@ public abstract class CommitBarrier {
      * @throws NullPointerException       if tx or unit is null is null.
      */
     public boolean tryJoinCommitUninterruptibly(Transaction tx, long timeout, TimeUnit unit) {
-        ensureNotDead(tx);
+        ensureNotDead(tx, "tryJoinCommitUninterruptibly");
 
         long timeoutNs = unit.toNanos(timeout);
 

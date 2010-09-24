@@ -20,7 +20,7 @@ public class CountDownCommitBarrier_incPartiesTest {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(10);
 
         try {
-            barrier.incParties(-1);
+            barrier.atomicIncParties(-1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
@@ -33,7 +33,7 @@ public class CountDownCommitBarrier_incPartiesTest {
     @Test
     public void whenZeroExtraParties() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(5);
-        barrier.incParties(0);
+        barrier.atomicIncParties(0);
 
         assertEquals(5, barrier.getParties());
         assertEquals(0, barrier.getNumberWaiting());
@@ -43,7 +43,7 @@ public class CountDownCommitBarrier_incPartiesTest {
     @Test
     public void whenPositiveNumber() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(10);
-        barrier.incParties(5);
+        barrier.atomicIncParties(5);
 
         assertEquals(0, barrier.getNumberWaiting());
         assertEquals(15, barrier.getParties());
@@ -53,7 +53,7 @@ public class CountDownCommitBarrier_incPartiesTest {
     @Test
     public void whenPartiesAdded_commitTakesLonger() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(2);
-        barrier.incParties(1);
+        barrier.atomicIncParties(1);
 
         barrier.countDown();
         barrier.countDown();
@@ -75,7 +75,7 @@ public class CountDownCommitBarrier_incPartiesTest {
         sleepMs(500);
         assertTrue(barrier.isClosed());
 
-        barrier.incParties(1);
+        barrier.atomicIncParties(1);
 
         sleepMs(500);
         assertAlive(t1, t2);
@@ -90,7 +90,7 @@ public class CountDownCommitBarrier_incPartiesTest {
         barrier.abort();
 
         try {
-            barrier.incParties(10);
+            barrier.atomicIncParties(10);
             fail();
         } catch (CommitBarrierOpenException expected) {
         }

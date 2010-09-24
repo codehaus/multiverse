@@ -8,7 +8,6 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.stms.beta.BetaStm;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.spy;
 import static org.multiverse.TestUtils.*;
 
 public class CountDownCommitBarrier_incPartiesWithTransactionTest {
@@ -24,7 +23,7 @@ public class CountDownCommitBarrier_incPartiesWithTransactionTest {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(10);
 
         try {
-            barrier.incParties(-1);
+            barrier.atomicIncParties(-1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
@@ -163,7 +162,7 @@ public class CountDownCommitBarrier_incPartiesWithTransactionTest {
         startAll(t1, t2);
         sleepMs(300);
 
-        barrier.incParties(2);
+        barrier.atomicIncParties(2);
         sleepMs(300);
 
         assertAlive(t1, t2);
