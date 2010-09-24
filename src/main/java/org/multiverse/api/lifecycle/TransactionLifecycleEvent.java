@@ -27,7 +27,7 @@ public enum TransactionLifecycleEvent {
      */
     PostAbort,
 
-     /**
+    /**
      * Just after committing.
      */
     PostCommit

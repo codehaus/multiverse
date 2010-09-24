@@ -3,6 +3,7 @@ package org.multiverse.stms.beta.benchmarks;
 import org.multiverse.TestThread;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
@@ -18,7 +19,7 @@ import static org.multiverse.stms.beta.BetaStmUtils.format;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
-public class UncontendedLeanUpdateScalabilityTest {
+public class UncontendedLeanUpdateScalabilityTest implements BetaStmConstants {
     private BetaStm stm;
 
     public static void main(String[] args) {
@@ -104,7 +105,7 @@ public class UncontendedLeanUpdateScalabilityTest {
                             .setDirtyCheckEnabled(false));
             long startMs = System.currentTimeMillis();
             for (long k = 0; k < transactionCount; k++) {
-                tx.openForWrite(ref, true).value++;
+                tx.openForWrite(ref, LOCKMODE_COMMIT).value++;
                 tx.commit();
                 tx.hardReset();
 

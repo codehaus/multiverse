@@ -9,10 +9,10 @@ import org.multiverse.durability.SimpleStorage;
 import org.multiverse.durability.UnitOfWrite;
 import org.multiverse.durability.account.SerializeUtils;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
-import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,14 +20,14 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
-public class SimpleDurabilityIntegrationTest {
+public class SimpleDurabilityIntegrationTest implements BetaStmConstants{
     private BetaStm stm;
     private SimpleStorage storage;
 
     @Before
     public void setUp() {
         stm = new BetaStm();
-       storage = new SimpleStorage(stm);
+        storage = new SimpleStorage(stm);
         storage.register(BetaLongRef.class, new LongRefSerializer());
         storage.clear();
     }
@@ -60,10 +60,8 @@ public class SimpleDurabilityIntegrationTest {
         storage.clearEntities();
 
         BetaLongRef loaded = (BetaLongRef) storage.loadDurableObject(ref.___getStorageId());
-
-        BetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(loaded, false).value++;
-        tx.commit();
+        
+        loaded.atomicIncrementAndGet(1);
 
         UnitOfWrite write2 = storage.startUnitOfWrite();
         write2.addChange(loaded.___unsafeLoad());

@@ -29,7 +29,7 @@ public class NoTransactionFoundException extends IllegalStateException {
      * Creates a new NoTransactionFoundException with the provided message.
      *
      * @param message the message of the exception.
-     * @param cause the cause of the exception.
+     * @param cause   the cause of the exception.
      */
     public NoTransactionFoundException(String message, Throwable cause) {
         super(message, cause);

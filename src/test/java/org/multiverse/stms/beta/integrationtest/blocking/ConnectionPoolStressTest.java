@@ -54,7 +54,7 @@ public class ConnectionPoolStressTest implements BetaStmConstants {
     }
 
     @Test
-    public void testPrivatized(){
+    public void testPrivatized() {
         test(LOCKMODE_COMMIT);
     }
 
@@ -147,7 +147,7 @@ public class ConnectionPoolStressTest implements BetaStmConstants {
                 @Override
                 public int execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    return btx.openForRead(size, false).value;
+                    return btx.openForRead(size, LOCKMODE_NONE).value;
                 }
             });
         }

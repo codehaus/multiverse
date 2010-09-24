@@ -513,7 +513,9 @@ public abstract class CommitBarrier {
      * @param tx the Transaction to commit.
      * @throws InterruptedException       if the thread is interrupted while waiting.
      * @throws NullPointerException       if tx is null.
-     * @throws DeadTransactionException   if tx is committed/aborted.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                                    if the tx is no in the correct
+     *                                    state for this operation.
      * @throws CommitBarrierOpenException if this VetoCommitBarrier is committed or aborted.
      */
     public void joinCommit(Transaction tx) throws InterruptedException {
@@ -570,7 +572,9 @@ public abstract class CommitBarrier {
      *
      * @param tx the Transaction to join in the commit.
      * @throws NullPointerException       if tx is null.
-     * @throws DeadTransactionException   if tx is committed/aborted.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                                    if the tx is not in the correct
+     *                                    state for the operation.
      * @throws CommitBarrierOpenException if this VetoCommitBarrier is committed or aborted.
      */
     public void joinCommitUninterruptibly(Transaction tx) {
@@ -627,7 +631,7 @@ public abstract class CommitBarrier {
      * @throws NullPointerException       if tx is null.
      */
     public boolean tryJoinCommit(Transaction tx) {
-        ensureNotDead(tx,"tryJoinCommit");
+        ensureNotDead(tx, "tryJoinCommit");
 
         List<Runnable> postCommitTasks = null;
         boolean abort = true;

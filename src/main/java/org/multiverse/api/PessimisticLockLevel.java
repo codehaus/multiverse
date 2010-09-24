@@ -9,12 +9,12 @@ import org.multiverse.MultiverseConstants;
  *
  * @author Peter Veentjer.
  */
-public enum PessimisticLockLevel implements MultiverseConstants{
+public enum PessimisticLockLevel implements MultiverseConstants {
 
     /**
      * A PessimisticLockLevel that requires the locks of all writes.
      */
-    PrivatizeWrites(LOCKMODE_NONE,LOCKMODE_COMMIT),
+    PrivatizeWrites(LOCKMODE_NONE, LOCKMODE_COMMIT),
 
     /**
      * A PessimisticLockLevel that requires the locks of all reads (and therefor all writes). It is the most

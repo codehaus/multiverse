@@ -1,6 +1,6 @@
 package org.multiverse.api.exceptions;
 
-public class LockedException extends AtomicOperationException{
+public class LockedException extends AtomicOperationException {
 
     public LockedException() {
     }

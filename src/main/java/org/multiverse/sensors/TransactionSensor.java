@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import static java.lang.String.format;
 
 /**
- * A sensor responsible for measuring performance characteristics of transaction execution. 
+ * A sensor responsible for measuring performance characteristics of transaction execution.
  *
  * @author Peter Veentjer.
  */

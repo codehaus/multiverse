@@ -283,7 +283,7 @@ public class BetaLongRef_privatizeTest {
 
     @Test
     @Ignore
-    public void whenReadBiased(){
+    public void whenReadBiased() {
 
     }
 

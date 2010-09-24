@@ -76,7 +76,7 @@ public class ReadBiasedIsolationStressTest {
         long sum = 0;
         for (StressThread thread : threads) {
             totalDurationMs += thread.durationMs;
-            sum+=thread.incrementCount;
+            sum += thread.incrementCount;
         }
 
         System.out.println("--------------------------------------------------------");
@@ -115,7 +115,7 @@ public class ReadBiasedIsolationStressTest {
             AtomicBooleanClosure closure = new AtomicBooleanClosure() {
                 @Override
                 public boolean execute(Transaction tx) throws Exception {
-                    if(pessimistic){
+                    if (pessimistic) {
                         ref.ensure(tx);
                     }
 
@@ -132,11 +132,11 @@ public class ReadBiasedIsolationStressTest {
             long startMs = currentTimeMillis();
 
             for (long k = 0; k < count; k++) {
-                if(block.execute(closure)){
-                   incrementCount++;
+                if (block.execute(closure)) {
+                    incrementCount++;
                 }
 
-                if(k % 10000000 == 0){
+                if (k % 10000000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
             }

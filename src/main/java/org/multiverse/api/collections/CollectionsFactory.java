@@ -22,7 +22,7 @@ public interface CollectionsFactory {
      * Creates a new committed TransactionalList that is based on linked nodes and
      * is initialized with the given collection.
      *
-     * @param c the initial collection.
+     * @param c   the initial collection.
      * @param <E> the type of the elements in the list.
      * @return the created list.
      * @throws NullPointerException if c is null.
@@ -41,7 +41,7 @@ public interface CollectionsFactory {
      * Creates a new committed TransactionalDeque based on linked nodes and is initialized
      * with the given collection.
      *
-     * @param c the initial collection
+     * @param c   the initial collection
      * @param <E> the type of the elements in the deque.
      * @return the created TransactionalDeque.
      * @throws NullPointerException if c is null.
@@ -61,7 +61,7 @@ public interface CollectionsFactory {
      * capacity.
      *
      * @param capacity the maximum capacity of the TransactionalBlockingDeque.
-     * @param <E> the type of the elements in the deque.
+     * @param <E>      the type of the elements in the deque.
      * @return the created TransactionalBlockingDeque.
      * @throws IllegalArgumentException if capacity is smaller than zero.
      */
@@ -71,7 +71,7 @@ public interface CollectionsFactory {
      * Creates  a new committed TransactionalBlockingDeque based on linked nodes initialized with the given
      * collection.
      *
-     * @param c the initial collection to
+     * @param c   the initial collection to
      * @param <E> the type of the elements in the deque.
      * @return the created TransactionalBlockingDeque
      * @throws NullPointerException if c is null.
@@ -90,7 +90,7 @@ public interface CollectionsFactory {
      * Creates a new committed TransactionalQueue based on linked nodes and is initialized with the given
      * collection.
      *
-     * @param c the initial collection to place in the queue.
+     * @param c   the initial collection to place in the queue.
      * @param <E> the type of the elements in the queue
      * @return the created TransactionalQueue
      * @throws NullPointerException if c is null.
@@ -109,7 +109,7 @@ public interface CollectionsFactory {
      * Creates a new committed TransactionalBLockingQueue based on linked nodes and a maximum capacity.
      *
      * @param capacity the maximum capacity of the queue.
-     * @param <E> the type of the elements in the queue
+     * @param <E>      the type of the elements in the queue
      * @return the created TransactionalBlockingQueue
      * @throws IllegalArgumentException if capacity smaller than zero.
      */
@@ -119,7 +119,7 @@ public interface CollectionsFactory {
      * Creates a new TransactionalBLockingQueue based on linked nodes and initialized with the given
      * collection.
      *
-     * @param c the initial collection to be placed in the queue
+     * @param c   the initial collection to be placed in the queue
      * @param <E> the type of the elements in the queue
      * @return the created TransactionalBlockingQueue.
      */

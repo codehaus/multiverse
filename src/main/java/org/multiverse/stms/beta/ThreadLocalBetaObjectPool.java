@@ -1,7 +1,6 @@
 package org.multiverse.stms.beta;
 
 /**
- *
  * @author Peter Veentjer.
  */
 public class ThreadLocalBetaObjectPool {

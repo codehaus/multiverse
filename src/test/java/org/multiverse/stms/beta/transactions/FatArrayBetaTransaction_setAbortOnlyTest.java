@@ -21,7 +21,8 @@ public class FatArrayBetaTransaction_setAbortOnlyTest {
 
     @Test
     @Ignore
-    public void whenUndefined(){}
+    public void whenUndefined() {
+    }
 
     @Test
     public void whenActive() {

@@ -66,5 +66,5 @@ public abstract class AbstractFatBetaTransaction extends BetaTransaction {
             default:
                 throw new IllegalStateException();
         }
-    }  
+    }
 }

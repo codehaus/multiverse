@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
@@ -13,7 +14,7 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
 import static org.multiverse.stms.beta.BetaStmUtils.newRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
-public class BetaRef_atomicIsNullTest {
+public class BetaRef_atomicIsNullTest implements BetaStmConstants {
     private BetaStm stm;
 
     @Before
@@ -90,11 +91,11 @@ public class BetaRef_atomicIsNullTest {
     }
 
     @Test
-    public void whenLocked() {
+    public void whenAlreadyPrivatized() {
         BetaRef<String> ref = newRef(stm, "foo");
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        tx.openForRead(ref, true);
+        ref.privatize(tx);
 
         try {
             ref.atomicIsNull();
@@ -104,6 +105,24 @@ public class BetaRef_atomicIsNullTest {
 
         assertSurplus(1, ref);
         assertHasCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertSame(tx, ref.___getLockOwner());
+        assertIsActive(tx);
+    }
+
+    @Test
+    public void whenAlreadyEnsured() {
+        BetaRef<String> ref = newRef(stm, "foo");
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.ensure(tx);
+
+        boolean result = ref.atomicIsNull();
+
+        assertFalse(result);
+        assertSurplus(1, ref);
+        assertHasNoCommitLock(ref);
+        assertHasUpdateLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertIsActive(tx);
     }

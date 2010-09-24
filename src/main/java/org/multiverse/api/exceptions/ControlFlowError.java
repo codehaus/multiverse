@@ -37,7 +37,7 @@ public abstract class ControlFlowError extends Error {
      * Creates a new ControlFlowError with the provided message and cause.
      *
      * @param message the message of the exception.
-     * @param cause the cause of the exception.
+     * @param cause   the cause of the exception.
      */
     public ControlFlowError(String message, Throwable cause) {
         super(message, cause);

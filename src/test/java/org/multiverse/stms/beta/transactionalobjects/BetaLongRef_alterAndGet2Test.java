@@ -6,8 +6,10 @@ import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
+import org.multiverse.api.functions.IncLongFunction;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
@@ -17,15 +19,14 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasCommitLock;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
  * Tests {@link BetaLongRef#alterAndGet(BetaTransaction, LongFunction)}.
  *
  * @author Peter Veentjer.
  */
-public class BetaLongRef_alterAndGet2Test {
+public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
 
     private BetaStm stm;
 
@@ -150,12 +151,12 @@ public class BetaLongRef_alterAndGet2Test {
     }
 
     @Test
-    public void whenLockedByOther() {
+    public void whenPrivatizedByOther() {
         BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForRead(ref, true);
+        ref.privatize(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongFunction function = mock(LongFunction.class);
@@ -167,6 +168,34 @@ public class BetaLongRef_alterAndGet2Test {
         }
 
         assertHasCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertSurplus(1, ref);
+        assertIsActive(otherTx);
+        assertIsAborted(tx);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+    }
+
+    @Test
+    public void whenEnsuredByOther_thenOperationSucceedsButCommitFails() {
+        BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.ensure(otherTx);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        ref.alterAndGet(tx, function);
+
+        try {
+            tx.commit();
+            fail();
+        } catch (ReadWriteConflict expected) {
+        }
+
+        assertHasNoCommitLock(ref);
+        assertHasUpdateLock(ref);
         assertSurplus(1, ref);
         assertIsActive(otherTx);
         assertIsAborted(tx);

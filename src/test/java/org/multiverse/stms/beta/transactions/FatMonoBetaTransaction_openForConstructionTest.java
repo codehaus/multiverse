@@ -130,7 +130,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
 
         try {
             tx.openForConstruction(ref);
@@ -153,7 +153,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(ref, false);
+        tx.openForWrite(ref, LOCKMODE_NONE);
 
         try {
             tx.openForConstruction(ref);
@@ -202,7 +202,7 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
 
         stm.getGlobalConflictCounter().signalConflict(ref);
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         assertEquals(stm.getGlobalConflictCounter().count(), tx.getLocalConflictCounter().get());
         assertIsActive(tx);
@@ -227,7 +227,8 @@ public class FatMonoBetaTransaction_openForConstructionTest implements BetaStmCo
 
     @Test
     @Ignore
-    public void whenUndefined(){}
+    public void whenUndefined() {
+    }
 
     @Test
     public void whenAborted_thenDeadTransactionException() {

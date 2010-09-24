@@ -78,7 +78,7 @@ public class VetoCommitBarrier_joinCommitTest {
     }
 
     @Test
-   public void whenPrepareFails() throws InterruptedException {
+    public void whenPrepareFails() throws InterruptedException {
         final VetoCommitBarrier group = new VetoCommitBarrier();
         final BetaIntRef ref = new BetaIntRef(stm);
 
@@ -86,7 +86,7 @@ public class VetoCommitBarrier_joinCommitTest {
         thread.start();
 
         sleepMs(500);
-        stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure(){
+        stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
                 ref.incrementAndGet(tx, 1);

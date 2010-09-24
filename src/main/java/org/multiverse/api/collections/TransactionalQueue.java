@@ -39,5 +39,5 @@ public interface TransactionalQueue<E> extends TransactionalCollection<E>, Queue
 
     E peek(Transaction tx);
 
-    E atomicPeek();    
+    E atomicPeek();
 }

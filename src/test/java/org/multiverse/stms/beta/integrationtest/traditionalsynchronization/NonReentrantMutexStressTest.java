@@ -42,12 +42,12 @@ public class NonReentrantMutexStressTest {
     }
 
     @Test
-    public void testPessimistic(){
+    public void testPessimistic() {
         test(true);
     }
 
     @Test
-    public void testOptimistic(){
+    public void testOptimistic() {
         test(false);
     }
 
@@ -135,12 +135,12 @@ public class NonReentrantMutexStressTest {
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
 
-                IntRefTranlocal read = btx.openForRead(locked, pessimistic);
+                IntRefTranlocal read = btx.openForRead(locked, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
                 if (read.value == 1) {
                     retry();
                 }
 
-                IntRefTranlocal write = btx.openForWrite(locked, pessimistic);
+                IntRefTranlocal write = btx.openForWrite(locked, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
                 write.value = 1;
             }
         };
@@ -150,8 +150,8 @@ public class NonReentrantMutexStressTest {
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
 
-                IntRefTranlocal write = btx.openForWrite(locked, pessimistic);
-                if(write.value == 0){
+                IntRefTranlocal write = btx.openForWrite(locked, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
+                if (write.value == 0) {
                     throw new IllegalStateException();
                 }
 

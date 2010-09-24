@@ -31,7 +31,7 @@ public class RetryInterruptibleTest {
 
     @Test
     public void test() throws InterruptedException {
-        ref = new BetaIntRef(stm,0);
+        ref = new BetaIntRef(stm, 0);
 
         AwaitThread t = new AwaitThread();
         t.start();

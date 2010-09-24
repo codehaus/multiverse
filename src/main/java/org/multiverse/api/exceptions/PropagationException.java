@@ -27,7 +27,7 @@ public class PropagationException extends IllegalStateException {
      * Creates a new PropagationException with the provided message and cause.
      *
      * @param message the message of the exception
-     * @param cause the cause of the exception.
+     * @param cause   the cause of the exception.
      */
     public PropagationException(String message, Throwable cause) {
         super(message, cause);

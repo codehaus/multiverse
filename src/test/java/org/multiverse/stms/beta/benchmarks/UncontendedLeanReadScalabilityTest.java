@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.benchmarks;
 
 import org.multiverse.TestThread;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
@@ -15,7 +16,7 @@ import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
-public class UncontendedLeanReadScalabilityTest {
+public class UncontendedLeanReadScalabilityTest implements BetaStmConstants {
 
     private BetaStm stm;
 
@@ -74,11 +75,11 @@ public class UncontendedLeanReadScalabilityTest {
 
         double transactionsPerSecondPerThread = BenchmarkUtils.transactionsPerSecondPerThread(
                 transactionsPerThread, totalDurationMs, threadCount);
-        System.out.printf("Multiverse> Threadcount %s\n",threadCount);
+        System.out.printf("Multiverse> Threadcount %s\n", threadCount);
         System.out.printf("Multiverse> Performance %s transactions/second/thread\n",
                 format(transactionsPerSecondPerThread));
         System.out.printf("Multiverse> Performance %s transactions/second\n",
-                transactionsPerSecondAsString(transactionsPerThread,totalDurationMs, threadCount));
+                transactionsPerSecondAsString(transactionsPerThread, totalDurationMs, threadCount));
         return transactionsPerSecondPerThread;
     }
 
@@ -102,7 +103,7 @@ public class UncontendedLeanReadScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long k = 0; k < transactionCount; k++) {
-                long x = tx.openForRead(ref, false).value;
+                long x = tx.openForRead(ref, LOCKMODE_NONE).value;
                 tx.commit();
                 tx.hardReset();
             }

@@ -27,7 +27,7 @@ public class IllegalTransactionStateException extends IllegalStateException {
      * Creates a new IllegalTransactionStateException with the provided message and cause.
      *
      * @param message the message of the exception.
-     * @param cause the cause of the exception.
+     * @param cause   the cause of the exception.
      */
     public IllegalTransactionStateException(String message, Throwable cause) {
         super(message, cause);

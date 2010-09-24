@@ -84,7 +84,7 @@ public class FastOrec_arriveTest implements BetaStmConstants {
         assertReadonlyCount(0, orec);
         assertHasCommitLock(orec);
         assertHasNoUpdateLock(orec);
-        assertReadBiased(orec);        
+        assertReadBiased(orec);
     }
 
     @Test

@@ -12,7 +12,7 @@ public final class GlobalConflictCounter {
     private final AtomicLong[] counters;
     private final long[] initArray;
 
-    public GlobalConflictCounter(){
+    public GlobalConflictCounter() {
         this(1);
     }
 
@@ -27,7 +27,7 @@ public final class GlobalConflictCounter {
     }
 
     public void signalConflict(BetaTransactionalObject ref) {
-        int index  ;
+        int index;
         if (counters.length == 1) {
             index = 0;
         } else {

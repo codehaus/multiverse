@@ -103,10 +103,10 @@ public final class BetaStm implements Stm {
         return collectionsFactory;
     }
 
-    public final class BetaCollectionsFactoryImpl implements BetaCollectionsFactory{
+    public final class BetaCollectionsFactoryImpl implements BetaCollectionsFactory {
         @Override
         public <E> BetaTransactionalLinkedList<E> newLinkedList() {
-             throw new TodoException();
+            throw new TodoException();
         }
 
         @Override
@@ -164,7 +164,7 @@ public final class BetaStm implements Stm {
             throw new TodoException();
         }
     }
-    
+
     public final class BetaRefFactoryImpl implements BetaRefFactory {
 
         @Override

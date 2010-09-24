@@ -69,7 +69,7 @@ public class FatArrayBetaTransaction_softResetTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
 
         boolean result = tx.softReset();
 
@@ -89,7 +89,7 @@ public class FatArrayBetaTransaction_softResetTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
 
         boolean result = tx.softReset();
 
@@ -109,7 +109,7 @@ public class FatArrayBetaTransaction_softResetTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         boolean result = tx.softReset();
 
@@ -131,7 +131,7 @@ public class FatArrayBetaTransaction_softResetTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, true);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
 
         boolean result = tx.softReset();
 
@@ -164,7 +164,7 @@ public class FatArrayBetaTransaction_softResetTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         tx.prepare();
 
         boolean result = tx.softReset();
@@ -198,7 +198,7 @@ public class FatArrayBetaTransaction_softResetTest {
         assertSurplus(1, ref);
         assertHasNoUpdates(tx);
     }
-    
+
     @Test
     public void whenHasNormalListener_thenTheyAreRemoved() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -209,7 +209,7 @@ public class FatArrayBetaTransaction_softResetTest {
 
         assertTrue(result);
         verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
-        assertHasNoNormalListeners(tx);        
+        assertHasNoNormalListeners(tx);
     }
 
     @Test

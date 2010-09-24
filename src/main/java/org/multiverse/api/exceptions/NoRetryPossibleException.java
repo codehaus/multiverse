@@ -30,7 +30,7 @@ public class NoRetryPossibleException extends IllegalTransactionStateException {
      * Creates a new NoRetryPossibleException with the provided message and cause.
      *
      * @param message the message of the exception.
-     * @param cause the cause of the exception.
+     * @param cause   the cause of the exception.
      */
     public NoRetryPossibleException(String message, Throwable cause) {
         super(message, cause);

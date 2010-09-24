@@ -127,7 +127,7 @@ public class BetaLongRef_getAndSet2Test {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        long value = ref.getAndSet(tx,10);
+        long value = ref.getAndSet(tx, 10);
         tx.commit();
 
         assertEquals(10, value);

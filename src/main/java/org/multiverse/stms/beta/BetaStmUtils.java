@@ -11,7 +11,7 @@ import java.util.Locale;
 /**
  * @author Peter Veentjer
  */
-public class BetaStmUtils {
+public class BetaStmUtils implements BetaStmConstants {
 
     public static String toDebugString(BetaTransactionalObject o) {
         if (o == null) {
@@ -23,7 +23,7 @@ public class BetaStmUtils {
 
     public static void arbitraryUpdate(BetaStm stm, BetaLongRef ref) {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(ref, false);
+        tx.openForWrite(ref, LOCKMODE_NONE);
         tx.commit();
     }
 
@@ -50,7 +50,7 @@ public class BetaStmUtils {
         return newRef(stm, null);
     }
 
-     public static BetaIntRef newIntRef(BetaStm stm) {
+    public static BetaIntRef newIntRef(BetaStm stm) {
         return newIntRef(stm, 0);
     }
 
@@ -72,7 +72,7 @@ public class BetaStmUtils {
 
         for (int k = 0; k < ref.___getOrec().___getReadBiasedThreshold(); k++) {
             BetaTransaction tx = new FatMonoBetaTransaction(stm);
-            ref.get(tx);            
+            ref.get(tx);
             tx.commit();
         }
 
@@ -92,7 +92,7 @@ public class BetaStmUtils {
         return ref;
     }
 
-   
+
     public static String format(double value) {
         return NumberFormat.getInstance(Locale.ENGLISH).format(value);
     }

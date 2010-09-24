@@ -97,7 +97,7 @@ public final class SpeculativeBetaConfiguration {
                 ", isCommuteRequired=" + isCommuteRequired +
                 ", isOrelseRequired=" + isOrelseRequired +
                 ", minimalLength=" + minimalLength +
-                ", isFat=" + isFat +                
+                ", isFat=" + isFat +
                 '}';
     }
 }

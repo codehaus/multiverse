@@ -16,7 +16,7 @@ import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPer
 
 public class AtomicIncrementIsolationStressTest {
 
-     private BetaStm stm;
+    private BetaStm stm;
 
     @Before
     public void setUp() {
@@ -74,8 +74,8 @@ public class AtomicIncrementIsolationStressTest {
             for (long k = 0; k < count; k++) {
                 ref.atomicIncrementAndGet(1);
 
-                if(k % 10000000 == 0){
-                    System.out.printf("%s is at %s\n",getName(), k);
+                if (k % 10000000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), k);
                 }
             }
 

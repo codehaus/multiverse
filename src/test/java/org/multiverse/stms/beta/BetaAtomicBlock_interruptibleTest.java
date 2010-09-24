@@ -20,7 +20,7 @@ import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
-public class BetaAtomicBlock_interruptibleTest {
+public class BetaAtomicBlock_interruptibleTest implements BetaStmConstants{
 
     private BetaStm stm;
 
@@ -93,7 +93,7 @@ public class BetaAtomicBlock_interruptibleTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    LongRefTranlocal write = btx.openForWrite(ref, false);
+                    LongRefTranlocal write = btx.openForWrite(ref, LOCKMODE_NONE);
                     if (write.value == 0) {
                         retry();
                     }

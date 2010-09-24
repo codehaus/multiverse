@@ -79,7 +79,7 @@ public class StmUtils_executeTest {
         assertEquals(0, ref.atomicGet());
     }
 
-     @Test
+    @Test
     public void whenExecuteCheckedSuccess() throws Exception {
         final IntRef ref = newIntRef();
 

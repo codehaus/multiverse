@@ -63,7 +63,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
 
         boolean result = tx.softReset();
 
@@ -83,7 +83,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
 
         boolean result = tx.softReset();
 
@@ -103,7 +103,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         boolean result = tx.softReset();
 
@@ -125,7 +125,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, true);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
 
         boolean result = tx.softReset();
 
@@ -158,7 +158,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         tx.prepare();
 
         boolean result = tx.softReset();

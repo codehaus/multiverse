@@ -10,7 +10,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class BetaLongRef_openForConstructionTest implements BetaStmConstants{
+public class BetaLongRef_openForConstructionTest implements BetaStmConstants {
     private BetaStm stm;
     private BetaObjectPool pool;
 

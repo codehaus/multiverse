@@ -105,7 +105,7 @@ public class FatMonoBetaTransaction_commuteTest {
         BetaLongRef ref = newLongRef(stm, 100);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
         tx.commute(ref, new IncLongFunction());
 
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
@@ -126,7 +126,7 @@ public class FatMonoBetaTransaction_commuteTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal tranlocal = tx.openForWrite(ref, false);
+        LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tx.commute(ref, new IncLongFunction());
 
         assertIsActive(tx);
@@ -257,7 +257,7 @@ public class FatMonoBetaTransaction_commuteTest {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForRead(ref, true);
+        otherTx.openForRead(ref, LOCKMODE_COMMIT);
 
         LongFunction function = mock(LongFunction.class);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
@@ -316,7 +316,8 @@ public class FatMonoBetaTransaction_commuteTest {
 
     @Test
     @Ignore
-    public void whenUndefined(){}
+    public void whenUndefined() {
+    }
 
     @Test
     public void whenAlreadyCommitted_thenDeadTransactionException() {

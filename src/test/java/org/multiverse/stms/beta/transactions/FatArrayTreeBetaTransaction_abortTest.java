@@ -45,7 +45,7 @@ public class FatArrayTreeBetaTransaction_abortTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
         tx.abort();
 
         assertIsAborted(tx);
@@ -65,7 +65,7 @@ public class FatArrayTreeBetaTransaction_abortTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
         tx.abort();
 
         assertIsAborted(tx);
@@ -83,7 +83,7 @@ public class FatArrayTreeBetaTransaction_abortTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForRead(ref, true);
+        tx.openForRead(ref, LOCKMODE_COMMIT);
         tx.abort();
 
         assertIsAborted(tx);
@@ -101,7 +101,7 @@ public class FatArrayTreeBetaTransaction_abortTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForWrite(ref, false);
+        tx.openForWrite(ref, LOCKMODE_NONE);
         tx.abort();
 
         assertIsAborted(tx);
@@ -119,7 +119,7 @@ public class FatArrayTreeBetaTransaction_abortTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForWrite(ref, true);
+        tx.openForWrite(ref, LOCKMODE_COMMIT);
         tx.abort();
 
         assertIsAborted(tx);
@@ -156,7 +156,7 @@ public class FatArrayTreeBetaTransaction_abortTest {
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.register(listenerMock);
-        tx.openForWrite(ref, false);
+        tx.openForWrite(ref, LOCKMODE_NONE);
         tx.abort();
 
         assertEquals(1, listenerMock.events.size());
@@ -171,7 +171,7 @@ public class FatArrayTreeBetaTransaction_abortTest {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .addPermanentListener(listenerMock);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
-        tx.openForWrite(ref, false);
+        tx.openForWrite(ref, LOCKMODE_NONE);
         tx.abort();
 
         assertEquals(1, listenerMock.events.size());
@@ -200,7 +200,8 @@ public class FatArrayTreeBetaTransaction_abortTest {
 
     @Test
     @Ignore
-    public void whenUndefined(){}
+    public void whenUndefined() {
+    }
 
     @Test
     public void whenAborted_thenIgnored() {

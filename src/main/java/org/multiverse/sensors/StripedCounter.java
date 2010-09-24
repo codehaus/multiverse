@@ -95,7 +95,7 @@ public final class StripedCounter {
             return;
         }
 
-        index = index * 128;                
+        index = index * 128;
         final long rawIndex = rawIndex(index);
         while (true) {
             final long current = unsafe.getLongVolatile(array, rawIndex);

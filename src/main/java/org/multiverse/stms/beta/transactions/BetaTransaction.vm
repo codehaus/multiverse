@@ -388,17 +388,6 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForWrite(${ref.name}${ref.typeParameter} ref, int lockMode);
 
-    //todo: methods need to go
-    public  ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForRead(${ref.name}${ref.typeParameter} ref, boolean lock){
-        return openForRead(ref, lock?LOCKMODE_COMMIT:LOCKMODE_NONE);
-    }
-
-    //todo: methods need to go
-    public  ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForWrite(${ref.name}${ref.typeParameter} ref, boolean lock){
-        return openForWrite(ref, lock?LOCKMODE_COMMIT:LOCKMODE_NONE);
-    }
-
-
     public abstract ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForConstruction(${ref.name}${ref.typeParameter} ref);
 
     public abstract ${ref.typeParameter} void commute(${ref.name}${ref.typeParameter} ref, final ${ref.functionClass}${ref.typeParameter} function);

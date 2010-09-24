@@ -41,7 +41,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
 
         try {
-            tx.openForWrite((BetaLongRef) null, false);
+            tx.openForWrite((BetaLongRef) null, LOCKMODE_NONE);
             fail();
         } catch (NullPointerException ex) {
         }
@@ -57,7 +57,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(
                 new BetaTransactionConfiguration(stm).setReadonly(true));
         try {
-            tx.openForWrite(ref, false);
+            tx.openForWrite(ref, LOCKMODE_NONE);
             fail();
         } catch (ReadonlyException expected) {
         }
@@ -72,10 +72,10 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(
                 new BetaTransactionConfiguration(stm).setReadonly(true));
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
 
         try {
-            tx.openForWrite(ref, false);
+            tx.openForWrite(ref, LOCKMODE_NONE);
             fail();
         } catch (ReadonlyException expected) {
         }
@@ -89,7 +89,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         Tranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        Tranlocal write = tx.openForWrite(ref, false);
+        Tranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertFalse(write.isCommitted());
@@ -104,8 +104,8 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal read = tx.openForRead(ref, false);
-        Tranlocal write = tx.openForWrite(ref, false);
+        Tranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        Tranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertNotSame(read, write);
@@ -123,8 +123,8 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         Tranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal write1 = tx.openForWrite(ref, false);
-        Tranlocal write2 = tx.openForWrite(ref, false);
+        Tranlocal write1 = tx.openForWrite(ref, LOCKMODE_NONE);
+        Tranlocal write2 = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertSame(write1, write2);
@@ -139,13 +139,13 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal read = tx.openForRead(ref, false);
+        Tranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForWrite(ref, false);
+        otherTx.openForWrite(ref, LOCKMODE_NONE);
         otherTx.commit();
 
-        Tranlocal write = tx.openForWrite(ref, false);
+        Tranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertNotNull(write);
@@ -161,13 +161,13 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal write1 = tx.openForWrite(ref, false);
+        Tranlocal write1 = tx.openForWrite(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForWrite(ref, false);
+        otherTx.openForWrite(ref, LOCKMODE_NONE);
         otherTx.commit();
 
-        Tranlocal write2 = tx.openForWrite(ref, false);
+        Tranlocal write2 = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertSame(write2, write1);
@@ -181,12 +181,12 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         BetaLongRef ref = newLongRef(stm);
         Orec orec = ref.___getOrec();
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1,true);
+        orec.___tryLockAfterNormalArrive(1, true);
 
         BetaTransaction tx1 = stm.startDefaultTransaction();
 
         try {
-            tx1.openForWrite(ref, false);
+            tx1.openForWrite(ref, LOCKMODE_NONE);
             fail();
         } catch (ReadWriteConflict expected) {
         }
@@ -200,12 +200,12 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        Tranlocal write1 = tx.openForWrite(ref, false);
+        Tranlocal write1 = tx.openForWrite(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForWrite(ref, true);
+        otherTx.openForWrite(ref, LOCKMODE_COMMIT);
 
-        Tranlocal write2 = tx.openForWrite(ref, false);
+        Tranlocal write2 = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertSame(write1, write2);
@@ -221,7 +221,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertNotSame(committed, write);
@@ -244,7 +244,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeWrites);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertNotSame(committed, write);
@@ -265,15 +265,15 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         BetaLongRef ref2 = newLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRefTranlocal read1 = tx.openForRead(ref1, false);
+        LongRefTranlocal read1 = tx.openForRead(ref1, LOCKMODE_NONE);
 
         FatArrayTreeBetaTransaction conflictingTx = new FatArrayTreeBetaTransaction(stm);
-        conflictingTx.openForWrite(ref1, false).value++;
-        conflictingTx.openForWrite(ref2, false).value++;
+        conflictingTx.openForWrite(ref1, LOCKMODE_NONE).value++;
+        conflictingTx.openForWrite(ref2, LOCKMODE_NONE).value++;
         conflictingTx.commit();
 
         try {
-            tx.openForWrite(ref2, false);
+            tx.openForWrite(ref2, LOCKMODE_NONE);
             fail();
         } catch (ReadWriteConflict expected) {
         }
@@ -298,7 +298,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         LongRefTranlocal constructed = tx.openForConstruction(ref);
         constructed.value = 100;
 
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertNotNull(write);
         assertSame(constructed, write);
@@ -323,7 +323,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         LongRefTranlocal constructed = tx.openForConstruction(ref);
         constructed.value = 100;
 
-        LongRefTranlocal write = tx.openForWrite(ref, true);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
 
         assertNotNull(write);
         assertSame(constructed, write);
@@ -350,13 +350,13 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
                 .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
-        LongRefTranlocal write1 = tx.openForWrite(ref1, false);
+        LongRefTranlocal write1 = tx.openForWrite(ref1, LOCKMODE_NONE);
 
         long oldLocalConflictCount = tx.getLocalConflictCounter().get();
 
         stm.getGlobalConflictCounter().signalConflict(newLongRef(stm));
 
-        LongRefTranlocal write2 = tx.openForWrite(ref2, false);
+        LongRefTranlocal write2 = tx.openForWrite(ref2, LOCKMODE_NONE);
 
         assertEquals(oldLocalConflictCount, tx.getLocalConflictCounter().get());
 
@@ -373,7 +373,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         tx.prepare();
 
         try {
-            tx.openForWrite(ref, false);
+            tx.openForWrite(ref, LOCKMODE_NONE);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -392,7 +392,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
 
         LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
 
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertSame(commuting, write);
@@ -416,14 +416,14 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction otherTx = new FatArrayBetaTransaction(stm);
-        otherTx.openForRead(ref, true);
+        otherTx.openForRead(ref, LOCKMODE_COMMIT);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongFunction function = new IncLongFunction();
         tx.commute(ref, function);
 
         try {
-            tx.openForWrite(ref, false);
+            tx.openForWrite(ref, LOCKMODE_NONE);
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -443,16 +443,14 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         BetaLongRef ref2 = newLongRef(stm, 10);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForRead(ref1, false);
+        tx.openForRead(ref1, LOCKMODE_NONE);
         LongFunction function = mock(LongFunction.class);
         tx.commute(ref2, function);
 
-        FatArrayTreeBetaTransaction otherTx = new FatArrayTreeBetaTransaction(stm);
-        otherTx.openForWrite(ref1, true).value++;
-        otherTx.commit();
+        ref1.atomicIncrementAndGet(1);
 
         try {
-            tx.openForWrite(ref2, false);
+            tx.openForWrite(ref2, LOCKMODE_NONE);
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -483,7 +481,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         tx.commute(ref, function);
 
         try {
-            tx.openForWrite(ref, false);
+            tx.openForWrite(ref, LOCKMODE_NONE);
             fail();
         } catch (RuntimeException e) {
             assertSame(exception, e);
@@ -510,7 +508,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         tx.commute(ref, function);
 
         try {
-            tx.openForWrite(ref, true);
+            tx.openForWrite(ref, LOCKMODE_COMMIT);
             fail();
         } catch (RuntimeException e) {
             assertSame(exception, e);
@@ -531,7 +529,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
 
         stm.getGlobalConflictCounter().signalConflict(ref);
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertEquals(stm.getGlobalConflictCounter().count(), tx.getLocalConflictCounter().get());
         assertIsActive(tx);
@@ -546,11 +544,11 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
 
         stm.getGlobalConflictCounter().signalConflict(newLongRef(stm));
 
-        LongRefTranlocal write1 = tx.openForWrite(ref, false);
+        LongRefTranlocal write1 = tx.openForWrite(ref, LOCKMODE_NONE);
         long localConflictCount = tx.getLocalConflictCounter().get();
         stm.getGlobalConflictCounter().signalConflict(newLongRef(stm));
 
-        LongRefTranlocal write2 = tx.openForWrite(ref, false);
+        LongRefTranlocal write2 = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertEquals(localConflictCount, tx.getLocalConflictCounter().get());
         assertIsActive(tx);
@@ -568,16 +566,16 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
 
         stm.getGlobalConflictCounter().signalConflict(newLongRef(stm));
 
-        LongRefTranlocal write1 = tx.openForWrite(ref1, false);
+        LongRefTranlocal write1 = tx.openForWrite(ref1, LOCKMODE_NONE);
 
         //do second read
         stm.getGlobalConflictCounter().signalConflict(newLongRef(stm));
-        LongRefTranlocal write2 = tx.openForWrite(ref2, false);
+        LongRefTranlocal write2 = tx.openForWrite(ref2, LOCKMODE_NONE);
         assertEquals(stm.getGlobalConflictCounter().count(), tx.getLocalConflictCounter().get());
 
         //do another read
         stm.getGlobalConflictCounter().signalConflict(newLongRef(stm));
-        LongRefTranlocal write3 = tx.openForWrite(ref3, false);
+        LongRefTranlocal write3 = tx.openForWrite(ref3, LOCKMODE_NONE);
         assertEquals(stm.getGlobalConflictCounter().count(), tx.getLocalConflictCounter().get());
 
         assertIsActive(tx);
@@ -594,11 +592,11 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         stm.getGlobalConflictCounter().signalConflict(ref1);
 
-        LongRefTranlocal write1 = tx.openForWrite(ref1, false);
+        LongRefTranlocal write1 = tx.openForWrite(ref1, LOCKMODE_NONE);
 
         assertEquals(tx.getLocalConflictCounter().get(), stm.getGlobalConflictCounter().count());
 
-        LongRefTranlocal write2 = tx.openForWrite(ref2, false);
+        LongRefTranlocal write2 = tx.openForWrite(ref2, LOCKMODE_NONE);
 
         assertEquals(tx.getLocalConflictCounter().get(), stm.getGlobalConflictCounter().count());
         assertIsActive(tx);
@@ -615,13 +613,13 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
                 .setReadTrackingEnabled(false);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
-        tx.openForRead(ref1, false);
+        tx.openForRead(ref1, LOCKMODE_NONE);
 
         //an unreal readconflict
         stm.getGlobalConflictCounter().signalConflict(newLongRef(stm));
 
         try {
-            tx.openForWrite(ref2, false);
+            tx.openForWrite(ref2, LOCKMODE_NONE);
             fail();
         } catch (ReadWriteConflict expected) {
         }
@@ -637,7 +635,8 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
 
     @Test
     @Ignore
-    public void whenUndefined(){}
+    public void whenUndefined() {
+    }
 
     @Test
     public void whenAborted_thenIllegalStateException() {
@@ -647,7 +646,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         BetaLongRef ref = newLongRef(stm);
 
         try {
-            tx.openForWrite(ref, true);
+            tx.openForWrite(ref, LOCKMODE_COMMIT);
             fail();
         } catch (IllegalStateException expected) {
         }
@@ -663,7 +662,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         BetaLongRef ref = newLongRef(stm);
 
         try {
-            tx.openForWrite(ref, true);
+            tx.openForWrite(ref, LOCKMODE_COMMIT);
             fail();
         } catch (IllegalStateException expected) {
         }

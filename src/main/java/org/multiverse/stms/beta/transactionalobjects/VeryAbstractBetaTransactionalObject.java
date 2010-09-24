@@ -211,12 +211,12 @@ public abstract class VeryAbstractBetaTransactionalObject
     }
 
     @Override
-    public final void ___markAsDurable(){
+    public final void ___markAsDurable() {
         durable = true;
     }
 
     @Override
-    public  final boolean ___isDurable(){
+    public final boolean ___isDurable() {
         return durable;
     }
 }

@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
@@ -20,7 +21,7 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 /**
  * @author Peter Veentjer
  */
-public class FatMonoBetaTransaction_softResetTest {
+public class FatMonoBetaTransaction_softResetTest implements BetaStmConstants {
     private BetaStm stm;
 
     @Before
@@ -69,7 +70,7 @@ public class FatMonoBetaTransaction_softResetTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
 
         boolean result = tx.softReset();
 
@@ -89,7 +90,7 @@ public class FatMonoBetaTransaction_softResetTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
 
         boolean result = tx.softReset();
 
@@ -109,7 +110,7 @@ public class FatMonoBetaTransaction_softResetTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         boolean result = tx.softReset();
 
@@ -131,7 +132,7 @@ public class FatMonoBetaTransaction_softResetTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, true);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
 
         boolean result = tx.softReset();
 
@@ -165,7 +166,7 @@ public class FatMonoBetaTransaction_softResetTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         tx.prepare();
 
         boolean result = tx.softReset();

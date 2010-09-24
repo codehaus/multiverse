@@ -85,8 +85,9 @@ public final class StandardThreadFactory implements ThreadFactory {
 
     /**
      * Creates a new StandardThreadFactory with the given priority and if the threads are daemons
+     *
      * @param priority the priority of the thread.
-     * @param daemon if the thread is a daemon.
+     * @param daemon   if the thread is a daemon.
      */
     public StandardThreadFactory(int priority, boolean daemon) {
         this(priority, new ThreadGroup(

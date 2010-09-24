@@ -20,7 +20,7 @@ import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
-public class FatBetaAtomicBlock_propagationLevelTest {
+public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants{
     private BetaStm stm;
 
     @Before
@@ -126,7 +126,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
             public int execute(Transaction tx) throws Exception {
                 assertNotNull(tx);
                 BetaTransaction btx = (BetaTransaction) tx;
-                btx.openForWrite(ref, false).value++;
+                btx.openForWrite(ref, LOCKMODE_NONE).value++;
                 return 10;
             }
         };
@@ -154,7 +154,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
             public int execute(Transaction tx) throws Exception {
                 assertSame(existingTx, tx);
                 BetaTransaction btx = (BetaTransaction) tx;
-                btx.openForWrite(ref, false).value++;
+                btx.openForWrite(ref, LOCKMODE_NONE).value++;
                 return 10;
             }
         };
@@ -181,7 +181,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
             public int execute(Transaction tx) throws Exception {
                 assertNotNull(tx);
                 BetaTransaction btx = (BetaTransaction) tx;
-                btx.openForWrite(ref, false).value++;
+                btx.openForWrite(ref, LOCKMODE_NONE).value++;
                 return 10;
             }
         };
@@ -210,7 +210,7 @@ public class FatBetaAtomicBlock_propagationLevelTest {
                 assertNotNull(tx);
                 assertNotSame(otherTx, tx);
                 BetaTransaction btx = (BetaTransaction) tx;
-                btx.openForWrite(ref, false).value++;
+                btx.openForWrite(ref, LOCKMODE_NONE).value++;
                 return 1;
             }
         };

@@ -44,7 +44,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         ref.___registerChangeListener(latch, ref.___unsafeLoad(), pool, listenerEra);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         ref.___tryLockAndCheckConflict(tx, 1, write, true);
 
         long oldConflictCount = globalConflictCounter.count();
@@ -98,7 +98,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
         write.isDirty = DIRTY_TRUE;
         ref.___tryLockAndCheckConflict(tx, 1, write, true);
@@ -122,7 +122,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         Orec orec = ref.___getOrec();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal write = tx.openForWrite(ref, false);
+        Tranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         ref.___tryLockAndCheckConflict(tx, 1, write, true);
 
         long oldConflictCount = globalConflictCounter.count();
@@ -146,7 +146,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         assertHasNoCommitLock(orec);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal tranlocal = tx.openForWrite(ref, false);
+        Tranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         ref.___tryLockAndCheckConflict(tx, 1, tranlocal, true);
 
         long oldConflictCount = globalConflictCounter.count();

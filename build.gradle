@@ -54,7 +54,7 @@ allprojects {
     compile group: 'junit', name: 'junit', version: '4.8.1'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.8.2'
     deployerJars group: 'org.apache.maven.wagon', name: 'wagon-webdav-jackrabbit', version: '1.0-beta-6'
-  }   
+  }
 
 //  uploadArchives {
 //   repositories.mavenDeployer {

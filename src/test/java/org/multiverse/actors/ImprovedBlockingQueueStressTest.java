@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ImprovedBlockingQueueStressTest {
 
-     private final long transactionCount = 50 * 1000 * 1000;
+    private final long transactionCount = 50 * 1000 * 1000;
 
     @Test
     public void run() throws InterruptedException {

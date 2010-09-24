@@ -9,11 +9,12 @@ public class PhantomReadTest {
     private BetaStm stm;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         stm = new BetaStm();
     }
 
     @Test
     @Ignore
-    public void test(){}
+    public void test() {
+    }
 }

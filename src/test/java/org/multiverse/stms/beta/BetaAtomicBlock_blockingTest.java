@@ -39,7 +39,7 @@ public class BetaAtomicBlock_blockingTest {
             @Override
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                LongRefTranlocal write = btx.openForWrite(ref, false);
+                LongRefTranlocal write = btx.openForWrite(ref, LOCKMODE_NONE);
                 write.value = 1;
             }
         });
@@ -61,7 +61,7 @@ public class BetaAtomicBlock_blockingTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    LongRefTranlocal write = btx.openForWrite(ref, false);
+                    LongRefTranlocal write = btx.openForWrite(ref, LOCKMODE_NONE);
                     if (write.value == 0) {
                         retry();
                     }

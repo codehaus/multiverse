@@ -66,7 +66,7 @@ public interface TransactionalCollection<E> extends Collection<E> {
     @Override
     boolean containsAll(Collection<?> c);
 
-    boolean containsAll(Transaction tx,Collection<?> c);
+    boolean containsAll(Transaction tx, Collection<?> c);
 
     boolean atomicContainsAll(Collection<?> c);
 

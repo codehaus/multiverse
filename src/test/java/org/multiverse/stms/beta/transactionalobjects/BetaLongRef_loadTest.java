@@ -101,7 +101,7 @@ public class BetaLongRef_loadTest implements BetaStmConstants {
 
     @Test
     @Ignore
-    public void whenJustBecomeReadBiased(){
+    public void whenJustBecomeReadBiased() {
 
     }
 
@@ -187,13 +187,13 @@ public class BetaLongRef_loadTest implements BetaStmConstants {
 
     @Test
     @Ignore
-    public void whenReadByOther(){
+    public void whenReadByOther() {
 
     }
 
     @Test
     @Ignore
-    public void whenPendingUpdateByOther(){
+    public void whenPendingUpdateByOther() {
 
     }
 }

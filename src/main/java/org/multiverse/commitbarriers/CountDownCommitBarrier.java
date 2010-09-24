@@ -118,7 +118,7 @@ public final class CountDownCommitBarrier extends CommitBarrier {
      * @throws CommitBarrierOpenException if this CountDownCommitBarrier already is committed or aborted.
      * @see #atomicIncParties(int)
      */
-    public void incParties() {
+    public void atomicIncParties() {
         atomicIncParties(1);
     }
 
@@ -169,8 +169,8 @@ public final class CountDownCommitBarrier extends CommitBarrier {
      * The parties are only increased after the transaction has committed.
      * <p/>
      * If extra is 0, this call is ignored.
-     *
-     * This is the call you want to use when you are doing an incParties inside a transaction.
+     * <p/>
+     * This is the call you want to use when you are doing an atomicIncParties inside a transaction.
      * A transaction can be retried multiple times, and if number of parties is incremented more than
      * once, you run into problems. That is why a transaction can be passed where a compensating
      * tasks is registered on, that removes the added parties when the transaction is aborted.
@@ -214,7 +214,7 @@ public final class CountDownCommitBarrier extends CommitBarrier {
                     throw new CommitBarrierOpenException(abortMsg);
                 case Committed:
                     String commitMsg = format("[%s] Can't call incParties on already committed CountDownCommitBarrier",
-                           tx.getConfiguration().getFamilyName());
+                            tx.getConfiguration().getFamilyName());
                     throw new CommitBarrierOpenException(commitMsg);
                 default:
                     throw new IllegalStateException();

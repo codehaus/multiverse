@@ -33,7 +33,7 @@ public class LeanArrayTreeBetaTransaction_orelseTest {
     }
 
     @Test
-    public void whenStartOrElseBranchBranchCalled_thenIllegalStateException(){
+    public void whenStartOrElseBranchBranchCalled_thenIllegalStateException() {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm).init();
         LeanArrayTreeBetaTransaction tx = new LeanArrayTreeBetaTransaction(config);
 
@@ -48,8 +48,8 @@ public class LeanArrayTreeBetaTransaction_orelseTest {
         assertFalse(config.getSpeculativeConfiguration().isOrelseRequired);
     }
 
-     @Test
-    public void whenEndEitherBranchCalled_thenIllegalStateException(){
+    @Test
+    public void whenEndEitherBranchCalled_thenIllegalStateException() {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm).init();
         LeanArrayTreeBetaTransaction tx = new LeanArrayTreeBetaTransaction(config);
 

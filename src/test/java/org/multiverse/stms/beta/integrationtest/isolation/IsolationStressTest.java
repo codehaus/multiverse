@@ -7,6 +7,7 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -24,7 +25,7 @@ import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPer
  *
  * @author Peter Veentjer
  */
-public class IsolationStressTest {
+public class IsolationStressTest implements BetaStmConstants {
 
     private BetaStm stm;
 
@@ -110,7 +111,7 @@ public class IsolationStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    btx.openForWrite(ref, pessimistic).value++;
+                    btx.openForWrite(ref, pessimistic?LOCKMODE_COMMIT:LOCKMODE_NONE).value++;
                 }
             };
 

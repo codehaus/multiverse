@@ -42,7 +42,7 @@ public class ThreadLocalRandom extends Random {
      * We rely on the fact that the superclass no-arg constructor
      * invokes setSeed exactly once to initialize.
      */
-    ThreadLocalRandom() {
+    public ThreadLocalRandom() {
         super();
     }
 

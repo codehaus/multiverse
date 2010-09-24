@@ -8,11 +8,12 @@ public class SerializedTest {
     private BetaStm stm;
 
     @Test
-    public void setUp(){
+    public void setUp() {
         stm = new BetaStm();
     }
-    
+
     @Test
     @Ignore
-    public void test(){}
+    public void test() {
+    }
 }

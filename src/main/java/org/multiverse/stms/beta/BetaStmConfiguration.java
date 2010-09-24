@@ -31,44 +31,44 @@ public class BetaStmConfiguration {
      *
      * @throws IllegalStateException if the configuration isn't valid.
      */
-    public void validate(){
-        if(writeSkewAllowed && !trackReads){
+    public void validate() {
+        if (writeSkewAllowed && !trackReads) {
             throw new IllegalStateException("writeSkewAllowed can't be true if trackReads is false");
         }
 
-        if(blockingAllowed && !trackReads){
+        if (blockingAllowed && !trackReads) {
             throw new IllegalStateException("blockingAllowed can't be true if trackReads is false");
         }
 
-        if(spinCount<0){
-            throw new IllegalStateException("spinCount can't be smaller than 0, but was "+spinCount);
+        if (spinCount < 0) {
+            throw new IllegalStateException("spinCount can't be smaller than 0, but was " + spinCount);
         }
 
-        if(pessimisticLockLevel == null){
+        if (pessimisticLockLevel == null) {
             throw new IllegalStateException("pessimisticLockLevel can't be null");
         }
 
-        if(minimalArrayTreeSize<0){
-            throw new IllegalStateException("minimalArrayTreeSize can't be smaller than 0, but was "+minimalArrayTreeSize);
+        if (minimalArrayTreeSize < 0) {
+            throw new IllegalStateException("minimalArrayTreeSize can't be smaller than 0, but was " + minimalArrayTreeSize);
         }
 
-        if(maxRetries<0){
-            throw new IllegalStateException("maxRetries can't be smaller than 0, but was "+maxRetries);
+        if (maxRetries < 0) {
+            throw new IllegalStateException("maxRetries can't be smaller than 0, but was " + maxRetries);
         }
 
-        if(maxArrayTransactionSize<2){
-            throw new IllegalStateException("maxArrayTransactionSize can't be smaller than 2, but was "+maxArrayTransactionSize);
+        if (maxArrayTransactionSize < 2) {
+            throw new IllegalStateException("maxArrayTransactionSize can't be smaller than 2, but was " + maxArrayTransactionSize);
         }
 
-        if(backoffPolicy == null){
+        if (backoffPolicy == null) {
             throw new IllegalStateException("backoffPolicy can't be null");
         }
 
-        if(traceLevel == null){
+        if (traceLevel == null) {
             throw new IllegalStateException("traceLevel can't be null");
         }
 
-        if(propagationLevel == null){
+        if (propagationLevel == null) {
             throw new IllegalStateException("propagationLevel can't be null");
         }
     }

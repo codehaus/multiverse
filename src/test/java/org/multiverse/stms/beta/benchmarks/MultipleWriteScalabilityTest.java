@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.benchmarks;
 
 import org.multiverse.TestThread;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
@@ -18,7 +19,7 @@ import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 /**
  * @author Peter Veentjer
  */
-public class MultipleWriteScalabilityTest {
+public class MultipleWriteScalabilityTest implements BetaStmConstants {
 
     private BetaStm stm;
     private final long transactionsPerThread = 100 * 1000 * 1000;
@@ -117,7 +118,7 @@ public class MultipleWriteScalabilityTest {
 
             for (int iteration = 0; iteration < transactionsPerThread; iteration++) {
                 for (int k = 0; k < refs.length; k++) {
-                    tx.openForWrite(refs[0], false).value++;
+                    tx.openForWrite(refs[0], LOCKMODE_NONE).value++;
                 }
                 tx.commit();
                 tx.hardReset();

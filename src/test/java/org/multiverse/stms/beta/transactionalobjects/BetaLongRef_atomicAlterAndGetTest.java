@@ -143,7 +143,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
 
     @Test
     public void whenPrivatizedByOther() {
-         BetaLongRef ref = newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();

@@ -22,8 +22,8 @@ public class BetaObjectPool_tranlocalsTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void putNullInPoolInSpecializedPool_thenNullPointerException(){
-        pool.put((LongRefTranlocal)null);
+    public void putNullInPoolInSpecializedPool_thenNullPointerException() {
+        pool.put((LongRefTranlocal) null);
     }
 
     @Test

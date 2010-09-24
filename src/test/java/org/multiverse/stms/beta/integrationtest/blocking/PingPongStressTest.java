@@ -72,11 +72,11 @@ public class PingPongStressTest {
         sleepMs(30 * 1000);
         stop = true;
 
-        stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure(){
+        stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                BetaTransaction btx = (BetaTransaction)tx;
-                LongRefTranlocal write = btx.openForWrite(ref, false);
+                BetaTransaction btx = (BetaTransaction) tx;
+                LongRefTranlocal write = btx.openForWrite(ref, LOCKMODE_NONE);
                 write.value = -abs(write.value);
             }
         });
@@ -122,7 +122,7 @@ public class PingPongStressTest {
                 @Override
                 public boolean execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    LongRefTranlocal write = btx.openForWrite(ref, false);
+                    LongRefTranlocal write = btx.openForWrite(ref, LOCKMODE_NONE);
 
                     if (write.value < 0) {
                         return false;
@@ -142,7 +142,7 @@ public class PingPongStressTest {
                     System.out.println(getName() + " " + count);
                 }
 
-                if(!block.execute(closure)){
+                if (!block.execute(closure)) {
                     break;
                 }
                 count++;

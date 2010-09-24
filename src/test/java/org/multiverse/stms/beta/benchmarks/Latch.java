@@ -10,7 +10,7 @@ public final class Latch {
 
     private volatile boolean isOpen = false;
 
-    public Latch(){
+    public Latch() {
         this(false);
     }
 

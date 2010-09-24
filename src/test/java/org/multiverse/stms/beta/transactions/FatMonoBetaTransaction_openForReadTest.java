@@ -50,7 +50,7 @@ public class FatMonoBetaTransaction_openForReadTest {
                 .setReadTrackingEnabled(false);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertSame(committed, read);
@@ -66,7 +66,7 @@ public class FatMonoBetaTransaction_openForReadTest {
     @Test
     public void whenNull() {
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
-        Tranlocal result = tx.openForRead((BetaLongRef) null, true);
+        Tranlocal result = tx.openForRead((BetaLongRef) null, LOCKMODE_NONE);
 
         assertNull(result);
         assertIsActive(tx);
@@ -79,9 +79,9 @@ public class FatMonoBetaTransaction_openForReadTest {
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm).init();
         BetaTransaction tx = new FatMonoBetaTransaction(config);
-        tx.openForRead(ref1, false);
+        tx.openForRead(ref1, LOCKMODE_NONE);
         try {
-            tx.openForRead(ref2, false);
+            tx.openForRead(ref2, LOCKMODE_NONE);
             fail();
         } catch (SpeculativeConfigurationError expected) {
 
@@ -97,7 +97,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         Tranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertSame(committed, read);
@@ -118,7 +118,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertSame(committed, read);
@@ -137,8 +137,8 @@ public class FatMonoBetaTransaction_openForReadTest {
         BetaLongRef ref = newLongRef(stm, 10);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal read1 = tx.openForRead(ref, false);
-        LongRefTranlocal read2 = tx.openForRead(ref, false);
+        LongRefTranlocal read1 = tx.openForRead(ref, LOCKMODE_NONE);
+        LongRefTranlocal read2 = tx.openForRead(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertSame(read1, read2);
@@ -154,8 +154,8 @@ public class FatMonoBetaTransaction_openForReadTest {
         BetaLongRef ref = newLongRef(stm, 10);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false);
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertSame(write, read);
@@ -171,7 +171,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         BetaLongRef ref = new BetaLongRef(tx);
         LongRefTranlocal construction = tx.openForConstruction(ref);
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertSame(construction, read);
@@ -189,7 +189,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         BetaLongRef ref = new BetaLongRef(tx);
         LongRefTranlocal construction = tx.openForConstruction(ref);
 
-        LongRefTranlocal read = tx.openForRead(ref, true);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_COMMIT);
 
         assertIsActive(tx);
         assertSame(construction, read);
@@ -207,11 +207,11 @@ public class FatMonoBetaTransaction_openForReadTest {
         Tranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForRead(ref, true);
+        otherTx.openForRead(ref, LOCKMODE_COMMIT);
 
         FatMonoBetaTransaction tx2 = new FatMonoBetaTransaction(stm);
         try {
-            tx2.openForRead(ref, false);
+            tx2.openForRead(ref, LOCKMODE_NONE);
             fail();
         } catch (ReadWriteConflict expected) {
         }
@@ -231,7 +231,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         Tranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, true);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_COMMIT);
 
         assertIsActive(tx);
         assertSame(committed, read);
@@ -248,8 +248,8 @@ public class FatMonoBetaTransaction_openForReadTest {
         Tranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal read1 = tx.openForRead(ref, true);
-        LongRefTranlocal read2 = tx.openForRead(ref, true);
+        LongRefTranlocal read1 = tx.openForRead(ref, LOCKMODE_COMMIT);
+        LongRefTranlocal read2 = tx.openForRead(ref, LOCKMODE_COMMIT);
 
         assertIsActive(tx);
         assertSame(read1, read2);
@@ -270,7 +270,7 @@ public class FatMonoBetaTransaction_openForReadTest {
                 .setBlockingAllowed(false)
                 .setReadTrackingEnabled(false);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
-        LongRefTranlocal read = tx.openForRead(ref, true);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_COMMIT);
 
         assertIsActive(tx);
         assertSame(committed, read);
@@ -294,13 +294,13 @@ public class FatMonoBetaTransaction_openForReadTest {
                 .setReadTrackingEnabled(false);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
-        tx.openForRead(ref1, false);
+        tx.openForRead(ref1, LOCKMODE_NONE);
 
         //an unreal readconflict
         stm.getGlobalConflictCounter().signalConflict(newLongRef(stm));
 
         try {
-            tx.openForRead(ref2, false);
+            tx.openForRead(ref2, LOCKMODE_NONE);
             fail();
         } catch (ReadWriteConflict expected) {
         }
@@ -322,7 +322,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
         BetaTransaction tx = new FatMonoBetaTransaction(config);
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertSame(committed, read);
@@ -343,7 +343,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeWrites);
         BetaTransaction tx = new FatMonoBetaTransaction(config);
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertSame(committed, read);
@@ -367,7 +367,7 @@ public class FatMonoBetaTransaction_openForReadTest {
 
         LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
 
-        LongRefTranlocal read = tx.openForWrite(ref, false);
+        LongRefTranlocal read = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertSame(commuting, read);
@@ -388,14 +388,14 @@ public class FatMonoBetaTransaction_openForReadTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        otherTx.openForRead(ref, true);
+        otherTx.openForRead(ref, LOCKMODE_COMMIT);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongFunction function = new IncLongFunction();
         tx.commute(ref, function);
 
         try {
-            tx.openForRead(ref, false);
+            tx.openForRead(ref, LOCKMODE_NONE);
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -422,7 +422,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         tx.commute(ref, function);
 
         try {
-            tx.openForRead(ref, false);
+            tx.openForRead(ref, LOCKMODE_NONE);
             fail();
         } catch (RuntimeException e) {
             assertSame(exception, e);
@@ -449,7 +449,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         tx.commute(ref, function);
 
         try {
-            tx.openForRead(ref, true);
+            tx.openForRead(ref, LOCKMODE_COMMIT);
             fail();
         } catch (RuntimeException e) {
             assertSame(exception, e);
@@ -472,7 +472,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         try {
-            tx.openForRead(ref, true);
+            tx.openForRead(ref, LOCKMODE_COMMIT);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -492,7 +492,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         BetaLongRef ref = newLongRef(stm);
 
         try {
-            tx.openForRead(ref, true);
+            tx.openForRead(ref, LOCKMODE_COMMIT);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -508,7 +508,7 @@ public class FatMonoBetaTransaction_openForReadTest {
         BetaLongRef ref = newLongRef(stm);
 
         try {
-            tx.openForRead(ref, true);
+            tx.openForRead(ref, LOCKMODE_COMMIT);
             fail();
         } catch (DeadTransactionException expected) {
         }

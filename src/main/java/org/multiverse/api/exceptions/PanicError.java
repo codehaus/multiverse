@@ -28,7 +28,7 @@ public class PanicError extends Error {
      * Creates a new PanicError with the provided message and cause.
      *
      * @param message the message of the PanicError.
-     * @param cause the cause of the PanicError.
+     * @param cause   the cause of the PanicError.
      */
     public PanicError(String message, Throwable cause) {
         super(message, cause);

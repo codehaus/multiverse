@@ -49,7 +49,7 @@ public class FastOrec_departAfterFailureAndUnlockTest {
     public void whenUpdateBiasedAndLocked() {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1,true);
+        orec.___tryLockAfterNormalArrive(1, true);
 
         long result = orec.___departAfterFailureAndUnlock();
         assertEquals(0, result);
@@ -64,7 +64,7 @@ public class FastOrec_departAfterFailureAndUnlockTest {
     public void whenReadBiasedAndLocked() {
         FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1,true);
+        orec.___tryLockAfterNormalArrive(1, true);
 
         long result = orec.___departAfterFailureAndUnlock();
         assertEquals(1, result);

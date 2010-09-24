@@ -6,7 +6,7 @@ package org.multiverse.api.exceptions;
  *
  * @author Peter Veentjer.
  */
-public class AtomicOperationException extends IllegalStateException{
+public class AtomicOperationException extends IllegalStateException {
 
     public AtomicOperationException() {
     }

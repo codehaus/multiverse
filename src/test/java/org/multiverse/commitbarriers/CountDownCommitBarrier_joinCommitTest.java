@@ -72,7 +72,7 @@ public class CountDownCommitBarrier_joinCommitTest {
                 stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
                     @Override
                     public void execute(Transaction tx) throws Exception {
-                        ref.set(tx,10);
+                        ref.set(tx, 10);
                         barrier.joinCommit(tx);
                     }
                 });

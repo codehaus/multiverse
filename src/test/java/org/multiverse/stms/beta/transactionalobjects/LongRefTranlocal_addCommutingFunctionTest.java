@@ -37,7 +37,7 @@ public class LongRefTranlocal_addCommutingFunctionTest {
     }
 
     @Test
-    public void whenMultipleAdditions(){
+    public void whenMultipleAdditions() {
         BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
 

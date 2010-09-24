@@ -78,14 +78,14 @@ public class EnsureDeadLockStressTest {
                 }
             };
 
-            int k=0;
+            int k = 0;
             while (!stop) {
                 block.execute(closure);
                 sleepMs(10);
                 k++;
 
-                if(k%10 == 0){
-                    System.out.printf("%s is at %s\n",getName(),k);
+                if (k % 10 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), k);
                 }
             }
         }

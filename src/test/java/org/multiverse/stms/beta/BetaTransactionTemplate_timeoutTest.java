@@ -65,7 +65,7 @@ public class BetaTransactionTemplate_timeoutTest {
             @Override
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                btx.openForWrite(ref, false).value = 1;
+                btx.openForWrite(ref, LOCKMODE_NONE).value = 1;
             }
         });
 
@@ -80,7 +80,7 @@ public class BetaTransactionTemplate_timeoutTest {
             @Override
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                btx.openForWrite(ref, false).value = 1;
+                btx.openForWrite(ref, LOCKMODE_NONE).value = 1;
             }
         });
 
@@ -112,7 +112,7 @@ public class BetaTransactionTemplate_timeoutTest {
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
 
-                    LongRefTranlocal write = btx.openForWrite(ref, false);
+                    LongRefTranlocal write = btx.openForWrite(ref, LOCKMODE_NONE);
                     if (write.value == 0) {
                         retry();
                     }

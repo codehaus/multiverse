@@ -7,6 +7,6 @@ package org.multiverse.stms.beta;
  * Time: 7:38:16 PM
  * To change this template use File | Settings | File Templates.
  */
-class Raf<E> extends Tobject<RafTlocal<E>>{
+class Raf<E> extends Tobject<RafTlocal<E>> {
 
 }

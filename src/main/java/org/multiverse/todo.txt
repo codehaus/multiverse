@@ -214,6 +214,8 @@ and not allowed. So not throw the retry error immediately..
 
 - ensureOptimistic
 
+- every transaction should have a random unit.
+
 done
 
 - yield and spinning.

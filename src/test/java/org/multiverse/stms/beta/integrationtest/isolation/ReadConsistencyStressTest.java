@@ -142,7 +142,7 @@ public class ReadConsistencyStressTest {
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
                     for (BetaLongRef ref : refs) {
-                        ref.set(btx,  ref.get(btx));
+                        ref.set(btx, ref.get(btx));
                     }
                 }
             };

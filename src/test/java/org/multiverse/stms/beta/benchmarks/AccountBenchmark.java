@@ -5,6 +5,7 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
@@ -21,7 +22,7 @@ import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPer
 /**
  * @author Peter Veentjer
  */
-public class AccountBenchmark {
+public class AccountBenchmark implements BetaStmConstants {
 
     private final int accountCount;
     private final BetaStm stm;
@@ -78,7 +79,7 @@ public class AccountBenchmark {
         joinAll(threads);
 
         long durationMs = System.currentTimeMillis() - startMs;
-    long individualDurationMs = 0;
+        long individualDurationMs = 0;
         for (TransferThread t : threads) {
             individualDurationMs += t.durationMs;
         }
@@ -141,7 +142,7 @@ public class AccountBenchmark {
                     BetaTransaction btx = (BetaTransaction) tx;
                     for (int k = 0; k < accounts.length; k++) {
                         BetaLongRef account = accounts[k];
-                        LongRefTranlocal tranlocal = btx.openForWrite(account, false);
+                        LongRefTranlocal tranlocal = btx.openForWrite(account, LOCKMODE_NONE);
                         tranlocal.value = Math.round(tranlocal.value * rate);
                     }
                 }
@@ -157,7 +158,7 @@ public class AccountBenchmark {
                     BetaTransaction btx = (BetaTransaction) tx;
                     long sum = 0;
                     for (int k = 0; k < accounts.length; k++) {
-                        LongRefTranlocal tranlocal = btx.openForWrite(accounts[k], false);
+                        LongRefTranlocal tranlocal = btx.openForWrite(accounts[k], LOCKMODE_NONE);
                         sum += tranlocal.value;
                     }
                 }
@@ -176,8 +177,8 @@ public class AccountBenchmark {
                     BetaLongRef from = accounts[random.nextInt(accountCount)];
                     BetaLongRef to = accounts[random.nextInt(accountCount)];
 
-                    LongRefTranlocal fromTranlocal = btx.openForWrite(from, true);
-                    LongRefTranlocal toTranlocal = btx.openForWrite(to, true);
+                    LongRefTranlocal fromTranlocal = btx.openForWrite(from, LOCKMODE_COMMIT);
+                    LongRefTranlocal toTranlocal = btx.openForWrite(to, LOCKMODE_COMMIT);
 
                     //if (fromTranlocal.value < amount) {
                     //throw OverdraftException.INSTANCE;

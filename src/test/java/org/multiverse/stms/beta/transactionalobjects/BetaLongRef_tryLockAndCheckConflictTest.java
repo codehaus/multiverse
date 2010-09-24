@@ -246,11 +246,11 @@ public class BetaLongRef_tryLockAndCheckConflictTest implements BetaStmConstants
 
         BetaTransaction tx = stm.startDefaultTransaction();
 
-        Tranlocal read2 = tx.openForRead(ref, false);
+        Tranlocal read2 = tx.openForRead(ref, LOCKMODE_NONE);
 
         //lock it by another thread
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForRead(ref, true);
+        otherTx.openForRead(ref, LOCKMODE_COMMIT);
 
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, read2, true);
 

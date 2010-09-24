@@ -11,7 +11,7 @@ public class CountDownCommitBarrier_incPartiesTest {
     private BetaStm stm;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         stm = new BetaStm();
     }
 
@@ -67,8 +67,8 @@ public class CountDownCommitBarrier_incPartiesTest {
     public void whenPendingTransactions() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(3);
 
-        JoinCommitThread t1 = new JoinCommitThread(stm,barrier);
-        JoinCommitThread t2 = new JoinCommitThread(stm,barrier);
+        JoinCommitThread t1 = new JoinCommitThread(stm, barrier);
+        JoinCommitThread t2 = new JoinCommitThread(stm, barrier);
 
         startAll(t1, t2);
 
@@ -105,7 +105,7 @@ public class CountDownCommitBarrier_incPartiesTest {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(0);
 
         try {
-            barrier.incParties();
+            barrier.atomicIncParties();
             fail();
         } catch (CommitBarrierOpenException expected) {
         }

@@ -50,7 +50,7 @@ public class FatMonoBetaTransaction_hardResetTest {
     public void whenHasNormalRead() {
         BetaLongRef ref = newLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
 
         tx.hardReset();
         assertWasHardReset(tx);
@@ -60,7 +60,7 @@ public class FatMonoBetaTransaction_hardResetTest {
     public void whenHasPermanentRead() {
         BetaLongRef ref = createReadBiasedLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
         tx.hardReset();
         assertWasHardReset(tx);
     }
@@ -69,7 +69,7 @@ public class FatMonoBetaTransaction_hardResetTest {
     public void whenHasWrite() {
         BetaLongRef ref = newLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(ref, false);
+        tx.openForWrite(ref, LOCKMODE_NONE);
         tx.hardReset();
         assertWasHardReset(tx);
     }
@@ -105,7 +105,8 @@ public class FatMonoBetaTransaction_hardResetTest {
 
     @Test
     @Ignore
-    public void whenUndefined(){}
+    public void whenUndefined() {
+    }
 
     @Test
     public void whenPrepared() {

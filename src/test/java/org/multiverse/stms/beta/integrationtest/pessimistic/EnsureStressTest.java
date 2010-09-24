@@ -9,12 +9,13 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 public class EnsureStressTest {
     private BetaStm stm;
 
-    public void setUp(){
+    public void setUp() {
         clearThreadLocalTransaction();
         stm = new BetaStm();
     }
 
     @Test
     @Ignore
-    public void test(){}
+    public void test() {
+    }
 }

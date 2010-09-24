@@ -104,7 +104,7 @@ public class FatArrayTreeBetaTransaction_commuteTest {
         BetaLongRef ref = newLongRef(stm, 100);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
         tx.commute(ref, new IncLongFunction());
 
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
@@ -125,7 +125,7 @@ public class FatArrayTreeBetaTransaction_commuteTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRefTranlocal tranlocal = tx.openForWrite(ref, false);
+        LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tx.commute(ref, new IncLongFunction());
 
         assertIsActive(tx);
@@ -247,7 +247,7 @@ public class FatArrayTreeBetaTransaction_commuteTest {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForRead(ref, true);
+        otherTx.openForRead(ref, LOCKMODE_COMMIT);
 
         LongFunction function = mock(LongFunction.class);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
@@ -306,7 +306,8 @@ public class FatArrayTreeBetaTransaction_commuteTest {
 
     @Test
     @Ignore
-    public void whenUndefined(){}
+    public void whenUndefined() {
+    }
 
     @Test
     public void whenAlreadyCommitted_thenDeadTransactionException() {

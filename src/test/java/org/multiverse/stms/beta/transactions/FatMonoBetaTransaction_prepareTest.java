@@ -47,17 +47,14 @@ public class FatMonoBetaTransaction_prepareTest {
         BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
-        FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false);
-        conflictingWrite.value++;
-        otherTx.commit();
+        ref.atomicIncrementAndGet(1);
+        LongRefTranlocal conflictingWrite = ref.___unsafeLoad();
 
         tx.prepare();
 
         assertIsPrepared(tx);
-        assertIsCommitted(otherTx);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSame(conflictingWrite, ref.___unsafeLoad());
@@ -71,10 +68,10 @@ public class FatMonoBetaTransaction_prepareTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        otherTx.openForRead(ref, true);
+        otherTx.openForRead(ref, LOCKMODE_COMMIT);
 
         tx.prepare();
 
@@ -93,7 +90,7 @@ public class FatMonoBetaTransaction_prepareTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
         tx.prepare();
 
@@ -113,7 +110,7 @@ public class FatMonoBetaTransaction_prepareTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, true);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
         tx.prepare();
 
         assertIsPrepared(tx);
@@ -132,11 +129,11 @@ public class FatMonoBetaTransaction_prepareTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
 
         FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        otherTx.openForRead(ref, true);
+        ref.privatize(otherTx);
 
         try {
             tx.prepare();
@@ -175,11 +172,11 @@ public class FatMonoBetaTransaction_prepareTest {
         BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
 
         FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false);
+        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, LOCKMODE_NONE);
         conflictingWrite.value++;
         otherTx.commit();
 
@@ -220,7 +217,7 @@ public class FatMonoBetaTransaction_prepareTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
         tx.prepare();
 

@@ -73,7 +73,7 @@ public class DirtyCheckTest {
 
     @Test
     public void whenDirtyCheckAndDirtyWrite() {
-          BetaLongRef ref = newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()

@@ -16,7 +16,7 @@ public class TodoException extends RuntimeException {
 
     /**
      * Creates a new TodoException.
-     * 
+     *
      * @param message the message of the exception
      */
     public TodoException(String message) {

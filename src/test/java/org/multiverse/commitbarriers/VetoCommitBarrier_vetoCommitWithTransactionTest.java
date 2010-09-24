@@ -10,6 +10,7 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -17,7 +18,7 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class VetoCommitBarrier_vetoCommitWithTransactionTest {
+public class VetoCommitBarrier_vetoCommitWithTransactionTest implements BetaStmConstants {
     private BetaStm stm;
 
     @Before
@@ -97,16 +98,16 @@ public class VetoCommitBarrier_vetoCommitWithTransactionTest {
         final BetaIntRef ref = new BetaIntRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
 
-        stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure(){
+        stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                ref.incrementAndGet(tx,1);
+                ref.incrementAndGet(tx, 1);
             }
         });
 
-        tx.openForWrite(ref, false).value++;
+        tx.openForWrite(ref, LOCKMODE_NONE).value++;
 
         VetoCommitBarrier barrier = new VetoCommitBarrier();
         try {

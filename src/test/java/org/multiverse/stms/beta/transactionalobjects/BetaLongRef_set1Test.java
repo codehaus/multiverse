@@ -84,7 +84,7 @@ public class BetaLongRef_set1Test {
         BetaLongRef ref = newLongRef(stm, 10);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        tx.openForRead(ref, true);
+        tx.openForRead(ref, LOCKMODE_COMMIT);
 
         try {
             ref.set(20);

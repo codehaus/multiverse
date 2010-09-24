@@ -11,20 +11,20 @@ public class Listeners_openAllTest {
     private BetaObjectPool pool;
 
     @Before
-    public void setUp(){
-       pool = new BetaObjectPool();
+    public void setUp() {
+        pool = new BetaObjectPool();
     }
 
     @Test
     public void test() {
-        Latch latch1  = mock(Latch.class);
-        Latch latch2  = mock(Latch.class);
+        Latch latch1 = mock(Latch.class);
+        Latch latch2 = mock(Latch.class);
 
         Listeners listeners = new Listeners();
         listeners.listener = latch1;
         listeners.listenerEra = 1;
 
-        listeners.next  = new Listeners();
+        listeners.next = new Listeners();
         listeners.next.listener = latch2;
         listeners.next.listenerEra = 2;
 

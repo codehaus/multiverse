@@ -54,7 +54,7 @@ public class StackWithoutCapacityStressTest implements BetaStmConstants {
     }
 
     @Test
-    public void testOptimistic(){
+    public void testOptimistic() {
         test(LOCKMODE_NONE);
     }
 

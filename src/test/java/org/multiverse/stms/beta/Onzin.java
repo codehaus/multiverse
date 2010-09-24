@@ -15,6 +15,6 @@ public interface Onzin {
     <E> RafTlocal<E> openForWrite(Raf<E> o);
 }
 
-class Tlocal{
+class Tlocal {
 
 }

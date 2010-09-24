@@ -126,7 +126,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         int readonlyCount = ref.___getOrec().___getReadonlyCount();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
         tx.commit();
 
         assertIsCommitted(tx);
@@ -143,12 +143,12 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         BetaLongRef ref = newLongRef(stm);
 
         FatArrayBetaTransaction listeningTx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal read = listeningTx.openForRead(ref, false);
+        LongRefTranlocal read = listeningTx.openForRead(ref, LOCKMODE_NONE);
         Latch latch = new CheapLatch();
         listeningTx.registerChangeListenerAndAbort(latch);
 
         FatArrayBetaTransaction updatingTx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal write = updatingTx.openForWrite(ref, false);
+        LongRefTranlocal write = updatingTx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
         write.isDirty = DIRTY_TRUE;
         updatingTx.commit();
@@ -166,12 +166,12 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         BetaLongRef ref = newLongRef(stm);
 
         FatArrayBetaTransaction listeneningTx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal read = listeneningTx.openForRead(ref, false);
+        LongRefTranlocal read = listeneningTx.openForRead(ref, LOCKMODE_NONE);
         Latch latch = new CheapLatch();
         listeneningTx.registerChangeListenerAndAbort(latch);
 
         FatArrayBetaTransaction updatingTx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal write = updatingTx.openForWrite(ref, false);
+        LongRefTranlocal write = updatingTx.openForWrite(ref, LOCKMODE_NONE);
         //write.isDirty = false;
         updatingTx.commit();
 
@@ -190,14 +190,14 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         List<Latch> listeners = new LinkedList<Latch>();
         for (int k = 0; k < 10; k++) {
             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-            tx.openForRead(ref, false);
+            tx.openForRead(ref, LOCKMODE_NONE);
             Latch listener = new CheapLatch();
             listeners.add(listener);
             tx.registerChangeListenerAndAbort(listener);
         }
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.openForWrite(ref, false).value++;
+        tx.openForWrite(ref, LOCKMODE_NONE).value++;
         tx.commit();
 
         for (Latch listener : listeners) {
@@ -210,7 +210,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         BetaLongRef ref = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal tranlocal = tx.openForWrite(ref, false);
+        LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tranlocal.value++;
         tx.commit();
 
@@ -232,7 +232,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(new BetaTransactionConfiguration(stm));
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         tx.commit();
 
         assertFalse(write.isCommitted);
@@ -245,7 +245,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         assertReadonlyCount(1, ref.___getOrec());
     }
 
-  
+
     @Test
     public void whenConstructed() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
@@ -278,14 +278,14 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, refs.length);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         for (BetaLongRef ref : refs) {
-            LongRefTranlocal tranlocal = tx.openForWrite(ref, false);
+            LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
             tranlocal.value++;
         }
         tx.commit();
 
         tx.hardReset();
         for (BetaLongRef ref : refs) {
-            assertEquals(1, tx.openForRead(ref, false).value);
+            assertEquals(1, tx.openForRead(ref, LOCKMODE_NONE).value);
         }
     }
 
@@ -296,9 +296,9 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
 
         BetaTransaction tx = new FatArrayBetaTransaction(stm);
         for (int k = 0; k < 100; k++) {
-            LongRefTranlocal tranlocal1 = tx.openForWrite(ref1, false);
+            LongRefTranlocal tranlocal1 = tx.openForWrite(ref1, LOCKMODE_NONE);
             tranlocal1.value++;
-            LongRefTranlocal tranlocal2 = tx.openForWrite(ref2, false);
+            LongRefTranlocal tranlocal2 = tx.openForWrite(ref2, LOCKMODE_NONE);
             tranlocal2.value++;
             tx.commit();
             tx.hardReset();
@@ -313,11 +313,11 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
 
         BetaTransaction otherTx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, false);
+        LongRefTranlocal conflictingWrite = otherTx.openForWrite(ref, LOCKMODE_NONE);
         conflictingWrite.value++;
         otherTx.commit();
 
@@ -349,7 +349,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.register(listenerMock);
-        tx.openForWrite(ref, false);
+        tx.openForWrite(ref, LOCKMODE_NONE);
         tx.commit();
 
         assertEquals(2, listenerMock.events.size());
@@ -365,7 +365,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .addPermanentListener(listenerMock);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
-        tx.openForWrite(ref, false);
+        tx.openForWrite(ref, LOCKMODE_NONE);
         tx.commit();
 
         assertEquals(2, listenerMock.events.size());
@@ -443,10 +443,10 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.openForWrite(ref1, false).value++;
+        tx.openForWrite(ref1, LOCKMODE_NONE).value++;
 
         FatArrayBetaTransaction otherTx = new FatArrayBetaTransaction(stm);
-        otherTx.openForWrite(ref2, false).value++;
+        otherTx.openForWrite(ref2, LOCKMODE_NONE).value++;
         otherTx.commit();
 
         tx.commute(ref2, IncLongFunction.INSTANCE_INC_ONE);
@@ -489,7 +489,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForRead(ref, true);
+        otherTx.openForRead(ref, LOCKMODE_COMMIT);
 
         try {
             tx.commit();
@@ -511,7 +511,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
                 .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeWrites)
                 .setDirtyCheckEnabled(true);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
-        tx.openForWrite(ref, false).value++;
+        tx.openForWrite(ref, LOCKMODE_NONE).value++;
         tx.commit();
 
         assertEquals(1, ref.___unsafeLoad().value);
@@ -524,7 +524,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
                 .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
                 .setDirtyCheckEnabled(true);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
-        tx.openForWrite(ref, false).value++;
+        tx.openForWrite(ref, LOCKMODE_NONE).value++;
         tx.commit();
 
         assertEquals(1, ref.___unsafeLoad().value);
@@ -536,12 +536,12 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         BetaLongRef ref2 = newLongRef(stm, 0);
 
         BetaTransaction tx1 = new FatArrayBetaTransaction(stm);
-        tx1.openForWrite(ref1, false).value++;
-        tx1.openForRead(ref2, false);
+        tx1.openForWrite(ref1, LOCKMODE_NONE).value++;
+        tx1.openForRead(ref2, LOCKMODE_NONE);
 
         BetaTransaction tx2 = new FatArrayBetaTransaction(stm);
-        tx2.openForRead(ref1, false);
-        tx2.openForWrite(ref2, false).value++;
+        tx2.openForRead(ref1, LOCKMODE_NONE);
+        tx2.openForWrite(ref2, LOCKMODE_NONE).value++;
 
         tx1.commit();
         tx2.commit();
@@ -553,14 +553,14 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         BetaLongRef ref2 = newLongRef(stm, 0);
 
         BetaTransaction tx1 = new FatArrayBetaTransaction(stm);
-        tx1.openForWrite(ref1, false).value++;
-        tx1.openForRead(ref2, false);
+        tx1.openForWrite(ref1, LOCKMODE_NONE).value++;
+        tx1.openForRead(ref2, LOCKMODE_NONE);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setWriteSkewAllowed(false);
         BetaTransaction tx2 = new FatArrayBetaTransaction(config);
-        tx2.openForRead(ref1, false);
-        tx2.openForWrite(ref2, false).value++;
+        tx2.openForRead(ref1, LOCKMODE_NONE);
+        tx2.openForWrite(ref2, LOCKMODE_NONE).value++;
 
         tx1.commit();
 
@@ -573,7 +573,7 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         assertIsAborted(tx2);
     }
 
-  
+
     @Test
     public void whenAbortOnly() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);

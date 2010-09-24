@@ -3,6 +3,7 @@ package org.multiverse.stms.beta.transactions;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import java.util.Random;
@@ -10,7 +11,7 @@ import java.util.Random;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
-public class FatArrayBetaTransaction_stressTest {
+public class FatArrayBetaTransaction_stressTest implements BetaStmConstants {
     private BetaStm stm;
 
     @Before
@@ -47,10 +48,10 @@ public class FatArrayBetaTransaction_stressTest {
 
             for (int k = 0; k < refs.length; k++) {
                 if (random.nextInt(3) == 1) {
-                    tx.openForWrite(refs[k], false).value++;
+                    tx.openForWrite(refs[k], LOCKMODE_NONE).value++;
                     created++;
                 } else {
-                    tx.openForWrite(refs[k], false);
+                    tx.openForWrite(refs[k], LOCKMODE_NONE);
                 }
             }
             tx.commit();

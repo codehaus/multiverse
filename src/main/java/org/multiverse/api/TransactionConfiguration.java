@@ -9,7 +9,7 @@ import java.util.List;
  * placed in the Transaction, adding a lot of 'informational' methods to the transaction and therefor
  * complicating its usage. So all the configurational properties of the transaction are contained in
  * this structure.
- *
+ * <p/>
  * The same TransactionConfiguration is used for multiple transactions. Each TransactionFactory has just a
  * single configuration and all Transactions created by that TransactionFactory, share that configuration.
  *

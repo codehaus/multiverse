@@ -51,7 +51,7 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
     public void whenHasNormalRead() {
         BetaLongRef ref = newLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
 
         tx.hardReset();
         assertWasHardReset(tx);
@@ -61,7 +61,7 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
     public void whenHasPermanentRead() {
         BetaLongRef ref = createReadBiasedLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
         tx.hardReset();
         assertWasHardReset(tx);
     }
@@ -70,7 +70,7 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
     public void whenHasWrite() {
         BetaLongRef ref = newLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForWrite(ref, false);
+        tx.openForWrite(ref, LOCKMODE_NONE);
         tx.hardReset();
         assertWasHardReset(tx);
     }
@@ -146,7 +146,8 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
 
     @Test
     @Ignore
-    public void whenUndefined(){}
+    public void whenUndefined() {
+    }
 
     @Test
     public void whenAborted() {

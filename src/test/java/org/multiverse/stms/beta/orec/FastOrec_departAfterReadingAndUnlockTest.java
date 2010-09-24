@@ -40,7 +40,7 @@ public class FastOrec_departAfterReadingAndUnlockTest {
         assertUpdateBiased(orec);
         assertReadonlyCount(1, orec);
     }
-   
+
     @Test
     public void whenSuccess() {
         FastOrec orec = new FastOrec();

@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
-public class BetaAtomicBlock_exceptionsTest {
+public class BetaAtomicBlock_exceptionsTest implements BetaStmConstants {
     private BetaStm stm;
 
     @Before
@@ -34,7 +34,7 @@ public class BetaAtomicBlock_exceptionsTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    btx.openForWrite(ref, false).value++;
+                    btx.openForWrite(ref, LOCKMODE_NONE).value++;
                     throw ex;
                 }
             });
@@ -58,7 +58,7 @@ public class BetaAtomicBlock_exceptionsTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    btx.openForWrite(ref, false).value++;
+                    btx.openForWrite(ref, LOCKMODE_NONE).value++;
                     throw ex;
                 }
             });
@@ -83,7 +83,7 @@ public class BetaAtomicBlock_exceptionsTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    btx.openForWrite(ref, false).value++;
+                    btx.openForWrite(ref, LOCKMODE_NONE).value++;
                     throw ex;
                 }
             });
@@ -95,7 +95,7 @@ public class BetaAtomicBlock_exceptionsTest {
         assertEquals(10, ref.atomicGet());
     }
 
-     @Test
+    @Test
     public void execute_whenCheckedExceptionThrown() {
         AtomicBlock block = stm.createTransactionFactoryBuilder().buildAtomicBlock();
         final BetaLongRef ref = newLongRef(stm, 10);
@@ -107,7 +107,7 @@ public class BetaAtomicBlock_exceptionsTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    btx.openForWrite(ref, false).value++;
+                    btx.openForWrite(ref, LOCKMODE_NONE).value++;
                     throw ex;
                 }
             });
@@ -131,7 +131,7 @@ public class BetaAtomicBlock_exceptionsTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    btx.openForWrite(ref, false).value++;
+                    btx.openForWrite(ref, LOCKMODE_NONE).value++;
                     throw ex;
                 }
             });
@@ -156,7 +156,7 @@ public class BetaAtomicBlock_exceptionsTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    btx.openForWrite(ref, false).value++;
+                    btx.openForWrite(ref, LOCKMODE_NONE).value++;
                     throw ex;
                 }
             });

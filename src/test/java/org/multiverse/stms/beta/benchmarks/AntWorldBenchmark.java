@@ -8,6 +8,7 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -19,7 +20,7 @@ import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 /**
  * @author Peter Veentjer
  */
-public class AntWorldBenchmark {
+public class AntWorldBenchmark implements BetaStmConstants {
 
     private BetaStm stm;
     private BetaLongRef[] cells;
@@ -88,7 +89,7 @@ public class AntWorldBenchmark {
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
                     for (int k = 0; k < cells.length; k++) {
-                        btx.openForRead(cells[k], false);
+                        btx.openForRead(cells[k], LOCKMODE_NONE);
                     }
                 }
             };

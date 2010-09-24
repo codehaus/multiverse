@@ -20,7 +20,7 @@ public class LongRefTranlocal_openForWriteTest implements BetaStmConstants {
     }
 
     @Test
-    public void test(){
+    public void test() {
         BetaLongRef ref = newLongRef(stm, 200);
         LongRefTranlocal committed = ref.___unsafeLoad();
 

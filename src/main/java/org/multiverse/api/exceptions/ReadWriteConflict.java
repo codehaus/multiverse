@@ -31,7 +31,7 @@ public class ReadWriteConflict extends ControlFlowError {
      * Creates a new ReadWriteConflict.
      *
      * @param message the message of the ReadWriteConflict.
-     * @param cause the cause of the ReadWriteConflict.
+     * @param cause   the cause of the ReadWriteConflict.
      */
     public ReadWriteConflict(String message, Throwable cause) {
         super(message, cause);

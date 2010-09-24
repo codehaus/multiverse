@@ -13,8 +13,8 @@ public class ImprovedBlockingQueueTest {
         queue.put("2");
         queue.put("3");
 
-        assertEquals("1",queue.take());
-        assertEquals("2",queue.take());
-        assertEquals("3",queue.take());
+        assertEquals("1", queue.take());
+        assertEquals("2", queue.take());
+        assertEquals("3", queue.take());
     }
 }

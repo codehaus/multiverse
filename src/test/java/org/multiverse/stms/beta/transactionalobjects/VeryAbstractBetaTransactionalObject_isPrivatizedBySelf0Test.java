@@ -14,7 +14,7 @@ import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class VeryAbstractBetaTransactionalObject_isPrivatizedBySelf0Test {
 
-     private BetaStm stm;
+    private BetaStm stm;
 
     @Before
     public void setUp() {

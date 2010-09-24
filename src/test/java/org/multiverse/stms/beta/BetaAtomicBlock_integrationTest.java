@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
-public class BetaAtomicBlock_integrationTest {
+public class BetaAtomicBlock_integrationTest implements BetaStmConstants {
 
     private BetaStm stm;
 
@@ -24,7 +24,7 @@ public class BetaAtomicBlock_integrationTest {
         stm = new BetaStm();
     }
 
-    
+
     @Test
     public void whenRead() {
         final BetaLongRef ref = newLongRef(stm, 10);
@@ -48,7 +48,7 @@ public class BetaAtomicBlock_integrationTest {
         block.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                ref.incrementAndGet(tx,1);
+                ref.incrementAndGet(tx, 1);
             }
         });
 
@@ -60,7 +60,7 @@ public class BetaAtomicBlock_integrationTest {
         final BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        otherTx.openForWrite(ref, true);
+        otherTx.openForWrite(ref, LOCKMODE_COMMIT);
 
         try {
             AtomicBlock block = stm.createTransactionFactoryBuilder()
@@ -89,7 +89,7 @@ public class BetaAtomicBlock_integrationTest {
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
                 for (int k = 0; k < 10; k++) {
-                    ref.set(ref.get()+1);
+                    ref.set(ref.get() + 1);
                 }
             }
         });

@@ -26,7 +26,7 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
 /**
  * @author Peter Veentjer
  */
-public class TestUtils implements MultiverseConstants{
+public class TestUtils implements MultiverseConstants {
 
     public static void clearCurrentThreadInterruptedStatus() {
         Thread.interrupted();

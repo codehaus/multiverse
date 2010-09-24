@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import static org.junit.Assert.assertEquals;
@@ -12,7 +13,7 @@ import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.createReadBiasedLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
-public class LeanMonoBetaTransaction_openForReadTest {
+public class LeanMonoBetaTransaction_openForReadTest implements BetaStmConstants {
     private BetaStm stm;
 
     @Before
@@ -32,7 +33,7 @@ public class LeanMonoBetaTransaction_openForReadTest {
         LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(config);
 
         try {
-            tx.openForRead(ref, false);
+            tx.openForRead(ref, LOCKMODE_NONE);
             fail();
         } catch (SpeculativeConfigurationError expected) {
         }

@@ -10,12 +10,12 @@ import static org.multiverse.api.StmUtils.newRef;
 public class StripeTest {
 
     @Test
-    public void test(){
+    public void test() {
         int size = 10;
         Ref<String>[] refs = new Ref[size];
 
-        for(int k=0;k<refs.length;k++){
-            refs[k]=newRef();
+        for (int k = 0; k < refs.length; k++) {
+            refs[k] = newRef();
         }
 
         refs[0].ensure();

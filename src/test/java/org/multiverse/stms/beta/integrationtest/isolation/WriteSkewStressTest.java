@@ -25,7 +25,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  * A Test that checks if the writeskew problem is happening. When
  * pessimisticRead/PessimisticLockLevel.Read/writeskew=false is used, no writeskew is possible. Otherwise
  * it can happen.
- * 
+ *
  * @author Peter Veentjer.
  */
 public class WriteSkewStressTest {
@@ -64,7 +64,7 @@ public class WriteSkewStressTest {
 
         BetaIntRef account = user1.getRandomAccount();
         BetaTransaction tx = stm.startDefaultTransaction();
-        tx.openForWrite(account, false).value = 1000;
+        tx.openForWrite(account, LOCKMODE_NONE).value = 1000;
         tx.commit();
     }
 
@@ -294,8 +294,8 @@ public class WriteSkewStressTest {
             User from = random(user1, user2);
             User to = random(user1, user2);
 
-            int sum = tx.openForRead(from.account1, pessimisticRead).value
-                    + tx.openForRead(from.account2, pessimisticRead).value;
+            int sum = tx.openForRead(from.account1, pessimisticRead ? LOCKMODE_COMMIT : LOCKMODE_NONE).value
+                    + tx.openForRead(from.account2, pessimisticRead ? LOCKMODE_COMMIT : LOCKMODE_NONE).value;
 
             if (sum < 0) {
                 if (!writeSkewEncountered.get()) {
@@ -306,10 +306,10 @@ public class WriteSkewStressTest {
 
             if (sum >= amount) {
                 BetaIntRef fromAccount = from.getRandomAccount();
-                tx.openForWrite(fromAccount, pessimisticWrite).value -= amount;
+                tx.openForWrite(fromAccount, pessimisticWrite ? LOCKMODE_COMMIT : LOCKMODE_NONE).value -= amount;
 
                 BetaIntRef toAccount = to.getRandomAccount();
-                tx.openForWrite(toAccount, pessimisticWrite).value += amount;
+                tx.openForWrite(toAccount, pessimisticWrite ? LOCKMODE_COMMIT : LOCKMODE_NONE).value += amount;
             }
 
             sleepRandomUs(20);

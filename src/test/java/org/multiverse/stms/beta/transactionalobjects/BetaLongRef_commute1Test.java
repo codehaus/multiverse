@@ -290,7 +290,7 @@ public class BetaLongRef_commute1Test {
 
     @Test
     public void whenPrivatizedByOther_thenCommuteSucceedsButCommitFails() {
-         BetaLongRef ref = newLongRef(stm, 2);
+        BetaLongRef ref = newLongRef(stm, 2);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         BetaTransaction tx = stm.startDefaultTransaction();

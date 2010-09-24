@@ -27,7 +27,7 @@ public class PreparedTransactionException extends IllegalTransactionStateExcepti
      * Creates a new PreparedTransactionException with the provided message and cause.
      *
      * @param message the message of the exception.
-     * @param cause the cause of the exception.
+     * @param cause   the cause of the exception.
      */
     public PreparedTransactionException(String message, Throwable cause) {
         super(message, cause);

@@ -133,11 +133,12 @@ public interface Orec extends BetaStmConstants {
     @Deprecated
     void ___unlockByReadBiased();
 
-   /**
+    /**
      * Upgrades the updatelock to a commit lock. The call safely can be made if the commit lock
      * already is acquired.
      *
-     * @throws org.multiverse.api.exceptions.PanicError if the updateLock and commitLock is not acquired 
+     * @throws org.multiverse.api.exceptions.PanicError
+     *          if the updateLock and commitLock is not acquired
      */
     void ___upgradeToCommitLock();
 

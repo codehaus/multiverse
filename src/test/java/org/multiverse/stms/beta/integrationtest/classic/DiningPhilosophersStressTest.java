@@ -131,7 +131,7 @@ public class DiningPhilosophersStressTest {
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
                     leftFork.getAndSet(btx, leftFork.get(btx) - 1);
-                    rightFork.getAndSet(btx,rightFork.get(btx) - 1);
+                    rightFork.getAndSet(btx, rightFork.get(btx) - 1);
                 }
             });
         }

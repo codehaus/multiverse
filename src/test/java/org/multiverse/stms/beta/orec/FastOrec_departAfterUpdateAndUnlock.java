@@ -66,7 +66,7 @@ public class FastOrec_departAfterUpdateAndUnlock {
     public void whenLockedAndNoAdditionalSurplus() {
         FastOrec orec = new FastOrec();
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1,true);
+        orec.___tryLockAfterNormalArrive(1, true);
 
         long oldConflictCount = globalConflictCounter.count();
 
@@ -87,7 +87,7 @@ public class FastOrec_departAfterUpdateAndUnlock {
         orec.___arrive(1);
         orec.___arrive(1);
         orec.___arrive(1);
-        orec.___tryLockAfterNormalArrive(1,true);
+        orec.___tryLockAfterNormalArrive(1, true);
 
         long oldConflictCount = globalConflictCounter.count();
 

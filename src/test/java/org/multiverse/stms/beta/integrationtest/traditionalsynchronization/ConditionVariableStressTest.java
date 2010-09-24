@@ -12,8 +12,9 @@ public class ConditionVariableStressTest {
     public void setUp() {
         stm = new BetaStm();
     }
-    
+
     @Test
     @Ignore
-    public void test(){}
+    public void test() {
+    }
 }

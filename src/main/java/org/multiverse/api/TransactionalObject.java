@@ -19,7 +19,7 @@ public interface TransactionalObject {
     /**
      * Checks if the TransactionalObject is privatized. It could be that it is privatized by the active
      * transaction or by another transaction.
-     *
+     * <p/>
      * The value could be stale as soon as it is returned.
      *
      * @return true if privatized, false otherwise.
@@ -28,7 +28,7 @@ public interface TransactionalObject {
 
     /**
      * Checks if the TransactionalObject is privatized by another transaction.
-     *
+     * <p/>
      * The value could be stale as soon as it is returned.
      *
      * @return true if the TransactionalObject has been privatized by another transaction than the
@@ -49,11 +49,12 @@ public interface TransactionalObject {
 
     /**
      * Checks if the TransactionalObject is privatized by the active transaction.
-     *
+     * <p/>
      * The value could be stale as soon as it is returned.
      *
      * @return
-     * @throws org.multiverse.api.exceptions.NoTransactionFoundException if no alive transaction is found.
+     * @throws org.multiverse.api.exceptions.NoTransactionFoundException
+     *          if no alive transaction is found.
      */
     boolean isPrivatizedBySelf();
 

@@ -40,7 +40,7 @@ public class BetaLongRef_openForCommuteTest implements BetaStmConstants {
         assertFalse(tranlocal.isPermanent);
     }
 
-      @Test
+    @Test
     public void whenPrivatized_thenOpenForCommuteNoProblem() {
         BetaLongRef ref = newLongRef(stm, 100);
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -88,5 +88,5 @@ public class BetaLongRef_openForCommuteTest implements BetaStmConstants {
         assertNull(tranlocal.read);
         assertNull(tranlocal.headCallable);
         assertFalse(tranlocal.isPermanent);
-    }    
+    }
 }

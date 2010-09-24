@@ -22,7 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.assertInstanceof;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
-public class BetaAtomicBlock_speculativeTest {
+public class BetaAtomicBlock_speculativeTest implements BetaStmConstants{
 
     private BetaStm stm;
 
@@ -54,7 +54,7 @@ public class BetaAtomicBlock_speculativeTest {
 
                 transactions.add(btx);
                 for (BetaLongRef ref : refs) {
-                    btx.openForWrite(ref, false).value = 1;
+                    btx.openForWrite(ref, LOCKMODE_NONE).value = 1;
                 }
             }
         });
@@ -64,9 +64,9 @@ public class BetaAtomicBlock_speculativeTest {
         }
 
         assertEquals(3, transactions.size());
-        assertInstanceof(LeanMonoBetaTransaction.class,transactions.get(0));
-        assertInstanceof(LeanArrayBetaTransaction.class,transactions.get(1));
-        assertInstanceof(LeanArrayTreeBetaTransaction.class,transactions.get(2));
+        assertInstanceof(LeanMonoBetaTransaction.class, transactions.get(0));
+        assertInstanceof(LeanArrayBetaTransaction.class, transactions.get(1));
+        assertInstanceof(LeanArrayTreeBetaTransaction.class, transactions.get(2));
     }
 
     /*
@@ -172,14 +172,14 @@ public class BetaAtomicBlock_speculativeTest {
                 BetaTransaction btx = (BetaTransaction) tx;
                 transactions.add(btx);
 
-                if(transactions.size()==1){
+                if (transactions.size() == 1) {
                     btx.setRemainingTimeoutNs(500);
-                }else{
+                } else {
                     assertEquals(500, btx.getRemainingTimeoutNs());
                 }
 
-                btx.openForWrite(ref1,false);
-                btx.openForWrite(ref2,false);
+                btx.openForWrite(ref1, LOCKMODE_NONE);
+                btx.openForWrite(ref2, LOCKMODE_NONE);
             }
         });
     }

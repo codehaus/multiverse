@@ -12,7 +12,7 @@ import org.multiverse.api.functions.LongFunction;
  * @see org.multiverse.api.references.Ref
  */
 public interface LongRef extends TransactionalObject {
-  
+
     /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
      * will commute. If somehow there already is a dependency or a dependency is formed on the result of
@@ -163,7 +163,7 @@ public interface LongRef extends TransactionalObject {
 
     /**
      * Alters the value stored in this Ref using the alterAndGet function.
-     *
+     * <p/>
      * No dirty check is done, so a write will always be done.O
      *
      * @param function the function that alters the value stored in this Ref.
@@ -181,7 +181,7 @@ public interface LongRef extends TransactionalObject {
     /**
      * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
      * any running transactions.
-     *
+     * <p/>
      * No dirty check is done, so a write will always be done.
      *
      * @param function the Function responsible to alterAndGet the function.
@@ -195,7 +195,7 @@ public interface LongRef extends TransactionalObject {
     /**
      * Alters the value stored in this Ref using the alterAndGet function. If a transaction is available it will
      * lift on that transaction, else it will be run under its own transaction.
-     *
+     * <p/>
      * No dirty check is done, so a write will always be done.
      *
      * @param function the function that alters the value stored in this Ref.

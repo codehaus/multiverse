@@ -127,12 +127,12 @@ public class MoneyTransferStressTest {
                     BetaLongRef to = accounts[randomInt(accounts.length)];
                     int amount = randomInt(100);
 
-                    btx.openForWrite(to, !optimistic).value += amount;
+                    btx.openForWrite(to, !optimistic?LOCKMODE_NONE:LOCKMODE_COMMIT).value += amount;
 
                     sleepRandomMs(10);
 
-                    LongRefTranlocal toTranlocal = btx.openForWrite(from, !optimistic);
-                    if(toTranlocal.value<0){
+                    LongRefTranlocal toTranlocal = btx.openForWrite(from, !optimistic?LOCKMODE_NONE:LOCKMODE_COMMIT);
+                    if (toTranlocal.value < 0) {
                         throw new NotEnoughMoneyException();
                     }
 

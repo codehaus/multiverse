@@ -8,9 +8,9 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 public class FastOrec_unlockByReadBiased {
 
     @Test
-    public void whenSurplusAndReadBiasedAndLocked(){
+    public void whenSurplusAndReadBiasedAndLocked() {
         FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
-        orec.___tryLockAndArrive(1,true);
+        orec.___tryLockAndArrive(1, true);
 
         orec.___unlockByReadBiased();
 
@@ -23,19 +23,19 @@ public class FastOrec_unlockByReadBiased {
 
     @Test
     @Ignore
-    public void whenSurplusAndUpdateBiasedAndLocked_thenPanicError(){
+    public void whenSurplusAndUpdateBiasedAndLocked_thenPanicError() {
 
     }
 
     @Test
     @Ignore
-    public void whenNoSurplusAndReadBiasedAndUnlocked_thenPanicError(){
+    public void whenNoSurplusAndReadBiasedAndUnlocked_thenPanicError() {
 
     }
 
     @Test
     @Ignore
-    public void whenNoSurplusAndUpdateBiasedAndUnlocked_thenPanicError(){
+    public void whenNoSurplusAndUpdateBiasedAndUnlocked_thenPanicError() {
 
     }
 }

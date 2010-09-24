@@ -66,7 +66,7 @@ public class FatArrayTreeBetaTransaction_initTest {
         BetaLongRef ref = newLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForWrite(ref, true);
+        tx.openForWrite(ref, LOCKMODE_COMMIT);
         tx.prepare();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
@@ -89,7 +89,7 @@ public class FatArrayTreeBetaTransaction_initTest {
         BetaLongRef ref = newLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForWrite(ref, false).value++;
+        tx.openForWrite(ref, LOCKMODE_NONE).value++;
         tx.abort();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
@@ -103,7 +103,7 @@ public class FatArrayTreeBetaTransaction_initTest {
     public void whenCommitted() {
         BetaLongRef ref = newLongRef(stm);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForWrite(ref, false).value++;
+        tx.openForWrite(ref, LOCKMODE_NONE).value++;
         tx.commit();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);

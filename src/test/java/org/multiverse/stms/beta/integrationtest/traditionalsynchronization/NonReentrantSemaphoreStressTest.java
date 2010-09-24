@@ -87,7 +87,7 @@ public class NonReentrantSemaphoreStressTest {
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
 
-                IntRefTranlocal write = btx.openForWrite(ref, pessimistic);
+                IntRefTranlocal write = btx.openForWrite(ref, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
                 write.value++;
             }
         };
@@ -96,7 +96,7 @@ public class NonReentrantSemaphoreStressTest {
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
 
-                IntRefTranlocal write = btx.openForWrite(ref, pessimistic);
+                IntRefTranlocal write = btx.openForWrite(ref, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
                 if (write.value == 0) {
                     retry();
                 }

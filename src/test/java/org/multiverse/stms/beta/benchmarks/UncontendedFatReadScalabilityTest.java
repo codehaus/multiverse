@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.benchmarks;
 
 import org.multiverse.TestThread;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
@@ -18,7 +19,7 @@ import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 /**
  * @author Peter Veentjer
  */
-public class UncontendedFatReadScalabilityTest {
+public class UncontendedFatReadScalabilityTest implements BetaStmConstants {
 
     private BetaStm stm;
 
@@ -104,7 +105,7 @@ public class UncontendedFatReadScalabilityTest {
             //ArrayUpdateTransaction tx = new ArrayUpdateTransaction(stm, 1);
             for (long k = 0; k < transactionCount; k++) {
                 //long x = ((LongRefTranlocal)(tx.openForRead((BetaTransactionalObject)ref, true, pool))).value;
-                long x = tx.openForRead(ref, false).value;
+                long x = tx.openForRead(ref, LOCKMODE_NONE).value;
                 tx.commit();
                 tx.hardReset();
             }

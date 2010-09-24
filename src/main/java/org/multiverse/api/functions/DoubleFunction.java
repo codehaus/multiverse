@@ -2,7 +2,7 @@ package org.multiverse.api.functions;
 
 /**
  * A {@link Function} optimized for a double. It depends on the stm if {@link #call(double)} without boxing or
- * {@link #call(Double)} is done (with boxing). 
+ * {@link #call(Double)} is done (with boxing).
  *
  * @author Peter Veentjer
  */

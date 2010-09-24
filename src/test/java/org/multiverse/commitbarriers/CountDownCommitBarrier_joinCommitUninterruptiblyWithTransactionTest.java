@@ -181,7 +181,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
                 stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
                     @Override
                     public void execute(Transaction tx) throws Exception {
-                        ref.getAndIncrement(tx,1);
+                        ref.getAndIncrement(tx, 1);
                         barrier.joinCommitUninterruptibly(tx);
                     }
                 });

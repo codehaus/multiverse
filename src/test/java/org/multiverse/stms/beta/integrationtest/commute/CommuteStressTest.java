@@ -99,7 +99,7 @@ public class CommuteStressTest {
                 public long execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
                     for (int k = 0; k < refs.length; k++) {
-                        btx.openForWrite(refs[k], false).value++;
+                        btx.openForWrite(refs[k], LOCKMODE_NONE).value++;
                     }
                     return refs.length;
                 }

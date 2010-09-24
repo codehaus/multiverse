@@ -12,7 +12,7 @@ import org.multiverse.api.functions.DoubleFunction;
  * @see org.multiverse.api.references.Ref
  */
 public interface DoubleRef extends TransactionalObject {
-  
+
     /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
      * will commute. If somehow there already is a dependency or a dependency is formed on the result of

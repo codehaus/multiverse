@@ -85,7 +85,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
         LongRefTranlocal construction2 = tx.openForConstruction(ref);
 
         assertIsActive(tx);
-        assertAttached(tx,construction1);
+        assertAttached(tx, construction1);
         assertSame(construction1, construction2);
         assertNotNull(construction1);
         assertEquals(0, construction1.value);
@@ -140,7 +140,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
 
         try {
             tx.openForConstruction(ref);
@@ -163,7 +163,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.openForWrite(ref, false);
+        tx.openForWrite(ref, LOCKMODE_NONE);
 
         try {
             tx.openForConstruction(ref);
@@ -213,7 +213,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
                 .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
-        tx.openForRead(ref1, false);
+        tx.openForRead(ref1, LOCKMODE_NONE);
 
         long oldLocalConflictCount = tx.getLocalConflictCounter().get();
 
@@ -221,7 +221,7 @@ public class FatArrayBetaTransaction_openForConstructionTest implements BetaStmC
         BetaLongRef ref2 = new BetaLongRef(tx);
         tx.openForConstruction(ref2);
 
-        assertEquals(oldLocalConflictCount, tx.getLocalConflictCounter().get());        
+        assertEquals(oldLocalConflictCount, tx.getLocalConflictCounter().get());
     }
 
     @Test

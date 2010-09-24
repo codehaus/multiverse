@@ -90,7 +90,7 @@ public class WriteSkewTest {
         assertEquals(1, ref1.atomicGet());
     }
 
-     @Test
+    @Test
     public void whenEnsureReadsPessimisticLockLevel_thenWriteSkewNotPossible() {
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
@@ -106,7 +106,7 @@ public class WriteSkewTest {
         ref2.get(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-         ref2.incrementAndGet(otherTx, 1);
+        ref2.incrementAndGet(otherTx, 1);
 
         try {
             otherTx.commit();
@@ -169,31 +169,31 @@ public class WriteSkewTest {
     }
 
     @Test
-     public void whenEnsured_thenWriteSkewNotPossible() {
-         BetaLongRef ref1 = newLongRef(stm);
-         BetaLongRef ref2 = newLongRef(stm);
+    public void whenEnsured_thenWriteSkewNotPossible() {
+        BetaLongRef ref1 = newLongRef(stm);
+        BetaLongRef ref2 = newLongRef(stm);
 
-         BetaTransaction tx = stm.createTransactionFactoryBuilder()
-                 .setSpeculativeConfigurationEnabled(false)
-                 .setWriteSkewAllowed(false)
-                 .build()
-                 .start();
+        BetaTransaction tx = stm.createTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .setWriteSkewAllowed(false)
+                .build()
+                .start();
 
-         ref1.incrementAndGet(tx, 1);
-         ref2.ensure(tx);
-         ref2.get(tx);
+        ref1.incrementAndGet(tx, 1);
+        ref2.ensure(tx);
+        ref2.get(tx);
 
-         BetaTransaction otherTx = stm.startDefaultTransaction();
-         ref2.incrementAndGet(otherTx, 1);
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref2.incrementAndGet(otherTx, 1);
 
-         try {
-             otherTx.commit();
-             fail();
-         } catch (ReadWriteConflict expected) {
-         }
+        try {
+            otherTx.commit();
+            fail();
+        } catch (ReadWriteConflict expected) {
+        }
 
-         tx.commit();
-     }
+        tx.commit();
+    }
 
     @Test
     public void whenWriteSkewNotAllowed_thenDetected() {

@@ -53,7 +53,7 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
     public int isDirty = DIRTY_UNKNOWN;
     public final boolean isLocked;
     public Tranlocal read;
- 
+
     public Tranlocal(BetaTransactionalObject owner, boolean locked) {
         this.owner = owner;
         this.isLocked = locked;
@@ -71,7 +71,7 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
      * Prepares this Tranlocal for committing. If there is a read, the read is getAndSet to null (to prevent
      * retaining an uncontrollable number of objects). Also the isDirty field is getAndSet to false and the isCommitted
      * field to false.
-     *
+     * <p/>
      * No checks are done if the Tranlocal is in the committed state, so make sure that this is done from
      * the outside.
      */
@@ -107,7 +107,7 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
     /**
      * Calculates if this Tranlocal is dirty (so needs to be written) and stores the result in the
      * isDirty field.
-     *
+     * <p/>
      * todo: say something about repeated calls.
      *
      * @return true if dirty, false otherwise.
@@ -126,11 +126,11 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
     /**
      * Adds a Function for commute to this Tranlocal. This call is made under the assumption that
      * the Tranlocal is not committed and in the 'isCommuting' mode.
-     *
+     * <p/>
      * No checks on the Function are done, so no null check or check if the Function already is added.
      *
      * @param function the Function to add.
-     * @param pool the BetaObjectPool that can be used to pool resources for this operation.
+     * @param pool     the BetaObjectPool that can be used to pool resources for this operation.
      */
     public abstract void addCommutingFunction(Function function, BetaObjectPool pool);
 

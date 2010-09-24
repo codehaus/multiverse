@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -12,7 +13,7 @@ import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
-public class DeadLockTest {
+public class DeadLockTest implements BetaStmConstants {
     private BetaStm stm;
 
     @Before
@@ -28,18 +29,18 @@ public class DeadLockTest {
         BetaTransaction tx1 = stm.startDefaultTransaction();
         BetaTransaction tx2 = stm.startDefaultTransaction();
 
-        tx1.openForWrite(ref1, true).value++;
-        tx2.openForWrite(ref2, true).value++;
+        tx1.openForWrite(ref1, LOCKMODE_COMMIT).value++;
+        tx2.openForWrite(ref2, LOCKMODE_COMMIT).value++;
 
-        try{
-            tx1.openForWrite(ref2, true);
+        try {
+            tx1.openForWrite(ref2, LOCKMODE_COMMIT);
             fail();
-        }catch(ReadWriteConflict expected){
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx1);
 
-        tx2.openForWrite(ref1, true).value++;
+        tx2.openForWrite(ref1, LOCKMODE_COMMIT).value++;
         tx2.commit();
 
         assertEquals(1, ref1.atomicGet());

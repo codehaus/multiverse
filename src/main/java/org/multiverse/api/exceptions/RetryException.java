@@ -7,7 +7,7 @@ package org.multiverse.api.exceptions;
  *
  * @author Peter Veentjer.
  */
-public abstract class RetryException extends RuntimeException{
+public abstract class RetryException extends RuntimeException {
 
     /**
      * Creates a new RetryException.
@@ -28,7 +28,7 @@ public abstract class RetryException extends RuntimeException{
      * Creates a new RetryException with the provided message and cause.
      *
      * @param message the message of the RetryException.
-     * @param cause the cause of the RetryException.
+     * @param cause   the cause of the RetryException.
      */
     public RetryException(String message, Throwable cause) {
         super(message, cause);

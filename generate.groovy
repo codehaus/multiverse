@@ -213,7 +213,7 @@ List<TransactionalObject> createTransactionalObjects() {
           isReference: true,
           isNumber: false,
           predicateClass: "BooleanPredicate")
-   result.add new TransactionalObject(
+  result.add new TransactionalObject(
           name: 'BetaDoubleRef',
           tranlocal: 'DoubleRefTranlocal',
 //          parametrizedTranlocal: 'IntRefTranlocal',

@@ -28,7 +28,7 @@ public class NoTransactionAllowedException extends PropagationException {
      * Creates a new NoTransactionAllowedException with the provided message and cause.
      *
      * @param message the message of the exception.
-     * @param cause the cause of the Exception.
+     * @param cause   the cause of the Exception.
      */
     public NoTransactionAllowedException(String message, Throwable cause) {
         super(message, cause);

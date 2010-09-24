@@ -22,18 +22,12 @@ import static java.lang.String.format;
  */
 public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
-    public final static int BITMASK_HAS_UPDATES = 0x1;
-    public final static int BITMASK_HAS_READS = 0x2;
-    public final static int BITMASK_HAS_UNTRACKED_READS = 0x4;
-    public final static int BITMASK_EVALUATING_COMMUTE = 0x8;
-
-    private int state = 0;
     private Tranlocal attached;
-//    private boolean hasUpdates;
-//    private boolean hasReads;
+    private boolean hasUpdates;
+    private boolean hasReads;
     private boolean hasUntrackedReads;
-    private boolean evaluatingCommute;
     private LocalConflictCounter localConflictCounter;
+    private boolean evaluatingCommute;
 
     public FatMonoBetaTransaction(final BetaStm stm){
         this(new BetaTransactionConfiguration(stm).init());
@@ -59,9 +53,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         final RefTranlocal<E> tranlocal,
         final int lockMode){
 
-        if((state & BITMASK_HAS_READS) == 0){
+        if(!hasReads){
             localConflictCounter.reset();
-            state = state | BITMASK_HAS_READS;
+            hasReads = true;
         }
 
         final RefTranlocal<E> read = ref.___load(config.spinCount, this, lockMode);
@@ -111,10 +105,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(attached == null){
             //the transaction has no previous attached references.
 
-            if((state & BITMASK_HAS_READS) == 0){
+            if(!hasReads){
                 localConflictCounter.reset();
-                state = state | BITMASK_HAS_READS;
-//                hasReads = true;
+                hasReads = true;
             }
             RefTranlocal<E> read = ref.___load(config.spinCount, this, lockMode);
 
@@ -157,9 +150,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if((state & BITMASK_HAS_READS) == 0){
+        if(!hasReads){
             localConflictCounter.reset();
-            state = state | BITMASK_HAS_READS;
+            hasReads = true;
         }
 
         RefTranlocal<E> read = ref.___load(config.spinCount, this, lockMode);
@@ -207,9 +200,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(attached == null){
             //the transaction has no previous attached references.
 
-            if((state & BITMASK_HAS_READS) == 0){
+            if(!hasReads){
                 localConflictCounter.reset();
-                state = state | BITMASK_HAS_READS;
+                hasReads = true;
             }
             RefTranlocal<E> read = ref.___load(config.spinCount, this, lockMode);
 
@@ -230,8 +223,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             result.value = read.value;
             result.read = read;
 
-            state = BITMASK_HAS_UPDATES | state;
-//            hasUpdates = true;
+            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -265,8 +257,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
         result.value = read.value;
         result.read = read;
-        state = state | BITMASK_HAS_UPDATES;
-//        hasUpdates = true;
+        hasUpdates = true;    
         attached = result;
         return result;
     }
@@ -351,8 +342,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             //todo: call to 'openForCommute' can be inlined.
             RefTranlocal<E> result = ref.___openForCommute(pool);
             attached=result;
-            state = state | BITMASK_HAS_UPDATES;
-//            hasUpdates = true;
+            hasUpdates = true;
             result.addCommutingFunction(function, pool);
             return;
         }
@@ -371,8 +361,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
             result.read = read;
             result.value = read.value;
-            state = state | BITMASK_HAS_UPDATES;
-//            hasUpdates = true;
+            hasUpdates = true;
             attached=result;
         }
 
@@ -385,9 +374,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         final IntRefTranlocal tranlocal,
         final int lockMode){
 
-        if((state & BITMASK_HAS_READS) == 0){
+        if(!hasReads){
             localConflictCounter.reset();
-            state = state | BITMASK_HAS_READS;
+            hasReads = true;
         }
 
         final IntRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
@@ -437,10 +426,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(attached == null){
             //the transaction has no previous attached references.
 
-            if((state & BITMASK_HAS_READS) == 0){
+            if(!hasReads){
                 localConflictCounter.reset();
-                state = state | BITMASK_HAS_READS;
-//                hasReads = true;
+                hasReads = true;
             }
             IntRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
 
@@ -483,9 +471,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if((state & BITMASK_HAS_READS) == 0){
+        if(!hasReads){
             localConflictCounter.reset();
-            state = state | BITMASK_HAS_READS;
+            hasReads = true;
         }
 
         IntRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
@@ -533,9 +521,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(attached == null){
             //the transaction has no previous attached references.
 
-            if((state & BITMASK_HAS_READS) == 0){
+            if(!hasReads){
                 localConflictCounter.reset();
-                state = state | BITMASK_HAS_READS;
+                hasReads = true;
             }
             IntRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
 
@@ -556,8 +544,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             result.value = read.value;
             result.read = read;
 
-            state = BITMASK_HAS_UPDATES | state;
-//            hasUpdates = true;
+            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -591,8 +578,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
         result.value = read.value;
         result.read = read;
-        state = state | BITMASK_HAS_UPDATES;
-//        hasUpdates = true;
+        hasUpdates = true;    
         attached = result;
         return result;
     }
@@ -677,8 +663,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             //todo: call to 'openForCommute' can be inlined.
             IntRefTranlocal result = ref.___openForCommute(pool);
             attached=result;
-            state = state | BITMASK_HAS_UPDATES;
-//            hasUpdates = true;
+            hasUpdates = true;
             result.addCommutingFunction(function, pool);
             return;
         }
@@ -697,8 +682,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
             result.read = read;
             result.value = read.value;
-            state = state | BITMASK_HAS_UPDATES;
-//            hasUpdates = true;
+            hasUpdates = true;
             attached=result;
         }
 
@@ -711,9 +695,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         final BooleanRefTranlocal tranlocal,
         final int lockMode){
 
-        if((state & BITMASK_HAS_READS) == 0){
+        if(!hasReads){
             localConflictCounter.reset();
-            state = state | BITMASK_HAS_READS;
+            hasReads = true;
         }
 
         final BooleanRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
@@ -763,10 +747,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(attached == null){
             //the transaction has no previous attached references.
 
-            if((state & BITMASK_HAS_READS) == 0){
+            if(!hasReads){
                 localConflictCounter.reset();
-                state = state | BITMASK_HAS_READS;
-//                hasReads = true;
+                hasReads = true;
             }
             BooleanRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
 
@@ -809,9 +792,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if((state & BITMASK_HAS_READS) == 0){
+        if(!hasReads){
             localConflictCounter.reset();
-            state = state | BITMASK_HAS_READS;
+            hasReads = true;
         }
 
         BooleanRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
@@ -859,9 +842,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(attached == null){
             //the transaction has no previous attached references.
 
-            if((state & BITMASK_HAS_READS) == 0){
+            if(!hasReads){
                 localConflictCounter.reset();
-                state = state | BITMASK_HAS_READS;
+                hasReads = true;
             }
             BooleanRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
 
@@ -882,8 +865,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             result.value = read.value;
             result.read = read;
 
-            state = BITMASK_HAS_UPDATES | state;
-//            hasUpdates = true;
+            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -917,8 +899,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
         result.value = read.value;
         result.read = read;
-        state = state | BITMASK_HAS_UPDATES;
-//        hasUpdates = true;
+        hasUpdates = true;    
         attached = result;
         return result;
     }
@@ -1003,8 +984,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             //todo: call to 'openForCommute' can be inlined.
             BooleanRefTranlocal result = ref.___openForCommute(pool);
             attached=result;
-            state = state | BITMASK_HAS_UPDATES;
-//            hasUpdates = true;
+            hasUpdates = true;
             result.addCommutingFunction(function, pool);
             return;
         }
@@ -1023,8 +1003,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
             result.read = read;
             result.value = read.value;
-            state = state | BITMASK_HAS_UPDATES;
-//            hasUpdates = true;
+            hasUpdates = true;
             attached=result;
         }
 
@@ -1037,9 +1016,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         final DoubleRefTranlocal tranlocal,
         final int lockMode){
 
-        if((state & BITMASK_HAS_READS) == 0){
+        if(!hasReads){
             localConflictCounter.reset();
-            state = state | BITMASK_HAS_READS;
+            hasReads = true;
         }
 
         final DoubleRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
@@ -1089,10 +1068,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(attached == null){
             //the transaction has no previous attached references.
 
-            if((state & BITMASK_HAS_READS) == 0){
+            if(!hasReads){
                 localConflictCounter.reset();
-                state = state | BITMASK_HAS_READS;
-//                hasReads = true;
+                hasReads = true;
             }
             DoubleRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
 
@@ -1135,9 +1113,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if((state & BITMASK_HAS_READS) == 0){
+        if(!hasReads){
             localConflictCounter.reset();
-            state = state | BITMASK_HAS_READS;
+            hasReads = true;
         }
 
         DoubleRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
@@ -1185,9 +1163,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(attached == null){
             //the transaction has no previous attached references.
 
-            if((state & BITMASK_HAS_READS) == 0){
+            if(!hasReads){
                 localConflictCounter.reset();
-                state = state | BITMASK_HAS_READS;
+                hasReads = true;
             }
             DoubleRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
 
@@ -1208,8 +1186,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             result.value = read.value;
             result.read = read;
 
-            state = BITMASK_HAS_UPDATES | state;
-//            hasUpdates = true;
+            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -1243,8 +1220,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
         result.value = read.value;
         result.read = read;
-        state = state | BITMASK_HAS_UPDATES;
-//        hasUpdates = true;
+        hasUpdates = true;    
         attached = result;
         return result;
     }
@@ -1329,8 +1305,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             //todo: call to 'openForCommute' can be inlined.
             DoubleRefTranlocal result = ref.___openForCommute(pool);
             attached=result;
-            state = state | BITMASK_HAS_UPDATES;
-//            hasUpdates = true;
+            hasUpdates = true;
             result.addCommutingFunction(function, pool);
             return;
         }
@@ -1349,8 +1324,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
             result.read = read;
             result.value = read.value;
-            state = state | BITMASK_HAS_UPDATES;
-//            hasUpdates = true;
+            hasUpdates = true;
             attached=result;
         }
 
@@ -1363,9 +1337,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         final LongRefTranlocal tranlocal,
         final int lockMode){
 
-        if((state & BITMASK_HAS_READS) == 0){
+        if(!hasReads){
             localConflictCounter.reset();
-            state = state | BITMASK_HAS_READS;
+            hasReads = true;
         }
 
         final LongRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
@@ -1415,10 +1389,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(attached == null){
             //the transaction has no previous attached references.
 
-            if((state & BITMASK_HAS_READS) == 0){
+            if(!hasReads){
                 localConflictCounter.reset();
-                state = state | BITMASK_HAS_READS;
-//                hasReads = true;
+                hasReads = true;
             }
             LongRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
 
@@ -1461,9 +1434,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if((state & BITMASK_HAS_READS) == 0){
+        if(!hasReads){
             localConflictCounter.reset();
-            state = state | BITMASK_HAS_READS;
+            hasReads = true;
         }
 
         LongRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
@@ -1511,9 +1484,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(attached == null){
             //the transaction has no previous attached references.
 
-            if((state & BITMASK_HAS_READS) == 0){
+            if(!hasReads){
                 localConflictCounter.reset();
-                state = state | BITMASK_HAS_READS;
+                hasReads = true;
             }
             LongRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
 
@@ -1534,8 +1507,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             result.value = read.value;
             result.read = read;
 
-            state = BITMASK_HAS_UPDATES | state;
-//            hasUpdates = true;
+            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -1569,8 +1541,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
         result.value = read.value;
         result.read = read;
-        state = state | BITMASK_HAS_UPDATES;
-//        hasUpdates = true;
+        hasUpdates = true;    
         attached = result;
         return result;
     }
@@ -1655,8 +1626,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             //todo: call to 'openForCommute' can be inlined.
             LongRefTranlocal result = ref.___openForCommute(pool);
             attached=result;
-            state = state | BITMASK_HAS_UPDATES;
-//            hasUpdates = true;
+            hasUpdates = true;
             result.addCommutingFunction(function, pool);
             return;
         }
@@ -1675,8 +1645,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
             result.read = read;
             result.value = read.value;
-            state = state | BITMASK_HAS_UPDATES;
-//            hasUpdates = true;
+            hasUpdates = true;
             attached=result;
         }
 
@@ -1689,9 +1658,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         final Tranlocal tranlocal,
         final int lockMode){
 
-        if((state & BITMASK_HAS_READS) == 0){
+        if(!hasReads){
             localConflictCounter.reset();
-            state = state | BITMASK_HAS_READS;
+            hasReads = true;
         }
 
         final Tranlocal read = ref.___load(config.spinCount, this, lockMode);
@@ -1741,10 +1710,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(attached == null){
             //the transaction has no previous attached references.
 
-            if((state & BITMASK_HAS_READS) == 0){
+            if(!hasReads){
                 localConflictCounter.reset();
-                state = state | BITMASK_HAS_READS;
-//                hasReads = true;
+                hasReads = true;
             }
             Tranlocal read = ref.___load(config.spinCount, this, lockMode);
 
@@ -1787,9 +1755,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if((state & BITMASK_HAS_READS) == 0){
+        if(!hasReads){
             localConflictCounter.reset();
-            state = state | BITMASK_HAS_READS;
+            hasReads = true;
         }
 
         Tranlocal read = ref.___load(config.spinCount, this, lockMode);
@@ -1837,9 +1805,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(attached == null){
             //the transaction has no previous attached references.
 
-            if((state & BITMASK_HAS_READS) == 0){
+            if(!hasReads){
                 localConflictCounter.reset();
-                state = state | BITMASK_HAS_READS;
+                hasReads = true;
             }
             Tranlocal read = ref.___load(config.spinCount, this, lockMode);
 
@@ -1855,8 +1823,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     
             Tranlocal result = read.openForWrite(pool);
 
-            state = BITMASK_HAS_UPDATES | state;
-//            hasUpdates = true;
+            hasUpdates = true;
             attached = result;
             return result;
         }
@@ -1885,8 +1852,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         final Tranlocal read = result;
         result = read.openForWrite(pool);
-        state = state | BITMASK_HAS_UPDATES;
-//        hasUpdates = true;
+        hasUpdates = true;    
         attached = result;
         return result;
     }
@@ -1968,8 +1934,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             //todo: call to 'openForCommute' can be inlined.
             Tranlocal result = ref.___openForCommute(pool);
             attached=result;
-            state = state | BITMASK_HAS_UPDATES;
-//            hasUpdates = true;
+            hasUpdates = true;
             result.addCommutingFunction(function, pool);
             return;
         }
@@ -1983,8 +1948,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(result.isCommitted){
             final Tranlocal read = result;
             result = read.openForWrite(pool);
-            state = state | BITMASK_HAS_UPDATES;
-//            hasUpdates = true;
+            hasUpdates = true;
             attached=result;
         }
 
@@ -2127,7 +2091,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnWriteConflict();
             }
           
-            if((state & BITMASK_HAS_UPDATES) > 0){
+            if(hasUpdates){
                 if(config.dirtyCheck){
                     if(!doPrepareDirty()){
                         throw abortOnWriteConflict();
@@ -2269,12 +2233,11 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         status = ACTIVE;
-        status = 0;
-//        hasUpdates = false;
+        hasUpdates = false;
         attempt++;
         abortOnly = false;
         evaluatingCommute = false;
-//        hasReads = false;
+        hasReads = false;
         hasUntrackedReads = false;
         if(normalListeners!=null){
             normalListeners.clear();
@@ -2288,14 +2251,13 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             abort();
         }
 
-        state = 0;
-//        hasUpdates = false;
+        hasUpdates = false;
         status = ACTIVE;
         abortOnly = false;        
         remainingTimeoutNs = config.timeoutNs;
         attempt = 1;
         evaluatingCommute = false;
-//        hasReads = false;
+        hasReads = false;
         hasUntrackedReads = false;
         if(normalListeners !=null){
             pool.putArrayList(normalListeners);

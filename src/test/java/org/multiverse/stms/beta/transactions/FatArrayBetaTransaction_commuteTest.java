@@ -31,7 +31,7 @@ public class FatArrayBetaTransaction_commuteTest {
 
     @Test
     @Ignore
-    public void whenUndefined(){
+    public void whenUndefined() {
 
     }
 
@@ -220,7 +220,7 @@ public class FatArrayBetaTransaction_commuteTest {
         BetaLongRef ref = newLongRef(stm, 100);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
         tx.commute(ref, new IncLongFunction());
 
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
@@ -241,7 +241,7 @@ public class FatArrayBetaTransaction_commuteTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal tranlocal = tx.openForWrite(ref, false);
+        LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tx.commute(ref, new IncLongFunction());
 
         assertIsActive(tx);
@@ -288,7 +288,7 @@ public class FatArrayBetaTransaction_commuteTest {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForRead(ref, true);
+        otherTx.openForRead(ref, LOCKMODE_COMMIT);
 
         LongFunction function = mock(LongFunction.class);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);

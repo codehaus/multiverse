@@ -37,82 +37,82 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public void putLast(E e) throws InterruptedException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new TodoException();
     }
 
     @Override
     public boolean offerFirst(E e, long timeout, TimeUnit unit) throws InterruptedException {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new TodoException();
     }
 
     @Override
     public boolean offerLast(E e, long timeout, TimeUnit unit) throws InterruptedException {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new TodoException();
     }
 
     @Override
     public E takeFirst() throws InterruptedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new TodoException();
     }
 
     @Override
     public E takeLast() throws InterruptedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new TodoException();
     }
 
     @Override
     public E pollFirst(long timeout, TimeUnit unit) throws InterruptedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new TodoException();
     }
 
     @Override
     public E pollLast(long timeout, TimeUnit unit) throws InterruptedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new TodoException();
     }
 
     @Override
     public void put(E e) throws InterruptedException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new TodoException();
     }
 
     @Override
     public void put(Transaction tx, E e) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new TodoException();
     }
 
     @Override
     public void atomicPut() throws InterruptedException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new TodoException();
     }
 
     @Override
     public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new TodoException();
     }
 
     @Override
     public E take() throws InterruptedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new TodoException();
     }
 
     @Override
     public E poll(long timeout, TimeUnit unit) throws InterruptedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new TodoException();
     }
 
     @Override
     public int remainingCapacity() {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new TodoException();
     }
 
     @Override
     public int drainTo(Collection<? super E> c) {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new TodoException();
     }
 
     @Override
     public int drainTo(Collection<? super E> c, int maxElements) {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new TodoException();
     }
 
     @Override
@@ -1385,7 +1385,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public String toString(final Transaction tx) {
-        return toString((BetaTransaction)tx);
+        return toString((BetaTransaction) tx);
     }
 
     public String toString(final BetaTransaction tx) {
@@ -1396,5 +1396,5 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
     public String atomicToString() {
         throw new TodoException();
     }
-    
+
 }

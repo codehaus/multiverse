@@ -34,10 +34,10 @@ public class BetaLongRef_readBiasedTest {
         assertHasNoCommitLock(ref.___getOrec());
         assertSurplus(0, ref.___getOrec());
     }
-    
+
     @Test
     @Ignore
-    public void whenArrivingOnReadBiasedOrec(){
+    public void whenArrivingOnReadBiasedOrec() {
 
     }
 }

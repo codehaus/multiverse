@@ -8,6 +8,7 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -16,7 +17,7 @@ import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 @Ignore
-public class SensorExampleTest {
+public class SensorExampleTest implements BetaStmConstants {
     private BetaStm stm;
     private BetaLongRef ref;
 
@@ -30,8 +31,8 @@ public class SensorExampleTest {
     @Test
     public void test() {
         WorkerThread[] threads = new WorkerThread[5];
-        for(int k=0;k<threads.length;k++){
-            threads[k]=new WorkerThread(k);
+        for (int k = 0; k < threads.length; k++) {
+            threads[k] = new WorkerThread(k);
         }
 
         startAll(threads);
@@ -40,8 +41,8 @@ public class SensorExampleTest {
 
     public class WorkerThread extends TestThread {
 
-        public WorkerThread(int id){
-            super("WorkerThread-"+id);
+        public WorkerThread(int id) {
+            super("WorkerThread-" + id);
         }
 
         @Override
@@ -57,7 +58,7 @@ public class SensorExampleTest {
                     @Override
                     public void execute(Transaction tx) throws Exception {
                         BetaTransaction btx = (BetaTransaction) tx;
-                        btx.openForWrite(ref, false).value++;
+                        btx.openForWrite(ref, LOCKMODE_NONE).value++;
                     }
                 });
             }

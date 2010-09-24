@@ -13,12 +13,12 @@ public class LocalConflictCounterTest {
     private BetaStm stm;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         stm = new BetaStm();
     }
 
     @Test
-    public void whenConflictHappened(){
+    public void whenConflictHappened() {
         GlobalConflictCounter global = new GlobalConflictCounter(1);
 
         LocalConflictCounter local = global.createLocalConflictCounter();
@@ -33,7 +33,7 @@ public class LocalConflictCounterTest {
     }
 
     @Test
-    public void whenNoConflictHappened(){
+    public void whenNoConflictHappened() {
         GlobalConflictCounter global = new GlobalConflictCounter(1);
 
         LocalConflictCounter local = global.createLocalConflictCounter();

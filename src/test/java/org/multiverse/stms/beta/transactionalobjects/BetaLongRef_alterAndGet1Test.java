@@ -161,7 +161,7 @@ public class BetaLongRef_alterAndGet1Test {
 
     @Test
     @Ignore
-    public void whenListenersAvailable(){
+    public void whenListenersAvailable() {
 
     }
 

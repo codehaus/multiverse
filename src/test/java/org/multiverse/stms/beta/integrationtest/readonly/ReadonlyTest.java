@@ -41,7 +41,7 @@ public class ReadonlyTest {
     }
 
     public void updateInReadonlyMethod(final BetaIntRef ref, final int newValue) {
-         AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setReadonly(true)
                 .buildAtomicBlock();
 

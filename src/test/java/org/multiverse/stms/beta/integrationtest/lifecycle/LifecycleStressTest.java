@@ -18,5 +18,6 @@ public class LifecycleStressTest {
 
     @Test
     @Ignore
-    public void test(){}
+    public void test() {
+    }
 }

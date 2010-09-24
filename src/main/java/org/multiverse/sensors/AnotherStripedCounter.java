@@ -21,7 +21,7 @@ public class AnotherStripedCounter {
         return sum;
     }
 
-    public void incAtIndex(int index, long amount){
+    public void incAtIndex(int index, long amount) {
         array[index].addAndGet(amount);
     }
 }

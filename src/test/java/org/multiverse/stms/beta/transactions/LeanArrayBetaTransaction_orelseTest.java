@@ -9,8 +9,8 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsAborted;
 
 public class LeanArrayBetaTransaction_orelseTest {
-    
-     private BetaStm stm;
+
+    private BetaStm stm;
 
     @Before
     public void setUp() {
@@ -34,7 +34,7 @@ public class LeanArrayBetaTransaction_orelseTest {
     }
 
     @Test
-    public void whenStartOrElseBranchBranchCalled_thenIllegalStateException(){
+    public void whenStartOrElseBranchBranchCalled_thenIllegalStateException() {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm).init();
         LeanArrayBetaTransaction tx = new LeanArrayBetaTransaction(config);
 
@@ -49,8 +49,8 @@ public class LeanArrayBetaTransaction_orelseTest {
         assertFalse(config.getSpeculativeConfiguration().isOrelseRequired);
     }
 
-     @Test
-    public void whenEndEitherBranchCalled_thenIllegalStateException(){
+    @Test
+    public void whenEndEitherBranchCalled_thenIllegalStateException() {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm).init();
         LeanArrayBetaTransaction tx = new LeanArrayBetaTransaction(config);
 

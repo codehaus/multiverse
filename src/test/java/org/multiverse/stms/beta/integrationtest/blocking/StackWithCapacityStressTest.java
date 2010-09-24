@@ -48,19 +48,19 @@ public class StackWithCapacityStressTest implements BetaStmConstants {
     }
 
     @Test
-      public void testPrivatized() {
-          test(LOCKMODE_COMMIT);
-      }
+    public void testPrivatized() {
+        test(LOCKMODE_COMMIT);
+    }
 
-      @Test
-      public void testEnsured() {
-          test(LOCKMODE_UPDATE);
-      }
+    @Test
+    public void testEnsured() {
+        test(LOCKMODE_UPDATE);
+    }
 
-      @Test
-      public void testOptimistic(){
-          test(LOCKMODE_NONE);
-      }
+    @Test
+    public void testOptimistic() {
+        test(LOCKMODE_NONE);
+    }
 
 
     public void test(int lockMode) {

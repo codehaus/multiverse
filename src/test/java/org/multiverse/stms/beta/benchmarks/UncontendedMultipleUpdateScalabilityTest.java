@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.benchmarks;
 
 import org.multiverse.TestThread;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
@@ -15,7 +16,7 @@ import static org.multiverse.stms.beta.BetaStmUtils.format;
 import static org.multiverse.stms.beta.BetaStmUtils.newReadBiasedLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
-public class UncontendedMultipleUpdateScalabilityTest {
+public class UncontendedMultipleUpdateScalabilityTest implements BetaStmConstants {
 
     private BetaStm stm;
     private final long transactionsPerThread = 400 * 1000 * 1000;
@@ -65,8 +66,8 @@ public class UncontendedMultipleUpdateScalabilityTest {
         ReadThread[] threads = new ReadThread[threadCount];
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
-                //.setDirtyCheckEnabled(true)
-                //.setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
+        //.setDirtyCheckEnabled(true)
+        //.setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
         config.maxArrayTransactionSize = refCount;
 
         for (int k = 0; k < threads.length; k++) {
@@ -146,7 +147,7 @@ public class UncontendedMultipleUpdateScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
-                tx.openForWrite(ref1, false);
+                tx.openForWrite(ref1, LOCKMODE_NONE);
                 tx.commit();
                 tx.hardReset();
             }
@@ -164,8 +165,8 @@ public class UncontendedMultipleUpdateScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
-                tx.openForWrite(ref1, false).value++;
-                tx.openForWrite(ref2, false).value++;
+                tx.openForWrite(ref1, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref2, LOCKMODE_NONE).value++;
                 tx.commit();
                 tx.hardReset();
 
@@ -180,14 +181,14 @@ public class UncontendedMultipleUpdateScalabilityTest {
             BetaLongRef ref2 = newReadBiasedLongRef(stm);
             BetaLongRef ref3 = newReadBiasedLongRef(stm);
 
-             FatArrayBetaTransaction tx = new FatArrayBetaTransaction(betaTransactionConfiguration);
+            FatArrayBetaTransaction tx = new FatArrayBetaTransaction(betaTransactionConfiguration);
 
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
-                tx.openForWrite(ref1, false).value++;
-                tx.openForWrite(ref2, false).value++;
-                tx.openForWrite(ref3, false).value++;
+                tx.openForWrite(ref1, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref2, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref3, LOCKMODE_NONE).value++;
                 tx.commit();
                 tx.hardReset();
             }
@@ -207,10 +208,10 @@ public class UncontendedMultipleUpdateScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
-                tx.openForWrite(ref1, false).value++;
-                tx.openForWrite(ref2, false).value++;
-                tx.openForWrite(ref3, false).value++;
-                tx.openForWrite(ref4, false).value++;
+                tx.openForWrite(ref1, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref2, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref3, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref4, LOCKMODE_NONE).value++;
                 tx.commit();
                 tx.hardReset();
             }
@@ -234,14 +235,14 @@ public class UncontendedMultipleUpdateScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
-                tx.openForWrite(ref1, false).value++;
-                tx.openForWrite(ref2, false).value++;
-                tx.openForWrite(ref3, false).value++;
-                tx.openForWrite(ref4, false).value++;
-                tx.openForWrite(ref5, false).value++;
-                tx.openForWrite(ref6, false).value++;
-                tx.openForWrite(ref7, false).value++;
-                tx.openForWrite(ref8, false).value++;
+                tx.openForWrite(ref1, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref2, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref3, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref4, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref5, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref6, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref7, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref8, LOCKMODE_NONE).value++;
 
                 tx.commit();
                 tx.hardReset();
@@ -275,22 +276,22 @@ public class UncontendedMultipleUpdateScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
-                tx.openForWrite(ref1, false).value++;
-                tx.openForWrite(ref2, false).value++;
-                tx.openForWrite(ref3, false).value++;
-                tx.openForWrite(ref4, false).value++;
-                tx.openForWrite(ref5, false).value++;
-                tx.openForWrite(ref6, false).value++;
-                tx.openForWrite(ref7, false).value++;
-                tx.openForWrite(ref8, false).value++;
-                tx.openForWrite(ref9, false).value++;
-                tx.openForWrite(ref10, false).value++;
-                tx.openForWrite(ref11, false).value++;
-                tx.openForWrite(ref12, false).value++;
-                tx.openForWrite(ref13, false).value++;
-                tx.openForWrite(ref14, false).value++;
-                tx.openForWrite(ref15, false).value++;
-                tx.openForWrite(ref16, false).value++;
+                tx.openForWrite(ref1, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref2, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref3, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref4, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref5, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref6, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref7, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref8, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref9, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref10, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref11, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref12, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref13, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref14, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref15, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref16, LOCKMODE_NONE).value++;
 
                 tx.commit();
                 tx.hardReset();
@@ -340,38 +341,38 @@ public class UncontendedMultipleUpdateScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
-                tx.openForWrite(ref1, false).value++;
-                tx.openForWrite(ref2, false).value++;
-                tx.openForWrite(ref3, false).value++;
-                tx.openForWrite(ref4, false).value++;
-                tx.openForWrite(ref5, false).value++;
-                tx.openForWrite(ref6, false).value++;
-                tx.openForWrite(ref7, false).value++;
-                tx.openForWrite(ref8, false).value++;
-                tx.openForWrite(ref9, false).value++;
-                tx.openForWrite(ref10, false).value++;
-                tx.openForWrite(ref11, false).value++;
-                tx.openForWrite(ref12, false).value++;
-                tx.openForWrite(ref13, false).value++;
-                tx.openForWrite(ref14, false).value++;
-                tx.openForWrite(ref15, false).value++;
-                tx.openForWrite(ref16, false).value++;
-                tx.openForWrite(ref17, false).value++;
-                tx.openForWrite(ref18, false).value++;
-                tx.openForWrite(ref19, false).value++;
-                tx.openForWrite(ref20, false).value++;
-                tx.openForWrite(ref21, false).value++;
-                tx.openForWrite(ref22, false).value++;
-                tx.openForWrite(ref23, false).value++;
-                tx.openForWrite(ref24, false).value++;
-                tx.openForWrite(ref25, false).value++;
-                tx.openForWrite(ref26, false).value++;
-                tx.openForWrite(ref27, false).value++;
-                tx.openForWrite(ref28, false).value++;
-                tx.openForWrite(ref29, false).value++;
-                tx.openForWrite(ref30, false).value++;
-                tx.openForWrite(ref31, false).value++;
-                tx.openForWrite(ref32, false).value++;
+                tx.openForWrite(ref1, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref2, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref3, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref4, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref5, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref6, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref7, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref8, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref9, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref10, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref11, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref12, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref13, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref14, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref15, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref16, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref17, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref18, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref19, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref20, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref21, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref22, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref23, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref24, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref25, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref26, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref27, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref28, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref29, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref30, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref31, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref32, LOCKMODE_NONE).value++;
 
                 tx.commit();
                 tx.hardReset();
@@ -453,70 +454,70 @@ public class UncontendedMultipleUpdateScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionsPerThread; iteration++) {
-                tx.openForWrite(ref1, false).value++;
-                tx.openForWrite(ref2, false).value++;
-                tx.openForWrite(ref3, false).value++;
-                tx.openForWrite(ref4, false).value++;
-                tx.openForWrite(ref5, false).value++;
-                tx.openForWrite(ref6, false).value++;
-                tx.openForWrite(ref7, false).value++;
-                tx.openForWrite(ref8, false).value++;
-                tx.openForWrite(ref9, false).value++;
-                tx.openForWrite(ref10, false).value++;
-                tx.openForWrite(ref11, false).value++;
-                tx.openForWrite(ref12, false).value++;
-                tx.openForWrite(ref13, false).value++;
-                tx.openForWrite(ref14, false).value++;
-                tx.openForWrite(ref15, false).value++;
-                tx.openForWrite(ref16, false).value++;
-                tx.openForWrite(ref17, false).value++;
-                tx.openForWrite(ref18, false).value++;
-                tx.openForWrite(ref19, false).value++;
-                tx.openForWrite(ref20, false).value++;
-                tx.openForWrite(ref21, false).value++;
-                tx.openForWrite(ref22, false).value++;
-                tx.openForWrite(ref23, false).value++;
-                tx.openForWrite(ref24, false).value++;
-                tx.openForWrite(ref25, false).value++;
-                tx.openForWrite(ref26, false).value++;
-                tx.openForWrite(ref27, false).value++;
-                tx.openForWrite(ref28, false).value++;
-                tx.openForWrite(ref29, false).value++;
-                tx.openForWrite(ref30, false).value++;
-                tx.openForWrite(ref31, false).value++;
-                tx.openForWrite(ref32, false).value++;
-                tx.openForWrite(ref33, false).value++;
-                tx.openForWrite(ref34, false).value++;
-                tx.openForWrite(ref35, false).value++;
-                tx.openForWrite(ref36, false).value++;
-                tx.openForWrite(ref37, false).value++;
-                tx.openForWrite(ref38, false).value++;
-                tx.openForWrite(ref39, false).value++;
-                tx.openForWrite(ref40, false).value++;
-                tx.openForWrite(ref41, false).value++;
-                tx.openForWrite(ref42, false).value++;
-                tx.openForWrite(ref43, false).value++;
-                tx.openForWrite(ref44, false).value++;
-                tx.openForWrite(ref45, false).value++;
-                tx.openForWrite(ref46, false).value++;
-                tx.openForWrite(ref47, false).value++;
-                tx.openForWrite(ref48, false).value++;
-                tx.openForWrite(ref49, false).value++;
-                tx.openForWrite(ref50, false).value++;
-                tx.openForWrite(ref51, false).value++;
-                tx.openForWrite(ref52, false).value++;
-                tx.openForWrite(ref53, false).value++;
-                tx.openForWrite(ref54, false).value++;
-                tx.openForWrite(ref55, false).value++;
-                tx.openForWrite(ref56, false).value++;
-                tx.openForWrite(ref57, false).value++;
-                tx.openForWrite(ref58, false).value++;
-                tx.openForWrite(ref59, false).value++;
-                tx.openForWrite(ref60, false).value++;
-                tx.openForWrite(ref61, false).value++;
-                tx.openForWrite(ref62, false).value++;
-                tx.openForWrite(ref63, false).value++;
-                tx.openForWrite(ref64, false).value++;
+                tx.openForWrite(ref1, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref2, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref3, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref4, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref5, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref6, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref7, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref8, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref9, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref10, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref11, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref12, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref13, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref14, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref15, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref16, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref17, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref18, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref19, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref20, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref21, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref22, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref23, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref24, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref25, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref26, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref27, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref28, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref29, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref30, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref31, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref32, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref33, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref34, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref35, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref36, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref37, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref38, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref39, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref40, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref41, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref42, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref43, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref44, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref45, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref46, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref47, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref48, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref49, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref50, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref51, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref52, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref53, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref54, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref55, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref56, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref57, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref58, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref59, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref60, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref61, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref62, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref63, LOCKMODE_NONE).value++;
+                tx.openForWrite(ref64, LOCKMODE_NONE).value++;
 
                 tx.commit();
                 tx.hardReset();

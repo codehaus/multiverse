@@ -17,7 +17,7 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
-public class FatArrayTreeBetaTransaction_openForConstructionTest implements BetaStmConstants{
+public class FatArrayTreeBetaTransaction_openForConstructionTest implements BetaStmConstants {
 
     private BetaStm stm;
 
@@ -111,7 +111,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
 
         try {
             tx.openForConstruction(ref);
@@ -134,7 +134,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForWrite(ref, false);
+        tx.openForWrite(ref, LOCKMODE_NONE);
 
         try {
             tx.openForConstruction(ref);
@@ -184,7 +184,7 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
                 .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
-        LongRefTranlocal read1 = tx.openForRead(ref1, false);
+        LongRefTranlocal read1 = tx.openForRead(ref1, LOCKMODE_NONE);
 
         long oldLocalConflictCount = tx.getLocalConflictCounter().get();
 
@@ -231,7 +231,8 @@ public class FatArrayTreeBetaTransaction_openForConstructionTest implements Beta
 
     @Test
     @Ignore
-    public void whenUndefined(){}
+    public void whenUndefined() {
+    }
 
     @Test
     public void whenAborted_thenDeadTransactionException() {

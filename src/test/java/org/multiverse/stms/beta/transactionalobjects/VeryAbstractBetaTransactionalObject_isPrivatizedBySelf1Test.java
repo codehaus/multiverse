@@ -28,7 +28,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedBySelf1Test {
     }
 
     @Test
-    public void whenFree(){
+    public void whenFree() {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -38,7 +38,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedBySelf1Test {
     }
 
     @Test
-    public void whenPrivatizedBySelf(){
+    public void whenPrivatizedBySelf() {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -49,7 +49,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedBySelf1Test {
     }
 
     @Test
-    public void whenEnsuredBySelf(){
+    public void whenEnsuredBySelf() {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -60,7 +60,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedBySelf1Test {
     }
 
     @Test
-    public void whenPrivatizedByOther(){
+    public void whenPrivatizedByOther() {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
@@ -73,7 +73,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedBySelf1Test {
     }
 
     @Test
-    public void whenEnsuredByOther(){
+    public void whenEnsuredByOther() {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();

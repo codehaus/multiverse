@@ -8,6 +8,7 @@ import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.references.LongRef;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConfiguration;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
@@ -17,7 +18,7 @@ import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
-public class BetaLongRef_getAndIncrement1Test {
+public class BetaLongRef_getAndIncrement1Test implements BetaStmConstants {
 
     private BetaStm stm;
 
@@ -93,7 +94,7 @@ public class BetaLongRef_getAndIncrement1Test {
         BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
         BetaTransaction tx = stm.startDefaultTransaction();
-        tx.openForRead(ref, true);
+        tx.openForRead(ref, LOCKMODE_COMMIT);
 
         try {
             ref.getAndIncrement(1);

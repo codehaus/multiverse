@@ -39,7 +39,7 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
         assertEquals(100, tranlocal.value);
     }
 
-  
+
     @Test
     public void whenSingleCommutingFunction() {
         BetaLongRef ref = newLongRef(stm, 100);

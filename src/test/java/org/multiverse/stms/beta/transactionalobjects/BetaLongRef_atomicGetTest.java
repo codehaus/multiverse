@@ -103,7 +103,7 @@ public class BetaLongRef_atomicGetTest {
         assertReadBiased(ref);
     }
 
-      @Test
+    @Test
     public void whenReadBiasedAndPrivatizedByOther_thenLockedException() {
         BetaLongRef ref = makeReadBiased(newLongRef(stm, 100));
         LongRefTranlocal committed = ref.___unsafeLoad();

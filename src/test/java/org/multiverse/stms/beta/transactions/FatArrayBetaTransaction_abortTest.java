@@ -45,7 +45,7 @@ public class FatArrayBetaTransaction_abortTest {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.openForWrite(ref, false);
+        tx.openForWrite(ref, LOCKMODE_NONE);
 
         tx.abort();
 
@@ -65,7 +65,7 @@ public class FatArrayBetaTransaction_abortTest {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.openForWrite(ref, true);
+        tx.openForWrite(ref, LOCKMODE_COMMIT);
 
         tx.abort();
 
@@ -85,7 +85,7 @@ public class FatArrayBetaTransaction_abortTest {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.openForRead(ref, true);
+        tx.openForRead(ref, LOCKMODE_COMMIT);
 
         tx.abort();
 
@@ -105,7 +105,7 @@ public class FatArrayBetaTransaction_abortTest {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
 
         tx.abort();
 
@@ -149,7 +149,7 @@ public class FatArrayBetaTransaction_abortTest {
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.register(listenerMock);
-        tx.openForWrite(ref, false);
+        tx.openForWrite(ref, LOCKMODE_NONE);
         tx.abort();
 
         assertEquals(1, listenerMock.events.size());
@@ -164,7 +164,7 @@ public class FatArrayBetaTransaction_abortTest {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .addPermanentListener(listenerMock);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
-        tx.openForWrite(ref, false);
+        tx.openForWrite(ref, LOCKMODE_NONE);
         tx.abort();
 
         assertEquals(1, listenerMock.events.size());

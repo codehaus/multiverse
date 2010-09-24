@@ -71,7 +71,7 @@ public class FatMonoBetaTransaction_initTest {
         BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(ref, true);
+        tx.openForWrite(ref, LOCKMODE_COMMIT);
         tx.prepare();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
@@ -88,7 +88,7 @@ public class FatMonoBetaTransaction_initTest {
         BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(ref, false).value++;
+        tx.openForWrite(ref, LOCKMODE_NONE).value++;
         tx.abort();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
@@ -102,7 +102,7 @@ public class FatMonoBetaTransaction_initTest {
     public void whenCommitted() {
         BetaLongRef ref = newLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(ref, false).value++;
+        tx.openForWrite(ref, LOCKMODE_NONE).value++;
         tx.commit();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);

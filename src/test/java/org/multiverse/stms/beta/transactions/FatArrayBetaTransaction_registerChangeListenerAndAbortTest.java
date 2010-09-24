@@ -44,9 +44,9 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
         BetaLongRef ref3 = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.openForRead(ref1, false);
-        tx.openForRead(ref2, false);
-        tx.openForRead(ref3, false);
+        tx.openForRead(ref1, LOCKMODE_NONE);
+        tx.openForRead(ref2, LOCKMODE_NONE);
+        tx.openForRead(ref3, LOCKMODE_NONE);
 
         Latch latch = new CheapLatch();
         tx.registerChangeListenerAndAbort(latch);
@@ -103,7 +103,7 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
                 .setBlockingAllowed(false);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
 
         Latch latch = new CheapLatch();
 
@@ -121,7 +121,7 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
         BetaLongRef ref = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         Latch latch = new CheapLatch();
         tx.registerChangeListenerAndAbort(latch);
@@ -138,7 +138,7 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
         BetaLongRef ref = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, true);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_COMMIT);
 
         Latch latch = new CheapLatch();
         tx.registerChangeListenerAndAbort(latch);
@@ -155,7 +155,7 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
         BetaLongRef ref = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         Latch latch = new CheapLatch();
         tx.registerChangeListenerAndAbort(latch);
@@ -172,7 +172,7 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
         BetaLongRef ref = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, true);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
 
         Latch latch = new CheapLatch();
         tx.registerChangeListenerAndAbort(latch);
@@ -219,9 +219,9 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         BetaLongRef ref3 = new BetaLongRef(tx);
-        tx.openForRead(ref1, false);
+        tx.openForRead(ref1, LOCKMODE_NONE);
         LongRefTranlocal write3 = tx.openForConstruction(ref3);
-        tx.openForWrite(ref2, false);
+        tx.openForWrite(ref2, LOCKMODE_NONE);
         tx.registerChangeListenerAndAbort(latch);
 
         assertIsAborted(tx);
@@ -238,7 +238,7 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         Latch latch = new CheapLatch();
         tx.register(listenerMock);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
 
         tx.registerChangeListenerAndAbort(latch);
 
@@ -255,7 +255,7 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest {
                 .addPermanentListener(listenerMock);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
         Latch latch = new CheapLatch();
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
 
         tx.registerChangeListenerAndAbort(latch);
 

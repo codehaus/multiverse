@@ -13,8 +13,8 @@ public class BetaObjectPool_listenerArrayTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void whenNullPutInPool_thenNullPointerException(){
-         pool.putListenersArray(null);
+    public void whenNullPutInPool_thenNullPointerException() {
+        pool.putListenersArray(null);
     }
 
     @Test

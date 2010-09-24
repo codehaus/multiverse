@@ -8,6 +8,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
@@ -24,7 +25,7 @@ import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.newRef;
 
-public class QueueWithCapacityStressTest {
+public class QueueWithCapacityStressTest implements BetaStmConstants {
 
     private boolean pessimistic;
 
@@ -116,7 +117,7 @@ public class QueueWithCapacityStressTest {
             pushBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    if(size.get()>=maxCapacity){
+                    if (size.get() >= maxCapacity) {
                         retry();
                     }
 
@@ -133,7 +134,7 @@ public class QueueWithCapacityStressTest {
                 public E execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
 
-                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, pessimistic);
+                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
 
                     if (!readyToPopStack.isEmpty(btx)) {
                         sizeTranlocal.value--;
@@ -161,17 +162,17 @@ public class QueueWithCapacityStressTest {
         final BetaRef<Node<E>> head = newRef(stm);
 
         void push(BetaTransaction tx, E item) {
-            RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, pessimistic);
+            RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
             headTranlocal.value = new Node<E>(item, headTranlocal.value);
         }
 
         boolean isEmpty(BetaTransaction tx) {
-            RefTranlocal<Node<E>> headTranlocal = tx.openForRead(head, pessimistic);
+            RefTranlocal<Node<E>> headTranlocal = tx.openForRead(head, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
             return headTranlocal.value == null;
         }
 
         E pop(BetaTransaction tx) {
-            RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, pessimistic);
+            RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
             Node<E> node = headTranlocal.value;
 
             if (node == null) {

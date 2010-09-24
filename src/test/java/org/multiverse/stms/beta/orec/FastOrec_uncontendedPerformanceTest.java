@@ -13,7 +13,7 @@ import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPer
 
 /**
  * A Performance test to help to figure out if overhead can be removed from the FastOrec.
- *
+ * <p/>
  * todo: idea; work with ccas? Could be cheaper under contention.. but more expensive is there is no contention.
  *
  * @author Peter Veentjer.
@@ -41,7 +41,7 @@ public class FastOrec_uncontendedPerformanceTest implements BetaStmConstants {
             if (arriveStatus == ARRIVE_NORMAL) {
                 orec.___tryLockAfterNormalArrive(0, true);
             } else {
-                orec.___tryLockAndArrive(0,true);
+                orec.___tryLockAndArrive(0, true);
             }
             orec.___departAfterUpdateAndUnlock(globalConflictCounter, ref);
         }
@@ -63,9 +63,9 @@ public class FastOrec_uncontendedPerformanceTest implements BetaStmConstants {
         long startNs = System.nanoTime();
 
         for (long k = 0; k < cycles; k++) {
-            int arriveStatus = orec.___tryLockAndArrive(0,true);
+            int arriveStatus = orec.___tryLockAndArrive(0, true);
             if (arriveStatus != ARRIVE_NORMAL) {
-                orec.___tryLockAndArrive(0,true);
+                orec.___tryLockAndArrive(0, true);
             }
             orec.___departAfterUpdateAndUnlock(globalConflictCounter, ref);
         }
@@ -95,7 +95,7 @@ public class FastOrec_uncontendedPerformanceTest implements BetaStmConstants {
             if (arriveStatus == ARRIVE_NORMAL) {
                 orec.___departAfterReading();
             } else {
-                orec.___tryLockAndArrive(0,true);
+                orec.___tryLockAndArrive(0, true);
                 orec.___departAfterUpdateAndUnlock(globalConflictCounter, ref);
             }
         }
@@ -111,9 +111,9 @@ public class FastOrec_uncontendedPerformanceTest implements BetaStmConstants {
     }
 
     @Test
-    public void readBiasedRead(){
+    public void readBiasedRead() {
         FastOrec orec = new FastOrec();
-        long cycles = 10l* 1000 * 1000 * 1000;
+        long cycles = 10l * 1000 * 1000 * 1000;
         long startNs = System.nanoTime();
 
         for (long k = 0; k < cycles; k++) {

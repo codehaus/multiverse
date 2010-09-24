@@ -10,12 +10,12 @@ public class BetaObjectPool_listenersTest {
     private BetaObjectPool pool;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         pool = new BetaObjectPool();
     }
 
     @Test(expected = NullPointerException.class)
-    public void whenNullPutInPool_thenNullPointerException(){
+    public void whenNullPutInPool_thenNullPointerException() {
         pool.putListeners(null);
     }
 

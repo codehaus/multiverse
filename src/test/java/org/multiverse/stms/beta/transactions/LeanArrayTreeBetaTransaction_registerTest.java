@@ -17,7 +17,7 @@ public class LeanArrayTreeBetaTransaction_registerTest {
 
     @Before
     public void setUp() {
-        stm = new BetaStm();        
+        stm = new BetaStm();
     }
 
     @Test

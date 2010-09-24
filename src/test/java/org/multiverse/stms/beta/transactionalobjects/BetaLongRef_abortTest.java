@@ -203,7 +203,7 @@ public class BetaLongRef_abortTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenListenersAvailable_theyRemain(){
+    public void whenListenersAvailable_theyRemain() {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();

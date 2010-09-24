@@ -55,10 +55,10 @@ public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants 
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        LongRefTranlocal write = otherTx.openForWrite(ref, false);
+        LongRefTranlocal write = otherTx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
         otherTx.commit();
 
@@ -76,7 +76,7 @@ public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants 
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.privatize(otherTx);
@@ -100,7 +100,7 @@ public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants 
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.ensure(otherTx);
@@ -124,7 +124,7 @@ public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants 
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         ref.atomicIncrementAndGet(1);
         LongRefTranlocal committed = ref.___unsafeLoad();
@@ -152,7 +152,7 @@ public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants 
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         ref.atomicIncrementAndGet(1);
         LongRefTranlocal committed = ref.___unsafeLoad();
@@ -195,7 +195,7 @@ public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants 
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         Latch latch = new CheapLatch();
         long listenerEra = latch.getEra();
@@ -215,14 +215,14 @@ public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants 
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx1 = stm.startDefaultTransaction();
-        LongRefTranlocal read1 = tx1.openForRead(ref, false);
+        LongRefTranlocal read1 = tx1.openForRead(ref, LOCKMODE_NONE);
 
         Latch latch1 = new CheapLatch();
         long listenerEra1 = latch1.getEra();
         ref.___registerChangeListener(latch1, read1, pool, listenerEra1);
 
         BetaTransaction tx2 = stm.startDefaultTransaction();
-        LongRefTranlocal read2 = tx2.openForRead(ref, false);
+        LongRefTranlocal read2 = tx2.openForRead(ref, LOCKMODE_NONE);
 
         Latch latch2 = new CheapLatch();
         long listenerEra2 = latch2.getEra();

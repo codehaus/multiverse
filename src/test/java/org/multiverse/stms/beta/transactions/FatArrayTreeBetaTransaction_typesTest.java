@@ -4,13 +4,14 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertEqualsDouble;
 import static org.multiverse.stms.beta.BetaStmUtils.*;
 
-public class FatArrayTreeBetaTransaction_typesTest {
+public class FatArrayTreeBetaTransaction_typesTest implements BetaStmConstants {
 
     private BetaStm stm;
 
@@ -24,9 +25,9 @@ public class FatArrayTreeBetaTransaction_typesTest {
         BetaIntRef ref = newIntRef(stm, 100);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        IntRefTranlocal read = tx.openForRead(ref, false);
+        IntRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
         assertEquals(100, read.value);
-        IntRefTranlocal write = tx.openForWrite(ref, false);
+        IntRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
         tx.commit();
 
@@ -38,9 +39,9 @@ public class FatArrayTreeBetaTransaction_typesTest {
         BetaLongRef ref = newLongRef(stm, 100);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
         assertEquals(100, read.value);
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
         tx.commit();
 
@@ -52,9 +53,9 @@ public class FatArrayTreeBetaTransaction_typesTest {
         BetaRef<String> ref = newRef(stm, "peter");
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        RefTranlocal read = tx.openForRead(ref, false);
+        RefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
         assertEquals("peter", read.value);
-        RefTranlocal write = tx.openForWrite(ref, false);
+        RefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value = "john";
         tx.commit();
 
@@ -66,9 +67,9 @@ public class FatArrayTreeBetaTransaction_typesTest {
         BetaDoubleRef ref = newDoubleRef(stm, 10);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        DoubleRefTranlocal read = tx.openForRead(ref, false);
+        DoubleRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
         assertEqualsDouble(10, read.value);
-        DoubleRefTranlocal write = tx.openForWrite(ref, false);
+        DoubleRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value = 20;
         tx.commit();
 
@@ -81,9 +82,9 @@ public class FatArrayTreeBetaTransaction_typesTest {
         BetaBooleanRef ref = new BetaBooleanRef(stm, false);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        BooleanRefTranlocal read = tx.openForRead(ref, false);
+        BooleanRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
         assertFalse(read.value);
-        BooleanRefTranlocal write = tx.openForWrite(ref, false);
+        BooleanRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value = true;
         tx.commit();
 

@@ -19,7 +19,7 @@ public class LeanArrayBetaTransaction_commuteTest {
 
     @Before
     public void setUp() {
-        stm = new BetaStm();        
+        stm = new BetaStm();
     }
 
     @Test

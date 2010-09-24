@@ -27,7 +27,7 @@ public class DeadTransactionException extends IllegalTransactionStateException {
      * Creates a new DeadTransactionException.
      *
      * @param message the message of the exception.
-     * @param cause the cause of the exception.
+     * @param cause   the cause of the exception.
      */
     public DeadTransactionException(String message, Throwable cause) {
         super(message, cause);

@@ -274,11 +274,11 @@ public class BetaLongRef_commute2Test {
         BetaLongRef ref2 = newLongRef(stm, 10);
 
         BetaTransaction tx1 = stm.startDefaultTransaction();
-        tx1.openForWrite(ref1, false).value++;
+        tx1.openForWrite(ref1, LOCKMODE_NONE).value++;
         tx1.commute(ref2, IncLongFunction.INSTANCE_INC_ONE);
 
         BetaTransaction tx2 = stm.startDefaultTransaction();
-        tx2.openForWrite(ref2, false).value++;
+        tx2.openForWrite(ref2, LOCKMODE_NONE).value++;
         tx2.commit();
 
         tx1.commit();

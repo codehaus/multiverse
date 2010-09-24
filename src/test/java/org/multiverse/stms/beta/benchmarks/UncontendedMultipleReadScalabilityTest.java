@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.benchmarks;
 
 import org.multiverse.TestThread;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
@@ -18,7 +19,7 @@ import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 /**
  * @author Peter Veentjer
  */
-public class UncontendedMultipleReadScalabilityTest {
+public class UncontendedMultipleReadScalabilityTest implements BetaStmConstants {
     private BetaStm stm;
     private final long transactionCount = 100 * 1000 * 1000;
 
@@ -131,7 +132,7 @@ public class UncontendedMultipleReadScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionCount; iteration++) {
-                tx.openForRead(ref1, false);
+                tx.openForRead(ref1, LOCKMODE_NONE);
                 tx.commit();
                 tx.hardReset();
             }
@@ -151,8 +152,8 @@ public class UncontendedMultipleReadScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionCount; iteration++) {
-                tx.openForRead(ref1, false);
-                tx.openForRead(ref2, false);
+                tx.openForRead(ref1, LOCKMODE_NONE);
+                tx.openForRead(ref2, LOCKMODE_NONE);
                 tx.commit();
                 tx.hardReset();
 
@@ -175,10 +176,10 @@ public class UncontendedMultipleReadScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionCount; iteration++) {
-                tx.openForRead(ref1, false);
-                tx.openForRead(ref2, false);
-                tx.openForRead(ref3, false);
-                tx.openForRead(ref4, false);
+                tx.openForRead(ref1, LOCKMODE_NONE);
+                tx.openForRead(ref2, LOCKMODE_NONE);
+                tx.openForRead(ref3, LOCKMODE_NONE);
+                tx.openForRead(ref4, LOCKMODE_NONE);
                 tx.commit();
                 tx.hardReset();
 
@@ -205,14 +206,14 @@ public class UncontendedMultipleReadScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionCount; iteration++) {
-                tx.openForRead(ref1, false);
-                tx.openForRead(ref2, false);
-                tx.openForRead(ref3, false);
-                tx.openForRead(ref4, false);
-                tx.openForRead(ref5, false);
-                tx.openForRead(ref6, false);
-                tx.openForRead(ref7, false);
-                tx.openForRead(ref8, false);
+                tx.openForRead(ref1, LOCKMODE_NONE);
+                tx.openForRead(ref2, LOCKMODE_NONE);
+                tx.openForRead(ref3, LOCKMODE_NONE);
+                tx.openForRead(ref4, LOCKMODE_NONE);
+                tx.openForRead(ref5, LOCKMODE_NONE);
+                tx.openForRead(ref6, LOCKMODE_NONE);
+                tx.openForRead(ref7, LOCKMODE_NONE);
+                tx.openForRead(ref8, LOCKMODE_NONE);
 
                 tx.commit();
                 tx.hardReset();
@@ -248,22 +249,22 @@ public class UncontendedMultipleReadScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionCount; iteration++) {
-                tx.openForRead(ref1, false);
-                tx.openForRead(ref2, false);
-                tx.openForRead(ref3, false);
-                tx.openForRead(ref4, false);
-                tx.openForRead(ref5, false);
-                tx.openForRead(ref6, false);
-                tx.openForRead(ref7, false);
-                tx.openForRead(ref8, false);
-                tx.openForRead(ref9, false);
-                tx.openForRead(ref10, false);
-                tx.openForRead(ref11, false);
-                tx.openForRead(ref12, false);
-                tx.openForRead(ref13, false);
-                tx.openForRead(ref14, false);
-                tx.openForRead(ref15, false);
-                tx.openForRead(ref16, false);
+                tx.openForRead(ref1, LOCKMODE_NONE);
+                tx.openForRead(ref2, LOCKMODE_NONE);
+                tx.openForRead(ref3, LOCKMODE_NONE);
+                tx.openForRead(ref4, LOCKMODE_NONE);
+                tx.openForRead(ref5, LOCKMODE_NONE);
+                tx.openForRead(ref6, LOCKMODE_NONE);
+                tx.openForRead(ref7, LOCKMODE_NONE);
+                tx.openForRead(ref8, LOCKMODE_NONE);
+                tx.openForRead(ref9, LOCKMODE_NONE);
+                tx.openForRead(ref10, LOCKMODE_NONE);
+                tx.openForRead(ref11, LOCKMODE_NONE);
+                tx.openForRead(ref12, LOCKMODE_NONE);
+                tx.openForRead(ref13, LOCKMODE_NONE);
+                tx.openForRead(ref14, LOCKMODE_NONE);
+                tx.openForRead(ref15, LOCKMODE_NONE);
+                tx.openForRead(ref16, LOCKMODE_NONE);
 
                 tx.commit();
                 tx.hardReset();
@@ -316,38 +317,38 @@ public class UncontendedMultipleReadScalabilityTest {
             long startMs = System.currentTimeMillis();
 
             for (long iteration = 0; iteration < transactionCount; iteration++) {
-                tx.openForRead(ref1, false);
-                tx.openForRead(ref2, false);
-                tx.openForRead(ref3, false);
-                tx.openForRead(ref4, false);
-                tx.openForRead(ref5, false);
-                tx.openForRead(ref6, false);
-                tx.openForRead(ref7, false);
-                tx.openForRead(ref8, false);
-                tx.openForRead(ref9, false);
-                tx.openForRead(ref10, false);
-                tx.openForRead(ref11, false);
-                tx.openForRead(ref12, false);
-                tx.openForRead(ref13, false);
-                tx.openForRead(ref14, false);
-                tx.openForRead(ref15, false);
-                tx.openForRead(ref16, false);
-                tx.openForRead(ref17, false);
-                tx.openForRead(ref18, false);
-                tx.openForRead(ref19, false);
-                tx.openForRead(ref20, false);
-                tx.openForRead(ref21, false);
-                tx.openForRead(ref22, false);
-                tx.openForRead(ref23, false);
-                tx.openForRead(ref24, false);
-                tx.openForRead(ref25, false);
-                tx.openForRead(ref26, false);
-                tx.openForRead(ref27, false);
-                tx.openForRead(ref28, false);
-                tx.openForRead(ref29, false);
-                tx.openForRead(ref30, false);
-                tx.openForRead(ref31, false);
-                tx.openForRead(ref32, false);
+                tx.openForRead(ref1, LOCKMODE_NONE);
+                tx.openForRead(ref2, LOCKMODE_NONE);
+                tx.openForRead(ref3, LOCKMODE_NONE);
+                tx.openForRead(ref4, LOCKMODE_NONE);
+                tx.openForRead(ref5, LOCKMODE_NONE);
+                tx.openForRead(ref6, LOCKMODE_NONE);
+                tx.openForRead(ref7, LOCKMODE_NONE);
+                tx.openForRead(ref8, LOCKMODE_NONE);
+                tx.openForRead(ref9, LOCKMODE_NONE);
+                tx.openForRead(ref10, LOCKMODE_NONE);
+                tx.openForRead(ref11, LOCKMODE_NONE);
+                tx.openForRead(ref12, LOCKMODE_NONE);
+                tx.openForRead(ref13, LOCKMODE_NONE);
+                tx.openForRead(ref14, LOCKMODE_NONE);
+                tx.openForRead(ref15, LOCKMODE_NONE);
+                tx.openForRead(ref16, LOCKMODE_NONE);
+                tx.openForRead(ref17, LOCKMODE_NONE);
+                tx.openForRead(ref18, LOCKMODE_NONE);
+                tx.openForRead(ref19, LOCKMODE_NONE);
+                tx.openForRead(ref20, LOCKMODE_NONE);
+                tx.openForRead(ref21, LOCKMODE_NONE);
+                tx.openForRead(ref22, LOCKMODE_NONE);
+                tx.openForRead(ref23, LOCKMODE_NONE);
+                tx.openForRead(ref24, LOCKMODE_NONE);
+                tx.openForRead(ref25, LOCKMODE_NONE);
+                tx.openForRead(ref26, LOCKMODE_NONE);
+                tx.openForRead(ref27, LOCKMODE_NONE);
+                tx.openForRead(ref28, LOCKMODE_NONE);
+                tx.openForRead(ref29, LOCKMODE_NONE);
+                tx.openForRead(ref30, LOCKMODE_NONE);
+                tx.openForRead(ref31, LOCKMODE_NONE);
+                tx.openForRead(ref32, LOCKMODE_NONE);
 
                 tx.commit();
                 tx.hardReset();

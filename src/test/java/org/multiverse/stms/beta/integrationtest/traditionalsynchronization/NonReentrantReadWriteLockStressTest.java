@@ -20,10 +20,10 @@ public class NonReentrantReadWriteLockStressTest {
         stm = new BetaStm();
         clearThreadLocalTransaction();
     }
-   
+
     @Test
     @Ignore
-    public void test(){
+    public void test() {
 
     }
 }

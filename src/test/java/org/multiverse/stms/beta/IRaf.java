@@ -7,6 +7,6 @@ package org.multiverse.stms.beta;
  * Time: 7:38:16 PM
  * To change this template use File | Settings | File Templates.
  */
-class IRaf extends Tobject<IRafTlocal>{
+class IRaf extends Tobject<IRafTlocal> {
 
 }

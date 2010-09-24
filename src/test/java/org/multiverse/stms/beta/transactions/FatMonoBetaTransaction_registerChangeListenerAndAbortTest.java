@@ -13,6 +13,7 @@ import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
@@ -29,7 +30,7 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 /**
  * @author Peter Veentjer
  */
-public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
+public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest implements BetaStmConstants {
 
     private BetaStm stm;
 
@@ -58,14 +59,14 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         assertIsAborted(tx);
     }
 
-       @Test
-    public void whenOnlyContainsCommute_thenNoRetryPossibleException(){
+    @Test
+    public void whenOnlyContainsCommute_thenNoRetryPossibleException() {
         BetaLongRef ref = new BetaLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         LongFunction function = mock(LongFunction.class);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.commute(ref,function);
+        tx.commute(ref, function);
 
         Latch listener = new CheapLatch();
         try {
@@ -89,7 +90,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
                 .setBlockingAllowed(false);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
 
         Latch latch = new CheapLatch();
 
@@ -107,7 +108,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, false);
+        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         Latch latch = new CheapLatch();
         tx.registerChangeListenerAndAbort(latch);
@@ -124,7 +125,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, true);
+        ref.privatize(tx);
 
         Latch latch = new CheapLatch();
         tx.registerChangeListenerAndAbort(latch);
@@ -141,7 +142,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         Latch latch = new CheapLatch();
         tx.registerChangeListenerAndAbort(latch);
@@ -156,7 +157,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, true);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
 
         Latch latch = new CheapLatch();
         tx.registerChangeListenerAndAbort(latch);
@@ -198,7 +199,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         Latch latch = new CheapLatch();
         tx.register(listenerMock);
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
 
         tx.registerChangeListenerAndAbort(latch);
 
@@ -215,7 +216,7 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest {
                 .addPermanentListener(listenerMock);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
         Latch latch = new CheapLatch();
-        tx.openForRead(ref, false);
+        tx.openForRead(ref, LOCKMODE_NONE);
 
         tx.registerChangeListenerAndAbort(latch);
 

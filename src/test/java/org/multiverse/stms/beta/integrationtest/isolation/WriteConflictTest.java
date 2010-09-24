@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -16,7 +17,7 @@ import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
-public class WriteConflictTest {
+public class WriteConflictTest implements BetaStmConstants {
 
     private BetaStm stm;
 
@@ -40,7 +41,7 @@ public class WriteConflictTest {
                 .setDirtyCheckEnabled(true)
                 .build()
                 .start();
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
 
         ref.atomicIncrementAndGet(1);
@@ -67,7 +68,7 @@ public class WriteConflictTest {
                 .build()
                 .start();
 
-        tx.openForWrite(ref, false);
+        tx.openForWrite(ref, LOCKMODE_NONE);
 
         ref.atomicIncrementAndGet(1);
         LongRefTranlocal committed = ref.___unsafeLoad();
@@ -88,7 +89,7 @@ public class WriteConflictTest {
                 .setDirtyCheckEnabled(false)
                 .build()
                 .start();
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
 
         ref.atomicIncrementAndGet(1);
@@ -113,7 +114,7 @@ public class WriteConflictTest {
                 .setDirtyCheckEnabled(false)
                 .build()
                 .start();
-        LongRefTranlocal write = tx.openForWrite(ref, false);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
 
         ref.atomicIncrementAndGet(1);

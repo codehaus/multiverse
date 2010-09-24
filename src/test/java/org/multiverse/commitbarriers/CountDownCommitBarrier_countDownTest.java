@@ -19,8 +19,8 @@ public class CountDownCommitBarrier_countDownTest {
     public void whenLastOne_thenBarrierOpened() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(3);
 
-        JoinCommitThread t1 = new JoinCommitThread(stm,barrier);
-        JoinCommitThread t2 = new JoinCommitThread(stm,barrier);
+        JoinCommitThread t1 = new JoinCommitThread(stm, barrier);
+        JoinCommitThread t2 = new JoinCommitThread(stm, barrier);
 
         startAll(t1, t2);
         sleepMs(500);
@@ -39,8 +39,8 @@ public class CountDownCommitBarrier_countDownTest {
     public void whenNotLastOne() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(4);
 
-        JoinCommitThread t1 = new JoinCommitThread(stm,barrier);
-        JoinCommitThread t2 = new JoinCommitThread(stm,barrier);
+        JoinCommitThread t1 = new JoinCommitThread(stm, barrier);
+        JoinCommitThread t2 = new JoinCommitThread(stm, barrier);
 
         startAll(t1, t2);
         sleepMs(500);

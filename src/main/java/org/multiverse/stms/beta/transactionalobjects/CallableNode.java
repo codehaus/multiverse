@@ -13,8 +13,8 @@ public class CallableNode {
         this.next = next;
         this.function = function;
     }
-        
-    public void prepareForPooling(){
+
+    public void prepareForPooling() {
         next = null;
         function = null;
     }

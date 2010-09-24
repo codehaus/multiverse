@@ -13,7 +13,7 @@ public interface TransactionalBlockingQueue<E> extends TransactionalQueue<E>, Bl
 
     void put(Transaction tx, E e);
 
-    void atomicPut()throws InterruptedException;
+    void atomicPut() throws InterruptedException;
 
     //todo: all methods needs to be transformed.
 

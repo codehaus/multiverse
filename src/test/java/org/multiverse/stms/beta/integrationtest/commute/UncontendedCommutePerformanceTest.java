@@ -75,7 +75,7 @@ public class UncontendedCommutePerformanceTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    btx.openForWrite(ref, false).value++;
+                    btx.openForWrite(ref, LOCKMODE_NONE).value++;
                 }
             };
 

@@ -45,7 +45,7 @@ public abstract class TestThread extends Thread {
         return endedWithInterruptStatus;
     }
 
-    public long getDurationMs(){
+    public long getDurationMs() {
         return durationMs;
     }
 

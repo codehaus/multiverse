@@ -55,7 +55,7 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      */
     Tranlocal ___load(int spinCount, BetaTransaction newLockOwner, int lockMode);
 
-       /**
+    /**
      * Loads the current stored Tranlocal without any form of consistency guarantees. This method is purely
      * meant for testing/debugging purposes.
      *

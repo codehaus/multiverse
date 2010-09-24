@@ -7,11 +7,11 @@ import static org.junit.Assert.assertEquals;
 public class StripedCounterTest {
 
     @Test
-    public void test(){
+    public void test() {
         StripedCounter counter = new StripedCounter(10);
         counter.inc(10);
 
         assertEquals(10, counter.get());
     }
-        
+
 }

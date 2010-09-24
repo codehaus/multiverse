@@ -39,24 +39,23 @@ public interface Latch {
      * Awaits for this latch to open with a timeout. This call is not responsive to interrupts.
      *
      * @param expectedEra the expected era.
-     * @param timeout the timeout
-     * @param unit the TimeUnit for the timeout
+     * @param timeout     the timeout
+     * @param unit        the TimeUnit for the timeout
      * @return the remaining timeout.  A negative value indicates that the Latch is not opened in time.
-     * @throws NullPointerException if unit is null
+     * @throws NullPointerException          if unit is null
      * @throws UnsupportedOperationException if the Latch implementation doesn't implement this method.
      */
-     long tryAwaitUninterruptible(long expectedEra, long timeout, TimeUnit unit);
+    long tryAwaitUninterruptible(long expectedEra, long timeout, TimeUnit unit);
 
     /**
      * Awaits for this latch to open with a timeout. This call is responsive to interrupts.
      *
-     *
      * @param expectedEra the expected era
-     * @param timeout the timeout
-     * @param unit the TimeUnit for the timeout
+     * @param timeout     the timeout
+     * @param unit        the TimeUnit for the timeout
      * @return the remaining timeout. A negative value indicates that the latch is not opened in time.
-     * @throws InterruptedException if the thread is interrupted while waiting
-     * @throws NullPointerException if unit is null
+     * @throws InterruptedException          if the thread is interrupted while waiting
+     * @throws NullPointerException          if unit is null
      * @throws UnsupportedOperationException if the Latch implementation doesn't implement this method.
      */
     long tryAwait(long expectedEra, long timeout, TimeUnit unit) throws InterruptedException;
