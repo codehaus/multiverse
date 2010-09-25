@@ -241,13 +241,12 @@ public class FatArrayTreeBetaTransaction_commuteTest {
         assertHasCommutingFunctions(tranlocal2, function2);
     }
 
-
     @Test
-    public void whenLocked_thenNoProblem() {
+    public void whenPrivatizedByOther_thenNoProblem() {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForRead(ref, LOCKMODE_COMMIT);
+        ref.privatize(otherTx);
 
         LongFunction function = mock(LongFunction.class);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
@@ -261,6 +260,32 @@ public class FatArrayTreeBetaTransaction_commuteTest {
         assertNull(commuting.read);
         assertHasCommutingFunctions(commuting, function);
         assertHasCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSurplus(1, ref);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    public void whenEnsuredByOther_thenNoProblem() {
+        BetaLongRef ref = newLongRef(stm);
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.ensure(otherTx);
+
+        LongFunction function = mock(LongFunction.class);
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        tx.commute(ref, function);
+
+        LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
+
+        assertIsActive(tx);
+        assertTrue(commuting.isCommuting);
+        assertFalse(commuting.isCommitted);
+        assertNull(commuting.read);
+        assertHasCommutingFunctions(commuting, function);
+        assertHasNoCommitLock(ref);
+        assertHasUpdateLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
