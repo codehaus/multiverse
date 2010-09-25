@@ -76,25 +76,7 @@ public class FatArrayTreeBetaTransaction_abortTest {
         assertSame(committed, ref.___unsafeLoad());
         assertFalse(committed.isPermanent);
     }
-
-    @Test
-    public void whenContainsLockedNormalRead() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
-
-        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForRead(ref, LOCKMODE_COMMIT);
-        tx.abort();
-
-        assertIsAborted(tx);
-        assertHasNoCommitLock(ref.___getOrec());
-        assertUpdateBiased(ref);
-        assertSurplus(0, ref);
-        assertNull(ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
-        assertFalse(committed.isPermanent);
-    }
-
+  
     @Test
     public void whenContainsUnlockedWrite() {
         BetaLongRef ref = newLongRef(stm);
@@ -113,22 +95,89 @@ public class FatArrayTreeBetaTransaction_abortTest {
         assertFalse(committed.isPermanent);
     }
 
-    @Test
-    public void whenContainsLockedWrite() {
+   @Test
+    public void whenHasPrivatizedWrite() {
         BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
+        int oldReadonlyCount = ref.___getReadonlyCount();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForWrite(ref, LOCKMODE_COMMIT);
+        ref.privatize(tx);
+
         tx.abort();
 
         assertIsAborted(tx);
-        assertHasNoCommitLock(ref.___getOrec());
-        assertUpdateBiased(ref);
-        assertSurplus(0, ref);
+        assertHasNoCommitLock(ref);
+        assertHasNoUpdateLock(ref);
         assertNull(ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
-        assertFalse(committed.isPermanent);
+        assertSurplus(0, ref);
+        assertReadonlyCount(oldReadonlyCount, ref);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    public void whenHasEnsuredWrite() {
+        BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+        int oldReadonlyCount = ref.___getReadonlyCount();
+
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        ref.ensure(tx);
+
+        tx.abort();
+
+        assertIsAborted(tx);
+        assertHasNoCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertSurplus(0, ref);
+        assertReadonlyCount(oldReadonlyCount, ref);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    public void whenHasPrivatizedRead() {
+        BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+        int oldReadonlyCount = ref.___getReadonlyCount();
+
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        ref.privatize(tx);
+
+        tx.abort();
+
+        assertIsAborted(tx);
+        assertHasNoCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertSurplus(0, ref);
+
+        assertReadonlyCount(oldReadonlyCount, ref);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    public void whenHasEnsuredRead() {
+        BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+        int oldReadonlyCount = ref.___getReadonlyCount();
+
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        ref.ensure(tx);
+
+        tx.abort();
+
+        assertIsAborted(tx);
+        assertHasNoCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertSurplus(0, ref);
+        assertReadonlyCount(oldReadonlyCount, ref);
+        assertUpdateBiased(ref);
     }
 
     @Test

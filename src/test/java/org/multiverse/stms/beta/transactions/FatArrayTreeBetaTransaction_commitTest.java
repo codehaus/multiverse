@@ -39,7 +39,90 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         stm = new BetaStm();
     }
 
-    //since the readset is not checked for conflicting writes at the commit, a writeskew still can happen.
+    @Test
+    public void whenHasPrivatizedWrite() {
+        BetaLongRef ref = newLongRef(stm);
+        int oldReadonlyCount = ref.___getReadonlyCount();
+
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        ref.privatize(tx);
+        ref.incrementAndGet(tx, 1);
+        LongRefTranlocal committed = (LongRefTranlocal) tx.get(ref);
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertHasNoCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertSurplus(0, ref);
+        assertReadonlyCount(oldReadonlyCount, ref);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    public void whenHasEnsuredWrite() {
+        BetaLongRef ref = newLongRef(stm);
+        int oldReadonlyCount = ref.___getReadonlyCount();
+
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        ref.ensure(tx);
+        ref.incrementAndGet(tx, 1);
+        LongRefTranlocal committed = (LongRefTranlocal) tx.get(ref);
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertHasNoCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertSurplus(0, ref);
+        assertReadonlyCount(oldReadonlyCount, ref);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    public void whenHasPrivatizedRead() {
+        BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+        int oldReadonlyCount = ref.___getReadonlyCount();
+
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        ref.privatize(tx);
+
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertHasNoCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertSurplus(0, ref);
+        assertReadonlyCount(oldReadonlyCount + 1, ref);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    public void whenHasEnsuredRead() {
+        BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+        int oldReadonlyCount = ref.___getReadonlyCount();
+
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        ref.ensure(tx);
+
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertHasNoCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertSurplus(0, ref);
+        assertReadonlyCount(oldReadonlyCount + 1, ref);
+        assertUpdateBiased(ref);
+    }
+
 
     @Test
     public void whenMultipleChangeListeners_thenAllNotified() {
