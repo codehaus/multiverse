@@ -101,7 +101,7 @@ public class FatMonoBetaTransaction_openForWriteTest implements BetaStmConstants
     }
 
     @Test
-    public void whenReadBiasedAndLock() {
+    public void whenReadBiasedAndPrivatize() {
         BetaLongRef ref = createReadBiasedLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
         int oldReadonlyCount = ref.___getReadonlyCount();

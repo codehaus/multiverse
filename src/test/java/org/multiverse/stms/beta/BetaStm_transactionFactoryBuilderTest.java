@@ -28,6 +28,7 @@ public class BetaStm_transactionFactoryBuilderTest implements BetaStmConstants {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         config.init();
 
+        assertEquals(IsolationLevel.Snapshot,config.isolationLevel);
         assertFalse(config.isInterruptible());
         assertFalse(config.isReadonly());
         assertEquals(LOCKMODE_NONE, config.readLockMode);
@@ -149,7 +150,7 @@ public class BetaStm_transactionFactoryBuilderTest implements BetaStmConstants {
                 .setIsolationLevel(IsolationLevel.Serializable)
                 .build();
 
-        BetaTransaction tx = txFactory.start();
+        BetaTransaction tx = txFactory.newTransaction();
         assertTrue(tx instanceof AbstractFatBetaTransaction);
     }
 
@@ -160,7 +161,7 @@ public class BetaStm_transactionFactoryBuilderTest implements BetaStmConstants {
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .build();
 
-        BetaTransaction tx = txFactory.start();
+        BetaTransaction tx = txFactory.newTransaction();
         assertTrue(tx instanceof AbstractLeanBetaTransaction);
     }
 }

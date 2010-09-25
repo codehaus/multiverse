@@ -24,12 +24,12 @@ public final class FatArrayTreeBetaTransactionFactory implements BetaTransaction
     }
 
     @Override
-    public BetaTransaction start() {
-        return start(getThreadLocalBetaTransactionPool());
+    public BetaTransaction newTransaction() {
+        return newTransaction(getThreadLocalBetaTransactionPool());
     }
 
     @Override
-    public BetaTransaction start(BetaTransactionPool pool) {
+    public BetaTransaction newTransaction(BetaTransactionPool pool) {
         FatArrayTreeBetaTransaction tx = pool.takeFatArrayTreeBetaTransaction();
         if (tx == null) {
             tx = new FatArrayTreeBetaTransaction(config);

@@ -47,11 +47,11 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
     };
 
     public BetaTransactionalObject owner;
+    public final boolean isLocked;      
     public boolean isPermanent;
     public boolean isCommitted;
     public boolean isCommuting;
     public int isDirty = DIRTY_UNKNOWN;
-    public final boolean isLocked;
     public Tranlocal read;
 
     public Tranlocal(BetaTransactionalObject owner, boolean locked) {

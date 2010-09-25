@@ -202,7 +202,7 @@ public class FatMonoBetaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenLockedByOther_thenLockedConflict() {
+    public void whenPrivatizedByOther_thenLockedConflict() {
         BetaLongRef ref = newLongRef(stm);
         Tranlocal committed = ref.___unsafeLoad();
 
@@ -224,9 +224,9 @@ public class FatMonoBetaTransaction_openForReadTest {
         assertSurplus(1, ref);
         assertSame(otherTx, ref.___getLockOwner());
     }
-
+       
     @Test
-    public void whenLock() {
+    public void whenPrivatized() {
         BetaLongRef ref = newLongRef(stm);
         Tranlocal committed = ref.___unsafeLoad();
 
@@ -243,7 +243,7 @@ public class FatMonoBetaTransaction_openForReadTest {
     }
 
     @Test
-    public void whenAlreadyLockedBySelf_thenNoProblem() {
+    public void whenAlreadyPrivatizedBySelf_thenNoProblem() {
         BetaLongRef ref = newLongRef(stm);
         Tranlocal committed = ref.___unsafeLoad();
 

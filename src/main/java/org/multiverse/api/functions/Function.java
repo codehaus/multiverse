@@ -5,15 +5,15 @@ package org.multiverse.api.functions;
  * <p/>
  * Can be used for commuting functions or for the BetaRef.alter.
  *
- * @param <E>
+ * @author Peter Veentjer.
  */
-public interface Function<E> {
+public interface Function<E>{
 
     /**
-     * Calls the function
+     * Evaluates the function.
      *
-     * @param arg the argument to call the function with.
-     * @return the new value.
+     * @param value the value to evaluate.
+     * @return the result of the evaluation
      */
-    E call(E arg);
+    E call(E value);
 }

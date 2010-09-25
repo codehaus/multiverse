@@ -45,7 +45,7 @@ public class WriteSkewTest {
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .build()
-                .start();
+                .newTransaction();
 
         ref1.incrementAndGet(tx, 1);
         ref2.get(tx);
@@ -66,7 +66,7 @@ public class WriteSkewTest {
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeWrites)
                 .build()
-                .start();
+                .newTransaction();
 
         ref1.incrementAndGet(tx, 1);
         ref2.get(tx);
@@ -87,7 +87,7 @@ public class WriteSkewTest {
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setPessimisticLockLevel(PessimisticLockLevel.EnsureWrites)
                 .build()
-                .start();
+                .newTransaction();
 
         ref1.incrementAndGet(tx, 1);
         ref2.get(tx);
@@ -108,7 +108,7 @@ public class WriteSkewTest {
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setPessimisticLockLevel(PessimisticLockLevel.EnsureReads)
                 .build()
-                .start();
+                .newTransaction();
 
         ref1.incrementAndGet(tx, 1);
         ref2.get(tx);
@@ -135,7 +135,7 @@ public class WriteSkewTest {
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
                 .build()
-                .start();
+                .newTransaction();
 
         ref1.incrementAndGet(tx, 1);
         ref2.get(tx);
@@ -159,7 +159,7 @@ public class WriteSkewTest {
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .build()
-                .start();
+                .newTransaction();
 
         ref1.incrementAndGet(tx, 1);
         ref2.privatize(tx);
@@ -185,7 +185,7 @@ public class WriteSkewTest {
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .build()
-                .start();
+                .newTransaction();
 
         ref1.incrementAndGet(tx, 1);
         ref2.ensure(tx);
@@ -212,7 +212,7 @@ public class WriteSkewTest {
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Serializable)
                 .build()
-                .start();
+                .newTransaction();
         ref1.incrementAndGet(tx, 1);
         ref2.get(tx);
 

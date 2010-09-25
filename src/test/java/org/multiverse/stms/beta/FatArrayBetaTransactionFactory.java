@@ -30,12 +30,12 @@ public final class FatArrayBetaTransactionFactory implements BetaTransactionFact
     }
 
     @Override
-    public BetaTransaction start() {
-        return start(getThreadLocalBetaTransactionPool());
+    public BetaTransaction newTransaction() {
+        return newTransaction(getThreadLocalBetaTransactionPool());
     }
 
     @Override
-    public BetaTransaction start(BetaTransactionPool pool) {
+    public BetaTransaction newTransaction(BetaTransactionPool pool) {
         FatArrayBetaTransaction tx = pool.takeFatArrayBetaTransaction();
         if (tx == null) {
             tx = new FatArrayBetaTransaction(config);

@@ -1,12 +1,13 @@
 package org.multiverse.api.functions;
 
 /**
- * A {@link Function} optimized for a long. It depends on the stm if {@link #call(long)} without boxing or
- * {@link #call(Long)} is done (with boxing).
+ * A Function that accepts an argument of a certain type and returns a new value of the same type.
+ * <p/>
+ * Can be used for commuting functions or for the BetaRef.alter.
  *
- * @author Peter Veentjer
+ * @author Peter Veentjer.
  */
-public abstract class LongFunction implements Function<Long> {
+public abstract class LongFunction implements Function<Long>{
 
     /**
      * Calculates the new value based on the current value.

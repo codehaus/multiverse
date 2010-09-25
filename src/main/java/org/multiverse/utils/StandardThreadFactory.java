@@ -172,7 +172,7 @@ public final class StandardThreadFactory implements ThreadFactory {
      * <p/>
      * This call is not completely threadsafe, the following scenario could happen:
      * <ol>
-     * <li>thread1 call setPriority and start the checking part of this method and the check passes</li>
+     * <li>thread1 call setPriority and newTransaction the checking part of this method and the check passes</li>
      * <li>thread2 calls the ThreadGroup directly and lowers the priority</li>
      * <li>thread1 sets the priority on this StandardThreadFactory</li>
      * </ol>

@@ -28,7 +28,7 @@ public class DirtyCheckTest {
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(false)
                 .build()
-                .start();
+                .newTransaction();
 
         ref.set(tx, 0);
         tx.commit();
@@ -45,7 +45,7 @@ public class DirtyCheckTest {
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(false)
                 .build()
-                .start();
+                .newTransaction();
 
         ref.set(tx, 1);
         tx.commit();
@@ -62,7 +62,7 @@ public class DirtyCheckTest {
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(true)
                 .build()
-                .start();
+                .newTransaction();
 
         ref.set(tx, 0);
         tx.commit();
@@ -79,7 +79,7 @@ public class DirtyCheckTest {
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(true)
                 .build()
-                .start();
+                .newTransaction();
 
         ref.set(tx, 1);
         tx.commit();

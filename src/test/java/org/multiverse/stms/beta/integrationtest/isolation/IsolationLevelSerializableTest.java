@@ -43,7 +43,7 @@ public class IsolationLevelSerializableTest {
         final BetaLongRef ref1 = newLongRef(stm);
         final BetaLongRef ref2 = newLongRef(stm);
 
-        BetaTransaction tx = transactionFactory.start();
+        BetaTransaction tx = transactionFactory.newTransaction();
 
         ref1.get(tx);
 
@@ -68,7 +68,7 @@ public class IsolationLevelSerializableTest {
         final BetaLongRef ref1 = newLongRef(stm);
         final BetaLongRef ref2 = newLongRef(stm);
 
-        BetaTransaction tx = transactionFactory.start();
+        BetaTransaction tx = transactionFactory.newTransaction();
         ref1.get(tx);
 
         ref2.incrementAndGet(tx, 1);

@@ -40,7 +40,7 @@ public class WriteConflictTest implements BetaStmConstants {
                 .setSpeculativeConfigurationEnabled(false)
                 .setDirtyCheckEnabled(true)
                 .build()
-                .start();
+                .newTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
 
@@ -66,7 +66,7 @@ public class WriteConflictTest implements BetaStmConstants {
                 .setSpeculativeConfigurationEnabled(false)
                 .setDirtyCheckEnabled(true)
                 .build()
-                .start();
+                .newTransaction();
 
         tx.openForWrite(ref, LOCKMODE_NONE);
 
@@ -88,7 +88,7 @@ public class WriteConflictTest implements BetaStmConstants {
                 .setSpeculativeConfigurationEnabled(false)
                 .setDirtyCheckEnabled(false)
                 .build()
-                .start();
+                .newTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
 
@@ -113,7 +113,7 @@ public class WriteConflictTest implements BetaStmConstants {
                 .setSpeculativeConfigurationEnabled(false)
                 .setDirtyCheckEnabled(false)
                 .build()
-                .start();
+                .newTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
 

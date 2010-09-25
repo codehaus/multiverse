@@ -14,6 +14,10 @@ import static java.lang.String.format;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactionContainer;
 
 /**
+ * An AbstractBetaAtomicBlock made for the BetaStm.
+ *
+ * This code is generated.
+ *
  * @author Peter Veentjer
  */
 public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
@@ -28,6 +32,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
         this.propagationLevel = transactionConfiguration.propagationLevel;
     }
 
+    @Override
     public BetaTransactionFactory getTransactionFactory(){
         return transactionFactory;
     }
@@ -67,7 +72,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                             }
                         }
 
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         return execute(tx, transactionContainer, closure);
                     } else {
@@ -140,7 +145,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                             }
                         }
 
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         return execute(tx, transactionContainer, closure);
                     } else {
@@ -153,7 +158,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         }
 
                         BetaTransaction suspendedTransaction = tx;
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         try {
                             return execute(tx, transactionContainer, closure);
@@ -305,7 +310,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                             }
                         }
 
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         return execute(tx, transactionContainer, closure);
                     } else {
@@ -378,7 +383,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                             }
                         }
 
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         return execute(tx, transactionContainer, closure);
                     } else {
@@ -391,7 +396,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         }
 
                         BetaTransaction suspendedTransaction = tx;
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         try {
                             return execute(tx, transactionContainer, closure);
@@ -543,7 +548,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                             }
                         }
 
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         return execute(tx, transactionContainer, closure);
                     } else {
@@ -616,7 +621,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                             }
                         }
 
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         return execute(tx, transactionContainer, closure);
                     } else {
@@ -629,7 +634,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         }
 
                         BetaTransaction suspendedTransaction = tx;
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         try {
                             return execute(tx, transactionContainer, closure);
@@ -781,7 +786,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                             }
                         }
 
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         return execute(tx, transactionContainer, closure);
                     } else {
@@ -854,7 +859,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                             }
                         }
 
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         return execute(tx, transactionContainer, closure);
                     } else {
@@ -867,7 +872,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         }
 
                         BetaTransaction suspendedTransaction = tx;
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         try {
                             return execute(tx, transactionContainer, closure);
@@ -1019,7 +1024,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                             }
                         }
 
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         return execute(tx, transactionContainer, closure);
                     } else {
@@ -1092,7 +1097,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                             }
                         }
 
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         return execute(tx, transactionContainer, closure);
                     } else {
@@ -1105,7 +1110,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         }
 
                         BetaTransaction suspendedTransaction = tx;
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         try {
                             return execute(tx, transactionContainer, closure);
@@ -1257,7 +1262,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                             }
                         }
 
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         execute(tx, transactionContainer, closure);
                         return;
@@ -1334,7 +1339,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                             }
                         }
 
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         execute(tx, transactionContainer, closure);
                         return;
@@ -1348,7 +1353,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         }
 
                         BetaTransaction suspendedTransaction = tx;
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         try {
                             execute(tx, transactionContainer, closure);

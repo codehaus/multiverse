@@ -639,7 +639,13 @@ public final class BetaIntRef
 
     @Override
     public final boolean tryEnsure(){
-         throw new TodoException();
+        Transaction tx = getThreadLocalTransaction();
+
+        if(tx!=null && tx.isAlive()){
+            return tryEnsure((BetaTransaction)tx);            
+        }
+
+        throw new NoTransactionFoundException("No transaction is found for the tryEnsure operation");
     }
 
     @Override

@@ -21,5 +21,5 @@ public interface TransactionFactory {
      *
      * @return the started Transaction.
      */
-    Transaction start();
+    Transaction newTransaction();
 }

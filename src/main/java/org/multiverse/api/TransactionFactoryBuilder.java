@@ -59,7 +59,7 @@ public interface TransactionFactoryBuilder {
      * multiple times.
      * <p/>
      * This method is very useful for integrating Multiverse in other JVM based environments because with this
-     * approach you have a callback when transaction start/___abort/commit and can add your own logic.
+     * approach you have a callback when transaction newTransaction/___abort/commit and can add your own logic.
      *
      * @param listener the permanent listener to add.
      * @return the updated TransactionFactoryBuilder.
@@ -147,7 +147,7 @@ public interface TransactionFactoryBuilder {
 
     /**
      * With the speculative configuration enabled, the stm is allowed to determine optimal settings for transactions.
-     * Some behavior like readonly or the need for tracking reads can be determined runtime. The system can start with
+     * Some behavior like readonly or the need for tracking reads can be determined runtime. The system can newTransaction with
      * a readonly non readtracking transaction and upgrade to an update or a read tracking once a write or retry
      * happens.
      *

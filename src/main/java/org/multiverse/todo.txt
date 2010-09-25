@@ -98,8 +98,8 @@ performance.
 - transactional treeset
 
 - a reference that always causes a privatization.
-- transactional array
 
+- transactional array
 
 todo
 
@@ -225,6 +225,8 @@ and not allowed. So not throw the retry error immediately..
 - use a retry policy for re-acquiring lock. atm only spinning is used. 
 
 done
+
+- functions are not generated
 
 - removal of the locking methods in the betatransaction (were added for backwards compatibility)
 

@@ -230,7 +230,7 @@ public class BetaLongRef_privatizeTest {
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setReadonly(true)
                 .build()
-                .start();
+                .newTransaction();
         setThreadLocalTransaction(tx);
 
         ref.privatize();

@@ -42,7 +42,7 @@ public class FatMonoBetaTransaction_registerTest {
     @Test
     public void whenFirst() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        //todo: tx.start()
+        //todo: tx.newTransaction()
 
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         tx.register(listener);
@@ -55,7 +55,7 @@ public class FatMonoBetaTransaction_registerTest {
     @Test
     public void whenMultipleRegisters() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        //todo: tx.start()
+        //todo: tx.newTransaction()
 
         TransactionLifecycleListener listener1 = mock(TransactionLifecycleListener.class);
         TransactionLifecycleListener listener2 = mock(TransactionLifecycleListener.class);

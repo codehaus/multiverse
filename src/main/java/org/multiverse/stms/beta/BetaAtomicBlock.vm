@@ -11,6 +11,10 @@ import static java.lang.String.format;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 
 /**
+ * An AbstractBetaAtomicBlock made for the BetaStm.
+ *
+ * This code is generated.
+ *
  * @author Peter Veentjer
  */
 public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
@@ -29,6 +33,7 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
 #end
     }
 
+    @Override
     public BetaTransactionFactory getTransactionFactory(){
         return transactionFactory;
     }
@@ -73,7 +78,7 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
 #end
             }
 
-            tx = transactionFactory.start(transactionContainer.transactionPool);
+            tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
             transactionContainer.transaction=tx;
 #transactionLogic()
 
@@ -103,7 +108,7 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
                             }
                         }
 
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
 #if($closure.type eq 'void')
                         execute(tx, transactionContainer, closure);
@@ -196,7 +201,7 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
                             }
                         }
 
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
 #if($closure.type eq 'void')
                         execute(tx, transactionContainer, closure);
@@ -214,7 +219,7 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
                         }
 
                         BetaTransaction suspendedTransaction = tx;
-                        tx = transactionFactory.start(transactionContainer.transactionPool);
+                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
                         transactionContainer.transaction = tx;
                         try {
 #if($closure.type eq 'void')

@@ -4,8 +4,6 @@ import org.apache.velocity.Template
 
 @Grab(group = 'org.apache.velocity', module = 'velocity', version = '1.6.4')
 
-class IgnoreMe {}
-
 class AtomicClosure {
   String type
   String name
@@ -29,6 +27,7 @@ class TransactionalObject {
   String tranlocal
   String name//the name of the reference.
   String type//the type of data it contains
+  String objectType//the type of data it contains
   String initialValue//the initial value
   int classIndex
   String typeParameter
@@ -101,12 +100,14 @@ for (def param in refs) {
   generateTranlocal(engine, param)
   generateTransactionalObject(engine, param)
   generatePredicate(engine, param)
+  generateFunction(engine, param)
 }
 
 def abstractTransactionalObject = new TransactionalObject(
         name: 'AbstractBetaTransactionalObject',
         tranlocal: 'Tranlocal',
         type: "",
+        objectType: "",
         typeParameter: '',
         initialValue: '',
         classIndex: -1,
@@ -175,8 +176,8 @@ List<TransactionalObject> createTransactionalObjects() {
           name: 'BetaRef',
           tranlocal: 'RefTranlocal',
           type: 'E',
+          objectType: '',
           typeParameter: '<E>',
-//          parametrizedTranlocal: 'RefTranlocal<E>',
           initialValue: 'null',
           referenceInterface: 'Ref',
           classIndex: 0,
@@ -188,8 +189,8 @@ List<TransactionalObject> createTransactionalObjects() {
   result.add new TransactionalObject(
           name: 'BetaIntRef',
           tranlocal: 'IntRefTranlocal',
-//          parametrizedTranlocal: 'IntRefTranlocal',
           type: 'int',
+          objectType: 'Integer',
           referenceInterface: 'IntRef',
           typeParameter: '',
           initialValue: '0',
@@ -202,8 +203,8 @@ List<TransactionalObject> createTransactionalObjects() {
   result.add new TransactionalObject(
           name: 'BetaBooleanRef',
           tranlocal: 'BooleanRefTranlocal',
-//          parametrizedTranlocal: 'IntRefTranlocal',
           type: 'boolean',
+          objectType: 'Boolean',
           referenceInterface: 'BooleanRef',
           typeParameter: '',
           initialValue: 'false',
@@ -216,8 +217,8 @@ List<TransactionalObject> createTransactionalObjects() {
   result.add new TransactionalObject(
           name: 'BetaDoubleRef',
           tranlocal: 'DoubleRefTranlocal',
-//          parametrizedTranlocal: 'IntRefTranlocal',
           type: 'double',
+          objectType: 'Double',
           referenceInterface: 'DoubleRef',
           typeParameter: '',
           initialValue: '0',
@@ -232,6 +233,7 @@ List<TransactionalObject> createTransactionalObjects() {
           tranlocal: 'LongRefTranlocal',
           referenceInterface: 'LongRef',
           type: 'long',
+          objectType: 'Long',
           typeParameter: '',
           initialValue: '0',
           classIndex: 4,
@@ -243,7 +245,8 @@ List<TransactionalObject> createTransactionalObjects() {
   result.add new TransactionalObject(
           name: 'BetaTransactionalObject',
           tranlocal: 'Tranlocal',
-          type: "",
+          type: '',
+          objectType: '',
           typeParameter: '',
           initialValue: '',
           classIndex: -1,
@@ -434,6 +437,24 @@ void generatePredicate(VelocityEngine engine, TransactionalObject transactionalO
   t.merge(context, writer)
 
   File file = new File('src/main/java/org/multiverse/api/predicates/', "${transactionalObject.predicateClass}.java")
+  file.createNewFile()
+  file.text = writer.toString()
+}
+
+void generateFunction(VelocityEngine engine, TransactionalObject transactionalObject) {
+  if (!transactionalObject.isReference) {
+    return
+  }
+
+  Template t = engine.getTemplate('src/main/java/org/multiverse/api/functions/Function.vm')
+
+  VelocityContext context = new VelocityContext()
+  context.put("transactionalObject", transactionalObject)
+
+  StringWriter writer = new StringWriter()
+  t.merge(context, writer)
+
+  File file = new File('src/main/java/org/multiverse/api/functions/', "${transactionalObject.functionClass}.java")
   file.createNewFile()
   file.text = writer.toString()
 }

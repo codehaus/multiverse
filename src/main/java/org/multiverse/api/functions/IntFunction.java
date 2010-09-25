@@ -1,12 +1,13 @@
 package org.multiverse.api.functions;
 
 /**
- * A {@link Function} optimized for an int. It depends on the stm if {@link #call(int)} without boxing or
- * {@link #call(Integer)} is done (with boxing).
+ * A Function that accepts an argument of a certain type and returns a new value of the same type.
+ * <p/>
+ * Can be used for commuting functions or for the BetaRef.alter.
  *
- * @author Peter Veentjer
+ * @author Peter Veentjer.
  */
-public abstract class IntFunction implements Function<Integer> {
+public abstract class IntFunction implements Function<Integer>{
 
     /**
      * Calculates the new value based on the current value.

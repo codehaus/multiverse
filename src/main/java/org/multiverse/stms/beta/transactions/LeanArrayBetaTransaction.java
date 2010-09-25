@@ -41,8 +41,19 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         return localConflictCounter;
     }
 
+    @Override
     public final boolean tryLock(BetaTransactionalObject ref, int lockMode){
-        throw new TodoException();
+       if (status != ACTIVE) {
+           throw abortTryLock(ref);
+       }
+
+       if (ref == null) {
+           throw abortTryLockWhenNullReference(ref);
+       }
+
+       lockMode = lockMode>=config.readLockMode?lockMode:config.readLockMode;
+             
+       throw new TodoException();
     }
 
 

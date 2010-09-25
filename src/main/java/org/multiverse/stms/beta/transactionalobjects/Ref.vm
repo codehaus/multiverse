@@ -678,8 +678,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         Transaction tx = getThreadLocalTransaction();
 
         if(tx!=null && tx.isAlive()){
-            return tryEnsure((BetaTransaction)tx);
-            return;
+            return tryEnsure((BetaTransaction)tx);            
         }
 
         throw new NoTransactionFoundException("No transaction is found for the tryEnsure operation");

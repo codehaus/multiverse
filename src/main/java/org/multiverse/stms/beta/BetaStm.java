@@ -389,12 +389,12 @@ public final class BetaStm implements Stm {
         }
 
         @Override
-        public BetaTransaction start() {
-            return start(getThreadLocalBetaTransactionPool());
+        public BetaTransaction newTransaction() {
+            return newTransaction(getThreadLocalBetaTransactionPool());
         }
 
         @Override
-        public BetaTransaction start(final BetaTransactionPool pool) {
+        public BetaTransaction newTransaction(final BetaTransactionPool pool) {
             FatArrayTreeBetaTransaction tx = pool.takeFatArrayTreeBetaTransaction();
 
             if (tx == null) {
@@ -427,20 +427,20 @@ public final class BetaStm implements Stm {
         }
 
         @Override
-        public BetaTransaction start() {
-            return start(getThreadLocalBetaTransactionPool());
+        public BetaTransaction newTransaction() {
+            return newTransaction(getThreadLocalBetaTransactionPool());
         }
 
         @Override
         public BetaTransaction upgradeAfterSpeculativeFailure(
                 final BetaTransaction failingTransaction, final BetaTransactionPool pool) {
-            final BetaTransaction tx = start(pool);
+            final BetaTransaction tx = newTransaction(pool);
             tx.copyForSpeculativeFailure(failingTransaction);
             return tx;
         }
 
         @Override
-        public BetaTransaction start(final BetaTransactionPool pool) {
+        public BetaTransaction newTransaction(final BetaTransactionPool pool) {
             final SpeculativeBetaConfiguration speculativeConfiguration = config.speculativeConfiguration.get();
             final int length = speculativeConfiguration.minimalLength;
 

@@ -16,7 +16,7 @@ public interface BetaTransactionFactory extends TransactionFactory {
     BetaTransactionConfiguration getTransactionConfiguration();
 
     @Override
-    BetaTransaction start();
+    BetaTransaction newTransaction();
 
     /**
      * Creates a new BetaTransaction.
@@ -24,7 +24,7 @@ public interface BetaTransactionFactory extends TransactionFactory {
      * @param pool the BetaObjectPool used to get a pooled transaction from if one is available.
      * @return the started BetaTransaction.
      */
-    BetaTransaction start(BetaTransactionPool pool);
+    BetaTransaction newTransaction(BetaTransactionPool pool);
 
     /**
      * Upgrades the transaction after a speculative failure happened.

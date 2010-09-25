@@ -13,6 +13,10 @@ import static java.lang.String.format;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactionContainer;
 
 /**
+ * An AbstractBetaAtomicBlock made for the BetaStm.
+ *
+ * This code is generated.
+ *
  * @author Peter Veentjer
  */
 public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
@@ -24,6 +28,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
         super(transactionFactory);
     }
 
+    @Override
     public BetaTransactionFactory getTransactionFactory(){
         return transactionFactory;
     }
@@ -57,7 +62,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 return closure.execute(tx);
             }
 
-            tx = transactionFactory.start(transactionContainer.transactionPool);
+            tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
             transactionContainer.transaction=tx;
             boolean abort = true;
 
@@ -164,7 +169,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 return closure.execute(tx);
             }
 
-            tx = transactionFactory.start(transactionContainer.transactionPool);
+            tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
             transactionContainer.transaction=tx;
             boolean abort = true;
 
@@ -271,7 +276,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 return closure.execute(tx);
             }
 
-            tx = transactionFactory.start(transactionContainer.transactionPool);
+            tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
             transactionContainer.transaction=tx;
             boolean abort = true;
 
@@ -378,7 +383,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 return closure.execute(tx);
             }
 
-            tx = transactionFactory.start(transactionContainer.transactionPool);
+            tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
             transactionContainer.transaction=tx;
             boolean abort = true;
 
@@ -485,7 +490,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 return closure.execute(tx);
             }
 
-            tx = transactionFactory.start(transactionContainer.transactionPool);
+            tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
             transactionContainer.transaction=tx;
             boolean abort = true;
 
@@ -593,7 +598,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                 return;
             }
 
-            tx = transactionFactory.start(transactionContainer.transactionPool);
+            tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
             transactionContainer.transaction=tx;
             boolean abort = true;
 

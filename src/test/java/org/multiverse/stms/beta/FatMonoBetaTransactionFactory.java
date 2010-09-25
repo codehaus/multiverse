@@ -29,12 +29,12 @@ public final class FatMonoBetaTransactionFactory implements BetaTransactionFacto
     }
 
     @Override
-    public BetaTransaction start() {
-        return start(getThreadLocalBetaTransactionPool());
+    public BetaTransaction newTransaction() {
+        return newTransaction(getThreadLocalBetaTransactionPool());
     }
 
     @Override
-    public BetaTransaction start(BetaTransactionPool pool) {
+    public BetaTransaction newTransaction(BetaTransactionPool pool) {
         FatMonoBetaTransaction tx = pool.takeFatMonoBetaTransaction();
         if (tx == null) {
             tx = new FatMonoBetaTransaction(config);
