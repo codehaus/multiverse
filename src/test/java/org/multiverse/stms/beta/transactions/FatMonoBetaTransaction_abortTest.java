@@ -51,11 +51,11 @@ public class FatMonoBetaTransaction_abortTest {
 
         assertNull(ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
-        assertHasNoCommitLock(ref.___getOrec());
-        assertReadBiased(ref.___getOrec());
-        assertReadonlyCount(0, ref.___getOrec());
+        assertHasNoCommitLock(ref);
+        assertReadBiased(ref);
+        assertReadonlyCount(0, ref);
         //once arrived, a depart will not be called on a readbiased tranlocal
-        assertSurplus(1, ref.___getOrec());
+        assertSurplus(1, ref);
     }
 
     @Test
@@ -68,7 +68,7 @@ public class FatMonoBetaTransaction_abortTest {
         tx.abort();
 
         assertIsAborted(tx);
-        assertHasNoCommitLock(ref.___getOrec());
+        assertHasNoCommitLock(ref);
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
@@ -86,7 +86,7 @@ public class FatMonoBetaTransaction_abortTest {
         tx.abort();
 
         assertIsAborted(tx);
-        assertHasNoCommitLock(ref.___getOrec());
+        assertHasNoCommitLock(ref);
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());

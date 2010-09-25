@@ -101,10 +101,10 @@ public class FatMonoBetaTransaction_openForReadTest {
 
         assertIsActive(tx);
         assertSame(committed, read);
-        assertSurplus(1, ref.___getOrec());
-        assertHasNoCommitLock(ref.___getOrec());
-        assertUpdateBiased(ref.___getOrec());
-        assertReadonlyCount(0, ref.___getOrec());
+        assertSurplus(1, ref);
+        assertHasNoCommitLock(ref);
+        assertUpdateBiased(ref);
+        assertReadonlyCount(0, ref);
         assertSame(ref, read.owner);
         assertTrue(committed.isCommitted);
         assertFalse(committed.isPermanent);
@@ -142,10 +142,10 @@ public class FatMonoBetaTransaction_openForReadTest {
 
         assertIsActive(tx);
         assertSame(read1, read2);
-        assertHasNoCommitLock(ref.___getOrec());
-        assertUpdateBiased(ref.___getOrec());
-        assertReadonlyCount(0, ref.___getOrec());
-        assertSurplus(1, ref.___getOrec());
+        assertHasNoCommitLock(ref);
+        assertUpdateBiased(ref);
+        assertReadonlyCount(0, ref);
+        assertSurplus(1, ref);
         assertAttached(tx, read2);
     }
 
@@ -218,10 +218,10 @@ public class FatMonoBetaTransaction_openForReadTest {
 
         assertIsAborted(tx2);
         assertSame(committed, ref.___unsafeLoad());
-        assertHasCommitLock(ref.___getOrec());
-        assertReadonlyCount(0, ref.___getOrec());
-        assertUpdateBiased(ref.___getOrec());
-        assertSurplus(1, ref.___getOrec());
+        assertHasCommitLock(ref);
+        assertReadonlyCount(0, ref);
+        assertUpdateBiased(ref);
+        assertSurplus(1, ref);
         assertSame(otherTx, ref.___getLockOwner());
     }
 
