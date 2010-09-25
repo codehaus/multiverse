@@ -1907,7 +1907,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     private boolean hasReadConflict() {
-        if (config.readLockMode!=LOCKMODE_NONE) {
+        if (config.readLockMode!=LOCKMODE_NONE||config.inconsistentReadAllowed) {
             return false;
         }
 

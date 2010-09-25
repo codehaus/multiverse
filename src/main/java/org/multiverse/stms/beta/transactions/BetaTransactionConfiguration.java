@@ -31,6 +31,13 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     public final AtomicReference<SpeculativeBetaConfiguration> speculativeConfiguration
             = new AtomicReference<SpeculativeBetaConfiguration>();
     public final TransactionSensor transactionSensor;
+    public PropagationLevel propagationLevel;
+    public IsolationLevel isolationLevel;
+    public boolean writeSkewAllowed;
+    public boolean inconsistentReadAllowed;
+    public PessimisticLockLevel pessimisticLockLevel;
+    public int readLockMode;
+    public int writeLockMode;
     public StmCallback stmCallback;
     public final String familyName;
     public final boolean isAnonymous;
@@ -38,9 +45,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     public boolean durable = false;
     public boolean readonly = false;
     public int spinCount = 16;
-    public PessimisticLockLevel pessimisticLockLevel = PessimisticLockLevel.LockNone;
-    public int readLockMode = LOCKMODE_NONE;
-    public int writeLockMode = LOCKMODE_NONE;
     public boolean dirtyCheck = true;
     public int minimalArrayTreeSize = 4;
     public boolean trackReads = true;
@@ -51,19 +55,11 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     public BackoffPolicy backoffPolicy;
     public long timeoutNs = Long.MAX_VALUE;
     public TraceLevel traceLevel = TraceLevel.None;
-    public boolean writeSkewAllowed = true;
-    public PropagationLevel propagationLevel = PropagationLevel.Requires;
-    public IsolationLevel isolationLevel = IsolationLevel.Snapshot;
 
     public ArrayList<TransactionLifecycleListener> permanentListeners;
 
     public BetaTransactionConfiguration(BetaStm stm) {
         this(stm, new BetaStmConfiguration());
-    }
-
-    @Override
-    public IsolationLevel getIsolationLevel() {
-        return isolationLevel;
     }
 
     public BetaTransactionConfiguration(BetaStm stm, String familyName, boolean isAnonymous) {
@@ -103,7 +99,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         this.backoffPolicy = configuration.backoffPolicy;
         this.timeoutNs = configuration.timeoutNs;
         this.traceLevel = configuration.traceLevel;
-        this.writeSkewAllowed = configuration.writeSkewAllowed;
+        this.isolationLevel = configuration.isolationLevel;
+        this.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
+        this.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         this.propagationLevel = configuration.propagationLevel;
         this.familyName = "anonymoustransaction-" + idGenerator.incrementAndGet();
         this.isAnonymous = true;
@@ -114,6 +112,11 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     public BetaTransactionConfiguration(BetaStm stm, int maxArrayTransactionSize) {
         this(stm);
         this.maxArrayTransactionSize = maxArrayTransactionSize;
+    }
+
+    @Override
+    public IsolationLevel getIsolationLevel() {
+        return isolationLevel;
     }
 
     public boolean hasTimeout() {
@@ -307,7 +310,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.timeoutNs = timeoutNs;
         config.traceLevel = traceLevel;
         config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = writeSkewAllowed;
+        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
+        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.stmCallback = stmCallback;
@@ -336,8 +340,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.interruptible = interruptible;
         config.timeoutNs = timeoutNs;
         config.traceLevel = traceLevel;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = writeSkewAllowed;
+        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
+        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.stmCallback = stmCallback;
@@ -367,7 +371,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.timeoutNs = timeoutNs;
         config.traceLevel = traceLevel;
         config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = writeSkewAllowed;
+        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
+        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.stmCallback = stmCallback;
@@ -393,7 +398,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.timeoutNs = timeoutNs;
         config.traceLevel = traceLevel;
         config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = writeSkewAllowed;
+        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
+        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.stmCallback = stmCallback;
@@ -419,7 +425,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.timeoutNs = timeoutNs;
         config.traceLevel = traceLevel;
         config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = writeSkewAllowed;
+        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
+        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.stmCallback = stmCallback;
@@ -445,7 +452,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.timeoutNs = timeoutNs;
         config.traceLevel = traceLevel;
         config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = writeSkewAllowed;
+        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
+        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.stmCallback = stmCallback;
@@ -471,7 +479,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.timeoutNs = timeoutNs;
         config.traceLevel = traceLevel;
         config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = writeSkewAllowed;
+        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
+        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.stmCallback = stmCallback;
@@ -497,7 +506,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.timeoutNs = timeoutNs;
         config.traceLevel = traceLevel;
         config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = writeSkewAllowed;
+        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
+        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.stmCallback = stmCallback;
@@ -523,7 +533,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.timeoutNs = timeoutNs;
         config.traceLevel = traceLevel;
         config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = writeSkewAllowed;
+        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
+        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.stmCallback = stmCallback;
@@ -553,7 +564,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.timeoutNs = timeoutNs;
         config.traceLevel = traceLevel;
         config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = writeSkewAllowed;
+        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
+        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.stmCallback = stmCallback;
@@ -582,7 +594,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.timeoutNs = timeoutNs;
         config.traceLevel = traceLevel;
         config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = writeSkewAllowed;
+        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
+        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.permanentListeners = permanentListeners;
@@ -613,7 +626,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.timeoutNs = timeoutNs;
         config.traceLevel = traceLevel;
         config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = writeSkewAllowed;
+        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
+        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.stmCallback = stmCallback;
@@ -643,33 +657,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.timeoutNs = timeoutNs;
         config.traceLevel = traceLevel;
         config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = writeSkewAllowed;
-        config.propagationLevel = propagationLevel;
-        config.permanentListeners = permanentListeners;
-        config.stmCallback = stmCallback;
-        return config;
-    }
-
-    public BetaTransactionConfiguration setWriteSkewAllowed(boolean writeSkewAllowed) {
-        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, familyName, isAnonymous);
-        config.readonly = readonly;
-        config.spinCount = spinCount;
-        config.pessimisticLockLevel = pessimisticLockLevel;
-        config.readLockMode = pessimisticLockLevel.getReadLockMode();
-        config.writeLockMode = pessimisticLockLevel.getWriteLockMode();
-        config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.durable = durable;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxArrayTransactionSize = maxArrayTransactionSize;
-        config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = writeSkewAllowed;
+        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
+        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.stmCallback = stmCallback;
@@ -699,7 +688,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.timeoutNs = timeoutNs;
         config.traceLevel = traceLevel;
         config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = writeSkewAllowed;
+        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
+        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.stmCallback = stmCallback;
@@ -729,12 +719,12 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.interruptible = interruptible;
         config.timeoutNs = timeoutNs;
         config.traceLevel = traceLevel;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = writeSkewAllowed;
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.stmCallback = stmCallback;
         config.isolationLevel = isolationLevel;
+        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
+        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         return config;
     }
 
@@ -768,7 +758,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.timeoutNs = timeoutNs;
         config.traceLevel = traceLevel;
         config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = writeSkewAllowed;
+        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
+        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = newPermanentListeners;
         config.stmCallback = stmCallback;
@@ -781,10 +772,11 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
                 "familyName='" + familyName +
                 ", propagationLevel=" + propagationLevel +
                 ", isolationLevel=" + isolationLevel +
+                ", pessimisticLockLevel=" + pessimisticLockLevel +
+                ", traceLevel=" + traceLevel +
                 ", readonly=" + readonly +
                 ", speculativeConfiguration=" + speculativeConfiguration +
                 ", spinCount=" + spinCount +
-                ", pessimisticLockLevel=" + pessimisticLockLevel +
                 ", dirtyCheck=" + dirtyCheck +
                 ", minimalArrayTreeSize=" + minimalArrayTreeSize +
                 ", trackReads=" + trackReads +
@@ -796,7 +788,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
                 ", blockingAllowed=" + blockingAllowed +
                 ", timeoutNs=" + timeoutNs +
                 ", interruptible=" + interruptible +
-                ", traceLevel=" + traceLevel +
                 ", permanentListeners=" + permanentListeners +
                 '}';
     }

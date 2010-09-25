@@ -1964,7 +1964,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     // ======================= read conflict =======================================
 
     private boolean hasReadConflict() {
-        if(config.readLockMode!=LOCKMODE_NONE){
+        if(config.readLockMode!=LOCKMODE_NONE||config.inconsistentReadAllowed){
             return false;
         }
 

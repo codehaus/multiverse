@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InOrder;
+import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.api.blocking.Latch;
@@ -210,7 +211,7 @@ public class FatArrayTreeBetaTransaction_commitTest implements BetaStmConstants 
         tx1.openForRead(ref2, LOCKMODE_NONE);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setWriteSkewAllowed(false);
+                .setIsolationLevel(IsolationLevel.Serializable);
         BetaTransaction tx2 = new FatArrayTreeBetaTransaction(config);
         tx2.openForRead(ref1, LOCKMODE_NONE);
         tx2.openForWrite(ref2, LOCKMODE_NONE).value++;
