@@ -16,6 +16,18 @@ import java.util.List;
  * @author Peter Veentjer.
  */
 public interface TransactionConfiguration {
+    /**
+     * Returns the Stm that creates transaction based on this configuration.
+     *
+     * @return the stm.
+     */
+    Stm getStm();
+
+    /**
+     * 
+     * @return
+     */
+    IsolationLevel getIsolationLevel();
 
     /**
      * Returns the total timeout in nanoseconds. Long.MAX_VALUE indicates that there is no
@@ -105,27 +117,6 @@ public interface TransactionConfiguration {
      * @see org.multiverse.api.TransactionFactoryBuilder#setDirtyCheckEnabled(boolean)
      */
     boolean isDirtyCheck();
-
-    /**
-     * Checks if this Transaction allows writeskew. This is an isolation anomaly and could lead to an execution
-     * of transactions that doesn't match any sequential execution. Writeskew detection can be expensive because
-     * more checks needs to be done. It also leads to lower concurrency because certain executions of transactions
-     * are not allowed and are aborted and retried.
-     * <p/>
-     * If the transaction is readonly, the value is undefined since a readonly transaction can't suffer from the
-     * writeskew problem.
-     *
-     * @return true if the writeskew problem is allowed, false otherwise.
-     * @see TransactionFactoryBuilder#setWriteSkewAllowed(boolean)
-     */
-    boolean isWriteSkewAllowed();
-
-    /**
-     * Returns the Stm that creates transaction based on this configuration.
-     *
-     * @return the stm.
-     */
-    Stm getStm();
 
     /**
      * Checks if this transaction does automatic read tracking. Read tracking is needed for blocking transactions,

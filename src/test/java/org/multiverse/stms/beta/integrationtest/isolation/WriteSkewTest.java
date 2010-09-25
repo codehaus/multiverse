@@ -2,7 +2,9 @@ package org.multiverse.stms.beta.integrationtest.isolation;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.beta.BetaStm;
@@ -29,13 +31,19 @@ public class WriteSkewTest {
     }
 
     @Test
+    @Ignore
+    public void whenSerializedIsolationLevel_thenWriteSkewNotPossible(){
+
+    }
+
+    @Test
     public void whenWriteSkewAllowed_thenNotDetected() {
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
-                .setWriteSkewAllowed(true)
+                .setIsolationLevel(IsolationLevel.Snapshot)
                 .build()
                 .start();
 
@@ -55,7 +63,7 @@ public class WriteSkewTest {
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
-                .setWriteSkewAllowed(true)
+                .setIsolationLevel(IsolationLevel.Snapshot)
                 .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeWrites)
                 .build()
                 .start();
@@ -76,7 +84,7 @@ public class WriteSkewTest {
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
-                .setWriteSkewAllowed(true)
+                .setIsolationLevel(IsolationLevel.Snapshot)
                 .setPessimisticLockLevel(PessimisticLockLevel.EnsureWrites)
                 .build()
                 .start();
@@ -97,7 +105,7 @@ public class WriteSkewTest {
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
-                .setWriteSkewAllowed(true)
+                .setIsolationLevel(IsolationLevel.Snapshot)
                 .setPessimisticLockLevel(PessimisticLockLevel.EnsureReads)
                 .build()
                 .start();
@@ -124,7 +132,7 @@ public class WriteSkewTest {
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
-                .setWriteSkewAllowed(true)
+                .setIsolationLevel(IsolationLevel.Snapshot)
                 .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
                 .build()
                 .start();
@@ -149,7 +157,7 @@ public class WriteSkewTest {
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
-                .setWriteSkewAllowed(false)
+                .setIsolationLevel(IsolationLevel.Snapshot)
                 .build()
                 .start();
 
@@ -175,7 +183,7 @@ public class WriteSkewTest {
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
-                .setWriteSkewAllowed(false)
+                .setIsolationLevel(IsolationLevel.Snapshot)
                 .build()
                 .start();
 
@@ -202,7 +210,7 @@ public class WriteSkewTest {
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
-                .setWriteSkewAllowed(false)
+                .setIsolationLevel(IsolationLevel.Serializable)
                 .build()
                 .start();
         ref1.incrementAndGet(tx, 1);

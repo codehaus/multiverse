@@ -176,6 +176,7 @@ public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
         assertSame(committed, ref.___unsafeLoad());
     }
 
+    
     @Test
     public void whenEnsuredByOther_thenOperationSucceedsButCommitFails() {
         BetaLongRef ref = newLongRef(stm);

@@ -167,14 +167,13 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setMaxRetries(int maxRetries);
 
     /**
-     * If writeskew problem is allowed to happen. Defaults to true and can have a big impact on performance (the
-     * complete read getAndSet needs to be validated and not just the writes). So disallow it wisely.
+     * Sets the isolation level.
      *
-     * @param writeSkewAllowed indicates if writeSkew problem is allowed.
+     * @param isolationLevel the new IsolationLevel
      * @return the updated TransactionFactoryBuilder
+     * @throws NullPointerException if isolationLevel is null.
      */
-    TransactionFactoryBuilder setWriteSkewAllowed(boolean writeSkewAllowed);
-
+   TransactionFactoryBuilder setIsolationLevel(IsolationLevel isolationLevel);
     /**
      * Sets if the Transaction is allowed to do an explicit retry (needed for a blocking operation). One use case
      * for disallowing it, it when the transaction is used inside an actor, and you don't want that inside the logic

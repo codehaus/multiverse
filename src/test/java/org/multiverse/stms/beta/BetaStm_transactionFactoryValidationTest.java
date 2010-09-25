@@ -2,6 +2,7 @@ package org.multiverse.stms.beta;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.PessimisticLockLevel;
 
 import static org.junit.Assert.fail;
@@ -33,7 +34,7 @@ public class BetaStm_transactionFactoryValidationTest {
         BetaTransactionFactoryBuilder builder = stm.createTransactionFactoryBuilder()
                 .setReadonly(false)
                 .setReadTrackingEnabled(false)
-                .setWriteSkewAllowed(false);
+                .setIsolationLevel(IsolationLevel.Serializable);
 
         try {
             builder.build();
@@ -53,7 +54,7 @@ public class BetaStm_transactionFactoryValidationTest {
                 .setBlockingAllowed(false)
                 .setReadonly(true)
                 .setReadTrackingEnabled(readTrackingEnabled)
-                .setWriteSkewAllowed(false);
+                .setIsolationLevel(IsolationLevel.Serializable);
 
         builder.build();
     }

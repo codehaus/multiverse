@@ -27,7 +27,7 @@ public interface BetaTransactionFactoryBuilder extends TransactionFactoryBuilder
     BetaTransactionFactoryBuilder setBlockingAllowed(boolean blockingAllowed);
 
     @Override
-    BetaTransactionFactoryBuilder setWriteSkewAllowed(boolean writeSkewAllowed);
+    BetaTransactionFactoryBuilder setIsolationLevel(IsolationLevel isolationLevel);
 
     @Override
     BetaTransactionFactoryBuilder setTraceLevel(TraceLevel traceLevel);

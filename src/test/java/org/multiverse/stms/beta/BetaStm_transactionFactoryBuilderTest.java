@@ -2,10 +2,7 @@ package org.multiverse.stms.beta;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.ExponentialBackoffPolicy;
-import org.multiverse.api.PessimisticLockLevel;
-import org.multiverse.api.PropagationLevel;
-import org.multiverse.api.TraceLevel;
+import org.multiverse.api.*;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.transactions.AbstractFatBetaTransaction;
 import org.multiverse.stms.beta.transactions.AbstractLeanBetaTransaction;
@@ -136,7 +133,7 @@ public class BetaStm_transactionFactoryBuilderTest implements BetaStmConstants {
     public void whenWriteSkewNotAllowed() {
         BetaTransactionFactory txFactory = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(true)
-                .setWriteSkewAllowed(false)
+                .setIsolationLevel(IsolationLevel.Serializable)
                 .build();
 
 
@@ -149,7 +146,7 @@ public class BetaStm_transactionFactoryBuilderTest implements BetaStmConstants {
     public void whenWriteSkewNotAllowedThenFatTransaction() {
         BetaTransactionFactory txFactory = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(true)
-                .setWriteSkewAllowed(false)
+                .setIsolationLevel(IsolationLevel.Serializable)
                 .build();
 
         BetaTransaction tx = txFactory.start();
@@ -160,7 +157,7 @@ public class BetaStm_transactionFactoryBuilderTest implements BetaStmConstants {
     public void whenWriteSkewAllowedThenFatTransaction() {
         BetaTransactionFactory txFactory = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(true)
-                .setWriteSkewAllowed(true)
+                .setIsolationLevel(IsolationLevel.Snapshot)
                 .build();
 
         BetaTransaction tx = txFactory.start();

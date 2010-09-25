@@ -239,12 +239,12 @@ public final class BetaStm implements Stm {
         }
 
         @Override
-        public BetaTransactionFactoryBuilder setWriteSkewAllowed(final boolean writeSkewAllowed) {
-            if (writeSkewAllowed == config.writeSkewAllowed) {
+        public BetaTransactionFactoryBuilder setIsolationLevel(final IsolationLevel isolationLevel) {
+            if (isolationLevel == config.isolationLevel) {
                 return this;
             }
 
-            return new BetaTransactionFactoryBuilderImpl(config.setWriteSkewAllowed(writeSkewAllowed));
+            return new BetaTransactionFactoryBuilderImpl(config.setIsolationLevel(isolationLevel));
         }
 
         @Override

@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
@@ -34,12 +35,12 @@ public class WriteSkewStressTest {
     private User user2;
 
     enum Mode {
-        normal,
-        pessimisticLockLevelRead,
-        pessimisticLockLevelWrite,
-        pessimisticRead,
-        pessimisticWrite,
-        withoutWriteSkew
+        snapshot,
+        privatizedReadLevel,
+        privatizedWriteLevel,
+        privatizedRead,
+        privatizedWrite,
+        serialized
     }
 
     private Mode mode;
@@ -70,7 +71,7 @@ public class WriteSkewStressTest {
 
     @Test
     public void whenPessimisticRead_thenNoWriteSkewPossible() {
-        mode = Mode.pessimisticRead;
+        mode = Mode.privatizedRead;
         startAll(threads);
         sleepMs(getStressTestDurationMs(30 * 1000));
         stop = true;
@@ -89,7 +90,7 @@ public class WriteSkewStressTest {
      */
     @Test
     public void whenPessimisticWrite_thenWriteSkewPossible() {
-        mode = Mode.pessimisticWrite;
+        mode = Mode.privatizedWrite;
         startAll(threads);
         sleepMs(getStressTestDurationMs(30 * 1000));
         stop = true;
@@ -104,7 +105,7 @@ public class WriteSkewStressTest {
 
     @Test
     public void whenPessimisticLockLevelWrite_thenWriteSkewPossible() {
-        mode = Mode.pessimisticLockLevelWrite;
+        mode = Mode.privatizedWriteLevel;
         startAll(threads);
         sleepMs(getStressTestDurationMs(30 * 1000));
         stop = true;
@@ -119,7 +120,7 @@ public class WriteSkewStressTest {
 
     @Test
     public void whenPessimisticLockLevelRead_thenNoWriteSkewPossible() {
-        mode = Mode.pessimisticLockLevelRead;
+        mode = Mode.privatizedReadLevel;
         startAll(threads);
         sleepMs(getStressTestDurationMs(30 * 1000));
         stop = true;
@@ -134,7 +135,7 @@ public class WriteSkewStressTest {
 
     @Test
     public void whenWriteSkewAllowed_thenWriteSkewPossible() {
-        mode = Mode.normal;
+        mode = Mode.snapshot;
         startAll(threads);
         sleepMs(getStressTestDurationMs(30 * 1000));
         stop = true;
@@ -154,7 +155,7 @@ public class WriteSkewStressTest {
 
     @Test
     public void whenWriteSkewNotAllowed_thenNoWriteSkewPossible() {
-        mode = Mode.withoutWriteSkew;
+        mode = Mode.serialized;
         startAll(threads);
         sleepMs(getStressTestDurationMs(30 * 1000));
         stop = true;
@@ -169,22 +170,22 @@ public class WriteSkewStressTest {
 
     public class TransferThread extends TestThread {
 
-        private final AtomicBlock normal = stm.createTransactionFactoryBuilder()
-                .setWriteSkewAllowed(true)
+        private final AtomicBlock snapshotBlock = stm.createTransactionFactoryBuilder()
+                .setIsolationLevel(IsolationLevel.Snapshot)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
-        private final AtomicBlock noWriteSkew = stm.createTransactionFactoryBuilder()
-                .setWriteSkewAllowed(false)
+        private final AtomicBlock serializedBlock = stm.createTransactionFactoryBuilder()
+                .setIsolationLevel(IsolationLevel.Serializable)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
-        private final AtomicBlock pessimisticReadLockLevel = stm.createTransactionFactoryBuilder()
+        private final AtomicBlock privatizedReadLevelBlock = stm.createTransactionFactoryBuilder()
                 .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
-                .setWriteSkewAllowed(true)
+                .setIsolationLevel(IsolationLevel.Snapshot)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
-        private final AtomicBlock pessimisticWriteLockLevel = stm.createTransactionFactoryBuilder()
+        private final AtomicBlock privatizedWriteLevelBlock = stm.createTransactionFactoryBuilder()
                 .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeWrites)
-                .setWriteSkewAllowed(true)
+                .setIsolationLevel(IsolationLevel.Snapshot)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
 
@@ -202,23 +203,23 @@ public class WriteSkewStressTest {
                 }
 
                 switch (mode) {
-                    case normal:
-                        doItNormal();
+                    case snapshot:
+                        doItWithSnapshot();
                         break;
-                    case withoutWriteSkew:
-                        doItWithNoWriteSkew();
+                    case serialized:
+                        doItWithSerializedBlock();
                         break;
-                    case pessimisticLockLevelRead:
-                        doItWithPessimisticReadLockLevel();
+                    case privatizedReadLevel:
+                        doItWithPrivatizedReadLevel();
                         break;
-                    case pessimisticLockLevelWrite:
-                        doItWithPessimisticWriteLockLevel();
+                    case privatizedWriteLevel:
+                        doItWithPrivatizedWriteLevel();
                         break;
-                    case pessimisticRead:
-                        doItPessimisticRead();
+                    case privatizedRead:
+                        doItWithPrivatizedRead();
                         break;
-                    case pessimisticWrite:
-                        doItPessimisticWrite();
+                    case privatizedWrite:
+                        doItWithPrivatizedWrite();
                         break;
                     default:
                         throw new IllegalStateException();
@@ -228,8 +229,8 @@ public class WriteSkewStressTest {
             }
         }
 
-        private void doItWithPessimisticReadLockLevel() {
-            pessimisticReadLockLevel.execute(new AtomicVoidClosure() {
+        private void doItWithPrivatizedReadLevel() {
+            privatizedReadLevelBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
@@ -238,8 +239,8 @@ public class WriteSkewStressTest {
             });
         }
 
-        private void doItWithPessimisticWriteLockLevel() {
-            pessimisticWriteLockLevel.execute(new AtomicVoidClosure() {
+        private void doItWithPrivatizedWriteLevel() {
+            privatizedWriteLevelBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
@@ -248,8 +249,8 @@ public class WriteSkewStressTest {
             });
         }
 
-        private void doItWithNoWriteSkew() {
-            noWriteSkew.execute(new AtomicVoidClosure() {
+        private void doItWithSerializedBlock() {
+            serializedBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
@@ -258,8 +259,8 @@ public class WriteSkewStressTest {
             });
         }
 
-        private void doItNormal() {
-            normal.execute(new AtomicVoidClosure() {
+        private void doItWithSnapshot() {
+            snapshotBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
@@ -268,8 +269,8 @@ public class WriteSkewStressTest {
             });
         }
 
-        private void doItPessimisticRead() {
-            normal.execute(new AtomicVoidClosure() {
+        private void doItWithPrivatizedRead() {
+            snapshotBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
@@ -278,8 +279,8 @@ public class WriteSkewStressTest {
             });
         }
 
-        private void doItPessimisticWrite() {
-            normal.execute(new AtomicVoidClosure() {
+        private void doItWithPrivatizedWrite() {
+            snapshotBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
