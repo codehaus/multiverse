@@ -8,6 +8,14 @@ package org.multiverse.api;
 public interface TransactionalObject {
 
     /**
+     * Returns the Stm this TransactionalObject is part of. Once a TransactionalObject is created using some
+     * STM, it will never come part of another STM.
+     *
+     * @return the Stm this TransactionalObject is part of. Returned value will never be null.
+     */
+    Stm getStm();
+
+    /**
      * Checks if the TransactionalObject has not been ensured or privatized.
      * <p/>
      * The value could be stale as soon as it is returned.
@@ -15,6 +23,83 @@ public interface TransactionalObject {
      * @return true if the TransactionalObject has not been ensured or privatized.
      */
     boolean isFree();
+
+    /**
+     * Privatizes the transactional object. This means that it can't be read or written by another transaction
+     * (so the provided transaction will have exclusive ownership of it).
+     * <p/>
+     * If the transactional object already has been read, a conflict check will be done. So once privatized,
+     * you have the guarantee that a transaction can commit on this transactional object (although it still
+     * can fail on other transactional objects).
+     * <p/>
+     * The lock acquired will automatically be acquired for the duration of the transaction and automatically
+     * released when the transaction commits or aborts.
+     *
+     * @throws org.multiverse.api.exceptions.NoTransactionFoundException
+     *          if no transaction is found.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
+     */
+    void privatize();
+
+    /**
+     * Privatizes the transactional object using the provided transaction. This means that it can't be read
+     * or written by another transaction (so the provided transaction will have exclusive ownership of it).
+     * <p/>
+     * If the transactional object already has been read, a conflict check will be done. So once privatized,
+     * you have the guarantee that a transaction can commit on this transactional object (although it still
+     * can fail on other transactional objects).
+     * <p/>
+     * The lock acquired will automatically be acquired for the duration of the transaction and automatically
+     * released when the transaction commits or aborts.
+     *
+     * @param tx the transaction used to privatize the transactional object.
+     * @throws NullPointerException if tx is null
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if the transaction isn't in the
+     *                              correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
+     */
+    void privatize(Transaction tx);
+
+    /**
+     * Tries to privatize
+     * <p/>
+     * The lock acquired will automatically be acquired for the duration of the transaction and automatically
+     * released when the transaction commits or aborts.
+     *
+     * @return true if the privatization was a success, false otherwise.
+     * @throws org.multiverse.api.exceptions.NoTransactionFoundException
+     *          if no transaction was found
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if the transaction found was not
+     *          in the correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
+     */
+    boolean tryPrivatize();
+
+    /**
+     * Tries to privatize this TransactionalObject. This call is reentrant, so it doesn't matter if the
+     * TransactionalObject is already privatized by itself. If the TransactionalObject already is ensured
+     * by itself, it will be upgraded to a privatize.
+     * <p/>
+     * Once the privatization is a success, the transaction has exclusive read/write ownership of the
+     * TransactionalObject.
+     * <p/>
+     * If reading the transactional object could cause a read conflict, also false is returned.
+     *
+     * @param tx the
+     * @return true if the privatization is a success, false otherwise.
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if the transaction is not in the
+     *                              correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
+     */
+    boolean tryPrivatize(Transaction tx);
 
     /**
      * Checks if the TransactionalObject is privatized. It could be that it is privatized by the active
@@ -52,30 +137,77 @@ public interface TransactionalObject {
      * <p/>
      * The value could be stale as soon as it is returned.
      *
-     * @return
+     * @return true if the TransactionalObject is privatized by the active transaction.
      * @throws org.multiverse.api.exceptions.NoTransactionFoundException
      *          if no alive transaction is found.
      */
     boolean isPrivatizedBySelf();
 
+    /**
+     * Checks if the TransactionalObject is privatized by the provided transaction.
+     * <p/>
+     * The value could be stale as soon as it is returned.
+     *
+     * @param tx the transaction to check with.
+     * @return true if the TransactionalObject it privatized by the provided transaction, false otherwise.
+     * @throws NullPointerException if tx is null.
+     */
     boolean isPrivatizedBySelf(Transaction tx);
 
+    /**
+     * Checks if the TransactionObject is privatized.
+     * <p/>
+     * The value could be stale as soon as it is returned.
+     *
+     * @return true if the transaction is privatized, false otherwise.
+     */
     boolean isEnsured();
 
+    /**
+     * Checks if the TransactionalObject is ensured by the active transaction.
+     * <p/>
+     * The value could be stale as soon as it is returned.
+     *
+     * @return true if ensured by itself, false otherwise.
+     * @throws org.multiverse.api.exceptions.NoTransactionFoundException
+     *          if no alive transaction is found.
+     */
     boolean isEnsuredBySelf();
 
+    /**
+     * Checks if the TransactionalObject is ensured by the provided transaction.
+     * <p/>
+     * The value could be stale as soon as it is returned.
+     *
+     * @param tx the transaction to check with.
+     * @return true if ensured by self, false otherwise.
+     * @throws NullPointerException if tx is null.
+     */
     boolean isEnsuredBySelf(Transaction tx);
 
+    /**
+     * Checks if the TransactionalObject is ensured by another transaction than the active transaction.
+     * <p/>
+     * The value could be stale as soon as it is returned.
+     *
+     * @return true if the TransactionalObject is ensured by another, false otherwise.
+     * @throws org.multiverse.api.exceptions.NoTransactionFoundException
+     *          if no alive transaction is found
+     */
     boolean isEnsuredByOther();
 
+    /**
+     * Checks if the TransactionalObject is ensured by another transaction than the provided transaction.
+     * If the TransactionalObject is ensured by the provided transaction, false will be returned.
+     * <p/>
+     * The value could be stale as soon as it is returned.
+     *
+     * @param tx the Transaction to check with.
+     * @return true if privatized by another Transaction, false otherwise.
+     * @throws NullPointerException if tx is null.
+     */
     boolean isEnsuredByOther(Transaction tx);
 
-    /**
-     * Returns the Stm this TransactionalObject is part of.
-     *
-     * @return the Stm this TransactionalObject is part of.
-     */
-    Stm getStm();
 
     /**
      * Ensures that when this ref is read in a transaction, no other transaction is able to write to this
@@ -88,7 +220,9 @@ public interface TransactionalObject {
      * The lock acquired will automatically be acquired for the duration of the transaction and automatically
      * released when the transaction commits or aborts.
      *
-     * @throws IllegalStateException
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if the transaction is not in the
+     *          correct state for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
      */
@@ -163,65 +297,6 @@ public interface TransactionalObject {
      */
     boolean tryEnsure(Transaction tx);
 
-    /**
-     * Privatizes the transactional object. This means that it can't be read or written by another transaction
-     * (so the provided transaction will have exclusive ownership of it).
-     * <p/>
-     * If the transactional object already has been read, a conflict check will be done. So once privatized,
-     * you have the guarantee that a transaction can commit on this transactional object (although it still
-     * can fail on other transactional objects).
-     * <p/>
-     * The lock acquired will automatically be acquired for the duration of the transaction and automatically
-     * released when the transaction commits or aborts.
-     *
-     * @throws org.multiverse.api.exceptions.NoTransactionFoundException
-     *          if no transaction is found.
-     */
-    void privatize();
-
-    /**
-     * Privatizes the transactional object using the provided transaction. This means that it can't be read
-     * or written by another transaction (so the provided transaction will have exclusive ownership of it).
-     * <p/>
-     * If the transactional object already has been read, a conflict check will be done. So once privatized,
-     * you have the guarantee that a transaction can commit on this transactional object (although it still
-     * can fail on other transactional objects).
-     * <p/>
-     * The lock acquired will automatically be acquired for the duration of the transaction and automatically
-     * released when the transaction commits or aborts.
-     *
-     * @param tx the transaction used to privatize the transactional object.
-     * @throws NullPointerException if tx is null
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction isn't in the
-     *                              correct state for this operation.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     */
-    void privatize(Transaction tx);
-
-    /**
-     * Tries to privatize
-     * <p/>
-     * The lock acquired will automatically be acquired for the duration of the transaction and automatically
-     * released when the transaction commits or aborts.
-     *
-     * @return true if the privatization was a success, false otherwise.
-     * @throws org.multiverse.api.exceptions.NoTransactionFoundException
-     *          if no transaction was found
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *          if the transaction found was not
-     *          in the correct state for this operation.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     */
-    boolean tryPrivatize();
-
-    /**
-     * @param tx
-     * @return
-     */
-    boolean tryPrivatize(Transaction tx);
 
     /**
      *
