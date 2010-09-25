@@ -36,6 +36,7 @@ import static java.lang.String.format;
  * bit 54-63  : contains readonly count
  * <p/>
  * <p/>
+ * The update lock is the same as the 'ensure' and the commit lock is the same as the privatize lock.
  *
  * @author Peter Veentjer
  */

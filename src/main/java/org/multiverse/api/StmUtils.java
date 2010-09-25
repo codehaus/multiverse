@@ -1,10 +1,13 @@
 package org.multiverse.api;
 
 import org.multiverse.api.closures.*;
+import org.multiverse.api.collections.*;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.api.references.*;
+
+import java.util.Collection;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.getRequiredThreadLocalTransaction;
@@ -12,7 +15,7 @@ import static org.multiverse.api.ThreadLocalTransaction.getRequiredThreadLocalTr
 /**
  * A utility class with convenience methods to access the {@link org.multiverse.api.Stm} or
  * {@link Transaction}. These methods can be imported using the static import for a less
- * ugly (but potentially more confusing) syntax.
+ * ugly syntax.
  *
  * @author Peter Veentjer.
  */
@@ -20,6 +23,71 @@ public class StmUtils {
 
     private final static RefFactory refFactory = getGlobalStmInstance().getDefaultRefFactory();
     private final static AtomicBlock defaultAtomicBlock = getGlobalStmInstance().getDefaultAtomicBlock();
+    private final static CollectionsFactory collectionsFactory = getGlobalStmInstance().getCollectionsFactory();
+
+
+    /**
+     * Creates a new committed TransactionalList that is based on linked nodes using the GlobalStmInstance.
+     *
+     * @param <E> the type of the elements in the list.
+     * @return the created list.
+     */
+    public static <E> TransactionalList<E> newLinkedList(){
+        return collectionsFactory.newLinkedList();
+    }
+
+     /**
+     * Creates a new committed TransactionalList that is based on linked nodes and
+     * is initialized with the given collection and using the GlobalStmInstance.
+     *
+     * @param c   the initial collection.
+     * @param <E> the type of the elements in the list.
+     * @return the created list.
+     * @throws NullPointerException if c is null.
+     */
+    public static <E> TransactionalList<E> newLinkedList(Collection<? extends E> c){
+        return collectionsFactory.newLinkedList(c);
+    }
+
+    public static <E> TransactionalDeque<E> newLinkedDeque(){
+        return collectionsFactory.newLinkedDeque();
+    }
+
+    public static <E> TransactionalDeque<E> newLinkedDeque(Collection<? extends E> c){
+        return collectionsFactory.newLinkedDeque(c);
+    }
+
+    public static <E> TransactionalBlockingDeque<E> newLinkedBlockingDeque(){
+        return collectionsFactory.newLinkedBlockingDeque();
+    }
+
+    public static <E> TransactionalBlockingDeque<E> newLinkedBlockingDeque(int capacity){
+        return collectionsFactory.newLinkedBlockingDeque(capacity);
+    }
+
+    public static <E> TransactionalBlockingDeque<E> newLinkedBlockingDeque(Collection<? extends E> c){
+        return collectionsFactory.newLinkedBlockingDeque(c);
+    }
+
+    public static <E> TransactionalQueue<E> newLinkedQueue(){
+        return collectionsFactory.newLinkedQueue();
+    }
+
+    public static <E> TransactionalQueue<E> newLinkedQueue(Collection<? extends E> c){
+        return collectionsFactory.newLinkedQueue(c);
+    }
+
+    public static <E> TransactionalBlockingQueue<E> newLinkedBlockingQueue(){
+        return collectionsFactory.newLinkedBlockingQueue();
+    }
+
+    public static <E> TransactionalBlockingQueue<E> newLinkedBlockingQueue(int capacity){
+        return collectionsFactory.newLinkedBlockingQueue(capacity);
+    }
+
+    public static <E> TransactionalBlockingQueue<E> newLinkedBlockingQueue(Collection<? extends E> c){
+        return collectionsFactory.newLinkedBlockingQueue(c);
+    }
 
     /**
      * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a

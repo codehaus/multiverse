@@ -98,6 +98,8 @@ performance.
 - transactional treeset
 
 - a reference that always causes a privatization.
+- transactional array
+
 
 todo
 
@@ -178,8 +180,6 @@ and not allowed. So not throw the retry error immediately..
 
 - transactional linked list
 
-- transactional array
-
 - 'size' structure to help with an approximate size for collections
 
 - listeners are not cleaned after abort/commit, so still a potential memory leak
@@ -187,8 +187,6 @@ and not allowed. So not throw the retry error immediately..
 - atomic change methods on ref should deal with listeners
 
 - detection of ref.stm & transaction.stm mismatch
-
-- removal of the locking methods in the betatransaction (were added for backwards compatibility)
 
 - Collection: map
 
@@ -216,7 +214,25 @@ and not allowed. So not throw the retry error immediately..
 
 - every transaction should have a random unit.
 
+- read uncommitted isolation level
+
+- improved testing in the transaction for the ensure functionality
+
+- improved testing in the transaction for read committed isolation level
+
+- the skipreadconflict logic can be made cheaper by mering the config.readlocklevel and config.inconsistentread.
+
+- use a retry policy for re-acquiring lock. atm only spinning is used. 
+
 done
+
+- removal of the locking methods in the betatransaction (were added for backwards compatibility)
+
+- added the newCollection methods to the stmutils.
+
+- added the isolation level and dropped writeskew from configuration
+
+- added the committed read isolation level
 
 - yield and spinning.
 

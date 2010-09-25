@@ -187,6 +187,13 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
                 config.familyName));
     }
 
+    public final NullPointerException abortTryLockWhenNullReference(final TransactionalObject object){
+        abort();
+        return new NullPointerException(
+            format("[%s] Can't tryLock with a null reference",
+                config.familyName));
+    }
+
     public final NullPointerException abortCommuteWhenNullReference(
         final Function function){
 
@@ -212,6 +219,26 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
         return new ReadonlyException(
             format("[%s] Can't commute on '%s' with function '%s' and a readonly transaction ''",
                  config.familyName, toDebugString(object), function));
+    }
+
+    public final IllegalTransactionStateException abortTryLock(final BetaTransactionalObject object) {
+       switch (status) {
+           case PREPARED:
+               abort();
+               return new PreparedTransactionException(
+                   format("[%s] Can't tryLock '%s' using an already prepared transaction",
+                       config.familyName, toDebugString(object)));
+           case ABORTED:
+               return new DeadTransactionException(
+                   format("[%s] Can't tryLock '%s' using an already aborted transaction",
+                       config.familyName, toDebugString(object)));
+           case COMMITTED:
+               return new DeadTransactionException(
+                   format("[%s] Can't tryLock '%s' using already committed transaction",
+                       config.familyName, toDebugString(object)));
+           default:
+               throw new IllegalStateException();
+       }
     }
 
     public final IllegalTransactionStateException abortOpenForRead(final BetaTransactionalObject object) {

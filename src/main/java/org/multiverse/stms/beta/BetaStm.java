@@ -6,6 +6,7 @@ import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.durability.SimpleStorage;
 import org.multiverse.durability.Storage;
 import org.multiverse.sensors.SimpleProfiler;
+import org.multiverse.stms.beta.collections.BetaCollectionsFactory;
 import org.multiverse.stms.beta.collections.BetaTransactionalLinkedList;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.*;

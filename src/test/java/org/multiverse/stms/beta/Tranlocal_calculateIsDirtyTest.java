@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
@@ -33,6 +34,7 @@ public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants {
     }
 
     @Test
+    @Ignore
     public void whenCommuting() {
         BetaLongRef ref = new BetaLongRef(stm, 0);
         Tranlocal tranlocal = ref.___openForCommute(pool);

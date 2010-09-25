@@ -1,7 +1,6 @@
-package org.multiverse.stms.beta;
+package org.multiverse.stms.beta.collections;
 
 import org.multiverse.api.collections.CollectionsFactory;
-import org.multiverse.stms.beta.collections.BetaTransactionalLinkedList;
 
 import java.util.Collection;
 
