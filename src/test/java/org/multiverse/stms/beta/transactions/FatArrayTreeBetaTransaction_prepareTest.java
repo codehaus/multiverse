@@ -102,8 +102,8 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
         assertFalse(write.isCommitted);
     }
 
-    @Test
-    public void whenUpdateAlreadyLockedBySelf() {
+     @Test
+    public void whenContainsPrivatizedWriteBySelf() {
         BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
@@ -112,8 +112,27 @@ public class FatArrayTreeBetaTransaction_prepareTest implements BetaStmConstants
         tx.prepare();
 
         assertIsPrepared(tx);
-
         assertHasCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertSame(tx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertSurplus(1, ref);
+        assertUpdateBiased(ref);
+        assertFalse(write.isCommitted);
+    }
+
+    @Test
+    public void whenContainsEnsuredWriteBySelf() {
+        BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_UPDATE);
+        tx.prepare();
+
+        assertIsPrepared(tx);
+        assertHasNoCommitLock(ref);
+        assertHasUpdateLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(1, ref);

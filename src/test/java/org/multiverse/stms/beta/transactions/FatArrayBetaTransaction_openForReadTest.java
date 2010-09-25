@@ -191,6 +191,7 @@ public class FatArrayBetaTransaction_openForReadTest {
         assertTrue(read.isPermanent);
         assertTrue(read.isCommitted);
         assertHasCommitLock(ref);
+        assertHasNoUpdateLock(ref);
         assertSurplus(1, ref);
         assertReadBiased(ref);
         assertSame(tx, ref.___getLockOwner());
@@ -211,7 +212,8 @@ public class FatArrayBetaTransaction_openForReadTest {
         assertEquals(100, read.value);
         assertTrue(read.isPermanent);
         assertTrue(read.isCommitted);
-        assertHasCommitLock(ref);
+        assertHasNoCommitLock(ref);
+        assertHasUpdateLock(ref);
         assertSurplus(1, ref);
         assertReadBiased(ref);
         assertSame(tx, ref.___getLockOwner());
@@ -219,7 +221,6 @@ public class FatArrayBetaTransaction_openForReadTest {
         assertIsActive(tx);
         assertAttached(tx, read);
     }
-
 
     @Test
     public void whenUpdateBiasedAndPrivatize() {
@@ -254,7 +255,8 @@ public class FatArrayBetaTransaction_openForReadTest {
         assertEquals(100, read.value);
         assertFalse(read.isPermanent);
         assertTrue(read.isCommitted);
-        assertHasCommitLock(ref);
+        assertHasNoCommitLock(ref);
+        assertHasUpdateLock(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertSame(tx, ref.___getLockOwner());

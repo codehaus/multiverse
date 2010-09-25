@@ -75,7 +75,7 @@ public enum IsolationLevel {
 
     @Override
     public String toString() {
-        return name() + "{" +
+        return "IsolationLevel."+name() + "{" +
                 "writeSkewAllowed=" + writeSkewAllowed +
                 ", dirtyReadAllowed=" + dirtyReadAllowed +
                 ", inconsistentReadAllowed=" + inconsistentReadAllowed +

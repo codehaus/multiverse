@@ -333,7 +333,6 @@ public class FatArrayBetaTransaction_openForWriteTest {
     @Test
     public void whenAlreadyOpenedForReadThenUpgraded() {
         BetaLongRef ref = newLongRef(stm);
-        Tranlocal committed = ref.___unsafeLoad();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.openForRead(ref, LOCKMODE_NONE);
@@ -341,7 +340,9 @@ public class FatArrayBetaTransaction_openForWriteTest {
 
         assertIsActive(tx);
         assertOpenedForWrite(ref, write);
-        assertHasCommitLock(ref);        
+        assertHasNoCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertNull(ref.___getLockOwner());
         assertAttached(tx, write);
         assertHasUpdates(tx);
     }

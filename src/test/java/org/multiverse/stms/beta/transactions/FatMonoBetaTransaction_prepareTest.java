@@ -105,7 +105,7 @@ public class FatMonoBetaTransaction_prepareTest {
     }
 
     @Test
-    public void whenUpdateAlreadyLockedBySelf() {
+    public void whenContainsPrivatizedWriteBySelf() {
         BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
@@ -114,8 +114,27 @@ public class FatMonoBetaTransaction_prepareTest {
         tx.prepare();
 
         assertIsPrepared(tx);
-
         assertHasCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertSame(tx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertSurplus(1, ref);
+        assertUpdateBiased(ref);
+        assertFalse(write.isCommitted);
+    }
+
+    @Test
+    public void whenContainsEnsuredWriteBySelf() {
+        BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_UPDATE);
+        tx.prepare();
+
+        assertIsPrepared(tx);
+        assertHasNoCommitLock(ref);
+        assertHasUpdateLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
         assertSurplus(1, ref);
