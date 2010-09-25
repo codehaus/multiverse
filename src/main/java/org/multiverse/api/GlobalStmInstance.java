@@ -46,7 +46,7 @@ public final class GlobalStmInstance {
             throw new IllegalArgumentException(msg, e);
         } catch (ClassCastException e) {
             String msg = format("Failed to initialize GlobalStmInstance through System property '%s' with value '%s'." +
-                    "'%s' is not accessable (it should be public)').",
+                    "'%s' is not accessible (it should be public)').",
                     KEY, factoryMethod, factoryMethod);
             logger.severe(msg);
             throw new IllegalArgumentException(msg, e);

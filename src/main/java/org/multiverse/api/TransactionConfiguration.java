@@ -16,16 +16,20 @@ import java.util.List;
  * @author Peter Veentjer.
  */
 public interface TransactionConfiguration {
+
     /**
-     * Returns the Stm that creates transaction based on this configuration.
+     * Returns the Stm that creates transactions based on this configuration.
      *
      * @return the stm.
      */
     Stm getStm();
 
     /**
-     * 
-     * @return
+     * Gets the IsolationLevel used. With the IsolationLevel you have control on the isolated behavior between
+     * transactions.
+     *
+     * @return the IsolationLevel.
+     * @see TransactionFactoryBuilder#setIsolationLevel(IsolationLevel)
      */
     IsolationLevel getIsolationLevel();
 
@@ -102,7 +106,9 @@ public interface TransactionConfiguration {
     int getSpinCount();
 
     /**
-     * Returns the PessimisticLockLevel used on all reads/writes.
+     * Returns the PessimisticLockLevel used on all reads/writes. The highest level always overrides the
+     * lowest level (so a PessimisticLockLevel.ensureAllReads overrides a non locking individual read and
+     * an ensure overrides PessimisticLockLevel.none).
      *
      * @return the PessimisticLockLevel.
      * @see org.multiverse.api.TransactionFactoryBuilder#setPessimisticLockLevel(PessimisticLockLevel)
@@ -133,7 +139,7 @@ public interface TransactionConfiguration {
      * that a Transaction is able to block waiting for some change.
      *
      * @return true if explicit retry is allowed, false otherwise.
-     * @see TransactionFactoryBuilder#setBlockingAllowed(boolean) (boolean)
+     * @see TransactionFactoryBuilder#setBlockingAllowed(boolean)
      */
     boolean isBlockingAllowed();
 

@@ -50,8 +50,8 @@ public interface TransactionalObject {
      * you have the guarantee that a transaction can commit on this transactional object (although it still
      * can fail on other transactional objects).
      * <p/>
-     * The lock acquired will automatically be acquired for the duration of the transaction and automatically
-     * released when the transaction commits or aborts.
+     * The privatize lock acquired will automatically be acquired for the duration of the transaction and
+     * automatically released when the transaction commits or aborts.
      *
      * @param tx the transaction used to privatize the transactional object.
      * @throws NullPointerException if tx is null
@@ -66,8 +66,9 @@ public interface TransactionalObject {
     /**
      * Tries to privatize
      * <p/>
-     * The lock acquired will automatically be acquired for the duration of the transaction and automatically
-     * released when the transaction commits or aborts.
+     * <p/>
+     * The privatize lock acquired will automatically be acquired for the duration of the transaction and
+     * automatically released when the transaction commits or aborts.
      *
      * @return true if the privatization was a success, false otherwise.
      * @throws org.multiverse.api.exceptions.NoTransactionFoundException
@@ -125,6 +126,9 @@ public interface TransactionalObject {
 
     /**
      * Checks if the TransactionalObject is privatized by another transaction than the provided transaction.
+     * If the transaction is privatized by itself, it will also return false.
+     *
+     * The value could be stale as soon as it is returned (unless is it privatized by itself). 
      *
      * @param tx the transaction to compare with.
      * @return true if the TransactionalObject is privatized by another transaction.
@@ -210,8 +214,9 @@ public interface TransactionalObject {
 
 
     /**
-     * Ensures that when this ref is read in a transaction, no other transaction is able to write to this
-     * reference. Once it is ensured, it is guaranteed to commit (unless the transaction aborts otherwise).
+     * Ensures that when this ref is read in a transaction, no other transaction is able to commit to this
+     * reference or do an ensure. Once it is ensured, it is guaranteed to commit (unless the transaction
+     * aborts otherwise). So other transactions still can read the TransactionalObject.
      * <p/>
      * This call expects a running transaction.
      * <p/>
