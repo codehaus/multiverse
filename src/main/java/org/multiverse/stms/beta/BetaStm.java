@@ -6,7 +6,7 @@ import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.durability.SimpleStorage;
 import org.multiverse.durability.Storage;
 import org.multiverse.sensors.SimpleProfiler;
-import org.multiverse.stms.beta.collections.BetaCollectionsFactory;
+import org.multiverse.stms.beta.collections.BetaTransactionalCollectionsFactory;
 import org.multiverse.stms.beta.collections.BetaTransactionalLinkedList;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.*;
@@ -25,7 +25,7 @@ public final class BetaStm implements Stm {
         return new BetaStm(new BetaStmConfiguration());
     }
 
-    public final BetaCollectionsFactoryImpl collectionsFactory = new BetaCollectionsFactoryImpl();
+    public final BetaTransactionalCollectionsFactoryImpl collectionsFactory = new BetaTransactionalCollectionsFactoryImpl();
     public final AtomicBlock defaultAtomicBlock;
     public final GlobalConflictCounter globalConflictCounter;
     public final int spinCount;
@@ -100,11 +100,11 @@ public final class BetaStm implements Stm {
     }
 
     @Override
-    public BetaCollectionsFactory getCollectionsFactory() {
+    public BetaTransactionalCollectionsFactory getCollectionsFactory() {
         return collectionsFactory;
     }
 
-    public final class BetaCollectionsFactoryImpl implements BetaCollectionsFactory {
+    public final class BetaTransactionalCollectionsFactoryImpl implements BetaTransactionalCollectionsFactory {
         @Override
         public <E> BetaTransactionalLinkedList<E> newLinkedList() {
             throw new TodoException();

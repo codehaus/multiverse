@@ -221,6 +221,26 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
                  config.familyName, toDebugString(object), function));
     }
 
+    public final IllegalTransactionStateException abortEnsureWrites() {
+        switch (status) {
+            case PREPARED:
+                abort();
+                return new PreparedTransactionException(
+                    format("[%s] Can't ensureWrites using an already prepared transaction",
+                        config.familyName));
+            case ABORTED:
+                return new DeadTransactionException(
+                    format("[%s] Can't ensureWrites using an already aborted transaction",
+                        config.familyName));
+            case COMMITTED:
+                return new DeadTransactionException(
+                    format("[%s] Can't ensureWrites using already committed transaction",
+                        config.familyName));
+            default:
+                throw new IllegalStateException();
+      }
+   }
+
     public final IllegalTransactionStateException abortTryLock(final BetaTransactionalObject object) {
        switch (status) {
            case PREPARED:

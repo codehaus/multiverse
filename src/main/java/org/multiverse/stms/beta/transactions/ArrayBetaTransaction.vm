@@ -43,6 +43,33 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         return localConflictCounter;
     }
 
+    public void ensureWrites(){
+        if(status != ACTIVE){
+            throw abortEnsureWrites();
+        }
+
+        if(config.writeLockMode!=LOCKMODE_NONE){
+            return;
+        }
+
+        if(firstFreeIndex == 0){
+            return;
+        }
+
+        final int spinCount = config.spinCount;
+        for(int k=0;k<firstFreeIndex;k++){
+            final Tranlocal tranlocal = array[k];
+
+            if(tranlocal.isCommitted){
+                continue;
+            }
+
+            if(!tranlocal.owner.___tryLockAndCheckConflict(this, spinCount, tranlocal, false)){
+                throw abortOnReadConflict();
+            }
+        }
+    }
+  
     @Override
     public final boolean tryLock(BetaTransactionalObject ref, int lockMode){
        if (status != ACTIVE) {

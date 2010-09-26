@@ -55,6 +55,34 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         throw new TodoException();
     }
 
+    public void ensureWrites(){
+        if(status != ACTIVE){
+            throw abortEnsureWrites();
+        }
+
+        if(config.writeLockMode!=LOCKMODE_NONE){
+            return;
+        }
+
+        if(size == 0){
+            return;
+        }
+
+        final int spinCount = config.spinCount;
+        for(int k=0;k<array.length;k++){
+            final Tranlocal tranlocal = array[k];
+
+            if(tranlocal==null||tranlocal.isCommitted){
+                continue;
+            }
+
+            if(!tranlocal.owner.___tryLockAndCheckConflict(this, spinCount, tranlocal, false)){
+                throw abortOnReadConflict();
+            }
+        }
+    }
+
+
     @Override
     public <E> RefTranlocal<E> openForRead(
         final BetaRef<E> ref, int lockMode) {

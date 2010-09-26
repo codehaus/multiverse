@@ -138,6 +138,19 @@ public interface Transaction {
     void prepare();
 
     /**
+     * Ensures all writes that have been made. If one or more of the ref have been privatized, this call will also
+     * complete successfully.
+     *
+     * @throws org.multiverse.api.exceptions.ReadWriteConflict
+     *          if one or more of the transactional objects
+     *          can't be ensured.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if the transaction is not in the correct
+     *          state for this operation.
+     */
+    void ensureWrites();
+
+    /**
      * Signals that the only possible outcome of the Transaction is one that aborts. When the transaction prepares or
      * commits it checks if the transaction is marked for ___abort. If so, it will automatically aborted. If the
      * transaction is executed inside an AtomicBlock, it is automatically retried.

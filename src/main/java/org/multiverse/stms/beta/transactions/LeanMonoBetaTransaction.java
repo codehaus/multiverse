@@ -37,7 +37,25 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
     public final boolean tryLock(BetaTransactionalObject ref, int lockMode){
         throw new TodoException();
     }
-    
+
+    public void ensureWrites(){
+        if(status != ACTIVE){
+            throw abortEnsureWrites();
+        }
+
+        if(config.writeLockMode!=LOCKMODE_NONE){
+            return;
+        }
+
+        if(attached == null||attached.isCommitted){
+            return;
+        }
+
+        if(!attached.owner.___tryLockAndCheckConflict(this, config.spinCount, attached, false)){
+            throw abortOnReadConflict();
+        }
+    }
+
 
     @Override
     public final <E> RefTranlocal<E> openForRead(

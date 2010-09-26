@@ -1,5 +1,7 @@
 ideas:
 
+- ensure on the transaction? To make all changes 'committable'.
+
 - http://iamchrislewis.tumblr.com/post/239967776/a-look-at-how-scala-compiles-to-java
 
 - selective notifies in transaction, instead of always waking up.. one could provide a function that only wakes

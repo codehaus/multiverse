@@ -8,7 +8,7 @@ import java.util.Collection;
  *
  * @author Peter Veentjer.
  */
-public interface CollectionsFactory {
+public interface TransactionalCollectionsFactory {
 
     /**
      * Creates a new committed TransactionalList that is based on linked nodes.

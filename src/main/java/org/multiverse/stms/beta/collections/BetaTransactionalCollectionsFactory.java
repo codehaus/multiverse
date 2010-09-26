@@ -1,10 +1,10 @@
 package org.multiverse.stms.beta.collections;
 
-import org.multiverse.api.collections.CollectionsFactory;
+import org.multiverse.api.collections.TransactionalCollectionsFactory;
 
 import java.util.Collection;
 
-public interface BetaCollectionsFactory extends CollectionsFactory {
+public interface BetaTransactionalCollectionsFactory extends TransactionalCollectionsFactory {
 
     @Override
     <E> BetaTransactionalLinkedList<E> newLinkedList();

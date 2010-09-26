@@ -46,7 +46,25 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     public final boolean tryLock(BetaTransactionalObject ref, int lockMode){
         throw new TodoException();
     }
-    
+
+    public void ensureWrites(){
+        if(status != ACTIVE){
+            throw abortEnsureWrites();
+        }
+
+        if(config.writeLockMode!=LOCKMODE_NONE){
+            return;
+        }
+
+        if(attached == null||attached.isCommitted){
+            return;
+        }
+
+        if(!attached.owner.___tryLockAndCheckConflict(this, config.spinCount, attached, false)){
+            throw abortOnReadConflict();
+        }
+    }
+
 
     private <E> void flattenCommute(
         final BetaRef<E> ref,

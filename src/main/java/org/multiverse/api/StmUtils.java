@@ -2,6 +2,9 @@ package org.multiverse.api;
 
 import org.multiverse.api.closures.*;
 import org.multiverse.api.collections.*;
+import org.multiverse.api.exceptions.ControlFlowError;
+import org.multiverse.api.exceptions.IllegalTransactionStateException;
+import org.multiverse.api.exceptions.NoTransactionFoundException;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
@@ -21,9 +24,12 @@ import static org.multiverse.api.ThreadLocalTransaction.getRequiredThreadLocalTr
  */
 public class StmUtils {
 
-    private final static RefFactory refFactory = getGlobalStmInstance().getDefaultRefFactory();
-    private final static AtomicBlock defaultAtomicBlock = getGlobalStmInstance().getDefaultAtomicBlock();
-    private final static CollectionsFactory collectionsFactory = getGlobalStmInstance().getCollectionsFactory();
+    private final static RefFactory refFactory
+        = getGlobalStmInstance().getDefaultRefFactory();
+    private final static AtomicBlock defaultAtomicBlock
+        = getGlobalStmInstance().getDefaultAtomicBlock();
+    private final static TransactionalCollectionsFactory collectionsFactory
+        = getGlobalStmInstance().getCollectionsFactory();
 
 
     /**
@@ -392,6 +398,11 @@ public class StmUtils {
      * Prepares the Transaction in the ThreadLocalTransaction transaction.
      * <p/>
      * For more information see {@link Transaction#prepare()}.
+     *
+     * @throws NoTransactionFoundException if no active transaction is found.
+     * @throws IllegalTransactionStateException if the active transaction is not in the correct
+     *                                           state for this operation.
+     * @throws ControlFlowError
      */
     public static void prepare() {
         Transaction tx = getRequiredThreadLocalTransaction();
@@ -401,7 +412,12 @@ public class StmUtils {
     /**
      * Aborts the Transaction in the ThreadLocalTransaction transaction.
      * <p/>
-     * For more information see {@link Transaction#abort()} ()}.
+     * For more information see {@link Transaction#abort()}.
+     *
+     * @throws NoTransactionFoundException if no active transaction is found.
+     * @throws IllegalTransactionStateException if the active transaction is not in the correct
+     *                                           state for this operation.
+     * @throws ControlFlowError
      */
     public static void abort() {
         Transaction tx = getRequiredThreadLocalTransaction();
@@ -409,9 +425,29 @@ public class StmUtils {
     }
 
     /**
+     * Ensures all writes.
+     *
+     * For more information see {@link Transaction#ensureAllWrites()}
+     *
+     * @throws NoTransactionFoundException if no active transaction is found.
+     * @throws IllegalTransactionStateException if the active transaction is not in the correct
+     *                                           state for this operation.
+     * @throws ControlFlowError
+     */
+    public static void ensureWrites(){
+        Transaction tx = getRequiredThreadLocalTransaction();
+        tx.ensureWrites();
+    }
+
+    /**
      * Commits the Transaction in the ThreadLocalTransaction transaction.
      * <p/>
-     * For more information see {@link Transaction#abort()} ()}.
+     * For more information see {@link Transaction#commit()}.
+     *
+     * @throws NoTransactionFoundException if no active transaction is found.
+     * @throws IllegalTransactionStateException if the active transaction is not in the correct
+     *                                           state for this operation.
+     * @throws ControlFlowError                                
      */
     public static void commit() {
         Transaction tx = getRequiredThreadLocalTransaction();
@@ -422,7 +458,6 @@ public class StmUtils {
      * Scheduled an deferred or compensating task on the Transaction in the ThreadLocalTransaction. This task is
      * executed after the transaction commits or aborts.
      * <p/>
-     *
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
      * @throws org.multiverse.api.exceptions.NoTransactionFoundException
@@ -453,7 +488,6 @@ public class StmUtils {
      * Scheduled an deferred task on the Transaction in the ThreadLocalTransaction. This task is executed after
      * the transaction commits and one of the use cases is starting transactions.
      * <p/>
-     *
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
      * @throws org.multiverse.api.exceptions.NoTransactionFoundException
@@ -483,7 +517,6 @@ public class StmUtils {
      * Scheduled an compensating task on the Transaction in the ThreadLocalTransaction. This task is executed after
      * the transaction aborts and one of the use cases is cleaning up non transaction resources like the file system.
      * <p/>
-     *
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
      * @throws org.multiverse.api.exceptions.NoTransactionFoundException
