@@ -425,7 +425,7 @@ public class StmUtils {
     }
 
     /**
-     * Ensures all writes.
+     * Ensures all writes (so you get the guarantee that all writes are able to commit).
      *
      * For more information see {@link Transaction#ensureAllWrites()}
      *

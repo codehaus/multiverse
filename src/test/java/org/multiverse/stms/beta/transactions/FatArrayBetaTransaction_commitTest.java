@@ -657,7 +657,6 @@ public class FatArrayBetaTransaction_commitTest implements BetaStmConstants {
         assertIsAborted(tx2);
     }
 
-
     @Test
     public void whenAbortOnly() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);

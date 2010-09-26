@@ -2,7 +2,6 @@ package org.multiverse.api;
 
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 
 /**
  * All changes on transaction objects must be done through a Transaction. The transaction make sure that changes
@@ -139,7 +138,8 @@ public interface Transaction {
 
     /**
      * Ensures all writes that have been made. If one or more of the ref have been privatized, this call will also
-     * complete successfully.
+     * complete successfully. After this call completes successfully, the transaction still can be used (unlike the
+     * {@link #prepare()}.
      *
      * @throws org.multiverse.api.exceptions.ReadWriteConflict
      *          if one or more of the transactional objects
@@ -155,8 +155,6 @@ public interface Transaction {
      * commits it checks if the transaction is marked for ___abort. If so, it will automatically aborted. If the
      * transaction is executed inside an AtomicBlock, it is automatically retried.
      * <p/>
-     * The abortOnly marker is reset when a {@link #softReset()} or {@link #hardReset()} is done.
-     * <p/>
      * This method is not threadsafe, so can only be called by the thread that used the transaction.
      *
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
@@ -164,37 +162,6 @@ public interface Transaction {
      *          stat for this operation.
      */
     void setAbortOnly();
-
-    /**
-     * Resets the transaction so that it can be reused for another attempt to evaluate the transaction. If
-     * another attempt can be made, the attempt field will be increased.
-     * <p/>
-     * If the Transaction still is active/prepared, it will be aborted first.
-     *
-     * @return true if another attempt can be made, false otherwise.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *          if the Transaction isn't in the correct
-     *          state for this operation.
-     */
-    boolean softReset();
-
-    /**
-     * Resets the transaction so that it can be reused.
-     */
-    void hardReset();
-
-    /**
-     * todo: this operation should only be allowed when it is in the new state?
-     * <p/>
-     * todo: instead of accepting a BetaTransactionConfiguration, TransactionConfiguration should be used.
-     *
-     * @param transactionConfiguration the TransactionConfiguration to initialize the Transaction with.
-     * @throws NullPointerException if transactionConfiguration is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              when the transaction isn't in the
-     *                              correct state for this operation.
-     */
-    void init(BetaTransactionConfiguration transactionConfiguration);
 
     /**
      * Registers a permanent TransactionLifecycleListener.
@@ -217,22 +184,7 @@ public interface Transaction {
      */
     long getRemainingTimeoutNs();
 
-    /**
-     * Sets the remaining timeout in nanoseconds. Long.MAX_VALUE indicates that no timeout should be used. When
-     * the Transaction is used for the first attempt, the remaining timeout is getAndSet to the
-     * {@link org.multiverse.api.TransactionConfiguration#getTimeoutNs()}.
-     * <p/>
-     * This normally isn't called from the user code, it is task of the stm internals and the
-     * transaction management to use the timeout.
-     *
-     * @param timeoutNs the timeout.
-     * @throws IllegalArgumentException if timeout smaller than 0 or when the timeout is larger than the previous
-     *                                  remaining timeout. This is done to prevent that the timeout is increased
-     *                                  to a value that is in conflict with the {@link TransactionConfiguration}.
-     */
-    void setRemainingTimeoutNs(long timeoutNs);
-
-    /**
+      /**
      * Registers the changeListener to all reads done by the transaction and aborts the transaction. This functionality
      * is needed for creating blocking transactions; transactions that are able to wait for change. In the STM literature
      * this is know as the 'retry' and 'orelse' functionality.
