@@ -5,13 +5,18 @@ package org.multiverse.api.predicates;
  *
  * @author Peter Veentjer.
  */
-public interface BooleanPredicate{
+public abstract class BooleanPredicate implements Predicate<Boolean>{
 
     /**
-     * Evaluates the predicate.
+     * Evaluates the predicate
      *
-     * @param value the value to evaluate.
+     * @param current the current value.
      * @return true or false.
      */
-    boolean evaluate(boolean value);
+    public abstract boolean evaluate(boolean current);
+
+    @Override
+    public final boolean evaluate(Boolean arg) {
+        return evaluate((boolean) arg);
+    }
 }

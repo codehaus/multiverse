@@ -5,13 +5,18 @@ package org.multiverse.api.predicates;
  *
  * @author Peter Veentjer.
  */
-public interface IntPredicate{
+public abstract class IntPredicate implements Predicate<Integer>{
 
     /**
-     * Evaluates the predicate.
+     * Evaluates the predicate
      *
-     * @param value the value to evaluate.
+     * @param current the current value.
      * @return true or false.
      */
-    boolean evaluate(int value);
+    public abstract boolean evaluate(int current);
+
+    @Override
+    public final boolean evaluate(Integer arg) {
+        return evaluate((int) arg);
+    }
 }

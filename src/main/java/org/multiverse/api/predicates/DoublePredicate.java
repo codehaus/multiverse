@@ -5,13 +5,18 @@ package org.multiverse.api.predicates;
  *
  * @author Peter Veentjer.
  */
-public interface DoublePredicate{
+public abstract class DoublePredicate implements Predicate<Double>{
 
     /**
-     * Evaluates the predicate.
+     * Evaluates the predicate
      *
-     * @param value the value to evaluate.
+     * @param current the current value.
      * @return true or false.
      */
-    boolean evaluate(double value);
+    public abstract boolean evaluate(double current);
+
+    @Override
+    public final boolean evaluate(Double arg) {
+        return evaluate((double) arg);
+    }
 }

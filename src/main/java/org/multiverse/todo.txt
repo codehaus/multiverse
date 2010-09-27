@@ -228,6 +228,8 @@ and not allowed. So not throw the retry error immediately..
 
 done
 
+- Predicates modelled in same way as Function
+
 - functions are not generated
 
 - removal of the locking methods in the betatransaction (were added for backwards compatibility)

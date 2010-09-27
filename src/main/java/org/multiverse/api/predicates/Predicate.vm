@@ -5,9 +5,9 @@ package org.multiverse.api.predicates;
  *
  * @author Peter Veentjer.
  */
+#if(${transactionalObject.referenceInterface} eq 'Ref')
 public interface ${transactionalObject.predicateClass}${transactionalObject.typeParameter}{
 
-#if(${transactionalObject.referenceInterface} eq 'Ref')
     ${transactionalObject.predicateClass} IS_NOT_NULL_PREDICATE = new ${transactionalObject.predicateClass}(){
         public boolean evaluate(Object value){
             return value != null;
@@ -20,7 +20,6 @@ public interface ${transactionalObject.predicateClass}${transactionalObject.type
         }
     };
 
-#end
     /**
      * Evaluates the predicate.
      *
@@ -29,3 +28,20 @@ public interface ${transactionalObject.predicateClass}${transactionalObject.type
      */
     boolean evaluate(${transactionalObject.type} value);
 }
+#else
+public abstract class ${transactionalObject.predicateClass} implements Predicate<${transactionalObject.objectType}>{
+
+    /**
+     * Evaluates the predicate
+     *
+     * @param current the current value.
+     * @return true or false.
+     */
+    public abstract boolean evaluate(${transactionalObject.type} current);
+
+    @Override
+    public final boolean evaluate(${transactionalObject.objectType} arg) {
+        return evaluate((${transactionalObject.type}) arg);
+    }
+}
+#end

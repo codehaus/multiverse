@@ -5,13 +5,18 @@ package org.multiverse.api.predicates;
  *
  * @author Peter Veentjer.
  */
-public interface LongPredicate{
+public abstract class LongPredicate implements Predicate<Long>{
 
     /**
-     * Evaluates the predicate.
+     * Evaluates the predicate
      *
-     * @param value the value to evaluate.
+     * @param current the current value.
      * @return true or false.
      */
-    boolean evaluate(long value);
+    public abstract boolean evaluate(long current);
+
+    @Override
+    public final boolean evaluate(Long arg) {
+        return evaluate((long) arg);
+    }
 }
