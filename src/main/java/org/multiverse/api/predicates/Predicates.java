@@ -9,7 +9,7 @@ public class Predicates {
 
     private final static Predicate IsNullPredicate = new Predicate() {
         public boolean evaluate(Object value) {
-            return value != null;
+            return value == null;
         }
     };
 
@@ -19,10 +19,20 @@ public class Predicates {
         }
     };
 
+    /**
+     * Creates a Predicate that checks if the passed object is null. You will get an existing instance.
+     *
+     * @return the Predicate.
+     */
     public static Predicate newIsNullPredicate() {
         return IsNullPredicate;
     }
 
+    /**
+     * Creates a Predicate that checks if the passed object is not null. You will get an existing instance.
+     *
+     * @return the Predicate.
+     */
     public static Predicate newIsNotNullPredicate() {
         return IsNotNullPredicate;
     }

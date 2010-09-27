@@ -15,16 +15,34 @@ public class Functions {
 
     private static final LongFunction decOneLongFunction = new IncLongFunction(-1);
 
+    /**
+     * Creates a identity IntFunction (a function that returns its input value). You will receive an existing
+     * instance.
+     *
+     * @return the create identity IntFunction.
+     */
     public static IntFunction newIntIdentityFunction() {
         return identityIntFunction;
     }
 
+    /**
+     * Creates a identity LongFunction (a function that returns its input value). You will receive an existing
+     * instance.
+     *
+     * @return the create identity LongFunction.
+     */
     public static LongFunction newLongIdentityFunction() {
         return identityLongFunction;
     }
 
-    public static IntFunction newIncIntFunction(int increment) {
-        switch (increment) {
+    /**
+     * Creates a IntFunction that increments. For the -1, 0 and 1 you get an already existing instance.
+     *
+     * @param amount the value to increment with. A negative value does a decrement.
+     * @return the create identity IntFunction.
+     */
+    public static IntFunction newIncIntFunction(int amount) {
+        switch (amount) {
             case 0:
                 return identityIntFunction;
             case 1:
@@ -32,24 +50,31 @@ public class Functions {
             case -1:
                 return decOneIntFunction;
             default:
-                return new IncIntFunction(increment);
+                return new IncIntFunction(amount);
         }
     }
 
-    public static LongFunction newIncLongFunction(long increment) {
-        if (increment == 0) {
+    /**
+     * Creates a LongFunction that increments with the given amount. For the -1, 0 and 1 you
+     * get an already existing instance.
+     *
+     * @param amount the value to increment with. A negative value does a decrement.
+     * @return the create identity IntFunction.
+     */
+    public static LongFunction newIncLongFunction(long amount) {
+        if (amount == 0) {
             return identityLongFunction;
         }
 
-        if (increment == 1) {
+        if (amount == 1) {
             return incOneLongFunction;
         }
 
-        if (increment == -1) {
+        if (amount == -1) {
             return decOneLongFunction;
         }
 
-        return new IncLongFunction(increment);
+        return new IncLongFunction(amount);
     }
 
     private static final IntFunction identityIntFunction = new IntFunction() {
