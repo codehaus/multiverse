@@ -8,18 +8,6 @@ package org.multiverse.api.predicates;
 #if(${transactionalObject.referenceInterface} eq 'Ref')
 public interface ${transactionalObject.predicateClass}${transactionalObject.typeParameter}{
 
-    ${transactionalObject.predicateClass} IS_NOT_NULL_PREDICATE = new ${transactionalObject.predicateClass}(){
-        public boolean evaluate(Object value){
-            return value != null;
-        }
-    };
-
-    ${transactionalObject.predicateClass} IS_NULL_PREDICATE = new ${transactionalObject.predicateClass}(){
-        public boolean evaluate(Object value){
-            return value == null;
-        }
-    };
-
     /**
      * Evaluates the predicate.
      *

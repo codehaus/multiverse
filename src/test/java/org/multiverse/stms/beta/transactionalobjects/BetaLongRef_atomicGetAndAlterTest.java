@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.LockedException;
-import org.multiverse.api.functions.IncLongFunction;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConfiguration;
@@ -33,7 +33,7 @@ public class BetaLongRef_atomicGetAndAlterTest {
     public void whenSuccess() {
         BetaLongRef ref = newLongRef(stm, 2);
 
-        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        LongFunction function = Functions.newIncLongFunction(1);
         long result = ref.atomicGetAndAlter(function);
 
         assertEquals(2, result);
@@ -71,7 +71,7 @@ public class BetaLongRef_atomicGetAndAlterTest {
         setThreadLocalTransaction(tx);
         ref.set(10);
 
-        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        LongFunction function = Functions.newIncLongFunction(1);
         long result = ref.atomicGetAndAlter(function);
 
         tx.abort();

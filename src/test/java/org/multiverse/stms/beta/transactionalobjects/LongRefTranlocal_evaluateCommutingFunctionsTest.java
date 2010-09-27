@@ -2,7 +2,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.functions.IncLongFunction;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
@@ -46,7 +46,7 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
-        tranlocal.addCommutingFunction(IncLongFunction.INSTANCE_INC_ONE, pool);
+        tranlocal.addCommutingFunction(Functions.newIncLongFunction(1), pool);
         tranlocal.read = committed;
         tranlocal.evaluateCommutingFunctions(pool);
 
@@ -64,9 +64,9 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
-        tranlocal.addCommutingFunction(IncLongFunction.INSTANCE_INC_ONE, pool);
-        tranlocal.addCommutingFunction(IncLongFunction.INSTANCE_INC_ONE, pool);
-        tranlocal.addCommutingFunction(IncLongFunction.INSTANCE_INC_ONE, pool);
+        tranlocal.addCommutingFunction(Functions.newIncLongFunction(1), pool);
+        tranlocal.addCommutingFunction(Functions.newIncLongFunction(1), pool);
+        tranlocal.addCommutingFunction(Functions.newIncLongFunction(1), pool);
         tranlocal.read = committed;
         tranlocal.evaluateCommutingFunctions(pool);
 

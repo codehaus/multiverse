@@ -7,7 +7,7 @@ import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.exceptions.ReadonlyException;
-import org.multiverse.api.functions.IncLongFunction;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.orec.Orec;
@@ -387,7 +387,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongFunction function = new IncLongFunction();
+        LongFunction function = Functions.newIncLongFunction(1);
         tx.commute(ref, function);
 
         LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
@@ -419,7 +419,7 @@ public class FatArrayTreeBetaTransaction_openForWriteTest {
         otherTx.openForRead(ref, LOCKMODE_COMMIT);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongFunction function = new IncLongFunction();
+        LongFunction function = Functions.newIncLongFunction(1);
         tx.commute(ref, function);
 
         try {

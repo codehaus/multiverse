@@ -9,7 +9,7 @@ import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.api.functions.IncLongFunction;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
@@ -655,7 +655,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
         BetaLongRef ref = newLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
-        tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
+        tx.commute(ref, Functions.newIncLongFunction(1));
         tx.commit();
 
         assertIsCommitted(tx);
@@ -672,7 +672,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
         BetaLongRef ref = newLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
-        tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
+        tx.commute(ref, Functions.newIncLongFunction(1));
         tx.commit();
 
         assertIsCommitted(tx);
@@ -694,7 +694,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
         otherTx.openForWrite(ref2, LOCKMODE_NONE).value++;
         otherTx.commit();
 
-        tx.commute(ref2, IncLongFunction.INSTANCE_INC_ONE);
+        tx.commute(ref2, Functions.newIncLongFunction(1));
         tx.commit();
 
         assertIsCommitted(tx);
@@ -715,9 +715,9 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
 
         BetaLongRef ref = newLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(config);
-        tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
-        tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
-        tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
+        tx.commute(ref, Functions.newIncLongFunction(1));
+        tx.commute(ref, Functions.newIncLongFunction(1));
+        tx.commute(ref, Functions.newIncLongFunction(1));
         tx.commit();
 
         assertIsCommitted(tx);
@@ -731,7 +731,7 @@ public class FatMonoBetaTransaction_commitTest implements BetaStmConstants {
     public void whenCommuteAndLockedByOtherTransaction_thenWriteConflict() {
         BetaLongRef ref = newLongRef(stm);
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.commute(ref, IncLongFunction.INSTANCE_INC_ONE);
+        tx.commute(ref, Functions.newIncLongFunction(1));
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.privatize(otherTx);

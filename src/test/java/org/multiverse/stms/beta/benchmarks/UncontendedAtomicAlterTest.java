@@ -1,7 +1,8 @@
 package org.multiverse.stms.beta.benchmarks;
 
 import org.multiverse.TestThread;
-import org.multiverse.api.functions.IncLongFunction;
+import org.multiverse.api.functions.Functions;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
@@ -93,7 +94,7 @@ public class UncontendedAtomicAlterTest {
             BetaLongRef ref = newLongRef(stm, -1);
 
             long startMs = System.currentTimeMillis();
-            IncLongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+            LongFunction function = Functions.newIncLongFunction(0);
             for (long k = 0; k < transactionCount; k++) {
                 ref.atomicAlterAndGet(function);
             }

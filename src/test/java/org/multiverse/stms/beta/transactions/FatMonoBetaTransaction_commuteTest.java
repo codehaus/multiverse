@@ -7,7 +7,7 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
-import org.multiverse.api.functions.IncLongFunction;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -106,7 +106,7 @@ public class FatMonoBetaTransaction_commuteTest {
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
-        tx.commute(ref, new IncLongFunction());
+        tx.commute(ref, Functions.newIncLongFunction(1));
 
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
         assertIsActive(tx);
@@ -127,7 +127,7 @@ public class FatMonoBetaTransaction_commuteTest {
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
-        tx.commute(ref, new IncLongFunction());
+        tx.commute(ref, Functions.newIncLongFunction(1));
 
         assertIsActive(tx);
         assertSame(ref, tranlocal.owner);
@@ -152,7 +152,7 @@ public class FatMonoBetaTransaction_commuteTest {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
         BetaLongRef ref = new BetaLongRef(tx);
         tx.openForConstruction(ref);
-        tx.commute(ref, new IncLongFunction());
+        tx.commute(ref, Functions.newIncLongFunction(1));
 
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
 

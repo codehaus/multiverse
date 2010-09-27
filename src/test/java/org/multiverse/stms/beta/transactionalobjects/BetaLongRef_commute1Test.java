@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.api.functions.IncLongFunction;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -30,7 +30,7 @@ public class BetaLongRef_commute1Test {
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
-        LongFunction function = new IncLongFunction(1);
+        LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
         LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
@@ -106,7 +106,7 @@ public class BetaLongRef_commute1Test {
     public void whenNoTransactionAvailable_thenExecutedAtomically() {
         BetaLongRef ref = newLongRef(stm, 2);
 
-        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
         assertSurplus(0, ref);
@@ -124,7 +124,7 @@ public class BetaLongRef_commute1Test {
         setThreadLocalTransaction(tx);
         tx.commit();
 
-        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
         assertIsCommitted(tx);
@@ -144,7 +144,7 @@ public class BetaLongRef_commute1Test {
         setThreadLocalTransaction(tx);
         tx.abort();
 
-        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
         assertIsAborted(tx);
@@ -165,7 +165,7 @@ public class BetaLongRef_commute1Test {
         setThreadLocalTransaction(tx);
         tx.prepare();
 
-        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        LongFunction function = Functions.newIncLongFunction(1);
         try {
             ref.commute(function);
             fail();
@@ -191,7 +191,7 @@ public class BetaLongRef_commute1Test {
         setThreadLocalTransaction(tx);
 
         ref.ensure();
-        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
@@ -224,7 +224,7 @@ public class BetaLongRef_commute1Test {
         setThreadLocalTransaction(tx);
 
         ref.privatize();
-        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
@@ -260,7 +260,7 @@ public class BetaLongRef_commute1Test {
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.ensure(otherTx);
 
-        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
@@ -299,7 +299,7 @@ public class BetaLongRef_commute1Test {
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.privatize(otherTx);
 
-        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);

@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.functions.IncLongFunction;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -71,7 +71,7 @@ public class BetaLongRef_alterAndGet1Test {
     public void whenActiveTransactionAvailable() {
         BetaLongRef ref = newLongRef(stm);
 
-        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        LongFunction function = Functions.newIncLongFunction(1);
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
@@ -107,7 +107,7 @@ public class BetaLongRef_alterAndGet1Test {
     @Test
     public void whenNoTransactionAvailable_thenExecutedAtomically() {
         BetaLongRef ref = newLongRef(stm);
-        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        LongFunction function = Functions.newIncLongFunction(1);
 
         long result = ref.alterAndGet(function);
 
@@ -126,7 +126,7 @@ public class BetaLongRef_alterAndGet1Test {
         tx.commit();
 
         BetaLongRef ref = newLongRef(stm);
-        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        LongFunction function = Functions.newIncLongFunction(1);
 
         long result = ref.alterAndGet(function);
 
@@ -146,7 +146,7 @@ public class BetaLongRef_alterAndGet1Test {
         tx.abort();
 
         BetaLongRef ref = newLongRef(stm);
-        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        LongFunction function = Functions.newIncLongFunction(1);
 
         long result = ref.alterAndGet(function);
 

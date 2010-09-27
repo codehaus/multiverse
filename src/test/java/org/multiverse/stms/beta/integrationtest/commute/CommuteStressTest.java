@@ -6,7 +6,7 @@ import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicLongClosure;
-import org.multiverse.api.functions.IncLongFunction;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.FatArrayTreeBetaTransactionFactory;
 import org.multiverse.stms.beta.LeanBetaAtomicBlock;
@@ -88,7 +88,7 @@ public class CommuteStressTest {
                 public long execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
                     for (int k = 0; k < refs.length; k++) {
-                        btx.commute(refs[k], IncLongFunction.INSTANCE_INC_ONE);
+                        btx.commute(refs[k], Functions.newIncLongFunction(1));
                     }
                     return refs.length;
                 }

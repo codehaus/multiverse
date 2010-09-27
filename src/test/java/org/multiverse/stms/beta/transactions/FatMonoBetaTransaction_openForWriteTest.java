@@ -5,7 +5,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.exceptions.*;
-import org.multiverse.api.functions.IncLongFunction;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
@@ -570,7 +570,7 @@ public class FatMonoBetaTransaction_openForWriteTest implements BetaStmConstants
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongFunction function = new IncLongFunction();
+        LongFunction function = Functions.newIncLongFunction(1);
         tx.commute(ref, function);
 
         LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
@@ -601,7 +601,7 @@ public class FatMonoBetaTransaction_openForWriteTest implements BetaStmConstants
         ref.privatize(otherTx);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongFunction function = new IncLongFunction();
+        LongFunction function = Functions.newIncLongFunction(1);
         tx.commute(ref, function);
 
         try {

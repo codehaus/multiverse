@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.api.functions.IncLongFunction;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
@@ -186,7 +186,7 @@ public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
         ref.ensure(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongFunction function = IncLongFunction.INSTANCE_INC_ONE;
+        LongFunction function = Functions.newIncLongFunction(1);
         ref.alterAndGet(tx, function);
 
         try {

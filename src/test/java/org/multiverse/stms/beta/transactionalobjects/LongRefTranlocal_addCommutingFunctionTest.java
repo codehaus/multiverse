@@ -2,7 +2,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.functions.IncLongFunction;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
@@ -27,13 +27,13 @@ public class LongRefTranlocal_addCommutingFunctionTest {
     public void whenFirstAddition() {
         BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
-        tranlocal.addCommutingFunction(IncLongFunction.INSTANCE_INC_ONE, pool);
+        tranlocal.addCommutingFunction(Functions.newIncLongFunction(1), pool);
 
         assertFalse(tranlocal.isCommitted);
         assertTrue(tranlocal.isCommuting);
         assertEquals(0, tranlocal.value);
         assertNull(tranlocal.read);
-        assertHasCommutingFunctions(tranlocal, IncLongFunction.INSTANCE_INC_ONE);
+        assertHasCommutingFunctions(tranlocal, Functions.newIncLongFunction(1));
     }
 
     @Test
