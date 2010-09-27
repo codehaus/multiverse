@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.api.functions.Function;
 import org.multiverse.api.functions.LongFunction;
+import org.multiverse.api.predicates.LongPredicate;
 import org.multiverse.stms.beta.BetaObjectPool;
 
 /**
@@ -16,6 +17,7 @@ public final class LongRefTranlocal extends Tranlocal{
     public final static LongRefTranlocal LOCKED = new LongRefTranlocal(null,true);
 
     public long value;
+    public LongPredicate[] validators;    
     public CallableNode headCallable;
 
     public LongRefTranlocal(BetaLongRef ref){
@@ -36,6 +38,7 @@ public final class LongRefTranlocal extends Tranlocal{
         }
 
         tranlocal.read = this;
+        tranlocal.validators = validators;
         tranlocal.value = value;
         return tranlocal;
     }
@@ -87,6 +90,7 @@ public final class LongRefTranlocal extends Tranlocal{
         tranlocal.isCommuting = true;
         tranlocal.read = this;
         tranlocal.value = value;
+        tranlocal.validators = validators;
         return tranlocal;
     }
 

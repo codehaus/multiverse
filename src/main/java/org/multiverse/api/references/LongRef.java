@@ -3,6 +3,7 @@ package org.multiverse.api.references;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionalObject;
 import org.multiverse.api.functions.LongFunction;
+import org.multiverse.api.predicates.LongPredicate;
 
 /**
  * A transactional reference for a long. No boxing is needed when this reference is used (unlike
@@ -12,6 +13,12 @@ import org.multiverse.api.functions.LongFunction;
  * @see org.multiverse.api.references.Ref
  */
 public interface LongRef extends TransactionalObject {
+
+    void addDeferredValidator(LongPredicate predicate);
+
+    void addDeferredValidator(Transaction tx, LongPredicate predicate);
+
+    void atomicAddDeferredValidator(LongPredicate predicate);
 
     /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function

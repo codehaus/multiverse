@@ -2,10 +2,11 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.*;
 import org.multiverse.api.*;
-import org.multiverse.api.references.*;
 import org.multiverse.api.blocking.*;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.*;
+import org.multiverse.api.predicates.*;
+import org.multiverse.api.references.*;
 import org.multiverse.stms.beta.*;
 import org.multiverse.stms.beta.conflictcounters.*;
 import org.multiverse.stms.beta.orec.*;
@@ -518,6 +519,50 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
 #if(${transactionalObject.isReference})
+    @Override
+    public void addDeferredValidator(${transactionalObject.predicateClass}${transactionalObject.typeParameter} validator){
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx != null && tx.isAlive()){
+            addDeferredValidator((BetaTransaction)tx, validator);
+            return;
+        }
+
+        atomicAddDeferredValidator(validator);
+    }
+
+    @Override
+    public void addDeferredValidator(Transaction tx, ${transactionalObject.predicateClass}${transactionalObject.typeParameter} validator){
+        addDeferredValidator((BetaTransaction)tx, validator);
+    }
+
+    public void addDeferredValidator(BetaTransaction tx, ${transactionalObject.predicateClass}${transactionalObject.typeParameter} validator){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        if(validator == null){
+            tx.abort();
+            throw new NullPointerException();
+        }
+
+        ${transactionalObject.tranlocal} write= tx.openForWrite(this, LOCKMODE_NONE);
+        if(write.validators == null){
+            write.validators = new ${transactionalObject.predicateClass}[1];
+            write.validators[0]=validator;
+        }else{
+            throw new TodoException();
+        }        
+    }
+
+    @Override
+    public void atomicAddDeferredValidator(${transactionalObject.predicateClass}${transactionalObject.typeParameter} validator){
+        if(validator == null){
+            throw new NullPointerException();
+        }
+        throw new TodoException();
+    }
+
 #if(${transactionalObject.isNumber})
     @Override
     public final ${transactionalObject.type} atomicGetAndIncrement(final ${transactionalObject.type} amount){

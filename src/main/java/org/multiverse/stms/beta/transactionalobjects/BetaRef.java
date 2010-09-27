@@ -8,6 +8,7 @@ import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.exceptions.NoTransactionFoundException;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.Function;
+import org.multiverse.api.predicates.Predicate;
 import org.multiverse.api.references.Ref;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
@@ -508,6 +509,50 @@ public final class BetaRef<E>
 
             return REGISTRATION_NOT_NEEDED;
         }
+    }
+
+    @Override
+    public void addDeferredValidator(Predicate<E> validator){
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx != null && tx.isAlive()){
+            addDeferredValidator((BetaTransaction)tx, validator);
+            return;
+        }
+
+        atomicAddDeferredValidator(validator);
+    }
+
+    @Override
+    public void addDeferredValidator(Transaction tx, Predicate<E> validator){
+        addDeferredValidator((BetaTransaction)tx, validator);
+    }
+
+    public void addDeferredValidator(BetaTransaction tx, Predicate<E> validator){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        if(validator == null){
+            tx.abort();
+            throw new NullPointerException();
+        }
+
+        RefTranlocal write= tx.openForWrite(this, LOCKMODE_NONE);
+        if(write.validators == null){
+            write.validators = new Predicate[1];
+            write.validators[0]=validator;
+        }else{
+            throw new TodoException();
+        }        
+    }
+
+    @Override
+    public void atomicAddDeferredValidator(Predicate<E> validator){
+        if(validator == null){
+            throw new NullPointerException();
+        }
+        throw new TodoException();
     }
 
     @Override

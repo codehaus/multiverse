@@ -26,7 +26,6 @@ public class StmUtils {
     private final static TransactionalCollectionsFactory collectionsFactory
         = getGlobalStmInstance().getCollectionsFactory();
 
-
     /**
      * Creates a new committed TransactionalList that is based on linked nodes using the GlobalStmInstance.
      *
@@ -278,7 +277,7 @@ public class StmUtils {
     /**
      * Ensures all writes (so you get the guarantee that all writes are able to commit).
      *
-     * For more information see {@link Transaction#ensureAllWrites()}
+     * For more information see {@link Transaction#ensureWrites()}
      *
      * @throws NoTransactionFoundException if no active transaction is found.
      * @throws IllegalTransactionStateException if the active transaction is not in the correct

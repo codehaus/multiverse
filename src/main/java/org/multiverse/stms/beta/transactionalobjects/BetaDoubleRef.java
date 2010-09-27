@@ -8,6 +8,7 @@ import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.exceptions.NoTransactionFoundException;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.DoubleFunction;
+import org.multiverse.api.predicates.DoublePredicate;
 import org.multiverse.api.references.DoubleRef;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
@@ -508,6 +509,50 @@ public  class BetaDoubleRef
 
             return REGISTRATION_NOT_NEEDED;
         }
+    }
+
+    @Override
+    public void addDeferredValidator(DoublePredicate validator){
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx != null && tx.isAlive()){
+            addDeferredValidator((BetaTransaction)tx, validator);
+            return;
+        }
+
+        atomicAddDeferredValidator(validator);
+    }
+
+    @Override
+    public void addDeferredValidator(Transaction tx, DoublePredicate validator){
+        addDeferredValidator((BetaTransaction)tx, validator);
+    }
+
+    public void addDeferredValidator(BetaTransaction tx, DoublePredicate validator){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        if(validator == null){
+            tx.abort();
+            throw new NullPointerException();
+        }
+
+        DoubleRefTranlocal write= tx.openForWrite(this, LOCKMODE_NONE);
+        if(write.validators == null){
+            write.validators = new DoublePredicate[1];
+            write.validators[0]=validator;
+        }else{
+            throw new TodoException();
+        }        
+    }
+
+    @Override
+    public void atomicAddDeferredValidator(DoublePredicate validator){
+        if(validator == null){
+            throw new NullPointerException();
+        }
+        throw new TodoException();
     }
 
     @Override

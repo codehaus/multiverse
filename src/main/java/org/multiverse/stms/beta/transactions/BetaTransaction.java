@@ -356,7 +356,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     }
 
     @Override
-    public final int getAttempt() {
+    public final int getAttempt() {        
         return attempt;
     }
 
@@ -383,7 +383,19 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
         return remainingTimeoutNs;
     }
 
-    @Override
+    /**
+     * Sets the remaining timeout in nanoseconds. Long.MAX_VALUE indicates that no timeout should be used. When
+     * the Transaction is used for the first attempt, the remaining timeout is getAndSet to the
+     * {@link org.multiverse.api.TransactionConfiguration#getTimeoutNs()}.
+     * <p/>
+     * This normally isn't called from the user code, it is task of the stm internals and the
+     * transaction management to use the timeout.
+     *
+     * @param timeoutNs the timeout.
+     * @throws IllegalArgumentException if timeout smaller than 0 or when the timeout is larger than the previous
+     *                                  remaining timeout. This is done to prevent that the timeout is increased
+     *                                  to a value that is in conflict with the {@link TransactionConfiguration}.
+     */    
     public final void setRemainingTimeoutNs(long timeoutNs) {
         if (timeoutNs > remainingTimeoutNs) {
             throw new IllegalArgumentException();
@@ -426,21 +438,6 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     public abstract boolean softReset();
 
     public abstract void hardReset();
-
-   /**
-    * Sets the remaining timeout in nanoseconds. Long.MAX_VALUE indicates that no timeout should be used. When
-    * the Transaction is used for the first attempt, the remaining timeout is getAndSet to the
-    * {@link org.multiverse.api.TransactionConfiguration#getTimeoutNs()}.
-    * <p/>
-    * This normally isn't called from the user code, it is task of the stm internals and the
-    * transaction management to use the timeout.
-    *
-    * @param timeoutNs the timeout.
-    * @throws IllegalArgumentException if timeout smaller than 0 or when the timeout is larger than the previous
-    *                                  remaining timeout. This is done to prevent that the timeout is increased
-    *                                  to a value that is in conflict with the {@link TransactionConfiguration}.
-    */
-    public abstract void setRemainingTimeoutNs(long timeoutNs);
 
     /**
      *

@@ -3,6 +3,7 @@ package org.multiverse.api.references;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionalObject;
 import org.multiverse.api.functions.Function;
+import org.multiverse.api.predicates.Predicate;
 
 /**
  * A Transactional Reference comparable to the <a href="http://clojure.org/refs">Clojure Ref</a>.
@@ -11,6 +12,11 @@ import org.multiverse.api.functions.Function;
  */
 public interface Ref<E> extends TransactionalObject {
 
+    void addDeferredValidator(Predicate<E> predicate);
+
+    void addDeferredValidator(Transaction tx, Predicate<E> predicate);
+
+    void atomicAddDeferredValidator(Predicate<E> predicate);
 
     /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
@@ -31,7 +37,7 @@ public interface Ref<E> extends TransactionalObject {
     void commute(Function<E> function);
 
     /**
-     * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
+     * Applies the function on the ref in a commuting manner. So if there are no dependencies, the function
      * will commute. If somehow there already is a dependency or a dependency is formed on the result of
      * the commuting function, the function will not commute and will be exactly the same as an alter.
      * <p/>

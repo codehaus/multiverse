@@ -7,7 +7,7 @@ package org.multiverse.api;
  *
  * @author Peter Veentjer.
  */
-public interface Watch<O extends TransactionalObject> {
+public interface Watch<T extends TransactionalObject> {
 
-    void execute(O transactionalObject);
+    void execute(T transactionalObject);
 }

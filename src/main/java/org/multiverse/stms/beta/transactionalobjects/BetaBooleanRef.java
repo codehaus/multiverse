@@ -8,6 +8,7 @@ import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.exceptions.NoTransactionFoundException;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.BooleanFunction;
+import org.multiverse.api.predicates.BooleanPredicate;
 import org.multiverse.api.references.BooleanRef;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
@@ -508,6 +509,50 @@ public final class BetaBooleanRef
 
             return REGISTRATION_NOT_NEEDED;
         }
+    }
+
+    @Override
+    public void addDeferredValidator(BooleanPredicate validator){
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx != null && tx.isAlive()){
+            addDeferredValidator((BetaTransaction)tx, validator);
+            return;
+        }
+
+        atomicAddDeferredValidator(validator);
+    }
+
+    @Override
+    public void addDeferredValidator(Transaction tx, BooleanPredicate validator){
+        addDeferredValidator((BetaTransaction)tx, validator);
+    }
+
+    public void addDeferredValidator(BetaTransaction tx, BooleanPredicate validator){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        if(validator == null){
+            tx.abort();
+            throw new NullPointerException();
+        }
+
+        BooleanRefTranlocal write= tx.openForWrite(this, LOCKMODE_NONE);
+        if(write.validators == null){
+            write.validators = new BooleanPredicate[1];
+            write.validators[0]=validator;
+        }else{
+            throw new TodoException();
+        }        
+    }
+
+    @Override
+    public void atomicAddDeferredValidator(BooleanPredicate validator){
+        if(validator == null){
+            throw new NullPointerException();
+        }
+        throw new TodoException();
     }
 
     @Override

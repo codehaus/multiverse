@@ -3,6 +3,7 @@ package org.multiverse.api.references;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionalObject;
 import org.multiverse.api.functions.BooleanFunction;
+import org.multiverse.api.predicates.BooleanPredicate;
 
 /**
  * A Ref optimized for a boolean.
@@ -10,6 +11,12 @@ import org.multiverse.api.functions.BooleanFunction;
  * @author Peter Veentjer.
  */
 public interface BooleanRef extends TransactionalObject {
+
+    void addDeferredValidator(BooleanPredicate predicate);
+
+    void addDeferredValidator(Transaction tx, BooleanPredicate predicate);
+
+    void atomicAddDeferredValidator(BooleanPredicate predicate);
 
 
     /**

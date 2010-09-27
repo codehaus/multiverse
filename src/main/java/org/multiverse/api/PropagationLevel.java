@@ -8,8 +8,9 @@ package org.multiverse.api;
 public enum PropagationLevel {
 
     /**
-     * A new transaction always is started, even when there is an active transaction. The active transaction
-     * is postponed and used again after the nested transaction commits.
+     * Indicates that a new transaction always is started, even when there is an active transaction. The
+     * active transaction is postponed and used again after the nested transaction commits. It could be that
+     * the outer transaction conflicts made on changes by the inner transaction.
      */
     RequiresNew,
 

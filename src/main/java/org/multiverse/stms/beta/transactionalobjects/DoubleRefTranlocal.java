@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.api.functions.DoubleFunction;
 import org.multiverse.api.functions.Function;
+import org.multiverse.api.predicates.DoublePredicate;
 import org.multiverse.stms.beta.BetaObjectPool;
 
 /**
@@ -16,6 +17,7 @@ public final class DoubleRefTranlocal extends Tranlocal{
     public final static DoubleRefTranlocal LOCKED = new DoubleRefTranlocal(null,true);
 
     public double value;
+    public DoublePredicate[] validators;    
     public CallableNode headCallable;
 
     public DoubleRefTranlocal(BetaDoubleRef ref){
@@ -36,6 +38,7 @@ public final class DoubleRefTranlocal extends Tranlocal{
         }
 
         tranlocal.read = this;
+        tranlocal.validators = validators;
         tranlocal.value = value;
         return tranlocal;
     }
@@ -87,6 +90,7 @@ public final class DoubleRefTranlocal extends Tranlocal{
         tranlocal.isCommuting = true;
         tranlocal.read = this;
         tranlocal.value = value;
+        tranlocal.validators = validators;
         return tranlocal;
     }
 

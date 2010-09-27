@@ -3,6 +3,7 @@ package org.multiverse.api.references;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionalObject;
 import org.multiverse.api.functions.IntFunction;
+import org.multiverse.api.predicates.IntPredicate;
 
 /**
  * A Transactional reference for managing an int. No boxing is needed when this reference is used (unlike
@@ -12,6 +13,13 @@ import org.multiverse.api.functions.IntFunction;
  * @see org.multiverse.api.references.Ref
  */
 public interface IntRef extends TransactionalObject {
+
+    void addDeferredValidator(IntPredicate predicate);
+
+    void addDeferredValidator(Transaction tx, IntPredicate predicate);
+
+    void atomicAddDeferredValidator(IntPredicate predicate);
+
 
     /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function

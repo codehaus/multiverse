@@ -3,6 +3,7 @@ package org.multiverse.api.references;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionalObject;
 import org.multiverse.api.functions.DoubleFunction;
+import org.multiverse.api.predicates.DoublePredicate;
 
 /**
  * A Transactional reference for managing a double. No boxing is needed when this reference is used (unlike
@@ -12,6 +13,13 @@ import org.multiverse.api.functions.DoubleFunction;
  * @see org.multiverse.api.references.Ref
  */
 public interface DoubleRef extends TransactionalObject {
+
+    void addDeferredValidator(DoublePredicate predicate);
+
+    void addDeferredValidator(Transaction tx, DoublePredicate predicate);
+
+    void atomicAddDeferredValidator(DoublePredicate predicate);
+
 
     /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
