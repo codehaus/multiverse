@@ -103,5 +103,4 @@ public final class CheapLatch implements Latch {
     public String toString() {
         return format("CheapLatch(open=%s)", isOpen);
     }
-
 }

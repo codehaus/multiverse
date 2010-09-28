@@ -12,13 +12,6 @@ import org.multiverse.api.predicates.BooleanPredicate;
  */
 public interface BooleanRef extends TransactionalObject {
 
-    void addDeferredValidator(BooleanPredicate predicate);
-
-    void addDeferredValidator(Transaction tx, BooleanPredicate predicate);
-
-    void atomicAddDeferredValidator(BooleanPredicate predicate);
-
-
     /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
      * will commute. If somehow there already is a dependency or a dependency is formed on the result of
@@ -290,4 +283,10 @@ public interface BooleanRef extends TransactionalObject {
      *
      */
     void await(Transaction tx, boolean value);
+
+    void addDeferredValidator(BooleanPredicate predicate);
+
+    void addDeferredValidator(Transaction tx, BooleanPredicate predicate);
+
+    void atomicAddDeferredValidator(BooleanPredicate predicate);
 }

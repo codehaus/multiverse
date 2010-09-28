@@ -554,7 +554,7 @@ public final class BetaIntRef
         }
         throw new TodoException();
     }
-
+    
     @Override
     public final int atomicGetAndIncrement(final int amount){
         int result = atomicIncrementAndGet(amount);

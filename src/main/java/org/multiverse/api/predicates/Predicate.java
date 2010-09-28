@@ -7,18 +7,6 @@ package org.multiverse.api.predicates;
  */
 public interface Predicate<E>{
 
-    Predicate IS_NOT_NULL_PREDICATE = new Predicate(){
-        public boolean evaluate(Object value){
-            return value != null;
-        }
-    };
-
-    Predicate IS_NULL_PREDICATE = new Predicate(){
-        public boolean evaluate(Object value){
-            return value == null;
-        }
-    };
-
     /**
      * Evaluates the predicate.
      *

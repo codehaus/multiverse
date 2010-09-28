@@ -1,5 +1,11 @@
 package org.multiverse.api.exceptions;
 
+/**
+ * An {@link AtomicOperationException} that indicates that an operation was executed on an ensured or privatized
+ * ref or transactional object.
+ *
+ * @author Peter Veentjer.
+ */
 public class LockedException extends AtomicOperationException {
 
     public LockedException() {

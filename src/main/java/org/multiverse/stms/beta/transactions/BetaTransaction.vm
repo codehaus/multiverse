@@ -54,6 +54,89 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     }
 
     @Override
+    public final BetaTransactionConfiguration getConfiguration() {
+        return config;
+    }
+
+    @Override
+    public final int getAttempt() {
+        return attempt;
+    }
+
+    @Override
+    public final TransactionStatus getStatus() {
+        switch (status) {
+            case NEW:
+                return TransactionStatus.Undefined;
+            case ACTIVE:
+                return TransactionStatus.Active;
+            case ABORTED:
+                return TransactionStatus.Aborted;
+            case COMMITTED:
+                return TransactionStatus.Committed;
+            case PREPARED:
+                return TransactionStatus.Prepared;
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
+    @Override
+    public final long getRemainingTimeoutNs() {
+        return remainingTimeoutNs;
+    }
+
+    /**
+    * Sets the remaining timeout in nanoseconds. Long.MAX_VALUE indicates that no timeout should be used. When
+    * the Transaction is used for the first attempt, the remaining timeout is getAndSet to the
+    * {@link org.multiverse.api.TransactionConfiguration#getTimeoutNs()}.
+    * <p/>
+    * This normally isn't called from the user code, it is task of the stm internals and the
+    * transaction management to use the timeout.
+    *
+    * @param timeoutNs the timeout.
+    * @throws IllegalArgumentException if timeout smaller than 0 or when the timeout is larger than the previous
+    *                                  remaining timeout. This is done to prevent that the timeout is increased
+    *                                  to a value that is in conflict with the {@link TransactionConfiguration}.
+    */
+    public final void setRemainingTimeoutNs(long timeoutNs) {
+        if (timeoutNs > remainingTimeoutNs) {
+            throw new IllegalArgumentException();
+        }
+        this.remainingTimeoutNs = timeoutNs;
+    }
+
+    /**
+    * Returns the tranlocal that belongs to the given transactional object.
+    *
+    * @returns the found tranlocal, or null if not found.
+    */
+    public abstract Tranlocal get(BetaTransactionalObject object);
+
+    /**
+    * Returns a list containing the normal TransactionLifecycleListeners. The returned list
+    * can be null (essentially the same as an empty list).
+    *
+    */
+    public abstract ArrayList<TransactionLifecycleListener> getNormalListeners();
+
+    protected final SpeculativeConfigurationError abortOnTooSmallSize(int minimalSize) {
+        config.needsMinimalTransactionLength(minimalSize);
+        abort();
+        return SpeculativeConfigurationError.INSTANCE;
+    }
+
+    protected final ReadWriteConflict abortOnReadConflict() {
+        abort();
+        return ReadWriteConflict.INSTANCE;
+    }
+
+    protected final ReadWriteConflict abortOnWriteConflict() {
+        abort();
+        return ReadWriteConflict.INSTANCE;
+    }
+
+    @Override
     public final void setAbortOnly() {
         switch (status) {
             case NEW:
@@ -347,99 +430,36 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
        }
     }
 
-    @Override
-    public final BetaTransactionConfiguration getConfiguration() {
-        return config;
-    }
-
-    @Override
-    public final int getAttempt() {        
-        return attempt;
-    }
-
-    @Override
-    public final TransactionStatus getStatus() {
-        switch (status) {
-            case NEW:
-                return TransactionStatus.Undefined;
-            case ACTIVE:
-                return TransactionStatus.Active;
-            case ABORTED:
-                return TransactionStatus.Aborted;
-            case COMMITTED:
-                return TransactionStatus.Committed;
-            case PREPARED:
-                return TransactionStatus.Prepared;
-            default:
-                throw new IllegalStateException();
-        }
-    }
-
-    @Override
-    public final long getRemainingTimeoutNs() {
-        return remainingTimeoutNs;
-    }
-
-    /**
-     * Sets the remaining timeout in nanoseconds. Long.MAX_VALUE indicates that no timeout should be used. When
-     * the Transaction is used for the first attempt, the remaining timeout is getAndSet to the
-     * {@link org.multiverse.api.TransactionConfiguration#getTimeoutNs()}.
-     * <p/>
-     * This normally isn't called from the user code, it is task of the stm internals and the
-     * transaction management to use the timeout.
-     *
-     * @param timeoutNs the timeout.
-     * @throws IllegalArgumentException if timeout smaller than 0 or when the timeout is larger than the previous
-     *                                  remaining timeout. This is done to prevent that the timeout is increased
-     *                                  to a value that is in conflict with the {@link TransactionConfiguration}.
-     */    
-    public final void setRemainingTimeoutNs(long timeoutNs) {
-        if (timeoutNs > remainingTimeoutNs) {
-            throw new IllegalArgumentException();
-        }
-        this.remainingTimeoutNs = timeoutNs;
-    }
-
-    protected final ReadWriteConflict abortOnReadConflict() {
-        abort();
-        return ReadWriteConflict.INSTANCE;
-    }
-
-    protected final SpeculativeConfigurationError abortOnTooSmallSize(int minimalSize) {
-        config.needsMinimalTransactionLength(minimalSize);
-        abort();
-        return SpeculativeConfigurationError.INSTANCE;
-    }
-
-    protected final ReadWriteConflict abortOnWriteConflict() {
-        abort();
-        return ReadWriteConflict.INSTANCE;
-    }
-
-    /**
-     * Returns the tranlocal that belongs to the given transactional object.
-     *
-     * @returns the found tranlocal, or null if not found.
-     */
-    public abstract Tranlocal get(BetaTransactionalObject object);
-
-    /**
-     * Returns a list containing the normal TransactionLifecycleListeners. The returned list
-     * can be null (essentially the same as an empty list).
-     *
-     */
-    public abstract ArrayList<TransactionLifecycleListener> getNormalListeners();
-
     public abstract void copyForSpeculativeFailure(BetaTransaction tx);
 
     public abstract boolean softReset();
 
     public abstract void hardReset();
 
-    /**
-     *
-     *
-     */
+   /**
+    * Registers the changeListener to all reads done by the transaction and aborts the transaction. This functionality
+    * is needed for creating blocking transactions; transactions that are able to wait for change. In the STM literature
+    * this is know as the 'retry' and 'orelse' functionality.
+    *
+    * @param changeListener the Latch the is notified when a change happens on one of the reads.
+    * @throws NullPointerException if changeListener is null (will also ___abort the transaction).
+    * @throws org.multiverse.api.exceptions.NoRetryPossibleException
+    *                              if no registration can be done because the
+    *                              transaction doesn't have any reads. When this exception happens, the transaction
+    *                              will also be aborted.
+    * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+    *                              if the transaction isn't in the correct
+    *                              state for this transaction. When this exception happens, the transaction will also
+    *                              be aborted (if it isn't committed).
+    */
+    public abstract void registerChangeListenerAndAbort(Latch changeListener);
+
+    public abstract void startEitherBranch();
+
+    public abstract void endEitherBranch();
+
+    public abstract void startOrElseBranch();
+
     public abstract void init(BetaTransactionConfiguration transactionConfig);
 
     public abstract boolean tryLock(BetaTransactionalObject ref, int lockMode);

@@ -554,7 +554,7 @@ public final class BetaRef<E>
         }
         throw new TodoException();
     }
-
+    
     @Override
     public final boolean isNull(){
         final Transaction tx = getThreadLocalTransaction();

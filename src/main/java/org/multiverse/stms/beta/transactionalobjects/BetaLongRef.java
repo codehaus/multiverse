@@ -554,7 +554,7 @@ public final class BetaLongRef
         }
         throw new TodoException();
     }
-
+    
     @Override
     public final long atomicGetAndIncrement(final long amount){
         long result = atomicIncrementAndGet(amount);

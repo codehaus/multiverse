@@ -30,7 +30,7 @@ public class IllegalTransactionFactoryException extends IllegalStateException {
     /**
      * Creates a new IllegalTransactionFactoryException.
      *
-     * @param cause
+     * @param cause the cause of the exception.
      */
     public IllegalTransactionFactoryException(Throwable cause) {
         super(cause);

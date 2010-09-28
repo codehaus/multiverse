@@ -554,7 +554,7 @@ public  class BetaDoubleRef
         }
         throw new TodoException();
     }
-
+    
     @Override
     public final double atomicGetAndIncrement(final double amount){
         double result = atomicIncrementAndGet(amount);

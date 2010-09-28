@@ -24,7 +24,7 @@ public class Predicates {
      *
      * @return the Predicate.
      */
-    public static Predicate newIsNullPredicate() {
+    public static <E> Predicate<E> newIsNullPredicate() {
         return IsNullPredicate;
     }
 
@@ -33,7 +33,7 @@ public class Predicates {
      *
      * @return the Predicate.
      */
-    public static Predicate newIsNotNullPredicate() {
+    public static <E> Predicate<E> newIsNotNullPredicate() {
         return IsNotNullPredicate;
     }
 

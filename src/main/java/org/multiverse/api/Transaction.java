@@ -1,6 +1,5 @@
 package org.multiverse.api;
 
-import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 
 /**
@@ -34,18 +33,6 @@ import org.multiverse.api.lifecycle.TransactionLifecycleListener;
  * When the Transaction is reset, the normal lifecycle tasks are dropped and the permanent are not. So the lifecycle
  * task need to be registered again (this is easy because the transaction is executed again).
  * </dd>
- * <p/>
- * <dt>Blocking</dt>
- * <dd>
- * It is possible to let a transaction block until some state changes has happened; comparable with
- * the waitset/{@link java.util.concurrent.locks.Condition} functionality already provided. For more information see the
- * {@link #registerChangeListenerAndAbort(org.multiverse.api.blocking.Latch)}
- * <p/>
- * Because a custom {@link org.multiverse.api.blocking.Latch} implementation can be provided, you have a lot of control
- * on the blocking behavior. But atm it is not possible to get fairness on when the Latch is opened. Policies to
- * customize starvation, lifelocking, deadlocking will be added in the future.
- * </dd>
- * <p/>
  * </dl>
  *
  * @author Peter Veentjer.
@@ -83,6 +70,13 @@ public interface Transaction {
     int getAttempt();
 
     /**
+     * Gets the remaining timeout in nanoseconds. Long.MAX_VALUE indicates that no timeout is used.
+     *
+     * @return the remaining timeout.
+     */
+    long getRemainingTimeoutNs();
+
+    /**
      * Commits this Transaction. If the Transaction is:
      * <ol>
      * <li>new: is is activated and following the same flow as an active transaction. This is done so that
@@ -108,19 +102,6 @@ public interface Transaction {
     void commit();
 
     /**
-     * Aborts this Transaction. This means that the changes made in this transaction are not committed. It depends on
-     * the implementation if this operation is simple (ditching objects for example), or if changes need to be rolled
-     * back. If an exception is thrown while executing the ___abort, the transaction is still aborted. And example of
-     * such a situation is a pre-___abort task that fails. So the transaction always is aborted (unless it is committed).
-     * <p/>
-     * If the Transaction already is aborted, the call is ignored.
-     *
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *          if the Transaction is not in the correct state for this operation.
-     */
-    void abort();
-
-    /**
      * Prepares this transaction to be committed. It can lock resources to make sure that no conflicting changes are
      * made after the transaction has been prepared. If the transaction already is prepared, the call is ignored.  If
      * the prepare fails, the transaction automatically is aborted. Once a transaction is prepared, the commit will
@@ -137,6 +118,32 @@ public interface Transaction {
     void prepare();
 
     /**
+     * Aborts this Transaction. This means that the changes made in this transaction are not committed. It depends on
+     * the implementation if this operation is simple (ditching objects for example), or if changes need to be rolled
+     * back. If an exception is thrown while executing the abort, the transaction is still aborted. And example of
+     * such a situation is a pre-abort task that fails. So the transaction always is aborted (unless it is committed).
+     * <p/>
+     * If the Transaction already is aborted, the call is ignored.
+     *
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if the Transaction is not in the correct state for this operation.
+     */
+    void abort();
+
+    /**
+     * Signals that the only possible outcome of the Transaction is one that aborts. When the transaction prepares or
+     * commits it checks if the transaction is marked for abort. If so, it will automatically aborted. If the
+     * transaction is executed inside an AtomicBlock, it is automatically retried.
+     * <p/>
+     * This method is not threadsafe, so can only be called by the thread that used the transaction.
+     *
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if the transaction is not in the correct
+     *          state for this operation.
+     */
+    void setAbortOnly();
+
+    /**
      * Ensures all writes that have been made. If one or more of the ref have been privatized, this call will also
      * complete successfully. After this call completes successfully, the transaction still can be used (unlike the
      * {@link #prepare()}.
@@ -151,20 +158,9 @@ public interface Transaction {
     void ensureWrites();
 
     /**
-     * Signals that the only possible outcome of the Transaction is one that aborts. When the transaction prepares or
-     * commits it checks if the transaction is marked for ___abort. If so, it will automatically aborted. If the
-     * transaction is executed inside an AtomicBlock, it is automatically retried.
-     * <p/>
-     * This method is not threadsafe, so can only be called by the thread that used the transaction.
-     *
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *          if the transaction is not in the correct
-     *          stat for this operation.
-     */
-    void setAbortOnly();
-
-    /**
-     * Registers a permanent TransactionLifecycleListener.
+     * Registers a TransactionLifecycleListener. Every time a transaction is retried, the listener needs to
+     * be registered again if you want the task to be executed again. If you want a permanent listener, have
+     * a look at the {@link TransactionFactoryBuilder#addPermanentListener(TransactionLifecycleListener)}.
      * <p/>
      * If a TransactionLifecycleListener is added more than once, it is executed more than once. No checks
      * are made. The permanent listeners are executed in the order they are added.
@@ -176,35 +172,4 @@ public interface Transaction {
      *                              state (e.g. aborted or committed).
      */
     void register(TransactionLifecycleListener listener);
-
-    /**
-     * Gets the remaining timeout in nanoseconds. Long.MAX_VALUE indicates that no timeout should be used.
-     *
-     * @return the remaining timeout.
-     */
-    long getRemainingTimeoutNs();
-
-      /**
-     * Registers the changeListener to all reads done by the transaction and aborts the transaction. This functionality
-     * is needed for creating blocking transactions; transactions that are able to wait for change. In the STM literature
-     * this is know as the 'retry' and 'orelse' functionality.
-     *
-     * @param changeListener the Latch the is notified when a change happens on one of the reads.
-     * @throws NullPointerException if changeListener is null (will also ___abort the transaction).
-     * @throws org.multiverse.api.exceptions.NoRetryPossibleException
-     *                              if no registration can be done because the
-     *                              transaction doesn't have any reads. When this exception happens, the transaction
-     *                              will also be aborted.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction isn't in the correct
-     *                              state for this transaction. When this exception happens, the transaction will also
-     *                              be aborted (if it isn't committed).
-     */
-    void registerChangeListenerAndAbort(Latch changeListener);
-
-    void startEitherBranch();
-
-    void endEitherBranch();
-
-    void startOrElseBranch();
 }
